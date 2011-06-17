@@ -1,4 +1,4 @@
-package fi.nabouwengwt.client;
+package fi.nabouwenaanzichtengwt.client;
 
 
 

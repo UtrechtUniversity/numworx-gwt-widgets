@@ -1,4 +1,4 @@
-package fi.nabouwengwt.client;
+package fi.nabouwenaanzichtengwt.client;
 
 class RKubus extends Veelvlak 
 {	Punt3D positie;

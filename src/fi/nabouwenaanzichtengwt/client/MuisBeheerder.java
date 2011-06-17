@@ -1,9 +1,14 @@
-package fi.nabouwengwt.client;
+package fi.nabouwenaanzichtengwt.client;
 
-import java.awt.*;
-import java.awt.event.*;
+//import java.awt.*;
+//import java.awt.event.*;
+import com.google.gwt.event.dom.client.MouseEvent;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 
-class MuisBeheerder implements MouseListener, MouseMotionListener
+class MuisBeheerder //implements MouseListener, MouseMotionListener
 {
 	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
 	private Viewer3d eigenaar;

@@ -1,4 +1,4 @@
-package fi.nabouwengwt.client;
+package fi.nabouwenaanzichtengwt.client;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -18,6 +18,7 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+
 
 public class CanvasDemo implements EntryPoint {
   static final String holderId = "canvasholder";
@@ -42,7 +43,27 @@ public class CanvasDemo implements EntryPoint {
   Context2d backBufferContext;
   
   public void onModuleLoad() {
-    canvas = Canvas.createIfSupported();
+	  
+	Viewer3d  vWerk = new Viewer3d(new KubusRooster(4,1), 351, -30, 450, 450, this);
+		//vWerk.zetAchtergrond(bgcolor);
+		vWerk.zetAfstand(10000000);
+		vWerk.zetSchaduw(false);
+		vWerk.zetBeginHoeken(90,0);
+		vWerk.zetMuisAan(false);
+		vWerk.zetGetalRooster(true);
+		
+		canvas = vWerk.getCanvas();
+		if (canvas == null) {
+	      RootPanel.get(holderId).add(new Label(upgradeMessage));
+	      return;
+	    }
+		
+		RootPanel.get(holderId).add(canvas);
+		
+		vWerk.initContext2d();
+		
+		vWerk.draw();
+    /*canvas = Canvas.createIfSupported();
     backBuffer = Canvas.createIfSupported();
     if (canvas == null) {
       RootPanel.get(holderId).add(new Label(upgradeMessage));
@@ -83,6 +104,8 @@ public class CanvasDemo implements EntryPoint {
 
 
     // update the front canvas
+     
+     */
     
   }
   

@@ -1,4 +1,4 @@
-package fi.nabouwengwt.client;
+package fi.nabouwenaanzichtengwt.client;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -47,7 +47,7 @@ public class Viewer3d
 	KubusRooster kr;
 	private double k, xhoek,yhoek, beginx, beginy;
 	private int[] sorteerRij;
-	private CubeRemoveThread cubeRemoveThread;
+	//private CubeRemoveThread cubeRemoveThread;
 	private boolean removed = false;
 	private boolean removing = false;
 	
@@ -56,10 +56,14 @@ public class Viewer3d
 	{	canvas = Canvas.createIfSupported();
 		canvas.setWidth(b + "px");
 		canvas.setHeight(h + "px");
+		canvas.setCoordinateSpaceWidth(b);
+	    canvas.setCoordinateSpaceHeight(h);
 		breedte = b;
 		hoogte = h;	
 		aantalVeelvlakken = 0;
 		eigenaar = hb;
+		
+		
 		
 		this.kr = kr;
 		int n = kr.maxAantal;
@@ -80,7 +84,7 @@ public class Viewer3d
 		//mb = new MuisBeheerder(this);
 		//addMouseListener(mb);
 		//addMouseMotionListener(mb);
-		achtergrondkleur = CssColor.make("white");
+		achtergrondkleur = CssColor.make("red");
 		leeg = false;
 		schaduw = true;
 		muisAan = true;
@@ -105,6 +109,17 @@ public class Viewer3d
 		beginx = 30;
 		beginy = -30;
 	}
+	
+	public Canvas getCanvas(){
+		return canvas;
+	}
+	
+	public void initContext2d() {
+		gIm = canvas.getContext2d();
+		//gIm.setFillStyle(achtergrondkleur);
+		//gIm.fillRect(0,0,200, 100);
+	}
+	
 	
 	public void zetAfstand(double afst)
 	{	afstand = afst;
@@ -249,6 +264,12 @@ public class Viewer3d
 		stap(-k*v.punten[0].x, -k*v.punten[0].y, -k*v.punten[0].z);
 		
 	}
+	
+	public void draw()
+  	{
+		draw(gIm);
+  	}
+	
 	public void draw(Context2d g)
   	{ 	bezigMetTekenen = true;
 		/*if(im==null)
@@ -266,6 +287,9 @@ public class Viewer3d
 			tekenOpImage(true);
 		}
     	g.drawImage(im, 0, 0, null);*/
+  		tekenOpImage(true);
+  		//gIm.setFillStyle(achtergrondkleur);
+    	//gIm.fillRect(0, 0, breedte, hoogte);
 		bezigMetTekenen = false;
   	}
 	
@@ -593,12 +617,12 @@ public class Viewer3d
 	public void muisDrukActie(MouseEvent e){
 		if(removing) return;
 		removing = true;
-        if(cubeRemoveThread!=null)
-		{	cubeRemoveThread.maakDood();
-			cubeRemoveThread=null;
+        //if(cubeRemoveThread!=null)
+		{	//cubeRemoveThread.maakDood();
+			//cubeRemoveThread=null;
 		}
-        cubeRemoveThread = new CubeRemoveThread(e);
-        cubeRemoveThread.start();
+        //cubeRemoveThread = new CubeRemoveThread(e);
+        //cubeRemoveThread.start();
 		
         
     }
@@ -611,7 +635,7 @@ public class Viewer3d
 		}
 		removed = false;
     }
-	
+	/*
 	class CubeRemoveThread extends Thread 
 	{	
 		final MouseEvent ee;
@@ -638,6 +662,7 @@ public class Viewer3d
 		{	dood = true;
 		}
 	}
+	*/
 }
 
 	
