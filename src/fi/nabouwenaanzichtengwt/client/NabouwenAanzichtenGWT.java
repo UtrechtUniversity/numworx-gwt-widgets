@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 
 
-public class CanvasDemo implements EntryPoint {
+public class NabouwenAanzichtenGWT implements EntryPoint {
   static final String holderId = "canvasholder";
 
   static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -43,14 +43,24 @@ public class CanvasDemo implements EntryPoint {
   Context2d backBufferContext;
   
   public void onModuleLoad() {
-	  
-	Viewer3d  vWerk = new Viewer3d(new KubusRooster(4,1), 351, -30, 450, 450, this);
+	
+	  int maxAantal = 6;
+	boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+	for(int i=0 ; i<maxAantal ; i++)
+	{	for(int j=0 ; j<maxAantal ; j++)
+		{	for(int k=0 ; k<maxAantal ; k++)
+			{	if(k==0 && j==0 && i==0) ;
+				b[i][j][k]=false;
+			}
+		}
+	}
+	Viewer3d  vWerk = new Viewer3d(new KubusRooster(b,1), 351, -30, 450, 450, this);
 		//vWerk.zetAchtergrond(bgcolor);
-		vWerk.zetAfstand(10000000);
-		vWerk.zetSchaduw(false);
-		vWerk.zetBeginHoeken(90,0);
-		vWerk.zetMuisAan(false);
-		vWerk.zetGetalRooster(true);
+		vWerk.zetAfstand(1000);
+		vWerk.zetSchaduw(true);
+		vWerk.zetBeginHoeken(30,-30);
+		vWerk.zetMuisAan(true);
+		//vWerk.zetGetalRooster(true);
 		
 		canvas = vWerk.getCanvas();
 		if (canvas == null) {
@@ -72,7 +82,7 @@ public class CanvasDemo implements EntryPoint {
 
     // init the canvases
     canvas.setWidth(width + "px");
-    canvas.setHeight(height + "px");
+    canvas.setHeight(height + "py");
     canvas.setCoordinateSpaceWidth(width);
     canvas.setCoordinateSpaceHeight(height);
     backBuffer.setCoordinateSpaceWidth(width);

@@ -1,5 +1,6 @@
 package fi.nabouwenaanzichtengwt.client;
 
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
 
@@ -36,6 +37,15 @@ class Lichaam3D
 		nulpunt = new Punt3D(0,0,0);
 		afstand = 1000;
 	}
+	
+	public void draw(Context2d gIm, boolean schaduw)
+  	{
+		for(int i=0 ; i<aantalPolygonen ; i++)
+		{	vlakken[i].draw(gIm, schaduw);
+			System.out.println("vlak "+i);
+		}
+  	}
+	
 	public void zetAfstand(double afst)
 	{	afstand = afst;
 	}

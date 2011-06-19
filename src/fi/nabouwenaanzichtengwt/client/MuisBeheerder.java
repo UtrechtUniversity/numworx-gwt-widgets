@@ -2,18 +2,35 @@ package fi.nabouwenaanzichtengwt.client;
 
 //import java.awt.*;
 //import java.awt.event.*;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.MouseEvent;
+
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
+import com.google.gwt.event.dom.client.TouchMoveHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.user.client.ui.Widget;
 
-class MuisBeheerder //implements MouseListener, MouseMotionListener
+
+
+class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler, TouchStartHandler, TouchEndHandler, TouchMoveHandler
 {
 	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
 	private Viewer3d eigenaar;
 	//private AnimatieBeheerder ab;
 	//private boolean animatieWasAan;
+	private boolean mouseDown;
 	
 	public MuisBeheerder(Viewer3d v3d)
 	{	eigenaar = v3d;
@@ -35,11 +52,13 @@ class MuisBeheerder //implements MouseListener, MouseMotionListener
 	//-------------------------------------------------------------------------------------------
 	//afhandeling van de muis gebeurtenissen 
 	//-------------------------------------------------------------------------------------------
-	public void mousePressed(MouseEvent e)
+	public void onMouseDown(MouseDownEvent e)
 	{	//if(ab!=null && ab.animatieStatus())
 		//{	animatieWasAan = true;
 		//	ab.onderbreekAnimatie();
 		//}
+		mouseDown = true;
+		
 		eerstex = e.getX();
 		eerstey = e.getY();
 		laatstex = e.getX();
@@ -47,8 +66,9 @@ class MuisBeheerder //implements MouseListener, MouseMotionListener
 		eigenaar.muisDrukActie(e);
 	}
 	
-	public void mouseDragged(MouseEvent e)
-	{	int x = e.getX();
+	public void onMouseMove(MouseMoveEvent e)
+	{	if(!mouseDown)return;
+		int x = e.getX();
 		int y = e.getY();
 		dx = x - laatstex;
 		dy = laatstey -y;
@@ -57,8 +77,9 @@ class MuisBeheerder //implements MouseListener, MouseMotionListener
 		laatstey = y;	
 	}
 	
-	public void mouseReleased(MouseEvent e)
-	{	eigenaar.muisLosActie(e);
+	public void onMouseUp(MouseUpEvent e)
+	{	mouseDown = false;
+		eigenaar.muisLosActie(e);
 		//if(animatieWasAan)
 		//{	animatieWasAan = false;
 		//	ab.beginAnimatie();
@@ -106,6 +127,49 @@ class MuisBeheerder //implements MouseListener, MouseMotionListener
 	}
 	public int geefY()
 	{	return laatstey;
+	}
+
+	@Override
+	public void onTouchMove(TouchMoveEvent event) {
+		event.preventDefault();
+		if (event.getTouches().length() > 0) {
+			Touch touch = event.getTouches().get(0);
+			Widget sender = (Widget) event.getSource();
+		    Element elem = sender.getElement();
+			int x = touch.getRelativeX(elem);
+			int y = touch.getRelativeY(elem);
+	        dx = x - laatstex;
+			dy = laatstey -y;
+			eigenaar.muisSleepActie();
+			laatstex = x;
+			laatstey = y;
+	    }
+	    event.preventDefault();
+		
+	}
+
+	@Override
+	public void onTouchStart(TouchStartEvent event) {
+		event.preventDefault();
+		
+		if (event.getTouches().length() > 0) {
+			Touch touch = event.getTouches().get(0);
+			Widget sender = (Widget) event.getSource();
+		    Element elem = sender.getElement();
+			eerstex = touch.getRelativeX(elem);
+			eerstey = touch.getRelativeY(elem);
+			laatstex = touch.getRelativeX(elem);
+			laatstey = touch.getRelativeY(elem);
+			eigenaar.muisDrukActie(event);
+	    }
+		event.preventDefault();
+		
+	}
+
+	@Override
+	public void onTouchEnd(TouchEndEvent event) {
+		eigenaar.muisLosActie(event);
+		
 	}
 
 }	

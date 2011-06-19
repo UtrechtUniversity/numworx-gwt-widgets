@@ -1,6 +1,5 @@
 package fi.nabouwenaanzichtengwt.client;
  
-import java.awt.*;
 
 public class KubusRooster
 {	int maxAantal;

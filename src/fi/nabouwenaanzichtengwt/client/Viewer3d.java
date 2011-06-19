@@ -9,6 +9,8 @@ import com.google.gwt.event.dom.client.GestureStartEvent;
 import com.google.gwt.event.dom.client.GestureStartHandler;
 //import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseEvent;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
@@ -17,13 +19,14 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
 
 import javax.swing.*;
 
 public class Viewer3d 
 {
 	Canvas canvas;
-	private CanvasDemo eigenaar;
+	private NabouwenAanzichtenGWT eigenaar;
 	private GetalRooster gr;
 	//private AnimatieBeheerder ab;
 	private MuisBeheerder mb;
@@ -52,7 +55,7 @@ public class Viewer3d
 	private boolean removing = false;
 	
 	
-	public Viewer3d(KubusRooster kr, int x, int y,int b, int h, CanvasDemo hb)
+	public Viewer3d(KubusRooster kr, int x, int y,int b, int h, NabouwenAanzichtenGWT hb)
 	{	canvas = Canvas.createIfSupported();
 		canvas.setWidth(b + "px");
 		canvas.setHeight(h + "px");
@@ -81,10 +84,14 @@ public class Viewer3d
 			}
 		}
 		
-		//mb = new MuisBeheerder(this);
-		//addMouseListener(mb);
-		//addMouseMotionListener(mb);
-		achtergrondkleur = CssColor.make("red");
+		mb = new MuisBeheerder(this);
+		canvas.addMouseDownHandler(mb);
+		canvas.addMouseUpHandler(mb);
+		canvas.addMouseMoveHandler(mb);
+		canvas.addTouchStartHandler(mb);
+		canvas.addTouchEndHandler(mb);
+		canvas.addTouchMoveHandler(mb);
+		achtergrondkleur = CssColor.make("white");
 		leeg = false;
 		schaduw = true;
 		muisAan = true;
@@ -287,7 +294,14 @@ public class Viewer3d
 			tekenOpImage(true);
 		}
     	g.drawImage(im, 0, 0, null);*/
-  		tekenOpImage(true);
+	  	double startschaal = Math.min((double)breedte/400,(double)hoogte/500);
+		mat.initialiseer(0,0,0,startschaal);	
+		startpunt = new Punt3D(breedte/2,hoogte/2,0);
+		for(int i=0 ; i<5 ; i++)
+		{	l[i].maakNulpunt(breedte/2,hoogte/2,0);
+		}
+		tekenOpImage(true);
+	  	
   		//gIm.setFillStyle(achtergrondkleur);
     	//gIm.fillRect(0, 0, breedte, hoogte);
 		bezigMetTekenen = false;
@@ -297,11 +311,8 @@ public class Viewer3d
   	{ 	if(gIm==null)return;
   		beginpunt = new Punt3D(startpunt);
     	eindpunt = new Punt3D(beginpunt);
-		//mat.initialiseer();
-	  	gIm.setFillStyle(achtergrondkleur);
-    	if(wis)gIm.fillRect(0, 0, breedte, hoogte);
-		penAan(0,0,0);
-		//gIm.drawRect(0, 0, breedte-1, hoogte-1);
+		mat.initialiseer();
+	  	penAan(0,0,0);
 		vul = false;
     	tekenprogramma();
 		for(int i=0 ; i<5 ; i++)
@@ -310,68 +321,13 @@ public class Viewer3d
 		for(int i=0 ; i<2000 ; i++)
 		{	sorteerRij[i] = l[1].sorteerRij[i];
 		}	
+		if(wis)
+		{	gIm.setFillStyle(achtergrondkleur);
+    		gIm.fillRect(0, 0, breedte, hoogte);
+		}
 		for(int j=0 ; j<5 ; j++)
 		{
-			for(int i=0 ; i<l[j].aantalPolygonen ; i++)
-			{
-				if(l[j].vlakken[i].normaal.z >0)
-				{	if(schaduw)
-					{	double grijsfactor = 0.5*((-l[j].vlakken[i].normaal.x - l[j].vlakken[i].normaal.y + l[j].vlakken[i].normaal.z)/Math.sqrt(3)+1);
-						if(grijsfactor<0)grijsfactor=0;if(grijsfactor>1)grijsfactor=1;
-						//int roodwaarde = 50+(int)(l[j].vlakken[i].vulkleur.getRed()*grijsfactor*0.75);
-						//int groenwaarde = 50+(int)(l[j].vlakken[i].vulkleur.getGreen()*grijsfactor*0.75);
-						//int blauwwaarde = 50+(int)(l[j].vlakken[i].vulkleur.getBlue()*grijsfactor*0.75);
-						//gIm.setColor(new Color(roodwaarde,groenwaarde,blauwwaarde));
-						gIm.setFillStyle(l[j].vlakken[i].vulkleur);
-					}
-					else
-					{	gIm.setFillStyle(l[j].vlakken[i].vulkleur);
-					}
-					
-					Polygon p = l[j].vlakken[i].pol;
-					if(!l[j].vlakken[i].isLeeg)
-					{	
-						gIm.beginPath();
-						for (int k = 0; k < p.geefAantalPunten(); k++) {
-							gIm.lineTo(p.geefPuntX(k), p.geefPuntY(k));
-						}
-						gIm.lineTo(p.geefPuntX(0), p.geefPuntY(0));
-						gIm.closePath();
-						gIm.fill();
-						//gIm.fillPolygon(l[j].vlakken[i].pol);
-					}
-					gIm.setFillStyle(l[j].vlakken[i].lijnkleur);
-					if(!l[j].vlakken[i].isLijn && l[j].vlakken[i].isOmlijnd )
-					{	gIm.setFillStyle(l[j].vlakken[i].lijnkleur);
-						
-						gIm.beginPath();
-						for (int k = 0; k < p.geefAantalPunten(); k++) {
-							gIm.lineTo(p.geefPuntX(k), p.geefPuntY(k));
-						}
-						gIm.lineTo(p.geefPuntX(0), p.geefPuntY(0));
-						gIm.closePath();
-						gIm.stroke();
-					
-					
-					//gIm.drawPolygon(l[j].vlakken[i].pol);
-					}
-					if (l[j].vlakken[i].isLijn)
-					{	//int grw = (int)(125-0.7*l[j].vlakken[i].gemz);
-						//gIm.setColor(new Color(grw,grw,grw));
-						gIm.setFillStyle(l[j].vlakken[i].lijnkleur);
-						
-						gIm.beginPath();
-						for (int k = 0; k < p.geefAantalPunten(); k++) {
-							gIm.lineTo(p.geefPuntX(k), p.geefPuntY(k));
-						}
-						gIm.lineTo(p.geefPuntX(0), p.geefPuntY(0));
-						gIm.closePath();
-						gIm.stroke();
-						//gIm.drawPolygon(l[j].vlakken[i].pol);
-						penkleur = CssColor.make(0,0,0);
-					}
-				}
-			}
+			l[j].draw(gIm, schaduw);
 			l[j] = new Lichaam3D();	
 			l[j].zetAfstand(afstand);
 			l[j].maakNulpunt(breedte/2,hoogte/2,0);
@@ -464,7 +420,7 @@ public class Viewer3d
 	void vulAan(String kl)
 	{	vul = true;
 		if(kl.equals("transparant"))leeg = true;
-		vulkleur = maakKleur(kl);
+		else vulkleur = maakKleur(kl);
 	}
 	void vulAan(int r, int g, int b)
 	{	vul = true;	
@@ -478,7 +434,7 @@ public class Viewer3d
 	{	vul = true;
 		lnummer=n;
 		if(kl.equals("transparant"))leeg = true;
-		vulkleur = maakKleur(kl);
+		else vulkleur = maakKleur(kl);
 	}
 	void vulAan(int n,int r, int g, int b)
 	{	vul = true;
@@ -542,19 +498,19 @@ public class Viewer3d
 		else return new Polygon();
 	}
 	private CssColor maakKleur(String kl)
-	{	if(kl.equals("rood")) return CssColor.make("red");
-		else if(kl.equals("groen")) return CssColor.make("green");
-		else if(kl.equals("blauw")) return CssColor.make("blue");
-		else if(kl.equals("geel")) return CssColor.make("yellow");
-		else if(kl.equals("cyaan")) return CssColor.make("cyan");
+	{	if(kl.equals("rood")) return CssColor.make(255,0,0);
+		else if(kl.equals("groen")) return CssColor.make(0,255,0);
+		else if(kl.equals("blauw")) return CssColor.make(0,0,255);
+		else if(kl.equals("geel")) return CssColor.make(255,255,0);
+		else if(kl.equals("cyaan")) return CssColor.make(0,255,255);
 		else if(kl.equals("roze")) return CssColor.make("pink");
-		else if(kl.equals("zwart")) return CssColor.make("black");
-		else if(kl.equals("grijs")) return CssColor.make("gray");
-		else if(kl.equals("lichtgrijs")) return CssColor.make("lightGray");
-		else if(kl.equals("magenta")) return CssColor.make("magenta");
-		else if(kl.equals("wit")) return CssColor.make("white");
-		else if(kl.equals("oranje")) return CssColor.make("orange");
-		else return CssColor.make("black");		
+		else if(kl.equals("zwart")) return CssColor.make(0,0,0);
+		else if(kl.equals("grijs")) return CssColor.make(128,128,128);
+		else if(kl.equals("lichtgrijs")) return CssColor.make(200,200,200);
+		else if(kl.equals("magenta")) return CssColor.make(255,0,255);
+		else if(kl.equals("wit")) return CssColor.make(255,255,255);
+		else if(kl.equals("oranje")) return CssColor.make(255,128,0);
+		else return CssColor.make(0,0,0);	
 	}	
 	public void animatie(){}
 	
@@ -568,7 +524,7 @@ public class Viewer3d
 			tekenOpnieuw();
 		}
 	}
-	public void muisKkActie(MouseEvent e, boolean remove)
+	public void muisKkActie(MouseUpEvent e, boolean remove)
 	{	
 		for(int q=aantalKv-1 ; q>-1 ; q--)
 		{	int n = sorteerRij[q];
@@ -614,7 +570,55 @@ public class Viewer3d
 			}
 		}
 	}
-	public void muisDrukActie(MouseEvent e){
+	
+	public void muisKkActie(TouchEndEvent e, boolean remove)
+	{	
+		for(int q=aantalKv-1 ; q>-1 ; q--)
+		{	int n = sorteerRij[q];
+			if(kv[n].m == 6 && kv[n].k == 0 && p[kv[n].i][kv[n].j].contains(mb.geefDrukx(),mb.geefDruky()))
+			{	if(eigenaar.isBouwen() && !(e.isControlKeyDown() || remove))
+				{	kr.voegKubusToe(kv[n].i,kv[n].j,0);
+					if(gr!=null)gr.verhoog(kv[n].i,kv[n].j);
+				}
+				else
+				{	kr.verwijderKubus(kv[n].i,kv[n].j,0);
+					if(gr!=null)gr.verlaag(kv[n].i,kv[n].j);
+				}
+				return;
+			}
+			else if(kv[n].m != 6 && pp[kv[n].i][kv[n].j][kv[n].k][kv[n].m].contains(mb.geefDrukx(),mb.geefDruky()))
+			{	if(eigenaar.isBouwen() && !(e.isControlKeyDown() ||remove))
+				{	
+					if(kv[n].m==0)
+					{	kr.voegKubusToe(kv[n].i,kv[n].j,kv[n].k+1);
+						if(gr!=null)gr.verhoog(kv[n].i,kv[n].j);
+					}
+					if(kv[n].m==1)
+					{	kr.voegKubusToe(kv[n].i,kv[n].j-1,kv[n].k);
+					}
+					if(kv[n].m==2)
+					{	kr.voegKubusToe(kv[n].i+1,kv[n].j,kv[n].k);
+					}
+					if(kv[n].m==3)
+					{	kr.voegKubusToe(kv[n].i,kv[n].j+1,kv[n].k);
+					}
+					if(kv[n].m==4)
+					{	kr.voegKubusToe(kv[n].i-1,kv[n].j,kv[n].k);
+					}
+					if(kv[n].m==5)
+					{	kr.voegKubusToe(kv[n].i,kv[n].j,kv[n].k-1);
+					}
+				}
+				else
+				{	kr.verwijderKubus(kv[n].i,kv[n].j,kv[n].k);
+					if(gr!=null)gr.verlaag(kv[n].i,kv[n].j);
+				}
+				return;
+			}
+		}
+	}
+	
+	public void muisDrukActie(MouseDownEvent e){
 		if(removing) return;
 		removing = true;
         //if(cubeRemoveThread!=null)
@@ -626,15 +630,41 @@ public class Viewer3d
 		
         
     }
+	
+	public void muisDrukActie(TouchStartEvent e){
+		if(removing) return;
+		removing = true;
+        //if(cubeRemoveThread!=null)
+		{	//cubeRemoveThread.maakDood();
+			//cubeRemoveThread=null;
+		}
+        //cubeRemoveThread = new CubeRemoveThread(e);
+        //cubeRemoveThread.start();
+		
+        
+    }
+	
 	public void muisKlikActie(){}
-	public void muisLosActie(MouseEvent e)
+	public void muisLosActie(MouseUpEvent e)
 	{	removing = false;
         if(!removed && (klikAan && (mb.geefDrukx()-mb.geefX())*(mb.geefDrukx()-mb.geefX()) + (mb.geefDruky()-mb.geefY())*(mb.geefDruky()-mb.geefY()) < 16) )
 		{	muisKkActie(e, false);
+			tekenOpnieuw();
 			eigenaar.zetVeranderd();
 		}
 		removed = false;
     }
+	
+	public void muisLosActie(TouchEndEvent e)
+	{	removing = false;
+        if(!removed && (klikAan && (mb.geefDrukx()-mb.geefX())*(mb.geefDrukx()-mb.geefX()) + (mb.geefDruky()-mb.geefY())*(mb.geefDruky()-mb.geefY()) < 16) )
+		{	muisKkActie(e, false);
+			tekenOpnieuw();
+			eigenaar.zetVeranderd();
+		}
+		removed = false;
+    }
+	
 	/*
 	class CubeRemoveThread extends Thread 
 	{	
