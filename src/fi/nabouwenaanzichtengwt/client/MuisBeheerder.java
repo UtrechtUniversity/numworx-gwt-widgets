@@ -58,7 +58,6 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		//	ab.onderbreekAnimatie();
 		//}
 		mouseDown = true;
-		
 		eerstex = e.getX();
 		eerstey = e.getY();
 		laatstex = e.getX();
