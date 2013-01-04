@@ -42,7 +42,7 @@ class Lichaam3D
   	{
 		for(int i=0 ; i<aantalPolygonen ; i++)
 		{	vlakken[i].draw(gIm, schaduw);
-			System.out.println("vlak "+i);
+			//System.out.println("vlak "+i);
 		}
   	}
 	

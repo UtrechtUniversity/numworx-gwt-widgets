@@ -1,5 +1,4 @@
-package fi.nabouwenaanzichtengwt.client;
- 
+package fi.nabouwenaanzichtengwt.client; 
 
 public class KubusRooster
 {	int maxAantal;
@@ -22,7 +21,7 @@ public class KubusRooster
 		totLengte = totL;
 		ribLengte = totLengte/maxAantal;
 		beginpos = -(totLengte-ribLengte)/2;
-		grondvlak = new RVierkant(1.2, 0, -0.5, 0);
+		grondvlak = new RVierkant(1.2*totLengte, 0, -0.5*totLengte, 0);
 		pijl = maakPijl();
 		kubussen = new RKubus[maxAantal][maxAantal][maxAantal];
 		//isZichtbaar = new boolean[maxAantal][maxAantal][maxAantal];
@@ -50,7 +49,7 @@ public class KubusRooster
 		totLengte = totL;
 		ribLengte = totLengte/maxAantal;
 		beginpos = -(totLengte-ribLengte)/2;
-		grondvlak = new RVierkant(1.2, 0, -0.5, 0);
+		grondvlak = new RVierkant(1.2*totLengte, 0, -0.5*totLengte, 0);
 		pijl = maakPijl();
 		kubussen = new RKubus[maxAantal][maxAantal][maxAantal];
 		vierkanten = new RVierkant[maxAantal][maxAantal];
@@ -119,9 +118,11 @@ public class KubusRooster
 	
 
 	
-	public void voegKubusToe(int x, int z, int y)
-	{	if(x<maxAantal && y<maxAantal && z<maxAantal && x>-1 && y>-1 && z>-1)
+	public boolean voegKubusToe(int x, int z, int y)
+	{	boolean toegevoegd = false;
+		if(x<maxAantal && y<maxAantal && z<maxAantal && x>-1 && y>-1 && z>-1)
 		{	kubussen[x][z][y] = new RKubus(ribLengte, beginpos + x*ribLengte, beginpos + y*ribLengte, beginpos + z*ribLengte);
+			toegevoegd = true;
 			aantalKubussen++;
 			if(y>0 && kubussen[x][z][y-1] !=null)
 			{	kubussen[x][z][y-1].isOnbedekt[0] = false;
@@ -148,14 +149,19 @@ public class KubusRooster
 				kubussen[x][z][y].isOnbedekt[2] = false;
 			}
 		}
+		return toegevoegd;
 	}
 	
 	
 	
-	public void verwijderKubus(int x, int z, int y)
-	{	if(x<maxAantal && y<maxAantal && z<maxAantal && x>-1 && y>-1 && z>-1)
+	public boolean verwijderKubus(int x, int z, int y)
+	{	boolean verwijderd = false;
+		if(x<maxAantal && y<maxAantal && z<maxAantal && x>-1 && y>-1 && z>-1)
 		{	//isZichtbaar[x][z][y] = false;
-			if(kubussen[x][z][y] != null)aantalKubussen--;
+			if(kubussen[x][z][y] != null)
+			{	verwijderd = true;
+				aantalKubussen--;
+			}
 			kubussen[x][z][y] = null;
 			if(y>0 && kubussen[x][z][y-1] !=null)kubussen[x][z][y-1].isOnbedekt[0] = true;
 			if(y<maxAantal-1 && kubussen[x][z][y+1] !=null)kubussen[x][z][y+1].isOnbedekt[5] = true;
@@ -165,6 +171,7 @@ public class KubusRooster
 			if(x<maxAantal-1 && kubussen[x+1][z][y] !=null)kubussen[x+1][z][y].isOnbedekt[4] = true;
 			
 		}
+		return verwijderd;
 	}
 	
 	public void maakVol()
@@ -329,4 +336,62 @@ public class KubusRooster
 		}
 		return true;
 	}
+	
+	public boolean isGelijkVoorEnRechtsAanzicht(KubusRooster kr)
+	{	
+		if (maxAantal != kr.maxAantal)
+			return false;
+		for (int i = 0; i < maxAantal; i++)
+		{	for (int j = 0; j < maxAantal; j++)
+			{	for (int k = 0; k < maxAantal; k++)
+				{	if (kubussen[i][j][k] != null) 
+					{   boolean bb = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!bb) 
+								bb = kr.kubussen[i][j][m] != null;
+						}
+						boolean bv = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!bv) 
+								bv = kr.kubussen[i][m][k] != null;
+						}
+						boolean br = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!br) 
+							br = kr.kubussen[m][j][k] != null;
+						}
+						//if(!bb || !bv || !br)return false;
+						if (!bv || !br)
+							return false;
+					}
+				}
+			}
+		}
+		for (int i = 0; i < maxAantal; i++)
+		{	for (int j = 0; j < maxAantal; j++)
+			{	for (int k = 0; k < maxAantal; k++)
+				{	if (kr.kubussen[i][j][k] != null) 
+					{   boolean bb = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!bb) 
+								bb = kubussen[i][j][m] != null;
+						}
+						boolean bv = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!bv) 
+								bv = kubussen[i][m][k] != null;
+						}
+						boolean br = false;
+						for (int m = 0; m < maxAantal; m++)
+						{	if (!br) 
+								br = kubussen[m][j][k] != null;
+						}
+						//if(!bb || !bv || !br)return false;
+						if(!bv || !br)return false;
+					}
+				}
+			}
+		}
+		return true;
+	}	
 }

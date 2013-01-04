@@ -3,7 +3,7 @@ package fi.nabouwenaanzichtengwt.client;
 //import java.awt.*;
 //import java.awt.event.*;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.Touch;
+//import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.MouseEvent;
 
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -14,12 +14,24 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
+/*import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;*/
+
+import com.googlecode.mgwt.dom.client.event.touch.Touch;
+import com.googlecode.mgwt.dom.client.event.touch.TouchMoveHandler;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
+import com.googlecode.mgwt.dom.client.event.touch.TouchEndHandler;
+import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
+import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -40,6 +52,7 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		laatstey = 0;
 		dx = 0;
 		dy = 0;
+		v3d.zetMuisBeheerder(this);
 	}
 	
 	//-------------------------------------------------------------------------------------------
@@ -85,6 +98,9 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		//}
 		
 	}
+	
+	
+	
 	public void mouseClicked(MouseEvent e)
 	{	//if(ab!=null && ab.animatieStatus())
 		//{	animatieWasAan = true;
@@ -131,12 +147,13 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	@Override
 	public void onTouchMove(TouchMoveEvent event) {
 		event.preventDefault();
-		if (event.getTouches().length() > 0) {
-			Touch touch = event.getTouches().get(0);
+		event.stopPropagation();
+		if (event.touches().length() > 0) {
+			Touch touch = event.touches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
-			int x = touch.getRelativeX(elem);
-			int y = touch.getRelativeY(elem);
+			int x = touch.getPageX()- eigenaar.getCanvas().getAbsoluteLeft();//getRelativeX(elem);
+			int y = touch.getPageY()- eigenaar.getCanvas().getAbsoluteTop();//getRelativeY(elem);
 	        dx = x - laatstex;
 			dy = laatstey -y;
 			eigenaar.muisSleepActie();
@@ -144,24 +161,26 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 			laatstey = y;
 	    }
 	    event.preventDefault();
+	    event.stopPropagation();
 		
 	}
 
 	@Override
 	public void onTouchStart(TouchStartEvent event) {
 		event.preventDefault();
-		
-		if (event.getTouches().length() > 0) {
-			Touch touch = event.getTouches().get(0);
+		event.stopPropagation();
+		if (event.touches().length() > 0) {
+			Touch touch = event.touches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
-			eerstex = touch.getRelativeX(elem);
-			eerstey = touch.getRelativeY(elem);
-			laatstex = touch.getRelativeX(elem);
-			laatstey = touch.getRelativeY(elem);
+			eerstex = touch.getPageX() - eigenaar.getCanvas().getAbsoluteLeft();//getRelativeX(elem);
+			eerstey = touch.getPageY() - eigenaar.getCanvas().getAbsoluteTop();;//getRelativeY(elem);
+			laatstex = touch.getPageX() - eigenaar.getCanvas().getAbsoluteLeft();;//getRelativeX(elem);
+			laatstey = touch.getPageY() - eigenaar.getCanvas().getAbsoluteTop();;//getRelativeY(elem);
 			eigenaar.muisDrukActie(event);
 	    }
 		event.preventDefault();
+		event.stopPropagation();
 		
 	}
 
