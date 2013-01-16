@@ -9,6 +9,7 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -26,6 +27,7 @@ import com.googlecode.mgwt.dom.client.event.touch.TouchMoveHandler;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 {
@@ -64,6 +66,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	boolean kijkNaActief = false;
 
 	private KubusRooster startKr;
+	
+	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage, vinkjeGrijsImage, buttonBgImage;
+	private NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 
 	public NabouwenAanzichtenGWT()
 	{
@@ -72,6 +77,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 
 	public NabouwenAanzichtenGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		makeResources();
+		
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
 		if (h != null && h.get("breedte") != null)
@@ -212,9 +219,23 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 			touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
 		}
 	}
+	
+	public void makeResources()
+	{	
+		NabouwenAanzichtenGWTClientBundle clientBundle = GWT.create(NabouwenAanzichtenGWTClientBundle.class);
+		nabouwenAanzichtenCss = clientBundle.getNabouwenAanzichtenGWTCSS();
+		nabouwenAanzichtenCss.ensureInjected();
+		
+		vinkjeGroenImage = new Image(clientBundle.vinkje());
+		vinkjeGeelImage = new Image(clientBundle.vinkjegeel());
+		vinkjeRoodImage = new Image(clientBundle.vinkjerood());
+		vinkjeGrijsImage = new Image(clientBundle.vinkjegrijs());
+		buttonBgImage = new Image(clientBundle.footerbgimage());
+	}
 
 	public void onModuleLoad()
 	{
+		makeResources();
 		int maxAantal = 6;
 		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
