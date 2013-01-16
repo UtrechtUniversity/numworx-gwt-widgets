@@ -1,7 +1,5 @@
 package fi.nabouwenaanzichtengwt.client;
 
-
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -69,8 +67,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 
 	public NabouwenAanzichtenGWT()
 	{
-		
+
 	}
+
 	public NabouwenAanzichtenGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
 		this.randomVarNamen = randomVarNamen;
@@ -213,51 +212,57 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 			touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
 		}
 	}
-	
-	public void onModuleLoad() 
+
+	public void onModuleLoad()
 	{
 		int maxAantal = 6;
 		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-		for(int i=0 ; i<maxAantal ; i++)
-		{	for(int j=0 ; j<maxAantal ; j++)
-			{	for(int k=0 ; k<maxAantal ; k++)
-				{	if(k==0 && j==0 && i==0) ;
-					b[i][j][k]=false;
+		for (int i = 0; i < maxAantal; i++)
+		{
+			for (int j = 0; j < maxAantal; j++)
+			{
+				for (int k = 0; k < maxAantal; k++)
+				{
+					if (k == 0 && j == 0 && i == 0)
+						;
+					b[i][j][k] = false;
 				}
 			}
 		}
-		Viewer3d  vWerk = new Viewer3d(new KubusRooster(b,1), 351, -30, 450, 450, this);
-			//vWerk.zetAchtergrond(bgcolor);
-			vWerk.zetAfstand(1000);
-			vWerk.zetSchaduw(true);
-			vWerk.zetBeginHoeken(30,-30);
-			vWerk.zetMuisAan(true);
-			//vWerk.zetGetalRooster(true);
-			
-			canvas = vWerk.getCanvas();
-			if (canvas == null) {
-		      RootPanel.get(holderId).add(new Label(upgradeMessage));
-		      return;
-		    }
-			
-			
-			
-			vWerk.initContext2d();
-			
-			vWerk.draw();
-			
-			touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
-			touchPanel.add(canvas);
-			panel.add(touchPanel);
-			
-			RootPanel.get(holderId).add(touchPanel);
-			
-			MuisBeheerder mb = new MuisBeheerder(vWerk);
+		Viewer3d vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, 450, 450, this);
+		//vWerk.zetAchtergrond(bgcolor);
+		vWerk.zetAfstand(1000);
+		vWerk.zetSchaduw(true);
+		vWerk.zetBeginHoeken(30, -30);
+		vWerk.zetMuisAan(true);
+		//vWerk.zetGetalRooster(true);
 
-			touchPanel.addTouchStartHandler((TouchStartHandler) mb);
-			touchPanel.addTouchEndHandler((TouchEndHandler) mb);
-			touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
+		canvas = vWerk.getCanvas();
+		RootPanel rootPanel = RootPanel.get(holderId);
+		if (canvas == null)
+		{
+			if (rootPanel != null)
+				rootPanel.add(new Label(upgradeMessage));
+			return;
+		}
+
+		vWerk.initContext2d();
+
+		vWerk.draw();
+
+		touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
+		touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
+		touchPanel.add(canvas);
+		panel.add(touchPanel);
+
+		if (rootPanel != null)
+			rootPanel.add(touchPanel);
+
+		MuisBeheerder mb = new MuisBeheerder(vWerk);
+
+		touchPanel.addTouchStartHandler((TouchStartHandler) mb);
+		touchPanel.addTouchEndHandler((TouchEndHandler) mb);
+		touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
 	}
 
 	private void addCheckButtonHandler(final TouchButton tb)
