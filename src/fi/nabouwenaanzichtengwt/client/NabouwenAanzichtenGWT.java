@@ -28,7 +28,6 @@ import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
-
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 {
 	static final String holderId = "canvasholder";
@@ -66,8 +65,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	boolean kijkNaActief = false;
 
 	private KubusRooster startKr;
-	
-	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage, vinkjeGrijsImage, buttonBgImage;
+
+	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
+			vinkjeGrijsImage, buttonBgImage;
 	private NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 
 	public NabouwenAanzichtenGWT()
@@ -78,7 +78,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	public NabouwenAanzichtenGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
 		makeResources();
-		
+
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
 		if (h != null && h.get("breedte") != null)
@@ -193,7 +193,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 			{
 				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
 
-				Image image = new Image("images/resources/vinkjegrijs.png");
+				Image image = new Image(clientBundle.vinkjegrijs());
 				nakijkKnop.add(image);
 				addCheckButtonHandler(nakijkKnop);
 				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
@@ -219,13 +219,14 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 			touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
 		}
 	}
-	
+
+	NabouwenAanzichtenGWTClientBundle clientBundle = GWT.create(NabouwenAanzichtenGWTClientBundle.class);
+
 	public void makeResources()
-	{	
-		NabouwenAanzichtenGWTClientBundle clientBundle = GWT.create(NabouwenAanzichtenGWTClientBundle.class);
+	{
 		nabouwenAanzichtenCss = clientBundle.getNabouwenAanzichtenGWTCSS();
 		nabouwenAanzichtenCss.ensureInjected();
-		
+
 		vinkjeGroenImage = new Image(clientBundle.vinkje());
 		vinkjeGeelImage = new Image(clientBundle.vinkjegeel());
 		vinkjeRoodImage = new Image(clientBundle.vinkjerood());
@@ -362,7 +363,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 		if (vWerk == null || !kijkNaActief)
 			return;
 		nakijkKnop.clear();
-		nakijkKnop.add(new Image("images/resources/vinkjegrijs.png"));
+		nakijkKnop.add(new Image(clientBundle.vinkjegrijs()));
 		correct = false;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
@@ -401,18 +402,20 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 		if (vWerk == null)
 			return;
 
-		boolean[][][] stateNew = null;
+		Object stateNew = null;
 
 		if (h.containsKey("nagekeken"))
 			nagekeken = (Boolean) h.get("nagekeken");
 		if (h.containsKey("ingevuld"))
 			ingevuld = (Boolean) h.get("ingevuld");
 		if (h.containsKey("stateNew"))
-			stateNew = (boolean[][][]) h.get("stateNew");
-
+			stateNew = h.get("stateNew");
 		if (stateNew != null)
 		{
-			vWerk.zetKubusRooster(new KubusRooster(stateNew, 1));
+			if (stateNew instanceof boolean[][][])
+				vWerk.zetKubusRooster(new KubusRooster((boolean[][][]) stateNew, 1));
+			else if (stateNew instanceof Object[])
+				vWerk.zetKubusRooster(new KubusRooster(KubusRooster.toBooleanArray((Object[]) stateNew), 1));
 			vWerk.draw();
 		}
 		if (nagekeken)
