@@ -399,7 +399,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		if (vWerk == null)
+		if (vWerk == null || h == null)
 			return;
 
 		Object stateNew = null;
