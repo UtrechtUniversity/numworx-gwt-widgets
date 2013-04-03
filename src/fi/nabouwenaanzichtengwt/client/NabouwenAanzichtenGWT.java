@@ -5,6 +5,9 @@ import java.util.HashMap;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.touch.TouchPanel;
+import nl.uu.fi.dwo.interaction.client.touch.TouchStartEvent;
+import nl.uu.fi.dwo.interaction.client.touch.TouchStartHandler;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -18,15 +21,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchEndHandler;
-import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
-import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchMoveHandler;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 {
@@ -214,9 +208,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 
 			MuisBeheerder mb = new MuisBeheerder(vWerk);
 
-			touchPanel.addTouchStartHandler((TouchStartHandler) mb);
-			touchPanel.addTouchEndHandler((TouchEndHandler) mb);
-			touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
+			touchPanel.addTouchHandler( mb);
 		}
 	}
 
@@ -282,14 +274,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 
 		MuisBeheerder mb = new MuisBeheerder(vWerk);
 
-		touchPanel.addTouchStartHandler((TouchStartHandler) mb);
-		touchPanel.addTouchEndHandler((TouchEndHandler) mb);
-		touchPanel.addTouchMoveHandler((TouchMoveHandler) mb);
+		touchPanel.addTouchStartHandler( mb);
 	}
 
 	private void addCheckButtonHandler(final TouchButton tb)
 	{
-		tb.addTouchHandler(new TouchHandler()
+		tb.addTouchStartHandler(new TouchStartHandler()
 		{
 			@Override
 			public void onTouchStart(TouchStartEvent event)
@@ -297,20 +287,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 				check();
 			}
 
-			@Override
-			public void onTouchMove(TouchMoveEvent event)
-			{
-			}
-
-			@Override
-			public void onTouchEnd(TouchEndEvent event)
-			{
-			}
-
-			@Override
-			public void onTouchCanceled(TouchCancelEvent event)
-			{
-			}
 		});
 	}
 
