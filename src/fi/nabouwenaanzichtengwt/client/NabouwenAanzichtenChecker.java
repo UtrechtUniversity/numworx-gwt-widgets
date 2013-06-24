@@ -2,6 +2,8 @@ package fi.nabouwenaanzichtengwt.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 //import fi.wiskopdr.AntwoordVakChecker;
 //import fi.wiskopdr.expressies.Algebra;
@@ -15,7 +17,7 @@ public class NabouwenAanzichtenChecker {
 	public static final int GEEN = 4;
 	
 	private String[] randomVarNamen = null;
-	private HashMap<String,Object> randomVarWaarden = null;
+	private Map<String,?> randomVarWaarden = null;
 	
 	private int score;
 	private int scoreMax;
@@ -30,68 +32,80 @@ public class NabouwenAanzichtenChecker {
 	boolean checkVoorZijAanzicht;
 	boolean checkAantalKubus;
 	
-	public NabouwenAanzichtenChecker(HashMap<String,Object> nbCheckerModel, String[] randomVars, HashMap<String,Object> randomValues )
+	public NabouwenAanzichtenChecker(Map<String, Object> launchState, String[] randomVars, Map<String, ?> randomVarWaarden2 )
 	{	
 		randomVarNamen = randomVars;
-		randomVarWaarden = randomValues;
+		randomVarWaarden = randomVarWaarden2;
 		
-		ArrayList<ArrayList<ArrayList<Boolean>>> docentStateNew = null;
-		if (nbCheckerModel.containsKey("docentStateNew")) 
-			docentStateNew = (ArrayList<ArrayList<ArrayList<Boolean>>>) nbCheckerModel.get("docentStateNew");
-		
+		Object docentStateNew = null;
+		if (launchState.containsKey("docentStateNew")) 
+			docentStateNew = launchState.get("docentStateNew");
+		else if(launchState.containsKey("docentState"))
+		{
+			docentStateNew = launchState.get("docentState");
+			if(docentStateNew instanceof List) docentStateNew = ((List)docentStateNew).get(0);
+			else if(docentStateNew instanceof Object[]) docentStateNew = ((Object[])docentStateNew)[0];
+
+		}
 		if (docentStateNew != null) {
-			int maxAantal = docentStateNew.size();
-			boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-			for (int i = 0; i < docentStateNew.size(); i++) {
-				for (int j = 0; j < docentStateNew.get(i).size(); j++) {
-					for (int k = 0; k < docentStateNew.get(i).get(j).size(); k++) {
-						b[i][j][k] = (Boolean) docentStateNew.get(i).get(j).get(k);
+			if(docentStateNew instanceof List) {
+				List<List<List<Boolean>>> docentStateLst = (List) docentStateNew;		
+				int maxAantal = docentStateLst.size();
+				boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+				for (int i = 0; i < docentStateLst.size(); i++) {
+					for (int j = 0; j < docentStateLst.get(i).size(); j++) {
+						for (int k = 0; k < docentStateLst.get(i).get(j).size(); k++) {
+						b[i][j][k] = docentStateLst.get(i).get(j).get(k);
+						}
 					}
 				}
+				docentKr = new KubusRooster(b,1);
+			} else if(docentStateNew instanceof Object[] ) {
+				boolean[][][] b = KubusRooster.toBooleanArray((Object[]) docentStateNew);
+				docentKr = new KubusRooster(b,1);
 			}
-			docentKr = new KubusRooster(b,1);
 		}
 		
 		
 		boolean checkBlokkenBouwsel = true;
-		if (nbCheckerModel.containsKey("checkBlokkenBouwsel"))
-			checkBlokkenBouwsel = ((Boolean) nbCheckerModel.get("checkBlokkenBouwsel")).booleanValue();
+		if (launchState.containsKey("checkBlokkenBouwsel"))
+			checkBlokkenBouwsel = ((Boolean) launchState.get("checkBlokkenBouwsel")).booleanValue();
 
 		boolean checkDrieAanzichten = false;
-		if (nbCheckerModel.containsKey("checkDrieAanzichten"))
-			checkDrieAanzichten = ((Boolean) nbCheckerModel.get("checkDrieAanzichten")).booleanValue();
+		if (launchState.containsKey("checkDrieAanzichten"))
+			checkDrieAanzichten = ((Boolean) launchState.get("checkDrieAanzichten")).booleanValue();
 
 	    boolean checkVoorZijAanzicht = false;
-		if (nbCheckerModel.containsKey("checkVoorZijAanzicht"))
-			checkVoorZijAanzicht = ((Boolean) nbCheckerModel.get("checkVoorZijAanzicht")).booleanValue();
+		if (launchState.containsKey("checkVoorZijAanzicht"))
+			checkVoorZijAanzicht = ((Boolean) launchState.get("checkVoorZijAanzicht")).booleanValue();
 	    
 	    boolean checkBovenVoorAanzicht = false;
-		if (nbCheckerModel.containsKey("checkBovenVoorAanzicht"))
-			checkBovenVoorAanzicht = ((Boolean) nbCheckerModel.get("checkBovenVoorAanzicht")).booleanValue();
+		if (launchState.containsKey("checkBovenVoorAanzicht"))
+			checkBovenVoorAanzicht = ((Boolean) launchState.get("checkBovenVoorAanzicht")).booleanValue();
 	    
 	    boolean checkBovenZijAanzicht = false;
-		if (nbCheckerModel.containsKey("checkBovenZijAanzicht"))
-			checkBovenZijAanzicht = ((Boolean) nbCheckerModel.get("checkBovenZijAanzicht")).booleanValue();
+		if (launchState.containsKey("checkBovenZijAanzicht"))
+			checkBovenZijAanzicht = ((Boolean) launchState.get("checkBovenZijAanzicht")).booleanValue();
 		
 		boolean checkBovenAanzicht = false;
-		if (nbCheckerModel.containsKey("checkBovenAanzicht"))
-			checkBovenAanzicht = ((Boolean) nbCheckerModel.get("checkBovenAanzicht")).booleanValue();
+		if (launchState.containsKey("checkBovenAanzicht"))
+			checkBovenAanzicht = ((Boolean) launchState.get("checkBovenAanzicht")).booleanValue();
 		
 		boolean checkVoorAanzicht = false;
-		if (nbCheckerModel.containsKey("checkVoorAanzicht"))
-			checkVoorAanzicht = ((Boolean) nbCheckerModel.get("checkVoorAanzicht")).booleanValue();
+		if (launchState.containsKey("checkVoorAanzicht"))
+			checkVoorAanzicht = ((Boolean) launchState.get("checkVoorAanzicht")).booleanValue();
 				
 		boolean checkRechtsAanzicht = false;
-		if (nbCheckerModel.containsKey("checkRechtsAanzicht"))
-			checkRechtsAanzicht = ((Boolean) nbCheckerModel.get("checkRechtsAanzicht")).booleanValue();
+		if (launchState.containsKey("checkRechtsAanzicht"))
+			checkRechtsAanzicht = ((Boolean) launchState.get("checkRechtsAanzicht")).booleanValue();
 				
 		boolean checkAantalKubus = false;
-		if (nbCheckerModel.containsKey("checkAantalKubus"))
-			checkAantalKubus = ((Boolean) nbCheckerModel.get("checkAantalKubus")).booleanValue();
+		if (launchState.containsKey("checkAantalKubus"))
+			checkAantalKubus = ((Boolean) launchState.get("checkAantalKubus")).booleanValue();
 		
 		int scoreMax = 10;
-		if (nbCheckerModel.containsKey("scoreMax"))
-			scoreMax = ((Integer) nbCheckerModel.get("scoreMax")).intValue();
+		if (launchState.containsKey("scoreMax"))
+			scoreMax = ((Number) launchState.get("scoreMax")).intValue();
 		//this.scoreMax = scoreMax;
 		
 		this.checkBlokkenBouwsel = checkBlokkenBouwsel;

@@ -2,9 +2,13 @@ package fi.nabouwenaanzichtengwt.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.touch.TouchPanel;
 import nl.uu.fi.dwo.interaction.client.touch.TouchStartEvent;
 import nl.uu.fi.dwo.interaction.client.touch.TouchStartHandler;
@@ -22,9 +26,8 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
+public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 {
-	static final String holderId = "canvasholder";
 	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
 	Canvas canvas;
@@ -37,9 +40,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 
 	private int breedte = 600;
 	private int hoogte = 250;
-	private HashMap<String, Object> launchState;
+	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
-	HashMap<String, Object> randomVarWaarden = null;
+	Map<String, ?> randomVarWaarden = null;
 
 	FlowPanel panel = new FlowPanel();
 	TouchPanel touchPanel = new TouchPanel();
@@ -82,134 +85,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 		if (h != null && h.get("interactiePanelLaunchState") != null)
 			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
 
-		panel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
-		panel.getElement().getStyle().setProperty("textAlign", "right");
-
-		int maxAantal = 4;
-		ArrayList<ArrayList<ArrayList<Boolean>>> stateNew = null;
-
-		if (launchState.containsKey("stateNew"))
-			stateNew = (ArrayList<ArrayList<ArrayList<Boolean>>>) launchState.get("stateNew");
-		if (launchState.containsKey("maxAantal"))
-			maxAantal = (Integer) launchState.get("maxAantal");
-
-		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-		for (int i = 0; i < maxAantal; i++)
-		{
-			for (int j = 0; j < maxAantal; j++)
-			{
-				for (int k = 0; k < maxAantal; k++)
-				{
-					b[i][j][k] = false;
-				}
-			}
-		}
-		if (stateNew != null)
-		{
-			b = new boolean[maxAantal][maxAantal][maxAantal];
-			for (int i = 0; i < stateNew.size(); i++)
-			{
-				for (int j = 0; j < stateNew.get(i).size(); j++)
-				{
-					for (int k = 0; k < stateNew.get(i).get(j).size(); k++)
-					{
-						b[i][j][k] = (Boolean) stateNew.get(i).get(j).get(k);
-					}
-				}
-			}
-
-		}
-
-		kijkNaActief = false;
-		if (launchState.containsKey("kijkNaActief"))
-			kijkNaActief = ((Boolean) launchState.get("kijkNaActief")).booleanValue();
-
-		boolean drieAanzichten = false;
-		if (launchState.containsKey("drieAanzichten"))
-			drieAanzichten = ((Boolean) launchState.get("drieAanzichten")).booleanValue();
-		boolean voorZijAanzicht = false;
-		if (launchState.containsKey("voorZijAanzicht"))
-			voorZijAanzicht = ((Boolean) launchState.get("voorZijAanzicht")).booleanValue();
-
-		if (drieAanzichten)
-		{
-			startKr = new KubusRooster(b, 1.5);
-			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 3, this);
-			panel.add(vaktekPanel.getPanel());
-		}
-		else if (voorZijAanzicht)
-		{
-			startKr = new KubusRooster(b, 1.5);
-			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 2, this);
-			panel.add(vaktekPanel.getPanel());
-		}
-		else
-		{
-			startKr = new KubusRooster(b, 1);
-
-			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, breedte, hoogte - (kijkNaActief ? 30 : 0), this);
-			vWerk.zetAfstand(1000);
-			vWerk.zetSchaduw(true);
-			vWerk.zetBeginHoeken(30, -30);
-			vWerk.zetMuisAan(true);
-
-			boolean rotatieVast = false;
-			if (launchState.containsKey("rotatieVast"))
-				rotatieVast = ((Boolean) launchState.get("rotatieVast")).booleanValue();
-			vWerk.zetMuisAan(!rotatieVast);
-
-			double beginHoekX = 30;
-			double beginHoekY = -30;
-			if (launchState.containsKey("beginHoekX"))
-				beginHoekX = ((Double) launchState.get("beginHoekX")).doubleValue();
-			if (launchState.containsKey("beginHoekY"))
-				beginHoekY = ((Double) launchState.get("beginHoekY")).doubleValue();
-			vWerk.zetBeginHoeken(beginHoekX, beginHoekY);
-
-			boolean nietBouwenSlopen = false;
-			if (launchState.containsKey("nietBouwenSlopen"))
-				nietBouwenSlopen = ((Boolean) launchState.get("nietBouwenSlopen")).booleanValue();
-			vWerk.zetKlikAan(!nietBouwenSlopen);
-
-			vWerk.initContext2d();
-
-			vWerk.draw();
-
-			canvas = vWerk.getCanvas();
-
-			touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
-			touchPanel.add(canvas);
-			panel.add(touchPanel);
-
-			if (kijkNaActief)
-			{
-				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
-
-				Image image = new Image(clientBundle.vinkjegrijs());
-				nakijkKnop.add(image);
-				addCheckButtonHandler(nakijkKnop);
-				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
-				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
-				nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
-				nakijkKnop.getElement().getStyle().setBorderColor("gray");
-				nakijkKnop.getElement().getStyle().setBorderColor("gray");
-				nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-				nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
-				nakijkKnop.getElement().getStyle().setProperty("display", "inline-block");
-				nakijkKnop.getElement().getStyle().setPaddingTop(3, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingBottom(3, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingLeft(10, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingRight(10, Unit.PX);
-				nakijkKnop.getElement().getStyle().setProperty("borderRadius", "5px");
-				panel.add(nakijkKnop);
-			}
-
-			MuisBeheerder mb = new MuisBeheerder(vWerk);
-
-			touchPanel.addTouchHandler( mb);
-		}
+		init(breedte, hoogte, launchState, randomVarWaarden);
+		
 	}
 
 	NabouwenAanzichtenGWTClientBundle clientBundle = GWT.create(NabouwenAanzichtenGWTClientBundle.class);
@@ -229,6 +106,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	public void onModuleLoad()
 	{
 		makeResources();
+		//initOnLoad();
+		RootPanel.get().add(panel);
+		Stub.publish(this);
+	}
+
+	private void initOnLoad() {
 		int maxAantal = 6;
 		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
@@ -252,14 +135,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 		//vWerk.zetGetalRooster(true);
 
 		canvas = vWerk.getCanvas();
-		RootPanel rootPanel = RootPanel.get(holderId);
-		if (canvas == null)
-		{
-			if (rootPanel != null)
-				rootPanel.add(new Label(upgradeMessage));
-			return;
-		}
-
 		vWerk.initContext2d();
 
 		vWerk.draw();
@@ -268,10 +143,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 		touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
 		touchPanel.add(canvas);
 		panel.add(touchPanel);
-
-		if (rootPanel != null)
-			rootPanel.add(touchPanel);
-
+		
 		MuisBeheerder mb = new MuisBeheerder(vWerk);
 
 		touchPanel.addTouchStartHandler( mb);
@@ -401,7 +273,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
 		return score;
 	}
 
@@ -424,5 +295,171 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionView
 	public Widget asWidget()
 	{
 		return getAsPanel();
+	}
+
+	@Override
+	public void init(int width, int height, Map<String, Object> launchData,
+			Map<String, Number> values) {
+		breedte = width;
+		hoogte  = height;
+		launchState = launchData;
+		randomVarWaarden = values;
+		randomVarNamen   = values.keySet().toArray(new String[values.size()]);
+		
+		panel.getElement().getStyle().setWidth(breedte, Unit.PX);
+		panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
+		panel.getElement().getStyle().setProperty("textAlign", "right");
+
+		int maxAantal = 4;
+		Object stateNew = null;
+
+		if (launchState.containsKey("stateNew"))
+		{
+			stateNew = launchState.get("stateNew");
+		} else if (launchState.containsKey("state"))
+		{
+			stateNew = launchState.get("state");
+			if(stateNew instanceof List) stateNew = ((List)stateNew).get(0);
+			else if(stateNew instanceof Object[]) stateNew = ((Object[])stateNew)[0];
+		}
+		if (launchState.containsKey("maxAantal"))
+			maxAantal = (Integer) launchState.get("maxAantal");
+
+		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+		for (int i = 0; i < maxAantal; i++)
+		{
+			for (int j = 0; j < maxAantal; j++)
+			{
+				for (int k = 0; k < maxAantal; k++)
+				{
+					b[i][j][k] = false;
+				}
+			}
+		}
+		if (stateNew != null)
+		{
+			// Complicaties: stateNew is Object[] als afkomstig via stub
+			// stateNew is List<?> als afkomstig via constructor
+			
+			if(stateNew instanceof List)
+			{
+				List<List<List<Boolean>>> stateLst = (List<List<List<Boolean>>>) stateNew;
+				b = new boolean[maxAantal][maxAantal][maxAantal];
+				for (int i = 0; i < stateLst.size(); i++)
+				{
+					for (int j = 0; j < stateLst.get(i).size(); j++)
+					{
+						for (int k = 0; k < stateLst.get(i).get(j).size(); k++)
+						{
+							b[i][j][k] = stateLst.get(i).get(j).get(k);
+						}
+					}
+				}
+			} else if (stateNew instanceof Object[]) {
+				final boolean[][][] bb = KubusRooster.toBooleanArray((Object[]) stateNew);
+				b = new boolean[maxAantal][maxAantal][maxAantal];
+				for (int i = 0; i < bb.length; i++)
+				{
+					for (int j = 0; j < bb[i].length; j++)
+					{
+						for (int k = 0; k < bb[i][j].length; k++)
+						{
+							b[i][j][k] = bb[i][j][k];
+						}
+					}
+				}
+			}
+		}
+
+		kijkNaActief = false;
+		if (launchState.containsKey("kijkNaActief"))
+			kijkNaActief = ((Boolean) launchState.get("kijkNaActief")).booleanValue();
+
+		boolean drieAanzichten = false;
+		if (launchState.containsKey("drieAanzichten"))
+			drieAanzichten = ((Boolean) launchState.get("drieAanzichten")).booleanValue();
+		boolean voorZijAanzicht = false;
+		if (launchState.containsKey("voorZijAanzicht"))
+			voorZijAanzicht = ((Boolean) launchState.get("voorZijAanzicht")).booleanValue();
+
+		if (drieAanzichten)
+		{
+			startKr = new KubusRooster(b, 1.5);
+			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 3, this);
+			panel.add(vaktekPanel.getPanel());
+		}
+		else if (voorZijAanzicht)
+		{
+			startKr = new KubusRooster(b, 1.5);
+			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 2, this);
+			panel.add(vaktekPanel.getPanel());
+		}
+		else
+		{
+			startKr = new KubusRooster(b, 1);
+
+			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, breedte, hoogte - (kijkNaActief ? 30 : 0), this);
+			vWerk.zetAfstand(1000);
+			vWerk.zetSchaduw(true);
+			vWerk.zetBeginHoeken(30, -30);
+			vWerk.zetMuisAan(true);
+
+			boolean rotatieVast = false;
+			if (launchState.containsKey("rotatieVast"))
+				rotatieVast = ((Boolean) launchState.get("rotatieVast")).booleanValue();
+			vWerk.zetMuisAan(!rotatieVast);
+
+			double beginHoekX = 30;
+			double beginHoekY = -30;
+			if (launchState.containsKey("beginHoekX"))
+				beginHoekX = ((Double) launchState.get("beginHoekX")).doubleValue();
+			if (launchState.containsKey("beginHoekY"))
+				beginHoekY = ((Double) launchState.get("beginHoekY")).doubleValue();
+			vWerk.zetBeginHoeken(beginHoekX, beginHoekY);
+
+			boolean nietBouwenSlopen = false;
+			if (launchState.containsKey("nietBouwenSlopen"))
+				nietBouwenSlopen = ((Boolean) launchState.get("nietBouwenSlopen")).booleanValue();
+			vWerk.zetKlikAan(!nietBouwenSlopen);
+
+			vWerk.initContext2d();
+
+			vWerk.draw();
+
+			canvas = vWerk.getCanvas();
+
+			touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
+			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
+			touchPanel.add(canvas);
+			panel.add(touchPanel);
+
+			if (kijkNaActief)
+			{
+				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
+
+				Image image = new Image(clientBundle.vinkjegrijs());
+				nakijkKnop.add(image);
+				addCheckButtonHandler(nakijkKnop);
+				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
+				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
+				nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
+				nakijkKnop.getElement().getStyle().setBorderColor("gray");
+				nakijkKnop.getElement().getStyle().setBorderColor("gray");
+				nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+				nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
+				nakijkKnop.getElement().getStyle().setProperty("display", "inline-block");
+				nakijkKnop.getElement().getStyle().setPaddingTop(3, Unit.PX);
+				nakijkKnop.getElement().getStyle().setPaddingBottom(3, Unit.PX);
+				nakijkKnop.getElement().getStyle().setPaddingLeft(10, Unit.PX);
+				nakijkKnop.getElement().getStyle().setPaddingRight(10, Unit.PX);
+				nakijkKnop.getElement().getStyle().setProperty("borderRadius", "5px");
+				panel.add(nakijkKnop);
+			}
+
+			MuisBeheerder mb = new MuisBeheerder(vWerk);
+
+			touchPanel.addTouchHandler( mb);
+		}
+
 	}
 }
