@@ -140,7 +140,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		vWerk.draw();
 
 		touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
+		touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
 		touchPanel.add(canvas);
 		panel.add(touchPanel);
 		
@@ -183,18 +183,18 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
 			nakijkKnop.clear();
-			nakijkKnop.add(new Image("images/resources/vinkjegeel.png"));
+			nakijkKnop.add(vinkjeGeelImage);
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
 		{
 			nakijkKnop.clear();
-			nakijkKnop.add(new Image("images/resources/vinkje.png"));
+			nakijkKnop.add(vinkjeGroenImage);
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
 			nakijkKnop.clear();
-			nakijkKnop.add(new Image("images/resources/vinkjerood.png"));
+			nakijkKnop.add(vinkjeRoodImage);
 		}
 		nagekeken = true;
 		comRoot.setChanged();
@@ -211,7 +211,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		if (vWerk == null || !kijkNaActief)
 			return;
 		nakijkKnop.clear();
-		nakijkKnop.add(new Image(clientBundle.vinkjegrijs()));
+		nakijkKnop.add(vinkjeGrijsImage);
 		correct = false;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
@@ -319,8 +319,14 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		} else if (launchState.containsKey("state"))
 		{
 			stateNew = launchState.get("state");
-			if(stateNew instanceof List) stateNew = ((List)stateNew).get(0);
-			else if(stateNew instanceof Object[]) stateNew = ((Object[])stateNew)[0];
+			if(stateNew instanceof List) {
+				stateNew = ((List)stateNew).get(0);
+				maxAantal = ((List)stateNew).size();
+			}
+			else if(stateNew instanceof Object[]) {
+				stateNew = ((Object[])stateNew)[0];
+				maxAantal = ((Object[])stateNew).length;
+			}
 		}
 		if (launchState.containsKey("maxAantal"))
 			maxAantal = (Integer) launchState.get("maxAantal");
@@ -398,7 +404,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		{
 			startKr = new KubusRooster(b, 1);
 
-			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, breedte, hoogte - (kijkNaActief ? 30 : 0), this);
+			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, breedte, hoogte - (kijkNaActief ? 32 : 0), this);
 			vWerk.zetAfstand(1000);
 			vWerk.zetSchaduw(true);
 			vWerk.zetBeginHoeken(30, -30);
@@ -429,7 +435,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			canvas = vWerk.getCanvas();
 
 			touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 30 : 0), Unit.PX);
+			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
 			touchPanel.add(canvas);
 			panel.add(touchPanel);
 
@@ -437,13 +443,13 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			{
 				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
 
-				Image image = new Image(clientBundle.vinkjegrijs());
-				nakijkKnop.add(image);
+				//Image image = new Image(clientBundle.vinkjegrijs());
+				//nakijkKnop.add(buttonBgImage);
+				nakijkKnop.add(vinkjeGrijsImage);
 				addCheckButtonHandler(nakijkKnop);
 				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
 				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
 				nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
-				nakijkKnop.getElement().getStyle().setBorderColor("gray");
 				nakijkKnop.getElement().getStyle().setBorderColor("gray");
 				nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 				nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
