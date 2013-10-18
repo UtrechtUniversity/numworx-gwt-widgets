@@ -79,9 +79,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
 		if (h != null && h.get("breedte") != null)
-			breedte = (Integer) h.get("breedte");
+			breedte = ((Number) h.get("breedte")).intValue();
 		if (h != null && h.get("hoogte") != null)
-			hoogte = (Integer) h.get("hoogte");
+			hoogte = ((Number) h.get("hoogte")).intValue();
 		if (h != null && h.get("interactiePanelLaunchState") != null)
 			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
 
@@ -329,7 +329,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			}
 		}
 		if (launchState.containsKey("maxAantal"))
-			maxAantal = (Integer) launchState.get("maxAantal");
+			maxAantal = ((Number) launchState.get("maxAantal")).intValue();
 
 		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
