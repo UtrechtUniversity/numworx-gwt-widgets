@@ -35,15 +35,19 @@ public class Curve3D extends Object3D
 	
 //	String[] vLabels; 
 	
+	boolean checkForAsymptotes = false;
+	
     public Curve3D()
     {}
     public Curve3D(Expressie expX, Expressie expY, Expressie expZ,
+    			   boolean cfa,
     			   double tMin, double tMax, int tPoints, 
    				   double xMin, double xMax,  
     			   double yMin, double yMax, 
     			   double zMin, double zMax, 
     			   String paramNaam)
     {
+    	checkForAsymptotes = cfa;
     	
 		double xAsyPos = 0;
 		double xAszPos = 0;
@@ -325,6 +329,7 @@ public class Curve3D extends Object3D
     	return isUnDefined(v.x) || isUnDefined(v.y) || isUnDefined(v.z);
     }
     
+/*    
     public boolean isUnWanted(double d)
     {	boolean unWanted = false;
     	
@@ -332,9 +337,15 @@ public class Curve3D extends Object3D
     	
     	return unWanted;
     }
-    
+*/    
     public boolean isUnWanted(double t1, double t2, Expressie expX, Expressie expY, Expressie expZ, String paramNaam)
-    {	boolean unWanted = false;
+    {	
+    	if (!checkForAsymptotes)
+    	{
+    		return false;
+    	}    	
+    	
+    	boolean unWanted = false;
     
     	double[] subst = new double[1];
     	String[] vars = new String[1];

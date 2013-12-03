@@ -40,6 +40,8 @@ public class OppervlakVoorbeeld
 	
 	String nlNaam = "";
 	String enNaam = "";
+	
+	boolean checkForAsymptotes = false;
 
 }
 class Cylinder extends OppervlakVoorbeeld
@@ -64,6 +66,8 @@ class Cylinder extends OppervlakVoorbeeld
 		
 		nlNaam = "cylinder";
 		enNaam = "cylinder";
+		
+		checkForAsymptotes = false;
 		
 	}
 }
@@ -90,6 +94,8 @@ class Cones extends OppervlakVoorbeeld
 		nlNaam = "kegels";
 		enNaam = "cones";
 		
+		checkForAsymptotes = false;
+		
 	}
 }
 class Helicoide extends OppervlakVoorbeeld
@@ -114,6 +120,8 @@ class Helicoide extends OppervlakVoorbeeld
 		nlNaam = "helicoide";
 		enNaam = "helicoide";
 		
+		checkForAsymptotes = false;
+		
 	}
 }
 class Sphere extends OppervlakVoorbeeld
@@ -135,6 +143,8 @@ class Sphere extends OppervlakVoorbeeld
 		
 		nlNaam = "bol";
 		enNaam = "sphere";
+		
+		checkForAsymptotes = false;
 	}
 }
 class Ellipsoid extends OppervlakVoorbeeld
@@ -157,6 +167,8 @@ class Ellipsoid extends OppervlakVoorbeeld
 		
 		nlNaam = "ellipsoide";
 		enNaam = "ellipsoid";
+		
+		checkForAsymptotes = false;
 		
 	}
 }
@@ -183,6 +195,8 @@ class Torus extends OppervlakVoorbeeld
 		
 		nlNaam = "donut";
 		enNaam = "donut";
+		
+		checkForAsymptotes = false;
 		
 	}
 	
@@ -213,6 +227,8 @@ class Trumpet extends OppervlakVoorbeeld
 		nlNaam = "toeter";
 		enNaam = "trumpet";
 		
+		checkForAsymptotes = false;
+		
 	}
 }
 class EightSurface extends OppervlakVoorbeeld
@@ -241,6 +257,8 @@ class EightSurface extends OppervlakVoorbeeld
 		nlNaam = "luchtballon";
 		enNaam = "balloon";
 		
+		checkForAsymptotes = false;
+		
 	}	
 }
 
@@ -265,6 +283,8 @@ class Shell extends OppervlakVoorbeeld
 		
 		nlNaam = "schelp";
 		enNaam = "shell";
+		
+		checkForAsymptotes = false;
 		
 	}
 
@@ -294,6 +314,8 @@ class KleinBagel extends OppervlakVoorbeeld
 		
 		nlNaam = "Klein bagel";
 		enNaam = "Klein bagel";
+		
+		checkForAsymptotes = false;
 		
 	}
 	

@@ -17,16 +17,22 @@ public class Grafiek3D extends Object3D
 	double bigPos = 0;
 	double bigMin = 0;
 	
+	boolean checkForAsymptotes = false;
 //	String[] vLabels; 
+	
+// tijdelijk
+int unWantedSkipped = 0;	
 	
     public Grafiek3D()
     {}
-    public Grafiek3D(Expressie exp,
+    public Grafiek3D(Expressie exp, boolean cfa,
     			double xMin, double xMax, double xStep, 
     		    double yMin, double yMax, double yStep,
     		    double zMin, double zMax, double zStep,
     		    String varNaamX, String varNaamY, int xFinerSteps, int yFinerSteps)
     {
+    	
+    	checkForAsymptotes = cfa;
     	
 		double xAsyPos = 0;
 		double xAszPos = 0;
@@ -73,8 +79,10 @@ public class Grafiek3D extends Object3D
     	int numXFacets = (int) Math.round((xMax - xMin) / xStepFine);
     	int numYFacets = (int) Math.round((yMax - yMin) / yStepFine);
     	int numGraphFacets = numXFacets * numYFacets;
+
 //System.out.println("numGraphfacets = " + numGraphFacets);    	
-   		int numGraphVertices = (numXFacets + 1) * (numYFacets + 1);
+   		
+		int numGraphVertices = (numXFacets + 1) * (numYFacets + 1);
     	numVertices = numGraphVertices;
 		numVertexLabels = numVertices;
 		vertices = new Vector3D[numVertices];
@@ -86,17 +94,25 @@ public class Grafiek3D extends Object3D
 		String[] vars = new String[2];
 		vars[0] = varNaamX;
 		vars[1] = varNaamY;
-		for (int yCnt = 0; yCnt < (numYFacets + 1); yCnt++)			
-			for (int xCnt = 0; xCnt < (numXFacets + 1); xCnt++)
+		
+		//for (int yCnt = 0; yCnt < (numYFacets + 1); yCnt++)			
+		//	for (int xCnt = 0; xCnt < (numXFacets + 1); xCnt++)
+		for (int yCnt = numYFacets; yCnt >= 0; yCnt--)			
+			for (int xCnt = numXFacets; xCnt >= 0; xCnt--)
 			{	subst[0] = xMin + xCnt * xStepFine;
 				subst[1] = yMin + yCnt * yStepFine;
 				double expWaarde = exp.geefWaarde(subst, vars);
+				//double xWaarde = xMin + xCnt * xStepFine;
+				//double yWaarde = yMin + yCnt * yStepFine;
+				//double expWaarde = exp.geefWaarde(xWaarde, yWaarde);
 
 // LATER "oneindige" vertices omlabelen tot iets onschuldigs
 				
 				vertices[xCnt + (numXFacets + 1) * yCnt] = 
+				//	new Vector3D(xWaarde, yWaarde, expWaarde);	
 					new Vector3D(subst[0], subst[1], expWaarde);
 				
+				// dit is maar een(1)check
 				if (!isUnDefined(expWaarde))
 				{
 					if (expWaarde > (zMax + NZERO))
@@ -141,8 +157,10 @@ public class Grafiek3D extends Object3D
 	    Facet3D[] tempFacets = new Facet3D[tempNumFacets];
 	    int facetCount = 0;
 	        
-	    for (int yCnt = 0; yCnt < numYFacets; yCnt++)
-	     	for (int xCnt = 0; xCnt < numXFacets; xCnt++)
+	    //for (int yCnt = 0; yCnt < numYFacets; yCnt++)
+	    // 	for (int xCnt = 0; xCnt < numXFacets; xCnt++)
+	    for (int yCnt = numYFacets - 1; yCnt >= 0; yCnt--)
+	    	for (int xCnt = numXFacets - 1; xCnt >= 0; xCnt--)
 	       	{	// indices van de 4 vertices
 	     		int[] indices = new int[4];
 	       		indices[0] = xCnt + (numXFacets + 1) * yCnt;
@@ -150,7 +168,7 @@ public class Grafiek3D extends Object3D
 	       		indices[2] = xCnt + 1 + (numXFacets + 1) * (yCnt + 1);
 	       		indices[3] = xCnt + (numXFacets + 1) * (yCnt + 1);	
 
-	       		// 4 mogelijke deeldriehoejes
+	       		// 4 mogelijke deeldriehoekjes
        			int[] indices1 = new int[3];
        			indices1[0] = indices[0];
        			indices1[1] = indices[1];
@@ -479,6 +497,8 @@ public class Grafiek3D extends Object3D
         //initObject3D(true, false);
         initObject3D(true, center, false);
                 
+//System.out.println("Grafiek3D uws = " + unWantedSkipped);
+//System.out.println("Grafiek3D fc = " + numFacets);
     	
     }
     
@@ -490,7 +510,8 @@ public class Grafiek3D extends Object3D
     	
     	return unDefined;
     }
-    
+ 
+/*    
     public boolean isUnWanted(double d)
     {	boolean unWanted = false;
     	
@@ -498,9 +519,16 @@ public class Grafiek3D extends Object3D
     	
     	return unWanted;
     }
-    
+*/    
     public boolean isUnWanted(Vector3D v1, Vector3D v2, Expressie exp, String varNaamX, String varNaamY)
-    {	boolean unWanted = false;
+    {	
+    	if (!checkForAsymptotes)
+    	{
+    		unWantedSkipped++;
+    		return false;
+    	}	
+    	
+    	boolean unWanted = false;
     
     	double[] subst = new double[2];
     	String[] vars = new String[2];
@@ -509,6 +537,7 @@ public class Grafiek3D extends Object3D
     	subst[0] = v1.x;
 		subst[1] = v1.y;
 		double expWaarde = exp.geefWaarde(subst, vars);
+		//double expWaarde = exp.geefWaarde(v1.x, v1.y);
     
     	double max = expWaarde;
     	double min = expWaarde;
@@ -520,6 +549,7 @@ public class Grafiek3D extends Object3D
     		subst[0] = v1.x + stepCnt * stepX;
     		subst[1] = v1.y + stepCnt * stepY;
     		expWaarde = exp.geefWaarde(subst, vars);
+    		//expWaarde = exp.geefWaarde(v1.x + stepCnt * stepX, v1.y + stepCnt * stepY);
     		
     		if (!Double.isNaN(expWaarde) && !Double.isInfinite(expWaarde))
     		{
@@ -532,7 +562,7 @@ public class Grafiek3D extends Object3D
     	
     	if ((max > bigPos) && (min < bigMin))
     	{	unWanted = true;
-//System.out.println("unWanted " + v1.toString() + " " + v2.toString());    	
+//System.out.println("unWanted " + v1.toString() + " " + v2.toString());
     	}
     
     	return unWanted;	

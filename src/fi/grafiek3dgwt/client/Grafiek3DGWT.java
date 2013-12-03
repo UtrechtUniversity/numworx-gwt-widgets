@@ -707,6 +707,7 @@ public class Grafiek3DGWT implements EntryPoint, InteractionView
 		{	
 			GrafiekVoorbeeld gv = (GrafiekVoorbeeld) grafiekVoorbeelden.get(voorbeeldKeuze);
 			Expressie exp = FormuleParser.geefExpressie(gv.graphString);
+			//Expressie exp = gv;
 			
 			grafiek3DComponent.objectType = FUNCTION;
 			grafiek3DComponent.zetGrafiekVoorbeeld(gv);

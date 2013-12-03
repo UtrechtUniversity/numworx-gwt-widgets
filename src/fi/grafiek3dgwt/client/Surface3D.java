@@ -36,9 +36,12 @@ public class Surface3D extends Object3D
 	
 //	String[] vLabels; 
 	
+	boolean checkForAsymptotes = false;
+	
     public Surface3D()
     {}
     public Surface3D(Expressie expX, Expressie expY, Expressie expZ,
+    				 boolean cfa,
     				 double uMin, double uMax, int uPoints, 
     				 double vMin, double vMax, int vPoints,
     				 double xMin, double xMax,  
@@ -46,6 +49,7 @@ public class Surface3D extends Object3D
     				 double zMin, double zMax, 
     				 String paramNaamU, String paramNaamV)
     {
+    	checkForAsymptotes = cfa;
     	
 		double xAsyPos = 0;
 		double xAszPos = 0;
@@ -521,7 +525,8 @@ public class Surface3D extends Object3D
     {
     	return isUnDefined(v.x) || isUnDefined(v.y) || isUnDefined(v.z);
     }
-    
+  
+/*    
     public boolean isUnWanted(double d)
     {	boolean unWanted = false;
     	
@@ -529,10 +534,17 @@ public class Surface3D extends Object3D
     	
     	return unWanted;
     }
-    
+*/    
     public boolean isUnWanted(double u1, double v1, double u2, double v2, 
     						  Expressie expX, Expressie expY, Expressie expZ, String paramNaamU, String paramNaamV)
-    {	boolean unWanted = false;
+    {	
+    	
+    	if (!checkForAsymptotes)
+    	{
+    		return false;
+    	}    	
+    	
+    	boolean unWanted = false;
     
     	double[] subst = new double[2];
     	String[] vars = new String[2];

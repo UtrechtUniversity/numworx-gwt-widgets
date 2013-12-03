@@ -2,7 +2,9 @@ package fi.grafiek3dgwt.client;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
-public class GrafiekVoorbeeld 
+//import fi.grafiek3dgwt.client.expressies.Expressie;
+
+public class GrafiekVoorbeeld// extends Expressie
 {
 	double angleXG = 75;
 	double angleZG = 25;
@@ -32,6 +34,13 @@ public class GrafiekVoorbeeld
 	String nlNaam = "";
 	String enNaam = "";
 	
+	boolean checkForAsymptotes = false;
+	
+	public double geefWaarde(double x, double y)
+	{	return Double.NaN;
+	}
+
+	
 }
 class Paraboloide extends GrafiekVoorbeeld
 {
@@ -47,7 +56,14 @@ class Paraboloide extends GrafiekVoorbeeld
 		
 		nlNaam = "paraboloide";
 		enNaam = "paraboloide";
+		
+		checkForAsymptotes = false;
+
 	}
+	public double geefWaarde(double x, double y)
+	{	return x*x+y*y-1;
+	}
+
 }
 class Zadel extends GrafiekVoorbeeld
 {
@@ -63,7 +79,13 @@ class Zadel extends GrafiekVoorbeeld
 		
 		nlNaam = "zadel";
 		enNaam = "saddle";
+		
+		checkForAsymptotes = false;
 	}
+	public double geefWaarde(double x, double y)
+	{	return x*x-y*y;
+	}
+
 }
 class ReciprokeTrumpet extends GrafiekVoorbeeld
 {
@@ -80,9 +102,14 @@ class ReciprokeTrumpet extends GrafiekVoorbeeld
 		
 		nlNaam = "1/ toeter";
 		enNaam = "1/ trumpet";
+		
+		checkForAsymptotes = true;
 	}
 
-		
+	public double geefWaarde(double x, double y)
+	{	return 1/(x*x+y*y)-1;
+	}
+	
 }
 class LnTrumpet extends GrafiekVoorbeeld
 {
@@ -97,6 +124,11 @@ class LnTrumpet extends GrafiekVoorbeeld
 		
 		nlNaam = "ln toeter";
 		enNaam = "ln trumpet";
+		
+		checkForAsymptotes = true;
+	}
+	public double geefWaarde(double x, double y)
+	{	return Math.log(x*x+y*y);
 	}
 
 		
@@ -116,6 +148,11 @@ class SineHat extends GrafiekVoorbeeld
 		
 		nlNaam = "sinus hoed";
 		enNaam = "sine hat";
+		
+		checkForAsymptotes = false;
+	}
+	public double geefWaarde(double x, double y)
+	{	return Math.sin(x*x+y*y);
 	}
 
 		
@@ -134,7 +171,12 @@ class TangensChaos extends GrafiekVoorbeeld
 		
 		nlNaam = "tangens chaos";
 		enNaam = "tangens chaos";
+		
+		checkForAsymptotes = true;
 	}
 
-		
+	public double geefWaarde(double x, double y)
+	{	return Math.tan(x*x+y*y);
+	}
+	
 }

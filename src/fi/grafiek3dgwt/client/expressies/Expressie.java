@@ -80,6 +80,12 @@ public class Expressie
 	{	return Double.NaN;
 	}
 	
+// voor Grafiek3DGWT
+//	public double geefWaarde(double x, double y)
+//	{	return Double.NaN;
+//	}
+	
+	
 	public Complex geefWaardeComplex(Complex subst)
 	{	return null;
 	}

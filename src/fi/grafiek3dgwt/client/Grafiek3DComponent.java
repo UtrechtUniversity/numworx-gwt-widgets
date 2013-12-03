@@ -233,6 +233,8 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
 	String paramNaamU = "u";
 	String paramNaamV = "v";
 
+	boolean checkForAsymptotes = false;
+	
 	Axes axesObject;
 	// state
 	Expressie grafiek3DExpressie = null;
@@ -832,60 +834,31 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
     }
     
     public Grafiek3D makeGrafiek3D()
-    {	grafiek3DObject = new Grafiek3D(grafiek3DExpressie, 
+    {	
+    	
+//System.out.println("makeGrafiek3D cfa = " + checkForAsymptotes);    	
+    	
+    	grafiek3DObject = new Grafiek3D(grafiek3DExpressie, checkForAsymptotes,  
 					 				    xMinG, xMaxG, xStepG, yMinG, yMaxG, yStepG, zMinG, zMaxG, zStepG, 
 			 					 		varNaamX, varNaamY, xFinerStepsG, yFinerStepsG);    	 
     
     	objectColor = graphColor;
     	
+    	
     	if (grafiek3DObject.trimTop)
     	{	
-//System.out.println("trimTop");    		
-    		Plane3D zMaxPlane = new Plane3D(0, 0, 1, zMaxG);
-    		ObjectGroup3D grafiek3DObjectGroup = new ObjectGroup3D(grafiek3DObject, false);
-    		ObjectGroup3D topTrimmedGroup = cutObjectGroup(grafiek3DObjectGroup, zMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
+//System.out.println("trimTop");
 
-    		// hier nog kiezen !!
+			grafiek3DObject = (Grafiek3D) Trim.trimObject3D(grafiek3DObject, zMaxG, Trim.ZMAX);
     		
-			grafiek3DObject = (Grafiek3D) topTrimmedGroup.objects.elementAt(0);
-			if (grafiek3DObject.insideVertex != null)
-			{	if (grafiek3DObject.containsVertex(grafiek3DObject.insideVertex) < 0)
-					grafiek3DObject = (Grafiek3D) topTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (grafiek3DObject.containsVertex(grafiek3DObject.topMaxVertex) >= 0)
-					grafiek3DObject = (Grafiek3D) topTrimmedGroup.objects.elementAt(1);
-			}	
-//System.out.println("topMax = " + grafiek3DObject.topMaxVertex.toString());
-//if (grafiek3DObject.insideVertex != null)
-//System.out.println("inside = " + grafiek3DObject.insideVertex.toString());
-
-//if (grafiek3DObject instanceof Grafiek3D)
-//System.out.println("Grafiek3D");	
-    		
-    	}
+    	} // if trimTop
+    	
+    	
     	if (grafiek3DObject.trimBottom)
     	{
 //System.out.println("trimBottom");    		
     		
-    		Plane3D zMinPlane = new Plane3D(0, 0, 1, zMinG);
-    		ObjectGroup3D grafiek3DObjectGroup = new ObjectGroup3D(grafiek3DObject, false);
-    		ObjectGroup3D bottomTrimmedGroup = cutObjectGroup(grafiek3DObjectGroup, zMinPlane);
-
-    		// hier nog kiezen !!
-    		
-			grafiek3DObject = (Grafiek3D) bottomTrimmedGroup.objects.elementAt(0);
-			if (grafiek3DObject.insideVertex != null)
-			{	if (grafiek3DObject.containsVertex(grafiek3DObject.insideVertex) < 0)
-					grafiek3DObject = (Grafiek3D) bottomTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{
-				if (grafiek3DObject.containsVertex(grafiek3DObject.bottomMinVertex) >= 0)
-					grafiek3DObject = (Grafiek3D) bottomTrimmedGroup.objects.elementAt(1);
-			}	
-//System.out.println("bottomMin = " + grafiek3DObject.bottomMinVertex.toString());    		
+			grafiek3DObject = (Grafiek3D) Trim.trimObject3D(grafiek3DObject, zMinG, Trim.ZMIN);
     	}
     
     	grafiek3DObject.setOutlineColor(graphOutlineColor);
@@ -914,163 +887,56 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
     public Surface3D makeSurface3D()
     {
     	surface3DObject = new Surface3D(surfaceXExpressie, surfaceYExpressie, surfaceZExpressie,
+    									checkForAsymptotes, 
     			                        uMin, uMax, uPoints, vMin, vMax, vPoints,
     			                        xMinS, xMaxS, yMinS, yMaxS, zMinS, zMaxS,
     			                        paramNaamU, paramNaamV);
     	
     	objectColor = surfaceColor;
+  
     	
     	if (surface3DObject.trimTop)
     	{	
 //System.out.println("trimTop");    		
-    		Plane3D zMaxPlane = new Plane3D(0, 0, 1, zMaxS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D topTrimmedGroup = cutObjectGroup(surface3DObjectGroup, zMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
-    		
-			surface3DObject = (Surface3D) topTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) topTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.topMaxVertex) >= 0)
-					surface3DObject = (Surface3D) topTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("topMax = " + surface3DObject.topMaxVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
+			surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, zMaxS, Trim.ZMAX);    		
 
     	}
     	if (surface3DObject.trimBottom)
     	{	
 //System.out.println("trimBottom");    		
-    		Plane3D zMinPlane = new Plane3D(0, 0, 1, zMinS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D bottomTrimmedGroup = cutObjectGroup(surface3DObjectGroup, zMinPlane);
-//System.out.println("ttsize = " + bottomTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
+			surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, zMinS, Trim.ZMIN);
     		
-			surface3DObject = (Surface3D) bottomTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) bottomTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.bottomMinVertex) >= 0)
-					surface3DObject = (Surface3D) bottomTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("bottomMin = " + surface3DObject.bottomMinVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
-
     	}
     	if (surface3DObject.trimRight)
     	{	
 //System.out.println("trimRight");    		
-    		Plane3D xMaxPlane = new Plane3D(1, 0, 0, xMaxS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D rightTrimmedGroup = cutObjectGroup(surface3DObjectGroup, xMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
-    		
-			surface3DObject = (Surface3D) rightTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) rightTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.rightMaxVertex) >= 0)
-					surface3DObject = (Surface3D) rightTrimmedGroup.objects.elementAt(1);
-			}
 			
-//System.out.println("rightMax = " + surface3DObject.rightMaxVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
-
+    		surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, xMaxS, Trim.XMAX);
+    		
     	}
     	if (surface3DObject.trimLeft)
     	{	
 //System.out.println("trimLeft");    		
-    		Plane3D xMinPlane = new Plane3D(1, 0, 0, xMinS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D leftTrimmedGroup = cutObjectGroup(surface3DObjectGroup, xMinPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
     		
-			surface3DObject = (Surface3D) leftTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) leftTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.leftMinVertex) >= 0)
-					surface3DObject = (Surface3D) leftTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("leftMin = " + surface3DObject.leftMinVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
-
+    		surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, xMinS, Trim.XMIN);
     	}
     	if (surface3DObject.trimBack)
     	{	
 //System.out.println("trimBack");    		
-    		Plane3D yMaxPlane = new Plane3D(0, 1, 0, yMaxS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D backTrimmedGroup = cutObjectGroup(surface3DObjectGroup, yMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
-    		
-			surface3DObject = (Surface3D) backTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) backTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.backMaxVertex) >= 0)
-					surface3DObject = (Surface3D) backTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("backMax = " + surface3DObject.backMaxVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
+    		surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, yMaxS, Trim.YMAX);
 
     	}
     	if (surface3DObject.trimFront)
     	{	
 //System.out.println("trimFront");    		
-    		Plane3D yMinPlane = new Plane3D(0, 1, 0, yMinS);
-    		ObjectGroup3D surface3DObjectGroup = new ObjectGroup3D(surface3DObject, false);
-    		ObjectGroup3D frontTrimmedGroup = cutObjectGroup(surface3DObjectGroup, yMinPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
     		
-			surface3DObject = (Surface3D) frontTrimmedGroup.objects.elementAt(0);
-			if (surface3DObject.insideVertex != null)
-			{	if (surface3DObject.containsVertex(surface3DObject.insideVertex) < 0)
-					surface3DObject = (Surface3D) frontTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (surface3DObject.containsVertex(surface3DObject.frontMinVertex) >= 0)
-					surface3DObject = (Surface3D) frontTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("frontMin = " + surface3DObject.frontMinVertex.toString());
-//if (surface3DObject.insideVertex != null)
-//System.out.println("inside = " + surface3DObject.insideVertex.toString());
+    		surface3DObject = (Surface3D) Trim.trimObject3D(surface3DObject, yMinS, Trim.YMIN);
 
     	}
-    	
+   	
     	surface3DObject.setOutlineColor(surfaceOutlineColor);
     	
     	if (wireFrameS)
@@ -1088,167 +954,61 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
     public Curve3D makeCurve3D()
     {
     	curve3DObject = new Curve3D(curveXExpressie, curveYExpressie, curveZExpressie,
-                tMin, tMax, tPoints,
+    			checkForAsymptotes, tMin, tMax, tPoints,
                 xMinC, xMaxC, yMinC, yMaxC, zMinC, zMaxC,
                 paramNaam);
 
     	objectColor = curveColor;
+    
     	
     	if (curve3DObject.trimTop)
     	{	
 //System.out.println("trimTop");    		
-    		Plane3D zMaxPlane = new Plane3D(0, 0, 1, zMaxS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D topTrimmedGroup = cutObjectGroup(curve3DObjectGroup, zMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
     		
-			curve3DObject = (Curve3D) topTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) topTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.topMaxVertex) >= 0)
-					curve3DObject = (Curve3D) topTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("topMax = " + curve3DObject.topMaxVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, zMaxS, Trim.ZMAX);
 
     	}
     	if (curve3DObject.trimBottom)
     	{	
 //System.out.println("trimBottom");    		
-    		Plane3D zMinPlane = new Plane3D(0, 0, 1, zMinS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D bottomTrimmedGroup = cutObjectGroup(curve3DObjectGroup, zMinPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
     		
-			curve3DObject = (Curve3D) bottomTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) bottomTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.bottomMinVertex) >= 0)
-					curve3DObject = (Curve3D) bottomTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("bottomMin = " + curve3DObject.bottomMinVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, zMinS, Trim.ZMIN);    		
+
 
     	}
     	if (curve3DObject.trimRight)
     	{	
 //System.out.println("trimRight");    		
-    		Plane3D xMaxPlane = new Plane3D(1, 0, 0, xMaxS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D rightTrimmedGroup = cutObjectGroup(curve3DObjectGroup, xMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
-    		
-			curve3DObject = (Curve3D) rightTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) rightTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.rightMaxVertex) >= 0)
-					curve3DObject = (Curve3D) rightTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("rightMax = " + curve3DObject.rightMaxVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, xMaxS, Trim.XMAX);
 
     	}
     	if (curve3DObject.trimLeft)
     	{	
 //System.out.println("trimLeft");    		
-    		Plane3D xMinPlane = new Plane3D(1, 0, 0, xMinS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D leftTrimmedGroup = cutObjectGroup(curve3DObjectGroup, xMinPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, xMinS, Trim.XMIN);
     		
-			curve3DObject = (Curve3D) leftTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) leftTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.leftMinVertex) >= 0)
-					curve3DObject = (Curve3D) leftTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("leftMin = " + curve3DObject.leftMinVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
-
     	}
     	if (curve3DObject.trimBack)
     	{	
 //System.out.println("trimBack");    		
-    		Plane3D yMaxPlane = new Plane3D(0, 1, 0, yMaxS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D backTrimmedGroup = cutObjectGroup(curve3DObjectGroup, yMaxPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
 
-    		// hier nog kiezen !!
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, yMaxS, Trim.YMAX);
     		
-			curve3DObject = (Curve3D) backTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) backTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.backMaxVertex) >= 0)
-					curve3DObject = (Curve3D) backTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("backMax = " + curve3DObject.backMaxVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
-
     	}
     	if (curve3DObject.trimFront)
     	{	
 //System.out.println("trimFront");    		
-    		Plane3D yMinPlane = new Plane3D(0, 1, 0, yMinS);
-    		ObjectGroup3D curve3DObjectGroup = new ObjectGroup3D(curve3DObject, false);
-    		ObjectGroup3D frontTrimmedGroup = cutObjectGroup(curve3DObjectGroup, yMinPlane);
-//System.out.println("ttsize = " + topTrimmedGroup.objects.size());    
-
-    		// hier nog kiezen !!
     		
-			curve3DObject = (Curve3D) frontTrimmedGroup.objects.elementAt(0);
-			if (curve3DObject.insideVertex != null)
-			{	if (curve3DObject.containsVertex(curve3DObject.insideVertex) < 0)
-					curve3DObject = (Curve3D) frontTrimmedGroup.objects.elementAt(1);
-			}
-			else
-			{	if (curve3DObject.containsVertex(curve3DObject.frontMinVertex) >= 0)
-					curve3DObject = (Curve3D) frontTrimmedGroup.objects.elementAt(1);
-			}
-			
-//System.out.println("frontMin = " + curve3DObject.frontMinVertex.toString());
-//if (curve3DObject.insideVertex != null)
-//System.out.println("inside = " + curve3DObject.insideVertex.toString());
+    		curve3DObject = (Curve3D) Trim.trimObject3D(curve3DObject, yMinS, Trim.YMIN);
 
-	    	if (centraleProjC)
-	    		setProjection(CENTRALPROJ);
-	    	else
+		}	
+		
+	    if (centraleProjC)
+	    	setProjection(CENTRALPROJ);
+	    else
 	    		setProjection(PARALLELPROJ);
-			
-    	}
     	
     	return curve3DObject;
 
@@ -1980,6 +1740,8 @@ System.out.println("grover");
 	
 	public void zetGrafiekVoorbeeld(GrafiekVoorbeeld gv)
 	{
+		checkForAsymptotes = gv.checkForAsymptotes;
+		
 		zoomStandaard(false, FUNCTION);
 
 		angleXG = gv.angleXG;
@@ -2044,6 +1806,8 @@ System.out.println("grover");
 
 	public void zetOppervlakVoorbeeld(OppervlakVoorbeeld ov)
 	{
+		checkForAsymptotes = ov.checkForAsymptotes;
+		
 		zoomStandaard(false, SURFACE);
 		
 		angleXS = ov.angleXS;
@@ -2099,6 +1863,8 @@ System.out.println("grover");
 	
 	public void zetKrommeVoorbeeld(KrommeVoorbeeld kv)
 	{
+		checkForAsymptotes = kv.checkForAsymptotes;
+		
 		zoomStandaard(false, CURVE);
 		
 		angleXC = kv.angleXC;
@@ -2313,7 +2079,7 @@ System.out.println("grover");
       
     }
 */    
-    public ObjectGroup3D cutObjectGroup(ObjectGroup3D ob, Plane3D plane)
+    public Object3D cutObjectGroup(ObjectGroup3D ob, Plane3D plane)
     {   
         Object3D start = ob.leftMostLeaf().deepCopy();
         start.setVisible(true);
@@ -2329,11 +2095,10 @@ System.out.println("grover");
             0, false);
         owp.fixFacetArray();    
 
-//if (start instanceof Grafiek3D)
-//System.out.println("start is Grafiek3D");
-
         Object3D left = new EmptyObject3D();
         Object3D right = new EmptyObject3D();
+        
+        Vector3D insideVertex = null;
         
         if (start instanceof Grafiek3D)
         {
@@ -2349,6 +2114,8 @@ System.out.println("grover");
         	((Grafiek3D) right).topMaxVertex  = Vector3D.copyVector3D(((Grafiek3D) start).topMaxVertex);
         	((Grafiek3D) right).bottomMinVertex  = Vector3D.copyVector3D(((Grafiek3D) start).bottomMinVertex);
         	((Grafiek3D) right).insideVertex  = Vector3D.copyVector3D(((Grafiek3D) start).insideVertex);
+        	
+        	insideVertex = Vector3D.copyVector3D(((Grafiek3D) start).insideVertex);
         	
         }
         
@@ -2388,6 +2155,7 @@ System.out.println("grover");
         	
         	((Surface3D) right).insideVertex  = Vector3D.copyVector3D(((Surface3D) start).insideVertex);
         	
+        	insideVertex = Vector3D.copyVector3D(((Surface3D) start).insideVertex);
         }
 
         if (start instanceof Curve3D)
@@ -2426,20 +2194,16 @@ System.out.println("grover");
         	
         	((Curve3D) right).insideVertex  = Vector3D.copyVector3D(((Curve3D) start).insideVertex);
         	
+        	insideVertex = Vector3D.copyVector3D(((Curve3D) start).insideVertex);
+        	
+        	
+        	
         }
         
         ObjectGroup3D leftGroup, rightGroup;
+        
+        int insideVertexPos =  plane.planePosition(insideVertex);
   
-/*
-oud omitted         
-/
-        Vector leftVerticesLabeled = new Vector();
-        Vector leftVertexLabels = new Vector();
-        Vector rightVerticesLabeled = new Vector();
-        Vector rightVertexLabels = new Vector();
-        Facet3D leftCutFacet = null;
-        Facet3D rightCutFacet = null;
-*/        
         for (int i = 0; i < owp.numFacets; i++)
         {   
             if (!owp.hasReplacement(owp.facets[i]))
@@ -2461,8 +2225,8 @@ oud omitted
 // zijn omgekeerde links
             
                 } // points of facet[i]
-                // left of cut
-                if ((leftPos > 0) && (onPos >= 0))
+                // facet is positioned left of cut
+                if ((leftPos > 0) && (onPos >= 0) && (insideVertexPos == -1))
                 {   // add facet to left
                     int firstIndex = left.numVertices;
                     for (int j = 0; j < owp.facets[i].numPoints; j++)
@@ -2489,22 +2253,11 @@ oud omitted
                     {	leftFacet.edgeCodes[inPlaneEdgeIndex] = 52;
 //System.out.println("left 52");                    
                     }
-/* 
-oud omitted
-                    for (int m = 0; m < leftFacet.numPoints; m++)
-                    {   if (owp.facets[i].vertexLabels[m] != null)
-                            leftFacet.vertexLabels[m] = new String(owp.facets[i].vertexLabels[m]);
-                        if (!leftVerticesLabeled.contains(leftFacet.points[m]))
-                        {   leftVerticesLabeled.addElement(leftFacet.points[m]);
-                            leftVertexLabels.addElement(leftFacet.vertexLabels[m]);
-                        }   
-                    }    
-*/                    
                     // update cut colors?
                     
                 }    
-                // right of cut
-                else if ((rightPos > 0) && (onPos >= 0))
+                // facet is positioned right of cut
+                else if ((rightPos > 0) && (onPos >= 0) && (insideVertexPos == 1))
                 {   // add facet to right
                     int firstIndex = right.numVertices;
                     for (int j = 0; j < owp.facets[i].numPoints; j++)
@@ -2529,17 +2282,6 @@ oud omitted
                     }
                     if (inPlaneEdgeIndex >= 0)
                     	rightFacet.edgeCodes[inPlaneEdgeIndex] = 52;
-/*
-oud omitted                      
-                    for (int m = 0; m < rightFacet.numPoints; m++)
-                    {   if (owp.facets[i].vertexLabels[m] != null)
-                            rightFacet.vertexLabels[m] = new String(owp.facets[i].vertexLabels[m]);
-                        if (!rightVerticesLabeled.contains(rightFacet.points[m]))
-                        {   rightVerticesLabeled.addElement(rightFacet.points[m]);
-                            rightVertexLabels.addElement(rightFacet.vertexLabels[m]);
-                        }   
-                    }    
-*/                    
                     // update cut colors?
                     
                 }    
@@ -2593,49 +2335,17 @@ System.out.println("(leftPos == 0) && (rightPos == 0)");
 //System.out.println((String) leftVertexLabels.elementAt(lft));
 //System.out.println("right " + rightVerticesLabeled.size());                        
         // find true center and diameter    
-/*        
-oud omitted
-        for (int lft = 0; lft < leftCutFacet.numPoints; lft++)
-        {   int lIndex = leftVerticesLabeled.indexOf(leftCutFacet.points[lft]);
-            if (lIndex >= 0)
-                leftCutFacet.vertexLabels[lft] = 
-                    new String((String) leftVertexLabels.elementAt(lIndex));
-        
+
+        if (left.numVertices > right.numVertices)
+        {   left.initObject3D(true, false);
+        	right = null;
+        	return left;
         }
-*/
-/*
-oud omitted
-        for (int rgt = 0; rgt < rightCutFacet.numPoints; rgt++)
-        {   int rIndex = rightVerticesLabeled.indexOf(rightCutFacet.points[rgt]);
-            if (rIndex >= 0)
-                rightCutFacet.vertexLabels[rgt] = 
-                    new String((String) rightVertexLabels.elementAt(rIndex));
-        
+        else
+        {   right.initObject3D(true, false);
+        	left = null;
+        	return right;
         }
-*/
-/*
-oud omitted 
-        int leftIndex = 0;
-        for (int lCnt = 0; lCnt < leftVertexLabels.size(); lCnt++)
-        {   leftIndex = Math.max(leftIndex,
-                getLabelIndex((String) leftVertexLabels.elementAt(lCnt)));
-        }    
-*/
-/*
-oud omitted 
-        int rightIndex = 0;
-        for (int rCnt = 0; rCnt < rightVertexLabels.size(); rCnt++)
-        {   rightIndex = Math.max(rightIndex,
-                getLabelIndex((String) rightVertexLabels.elementAt(rCnt)));
-        }    
-*/
-/*
-oud omitted 
-        left.numVertexLabels = leftIndex; // not relevant?
-        right.numVertexLabels = rightIndex; // not relevant?
-*/        
-        left.initObject3D(true, false);
-        right.initObject3D(true, false);
         
 
 // note: up to here the labelling of the two basic halves is consistent
@@ -2643,6 +2353,8 @@ oud omitted
 
 // now find all OTHER labels present in the original object
 
+/*
+new omitted         
         Vector otherVerticesLabeled = new Vector();
         Vector otherVertexLabels = new Vector();
         // assume ob's facetArray is fixed
@@ -2661,6 +2373,7 @@ oud omitted
                 }   
             }
         }
+*/        
 /*        
 new omitted 
         // find maximum labelindex of ob
@@ -2670,26 +2383,12 @@ new omitted
                 getLabelIndex((String) otherVertexLabels.elementAt(oCnt)));
         }    
 */        
-/*        
-new omitted        
-        if ((start.modelCode == CYLINDER) ||
-            (start.modelCode == CONE1) ||
-            (start.modelCode == CONE2) ||
-            (start.modelCode == CONE3) ||
-            (start.modelCode == CONE4)
-            )
-        {   if (isCylinderType(left))    
-                left.modelCode = start.modelCode;
-            if (isCylinderType(right))        
-                right.modelCode = start.modelCode;
-        }
-*/        
-//        letterObject(left);
-//        letterObject(right);
+
 //System.out.println("left-vert = " + left.numVertices);
 //System.out.println("right-vert = " + right.numVertices);
 
-                
+        
+/*                
         Vector3D trVector = new Vector3D(plane.normal);
         Vector3D.scaleBy(trVector, ob.diameter / 3);
                
@@ -2709,13 +2408,29 @@ new omitted
             //right.translateBy(trVector.x, trVector.y, trVector.z);
                 
         }
+*/        
 
+/*        
         Vector origConstruction = new Vector();   
         if (ob instanceof ObjectWithPlane)
             origConstruction = ((ObjectWithPlane) ob).getConstruction();
         else if (ob instanceof ObjectWithLine)
             origConstruction = ((ObjectWithLine) ob).getConstruction();
-        origConstruction.removeElement(plane);            
+        origConstruction.removeElement(plane);
+  
+        if (left != null)
+        {	leftGroup = ObjectWithPlane.rebuild(left, origConstruction);
+        	leftGroup.fixFacetArray();
+        	return leftGroup;
+        }
+        else
+        {   rightGroup = ObjectWithPlane.rebuild(left, origConstruction);
+        	rightGroup.fixFacetArray();
+        	return rightGroup;
+        }
+*/        
+        
+/*        
         Vector trConstruction = new Vector();
         Vector minTrConstruction = new Vector();
         for (int i = 0; i < origConstruction.size(); i++)
@@ -2734,10 +2449,12 @@ new omitted
                 minTrConstruction.addElement(minTrPlane);            
                     
             }    
-        }        
+        }
+*/                
 //System.out.println("" + trConstruction.size());            
 //System.out.println("" + minTrConstruction.size());            
-        
+  
+/*        
         if (trPos < minTrPos)
         {   leftGroup = ObjectWithPlane.rebuild(left, trConstruction);
             leftGroup.fixFacetArray();
@@ -2750,8 +2467,8 @@ new omitted
                     Vector3D trLVertex = new Vector3D(lVertex);
                     // translate back
                     Vector3D.translateBy(trLVertex, -trVector.x, -trVector.y, -trVector.z);
-/*                    
-new omitted
+                    
+//new omitted
                     // if lVertex has a Label
                     if ((lLabel != null) && !lLabel.equals("") && !lLabel.equals("XX"))
                     {   if (otherVerticesLabeled.contains(trLVertex))
@@ -2769,7 +2486,7 @@ new omitted
                         }    
                         
                     }
-*/                    
+// einde new omitted                    
                 }    
             }
             
@@ -2784,8 +2501,8 @@ new omitted
                     Vector3D trRVertex = new Vector3D(rVertex);
                     // translate back
                     Vector3D.translateBy(trRVertex, -minTrVector.x, -minTrVector.y, -minTrVector.z);
-/*         
-new omitted            
+         
+//new omitted            
                     // if rVertex has a Label
                     if ((rLabel != null) && !rLabel.equals("") && !rLabel.equals("XX"))
                     {   if (otherVerticesLabeled.contains(trRVertex))
@@ -2804,12 +2521,14 @@ new omitted
                         }    
                         
                     }
-*/                    
+//einde new omitted                    
                 }    
             }
             
         }
-        else
+*/        
+/*        
+        else // trPos >= minTrPos 
         {   
 
             leftGroup = ObjectWithPlane.rebuild(left, minTrConstruction);
@@ -2822,8 +2541,8 @@ new omitted
                     String lLabel = leftGroup.facets[lFCnt].vertexLabels[lVCnt];
                     Vector3D trLVertex = new Vector3D(lVertex);
                     Vector3D.translateBy(trLVertex, -minTrVector.x, -minTrVector.y, -minTrVector.z);
-/*                    
-new omitted
+                    
+//new omitted
                     // if lVertex has a Label
                     if ((lLabel != null) && !lLabel.equals("") && !lLabel.equals("XX"))
                     {   if (otherVerticesLabeled.contains(trLVertex))
@@ -2841,7 +2560,7 @@ new omitted
                         }    
                         
                     }
-*/                    
+// einde new omitted                    
                 }    
             }
             
@@ -2856,8 +2575,8 @@ new omitted
                     Vector3D trRVertex = new Vector3D(rVertex);
                     // translate back
                     Vector3D.translateBy(trRVertex, -trVector.x, -trVector.y, -trVector.z);
-/*                    
-new omitted
+                    
+//new omitted
                     // if rVertex has a Label
                     if ((rLabel != null) && !rLabel.equals("") && !rLabel.equals("XX"))
                     {   if (otherVerticesLabeled.contains(trRVertex))
@@ -2876,15 +2595,16 @@ new omitted
                         }    
                         
                     }
-*/            
+//einde new omitted            
                 }    
             }
                 
         }
-
+*/
 
         // leftGroup, rightGroup have correct diameter and translated center
-        
+
+/*        
         // rebuild de twee stukken
         ObjectGroup3D result = new ObjectGroup3D();
         result.addObject3D(left);
@@ -2892,6 +2612,8 @@ new omitted
         // force center and diameter
         result.initObject3D(true, new Vector3D(ob.center), ob.diameter, false);
         return result;
+*/        
+        
         
     } //    
 

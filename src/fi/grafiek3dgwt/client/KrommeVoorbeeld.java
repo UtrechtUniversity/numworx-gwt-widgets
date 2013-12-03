@@ -31,6 +31,7 @@ public class KrommeVoorbeeld
 	String nlNaam = "";
 	String enNaam = "";
 	
+	boolean checkForAsymptotes = false;
 }
 class Helix extends KrommeVoorbeeld
 {
@@ -48,6 +49,8 @@ class Helix extends KrommeVoorbeeld
 		
 		nlNaam = "helix";
 		enNaam = "helix";
+		
+		checkForAsymptotes = false;
 		
 	}
 }
@@ -72,6 +75,8 @@ class ConeHelix extends KrommeVoorbeeld
 		nlNaam = "kegels helix";
 		enNaam = "cones helix";
 		
+		checkForAsymptotes = false;
+		
 	}
 }
 class TorusHelix extends KrommeVoorbeeld
@@ -94,6 +99,8 @@ class TorusHelix extends KrommeVoorbeeld
 		nlNaam = "torus helix";
 		enNaam = "torus helix";
 		
+		checkForAsymptotes = false;
+		
 	}
 	
 }
@@ -114,6 +121,8 @@ class FlowerLeaves extends KrommeVoorbeeld
 		
 		nlNaam = "bloembladen";
 		enNaam = "flower leaves";
+		
+		checkForAsymptotes = false;
 		
 	}
 	

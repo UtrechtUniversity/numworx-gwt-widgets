@@ -1362,22 +1362,31 @@ System.out.println("" + index + " is not on top of " + cnt);
     // leave world space vertices unchanged
     // redefine for subclass ObjectGroup3D        
     public void transformBy(Matrix3D m, double dis, boolean zSort)
-    {   // taking m == null only sorts
+    {   int lNumVertices = numVertices;
+    	Vector3D[] lVertices = vertices;
+    	Vector3D[] lTrVertices = trVertices;
+    	int lNumFacets = numFacets;
+    	Facet3D[] lFacets = facets;
+    	Object3D topParent = topParent();
+    	
+    	// taking m == null only sorts
         if (m != null)
         {   Vector3D temp;
-            for (int i = 0; i < numVertices; i++)
-            {   Object3D topParent = topParent();
+            //for (int i = 0; i < lNumVertices; i++)
+        	for (int i = lNumVertices - 1; i >= 0; i--)
+            {   //Object3D topParent = topParent();
                 // center the object(group) here!!
-                trVertices[i] = m.transform(
-                    Vector3D.minus(vertices[i], topParent.center));
+                lTrVertices[i] = m.transform(
+                    Vector3D.minus(lVertices[i], topParent.center));
             }
-            for (int i = 0; i < numFacets; i++)
+            //for (int i = 0; i < lNumFacets; i++)
+        	for (int i = lNumFacets - 1; i >= 0; i--)
             {   // notify facet[i] to reference the correct transformed 3-points
-                facets[i].updateTrPoints(trVertices);
-                facets[i].calculateZValue(m.origin, dis);
+                lFacets[i].updateTrPoints(lTrVertices);
+                lFacets[i].calculateZValue(m.origin, dis);
                 // unit normal stays in  (0, 0, 0)
-                facets[i].unitNormal = m.nTransform(facets[i].normal);
-                Vector3D.makeUnitary(facets[i].unitNormal);
+                lFacets[i].unitNormal = m.nTransform(lFacets[i].normal);
+                Vector3D.makeUnitary(lFacets[i].unitNormal);
             }
         } // if (m != null)
         if (zSort)
@@ -1403,41 +1412,47 @@ System.out.println("" + index + " is not on top of " + cnt);
     {   facets = mergeSort(facets);
     }    
     public Facet3D[] mergeSort(Facet3D[] list)
-    {   if (list == null)
+    {   
+    	if (list == null)
     		return list;
-    	if (list.length == 1)
+    	int listLength = list.length;
+    	if (listLength == 1)
             return list;
-        int half = list.length / 2;
+        int half = listLength / 2;
         Facet3D[] list1 = new Facet3D[half];
-        Facet3D[] list2 = new Facet3D[list.length - half];
+        Facet3D[] list2 = new Facet3D[listLength - half];
         // fast copy            
         System.arraycopy(list, 0, list1, 0, half);    
         // fast copy
-        System.arraycopy(list, half, list2, 0, list.length - half);                
+        System.arraycopy(list, half, list2, 0, listLength - half);                
         list1 = mergeSort(list1);
         list2 = mergeSort(list2);
         return merge(list1, list2);
     }    
     public Facet3D[] merge(Facet3D[] list1, Facet3D[] list2)
-    {   Facet3D[] list = new Facet3D[list1.length + list2.length];
+    {   
+    	int list1Length = list1.length;
+    	int list2Length = list2.length;
+    	
+    	Facet3D[] list = new Facet3D[list1Length + list2Length];
         int index1 = 0;
         int index2 = 0;
         int index = 0;
-        while ((index1 < list1.length) || (index2 < list2.length))
+        while ((index1 < list1Length) || (index2 < list2Length))
         {   // check if list1 is empty
-            if ((index1 == list1.length) && (index2 < list2.length))
+            if ((index1 == list1Length) && (index2 < list2Length))
             {   // fast copy                
                 System.arraycopy(list2, index2, 
                                  list, index, 
-                                 list2.length - index2);
+                                 list2Length - index2);
                 return list;
             }
             // check if list2 is empty
-            else if ((index1 < list1.length) && (index2 == list2.length))
+            else if ((index1 < list1Length) && (index2 == list2Length))
             {   // fast copy                
                 System.arraycopy(list1, index1, 
                                  list, index, 
-                                 list1.length - index1);                
+                                 list1Length - index1);                
                 return list;            
             }
             else // both list not empty
