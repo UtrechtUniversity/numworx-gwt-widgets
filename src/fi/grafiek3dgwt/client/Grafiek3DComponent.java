@@ -2758,7 +2758,7 @@ new omitted
 
             panel3D.rotateCake(xTheta, yTheta);                
             
-            panel3D.repaint();
+            //panel3D.repaint();
             
             panel3D.oldX = eventX;
             panel3D.oldY = eventY;
