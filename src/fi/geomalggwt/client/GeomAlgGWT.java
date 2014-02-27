@@ -8,6 +8,8 @@ import java.util.Set;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
 
@@ -749,36 +751,38 @@ boolean touchStart = false;
 	}
 	
 	@Override
-	public void init(int width, int height, Map<String, Object> launchState,
+	public void init(int width, int height, Map<String, Object> map, //launchState,
 					 Map<String, Number> values) 
 	{
 		this.breedte = width;
 		this.hoogte = height;
-		this.launchState = launchState;
-		if (launchState != null && launchState.get("varWaardeZichtbaar") != null)
-			varWaardeZichtbaar = (Boolean) launchState.get("varWaardeZichtbaar");
-		if (launchState != null && launchState.get("oppWaardeZichtbaar") != null)
-			oppWaardeZichtbaar = (Boolean) launchState.get("oppWaardeZichtbaar");
-		if (launchState != null && launchState.get("formuleZichtbaar") != null)
-			formuleZichtbaar = (Boolean) launchState.get("formuleZichtbaar");
-		if (launchState != null && launchState.get("constructieTools") != null)
-			constructieTools = (Boolean) launchState.get("constructieTools");
-		if (launchState != null && launchState.get("alleenOppervlaktes") != null)
-			alleenOppervlaktes = (Boolean) launchState.get("alleenOppervlaktes");
-		if (launchState != null && launchState.get("werkblad") != null)
-			werkblad = (Boolean) launchState.get("werkblad");
-		if (launchState != null && launchState.get("oppervlaktesZichtbaar") != null)
-			oppervlaktesZichtbaar = (Boolean) launchState.get("oppervlaktesZichtbaar");
-		if (launchState != null && launchState.get("lengtesBreedtesZichtbaar") != null)
-			lengtesBreedtesZichtbaar = (Boolean) launchState.get("lengtesBreedtesZichtbaar");
-		if (launchState != null && launchState.get("negatieveWaarden") != null)
-			negatieveWaarden = (Boolean) launchState.get("negatieveWaarden");
-		if (launchState != null && launchState.get("puzzelen") != null)
-			puzzelen = (Boolean) launchState.get("puzzelen");
+		//this.launchState = launchState;
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		
+		if (launchState.containsKey("varWaardeZichtbaar"))
+			varWaardeZichtbaar = launchState.getBoolean("varWaardeZichtbaar");
+		if (launchState.containsKey("oppWaardeZichtbaar"))
+			oppWaardeZichtbaar = launchState.getBoolean("oppWaardeZichtbaar");
+		if (launchState.containsKey("formuleZichtbaar"))
+			formuleZichtbaar = launchState.getBoolean("formuleZichtbaar");
+		if (launchState.containsKey("constructieTools"))
+			constructieTools = launchState.getBoolean("constructieTools");
+		if (launchState.containsKey("alleenOppervlaktes"))
+			alleenOppervlaktes = launchState.getBoolean("alleenOppervlaktes");
+		if (launchState.containsKey("werkblad"))
+			werkblad = launchState.getBoolean("werkblad");
+		if (launchState.containsKey("oppervlaktesZichtbaar"))
+			oppervlaktesZichtbaar = launchState.getBoolean("oppervlaktesZichtbaar");
+		if (launchState.containsKey("lengtesBreedtesZichtbaar"))
+			lengtesBreedtesZichtbaar = launchState.getBoolean("lengtesBreedtesZichtbaar");
+		if (launchState.containsKey("negatieveWaarden"))
+			negatieveWaarden = launchState.getBoolean("negatieveWaarden");
+		if (launchState.containsKey("puzzelen"))
+			puzzelen = launchState.getBoolean("puzzelen");
 
-		HashMap<String,Object> stateHM = new HashMap<String,Object>();
-		if (launchState != null && launchState.get("stateHM") != null)
-		{	stateHM = (HashMap<String,Object>) launchState.get("stateHM");
+		Map<String,Object> stateHM = new HashMap<String,Object>();
+		if (launchState.containsKey("stateHM"))
+		{	stateHM = launchState.getMap("stateHM");
 //testString += " found";		
 		}
 		else

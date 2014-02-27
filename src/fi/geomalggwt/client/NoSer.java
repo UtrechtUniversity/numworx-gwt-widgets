@@ -1,7 +1,12 @@
 package fi.geomalggwt.client;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.List;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class NoSer 
 {
@@ -200,20 +205,26 @@ public class NoSer
 		return h;
 	}
 
-	public static Figuur setFiguurState2(HashMap<String,Object> h)
+	public static Figuur setFiguurState2(HashMap<String,Object> map)
 	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
 		int aantalx = 0;
 		if (h.containsKey("aantalx"))
-			aantalx = ((Integer) h.get("aantalx")).intValue();
+			aantalx = h.getInt("aantalx");
+			//aantalx = ((Integer) h.get("aantalx")).intValue();
 		int aantaly = 0;
 		if (h.containsKey("aantaly"))
-			aantaly = ((Integer) h.get("aantaly")).intValue();
+			aantaly = h.getInt("aantaly");
+			//aantaly = ((Integer) h.get("aantaly")).intValue();
 		int positieX = 0;
 		int positieY = 0;
 		if (h.containsKey("positieX"))
-			positieX = ((Integer) h.get("positieX")).intValue();
+			positieX = h.getInt("positieX");
+			//positieX = ((Integer) h.get("positieX")).intValue();
 		if (h.containsKey("positieY"))
-			positieY = ((Integer) h.get("positieY")).intValue();
+			positieY = h.getInt("positieY");
+			//positieY = ((Integer) h.get("positieY")).intValue();
 		Figuur fig = new Figuur(positieX, positieY);
 		fig.aantalx = aantalx;
 		fig.aantaly = aantaly;
@@ -221,30 +232,36 @@ public class NoSer
 		{	String name1 = "lsx" + xCnt;
 			ArrayList<Integer> al = new ArrayList<Integer>();
 			if (h.containsKey(name1))
-				al = (ArrayList<Integer>) h.get(name1);
+				al = (ArrayList<Integer>) h.getIntegerList(name1);
+				//al = (ArrayList<Integer>) h.get(name1);
 			String name2 = "xisvar" + xCnt;
 			boolean iv = false;	
 			if (h.containsKey(name2))
-				iv = ((Boolean) h.get(name2)).booleanValue();
+				iv = h.getBoolean(name2);
+				//iv = ((Boolean) h.get(name2)).booleanValue();
 			String name3 = "xvarnaam" + xCnt;
 			String vn = "";
 			if (h.containsKey(name3))
-				vn = (String) h.get(name3);
+				vn = h.getString(name3);
+				//vn = (String) h.get(name3);
 			fig.lsx[xCnt] = setLijnstukState2(al,iv,vn);
 		}
 		for (int yCnt = 0; yCnt < fig.aantaly ; yCnt++)
 		{	String name1 = "lsy" + yCnt;
 			ArrayList<Integer> al = new ArrayList<Integer>();
 			if (h.containsKey(name1))
-				al = (ArrayList<Integer>) h.get(name1);
+				al = (ArrayList<Integer>) h.getIntegerList(name1);
+				//al = (ArrayList<Integer>) h.get(name1);
 			String name2 = "yisvar" + yCnt;
 			boolean iv = false;	
 			if (h.containsKey(name2))
-				iv = ((Boolean) h.get(name2)).booleanValue();
+				iv = h.getBoolean(name2);
+				//iv = ((Boolean) h.get(name2)).booleanValue();
 			String name3 = "yvarnaam" + yCnt;
 			String vn = "";
 			if (h.containsKey(name3))
-				vn = (String) h.get(name3);
+				vn = h.getString(name3);
+				//vn = (String) h.get(name3);
 			fig.lsy[yCnt] = setLijnstukState2(al,iv,vn);
 		}
 		
@@ -311,14 +328,17 @@ public class NoSer
 		return h;
 	}
 	
-	public static State setStateState(HashMap<String,Object> h)
+	public static State setStateState(Map<String,Object> map)
 	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
 		int aantalFg = 0;
 		if (h.containsKey("aantalFg"))
-			aantalFg = ((Integer) h.get("aantalFg")).intValue();
-		ArrayList<HashMap<String,Object>> figurenHash = new ArrayList<HashMap<String,Object>>();		
+			aantalFg = h.getInt("aantalFg");
+			//aantalFg = ((Integer) h.get("aantalFg")).intValue();
+		ArrayList<Map<String,Object>> figurenHash = new ArrayList<Map<String,Object>>();		
 		if (h.containsKey("figurenrij"))
-			figurenHash = (ArrayList<HashMap<String,Object>>) h.get("figurenrij");
+			figurenHash = (ArrayList<Map<String,Object>>) h.getMapList("figurenrij");
 		Figuur[] figurenrij = new Figuur[aantalFg];
 		for (int i = 0; i < aantalFg; i++)
 		{	figurenrij[i] = setFiguurState2((HashMap<String,Object>) figurenHash.get(i));
@@ -327,7 +347,8 @@ public class NoSer
 		ArrayList<Integer> varList = new ArrayList<Integer>();
 		
 		if (h.containsKey("varList"))
-		{	varList = (ArrayList<Integer>) h.get("varList");
+		{	//varList = (ArrayList<Integer>) h.get("varList");
+			varList = (ArrayList<Integer>) h.getIntegerList("varList");
 			for (int vCnt = 0; vCnt < varList.size(); vCnt++)
 				var[vCnt] = ((Integer) varList.get(vCnt)).intValue();
 		}
