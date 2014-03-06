@@ -7,6 +7,7 @@ import java.util.List;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+//import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
 public class NoSer 
 {
@@ -37,9 +38,9 @@ public class NoSer
 		return h;
 	}
 
-	public static ArrayList<Integer> getLijnstukState2(Lijnstuk ls)
+	public static List<Integer> getLijnstukState2(Lijnstuk ls)
 	{
-		ArrayList<Integer> a = new ArrayList<Integer>();
+		List<Integer> a = new ArrayList<Integer>();
 		
 		a.add(new Integer(ls.schaal));
 		a.add(new Integer(ls.stand));
@@ -61,7 +62,7 @@ public class NoSer
 		return a;
 	}
 
-	public static Lijnstuk setLijnstukState2(ArrayList<Integer> a, boolean isVar, String varNaam)
+	public static Lijnstuk setLijnstukState2(List<Integer> a, boolean isVar, String varNaam)
 	{
 		int schaal = ((Integer) a.get(0)).intValue();
 		int stand = ((Integer) a.get(1)).intValue();
@@ -175,9 +176,9 @@ public class NoSer
 		return h;
 	}
 
-	public static HashMap<String,Object> getFiguurState2(Figuur fig)
+	public static Map<String,Object> getFiguurState2(Figuur fig)
 	{
-		HashMap<String,Object> h = new HashMap<String,Object>();
+		Map<String,Object> h = new HashMap<String,Object>();
 		
 		h.put("aantalx", new Integer(fig.aantalx));
 		h.put("aantaly", new Integer(fig.aantaly));
@@ -205,7 +206,7 @@ public class NoSer
 		return h;
 	}
 
-	public static Figuur setFiguurState2(HashMap<String,Object> map)
+	public static Figuur setFiguurState2(Map<String,Object> map)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
@@ -230,9 +231,9 @@ public class NoSer
 		fig.aantaly = aantaly;
 		for (int xCnt = 0; xCnt < fig.aantalx ; xCnt++)
 		{	String name1 = "lsx" + xCnt;
-			ArrayList<Integer> al = new ArrayList<Integer>();
+			List<Integer> al = new ArrayList<Integer>();
 			if (h.containsKey(name1))
-				al = (ArrayList<Integer>) h.getIntegerList(name1);
+				al = h.getIntegerList(name1);
 				//al = (ArrayList<Integer>) h.get(name1);
 			String name2 = "xisvar" + xCnt;
 			boolean iv = false;	
@@ -248,9 +249,9 @@ public class NoSer
 		}
 		for (int yCnt = 0; yCnt < fig.aantaly ; yCnt++)
 		{	String name1 = "lsy" + yCnt;
-			ArrayList<Integer> al = new ArrayList<Integer>();
+			List<Integer> al = new ArrayList<Integer>();
 			if (h.containsKey(name1))
-				al = (ArrayList<Integer>) h.getIntegerList(name1);
+				al = h.getIntegerList(name1);
 				//al = (ArrayList<Integer>) h.get(name1);
 			String name2 = "yisvar" + yCnt;
 			boolean iv = false;	
@@ -306,12 +307,12 @@ public class NoSer
 		return fig;
 	}
 	
-	public static HashMap<String,Object> getStateState(State s)
+	public static Map<String,Object> getStateState(State s)
 	{
-		HashMap<String,Object> h = new HashMap<String,Object>();
+		Map<String,Object> h = new HashMap<String,Object>();
 		int aantalFg = s.geefAantalFiguren();
 		h.put("aantalFg", new Integer(aantalFg));
-		ArrayList<HashMap<String,Object>> figurenHash = new ArrayList<HashMap<String,Object>>(); 
+		List<Map<String,Object>> figurenHash = new ArrayList<Map<String,Object>>(); 
 		Figuur[] figurenrij = s.geefFigurenRij();
 		for (int i = 0; i < aantalFg; i++)
 		{	figurenHash.add(getFiguurState2(figurenrij[i]));				
@@ -320,7 +321,7 @@ public class NoSer
 		
 		int[] var = s.geefVars();
 		
-		ArrayList<Integer> varList = new ArrayList<Integer>();
+		List<Integer> varList = new ArrayList<Integer>();
 		for (int vCnt = 0; vCnt < var.length; vCnt++)
 			varList.add(new Integer(var[vCnt]));
 		h.put("varList", varList);
@@ -336,13 +337,19 @@ public class NoSer
 		if (h.containsKey("aantalFg"))
 			aantalFg = h.getInt("aantalFg");
 			//aantalFg = ((Integer) h.get("aantalFg")).intValue();
-		ArrayList<Map<String,Object>> figurenHash = new ArrayList<Map<String,Object>>();		
+
+		List<Map<String,Object>> figurenHash = new ArrayList<Map<String,Object>>();
+	
+				
+//VERANDEREN???		
+		//ObjectList figurenHash = h.getObjectList("figurenrij");
 		if (h.containsKey("figurenrij"))
-			figurenHash = (ArrayList<Map<String,Object>>) h.getMapList("figurenrij");
+			figurenHash = h.getMapList("figurenrij");
 		Figuur[] figurenrij = new Figuur[aantalFg];
 		for (int i = 0; i < aantalFg; i++)
-		{	figurenrij[i] = setFiguurState2((HashMap<String,Object>) figurenHash.get(i));
+		{	figurenrij[i] = setFiguurState2((Map<String,Object>) figurenHash.get(i));
 		}
+	
 		int[] var = new int[4];
 		ArrayList<Integer> varList = new ArrayList<Integer>();
 		
@@ -353,9 +360,6 @@ public class NoSer
 				var[vCnt] = ((Integer) varList.get(vCnt)).intValue();
 		}
 
-//		if (h.containsKey("var"))
-//			var = (int[]) h.get("var");
-		
 		State s = new State(aantalFg, figurenrij, var);
 		
 		return s;

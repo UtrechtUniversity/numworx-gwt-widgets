@@ -340,16 +340,18 @@ boolean touchStart = false;
 	}
 
 	
-	public GeomAlgGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
+	public GeomAlgGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
-		if (h != null && h.get("breedte") != null)
-			breedte = (Integer) h.get("breedte");
-		if (h != null && h.get("hoogte") != null)
-			hoogte = (Integer) h.get("hoogte");
-		if (h != null && h.get("interactiePanelLaunchState") != null)
-			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+		if (h.containsKey("breedte"))
+			breedte = h.getInt("breedte");
+		if (h.containsKey("hoogte"))
+			hoogte = h.getInt("hoogte");
+		if (h.containsKey("interactiePanelLaunchState"))
+			launchState = h.getMap("interactiePanelLaunchState");
 		
 		getImages();
 		
@@ -718,7 +720,7 @@ boolean touchStart = false;
 	public HashMap<String, Object> getState()
 	{
 		State state = av.getStateState();
-		HashMap stateHM = NoSer.getStateState(state);
+		HashMap stateHM = (HashMap) NoSer.getStateState(state);
 		return stateHM;
 	}
 
