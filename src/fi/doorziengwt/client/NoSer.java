@@ -359,7 +359,7 @@ public class NoSer
 		return h;
 	}
 	
-	public static Object3D setObject3DState(HashMap<String,Object> map)
+	public static Object3D setObject3DState(Map<String,Object> map)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
@@ -447,9 +447,10 @@ public class NoSer
 		return object;
 	}
 	
-	public static Vector getConstructionState(Vector construction)
+	public static List<Object> getConstructionState(Vector construction)
 	{
-		Vector conState = new Vector();
+		//Vector conState = new Vector();
+		List<Object> conState = new ArrayList<Object>();
 		
 		for (int cCnt = 0; cCnt < construction.size(); cCnt++)
 		{
@@ -459,13 +460,15 @@ public class NoSer
 			{	Line3D line3D = (Line3D) o;
 				//double[] line = getLine3DState(line3D);
 				List<Double> line = getLine3DState(line3D);
-				conState.addElement(line);
+				//conState.addElement(line);
+				conState.add(line);
 			}
 			else if (o instanceof Plane3D)
 			{	Plane3D plane3D = (Plane3D) o;
 				//double[] plane = getPlane3DState(plane3D);
 				List<Double> plane = getPlane3DState(plane3D);
-				conState.addElement(plane);
+				//conState.addElement(plane);
+				conState.add(plane);
 				
 			}
 				
@@ -475,14 +478,15 @@ public class NoSer
 		return conState;
 	}
 	
-	public static Vector setConstructionState(Vector conState)
+	public static Vector setConstructionState(List<Object> conState)
 	{
 		Vector construction = new Vector();
 		
 		for (int cCnt = 0; cCnt < conState.size(); cCnt++)
 		{
 			//double[] instruct = (double[]) conState.elementAt(cCnt);
-			List<Double> instruct = (ArrayList<Double>) conState.elementAt(cCnt);
+			//List<Double> instruct = (ArrayList<Double>) conState.elementAt(cCnt);
+			List<Double> instruct = (ArrayList<Double>) conState.get(cCnt);
 			
 			//if (instruct.length == 6)
 			if (instruct.size() == 6)

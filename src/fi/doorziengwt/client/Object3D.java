@@ -1379,7 +1379,7 @@ System.out.println("" + index + " is not on top of " + cnt);
     {   facets = mergeSort(facets);
     }    
     public Facet3D[] mergeSort(Facet3D[] list)
-    {   if (list.length == 1)
+    {   if (list.length <= 1)
             return list;
         int half = list.length / 2;
         Facet3D[] list1 = new Facet3D[half];

@@ -854,8 +854,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     }
 
     
-    public void setViewerState(Map<String,Object> h)
+    public void setViewerState(Map<String,Object> map)
     {
+    	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    	
 //		boolean letters = false;
 //		boolean hulpPunten = false;
 //		boolean centraleProjectie = true;
@@ -890,7 +893,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 		int figuurCode = CUBE;
 		if (h.containsKey("figuurCode"))
-			figuurCode = ((Integer) h.get("figuurCode")).intValue();
+			figuurCode = h.getInt("figuurCode");
 		
 //		selectItem(figuurCode);
 		
@@ -901,13 +904,13 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		boolean planesFilled = false;
 
 		if (h.containsKey("numLines"))
-			numLines = ((Integer) h.get("numLines")).intValue();
+			numLines = h.getInt("numLines");
 		if (h.containsKey("numPlanes"))
-			numPlanes = ((Integer) h.get("numPlanes")).intValue();
+			numPlanes = h.getInt("numPlanes");
 		if (h.containsKey("filled"))
-			filled = ((Boolean) h.get("filled")).booleanValue();
+			filled = h.getBoolean("filled");
 		if (h.containsKey("planesFilled"))
-			planesFilled = ((Boolean) h.get("planesFilled")).booleanValue();
+			planesFilled = h.getBoolean("planesFilled");
 		
 
 		drawingShell.setNumLines(numLines);
@@ -922,7 +925,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		double lengthFactor = 0;
 		if (h.containsKey("lengthFactor"))
-			lengthFactor = ((Double) h.get("lengthFactor")).doubleValue();
+			lengthFactor = h.getDouble("lengthFactor");
 
 		DrawConstants.llFactor = lengthFactor;
 		
@@ -935,20 +938,20 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		Matrix3D mat = new Matrix3D();
 		//double[] coeff = new double[9];
-		ArrayList<Double> coeff = new ArrayList<Double>(); 
+		List<Double> coeff = new ArrayList<Double>(); 
 		int paintType = Object3DContainer.PUREZ;
 		double zoomFactor = 9e-1d;
 		boolean showInside = true;
 		
 		if (h.containsKey("matrix3D"))
-			coeff = (ArrayList<Double>) h.get("matrix3D");
+			coeff = h.getDoubleList("matrix3D");
 		mat = NoSer.setMatrix3DState(coeff);		
 		if (h.containsKey("paintType"))
-			paintType = ((Integer) h.get("paintType")).intValue();
+			paintType = h.getInt("paintType");
 		if (h.containsKey("zoomFactor"))
-			zoomFactor = ((Double) h.get("zoomFactor")).doubleValue();
+			zoomFactor = h.getDouble("zoomFactor");
 		if (h.containsKey("showInside"))
-			showInside = ((Boolean) h.get("showInside")).booleanValue();
+			showInside = h.getBoolean("showInside");
 		
 		// moet dit VOOR of NA het creeeren van het Object3D?
 		drawingShell.panel3D.mat = mat;
@@ -972,7 +975,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
         int mode = drawingShell.INERT;
         if (h.containsKey("mode"))
-        {	mode = ((Integer) h.get("mode")).intValue();
+        {	mode = h.getInt("mode");
 //System.out.println("contains mode");        
         }
         
@@ -980,16 +983,19 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         
 //System.out.println("dp mode = " + mode);        
         
-		HashMap<String,Object> origObject = new HashMap<String,Object>();
-		Vector conState = new Vector();
+		Map<String,Object> origObject = new HashMap<String,Object>();
+		//Vector conState = new Vector();
 		Object conStateOb = null;
+		List<Object> conStateList = new ArrayList<Object>();
 		
 		if (h.containsKey("origObject"))
-		{	origObject = (HashMap<String,Object>) h.get("origObject");
+		{	origObject = h.getMap("origObject");
 		}
 		if (h.containsKey("conState"))
-		{	conStateOb = h.get("conState");
+		{	//conStateOb = h.get("conState");
+			conStateList = h.getList("conState");
 		}
+/*		
 		if (conStateOb instanceof Vector)
 		{
 			conState = (Vector) conStateOb;
@@ -1003,10 +1009,10 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				conState.addElement(o);
 			}
 		}
-
+*/
 		
 		Object3D originalObject = NoSer.setObject3DState(origObject);
-		Vector construction = NoSer.setConstructionState(conState);
+		Vector construction = NoSer.setConstructionState(conStateList);
 		
 //drawingShell.panel3D.testString2 = "pv = " + popupVisible + " nvob = " + originalObject.numVertices;		
 		
@@ -1019,20 +1025,20 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			boolean oldFilled = false;
 			Matrix3D oldPos = new Matrix3D();
 			//double[] oldCoeff = new double[9];
-			ArrayList<Double> oldCoeff = new ArrayList<Double>();
+			List<Double> oldCoeff = new ArrayList<Double>();
 			if (h.containsKey("oldFilled"))
-				oldFilled = ((Boolean) h.get("oldFilled")).booleanValue();
+				oldFilled = h.getBoolean("oldFilled");
 			if (h.containsKey("oldPos"))
-				oldCoeff = (ArrayList<Double>) h.get("oldPos");
+				oldCoeff = h.getDoubleList("oldPos");
 			oldPos = NoSer.setMatrix3DState(oldCoeff);
 			
 			// toestand fold out
 			boolean flattened = false;
 			double angle = 2e-1d;
 			if (h.containsKey("flattened"))
-				flattened = ((Boolean) h.get("flattened")).booleanValue();
+				flattened = h.getBoolean("flattened");
 			if (h.containsKey("angle"))
-				angle = ((Double) h.get("angle")).doubleValue();
+				angle = h.getDouble("angle");
 			drawingShell.flattened = flattened;
 			drawingShell.currentFoldOut = angle;
 			
@@ -1040,9 +1046,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			
 			Facet3D startFacet = null;
 			//double[] vertices = new double[0];;
-			ArrayList<Double> vertices = new ArrayList<Double>(); 
+			List<Double> vertices = new ArrayList<Double>(); 
 			if (h.containsKey("startFacet"))
-			{	vertices = (ArrayList<Double>) h.get("startFacet");
+			{	vertices = h.getDoubleList("startFacet");
 //System.out.println("contains sf");			
 			}
 	
@@ -1073,21 +1079,21 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			// toestand originele object
 			boolean oldPlanesFilled = false;
 			if (h.containsKey("oldPlanesFilled"))
-				oldPlanesFilled = ((Boolean) h.get("oldPlanesFilled")).booleanValue();
+				oldPlanesFilled = h.getBoolean("oldPlanesFilled");
 			drawingShell.oldPlanesFilled = oldPlanesFilled;
 
 			// toestand cut object
 			String volumeString = "";
 			if (h.containsKey("volumeString"))
-				volumeString = (String) h.get("volumeString");
+				volumeString = h.getString("volumeString");
 			drawingShell.panel3D.testString = volumeString;
 			
 			
 			Plane3D planeChoosen = new Plane3D(1, 0, 0, 0);
 			//double[] planeChoosenCoeff = new double[9];
-			ArrayList<Double> planeChoosenCoeff = new ArrayList<Double>(); 
+			List<Double> planeChoosenCoeff = new ArrayList<Double>(); 
 			if (h.containsKey("planeChoosen"))
-				planeChoosenCoeff = (ArrayList<Double>) h.get("planeChoosen");
+				planeChoosenCoeff = h.getDoubleList("planeChoosen");
 			planeChoosen = NoSer.setPlane3DState(planeChoosenCoeff);
 			drawingShell.planeChoosen = planeChoosen; 
 			
@@ -1179,7 +1185,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         else if (drawingShell.currentObjectGroup instanceof ObjectWithPlane)
             construction = ((ObjectWithPlane) drawingShell.currentObjectGroup).getConstruction();
         
-        Vector conState = NoSer.getConstructionState(construction);
+        //Vector conState = NoSer.getConstructionState(construction);
+        List<Object> conState = NoSer.getConstructionState(construction);
 		
 		h.put("origObject", origObject);
 		h.put("conState", conState);
@@ -1242,7 +1249,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	
     }
 
-    public void setPopupState(Map<String,Object> h)
+    public void setPopupState(Map<String,Object> map)
     {
 //		boolean letters = false;
 //		boolean hulpPunten = false;
@@ -1257,6 +1264,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 		// true voegt de helpPointDrop toe maar laat
 		// die niet zien
+    	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
     	
 		if (hulpPunten)
 		{	drawingPanel.setHelpPointDrop(true);
@@ -1294,7 +1303,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 		int figuurCode = CUBE;
 		if (h.containsKey("figuurCode"))
-			figuurCode = ((Integer) h.get("figuurCode")).intValue();
+			figuurCode = h.getInt("figuurCode");
 		
 //		selectItem(figuurCode);
 		
@@ -1305,13 +1314,13 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		boolean planesFilled = false;
 
 		if (h.containsKey("numLines"))
-			numLines = ((Integer) h.get("numLines")).intValue();
+			numLines = h.getInt("numLines");
 		if (h.containsKey("numPlanes"))
-			numPlanes = ((Integer) h.get("numPlanes")).intValue();
+			numPlanes = h.getInt("numPlanes");
 		if (h.containsKey("filled"))
-			filled = ((Boolean) h.get("filled")).booleanValue();
+			filled = h.getBoolean("filled");
 		if (h.containsKey("planesFilled"))
-			planesFilled = ((Boolean) h.get("planesFilled")).booleanValue();
+			planesFilled = h.getBoolean("planesFilled");
 		
 		// dit enabled/disabled de lijn knoppen
 		drawingPanel.setNumLines(numLines);
@@ -1328,7 +1337,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		double lengthFactor = 0;
 		if (h.containsKey("lengthFactor"))
-			lengthFactor = ((Double) h.get("lengthFactor")).doubleValue();
+			lengthFactor = h.getDouble("lengthFactor");
 
 		DrawConstants.llFactor = lengthFactor;
 		// dit betekent dat er zeker lijnen zijn!
@@ -1341,20 +1350,20 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		Matrix3D mat = new Matrix3D();
 		//double[] coeff = new double[9];
-		ArrayList<Double> coeff = new ArrayList<Double>(); 
+		List<Double> coeff = new ArrayList<Double>(); 
 		int paintType = Object3DContainer.PUREZ;
 		double zoomFactor = 9e-1d;
 		boolean showInside = true;
 		
 		if (h.containsKey("matrix3D"))
-			coeff = (ArrayList<Double>) h.get("matrix3D");
+			coeff = h.getDoubleList("matrix3D");
 		mat = NoSer.setMatrix3DState(coeff);		
 		if (h.containsKey("paintType"))
-			paintType = ((Integer) h.get("paintType")).intValue();
+			paintType = h.getInt("paintType");
 		if (h.containsKey("zoomFactor"))
-			zoomFactor = ((Double) h.get("zoomFactor")).doubleValue();
+			zoomFactor = h.getDouble("zoomFactor");
 		if (h.containsKey("showInside"))
-			showInside = ((Boolean) h.get("showInside")).booleanValue();
+			showInside = h.getBoolean("showInside");
 		
 		// moet dit VOOR of NA het creeeren van het Object3D?
 		drawingPanel.panel3D.mat = mat;
@@ -1377,7 +1386,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
         int mode = drawingPanel.INERT;
         if (h.containsKey("mode"))
-        {	mode = ((Integer) h.get("mode")).intValue();
+        {	mode = h.getInt("mode");
 //System.out.println("contains mode");        
         }
         
@@ -1385,17 +1394,20 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         
 //System.out.println("dp mode = " + mode);        
         
-		HashMap<String,Object> origObject = new HashMap<String,Object>();
-		Vector conState = new Vector();
+		Map<String,Object> origObject = new HashMap<String,Object>();
+		//Vector conState = new Vector();
 		Object conStateOb = null;
+		List<Object> conStateList = new ArrayList<Object>(); 
 		
 		if (h.containsKey("origObject"))
-		{	origObject = (HashMap<String,Object>) h.get("origObject");
+		{	origObject = h.getMap("origObject");
 		}
 		if (h.containsKey("conState"))
 		{	//conState = (Vector) h.get("conState");
-			conStateOb = h.get("conState");
+			//conStateOb = h.getObject("conState");
+			conStateList = h.getList("conState");
 		}
+/*		
 		if (conStateOb instanceof Vector)
 		{
 			conState = (Vector) conStateOb;
@@ -1409,10 +1421,10 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				conState.addElement(o);
 			}
 		}
-		
+*/		
 		
 		Object3D originalObject = NoSer.setObject3DState(origObject);
-		Vector construction = NoSer.setConstructionState(conState);
+		Vector construction = NoSer.setConstructionState(conStateList);
 		
 		drawingPanel.currentObjectGroup = drawingPanel.rebuild(originalObject, construction, null);
 		drawingPanel.originalObject = drawingPanel.currentObjectGroup.leftMostLeaf();
@@ -1423,20 +1435,20 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			boolean oldFilled = false;
 			Matrix3D oldPos = new Matrix3D();
 			//double[] oldCoeff = new double[9];
-			ArrayList<Double> oldCoeff = new ArrayList<Double>();
+			List<Double> oldCoeff = new ArrayList<Double>();
 			if (h.containsKey("oldFilled"))
-				oldFilled = ((Boolean) h.get("oldFilled")).booleanValue();
+				oldFilled = h.getBoolean("oldFilled");
 			if (h.containsKey("oldPos"))
-				oldCoeff = (ArrayList<Double>) h.get("oldPos");
+				oldCoeff = h.getDoubleList("oldPos");
 			oldPos = NoSer.setMatrix3DState(oldCoeff);
 			
 			// toestand fold out
 			boolean flattened = false;
 			double angle = 2e-1d;
 			if (h.containsKey("flattened"))
-				flattened = ((Boolean) h.get("flattened")).booleanValue();
+				flattened = h.getBoolean("flattened");
 			if (h.containsKey("angle"))
-				angle = ((Double) h.get("angle")).doubleValue();
+				angle = h.getDouble("angle");
 			drawingPanel.flattened = flattened;
 			drawingPanel.currentFoldOut = angle;
 			
@@ -1444,9 +1456,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			
 			Facet3D startFacet = null;
 			//double[] vertices = new double[0];;
-			ArrayList<Double> vertices = new ArrayList<Double>(); 
+			List<Double> vertices = new ArrayList<Double>(); 
 			if (h.containsKey("startFacet"))
-			{	vertices = (ArrayList<Double>) h.get("startFacet");
+			{	vertices = h.getDoubleList("startFacet");
 //System.out.println("contains sf");			
 			}
 	
@@ -1479,21 +1491,21 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			// toestand originele object
 			boolean oldPlanesFilled = false;
 			if (h.containsKey("oldPlanesFilled"))
-				oldPlanesFilled = ((Boolean) h.get("oldPlanesFilled")).booleanValue();
+				oldPlanesFilled = h.getBoolean("oldPlanesFilled");
 			drawingPanel.oldPlanesFilled = oldPlanesFilled;
 
 			// toestand cut object
 			String volumeString = "";
 			if (h.containsKey("volumeString"))
-				volumeString = (String) h.get("volumeString");
+				volumeString = h.getString("volumeString");
 			drawingPanel.panel3D.testString = volumeString;
 			
 			
 			Plane3D planeChoosen = new Plane3D(1, 0, 0, 0);
 			//double[] planeChoosenCoeff = new double[9];
-			ArrayList<Double> planeChoosenCoeff = new ArrayList<Double>(); 
+			List<Double> planeChoosenCoeff = new ArrayList<Double>(); 
 			if (h.containsKey("planeChoosen"))
-				planeChoosenCoeff = (ArrayList<Double>) h.get("planeChoosen");
+				planeChoosenCoeff = h.getDoubleList("planeChoosen");
 			planeChoosen = NoSer.setPlane3DState(planeChoosenCoeff);
 			drawingPanel.planeChoosen = planeChoosen; 
 			
@@ -1577,7 +1589,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         else if (drawingPanel.currentObjectGroup instanceof ObjectWithPlane)
             construction = ((ObjectWithPlane) drawingPanel.currentObjectGroup).getConstruction();
         
-        Vector conState = NoSer.getConstructionState(construction);
+        //Vector conState = NoSer.getConstructionState(construction);
+        List<Object> conState = NoSer.getConstructionState(construction);
 		
 		h.put("origObject", origObject);
 		h.put("conState", conState);
@@ -1786,7 +1799,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			lijnVerlengOptie = launchState.getBoolean("lijnVerlengOptie");
 
 		if (launchState.containsKey("vlakTekenOptie"))
-			vlakTekenOptie = (Boolean) launchState.getBoolean("vlakTekenOptie");
+			vlakTekenOptie = launchState.getBoolean("vlakTekenOptie");
 		if (launchState.containsKey("evenwijdigVlakOptie"))
 			evenwijdigVlakOptie = launchState.getBoolean("evenwijdigVlakOptie");
 
@@ -1821,7 +1834,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		//Object origObject = launchState.get("origObject");
 		
 		// beginfiguur
-		if (launchState != null && launchState.get("origObject") != null)
+		if (launchState != null && launchState.getMap("origObject") != null)
 		{	resetState = mapToHashMap(map); //launchState;
 			 
 		}
