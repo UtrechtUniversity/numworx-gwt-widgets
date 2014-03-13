@@ -4,7 +4,7 @@ import java.util.*;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
-
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 //import fi.beans.base64code.StringCodeObject;
 
 public class NoSer 
@@ -478,15 +478,17 @@ public class NoSer
 		return conState;
 	}
 	
-	public static Vector setConstructionState(List<Object> conState)
+	public static Vector setConstructionState(List<Object> l)
 	{
 		Vector construction = new Vector();
+		
+		ObjectList conState = JSONUtilities.wrapList(l);
 		
 		for (int cCnt = 0; cCnt < conState.size(); cCnt++)
 		{
 			//double[] instruct = (double[]) conState.elementAt(cCnt);
 			//List<Double> instruct = (ArrayList<Double>) conState.elementAt(cCnt);
-			List<Double> instruct = (ArrayList<Double>) conState.get(cCnt);
+			List<Double> instruct = conState.getDoubleList(cCnt);
 			
 			//if (instruct.length == 6)
 			if (instruct.size() == 6)
