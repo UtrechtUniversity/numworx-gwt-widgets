@@ -1,6 +1,10 @@
 package fi.algebraexprgwt.client;
 
 import java.util.*;
+import java.util.Map;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class ZoomStateHolder 
 {
@@ -29,7 +33,7 @@ public class ZoomStateHolder
 		return zoomStates.keySet();
 	}
 	
-	public HashMap<String,Object> getState()
+	public Map<String,Object> getState()
 	{	HashMap<String,Object> h = new HashMap<String,Object>();
 	
 		//Enumeration en = zoomStates.keys();
@@ -46,12 +50,14 @@ public class ZoomStateHolder
 		return h;
 	}
 
-    public void setState(HashMap<String,Object> h)
-    {	if (h == null) 
+    public void setState(Map<String,Object> map)
+    {	if (map == null) 
     		return;
     
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    
     	//Enumeration en = h.keys();
-		Set keySet = h.keySet();
+		Set keySet = map.keySet();
 		Object[] keys = keySet.toArray();
     	
 		//while(en.hasMoreElements())
@@ -61,7 +67,7 @@ public class ZoomStateHolder
 			String key = (String) keys[kCnt];
 			
 			ZoomState zs = new ZoomState();
-			zs.setState((HashMap<String,Object>) h.get(key));
+			zs.setState(h.getMap(key));
 			zoomStates.put(key, zs);
 		}
     }

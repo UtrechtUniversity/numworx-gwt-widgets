@@ -1,6 +1,10 @@
 package fi.algebraexprgwt.client;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class ZoomState 
 {
@@ -14,7 +18,7 @@ public class ZoomState
 	private double beginy = 14;
 	private double tracexD = 0;
 	
-	public HashMap<String,Object> getState()
+	public Map<String,Object> getState()
 	{	HashMap<String,Object> h = new HashMap<String,Object>();
 		h.put("schaalFactorY", new Double(schaalFactorY));
 		h.put("factorRijNummerY", new Integer(factorRijNummerY));
@@ -28,8 +32,11 @@ public class ZoomState
 		return h;
 	}
 
-    public void setState(HashMap<String,Object> h)
-    {	double schaalFactorY = 1;
+    public void setState(Map<String,Object> map)
+    {	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    	
+    	double schaalFactorY = 1;
 		int factorRijNummerY = 99;
 		double schaalFactorX = 1;
 		int factorRijNummerX = 99;
@@ -40,23 +47,23 @@ public class ZoomState
 		double tracexD = 0;
 		
 		if (h.containsKey("schaalFactorY")) 
-			schaalFactorY = ((Double) h.get("schaalFactorY")).doubleValue();
+			schaalFactorY = h.getDouble("schaalFactorY");
 		if (h.containsKey("factorRijNummerY")) 
-			factorRijNummerY = ((Integer) h.get("factorRijNummerY")).intValue();
+			factorRijNummerY = h.getInt("factorRijNummerY");
 		if (h.containsKey("schaalFactorX")) 
-			schaalFactorX = ((Double) h.get("schaalFactorX")).doubleValue();
+			schaalFactorX = h.getDouble("schaalFactorX");
 		if (h.containsKey("factorRijNummerX")) 
-			factorRijNummerX = ((Integer) h.get("factorRijNummerX")).intValue();
+			factorRijNummerX = h.getInt("factorRijNummerX");
 		if (h.containsKey("beginwaarde")) 
-			beginwaarde = ((Integer) h.get("beginwaarde")).intValue();
+			beginwaarde = h.getInt("beginwaarde");
 		if (h.containsKey("selectnummer")) 
-			selectnummer = ((Integer) h.get("selectnummer")).intValue();
+			selectnummer = h.getInt("selectnummer");
 		if (h.containsKey("beginx")) 
-			beginx = ((Double) h.get("beginx")).doubleValue();
+			beginx = h.getDouble("beginx");
 		if (h.containsKey("beginy")) 
-			beginy = ((Double) h.get("beginy")).doubleValue();
+			beginy = h.getDouble("beginy");
 		if (h.containsKey("tracexD")) 
-			tracexD = ((Double) h.get("tracexD")).doubleValue();
+			tracexD = h.getDouble("tracexD");
 		
 		this.schaalFactorY = schaalFactorY;
 		this.factorRijNummerY = factorRijNummerY;

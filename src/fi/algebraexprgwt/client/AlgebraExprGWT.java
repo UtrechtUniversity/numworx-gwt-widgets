@@ -7,7 +7,8 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
-
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -136,16 +137,18 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		//this(null, null, null);
 	}
 	
-	public AlgebraExprGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
+	public AlgebraExprGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
-		if (h != null && h.get("breedte") != null)
-			breedte = (Integer) h.get("breedte");
-		if (h != null && h.get("hoogte") != null)
-			hoogte = (Integer) h.get("hoogte");
-		if (h != null && h.get("interactiePanelLaunchState") != null)
-			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+		if (h.containsKey("breedte"))
+			breedte = h.getInt("breedte");
+		if (h.containsKey("hoogte"))
+			hoogte = h.getInt("hoogte");
+		if (h.containsKey("interactiePanelLaunchState"))
+			launchState = h.getMap("interactiePanelLaunchState");
 
 		getImages();
 		
@@ -448,30 +451,31 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	}
 	
 	@Override
-	public void init(int width, int height, Map<String, Object> launchState,
+	public void init(int width, int height, Map<String, Object> map,//launchState,
 					 Map<String, Number> values) 
 	{
 		this.breedte = width;
 		this.hoogte = height;
-		this.launchState = launchState;
+		//this.launchState = launchState;
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
-		if (launchState != null && launchState.get("toolkit") != null)
-			toolkit = ((Boolean) launchState.get("toolkit")).booleanValue();
+		if (launchState.containsKey("toolkit"))
+			toolkit = launchState.getBoolean("toolkit");
 		
-		if (launchState != null && launchState.get("alleenInvullen") != null)
-			alleenInvullen = ((Boolean) launchState.get("alleenInvullen")).booleanValue();
+		if (launchState.containsKey("alleenInvullen"))
+			alleenInvullen = launchState.getBoolean("alleenInvullen");
 		
-		if (launchState != null && launchState.get("isDemo") != null)
-			isDemo = ((Boolean) launchState.get("isDemo")).booleanValue();
+		if (launchState.containsKey("isDemo"))
+			isDemo = launchState.getBoolean("isDemo");
 
-		if (launchState != null && launchState.get("brugklas") != null)
-			brugklas = ((Boolean) launchState.get("brugklas")).booleanValue();
+		if (launchState.containsKey("brugklas"))
+			brugklas = launchState.getBoolean("brugklas");
 		
-		if (launchState != null && launchState.get("tabelOptie") != null)
-			tabelOptie = ((Boolean) launchState.get("tabelOptie")).booleanValue();
+		if (launchState.containsKey("tabelOptie"))
+			tabelOptie = launchState.getBoolean("tabelOptie");
 		
-		if (launchState != null && launchState.get("grafiekOptie") != null)
-			grafiekOptie = ((Boolean) launchState.get("grafiekOptie")).booleanValue();
+		if (launchState.containsKey("grafiekOptie"))
+			grafiekOptie = launchState.getBoolean("grafiekOptie");
 
 		canvasPanel = new LayoutPanel();
 		dlp.add(canvasPanel);
@@ -514,8 +518,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
 		makeLeft();
 		
-		if (!standAlone && (launchState != null))
-			asv.setState(launchState);
+		if (!standAlone && (map != null))
+			asv.setState(map);
 		
 		asv.paint();
 

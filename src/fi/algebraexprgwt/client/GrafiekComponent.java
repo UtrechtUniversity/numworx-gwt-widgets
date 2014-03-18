@@ -6,6 +6,9 @@ package fi.algebraexprgwt.client;
 //import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
 import fi.algebraexprgwt.client.expressies_ap.*;
 //import fi.algebraexpressies.schuifobjects.*;
 
@@ -298,8 +301,11 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 	    return h;
 	}
 	
-	public void setState(HashMap h)
-    {	int sizeB = 0;
+	public void setState(HashMap map)
+    {	
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
+		int sizeB = 0;
 		int sizeH = 0;
 		boolean trace = false;
 		double tracexD = 0;
@@ -308,14 +314,22 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		double schaalFactorY  = 1;
 		int factorRijNummerY = 99;
 		
-		if (h.containsKey("sizeB")) sizeB = ((Integer)h.get("sizeB")).intValue();
-    	if (h.containsKey("sizeH")) sizeH = ((Integer)h.get("sizeH")).intValue();
-    	if (h.containsKey("trace")) trace = ((Boolean)h.get("trace")).booleanValue();
-    	if (h.containsKey("tracexD")) tracexD = ((Double)h.get("tracexD")).doubleValue();
-    	if (h.containsKey("beginy")) beginy = ((Double)h.get("beginy")).doubleValue();
-    	if (h.containsKey("kettingZichtbaar")) kettingZichtbaar = ((Boolean)h.get("kettingZichtbaar")).booleanValue();
-    	if (h.containsKey("schaalFactorY")) schaalFactorY = ((Double)h.get("schaalFactorY")).doubleValue();
-    	if (h.containsKey("factorRijNummerY")) factorRijNummerY = ((Integer)h.get("factorRijNummerY")).intValue();
+		if (h.containsKey("sizeB")) 
+			sizeB = h.getInt("sizeB");
+    	if (h.containsKey("sizeH")) 
+    		sizeH = h.getInt("sizeH");
+    	if (h.containsKey("trace")) 
+    		trace = h.getBoolean("trace");
+    	if (h.containsKey("tracexD")) 
+    		tracexD = h.getDouble("tracexD");
+    	if (h.containsKey("beginy")) 
+    		beginy = h.getDouble("beginy");
+    	if (h.containsKey("kettingZichtbaar")) 
+    		kettingZichtbaar = h.getBoolean("kettingZichtbaar");
+    	if (h.containsKey("schaalFactorY")) 
+    		schaalFactorY = h.getDouble("schaalFactorY");
+    	if (h.containsKey("factorRijNummerY")) 
+    		factorRijNummerY = h.getInt("factorRijNummerY");
     	
 		
 		setSize(sizeB,sizeH);

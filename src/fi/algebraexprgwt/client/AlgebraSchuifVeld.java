@@ -2,10 +2,14 @@ package fi.algebraexprgwt.client;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
@@ -360,15 +364,15 @@ String testString = "test";
 	{	
 		
 		int aantalSc = 0;
-		ArrayList<String> classNamesList = new ArrayList<String>();
-		ArrayList<Integer> posXList = new ArrayList<Integer>();
-		ArrayList<Integer> posYList = new ArrayList<Integer>();
-		ArrayList<HashMap<String,Object>> scStatesList = new ArrayList<HashMap<String,Object>>();
-		ArrayList<Integer> connectionsList = new ArrayList<Integer>();
-		ArrayList<Integer> graphConnectionsList = new ArrayList<Integer>();
+		List<String> classNamesList = new ArrayList<String>();
+		List<Integer> posXList = new ArrayList<Integer>();
+		List<Integer> posYList = new ArrayList<Integer>();
+		List<Map<String,Object>> scStatesList = new ArrayList<Map<String,Object>>();
+		List<Integer> connectionsList = new ArrayList<Integer>();
+		List<Integer> graphConnectionsList = new ArrayList<Integer>();
 		boolean grafiek = false;
 		boolean expressie = false;
-		HashMap<String,Object> zoomStateHolderState = null;
+		Map<String,Object> zoomStateHolderState = null;
 
 		aantalSc = this.aantalSc;
 		for (int i = 0; i < aantalSc; i++)
@@ -460,58 +464,59 @@ String testString = "test";
 		setState(h);
 	}
 		
-    public void setState(Map<String,Object> h)
+    public void setState(Map<String,Object> map)
     {	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
     	
 // niet echt nodig, want de leerling kan dit niet veranderen    	
     	boolean toolkit = true;
-    	if ((h != null) && h.containsKey("toolkit"))
-    		toolkit = ((Boolean) h.get("toolkit")).booleanValue();
+    	if (h.containsKey("toolkit"))
+    		toolkit = h.getBoolean("toolkit");
     	//this.toolkit = toolkit;
 
     	boolean alleenInvullen = false;
-    	if ((h != null) && h.containsKey("alleenInvullen"))
-    		alleenInvullen = ((Boolean) h.get("alleenInvullen")).booleanValue();
+    	if (h.containsKey("alleenInvullen"))
+    		alleenInvullen = h.getBoolean("alleenInvullen");
     	//this.alleenInvullen = alleenInvullen;
 
     	boolean isDemo = false;
-    	if ((h != null) && h.containsKey("isDemo"))
-    		isDemo = ((Boolean) h.get("isDemo")).booleanValue();
+    	if (h.containsKey("isDemo"))
+    		isDemo = h.getBoolean("isDemo");
     	//this.isDemo = isDemo;
 
     	int aantalSc = 0;
-    	ArrayList<String> classNamesList = new ArrayList<String>();
-		ArrayList<Integer> posXList = new ArrayList<Integer>();
-		ArrayList<Integer> posYList = new ArrayList<Integer>();
-		ArrayList<HashMap<String,Object>> scStatesList = new ArrayList<HashMap<String,Object>>();
-		ArrayList<Integer> connectionsList = new ArrayList<Integer>();
-		ArrayList<Integer> graphConnectionsList = new ArrayList<Integer>();
+    	List<String> classNamesList = new ArrayList<String>();
+		List<Integer> posXList = new ArrayList<Integer>();
+		List<Integer> posYList = new ArrayList<Integer>();
+		List<Map<String,Object>> scStatesList = new ArrayList<Map<String,Object>>();
+		List<Integer> connectionsList = new ArrayList<Integer>();
+		List<Integer> graphConnectionsList = new ArrayList<Integer>();
 		boolean grafiek = false;
 		boolean expressie = false;
 
-		HashMap<String,Object> zoomStateHolderState = null;
+		Map<String,Object> zoomStateHolderState = null;
 	
 		
 		if (h.containsKey("aantalSc"))
-			aantalSc = ((Integer) h.get("aantalSc")).intValue();
+			aantalSc = h.getInt("aantalSc");
 		if (h.containsKey("classNamesList"))
-			classNamesList = (ArrayList<String>) h.get("classNamesList");
+			classNamesList = h.getStringList("classNamesList");
 		if (h.containsKey("posXList"))
-			posXList = (ArrayList<Integer>) h.get("posXList");
+			posXList = h.getIntegerList("posXList");
 		if (h.containsKey("posYList"))
-			posYList = (ArrayList<Integer>) h.get("posYList");
+			posYList = h.getIntegerList("posYList");
 		if (h.containsKey("scStatesList"))		
-			scStatesList = (ArrayList<HashMap<String,Object>>) h.get("scStatesList");
+			scStatesList = h.getMapList("scStatesList");
 		if (h.containsKey("connectionsList"))			
-			connectionsList = (ArrayList<Integer>) h.get("connectionsList");
+			connectionsList = h.getIntegerList("connectionsList");
 		if (h.containsKey("graphConnectionsList"))			
-			graphConnectionsList = (ArrayList<Integer>) h.get("graphConnectionsList");
+			graphConnectionsList = h.getIntegerList("graphConnectionsList");
 		if (h.containsKey("grafiek"))		
-			grafiek = ((Boolean) h.get("grafiek")).booleanValue();
+			grafiek = h.getBoolean("grafiek");
 		if (h.containsKey("expressie"))	
-			expressie = ((Boolean) h.get("expressie")).booleanValue();
+			expressie = h.getBoolean("expressie");
 		if (h.containsKey("zoomStateHolderState"))	
-			zoomStateHolderState = (HashMap<String,Object>) h.get("zoomStateHolderState");
+			zoomStateHolderState = h.getMap("zoomStateHolderState");
 		
 		zoomStateHolder.setState(zoomStateHolderState);
 		
