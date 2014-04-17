@@ -1,0 +1,98 @@
+package fi.kladjegwt.client;
+
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.ClientBundle.Source;
+
+public interface KladjeGWTClientBundle extends ClientBundle 
+{
+
+   @Source("fi/kladjegwt/client/images/teken_penknop_up.gif")
+   public ImageResource tekenKnopUpResource();
+
+   @Source("fi/kladjegwt/client/images/teken_penknop_down.gif")
+   public ImageResource tekenKnopDownResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_gumknop_up.gif")
+   public ImageResource gumKnopUpResource();
+
+   @Source("fi/kladjegwt/client/images/teken_gumknop_down.gif")
+   public ImageResource gumKnopDownResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_lijn_up.gif")
+   public ImageResource tekenLijnUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_lijn_down.gif")
+   public ImageResource tekenLijnDownResource();
+
+   @Source("fi/kladjegwt/client/images/teken_rechthoek_up.gif")
+   public ImageResource tekenRechthoekUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_rechthoek_down.gif")
+   public ImageResource tekenRechthoekDownResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_cirkel_up.gif")
+   public ImageResource tekenCirkelUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_cirkel_down.gif")
+   public ImageResource tekenCirkelDownResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_tekst_up.gif")
+   public ImageResource tekenTekstUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_tekst_down.gif")
+   public ImageResource tekenTekstDownResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_selecteren_up.gif")
+   public ImageResource selecterenUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_selecteren_down.gif")
+   public ImageResource selecterenDownResource();
+
+   @Source("fi/kladjegwt/client/images/roteer-links.gif")
+   public ImageResource roteerLinksomResource();
+   
+   @Source("fi/kladjegwt/client/images/roteer-rechts.gif")
+   public ImageResource roteerRechtsomResource();
+
+   @Source("fi/kladjegwt/client/images/zoominknop.gif")
+   public ImageResource vergrootResource();
+
+   @Source("fi/kladjegwt/client/images/zoomuitknop.gif")
+   public ImageResource verkleinResource();
+
+   @Source("fi/kladjegwt/client/images/regenboog3.gif")
+   public ImageResource regenboogResource();
+   
+   @Source("fi/kladjegwt/client/images/zwart.gif")
+   public ImageResource zwartResource();
+
+   @Source("fi/kladjegwt/client/images/grijs.gif")
+   public ImageResource grijsResource();
+
+   @Source("fi/kladjegwt/client/images/rood.gif")
+   public ImageResource roodResource();
+   
+   @Source("fi/kladjegwt/client/images/oranje.gif")
+   public ImageResource oranjeResource();
+   
+   @Source("fi/kladjegwt/client/images/groen.gif")
+   public ImageResource groenResource();
+   
+   @Source("fi/kladjegwt/client/images/cyaan.gif")
+   public ImageResource cyaanResource();
+   
+   @Source("fi/kladjegwt/client/images/blauw.gif")
+   public ImageResource blauwResource();
+   
+   @Source("fi/kladjegwt/client/images/magenta.gif")
+   public ImageResource magentaResource();
+   
+//   @Source("fi/kladjehwt/client/images/geel.gif")
+//   public ImageResource geelResource();
+
+   
+   @Source("fi/kladjegwt/client/css/KladjeGWT.css")
+   public  KladjeCssResource getKladjeGWTCSS();
+
+}
