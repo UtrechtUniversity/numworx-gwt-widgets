@@ -154,8 +154,8 @@ class Polygon
 	{	
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
 		{
-			double rotX = Math.cos(rotation) * (puntenX[pCnt] - cx) - Math.sin(rotation) * (puntenY[pCnt] - cy);
-			double rotY = Math.sin(rotation) * (puntenX[pCnt] - cx) + Math.cos(rotation) * (puntenY[pCnt] - cy);
+			double rotX = Math.cos(rotation) * (doubleX[pCnt] - cx) - Math.sin(rotation) * (doubleY[pCnt] - cy);
+			double rotY = Math.sin(rotation) * (doubleX[pCnt] - cx) + Math.cos(rotation) * (doubleY[pCnt] - cy);
 						
 			puntenX[pCnt] = (int) Math.round(cx + rotX);
 			puntenY[pCnt] = (int) Math.round(cy + rotY);

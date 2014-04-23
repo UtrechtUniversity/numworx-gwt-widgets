@@ -7,7 +7,9 @@ import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
-
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+//import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -94,7 +96,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	boolean kleurkeuze = true;
 	
 	boolean lijnen = false;
-	boolean ruitjes = false;
+	boolean ruitjes = true;
 	boolean lijnTekenen = true;
 	boolean rechthoekTekenen = true;
 	boolean cirkelTekenen = true;
@@ -257,27 +259,6 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		tekenButton.addClickHandler(toggleClickHandler);
 
 
-/*		
-		tekenButton.addClickHandler(new ClickHandler() { // Zowel touch als mouse, wordt aangeroepen als de toggle al geweest is.
-
-			@Override
-			public void onClick(ClickEvent event) {
-    			if (tekenButton.isDown())
-    			{
-    				buttonsUp(tekenButton);
-    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.tekenen;
-    				kladjeGWTVeld.hideTekstVeld(true);    				
-    				kladjeGWTVeld.selecteerRechthoek = null;
-    				kladjeGWTVeld.paint();
-    			}
-    			else
-    			{
-    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
-    			}
- 				
-			}});
-*/		
-		
 		currentX += toggleSize + leftOffset;
 
 
@@ -389,7 +370,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		
 		currentX += buttonWidth + 2 * leftOffset;
 		currentY -= 2;
-		
+
+/*		
 		if (roteren)
 		{	
 			roteerLinksomButton = new PushButton(roteerLinksomImage);
@@ -419,7 +401,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 			
 			currentX += pushSize + leftOffset;
 		}
-		
+*/
+/*		
 		if (schalen)
 		{
 			vergrootButton = new PushButton(vergrootImage);
@@ -448,7 +431,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		
 			currentX += pushSize + leftOffset;
 		}
-		
+*/		
 		if (kleurkeuze)
 		{
 			kleurkeuzeButton = new PushButton(regenboogImage);
@@ -479,16 +462,18 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	
 	
 	
-	public KladjeGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden)
+	public KladjeGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
 		this.randomVarNamen = randomVarNamen;
 		this.randomVarWaarden = randomVarWaarden;
-		if (h != null && h.get("breedte") != null)
-			breedte = (Integer) h.get("breedte");
-		if (h != null && h.get("hoogte") != null)
-			hoogte = (Integer) h.get("hoogte");
-		if (h != null && h.get("interactiePanelLaunchState") != null)
-			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+		if (h.containsKey("breedte"))
+			breedte = h.getInt("breedte");
+		if (h.containsKey("hoogte"))
+			hoogte = h.getInt("hoogte");
+		if (h.containsKey("interactiePanelLaunchState"))
+			launchState = h.getMap("interactiePanelLaunchState");
 		
 		
 // constructie en initialisatie uit elkaar trekken.
@@ -661,7 +646,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		
 	}
 
-	
+/*	
     class ToggleTouchStartHandler implements TouchStartHandler
 	{
     	public void onTouchStart(TouchStartEvent e)
@@ -687,24 +672,6 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     			}
     			
     		}
-/*    		
-    		else if (e.getSource() == gumButton)
-    		{
-    			if (gumButton.isDown())
-    			{
-    				buttonsUp(gumButton);
-    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.gummen;
-    				kladjeGWTVeld.selecteerRechthoek = null;
-    				kladjeGWTVeld.paint();
-    				
-    			}
-    			else
-    			{
-    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
-    			}
-    			
-    		}
-*/    		
     		else if (e.getSource() == tekenLijnButton)
     		{
     			if (tekenLijnButton.isDown())
@@ -803,7 +770,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     	}
     	
     } // ToggleTouchStartHandler
-    
+*/    
     
     //class PushMouseHandler implements MouseDownHandler
     class PushClickHandler implements ClickHandler
@@ -812,8 +779,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     	public void onClick(ClickEvent e)
     	{
     		
-    		if (touchStart)
-    			return;
+    		//if (touchStart)
+    		//	return;
     		
 			//e.preventDefault();
 			e.stopPropagation();
@@ -828,6 +795,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     		{
     			kladjeGWTVeld.wis(true);
     		}
+    		
+/*    		
     		else if (e.getSource() == roteerLinksomButton)
     		{
     			kladjeGWTVeld.hideTekstVeld(true);
@@ -856,6 +825,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     			if (kladjeGWTVeld.mouseMode == kladjeGWTVeld.selecteren)
     				kladjeGWTVeld.scaleObjectSelected(kladjeGWTVeld.scaleDownStep);
     		}
+*/    		
     		else if (e.getSource() == kleurkeuzeButton)
     		{
     			kladjeGWTVeld.hideTekstVeld(true);
@@ -878,7 +848,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     	}
     	
     }
-    
+  
+/*    
     class PushTouchStartHandler implements TouchStartHandler
     {
     	public void onTouchStart(TouchStartEvent e)
@@ -924,7 +895,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     		
     	}
     }
-
+*/
+    
+/*    
     class PushTouchEndHandler implements TouchEndHandler
     {
     	public void onTouchEnd(TouchEndEvent e)
@@ -936,7 +909,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     		//e.preventDefault();
 			e.stopPropagation();
 
-/*			
+			
     		long touchEventAt = stp.getTime();
 			if (lastTouchEventAt > 0)
 			{	long deltaTime = touchEventAt - lastTouchEventAt;
@@ -944,7 +917,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 				if (deltaTime < touchPause)
 					return;
 			}
-*/			
+			
     		
     		if (e.getSource() == terugButton)
     		{
@@ -988,7 +961,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     		
     	}
     }
-    
+*/    
 	@Override
 	public HashMap<String, Object> getState()
 	{
@@ -1022,31 +995,35 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	}
 
 	
-	public void init(int width, int height, Map<String, Object> launchState,
+	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
+		
+		
+		
 		this.breedte = width;
 		this.hoogte = height;
-		this.launchState = launchState;
+		//this.launchState = launchState;
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
-		if (launchState != null && launchState.get("lijnen") != null)
-			lijnen = (Boolean) launchState.get("lijnen");
-		if (launchState != null && launchState.get("ruitjes") != null)
-			ruitjes = (Boolean) launchState.get("ruitjes");
+		if (launchState.containsKey("lijnen"))
+			lijnen = launchState.getBoolean("lijnen");
+		if (launchState.containsKey("ruitjes"))
+			ruitjes = launchState.getBoolean("ruitjes");
 		
-		if (launchState != null && launchState.get("lijnTekenen") != null)
-			lijnTekenen = (Boolean) launchState.get("lijnTekenen");
-		if (launchState != null && launchState.get("rechthoekTekenen") != null)
-			rechthoekTekenen = (Boolean) launchState.get("rechthoekTekenen");
-		if (launchState != null && launchState.get("cirkelTekenen") != null)
-			cirkelTekenen = (Boolean) launchState.get("cirkelTekenen");
-		if (launchState != null && launchState.get("tekstTekenen") != null)
-			tekstTekenen = (Boolean) launchState.get("tekstTekenen");
+		if (launchState.containsKey("lijnTekenen"))
+			lijnTekenen = launchState.getBoolean("lijnTekenen");
+		if (launchState.containsKey("rechthoekTekenen"))
+			rechthoekTekenen = launchState.getBoolean("rechthoekTekenen");
+		if (launchState.containsKey("cirkelTekenen"))
+			cirkelTekenen = launchState.getBoolean("cirkelTekenen");
+		if (launchState.containsKey("tekstTekenen"))
+			tekstTekenen = launchState.getBoolean("tekstTekenen");
 		
-		if (launchState != null && launchState.get("roteren") != null)
-			roteren = (Boolean) launchState.get("roteren");
-		if (launchState != null && launchState.get("schalen") != null)
-			schalen = (Boolean) launchState.get("schalen");
+		if (launchState.containsKey("roteren"))
+			roteren = launchState.getBoolean("roteren");
+		if (launchState.containsKey("schalen"))
+			schalen = launchState.getBoolean("schalen");
 
 		dlp.setSize(breedte + "px", hoogte + "px");
 		
@@ -1071,8 +1048,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 
 		kladjeGWTVeld.lijnen = lijnen;
 		kladjeGWTVeld.ruitjes = ruitjes;
+		KladjeGWTVeld.roteren = roteren;
+		KladjeGWTVeld.schalen = schalen;
 		
-		kladjeGWTVeld.setState(launchState);
+		
+		kladjeGWTVeld.setState(map);
 
 		makeBottom();
 		
