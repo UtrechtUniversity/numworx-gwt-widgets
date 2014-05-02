@@ -541,9 +541,10 @@ public class TekenPanel //extends JPanel
 
 		//ACTIE
 		if (aantalNieuwHp > 0)
-			v = new DraaiObject(20,aantalNieuwHp,nieuwHp);
+		{	v = new DraaiObject(20,aantalNieuwHp,nieuwHp);
 				
-		begin = false;
+			begin = false;
+		}	
 		
 		tekenOpnieuw();
 				
