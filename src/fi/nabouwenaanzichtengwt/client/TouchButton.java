@@ -1,6 +1,7 @@
 package fi.nabouwenaanzichtengwt.client;
 
-import nl.uu.fi.dwo.interaction.client.touch.TouchPanel;
+import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+
 
 /**
  * Bug with MGWT Button, use this button instead

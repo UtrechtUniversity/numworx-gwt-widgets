@@ -1,17 +1,12 @@
 package fi.nabouwenaanzichtengwt.client;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
-import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
-import nl.uu.fi.dwo.interaction.client.touch.TouchPanel;
-import nl.uu.fi.dwo.interaction.client.touch.TouchStartEvent;
-import nl.uu.fi.dwo.interaction.client.touch.TouchStartHandler;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -21,10 +16,12 @@ import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
+import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 {
@@ -53,7 +50,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 	private int goedHalfFout;
 	private int score = 0;
-	private boolean correct = false;
+	private Boolean correct;
 	private String feedback = "";
 
 	private boolean nagekeken;
@@ -146,7 +143,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		
 		MuisBeheerder mb = new MuisBeheerder(vWerk);
 
-		touchPanel.addTouchStartHandler( mb);
+		touchPanel.addTouchHandler( mb);
 	}
 
 	private void addCheckButtonHandler(final TouchButton tb)
@@ -157,6 +154,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			public void onTouchStart(TouchStartEvent event)
 			{
 				check();
+				if (vWerk == null || !ingevuld || !kijkNaActief)
+					comRoot.setChanged();
 			}
 
 		});
@@ -197,7 +196,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			nakijkKnop.add(vinkjeRoodImage);
 		}
 		nagekeken = true;
-		comRoot.setChanged();
+		
 
 	}
 
@@ -212,7 +211,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			return;
 		nakijkKnop.clear();
 		nakijkKnop.add(vinkjeGrijsImage);
-		correct = false;
+		correct = null;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
 			ingevuld = true;
@@ -233,7 +232,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		if (vWerk == null)
 			return h;
 
-		check();
+		// check(); FIXME waarom staat die hier? Leidt tot oneindige recursie! 
 		boolean[][][] stateNew = null;
 		stateNew = vWerk.kr.geefBooleanRooster();
 
@@ -277,10 +276,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
 		if (!kijkNaActief)
-			return true;
+			return Boolean.TRUE;
+		if(!nagekeken) return null;
 		return correct;
 	}
 
@@ -467,5 +467,39 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			touchPanel.addTouchHandler( mb);
 		}
 
+	}
+
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		this.breedte = breedte;
+		
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		return hoogte;
+	}
+
+	@Override
+	public int getWidth() {
+		return breedte;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
 	}
 }

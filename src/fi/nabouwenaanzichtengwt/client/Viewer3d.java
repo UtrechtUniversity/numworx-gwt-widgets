@@ -1,7 +1,5 @@
 package fi.nabouwenaanzichtengwt.client;
 
-import nl.uu.fi.dwo.interaction.client.touch.TouchEndEvent;
-import nl.uu.fi.dwo.interaction.client.touch.TouchStartEvent;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -9,6 +7,8 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 
 public class Viewer3d
 {

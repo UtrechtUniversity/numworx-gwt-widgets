@@ -2,12 +2,6 @@ package fi.nabouwenaanzichtengwt.client;
 
 //import java.awt.*;
 //import java.awt.event.*;
-import nl.uu.fi.dwo.interaction.client.touch.Touch;
-import nl.uu.fi.dwo.interaction.client.touch.TouchCancelEvent;
-import nl.uu.fi.dwo.interaction.client.touch.TouchEndEvent;
-import nl.uu.fi.dwo.interaction.client.touch.TouchHandler;
-import nl.uu.fi.dwo.interaction.client.touch.TouchMoveEvent;
-import nl.uu.fi.dwo.interaction.client.touch.TouchStartEvent;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.MouseEvent;
@@ -28,10 +22,16 @@ import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;*/
 
 import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.dom.client.event.touch.Touch;
+import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
+import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 
 
 
-class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler, TouchHandler
+class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHandler,*/ TouchHandler
 {
 	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
 	private Viewer3d eigenaar;
@@ -143,8 +143,8 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	public void onTouchMove(TouchMoveEvent event) {
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.touches().size() > 0) {
-			Touch touch = event.touches().get(0);
+		if (event.getTouches().length() > 0) {
+			Touch touch = event.getTouches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
 			int x = touch.getPageX()- eigenaar.getCanvas().getAbsoluteLeft();//getRelativeX(elem);
@@ -164,8 +164,8 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	public void onTouchStart(TouchStartEvent event) {
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.touches().size() > 0) {
-			Touch touch = event.touches().get(0);
+		if (event.getTouches().length() > 0) {
+			Touch touch = event.getTouches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
 			eerstex = touch.getPageX() - eigenaar.getCanvas().getAbsoluteLeft();//getRelativeX(elem);
