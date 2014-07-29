@@ -234,8 +234,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 		
 	}	
@@ -982,9 +982,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
-		return false;
+		return Boolean.TRUE;
 	}
 
 	@Override
@@ -1057,6 +1057,42 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		makeBottom();
 		
 		kladjeGWTVeld.paint();
+	}
+
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
 	}
 	
     
