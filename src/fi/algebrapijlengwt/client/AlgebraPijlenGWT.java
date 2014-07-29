@@ -484,10 +484,9 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return Boolean.TRUE;
 	}
 
 	@Override
@@ -578,6 +577,48 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		asv.paint();
 		
 
+	}
+
+
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 
