@@ -295,8 +295,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		RootPanel.get(holderId).addStyleName(doorzienGWTCss.root());
 		
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 		
 	}
 
@@ -1771,10 +1771,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return Boolean.TRUE;
 	}
 
 	@Override
@@ -1899,6 +1898,42 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			result.put(key, o);
 		}
 		return result;
+	}
+
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 

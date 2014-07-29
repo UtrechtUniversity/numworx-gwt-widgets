@@ -6,6 +6,7 @@ import java.util.*;
 import java.io.Serializable;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.core.shared.GWT;
 
 
 // abstract class, subclasses MUST initialize facets in some way and call
@@ -1376,7 +1377,8 @@ System.out.println("" + index + " is not on top of " + cnt);
 
     // merge sort ALL facets by zValue, speed O(n log_2 n)    
     public void zMergeSort()
-    {   facets = mergeSort(facets);
+    {
+    	facets = mergeSort(facets);
     }    
     public Facet3D[] mergeSort(Facet3D[] list)
     {   if (list.length <= 1)
