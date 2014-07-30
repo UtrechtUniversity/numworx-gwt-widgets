@@ -124,8 +124,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	
 		standAlone = true;
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 			
 	}
 
