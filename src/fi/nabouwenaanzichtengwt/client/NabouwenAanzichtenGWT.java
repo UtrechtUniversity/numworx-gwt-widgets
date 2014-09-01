@@ -155,7 +155,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			{
 				check();
 				if (vWerk == null || !ingevuld || !kijkNaActief)
-					comRoot.setChanged();
+					comRoot.setChanged(goedHalfFout == NabouwenAanzichtenChecker.FOUT);
 			}
 
 		});
@@ -217,7 +217,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			ingevuld = true;
 		else
 			ingevuld = false;
-		comRoot.setChanged();
+		comRoot.setChanged(false);
 	}
 
 	boolean isBouwen()
