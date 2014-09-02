@@ -1,7 +1,6 @@
 package fi.kladjegwt.client;
 
 import java.awt.Color;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -33,11 +32,10 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
-
 public class KladjeGWTVeld 
 {
 	public Canvas kladjeHWTCanvas;
-	public Context2d gIm;
+	public static Context2d gIm;
 	
 	static double NZERO = 1e-5d;
 	
@@ -45,6 +43,7 @@ public class KladjeGWTVeld
 	static boolean schalen = true;
 	
 	boolean handleAction = false;
+	boolean groupHandleAction = false;
 	boolean scalingTopRight = false;
 	boolean scalingTopLeft = false;
 	boolean scalingBottomRight = false;
@@ -100,7 +99,13 @@ public class KladjeGWTVeld
 	boolean mouseDown;
 //	Point start = null;
 	
-	Vector<Point> draggPoints = new Vector<Point>();
+	final int GAUSSIAN = 0;
+	final int AVERAGE = 1;
+	final int AVERAGE2 = 2;
+	int smoothType = AVERAGE2;
+
+	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();	
+//	Vector<Point> draggPoints = new Vector<Point>();
 	//Vector gumPunten = new Vector();
 	//int gumGrootte = 7; // oneven	
 
@@ -112,9 +117,15 @@ public class KladjeGWTVeld
 //	KladjeRectangle wisRechthoek = null;
 	TekstElement tekstEdited = null;
 
+	Polygon topRightHandle, bottomRightHandle, topLeftHandle, bottomLeftHandle;
+	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
+	Rectangle rotateEastHandle, rotateWestHandle;
+	int hbFactor = 4;
+
 	// backwards compatibility
 	//ColorBytes[][] pixels = null;
-	Vector<ColorBytes> pixels = new Vector<ColorBytes>();
+	//Vector<ColorBytes> pixels = new Vector<ColorBytes>();
+	
 	int breedte, hoogte;
 	Vector<Streep> streepVector = new Vector<Streep>();
 	Vector<Lijn> lijnVector = new Vector<Lijn>();
@@ -358,6 +369,8 @@ public class KladjeGWTVeld
 			tekstElementen.add(tekstElement.getState());
 		}
 		h.put("tekstElementen", tekstElementen);
+
+System.out.println("kgwtv get " + tekstElementen.size());		
 		
 		
 		return h;
@@ -479,11 +492,12 @@ public class KladjeGWTVeld
 		{	TekstElement tekstElement = TekstElement.setState(tekstElementen.get(tCnt));
 			tekstElementVector.addElement(tekstElement);
 		}
-		
+System.out.println("kgwtv set " + tekstElementen.size());		
 
 		paint();
 	}
-	
+
+/*	
 	//public void setOldGWTState(Vector<short[]> gwtStateVector)
 	public void setOldGWTState(Vector<ArrayList<Short>> gwtStateVector)
 	{
@@ -504,7 +518,7 @@ public class KladjeGWTVeld
 		}
 
 	}
-	
+*/	
 	
 	void undo()
 	{
@@ -530,7 +544,7 @@ public class KladjeGWTVeld
 		}
 		else
 		{
-			pixels.removeAllElements();
+//			pixels.removeAllElements();
 			
 			streepVector.removeAllElements();
 			lijnVector.removeAllElements();
@@ -544,6 +558,66 @@ public class KladjeGWTVeld
 		paint();
 	}
 	
+	public ArrayList<DoublePoint> gaussianSmooth(ArrayList<DoublePoint> doublePoints)
+	{
+		if (doublePoints.size() < 3) 
+			return doublePoints;
+		ArrayList<DoublePoint> pointsNew = new ArrayList<DoublePoint>();
+		pointsNew.add(doublePoints.get(0));		
+		for (int i = 1; i < doublePoints.size() - 1; i++)
+		{
+			DoublePoint pOld0 = doublePoints.get(i-1);
+			DoublePoint pOld1 = doublePoints.get(i);
+			DoublePoint pOld2 = doublePoints.get(i+1);
+			DoublePoint smoothedPoint = new DoublePoint(pOld0.x / 4 + pOld1.x / 2 + pOld2.x / 4,
+														pOld0.y / 4 + pOld1.y / 2 + pOld2.y / 4);
+			pointsNew.add(smoothedPoint);
+		}
+		pointsNew.add(doublePoints.get(doublePoints.size() - 1));
+		
+		return pointsNew;
+		
+	}
+
+	public ArrayList<DoublePoint> averageSmooth(ArrayList<DoublePoint> doublePoints)
+	{
+		if (doublePoints.size() < 5) 
+			return doublePoints;
+		ArrayList<DoublePoint> pointsNew = new ArrayList<DoublePoint>();
+		pointsNew.add(doublePoints.get(0));		
+		pointsNew.add(doublePoints.get(1));
+		for (int i = 2; i < doublePoints.size() - 2; i++)
+		{
+			DoublePoint pOld0 = doublePoints.get(i-2);
+			DoublePoint pOld1 = doublePoints.get(i-1);
+			DoublePoint pOld2 = doublePoints.get(i);
+			DoublePoint pOld3 = doublePoints.get(i+1);
+			DoublePoint pOld4 = doublePoints.get(i+2);
+			
+			DoublePoint smoothedPoint = new DoublePoint(pOld0.x/5 + pOld1.x/5 + pOld2.x/5 + pOld3.x/5 + pOld4.x/5,
+														pOld0.y/5 + pOld1.y/5 + pOld2.y/5 + pOld3.y/5 + pOld4.y/5);
+			pointsNew.add(smoothedPoint);
+		}
+		pointsNew.add(doublePoints.get(doublePoints.size() - 1));
+		
+		return pointsNew;
+		
+	}
+
+	public ArrayList<DoublePoint> smooth(ArrayList<DoublePoint> doublePoints, int smoothType)
+	{
+		if (smoothType == GAUSSIAN)
+			return gaussianSmooth(doublePoints);
+		else if (smoothType == AVERAGE)
+			return averageSmooth(doublePoints);
+		else if (smoothType == AVERAGE2)
+		{	ArrayList<DoublePoint> oneSmooth = averageSmooth(doublePoints);
+			return averageSmooth(oneSmooth);			
+		}
+		else
+			return doublePoints;
+	}
+
 	public void paint()
 	{
 		paint(gIm);
@@ -630,6 +704,7 @@ public class KladjeGWTVeld
 	void tekenProgramma(Context2d g)
 	{
 
+/*		
 		// backwards compatibility
 		if (pixels != null)
 		{
@@ -645,6 +720,8 @@ public class KladjeGWTVeld
 			//g.putImageData(pixels, 0, 0);
 //System.out.println("imageData");			
 		}
+*/		
+		
 /*		
 		if (wisRechthoek != null)
 		{
@@ -682,19 +759,21 @@ public class KladjeGWTVeld
 		
 		g.setStrokeStyle(drawingColor);		
 		
-		if (draggPoints.size() == 1)
-		{	Point p = (Point) draggPoints.elementAt(0);
+		if (draggDoublePoints.size() == 1)
+		{	DoublePoint p = (DoublePoint) draggDoublePoints.get(0);
 			//g.moveTo(p.x, p.y);
 			//g.lineTo(p.x, p.y);
 			g.strokeRect(p.x, p.y, 1, 1);
 		}
-		if (draggPoints.size() > 1)
+		if (draggDoublePoints.size() > 1)
 		{	
-			Point p1 = (Point) draggPoints.elementAt(0);
+			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
+			
+			DoublePoint p1 = (DoublePoint) smoothedDraggDoublePoints.get(0);
 			g.beginPath();
 			g.moveTo(p1.x, p1.y);
-			for (int pCnt = 1; pCnt < draggPoints.size(); pCnt++)
-			{	Point p2 = (Point) draggPoints.elementAt(pCnt);
+			for (int pCnt = 1; pCnt < smoothedDraggDoublePoints.size(); pCnt++)
+			{	DoublePoint p2 = (DoublePoint) smoothedDraggDoublePoints.get(pCnt);
 				g.lineTo(p2.x, p2.y);
 				p1 = p2;
 			}
@@ -783,7 +862,112 @@ public class KladjeGWTVeld
 							selecteerRechthoek.width, selecteerRechthoek.height);
 				g.setLineWidth(1.5d);
 			//}
-			
+				if (schalen)
+				{	
+					if (topRightHandle != null)
+					{	//g.setColor(hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawPolygon(topRightHandle);
+						
+						g.beginPath();		
+						g.moveTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
+						for (int k = 1; k < topRightHandle.aantalPunten; k++) 
+						{	g.lineTo(topRightHandle.doubleX[k], topRightHandle.doubleY[k]);
+						}
+						g.lineTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
+						g.closePath();
+						g.stroke();
+
+		//g.setColor(Color.red);
+		//g.drawRect(topRightRect.x,topRightRect.y,topRightRect.width,topRightRect.height);
+					}
+					if (topLeftHandle != null)
+					{	//g.setColor(hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawPolygon(topLeftHandle);
+						
+						g.beginPath();		
+						g.moveTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
+						for (int k = 1; k < topLeftHandle.aantalPunten; k++) 
+						{	g.lineTo(topLeftHandle.doubleX[k], topLeftHandle.doubleY[k]);
+						}
+						g.lineTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
+						g.closePath();
+						g.stroke();
+		//g.setColor(Color.red);
+		//g.drawRect(topLeftRect.x,topLeftRect.y,topLeftRect.width,topLeftRect.height);
+					
+					}
+					if (bottomRightHandle != null)
+					{	//g.setColor(hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawPolygon(bottomRightHandle);
+						
+						g.beginPath();		
+						g.moveTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
+						for (int k = 1; k < bottomRightHandle.aantalPunten; k++) 
+						{	g.lineTo(bottomRightHandle.doubleX[k], bottomRightHandle.doubleY[k]);
+						}
+						g.lineTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
+						g.closePath();
+						g.stroke();
+		//g.setColor(Color.red);
+		//g.drawRect(bottomRightRect.x,bottomRightRect.y,bottomRightRect.width,bottomRightRect.height);
+					
+					}
+					if (bottomLeftHandle != null)
+					{	//g.setColor(hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawPolygon(bottomLeftHandle);
+						
+						g.beginPath();		
+						g.moveTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
+						for (int k = 1; k < bottomLeftHandle.aantalPunten; k++) 
+						{	g.lineTo(bottomLeftHandle.doubleX[k], bottomLeftHandle.doubleY[k]);
+						}
+						g.lineTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
+						g.closePath();
+						g.stroke();
+
+		//g.setColor(Color.red);
+		//g.drawRect(bottomLeftRect.x,bottomLeftRect.y,bottomLeftRect.width,bottomLeftRect.height);
+					
+					}
+				} // if schalen
+				if (roteren)
+				{
+					if (rotateEastHandle != null)
+					{	//g.setColor(KladjeVeld.hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawOval(selecteerRechthoek.x + selecteerRechthoek.width, // - 2 * hbFactor,
+						//		   selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor, 
+						//		   4 * hbFactor, 4 * hbFactor);
+						
+						g.beginPath();
+			            g.arc(selecteerRechthoek.x + selecteerRechthoek.width + 2 * hbFactor, 
+			            	  selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
+			       	 	g.stroke();
+						
+			//g.setColor(Color.red);			
+			//g.drawRect(rotateEastHandle.x, rotateEastHandle.y, rotateEastHandle.width, rotateEastHandle.height);
+					}
+					if (rotateWestHandle != null)
+					{	//g.setColor(KladjeVeld.hbColor);
+						g.setStrokeStyle(hbColor);
+						//g.drawOval(selecteerRechthoek.x - 4 * hbFactor, 
+						//		   selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor, 
+						//		   4 * hbFactor, 4 * hbFactor);
+						
+						g.beginPath();
+			            g.arc(selecteerRechthoek.x - 2 * hbFactor, 
+			            		selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
+			       	 	g.stroke();
+			//g.setColor(Color.red);			
+			//g.drawRect(rotateWestHandle.x, rotateWestHandle.y, rotateWestHandle.width, rotateWestHandle.height);
+					}
+
+				}
+
 		}
 		
 		if (mouseMode == selecteren)
@@ -860,6 +1044,159 @@ public class KladjeGWTVeld
 	}
 */	
 	
+	public void updateSelecteerRechthoek()
+	{
+		if (selecteerRechthoek == null)
+			return;
+		
+		int minX = 1000;
+		int maxX = -100;
+		int minY = 1000;
+		int maxY = -100;
+		
+		for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+		{
+			Object ob = objectsSelected.elementAt(cnt);
+			if (ob instanceof Streep)
+			{	Rectangle r = ((Streep) ob).handleBox;
+				if (r.x < minX)
+					minX = r.x;
+				if ((r.x + r.width) > maxX)
+					maxX = r.x + r.width;
+				if (r.y < minY)
+					minY = r.y;
+				if ((r.y + r.height) > maxY)
+					maxY = r.y + r.height;
+			}
+			else if (ob instanceof Lijn)
+			{	Rectangle r = ((Lijn) ob).handleBox;
+				if (r.x < minX)
+					minX = r.x;
+				if ((r.x + r.width) > maxX)
+					maxX = r.x + r.width;
+				if (r.y < minY)
+					minY = r.y;
+				if ((r.y + r.height) > maxY)
+					maxY = r.y + r.height;
+			}
+			if (ob instanceof Rechthoek)
+			{	Rectangle r = ((Rechthoek) ob).handleBox;
+				if (r.x < minX)
+					minX = r.x;
+				if ((r.x + r.width) > maxX)
+					maxX = r.x + r.width;
+				if (r.y < minY)
+					minY = r.y;
+				if ((r.y + r.height) > maxY)
+					maxY = r.y + r.height;
+			}
+			if (ob instanceof Ellips)
+			{	Rectangle r = ((Ellips) ob).handleBox;
+				if (r.x < minX)
+					minX = r.x;
+				if ((r.x + r.width) > maxX)
+					maxX = r.x + r.width;
+				if (r.y < minY)
+					minY = r.y;
+				if ((r.y + r.height) > maxY)
+					maxY = r.y + r.height;
+			}
+			if (ob instanceof TekstElement)
+			{	Rectangle r = ((TekstElement) ob).handleBox;
+				if (r.x < minX)
+					minX = r.x;
+				if ((r.x + r.width) > maxX)
+					maxX = r.x + r.width;
+				if (r.y < minY)
+					minY = r.y;
+				if ((r.y + r.height) > maxY)
+					maxY = r.y + r.height;
+			}
+		} // for
+		int w = maxX - minX + 2 * hbFactor;
+		int h = maxY - minY + 2 * hbFactor;
+		selecteerRechthoek = new Rectangle(minX - hbFactor, minY - hbFactor, w, h);
+		if (schalen)
+			makeScaleHandles();
+		if (roteren)
+			makeRotateHandles();
+
+		
+	}
+	
+	public void makeScaleHandles()
+	{
+		if (selecteerRechthoek == null)
+			return;
+		
+		topRightHandle = new Polygon();
+		topRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width + hbFactor,
+								selecteerRechthoek.y - hbFactor);
+		topRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width - 3 * hbFactor,
+								selecteerRechthoek.y - hbFactor);
+		topRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width + hbFactor,
+								selecteerRechthoek.y + 3 * hbFactor);
+		topRightRect = new Rectangle(selecteerRechthoek.x + selecteerRechthoek.width - 3 * hbFactor,
+									 selecteerRechthoek.y - hbFactor, 4 * hbFactor, 4 * hbFactor);
+		
+		topLeftHandle = new Polygon();
+		topLeftHandle.addPoint(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y - hbFactor);
+		topLeftHandle.addPoint(selecteerRechthoek.x + 3 * hbFactor, selecteerRechthoek.y - hbFactor);
+		topLeftHandle.addPoint(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y + 3 * hbFactor);
+		topLeftRect = new Rectangle(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y - hbFactor, 4 * hbFactor, 4 * hbFactor);
+		
+		bottomRightHandle = new Polygon();
+		bottomRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width + hbFactor,
+								   selecteerRechthoek.y + selecteerRechthoek.height + hbFactor);
+		bottomRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width - 3 * hbFactor,
+								   selecteerRechthoek.y + selecteerRechthoek.height + hbFactor);
+		bottomRightHandle.addPoint(selecteerRechthoek.x + selecteerRechthoek.width + hbFactor,
+								   selecteerRechthoek.y + selecteerRechthoek.height - 3 * hbFactor);
+		bottomRightRect = new Rectangle(selecteerRechthoek.x + selecteerRechthoek.width - 3 * hbFactor,
+				   						selecteerRechthoek.y + selecteerRechthoek.height - 3 * hbFactor, 4 * hbFactor, 4 * hbFactor);		
+		
+		bottomLeftHandle = new Polygon();
+		bottomLeftHandle.addPoint(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y + selecteerRechthoek.height + hbFactor);
+		bottomLeftHandle.addPoint(selecteerRechthoek.x + 3 * hbFactor, selecteerRechthoek.y + selecteerRechthoek.height + hbFactor);
+		bottomLeftHandle.addPoint(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y + selecteerRechthoek.height - 3 * hbFactor);
+		bottomLeftRect = new Rectangle(selecteerRechthoek.x - hbFactor, selecteerRechthoek.y + selecteerRechthoek.height - 3 * hbFactor, 
+									   4 * hbFactor, 4 * hbFactor);		
+		
+	}
+	
+	public void killScaleHandles()
+	{
+		topRightHandle = null; 
+		bottomRightHandle = null; 
+		topLeftHandle = null;
+		bottomLeftHandle = null;
+		topRightRect = null;
+		bottomRightRect = null;
+		topLeftRect = null;
+		bottomLeftRect = null;
+		
+	}
+	
+	public void makeRotateHandles()
+	{
+		
+		if (selecteerRechthoek == null)
+			return;
+		
+		rotateEastHandle = new Rectangle(selecteerRechthoek.x + selecteerRechthoek.width,// - 2 * hbFactor,
+										 selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor,
+										 4 * hbFactor, 4 * hbFactor);
+		rotateWestHandle = new Rectangle(selecteerRechthoek.x - 4 * hbFactor, 
+										 selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor,
+										 4 * hbFactor, 4 * hbFactor);
+	}
+
+	public void killRotateHandles()
+	{
+		rotateEastHandle = null; 
+		rotateWestHandle = null;
+	}
+
 	public void resetSelectedObject()
 	{
 		selectedStreep = null;
@@ -1063,6 +1400,9 @@ public class KladjeGWTVeld
 		sleepSelectie = false;
 		objectsSelected.removeAllElements();
 		selecteerRechthoek = null;
+		killScaleHandles();
+		killRotateHandles();
+
 		
 		if (gewist)
 			addToHistory();
@@ -1079,8 +1419,8 @@ public class KladjeGWTVeld
 			selectedRechthoek.rotate(rotateStep);
 		if (selectedEllips != null) 
 			selectedEllips.rotate(rotateStep);		
-		//if  (selectedTekstElement != null)
-		//	selectedTekstElement.rotate(rotateStep);
+		if  (selectedTekstElement != null)
+			selectedTekstElement.rotate(rotateStep);
 	
 		paint();
 	}
@@ -1095,8 +1435,8 @@ public class KladjeGWTVeld
 			selectedRechthoek.scale(scaleStep);
 		if (selectedEllips != null) 
 			selectedEllips.scale(scaleStep);		
-		//if  (selectedTekstElement != null)
-		//	selectedTekstElement.scale(scaleStep);
+		if  (selectedTekstElement != null)
+			selectedTekstElement.scale(scaleStep);
 		
 		paint();
 	}
@@ -1155,6 +1495,308 @@ public class KladjeGWTVeld
 			     selectedTekstElement.handleBox.contains(x, y));	   
 	}
 	
+	public void processSelecteerRechthoekHandleAction(int dx, int dy)
+	{
+		int crx = selecteerRechthoek.x + selecteerRechthoek.width / 2;
+		int cry = selecteerRechthoek.y + selecteerRechthoek.height / 2;
+		
+		if (scalingTopRight)
+		{
+			double aspectDirX = selecteerRechthoek.x + selecteerRechthoek.width - 
+								crx;
+			double aspectDirY = selecteerRechthoek.y - cry;
+			double dxDouble = (double) dx;
+			double dyDouble = (double) dy;
+			double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
+			double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
+			double asXDouble = s * aspectDirX;
+			double asYDouble = s * aspectDirY;
+			double oldWidth = (double) selecteerRechthoek.width / 2;
+			double oldHeight = (double) selecteerRechthoek.height / 2;
+			double newWidth = oldWidth + asXDouble;
+			double newHeight = oldHeight - asYDouble;
+			double sc = ((double) newWidth) / oldWidth;
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).scale(sc, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).scale(sc, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).scale(sc, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).scale(sc, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).scale(sc, crx, cry);
+				
+			}
+
+			int tlx = selecteerRechthoek.x;
+			int tly = selecteerRechthoek.y;
+			int b = selecteerRechthoek.width;
+			int h = selecteerRechthoek.height;
+				
+			int ntlx = (int) Math.round(sc * tlx + (1 - sc) * crx);
+			int ntly = (int) Math.round(sc * tly + (1 - sc) * cry);
+			int nb = (int) Math.round(sc * b);
+			int nh = (int) Math.round(sc * h);
+			selecteerRechthoek = new Rectangle(ntlx, ntly, nb, nh);
+			
+			topRightHandle.translate(ntlx + nb - tlx - b, ntly - tly);
+			topRightRect.translate(ntlx + nb - tlx - b, ntly - tly);
+			topLeftHandle.translate(ntlx - tlx, ntly - tly);
+			topLeftRect.translate(ntlx - tlx, ntly - tly);
+			bottomRightHandle.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomRightRect.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomLeftHandle.translate(ntlx - tlx, ntly + nh - tly - h);
+			bottomLeftRect.translate(ntlx - tlx, ntly + nh- tly - h);
+
+			if (roteren)
+			{	
+				rotateEastHandle.translate(ntlx + nb - tlx - b, ntly + nh/2 - tly - h/2);
+				rotateWestHandle.translate(ntlx - tlx, ntly + nh/2 - tly - h/2);
+			}	
+			
+		}
+		else if (scalingTopLeft)
+		{
+			double dxDouble = (double) dx;
+			double dyDouble = (double) dy;
+			
+			//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
+			//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
+			//double oldWidth = (double) selectedStreep.breedte / 2;
+			//double oldHeight = (double) selectedStreep.hoogte / 2;
+			
+			double oldWidth = (double) selecteerRechthoek.width / 2;
+			double oldHeight = (double) selecteerRechthoek.height / 2;
+
+			double newWidth = oldWidth - dx;
+			double newHeight = oldHeight - dy;
+			double sx = newWidth / oldWidth;
+			double sy = newHeight / oldHeight;
+
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).scale(sx, sy, crx, cry);
+				
+			}
+
+			int tlx = selecteerRechthoek.x;
+			int tly = selecteerRechthoek.y;
+			int b = selecteerRechthoek.width;
+			int h = selecteerRechthoek.height;
+				
+			int ntlx = (int) Math.round(sx * tlx + (1 - sx) * crx);
+			int ntly = (int) Math.round(sy * tly + (1 - sy) * cry);
+			int nb = (int) Math.round(sx * b);
+			int nh = (int) Math.round(sy * h);
+			selecteerRechthoek = new Rectangle(ntlx, ntly, nb, nh);
+			
+			topRightHandle.translate(ntlx + nb - tlx - b, ntly - tly);
+			topRightRect.translate(ntlx + nb - tlx - b, ntly - tly);
+			topLeftHandle.translate(ntlx - tlx, ntly - tly);
+			topLeftRect.translate(ntlx - tlx, ntly - tly);
+			bottomRightHandle.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomRightRect.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomLeftHandle.translate(ntlx - tlx, ntly + nh - tly - h);
+			bottomLeftRect.translate(ntlx - tlx, ntly + nh- tly - h);
+
+			if (roteren)
+			{	
+				rotateEastHandle.translate(ntlx + nb - tlx - b, ntly + nh/2 - tly - h/2);
+				rotateWestHandle.translate(ntlx - tlx, ntly + nh/2 - tly - h/2);
+			}	
+
+		}
+		else if (scalingBottomLeft)
+		{
+			double dxDouble = (double) dx;
+			double dyDouble = (double) dy;
+			
+			//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
+			//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
+			//double oldWidth = (double) selectedStreep.breedte / 2;
+			//double oldHeight = (double) selectedStreep.hoogte / 2;
+			
+			double oldWidth = (double) selecteerRechthoek.width / 2;
+			double oldHeight = (double) selecteerRechthoek.height / 2;
+
+			double newWidth = oldWidth - dx;
+			double newHeight = oldHeight + dy;
+			double sx = newWidth / oldWidth;
+			double sy = newHeight / oldHeight;
+
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).scale(sx, sy, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).scale(sx, sy, crx, cry);
+				
+			}
+			
+			int tlx = selecteerRechthoek.x;
+			int tly = selecteerRechthoek.y;
+			int b = selecteerRechthoek.width;
+			int h = selecteerRechthoek.height;
+				
+			int ntlx = (int) Math.round(sx * tlx + (1 - sx) * crx);
+			int ntly = (int) Math.round(sy * tly + (1 - sy) * cry);
+			int nb = (int) Math.round(sx * b);
+			int nh = (int) Math.round(sy * h);
+			selecteerRechthoek = new Rectangle(ntlx, ntly, nb, nh);
+			
+			topRightHandle.translate(ntlx + nb - tlx - b, ntly - tly);
+			topRightRect.translate(ntlx + nb - tlx - b, ntly - tly);
+			topLeftHandle.translate(ntlx - tlx, ntly - tly);
+			topLeftRect.translate(ntlx - tlx, ntly - tly);
+			bottomRightHandle.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomRightRect.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomLeftHandle.translate(ntlx - tlx, ntly + nh - tly - h);
+			bottomLeftRect.translate(ntlx - tlx, ntly + nh- tly - h);
+			
+			if (roteren)
+			{	
+				rotateEastHandle.translate(ntlx + nb - tlx - b, ntly + nh/2 - tly - h/2);
+				rotateWestHandle.translate(ntlx - tlx, ntly + nh/2 - tly - h/2);
+			}	
+
+		}
+		else if (scalingBottomRight)
+		{
+			double aspectDirX = selecteerRechthoek.x + selecteerRechthoek.width - crx; 
+			double aspectDirY = selecteerRechthoek.y + selecteerRechthoek.height - cry;
+			double dxDouble = (double) dx;
+			double dyDouble = (double) dy;
+			double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
+			double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
+			double asXDouble = s * aspectDirX;
+			double asYDouble = s * aspectDirY;
+			double oldWidth = (double) selecteerRechthoek.width / 2;
+			double oldHeight = (double) selecteerRechthoek.height / 2;
+			double newWidth = oldWidth + asXDouble;
+			double newHeight = oldHeight + asYDouble;
+			double sc = ((double) newWidth) / oldWidth;
+			
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).scale(sc, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).scale(sc, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).scale(sc, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).scale(sc, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).scale(sc, crx, cry);
+				
+			}
+
+			int tlx = selecteerRechthoek.x;
+			int tly = selecteerRechthoek.y;
+			int b = selecteerRechthoek.width;
+			int h = selecteerRechthoek.height;
+				
+			int ntlx = (int) Math.round(sc * tlx + (1 - sc) * crx);
+			int ntly = (int) Math.round(sc * tly + (1 - sc) * cry);
+			int nb = (int) Math.round(sc * b);
+			int nh = (int) Math.round(sc * h);
+			selecteerRechthoek = new Rectangle(ntlx, ntly, nb, nh);
+			
+			topRightHandle.translate(ntlx + nb - tlx - b, ntly - tly);
+			topRightRect.translate(ntlx + nb - tlx - b, ntly - tly);
+			topLeftHandle.translate(ntlx - tlx, ntly - tly);
+			topLeftRect.translate(ntlx - tlx, ntly - tly);
+			bottomRightHandle.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomRightRect.translate(ntlx + nb - tlx - b, ntly + nh - tly - h);
+			bottomLeftHandle.translate(ntlx - tlx, ntly + nh - tly - h);
+			bottomLeftRect.translate(ntlx - tlx, ntly + nh- tly - h);
+
+			if (roteren)
+			{	
+				rotateEastHandle.translate(ntlx + nb - tlx - b, ntly + nh/2 - tly - h/2);
+				rotateWestHandle.translate(ntlx - tlx, ntly + nh/2 - tly - h/2);
+			}	
+
+		}
+		
+		else if (rotatingEast)
+		{
+			// hier is alleen dy van belang
+			double angle = Math.atan(((double) dy) / (selecteerRechthoek.width/2));
+			//selectedStreep.rotate(angle);
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).rotate(angle, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).rotate(angle, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).rotate(angle, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).rotate(angle, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).rotate(angle, crx, cry);
+				
+			}
+			
+			updateSelecteerRechthoek();
+
+			
+		}
+		else if (rotatingWest)
+		{
+			// hier is alleen dy van belang
+			double angle = - Math.atan(((double) dy) / (selecteerRechthoek.width/2));
+			angleSum += angle; 
+			int rotateSteps = (int) Math.round(angleSum / rotateStep);
+			angleSum -= rotateSteps * rotateStep;
+			//selectedStreep.rotate(rotateSteps * rotateStep);
+			
+			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
+			{
+				Object ob = objectsSelected.elementAt(cnt);
+				if (ob instanceof Streep)
+					((Streep) ob).rotate(rotateSteps * rotateStep, crx, cry);
+				else if (ob instanceof Lijn)
+					((Lijn) ob).rotate(rotateSteps * rotateStep, crx, cry);
+				else if (ob instanceof Rechthoek)
+					((Rechthoek) ob).rotate(rotateSteps * rotateStep, crx, cry);
+				else if (ob instanceof Ellips)
+					((Ellips) ob).rotate(rotateSteps * rotateStep, crx, cry);
+				else if (ob instanceof TekstElement)
+					((TekstElement) ob).rotate(rotateSteps * rotateStep, crx, cry);
+				
+			}
+			
+			updateSelecteerRechthoek();
+		}
+
+		
+	}
+
 	public void processHandleAction(int dx, int dy)
 	{
 		if (selectedStreep != null)
@@ -1181,10 +1823,15 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedStreep.breedte / 2;
-				double oldHeight = (double) selectedStreep.hoogte / 2;
+				
+				//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedStreep.breedte / 2;
+				//double oldHeight = (double) selectedStreep.hoogte / 2;
+				
+				double oldWidth = (double) selectedStreep.handleBox.width / 2;
+				double oldHeight = (double) selectedStreep.handleBox.height / 2;
+				
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight - dy;
 				double sx = newWidth / oldWidth;
@@ -1195,10 +1842,15 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedStreep.breedte / 2;
-				double oldHeight = (double) selectedStreep.hoogte / 2;
+
+				//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedStreep.breedte / 2;
+				//double oldHeight = (double) selectedStreep.hoogte / 2;
+				
+				double oldWidth = (double) selectedStreep.handleBox.width / 2;
+				double oldHeight = (double) selectedStreep.handleBox.height / 2;
+				
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight + dy;
 				double sx = newWidth / oldWidth;
@@ -1269,12 +1921,17 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
-				double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
-				double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
-				double oldWidth = breedte / 2;
-				double oldHeight = hoogte / 2;
+				
+				//double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
+				//double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
+				//double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
+				//double oldWidth = breedte / 2;
+				//double oldHeight = hoogte / 2;
+				
+				double oldWidth = (double) selectedLijn.handleBox.width / 2;
+				double oldHeight = (double) selectedLijn.handleBox.height / 2;
+				
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight - dy;
 				double sx = newWidth / oldWidth;
@@ -1286,12 +1943,17 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
-				double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
-				double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
-				double oldWidth = breedte / 2;
-				double oldHeight = hoogte / 2;
+				
+				//double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
+				//double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
+				//double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
+				//double oldWidth = breedte / 2;
+				//double oldHeight = hoogte / 2;
+				
+				double oldWidth = (double) selectedLijn.handleBox.width / 2;
+				double oldHeight = (double) selectedLijn.handleBox.height / 2;
+				
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight + dy;
 				double sx = newWidth / oldWidth;
@@ -1362,10 +2024,15 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedRechthoek.breedte / 2;
-				double oldHeight = (double) selectedRechthoek.hoogte / 2;
+				
+				//double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedRechthoek.breedte / 2;
+				//double oldHeight = (double) selectedRechthoek.hoogte / 2;
+				
+				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
+				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight - dy;
 				double sx = newWidth / oldWidth;
@@ -1378,10 +2045,15 @@ public class KladjeGWTVeld
 				
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedRechthoek.breedte / 2;
-				double oldHeight = (double) selectedRechthoek.hoogte / 2;
+				
+				//double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedRechthoek.breedte / 2;
+				//double oldHeight = (double) selectedRechthoek.hoogte / 2;
+				
+				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
+				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight + dy;
 				double sx = newWidth / oldWidth;
@@ -1453,10 +2125,15 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedEllips.breedte / 2;
-				double oldHeight = (double) selectedEllips.hoogte / 2;
+				
+				//double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedEllips.breedte / 2;
+				//double oldHeight = (double) selectedEllips.hoogte / 2;
+				
+				double oldWidth = (double) selectedEllips.handleBox.width / 2;
+				double oldHeight = (double) selectedEllips.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight - dy;
 				double sx = newWidth / oldWidth;
@@ -1467,10 +2144,15 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedEllips.breedte / 2;
-				double oldHeight = (double) selectedEllips.hoogte / 2;
+				
+				//double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
+				//double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
+				//double oldWidth = (double) selectedEllips.breedte / 2;
+				//double oldHeight = (double) selectedEllips.hoogte / 2;
+				
+				double oldWidth = (double) selectedEllips.handleBox.width / 2;
+				double oldHeight = (double) selectedEllips.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight + dy;
 				double sx = newWidth / oldWidth;
@@ -1521,7 +2203,6 @@ public class KladjeGWTVeld
 		else if (selectedTekstElement != null)
 		{
 
-/*			
 			if (scalingTopRight)
 			{
 				double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox. width - 
@@ -1544,10 +2225,10 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedTekstElement.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedTekstElement.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedTekstElement.bb.width / 2;
-				double oldHeight = (double) selectedTekstElement.bb.height / 2;
+				
+				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
+				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight - dy;
 				double sx = newWidth / oldWidth;
@@ -1558,45 +2239,38 @@ public class KladjeGWTVeld
 			{
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedTekstElement.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedTekstElement.inverseRotY(dxDouble, dyDouble);
-				double oldWidth = (double) selectedTekstElement.bb.width / 2;
-				double oldHeight = (double) selectedTekstElement.bb.height / 2;
+
+				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
+				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
+
 				double newWidth = oldWidth - dx;
 				double newHeight = oldHeight + dy;
 				double sx = newWidth / oldWidth;
 				double sy = newHeight / oldHeight;
 				selectedTekstElement.scale(sx,sy);
 			}
+			
 			else if (scalingBottomRight)
 			{
-				//double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox.width - 
-				//				    selectedTekstElement.cx;
-				//double aspectDirY = selectedTekstElement.handleBox.y + selectedTekstElement.handleBox.height - 
-				//					selectedTekstElement.cy;
-				double aspectDirX = selectedTekstElement.bb.x + selectedTekstElement.bb.width - 
+				double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox.width - 
 								    selectedTekstElement.cx;
-				double aspectDirY = selectedTekstElement.bb.y + selectedTekstElement.bb.height - 
+				double aspectDirY = selectedTekstElement.handleBox.y + selectedTekstElement.handleBox.height - 
 									selectedTekstElement.cy;
 				
 				double dxDouble = (double) dx;
 				double dyDouble = (double) dy;
-				double dxInvRot = selectedTekstElement.inverseRotX(dxDouble, dyDouble);
-				double dyInvRot = selectedTekstElement.inverseRotY(dxDouble, dyDouble);
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
-				//double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
-				double s = (aspectDirX * dxInvRot + aspectDirY * dyInvRot) / aa;
+				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
 				double asYDouble = s * aspectDirY;
-				double oldWidth = (double) selectedTekstElement.bb.width / 2;
-				double oldHeight = (double) selectedTekstElement.bb.height / 2;
+				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
+				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
 				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
-				if (sc < 1)
-					selectedTekstElement.scale(scaleDownStep);
-				else
-					selectedTekstElement.scale(scaleUpStep);
+				
+				selectedTekstElement.scale(sc);
+				
 			}
 			else if (rotatingEast)
 			{
@@ -1616,10 +2290,43 @@ public class KladjeGWTVeld
 				
 				
 			}
-*/			
+			
 		}
 
+			
 	}
+
+	public boolean selecteerRechthoekHandlesContain(int x, int y)
+	{
+				
+		if ((topRightRect != null) && topRightRect.contains(x,y))
+		{	groupHandleAction = true;
+			scalingTopRight = true;
+		}
+		else if ((topLeftRect != null) && topLeftRect.contains(x,y))
+		{	groupHandleAction = true;
+			scalingTopLeft = true;
+		}
+		else if ((bottomRightRect != null) && bottomRightRect.contains(x,y))
+		{	groupHandleAction = true;
+			scalingBottomRight = true;
+		}
+		else if ((bottomLeftRect != null) && bottomLeftRect.contains(x,y))
+		{	groupHandleAction = true;
+			scalingBottomLeft = true;
+		}
+		else if ((rotateEastHandle != null) && rotateEastHandle.contains(x,y))
+		{	groupHandleAction = true;
+			rotatingEast = true;
+		}
+		else if ((rotateWestHandle != null) && rotateWestHandle.contains(x,y))
+		{	groupHandleAction = true;
+			rotatingWest = true;
+		}
+		
+		return groupHandleAction;
+	}
+
 	
 	public boolean objectSelectedHandlesContain(int x, int y)
 	{
@@ -1756,6 +2463,14 @@ public class KladjeGWTVeld
 			{	handleAction = true;
 				scalingBottomLeft = true;
 			}
+			else if ((selectedTekstElement.rotateEastHandle != null) && selectedTekstElement.rotateEastHandle.contains(x,y))
+			{	handleAction = true;
+				rotatingEast = true;
+			}
+			else if ((selectedTekstElement.rotateWestHandle != null) && selectedTekstElement.rotateWestHandle.contains(x,y))
+			{	handleAction = true;
+				rotatingWest = true;
+			}
 			
 
 		}
@@ -1769,7 +2484,7 @@ public class KladjeGWTVeld
 		if (mouseMode == tekenen)
 		{
 			mouseDown = true;
-			draggPoints.addElement(new Point(eventX, eventY));
+			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
 		}
 /*		
@@ -1806,15 +2521,18 @@ public class KladjeGWTVeld
 			if (tekstEdited != null)
 			{	tekstPopup.setText(tekstEdited.tekst);
 				tekstPopup.setTextColor(tekstEdited.kleur.toString());
+				tekstPopup.setPopupPosition(tekstEdited.bb.x, tekstEdited.bb.y);
 			}
 			else 
-				tekstPopup.setTextColor(drawingColor.toString());
+			{	tekstPopup.setTextColor(drawingColor.toString());
+				tekstPopup.setPopupPosition(startX - 10, startY - 10);
+			}
 				
 			//else	
 			//	tekstVeld.setText("");
 			//tekstPopup.setModal(true);
 			
-			tekstPopup.setPopupPosition(startX, startY);
+			//tekstPopup.setPopupPosition(startX, startY);
 			tekstPopup.show();
 			tekstPopup.textBox.setFocus(true);
 
@@ -1836,8 +2554,16 @@ public class KladjeGWTVeld
 		else if (mouseMode == selecteren)
 		{
 			mouseDown = true;
-			
-			if (objectSelectedHandlesContain(eventX, eventY))
+
+			if ((selecteerRechthoek != null) && selecteerRechthoek.contains(eventX, eventY))
+			{
+				resetSelectedObject();
+				sleepSelectie = true;
+				startX = eventX;//e.getX();
+				startY = eventY;//e.getY();
+			}
+
+			else if (objectSelectedHandlesContain(eventX, eventY))
 			{
 				startX = eventX;
 				startY = eventY;
@@ -1845,7 +2571,15 @@ public class KladjeGWTVeld
 				
 				objectHandled = false;
 			}
-			
+			else if (selecteerRechthoekHandlesContain(eventX, eventY))
+			{
+				startX = eventX;
+				startY = eventY;
+//System.out.println("mp oshc");			
+				
+				objectHandled = false;
+			}
+
 			// individueel object aangeklikt, was mogelijk al geselecteerd
 			//if (setSelectedObject(e.getX(), e.getY()) || objectSelectedContains(e.getX(), e.getY()))
 			else if (setSelectedObject(eventX, eventY) || objectSelectedContains(eventX, eventY))
@@ -1854,16 +2588,12 @@ public class KladjeGWTVeld
 				startX = eventX;//e.getX();
 				startY = eventY;//e.getY();
 				selecteerRechthoek = null;
+				killScaleHandles();
+				killRotateHandles();
+
 				resetSelectedObjects();
 
 				objectMoved = false;
-			}
-			else if ((selecteerRechthoek != null) && selecteerRechthoek.contains(eventX, eventY))
-			{
-				resetSelectedObject();
-				sleepSelectie = true;
-				startX = eventX;//e.getX();
-				startY = eventY;//e.getY();
 			}
 			else
 			{
@@ -1872,6 +2602,9 @@ public class KladjeGWTVeld
 				resetSelectedObjects();
 				figuurStart = new Point(eventX, eventY);
 				selecteerRechthoek = null;
+				killScaleHandles();
+				killRotateHandles();
+
 			}
 			paint();
 		}
@@ -1885,7 +2618,8 @@ public class KladjeGWTVeld
 		
 		if (mouseMode == tekenen)
 		{
-			draggPoints.addElement(new Point(eventX, eventY));
+			//draggPoints.addElement(new Point(eventX, eventY));
+			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
 		}
 /*		
@@ -2135,6 +2869,23 @@ public class KladjeGWTVeld
 				paint();
 				
 			}
+			
+			else if (groupHandleAction)
+			{
+				int dx = eventX - startX;
+				int dy = eventY - startY;
+
+				processSelecteerRechthoekHandleAction(dx,dy);
+				
+				startX = eventX;
+				startY = eventY;
+				
+				objectHandled = true;
+				
+				paint();
+				
+			}
+
 
 			else if (sleepSelectie) // verplaats de selecteerRechthoek met inhoud!!
 			{
@@ -2145,7 +2896,24 @@ public class KladjeGWTVeld
 				//int dx = eventX - start.x;
 				//int dy = eventY - start.y;
 				if (selecteerRechthoek != null)
-					selecteerRechthoek.translate(dx, dy);
+				{	selecteerRechthoek.translate(dx, dy);
+					if (schalen)
+					{
+						topRightHandle.translate(dx, dy); 
+						bottomRightHandle.translate(dx, dy); 
+						topLeftHandle.translate(dx, dy);
+						bottomLeftHandle.translate(dx, dy);
+						topRightRect.translate(dx, dy);
+						bottomRightRect.translate(dx, dy);
+						topLeftRect.translate(dx, dy);
+						bottomLeftRect.translate(dx, dy);
+					}
+					if (roteren)
+					{
+						rotateEastHandle.translate(dx, dy);
+						rotateWestHandle.translate(dx, dy);
+					}
+				}
 				
 				translateObjectSelected(dx, dy);
 				
@@ -2199,11 +2967,15 @@ public class KladjeGWTVeld
 	{
 		if (mouseMode == tekenen)
 		{	
-			Streep streep = new Streep(drawingColor, draggPoints);
+			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
+			
+			//Streep streep = new Streep(drawingColor, draggPoints);
+			Streep streep = new Streep(drawingColor, smoothedDraggDoublePoints);
 			streepVector.addElement(streep);
-			if (draggPoints.size() > 1)
+			if (draggDoublePoints.size() > 1)
 				addToHistory();
-			draggPoints.removeAllElements();
+			//draggPoints.removeAllElements();
+			draggDoublePoints.clear();
 			
 			paint();
 		}
@@ -2289,10 +3061,54 @@ public class KladjeGWTVeld
 				//sleepSelectie = false;
 				paint();
 			}
+			
+			if (objectsSelected.size() == 0)
+			{
+				selecteerRechthoek = null;
+				killScaleHandles();
+				killRotateHandles();
+				
+				paint();
+			}
+			else if (objectsSelected.size() == 1)
+			{	
+				
+//System.out.println("oss = 1");					
+				Object objectSelected = objectsSelected.elementAt(0);
+				if (objectSelected instanceof Streep)
+					selectedStreep = (Streep) objectSelected;
+				if (objectSelected instanceof Lijn)
+					selectedLijn = (Lijn) objectSelected;
+				if (objectSelected instanceof Rechthoek)
+					selectedRechthoek = (Rechthoek) objectSelected;
+				if (objectSelected instanceof Ellips)
+					selectedEllips = (Ellips) objectSelected;
+				if (objectSelected instanceof TekstElement)
+					selectedTekstElement = (TekstElement) objectSelected;
+				selecteerRechthoek = null;
+				killScaleHandles();
+				killRotateHandles();
+				resetSelectedObjects();
+				
+				paint();
+				
+				
+			}
+			else // objectsSelected.size() >= 2
+			{
+				if (schalen)
+					makeScaleHandles();
+				if (roteren)
+					makeRotateHandles();
+				
+				paint();
+			}
+			
 			if (objectHandled)
 				addToHistory();
 			objectHandled = false;
 			handleAction = false;
+			groupHandleAction = false;
 			scalingTopRight = false;
 			scalingTopLeft = false;
 			scalingBottomRight = false;
@@ -2430,6 +3246,7 @@ public class KladjeGWTVeld
 
 }
 
+/*
 class ColorBytes implements Serializable
 {	
 	int x, y;
@@ -2493,6 +3310,7 @@ class ColorBytes implements Serializable
 		
 	}
 }
+*/
 class Point
 {
 	int x; int y;
