@@ -279,6 +279,7 @@ public class KladjeGWTVeld
 	
 	void addToHistory()
 	{
+//System.out.println("get his");
 
 		HashMap<String,Object> stateTable = getState();
 		
@@ -370,7 +371,7 @@ public class KladjeGWTVeld
 		}
 		h.put("tekstElementen", tekstElementen);
 
-System.out.println("kgwtv get " + tekstElementen.size());		
+//System.out.println("kgwtv get " + tekstElementen.size());		
 		
 		
 		return h;

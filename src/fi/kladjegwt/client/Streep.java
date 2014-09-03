@@ -3305,25 +3305,47 @@ class TekstElement
 	public void scale(double scaleStep)
 	{	
 
+		scaleX *= scaleStep;
+		scaleY *= scaleStep;
+		
+		breedte = (int) Math.round(scaleStep * breedte);
+		hoogte = (int) Math.round(scaleStep * hoogte);
+
+		tekstX = (int) Math.round((1/scaleStep) * tekstX);// + (1 - (1/scaleStep)) * cx);
+		tekstY = (int) Math.round((1/scaleStep) * tekstY);// + (1 - (1/scaleStep)) * cy);
+		
 		AffineTransform sc = new AffineTransform(scaleStep, 0, 0, scaleStep, (1 - scaleStep) * cx, (1 - scaleStep) * cy);
 		at = at.leftMultiplyBy(sc);
 
 	}
 	
 	public void scale(double scaleStep, double dx, double dy)
-	{	AffineTransform sc = new AffineTransform(scaleStep, 0, 0, scaleStep, (1 - scaleStep) * dx, (1 - scaleStep) * dy);
+	{	
+		AffineTransform sc = new AffineTransform(scaleStep, 0, 0, scaleStep, (1 - scaleStep) * dx, (1 - scaleStep) * dy);
 		at = at.leftMultiplyBy(sc);
 	
 	}
 	
 	public void scale(double sx, double sy)
-	{	AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * cx, (1 - sy) * cy);
+	{	
+		
+		scaleX *= sx;
+		scaleY *= sy;
+		
+		breedte = (int) Math.round(sx * breedte);
+		hoogte = (int) Math.round(sy * hoogte);
+	
+		tekstX = (int) Math.round((1/sx) * tekstX);// + (1 - (1/sx)) * cx);
+		tekstY = (int) Math.round((1/sy) * tekstY);// + (1 - (1/sy)) * cy);
+		
+		AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * cx, (1 - sy) * cy);
 		at = at.leftMultiplyBy(sc);
 
 	}
 	
 	public void scale(double sx, double sy, double dx, double dy)
-	{	AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * dx, (1 - sy) * dy);
+	{	
+		AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * dx, (1 - sy) * dy);
 		at = at.leftMultiplyBy(sc);
 	
 	}
@@ -3336,6 +3358,13 @@ class TekstElement
 		h.put("tekst", new String(tekst));
 		h.put("xPos", new Integer(xPos));
 		h.put("yPos", new Integer(yPos));
+		
+		h.put("scaleX", new Double(scaleX));
+		h.put("scaleY", new Double(scaleY));
+		
+		h.put("bGWT", new Integer(breedte));
+		h.put("hGWT", new Integer(hoogte));
+				
 		h.put("m00GWT", new Double(at.m00));
 		h.put("m10GWT", new Double(at.m10));
 		h.put("m01GWT", new Double(at.m01));
@@ -3345,7 +3374,12 @@ class TekstElement
 		
 		h.put("gwtState", new String("gwtState"));
 		
-System.out.println("get " + tekst + " " + at.toString());		
+if (tekst.indexOf("P") >= 0)
+{	
+System.out.println("get " + tekst + " " + at.toString());
+System.out.println("get scaleX = " + scaleX);
+System.out.println("get scaleY = " + scaleY);
+}
 
 	
 		return h;
@@ -3360,11 +3394,11 @@ System.out.println("get " + tekst + " " + at.toString());
 		int xPos = 0;
 		int yPos = 0;
 		double rotation = 0;
-		double scaleX = 1;
-		double scaleY = 1;
+		double scaleX = 10;
+		double scaleY = 10;
 		
-		int breedteGWT = 20;
-		int hoogteGWT = 20;
+		double breedteGWT = 20;
+		double hoogteGWT = 20;
 		
 		//double m00 = 1;
 		//double m01 = 0;
@@ -3424,22 +3458,37 @@ System.out.println("get " + tekst + " " + at.toString());
 //System.out.println("b0GWT = " + b0GWT);		
 //System.out.println("b1GWT = " + b1GWT);		
 		
-		if (h.containsKey("breedteGWT"))
-			breedteGWT = h.getInt("breedteGWT");
-		if (h.containsKey("hoogteGWT"))
-			hoogteGWT = h.getInt("hoogteGWT");
+		if (h.containsKey("bGWT"))
+			breedteGWT = h.getInt("bGWT");
+		if (h.containsKey("hGWT"))
+			hoogteGWT = h.getInt("hGWT");
 		
 		TekstElement tekstElement = new TekstElement(kleur, tekst, xPos, yPos);
-		
+
+/*		
 		if (h.containsKey("m00GWT"))
 		{	
-			tekstElement.transformByGWT(m00GWT, m01GWT, m10GWT, m11GWT, b0GWT, b1GWT);
+			//tekstElement.transformByGWT(m00GWT, m01GWT, m10GWT, m11GWT, b0GWT, b1GWT);
+			
 		}
 		else
-		{	
+		{
+*/			
 			//tekstElement.scale(scaleX, scaleY);
 		
-		}
+			
+			tekstElement.breedte = (int) Math.round(breedteGWT / scaleX);
+			tekstElement.hoogte = (int) Math.round(hoogteGWT / scaleY);
+			
+			tekstElement.cx = xPos + ((double) tekstElement.breedte) / 2;
+			tekstElement.cy = yPos + ((double) tekstElement.hoogte) / 2;
+			
+			tekstElement.scale(scaleX, scaleY);
+			//tekstElement.scaleX = m00GWT;
+			//tekstElement.scaleY = m11GWT;
+
+		
+//		}
 		
 		return tekstElement;
 	}
@@ -3448,10 +3497,14 @@ System.out.println("get " + tekst + " " + at.toString());
 	{
 		at = new AffineTransform(m00, m01, m10, m11, b0, b1);
 
-if (tekst.equals("PPP"))		
+if (tekst.indexOf("P") >= 0)	
+{	
 System.out.println("set " + tekst + " " + at.toString());
-//System.out.println("set xPos " + xPos);
-//System.out.println("set yPos " + yPos);
+System.out.println("set xPos " + xPos);
+System.out.println("set yPos " + yPos);
+System.out.println("set scaleX = " + scaleX);
+System.out.println("set scaleY = " + scaleY);
+}
 	}
 	
 	public void transformBy(double m00, double m01, double m10, double m11, double b0, double b1, int bGWT, int hGWT)
@@ -3525,18 +3578,21 @@ System.out.println("atbb3 = " + atbb.geefPuntXD(3));
 		String fontString = "bold 14px arial, sans-serif";
 		g.setFont(fontString);
 		
-		TextMetrics tm = g.measureText(tekst);
-		breedte = (int) Math.round(tm.getWidth());
-		hoogte = 15;
+		//TextMetrics tm = g.measureText(tekst);
+		//breedte = (int) Math.round(tm.getWidth());
+		//hoogte = 15;
 		
 		makeBB();
-		bb2.transformBy(at);
-		setCenter();
+		//bb2.transformBy(at);
+		//setCenter();
 		makeHandleBox();
 
-		g.setTransform(at.m00, at.m01, at.m10, at.m11, at.b0, at.b1);
+		//g.setTransform(at.m00, at.m01, at.m10, at.m11, at.b0, at.b1);
+		
 		//g.transform(at.m00, at.m01, at.m10, at.m11, at.b0, at.b1);
 		//g.rotate(rotation);
+		
+		g.scale(scaleX, scaleY);
 		
 //System.out.println("ta = " + g.getTextAlign());
 //System.out.println("tbl = " + g.getTextBaseline());
@@ -3548,11 +3604,20 @@ System.out.println("atbb3 = " + atbb.geefPuntXD(3));
 		//g.setFillStyle(kleur);
 		g.setFillStyle(kleur);
 		
-		g.fillText(tekst, xPos, yPos + 15, breedte);
+		//g.fillText(tekst, xPos, yPos + 15, breedte);
+		g.fillText(tekst, tekstX, tekstY + 15, breedte);
 		
-		g.setTransform(1, 0, 0, 1, 0, 0);
+		//g.setTransform(1, 0, 0, 1, 0, 0);
+		g.scale(1/scaleX, 1/scaleY);
 		
 		tekenBB(g);
+		
+if (tekst.indexOf("P") >= 0)
+{
+System.out.println("teken " + tekst + " " + xPos + " " + yPos);
+System.out.println("teken bb " + bb2.puntenX[0] + " " + bb2.puntenY[0]);
+System.out.println("teken bb " + bb2.puntenX[2] + " " + bb2.puntenY[2]);
+}
 	}
 
 	public void tekenHandleBox(Context2d g)
@@ -3693,8 +3758,12 @@ System.out.println("atbb3 = " + atbb.geefPuntXD(3));
 		AffineTransform trans = new AffineTransform (1,0,0,1,dx,dy);
 		at = at.leftMultiplyBy(trans);
 
-		//xPos += dx;
-		//yPos += dy;
+		xPos += dx;
+		yPos += dy;
+		
+		tekstX = (int) Math.round(((double) xPos) / scaleX);
+		tekstY = (int) Math.round(((double) yPos) / scaleY);
+		
 		bb.translate(dx, dy);
 		cx += dx;
 		cy += dy;
