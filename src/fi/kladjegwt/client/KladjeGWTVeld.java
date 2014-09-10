@@ -32,6 +32,7 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
+
 public class KladjeGWTVeld 
 {
 	public Canvas kladjeHWTCanvas;
@@ -150,6 +151,7 @@ public class KladjeGWTVeld
 	Rechthoek selectedRechthoek = null;
 	Ellips selectedEllips = null;
 	TekstElement selectedTekstElement = null;
+	TekstElement oldSelectedTekstElement = null;
 	Vector<Object> objectsSelected = new Vector<Object>();
 	
 
@@ -247,6 +249,7 @@ public class KladjeGWTVeld
 		{
 			TekstElement tekstElement = 
 				new TekstElement(drawingColor, tekstString, tekstX, tekstY);
+			tekstElement.zetTekst(tekstString, gIm);
 			tekstElementVector.addElement(tekstElement);
 			addToHistory();
 			paint();
@@ -493,7 +496,7 @@ public class KladjeGWTVeld
 		{	TekstElement tekstElement = TekstElement.setState(tekstElementen.get(tCnt));
 			tekstElementVector.addElement(tekstElement);
 		}
-System.out.println("kgwtv set " + tekstElementen.size());		
+//System.out.println("kgwtv set " + tekstElementen.size());		
 
 		paint();
 	}
@@ -990,7 +993,7 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				selectedEllips.tekenHandleBox(g);
 			}
 			if (selectedTekstElement != null)
-			{	//selectedTekstElement.tekenBB(g);
+			{	selectedTekstElement.tekenBB(g);
 				selectedTekstElement.tekenHandleBox(g);
 			}
 			
@@ -2203,7 +2206,7 @@ System.out.println("kgwtv set " + tekstElementen.size());
 		}
 		else if (selectedTekstElement != null)
 		{
-
+// wordt niet gberuikt
 			if (scalingTopRight)
 			{
 				double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox. width - 
@@ -2222,6 +2225,7 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				double sc = ((double) newWidth) / oldWidth;
 				selectedTekstElement.scale(sc);
 			}
+// wordt niet gberuikt			
 			else if (scalingTopLeft)
 			{
 				double dxDouble = (double) dx;
@@ -2236,6 +2240,7 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				double sy = newHeight / oldHeight;
 				selectedTekstElement.scale(sx,sy);
 			}
+// wordt niet gberuikt			
 			else if (scalingBottomLeft)
 			{
 				double dxDouble = (double) dx;
@@ -2272,6 +2277,8 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				
 				selectedTekstElement.scale(sc);
 				
+				updateAction2();
+				
 			}
 			else if (rotatingEast)
 			{
@@ -2279,7 +2286,10 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				double angle = Math.atan(((double) dy) / (selectedTekstElement.handleBox.width/2));
 				selectedTekstElement.rotate(angle);
 				
+				updateAction2();
+				
 			}
+// wordt niet gebruikt			
 			else if (rotatingWest)
 			{
 				// hier is alleen dy van belang
@@ -2479,7 +2489,48 @@ System.out.println("kgwtv set " + tekstElementen.size());
 		return handleAction;
 	}
 
+	public void updateAction()
+	{
+		if (selectedTekstElement != null )
+		{
+
+//System.out.println("ua");
+
+			for (int tCnt = 0; tCnt < tekstElementVector.size(); tCnt++)
+			{	TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(tCnt);
+
+				if (oldSelectedTekstElement.isEqualTo(tekstElement))
+				{	
+					selectedTekstElement = selectedTekstElement.updateState();
+					// extra want selectedTekstElement wordt niet getekend
+					selectedTekstElement.makeBB();
+					selectedTekstElement.setCenter();
+					selectedTekstElement.bb2.rotate(selectedTekstElement.rotation, selectedTekstElement.cx, selectedTekstElement.cy);
+					selectedTekstElement.makeHandleBox();
+					tekstElement = tekstElement.updateState(selectedTekstElement);
+					tekstElementVector.setElementAt(tekstElement, tCnt);
+//System.out.println(selectedTekstElement.printTekst());
+//System.out.println(tekstElement.printTekst());
+				}	
+			}
+		}
+		
+	}
 	
+	public void updateAction2()
+	{
+		if (selectedTekstElement != null )
+		{
+			selectedTekstElement = selectedTekstElement.updateState();
+			// extra want selectedTekstElement wordt niet getekend
+			selectedTekstElement.makeBB();
+			selectedTekstElement.setCenter();
+			//selectedTekstElement.bb2.rotate(selectedTekstElement.rotation, selectedTekstElement.cx, selectedTekstElement.cy);
+			selectedTekstElement.makeHandleBox();
+		}
+				
+	}
+
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
 		if (mouseMode == tekenen)
@@ -2522,11 +2573,15 @@ System.out.println("kgwtv set " + tekstElementen.size());
 			if (tekstEdited != null)
 			{	tekstPopup.setText(tekstEdited.tekst);
 				tekstPopup.setTextColor(tekstEdited.kleur.toString());
-				tekstPopup.setPopupPosition(tekstEdited.bb.x, tekstEdited.bb.y);
+				//tekstPopup.setPopupPosition(tekstEdited.bb.x, tekstEdited.bb.y);
+				tekstPopup.setPopupPosition(tekstEdited.bb2.geefPuntX(0) + kladjeHWTCanvas.getAbsoluteLeft(),
+						                    tekstEdited.bb2.geefPuntY(0) + kladjeHWTCanvas.getAbsoluteTop());
+//System.out.println("tekstEdited " + tekstEdited.bb2.puntenX[0] + " " + tekstEdited.bb2.puntenY[0]);				
 			}
 			else 
 			{	tekstPopup.setTextColor(drawingColor.toString());
-				tekstPopup.setPopupPosition(startX - 10, startY - 10);
+				tekstPopup.setPopupPosition(startX - 8, startY - 8);
+//System.out.println("no tekstEdited " + startX + " " + startY);				
 			}
 				
 			//else	
@@ -2556,7 +2611,15 @@ System.out.println("kgwtv set " + tekstElementen.size());
 		{
 			mouseDown = true;
 
-			if ((selecteerRechthoek != null) && selecteerRechthoek.contains(eventX, eventY))
+			if (selecteerRechthoekHandlesContain(eventX, eventY))
+			{
+				startX = eventX;
+				startY = eventY;
+//System.out.println("mp oshc");			
+				
+				objectHandled = false;
+			}
+			else if ((selecteerRechthoek != null) && selecteerRechthoek.contains(eventX, eventY))
 			{
 				resetSelectedObject();
 				sleepSelectie = true;
@@ -2571,7 +2634,14 @@ System.out.println("kgwtv set " + tekstElementen.size());
 //System.out.println("mousedown oshc");			
 				
 				objectHandled = false;
+				
+				if (selectedTekstElement != null)
+				{	oldSelectedTekstElement = selectedTekstElement;
+//System.out.println("old = " + oldSelectedTekstElement.printTekst());					
+				}
+				
 			}
+/*			
 			else if (selecteerRechthoekHandlesContain(eventX, eventY))
 			{
 				startX = eventX;
@@ -2580,7 +2650,7 @@ System.out.println("kgwtv set " + tekstElementen.size());
 				
 				objectHandled = false;
 			}
-
+*/
 			// individueel object aangeklikt, was mogelijk al geselecteerd
 			//if (setSelectedObject(e.getX(), e.getY()) || objectSelectedContains(e.getX(), e.getY()))
 			else if (setSelectedObject(eventX, eventY) || objectSelectedContains(eventX, eventY))
@@ -3106,7 +3176,10 @@ System.out.println("kgwtv set " + tekstElementen.size());
 			}
 			
 			if (objectHandled)
+			{	updateAction();
 				addToHistory();
+			
+			}
 			objectHandled = false;
 			handleAction = false;
 			groupHandleAction = false;
