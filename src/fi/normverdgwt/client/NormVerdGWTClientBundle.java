@@ -12,5 +12,9 @@ public interface NormVerdGWTClientBundle extends ClientBundle
 
    @Source("fi/normverdgwt/client/images/goedkrul_en_klein.gif")
    public ImageResource goedKrulResource();
+   
+   @Source("fi/normverdgwt/client/css/NormVerdGWT.css")
+   public  NormVerdGWTCssResource getNormVerdGWTCSS();
+
 
 }

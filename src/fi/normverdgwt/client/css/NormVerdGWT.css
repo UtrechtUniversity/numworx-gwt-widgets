@@ -17,6 +17,17 @@
 	background-color: white;	
 }
 
+.radiobutton {
+	text-align: left;
+	/** background-color: yellow; */
+}	
+
+.label {
+	background-color: rgb(198, 239, 247);
+	color: blue;
+	text-align: left;
+}
+
 .upimage {
 	position: relative;
 	top: -3px;

@@ -3272,7 +3272,7 @@ grensDecimals = findGrensDecimals();
 		}
 		if (muZichtbaarOptie && muRect != null)
 		{
-			if (muVastOptie || berekenKeuze == BEREKENMU)
+			if (berekenKeuze == BEREKENMU)
 				og.setFillStyle(lightBlue);
 			else
 				og.setFillStyle(veryLightBlue);
@@ -3280,7 +3280,7 @@ grensDecimals = findGrensDecimals();
 		}
 		if (sigmaZichtbaarOptie && sigmaRect != null)
 		{
-			if (sigmaVastOptie || berekenKeuze == BEREKENSIGMA)
+			if (berekenKeuze == BEREKENSIGMA)
 				og.setFillStyle(lightBlue);
 			else
 				og.setFillStyle(veryLightBlue);
@@ -5017,6 +5017,33 @@ grensDecimals = findGrensDecimals();
 		zetBerekenKeuze(false);
 		
 		bereken();
+	}
+	
+	public void setInitState()
+	{
+		zetMu(mu, false, true);
+		zetSigma(sigma, false, true);
+		zetGrens(grens, false);
+		
+//		this.grensRechts = grensRechts;
+		
+		zetGrensLinks(grensLinks, false);				
+		zetGrensRechts(grensRechts, false);						
+		zetKans(kans, false);
+		
+//System.out.println("k = " + kans);		
+		
+		zetKansKeuze(true);
+		
+		if (this.kansKeuze == TWEEGRENZEN)
+		{	zetGrensLinks(grensLinks, false);				
+			zetGrensRechts(grensRechts, false);						
+		}
+		
+		zetBerekenKeuze(false);
+		
+		bereken();
+		
 	}
 	
 /*	

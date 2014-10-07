@@ -263,14 +263,14 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{	
 		raakLinks = linksEnabled && 
-					(new Rectangle(xPos + standLinks, yPos, 10, 20)).contains(eventX, eventY);
+					(new Rectangle(xPos + standLinks - 3, yPos, 16, 13)).contains(eventX, eventY);
 		
 		//if (raakLinks && actionListener != null)
 		//{	actionListener.actionPerformed(new ActionEvent(this, 0, "startLinks"));
 		//}
 		
 		raakRechts = rechtsEnabled && 
-					 (new Rectangle(xPos + standRechts, yPos, 10, 20)).contains(eventX, eventY);
+					 (new Rectangle(xPos + standRechts - 3, yPos, 16, 13)).contains(eventX, eventY);
 		
 		//if (raakRechts && actionListener != null)
 		//{	actionListener.actionPerformed(new ActionEvent(this, 0, "startRechts"));
@@ -285,7 +285,7 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
 	{	
 		if (!raakLinks && linksEnabled && 
-			(new Rectangle(xPos + standLinks, yPos, 10, 20)).contains(eventX, eventY))
+			(new Rectangle(xPos + standLinks - 3, yPos, 16, 13)).contains(eventX, eventY))
 		{	raakLinks = true;
 			muisStartX = eventX;
 			
@@ -300,7 +300,7 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 		}
 		
 		if (!raakRechts && rechtsEnabled && 
-			(new Rectangle(xPos + standRechts, yPos, 10, 20)).contains(eventX, eventY))
+			(new Rectangle(xPos + standRechts - 3, yPos, 16, 13)).contains(eventX, eventY))
 		{	raakRechts = true;
 			muisStartX = eventX;
 			

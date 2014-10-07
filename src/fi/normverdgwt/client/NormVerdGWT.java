@@ -1,6 +1,7 @@
 package fi.normverdgwt.client;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
@@ -70,12 +71,17 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	ImageResource foutKruisResource, goedKrulResource;
 	Image foutKruisImage, goedKrulImage;
 
+	static NormVerdGWTCssResource normVerdGWTCss;
+	
 	private int mode;
 	private OpdrNavIF comRoot;
 	
 	public void getImages() 
 	{
 		normVerdGWTClientBundle = GWT.create(NormVerdGWTClientBundle.class);
+		normVerdGWTCss = normVerdGWTClientBundle.getNormVerdGWTCSS();
+		normVerdGWTCss.ensureInjected();
+
 		
 		foutKruisResource = normVerdGWTClientBundle.foutKruisResource();
 		goedKrulResource = normVerdGWTClientBundle.goedKrulResource();
@@ -87,10 +93,12 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	{
 		getImages();
 		
-if (foutKruisImage == null)
-System.out.println("fki is null");
-else
-System.out.println("fki not null");
+//System.out.println("normverd onModuleLoad");
+
+//if (foutKruisImage == null)
+//System.out.println("fki is null");
+//else
+//System.out.println("fki not null");
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName("dock");
@@ -260,11 +268,81 @@ System.out.println("fki not null");
 	{
 		getImages();
 		
+//System.out.println("normverd init");		
+		
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
+		double mu = 0;
+		double sigma = 1;
+		double grens = mu + 1;
+		double grensLinks = mu - 1;
+		double grensRechts = mu + 1;
+		double kans = 6e-1d;
+		int kansKeuze = NormaalPanel.KANSLINKS;
+		int berekenKeuze = NormaalPanel.BEREKENKANS;
+		
+		if (launchState.containsKey("mu"))
+			mu = launchState.getDouble("mu");
+		if (launchState.containsKey("sigma"))
+			sigma = launchState.getDouble("sigma");	
+		if (launchState.containsKey("grens"))
+			grens = launchState.getDouble("grens");	
+		if (launchState.containsKey("grenslinks"))
+			grensLinks = launchState.getDouble("grenslinks");	
+		if (launchState.containsKey("grensrechts"))
+			grensRechts = launchState.getDouble("grensrechts");	
+		if (launchState.containsKey("kans"))
+			kans = launchState.getDouble("kans");	
+		
+		if (launchState.containsKey("kanskeuze"))
+			kansKeuze = launchState.getInt("kanskeuze");	
+		if (launchState.containsKey("berekenkeuze"))
+			berekenKeuze = launchState.getInt("berekenkeuze");	
+
+		// randomizatie
+		String muString = "";
+		String sigmaString = "";
+		String grensString = "";
+		String grensLinksString = "";
+		String grensRechtsString = "";
+		String kansString = "";
+		
+		if (launchState.containsKey("muString"))
+			muString = launchState.getString("muString");
+		if (launchState.containsKey("sigmaString"))
+			sigmaString = launchState.getString("sigmaString");
+		if (launchState.containsKey("grensString"))
+			grensString = launchState.getString("grensString");
+		if (launchState.containsKey("grensLinksString"))
+			grensLinksString = launchState.getString("grensLinksString");
+		if (launchState.containsKey("grensRechtsString"))
+			grensRechtsString = launchState.getString("grensRechtsString");
+		if (launchState.containsKey("kansString"))
+			kansString = launchState.getString("kansString");
+		
+		if (muString.length() > 0 && muString.charAt(0) == '#' && 
+			muString.charAt(muString.length() - 1) == '#') 
+				mu = substitueerRandom(mu, muString, randomVarNamen, randomVarWaarden);
+		if (sigmaString.length() > 0 && sigmaString.charAt(0) == '#' && 
+			sigmaString.charAt(sigmaString.length() - 1) == '#') 
+				sigma = substitueerRandom(sigma, sigmaString, randomVarNamen, randomVarWaarden);
+		if (grensString.length() > 0 && grensString.charAt(0) == '#' && 
+			grensString.charAt(grensString.length() - 1) == '#') 
+				grens = substitueerRandom(grens, grensString, randomVarNamen, randomVarWaarden);
+		if (grensLinksString.length() > 0 && grensLinksString.charAt(0) == '#' && 
+			grensLinksString.charAt(grensLinksString.length() - 1) == '#') 
+				grensLinks = substitueerRandom(grensLinks, grensLinksString, randomVarNamen, randomVarWaarden);
+		if (grensRechtsString.length() > 0 && grensRechtsString.charAt(0) == '#' && 
+			grensRechtsString.charAt(grensRechtsString.length() - 1) == '#') 
+				grensRechts = substitueerRandom(grensRechts, grensRechtsString, randomVarNamen, randomVarWaarden);
+		if (kansString.length() > 0 && kansString.charAt(0) == '#' && 
+			kansString.charAt(kansString.length() - 1) == '#') 
+				kans = substitueerRandom(kans,kansString, randomVarNamen, randomVarWaarden);
+
+		
 		// edit state variabelen
 		// kans opties
 		boolean kansLinksOptie = true;
@@ -301,8 +379,9 @@ System.out.println("fki not null");
 		if (launchState.containsKey("sigmavastoptie"))
 			sigmaVastOptie = launchState.getBoolean("sigmavastoptie");
 
-// dit moet naar setState in NormaalPanel		
+		// blijft		
 		// correctie
+/*		
 		final int KANSLINKS = 0;
 		final int KANSRECHTS = 1;
 		final int TWEEGRENZEN = 2;
@@ -317,6 +396,7 @@ System.out.println("fki not null");
 		{	actualMuBerekenbaarOptie = muBerekenbaarOptie && !muVastOptie;
 			actualSigmaBerekenbaarOptie = sigmaBerekenbaarOptie && !sigmaVastOptie;
 		}
+*/		
 		
 		// slider opties
 		boolean muSliderOptie = true; //false;
@@ -432,6 +512,15 @@ System.out.println("fki not null");
 		
 		dlp.add(normaalPanel);
 		
+		normaalPanel.mu = mu;
+		normaalPanel.sigma = sigma;
+		normaalPanel.grens = grens;
+		normaalPanel.grensLinks = grensLinks;
+		normaalPanel.grensRechts = grensRechts;
+		normaalPanel.kans = kans;
+		normaalPanel.kansKeuze = kansKeuze;
+		normaalPanel.berekenKeuze = berekenKeuze; 
+		
 		normaalPanel.kansLinksOptie = kansLinksOptie;
 		normaalPanel.kansRechtsOptie = kansRechtsOptie;
 		normaalPanel.tweeGrenzenOptie = tweeGrenzenOptie;
@@ -464,28 +553,52 @@ System.out.println("fki not null");
 		normaalPanel.berekenbaarZichtbaar = berekenbaarZichtbaar;
 		
 		if (!checkMu.equals(""))
-		{	checkMu = checkMu.replace(',', '.');	
-			antwoordMu = Double.parseDouble(checkMu);
+		{	if (checkMu.charAt(0) == '#' && checkMu.charAt(checkMu.length() - 1) == '#') 
+				antwoordMu = substitueerRandom(antwoordMu, checkMu, randomVarNamen, randomVarWaarden);
+			else
+			{	checkMu = checkMu.replace(',', '.');	
+				antwoordMu = Double.parseDouble(checkMu);
+			}	
 		}
 		if (!checkSigma.equals(""))
-		{	checkSigma = checkSigma.replace(',', '.');
-			antwoordSigma = Double.parseDouble(checkSigma);
+		{	if (checkSigma.charAt(0) == '#' && checkSigma.charAt(checkSigma.length() - 1) == '#') 
+				antwoordSigma = substitueerRandom(antwoordSigma, checkSigma, randomVarNamen, randomVarWaarden);
+			else 
+			{	checkSigma = checkSigma.replace(',', '.');
+				antwoordSigma = Double.parseDouble(checkSigma);
+			}
 		}
 		if (!checkGrens.equals(""))
-		{	checkGrens = checkGrens.replace(',', '.');	
-	 		antwoordGrens = Double.parseDouble(checkGrens);
+		{	if (checkGrens.charAt(0) == '#' && checkGrens.charAt(checkGrens.length() - 1) == '#') 
+				antwoordGrens = substitueerRandom(antwoordGrens, checkGrens, randomVarNamen, randomVarWaarden);
+			else
+			{	checkGrens = checkGrens.replace(',', '.');	
+	 			antwoordGrens = Double.parseDouble(checkGrens);
+			}	
 		}
 		if (!checkGrensLinks.equals(""))
-	 	{	checkGrensLinks = checkGrensLinks.replace(',', '.');	
-	 		antwoordGrensLinks = Double.parseDouble(checkGrensLinks);
+	 	{	if (checkGrensLinks.charAt(0) == '#' && checkGrensLinks.charAt(checkGrensLinks.length() - 1) == '#') 
+	 			antwoordGrensLinks = substitueerRandom(antwoordGrensLinks, checkGrensLinks, randomVarNamen, randomVarWaarden);
+	 		else
+			{	checkGrensLinks = checkGrensLinks.replace(',', '.');	
+	 			antwoordGrensLinks = Double.parseDouble(checkGrensLinks);
+	 		}
 	 	}
 		if (!checkGrensRechts.equals(""))
-		{	checkGrensRechts = checkGrensRechts.replace(',', '.');
-			antwoordGrensRechts = Double.parseDouble(checkGrensRechts);
+		{	if (checkGrensRechts.charAt(0) == '#' && checkGrensRechts.charAt(checkGrensRechts.length() - 1) == '#') 
+				antwoordGrensRechts = substitueerRandom(antwoordGrensRechts, checkGrensRechts, randomVarNamen, randomVarWaarden);
+			else
+			{	checkGrensRechts = checkGrensRechts.replace(',', '.');
+				antwoordGrensRechts = Double.parseDouble(checkGrensRechts);
+			}	
 		}
 		if (!checkKans.equals(""))
-		{	checkKans  = checkKans.replace(',', '.');
-			antwoordKans = Double.parseDouble(checkKans);
+		{	if (checkKans.charAt(0) == '#' && checkKans.charAt(checkKans.length() - 1) == '#') 
+				antwoordKans = substitueerRandom(antwoordKans, checkKans, randomVarNamen, randomVarWaarden);
+			else
+			{	checkKans  = checkKans.replace(',', '.');
+				antwoordKans = Double.parseDouble(checkKans);
+			}	
 		}	
 		
 		normaalPanel.kijkOpdrachtNa = kijkOpdrachtNa;
@@ -511,10 +624,32 @@ System.out.println("fki not null");
 		
 //System.out.println("init");		
 		
-		normaalPanel.setState(map);
+		normaalPanel.setInitState();
 		
 		normaalPanel.paint();
 
 
 	}
+	
+	public static double substitueerRandom(double def, String s, String[] randomVarNamen, HashMap randomVarWaarden) 
+	{	double d = Double.NaN;
+		s = s.substring(1, s.length() - 1);
+		String[] delen = StringUtils.split(s, "/");
+		int decFactor = 1;
+		
+		for (int j = 0 ; j < randomVarNamen.length; j++)
+		{	
+//System.out.println("rava " + j + " " + randomVars[j]);			
+			if (randomVarNamen[j].equals(delen[0])) 
+				d = ((Integer) randomVarWaarden.get(randomVarNamen[j])).intValue();
+		}
+		if (delen.length > 1)
+		{	decFactor = Integer.parseInt(delen[1]);
+			d = d / decFactor;
+		}
+		if (Double.isNaN(d)) 
+			d = def;
+		return d;
+	}
+
 }
