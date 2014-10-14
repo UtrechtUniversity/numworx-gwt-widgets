@@ -107,6 +107,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	
 	boolean touchStart = false;
 
+	private int asHoogte;
+
 	public void getImages() 
 	{
 		kladjeGWTClientBundle = GWT.create(KladjeGWTClientBundle.class);
@@ -234,8 +236,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 		
 	}	
@@ -1061,38 +1063,35 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 
 	@Override
 	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
+		this.breedte = breedte;
 	}
 
 	@Override
 	public int getAsHoogte() {
-		// TODO Auto-generated method stub
-		return 0;
+		return asHoogte;
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
+		this.asHoogte = ashoogte;
+	}
+
+	@Override
+	public void zetNagekeken(boolean b) {
 	}
 	
     
