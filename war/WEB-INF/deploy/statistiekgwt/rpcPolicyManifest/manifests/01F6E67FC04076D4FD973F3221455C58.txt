@@ -1,0 +1,2 @@
+serviceClass: fi.statistiekgwt.client.GreetingService
+path: C296B1CC2E6DD581ED33AC3DCAD4BB8B.gwt.rpc
