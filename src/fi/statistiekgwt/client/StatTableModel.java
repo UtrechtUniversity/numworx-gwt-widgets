@@ -15,6 +15,10 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 
+import fi.statistiekgwt.client.event.AddColumnEvent;
+import fi.statistiekgwt.client.event.AddColumnEventHandler;
+import fi.statistiekgwt.client.event.EditColumnEvent;
+import fi.statistiekgwt.client.event.EditColumnEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
@@ -28,7 +32,12 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @param <T>
  * 
  */
-public class StatTableModel implements HasHandlers//HasValueChangeHandlers //implements TableModel
+/**
+ * @author borku102
+ *
+ */
+public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditColumnEventHandler
+//HasValueChangeHandlers //implements TableModel
 {
 	private int rowCount;
 	private int columnCount;
@@ -214,9 +223,9 @@ public class StatTableModel implements HasHandlers//HasValueChangeHandlers //imp
 	/**
 	 * Subscribe for events
 	 */
-	public HandlerRegistration addChangeEventHandler(TableChangeEventHandler handler)
+	public HandlerRegistration addTableChangeEventHandler(TableChangeEventHandler handler)
 	{
-		return this.eventBus.addHandler(fi.statistiekgwt.client.event.TableChangeEvent.TYPE, handler);
+		return this.eventBus.addHandler(TableChangeEvent.TYPE, handler);
 	}
 	
 	/**
@@ -507,6 +516,15 @@ public class StatTableModel implements HasHandlers//HasValueChangeHandlers //imp
 		{
 			return null;
 		}
+	}
+	
+	/**
+	 * Get the values in the table.
+	 * @return
+	 */
+	public ArrayList<ArrayList<Object>> getValues()
+	{
+		return this.values;
 	}
 
 	/**
@@ -2544,6 +2562,32 @@ public class StatTableModel implements HasHandlers//HasValueChangeHandlers //imp
 		} 
 		// only got here if we didn't return false
 		return true;
+	}
+
+	@Override
+	public void onAddColumn(AddColumnEvent event)
+	{
+		this.addColumn(event.getName(), 
+			new ColumnType(event.getType(), event.getUitleg()));		
+	}
+
+	@Override
+	public void onEditColumn(EditColumnEvent event)
+	{
+		if (event.hasChangedType() || event.hasChangedEnumOptions() || event.hasChangedUitleg())
+		{
+			this.editColumn(
+				event.getColumnIndex(),
+				event.getName(), 
+				new ColumnType(
+					event.getType(), 
+					event.getEnumOptions().toArray(new String[event.getEnumOptions().size()]), 
+					event.getUitleg()));
+		}
+		else if (event.hasChangedName())
+		{
+			this.setColumnName(event.getName(), event.getColumnIndex());
+		}
 	}
 
 }

@@ -17,8 +17,7 @@ public class TableChangeEvent extends GwtEvent<TableChangeEventHandler>
 	@Override
 	public Type<TableChangeEventHandler> getAssociatedType()
 	{
-		// TODO Auto-generated method stub
-		return TYPE;
+		return this.TYPE;
 	}
 
 	@Override
@@ -29,6 +28,6 @@ public class TableChangeEvent extends GwtEvent<TableChangeEventHandler>
 
 	public String getInfo() 
 	{
-        return info;
+        return this.info;
     }
 }

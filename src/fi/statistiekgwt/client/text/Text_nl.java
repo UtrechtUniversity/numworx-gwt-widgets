@@ -85,6 +85,7 @@ public class Text_nl
 		{ "importButton", "Open bestand" },
 		{ "importWarning",
 			"De tabel bevat data. Een bestand openen overschrijft deze data en verwijdert de views." },
+		{ "importDialogLabel", "Open bestand"},
 		{ "binboundariesDialog", "Definieer klassengrenzen" },
 		{ "setupDialog", "Set up" },
 		{ "viewnameLabel", "View naam: " },

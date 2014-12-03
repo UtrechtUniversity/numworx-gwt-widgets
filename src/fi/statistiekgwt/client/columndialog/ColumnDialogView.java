@@ -1,21 +1,17 @@
-package fi.statistiekgwt.client.addcolumndialog;
+package fi.statistiekgwt.client.columndialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-import com.google.gwt.event.dom.client.TouchMoveEvent;
-import com.google.gwt.event.dom.client.TouchMoveHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.resources.css.ast.CssFontFace;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -26,8 +22,9 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
-import fi.statistiekgwt.client.ColorGenerator;
 import fi.statistiekgwt.client.StatistiekGWT;
+import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogChangeHandler;
+import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogValueChangeHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
@@ -37,9 +34,9 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Manu Drijvers
  * 
  */
-public class AddColumnDialogView extends DialogBox// implements Observer
+public class ColumnDialogView extends DialogBox// implements Observer
 {
-	private AddColumnDialogModel model;
+	private ColumnDialogModel model;
 
 	private LayoutPanel alles;
 
@@ -50,7 +47,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	private ListBox typeBox;
 	private LayoutPanel setTypePanel;
 
-	private LayoutPanel createEnumPanel;
+	private DockLayoutPanel createEnumPanel;
 	private LayoutPanel addEnumElementPanel;
 	private Label addEnumElementLabel;
 	private TextBox addEnumElementField;
@@ -58,7 +55,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	private ListBox enumElementsList; // was: OrderableJList
 	private ArrayList<String> stringOptions;
 	private AllowedTypes originalColumnType;
-	private ScrollPanel enumScrollPane; // was: JScrollPane
+	private LayoutPanel enumScrollPanel; // was: JScrollPane
 	/**
 	 * Panel with 'remove selected' and 'remove all' buttons for enumeration.
 	 */
@@ -78,12 +75,38 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	private Label uitlegLabel;
 	private ScrollPanel uitlegScrollPane; // was: JScrollPane
 	private TextArea uitlegArea;
-	private Button doneButton;
+	
+	/**
+	 * Panel with OK/Cancel buttons.
+	 */
+	private LayoutPanel okCancelPanel;
+	private Button okButton;
+	private Button cancelButton;
+
 
 	private String font;
 
 	public static final int DEFAULT_WIDTH = 600;
-	public static final int DEFAULT_HEIGHT = 300;
+	public static final int DEFAULT_HEIGHT = 330;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param model
+	 *            MVC Model
+	 */
+	public ColumnDialogView(ColumnDialogModel model)
+	{
+		super(true, true);
+		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		super.setText(StatistiekGWT.rb.getString("addacolumn"));
+		this.getElement().getStyle().setBackgroundColor("GREY");
+
+		this.model = model;
+		//this.model.addObserver(this);
+
+		this.initialize();
+	}
 
 	/**
 	 * Constructor with Frame owner
@@ -93,7 +116,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	 * @param model
 	 *            MVC Model
 	 */
-	public AddColumnDialogView(Frame owner, AddColumnDialogModel model)
+	public ColumnDialogView(Frame owner, ColumnDialogModel model)
 	{
 		//super(owner, "Add a column", true);
 		super(true, true);
@@ -114,7 +137,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	 * @param model
 	 *            MVC Model
 	 */
-	public AddColumnDialogView(DialogBox owner, AddColumnDialogModel model)
+	public ColumnDialogView(DialogBox owner, ColumnDialogModel model)
 	{
 		//super(owner, StatistiekGWT.rb.getString("addacolumn"), true);
 		super(true, true);
@@ -142,7 +165,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 //		this.nameField.setActionCommand("nameField");
 		this.kiesType = new Label(StatistiekGWT.rb.getString("choosetype"));
 
-		// Use strings from text file to create combobox
+		// Use strings from text file to create listbox
 		String[] types = {
 			StatistiekGWT.rb.getString("integer"),
 			StatistiekGWT.rb.getString("double"),
@@ -158,11 +181,19 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 //		this.typeBox.setActionCommand("typeBox");
 
 		this.setTypePanel = new LayoutPanel();
-//		this.setTypePanel.setLayout(new GridLayout(2, 2));
 		this.setTypePanel.add(this.kiesNaam);
 		this.setTypePanel.add(this.nameField);
 		this.setTypePanel.add(this.kiesType);
 		this.setTypePanel.add(this.typeBox);
+		// set position
+		this.setTypePanel.setWidgetLeftWidth(this.kiesNaam, 0, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.setTypePanel.setWidgetTopHeight(this.kiesNaam, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.setTypePanel.setWidgetLeftWidth(this.nameField, 50, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.setTypePanel.setWidgetTopHeight(this.nameField, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.setTypePanel.setWidgetLeftWidth(this.kiesType, 0, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.setTypePanel.setWidgetTopHeight(this.kiesType, 30, Style.Unit.PX, 30, Style.Unit.PX);
+		this.setTypePanel.setWidgetLeftWidth(this.typeBox, 50, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.setTypePanel.setWidgetTopHeight(this.typeBox, 30, Style.Unit.PX, 30, Style.Unit.PX);
 
 		this.addEnumElementLabel = new Label(
 			StatistiekGWT.rb.getString("addenumeration"));
@@ -172,8 +203,12 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 //		this.addEnumElementPanel.setLayout(new GridLayout(2, 1));
 		this.addEnumElementPanel.add(this.addEnumElementLabel);
 		this.addEnumElementPanel.add(this.addEnumElementField);
+		// set position
+		this.addEnumElementPanel.setWidgetLeftWidth(this.addEnumElementLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.addEnumElementPanel.setWidgetTopHeight(this.addEnumElementLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.addEnumElementPanel.setWidgetLeftWidth(this.addEnumElementField, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.addEnumElementPanel.setWidgetTopHeight(this.addEnumElementField, 30, Style.Unit.PX, 30, Style.Unit.PX);
 
-		this.createEnumPanel = new LayoutPanel();
 		/*
 		 * this.enumElementsView = new JTextArea();
 		 * this.enumElementsView.setFont(this.font);
@@ -187,7 +222,12 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 		{
 			this.enumElementsList.addItem(list.get(i));
 		}
-		this.enumScrollPane = new ScrollPanel(this.enumElementsList);
+		this.enumScrollPanel = new LayoutPanel();//new ScrollPanel(this.enumElementsList);
+		this.enumScrollPanel.add(this.enumElementsList);
+		// set position
+		this.enumScrollPanel.setWidgetLeftWidth(this.enumElementsList, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.enumScrollPanel.setWidgetTopHeight(this.enumElementsList, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		
 		this.removeSelectedElement = new Button(
 			StatistiekGWT.rb.getString("removeselectedelement"));
 //		this.removeSelectedElement.setActionCommand("removeSelectedElement");
@@ -197,9 +237,13 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 //		this.removeAllElements.setActionCommand("removeAllElements");
 		
 		this.enumSouthPanel = new LayoutPanel();
-//		this.enumSouthPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.enumSouthPanel.add(this.removeSelectedElement);
 		this.enumSouthPanel.add(this.removeAllElements);
+		// set position
+		this.enumSouthPanel.setWidgetLeftWidth(this.removeSelectedElement, 0, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.enumSouthPanel.setWidgetTopHeight(this.removeSelectedElement, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.enumSouthPanel.setWidgetLeftWidth(this.removeAllElements, 50, Style.Unit.PCT, 50, Style.Unit.PCT);
+		this.enumSouthPanel.setWidgetTopHeight(this.removeAllElements, 0, Style.Unit.PX, 30, Style.Unit.PX);
 		
 		this.sortElements = new Button(
 			StatistiekGWT.rb.getString("sortElements"));
@@ -221,42 +265,96 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 		this.enumEastPanel.add(this.moveElementUp);
 		this.enumEastPanel.add(this.moveElementDown);
 		this.enumEastPanel.add(this.sortElements);
+		// set position
+		this.enumEastPanel.setWidgetLeftWidth(this.moveElementUp, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.enumEastPanel.setWidgetTopHeight(this.moveElementUp, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.enumEastPanel.setWidgetLeftWidth(this.moveElementDown, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.enumEastPanel.setWidgetTopHeight(this.moveElementDown, 30, Style.Unit.PX, 30, Style.Unit.PX);
+		this.enumEastPanel.setWidgetLeftWidth(this.sortElements, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.enumEastPanel.setWidgetTopHeight(this.sortElements, 60, Style.Unit.PX, 30, Style.Unit.PX);
 
-		this.createEnumPanel = new LayoutPanel();
+//		this.createEnumPanel = new LayoutPanel();
+		this.createEnumPanel = new DockLayoutPanel(Unit.PX);
 //		this.createEnumPanel.setLayout(new BorderLayout());
-		this.createEnumPanel.add(this.addEnumElementPanel);//, BorderLayout.NORTH);
-		this.createEnumPanel.add(this.enumScrollPane);//, BorderLayout.CENTER);
-		this.createEnumPanel.add(this.enumEastPanel);//, BorderLayout.EAST);
-		this.createEnumPanel.add(this.enumSouthPanel);//, BorderLayout.SOUTH);
-
+		this.createEnumPanel.addNorth(this.addEnumElementPanel, 60);//, BorderLayout.NORTH);
+		this.createEnumPanel.addEast(this.enumEastPanel, 30);//, BorderLayout.EAST);
+		this.createEnumPanel.addSouth(this.enumSouthPanel, 30);//, BorderLayout.SOUTH);
+		this.createEnumPanel.add(this.enumScrollPanel);//, BorderLayout.CENTER);
+		this.createEnumPanel.setPixelSize(150, 240);
+		this.createEnumPanel.getElement().getStyle().setBackgroundColor("yellow");
+		// set position for this.createEnumPanel = LayoutPanel
+//		this.createEnumPanel.setWidgetLeftWidth(this.addEnumElementPanel, 0, Style.Unit.PCT, 80, Style.Unit.PCT);
+//		this.createEnumPanel.setWidgetTopHeight(this.addEnumElementPanel, 0, Style.Unit.PX, 60, Style.Unit.PX);
+//		this.createEnumPanel.setWidgetLeftWidth(this.enumScrollPanel, 0, Style.Unit.PCT, 80, Style.Unit.PCT);
+//		this.createEnumPanel.setWidgetTopHeight(this.enumScrollPanel, 60, Style.Unit.PX, 150, Style.Unit.PX);
+//		this.createEnumPanel.setWidgetLeftWidth(this.enumEastPanel, 80, Style.Unit.PCT, 20, Style.Unit.PCT);
+//		this.createEnumPanel.setWidgetTopHeight(this.enumEastPanel, 60, Style.Unit.PX, 150, Style.Unit.PX);
+//		this.createEnumPanel.setWidgetLeftWidth(this.enumSouthPanel, 0, Style.Unit.PCT, 80, Style.Unit.PCT);
+//		this.createEnumPanel.setWidgetTopHeight(this.enumSouthPanel, 210, Style.Unit.PX, 30, Style.Unit.PX);
+		
 		this.typePanel = new LayoutPanel();
 //		this.typePanel.setLayout(new BorderLayout());
-		this.typePanel.add(this.createEnumPanel);//, BorderLayout.CENTER);
 		this.typePanel.add(this.setTypePanel);//, BorderLayout.NORTH);
-
+		this.typePanel.add(this.createEnumPanel);//, BorderLayout.CENTER);
+		// test syl: even niet het onzichtbaar blijven createEnumPanel, maar alleen het noord-deel
+//		this.typePanel.add(this.enumScrollPanel);//, BorderLayout.CENTER);
+		
+		// set position
+		this.typePanel.setWidgetLeftWidth(this.setTypePanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.typePanel.setWidgetTopHeight(this.setTypePanel, 0, Style.Unit.PX, 60, Style.Unit.PX);
+		this.typePanel.setWidgetLeftWidth(this.createEnumPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.typePanel.setWidgetTopHeight(this.createEnumPanel, 60, Style.Unit.PX, 240, Style.Unit.PX);
+//		this.typePanel.setWidgetLeftWidth(this.enumScrollPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+//		this.typePanel.setWidgetTopHeight(this.enumScrollPanel, 60, Style.Unit.PX, 240, Style.Unit.PX);
+		
 		this.uitlegLabel = new Label(StatistiekGWT.rb.getString("uitlegbijkolom"));
 		this.uitlegArea = new TextArea();
 		this.uitlegScrollPane = new ScrollPanel(this.uitlegArea);
-		this.doneButton = new Button(StatistiekGWT.rb.getString("doneButton"));
-//		this.doneButton.setActionCommand("doneButton");
 		this.uitlegPanel = new LayoutPanel();
 //		this.uitlegPanel.setLayout(new BorderLayout());
 		this.uitlegPanel.add(this.uitlegLabel);//, BorderLayout.NORTH);
 		this.uitlegPanel.add(this.uitlegArea);//, BorderLayout.CENTER);
-		this.uitlegPanel.add(this.doneButton);//, BorderLayout.SOUTH);
+		// set position
+		this.uitlegPanel.setWidgetLeftWidth(this.uitlegLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.uitlegPanel.setWidgetTopHeight(this.uitlegLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.uitlegPanel.setWidgetLeftWidth(this.uitlegArea, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.uitlegPanel.setWidgetTopHeight(this.uitlegArea, 30, Style.Unit.PX, 240, Style.Unit.PX);
+
+		this.okCancelPanel = new LayoutPanel();
+		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+//		this.doneButton.setActionCommand("doneButton");
+		this.cancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
+		this.okCancelPanel.add(this.okButton);
+		this.okCancelPanel.add(this.cancelButton);
+		// set position
+		this.okCancelPanel.setWidgetLeftWidth(this.okButton, 25, Style.Unit.PCT, 25, Style.Unit.PCT);
+		this.okCancelPanel.setWidgetTopHeight(this.okButton, 0, Style.Unit.PX, 30, Style.Unit.PX);
+		this.okCancelPanel.setWidgetLeftWidth(this.cancelButton, 50, Style.Unit.PCT, 25, Style.Unit.PCT);
+		this.okCancelPanel.setWidgetTopHeight(this.cancelButton, 0, Style.Unit.PX, 30, Style.Unit.PX);
+
 
 //		GridLayout gl = new GridLayout(1, 2);
 //		gl.setHgap(5);
 		this.alles = new LayoutPanel();
+		this.alles.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 //		this.alles.setLayout(gl);
 		this.alles.add(this.typePanel);
 		this.alles.add(this.uitlegPanel);
+		this.alles.add(this.okCancelPanel);
+		// set position
+		this.alles.setWidgetLeftWidth(this.typePanel, 0, Unit.PCT, 50, Unit.PCT);  // Left panel
+		this.alles.setWidgetTopHeight(this.typePanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.alles.setWidgetLeftWidth(this.uitlegPanel, 50, Unit.PCT, 50, Unit.PCT); // Right panel
+		this.alles.setWidgetTopHeight(this.uitlegPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+		this.alles.setWidgetLeftWidth(this.okCancelPanel, 0, Unit.PCT, 100, Unit.PCT); // Bottom panel
+		this.alles.setWidgetTopHeight(this.okCancelPanel, 300, Style.Unit.PX, 30, Style.Unit.PX);
+
 		this.add(this.alles);
 		
 		this.originalColumnType = this.model.getType();
 		this.setStringOptions();
 
-		this.update(null);
+		this.update();
 	}
 
 	private void setStringOptions()
@@ -279,7 +377,6 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	 */
 	private void setTypeBox()
 	{
-		String typeString = "";
 		AllowedTypes type = this.model.getType(); 
 		
 		this.setSelectedItemTypeBox(type);
@@ -358,22 +455,20 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	}
 
 	/**
-	 * Add a touchstarthandler to all buttons and fields
+	 * Add a clickhandler to all buttons and fields
 	 * 
 	 * @param handler
-	 *            the attached touchstarthandler
+	 *            the attached clickhandler
 	 */
-	public void addTouchStartHandlers(TouchStartHandler handler) // was: addActionListeners()
+	public void addClickHandlers(ClickHandler handler) // was: addActionListeners()
 	{
-		this.typeBox.addTouchStartHandler(handler);//.addActionListener(handler);
-		this.addEnumElementField.addTouchStartHandler(handler);
-		this.removeSelectedElement.addTouchStartHandler(handler);
-		this.removeAllElements.addTouchStartHandler(handler);
-		this.sortElements.addTouchStartHandler(handler);
-		this.moveElementUp.addTouchStartHandler(handler);
-		this.moveElementDown.addTouchStartHandler(handler);
-		this.doneButton.addTouchStartHandler(handler);
-		this.nameField.addTouchStartHandler(handler);
+		this.removeSelectedElement.addClickHandler(handler);
+		this.removeAllElements.addClickHandler(handler);
+		this.sortElements.addClickHandler(handler);
+		this.moveElementUp.addClickHandler(handler);
+		this.moveElementDown.addClickHandler(handler);
+		this.okButton.addClickHandler(handler);
+		this.cancelButton.addClickHandler(handler);
 	}
 
 	/**
@@ -384,8 +479,21 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	 */
 	public void addBlurHandlers(BlurHandler handler)//addFocusListeners(FocusListener fl)
 	{
-		this.nameField.addBlurHandler(handler);//.addFocusListener(fl);
+		this.nameField.addBlurHandler(handler);
 		this.uitlegArea.addBlurHandler(handler);
+	}
+	
+	public void addChangeHandlers(ColumnDialogChangeHandler handler)
+	{
+		this.typeBox.addChangeHandler(handler);
+	}
+
+	public void addValueChangeHandlers(
+		ColumnDialogValueChangeHandler handler)
+	{
+		this.nameField.addValueChangeHandler(handler);
+		this.addEnumElementField.addValueChangeHandler(handler);
+		this.uitlegArea.addValueChangeHandler(handler);
 	}
 
 	public TextArea getUitlegArea()
@@ -406,7 +514,7 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 	/**
 	 * Implementation of Observer
 	 */
-	public void update(Object arg)//(Observable o, Object arg)
+	public void update()//(Observable o, Object arg)
 	{
 		// update typeBox selected item
 		this.setSelectedItemTypeBox(this.model.getType());
@@ -608,4 +716,50 @@ public class AddColumnDialogView extends DialogBox// implements Observer
 		
 		return isValid;
 	}
+
+	public TextBox getAddEnumElementField()
+	{
+		return this.addEnumElementField;
+	}
+
+	public Button getRemoveSelectedElement()
+	{
+		return this.removeSelectedElement;
+	}
+
+	public Button getRemoveAllElements()
+	{
+		return this.removeAllElements;
+	}
+
+	public Button getSortElements()
+	{
+		return this.sortElements;
+	}
+
+	public PushButton getMoveElementUp()
+	{
+		return this.moveElementUp;
+	}
+
+	public PushButton getMoveElementDown()
+	{
+		return this.moveElementDown;
+	}
+
+	public ListBox getTypeBox()
+	{
+		return this.typeBox;
+	}
+
+	public Button getOkButton()
+	{
+		return this.okButton;
+	}
+
+	public Button getCancelButton()
+	{
+		return this.cancelButton;
+	}
+
 }

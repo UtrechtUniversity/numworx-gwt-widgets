@@ -95,7 +95,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		//super(new BorderLayout());
 
 		this.model = model;
-		this.model.getStatTableModel().addChangeEventHandler(this);//addObserver(this);
+		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 		this.controller = controller;
 
 		// create GUI

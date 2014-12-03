@@ -96,7 +96,7 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 		this.tabPanel = new TabLayoutPanel(barHeight, barUnit);
 		
 		this.model = model;
-		this.model.getStatTableModel().addChangeEventHandler(this);//addObserver(this);
+		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 		this.controller = controller;
 		
 		this.dialogs = new ArrayList<SeparateViewDialog>();
@@ -551,7 +551,7 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 
 	public void update()//(Observable arg0, Object arg1)
 	{
-		//GWT.log("StatInteractiePanelView.update()");
+		GWT.log("StatInteractiePanelView.update()");
 		for (int i = super.getWidgetCount() - 1; i > 0; i--)
 		{
 			super.remove(i);

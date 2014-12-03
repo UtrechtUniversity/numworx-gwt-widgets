@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import fi.statistiekgwt.client.addcolumndialog.AddColumnDialogModel;
+import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
 import fi.statistiekgwt.client.types.AllowedTypes;
 
 /**
@@ -24,13 +24,13 @@ public class ColumnType implements Serializable
 	public static final String WILDCARD = new String("*");
 
 	/**
-	 * Constructor die een AddColumnDialogModel krijgt, dus de informatie uit de
+	 * Constructor die een ColumnDialogModel krijgt, dus de informatie uit de
 	 * "maak een nieuwe kolom" dialog
 	 * 
 	 * @param dialogModel
 	 *            Het model uit de AddColumnDialog
 	 */
-	public ColumnType(AddColumnDialogModel dialogModel)
+	public ColumnType(ColumnDialogModel dialogModel)
 	{
 		this.type = dialogModel.getType();
 		if (this.type.equals(AllowedTypes.ENUM))

@@ -1,29 +1,30 @@
-package fi.statistiekgwt.client.addcolumndialog;
+package fi.statistiekgwt.client.columndialog;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.event.shared.SimpleEventBus;
-
+import com.google.gwt.event.shared.HasHandlers;
 import fi.statistiekgwt.client.StatTableModel;
 import fi.statistiekgwt.client.StatistiekUtils;
+import fi.statistiekgwt.client.event.AddColumnEvent;
+import fi.statistiekgwt.client.event.AddColumnEventHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
 /**
- * Model for the add column dialog
+ * Model for the add or edit column dialog.
+ * Is deze nog nodig? Wijzigingen worden toch uit view afgelezen 
+ * en niet via ColumnDialogModel aan StatTableModel doorgegeven.
+ * (ColumnDialogController stuurt een Add/EditColumnEvent naar de handler (StatTableModel).)
  * 
  * @author Manu Drijvers, Sylvia van Borkulo
  */
-public class AddColumnDialogModel implements HasValueChangeHandlers<String>// extends Observable
+public class ColumnDialogModel implements HasHandlers// extends Observable
 {
 	private String name;
 	private String oldName;
@@ -34,12 +35,17 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 	private StatTableModel tableModel;
 	private boolean donePressed;
 	
+	private boolean hasChangedName;
+	private boolean hasChangedType;
+	private boolean hasChangedEnumOptions;
+	private boolean hasChangedUitleg;
+	
 	EventBus bus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 
 	/**
 	 * Constructor
 	 */
-	public AddColumnDialogModel(StatTableModel tableModel)
+	public ColumnDialogModel(StatTableModel tableModel)
 	{
 		this.tableModel = tableModel;
 		this.name = this.getFirstFreeName();
@@ -49,6 +55,11 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 		this.enumOptions.add(ColumnType.WILDCARD);
 		this.uitleg = new String();
 		this.donePressed = false;
+		
+		this.hasChangedName = false;
+		this.hasChangedType = false;
+		this.hasChangedEnumOptions = false;
+		this.hasChangedUitleg = false;
 	}
 
 	/**
@@ -61,7 +72,7 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 	 * @param cType
 	 *            The initial column type
 	 */
-	public AddColumnDialogModel(StatTableModel tableModel, String name,
+	public ColumnDialogModel(StatTableModel tableModel, String name,
 		ColumnType cType, int columnIndex)
 	{
 		this.name = name;
@@ -84,6 +95,11 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 
 		this.uitleg = cType.getUitleg();
 		this.donePressed = false;
+		
+		this.hasChangedName = false;
+		this.hasChangedType = false;
+		this.hasChangedEnumOptions = false;
+		this.hasChangedUitleg = false;
 	}
 
 	/**
@@ -95,9 +111,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 	public void setType(AllowedTypes type)
 	{
 		this.type = type;
-//		this.setChanged(); // dit komt van extends Observable
-//		this.notifyObservers();
-		ValueChangeEvent.fire(this, ""); // wat is value?
 	}
 	
 	public int getColumnIndex()
@@ -113,6 +126,46 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 	public void setDonePressed(boolean b)
 	{
 		this.donePressed = b;
+	}
+
+	public void setHasChangedName(boolean b)
+	{
+		this.hasChangedName = b;
+	}
+
+	public void setHasChangedType(boolean b)
+	{
+		this.hasChangedType = b;
+	}
+
+	public void setHasChangedEnumOptions(boolean b)
+	{
+		this.hasChangedEnumOptions = b;
+	}
+
+	public void setHasChangedUitleg(boolean b)
+	{
+		this.hasChangedUitleg = b;
+	}
+
+	public boolean hasChangedName()
+	{
+		return this.hasChangedName;
+	}
+
+	public boolean hasChangedType()
+	{
+		return this.hasChangedType;
+	}
+
+	public boolean hasChangedEnumOptions()
+	{
+		return this.hasChangedEnumOptions;
+	}
+
+	public boolean hasChangedUitleg()
+	{
+		return this.hasChangedUitleg;
 	}
 
 	/**
@@ -168,9 +221,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 		{
 			this.name = name;
 		}
-//		this.setChanged();
-//		this.notifyObservers();
-		ValueChangeEvent.fire(this, name);
 	}
 
 	/**
@@ -196,10 +246,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 
 			// add WILDCARD again
 			this.enumOptions.add(ColumnType.WILDCARD);
-
-//			this.setChanged();
-//			this.notifyObservers();
-			ValueChangeEvent.fire(this, ""); // wat is value?
 		}
 	}
 
@@ -229,9 +275,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 		if (this.enumOptions.size() > 1)
 		{
 			this.enumOptions.remove(this.enumOptions.size() - 2);
-//			this.setChanged();
-//			this.notifyObservers();
-			ValueChangeEvent.fire(this, ""); // wat is value?
 		}
 	}
 
@@ -248,9 +291,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 			&& !this.enumOptions.get(index).equals(ColumnType.WILDCARD))
 		{
 			this.enumOptions.remove(index);
-//			this.setChanged();
-//			this.notifyObservers();
-			ValueChangeEvent.fire(this, ""); // wat is value?
 		}
 	}
 
@@ -264,9 +304,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 	{
 		//System.out.println("setUitleg(" + uitleg + ")");
 		this.uitleg = uitleg;
-//		this.setChanged();
-//		this.notifyObservers();
-		ValueChangeEvent.fire(this, uitleg);
 	}
 
 	/**
@@ -326,9 +363,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 				this.enumOptions.remove(i);
 			}
 		}
-//		this.setChanged();
-//		this.notifyObservers();
-		ValueChangeEvent.fire(this, ""); // wat is value?
 	}
 
 	/**
@@ -364,10 +398,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
         });
 		
 		this.enumOptions = new ArrayList(Arrays.asList(sortedEnumOptions));
-
-//		this.setChanged();
-//		this.notifyObservers();
-		ValueChangeEvent.fire(this, ""); // wat is value?
 	}
 
 	/**
@@ -382,10 +412,6 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 			&& !this.enumOptions.get(index2).equals(ColumnType.WILDCARD))
 		{
 			Collections.swap(this.enumOptions, index1, index2);
-			
-//			this.setChanged();
-//			this.notifyObservers();
-			ValueChangeEvent.fire(this, ""); // wat is value?
 		}
 	}
 
@@ -407,16 +433,30 @@ public class AddColumnDialogModel implements HasValueChangeHandlers<String>// ex
 		return isValid;
 	}
 
+	/**
+	 * Send event to receiver StatTableModel.
+	 */
 	@Override
 	public void fireEvent(GwtEvent<?> event) 
 	{
 	    bus.fireEvent(event);
 	}
 
-	@Override
-	public HandlerRegistration addValueChangeHandler(
-		ValueChangeHandler<String> handler)
+	/**
+	 * Subscribe for events
+	 */
+	public HandlerRegistration addAddColumnEventHandler(AddColumnEventHandler handler)
 	{
-		return bus.addHandler(ValueChangeEvent.getType(), handler);
+		return bus.addHandler(AddColumnEvent.TYPE, handler);
+	}
+
+	/**
+	 * Get the name as it was when ColumnDialog was opened.
+	 * If a new column is added, old name is an empty string.
+	 * @return
+	 */
+	public String getOldName()
+	{
+		return this.oldName;
 	}
 }
