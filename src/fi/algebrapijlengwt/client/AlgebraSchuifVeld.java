@@ -110,6 +110,10 @@ public class AlgebraSchuifVeld
 		alleenInvullen = owner.alleenInvullen;
 		isDemo = owner.isDemo;
 
+//System.out.println("toolkit " + toolkit);
+//System.out.println("alleenInvullen " + alleenInvullen);
+//System.out.println("isDemo " + isDemo);
+
 		brugklas = owner.brugklas;
 		
 		if (toolkit)
@@ -569,6 +573,9 @@ public class AlgebraSchuifVeld
 		
 		//zoomStateHolder.setState(zoomStateHolderState);
 		
+//System.out.println("constr " + this.aantalSc);
+//System.out.println("state " + aantalSc);
+		
 		int n = this.aantalSc;
 		for (int i = 0; i < n; i++)
 		{	verwijder(schuifcomponenten[0]);
@@ -581,7 +588,12 @@ public class AlgebraSchuifVeld
 				String className = (String) classNamesList.get(i);
 				int posX = ((Integer) posXList.get(i)).intValue();
 				int posY = ((Integer) posYList.get(i)).intValue();
-			
+
+//System.out.println("posX = " + posX);
+
+//if (alleenInvullen || isDemo)
+//posX -= 110;	
+
 	    		if (className.equals("AftrekSchuifComponent") || 
 	    			className.equals("fi.algebrapijlenopdr.AftrekSchuifComponent"))
 	    		{
@@ -737,6 +749,8 @@ public class AlgebraSchuifVeld
 	    
 //GWT zoek even lokaties op in maakStapel
 	    
+if (toolkit)	    
+{	    
 	    // nodig voor launchdata, bij de Java versie staan de componenten iets hoger
 	    for (int i = 0; i < aantalSc; i++)
 		{	if (schuifcomponenten[i].isStapel)
@@ -750,8 +764,43 @@ public class AlgebraSchuifVeld
 				if(schuifcomponenten[i] instanceof MachtSchuifComponent)schuifcomponenten[i].zetPlaats(20, 240);
 			}
 		}
-	    
-	    
+}
+else // alleenInvullen || isDemo
+{
+//System.out.println("before " + this.aantalSc);	
+	boolean launching = verwijderStapels();
+//System.out.println("after " + this.aantalSc);	
+	if (launching)
+	{	for (int cnt = 0; cnt < this.aantalSc; cnt++)
+		{
+			if (schuifcomponenten[cnt] != null)
+			{	int x = schuifcomponenten[cnt].xPos;
+				int y = schuifcomponenten[cnt].yPos;
+				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+				for (int pCnt = 0; pCnt < asc.aantalPu; pCnt++)
+					asc.zetPlaats(x - 100,y,asc.pijlUit[pCnt]);
+//System.out.println("aantalPu " + asc.aantalPu);				
+			}
+//			else
+//System.out.println("sc " + cnt + " null");				
+		}
+		for (int cnt = 0; cnt < this.aantalSc; cnt++)
+		{
+			if (schuifcomponenten[cnt] != null)
+			{	//int x = schuifcomponenten[cnt].xPos;
+				//int y = schuifcomponenten[cnt].yPos;
+				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+				//asc.zetPlaats(x - 100,y);
+				if (asc.pijlIn1 != null)
+					asc.verbind(asc.pijlIn1);
+			
+			}
+		}
+		
+		//paint();
+	
+	}
+}
 	    //Enumeration en = zoomStateHolder.keys();
 	    Set keySet = zoomStateHolder.keySet();
 		Object[] keys = keySet.toArray();
@@ -806,6 +855,27 @@ public class AlgebraSchuifVeld
 			
     }
 
+    public boolean verwijderStapels()
+    {
+    	boolean stapel = false;
+    	SchuifComponent[] stapels = new SchuifComponent[20];
+    	int sCnt = 0;
+    	for (int i = 0; i < aantalSc; i++)
+    	{	if (schuifcomponenten[i].isStapel)
+    		{	stapels[sCnt] = schuifcomponenten[i];
+    			sCnt++;
+    			stapel = true;
+    		}
+    	}
+//System.out.println("verwijder before " + aantalSc);    	
+    	for (int j = 0; j < sCnt; j++)
+    	{	verwijder((AlgebraSchuifComponent) stapels[j]);
+    	}
+    	
+//System.out.println("verwijder after " + aantalSc);
+
+    	return stapel;
+    }
 
     public void tekenOpnieuw()
     {
@@ -862,7 +932,14 @@ public class AlgebraSchuifVeld
 				{
 					UitvoerSchuifComponent uvsc = (UitvoerSchuifComponent) schuifcomponenten[ascCnt];
 					if (uvsc.tabel != null)
-						uvsc.tabel.paint();
+					{	uvsc.tabel.paint();
+						if (uvsc.zoomInTabel)
+						{
+							uvsc.zoomInKnop.paint();
+							uvsc.zoomUitKnop.paint();
+						}
+					}
+					
 				}
    			}
    		}
@@ -883,7 +960,11 @@ public class AlgebraSchuifVeld
 	}
 	
 	public void maakStapel()
-	{	aantalSc = 0;
+	{	
+		
+//System.out.println("maakStapel");
+
+		aantalSc = 0;
 		int b = basisB; //50;
 		int h = basisH; //20;
 		

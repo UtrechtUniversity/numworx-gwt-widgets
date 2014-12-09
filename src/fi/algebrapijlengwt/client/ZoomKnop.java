@@ -33,6 +33,8 @@ public class ZoomKnop //extends JComponent
 	private String toolTip = "";	
 	
 	int xPos,yPos,breedte,hoogte;
+	
+	boolean visible = true;
 				public ZoomKnop(String s, int x, int y, int b, int h, Context2d c2d)
 	{	code = s;
 	
@@ -101,6 +103,13 @@ public class ZoomKnop //extends JComponent
 	public void paintBuffer(Context2d g)
 	{			//g.setColor(fgColor);
 		//{	
+			if (!visible)
+				return;
+			
+			int xPos = this.xPos;
+			if (code.equals("zoomintabel") || code.equals("zoomuittabel"))
+				xPos += 2;
+				
 			//g.setColor(bgColor);
 			g.setFillStyle(bgColor);
 			//g.fillRect(0,0,getSize().width,getSize().height);
@@ -715,6 +724,168 @@ public class ZoomKnop //extends JComponent
 			g.stroke();
 	
 		}
+		else if(code.equals("zoomintabel"))
+		{	
+			
+//System.out.println("zoomintabel paint");
+
+			//g.drawOval(4,4,10,10);
+			g.beginPath();
+			g.arc(xPos+5, yPos+5, 5, 0, 2*Math.PI);
+			g.stroke();
+			
+			//g.drawLine(6,9,12,9);
+			g.beginPath();
+			g.moveTo(xPos+2,yPos+5);
+			g.lineTo(xPos+8,yPos+5);
+			g.stroke();
+
+			//g.drawLine(9,6,9,12);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+2);
+			g.lineTo(xPos+5,yPos+8);
+			g.stroke();
+
+/*			
+			//g.drawLine(5,19,15,19);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+15,yPos+19);
+			g.stroke();
+
+			//g.drawLine(5,19,7,17);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+7,yPos+17);
+			g.stroke();
+
+			//g.drawLine(5,19,7,21);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+7,yPos+21);
+			g.stroke();
+
+			//g.drawLine(15,19,13,17);
+			g.beginPath();
+			g.moveTo(xPos+15,yPos+19);
+			g.lineTo(xPos+13,yPos+17);
+			g.stroke();
+
+			//g.drawLine(15,19,13,21);
+			g.beginPath();
+			g.moveTo(xPos+15,yPos+19);
+			g.lineTo(xPos+13,yPos+21);
+			g.stroke();
+
+			//g.drawLine(19,5,19,15);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+19,yPos+15);
+			g.stroke();
+
+			//g.drawLine(19,5,17,7);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+17,yPos+7);
+			g.stroke();
+
+			//g.drawLine(19,5,21,7);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+21,yPos+7);
+			g.stroke();
+
+			//g.drawLine(19,15,17,13);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+15);
+			g.lineTo(xPos+17,yPos+13);
+			g.stroke();
+
+			//g.drawLine(19,15,21,13);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+15);
+			g.lineTo(xPos+21,yPos+13);
+			g.stroke();
+*/
+		}
+		else if(code.equals("zoomuittabel"))
+		{	
+			//g.drawOval(4,4,10,10);
+			g.beginPath();
+			g.arc(xPos+5, yPos+5, 5, 0, 2*Math.PI);
+			g.stroke();
+
+			//g.drawLine(6,9,12,9);
+			g.beginPath();
+			g.moveTo(xPos+2,yPos+5);
+			g.lineTo(xPos+8,yPos+5);
+			g.stroke();
+			
+/*			
+			//g.drawLine(5,19,15,19);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+15,yPos+19);
+			g.stroke();
+
+			//g.drawLine(5,19,7,17);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+7,yPos+17);
+			g.stroke();
+
+			//g.drawLine(5,19,7,21);
+			g.beginPath();
+			g.moveTo(xPos+5,yPos+19);
+			g.lineTo(xPos+7,yPos+21);
+			g.stroke();
+
+			//g.drawLine(15,19,13,17);
+			g.beginPath();
+			g.moveTo(xPos+15,yPos+19);
+			g.lineTo(xPos+13,yPos+17);
+			g.stroke();
+
+			//g.drawLine(15,19,13,21);
+			g.beginPath();
+			g.moveTo(xPos+15,yPos+19);
+			g.lineTo(xPos+13,yPos+21);
+			g.stroke();
+
+			
+			//g.drawLine(19,5,19,15);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+19,yPos+15);
+			g.stroke();
+
+			//g.drawLine(19,5,17,7);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+17,yPos+7);
+			g.stroke();
+
+			//g.drawLine(19,5,21,7);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+5);
+			g.lineTo(xPos+21,yPos+7);
+			g.stroke();
+
+			//g.drawLine(19,15,17,13);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+15);
+			g.lineTo(xPos+17,yPos+13);
+			g.stroke();
+
+			//g.drawLine(19,15,21,13);
+			g.beginPath();
+			g.moveTo(xPos+19,yPos+15);
+			g.lineTo(xPos+21,yPos+13);
+			g.stroke();
+*/
+		}
+		
+		
 	}
 /*	
 	public void mousePressed(MouseEvent e)	{	actief = true;		repaint();

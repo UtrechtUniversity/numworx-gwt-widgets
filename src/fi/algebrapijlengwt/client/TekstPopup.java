@@ -13,10 +13,13 @@ public class TekstPopup extends PopupPanel
 	//int tekstX, tekstY;
 	int maxVisibleCharacters = 10;
 	int maxCharacters = 30;
+	boolean isForLabel = false;
 	
-	public TekstPopup(AlgebraSchuifComponent o)
+	public TekstPopup(AlgebraSchuifComponent o, boolean isForLabel)
 	{
 		super(true);
+		
+		this.isForLabel = isForLabel;
 		
 		owner = o;
 		//tekstX = eventX;
@@ -50,8 +53,10 @@ public class TekstPopup extends PopupPanel
 			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
 			{
 //System.out.println("enter");
-				
-				owner.zetInvulWaarde();
+				if ((owner instanceof UitvoerSchuifComponent) && isForLabel)
+					((UitvoerSchuifComponent) owner).zetLabelTekst();
+				else
+					owner.zetInvulWaarde();
 			}
 		}
 	}

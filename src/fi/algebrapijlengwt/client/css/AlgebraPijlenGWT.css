@@ -36,18 +36,22 @@
 }		
 
 .togglebutton {
-	
+	text-align: center;	
 	border-style: none;
-	margin: 0px;
-	padding: 0px;
+/**	margin: 0px;*/
+/**	padding: 0px;*/
 /**	color: red;*/
 	
 }
 
 .pushbutton {
-
-	background-color: yellow;
+	text-align: center;
+/**	background-color: yellow;*/
 /**	font-size: 0.875em;*/
-	padding: 0px;	
+/**	padding: 0px;*/	
 }	
 
+.checkbox {
+	text-align: center; 
+	/** background-color: yellow; */
+}	

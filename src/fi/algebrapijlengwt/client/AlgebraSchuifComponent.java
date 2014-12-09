@@ -350,6 +350,38 @@ public class AlgebraSchuifComponent extends SchuifComponent
 	}
 	
 	
+
+	public void zetPlaats(int x, int y, Pijl p)
+	{
+		//setLocation(x,y);
+		xPos = x;
+		yPos = y;
+		//Pijl p = pijlUit[aantalPu-1];
+		if (!links)
+		{	if (label)
+			{	//p.zetPlaats(getLocation().x + getSize().width + 9, getLocation().y + 30);
+				p.zetPlaats(xPos + breedte + 9, yPos + 30);
+			}
+			else 
+			{	//p.zetPlaats(getLocation().x + getSize().width + 9, getLocation().y + 10);
+				p.zetPlaats(xPos + breedte + 9, yPos + 10);
+			
+			}
+		}
+		else 
+		{	if (label) 
+			{	//p.zetPlaats(getLocation().x - 10, getLocation().y + 30);
+				p.zetPlaats(xPos - 10, yPos + 30);
+			}
+			else 
+			{	//p.zetPlaats(getLocation().x - 10, getLocation().y + 10);
+				p.zetPlaats(xPos - 10, yPos + 10);
+			
+			}
+		}
+	}
+	
+	
 	public void verbind(Pijl p)
 	{	pijlIn1 = p;
 		if (!links)
@@ -375,7 +407,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 //System.out.println("verbind " + (getLocation().x + getSize().width));		
 		}
 	}
-	
+
 	public void maakLos(Pijl p)
 	{	if(p==pijlIn1)
 		{	pijlIn1 = null;
@@ -535,6 +567,11 @@ public class AlgebraSchuifComponent extends SchuifComponent
 				uvsc.tabel.xPos += dx;
 				uvsc.tabel.yPos += dy;
 			}
+			uvsc.zoomInKnop.xPos += dx;
+			uvsc.zoomInKnop.yPos += dy;
+			uvsc.zoomUitKnop.xPos += dx;
+			uvsc.zoomUitKnop.yPos += dy;
+
 		}
 		
 		asv.tekenOpnieuw();
@@ -554,7 +591,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 		
 		//if (!isStapel && (getLocation().x < 80 || getLocation().x > schuifveld.getSize().width
 		//				|| getLocation().y < 0 || getLocation().y > schuifveld.getSize().height))
-		if (!isStapel && !(this instanceof GrafiekComponent) &&
+		if (!isStapel && !(this instanceof GrafiekComponent) && asv.toolkit && 
 						 (xPos < 80 || xPos > (asv.breedte-breedte) ||
 						  yPos < 0 || yPos > (asv.hoogte-hoogte)))
 		{	asv.verwijder(this);
@@ -562,7 +599,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 		
 // check dit!!: mouseUp wordt niet geregistreerd buiten asv
 		
-		if (!isStapel && this instanceof UitvoerSchuifComponent)
+		if (!isStapel && this instanceof UitvoerSchuifComponent && (asv.owner.tabelBox != null))
 		{	
 			
 		

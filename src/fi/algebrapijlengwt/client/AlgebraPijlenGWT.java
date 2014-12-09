@@ -108,6 +108,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		algebraPijlenGWTClientBundle = GWT.create(AlgebraPijlenGWTClientBundle.class);
 		algebraPijlenGWTCss = algebraPijlenGWTClientBundle.getAlgebraPijlenGWTCSS();
 		algebraPijlenGWTCss.ensureInjected();
+		
+//System.out.println("getImages");		
 	}
 	
 	
@@ -203,6 +205,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		tabelBox = new CheckBox();
 		tabelBox.setText("tabel");
+		tabelBox.addStyleName(algebraPijlenGWTCss.checkbox());
 		if (tabelOptie)
 		{	
 			canvasPanel.add(tabelBox);
@@ -218,6 +221,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		grafiekBox = new CheckBox();
 		grafiekBox.setText("grafiek");
+		grafiekBox.addStyleName(algebraPijlenGWTCss.checkbox());
 		if (grafiekOptie)
 		{	
 			canvasPanel.add(grafiekBox);
@@ -497,6 +501,43 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	}
 	
 	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+	@Override
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 					 Map<String, Number> values) 
 	{
@@ -504,6 +545,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		this.hoogte = height;
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		
+		getImages();
 		
 		if (launchState.containsKey("toolkit"))
 			toolkit = launchState.getBoolean("toolkit");
@@ -580,46 +623,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	}
 
 
-	@Override
-	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
-	}
 
-
-	@Override
-	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	@Override
-	public int getAsHoogte() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	@Override
-	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
-	}
 }
 
 class Point

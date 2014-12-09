@@ -21,4 +21,6 @@ public interface AlgebraPijlenGWTCssResource extends CssResource
 	String togglebutton();
 	
 	String pushbutton();
+	
+	String checkbox();
 }

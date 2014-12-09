@@ -107,7 +107,7 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implement
 			zetInvulWaarde();
 		}
 
-		tf = new TekstPopup(this);
+		tf = new TekstPopup(this,false);
 		tf.setText(tfString);
 		tf.setWidth("25px");
 		tf.setHeight("20px");
@@ -237,7 +237,8 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implement
 			
 		}
 		
-		//setSize(b,h);
+		// dit wel: past de pijlen aan
+		setSize(b,h);
 		breedte = b;
 		hoogte = h;
 	
