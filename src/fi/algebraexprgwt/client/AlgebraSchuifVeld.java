@@ -17,7 +17,6 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-
 public class AlgebraSchuifVeld //extends SchuifVeld 
 							   //implements //ItemListener, 
 							              //MouseListener, MouseMotionListener,ActionListener
@@ -605,11 +604,11 @@ String testString = "test";
 	    	}
 	    }
 
-testString = "comp + states";
+//testString = "comp + states";
 //tekenOpnieuw();
-   
-	    
-   
+/*   
+if (toolkit)	    
+{	    
 	    // nu weten we wie stapel is
 	    // nodig voor launchData, in Java staan de stapels anders
 	    // doe dit eerst voordat je de pijlen maakt
@@ -625,8 +624,48 @@ testString = "comp + states";
 				if(schuifcomponenten[i] instanceof MachtSchuifComponent)schuifcomponenten[i].zetPlaats(7, 235);
 			}
 		}
+//testString += " posCorr";	    
+}
+else // alleenInvullen || isDemo
+{
+System.out.println("before " + this.aantalSc);	
+	boolean launching = verwijderStapels();
+System.out.println("after " + this.aantalSc);	
+	if (launching)
+	{	for (int cnt = 0; cnt < this.aantalSc; cnt++)
+		{
+			if (schuifcomponenten[cnt] != null)
+			{	int x = schuifcomponenten[cnt].xPos;
+				int y = schuifcomponenten[cnt].yPos;
+				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+				for (int pCnt = 0; pCnt < asc.aantalPu; pCnt++)
+					asc.zetPlaats(x - 100,y,asc.pijlUit[pCnt]);
+//System.out.println("aantalPu " + asc.aantalPu);				
+			}
+//			else
+//System.out.println("sc " + cnt + " null");				
+		}
+		for (int cnt = 0; cnt < this.aantalSc; cnt++)
+		{
+			if (schuifcomponenten[cnt] != null)
+			{	//int x = schuifcomponenten[cnt].xPos;
+				//int y = schuifcomponenten[cnt].yPos;
+				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+				//asc.zetPlaats(x - 100,y);
+				if (asc.pijlIn1 != null)
+					asc.verbind(asc.pijlIn1, true);
+				if (asc.pijlIn2 != null)
+					asc.verbind(asc.pijlIn2, false);
+			
+			}
+		}
+		
+		//paint();
+	
+	}
+}
+*/
 	    
-testString += " posCorr";	    
 	    
 		int max = aantalSc;
 		for (int i = 0; i < max; i++)
@@ -640,7 +679,7 @@ testString += " posCorr";
 			//add(schuifcomponenten[i]);
 		}
 		
-testString += " pijlen";
+//testString += " pijlen";
 
 
 	    for (int i = 0; i < aantalSc; i++)
@@ -664,7 +703,7 @@ testString += " pijlen";
 	    }
 	    
 	    
-testString += " connections";
+//testString += " connections";
 
 
 	    if (grafiek)
@@ -706,7 +745,65 @@ testString += " connections";
 	    }
     
 
+	    if (toolkit)	    
+	    {	    
+	    	    // nu weten we wie stapel is
+	    	    // nodig voor launchData, in Java staan de stapels anders
+	    	    // doe dit eerst voordat je de pijlen maakt
+	    	    for (int i = 0; i < aantalSc; i++)
+	    		{	if (schuifcomponenten[i].isStapel)
+	    			{	if(schuifcomponenten[i] instanceof UitvoerSchuifComponent)schuifcomponenten[i].zetPlaats(30, 30);
+	    				if(schuifcomponenten[i] instanceof OptelSchuifComponent)schuifcomponenten[i].zetPlaats(7, 100);
+	    				if(schuifcomponenten[i] instanceof AftrekSchuifComponent)schuifcomponenten[i].zetPlaats(54, 100);
+	    				if(schuifcomponenten[i] instanceof VermenigvuldigSchuifComponent)schuifcomponenten[i].zetPlaats(7, 145);
+	    				if(schuifcomponenten[i] instanceof DeelSchuifComponent)schuifcomponenten[i].zetPlaats(54, 145);
+	    				if(schuifcomponenten[i] instanceof KwadraatSchuifComponent)schuifcomponenten[i].zetPlaats(7, 190);
+	    				if(schuifcomponenten[i] instanceof WortelSchuifComponent)schuifcomponenten[i].zetPlaats(54, 190);
+	    				if(schuifcomponenten[i] instanceof MachtSchuifComponent)schuifcomponenten[i].zetPlaats(7, 235);
+	    			}
+	    		}
+	    //testString += " posCorr";	    
+	    }
+	    else // alleenInvullen || isDemo
+	    {
+//System.out.println("before " + this.aantalSc);	
+	    	boolean launching = verwijderStapels();
+//System.out.println("after " + this.aantalSc);	
+	    	if (launching)
+	    	{	for (int cnt = 0; cnt < this.aantalSc; cnt++)
+	    		{
+	    			if (schuifcomponenten[cnt] != null)
+	    			{	int x = schuifcomponenten[cnt].xPos;
+	    				int y = schuifcomponenten[cnt].yPos;
+	    				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+	    				for (int pCnt = 0; pCnt < asc.aantalPu; pCnt++)
+	    					asc.zetPlaats(x - 100,y,asc.pijlUit[pCnt]);
+	    //System.out.println("aantalPu " + asc.aantalPu);				
+	    			}
+//	    			else
+	    //System.out.println("sc " + cnt + " null");				
+	    		}
+	    		for (int cnt = 0; cnt < this.aantalSc; cnt++)
+	    		{
+	    			if (schuifcomponenten[cnt] != null)
+	    			{	//int x = schuifcomponenten[cnt].xPos;
+	    				//int y = schuifcomponenten[cnt].yPos;
+	    				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+	    				//asc.zetPlaats(x - 100,y);
+	    				if (asc.pijlIn1 != null)
+	    					asc.verbind(asc.pijlIn1, true);
+	    				if (asc.pijlIn2 != null)
+	    					asc.verbind(asc.pijlIn2, false);
+	    			
+	    			}
+	    		}
+	    		
+	    		//paint();
+	    	
+	    	}
+	    }
 
+	    
 // niet in Java	    
 //	    tabelCheckbox.setSelected(tabel);
 	    
@@ -794,6 +891,29 @@ testString += " connections";
 		//add(ip, 0);
 	}
 	
+	   public boolean verwijderStapels()
+	    {
+	    	boolean stapel = false;
+	    	SchuifComponent[] stapels = new SchuifComponent[20];
+	    	int sCnt = 0;
+	    	for (int i = 0; i < aantalSc; i++)
+	    	{	if (schuifcomponenten[i].isStapel)
+	    		{	stapels[sCnt] = schuifcomponenten[i];
+	    			sCnt++;
+	    			stapel = true;
+	    		}
+	    	}
+	//System.out.println("verwijder before " + aantalSc);    	
+	    	for (int j = 0; j < sCnt; j++)
+	    	{	verwijder((AlgebraSchuifComponent) stapels[j]);
+	    	}
+	    	
+	//System.out.println("verwijder after " + aantalSc);
+
+	    	return stapel;
+	    }
+
+
     public void tekenOpnieuw()
     {
     	paint(asvContext2d);
@@ -855,7 +975,16 @@ testString += " connections";
 					UitvoerSchuifComponent uvsc = (UitvoerSchuifComponent) schuifcomponenten[ascCnt];
 					
 					if (uvsc.tabel != null)
-						uvsc.tabel.paint();
+					{	uvsc.tabel.paint();
+						if (uvsc.zoomInTabel)
+						{
+							uvsc.zoomInKnop.paint();
+							uvsc.zoomUitKnop.paint();
+						}
+					
+					
+					
+					}
 				}
    			}
    		}

@@ -13,6 +13,7 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import fi.algebraexprgwt.client.expressies_ap.*;
 
 
+
 public class AlgebraSchuifComponent extends SchuifComponent 
 {	
 	 int soort;
@@ -117,7 +118,18 @@ public class AlgebraSchuifComponent extends SchuifComponent
 	{
 		xPos = x;
 		yPos = y;
+		Pijl p = pijlUit[aantalPu-1];
+		p.zetPlaats(xPos + breedte - 20 ,yPos + hoogte + 10);
 	}
+	
+	public void zetPlaats(int x, int y, Pijl p)
+	{
+		xPos = x;
+		yPos = y;
+		
+		p.zetPlaats(xPos + breedte - 20 ,yPos + hoogte + 10);
+	}
+
 	public void zetBoomZichtbaar(boolean b)
 	{	
 		setVisible(b);
@@ -341,7 +353,14 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			{
 				uvsc.tabel.xPos += dx;
 				uvsc.tabel.yPos += dy;
-			}
+			}	
+			
+			uvsc.zoomInKnop.xPos += dx;
+			uvsc.zoomInKnop.yPos += dy;
+			uvsc.zoomUitKnop.xPos += dx;
+			uvsc.zoomUitKnop.yPos += dy;
+
+			
 		}
 		
 		asv.tekenOpnieuw();
@@ -365,7 +384,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 		//				 || getLocation().y < 0 || getLocation().y > schuifveld.getSize().height))
 		//{	((AlgebraSchuifVeld) schuifveld).verwijder(this);
 		//}
-		if (!isStapel && !(this instanceof GrafiekComponent) &&
+		if (!isStapel && !(this instanceof GrafiekComponent) && asv.toolkit &&
 						 (xPos < 80 || xPos > (asv.breedte-breedte) || 
 						  yPos < 0 || yPos > (asv.hoogte-hoogte)))
 		{	asv.verwijder(this);

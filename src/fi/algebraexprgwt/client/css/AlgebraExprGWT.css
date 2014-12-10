@@ -45,9 +45,15 @@
 }
 
 .pushbutton {
-
-	background-color: yellow;
+	text-align: center;
+/**	background-color: yellow;*/
 /**	font-size: 0.875em;*/
-	padding: 0px;	
+/**	padding: 0px;*/	
+}
+
+.checkbox {
+	text-align: center;
+	/** background-color: yellow; */
 }	
+
 
