@@ -139,17 +139,15 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		int canvasBreedte = breedte;
 		int canvasHoogte = hoogte;
 		algebraPijlenGWTCanvas = Canvas.createIfSupported();
+		if (algebraPijlenGWTCanvas == null) 
+		{   RootPanel.get(holderId).add(new Label(upgradeMessage));
+	        return;
+	    }
 		algebraPijlenGWTCanvas.setWidth(canvasBreedte + "px");
 		algebraPijlenGWTCanvas.setHeight(canvasHoogte + "px");
 		algebraPijlenGWTCanvas.setCoordinateSpaceWidth(canvasBreedte);
 		algebraPijlenGWTCanvas.setCoordinateSpaceHeight(canvasHoogte);
 		algebraPijlenGWTCanvas.addStyleName("canvas");
-		
-		if (algebraPijlenGWTCanvas == null) 
-		{   RootPanel.get(holderId).add(new Label(upgradeMessage));
-	        return;
-	    }
-		
 		algebraPijlenGWTCanvas.addStyleName(algebraPijlenGWTCss.canvas());
 		
 		MouseHandler mouseHandler = new MouseHandler();
@@ -455,7 +453,6 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 				boolean checked = grafiekBox.getValue();
 				asv.toonGrafiekComponent(checked);
 				asv.zetVeranderd();
-
 			}
 
 		}	
@@ -477,13 +474,11 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	public void setState(HashMap<String, Object> h)
 	{
 		asv.setState(h);
-
 	}
 
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -496,44 +491,33 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// TODO Auto-generated method stub
-
 	}
 	
 	@Override
 	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public int getAsHoogte() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	
@@ -620,6 +604,11 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		asv.paint();
 		
 
+	}
+
+
+	@Override
+	public void zetNagekeken(boolean b) {
 	}
 
 
