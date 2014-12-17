@@ -24,6 +24,7 @@
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='org.vectomatic.libgwtfile' />
+  <!--  <inherits name='com.alkacon.geranium.Geranium' />	-->
   
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.statistiekgwt.client.StatistiekGWT'/>

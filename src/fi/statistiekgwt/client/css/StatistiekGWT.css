@@ -1,5 +1,4 @@
 /** dit file staat in statistiekgwt/client/css */
-
 .root {
 	cursor: default;
 	background-color: yellow;
@@ -7,10 +6,12 @@
 
 .vertical {
 	/** background-color: orange; */
+	
 }
 
 .dock {
 	/** background-color: orange; */
+	
 }
 
 .bottom {
@@ -55,8 +56,8 @@
 .pushbutton {
 	background-color: yellow;
 	background-image: none;
- 	display: table-cell;
- 	text-align: center;
+	display: table-cell;
+	text-align: center;
 	font-size: 0.875em;
 	padding: 0px;
 }
@@ -74,8 +75,12 @@
 }
 
 .textbox {
-	font-size: 16px;
-	font-weight: bold;
+	/*font-size: 16px;*/
+	/*font-weight: bold;*/
+	width: 100%;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
 }
 
 .textblack {
@@ -84,4 +89,47 @@
 
 .textgray {
 	color: rgb(220, 220, 220);
+}
+
+.textarea {
+	border:1px solid #999999;
+    width:100%;
+    height:100%;
+    margin:5px 0;
+    padding:3px;
+}
+
+.selectioncell {
+	width: 100%;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.textinputcell {
+	width: 100%;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.titlelabel {
+	font-style: italic;
+	text-align: center;
+}
+
+.settingspanel {
+	margin: 2px;
+	padding: 2px;
+	border: 2px solid grey;
+}
+
+.horizontalrule {
+border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    width: 90%;
+    align: center;
+    text-align:center; margin: 0 auto;
 }

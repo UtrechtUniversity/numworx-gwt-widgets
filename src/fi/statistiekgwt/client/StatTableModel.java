@@ -1253,6 +1253,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public double getColumnMin(int columnIndex)
 	{
+		if (columnIndex < 0)
+		{
+			return 0;
+		}
+		
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
 		if (!(type.equals(AllowedTypes.DOUBLE) 
 			|| type.equals(AllowedTypes.INTEGER)))
@@ -2567,8 +2572,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	@Override
 	public void onAddColumn(AddColumnEvent event)
 	{
+		ArrayList<String> enumOptionsList = event.getEnumOptions();
+		String[] array = enumOptionsList.toArray(new String[enumOptionsList.size()]);
+		
 		this.addColumn(event.getName(), 
-			new ColumnType(event.getType(), event.getUitleg()));		
+			new ColumnType(event.getType(), array, event.getUitleg()));		
 	}
 
 	@Override

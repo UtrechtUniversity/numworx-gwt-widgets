@@ -1,8 +1,8 @@
 package fi.statistiekgwt.client.event;
 
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.GwtEvent.Type;
+import java.util.ArrayList;
 
+import com.google.gwt.event.shared.GwtEvent;
 import fi.statistiekgwt.client.types.AllowedTypes;
 
 public class AddColumnEvent extends GwtEvent<AddColumnEventHandler>
@@ -11,12 +11,14 @@ public class AddColumnEvent extends GwtEvent<AddColumnEventHandler>
 
 	private final String name;
 	private final AllowedTypes type;
+	private final ArrayList<String> enumOptions;
 	private final String uitleg;
 
-    public AddColumnEvent(String name, AllowedTypes type, String uitleg) 
+    public AddColumnEvent(String name, AllowedTypes type, ArrayList<String> enumOptions, String uitleg) 
     {
         this.name = name;
         this.type = type;
+        this.enumOptions = enumOptions;
         this.uitleg = uitleg;
     }
 
@@ -32,17 +34,22 @@ public class AddColumnEvent extends GwtEvent<AddColumnEventHandler>
 		handler.onAddColumn(this);
 	}
 
-	public String getName() 
+	public String getName()
 	{
         return this.name;
     }
 
-	public AllowedTypes getType() 
+	public AllowedTypes getType()
 	{
         return this.type;
     }
 
-	public String getUitleg() 
+	public ArrayList<String> getEnumOptions()
+	{
+        return this.enumOptions;
+    }
+
+	public String getUitleg()
 	{
         return this.uitleg;
     }

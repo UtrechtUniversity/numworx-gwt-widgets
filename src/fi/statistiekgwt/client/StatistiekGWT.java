@@ -2,6 +2,8 @@ package fi.statistiekgwt.client;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -224,7 +226,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Frequentiepolygoon"))
 		{
-			//return new HistogramController(model, viewName, true, startVar);
+			return new HistogramController(model, viewName, true, startVar);
 		}
 		else if (viewType.equals("Boxplot"))
 		{
@@ -593,5 +595,48 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	    number = bd.doubleValue(); 
 
 		return number;
+	}
+	
+	/**
+	 * Get the binWidth based on the values in bins. The number of 
+	 * decimals of d will be the maximum number of decimals
+	 * among the values in bins.
+	 * 
+	 * @param bins An arraylist of bin boundaries
+	 * @return The string value of the bin width
+	 */
+	public static String getFormattedBinWidth(ArrayList<Double> bins)
+	{
+		String formattedValueString;
+		int maxNumberOfDecimals = 0;
+		String binValueString;
+		
+		Double d = bins.get(1) - bins.get(0);
+		
+		for (int i = 0; i < bins.size(); i++)
+		{
+			binValueString = String.valueOf(bins.get(i));
+			int numberOfDecimals = binValueString.length() - binValueString.indexOf('.') - 1;
+			
+			if (numberOfDecimals > maxNumberOfDecimals)
+				maxNumberOfDecimals = numberOfDecimals;
+		}
+
+		// get format with numberOfDecimals
+		String pattern = "0";
+		
+		if (maxNumberOfDecimals > 0)
+		{
+			// set the pattern according to the number of decimals
+			pattern = pattern + ".";
+			for (int i = 0; i < maxNumberOfDecimals; i++)
+			{
+				pattern = pattern + "0";
+			}
+		}
+
+		formattedValueString = NumberFormat.getFormat(pattern.toString()).format(d); 
+		
+		return formattedValueString;
 	}
 }

@@ -37,5 +37,17 @@ public interface StatistiekCssResource extends CssResource
 	String textblack();
 	
 	String textgray();
+	
+	String textarea();
+	
+	String selectioncell();
+	
+	String textinputcell();
+
+	String titlelabel();
+
+	String settingspanel();
+
+	String horizontalrule();
 }
 

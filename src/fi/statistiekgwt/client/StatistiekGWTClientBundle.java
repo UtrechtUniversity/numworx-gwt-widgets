@@ -16,5 +16,4 @@ public interface StatistiekGWTClientBundle extends ClientBundle
 	
 	@Source("fi/statistiekgwt/client/css/StatistiekGWT.css")
 	public  StatistiekCssResource getStatistiekGWTCSS();
-
 }

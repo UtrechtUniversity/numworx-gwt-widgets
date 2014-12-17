@@ -103,7 +103,11 @@ public class ColumnType implements Serializable
 	public ColumnType(AllowedTypes type, String[] options, String uitleg)
 	{
 		this.type = type;
-		this.enumOptions = options;
+		if (this.type.equals(AllowedTypes.ENUM))
+		{
+			this.enumOptions = new String[options.length];
+			this.enumOptions = options;
+		}
 		this.uitleg = uitleg;
 	}
 

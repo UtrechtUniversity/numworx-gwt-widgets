@@ -33,6 +33,12 @@ public class SplitOptions
 		return columnSplitIndex;
 	}
 
+	/**
+	 * Set the index of the split column. If index is -1, 
+	 * the split is removed.
+	 * 
+	 * @param columnSplitIndex
+	 */
 	public void setColumnSplitIndex(int columnSplitIndex)
 	{
 		this.columnSplitIndex = columnSplitIndex;

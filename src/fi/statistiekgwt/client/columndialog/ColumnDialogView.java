@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -22,8 +23,11 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
+import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
+import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogChangeHandler;
+import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogKeyDownHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogValueChangeHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
@@ -53,7 +57,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	private TextBox addEnumElementField;
 	// private JTextArea enumElementsView;
 	private ListBox enumElementsList; // was: OrderableJList
-	private ArrayList<String> stringOptions;
+//	private ArrayList<String> stringOptions;
 	private AllowedTypes originalColumnType;
 	private LayoutPanel enumScrollPanel; // was: JScrollPane
 	/**
@@ -73,7 +77,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	private LayoutPanel typePanel;
 	private LayoutPanel uitlegPanel;
 	private Label uitlegLabel;
-	private ScrollPanel uitlegScrollPane; // was: JScrollPane
+	//private ScrollPanel uitlegScrollPane; // was: JScrollPane
 	private TextArea uitlegArea;
 	
 	/**
@@ -88,6 +92,9 @@ public class ColumnDialogView extends DialogBox// implements Observer
 
 	public static final int DEFAULT_WIDTH = 600;
 	public static final int DEFAULT_HEIGHT = 330;
+	
+	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	StatistiekCssResource statistiekCss;
 
 	/**
 	 * Constructor.
@@ -97,13 +104,17 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	 */
 	public ColumnDialogView(ColumnDialogModel model)
 	{
-		super(true, true);
+		super(false, true);
 		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		super.setText(StatistiekGWT.rb.getString("addacolumn"));
 		this.getElement().getStyle().setBackgroundColor("GREY");
 
 		this.model = model;
 		//this.model.addObserver(this);
+		
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
 
 		this.initialize();
 	}
@@ -119,12 +130,16 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	public ColumnDialogView(Frame owner, ColumnDialogModel model)
 	{
 		//super(owner, "Add a column", true);
-		super(true, true);
+		super(false, true);
 		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		super.setText(StatistiekGWT.rb.getString("addacolumn"));
 
 		this.model = model;
 		//this.model.addObserver(this);
+		
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
 
 		this.initialize();
 	}
@@ -140,12 +155,16 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	public ColumnDialogView(DialogBox owner, ColumnDialogModel model)
 	{
 		//super(owner, StatistiekGWT.rb.getString("addacolumn"), true);
-		super(true, true);
+		super(false, true);
 		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		super.setText(StatistiekGWT.rb.getString("addacolumn"));
 
 		this.model = model;
 		//this.model.addObserver(this);
+
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
 
 		this.initialize();
 	}
@@ -162,7 +181,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 
 		this.kiesNaam = new Label(StatistiekGWT.rb.getString("columnname"));
 		this.nameField = new TextBox();
-//		this.nameField.setActionCommand("nameField");
+		this.nameField.addStyleName(statistiekCss.textbox());
 		this.kiesType = new Label(StatistiekGWT.rb.getString("choosetype"));
 
 		// Use strings from text file to create listbox
@@ -198,7 +217,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.addEnumElementLabel = new Label(
 			StatistiekGWT.rb.getString("addenumeration"));
 		this.addEnumElementField = new TextBox();
-//		this.addEnumElementField.setActionCommand("addEnumElementField");
+		this.addEnumElementField.addStyleName(statistiekCss.textbox());
 		this.addEnumElementPanel = new LayoutPanel();
 //		this.addEnumElementPanel.setLayout(new GridLayout(2, 1));
 		this.addEnumElementPanel.add(this.addEnumElementLabel);
@@ -222,6 +241,8 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		{
 			this.enumElementsList.addItem(list.get(i));
 		}
+		
+		this.enumElementsList.setVisibleItemCount(list.size());
 		this.enumScrollPanel = new LayoutPanel();//new ScrollPanel(this.enumElementsList);
 		this.enumScrollPanel.add(this.enumElementsList);
 		// set position
@@ -251,12 +272,11 @@ public class ColumnDialogView extends DialogBox// implements Observer
 //		this.sortElements.setActionCommand("sortElements");
 		this.sortElements.setTitle(StatistiekGWT.rb.getString("sortElementsTooltip"));// tooltip
 
-//		ImageResource imageResource = //StatistiekGWT.class.getResource("resources/arrow-137-16_525252up.gif");
-		this.moveElementUp = new PushButton(new Image("resources/arrow-137-16_525252up.gif"));
+		this.moveElementUp = new PushButton(new Image(statistiekGWTClientBundle.arrowUpResource().getSafeUri()));
 //		this.moveElementUp.setActionCommand("moveElementUp");
 		this.moveElementUp.setTitle(StatistiekGWT.rb.getString("moveElementUpTooltip"));
 
-		this.moveElementDown = new PushButton(new Image("resources/arrow-199-16_525252down.gif"));
+		this.moveElementDown = new PushButton(new Image(statistiekGWTClientBundle.arrowDownResource().getSafeUri()));
 //		this.moveElementDown.setActionCommand("moveElementDown");
 		this.moveElementDown.setTitle(StatistiekGWT.rb.getString("moveElementDownTooltip"));
 
@@ -280,8 +300,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.createEnumPanel.addEast(this.enumEastPanel, 30);//, BorderLayout.EAST);
 		this.createEnumPanel.addSouth(this.enumSouthPanel, 30);//, BorderLayout.SOUTH);
 		this.createEnumPanel.add(this.enumScrollPanel);//, BorderLayout.CENTER);
-		this.createEnumPanel.setPixelSize(150, 240);
-		this.createEnumPanel.getElement().getStyle().setBackgroundColor("yellow");
+		this.createEnumPanel.setPixelSize(300, 240);
 		// set position for this.createEnumPanel = LayoutPanel
 //		this.createEnumPanel.setWidgetLeftWidth(this.addEnumElementPanel, 0, Style.Unit.PCT, 80, Style.Unit.PCT);
 //		this.createEnumPanel.setWidgetTopHeight(this.addEnumElementPanel, 0, Style.Unit.PX, 60, Style.Unit.PX);
@@ -309,7 +328,9 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		
 		this.uitlegLabel = new Label(StatistiekGWT.rb.getString("uitlegbijkolom"));
 		this.uitlegArea = new TextArea();
-		this.uitlegScrollPane = new ScrollPanel(this.uitlegArea);
+		//this.uitlegArea.setPixelSize(300, 200); // set position hieronder werkt niet...
+		this.uitlegArea.addStyleName(statistiekCss.textarea());
+		//this.uitlegScrollPane = new ScrollPanel(this.uitlegArea);
 		this.uitlegPanel = new LayoutPanel();
 //		this.uitlegPanel.setLayout(new BorderLayout());
 		this.uitlegPanel.add(this.uitlegLabel);//, BorderLayout.NORTH);
@@ -317,8 +338,8 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		// set position
 		this.uitlegPanel.setWidgetLeftWidth(this.uitlegLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		this.uitlegPanel.setWidgetTopHeight(this.uitlegLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		this.uitlegPanel.setWidgetLeftWidth(this.uitlegArea, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		this.uitlegPanel.setWidgetTopHeight(this.uitlegArea, 30, Style.Unit.PX, 240, Style.Unit.PX);
+		this.uitlegPanel.setWidgetLeftWidth(this.uitlegArea, 0, Style.Unit.PCT, 100, Style.Unit.PCT);// dit werkt niet...
+		this.uitlegPanel.setWidgetTopHeight(this.uitlegArea, 30, Style.Unit.PX, 240, Style.Unit.PX);// dit werkt niet...
 
 		this.okCancelPanel = new LayoutPanel();
 		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
@@ -352,25 +373,25 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.add(this.alles);
 		
 		this.originalColumnType = this.model.getType();
-		this.setStringOptions();
+//		this.setStringOptions();
 
 		this.update();
 	}
 
-	private void setStringOptions()
-	{
-		// Voor integerkolommen (dus ook nieuwe kolom) worden bij een switch naar enum 
-		// de waarden niet vooringevuld in stringoptions
-		if (this.wasInteger())
-		{
-			this.stringOptions = new ArrayList<String>();
-		}
-		else if (!this.wasEnum())
-		{
-			this.stringOptions = this.model.getTableModel().
-				getStringOptions(this.model.getColumnIndex());
-		}
-	}
+//	private void setStringOptions()
+//	{
+//		// Voor integerkolommen (dus ook nieuwe kolom) worden bij een switch naar enum 
+//		// de waarden niet vooringevuld in stringoptions
+//		if (this.wasInteger())
+//		{
+//			this.stringOptions = new ArrayList<String>();
+//		}
+//		else if (!this.wasEnum())
+//		{
+//			this.stringOptions = this.model.getTableModel().
+//				getStringOptions(this.model.getColumnIndex());
+//		}
+//	}
 
 	/**
 	 * Select the column's type in the type box. 
@@ -419,15 +440,15 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		return this.addEnumElementField.getText();
 	}
 
-	/**
-	 * Get the string options.
-	 * 
-	 * @return The string options
-	 */
-	public ArrayList getStringOptions()
-	{
-		return this.stringOptions;
-	}
+//	/**
+//	 * Get the string options.
+//	 * 
+//	 * @return The string options
+//	 */
+//	public ArrayList getStringOptions()
+//	{
+//		return this.stringOptions;
+//	}
 
 	/**
 	 * @return The text in the nameField textfield
@@ -471,18 +492,6 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.cancelButton.addClickHandler(handler);
 	}
 
-	/**
-	 * Add a blurhandler to text field and text area.
-	 * 
-	 * @param handler
-	 *            the subscribing FocusListener
-	 */
-	public void addBlurHandlers(BlurHandler handler)//addFocusListeners(FocusListener fl)
-	{
-		this.nameField.addBlurHandler(handler);
-		this.uitlegArea.addBlurHandler(handler);
-	}
-	
 	public void addChangeHandlers(ColumnDialogChangeHandler handler)
 	{
 		this.typeBox.addChangeHandler(handler);
@@ -494,6 +503,12 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.nameField.addValueChangeHandler(handler);
 		this.addEnumElementField.addValueChangeHandler(handler);
 		this.uitlegArea.addValueChangeHandler(handler);
+	}
+
+	public void addKeyDownHandlers(ColumnDialogKeyDownHandler handler)
+	{
+		this.nameField.addKeyDownHandler(handler);
+		this.addEnumElementField.addKeyDownHandler(handler);
 	}
 
 	public TextArea getUitlegArea()
@@ -527,18 +542,18 @@ public class ColumnDialogView extends DialogBox// implements Observer
 
 		// Update the list with options of current enumeration
 		// or with string options if there is no current enumeration
-		if (this.wasEnum())
-		{
+//		if (this.wasEnum())
+//		{
 			this.fillEnumElementsList(this.model.getEnumOptions());
 			//this.enumElementsList.setModel(new OrderableJListModel(this.model.getEnumOptions()));
-		}
-		else
-		{
-			// vul met stringOptions
-			this.fillEnumElementsList(this.stringOptions);
-//			this.enumElementsList.setModel(new OrderableJListModel(
-//				this.stringOptions));
-		}
+//		}
+//		else
+//		{
+//			// vul met stringOptions
+//			this.fillEnumElementsList(this.stringOptions);
+////			this.enumElementsList.setModel(new OrderableJListModel(
+////				this.stringOptions));
+//		}
 
 		this.nameField.setText(this.model.getName());
 
@@ -553,10 +568,18 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	 */
 	private void fillEnumElementsList(ArrayList<String> list)
 	{
+		// empty enumElementsList
+		for (int i = this.enumElementsList.getItemCount() - 1; i >= 0; i--)
+		{
+			this.enumElementsList.removeItem(i);
+		}
+		
 		for (int i = 0; i < list.size(); i++)
 		{
 			this.enumElementsList.addItem(list.get(i));
 		}
+		
+		this.enumElementsList.setVisibleItemCount(Math.min(list.size(), 7));
 	}
 
 	/**
@@ -610,112 +633,112 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		return this.originalColumnType.equals(AllowedTypes.INTEGER);
 	}
 
-	public void removeStringOption(int index)
-	{
-		if (index > -1)
-		{
-			this.stringOptions.remove(index);
-		}
-	}
+//	public void removeStringOption(int index)
+//	{
+//		if (index > -1)
+//		{
+//			this.stringOptions.remove(index);
+//		}
+//	}
 
-	public void addStringOption(String s)
-	{
-		this.stringOptions.add(s);
-	}
+//	public void addStringOption(String s)
+//	{
+//		this.stringOptions.add(s);
+//	}
 
 	/**
 	 * Add the options in stringOptions to the enum options.
 	 */
-	public void updateEnumOptions()
-	{
-		for (int i = 0; i < this.stringOptions.size(); i++)
-		{
-			String newElement = (String) this.stringOptions.get(i);
-			this.model.addEnumOptionWithoutEvent(newElement);
-		}
-	}
+//	public void updateEnumOptions()
+//	{
+//		for (int i = 0; i < this.stringOptions.size(); i++)
+//		{
+//			String newElement = (String) this.stringOptions.get(i);
+//			this.model.addEnumOptionWithoutEvent(newElement);
+//		}
+//	}
 
 	/**
 	 * Remove all string options except '*' from the string options.
 	 */
-	public void removeAllStringOptions()
-	{
-		for (int i = this.stringOptions.size() - 1; i > -1 ; i--)
-		{
-			if (!this.stringOptions.get(i).equals(ColumnType.WILDCARD))
-			{
-				this.stringOptions.remove(i);
-			}
-		}
-	}
+//	public void removeAllStringOptions()
+//	{
+//		for (int i = this.stringOptions.size() - 1; i > -1 ; i--)
+//		{
+//			if (!this.stringOptions.get(i).equals(ColumnType.WILDCARD))
+//			{
+//				this.stringOptions.remove(i);
+//			}
+//		}
+//	}
 
 	/**
 	 * Sort string options alphabetically ascending.
 	 */
-	public void sortStringOptions()
-	{
-		String[] sortedStringOptions = new String[this.stringOptions.size()];
-		sortedStringOptions = this.stringOptions.toArray(sortedStringOptions);
-		
-		Arrays.sort(sortedStringOptions, new Comparator<String>() {
-            @Override
-            /**
-             * Compare strings alphabetically. 
-             * A wildcard is larger than any other string.
-             * @param s1
-             * @param s2
-             * @return
-             */
-            public int compare(String s1, String s2) 
-            {
-            	// check for wildcard among the strings
-            	if (s1.equals(ColumnType.WILDCARD))
-            		return 1;
-            	else if (s2.equals(ColumnType.WILDCARD))
-            		return -1;
-            	else 
-            	{
-            		// apart from '*' sort the enum options alphabetically
-            		return s1.compareTo(s2);
-            	}
-            }
-        });
-		
-		this.stringOptions = new ArrayList(Arrays.asList(sortedStringOptions));
-	}
+//	public void sortStringOptions()
+//	{
+//		String[] sortedStringOptions = new String[this.stringOptions.size()];
+//		sortedStringOptions = this.stringOptions.toArray(sortedStringOptions);
+//		
+//		Arrays.sort(sortedStringOptions, new Comparator<String>() {
+//            @Override
+//            /**
+//             * Compare strings alphabetically. 
+//             * A wildcard is larger than any other string.
+//             * @param s1
+//             * @param s2
+//             * @return
+//             */
+//            public int compare(String s1, String s2) 
+//            {
+//            	// check for wildcard among the strings
+//            	if (s1.equals(ColumnType.WILDCARD))
+//            		return 1;
+//            	else if (s2.equals(ColumnType.WILDCARD))
+//            		return -1;
+//            	else 
+//            	{
+//            		// apart from '*' sort the enum options alphabetically
+//            		return s1.compareTo(s2);
+//            	}
+//            }
+//        });
+//		
+//		this.stringOptions = new ArrayList(Arrays.asList(sortedStringOptions));
+//	}
 
 	/**
 	 * Swap string options with index1 and index2. A wildcard is not swapped
 	 * @param index1
 	 * @param index2
 	 */
-	public void swapStringOptions(int index1, int index2)
-	{
-		if (this.validStringOptionsIndex(index1) && this.validStringOptionsIndex(index2)
-			&& !this.stringOptions.get(index1).equals(ColumnType.WILDCARD) // the wildcard should stay at the end
-			&& !this.stringOptions.get(index2).equals(ColumnType.WILDCARD))
-		{
-			Collections.swap(this.stringOptions, index1, index2);
-		}
-	}
+//	public void swapStringOptions(int index1, int index2)
+//	{
+//		if (this.validStringOptionsIndex(index1) && this.validStringOptionsIndex(index2)
+//			&& !this.stringOptions.get(index1).equals(ColumnType.WILDCARD) // the wildcard should stay at the end
+//			&& !this.stringOptions.get(index2).equals(ColumnType.WILDCARD))
+//		{
+//			Collections.swap(this.stringOptions, index1, index2);
+//		}
+//	}
 
 	/**
 	 * Check whether index is a valid index in string options.
 	 * @param index
 	 * @return True if index is a valid index, else false.
 	 */
-	private boolean validStringOptionsIndex(int index)
-	{
-		boolean isValid = false;
-		
-//		if ((this.enumOptions == null) || this.enumOptions.size() == 0)
-//			isValid = false;
-//		else 
-			if ((index > -1) && (index < this.stringOptions.size()))
-			isValid = true;
-		
-		return isValid;
-	}
+//	private boolean validStringOptionsIndex(int index)
+//	{
+//		boolean isValid = false;
+//		
+////		if ((this.enumOptions == null) || this.enumOptions.size() == 0)
+////			isValid = false;
+////		else 
+//			if ((index > -1) && (index < this.stringOptions.size()))
+//			isValid = true;
+//		
+//		return isValid;
+//	}
 
 	public TextBox getAddEnumElementField()
 	{

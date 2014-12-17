@@ -19,6 +19,8 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.touch.client.Point;
@@ -38,6 +40,8 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.statistiekgwt.client.StatistiekGWT;
+import fi.statistiekgwt.client.event.AddViewEvent;
+import fi.statistiekgwt.client.event.AddViewEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 
@@ -47,7 +51,8 @@ import fi.statistiekgwt.client.event.TableChangeEventHandler;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class StatInteractiePanelView extends LayoutPanel implements TableChangeEventHandler//TabLayoutPanel// implements Observer
+public class StatInteractiePanelView extends LayoutPanel 
+	implements TableChangeEventHandler, AddViewEventHandler//TabLayoutPanel// implements Observer
 {
 	private static final String RESET_ICON_PATH = "resources/reseticon.gif";
 	protected StatModel model;
@@ -92,11 +97,10 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 		double barHeight,
 		Unit barUnit)
 	{
-		//super(barHeight, barUnit); // komt van TabLayoutPanel
-		this.tabPanel = new TabLayoutPanel(barHeight, barUnit);
+		this.initTabPanel(barHeight, barUnit);
+
+		this.initModel(model);
 		
-		this.model = model;
-		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 		this.controller = controller;
 		
 		this.dialogs = new ArrayList<SeparateViewDialog>();
@@ -153,6 +157,44 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 		addViewTab.add(hp);
 
 		this.update();//(null, null);
+	}
+
+	/**
+	 * Set the model and add event handlers.
+	 * 
+	 * @param model
+	 */
+	private void initModel(StatModel model)
+	{
+		this.model = model;
+		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
+		this.model.addAddViewEventHandler(this);
+	}
+
+	/**
+	 * Create tabpanel and add selection handler
+	 * 
+	 * @param barHeight
+	 * @param barUnit
+	 */
+	private void initTabPanel(double barHeight, Unit barUnit)
+	{
+		//super(barHeight, barUnit); // komt van TabLayoutPanel
+		this.tabPanel = new TabLayoutPanel(barHeight, barUnit);
+
+		this.tabPanel.addSelectionHandler(new SelectionHandler<Integer>()
+		{
+			// https://code.google.com/p/google-web-toolkit/issues/detail?id=6889
+			// datagrid wordt niet volledig getoond zonder panel.forceLayout()
+			@Override
+			public void onSelection(SelectionEvent<Integer> event)
+			{
+				Integer selectedItem = event.getSelectedItem();
+				TabLayoutPanel panel = (TabLayoutPanel) event.getSource();
+				panel.forceLayout();
+
+			}
+		});
 	}
 
 	public void clearAddViewTab()
@@ -606,7 +648,7 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 			DraggedTabTouchHandler touchHandler = new DraggedTabTouchHandler(this.tabPanel);
 			this.tabPanel.addHandler(touchHandler, TouchStartEvent.getType());
 			// test syl
-			this.tabPanel.getElement().getStyle().setBackgroundColor("cyan");
+			this.tabPanel.getElement().getStyle().setBackgroundColor("LightCyan");
 			this.tabPanel.removeFromParent();
 			super.add(this.tabPanel);
 		}
@@ -1085,6 +1127,13 @@ public class StatInteractiePanelView extends LayoutPanel implements TableChangeE
 	public void onTableChange(TableChangeEvent event)
 	{
 		GWT.log("StatInteractiePanelView.onTableChange()");
+		this.update();
+	}
+
+	@Override
+	public void onAddView(AddViewEvent event)
+	{
+		GWT.log("StatInteractiePanelView.onAddView()");
 		this.update();
 	}
 }

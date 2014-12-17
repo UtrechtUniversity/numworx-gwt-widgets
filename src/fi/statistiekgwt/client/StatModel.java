@@ -5,6 +5,13 @@ import java.util.Iterator;
 import java.util.HashMap;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.HasHandlers;
+
+import fi.statistiekgwt.client.event.AddViewEvent;
+import fi.statistiekgwt.client.event.AddViewEventHandler;
 
 /**
  * Statistiek MVC Model
@@ -12,7 +19,7 @@ import com.google.gwt.event.dom.client.ChangeEvent;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class StatModel //extends Observable// implements TableModelListener 
+public class StatModel implements HasHandlers//extends Observable// implements TableModelListener 
 {
 	private StatTableModel statTableModel;
 
@@ -24,6 +31,8 @@ public class StatModel //extends Observable// implements TableModelListener
 
 	private ArrayList<StatistiekView> views;
 	private ArrayList<Boolean> viewInOwnWindow;
+
+	EventBus bus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 
 	/**
 	 * Constructor
@@ -79,8 +88,8 @@ public class StatModel //extends Observable// implements TableModelListener
 		this.views.add(view);
 		this.viewInOwnWindow.add(false);
 
-//		super.setChanged();
-//		super.notifyObservers();
+		AddViewEvent event = new AddViewEvent(view.getViewName());
+		this.fireEvent(event);
 	}
 
 	public int mainWindowIndexToGeneralIndex(int mainWindowIndex)
@@ -290,5 +299,19 @@ public class StatModel //extends Observable// implements TableModelListener
 	{
 //		super.setChanged();
 //		super.notifyObservers();
+	}
+
+	@Override
+	public void fireEvent(GwtEvent<?> event)
+	{
+	    bus.fireEvent(event);
+	}
+	
+	/**
+	 * Subscribe for events
+	 */
+	public HandlerRegistration addAddViewEventHandler(AddViewEventHandler handler)
+	{
+		return bus.addHandler(AddViewEvent.TYPE, handler);
 	}
 }

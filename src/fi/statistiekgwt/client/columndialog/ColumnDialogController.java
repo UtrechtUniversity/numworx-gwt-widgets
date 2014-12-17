@@ -6,20 +6,14 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-import com.google.gwt.event.dom.client.TouchMoveEvent;
-import com.google.gwt.event.dom.client.TouchMoveHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-
-import fi.statistiekgwt.client.StatTable;
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.EditColumnEvent;
-import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.types.AllowedTypes;
 
 /**
@@ -39,6 +33,7 @@ public class ColumnDialogController
 	private ColumnDialogValueChangeHandler valueChangeHandler;
 
 	private HandlerRegistration handlerRegistration;
+	private ColumnDialogKeyDownHandler keyDownHandler;
 
 	/**
 	 * Constructor
@@ -57,10 +52,11 @@ public class ColumnDialogController
 		this.blurHandler = new ColumnDialogBlurHandler();
 		this.changeHandler = new ColumnDialogChangeHandler();
 		this.valueChangeHandler = new ColumnDialogValueChangeHandler();
+		this.keyDownHandler = new ColumnDialogKeyDownHandler();
 		this.view.addClickHandlers(this.clickHandler);
-		this.view.addBlurHandlers(this.blurHandler);
 		this.view.addChangeHandlers(this.changeHandler);
 		this.view.addValueChangeHandlers(this.valueChangeHandler);
+		this.view.addKeyDownHandlers(this.keyDownHandler);
 	}
 
 	/**
@@ -223,6 +219,7 @@ public class ColumnDialogController
 			if (e.getSource() == ColumnDialogController.this.view.getTypeBox())
 			{
 				ColumnDialogController.this.model.setType(ColumnDialogController.this.view.getSelectedType());
+				ColumnDialogController.this.view.update();
 				
 				ColumnDialogController.this.model.setHasChangedType(true);
 			}
@@ -242,20 +239,21 @@ public class ColumnDialogController
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
 			{
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					String newElement = ColumnDialogController.this.view.getEnumOption();
 					ColumnDialogController.this.model.addEnumOption(newElement);
-				}
-				else
-				{
-					ColumnDialogController.this.view.addStringOption(
-						ColumnDialogController.this.view.getEnumOption());
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.addStringOption(
+//						ColumnDialogController.this.view.getEnumOption());
+//					//ColumnDialogController.this.view.update();
+//				}
 
 				// clear the text in the input field
 				ColumnDialogController.this.view.clearAddEnumElementField();
+				ColumnDialogController.this.view.update();
 				
 				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
 			}
@@ -276,60 +274,68 @@ public class ColumnDialogController
 		{
 			if (e.getSource() == ColumnDialogController.this.view.getRemoveSelectedElement())
 			{
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					ColumnDialogController.this.model.removeEnumOption(
 						ColumnDialogController.this.view.getSelectedOptionInListIndex());
-				}
-				else
-				{
-					ColumnDialogController.this.view.removeStringOption(
-						ColumnDialogController.this.view.getSelectedOptionInListIndex());
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.removeStringOption(
+//						ColumnDialogController.this.view.getSelectedOptionInListIndex());
+//					ColumnDialogController.this.view.update();
+//				}
+					
+				ColumnDialogController.this.view.update();
 				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getRemoveAllElements())
 			{
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					ColumnDialogController.this.model.removeAllEnumOption();
-				}
-				else
-				{
-					ColumnDialogController.this.view.removeAllStringOptions();
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.removeAllStringOptions();
+//					ColumnDialogController.this.view.update();
+//				}
+				
+				ColumnDialogController.this.view.update();
 				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getSortElements())
 			{
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					ColumnDialogController.this.model.sortEnumOptions();
-				}
-				else
-				{
-					ColumnDialogController.this.view.sortStringOptions();
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.sortStringOptions();
+//					ColumnDialogController.this.view.update();
+//				}
+				
+				ColumnDialogController.this.view.update();
 				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getMoveElementUp())
 			{
 				int index = ColumnDialogController.this.view.getSelectedOptionInListIndex();
 				
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					ColumnDialogController.this.model.swapEnumOptions(index,
 						index - 1);
-				}
-				else
-				{
-					ColumnDialogController.this.view.swapStringOptions(index,
-						index - 1);
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.swapStringOptions(index,
+//						index - 1);
+//					ColumnDialogController.this.view.update();
+//				}
+				
+				ColumnDialogController.this.view.update();
 				
 				ColumnDialogController.this.view.setSelectedOptionInListIndex(index - 1);
 
@@ -339,17 +345,19 @@ public class ColumnDialogController
 			{
 				int index = ColumnDialogController.this.view.getSelectedOptionInListIndex();
 				
-				if (ColumnDialogController.this.wasEnum())
-				{
+//				if (ColumnDialogController.this.wasEnum())
+//				{
 					ColumnDialogController.this.model.swapEnumOptions(index,
 						index + 1);
-				}
-				else
-				{
-					ColumnDialogController.this.view.swapStringOptions(index,
-						index + 1);
-					ColumnDialogController.this.view.update();
-				}
+//				}
+//				else
+//				{
+//					ColumnDialogController.this.view.swapStringOptions(index,
+//						index + 1);
+//					ColumnDialogController.this.view.update();
+//				}
+				
+				ColumnDialogController.this.view.update();
 				
 				ColumnDialogController.this.view.setSelectedOptionInListIndex(index + 1);
 
@@ -364,18 +372,21 @@ public class ColumnDialogController
 				if (ColumnDialogController.this.model.getOldName().equals(""))
 				{
 					// send an add column event
-					AddColumnEvent event = new AddColumnEvent(ColumnDialogController.this.view.getCurrentName(),
-						ColumnDialogController.this.view.getSelectedType(), ColumnDialogController.this.view.getUitleg());
+					AddColumnEvent event = new AddColumnEvent(
+						ColumnDialogController.this.view.getCurrentName(),
+						ColumnDialogController.this.view.getSelectedType(),
+						ColumnDialogController.this.model.getEnumOptions(),
+						ColumnDialogController.this.view.getUitleg());
 					ColumnDialogController.this.model.fireEvent(event);
 				}
 				else
 				{
 					// als type gewijzigd in enum, update enum options
-					if (!ColumnDialogController.this.wasEnum() 
-						&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
-					{
-						ColumnDialogController.this.view.updateEnumOptions();
-					}
+//					if (!ColumnDialogController.this.wasEnum() 
+//						&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
+//					{
+//						ColumnDialogController.this.view.updateEnumOptions();
+//					}
 
 					// send an edit column event
 					EditColumnEvent event = new EditColumnEvent(
@@ -413,6 +424,16 @@ public class ColumnDialogController
 				
 				ColumnDialogController.this.model.setHasChangedName(true);
 			}
+			else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
+			{
+				String newElement = ColumnDialogController.this.view.getEnumOption();
+				ColumnDialogController.this.model.addEnumOption(newElement);
+
+				ColumnDialogController.this.view.clearAddEnumElementField();
+				ColumnDialogController.this.view.update();
+				
+				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+			}
 			else if (e.getSource() == ColumnDialogController.this.view.getUitlegArea())
 			{
 				ColumnDialogController.this.model.setUitleg(ColumnDialogController.this.view.getUitleg());
@@ -420,5 +441,33 @@ public class ColumnDialogController
 				ColumnDialogController.this.model.setHasChangedUitleg(true);
 			}
 		}
-	}
+	} // class ColumnDialogBlurHandler
+	
+	class ColumnDialogKeyDownHandler implements KeyDownHandler
+	{
+		@Override
+		public void onKeyDown(KeyDownEvent e)
+		{
+			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			{
+				if (e.getSource() == ColumnDialogController.this.view.getNameField())
+				{
+					ColumnDialogController.this.model.setName(ColumnDialogController.this.view.getCurrentName());
+
+					ColumnDialogController.this.model.setHasChangedName(true);
+				}
+				else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
+				{
+					String newElement = ColumnDialogController.this.view.getEnumOption();
+					ColumnDialogController.this.model.addEnumOption(newElement);
+
+					// clear the text in the input field
+					ColumnDialogController.this.view.clearAddEnumElementField();
+					ColumnDialogController.this.view.update();
+					
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+			}
+		}
+	} // class ColumnDialogKeyDownHandler
 }

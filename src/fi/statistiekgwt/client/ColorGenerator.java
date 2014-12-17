@@ -99,9 +99,13 @@ public class ColorGenerator
 	{
 		int red;
 		
-		// colorStr e.g. "#FFFFFF"
+		// colorStr e.g. "rgb(67,147,195)"
 		String colorStr = c.toString();
-		red = Integer.valueOf( colorStr.substring( 1, 3 ), 16 );
+		int beginIndex = 4;
+		int endIndex = colorStr.indexOf(",");
+		
+		red = Integer.valueOf(colorStr.substring(beginIndex, endIndex));//, 16);
+		
 		return red;
 	}
 	
@@ -114,9 +118,13 @@ public class ColorGenerator
 	{
 		int green;
 		
-		// colorStr e.g. "#FFFFFF"
+		// colorStr e.g. "rgb(67,147,195)"
 		String colorStr = c.toString();
-		green = Integer.valueOf( colorStr.substring( 3, 5 ), 16 );
+		int beginIndex = colorStr.indexOf(",") + 1;
+		int endIndex = colorStr.indexOf(",", beginIndex);
+
+		green = Integer.valueOf(colorStr.substring(beginIndex, endIndex));
+		
 		return green;
 	}
 	
@@ -129,9 +137,14 @@ public class ColorGenerator
 	{
 		int blue;
 		
-		// colorStr e.g. "#FFFFFF"
+		// colorStr e.g. "rgb(67,147,195)"
 		String colorStr = c.toString();
-		blue = Integer.valueOf( colorStr.substring( 5, 7 ), 16 );
+		int indexFirstComma = colorStr.indexOf(",");
+		int beginIndex = colorStr.indexOf(",", indexFirstComma + 1) + 1; // begin after second comma
+		int endIndex = colorStr.indexOf(")", beginIndex);
+
+		blue = Integer.valueOf(colorStr.substring(beginIndex, endIndex));
+		
 		return blue;
 	}
 	

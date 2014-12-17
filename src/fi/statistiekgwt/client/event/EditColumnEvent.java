@@ -3,8 +3,6 @@ package fi.statistiekgwt.client.event;
 import java.util.ArrayList;
 
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.GwtEvent.Type;
-
 import fi.statistiekgwt.client.types.AllowedTypes;
 
 public class EditColumnEvent extends GwtEvent<EditColumnEventHandler>

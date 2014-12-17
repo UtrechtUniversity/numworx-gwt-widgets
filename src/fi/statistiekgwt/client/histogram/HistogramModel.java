@@ -307,6 +307,12 @@ public class HistogramModel
 		return nextToEachOther;
 	}
 
+	/**
+	 * Set the index of the split column. If index is -1, 
+	 * the split is removed.
+	 * 
+	 * @param columnSplitIndex
+	 */
 	public void setColumnSplitIndex(int columnSplitIndex)
 	{
 		if (this.splitOptions.getColumnSplitIndex() != columnSplitIndex)
