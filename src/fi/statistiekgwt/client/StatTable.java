@@ -105,7 +105,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		public Object getKey(List<String> s)
 		{
 			// the last item in s is the rowNumber
-			return s == null ? null : s.get(s.size()-1);
+			return ((s == null) || (s.size() == 0)) ? null : s.get(s.size()-1);
 
 		}
 	};
