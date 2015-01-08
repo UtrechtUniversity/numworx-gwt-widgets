@@ -2,7 +2,11 @@ package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
 
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.Label;
@@ -27,12 +31,14 @@ public class ColorLegend extends LayoutPanel
 	private Label columnLabel;
 	private LayoutPanel labelsPanel;
 	private ScrollPanel scrollPanel;
-	private int maxLength;
+	private int maxWidth;
 
 	public static final int LABEL_HEIGHT = 20;
 	public static final int COLOR_PREVIEW_WIDTH = 30;
 	public static final int LABEL_HGAP = 10;
 
+	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	StatistiekCssResource statistiekCss;
 	/**
 	 * Constructor
 	 * 
@@ -46,6 +52,10 @@ public class ColorLegend extends LayoutPanel
 	public ColorLegend(String columnName, ArrayList<String> splitStrings,
 		ArrayList<CssColor> splitColors)
 	{
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
+
 //		super(new BorderLayout());
 		super.getElement().getStyle().setBackgroundColor(CssColor.make(240, 240, 240).toString());
 		this.columnName = columnName;
@@ -61,6 +71,9 @@ public class ColorLegend extends LayoutPanel
 		this.updatePreferredSize();
 		this.placeComponents();
 		this.scrollPanel = new ScrollPanel(this.labelsPanel);
+		this.scrollPanel.setSize("125px", "650px");
+//		this.scrollPanel.setSize("10em", "100%"); // dit werkt niet
+//		this.scrollPanel.setSize("100%", "100%"); // dit werkt niet
 		super.add(this.scrollPanel);//, BorderLayout.CENTER);
 
 		// set position
@@ -116,7 +129,7 @@ public class ColorLegend extends LayoutPanel
 	}
 
 	/**
-	 * Create the JLabels and add them to labelsPanel
+	 * Create the labels and add them to labelsPanel
 	 */
 	private void makeLabels()
 	{
@@ -126,29 +139,42 @@ public class ColorLegend extends LayoutPanel
 		if (this.splitColors != null && this.splitStrings != null)
 		{
 
-			int count = 0;
 			for (String s : this.splitStrings)
 			{
 				Label label = new Label(s);
+				label.getElement().getStyle().setFontSize(14, Unit.PX);
+				label.addStyleName(statistiekCss.colorlegendlabel());
 				this.labels.add(label);
 				this.labelsPanel.add(label);
-				this.labelsPanel.setWidgetLeftWidth(label, 0, Style.Unit.PCT, 50, Style.Unit.PCT);
+			}
+			
+			// set field maxWidth in order to position the labels
+			this.setMaxWidth();
+			
+			int count = 0;
+			for (Label label : this.labels)
+			{
+				this.labelsPanel.setWidgetLeftWidth(label, 0, Style.Unit.PX, this.maxWidth + this.LABEL_HGAP, Style.Unit.PX);
 				this.labelsPanel.setWidgetTopHeight(label, count * LABEL_HEIGHT, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
 				count++;
 			}
 
 			// reset count
 			count = 0;
+			
+			// add the color boxes
 			for (CssColor c : this.splitColors)
 			{
 				Label label = new Label();
 				this.colorPreviews.add(label);
 				this.labelsPanel.add(label);
 				label.getElement().getStyle().setBackgroundColor(c.toString()); // Het kleurvakje
-				this.labelsPanel.setWidgetLeftWidth(label, 50, Style.Unit.PCT, 50, Style.Unit.PCT);
+				this.labelsPanel.setWidgetLeftWidth(label, this.maxWidth + this.LABEL_HGAP, Style.Unit.PX, this.COLOR_PREVIEW_WIDTH, Style.Unit.PX);
 				this.labelsPanel.setWidgetTopHeight(label, count * LABEL_HEIGHT, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
 				count++;
 			}
+			
+			this.labelsPanel.setPixelSize(this.maxWidth + this.LABEL_HGAP + this.COLOR_PREVIEW_WIDTH, (count + 1) * LABEL_HEIGHT);
 		}
 	}
 
@@ -157,11 +183,14 @@ public class ColorLegend extends LayoutPanel
 	 */
 	private void placeComponents()
 	{
+		// test syl: dit is toch al gebeurd in makeLabels()??
+		
 		if (this.splitStrings == null || this.splitColors == null)
 		{
 			return;
 		}
-//		this.labelsPanel.setSize(String.valueOf(super.getOffsetWidth() - 5),
+
+//		this.labelsPanel.setSize(String.valueOf(Math.max(super.getOffsetWidth() - 5, 0)),
 //			String.valueOf(this.splitStrings.size() * LABEL_HEIGHT
 //				+ (this.splitStrings.size() - 1) * LABEL_HGAP));
 //		for (int i = 0; i < this.splitStrings.size(); i++)
@@ -193,15 +222,40 @@ public class ColorLegend extends LayoutPanel
 	 */
 	private void updatePreferredSize()
 	{
-		this.maxLength = 0;
+//		super.getElement().getStyle().setHeight((this.labels.size() + 1) * this.LABEL_HEIGHT, Unit.PX);
+//		super.getElement().getStyle().setWidth(this.maxLength + COLOR_PREVIEW_WIDTH + 20, Unit.PX);
+
+//		this.labelsPanel.getElement().getStyle().setHeight((this.labels.size() + 1) * this.LABEL_HEIGHT, Unit.PX);
+//		this.labelsPanel.getElement().getStyle().setWidth((this.maxWidth + COLOR_PREVIEW_WIDTH) + this.LABEL_HGAP, Unit.PX);
+		this.labelsPanel.setPixelSize((this.labels.size() + 1) * this.LABEL_HEIGHT, (this.maxWidth + COLOR_PREVIEW_WIDTH) + this.LABEL_HGAP);
+	}
+	
+	private void setMaxWidth()
+	{
+		TextMetrics metrics;
+		Canvas canvas = Canvas.createIfSupported();
+		Context2d context = canvas.getContext2d();
+		// get the labels's font
+		String font = labels.get(0).getElement().getStyle().getFontSize() + " sans-serif";
+		context.setFont(font);
+//		System.out.println("ColorLegend.setMaxWidth(): context.font = " + context.getFont() 
+//			+ ", label.fontSize = " + labels.get(0).getElement().getStyle().getFontSize());
+		this.maxWidth = 0;
+		
 //		for (Label label : this.labels)
 //		{
-//			this.maxLength = Math.max(this.maxLength,
-//				Integer.parseInt(label.getElement().getStyle().getWidth()));
+//			metrics = context.measureText(label.getText());
+//			this.maxWidth = (int) Math.max(this.maxWidth, metrics.getWidth());
 //		}
-//		super.getElement().getStyle().setHeight(this.maxLength
-//			+ COLOR_PREVIEW_WIDTH + 20, Unit.PX);
-//		super.getElement().getStyle().setWidth(0, Unit.PX); // Waarom 0?
+
+		if (this.splitStrings != null)
+		{
+			for (String s : this.splitStrings)
+			{
+				metrics = context.measureText(s);
+				this.maxWidth = (int) Math.max(this.maxWidth, metrics.getWidth());
+			}
+		}
 	}
 
 	public void setBounds(String width, String height)//(Rectangle r)
