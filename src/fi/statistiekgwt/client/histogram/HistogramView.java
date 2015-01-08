@@ -8,8 +8,6 @@ import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,6 +30,8 @@ import fi.statistiekgwt.client.DialogButton;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
+import fi.statistiekgwt.client.event.SelectionChangeEvent;
+import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
@@ -48,7 +48,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author borku102
  *
  */
-public class HistogramView extends DockLayoutPanel implements TableChangeEventHandler//, UpdateViewEventHandler//implements Observer
+public class HistogramView extends DockLayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler
+//, UpdateViewEventHandler//implements Observer
 {
 	private HistogramModel model;
 	private HistogramController controller;
@@ -102,7 +103,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	public HistogramView(HistogramModel model, HistogramController controller)
 	{
 		//super(new BorderLayout());
-		super(Unit.EM);
+//		super(Unit.EM);
+		// test syl: de colorlegend heeft een pixelsize nodig om scroll bars te krijgen (...?)
+		super(Unit.PX);
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
@@ -110,6 +113,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.model = model;
 		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 		this.controller = controller;
+		
+		// bind histogramview to stattablemodel
+		this.model.getStatTableModel().addSelectionChangeEventHandler(this);
 
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
@@ -128,12 +134,14 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.userOptionsPanel.update();
 
 		this.colorLegend = new ColorLegend("", null, null);
-		this.addEast(this.colorLegend, 10);//, BorderLayout.EAST);
+//		this.addEast(this.colorLegend, 10);//em, BorderLayout.EAST);
+		this.addEast(this.colorLegend, 125);//, BorderLayout.EAST);
 		this.colorLegend.setVisible(false);
 		this.setWidgetHidden(this.colorLegend, true);
 
 		this.dialogButton = userOptionsPanel.getDialogButton();
-		super.addSouth(this.dialogButton, 3);//, BorderLayout.SOUTH);
+//		super.addSouth(this.dialogButton, 3);//em, BorderLayout.SOUTH);
+		super.addSouth(this.dialogButton, 50);//px, BorderLayout.SOUTH);
 		// test syl
 //		this.setPixelSize(700, 550);
 		this.setSize("100%", "100%");
@@ -521,6 +529,14 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			int r = cRGB.getRed();
 			int g = cRGB.getGreen();
 			int b = cRGB.getBlue();
+			
+			// test syl
+//			System.out.println("HistogramView.paintBar(barNumber = " + barNumber
+//				+ ", splitClass = " + splitClass 
+//				+ ", selectedLength = " + selectedLength
+//				+ "): c = " + c 
+//				+ ", rgb = (" + r + "," + g + "," + b + ")");
+			
 			RGBColor cRGBDarker =  new RGBColor((int) (r * darkerFactor), 
 				(int) (g * darkerFactor), (int) (b * darkerFactor));
 			RGBColor white = new RGBColor(255, 255, 255);
@@ -1323,7 +1339,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	}
 
 	/**
-	 * Paint the axes and bars for numerical data.
+	 * Paint the axes (??) and bars for numerical data.
 	 * 
 	 * @param context
 	 *	The graphics in which the bars will be painted
@@ -1979,7 +1995,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						context.restore();
 					}
 				} // for loop over bins
-			}
+			} // no normal fit
 		} // vertical bars
 		else
 		{ // horizontal bars
@@ -2948,7 +2964,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 //			this.mainPanel.getCanvas().setPixelSize(
 //				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
 //				this.scrollPanel.getOffsetHeight() - 5);
-			this.mainPanel.getCanvas().setPixelSize(800, 650);
+//			this.mainPanel.getCanvas().setPixelSize(800, 650);
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(650);
 
 //			System.out.println("HistogramView.setMainPanelSize(): splitInSingleView=true, "
 //				+ "mainPanel.getPreferredSize()=" + this.mainPanel.getPreferredSize());
@@ -3101,6 +3119,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	{
 		private Canvas canvas;
 		private Context2d context;
+		private HistogramBarMouseMoveHandler mouseMoveHandler;
 		
 		public HistogramBarPanel()
 		{
@@ -3113,7 +3132,8 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			this.canvas.setCoordinateSpaceHeight(650);
 			// test syl
 			this.canvas.getElement().getStyle().setBackgroundColor("Beige");
-			this.canvas.addMouseMoveHandler(new HistogramBarMouseMoveHandler());
+			mouseMoveHandler = new HistogramBarMouseMoveHandler(); 
+			this.canvas.addMouseMoveHandler(mouseMoveHandler);
 			this.canvas.addClickHandler(new BarClickHandler());
 			this.context = canvas.getContext2d();
 		}
@@ -3121,6 +3141,11 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		public Canvas getCanvas()
 		{
 			return this.canvas;
+		}
+		
+		public HistogramBarMouseMoveHandler getMouseMoveHandler()
+		{
+			return this.mouseMoveHandler;
 		}
 		
 		public void paint()
@@ -3204,7 +3229,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				: splitClasses); i++)
 			{
 				int ySplitOffset = i
-					* (HistogramView.this.scrollPanel.getOffsetHeight() - 5);
+					* (HistogramView.this.scrollPanel.getOffsetHeight() - 5);// - 5); // moet dit -5??
 
 				if (HistogramView.this.model.hasVerticalBars())
 				{
@@ -3543,7 +3568,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 										public void setPosition(
 											int offsetWidth, int offsetHeight)
 										{
-											popup.setPopupPosition(x, y);
+											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
+											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
+											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
 										}
 									});
 							}
@@ -3556,7 +3583,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 										public void setPosition(
 											int offsetWidth, int offsetHeight)
 										{
-											popup.setPopupPosition(x, y);
+											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
+											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
+											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
 										}
 									});
 							}
@@ -3789,6 +3818,23 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			hasSplit = true;
 		
 		return hasSplit;
+	}
+	
+	/**
+	 * Get the scroll panel in which histogram mainpanel is shown.
+	 * 
+	 * @return
+	 */
+	public ScrollPanel getScrollPanel()
+	{
+		return this.scrollPanel;
+	}
+
+	@Override
+	public void onSelectionChange(SelectionChangeEvent event)
+	{
+		GWT.log("HistogramView.onSelectionChange()");
+		this.update();
 	}
 
 //	@Override
