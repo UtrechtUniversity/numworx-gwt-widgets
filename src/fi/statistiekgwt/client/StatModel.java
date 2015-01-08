@@ -32,7 +32,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	private ArrayList<StatistiekView> views;
 	private ArrayList<Boolean> viewInOwnWindow;
 
-	EventBus bus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
+	EventBus eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 
 	/**
 	 * Constructor
@@ -295,16 +295,10 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 		this.resetHashMap = h;
 	}
 
-	public void tableChanged(ChangeEvent e)
-	{
-//		super.setChanged();
-//		super.notifyObservers();
-	}
-
 	@Override
 	public void fireEvent(GwtEvent<?> event)
 	{
-	    bus.fireEvent(event);
+	    eventBus.fireEvent(event);
 	}
 	
 	/**
@@ -312,6 +306,6 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	 */
 	public HandlerRegistration addAddViewEventHandler(AddViewEventHandler handler)
 	{
-		return bus.addHandler(AddViewEvent.TYPE, handler);
+		return eventBus.addHandler(AddViewEvent.TYPE, handler);
 	}
 }
