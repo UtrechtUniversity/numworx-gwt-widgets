@@ -49,5 +49,7 @@ public interface StatistiekCssResource extends CssResource
 	String settingspanel();
 
 	String horizontalrule();
+
+	String colorlegendlabel();
 }
 
