@@ -19,6 +19,8 @@ import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
 import fi.statistiekgwt.client.event.EditColumnEvent;
 import fi.statistiekgwt.client.event.EditColumnEventHandler;
+import fi.statistiekgwt.client.event.SelectionChangeEvent;
+import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
@@ -228,6 +230,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		return this.eventBus.addHandler(TableChangeEvent.TYPE, handler);
 	}
 	
+	/**
+	 * Subscribe for events
+	 */
+	public HandlerRegistration addSelectionChangeEventHandler(SelectionChangeEventHandler handler)
+	{
+		return this.eventBus.addHandler(SelectionChangeEvent.TYPE, handler);
+	}
+
 	/**
 	 * Subscribe the selection handler to changes in the selection of rows.
 	 */
@@ -2070,7 +2080,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		// System.out.println("StatTableModel.setSelectionList(selectionList="
 		// + selectionList + ")");
 		this.selectionList = selectionList;
-		this.fireSelectionChanged();
+		
+		//this.fireSelectionChanged();
+		SelectionChangeEvent event = new SelectionChangeEvent("StatTableModel");
+		this.fireEvent(event);
 	}
 
 	public ArrayList<Boolean> getSelectionList()
