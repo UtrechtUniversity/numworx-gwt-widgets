@@ -79,6 +79,8 @@ import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
 import fi.statistiekgwt.client.columndialog.ColumnDialogView;
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
+import fi.statistiekgwt.client.event.SelectionChangeEvent;
+import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
@@ -91,7 +93,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class StatTable extends DockLayoutPanel implements StatistiekView, TableChangeEventHandler
+public class StatTable extends DockLayoutPanel implements StatistiekView, TableChangeEventHandler,
+	SelectionChangeEventHandler
 //	,TableModelListener, ActionListener, ListSelectionListener,
 //	SelectionListener
 {
@@ -183,6 +186,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		this.statTableModel = statTableModel;
 		this.statTableModel.addTableChangeEventHandler(this);
+		this.statTableModel.addSelectionChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = "";
@@ -210,6 +214,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 		this.statTableModel = statTableModel;
 		this.statTableModel.addTableChangeEventHandler(this);
+		this.statTableModel.addSelectionChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = viewName;
@@ -1639,5 +1644,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setTempColumnIndex(int i)
 	{
 		this.tempColumnIndex = i;
+	}
+
+	@Override
+	public void onSelectionChange(SelectionChangeEvent event)
+	{
+		GWT.log("StatTable.onSelectionChange()");
+		this.update();
 	}
 }
