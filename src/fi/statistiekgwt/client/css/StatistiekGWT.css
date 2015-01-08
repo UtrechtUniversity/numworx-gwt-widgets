@@ -133,3 +133,7 @@ border: 0;
     align: center;
     text-align:center; margin: 0 auto;
 }
+
+.colorlegendlabel {
+	font-size: 12px;
+}
