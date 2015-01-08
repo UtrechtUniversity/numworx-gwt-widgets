@@ -1243,32 +1243,39 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 			if ((e.getSource() == amountRadioItem) || (e.getSource() == percentageRadioItem))
 			{
 				model.setPercentage(view.percentageItemSelected());
+				this.update();
 			}
 			else if ((e.getSource() == labelBetweenBinsRadioItem) ||
 				e.getSource() == labelUnderBinRadioItem)
 			{
 				model.setLabelUnderBin(view.labelUnderBinItemSelected());
+				this.update();
 			}
 			else if (e.getSource() == minBoundaryField)
 			{
 				controller.updateBoundariesFromBinSettings();
+				this.update();
 			}
 			else if (e.getSource() == binWidthField)
 			{
 				controller.updateBoundariesFromBinSettings();
+				this.update();
 			}
 			else if (e.getSource() == axisBox)
 			{
 				model.setVerticalBars(view.xAxisSelected());
+				this.update();
 			}
 			else if (e.getSource() == cumulativeBox)
 			{
 				model.setFrequencyPolygonCumulativeMode(
 					view.isCumulativeBoxSelected());
+				this.update();
 			}
 			else if (e.getSource() == singleViewRadioItem)
 			{
 				model.setSplitInSingleView(view.isSplitSingleViewSelected());
+				this.update();
 			}
 			else if ((e.getSource() == aboveEachOtherRadioItem)
 				&& !model.isFrequencyPolygonMode())
@@ -1277,7 +1284,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 //				this.model
 //					.setNextToEachOther(this.view.isNextToEachOtherSelected());
 				// code above is not working (anymore?), so straightforward
-				model.setNextToEachOther(false);			
+				model.setNextToEachOther(false);
+				this.update();
 			}
 			else if ((e.getSource() == nextToEachOtherRadioItem)
 				&& !model.isFrequencyPolygonMode())
@@ -1287,28 +1295,34 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 //					.setNextToEachOther(this.view.isNextToEachOtherSelected());
 				// code above is not working (anymore?), so straightforward
 				model.setNextToEachOther(true);
+				this.update();
 			}
 			else if (e.getSource() == separateRadioItem)
 			{
 				model.setSplitInSingleView(false);
+				this.update();
 			}
 			else if (e.getSource() == stackModeBox)
 			{
 				model.setFrequencyPolygonStackMode(view.isStackModeBoxSelected());
+				this.update();
 			}
 			else if (e.getSource() == splitBinsBox)
 			{
 				ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
 				controller.setSplitType(list.get(model.getSplitOptions().getColumnSplitIndex())
 					.getType());
+				this.update();
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
 				controller.updateSplitBoundariesFromBinSettings();
+				this.update();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
 				controller.updateSplitBoundariesFromBinSettings();
+				this.update();
 			}
 			else if (e.getSource() == splitChooseBoundariesButton)
 			{
@@ -1322,6 +1336,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 				}
 
 				resize(basisPanel);
+				this.update();
 			}
 			else if (e.getSource() == splitButton)
 			{
@@ -1331,11 +1346,14 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 					model.setColumnSplitIndex(-1);
 					setVisibleSplitOptions(false);
 					HistogramUserOptionsPanel.this.clearGUISplitComponents();
+					this.update();
 				}
 				else
 				{
 					setVisibleSplitOptions(true);
+					this.updateUserOptionsPanel();
 				}
+				
 				resize(basisPanel);
 			}
 			else if (e.getSource() == okButton)
@@ -1367,6 +1385,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 							.getType());
 					}
 				}
+
+				this.update();
 			}
 			else if (e.getSource() == dialogButton)
 			{
@@ -1376,13 +1396,37 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 			{
 				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.actionPerformed(): Unknown action source! " + e);
 			}
-
-			// update view
-			HistogramUserOptionsPanel.this.view.update();
-			// update the rest of the user options panel
+		}
+		
+		/**
+		 * Update the user options panel.
+		 */
+		private void updateUserOptionsPanel()
+		{
+			// update the user options panel
 			HistogramUserOptionsPanel.this.update();
 		}
-	} // class HistogramUOPBlurHandler
+
+		/**
+		 * Update the view.
+		 */
+		private void updateView()
+		{
+			// update view
+			HistogramUserOptionsPanel.this.view.update();
+		}
+
+		/**
+		 * Update the view and the user options panel.
+		 */
+		private void update()
+		{
+			// update view
+			this.updateView();
+			// update the user options panel
+			this.updateUserOptionsPanel();
+		}
+	} // class HistogramUOPClickHandler
 
 	/**
 	 * A blurhandler for HistogramUserOptionsPanel
@@ -1435,6 +1479,12 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 			{
 				model.setNoBins(view.getBinsBoxSelectedInt());
 			}
+			else if (e.getSource() == splitBinsBox)
+			{
+				controller.setSplitType(model.getStatTableModel().getColumnTypes()
+					.get(model.getSplitOptions().getColumnSplitIndex())
+					.getType());
+			}
 			else if (e.getSource() == axisBox)
 			{
 				model.setVerticalBars(view.xAxisSelected());
@@ -1485,6 +1535,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 			// update the rest of the user options panel
 			HistogramUserOptionsPanel.this.update();
 		}
-	} // class 
+	} // class HistogramUOPValueChangeHandler
 
 }
