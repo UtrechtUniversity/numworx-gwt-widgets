@@ -44,6 +44,7 @@ class VaktekPanel //Container
 		if (aantalViews == 2)
 		{	
 			grid = new Grid(1, 2);
+			grid.addStyleName(bd.nabouwenAanzichtenCss.borderless());
 			grid.getElement().getStyle().setProperty("textAlign", "center");
 			vakBreedte = Math.min((breedte-6)/2, (hoogte-40));
 			grid.getElement().getStyle().setMarginLeft(breedte/2-vakBreedte, Unit.PX);
@@ -93,13 +94,14 @@ class VaktekPanel //Container
 		else if (aantalViews == 3)
 		{	
 			grid = new Grid(2, 2);
+			grid.addStyleName(bd.nabouwenAanzichtenCss.borderless());
 			//grid.setBorderWidth(1);
 			//grid.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 			grid.getElement().getStyle().setProperty("textAlign", "center");
 			vakBreedte = Math.min((breedte-6)/2, (hoogte-40)/2);
 			grid.getElement().getStyle().setMarginLeft(breedte/2-vakBreedte, Unit.PX);
 			
-			ba = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2-vakBreedte+1, vakBreedte-1, vakBreedte-1, bd);
+			ba = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2-vakBreedte+1, vakBreedte-2, vakBreedte-2, bd);
 			ba.zetAfstand(10000000);
 			ba.zetSchaduw(false);
 			ba.zetBeginHoeken(90,0);
@@ -119,7 +121,7 @@ class VaktekPanel //Container
 			panelB.add(ba.getCanvas());
 			grid.setWidget(0,0,panelB);
 			
-			va = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2+1, vakBreedte-1, vakBreedte-1, bd);
+			va = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2+1, vakBreedte-2, vakBreedte-2, bd);
 			va.zetAfstand(10000000);
 			va.zetSchaduw(false);
 			va.zetBeginHoeken(0,0);
@@ -138,7 +140,7 @@ class VaktekPanel //Container
 			panelV.add(labelV);
 			grid.setWidget(1,0,panelV);
 			
-			ra = new Viewer3d(kr, breedte/2+1, hoogte/2+1, vakBreedte-1, vakBreedte-1, bd);
+			ra = new Viewer3d(kr, breedte/2+1, hoogte/2+1, vakBreedte-2, vakBreedte-2, bd);
 			ra.zetAfstand(10000000);
 			ra.zetSchaduw(false);
 			ra.zetBeginHoeken(0,-90);

@@ -62,7 +62,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
 			vinkjeGrijsImage, buttonBgImage;
-	private NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
+	
+	NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 
 	public NabouwenAanzichtenGWT()
 	{
@@ -108,7 +109,57 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		Stub.publish(this);
 	}
 
-	private void initOnLoad() {
+	// 2 aanzichten
+	private void initOnLoad()
+	{
+		hoogte = 200;
+		breedte = 200;
+		int maxAantal = 4;
+		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+		for (int i = 0; i < maxAantal; i++)
+		{
+			for (int j = 0; j < maxAantal; j++)
+			{
+				for (int k = 0; k < maxAantal; k++)
+				{
+					if (k == 0 && j == 0 && i == 0)
+						;
+					b[i][j][k] = Math.random()>0.8;
+				}
+			}
+		}
+		startKr = new KubusRooster(b, 1.5);
+		vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 2, this);
+		panel.add(vaktekPanel.getPanel());
+
+	}
+	
+	// 3 aanzichten
+	private void initOnLoad_1()
+	{
+		hoogte = 200;
+		breedte = 200;
+		int maxAantal = 4;
+		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+		for (int i = 0; i < maxAantal; i++)
+		{
+			for (int j = 0; j < maxAantal; j++)
+			{
+				for (int k = 0; k < maxAantal; k++)
+				{
+					if (k == 0 && j == 0 && i == 0)
+						;
+					b[i][j][k] = Math.random()>0.8;
+				}
+			}
+		}
+		startKr = new KubusRooster(b, 1.5);
+		vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 3, this);
+		panel.add(vaktekPanel.getPanel());
+
+	}
+
+	private void initOnLoad_0() {
 		int maxAantal = 6;
 		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)

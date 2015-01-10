@@ -40,4 +40,11 @@
 	background-color: yellow;
 	font-size: 0.875em;
 	padding: 0px;	
-}	
+}
+
+
+.borderless {
+	border-collapse: collapse;
+}
+
+
