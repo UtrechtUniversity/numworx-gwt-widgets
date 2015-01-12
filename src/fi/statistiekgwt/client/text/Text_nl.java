@@ -94,7 +94,7 @@ public class Text_nl
 		{ "variableYLabel", "Variabele y-as" },
 		{ "axisLabel", "Variabele-as" },
 		{ "amountLabel", "Aantal" },
-		{ "splitsingleviewCheckBox", "split in één scherm" },
+		{ "splitsingleviewCheckBox", "split in Ã©Ã©n scherm" },
 		{ "addacolumn", "Voeg een kolom toe" },
 		{ "columnname", "Kolom naam:" },
 		{ "choosetype", "Kies type:" },
