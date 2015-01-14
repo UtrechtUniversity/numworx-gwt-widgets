@@ -1,33 +1,22 @@
 package fi.statistiekgwt.client;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
-import com.gargoylesoftware.htmlunit.javascript.host.Window;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Touch;
-import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseEvent;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.touch.client.Point;
-import com.google.gwt.user.client.EventListener;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -35,7 +24,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
-import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -591,7 +579,10 @@ public class StatInteractiePanelView extends LayoutPanel
 		this.tabPanel.selectTab(this.tabPanel.getWidgetCount() - 2);
 	}
 
-	public void update()//(Observable arg0, Object arg1)
+	/**
+	 * Update the views and start var boxes.
+	 */
+	public void update()
 	{
 		GWT.log("StatInteractiePanelView.update()");
 		for (int i = super.getWidgetCount() - 1; i > 0; i--)
@@ -1126,8 +1117,15 @@ public class StatInteractiePanelView extends LayoutPanel
 	@Override
 	public void onTableChange(TableChangeEvent event)
 	{
-		GWT.log("StatInteractiePanelView.onTableChange()");
-		this.update();
+		String info = event.getInfo();
+		// test syl: alleen nodig als add/edit/remove column, niet als addRow of dataEditable...
+		if (info.equals(TableChangeEvent.ADD_COLUMN)
+			|| info.equals(TableChangeEvent.EDIT_COLUMN)
+			|| info.equals(TableChangeEvent.REMOVE_COLUMN))
+		{
+			GWT.log("StatInteractiePanelView.onTableChange()");
+			this.update();
+		}
 	}
 
 	@Override
