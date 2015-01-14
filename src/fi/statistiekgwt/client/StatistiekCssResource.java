@@ -51,5 +51,7 @@ public interface StatistiekCssResource extends CssResource
 	String horizontalrule();
 
 	String colorlegendlabel();
+
+	String boxsizingborder();
 }
 
