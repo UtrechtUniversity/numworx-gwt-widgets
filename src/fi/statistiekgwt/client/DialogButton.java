@@ -3,17 +3,10 @@ package fi.statistiekgwt.client;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-import com.google.gwt.event.dom.client.TouchMoveEvent;
-import com.google.gwt.event.dom.client.TouchMoveHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
 public class DialogButton extends Button implements HasClickHandlers// implements ActionListener,
@@ -52,6 +45,7 @@ public class DialogButton extends Button implements HasClickHandlers// implement
 			this.dialog = new DialogBox(false, true); //JDialog((Frame) null, title, true);
 			this.dialog.setText(this.title);
 		}
+		
 		//this.dialog.add(content);
 		this.dialog.setWidget(content);
 //		this.dialog.setPixelSize(this.preferredWidth, this.preferredHeight);
