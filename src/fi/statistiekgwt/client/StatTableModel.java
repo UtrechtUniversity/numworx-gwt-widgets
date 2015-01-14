@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
@@ -100,7 +101,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.viewsEditable = viewsEditable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("viewsEditable");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_EDITABLE);
 		this.fireEvent(event);
 	}
 
@@ -114,7 +115,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.dataEditable = dataEditable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("dataEditable");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.DATA_EDITABLE);
 		this.fireEvent(event);
 	}
 
@@ -128,7 +129,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.viewsAddable = viewsAddable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("viewsAddable");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_ADDABLE);
 		this.fireEvent(event);
 	}
 
@@ -300,7 +301,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.columnNames.set(columnIndex, name);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("setColumnName");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_COLUMN_NAME);
 		this.fireEvent(event);
 	}
 
@@ -642,7 +643,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.setValueAtWithoutEvent(o, rowIndex, columnIndex);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("setValueAt");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_VALUE_AT);
 		this.fireEvent(event);
 	}
 
@@ -703,7 +704,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.addRowWithoutEvent();
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("addRow");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_ROW);
 		this.fireEvent(event);
 	}
 
@@ -734,7 +735,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.stringOptions.add(this.stringColumnOptions(this.columnCount - 1));
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("addColumn");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN);
 		this.fireEvent(event);
 	}
 
@@ -781,7 +782,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.editColumnWithoutEvent(columnIndex, columnName, cType);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("editColumn");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.EDIT_COLUMN);
 		this.fireEvent(event);
 	}
 
@@ -890,7 +891,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			this.rowCount--;
 
 			// send an event
-			TableChangeEvent event = new TableChangeEvent("removeRow");
+			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROW);
 			this.fireEvent(event);
 		}
 	}
@@ -1048,7 +1049,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			this.updateColumnIndexInViews(column);
 
 			// send an event
-			TableChangeEvent event = new TableChangeEvent("removeColumn");
+			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_COLUMN);
 			this.fireEvent(event);
 		}
 	}
@@ -1139,7 +1140,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.quickSort(columnIndex, 0, this.rowCount - 1);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("sortColumn");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN);
 		this.fireEvent(event);
 	}
 
@@ -2468,7 +2469,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.updateNumericalColumnTypesWithoutEvent();
 		
 		// send an event
-		TableChangeEvent event = new TableChangeEvent("updateNumericalColumnTypes");
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.UPDATE_NUMERICAL_COLUMN_TYPES);
 		this.fireEvent(event);
 	}
 
@@ -2582,9 +2583,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		return true;
 	}
 
+	/**
+	 * Handle the add column event from column dialog.
+	 */
 	@Override
 	public void onAddColumn(AddColumnEvent event)
 	{
+		GWT.log("StatTableModel.onAddColumn()");
+		
 		ArrayList<String> enumOptionsList = event.getEnumOptions();
 		String[] array = enumOptionsList.toArray(new String[enumOptionsList.size()]);
 		
