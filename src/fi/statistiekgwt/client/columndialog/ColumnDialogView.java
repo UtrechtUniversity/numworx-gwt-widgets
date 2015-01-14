@@ -330,6 +330,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.uitlegArea = new TextArea();
 		//this.uitlegArea.setPixelSize(300, 200); // set position hieronder werkt niet...
 		this.uitlegArea.addStyleName(statistiekCss.textarea());
+		this.uitlegArea.addStyleName(statistiekCss.boxsizingborder());
 		//this.uitlegScrollPane = new ScrollPanel(this.uitlegArea);
 		this.uitlegPanel = new LayoutPanel();
 //		this.uitlegPanel.setLayout(new BorderLayout());
