@@ -10,6 +10,9 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
@@ -20,6 +23,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -37,6 +41,7 @@ import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
+import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
@@ -44,7 +49,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Sylvia van Borkulo
  *
  */
-public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandlers
+public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHandlers
 	//implements ActionListener
 {
 
@@ -68,6 +73,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 	private HistogramUOPBlurHandler blurHandler;
 	private HistogramUOPChangeHandler changeHandler;
 	private HistogramUOPValueChangeHandler valueChangeHandler;
+	private HistogramUOPKeyDownHandler keyDownHandler;
 
 	// variable settings
 	private Label varLabel;
@@ -144,7 +150,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 	private TextBox splitBinWidthField;
 	private Label splitBoundariesLabel;
 	private TextArea splitBoundariesArea;
-	private ScrollPanel splitBoundariesAreaScrollPanel;
+//	private ScrollPanel splitBoundariesAreaScrollPanel;
 	private Label splitNoObjectsLabel;
 	private Label splitMinValueLabel;
 	private Label splitMaxValueLabel;
@@ -188,6 +194,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		this.blurHandler = new HistogramUOPBlurHandler();
 		this.changeHandler = new HistogramUOPChangeHandler();
 		this.valueChangeHandler = new HistogramUOPValueChangeHandler();
+		this.keyDownHandler = new HistogramUOPKeyDownHandler();
 
 		createGuiComponents(); // including this.basisPanel
 		layoutGuiComponents();
@@ -221,6 +228,12 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		this.binWidthField.addBlurHandler(this.blurHandler);//addFocusListener(controller);
 		this.splitMinBoundaryField.addBlurHandler(this.blurHandler);
 		this.splitBinWidthField.addBlurHandler(this.blurHandler);
+		
+		// key down handlers
+		this.minBoundaryField.addKeyDownHandler(this.keyDownHandler);
+		this.binWidthField.addKeyDownHandler(this.keyDownHandler);
+		this.splitMinBoundaryField.addKeyDownHandler(this.keyDownHandler);
+		this.splitBinWidthField.addKeyDownHandler(this.keyDownHandler);
 		
 		// change handlers
 		this.varBox.addChangeHandler(this.changeHandler);
@@ -379,9 +392,16 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 			StatistiekGWT.rb.getString("binsButton"));
 
 		this.splitBoundariesArea = new TextArea();
+//		this.splitBoundariesArea.setSize("100%", "100%");
+		//this.splitBoundariesArea.setSize("150px", "150px%");
+		this.splitBoundariesArea.setPixelSize(150, 150);
 		this.splitBoundariesArea.setEnabled(false);
-		this.splitBoundariesAreaScrollPanel = new ScrollPanel(
-			this.splitBoundariesArea);
+		this.splitBoundariesArea.addStyleName(statistiekCss.boxsizingborder());
+		
+		// test syl: even zonder scrollpanel, alleen met textarea
+//		this.splitBoundariesAreaScrollPanel = new ScrollPanel(
+//			this.splitBoundariesArea);
+//		this.splitBoundariesAreaScrollPanel.setSize("150px", "150px");
 
 		this.splitNoObjectsLabel = new Label("");
 
@@ -551,7 +571,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		splitSettingsPanel.add(this.splitBinWidthField);
 
 		splitSettingsPanel.add(this.splitBoundariesLabel);
-		splitSettingsPanel.add(this.splitBoundariesAreaScrollPanel);
+//		splitSettingsPanel.add(this.splitBoundariesAreaScrollPanel);
+		splitSettingsPanel.add(this.splitBoundariesArea);
 		splitSettingsPanel.add(this.splitNoObjectsLabel);
 		splitSettingsPanel.add(this.splitMinValueLabel);
 		splitSettingsPanel.add(this.splitMaxValueLabel);
@@ -582,14 +603,17 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		splitSettingsPanel.setWidgetTopHeight(this.splitBinWidthField, 250, Style.Unit.PX, 30, Style.Unit.PX);
 		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesLabel, 280, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesAreaScrollPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesAreaScrollPanel, 310, Style.Unit.PX, 30, Style.Unit.PX);
+//		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesAreaScrollPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
+//		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesAreaScrollPanel, 0, Style.Unit.PX, 150, Style.Unit.PX);
+//		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesAreaScrollPanel, 310, Style.Unit.PX, 150, Style.Unit.PX);
+		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesArea, 0, Style.Unit.PX, 150, Style.Unit.PX);
+		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesArea, 310, Style.Unit.PX, 150, Style.Unit.PX);
 		splitSettingsPanel.setWidgetLeftWidth(this.splitNoObjectsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitNoObjectsLabel, 340, Style.Unit.PX, 30, Style.Unit.PX);
+		splitSettingsPanel.setWidgetTopHeight(this.splitNoObjectsLabel, 460, Style.Unit.PX, 30, Style.Unit.PX);
 		splitSettingsPanel.setWidgetLeftWidth(this.splitMinValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitMinValueLabel, 370, Style.Unit.PX, 30, Style.Unit.PX);
+		splitSettingsPanel.setWidgetTopHeight(this.splitMinValueLabel, 490, Style.Unit.PX, 30, Style.Unit.PX);
 		splitSettingsPanel.setWidgetLeftWidth(this.splitMaxValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitMaxValueLabel, 400, Style.Unit.PX, 30, Style.Unit.PX);
+		splitSettingsPanel.setWidgetTopHeight(this.splitMaxValueLabel, 520, Style.Unit.PX, 30, Style.Unit.PX);
 
 		
 		// Put settings panels together on allSettingsPanel
@@ -620,7 +644,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 
 		this.alles.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		this.alles.add(basisPanel);
-		//this.alles.add(allSettingsPanel); // test syl: alleen dit panel; met basispanel toont het niet goed
 		// set position
 		this.alles.setWidgetLeftWidth(basisPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		this.alles.setWidgetTopHeight(basisPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
@@ -1099,7 +1122,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		this.splitBinWidthField.setVisible(b && !this.splitEnumClasses);
 		this.splitBoundariesLabel.setVisible(b);
 		this.splitBoundariesArea.setVisible(b);
-		this.splitBoundariesAreaScrollPanel.setVisible(b);
+//		this.splitBoundariesAreaScrollPanel.setVisible(b);
+		this.splitBoundariesArea.setVisible(b);
 		this.splitNoObjectsLabel.setVisible(b && !this.splitEnumClasses);
 		this.splitMinValueLabel.setVisible(b && !this.splitEnumClasses);
 		this.splitMaxValueLabel.setVisible(b && !this.splitEnumClasses);
@@ -1187,9 +1211,9 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 	/**
 	 * Subscribe for events
 	 */
-//	public HandlerRegistration addUpdateViewEventHandler(UpdateViewEventHandler handler)
+//	public HandlerRegistration addAddColumnEventHandler(AddColumnEventHandler handler)
 //	{
-//		return this.eventBus.addHandler(UpdateViewEvent.TYPE, handler);
+//		return this.eventBus.addHandler(AddColumnEvent.TYPE, handler);
 //	}
 	
 	@Override
@@ -1537,4 +1561,41 @@ public class HistogramUserOptionsPanel extends LayoutPanel// implements HasHandl
 		}
 	} // class HistogramUOPValueChangeHandler
 
+	class HistogramUOPKeyDownHandler implements KeyDownHandler
+	{
+		@Override
+		public void onKeyDown(KeyDownEvent e)
+		{
+			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			{
+				HistogramController controller = HistogramUserOptionsPanel.this.controller;
+
+				if (e.getSource() == minBoundaryField)
+				{
+					// update column index bin settings
+					controller.updateBoundariesFromBinSettings();
+				}
+				else if (e.getSource() == binWidthField)
+				{
+					// update column index bin settings
+					controller.updateBoundariesFromBinSettings();
+				}
+				else if (e.getSource() == splitMinBoundaryField)
+				{
+					// update split index bin settings
+					controller.updateSplitBoundariesFromBinSettings();
+				}
+				else if (e.getSource() == splitBinWidthField)
+				{
+					// update split index bin settings
+					controller.updateSplitBoundariesFromBinSettings();
+				}
+
+				// update view
+				HistogramUserOptionsPanel.this.view.update();
+				// update the rest of the user options panel
+				HistogramUserOptionsPanel.this.update();
+			}
+		}
+	} // class HistogramUOPKeyDownHandler
 }
