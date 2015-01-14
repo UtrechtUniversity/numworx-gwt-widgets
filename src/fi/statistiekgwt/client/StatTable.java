@@ -2,6 +2,8 @@ package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,6 +28,7 @@ import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -41,6 +44,8 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -55,6 +60,8 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -109,7 +116,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			// the last item in s is the rowNumber
 			return ((s == null) || (s.size() == 0)) ? null : s.get(s.size()-1);
-
 		}
 	};
 
@@ -122,6 +128,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //	private CellTable<List<String>> table;
 	private DataGrid<List<String>> table; // datagrid provides fixed header and footer section
 	protected ListDataProvider<List<String>> dataProvider;
+	private ListHandler<List<String>> sortHandler;
 //	private SimplePager pager;
 	private MultiSelectionModel<List<String>> selectionModel;
 	
@@ -288,8 +295,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.dataProvider.addDataDisplay(this.table);
 		
 		// Attach a column sort handler to the ListDataProvider to sort the list.
-	    ListHandler<List<String>> sortHandler =
+	    sortHandler =
 	        new ListHandler<List<String>>(this.dataProvider.getList());
+	    
 	    this.table.addColumnSortHandler(sortHandler);
 
 	    // Create a Pager to control the table.
@@ -505,8 +513,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		VerticalPanel panel = new VerticalPanel();
 		panel.add(selectLabel);
 		panel.add(this.fileUpload);
-		panel.add(fileUploadSelectButton);
-		panel.add(fileUploadCancelButton);
+		
+		HorizontalPanel buttonPanel = new HorizontalPanel();
+		buttonPanel.add(fileUploadSelectButton);
+		buttonPanel.add(fileUploadCancelButton);
+		panel.add(buttonPanel);
+		
 		this.popupFileUploadPanel.add(panel);
 		this.popupFileUploadPanel.hide();
 		this.add(this.popupFileUploadPanel);
@@ -988,34 +1000,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		// Start processing the queue
 		readNextFile();
 
-//		Scheduler.get().scheduleDeferred(new ScheduledCommand()
+//		Timer t = new Timer()
 //		{
 //			@Override
-//			public void execute()
+//			public void run()
 //			{
-//				
-//				GWT.log("StatTable.processCSVDataFile(): csvText is set!");
-//
-//				Scheduler.get().scheduleDeferred(new ScheduledCommand()
-//				{
-//					@Override
-//					public void execute()
-//					{
-//						GWT.log("text is read!");
-//					}
-//				});
+//				GWT.log("StatTable.processCSVDatFile(): timer.run()");
 //			}
-//		});
-		
-		Timer t = new Timer()
-		{
-			@Override
-			public void run()
-			{
-				GWT.log("StatTable.processCSVDatFile(): timer.run()");
-			}
-		};
-		t.schedule(4000);
+//		};
+//		t.schedule(4000);
 
 		// process the first file
 		csvText = reader.getStringResult();
@@ -1044,7 +1037,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			
 			this.statTableModel.updateNumericalColumnTypesWithoutEvent();
 
-			this.fireEvent("importCSV");
+			this.fireEvent(TableChangeEvent.IMPORT_CSV);
 			
 			DOM.setStyleAttribute(RootPanel.getBodyElement(), "cursor", "default");
 		}
@@ -1299,35 +1292,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					StatTable.this.statTableModel);
 				// test syl: TODO dit worden er steeds meer! Bestaande verwijderen, ook al is dialogModel nieuw...
 				HandlerRegistration handlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
+				
 				ColumnDialogView dialogView;
 
 				dialogView = new ColumnDialogView(dialogModel);
 				
-				// Try to find the top level ancestor (Dialog or Frame)
-/*				Widget container = StatistiekGWT.getTopLevelAncestor(StatTable.this);
-				if (container instanceof Frame)
-				{
-					dialogView = new AddColumnDialogView((Frame) container, dialogModel);
-				}
-				else if (container instanceof DialogBox)
-				{
-					dialogView = new AddColumnDialogView((DialogBox) container, dialogModel);
-				}
-				else
-				{
-					System.out.println("Error finding top level frame/dialog");
-					return;
-				}
-*/				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
 				dialogController.setHandlerRegistration(handlerRegistration);
 
-				//dialogView.setVisible(true);
 				dialogView.center();
 				dialogView.show();
 
-				// statTableModel.addColumn() wordt uitgevoerd in onAddColumn() van AddColumnEvent
+				// statTableModel.addColumn() wordt uitgevoerd in onAddColumn()
 //				if (dialogModel.getDonePressed())
 //				{
 //					StatTable.this.statTableModel.addColumn(dialogModel.getName(),
@@ -1345,7 +1322,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					}
 					
 					// send an event
-					TableChangeEvent event = new TableChangeEvent("removeRows");
+					TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROWS);
 					StatTable.this.statTableModel.fireEvent(event);
 				}
 				
@@ -1437,10 +1414,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			okButton.addClickHandler(StatTable.this.clickHandler);
 			cancelButton.addClickHandler(StatTable.this.clickHandler);
 
+			HorizontalPanel buttonPanel = new HorizontalPanel();
+			//buttonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+			buttonPanel.add(okButton);
+			buttonPanel.add(cancelButton);
+
 			VerticalPanel vPanel = new VerticalPanel();
 			vPanel.add(message);
-			vPanel.add(okButton);
-			vPanel.add(cancelButton);
+			vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+			vPanel.add(buttonPanel);
+
 			setWidget(vPanel);
 		}
 	} // class ImportDialogBox
@@ -1577,19 +1560,32 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						public void update(int rowIndex, List<String> s,
 							String value)
 						{
-							GWT.log("StatTable.updateColumns(): index = "
+							GWT.log("StatTable.updateColumns(): rowIndex = "
 								+ rowIndex + ", s = " + s + ", value = " + value);
 							StatTable.this.statTableModel.setValueAt(value,
 								rowIndex, columnIndex);
-
+							// TODO test syl: scroll to the edit position; geeft JavaScriptException
+							//table.getRowElement(table.getVisibleItems().indexOf(value)).getCells().getItem(columnIndex).scrollIntoView();
 						}
 					});
+				
+			    // test syl
+				sortHandler.setComparator(enumColumn, new Comparator<List<String>>()
+				{
+					int columnIndex = StatTable.this.getTempColumnIndex();
+
+					@Override
+					public int compare(List<String> o1, List<String> o2)
+					{
+						return o1.get(columnIndex).compareTo(o2.get(columnIndex));
+					}
+				});
 
 				enumColumn.setSortable(true);
 				enumColumn.setCellStyleNames(statistiekCss.selectioncell());
 				this.table.addColumn(enumColumn, headers.get(i));
 				this.table.setColumnWidth(enumColumn, 10.0, Unit.EM);
-			}
+			} // ENUM
 			else
 			{
 				Column<List<String>, String> column = new Column<List<String>, String>(
@@ -1609,19 +1605,70 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					int columnIndex = StatTable.this.getTempColumnIndex();
 
 					@Override
-					public void update(int rowIndex, List<String> s,
+					public void update(int rowIndex, List<String> dataRow,
 						String value)
 					{
-						GWT.log("StatTable.updateColumns(): index = " + rowIndex + ", s = " + s + ", value = " + value);
+						GWT.log("StatTable.updateColumns(): rowIndex = " + rowIndex + ", s = " + dataRow + ", value = " + value);
 						StatTable.this.statTableModel.setValueAt(value, rowIndex, columnIndex);
+						// TODO test syl: scroll to the edit position; geeft JavaScriptException 
+						// kan de eigenschap compareDocumentPosition van een niet-gedefinieerde verwijzing of een verwijziging naar een lege waarde niet ophalen
+						//table.getRowElement(rowIndex).getCells().getItem(columnIndex).scrollIntoView(); // Geeft exception: is het probleem dat ik rowIndex aan de data heb toegevoegd?
+						
+						// dataRow is niet geupdate met de nieuwe value!
+//						dataProvider.flush(); // force immediate update of datagrid table
+//						table.getRowElement(18).getCells().getItem(columnIndex).scrollIntoView();
 					}
 				});
+
+			    // test syl
+				sortHandler.setComparator(column, new Comparator<List<String>>()
+				{
+					int columnIndex = StatTable.this.getTempColumnIndex();
+
+					@Override
+					public int compare(List<String> o1, List<String> o2)
+					{
+						return o1.get(columnIndex).compareTo(o2.get(columnIndex));
+					}
+				});
+
 				column.setSortable(true);
 				column.setCellStyleNames(statistiekCss.textinputcell());
 				this.table.addColumn(column, headers.get(i));
 				this.table.setColumnWidth(column, 10.0, Unit.EM);
 			}
 		} // for-loop over columns
+		
+		// test syl: even buiten fieldupdater
+		dataProvider.flush();
+		if ((table.getRowCount() == 19) && (table.getColumnCount() == 12))
+			table.getRowElement(18).getCells().getItem(11).scrollIntoView();
+		
+		// test syl
+		AsyncHandler columnSortHandler = new ColumnSortEvent.AsyncHandler(table)
+		{
+			@Override
+			public void onColumnSort(ColumnSortEvent event)
+			{
+				System.out.println("StatTable.updateColumns().onColumnSort()");
+				
+				List<String> newData = new ArrayList(table.getVisibleItems());
+				if (event.isSortAscending())
+				{
+					Collections.sort(newData, (Comparator) event.getColumn());
+				}
+				else
+				{
+					Collections.sort(newData, (Comparator) event.getColumn());
+					Collections.reverse(newData);
+				}
+				// table.setRowData(newData);
+			}
+		};
+        
+        // sorthandler is hierboven geupdate
+		table.addColumnSortHandler(columnSortHandler);
+		//table.addColumnSortHandler(sortHandler);
 	}
 
 	/**
