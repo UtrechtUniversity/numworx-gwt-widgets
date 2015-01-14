@@ -150,8 +150,8 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		// test syl
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
 		
-		// initial paint
-		this.mainPanel.paint();
+		// initial paint gebeurt in HistogramController() - view.update()
+//		this.mainPanel.paint();
 	}
 
 	/**
@@ -259,19 +259,20 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 	/**
 	 * Returns bin width as calculated from the values in this.model.getBinBoundaries().
+	 * -> test syl: dit geeft problemen bij gewijzigde waarde in uop
 	 * 
 	 * @return The bin width. Returns -1 if bin width can not be calculated.
 	 */
 	public double getBinWidth()
 	{
-		double binWidth = -1;
-		
-		if ((this.model.getBinBoundaries() != null) && (this.model.getBinBoundaries().size() > 1))
-		{
-			binWidth = this.model.getBinBoundaries().get(1) - this.model.getBinBoundaries().get(0);
-		}
-		return binWidth;
-		//return this.userOptionsPanel.getBinWidth();
+//		double binWidth = -1;
+//		
+//		if ((this.model.getBinBoundaries() != null) && (this.model.getBinBoundaries().size() > 1))
+//		{
+//			binWidth = this.model.getBinBoundaries().get(1) - this.model.getBinBoundaries().get(0);
+//		}
+//		return binWidth;
+		return this.userOptionsPanel.getBinWidth();
 	}
 
 	public void setBinWidth(double d)
@@ -425,7 +426,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	}
 
 	/**
-	 * Paint a single bar. In case of frequencypolygon, the dot and connecting
+	 * Paint a single bar. In case of frequency polygon, the dot and connecting
 	 * line is painted.
 	 * 
 	 * @param context
@@ -456,14 +457,21 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 //		System.out.println("HistogramView.paintBar(): barLength = " + barLength 
 //			+ ", barNumber = " + barNumber
 //			+ ", numberOfBars = " + numberOfBars
-//			+ ", splitClass = " + splitClass);
+//			+ ", splitClass = " + splitClass
+//			+ ", ySplitOffset = " + ySplitOffset);
+		
+		CssColor blackCss = CssColor.make(0, 0, 0);
 
 		if (this.model.isFrequencyPolygonMode())
 		{
-			context.setStrokeStyle(c); // setColor
+			// set color
+			context.setStrokeStyle(c);
+			context.setFillStyle(c);
+			
 			Point p = this.dotLocation(barLength, barNumber);
 			int size = 4;
 			
+			// test syl: dit wordt normaal gesproken niet meer gepaint. onMouseMove toont de popup, maar doet geen paint()
 			if ((highlightedBar == barNumber) && (highlightInSplit == splitClass))
 			{
 //				System.out.println("HIGHLIGHT! HistogramView.paintBar(): barNumber = " + barNumber
@@ -478,7 +486,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			}
 
 			context.beginPath();
-			context.arc(p.getX(), p.getY(), size, 0, 2 * Math.PI);
+			context.arc(p.getX(), p.getY() + ySplitOffset, size, 0, 2 * Math.PI);
 			context.fill();
 			context.closePath();
 			
@@ -503,6 +511,10 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			}
 
 			this.lastPolygonPoint = p;
+			
+			// reset color
+			context.setStrokeStyle(blackCss);
+
 		} // frequency polygon
 		else
 		{
@@ -577,17 +589,20 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
     					width, height, context, c, 
     					shadingColor.getCssColor(), true);
     				
-    				// draw selected bar
-    				y_coordinate = y + barLength - selectedLength + ySplitOffset;
-    				height = selectedLength;
-
-    				// draw the selected bar darker in its original color c
-    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, white,
-						colorMixSymm);
-    				fillRectWithSymmShade(x_coordinate, y_coordinate, 
-    					width, height, context, 
-    					cRGBDarker.getCssColor(), shadingColor.getCssColor(), true);
-				}
+    				// draw selected bar (part)
+    				if (selectedLength > 0)
+    				{
+	    				y_coordinate = y + barLength - selectedLength + ySplitOffset;
+	    				height = selectedLength;
+	
+	    				// draw the selected bar darker in its original color c
+	    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, white,
+							colorMixSymm);
+	    				fillRectWithSymmShade(x_coordinate, y_coordinate, 
+	    					width, height, context, 
+	    					cRGBDarker.getCssColor(), shadingColor.getCssColor(), true);
+    				}
+				} // symmetrical shading
 				else
 				{
 					// shading to the right 
@@ -617,7 +632,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
     				fillRectWithShadeToUpperBinSide(x_coordinate, y_coordinate, 
     					width, height, context, cRGBDarker.getCssColor(), shadingColor.getCssColor(),
     					true);
-				}
+				} // right shading
 				
 				// fill the rectangle above the bar white to get the correct
 				// color mixing when using alpha values
@@ -626,6 +641,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				// this.barAreaHeight()-barLength);
 				context.setStrokeStyle(black.getCssColor());
 				
+				// test syl: dit wordt normaal gesproken niet meer gepaint. onMouseMove toont de popup, maar doet geen paint()
 				if ((highlightedBar == barNumber) && (highlightInSplit == splitClass))
 				{
 //					System.out.println("HIGHLIGHT! HistogramView.paintBar(): barNumber = " + barNumber
@@ -1114,8 +1130,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				+ yOffset);
 		}
 
-		context.fillRect(0, this.barAreaHeight() + this.xAxisOffset - 2 + yOffset,
-			super.getOffsetWidth(), 1);
+		// test syl: wat doet dit?
+//		context.fillRect(0, this.barAreaHeight() + this.xAxisOffset - 2 + yOffset,
+//			super.getOffsetWidth(), 1);
 	}
 
 	private int maxFrequency(int[] frequencies)
@@ -2396,9 +2413,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				context.fillText(s, this.yAxisOffset - 7 - metrics.getWidth(), y
 					+ (int) (height / 2.0) - 2 + ySplitOffset);
 			}
-		}
+		} // vertical bars
 		else
-		{
+		{ // horizontal bars
 			int y = this.barAreaHeight();
 
 			context.beginPath();
@@ -2433,7 +2450,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				context.fillText(s, x - (int) (metrics.getWidth() / 2.0),
 					y + 7 + height + ySplitOffset);
 			}
-		}
+		} // horizontal bars
 	}
 
 	/**
@@ -3224,7 +3241,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				}
 			}
 
-			// draw the bottom line
+			// draw the x axis
 			for (int i = 0; i < (HistogramView.this.isSplitSingleViewSelected() ? 1
 				: splitClasses); i++)
 			{
@@ -3233,11 +3250,14 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 				if (HistogramView.this.model.hasVerticalBars())
 				{
-					context.moveTo(HistogramView.this.yAxisOffset,
-						HistogramView.this.barAreaHeight() + ySplitOffset);
-					context.lineTo(canvas.getOffsetWidth(), 
-						HistogramView.this.barAreaHeight() + ySplitOffset);
-					context.stroke();
+					if (canvas.getCoordinateSpaceWidth() > 0)
+					{
+						context.moveTo(HistogramView.this.yAxisOffset,
+							HistogramView.this.barAreaHeight() + ySplitOffset);
+						context.lineTo(canvas.getCoordinateSpaceWidth(), 
+							HistogramView.this.barAreaHeight() + ySplitOffset);
+						context.stroke();
+					}
 				}
 				else
 				{
@@ -3828,6 +3848,22 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	public ScrollPanel getScrollPanel()
 	{
 		return this.scrollPanel;
+	}
+
+	/**
+	 * @return the userOptionsPanel
+	 */
+	public HistogramUserOptionsPanel getUserOptionsPanel()
+	{
+		return userOptionsPanel;
+	}
+
+	/**
+	 * @param userOptionsPanel the userOptionsPanel to set
+	 */
+	public void setUserOptionsPanel(HistogramUserOptionsPanel userOptionsPanel)
+	{
+		this.userOptionsPanel = userOptionsPanel;
 	}
 
 	@Override
