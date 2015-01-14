@@ -351,7 +351,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		{
 			e = (int) Math.floor(Math.log10(b));
 		}
-		// test syl: voor lengte min 156, max 171 en noBins 2 wordt step 20 i.p.v. 10
+
 		double step = Math.ceil(b * Math.pow(10, -e)) * Math.pow(10, e);
 		
 		if (step == 0)
@@ -373,9 +373,12 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 		// make sure step is not too large
 		// use min value instead of start to be more constraining 
-		while (min + step >= max)
+		if (step > 1)
 		{
-			step = Math.ceil(step / 2);
+			while (min + step >= max)
+			{
+				step = Math.ceil(step / 2);
+			}
 		}
 		
 		// make sure the maximum value is covered by the bins
