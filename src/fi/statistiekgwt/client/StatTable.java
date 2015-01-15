@@ -277,7 +277,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		//this.scrollPanel = new ScrollPanel();
 //		this.table = new CellTable<Object>();//(this.statTableModel)
 //		this.table = new CellTable<List<String>>();
-		this.table = new DataGrid<List<String>>();
+		this.table = new DataGrid<List<String>>(KEY_PROVIDER);
 		//this.table.setMinimumTableWidth(140, Unit.EM);
 		this.table.setWidth("100%");
 		this.table.setHeight("100%");
@@ -1480,9 +1480,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			rows.add(row);
 		}
 		
+		// how about the sortHandler?
 		dataProvider = new ListDataProvider<List<String>>();
 		dataProvider.addDataDisplay(this.table);
-		
+
 		// test syl
 //		this.dataProvider.getList().addAll(columns);
 		this.dataProvider.getList().addAll(rows);
@@ -1561,7 +1562,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 							String value)
 						{
 							GWT.log("StatTable.updateColumns(): rowIndex = "
-								+ rowIndex + ", s = " + s + ", value = " + value);
+								+ rowIndex + ", s = " + s + ", value = " + value
+								+ ", columnIndex = " + columnIndex);
 							StatTable.this.statTableModel.setValueAt(value,
 								rowIndex, columnIndex);
 							// TODO test syl: scroll to the edit position; geeft JavaScriptException
@@ -1608,7 +1610,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					public void update(int rowIndex, List<String> dataRow,
 						String value)
 					{
-						GWT.log("StatTable.updateColumns(): rowIndex = " + rowIndex + ", s = " + dataRow + ", value = " + value);
+						GWT.log("StatTable.updateColumns(): rowIndex = " + rowIndex 
+								+ ", s = " + dataRow + ", value = " + value
+								+ ", columnIndex = " + columnIndex);
 						StatTable.this.statTableModel.setValueAt(value, rowIndex, columnIndex);
 						// TODO test syl: scroll to the edit position; geeft JavaScriptException 
 						// kan de eigenschap compareDocumentPosition van een niet-gedefinieerde verwijzing of een verwijziging naar een lege waarde niet ophalen
@@ -1652,7 +1656,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				System.out.println("StatTable.updateColumns().onColumnSort()");
 				
-				List<String> newData = new ArrayList(table.getVisibleItems());
+				List<? extends List<String>> newData = new ArrayList(table.getVisibleItems());
 				if (event.isSortAscending())
 				{
 					Collections.sort(newData, (Comparator) event.getColumn());
@@ -1662,13 +1666,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					Collections.sort(newData, (Comparator) event.getColumn());
 					Collections.reverse(newData);
 				}
-				// table.setRowData(newData);
+				table.setRowData(newData);
 			}
 		};
         
         // sorthandler is hierboven geupdate
 		table.addColumnSortHandler(columnSortHandler);
-		//table.addColumnSortHandler(sortHandler);
+		table.addColumnSortHandler(sortHandler);
 	}
 
 	/**
