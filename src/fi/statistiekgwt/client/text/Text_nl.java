@@ -167,6 +167,7 @@ public class Text_nl
 		{ "selectCSVFile", "Selecteer een CSV bestand: " },
 		{ "importFile", "Importeer bestand" },
 		{ "noFileMessage", "Geen bestand gekozen" },
-		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv)." }
+		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv)." },
+		{ "emptyTableMessage", "De tabel is leeg"}
 	};
 }
