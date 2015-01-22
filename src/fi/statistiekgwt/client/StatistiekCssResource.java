@@ -53,5 +53,9 @@ public interface StatistiekCssResource extends CssResource
 	String colorlegendlabel();
 
 	String boxsizingborder();
+
+	String dataGridCell();
+	
+	String dataGrid();
 }
 
