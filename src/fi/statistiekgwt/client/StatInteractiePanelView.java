@@ -1121,7 +1121,8 @@ public class StatInteractiePanelView extends LayoutPanel
 		// test syl: alleen nodig als add/edit/remove column, niet als addRow of dataEditable...
 		if (info.equals(TableChangeEvent.ADD_COLUMN)
 			|| info.equals(TableChangeEvent.EDIT_COLUMN)
-			|| info.equals(TableChangeEvent.REMOVE_COLUMN))
+			|| info.equals(TableChangeEvent.REMOVE_COLUMN)
+			|| info.equals(TableChangeEvent.IMPORT_CSV))
 		{
 			GWT.log("StatInteractiePanelView.onTableChange()");
 			this.update();
