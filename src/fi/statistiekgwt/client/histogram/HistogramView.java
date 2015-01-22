@@ -14,6 +14,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -30,10 +34,13 @@ import fi.statistiekgwt.client.DialogButton;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
+import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
+import fi.statistiekgwt.client.event.ViewSelectionChangeEvent;
+import fi.statistiekgwt.client.event.ViewSelectionChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
@@ -48,7 +55,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author borku102
  *
  */
-public class HistogramView extends DockLayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler
+public class HistogramView extends DockLayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
 //, UpdateViewEventHandler//implements Observer
 {
 	private HistogramModel model;
@@ -84,6 +91,12 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	private String tempString;
 	
 	/**
+	 * The event bus to send events to event handlers associated 
+	 * with the views using StatTableModel.
+	 */
+	EventBus eventBus;
+	
+	/**
 	 * The number of the highlighted bar, or for frequency polygons the
 	 * number of the highlighted dot. 
 	 */
@@ -111,11 +124,18 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.statistiekCss.ensureInjected();
 		
 		this.model = model;
-		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 		this.controller = controller;
 		
-		// bind histogramview to stattablemodel
+		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
+		
+		// bind histogramview to stattablemodel: to handle table changes in stattablemodel
+		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
+
+		// bind histogramview to stattablemodel: to handle selection changes in stattablemodel
 		this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		
+		// bind stattablemodel to histogramview: to handle selection changes in histogramview
+		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
 
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
@@ -3749,7 +3769,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 				HistogramView.this.model.getStatTableModel().setSelectionList(
 					selectionList);
-			}
+			} // number
 			else
 			{
 				String clicked;
@@ -3787,7 +3807,11 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				}
 				HistogramView.this.model.getStatTableModel().setSelectionList(
 					selectionList);
-			}
+			} // enum or string
+			
+			// view statTable moet updaten en de selectie laten zien
+			ViewSelectionChangeEvent event = new ViewSelectionChangeEvent(HistogramView.this.controller.getViewName());
+			HistogramView.this.fireEvent(event);
 		}
 		
 	} // private class BarClickListener
@@ -3825,6 +3849,12 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.update();
 	}
 	
+	@Override
+	public void fireEvent(GwtEvent<?> e)
+	{
+		eventBus.fireEvent(e);
+	}
+
 	/**
 	 * Return true if the view has a split, else false.
 	 * 
@@ -3866,11 +3896,22 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.userOptionsPanel = userOptionsPanel;
 	}
 
+	/**
+	 * Subscribe for events
+	 */
+	public HandlerRegistration addViewSelectionChangeEventHandler(ViewSelectionChangeEventHandler handler)
+	{
+		return this.eventBus.addHandler(ViewSelectionChangeEvent.TYPE, handler);
+	}
+
 	@Override
 	public void onSelectionChange(SelectionChangeEvent event)
 	{
-		GWT.log("HistogramView.onSelectionChange()");
-		this.update();
+		GWT.log("HistogramView.onSelectionChange(): event.sender = " + event.getSenderName());
+		if (!event.getSenderName().equals(this.controller.getViewName()))
+		{
+			this.update();
+		}
 	}
 
 //	@Override
