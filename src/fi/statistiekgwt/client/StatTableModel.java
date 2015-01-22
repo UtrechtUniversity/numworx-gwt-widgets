@@ -24,6 +24,8 @@ import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
+import fi.statistiekgwt.client.event.ViewSelectionChangeEvent;
+import fi.statistiekgwt.client.event.ViewSelectionChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
@@ -39,7 +41,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author borku102
  *
  */
-public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditColumnEventHandler
+public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditColumnEventHandler, ViewSelectionChangeEventHandler
 //HasValueChangeHandlers //implements TableModel
 {
 	private int rowCount;
@@ -58,7 +60,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	private ArrayList<Boolean> selectionList;
 	private ArrayList<SelectionHandler<Object>> selectionHandlers;
 	/**
-	 * The event bus to send change events to event handlers associated 
+	 * The event bus to send events to event handlers associated 
 	 * with the views using StatTableModel.
 	 */
 	EventBus eventBus;
@@ -1127,6 +1129,19 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		boolean tempSelection = this.selectionList.get(rowA);
 		this.selectionList.set(rowA, this.selectionList.get(rowB));
 		this.selectionList.set(rowB, tempSelection);
+	}
+	
+	/**
+	 * Set the selection of the row with the given rowIndex to boolean b.
+	 * 
+	 * @param rowIndex
+	 * @param b
+	 */
+	public void setSelected(int rowIndex, Boolean b)
+	{
+		this.selectionList.set(rowIndex, b);
+		SelectionChangeEvent event = new SelectionChangeEvent("StatTableModel");
+		this.fireEvent(event);
 	}
 
 	/**
@@ -2615,6 +2630,15 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			this.setColumnName(event.getName(), event.getColumnIndex());
 		}
+	}
+
+	@Override
+	public void onViewSelectionChange(ViewSelectionChangeEvent event)
+	{
+		GWT.log("StatTableModel.onViewSelectionChange(): event.getSenderName() = " + event.getSenderName());
+		
+		SelectionChangeEvent selectionChangeEvent = new SelectionChangeEvent("StatTableModel");
+		this.fireEvent(selectionChangeEvent);
 	}
 
 }
