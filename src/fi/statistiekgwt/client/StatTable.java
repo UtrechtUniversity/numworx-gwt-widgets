@@ -20,26 +20,22 @@ import org.vectomatic.file.events.ErrorHandler;
 import org.vectomatic.file.events.LoadEndEvent;
 import org.vectomatic.file.events.LoadEndHandler;
 
+import com.google.gwt.cell.client.Cell.Context;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
 import com.google.gwt.cell.client.TextInputCell;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -50,11 +46,11 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -71,21 +67,16 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
-import com.google.gwt.view.client.SelectionModel;
 
 import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
 import fi.statistiekgwt.client.columndialog.ColumnDialogView;
-import fi.statistiekgwt.client.event.AddColumnEvent;
-import fi.statistiekgwt.client.event.AddColumnEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -109,12 +100,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	StatistiekCssResource statistiekCss;
 	private static final String DELIMITER = ";";
     
+	/**
+	 * The key provider that provides the unique ID of a row in the table, i.e., the row number.
+	 */
 	public static final ProvidesKey<List<String>> KEY_PROVIDER = new ProvidesKey<List<String>>()
 	{
 		@Override
 		public Object getKey(List<String> s)
 		{
-			// the last item in s is the rowNumber
+			// the last item in s is the rowNumber; this is the unique ID
 			return ((s == null) || (s.size() == 0)) ? null : s.get(s.size()-1);
 		}
 	};
@@ -129,7 +123,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private DataGrid<List<String>> table; // datagrid provides fixed header and footer section
 	protected ListDataProvider<List<String>> dataProvider;
 	private ListHandler<List<String>> sortHandler;
-//	private SimplePager pager;
+	private SimplePager pager;
 	private MultiSelectionModel<List<String>> selectionModel;
 	
 	private String viewName;
@@ -272,7 +266,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		setUpFileUpload();
 		
 		//this.setPixelSize(800, 400);
-		this.getElement().getStyle().setBackgroundColor("tomato");
+		//this.getElement().getStyle().setBackgroundColor("tomato");
 		
 		//this.scrollPanel = new ScrollPanel();
 //		this.table = new CellTable<Object>();//(this.statTableModel)
@@ -280,13 +274,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.table = new DataGrid<List<String>>(KEY_PROVIDER);
 		//this.table.setMinimumTableWidth(140, Unit.EM);
 		this.table.setWidth("100%");
-		this.table.setHeight("100%");
+		//this.table.setHeight("90%");
 		 /*
 	     * Do not refresh the headers every time the data is updated. The footer
 	     * depends on the current data, so we do not disable auto refresh on the
 	     * footer.
 	     */
 	    this.table.setAutoHeaderRefreshDisabled(true);
+	    // Set the message to display when the table is empty
+	    this.table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("emptyTableMessage")));
+	    // set style
+	    this.table.addStyleName(statistiekCss.dataGrid());
 
 		// test syl
 		this.table.getElement().getStyle().setBackgroundColor("powderblue");
@@ -301,46 +299,20 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    this.table.addColumnSortHandler(sortHandler);
 
 	    // Create a Pager to control the table.
-//	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
-//	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
-//	    pager.setDisplay(this.table);
-//	    VerticalPanel vPanel = new VerticalPanel();
-//	    vPanel.add(this.table);
-//	    vPanel.add(pager);
+	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
+	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+	    pager.setDisplay(this.table);
+//	    pager.setHeight("50px");
+	    DockLayoutPanel tablePanel = new DockLayoutPanel(Unit.EM);
+	    tablePanel.addSouth(pager, 3);
+	    tablePanel.add(this.table);
+	    tablePanel.setHeight("100%");
 
 	    // Add a selection model so we can select cells.
 	    selectionModel =
 	        new MultiSelectionModel<List<String>>(KEY_PROVIDER);
 	    this.table.setSelectionModel(selectionModel, DefaultSelectionEventManager
 	        .<List<String>> createCheckboxManager());	    
-//		{
-//			protected JTableHeader createDefaultTableHeader()
-//			{
-//				return new JTableHeader(columnModel)
-//				{
-//					public String getToolTipText(MouseEvent e)
-//					{
-//						String tip = null;
-//						java.awt.Point p = e.getPoint();
-//						int index = columnModel.getColumnIndexAtX(p.x);
-//						int realIndex = columnModel.getColumn(index)
-//							.getModelIndex();
-//						return StatTable.this.statTableModel.getColumnTypes()
-//							.get(realIndex).getUitleg();
-//					}
-//				};
-//			}
-//		};
-		//this.table.getSelectionModel().addListSelectionListener(this);
-		//this.statTableModel.addTableModelListener(this);
-		//this.statTableModel.addSelectionListener(this);
-//		this.scrollPanel.add(this.table);//setViewportView(this.table);
-//		this.scrollPanel.setHeight("500px");
-
-//		this.rowTable = new RowNumberTable(this.table);
-//		this.scrollPanel.setRowHeaderView(this.rowTable);
-//		this.scrollPanel.setCorner(ScrollPanel.UPPER_LEFT_CORNER,
-//			this.rowTable.getTableHeader());
 
 		this.menuBar = new MenuBar();
 		this.popupMenu = new PopupPanel(true);
@@ -441,8 +413,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.editDataPanel.getElement().getStyle().setBackgroundColor("lemonchiffon");
 		super.addSouth(this.editDataPanel, 3);//, BorderLayout.SOUTH);
 //		super.add(this.scrollPanel);//, BorderLayout.CENTER); // moet als laatste
-		super.add(this.table);//, BorderLayout.CENTER); // moet als laatste
-//		super.add(vPanel);
+		//super.add(this.table);//, BorderLayout.CENTER); // moet als laatste
+		super.add(tablePanel);
 		//this.add(this.editDataPanel);//, BorderLayout.SOUTH);
 //		this.setWidgetLeftWidth(this.editDataPanel, 0, Style.Unit.PX, 800, Style.Unit.PX);
 //		this.setWidgetTopHeight(this.editDataPanel, 370, Style.Unit.PX, 30, Style.Unit.PX);
@@ -452,7 +424,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    
 		this.update();
 		// set the right selection
-		this.selectionChanged();
+		this.setSelectionFromModelInTable();
 	}
 	
 	private void createEditCommand()
@@ -1236,30 +1208,34 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //		}
 //	}
 
-	public void selectionChanged()
+	/**
+	 * De selectie uit StatTableModel wordt in de tabel gezet
+	 */
+	public void setSelectionFromModelInTable()
 	{
-		//System.out.println("selection Changed called");
-		//ListSelectionModel selectionModel = this.table.getSelectionModel();
+		GWT.log("StatTable.setSelectionFromModelInTable()");
+
 		MultiSelectionModel<Object> selectionModel = (MultiSelectionModel<Object>) this.table.getSelectionModel();
-		//selectionModel.removeListSelectionListener(this); // moet met HandlerRegistration if needed... 
+		List<List<String>> list = (List<List<String>>) this.dataProvider.getList();
 
 		for (int row = 0; row < this.statTableModel.getRowCount(); row++)
 		{
-			Object rowObject = this.statTableModel.getValues().get(row);//this.table.getRowElement(row);
+			//Object rowObject = this.statTableModel.getValues().get(row);//this.table.getRowElement(row); // hier zit geen rowIndex bij!, dus vergelijkt hij op de laatste (echte) kolom
+			Object rowObject = list.get(row);
+			
 			if (this.statTableModel.isRowSelected(row)
 				&& !selectionModel.isSelected(rowObject))
 			{
 				// System.out.println("Selecting row " + row);
-				selectionModel.setSelected(rowObject, true);//addSelectionInterval(row, row);
+				selectionModel.setSelected(rowObject, true);
 			}
 			else if (!this.statTableModel.isRowSelected(row)
 				&& selectionModel.isSelected(rowObject))
 			{
 				// System.out.println("Deselecting row " + row);
-				selectionModel.setSelected(rowObject, false);//removeSelectionInterval(row, row);
+				selectionModel.setSelected(rowObject, false);
 			}
 		}
-		//selectionModel.addListSelectionListener(this); // iets met HasSelectionHandler, onSelection()
 	}
 
 	public String toString()
@@ -1398,6 +1374,139 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	} // class StatTableClickHandler
 	
+	class StatTableColumn extends Column 
+		implements Comparator
+	{
+		int columnIndex;
+//		AllowedTypes type;
+		ColumnType type;
+
+		public StatTableColumn(TextInputCell cell, ColumnType type)
+		{
+			super(cell);
+			this.columnIndex = StatTable.this.getTempColumnIndex();
+			// type can be numerical or string
+			this.type = type;
+			this.setCellStyleNames(statistiekCss.dataGridCell());
+		}
+
+		public StatTableColumn(SelectionCell enumCell, ColumnType type)
+		{
+			super(enumCell);
+			this.columnIndex = StatTable.this.getTempColumnIndex();
+			// a selectioncell is always type enum
+			this.type = type;
+			this.setCellStyleNames(statistiekCss.dataGridCell());
+		}
+
+		public int getColumnIndex()
+		{
+			return this.columnIndex;
+		}
+
+		@Override
+		public Object getValue(Object object)
+		{
+			return object == null ? "" : ((List<String>) object).get(this.columnIndex);
+		}
+
+//		public int compare(List<String> o1, List<String> o2)
+//		{
+//			return o1.get(this.columnIndex).compareTo(o2.get(this.columnIndex));
+//		}
+		
+		@Override
+		public int compare(Object o1, Object o2)
+		{
+			int returnValue = type.compare(((List<String>) o1).get(this.columnIndex), ((List<String>) o2).get(this.columnIndex));
+			
+			return returnValue;
+			
+//			if (this.type.equals(AllowedTypes.STRING))
+//			{
+//				returnValue = ((List<String>) o1).get(this.columnIndex).compareTo(((List<String>) o2).get(this.columnIndex));
+//			}
+//			else if (this.type.equals(AllowedTypes.ENUM))
+//			{
+//				
+//			}
+//			else
+//			{
+//				// numerical value
+//				returnValue = Double.valueOf(((List<String>) o1).get(this.columnIndex)).compareTo(Double.valueOf(((List<String>) o2).get(this.columnIndex)));
+//			}
+//			return returnValue;
+		}
+		
+//		@Override
+//		/** 
+//		 * This method seems to prevent FieldUpdater.update() to be triggered.
+//		 * Should finishediting be called which then calles the update() method? How?
+//		 */
+//		public void onBrowserEvent(Cell.Context context, Element elem, Object object, NativeEvent event)
+//		{
+//			GWT.log("StatTable.StatTableColumn.onBrowserEvent(): column index = " + context.getColumn());
+//			
+//	        int button = event.getButton();
+//	        EventTarget target = event.getEventTarget();
+//	        
+//	        if (button == NativeEvent.BUTTON_LEFT) 
+//	        {
+//	        	//GWT.log("StatTable.onBrowserEvent(): left!");
+//	            //doLeftClick(cell);
+//	        }
+//	        else if (button == NativeEvent.BUTTON_RIGHT) 
+//	        {
+//	        	//GWT.log("StatTable.onBrowserEvent(): right!");
+//	            //event.preventDefault();
+//	            //doRightClick(cell);
+//	        }
+//
+//		}
+		
+	} // class StatTableColumn
+	
+
+	private static class StatTableTextHeader extends TextHeader
+	{
+
+		private ClickHandler handler;
+
+		public StatTableTextHeader(String text, ClickHandler handler)
+		{
+			super(text);
+			this.handler = handler;
+		}
+
+		@Override
+		public void onBrowserEvent(Context context, final Element elem,
+			final NativeEvent event)
+		{
+
+			// maybe hijack click event
+			if (handler != null)
+			{
+
+				if (Event.ONCLICK == Event.getTypeInt(event.getType()))
+				{
+
+					handler.onClick(new ClickEvent()
+					{
+						{
+							setNativeEvent(event);
+							setRelativeElement(elem);
+							setSource(StatTableTextHeader.this);
+						}
+					});
+				}
+			}
+
+			// default dom event handler
+			super.onBrowserEvent(context, elem, event);
+		}
+	} // class StatTableTextHeader
+	
+	
 	class ImportMessageDialogBox extends DialogBox
 	{
 		private Label message = new Label();
@@ -1450,23 +1559,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		GWT.log("StatTable.update()");
 		
-		this.updateColumns();
+//		this.updateColumns();
 
 		ArrayList<ArrayList<Object>> values = this.statTableModel.getValues();
 		//GWT.log("StatTable.update(): values.size() = "+ values.size());
 		//GWT.log("StatTable.update(): values.get(0) = "+ values.get(0)); // this is a data row
-		
-		ArrayList<List<String>> columns = new ArrayList<List<String>>();
-		
-//		for (int j = 0; j < values.get(0).size(); j ++) // j loops over the columns
-//		{
-//			List<String> column = new ArrayList<String>();
-//			for (int i = 0; i < values.size(); i++) // i loops over the rows
-//			{
-//				column.add((String) values.get(i).get(j));
-//			}
-//			columns.add(column);
-//		}
 		
 		ArrayList<List<String>> rows = new ArrayList<List<String>>();
 		
@@ -1484,15 +1581,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		dataProvider = new ListDataProvider<List<String>>();
 		dataProvider.addDataDisplay(this.table);
 
+		// test syl: na zetten van dataProvider de kolommen opnieuw maken...
+		this.updateColumns();
+		
 		// test syl
 //		this.dataProvider.getList().addAll(columns);
 		this.dataProvider.getList().addAll(rows);
 		this.dataProvider.refresh();
 		this.dataProvider.flush();
 		this.table.setVisibleRange(0, values.size());
+		this.updateSelectionModel();
 		this.table.redraw();
 	}
 
+	private void updateSelectionModel()
+	{
+	    this.table.setSelectionModel(selectionModel, DefaultSelectionEventManager
+	        .<List<String>> createCheckboxManager());	    
+	}
+
+	/**
+	 * Remove and create the columns in the table.
+	 */
 	private void updateColumns()
 	{
 		// remove columns
@@ -1504,10 +1614,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		// Checkbox column. This table will uses a checkbox column for
 		// selection.
 		// Alternatively, you can call dataGrid.setSelectionEnabled(true) to
-		// enable
-		// mouse selection.
+		// enable mouse selection. [METHOD NOT AVAILABLE??]
+
 		Column<List<String>, Boolean> checkColumn = new Column<List<String>, Boolean>(
-			new CheckboxCell(true, false))
+			new CheckboxCell(true, false))// false))
 		{
 			@Override
 			public Boolean getValue(List<String> s)
@@ -1519,6 +1629,23 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				return selectionModel.isSelected(s);
 			}
 		};
+		
+		checkColumn
+			.setFieldUpdater(new FieldUpdater<List<String>, Boolean>()
+			{
+				@Override
+				public void update(int rowIndex, List<String> s,
+					Boolean value)
+				{
+					GWT.log("StatTable.updateColumns(): checkbox, rowIndex = "
+						+ rowIndex + ", value = " + value
+						+ ", columnIndex = " + 0);
+					
+					// setSelectionList van StatTableModel 
+					StatTable.this.statTableModel.setSelected(rowIndex, value);
+				}
+			});
+		
 		this.table.addColumn(checkColumn,
 			SafeHtmlUtils.fromSafeConstant("<br/>"));
 		this.table.setColumnWidth(checkColumn, 40, Unit.PX);
@@ -1540,17 +1667,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				SelectionCell enumCell = new SelectionCell(
 					Arrays.asList(enumOptions));
 
-				Column<List<String>, String> enumColumn = new Column<List<String>, String>(
-					enumCell)
-				{
-					int columnIndex = StatTable.this.getTempColumnIndex();
-
-					@Override
-					public String getValue(List<String> s)
-					{
-						return s == null ? "" : s.get(columnIndex);
-					}
-				};
+				ColumnType type = this.statTableModel.getColumnTypes().get(i);
+				
+				Column<List<String>, String> enumColumn = new StatTableColumn(enumCell, type);
 
 				enumColumn
 					.setFieldUpdater(new FieldUpdater<List<String>, String>()
@@ -1572,35 +1691,30 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					});
 				
 			    // test syl
-				sortHandler.setComparator(enumColumn, new Comparator<List<String>>()
-				{
-					int columnIndex = StatTable.this.getTempColumnIndex();
-
-					@Override
-					public int compare(List<String> o1, List<String> o2)
-					{
-						return o1.get(columnIndex).compareTo(o2.get(columnIndex));
-					}
-				});
+//				sortHandler.setComparator(enumColumn, new Comparator<List<String>>()
+//				{
+//					int columnIndex = StatTable.this.getTempColumnIndex();
+//
+//					@Override
+//					public int compare(List<String> o1, List<String> o2)
+//					{
+//						ColumnType type = StatTable.this.statTableModel.getColumnTypes().get(columnIndex);
+//						int returnValue = type.compare(((List<String>) o1).get(this.columnIndex), ((List<String>) o2).get(this.columnIndex));
+//						return returnValue;
+//						//return o1.get(columnIndex).compareTo(o2.get(columnIndex));
+//					}
+//				});
 
 				enumColumn.setSortable(true);
 				enumColumn.setCellStyleNames(statistiekCss.selectioncell());
 				this.table.addColumn(enumColumn, headers.get(i));
-				this.table.setColumnWidth(enumColumn, 10.0, Unit.EM);
+				this.table.setColumnWidth(enumColumn, 8.0, Unit.EM);
 			} // ENUM
 			else
 			{
-				Column<List<String>, String> column = new Column<List<String>, String>(
-					new TextInputCell())
-				{
-					int columnIndex = StatTable.this.getTempColumnIndex();
-
-					@Override
-					public String getValue(List<String> s)
-					{
-						return s == null ? "" : s.get(columnIndex);
-					}
-				};
+				//AllowedTypes type = this.statTableModel.getColumnTypes().get(i).getType();
+				ColumnType type = this.statTableModel.getColumnTypes().get(i);
+				Column<List<String>, String> column = new StatTableColumn(new TextInputCell(), type);
 
 				column.setFieldUpdater(new FieldUpdater<List<String>, String>()
 				{
@@ -1625,26 +1739,29 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				});
 
 			    // test syl
-				sortHandler.setComparator(column, new Comparator<List<String>>()
-				{
-					int columnIndex = StatTable.this.getTempColumnIndex();
-
-					@Override
-					public int compare(List<String> o1, List<String> o2)
-					{
-						return o1.get(columnIndex).compareTo(o2.get(columnIndex));
-					}
-				});
+//				this.sortHandler.setComparator(column, new Comparator<List<String>>()
+//				{
+//					final int columnIndex = StatTable.this.getTempColumnIndex();
+//
+//					@Override
+//					public int compare(List<String> o1, List<String> o2)
+//					{
+//						ColumnType type = StatTable.this.statTableModel.getColumnTypes().get(columnIndex);
+//						int returnValue = type.compare(((List<String>) o1).get(this.columnIndex), ((List<String>) o2).get(this.columnIndex));
+//						return returnValue;
+////						return o1.get(this.columnIndex).compareTo(o2.get(this.columnIndex));
+//					}
+//				});
 
 				column.setSortable(true);
 				column.setCellStyleNames(statistiekCss.textinputcell());
 				this.table.addColumn(column, headers.get(i));
-				this.table.setColumnWidth(column, 10.0, Unit.EM);
+				this.table.setColumnWidth(column, 8.0, Unit.EM);
 			}
 		} // for-loop over columns
 		
 		// test syl: even buiten fieldupdater
-		dataProvider.flush();
+		this.dataProvider.flush();
 		if ((table.getRowCount() == 19) && (table.getColumnCount() == 12))
 			table.getRowElement(18).getCells().getItem(11).scrollIntoView();
 		
@@ -1654,16 +1771,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			@Override
 			public void onColumnSort(ColumnSortEvent event)
 			{
-				System.out.println("StatTable.updateColumns().onColumnSort()");
+//				GWT.log("StatTable.updateColumns().onColumnSort(): ((StatTableColumn) event.getColumn()).getColumnIndex() = " + ((StatTableColumn) event.getColumn()).getColumnIndex());
 				
-				List<? extends List<String>> newData = new ArrayList(table.getVisibleItems());
+//				List<? extends List<String>> newData = new ArrayList(table.getVisibleItems());
+				List<List<String>> newData = new ArrayList<List<String>>(table.getVisibleItems());
 				if (event.isSortAscending())
 				{
-					Collections.sort(newData, (Comparator) event.getColumn());
+					Collections.sort(newData, (Comparator) event.getColumn()); // dit roept StatTableColumn.compare() aan 
 				}
 				else
 				{
-					Collections.sort(newData, (Comparator) event.getColumn());
+					Collections.sort(newData, (Comparator) event.getColumn()); // dit roept StatTableColumn.compare() aan
 					Collections.reverse(newData);
 				}
 				table.setRowData(newData);
@@ -1671,8 +1789,51 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		};
         
         // sorthandler is hierboven geupdate
-		table.addColumnSortHandler(columnSortHandler);
-		table.addColumnSortHandler(sortHandler);
+		this.table.addColumnSortHandler(columnSortHandler);
+		this.table.addColumnSortHandler(sortHandler);
+		
+		// add handler for right mouse click
+		this.table.addHandler(new MouseDownHandler() {
+			@Override
+			public void onMouseDown(MouseDownEvent event)
+			{
+		        //Cell cell = StatTable.this.table.getCellForEvent(event);
+		        int button = event.getNativeEvent().getButton();
+		        
+		        if (button == NativeEvent.BUTTON_LEFT) 
+		        {
+//		        	System.out.println("StatTable.updateColumns().onMouseDown(): left!");
+		            //doLeftClick(cell);
+		        }
+		        else if (button == NativeEvent.BUTTON_RIGHT) 
+		        {
+//		        	System.out.println("StatTable.updateColumns().onMouseDown(): right!");
+		            event.preventDefault();
+		            //doRightClick(cell);
+		        }
+			}
+		}, MouseDownEvent.getType());
+		
+		this.table.addHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event)
+			{
+		        //Cell cell = StatTable.this.table.getCellForEvent(event);
+		        int button = event.getNativeEvent().getButton();
+		        
+		        if (button == NativeEvent.BUTTON_LEFT) 
+		        {
+//		        	System.out.println("StatTable.updateColumns().onClick(): left!");
+		            //doLeftClick(cell);
+		        }
+		        else if (button == NativeEvent.BUTTON_RIGHT) 
+		        {
+//		        	System.out.println("StatTable.updateColumns().onClick(): right!");
+		            event.preventDefault();
+		            //doRightClick(cell);
+		        }
+			}
+		}, ClickEvent.getType());
 	}
 
 	/**
@@ -1701,6 +1862,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public void onSelectionChange(SelectionChangeEvent event)
 	{
 		GWT.log("StatTable.onSelectionChange()");
+		this.setSelectionFromModelInTable();
 		this.update();
 	}
 }
