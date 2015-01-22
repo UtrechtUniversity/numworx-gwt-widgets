@@ -125,7 +125,7 @@
 }
 
 .horizontalrule {
-border: 0;
+	border: 0;
     height: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
@@ -142,4 +142,22 @@ border: 0;
     -webkit-box-sizing: border-box;
        -moz-box-sizing: border-box;
             box-sizing: border-box;
+}
+
+.dataGridCell td div{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -ms-text-overflow: ellipsis;
+}
+
+.dataGrid {
+     overflow: hidden;
+     white-space: nowrap;
+     table-layout: fixed;
+}
+
+td div{
+   overflow-x:hidden;
 }
