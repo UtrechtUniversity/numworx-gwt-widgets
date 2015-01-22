@@ -6,11 +6,11 @@ public class SelectionChangeEvent extends GwtEvent<SelectionChangeEventHandler>
 {
 	public static Type<SelectionChangeEventHandler> TYPE = new Type<SelectionChangeEventHandler>();
 
-	private final String info;
+	private final String sender;
 
-    public SelectionChangeEvent(String info) 
+    public SelectionChangeEvent(String sender) 
     {
-        this.info = info;
+        this.sender = sender;
     }
 
 	@Override
@@ -25,8 +25,12 @@ public class SelectionChangeEvent extends GwtEvent<SelectionChangeEventHandler>
 		handler.onSelectionChange(this);
 	}
 
-	public String getInfo() 
+	/**
+	 * Get the sender name.
+	 * @return
+	 */
+	public String getSenderName() 
 	{
-        return this.info;
+        return this.sender;
     }
 }
