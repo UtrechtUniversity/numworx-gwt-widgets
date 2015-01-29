@@ -150,12 +150,13 @@
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
+    outline: none;
 }
 
 .dataGrid {
      overflow: hidden;
      white-space: nowrap;
-     table-layout: fixed;
+     table-layout: auto;
 }
 
 td div{
