@@ -57,7 +57,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	private TextBox addEnumElementField;
 	// private JTextArea enumElementsView;
 	private ListBox enumElementsList; // was: OrderableJList
-//	private ArrayList<String> stringOptions;
+	private ArrayList<String> stringOptions;
 	private AllowedTypes originalColumnType;
 	private LayoutPanel enumScrollPanel; // was: JScrollPane
 	/**
@@ -87,6 +87,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	private Button okButton;
 	private Button cancelButton;
 
+	boolean isViewOnly = false;
 
 	private String font;
 
@@ -102,12 +103,17 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	 * @param model
 	 *            MVC Model
 	 */
-	public ColumnDialogView(ColumnDialogModel model)
+	public ColumnDialogView(ColumnDialogModel model, String text)
 	{
 		super(false, true);
 		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		super.setText(StatistiekGWT.rb.getString("addacolumn"));
+		super.setText(text);
 		this.getElement().getStyle().setBackgroundColor("GREY");
+		
+		if (text.equals(StatistiekGWT.rb.getString("columninfo")))
+		{
+			this.isViewOnly = true;
+		}
 
 		this.model = model;
 		//this.model.addObserver(this);
@@ -174,10 +180,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	 */
 	private void initialize()
 	{
-		//super.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
 		this.font = StatistiekGWT.fontString;
-//		Border border = BorderFactory.createEmptyBorder(5, 0, 5, 5);
 
 		this.kiesNaam = new Label(StatistiekGWT.rb.getString("columnname"));
 		this.nameField = new TextBox();
@@ -374,25 +377,68 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.add(this.alles);
 		
 		this.originalColumnType = this.model.getType();
-//		this.setStringOptions();
+		this.setStringOptions();
+		
+		if (this.isViewOnly)
+		{
+			this.setColumnInfoMode(false);
+		}
 
 		this.update();
 	}
 
-//	private void setStringOptions()
-//	{
-//		// Voor integerkolommen (dus ook nieuwe kolom) worden bij een switch naar enum 
-//		// de waarden niet vooringevuld in stringoptions
-//		if (this.wasInteger())
-//		{
-//			this.stringOptions = new ArrayList<String>();
-//		}
-//		else if (!this.wasEnum())
-//		{
-//			this.stringOptions = this.model.getTableModel().
-//				getStringOptions(this.model.getColumnIndex());
-//		}
-//	}
+	/**
+	 * Set column info mode yes/no, i.e. in column info mode
+	 * show info fields disabled 
+	 * and hide the irrelevant components.
+	 * 
+	 * @param b column info mode yes/no
+	 */
+	private void setColumnInfoMode(boolean b)
+	{
+		// set enabled
+		this.nameField.setEnabled(b);
+		this.typeBox.setEnabled(b);
+		this.enumElementsList.setEnabled(b);
+		this.uitlegArea.setEnabled(b);
+
+		// hide or show add enum element components
+		this.addEnumElementLabel.setVisible(b);
+		this.addEnumElementField.setVisible(b);
+		this.removeSelectedElement.setVisible(b);
+		this.removeAllElements.setVisible(b);
+		this.sortElements.setVisible(b);
+		this.moveElementUp.setVisible(b);
+		this.moveElementDown.setVisible(b);
+		// hide or show cancel button
+		this.cancelButton.setVisible(b);
+	}
+
+	private void setStringOptions()
+	{
+		// Voor integerkolommen (dus ook nieuwe kolom) worden bij een switch naar enum 
+		// de waarden niet vooringevuld in stringoptions
+		if (this.wasInteger())
+		{
+			this.stringOptions = new ArrayList<String>();
+		}
+		else if (!this.wasEnum())
+		{
+			// new ArrayList, else the model's stringoptions may be altered
+			this.stringOptions = new ArrayList<String>(this.model.getTableModel().
+				getStringOptions(this.model.getColumnIndex()));
+		}
+	}
+	
+	/**
+	 * Reset to the model's original stringoptions when the column dialog was opened.
+	 * Used in case of altering stringoptions and cancelling the action.
+	 */
+	public void resetOriginalStringOptions()
+	{
+		this.stringOptions = this.model.getTableModel().
+			getStringOptions(this.model.getColumnIndex());
+	}
 
 	/**
 	 * Select the column's type in the type box. 
@@ -543,18 +589,18 @@ public class ColumnDialogView extends DialogBox// implements Observer
 
 		// Update the list with options of current enumeration
 		// or with string options if there is no current enumeration
-//		if (this.wasEnum())
-//		{
+		if (this.wasEnum())
+		{
 			this.fillEnumElementsList(this.model.getEnumOptions());
 			//this.enumElementsList.setModel(new OrderableJListModel(this.model.getEnumOptions()));
-//		}
-//		else
-//		{
-//			// vul met stringOptions
-//			this.fillEnumElementsList(this.stringOptions);
-////			this.enumElementsList.setModel(new OrderableJListModel(
-////				this.stringOptions));
-//		}
+		}
+		else
+		{
+			// vul met stringOptions
+			this.fillEnumElementsList(this.stringOptions);
+//			this.enumElementsList.setModel(new OrderableJListModel(
+//				this.stringOptions));
+		}
 
 		this.nameField.setText(this.model.getName());
 
@@ -634,112 +680,112 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		return this.originalColumnType.equals(AllowedTypes.INTEGER);
 	}
 
-//	public void removeStringOption(int index)
-//	{
-//		if (index > -1)
-//		{
-//			this.stringOptions.remove(index);
-//		}
-//	}
+	public void removeStringOption(int index)
+	{
+		if (index > -1)
+		{
+			this.stringOptions.remove(index);
+		}
+	}
 
-//	public void addStringOption(String s)
-//	{
-//		this.stringOptions.add(s);
-//	}
+	public void addStringOption(String s)
+	{
+		this.stringOptions.add(s);
+	}
 
 	/**
 	 * Add the options in stringOptions to the enum options.
 	 */
-//	public void updateEnumOptions()
-//	{
-//		for (int i = 0; i < this.stringOptions.size(); i++)
-//		{
-//			String newElement = (String) this.stringOptions.get(i);
-//			this.model.addEnumOptionWithoutEvent(newElement);
-//		}
-//	}
+	public void updateEnumOptions()
+	{
+		for (int i = 0; i < this.stringOptions.size(); i++)
+		{
+			String newElement = (String) this.stringOptions.get(i);
+			this.model.addEnumOptionWithoutEvent(newElement);
+		}
+	}
 
 	/**
 	 * Remove all string options except '*' from the string options.
 	 */
-//	public void removeAllStringOptions()
-//	{
-//		for (int i = this.stringOptions.size() - 1; i > -1 ; i--)
-//		{
-//			if (!this.stringOptions.get(i).equals(ColumnType.WILDCARD))
-//			{
-//				this.stringOptions.remove(i);
-//			}
-//		}
-//	}
+	public void removeAllStringOptions()
+	{
+		for (int i = this.stringOptions.size() - 1; i > -1 ; i--)
+		{
+			if (!this.stringOptions.get(i).equals(ColumnType.WILDCARD))
+			{
+				this.stringOptions.remove(i);
+			}
+		}
+	}
 
 	/**
 	 * Sort string options alphabetically ascending.
 	 */
-//	public void sortStringOptions()
-//	{
-//		String[] sortedStringOptions = new String[this.stringOptions.size()];
-//		sortedStringOptions = this.stringOptions.toArray(sortedStringOptions);
-//		
-//		Arrays.sort(sortedStringOptions, new Comparator<String>() {
-//            @Override
-//            /**
-//             * Compare strings alphabetically. 
-//             * A wildcard is larger than any other string.
-//             * @param s1
-//             * @param s2
-//             * @return
-//             */
-//            public int compare(String s1, String s2) 
-//            {
-//            	// check for wildcard among the strings
-//            	if (s1.equals(ColumnType.WILDCARD))
-//            		return 1;
-//            	else if (s2.equals(ColumnType.WILDCARD))
-//            		return -1;
-//            	else 
-//            	{
-//            		// apart from '*' sort the enum options alphabetically
-//            		return s1.compareTo(s2);
-//            	}
-//            }
-//        });
-//		
-//		this.stringOptions = new ArrayList(Arrays.asList(sortedStringOptions));
-//	}
+	public void sortStringOptions()
+	{
+		String[] sortedStringOptions = new String[this.stringOptions.size()];
+		sortedStringOptions = this.stringOptions.toArray(sortedStringOptions);
+		
+		Arrays.sort(sortedStringOptions, new Comparator<String>() {
+            @Override
+            /**
+             * Compare strings alphabetically. 
+             * A wildcard is larger than any other string.
+             * @param s1
+             * @param s2
+             * @return
+             */
+            public int compare(String s1, String s2) 
+            {
+            	// check for wildcard among the strings
+            	if (s1.equals(ColumnType.WILDCARD))
+            		return 1;
+            	else if (s2.equals(ColumnType.WILDCARD))
+            		return -1;
+            	else 
+            	{
+            		// apart from '*' sort the enum options alphabetically
+            		return s1.compareTo(s2);
+            	}
+            }
+        });
+		
+		this.stringOptions = new ArrayList(Arrays.asList(sortedStringOptions));
+	}
 
 	/**
 	 * Swap string options with index1 and index2. A wildcard is not swapped
 	 * @param index1
 	 * @param index2
 	 */
-//	public void swapStringOptions(int index1, int index2)
-//	{
-//		if (this.validStringOptionsIndex(index1) && this.validStringOptionsIndex(index2)
-//			&& !this.stringOptions.get(index1).equals(ColumnType.WILDCARD) // the wildcard should stay at the end
-//			&& !this.stringOptions.get(index2).equals(ColumnType.WILDCARD))
-//		{
-//			Collections.swap(this.stringOptions, index1, index2);
-//		}
-//	}
+	public void swapStringOptions(int index1, int index2)
+	{
+		if (this.validStringOptionsIndex(index1) && this.validStringOptionsIndex(index2)
+			&& !this.stringOptions.get(index1).equals(ColumnType.WILDCARD) // the wildcard should stay at the end
+			&& !this.stringOptions.get(index2).equals(ColumnType.WILDCARD))
+		{
+			Collections.swap(this.stringOptions, index1, index2);
+		}
+	}
 
 	/**
 	 * Check whether index is a valid index in string options.
 	 * @param index
 	 * @return True if index is a valid index, else false.
 	 */
-//	private boolean validStringOptionsIndex(int index)
-//	{
-//		boolean isValid = false;
-//		
-////		if ((this.enumOptions == null) || this.enumOptions.size() == 0)
-////			isValid = false;
-////		else 
-//			if ((index > -1) && (index < this.stringOptions.size()))
-//			isValid = true;
-//		
-//		return isValid;
-//	}
+	private boolean validStringOptionsIndex(int index)
+	{
+		boolean isValid = false;
+		
+//		if ((this.enumOptions == null) || this.enumOptions.size() == 0)
+//			isValid = false;
+//		else 
+		if ((index > -1) && (index < this.stringOptions.size()))
+			isValid = true;
+		
+		return isValid;
+	}
 
 	public TextBox getAddEnumElementField()
 	{
