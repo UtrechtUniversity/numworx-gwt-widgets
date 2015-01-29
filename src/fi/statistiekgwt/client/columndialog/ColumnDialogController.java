@@ -274,94 +274,93 @@ public class ColumnDialogController
 		{
 			if (e.getSource() == ColumnDialogController.this.view.getRemoveSelectedElement())
 			{
-//				if (ColumnDialogController.this.wasEnum())
-//				{
+				if (ColumnDialogController.this.wasEnum())
+				{
 					ColumnDialogController.this.model.removeEnumOption(
 						ColumnDialogController.this.view.getSelectedOptionInListIndex());
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.removeStringOption(
-//						ColumnDialogController.this.view.getSelectedOptionInListIndex());
-//					ColumnDialogController.this.view.update();
-//				}
+
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+				else
+				{
+					ColumnDialogController.this.view.removeStringOption(
+						ColumnDialogController.this.view.getSelectedOptionInListIndex());
+					ColumnDialogController.this.view.update();
+				}
 					
-				ColumnDialogController.this.view.update();
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getRemoveAllElements())
 			{
-//				if (ColumnDialogController.this.wasEnum())
-//				{
+				if (ColumnDialogController.this.wasEnum())
+				{
 					ColumnDialogController.this.model.removeAllEnumOption();
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.removeAllStringOptions();
-//					ColumnDialogController.this.view.update();
-//				}
-				
-				ColumnDialogController.this.view.update();
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+				else
+				{
+					ColumnDialogController.this.view.removeAllStringOptions();
+					ColumnDialogController.this.view.update();
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getSortElements())
 			{
-//				if (ColumnDialogController.this.wasEnum())
-//				{
+				if (ColumnDialogController.this.wasEnum())
+				{
 					ColumnDialogController.this.model.sortEnumOptions();
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.sortStringOptions();
-//					ColumnDialogController.this.view.update();
-//				}
-				
-				ColumnDialogController.this.view.update();
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+				else
+				{
+					ColumnDialogController.this.view.sortStringOptions();
+					ColumnDialogController.this.view.update();
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getMoveElementUp())
 			{
 				int index = ColumnDialogController.this.view.getSelectedOptionInListIndex();
 				
-//				if (ColumnDialogController.this.wasEnum())
-//				{
+				if (ColumnDialogController.this.wasEnum())
+				{
 					ColumnDialogController.this.model.swapEnumOptions(index,
 						index - 1);
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.swapStringOptions(index,
-//						index - 1);
-//					ColumnDialogController.this.view.update();
-//				}
-				
-				ColumnDialogController.this.view.update();
-				
-				ColumnDialogController.this.view.setSelectedOptionInListIndex(index - 1);
-
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.view.setSelectedOptionInListIndex(index - 1);
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+				else
+				{
+					ColumnDialogController.this.view.swapStringOptions(index,
+						index - 1);
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.view.setSelectedOptionInListIndex(index - 1);
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getMoveElementDown())
 			{
 				int index = ColumnDialogController.this.view.getSelectedOptionInListIndex();
 				
-//				if (ColumnDialogController.this.wasEnum())
-//				{
+				if (ColumnDialogController.this.wasEnum())
+				{
 					ColumnDialogController.this.model.swapEnumOptions(index,
 						index + 1);
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.swapStringOptions(index,
-//						index + 1);
-//					ColumnDialogController.this.view.update();
-//				}
-				
-				ColumnDialogController.this.view.update();
-				
-				ColumnDialogController.this.view.setSelectedOptionInListIndex(index + 1);
-
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.view.setSelectedOptionInListIndex(index + 1);
+					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				}
+				else
+				{
+					ColumnDialogController.this.view.swapStringOptions(index,
+						index + 1);
+					ColumnDialogController.this.view.update();
+					ColumnDialogController.this.view.setSelectedOptionInListIndex(index + 1);
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getOkButton())
 			{
@@ -382,11 +381,11 @@ public class ColumnDialogController
 				else
 				{
 					// als type gewijzigd in enum, update enum options
-//					if (!ColumnDialogController.this.wasEnum() 
-//						&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
-//					{
-//						ColumnDialogController.this.view.updateEnumOptions();
-//					}
+					if (!ColumnDialogController.this.wasEnum() 
+						&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
+					{
+						ColumnDialogController.this.view.updateEnumOptions();
+					}
 
 					// send an edit column event
 					EditColumnEvent event = new EditColumnEvent(
@@ -399,12 +398,17 @@ public class ColumnDialogController
 				}
 				
 				// test syl: remove handler statTableModel from ColumnDialogModel
-				ColumnDialogController.this.getHandlerRegistration().removeHandler();
+				HandlerRegistration registration = ColumnDialogController.this.getHandlerRegistration(); 
+				if (registration != null) // null in case of column info mode
+					registration.removeHandler();
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getCancelButton())
 			{
 				ColumnDialogController.this.view.setVisible(false);
 				ColumnDialogController.this.view.hide();
+
+				// test syl: TODO reset stringOptions voor het geval er een stringoption verwijderd is
+				ColumnDialogController.this.view.resetOriginalStringOptions();
 				
 				// test syl: remove handler statTableModel from ColumnDialogModel
 				ColumnDialogController.this.getHandlerRegistration().removeHandler();
