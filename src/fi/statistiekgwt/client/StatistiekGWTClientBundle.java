@@ -14,6 +14,9 @@ public interface StatistiekGWTClientBundle extends ClientBundle
 	@Source("fi/statistiekgwt/client/images/arrow-199-16_525252down.gif")
 	public ImageResource arrowDownResource();
 	
+	@Source("fi/statistiekgwt/client/images/cross.png")
+	public ImageResource crossResource();
+	
 	@Source("fi/statistiekgwt/client/css/StatistiekGWT.css")
 	public  StatistiekCssResource getStatistiekGWTCSS();
 }
