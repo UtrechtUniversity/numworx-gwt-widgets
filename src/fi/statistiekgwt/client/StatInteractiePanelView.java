@@ -14,10 +14,14 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.touch.client.Point;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -71,6 +75,9 @@ public class StatInteractiePanelView extends LayoutPanel
 	private int selectedViewInTabPane = 0;
 
 	private ArrayList<SeparateViewDialog> dialogs;
+	
+	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	StatistiekCssResource statistiekCss;
 
 	/**
 	 * Constructor
@@ -85,6 +92,10 @@ public class StatInteractiePanelView extends LayoutPanel
 		double barHeight,
 		Unit barUnit)
 	{
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
+
 		this.initTabPanel(barHeight, barUnit);
 
 		this.initModel(model);
@@ -618,7 +629,9 @@ public class StatInteractiePanelView extends LayoutPanel
 				for (int i = 0; i < views.size(); i++)
 				{
 					StatistiekView view = views.get(i);
-					this.tabPanel.add(view.getWidget(), view.getViewName());
+//					this.tabPanel.add(view.getWidget(), view.getViewName());
+					// test syl: tab title with cross
+					this.tabPanel.add(view.getWidget(), this.getTabTitle(view.getWidget(), view.getViewName()));
 //					this.tabPanel.setTabComponentAt(i, new ButtonTabComponent(
 //						this.tabPanel, this.controller));
 				}
@@ -994,7 +1007,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			// TODO Auto-generated method stub
 			
 		}
-	}
+	} //class DraggedTabTouchHandler
 
 	/**
 	 * A Dialog for showing a single StatistiekView
@@ -1091,6 +1104,57 @@ public class StatInteractiePanelView extends LayoutPanel
 			// dit geeft problemen, omdat selectedView niet is gezet
 			// tabPane.setSelectedIndex(selectedTab);
 		}
+	} // class SeparateViewDialog
+	
+	
+	public class ImageAnchor extends Anchor
+	{
+		public ImageAnchor()
+		{
+		}
+
+		public void setResource(ImageResource imageResource)
+		{
+			Image img = new Image(imageResource);
+			img.setStyleName("navbarimg");
+			DOM.insertBefore(getElement(), 
+				img.getElement(),
+				DOM.getFirstChild(getElement()));
+		}
+		
+	} // class ImageAnchor
+	
+	
+	private Widget getTabTitle(final Widget widget, final String title) 
+	{
+
+	    final HorizontalPanel hPanel = new HorizontalPanel();
+	    final Label label = new Label(title);
+	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
+
+	    ImageAnchor closeBtn = new ImageAnchor();
+	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
+
+	    closeBtn.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event)
+			{
+				// test syl: TODO remove tab moet ook de view echt verwijderen anders blijven events doorgestuurd (alleen niet getoond)
+				
+				int widgetIndex = tabPanel.getWidgetIndex(widget);
+				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex);
+				
+				if (widgetIndex == tabPanel.getSelectedIndex())
+				{
+					tabPanel.selectTab(widgetIndex - 1);
+				}
+				tabPanel.remove(widgetIndex);
+			}
+		});
+	    hPanel.add(label);
+	    hPanel.add(new HTML("&nbsp&nbsp&nbsp"));
+	    hPanel.add(closeBtn);
+	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
+	    return hPanel;
 	}
 
 	public ListBox getViewsBox()
