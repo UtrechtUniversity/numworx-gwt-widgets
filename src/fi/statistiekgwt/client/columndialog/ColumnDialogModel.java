@@ -9,10 +9,13 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+
 import fi.statistiekgwt.client.StatTableModel;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
+import fi.statistiekgwt.client.event.EditColumnEvent;
+import fi.statistiekgwt.client.event.EditColumnEventHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
@@ -443,7 +446,7 @@ public class ColumnDialogModel implements HasHandlers// extends Observable
 	}
 
 	/**
-	 * Subscribe for events
+	 * Subscribe for add column events
 	 */
 	public HandlerRegistration addAddColumnEventHandler(AddColumnEventHandler handler)
 	{
@@ -458,5 +461,13 @@ public class ColumnDialogModel implements HasHandlers// extends Observable
 	public String getOldName()
 	{
 		return this.oldName;
+	}
+
+	/**
+	 * Subscribe for edit column events
+	 */
+	public HandlerRegistration addEditColumnEventHandler(EditColumnEventHandler handler)
+	{
+		return bus.addHandler(EditColumnEvent.TYPE, handler);
 	}
 }
