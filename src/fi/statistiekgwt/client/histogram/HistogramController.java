@@ -1,6 +1,5 @@
 package fi.statistiekgwt.client.histogram;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,7 +11,6 @@ import fi.statistiekgwt.client.StatTableModel;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekView;
 import fi.statistiekgwt.client.types.AllowedTypes;
-import fi.statistiekgwt.client.types.ColumnType;
 
 /**
  * MVC Controller for StatistiekView Histogram
