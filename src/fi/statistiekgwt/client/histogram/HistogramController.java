@@ -387,4 +387,10 @@ public class HistogramController implements StatistiekView
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void removeHandlers()
+	{
+		this.view.removeHandlers();
+	}
 }
