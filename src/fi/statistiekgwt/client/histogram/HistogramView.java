@@ -95,6 +95,16 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	 * with the views using StatTableModel.
 	 */
 	EventBus eventBus;
+	/**
+	 * The handler registration used to remove the view's 
+	 * table change event handler occurrence.
+	 */
+	HandlerRegistration tableChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * selection change event handler occurrence.
+	 */
+	HandlerRegistration selectionChangeEventHandlerRegistration;
 	
 	/**
 	 * The number of the highlighted bar, or for frequency polygons the
@@ -129,10 +139,10 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 		
 		// bind histogramview to stattablemodel: to handle table changes in stattablemodel
-		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
+		this.tableChangeEventHandlerRegistration = this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
 
 		// bind histogramview to stattablemodel: to handle selection changes in stattablemodel
-		this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
 		
 		// bind stattablemodel to histogramview: to handle selection changes in histogramview
 		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
@@ -3912,6 +3922,15 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		{
 			this.update();
 		}
+	}
+	
+	/**
+	 * Remove all of this view's handler occurrences.
+	 */
+	public void removeHandlers()
+	{
+		this.tableChangeEventHandlerRegistration.removeHandler();
+		this.selectionChangeEventHandlerRegistration.removeHandler();
 	}
 
 //	@Override
