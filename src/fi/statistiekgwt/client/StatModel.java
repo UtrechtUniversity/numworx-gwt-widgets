@@ -162,8 +162,10 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	 */
 	public void removeView(int viewIndex)
 	{
+		this.views.get(viewIndex).removeHandlers();
 		this.views.remove(viewIndex);
 		this.viewInOwnWindow.remove(viewIndex);
+		
 //		super.setChanged();
 //		super.notifyObservers();
 	}
