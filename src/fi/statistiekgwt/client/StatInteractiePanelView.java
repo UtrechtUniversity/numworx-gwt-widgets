@@ -3,10 +3,13 @@ package fi.statistiekgwt.client;
 import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
@@ -16,6 +19,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.touch.client.Point;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.Anchor;
@@ -27,6 +31,9 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -54,11 +61,20 @@ public class StatInteractiePanelView extends LayoutPanel
 	private TabLayoutPanel tabPanel;
 	private LayoutPanel addViewTab;
 	private ListBox viewsBox, startVarBox, startVar2Box;
+	
 	private HandlerRegistration viewsBoxHandlerRegistration;
 	private HandlerRegistration startVarBoxHandlerRegistration;
 	private HandlerRegistration startVar2BoxHandlerRegistration;
+	
+	//private LabelClickHandler labelClickHandler;
+	
 	private Label addViewLabel;
 	private Label chooseStartVarLabel, chooseStartVar2Label;
+	
+	private PopupPanel popupMenu;
+	private MenuBar menuBar;
+	private MenuItem changeNameItem;
+	private Command changeNameCommand;
 
 	// button to reset the data -> button now implemented in StatTable for
 	// layout reasons
@@ -95,11 +111,13 @@ public class StatInteractiePanelView extends LayoutPanel
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
-
+		
 		this.initTabPanel(barHeight, barUnit);
 
 		this.initModel(model);
 		
+		this.initPopupMenu();
+
 		this.controller = controller;
 		
 		this.dialogs = new ArrayList<SeparateViewDialog>();
@@ -154,9 +172,92 @@ public class StatInteractiePanelView extends LayoutPanel
 		hp.add(vp);
 
 		addViewTab.add(hp);
-
+		
 		this.update();//(null, null);
 	}
+
+	private void initPopupMenu()
+	{
+		// create vertical menubar
+		this.menuBar = new MenuBar(true);
+		this.popupMenu = new PopupPanel(true, true);
+		this.popupMenu.add(this.menuBar);
+
+		this.popupMenu.setVisible(false);
+		this.popupMenu.hide();
+		
+		this.createChangeNameCommand();
+		this.changeNameItem = new MenuItem(StatistiekGWT.rb.getString("changeViewName"), true, changeNameCommand);
+		this.menuBar.addItem(changeNameItem);
+	}
+
+	/**
+	 * Create the column info command for the column's menu bar.
+	 */
+	private void createChangeNameCommand()
+	{
+        this.changeNameCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	hidePopupMenu();
+	        	
+				ChangeViewNameDialog dialogView;
+
+				dialogView = new ChangeViewNameDialog(model, getSelectedViewName(), StatInteractiePanelView.this);
+				
+				dialogView.center();
+				dialogView.show();
+            }
+        };
+	}
+	
+	/**
+	 * Get the view name of the selected tab.
+	 * @return View name
+	 */
+	protected String getSelectedViewName()
+	{
+		int selectedTabIndex = this.tabPanel.getSelectedIndex(); 
+		String name = this.getViews().get(selectedTabIndex).getViewName();
+		
+		return name;
+	}
+
+	/**
+	 * Get the index of the selected tab.
+	 * @return Index
+	 */
+	protected int getSelectedTabIndex()
+	{
+		int selectedTabIndex = this.tabPanel.getSelectedIndex(); 
+		
+		return selectedTabIndex;
+	}
+
+	/**
+	 * Hide the view tab's popup menu.
+	 */
+	protected void hidePopupMenu()
+	{
+    	this.popupMenu.setVisible(false);
+    	this.popupMenu.hide();
+	}
+	
+	/**
+	 * Show the column's popup menu.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	protected void showPopupMenu(int x, int y)
+	{
+		this.popupMenu.setPopupPosition(x, y);
+    	this.popupMenu.setVisible(true);
+    	this.popupMenu.show();
+	}
+
+
 
 	/**
 	 * Set the model and add event handlers.
@@ -589,6 +690,15 @@ public class StatInteractiePanelView extends LayoutPanel
 	{
 		this.tabPanel.selectTab(this.tabPanel.getWidgetCount() - 2);
 	}
+	
+	/**
+	 * Get views.
+	 */
+	private ArrayList<StatistiekView> getViews()
+	{
+		ArrayList<StatistiekView> views = this.model.getMainWindowViews();
+		return views;
+	}
 
 	/**
 	 * Update the views and start var boxes.
@@ -601,7 +711,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			super.remove(i);
 		}
 
-		ArrayList<StatistiekView> views = this.model.getMainWindowViews();
+		ArrayList<StatistiekView> views = this.getViews();//this.model.getMainWindowViews();
 		ArrayList<StatistiekView> separateWindowViews = this.model.getSeparateWindowViews();
 
 		int amountOfTabs = views.size();
@@ -833,6 +943,63 @@ public class StatInteractiePanelView extends LayoutPanel
 			this.startVar2BoxHandlerRegistration = this.startVar2Box.addChangeHandler(controller);
 		}
 	}
+	
+	/**
+	 * Class that handles right mouse click on label.
+	 * 
+	 * @author borku102
+	 *
+	 */
+	public class LabelClickHandler implements ContextMenuHandler//ClickHandler
+	{
+		private Widget widget;
+		private String viewName;
+		
+		public LabelClickHandler(Widget widget, String viewName)
+		{
+			super();
+			this.widget = widget;
+			this.viewName = viewName;
+		}
+
+//		@Override
+//		public void onClick(ClickEvent event)
+//		{
+//			int button = event.getNativeEvent().getButton();
+//			int widgetIndex = tabPanel.getWidgetIndex(widget);
+//			
+//			if (button == NativeEvent.BUTTON_RIGHT)
+//			{
+//				GWT.log("LabelClickHandler.onClick(): right!");
+//				if (StatInteractiePanelView.this.model.getStatTableModel()
+//					.isViewsEditable()
+//					&& widgetIndex >= 0
+//					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
+//				{
+//					GWT.log("LabelClickHandler.onClick(): TODO show change view name dialog");
+//				}
+//			}
+//		}
+
+		@Override
+		public void onContextMenu(ContextMenuEvent event)
+		{
+			// TODO: select tab
+			tabPanel.selectTab(widget);
+			int viewIndex = getIndexOfViewName(viewName);
+			setSelectedView(viewIndex);
+			setSelectedViewInTabPane(viewIndex);
+			
+			if (StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
+			{
+				int x = event.getNativeEvent().getClientX();
+			    int y = event.getNativeEvent().getClientY();
+				showPopupMenu(x, y);
+			}
+		        event.preventDefault(); 
+	    }
+		
+	} // class LabelClickHandler
 
 	/**
 	 * class that handles tabs being dragged out of the TabPanel
@@ -1131,6 +1298,9 @@ public class StatInteractiePanelView extends LayoutPanel
 	    final HorizontalPanel hPanel = new HorizontalPanel();
 	    final Label label = new Label(title);
 	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
+	    
+	    label.addDomHandler(new LabelClickHandler(widget, title), ContextMenuEvent.getType());
+	    label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
 
 	    ImageAnchor closeBtn = new ImageAnchor();
 	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
@@ -1138,16 +1308,27 @@ public class StatInteractiePanelView extends LayoutPanel
 	    closeBtn.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event)
 			{
-				// test syl: TODO remove tab moet ook de view echt verwijderen anders blijven events doorgestuurd (alleen niet getoond)
-				
 				int widgetIndex = tabPanel.getWidgetIndex(widget);
-				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex);
+				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex
+					+ ", widgetCount = " + StatInteractiePanelView.this.tabPanel.getWidgetCount());
 				
-				if (widgetIndex == tabPanel.getSelectedIndex())
+				if (StatInteractiePanelView.this.model.getStatTableModel()
+						.isViewsAddable()
+					&& widgetIndex >= 0
+					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
 				{
-					tabPanel.selectTab(widgetIndex - 1);
+					StatInteractiePanelView.this.model
+						.removeView(StatInteractiePanelView.this.model
+							.mainWindowIndexToGeneralIndex(widgetIndex));
+
+					// set the tabs
+//					if (widgetIndex == tabPanel.getSelectedIndex())
+//					{
+//						tabPanel.selectTab(widgetIndex - 1);
+//					}
+					tabPanel.remove(widgetIndex);
 				}
-				tabPanel.remove(widgetIndex);
+				
 			}
 		});
 	    hPanel.add(label);
@@ -1155,6 +1336,22 @@ public class StatInteractiePanelView extends LayoutPanel
 	    hPanel.add(closeBtn);
 	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
 	    return hPanel;
+	}
+
+	public int getIndexOfViewName(String name)
+	{
+		int index = -1;
+		ArrayList<StatistiekView> views = this.getViews();
+		for (int i = 0; i < views.size(); i++)
+		{
+			if (views.get(i).getViewName().equals(name))
+			{
+				index = i;
+				break;
+			}
+		}
+		
+		return index;
 	}
 
 	public ListBox getViewsBox()
