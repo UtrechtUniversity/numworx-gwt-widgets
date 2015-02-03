@@ -58,4 +58,9 @@ public interface StatistiekView {
 	 * @return this view's name
 	 */
 	public String getViewName();
+	
+	/**
+	 * 
+	 */
+	public void removeHandlers();
 }
