@@ -108,6 +108,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //	,TableModelListener, ActionListener, ListSelectionListener,
 //	SelectionListener
 {
+	/**
+	 * The handler registration used to remove the view's 
+	 * table change event handler occurrence.
+	 */
+	HandlerRegistration tableChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * selection change event handler occurrence.
+	 */
+	HandlerRegistration selectionChangeEventHandlerRegistration;
+
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
 	private static final String DELIMITER = ";";
@@ -207,8 +218,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statistiekCss.ensureInjected();
 		
 		this.statTableModel = statTableModel;
-		this.statTableModel.addTableChangeEventHandler(this);
-		this.statTableModel.addSelectionChangeEventHandler(this);
+		this.tableChangeEventHandlerRegistration = this.statTableModel.addTableChangeEventHandler(this);
+		this.selectionChangeEventHandlerRegistration = this.statTableModel.addSelectionChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = "";
@@ -235,8 +246,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statistiekCss.ensureInjected();
 
 		this.statTableModel = statTableModel;
-		this.statTableModel.addTableChangeEventHandler(this);
-		this.statTableModel.addSelectionChangeEventHandler(this);
+		this.tableChangeEventHandlerRegistration = this.statTableModel.addTableChangeEventHandler(this);
+		this.selectionChangeEventHandlerRegistration = this.statTableModel.addSelectionChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = viewName;
@@ -463,7 +474,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void createInfoCommand()
 	{
-        infoCommand = new Command() {
+        this.infoCommand = new Command() {
 	        @Override
             public void execute() 
 	        {
@@ -2190,5 +2201,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		GWT.log("StatTable.onSelectionChange()");
 		this.setSelectionFromModelInTable();
 		this.update();
+	}
+
+	/**
+	 * Remove all of this view's handler occurrences.
+	 */
+	public void removeHandlers()
+	{
+		this.tableChangeEventHandlerRegistration.removeHandler();
+		this.selectionChangeEventHandlerRegistration.removeHandler();
 	}
 }
