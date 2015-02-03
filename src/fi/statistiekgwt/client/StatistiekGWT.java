@@ -309,8 +309,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		double max, int noBins)
 	{
 		// calculate decimal bin boundaries smaller than 1 
-		if ((Math.abs(min) < 1) && (Math.abs(max) < 1)
-			|| ((max - min) < 1))
+		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
+			|| (((max - min) < 1) && ((max - min) != 0)))
 		{
 			// determine the number of decimals of min and max
 			String minString = String.valueOf(min);
@@ -426,7 +426,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		double min, double max, double binWidth, double minBoundary)
 	{
 		// check if parameters are valid
-		if ((binWidth <= 0) || (binWidth > 2 * (max - min)) 
+		if ((binWidth <= 0) 
+			|| ((binWidth > 1) && (binWidth > 2 * (max - min))) 
 			|| (binWidth < (max - min)/50))
 			return null;
 		
@@ -434,7 +435,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			return null;
 		
 		// calculate decimal bin boundaries smaller than 1 
-		if ((Math.abs(min) < 1) && (Math.abs(max) < 1))
+		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
+			|| (((max - min) < 1) && ((max - min) != 0)))
 		{
 			// determine the number of decimals of min and max
 			String minString = String.valueOf(min);
