@@ -25,7 +25,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	private StatModel model;
 	private StatInteractiePanelView view;
 	public static final boolean DEBUG = false;
-	private double barHeight = 30;//3; 
+	private double barHeight;//40;//3; 
+	StatistiekGWTClientBundle statistiekGWTClientBundle;
 
 	/**
 	 * Constructor
@@ -33,16 +34,26 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	public StatInteractiePanel()
 	{
 		super();
+		
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		barHeight = this.statistiekGWTClientBundle.crossResource().getHeight() + 30;
+		
 		this.model = new StatModel();
 		this.view = new StatInteractiePanelView(this.model, this, barHeight, Unit.PX);
+		
 		super.add(this.view);
 	}
 
 	public StatInteractiePanel(StatModel model)
 	{
 		super();
+
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		barHeight = this.statistiekGWTClientBundle.crossResource().getHeight() + 30;
+		
 		this.model = model;
 		this.view = new StatInteractiePanelView(this.model, this, barHeight, Unit.PX);
+		
 		super.add(this.view);
 	}
 
