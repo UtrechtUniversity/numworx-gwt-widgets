@@ -33,7 +33,7 @@ public class ColorLegend extends LayoutPanel
 	private ScrollPanel scrollPanel;
 	private int maxWidth;
 
-	public static final int LABEL_HEIGHT = 20;
+	public static final int LABEL_HEIGHT = 35;//20;
 	public static final int COLOR_PREVIEW_WIDTH = 30;
 	public static final int LABEL_HGAP = 10;
 
@@ -50,7 +50,7 @@ public class ColorLegend extends LayoutPanel
 	 *            Colors of the split groups
 	 */
 	public ColorLegend(String columnName, ArrayList<String> splitStrings,
-		ArrayList<CssColor> splitColors)
+		ArrayList<CssColor> splitColors, int width, int height)
 	{
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
@@ -67,11 +67,13 @@ public class ColorLegend extends LayoutPanel
 		this.splitColors = splitColors;
 		this.labelsPanel = new LayoutPanel();
 		this.labelsPanel.getElement().getStyle().setBackgroundColor(CssColor.make(240, 240, 240).toString());
+//		this.labelsPanel.setSize("100%", "100%");
+		this.labelsPanel.setPixelSize(width, height);
 		this.makeLabels();
 		this.updatePreferredSize();
 		this.placeComponents();
 		this.scrollPanel = new ScrollPanel(this.labelsPanel);
-		this.scrollPanel.setSize("125px", "650px");
+		this.scrollPanel.setSize(width + "px", height + "px");
 //		this.scrollPanel.setSize("10em", "100%"); // dit werkt niet
 //		this.scrollPanel.setSize("100%", "100%"); // dit werkt niet
 		super.add(this.scrollPanel);//, BorderLayout.CENTER);
@@ -80,7 +82,7 @@ public class ColorLegend extends LayoutPanel
 		super.setWidgetLeftWidth(this.columnLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		super.setWidgetTopHeight(this.columnLabel, 0, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
 		super.setWidgetLeftWidth(this.scrollPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		super.setWidgetTopHeight(this.scrollPanel, 30, Style.Unit.PX, 100, Style.Unit.PCT);
+		super.setWidgetTopHeight(this.scrollPanel, 30, Style.Unit.PX, 70, Style.Unit.PCT);
 	}
 
 	/**
@@ -142,7 +144,7 @@ public class ColorLegend extends LayoutPanel
 			for (String s : this.splitStrings)
 			{
 				Label label = new Label(s);
-				label.getElement().getStyle().setFontSize(14, Unit.PX);
+				//label.getElement().getStyle().setFontSize(14, Unit.PX);
 				label.addStyleName(statistiekCss.colorlegendlabel());
 				this.labels.add(label);
 				this.labelsPanel.add(label);
@@ -154,7 +156,7 @@ public class ColorLegend extends LayoutPanel
 			int count = 0;
 			for (Label label : this.labels)
 			{
-				this.labelsPanel.setWidgetLeftWidth(label, 0, Style.Unit.PX, this.maxWidth + this.LABEL_HGAP, Style.Unit.PX);
+				this.labelsPanel.setWidgetLeftWidth(label, 0, Style.Unit.PX, this.maxWidth + ColorLegend.LABEL_HGAP, Style.Unit.PX);
 				this.labelsPanel.setWidgetTopHeight(label, count * LABEL_HEIGHT, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
 				count++;
 			}
@@ -165,16 +167,16 @@ public class ColorLegend extends LayoutPanel
 			// add the color boxes
 			for (CssColor c : this.splitColors)
 			{
-				Label label = new Label();
-				this.colorPreviews.add(label);
-				this.labelsPanel.add(label);
-				label.getElement().getStyle().setBackgroundColor(c.toString()); // Het kleurvakje
-				this.labelsPanel.setWidgetLeftWidth(label, this.maxWidth + this.LABEL_HGAP, Style.Unit.PX, this.COLOR_PREVIEW_WIDTH, Style.Unit.PX);
-				this.labelsPanel.setWidgetTopHeight(label, count * LABEL_HEIGHT, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
+				Label colorLabel = new Label();
+				this.colorPreviews.add(colorLabel);
+				this.labelsPanel.add(colorLabel);
+				colorLabel.getElement().getStyle().setBackgroundColor(c.toString()); // Het kleurvakje
+				this.labelsPanel.setWidgetLeftWidth(colorLabel, this.maxWidth + ColorLegend.LABEL_HGAP, Style.Unit.PX, ColorLegend.COLOR_PREVIEW_WIDTH, Style.Unit.PX);
+				this.labelsPanel.setWidgetTopHeight(colorLabel, count * LABEL_HEIGHT, Style.Unit.PX, LABEL_HEIGHT, Style.Unit.PX);
 				count++;
 			}
 			
-			this.labelsPanel.setPixelSize(this.maxWidth + this.LABEL_HGAP + this.COLOR_PREVIEW_WIDTH, (count + 1) * LABEL_HEIGHT);
+//			this.labelsPanel.setPixelSize(this.maxWidth + ColorLegend.LABEL_HGAP + ColorLegend.COLOR_PREVIEW_WIDTH, (count + 1) * LABEL_HEIGHT);
 		}
 	}
 
@@ -227,7 +229,7 @@ public class ColorLegend extends LayoutPanel
 
 //		this.labelsPanel.getElement().getStyle().setHeight((this.labels.size() + 1) * this.LABEL_HEIGHT, Unit.PX);
 //		this.labelsPanel.getElement().getStyle().setWidth((this.maxWidth + COLOR_PREVIEW_WIDTH) + this.LABEL_HGAP, Unit.PX);
-		this.labelsPanel.setPixelSize((this.labels.size() + 1) * this.LABEL_HEIGHT, (this.maxWidth + COLOR_PREVIEW_WIDTH) + this.LABEL_HGAP);
+		//this.labelsPanel.setPixelSize((this.labels.size() + 1) * ColorLegend.LABEL_HEIGHT, (this.maxWidth + COLOR_PREVIEW_WIDTH) + ColorLegend.LABEL_HGAP);
 	}
 	
 	private void setMaxWidth()
