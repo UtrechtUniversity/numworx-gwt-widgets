@@ -1,7 +1,12 @@
 package fi.statistiekgwt.client.histogram;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Frame;
@@ -23,23 +28,38 @@ public class HistogramController implements StatistiekView
 {
 	private HistogramModel model;
 	private HistogramView view;
+	private int width;
+	private int height;
 
 	/**
 	 * Constructor
 	 * 
 	 * @param tableModel
-	 *            the data table
+	 *      the data table
 	 * @param viewName
-	 *            The initial name of the StatistiekView
+	 *      The initial name of the StatistiekView
+	 * @param frequencyPolygonMode
+	 * 		Is frequence polygon mode yes/no
+	 * @param startVar
+	 * 		The index of the variable
+	 * @param width
+	 * 		The width of the histogram
+	 * @param height
+	 * 		The height of the histogram
 	 */
 	public HistogramController(StatTableModel tableModel, String viewName,
-		boolean frequencyPolygonMode, int startVar)
+		boolean frequencyPolygonMode, int startVar, int width, int height)
 	{
 //		System.out.println("HistogramController(): maakt nieuw HistogramModel en daarmee HistogramView");
 		
 		this.model = new HistogramModel(tableModel, viewName, frequencyPolygonMode);
 		model.setColumnIndex(startVar);
 		model.setDefaultLabelPositioning();
+		
+		// set size
+		this.setWidth(width);
+		this.setHeight(height);
+		
 		this.view = new HistogramView(this.model, this);
 		this.view.update();
 		
@@ -284,21 +304,32 @@ public class HistogramController implements StatistiekView
 		}
 
 		HashMap h = (HashMap) state;
+		ObjectMap map = JSONUtilities.wrapMap(h);
+
 
 		if (h.containsKey("columnIndex"))
 		{
 			// Let op: setColumnIndex() zet ook de binBoundaries
 			// Dat wordt hieronder goed gemaakt als de binBoundaries
 			// uit de hashtable worden gezet.
-			this.model.setColumnIndex(((Integer) h.get("columnIndex"))
-				.intValue());
+			this.model.setColumnIndex(map.getInt("columnIndex"));//((Integer) h.get("columnIndex")).intValue());
+			
+			// set size??
 		}
 		if (h.containsKey("binBoundaries"))
 		{
 //			System.out.println("HistogramController.setState(): binBoundaries="
 //				+ (ArrayList<Double>) h.get("binBoundaries"));
-			this.model.setBinBoundaries((ArrayList<Double>) h
-				.get("binBoundaries"));
+			ObjectList list = map.getObjectList("binBoundaries");
+			ArrayList<Double> binBoundaries = new ArrayList<Double>();
+			for (int i = 0; i < list.size(); i++) 
+			{
+				binBoundaries.add(list.getDouble(i));
+			}
+
+			this.model.setBinBoundaries(binBoundaries);
+			
+//			this.model.setBinBoundaries(new ArrayList(Arrays.asList(map.getObjectList("binBoundaries"))));//(ArrayList<Double>) h.get("binBoundaries"));
 //			System.out.println("... (setState) identityHashCode(this.model)=" + identityHashCode(this.model));
 //			System.out.println("... (setState) identityHashCode(this.model.getBinBoundaries())=" + identityHashCode(this.model.getBinBoundaries()));
 //			System.out.println("... (setState) identityHashCode(this.view)=" + identityHashCode(this.view));
@@ -307,54 +338,46 @@ public class HistogramController implements StatistiekView
 		}
 		if (h.containsKey("percentage"))
 		{
-			this.model.setPercentage(((Boolean) h.get("percentage"))
-				.booleanValue());
+			this.model.setPercentage(map.getBoolean("percentage"));//((Boolean) h.get("percentage")).booleanValue());
 		}
 		if (h.containsKey("labelUnderBin"))
 		{
-			this.model.setLabelUnderBin(((Boolean) h.get("labelUnderBin"))
-				.booleanValue());
+			this.model.setLabelUnderBin(map.getBoolean("labelUnderBin"));//((Boolean) h.get("labelUnderBin")).booleanValue());
 //			System.out.println("HistogramController.setState(): labelUnderBin="
 //				+ ((Boolean) h.get("labelUnderBin")).booleanValue());
 		}
 		if (h.containsKey("showUserOptions"))
 		{
-			this.model.setShowUserOptions(((Boolean) h.get("showUserOptions"))
-				.booleanValue());
+			this.model.setShowUserOptions(map.getBoolean("showUserOptions"));//((Boolean) h.get("showUserOptions")).booleanValue());
 		}
 		if (h.containsKey("verticalBars"))
 		{
-			this.model.setVerticalBars(((Boolean) h.get("verticalBars"))
-				.booleanValue());
+			this.model.setVerticalBars(map.getBoolean("verticalBars"));//((Boolean) h.get("verticalBars")).booleanValue());
 		}
 		if (h.containsKey("viewName"))
 		{
-			this.model.setViewName((String) h.get("viewName"));
+			this.model.setViewName(map.getString("viewName"));//(String) h.get("viewName"));
 		}
 		if (h.containsKey("frequencyPolygonCumulativeMode"))
 		{
-			this.model.setFrequencyPolygonCumulativeMode(((Boolean) h
-				.get("frequencyPolygonCumulativeMode")).booleanValue());
+			this.model.setFrequencyPolygonCumulativeMode(map.getBoolean("frequencyPolygonCumulativeMode"));//((Boolean) h.get("frequencyPolygonCumulativeMode")).booleanValue());
 		}
 
 		if (h.containsKey("columnSplitIndex"))
 		{
-			this.model.setColumnSplitIndex((Integer) h.get("columnSplitIndex"));
+			this.model.setColumnSplitIndex(map.getInt("columnSplitIndex"));//(Integer) h.get("columnSplitIndex"));
 		}
 		if (h.containsKey("splitBoundaries"))
 		{
-			this.model.setSplitBoundaries((ArrayList<Double>) h
-				.get("splitBoundaries"));
+			this.model.setSplitBoundaries(new ArrayList(Arrays.asList(map.getDoubleList("splitBoundaries"))));//(ArrayList<Double>) h.get("splitBoundaries"));
 		}
 		if (h.containsKey("splitInSingleView"))
 		{
-			this.model.setSplitInSingleView(((Boolean) h
-				.get("splitInSingleView")).booleanValue());
+			this.model.setSplitInSingleView(map.getBoolean("splitInSingleView"));//((Boolean) h.get("splitInSingleView")).booleanValue());
 		}
 		if (h.containsKey("nextToEachOther"))
 		{
-			this.model.setNextToEachOther(((Boolean) h.get("nextToEachOther"))
-				.booleanValue());
+			this.model.setNextToEachOther(map.getBoolean("nextToEachOther"));//((Boolean) h.get("nextToEachOther")).booleanValue());
 		}
 	}
 
@@ -386,9 +409,43 @@ public class HistogramController implements StatistiekView
 		
 	}
 
-	@Override
+	/**
+	 * Remove all of this view's handler occurrences.
+	 */
 	public void removeHandlers()
 	{
 		this.view.removeHandlers();
+	}
+
+	/**
+	 * Get the views width.
+	 */
+	public int getWidth()
+	{
+		return this.width;
+	}
+	
+	/**
+	 * Get the views height.
+	 */
+	public int getHeight()
+	{
+		return this.height;
+	}
+	
+	/**
+	 * Set the views width.
+	 */
+	public void setWidth(int w)
+	{
+		this.width = w;
+	}
+	
+	/**
+	 * Set the views height.
+	 */
+	public void setHeight(int h)
+	{
+		this.height = h;
 	}
 }
