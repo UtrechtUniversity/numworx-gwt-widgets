@@ -54,7 +54,7 @@
 }
 
 .pushbutton {
-	background-color: yellow;
+	background-color: rgb(240, 240, 240);
 	background-image: none;
 	display: table-cell;
 	text-align: center;
