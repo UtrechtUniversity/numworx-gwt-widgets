@@ -22,6 +22,8 @@ import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -67,6 +69,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	public static final int X_AS_OFFSET = 50;
 	public static final int Y_AS_OFFSET = 50;
 	public static final double MAX_SCREEN_FRACTION_FOR_BARS = 0.8;
+	public static final int COLOR_LEGEND_WIDTH = 125;
 
 	private double verticalBarWidth;
 	private double horizontalBarWidth;
@@ -81,10 +84,13 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 	public static final CssColor BAR_COLOR = ColorGenerator.DEFAULT_VIEW_ELEMENT_COLOR;
 	public static final CssColor SELECTED_BAR_COLOR = ColorGenerator.SELECTION_COLOR;
-
+	
 	private int xAxisOffset;
 	private int yAxisOffset;
 	private Point lastPolygonPoint;
+	
+	private int width;
+	private int height;
 	
 	private int tempWidth;
 	private int tempHeight;
@@ -153,9 +159,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel.getCanvas());
 		this.scrollPanel.setWidget(this.mainPanel.getCanvas());
-		this.scrollPanel.setSize("800px", "650px");
-		//this.scrollPanel.setSize("100%", "100%");
-		//this.scrollPanel.setPixelSize(500, 350);
 		//this.scrollPanel.getVerticalScrollBar().setUnitIncrement(StatistiekGWT.scrollSpeedUnit);
 		
 		this.userOptionsPanel = new HistogramUserOptionsPanel(this, controller, model);
@@ -163,18 +166,24 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		// initial update for setting widgets in user options panel
 		this.userOptionsPanel.update();
 
-		this.colorLegend = new ColorLegend("", null, null);
+		this.initializeSize();
+		
+		this.colorLegend = new ColorLegend("", null, null, 
+			HistogramView.COLOR_LEGEND_WIDTH, this.getHeight() - StatistiekGWT.BUTTON_HEIGHT);
 //		this.addEast(this.colorLegend, 10);//em, BorderLayout.EAST);
-		this.addEast(this.colorLegend, 125);//, BorderLayout.EAST);
+		this.addEast(this.colorLegend, HistogramView.COLOR_LEGEND_WIDTH);//, BorderLayout.EAST);
 		this.colorLegend.setVisible(false);
 		this.setWidgetHidden(this.colorLegend, true);
 
+		HorizontalPanel dialogButtonPanel = new HorizontalPanel();
+		dialogButtonPanel.setSize("100%", "100%");
+		dialogButtonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		this.dialogButton = userOptionsPanel.getDialogButton();
+		dialogButtonPanel.add(this.dialogButton);
+		
 //		super.addSouth(this.dialogButton, 3);//em, BorderLayout.SOUTH);
-		super.addSouth(this.dialogButton, 50);//px, BorderLayout.SOUTH);
-		// test syl
-//		this.setPixelSize(700, 550);
-		this.setSize("100%", "100%");
+//		super.addSouth(this.dialogButton, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
+		super.addSouth(dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
 		this.add(this.scrollPanel);//, BorderLayout.CENTER);
 		
 		// test syl
@@ -182,6 +191,20 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		
 		// initial paint gebeurt in HistogramController() - view.update()
 //		this.mainPanel.paint();
+	}
+
+	/**
+	 * Initialize the views size.
+	 */
+	private void initializeSize()
+	{
+		this.setWidth(this.controller.getWidth());
+		this.setHeight(this.controller.getHeight());
+		
+		this.scrollPanel.setSize(this.getWidth() + "px", 
+			this.getHeight() + "px");
+
+		this.setSize("100%", "100%");
 	}
 
 	/**
@@ -371,6 +394,42 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.verticalBarWidth = ((double) (this.barAreaWidth() - numberOfBars - 1) / ((double) numberOfBars + 0.5));
 		this.horizontalBarWidth = ((double) (this.barAreaHeight()
 			- numberOfBars - 1) / ((double) numberOfBars + 0.5));
+	}
+	
+	/**
+	 * Get the views width.
+	 */
+	public int getWidth()
+	{
+		return this.width;
+	}
+	
+	/**
+	 * Get the views height.
+	 */
+	public int getHeight()
+	{
+		return this.height;
+	}
+	
+	/**
+	 * Set the width of histogram view.
+	 * 
+	 * @param w
+	 */
+	public void setWidth(int w)
+	{
+		this.width = w;
+	}
+
+	/**
+	 * Set the height of histogram view.
+	 * 
+	 * @param h
+	 */
+	public void setHeight(int h)
+	{
+		this.height = h;
 	}
 
 //	private AlphaComposite makeComposite(int splitClasses)
@@ -1082,10 +1141,13 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		
 //		int w = this.getOffsetWidth() - this.yAxisOffset
 //			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
-		int w = this.mainPanel.getCanvas().getCoordinateSpaceWidth() - this.yAxisOffset
+//		int w = this.mainPanel.getCanvas().getCoordinateSpaceWidth() - this.yAxisOffset
+//			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
+		int w = this.getWidth() - this.yAxisOffset
 			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
-		return Math.max(w, 700);
-//			- this.scrollPanel.getVerticalScrollbar().getScrollHeight(); // dit is het niet...
+
+		return w;
+//		return Math.max(w, 700);
 	}
 
 	private int barAreaHeight()
@@ -1096,9 +1158,13 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		// return this.getHeight() - this.xAxisOffset-
 		// (this.model.getTableModel().isViewsEditable() ?
 		// HistogramView.KEUZEBALK_HOOGTE : 0);
-		int h = this.scrollPanel.getOffsetHeight() - this.xAxisOffset;
+
 //		int h = this.mainPanel.getCanvas().getCoordinateSpaceHeight() - this.xAxisOffset; // bij split wordt dit veel te groot...
-		return Math.max(h, 550);
+//		int h = this.scrollPanel.getOffsetHeight() - this.xAxisOffset;
+		int h = this.getHeight() - this.xAxisOffset;
+
+		return h;
+//		return Math.max(h, 550);
 	}
 
 	/**
@@ -3012,34 +3078,39 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 //				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
 //				this.scrollPanel.getOffsetHeight() - 5);
 //			this.mainPanel.getCanvas().setPixelSize(800, 650);
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(650);
+//			this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
+//			this.mainPanel.getCanvas().setCoordinateSpaceHeight(650);
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
 
 //			System.out.println("HistogramView.setMainPanelSize(): splitInSingleView=true, "
 //				+ "mainPanel.getPreferredSize()=" + this.mainPanel.getPreferredSize());
 		}
 		else
 		{
-			if (this.scrollPanel.getOffsetWidth() == 0)
-			{
-				// even hardcoded op de gebruikelijke maat... Hoe komt scrollPane 0x0?
-				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
-				
-				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
-
-			}
-			else
-			{
-//    			this.mainPanel.getCanvas().setPixelSize(
-//    				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
-//    				splitClasses * (this.scrollPanel.getOffsetHeight() - 5) + 1);
-				// test syl: TODO de juiste maat o.b.v. scrollpanel
-				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
-				
-				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
-			}
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
+			
+//			if (this.scrollPanel.getOffsetWidth() == 0)
+//			{
+//				// even hardcoded op de gebruikelijke maat... Hoe komt scrollPane 0x0?
+//				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
+//				
+//				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
+//				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
+//
+//			}
+//			else
+//			{
+////    			this.mainPanel.getCanvas().setPixelSize(
+////    				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
+////    				splitClasses * (this.scrollPanel.getOffsetHeight() - 5) + 1);
+//				// test syl: TODO de juiste maat o.b.v. scrollpanel
+//				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
+//				
+//				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
+//				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
+//			}
 
 //			System.out.println("HistogramView.setMainPanelSize(): splitInSingleView=false, "
 //				+ "scrollPanel w=" + this.scrollPanel.getOffsetWidth() + ", h=" + this.scrollPanel.getOffsetHeight() + "; "  
@@ -3319,6 +3390,8 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		private PopupPanel popup = new PopupPanel(true);
 		private int x = 0;
 		private int y = 0;
+		private int clientX = 0;
+		private int clientY = 0;
 		
 		@Override
 		public void onMouseMove(MouseMoveEvent e)
@@ -3327,6 +3400,8 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			
 			x = e.getX();
 			y = e.getY();
+			clientX = e.getClientX();
+			clientY = e.getClientY();
 			
 			// test syl
 			//System.out.println("HistogramView.HistogramBarMouseMoveHandler.onMouseMove(): (" + x + ", " + y +")");
@@ -3620,7 +3695,8 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 										{
 											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
 											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
-											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
+//											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
+											popup.setPopupPosition(clientX - scrollXCorrection, clientY - scrollYCorrection - offsetHeight);
 										}
 									});
 							}
@@ -3635,7 +3711,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 										{
 											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
 											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
-											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
+//											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
+											//popup.setPopupPosition(clientX - scrollXCorrection, clientY - scrollYCorrection - offsetHeight);
+											popup.setPopupPosition(clientX, clientY - offsetHeight);// no correction needed?
 										}
 									});
 							}
@@ -3712,13 +3790,15 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			
 			int i;
 			
+			double x = e.getX();//getClientX();
+			double y = e.getY();//getClientY();
+			Point p = new Point(x, y);
+
 			for (i = 0; i < HistogramView.this.barRectangles.size(); i++)
 			{
-				double x = e.getClientX();
-				double y = e.getClientY();
-				Point p = new Point(x, y);
-				if (HistogramView.this.barRectangles.get(i) != null
-					&& HistogramView.this.barRectangles.get(i).contains(p))
+				Rectangle rect = HistogramView.this.barRectangles.get(i);
+				
+				if ((rect != null) && rect.contains(p))
 				{
 					this.barClicked(i);
 					break;
@@ -3856,9 +3936,144 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	public void onTableChange(TableChangeEvent event)
 	{
 		GWT.log("HistogramView.onTableChange()");
-		this.update();
+
+		if (!event.getInfo().equals(TableChangeEvent.ADD_ROW) // if add row do nothing
+			&& !event.getInfo().equals(TableChangeEvent.SORT_COLUMN)) // if sort column do nothing
+		{
+			if (event.getInfo().equals(TableChangeEvent.ADD_COLUMN))
+			{
+				// only update user options panel
+				this.userOptionsPanel.update();
+			}
+			else
+			{
+				boolean typeHasChanged = false;
+				if (event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
+				{
+					typeHasChanged = true;
+				}
+				
+				if (event.getInfo().equals(TableChangeEvent.REMOVE_ROW)
+					|| event.getInfo().equals(TableChangeEvent.REMOVE_ROWS))
+				{
+					// verwijderde waarde kan bins veranderen:
+					// bins opnieuw berekenen
+					this.recalculateBinBoundaries(event.getColumnIndex(), typeHasChanged);
+
+					if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
+					{
+						// er is een split
+						
+						// split bins opnieuw berekenen
+						this.recalculateSplitBinBoundaries(event.getColumnIndex());
+					}
+				}
+				else if (event.getInfo().equals(TableChangeEvent.SET_VALUE_AT)
+					|| event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
+				{
+					if (event.getColumnIndex() == this.model.getColumnIndex())
+					{
+						// bins opnieuw berekenen
+						this.recalculateBinBoundaries(event.getColumnIndex(), typeHasChanged);
+					}
+					else if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
+					{
+						// split bins opnieuw berekenen
+						this.recalculateSplitBinBoundaries(event.getColumnIndex());
+					}
+				}
+				
+				// update both view and user options panel
+				this.update();
+				this.userOptionsPanel.update();
+			}
+		}
 	}
 	
+	/**
+	 * Recalculate the bin boundaries for column with columnIndex
+	 * if possible.
+	 * 
+	 * @param columnIndex
+	 * 		The index of the column for which the bin
+	 *      boundaries will be calculated.
+	 * @param typeHasChanged
+	 * 		The type has changed yes/no.
+	 */
+	public void recalculateBinBoundaries(int columnIndex, boolean typeHasChanged)
+	{
+			if (this.model.columnIndexValid())
+			{
+				ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
+				if (list.get(this.model.getColumnIndex())
+					.getType().isNumber())
+				{
+    				// binBoundaries worden hier standaard gezet
+    				ArrayList<Double> binBoundaries = StatistiekGWT
+    					.appropriateBoundaries(
+    						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
+    						this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()),
+    						this.model.getNoBins());
+    				this.model.setBinBoundaries(binBoundaries);
+    				
+    				
+    				// test syl: kan mooier, maar het werkt wel: opnieuw berekenen 
+    				// met de berekende binboundaries, omdat er mogelijk minder bins nodig zijn
+    				// TODO appropriateBoundaries(min, max) implementeren die binwidth en het aantal klassen bepaalt 
+    				binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+    					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
+    					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()), 
+    					binBoundaries.get(1) - binBoundaries.get(0), binBoundaries.get(0));
+    				this.model.setBinBoundaries(binBoundaries);
+    				
+    				this.model.setNoBins(binBoundaries.size() - 1);
+				}
+
+				if (typeHasChanged)
+				{
+					// set bin label positioning
+					AllowedTypes type = list.get(this.model.getColumnIndex()).getType(); 
+					if (type.equals(AllowedTypes.INTEGER))
+					{
+						this.model.setLabelUnderBin(true);
+					}
+					else if (type.equals(AllowedTypes.DOUBLE))
+					{
+						this.model.setLabelUnderBin(false);
+					}
+				}
+			}
+	}
+	
+	/**
+	 * Recalculate the split bin boundaries for column with columnSplitIndex
+	 * if possible.
+	 * 
+	 * @param columnIndex
+	 * 		The index of the column for which the bin
+	 *      boundaries will be calculated.
+	 * @param typeHasChanged
+	 * 		The type has changed yes/no.
+	 */
+	public void recalculateSplitBinBoundaries(int columnSplitIndex)
+	{
+		AllowedTypes splitType = this.model.getStatTableModel().getColumnTypes().get(columnSplitIndex).getType();
+		if (splitType.isNumber())
+		{
+			ArrayList<Double> boundaries = new ArrayList<Double>();
+			boundaries = StatistiekGWT.appropriateBoundaries(
+				this.model.getStatTableModel().getColumnMin(
+					this.model.getSplitOptions().getColumnSplitIndex()),
+				this.model.getStatTableModel().getColumnMax(
+					this.model.getSplitOptions().getColumnSplitIndex()),
+				this.getSplitBinsBoxSelectedInt());
+
+			this.model.setSplitBoundaries(boundaries);
+			this.model.setSplitOptions(this.model.getSplitOptions());
+			this.setModel(this.model);
+		}
+	}
+
 	@Override
 	public void fireEvent(GwtEvent<?> e)
 	{
