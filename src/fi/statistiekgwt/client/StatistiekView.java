@@ -60,7 +60,27 @@ public interface StatistiekView {
 	public String getViewName();
 	
 	/**
-	 * 
+	 * Remove all of this view's handler occurrences.
 	 */
 	public void removeHandlers();
+
+	/**
+	 * Get the views width.
+	 */
+	public int getWidth();
+	
+	/**
+	 * Get the views height.
+	 */
+	public int getHeight();
+	
+	/**
+	 * Set the views width.
+	 */
+	public void setWidth(int w);
+	
+	/**
+	 * Set the views height.
+	 */
+	public void setHeight(int h);
 }
