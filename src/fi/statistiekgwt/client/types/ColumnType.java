@@ -3,6 +3,8 @@ package fi.statistiekgwt.client.types;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
 import fi.statistiekgwt.client.types.AllowedTypes;
@@ -381,4 +383,15 @@ public class ColumnType implements Serializable
 		}
 		return ret;
 	}
+	
+	public HashMap toMap()
+	{
+		HashMap result = new HashMap();
+		result.put("@type", getClass().getName());
+		result.put("type", type.toString());
+		result.put("uitleg", uitleg);
+		result.put("enumOptions", enumOptions);
+		return result;
+	}
+	
 }
