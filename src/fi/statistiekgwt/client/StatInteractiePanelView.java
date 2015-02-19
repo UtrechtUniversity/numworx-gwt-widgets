@@ -791,16 +791,17 @@ public class StatInteractiePanelView extends LayoutPanel
 		}
 
 		// update the selected view in tabPane
+		// ---- test syl: onderstaande geeft outOfBoundException bij reset als er views zijn verwijderd... ---- 
 //		System.out.println("StatInteractiePanelView.update(): selectedView = " + this.selectedView
 //			+ ", selectedViewInPane = " + this.selectedViewInTabPane);
-		if (this.isInOwnWindow(selectedView))
-		{
-			this.setTabPane(previousSelectedView);
-		}
-		else
-		{
-			this.setTabPane(selectedViewInTabPane);
-		}
+//		if (this.isInOwnWindow(selectedView))
+//		{
+//			this.setTabPane(previousSelectedView);
+//		}
+//		else
+//		{
+//			this.setTabPane(selectedViewInTabPane);
+//		}
 
 		// Fill boxes with variable names
 		updateStartVarBox();
@@ -823,58 +824,76 @@ public class StatInteractiePanelView extends LayoutPanel
 			// test syl: moet dit zonder handler?
 			this.startVarBoxHandlerRegistration.removeHandler();
 			
-    		// Check the first item
-			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
-			if ((this.startVarBox.getItemCount() == 0) 
-				|| (!firstItem.equals(this.startVarBox.getItemText(0))))
+			// remove all items
+			for (int i = this.startVarBox.getItemCount() - 1; i > -1; i--)
 			{
-				this.startVarBox.addItem(firstItem);
-			}
-    
-			boolean exists;
-			String columnName;
-    		// Check the variable names in model.getStatTableModel()
-//			for (String varName : this.model.getStatTableModel().getColumnNames())
-			for (int j = 0; j < this.model.getStatTableModel().getColumnNames().size(); j++)
-			{
-				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
-				columnName = list.get(j);
-				exists = false;
-				for (int i = 0; i < this.startVarBox.getItemCount() && !exists; i++)
-				{
-					if (columnName.equals(this.startVarBox.getItemText(i)))
-					{
-						exists = true;
-					}
-				}
-				if (!exists)
-				{
-					// startVarBox heeft een eerste item 'Kies een variabele', dus j + 1
-					this.startVarBox.insertItem(columnName, j + 1);
-				}
+				this.startVarBox.removeItem(i);
 			}
 			
-			// Check if items from startVarBox need to be removed
-			for (int i = 1; i < this.startVarBox.getItemCount(); i++)
+			// add first item
+			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+			this.startVarBox.addItem(firstItem);
+			
+			// add column names
+			ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+			
+			for (String varName : list)
 			{
-				exists = false;
-				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
-				for (String varName : list)
-				{
-					if (varName.equals(this.startVarBox.getItemText(i)))
-					{
-						exists = true;
-						break;
-					}
-				}
-				if (!exists)
-				{
-					this.startVarBox.removeItem(i);
-				}					
+				this.startVarBox.addItem(varName);
 			}
+				
+//    		// Check the first item
+//			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+//			if ((this.startVarBox.getItemCount() == 0) 
+//				|| (!firstItem.equals(this.startVarBox.getItemText(0))))
+//			{
+//				this.startVarBox.addItem(firstItem);
+//			}
+//    
+//			boolean exists;
+//			String columnName;
+//    		// Check the variable names in model.getStatTableModel()
+////			for (String varName : this.model.getStatTableModel().getColumnNames())
+//			for (int j = 0; j < this.model.getStatTableModel().getColumnNames().size(); j++)
+//			{
+//				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+//				columnName = list.get(j);
+//				exists = false;
+//				for (int i = 0; i < this.startVarBox.getItemCount() && !exists; i++)
+//				{
+//					if (columnName.equals(this.startVarBox.getItemText(i)))
+//					{
+//						exists = true;
+//					}
+//				}
+//				if (!exists)
+//				{
+//					// startVarBox heeft een eerste item 'Kies een variabele', dus j + 1
+//					this.startVarBox.insertItem(columnName, j + 1);
+//				}
+//			}
+//			
+//			// Check if items from startVarBox need to be removed
+//			for (int i = 1; i < this.startVarBox.getItemCount(); i++)
+//			{
+//				exists = false;
+//				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+//				for (String varName : list)
+//				{
+//					if (varName.equals(this.startVarBox.getItemText(i)))
+//					{
+//						exists = true;
+//						break;
+//					}
+//				}
+//				if (!exists)
+//				{
+//					this.startVarBox.removeItem(i);
+//				}					
+//			}
 			
 			this.startVarBoxHandlerRegistration = this.startVarBox.addChangeHandler(controller);
-		}
+		} // if there are column names
 	}
 
 	/*
@@ -890,55 +909,74 @@ public class StatInteractiePanelView extends LayoutPanel
 			// test syl: moet dit zonder handler?
 			this.startVar2BoxHandlerRegistration.removeHandler();
 			
-    		// Check the first item
-			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
-			if ((this.startVar2Box.getItemCount() == 0) 
-				|| (!firstItem.equals(this.startVar2Box.getItemText(0))))
+			// remove all items
+			for (int i = this.startVar2Box.getItemCount() - 1; i > -1; i--)
 			{
-				this.startVar2Box.addItem(firstItem);
-			}
-    
-			boolean exists;
-			String columnName;
-    		// Check the variable names in model.getStatTableModel()
-//			for (String varName : this.model.getStatTableModel().getColumnNames())
-			for (int j = 0; j < this.model.getStatTableModel().getColumnNames().size(); j++)
-			{
-				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
-				columnName = list.get(j);
-				exists = false;
-				for (int i = 0; i < this.startVar2Box.getItemCount() && !exists; i++)
-				{
-					if (columnName.equals(this.startVar2Box.getItemText(i)))
-					{
-						exists = true;
-					}
-				}
-				if (!exists)
-				{
-					// startVarBox heeft een eerste item 'Kies een variabele', dus j + 1
-					this.startVar2Box.insertItem(columnName, j + 1);
-				}
+				this.startVar2Box.removeItem(i);
 			}
 			
-			// Check if items from startVarBox need to be removed
-			for (int i = 1; i < this.startVar2Box.getItemCount(); i++)
+			// add first item
+			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+			this.startVar2Box.addItem(firstItem);
+			
+			// add column names
+			ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+			
+			for (String varName : list)
 			{
-				exists = false;
-				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
-				for (String varName : list)
-				{
-					if (varName.equals(this.startVar2Box.getItemText(i)))
-					{
-						exists = true;
-						break;
-					}
-				}
-				if (!exists)
-				{
-					this.startVar2Box.removeItem(i);
-				}					
+				this.startVar2Box.addItem(varName);
 			}
+
+			
+    		// Check the first item
+//			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+//			if ((this.startVar2Box.getItemCount() == 0) 
+//				|| (!firstItem.equals(this.startVar2Box.getItemText(0))))
+//			{
+//				this.startVar2Box.addItem(firstItem);
+//			}
+//    
+//			boolean exists;
+//			String columnName;
+//    		// Check the variable names in model.getStatTableModel()
+////			for (String varName : this.model.getStatTableModel().getColumnNames())
+//			for (int j = 0; j < this.model.getStatTableModel().getColumnNames().size(); j++)
+//			{
+//				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+//				columnName = list.get(j);
+//				exists = false;
+//				for (int i = 0; i < this.startVar2Box.getItemCount() && !exists; i++)
+//				{
+//					if (columnName.equals(this.startVar2Box.getItemText(i)))
+//					{
+//						exists = true;
+//					}
+//				}
+//				if (!exists)
+//				{
+//					// startVarBox heeft een eerste item 'Kies een variabele', dus j + 1
+//					this.startVar2Box.insertItem(columnName, j + 1);
+//				}
+//			}
+//			
+//			// Check if items from startVarBox need to be removed
+//			for (int i = 1; i < this.startVar2Box.getItemCount(); i++)
+//			{
+//				exists = false;
+//				ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+//				for (String varName : list)
+//				{
+//					if (varName.equals(this.startVar2Box.getItemText(i)))
+//					{
+//						exists = true;
+//						break;
+//					}
+//				}
+//				if (!exists)
+//				{
+//					this.startVar2Box.removeItem(i);
+//				}					
+//			}
 			
 			this.startVar2BoxHandlerRegistration = this.startVar2Box.addChangeHandler(controller);
 		}
@@ -1395,5 +1433,20 @@ public class StatInteractiePanelView extends LayoutPanel
 	{
 		GWT.log("StatInteractiePanelView.onAddView()");
 		this.update();
+	}
+
+	/**
+	 * Remove all view tabs
+	 */
+	public void removeViewTabs()
+	{
+		int count = this.tabPanel.getWidgetCount();
+		if (count > 1)
+		{
+			for (int i = this.tabPanel.getWidgetCount() - 2; i > -1; i--)
+			{
+				this.tabPanel.remove(i);
+			}
+		}
 	}
 }
