@@ -83,15 +83,15 @@ public class HistogramModel
 		this.frequencyPolygonStackMode = false;
 	}
 
-	/**
-	 * Abbreviation of setChanged and notifyObservers
-	 */
-	private void changed()
-	{
-		// System.out.println("HistogramModel.changed()");
-		//this.setChanged();
-		//this.notifyObservers();
-	}
+//	/**
+//	 * Abbreviation of setChanged and notifyObservers
+//	 */
+//	private void changed()
+//	{
+//		// System.out.println("HistogramModel.changed()");
+//		//this.setChanged();
+//		//this.notifyObservers();
+//	}
 
 	public SplitOptions getSplitOptions()
 	{
@@ -101,7 +101,7 @@ public class HistogramModel
 	public void setSplitOptions(SplitOptions splitOptions)
 	{
 		this.splitOptions = splitOptions;
-		this.changed();
+//		this.changed();
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class HistogramModel
 			
 		this.noBins = this.binBoundaries.size() - 1;
 //		System.out.println("HistogramModel.setBinBoundaries(): this.getBinBoundaries=" + this.getBinBoundaries());
-		this.changed();
+//		this.changed();
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class HistogramModel
 		if (b != this.frequencyPolygonCumulativeMode)
 		{
 			this.frequencyPolygonCumulativeMode = b;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -175,7 +175,7 @@ public class HistogramModel
 			//System.out.println("... setNoBins(): boundaries=" + this.binBoundaries);
 		}
 
-		this.changed();
+//		this.changed();
 	}
 
 	/**
@@ -197,7 +197,7 @@ public class HistogramModel
 		if (!this.viewName.equals(viewName))
 		{
 			this.viewName = viewName;
-			this.changed();
+//			this.changed();
 		}
 
 	}
@@ -224,7 +224,7 @@ public class HistogramModel
 			this.statTableModel = tableModel;
 			//this.tableModel.addTableModelListener(this);
 			//this.tableModel.addSelectionListener(this);
-			this.changed();
+//			this.changed();
 		}
 
 	}
@@ -284,7 +284,7 @@ public class HistogramModel
 				}
 			}
 			
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -318,14 +318,14 @@ public class HistogramModel
 		if (this.splitOptions.getColumnSplitIndex() != columnSplitIndex)
 		{
 			this.splitOptions.setColumnSplitIndex(columnSplitIndex);
-			this.changed();
+//			this.changed();
 		}
 	}
 
 	public void setSplitBoundaries(ArrayList<Double> boundaries)
 	{
 		this.splitOptions.setBinBoundaries(boundaries);
-		this.changed();
+//		this.changed();
 	}
 
 	/**
@@ -339,7 +339,7 @@ public class HistogramModel
 		if (!(this.showUserOptions == b))
 		{
 			this.showUserOptions = b;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -414,7 +414,7 @@ public class HistogramModel
 		if (!(this.percentage == b))
 		{
 			this.percentage = b;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -430,7 +430,7 @@ public class HistogramModel
 		if (!(this.labelUnderBin == b))
 		{
 			this.labelUnderBin = b;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -462,7 +462,7 @@ public class HistogramModel
 		if (!(this.hasVerticalBars == b))
 		{
 			this.hasVerticalBars = b;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -479,10 +479,10 @@ public class HistogramModel
 //		this.changed();
 //	}
 
-	public void selectionChanged()
-	{
-		this.changed();
-	}
+//	public void selectionChanged()
+//	{
+//		this.changed();
+//	}
 
 	/**
 	 * @param splitInSingleView
@@ -503,7 +503,7 @@ public class HistogramModel
 		// dan moeten onderstaande acties ook uitgevoerd worden.
 		if (!splitInSingleView)
 			nextToEachOther = false;
-		this.changed();
+//		this.changed();
 	}
 
 	public void setNextToEachOther(boolean nextToEachOther)
@@ -513,7 +513,7 @@ public class HistogramModel
 			this.nextToEachOther = nextToEachOther;
 			if (nextToEachOther)
 				splitInSingleView = true;
-			this.changed();
+//			this.changed();
 		}
 	}
 
@@ -534,7 +534,7 @@ public class HistogramModel
 		if (this.frequencyPolygonStackMode != frequencyPolygonStackMode)
 		{
 			this.frequencyPolygonStackMode = frequencyPolygonStackMode;
-			this.changed();
+//			this.changed();
 		}
 	}
 
