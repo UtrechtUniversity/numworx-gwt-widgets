@@ -5,12 +5,16 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
 import fi.statistiekgwt.client.histogram.HistogramController;
 import fi.statistiekgwt.client.text.Text_nl;
@@ -38,9 +42,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	static final String upgradeMessage = 
 			"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
-	private HashMap<String, Object> launchState; 
+	private Map<String, Object> launchState; 
 	
-	LayoutPanel basisPanel;
+//	LayoutPanel basisPanel;
+	StatInteractiePanel basisPanel;
 
 	public static NumberFormat df = NumberFormat.getDecimalFormat();
 	public static String fontString = "12px sans-serif";
@@ -58,7 +63,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 											// "Frequentiepolygoon", "Boxplot", "Crosstab",
 											// "Scatterplot", "Descriptive statistics"};
 
+	int breedte;
+	int hoogte;
+	private static int WIDTH_OFFSET = 5;
+	private static int HEIGHT_OFFSET; 
+	public static int BUTTON_HEIGHT = 40; 
 	
+	boolean nagekeken = false;
+
+
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -72,17 +85,25 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public void onModuleLoad()
 	{
-		init();
+		initViews();
+		basisPanel = new StatInteractiePanel();
 		
 		// voeg statinteractiepanel toe
-//		RootPanel.get(holderId).add(basisPanel);
+		//RootPanel.get(holderId).add(basisPanel);
 		RootLayoutPanel.get().add(basisPanel);
 	}
 	
-	private void init()
+	/**
+	 * Deze methode wordt aangeroepen na init()
+	 */
+	private void initialize()
 	{
-		initViews();
-		basisPanel = new StatInteractiePanel();
+		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
+
+		this.basisPanel.setWidth(breedte);
+		this.basisPanel.setHeight(hoogte);
+		this.basisPanel.setState(launchState);
+		this.basisPanel.setPixelSize(breedte, hoogte);
 	}
 
 	static void initViews()
@@ -157,12 +178,16 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void zetNagekeken(boolean b) 
+	{
+			nagekeken = b;
+	}
 
 	@Override
 	public Widget asWidget()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return basisPanel;
 	}
 
 	@Override
@@ -175,15 +200,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public int getHeight()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override
@@ -193,12 +216,62 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 	}
 
+	/*
+	 * Default zero argument constructor is required.
+	 */
+	public StatistiekGWT()
+	{
+		
+	}
+	
+	public StatistiekGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden, int volleBreedte)
+	{	
+		initViews();
+		basisPanel = new StatInteractiePanel();
+
+		ObjectMap map = JSONUtilities.wrapMap(h);
+	
+		if(map != null)
+		{
+			if(map.containsKey("breedte"))
+				breedte = map.getInt("breedte");
+			if(map.containsKey("hoogte"))
+				hoogte = map.getInt("hoogte");
+		}
+		
+		if (h != null && h.get("interactiePanelLaunchState") != null)
+			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+
+		//alle gegevens uit launchState halen: 
+		init(breedte, hoogte, launchState, randomVarWaarden);
+	}
+
+	/**
+	 * Initialize with the values in launch data.
+	 */
 	@Override
-	public void init(int width, int height, Map<String, Object> launchData,
+	public void init(int width, int height, Map<String, Object> launchDataMap,
 		Map<String, Number> values)
 	{
-		// TODO Auto-generated method stub
+		breedte = width - 2 * WIDTH_OFFSET;
+		hoogte = height;
 		
+		ObjectMap launchData = JSONUtilities.wrapMap(launchDataMap);
+		launchState = launchDataMap;
+		
+		if (launchData != null)
+		{
+			// we hebben:
+			// tableModel
+			// selectionList
+			// statistiekViewTypes
+			// statistiekViewStates
+			// selectedView
+			// 
+		}
+		
+		// in initialize() wordt de launchState in statInteractiePanel gezet
+		this.initialize();
 	}
 	
 	public static StatistiekView createView(String viewType, String viewName,
@@ -208,13 +281,17 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 //		System.out.println("Statistiek.createView(viewType=" + viewType + ", viewName=" + viewName 
 //			+ ", identityHashCode(statTableModel)=" + identityHashCode(model) + ")");
 
+		StatistiekView view = null;
+		int w = statInteractiePanel != null ? statInteractiePanel.getWidth() : 0;
+		int h = statInteractiePanel != null ? Math.max(0, statInteractiePanel.getHeight() - HEIGHT_OFFSET) : 0;
+		
 		if (viewType.equals("Table"))
 		{
-			return new StatTable(model, statInteractiePanel, viewName);
+			view = new StatTable(model, statInteractiePanel, viewName);
 		}
 		else if (viewType.equals("Histogram"))
 		{
-			return new HistogramController(model, viewName, false, startVar);
+			view = new HistogramController(model, viewName, false, startVar, w, h);
 		}
 		else if (viewType.equals("Dotplot"))
 		{
@@ -226,7 +303,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Frequentiepolygoon"))
 		{
-			return new HistogramController(model, viewName, true, startVar);
+			return new HistogramController(model, viewName, true, startVar, w, h);
 		}
 		else if (viewType.equals("Boxplot"))
 		{
@@ -250,13 +327,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			//System.out.println("Statistiek.createView(): viewName = " + viewName);
 			//return new DescriptivesController(model, viewName, startVar);
 		}
-		else
-		{
-			//return null;
-		}
-		return null;
+		
+		return view;
 	}
 	
+	private void setHeightOffset()
+	{
+		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
+	}
+
 	/**
 	 * get the top level ancestor of a JComponent This implementation differs
 	 * from JComponent.getTopLevelAncestor because this doesn't stop at an
