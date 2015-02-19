@@ -22,10 +22,16 @@ public class TableChangeEvent extends GwtEvent<TableChangeEventHandler>
 	public static String IMPORT_CSV = "importCSV";
 
 	private final String info;
+	/**
+	 * The index of the column that has changed.
+	 * If not applicable the index is -1.
+	 */
+	private final int columnIndex;
 
-    public TableChangeEvent(String info) 
+    public TableChangeEvent(String info, int columnIndex) 
     {
         this.info = info;
+        this.columnIndex = columnIndex;
     }
 
 	@Override
@@ -43,5 +49,10 @@ public class TableChangeEvent extends GwtEvent<TableChangeEventHandler>
 	public String getInfo() 
 	{
         return this.info;
+    }
+
+	public int getColumnIndex() 
+	{
+        return this.columnIndex;
     }
 }
