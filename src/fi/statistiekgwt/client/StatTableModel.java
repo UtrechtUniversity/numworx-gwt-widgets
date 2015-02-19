@@ -5,9 +5,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -103,7 +109,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.viewsEditable = viewsEditable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_EDITABLE);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_EDITABLE, -1);
 		this.fireEvent(event);
 	}
 
@@ -117,7 +123,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.dataEditable = dataEditable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.DATA_EDITABLE);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.DATA_EDITABLE, -1);
 		this.fireEvent(event);
 	}
 
@@ -131,7 +137,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.viewsAddable = viewsAddable;
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_ADDABLE);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_ADDABLE, -1);
 		this.fireEvent(event);
 	}
 
@@ -157,39 +163,74 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	{
 		//System.out.println("StatTableModel.setState()");
 		
-		if (h.containsKey("rowCount"))
+		ObjectMap map = JSONUtilities.wrapMap(h);
+		
+		if (map.containsKey("rowCount"))
 		{
-			this.rowCount = ((Integer) h.get("rowCount")).intValue();
+			this.rowCount = map.getInt("rowCount");//((Number) h.get("rowCount")).intValue();
 		}
-		if (h.containsKey("columnCount"))
+		if (map.containsKey("columnCount"))
 		{
-			this.columnCount = ((Integer) h.get("columnCount")).intValue();
+			this.columnCount = map.getInt("columnCount");
 		}
-		if (h.containsKey("columnNames"))
+		if (map.containsKey("columnNames"))
 		{
-			this.columnNames = (ArrayList<String>) h.get("columnNames");
+			this.columnNames = new ArrayList(Arrays.asList(map.getStringArray("columnNames")));
 		}
-		if (h.containsKey("columnClass"))
+		if (map.containsKey("columnClass"))
 		{
-			this.columnClass = (ArrayList<ColumnType>) h.get("columnClass");
+			this.columnClass = new ArrayList(Arrays.asList((ArrayList<ColumnType>)(ArrayList<?>)map.getObjectList("columnClass")));//(ArrayList<ColumnType>) h.get("columnClass");
 		}
-		if (h.containsKey("values"))
+		if (map.containsKey("columnClassMapped"))
 		{
-			this.values = (ArrayList<ArrayList<Object>>) h.get("values");
-			// System.out.println("StatTableModel.setState(): values.size()=" +
-			// values.size());
+			this.columnClass = new ArrayList<ColumnType>();//(ArrayList<ColumnType>) h.get("columnClass");
+
+			List<Map<String, Object>> hashtable = map.getMapList("columnClassMapped");
+			for (Iterator iterator = hashtable.iterator(); iterator.hasNext();)
+			{
+				HashMap<String, Object> columnTypeMap = (HashMap<String, Object>) iterator.next();
+				ObjectMap columnTypeMap2 = JSONUtilities.wrapMap(columnTypeMap);
+				String typeString = (String) columnTypeMap.get("type");
+				AllowedTypes allowedType = null;
+				if (typeString.equals(AllowedTypes.INTEGER.toString()))
+					allowedType = AllowedTypes.INTEGER;
+				else if (typeString.equals(AllowedTypes.DOUBLE.toString()))
+					allowedType = AllowedTypes.DOUBLE;
+				else if (typeString.equals(AllowedTypes.ENUM.toString()))
+					allowedType = AllowedTypes.ENUM;
+				else if (typeString.equals(AllowedTypes.STRING.toString()))
+					allowedType = AllowedTypes.STRING;
+					
+				ColumnType type = new ColumnType(
+					allowedType, 
+					columnTypeMap2.getStringArray("enumOptions"),//(String[]) columnTypeMap.get("enumOptions"), 
+					(String) columnTypeMap.get("uitleg"));
+				this.columnClass.add(type);
+			}
 		}
-		if (h.containsKey("viewsEditable"))
+		if (map.containsKey("values"))
 		{
-			this.setViewsEditable(((Boolean) h.get("viewsEditable")).booleanValue());
+			ObjectList list = map.getObjectList("values");
+			this.values = new ArrayList<ArrayList<Object>>();
+			for (int i = 0; i < list.size(); i++) 
+			{
+				this.values.add(new ArrayList<Object>(list.getStringList(i)));
+			}
+			
+//			System.out.println("StatTableModel.setState(): values.size()=" +
+//				this.values.size());
 		}
-		if (h.containsKey("dataEditable"))
+		if (map.containsKey("viewsEditable"))
 		{
-			this.setDataEditable(((Boolean) h.get("dataEditable")).booleanValue());
+			this.setViewsEditable(map.getBoolean("viewsEditable"));
 		}
-		if (h.containsKey("viewsAddable"))
+		if (map.containsKey("dataEditable"))
 		{
-			this.setViewsAddable(((Boolean) h.get("viewsAddable")).booleanValue());
+			this.setDataEditable(map.getBoolean("dataEditable"));
+		}
+		if (map.containsKey("viewsAddable"))
+		{
+			this.setViewsAddable(map.getBoolean("viewsAddable"));
 		}
 
 		// this.selectionListeners = new ArrayList<SelectionListener>();
@@ -210,6 +251,24 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			this.stringOptions.add(stringsInHashtable(this.stringFrequencies.get(i)));
 		}
 	}
+	
+	private static List toList(Object object) 
+	{
+		if (object instanceof List)
+		{
+			return (List) object;
+		}
+		else if (object instanceof Object[])
+		{
+			Object[] objects = (Object[]) object;
+			return Arrays.asList(objects);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 
 	/**
 	 * This returns all key strings of a hashtable, sorted lexicographically
@@ -303,7 +362,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.columnNames.set(columnIndex, name);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_COLUMN_NAME);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_COLUMN_NAME, -1);
 		this.fireEvent(event);
 	}
 
@@ -645,7 +704,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.setValueAtWithoutEvent(o, rowIndex, columnIndex);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_VALUE_AT);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_VALUE_AT, columnIndex);
 		this.fireEvent(event);
 	}
 
@@ -706,7 +765,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.addRowWithoutEvent();
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_ROW);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_ROW, -1);
 		this.fireEvent(event);
 	}
 
@@ -737,7 +796,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.stringOptions.add(this.stringColumnOptions(this.columnCount - 1));
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN, -1);
 		this.fireEvent(event);
 	}
 
@@ -784,7 +843,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.editColumnWithoutEvent(columnIndex, columnName, cType);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.EDIT_COLUMN);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.EDIT_COLUMN, columnIndex);
 		this.fireEvent(event);
 	}
 
@@ -893,7 +952,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			this.rowCount--;
 
 			// send an event
-			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROW);
+			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROW, -1);
 			this.fireEvent(event);
 		}
 	}
@@ -1027,20 +1086,20 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	/**
 	 * Remove a column
 	 * 
-	 * @param column
+	 * @param columnIndex
 	 *            index of the column to remove
 	 */
-	public synchronized void removeColumn(int column)
+	public synchronized void removeColumn(int columnIndex)
 	{
-		if (column >= 0)
+		if (columnIndex >= 0)
 		{
-			this.columnNames.remove(column);
-			this.columnClass.remove(column);
-			this.stringFrequencies.remove(column);
+			this.columnNames.remove(columnIndex);
+			this.columnClass.remove(columnIndex);
+			this.stringFrequencies.remove(columnIndex);
 			
 			for (ArrayList<Object> row : this.values)
 			{
-				row.remove(column);
+				row.remove(columnIndex);
 			}
 			this.columnCount--;
 			
@@ -1048,10 +1107,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			// views. Als column < columnindex van view dan 
 			// columnindex - 1 voor ViewModel van alle views!
 			// als column == columnindex, dan verwijder view? of toon leeg
-			this.updateColumnIndexInViews(column);
+			this.updateColumnIndexInViews(columnIndex);
 
 			// send an event
-			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_COLUMN);
+			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_COLUMN, columnIndex);
 			this.fireEvent(event);
 		}
 	}
@@ -1155,7 +1214,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.quickSort(columnIndex, 0, this.rowCount - 1);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
 		this.fireEvent(event);
 	}
 
@@ -2072,7 +2131,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	public boolean isRowSelected(int rowIndex)
 	{
-		return this.selectionList.get(rowIndex);
+//		return this.selectionList.get(rowIndex);
+		return this.selectionList.get(rowIndex).booleanValue();
 	}
 
 	/**
@@ -2484,7 +2544,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.updateNumericalColumnTypesWithoutEvent();
 		
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.UPDATE_NUMERICAL_COLUMN_TYPES);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.UPDATE_NUMERICAL_COLUMN_TYPES, -1);
 		this.fireEvent(event);
 	}
 
