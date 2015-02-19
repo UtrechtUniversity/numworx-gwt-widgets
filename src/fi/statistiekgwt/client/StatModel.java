@@ -255,7 +255,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	}
 
 	/**
-	 * Remove all views
+	 * Remove all views without triggering an event.
 	 */
 	public void removeViewsWithoutEvent()
 	{
@@ -264,13 +264,34 @@ public class StatModel implements HasHandlers//extends Observable// implements T
         {
         	StatistiekView view = iterator.next();
         	if (view != null)
+        	{
         		iterator.remove();
+        	}
         }
 
 		this.views = new ArrayList<StatistiekView>();
 		this.viewInOwnWindow = new ArrayList<Boolean>();
 	}
 
+	/**
+	 * Remove all views
+	 */
+	public void removeViews()
+	{
+        Iterator<StatistiekView> iterator = this.views.iterator();
+        while (iterator.hasNext()) 
+        {
+        	StatistiekView view = iterator.next();
+        	if (view != null)
+        	{
+        		iterator.remove();
+        	}
+        }
+
+		this.views = new ArrayList<StatistiekView>();
+		this.viewInOwnWindow = new ArrayList<Boolean>();
+	}
+	
 	/**
 	 * Change data table
 	 * 
