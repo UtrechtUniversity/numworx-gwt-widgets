@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
@@ -13,6 +18,8 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.thirdparty.javascript.jscomp.CssRenamingMap.Style;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
+
+import fi.statistiekgwt.client.types.ColumnType;
 
 /**
  * Statistiek InteractiePanel MVC Controller
@@ -25,8 +32,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	private StatModel model;
 	private StatInteractiePanelView view;
 	public static final boolean DEBUG = false;
-	private double barHeight;//40;//3; 
+	private double barHeight; 
+	private static final int TAB_HEIGHT_OFFSET = 30;
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	
+	private int height;
+	private int width;
+
 
 	/**
 	 * Constructor
@@ -36,7 +48,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		super();
 		
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
-		barHeight = this.statistiekGWTClientBundle.crossResource().getHeight() + 30;
+		this.barHeight = this.statistiekGWTClientBundle.crossResource().getHeight() + StatInteractiePanel.TAB_HEIGHT_OFFSET;
 		
 		this.model = new StatModel();
 		this.view = new StatInteractiePanelView(this.model, this, barHeight, Unit.PX);
@@ -126,64 +138,115 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		return h;
 	}
 
-	public void setState(HashMap hashtable)
+	public void setState(Map<String, Object> launchState)
 	{
-		HashMap b = hashtable;//deepCopy(hashtable);
-		
 		this.model.removeViewsWithoutEvent();
+		this.view.removeViewTabs();
+		
+		ObjectMap map = JSONUtilities.wrapMap(launchState);
 
-		if (b.containsKey("tableModel"))
+		if(launchState != null)
 		{
-			this.model.getStatTableModel().setState((HashMap) b.get("tableModel"));
-			// this.view.setModel(this.model);
-		}
-		if (b.containsKey("selectionList"))
-		{
-			this.model.getStatTableModel().setSelectionList((ArrayList<Boolean>) b.get("selectionList"));
-		}
-		else
-		{
-			ArrayList<Boolean> selectionList = new ArrayList<Boolean>(
-				this.model.getStatTableModel().getRowCount());
-			for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
+			this.model.setResetHashtable((HashMap)launchState);
+
+			if (launchState.containsKey("tableModel"))
 			{
-				selectionList.add(false);
+				this.model.getStatTableModel().setState((HashMap) launchState.get("tableModel"));
+				// this.view.setModel(this.model);
 			}
-			this.model.getStatTableModel().setSelectionList(selectionList);
-		}
-
-		if (b.containsKey("statistiekViewTypes")
-			&& b.containsKey("statistiekViewStates"))
-		{
-			String[] statistiekViewTypes = (String[]) b.get("statistiekViewTypes");
-			Object[] statistiekViewStates = (Object[]) b.get("statistiekViewStates");
-
-			for (int i = 0; i < statistiekViewTypes.length; i++)
+			if (launchState.containsKey("selectionList"))
 			{
-				StatistiekView statistiekView = StatistiekGWT.createView(
-					statistiekViewTypes[i], "", this.model.getStatTableModel(), 0, 0, this);
-				if (statistiekView != null)
+				this.model.getStatTableModel().setSelectionList(
+					new ArrayList<Boolean>(map.getBooleanList("selectionList")));
+			}
+			else
+			{
+				ArrayList<Boolean> selectionList = new ArrayList<Boolean>(
+					this.model.getStatTableModel().getRowCount());
+				for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
 				{
-					statistiekView.setState(statistiekViewStates[i]);
-					this.model.addView(statistiekView);
+					selectionList.add(false);
 				}
-
+				this.model.getStatTableModel().setSelectionList(selectionList);
 			}
-			// this.view.setModel(this.model);
-		}
-
-		if (b.containsKey("selectedView"))
-		{
-			int index = ((Integer) b.get("selectedView")).intValue();
-			// System.out.println("StatInteractiePanel.setState(): selectedView in hashtable = "
-			// + index);
-			this.view.processSelectedTab(index);
+	
+			if (launchState.containsKey("statistiekViewTypes")
+				&& launchState.containsKey("statistiekViewStates"))
+			{
+				String[] statistiekViewTypes = map.getStringArray("statistiekViewTypes");//(String[]) launchState.get("statistiekViewTypes");
+				ObjectList statistiekViewStates = map.getObjectList("statistiekViewStates");
+	
+				for (int i = 0; i < statistiekViewTypes.length; i++)
+				{
+					StatistiekView statistiekView = StatistiekGWT.createView(
+						statistiekViewTypes[i], "", this.model.getStatTableModel(), 0, 0, this);
+					if (statistiekView != null)
+					{
+						if (statistiekViewTypes[i].equals(StatistiekGWT.VIEWS[0])) // Table
+						{
+							statistiekView.setState(statistiekViewStates.getString(i));
+						}
+						else
+						{
+							HashMap state = (HashMap) statistiekViewStates.getObjectMap(i);
+							statistiekView.setState(state);
+						}
+						
+						this.model.addView(statistiekView);
+					}
+				}
+				// this.view.setModel(this.model);
+			}
+	
+			if (launchState.containsKey("selectedView"))
+			{
+				int index = map.getInt("selectedView");
+				// System.out.println("StatInteractiePanel.setState(): selectedView in launchState = "
+				// + index);
+				this.view.processSelectedTab(index);
+			}
 		}
 	}
 
 	public void setBounds(int x, int y, int b, int h)
 	{
 		super.setSize(String.valueOf(b), String.valueOf(h));
+	}
+	
+	/**
+	 * Set the width of statinteractiepanel.
+	 * 
+	 * @param w
+	 */
+	public void setWidth(int w)
+	{
+		this.width = w;
+	}
+
+	/**
+	 * Set the height of statinteractiepanel.
+	 * 
+	 * @param h
+	 */
+	public void setHeight(int h)
+	{
+		this.height = h;
+	}
+
+	/**
+	 * Get the width of statinteractiepanel.
+	 */
+	public int getWidth()
+	{
+		return this.width;
+	}
+
+	/**
+	 * Get the height of statinteractiepanel.
+	 */
+	public int getHeight()
+	{
+		return this.height;
 	}
 
 	public void wis()
@@ -470,12 +533,15 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		
 //		Hashtable b = deepCopy(hashtable);
 //		Hashtable resetHashtable = deepCopy(hashtable);
+		
+		ObjectMap map = JSONUtilities.wrapMap(hashMap);
 
 		// Deep copy the hashtable, else references will be copied and fields
 		// within resetHashtable can be changed.
 		this.model.setResetHashtable(hashMap);
 
 		this.model.removeViewsWithoutEvent();
+		this.view.removeViewTabs();
 
 		if (hashMap.containsKey("tableModel"))
 		{
@@ -487,8 +553,10 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		ArrayList<Boolean> selectionList;
 		if (hashMap.containsKey("selectionList"))
 		{
-			selectionList = (ArrayList<Boolean>) hashMap.get("selectionList");
-			this.model.getStatTableModel().setSelectionList(selectionList);
+			this.model.getStatTableModel().setSelectionList(
+				new ArrayList<Boolean>(map.getBooleanList("selectionList")));
+//			selectionList = (ArrayList<Boolean>) hashMap.get("selectionList");
+//			this.model.getStatTableModel().setSelectionList(selectionList);
 		}
 		else
 		{
@@ -503,10 +571,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		if (hashMap.containsKey("statistiekViewTypes")
 			&& hashMap.containsKey("statistiekViewStates"))
 		{
-			String[] statistiekViewTypes = (String[]) hashMap
-				.get("statistiekViewTypes");
-			Object[] statistiekViewStates = (Object[]) hashMap
-				.get("statistiekViewStates");
+			String[] statistiekViewTypes = map.getStringArray("statistiekViewTypes");//(String[]) launchState.get("statistiekViewTypes");
+			ObjectList statistiekViewStates = map.getObjectList("statistiekViewStates");
 
 			for (int i = 0; i < statistiekViewTypes.length; i++)
 			{
@@ -514,23 +580,62 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 					statistiekViewTypes[i], "", this.model.getStatTableModel(), 0, 0, this);
 				if (statistiekView != null)
 				{
-					statistiekView.setState(statistiekViewStates[i]);
+					if (statistiekViewTypes[i].equals(StatistiekGWT.VIEWS[0])) // Table
+					{
+						statistiekView.setState(statistiekViewStates.getString(i));
+					}
+					else
+					{
+						HashMap state = (HashMap) statistiekViewStates.getObjectMap(i);
+						statistiekView.setState(state);
+					}
+					
 					this.model.addView(statistiekView);
 				}
-
 			}
-			// this.view.setModel(this.model);
+
+//			String[] statistiekViewTypes = (String[]) hashMap
+//				.get("statistiekViewTypes");
+//			Object[] statistiekViewStates = (Object[]) hashMap
+//				.get("statistiekViewStates");
+//
+//			for (int i = 0; i < statistiekViewTypes.length; i++)
+//			{
+//				StatistiekView statistiekView = StatistiekGWT.createView(
+//					statistiekViewTypes[i], "", this.model.getStatTableModel(), 0, 0, this);
+//				if (statistiekView != null)
+//				{
+//					statistiekView.setState(statistiekViewStates[i]);
+//					this.model.addView(statistiekView);
+//				}
+//
+//			}
+//			// this.view.setModel(this.model);
 		}
 
 		if (hashMap.containsKey("selectedView"))
 		{
+			int index = map.getInt("selectedView");
+			// System.out.println("StatInteractiePanel.setState(): selectedView in launchState = "
+			// + index);
+			this.view.processSelectedTab(index);
+
 			// test syl
 //			System.out.println("StatInteractiePanel.zetOpdracht(): selectedView in hashtable = "
 //			 + ((Integer)b.get("selectedView")).intValue());
-			this.view.processSelectedTab(((Integer) hashMap.get("selectedView")).intValue());
+			//this.view.processSelectedTab(((Integer) hashMap.get("selectedView")).intValue());
 			// test syl
 //			this.view.processSelectedTab(1); // ?? geeft geen tab 1??!!
 		}
 	}
 
+	/**
+	 * Get the height of the tab panels bar height.
+	 * 
+	 * @return bar height
+	 */
+	public double getBarHeight()
+	{
+		return this.barHeight;
+	}
 }
