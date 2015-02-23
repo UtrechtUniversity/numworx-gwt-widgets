@@ -4,11 +4,11 @@ package fi.calculatorgwt.client;
 import java.util.HashMap;
 import java.util.Map;
 
-//import nl.uu.fi.dwo.interaction.client.InteractionStub;
-//import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-//import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
-//import nl.uu.fi.dwo.interaction.client.Stub;
-//import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 
 
@@ -41,7 +41,7 @@ import com.google.gwt.user.client.ui.Widget;
 import fi.calculatorgwt.client.text.Text_nl;
 
 
-public class CalculatorGWT implements EntryPoint {//, InteractionStub {
+public class CalculatorGWT implements EntryPoint, InteractionStub {
 	
 	public static Text_nl rb = new Text_nl();
 	//protected static Locale language;
@@ -602,7 +602,6 @@ public class CalculatorGWT implements EntryPoint {//, InteractionStub {
 		//repaint();
 	}
 
-	/*
 	@Override
 	public HashMap<String, Object> getState() {
 		// TODO Auto-generated method stub
@@ -671,15 +670,13 @@ public class CalculatorGWT implements EntryPoint {//, InteractionStub {
 		// TODO Auto-generated method stub
 		
 	}
-	*/
 
-	//@Override
+	@Override
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
 		breedte = width;
 		hoogte = height;
 		
-		/*
 		ObjectMap h = JSONUtilities.wrapMap(launchData);
 		
 		if (launchData != null)
@@ -693,7 +690,7 @@ public class CalculatorGWT implements EntryPoint {//, InteractionStub {
 			if (h.containsKey("logaritmeKnoppen"))
 				logaritmeKnoppen = h.getBoolean("logaritmeKnoppen");
 		}
-		*/
+		
 		
 		initialize();
 		
