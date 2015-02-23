@@ -10,15 +10,22 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
-
-
-
-
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.FontWeight;
+import com.google.gwt.dom.client.Style.TextAlign;
+import com.google.gwt.dom.client.Style.VerticalAlign;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
@@ -32,11 +39,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 
 
-
-
-
-
-
 //import fi.calculatorgwt.ReplaceCaret;
 import fi.calculatorgwt.client.text.Text_nl;
 
@@ -44,6 +46,7 @@ import fi.calculatorgwt.client.text.Text_nl;
 public class CalculatorGWT implements EntryPoint, InteractionStub {
 	
 	public static Text_nl rb = new Text_nl();
+	private boolean isNederlands = true;
 	//protected static Locale language;
 	
 	FlowPanel basisPanel;
@@ -89,7 +92,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	int linksTeller, rechtsTeller;
 	
 	RadioButton gradenButton, radialenButton;
-	//ButtonGroup groep;
 	
 	boolean syntaxError;//, mathError;
 	String subString;
@@ -100,6 +102,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	CssColor blauw, oranje, groen, geel, lichtgeel, grijs, donkergrijs, lichtblauw, witblauw;
 	
 	boolean breuk = false;
+	
 	int rmMode = 1;
 	boolean gradenInstelbaar = true;
 	boolean gonioKnoppen = true;
@@ -140,7 +143,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	
 	public void initialize()
 	{
-		//setLayout(new BorderLayout(5, 5));
+		
 		
 //		theFont = new Font("Sansserif", Font.BOLD, 16);
 //		theFM = getFontMetrics(theFont);
@@ -188,10 +191,10 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		}
 		else
 		{
-			knopBreedte = (breedte - 30)/10;
+			knopBreedte = (breedte - 30)/10 - 1;
 			knopHoogteBasis = (hoogte - 50)/5;
 			knopHoogteNavigatie = knopHoogteBasis;
-			knopHoogteExtra = 30;
+			knopHoogteExtra = (hoogte - 50) / 6;
 		}
 		
 		getalKnop = new Button[10];
@@ -216,7 +219,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		if(rmMode < 2)
 			kolomBreedte = breedte / 5;
 		else
-			kolomBreedte = breedte / 10; //TODO: hier juiste breedte bepalen.
+			kolomBreedte = breedte / 10; 
 		
 		pijlLinksKnop = maakButton("\u25C4", blauw, witblauw, kolomBreedte - 5, knopHoogteNavigatie);
 		pijlRechtsKnop = maakButton("\u25BA", blauw, witblauw, kolomBreedte - 5, knopHoogteNavigatie);
@@ -224,10 +227,10 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		delKnop = maakButton("DEL", blauw, witblauw, kolomBreedte - 4, knopHoogteNavigatie);
 		cKnop = maakButton("C", blauw, witblauw, kolomBreedte - 5, knopHoogteNavigatie);
 		
-		//if(CalculatorGWT.language.toString().equals("nl"))
+		if(isNederlands)
 			kommaKnop = maakButton(",", grijs, witblauw, knopBreedte, knopHoogteBasis);
-		//else
-		//	kommaKnop = maakButton(".", grijs, witblauw);
+		else
+			kommaKnop = maakButton(".", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		negatiefKnop = maakButton("(-)", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		ansKnop = maakButton("Ans", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		isKnop = maakButton("=", groen, CssColor.make("white"), knopBreedte, knopHoogteBasis);
@@ -243,38 +246,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		eKnop = maakButton("e", grijs, witblauw, knopBreedte, knopHoogteExtra);
 		nWortelKnop = maakButton("\u207F\u221A", grijs, witblauw, knopBreedte, knopHoogteExtra);
 		
-//		for(int i = 0; i < 10; i++)
-//			getalKnop[i].addActionListener(this);
-//		plusKnop.addActionListener(this);
-//		minKnop.addActionListener(this);
-//		keerKnop.addActionListener(this);
-//		deelKnop.addActionListener(this);
-//		machtKnop.addActionListener(this);
-//		kwadraatKnop.addActionListener(this);
-//		wortelKnop.addActionListener(this);
-//		eenGedeeldDoorKnop.addActionListener(this);
-//		breukKnop.addActionListener(this);
-//		expKnop.addActionListener(this);
-//		haakLinksKnop.addActionListener(this);
-//		haakRechtsKnop.addActionListener(this);
-//		pijlLinksKnop.addActionListener(this);
-//		pijlRechtsKnop.addActionListener(this);
-//		insKnop.addActionListener(this);
-//		delKnop.addActionListener(this);
-//		cKnop.addActionListener(this);
-//		kommaKnop.addActionListener(this);
-//		negatiefKnop.addActionListener(this);
-//		ansKnop.addActionListener(this);
-//		isKnop.addActionListener(this);
-//		sinKnop.addActionListener(this);
-//		cosKnop.addActionListener(this);
-//		tanKnop.addActionListener(this);
-//		invKnop.addActionListener(this);
-//		piKnop.addActionListener(this);
-//		logKnop.addActionListener(this);
-//		lnKnop.addActionListener(this);
-//		eKnop.addActionListener(this);
-//		nWortelKnop.addActionListener(this);
+
 		leegLabel = new Label[15];
 		for(int i = 0; i<15; i++)
 			leegLabel[i] = new Label("");
@@ -285,58 +257,60 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		knoppenPanel = new FlowPanel();
 		
-		
-		//TODO: widgetleftwidth etc zetten
-		//add(knoppenPanel, BorderLayout.CENTER);
-		
-//		linkerKnoppen = new ();
-//		//linkerKnoppen.setLayout(new GridLayout(6, 5, 3, 3));
-//		rechterKnoppen = new LayoutPanel();
-//		//rechterKnoppen.setLayout(new GridLayout (5, 5, 3, 3));
-//		bovensteKnoppen = new FlowPanel();
-//		//bovensteKnoppen.setLayout(new GridLayout(1, 5, 3, 3));
-//		ondersteKnoppen = new LayoutPanel();
-//		
 		instellingenPanel = new FlowPanel();
-		//instellingenPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
-		gradenButton = new RadioButton(rb.getString("gradenButton"));
-		//gradenButton.addActionListener(this);
+		String groep =  "groep";
+		gradenButton = new RadioButton(groep, rb.getString("gradenButton"));
+		gradenButton.addClickHandler(new ClickHandler(){
+			public void onClick(ClickEvent e)
+			{
+				graden = true;
+			}
+		});
 		
-		radialenButton = new RadioButton(rb.getString("radialenButton"));
-		//radialenButton.setSelected(true);
-		//radialenButton.addActionListener(this);
-		
-//		groep = new ButtonGroup();
-//		groep.add(gradenButton);
-//		groep.add(radialenButton);
+		radialenButton = new RadioButton(groep, rb.getString("radialenButton"));
+		radialenButton.addClickHandler(new ClickHandler(){
+			public void onClick(ClickEvent e)
+			{
+				graden = false;
+			}
+		});
+		radialenButton.setValue(true);
 		
 		zetRmMode(rmMode, gradenInstelbaar);
 		
 		//replaceCaret = new ReplaceCaret();
 		//defaultCaret = new DefaultCaret();
+		LayoutPanel invoerPanel = new LayoutPanel();
+		invoerPanel.setPixelSize(breedte, 25);
+		
 		
 		invoerVeld = new TextBox();
-		invoerVeld.setWidth((breedte - 10) + "px");
+		invoerVeld.setWidth((breedte - 16) + "px");
 		invoerVeld.getElement().getStyle().setBackgroundColor(witblauw.toString());
+		invoerVeld.getElement().getStyle().setPaddingLeft(10, Style.Unit.PX);
+		invoerVeld.getElement().getStyle().setFontSize(14, Style.Unit.PX);
+		invoerVeld.getElement().getStyle().setFontWeight(FontWeight.BOLD);
+		invoerVeld.getElement().setAttribute("spellCheck", "false");
+		invoerVeld.addKeyDownHandler(new RmKeyDownHandler());
+		invoerVeld.addKeyPressHandler(new RmKeyPressHandler());
+		invoerVeld.addMouseUpHandler(new RmMouseUpHandler());
+		
 //		//invoerVeld.setCaret(defaultCaret);
 //		invoerVeld.getCaret().setBlinkRate(500);
 //		invoerVeld.getCaret().setVisible(true);
-//		invoerVeld.setBackground(witblauw);
-//		invoerVeld.setFont(theFont);
-//		invoerVeld.setMargin(new Insets(8,10,3,3));
-//		invoerVeld.addKeyListener(this);
-//		invoerVeld.addMouseListener(this);
 
 		invLabel = new Label("I");
-		//invLabel.setFont(theSmallFont);
-		//invLabel.setOpaque(true);
-		//invLabel.setBackground(Color.BLACK);
-		//invLabel.setForeground(witblauw);
-		//invLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		//invLabel.setBounds(2,2,5,6);
-		//invLabel.setVisible(invers);
-		//invoerVeld.add(invLabel, 0);
+		invLabel.getElement().getStyle().setFontSize(6, Style.Unit.PX);
+		invLabel.getElement().getStyle().setBackgroundColor("black");
+		invLabel.getElement().getStyle().setColor(witblauw.toString());
+		invLabel.setVisible(invers);
+		invoerPanel.add(invoerVeld);
+		invoerPanel.setWidgetLeftRight(invoerVeld, 0, Style.Unit.PX, 0, Style.Unit.PX);
+		invoerPanel.setWidgetTopHeight(invoerVeld, 0, Style.Unit.PX, 25, Style.Unit.PX);
+		invoerPanel.add(invLabel);
+		invoerPanel.setWidgetLeftWidth(invLabel, 2, Style.Unit.PX, 5, Style.Unit.PX);
+		invoerPanel.setWidgetTopHeight(invLabel, 2, Style.Unit.PX, 7, Style.Unit.PX);
 		
 		uitvoerVeld = new Label("0");
 		uitvoerVeld.setWidth(breedte + "px");
@@ -345,14 +319,8 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		uitvoerVeld.getElement().getStyle().setBackgroundColor(lichtblauw.toString());
 		uitvoerVeld.getElement().getStyle().setFontSize(14, Style.Unit.PX);
 		uitvoerVeld.getElement().getStyle().setFontWeight(FontWeight.BOLD);
-		//uitvoerVeld.setHorizontalAlignment(JLabel.RIGHT);
-		//uitvoerVeld.setFont(theLargeFont);
 		
-		//uitvoerPanel = new FlowPanel();
-		//uitvoerPanel.setLayout(new BorderLayout());
-		//uitvoerPanel.setBackground(lichtblauw);
-		
-		basisPanel.add(invoerVeld);
+		basisPanel.add(invoerPanel);
 		basisPanel.add(uitvoerVeld);
 
 		basisPanel.add(knoppenPanel);
@@ -363,23 +331,22 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	{
 		Button button = new Button(s);
 		button.removeStyleName("gwt-Button");
-		//button.setFont(theLargeFont);
 		button.getElement().getStyle().setBackgroundColor(backGround.toString());
 		button.getElement().getStyle().setColor(foreGround.toString());
 		//kunnen ook naar CSS.
-		button.getElement().getStyle().setFontSize(14, Style.Unit.PX);
+		button.getElement().getStyle().setFontSize(13, Style.Unit.PX);
 		button.getElement().getStyle().setFontWeight(FontWeight.BOLD);
 		button.setPixelSize(width, height);
-		//button.setMargin(new Insets(0, 0, 0, 0));
+		button.addClickHandler(new RmClickHandler());
 		return button;
 	}
 	
 	public Label maakLabel(String s, CssColor c)
 	{
 		Label label = new Label(s);
-		//label.setFont(theLargeFont);
-		//label.setForeground(c);
-		//label.setVerticalAlignment(SwingConstants.BOTTOM);
+		label.getElement().getStyle().setColor(c.toString());
+		label.getElement().getStyle().setFontSize(14, Style.Unit.PX);
+		label.getElement().getStyle().setFontWeight(FontWeight.BOLD);
 		return label;
 	}
 	
@@ -399,11 +366,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			graden = true;
 		else
 			graden = false;
-		//knoppenPanel.clear();
 		
 		if(rmMode < 2)
 		{
-			//knoppenPanel.setLayout(new BorderLayout(5, 5));
 			bovensteKnoppen = new Grid(1, 5);
 			if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen)
 			{
@@ -414,19 +379,12 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			else
 				ondersteKnoppen = new Grid(4,6);
 				
-			//ondersteKnoppen.getCellFormatter().
-			
 			bovensteKnoppen.setWidget(0, 0, pijlLinksKnop);
 			bovensteKnoppen.setWidget(0, 1, pijlRechtsKnop);
 			bovensteKnoppen.setWidget(0, 2, insKnop);
 			bovensteKnoppen.setWidget(0, 3, delKnop);
 			bovensteKnoppen.setWidget(0, 4, cKnop);
 			
-//			bovensteKnoppen.add(pijlRechtsKnop);
-//			bovensteKnoppen.add(insKnop);
-//			bovensteKnoppen.add(delKnop);
-//			bovensteKnoppen.add(cKnop);
-//			
 			knoppenPanel.add(bovensteKnoppen);
 			knoppenPanel.add(ondersteKnoppen);
 		
@@ -434,18 +392,10 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			{	instellingenPanel.add(gradenButton);
 				instellingenPanel.add(radialenButton);
 				knoppenPanel.add(instellingenPanel);
+				instellingenPanel.getElement().getStyle().setTextAlign(TextAlign.LEFT);
 				
 				
 			}
-			
-			//ondersteKnoppen.clear();
-//			if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen)
-//				ondersteKnoppen.setLayout(new GridLayout(5, 8, 3, 3));
-//			else if(rmMode == 1)
-//				ondersteKnoppen.setLayout(new GridLayout(4, 8, 3, 3));
-//			else
-//				ondersteKnoppen.setLayout(new GridLayout(4, 6, 3, 3));
-				
 			ondersteKnoppen.setWidget(0, 0, getalKnop[7]);
 			ondersteKnoppen.setWidget(0, 1, getalKnop[8]);
 			ondersteKnoppen.setWidget(0, 2, getalKnop[9]);
@@ -458,8 +408,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 					ondersteKnoppen.setWidget(0, 7, sinKnop);
 				else if(logaritmeKnoppen)
 					ondersteKnoppen.setWidget(0, 7, eenGedeeldDoorKnop);
-				//else
-				//	ondersteKnoppen.add(leegLabel[1]);
 			}
 			
 			ondersteKnoppen.setWidget(1, 0, getalKnop[4]);
@@ -477,8 +425,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 					ondersteKnoppen.setWidget(1, 7, cosKnop);
 				else if(logaritmeKnoppen)
 					ondersteKnoppen.setWidget(1, 7, breukKnop);
-				//else
-				//	ondersteKnoppen.setWidget(leegLabel[2]);
 			}
 			
 			ondersteKnoppen.setWidget(2, 0, getalKnop[1]);
@@ -516,119 +462,109 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				k++;
 			}
 			ondersteKnoppen.setWidget(3, k, isKnop);
-			if(gonioKnoppen && logaritmeKnoppen)
+			if(rmMode == 1 && (gonioKnoppen || logaritmeKnoppen))
 				ondersteKnoppen.setWidget(3, 7, invKnop);
 			if(rmMode == 1)
-			{	k = 0;
-				if(gonioKnoppen ^ logaritmeKnoppen)
-				{	ondersteKnoppen.setWidget(4, 0, invKnop);
-					k++;
-				}
-				if(gonioKnoppen && logaritmeKnoppen)
+			{	if(gonioKnoppen && logaritmeKnoppen)
 				{
-					ondersteKnoppen.setWidget(4, k, eenGedeeldDoorKnop);
-					ondersteKnoppen.setWidget(4, k+1, breukKnop);
-					ondersteKnoppen.setWidget(4, k+2, expKnop);
-					//ondersteKnoppen.setWidget(leegLabel[0]);
+					ondersteKnoppen.setWidget(4, 0, eenGedeeldDoorKnop);
+					ondersteKnoppen.setWidget(4, 1, breukKnop);
+					ondersteKnoppen.setWidget(4, 2, expKnop);
 				}
 			}
 			
 		}
 		else
-		{	//knoppenPanel.setLayout(new GridLayout(1, 2, 10, 5));
-			
+		{	
+			linkerKnoppen = new Grid(4, 5);
+			rechterKnoppen = new Grid(5, 5);
+			linkerKnoppen.setCellPadding(0);
+			rechterKnoppen.setCellPadding(0);
+			linkerKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+			rechterKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+			linkerKnoppen.getElement().getStyle().setVerticalAlign(VerticalAlign.TOP);
+			rechterKnoppen.getElement().getStyle().setPaddingLeft(10, Style.Unit.PX);
 			knoppenPanel.add(linkerKnoppen);
 			knoppenPanel.add(rechterKnoppen);
 			
-			linkerKnoppen.add(invKnop);
-			linkerKnoppen.add(leegLabel[0]);
-			linkerKnoppen.add(leegLabel[1]);
-			linkerKnoppen.add(leegLabel[2]);
-			linkerKnoppen.add(leegLabel[3]);
+			linkerKnoppen.setWidget(0, 0, invKnop);
+			int tussenRuimte = 20;
+			sinInvLabel.getElement().getStyle().setPaddingTop(tussenRuimte, Style.Unit.PX);
+			cosInvLabel.getElement().getStyle().setPaddingTop(tussenRuimte, Style.Unit.PX);
+			tanInvLabel.getElement().getStyle().setPaddingTop(tussenRuimte, Style.Unit.PX);
+			decLabel.getElement().getStyle().setPaddingTop(tussenRuimte, Style.Unit.PX);
 			
-			linkerKnoppen.add(sinInvLabel);
-			linkerKnoppen.add(cosInvLabel);
-			linkerKnoppen.add(tanInvLabel);
-			linkerKnoppen.add(decLabel);
-			linkerKnoppen.add(leegLabel[4]);
+			linkerKnoppen.setWidget(1, 0, sinInvLabel);
+			linkerKnoppen.setWidget(1, 1, cosInvLabel);
+			linkerKnoppen.setWidget(1, 2, tanInvLabel);
+			linkerKnoppen.setWidget(1, 3, decLabel);
 			
-			linkerKnoppen.add(sinKnop);
-			linkerKnoppen.add(cosKnop);
-			linkerKnoppen.add(tanKnop);
-			linkerKnoppen.add(breukKnop);
-			linkerKnoppen.add(expKnop);
+			linkerKnoppen.setWidget(2, 0, sinKnop);
+			linkerKnoppen.setWidget(2, 1, cosKnop);
+			linkerKnoppen.setWidget(2, 2, tanKnop);
+			linkerKnoppen.setWidget(2, 3, breukKnop);
+			linkerKnoppen.setWidget(2, 4, expKnop);
 			
-			linkerKnoppen.add(wortelKnop);
-			linkerKnoppen.add(kwadraatKnop);
-			linkerKnoppen.add(machtKnop);
-			linkerKnoppen.add(eenGedeeldDoorKnop);
-			linkerKnoppen.add(piKnop);
+			linkerKnoppen.setWidget(3, 0, wortelKnop);
+			linkerKnoppen.setWidget(3, 1, kwadraatKnop);
+			linkerKnoppen.setWidget(3, 2, machtKnop);
+			linkerKnoppen.setWidget(3, 3, eenGedeeldDoorKnop);
+			linkerKnoppen.setWidget(3, 4, piKnop);
 		
-			for(int j = 5; j < 15; j++)
-				linkerKnoppen.add(leegLabel[j]);
+			rechterKnoppen.setWidget(0, 0, pijlLinksKnop);
+			rechterKnoppen.setWidget(0, 1, pijlRechtsKnop);
+			rechterKnoppen.setWidget(0, 2, insKnop);
+			rechterKnoppen.setWidget(0, 3, delKnop);
+			rechterKnoppen.setWidget(0, 4, cKnop);
 			
-			rechterKnoppen.add(pijlLinksKnop);
-			rechterKnoppen.add(pijlRechtsKnop);
-			rechterKnoppen.add(insKnop);
-			rechterKnoppen.add(delKnop);
-			rechterKnoppen.add(cKnop);
+			rechterKnoppen.setWidget(1, 0, getalKnop[7]);
+			rechterKnoppen.setWidget(1, 1, getalKnop[8]);
+			rechterKnoppen.setWidget(1, 2, getalKnop[9]);
+			rechterKnoppen.setWidget(1, 3, keerKnop);
+			rechterKnoppen.setWidget(1, 4, deelKnop);
 			
-			rechterKnoppen.add(getalKnop[7]);
-			rechterKnoppen.add(getalKnop[8]);
-			rechterKnoppen.add(getalKnop[9]);
-			rechterKnoppen.add(keerKnop);
-			rechterKnoppen.add(deelKnop);
+			rechterKnoppen.setWidget(2, 0, getalKnop[4]);
+			rechterKnoppen.setWidget(2, 1, getalKnop[5]);
+			rechterKnoppen.setWidget(2, 2, getalKnop[6]);
+			rechterKnoppen.setWidget(2, 3, plusKnop);
+			rechterKnoppen.setWidget(2, 4, minKnop);
 			
-			rechterKnoppen.add(getalKnop[4]);
-			rechterKnoppen.add(getalKnop[5]);
-			rechterKnoppen.add(getalKnop[6]);
-			rechterKnoppen.add(plusKnop);
-			rechterKnoppen.add(minKnop);
+			rechterKnoppen.setWidget(3, 0, getalKnop[1]);
+			rechterKnoppen.setWidget(3, 1, getalKnop[2]);
+			rechterKnoppen.setWidget(3, 2, getalKnop[3]);
+			rechterKnoppen.setWidget(3, 3, haakLinksKnop);
+			rechterKnoppen.setWidget(3, 4, haakRechtsKnop);
 			
-			rechterKnoppen.add(getalKnop[1]);
-			rechterKnoppen.add(getalKnop[2]);
-			rechterKnoppen.add(getalKnop[3]);
-			rechterKnoppen.add(haakLinksKnop);
-			rechterKnoppen.add(haakRechtsKnop);
-			
-			rechterKnoppen.add(getalKnop[0]);
-			rechterKnoppen.add(kommaKnop);
-			rechterKnoppen.add(negatiefKnop);
-			rechterKnoppen.add(ansKnop);
-			rechterKnoppen.add(isKnop);
+			rechterKnoppen.setWidget(4, 0, getalKnop[0]);
+			rechterKnoppen.setWidget(4, 1, kommaKnop);
+			rechterKnoppen.setWidget(4, 2, negatiefKnop);
+			rechterKnoppen.setWidget(4, 3, ansKnop);
+			rechterKnoppen.setWidget(4, 4, isKnop);
 		}
-			
-		//revalidate();
-		//repaint();
 	}
 
 	@Override
 	public HashMap<String, Object> getState() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public int getScore() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public Boolean isCorrect() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void kijkNa() {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -690,9 +626,1683 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			if (h.containsKey("logaritmeKnoppen"))
 				logaritmeKnoppen = h.getBoolean("logaritmeKnoppen");
 		}
-		
+		//TODO: boolean isNederlands juiste waarde geven afhankelijk van taal profiel.
 		
 		initialize();
 		
 	}
+	
+	public void maakBerekenbaar(String s)
+	{
+		sb.delete(0, sb.length());
+		sb.append(s);
+		
+		//Alle kwadraten veranderen in ^2
+		for(int i = 0; i < sb.length(); i++)
+			if(sb.charAt(i) == '\u00B2')
+				sb.replace(i, i+1, "^2");
+		
+		//Alle ^(-1) goed schrijven
+		for(int i = 0; i < sb.length()-1; i++)
+			if(sb.charAt(i) == '\u207B')
+				sb.replace(i, i+2, "^-1");
+		
+		//Alle *10^x goed schrijven
+		for(int i = 0; i < sb.length()-1; i++)
+			if(sb.charAt(i) == '\u2081')
+			{	if(sb.length() < i + 3)
+					syntaxError = true;
+				else if(sb.charAt(i+2) == '-' || sb.charAt(i+2) == '\u2212')
+					sb.replace(i, i+3, "G");
+				else
+					sb.replace(i, i+2, "E");
+			}
+		
+		//Zorgen dat voor en na elke komma getallen staan
+		for(int i = 0; i < sb.length(); i++)
+			if(sb.charAt(i) == ',')
+			{	if(i == 0)
+					sb.insert(0, '0');
+				else if(!Character.isDigit(sb.charAt(i-1)))
+					sb.insert(i, '0');
+				if(i == sb.length()-1)
+					sb.append('0');
+				else if(!Character.isDigit(sb.charAt(i+1)))
+					sb.insert(i+1, '0');
+			}
+		
+		//Alle komma's veranderen in punten
+		for(int i = 0; i< sb.length(); i++)
+			if(sb.charAt(i) == ',')
+				sb.setCharAt(i, '.');
+		
+		//Aantal linker- en rechterhaakjes kloppend maken
+		berekenTellers(sb);
+		if(rechtsTeller > linksTeller)
+			syntaxError = true;
+		else if(linksTeller > rechtsTeller)
+			for(int i = 0; i < linksTeller - rechtsTeller; i++)
+			{	sb.append(')');
+				invoerVeld.setText(invoerVeld.getText()+")");
+			}
+		
+		//Maaltekens invoegen waar nodig
+		for(int i = 1; i < sb.length(); i++)
+			if(sb.charAt(i) == '\u03C0' || sb.charAt(i) == 'e' || sb.charAt(i) == '(' || sb.charAt(i)=='\u221A'||sb.charAt(i) == 'A')
+			{	if(sb.charAt(i-1)==')' || sb.charAt(i-1) == '\u03C0' || sb.charAt(i-1) == 'e' || Character.isDigit(sb.charAt(i-1)))
+					sb.insert(i, 'x');
+				if(sb.charAt(i-1) == 's' && sb.charAt(i-2) == 'n')
+					sb.insert(i, 'x');
+			}	
+		
+		//SyntaxErrors voor getal na pi, Ans en haakje sluiten
+		for(int i = 0; i < sb.length() - 1; i++)
+			if(sb.charAt(i) == '\u03C0' || sb.charAt(i) == 'e' || sb.charAt(i) == ')' || sb.charAt(i) == 's')
+				if(Character.isDigit(sb.charAt(i+1)))
+					syntaxError = true;
+				
+		if(syntaxError)
+		{	return;
+		}				
+				
+		//Ans invullen
+		for(int i = 0; i < sb.length(); i++)
+			if(sb.charAt(i) == 'A')
+				sb.replace(i, i+3, bewaardeAns);
+	}
+	
+	/*
+	 * De berekenmethode; berekent wat er in de stringbuffer staat. Regelt
+	 * gonioformules, logaritmes en haakjes zelf, besteedt de rest uit.
+	 */
+	
+	public void bereken(StringBuffer sb)
+	{
+		//alle minnen hetzelfde maken, en alle keertekens en gedeeld-doortekens snel leesbaar maken
+		replace(sb, "\u2212", "-");
+		replace(sb, "\u00F7", "/");
+		replace(sb, "\u00D7", "x");
+		
+		//++ veranderen in +, etc
+		replace(sb, "++", "+");
+		replace(sb, "+-", "-");
+		replace(sb, "--", "+");
+		replace(sb, "-+", "-");
+		replace(sb, "x+", "x");
+		replace(sb, "/+", "/");
+		
+		//checken of er breuktekentjes of B's in staan
+		if(sb.indexOf("\u22A5") > -1 || sb.indexOf("B") > -1)
+			breuk = true;	
+				
+		//goniofuncties uitrekenen
+		for(int i = 0; i < sb.length() - 1; i++)
+			if(sb.charAt(i) == 's' && sb.charAt(i+1)== 'i')
+			{	if(sb.charAt(i+3) == '(')
+				{	vindHaakjesUitdrukking(sb, i + 3);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}	
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3, 
+							Double.toString(Math.sin(teller/noemer)));
+					}
+					else	
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.sin(uitkomst)));
+					}
+				}
+				else //arcsin
+				{	vindHaakjesUitdrukking(sb, i + 7);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.asin(teller/noemer)));
+					}
+					else
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.asin(uitkomst)));
+					}
+				}
+			}
+		for(int i = 0; i < sb.length()-1; i++)
+			if(sb.charAt(i) == 'c' && sb.charAt(i+1) == 'o')
+			{	if(sb.charAt(i+3) == '(')
+				{	vindHaakjesUitdrukking(sb, i + 3);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.cos(teller/noemer)));
+					}
+					else
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.cos(uitkomst)));
+					}
+				}
+				else //arccos
+				{	
+					vindHaakjesUitdrukking(sb, i + 7);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.acos(teller/noemer)));
+					}
+					else
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.acos(uitkomst)));
+					}
+				}
+			}
+		for(int i = 0; i < sb.length()-1; i++)
+			if(sb.charAt(i) == 't' && sb.charAt(i+1) == 'a')
+			{	if(sb.charAt(i+3) == '(')
+				{	vindHaakjesUitdrukking(sb, i + 3);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.tan(teller/noemer)));
+					}
+					else
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+								Double.toString(Math.tan(uitkomst)));
+					}
+					
+				}
+				else //arctan
+				{	vindHaakjesUitdrukking(sb, i + 7);
+					if(breuk)
+					{	if(graden)
+						{	teller = teller * Math.PI;
+							noemer = noemer * 180;
+						}
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.atan(teller/noemer)));
+					}
+					else	
+					{	if(graden)
+							uitkomst = uitkomst * Math.PI / 180;
+						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
+							Double.toString(Math.atan(uitkomst)));
+					}
+				}
+			}
+		
+		//logfuncties uitrekenen
+		for(int i = 0; i < sb.length() - 1; i++)
+			if(sb.charAt(i) == 'l' && sb.charAt(i+1)== 'o')//log
+			{	vindHaakjesUitdrukking(sb, i + 3);
+				if(breuk)
+					sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.log10(teller/noemer)));
+				else
+					sb.replace(i, i + lengteHaakjesUitdrukking + 3,
+							Double.toString(Math.log10(uitkomst)));
+			}	
+		for(int i = 0; i < sb.length() - 1; i++)
+			if(sb.charAt(i) == 'l' && sb.charAt(i+1)== 'n')//ln
+			{	vindHaakjesUitdrukking(sb, i + 2);
+				if(breuk)
+					sb.replace(i, i + lengteHaakjesUitdrukking + 2,
+							Double.toString(Math.log(teller/noemer)));
+				else
+					sb.replace(i, i + lengteHaakjesUitdrukking + 2,
+							Double.toString(Math.log(uitkomst)));
+			}	
+		
+		//op zoek naar machten
+		sb = vindMachten(sb);
+			
+		
+		//haakjes wegwerken (met een while statement, zolang er nog ) zijn.
+		berekenTellers(sb);
+		String substring1;
+		while(rechtsTeller > 0)
+		{
+			try
+			{	int eindpunt = sb.indexOf(")");		
+				int beginpunt = sb.substring(0,eindpunt).lastIndexOf("(");
+				substring1 = sb.substring(beginpunt+1,eindpunt);				
+				berekenWaarde(substring1);
+				sb.replace(beginpunt, eindpunt+1, sb2.toString());
+			}
+			catch(Exception e){
+				syntaxError = true;
+			}
+			rechtsTeller--;
+		}
+		
+		try{
+			berekenWaarde(sb.toString());
+			sb.replace(0, sb.length(), sb2.toString());
+		}
+		catch(Exception e)
+		{ syntaxError = true;
+		}
+		
+	}
+	
+	public StringBuffer vindMachten(StringBuffer sb)
+	{ 
+		if(breuk)
+			while(sb.indexOf("^") != -1 && breuk)
+			{	vindUitkomstMachtBreuk("^", sb);		
+				sb.replace(vindIndex("^", sb) - lengte1, vindIndex("^", sb) + lengte2 + 1, teller + "B" + noemer);
+				if(syntaxError)
+				{	return sb;
+				}
+			}
+		else
+			while(sb.indexOf("^") != -1)
+			{	double rekenKind1, rekenKind2;
+				if(sb.indexOf("^") > 0 && sb.charAt(sb.indexOf("^") - 1) == ')')
+				{	int index = sb.indexOf("^") - 1;
+					int haakjesTeller = 1;
+					while(index > 0 && haakjesTeller > 0)
+					{	index--;
+						if(sb.charAt(index) == '(')
+							haakjesTeller--;
+						else if(sb.charAt(index) == ')')
+							haakjesTeller++;
+					}
+					vindHaakjesUitdrukking(sb, index);
+					rekenKind1 = uitkomst;
+					lengte1 = lengteHaakjesUitdrukking; //hier stond +1
+				}
+				else
+				{	vindGetalVoorBewerking(vindIndex("^", sb), sb, false);
+					rekenKind1 = rekenGetal;
+					lengte1 = lengteRekenGetal;
+				}
+				if(syntaxError)
+				{	return sb;
+				}
+				if(sb.indexOf("^") < sb.length() - 1 && sb.charAt(sb.indexOf("^") + 1) == '(')
+				{	vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+					rekenKind2 = uitkomst;
+					lengte2 = lengteHaakjesUitdrukking;
+				}
+				else
+				{	vindGetalNaBewerking(vindIndex("^", sb), sb);
+					rekenKind2 = rekenGetal;
+					lengte2 = lengteRekenGetal;
+				}
+				if(syntaxError)
+				{	return sb;
+				}
+				uitkomst = Math.pow(rekenKind1, rekenKind2);
+				if(Double.isNaN(uitkomst))
+				{	uitkomst = -Math.pow(-rekenKind1, rekenKind2);
+					double test = Math.pow(uitkomst, 1/rekenKind2);
+					if(Math.abs(test - rekenKind1) > 0.000000001)
+						uitkomst = Double.NaN;
+				}
+				sb.replace(vindIndex("^", sb)-lengte1, vindIndex("^", sb)+lengte2+1, Double.toString(uitkomst));
+				//vervangUitkomst("^", sb);
+				if(syntaxError)
+				{	return sb;
+				}
+			}
+		return sb;
+	}
+	
+	/*
+	 * berekenWaarde berekent de waarde van een expressie waarin geen haakjes, ans, logaritmes en
+	 * gonio-formules voorkomen.
+	 */
+	public void berekenWaarde(String str) 
+	{		
+		sb2.delete(0, sb2.length());
+		sb2.append(str);
+	
+		//op zoek naar wortels
+		if(breuk)
+		{	while(sb2.indexOf("\u221A") != -1)
+			{	vindBBreukVanaf(sb2.indexOf("\u221A"), sb2);
+				if(syntaxError)
+				{	return;
+				}
+				if(sb2.indexOf("\u221A") == 0 || sb2.charAt(sb2.indexOf("\u221A")-1) != '\u207F')
+				{	
+					//testen of de teller en de noemer geheel zijn.
+					//in dat geval breuk vereenvoudigen en dan pas wortels nemen, om te kunnen zien of ze geheel zijn.
+					if(tellerB - (int) tellerB == 0 && noemerB - (int) noemerB == 0)
+					{	teller = Math.sqrt(simplify((int) tellerB, (int) noemerB)[0]);
+						noemer = Math.sqrt(simplify((int) tellerB, (int) noemerB)[1]);
+					}
+					else
+					{	teller = Math.sqrt(tellerB);
+						noemer = Math.sqrt(noemerB);
+					}
+					lengteRekenGetal = lengteBreukB;
+					if(noemer == 1)
+						sb2.replace(sb2.indexOf("\u221A"), sb2.indexOf("\u221A") + lengteBreukB + 1, "" + teller);
+					else
+						sb2.replace(sb2.indexOf("\u221A"), sb2.indexOf("\u221A") + lengteBreukB + 1, teller + "B" + noemer);
+				}
+				else
+				{	teller = tellerB;
+					noemer = noemerB;
+					int lengte1 = lengteBreukB;
+					vindBBreukTot(sb2.indexOf("\u221A") - 1, sb2, true);
+					if(syntaxError)
+					{	return;
+					}
+					sb2.replace(sb2.indexOf("\u221A") - 1 - lengteBreukB, sb2.indexOf("\u221A") + lengte1 + 1, teller + "B" + noemer + "^"+noemerB + "B"+tellerB);
+				}
+			}
+		}
+		else
+		{	while(sb2.indexOf("\u221A") != -1)
+			{	vindGetalNaBewerking(sb2.indexOf("\u221A"), sb2);
+				if(syntaxError)
+				{	return;
+				}
+				if(sb2.indexOf("\u221A") == 0 || sb2.charAt(sb2.indexOf("\u221A")-1) != '\u207F')
+				{	rekenGetal = Math.sqrt(rekenGetal);
+					sb2.replace(sb2.indexOf("\u221A"), sb2.indexOf("\u221A") + lengteRekenGetal + 1, 
+						Double.toString(rekenGetal));
+				}
+				else
+				{	double rekenKind1 = rekenGetal;
+					int lengte1 = lengteRekenGetal;
+					vindGetalVoorBewerking(sb2.indexOf("\u207F"), sb2, true);
+					if(syntaxError)
+					{	return;
+					}
+					rekenGetal = 1/rekenGetal;
+					sb2.replace(sb2.indexOf("\u221A") - 1 - lengteRekenGetal, sb2.indexOf("\u221A") + lengte1 + 1, rekenKind1 + "^" + rekenGetal);
+				}
+			}
+		}
+		
+		vindMachten(sb2);
+
+		//op zoek naar producten en delingen
+		if(breuk)
+		{	while(sb2.indexOf("x") != -1 || sb2.indexOf("/") != -1)
+			{
+				if(sb2.indexOf("/") == -1) 
+					vervangUitkomstBreuk("x", sb2);
+				else if(sb2.indexOf("x") == -1)
+					vervangUitkomstBreuk("/", sb2);
+				else if(sb2.indexOf("x") < sb2.indexOf("/"))
+					vervangUitkomstBreuk("x", sb2);
+				else 
+					vervangUitkomstBreuk("/", sb2);
+				
+				if(syntaxError)
+				{	return;
+				}
+			}
+		}
+		else
+		{	while(sb2.indexOf("x") != -1 || sb2.indexOf("/") != -1)
+			{
+				if(sb2.indexOf("/") == -1) 
+					vervangUitkomst("x", sb2);
+				else if(sb2.indexOf("x") == -1)
+					vervangUitkomst("/", sb2);
+				else if(sb2.indexOf("x") < sb2.indexOf("/"))
+					vervangUitkomst("x", sb2);
+				else 
+					vervangUitkomst("/", sb2);
+			
+				if(syntaxError)
+				{	return;
+				}
+			}
+		}
+		
+		//E- veranderen in G om problemen met mintekens te voorkomen
+		replace(sb2, "E-", "G");
+		
+		//op zoek naar optellen en aftrekken
+		if(breuk)
+			while(vindIndex("+", sb2) != -1 || vindIndex("-", sb2) != -1)
+			{	if(vindIndex("-", sb2) == -1) 				
+					vervangUitkomstBreuk("+", sb2);
+				else if(vindIndex("+", sb2) == -1)
+					vervangUitkomstBreuk("-", sb2);
+				else if(vindIndex("+", sb2) < vindIndex("-", sb2))
+					vervangUitkomstBreuk("+", sb2);
+				else 
+					vervangUitkomstBreuk("-", sb2);			
+				if(syntaxError)
+				{	return;
+				}
+			}
+		else
+			while(vindIndex("+", sb2) != -1 || vindIndex("-", sb2) != -1)
+			{	if(vindIndex("-", sb2) == -1) 
+					vervangUitkomst("+", sb2);
+				else if(vindIndex("+", sb2) == -1)
+					vervangUitkomst("-", sb2);
+				else if(vindIndex("+", sb2) < vindIndex("-", sb2))
+					vervangUitkomst("+", sb2);
+				else 
+					vervangUitkomst("-", sb2);			
+				if(syntaxError)
+				{	return;
+				}
+			}
+		
+		if(breuk)
+		{	try
+			{	vindBreukVanaf(-1, sb2);
+				sb2.delete(0, sb2.length());
+				sb2.append(teller + "B" + noemer);
+			}
+			catch(Exception e)
+			{	syntaxError = true;
+			}
+		}
+		else
+			try{	
+				uitkomst = Double.parseDouble(sb2.toString());
+			}
+			catch(Exception e)
+			{	
+				if(sb2.toString().equals("\u03C0"))
+				{	uitkomst = Math.PI;
+					sb2.delete(0, sb2.length());
+					sb2.append(uitkomst);
+				}
+				else if(sb2.toString().equals("e"))
+				{	uitkomst = Math.E;
+					sb2.delete(0, sb2.length());
+					sb2.append(uitkomst);
+				}
+				else if(sb2.indexOf("E") > -1)//een zeer groot getal
+					try{
+						//vindUitkomst("E", sb2);
+						vervangUitkomst("E", sb2);
+					}
+					catch(Exception ex){
+					syntaxError = true;
+					}
+				else if(sb2.indexOf("G") > -1)//een zeer klein getal
+					try{
+						//vindUitkomst("G", sb2);
+						vervangUitkomst("G", sb2);
+					}
+					catch(Exception ex){
+					syntaxError = true;
+					}	
+				else
+				{	syntaxError = true;
+				}
+			}
+	}
+	
+	/*
+	 * Haakjestellers berekenen; kijken of er evenveel haakjes links als rechts zijn.
+	 */
+	public void berekenTellers(StringBuffer sb)
+	{
+		linksTeller = 0;
+		rechtsTeller = 0;
+		for(int i = 0; i < sb.length(); i++)
+			if(sb.charAt(i) == '(')
+				linksTeller++;
+		for(int i = 0; i < sb.length(); i++)
+			if(sb.charAt(i) == ')')
+				rechtsTeller++;
+	}
+	
+	/*
+	 * Voor het vervangen van symbolen, om de string beter te kunnen verwerken.
+	 */
+	public void replace(StringBuffer sb, String s1, String s2)
+	{
+		while(sb.indexOf(s1) != -1)
+		{	sb.replace(sb.indexOf(s1), sb.indexOf(s1)+s1.length(), s2);
+		}
+	}
+	
+	/*
+	 * Uitkomst van 'simpele' bewerkingen berekenen:
+	 * +, -, *, /
+	 */
+	public void vindUitkomst(String s, StringBuffer sb)
+	{
+		vindGetalVoorBewerking(vindIndex(s, sb), sb, true);
+		if(syntaxError)
+		{	return;
+		}
+		double rekenKind1 = rekenGetal;
+		
+		lengte1 = lengteRekenGetal;
+		vindGetalNaBewerking(vindIndex(s, sb), sb);
+		if(syntaxError)
+		{	return;
+		}
+		double rekenKind2 = rekenGetal;
+		lengte2 = lengteRekenGetal;
+		if(s.equals("+"))
+			uitkomst = rekenKind1 + rekenKind2;
+		else if(s.equals("-"))
+			uitkomst = rekenKind1 - rekenKind2;
+		else if(s.equals("x"))
+			uitkomst = rekenKind1 * rekenKind2;
+		else if(s.equals("/"))
+			uitkomst = rekenKind1/rekenKind2;
+		else if(s.equals("^"))
+			uitkomst = Math.pow(rekenKind1,rekenKind2);
+		else if(s.equals("E"))
+			uitkomst = rekenKind1 * Math.pow(10, rekenKind2);
+		else if(s.equals("G"))
+			uitkomst = rekenKind1 * Math.pow(10, -rekenKind2);
+	}
+	
+	public void vervangUitkomst(String s, StringBuffer sb)
+	{
+		vindUitkomst(s, sb);		
+		sb.replace(vindIndex(s, sb)-lengte1, vindIndex(s, sb)+lengte2+1, Double.toString(uitkomst));
+	}
+	
+	public void vindGetalVoorBewerking(int pos, StringBuffer sb, boolean minteken)
+	{	
+		int beginPos = pos-1;
+		try{
+			if(sb.charAt(pos-1) == '.')
+			{	sb.deleteCharAt(pos-1);
+				pos--;
+			}
+			
+			if(Character.isDigit(sb.charAt(pos-1)))
+			{	while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+					beginPos --;
+				//doet het één keer te vaak:
+				beginPos++;
+				
+				if(beginPos != 0 && sb.charAt(beginPos-1)=='.')
+				{	beginPos = beginPos-2;
+					while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+						beginPos--;
+					beginPos++;
+				}	
+				
+				subString = sb.substring(beginPos, pos);
+				rekenGetal = Double.parseDouble(subString);
+				lengteRekenGetal = subString.length();				
+				if(beginPos != 0 && sb.charAt(beginPos-1) == '-' && minteken)
+					if(beginPos == 1 || sb.charAt(beginPos - 2) == '^'
+							|| sb.charAt(beginPos - 2) == 'x' || sb.charAt(beginPos - 2) == '/' 
+								|| sb.charAt(beginPos - 2) == '(' || sb.charAt(beginPos - 2) == 'E')
+					{	rekenGetal = -rekenGetal;
+						lengteRekenGetal++;
+						beginPos--;
+					}	
+			}
+			else if(sb.charAt(pos - 1) == '\u03C0')//dit is pi
+			{	rekenGetal = Math.PI;
+				lengteRekenGetal = 1;
+				if(pos > 0 && sb.charAt(pos - 1) == '-')
+					if(pos == 1 || sb.charAt(pos - 2) == '^'
+						|| sb.charAt(pos - 2) == 'x' || sb.charAt(pos - 2) == '/' 
+							|| sb.charAt(pos - 2) == '(' || sb.charAt(beginPos - 2) == 'E')
+					{	rekenGetal = -rekenGetal;
+						lengteRekenGetal++;
+						beginPos--;
+					}		
+			}
+			else if(sb.charAt(pos - 1) == 'e') //dan moet er wel e staan
+			{	rekenGetal = Math.E;
+				lengteRekenGetal = 1;
+				if(pos > 0 && sb.charAt(pos - 1) == '-')
+					if(pos == 1 || sb.charAt(pos - 2) == '^'
+						|| sb.charAt(pos - 2) == 'x' || sb.charAt(pos - 2) == '/' 
+							|| sb.charAt(pos - 2) == '(' || sb.charAt(beginPos - 2) == 'E')
+					{	rekenGetal = -rekenGetal;
+						lengteRekenGetal++;
+						beginPos--;
+					}	
+			}				
+			else
+			{	syntaxError = true;
+			}
+			
+		}
+		catch(Exception e){
+			syntaxError = true;
+		}
+		if(beginPos != 0 && sb.charAt(beginPos-1) == 'E') 
+		{
+			int beginPos2 = beginPos - 2;
+			beginPos = beginPos2;
+			while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+				beginPos--;
+			beginPos++;
+			
+			if(beginPos != 0 && sb.charAt(beginPos-1)=='.')
+			{	beginPos = beginPos-2;
+				while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+					beginPos--;
+				beginPos++;
+			}	
+			
+			subString = sb.substring(beginPos, beginPos2+1);
+			double rekenGetal2 = Double.parseDouble(subString);
+			rekenGetal = rekenGetal2*Math.pow(10, rekenGetal);
+			lengteRekenGetal = lengteRekenGetal + subString.length() + 1;
+		}
+		if(beginPos != 0 && sb.charAt(beginPos-1) == 'G') 
+		{
+			int beginPos2 = beginPos - 2;
+			beginPos = beginPos2;
+			while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+				beginPos--;
+			beginPos++;
+			
+			if(beginPos != 0 && sb.charAt(beginPos-1)=='.')
+			{	beginPos = beginPos-2;
+				while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
+					beginPos--;
+				beginPos++;
+			}	
+			
+			subString = sb.substring(beginPos, beginPos2+1);
+			double rekenGetal2 = Double.parseDouble(subString);
+			
+			rekenGetal = rekenGetal2*Math.pow(10, -rekenGetal);
+			lengteRekenGetal = lengteRekenGetal + subString.length() + 1;
+		}
+	}
+	
+	public void vindGetalNaBewerking(int pos, StringBuffer sb)
+	{
+		boolean negatief = false;
+		try
+		{	if(sb.charAt(pos+1) == '.')
+			{	sb.insert(pos+1,'0');
+			}
+		
+			if(sb.charAt(pos+1) == '-')
+			{
+				pos++;
+				negatief = true;
+			}
+			int eindPos = pos + 1;	
+			if(Character.isDigit(sb.charAt(pos+1)))//geval dat er een getal na de bewerking staat
+			{	
+				
+				//int eindPos = pos+1;
+				while(eindPos <= sb.length()-1 && Character.isDigit(sb.charAt(eindPos)))
+					eindPos ++;
+				//doet het één keer te vaak:
+				eindPos--;
+								
+				if(eindPos < sb.length()-1 && sb.charAt(eindPos+1)=='.')
+				{	eindPos = eindPos+2;
+					while(eindPos <= sb.length() - 1 && Character.isDigit(sb.charAt(eindPos)))
+						eindPos ++;
+					eindPos--;
+				}
+				subString = sb.substring(pos + 1, eindPos + 1);
+				rekenGetal = Double.parseDouble(subString);
+				lengteRekenGetal = subString.length();
+					
+			}
+			else if(sb.charAt(pos + 1) == '\u03C0')//dit is pi
+			{	eindPos = pos + 1;//klopt dit??
+				rekenGetal = Math.PI;
+				lengteRekenGetal = 1;
+			}
+			else if(sb.charAt(pos + 1) == 'e') //nu moet er wel e staan
+			{	eindPos = pos + 1;
+				rekenGetal = Math.E;
+				lengteRekenGetal = 1;
+			}	
+			else
+			{	syntaxError = true;
+				return;
+			}
+		
+			if(negatief)
+			{
+				rekenGetal = - rekenGetal;
+				lengteRekenGetal++;
+			}
+			
+			if(eindPos < sb.length() - 1 && sb.charAt(eindPos + 1) == 'E')
+			{
+				negatief = false;
+				int eindPos2 = eindPos + 2;
+				eindPos = eindPos2;
+				if(sb.charAt(eindPos)=='-')
+				{	negatief = true;
+					eindPos++;
+				}
+				
+				while(eindPos <= sb.length() - 1 && Character.isDigit(sb.charAt(eindPos)))
+					eindPos ++;
+				eindPos--;
+				subString = sb.substring(eindPos2, eindPos + 1);
+				double rekenGetal2 = Double.parseDouble(subString);
+				if(negatief)
+					rekenGetal2 = - rekenGetal2;
+				rekenGetal = rekenGetal*Math.pow(10, rekenGetal2);
+				lengteRekenGetal = lengteRekenGetal + subString.length() + 1;
+				if(negatief)
+					lengteRekenGetal++;			
+			}
+			if(eindPos < sb.length() - 1 && sb.charAt(eindPos + 1) == 'G')
+			{
+				int eindPos2 = eindPos + 2;
+				eindPos = eindPos2;
+				
+				while(eindPos <= sb.length() - 1 && Character.isDigit(sb.charAt(eindPos)))
+					eindPos ++;
+				eindPos--;
+				subString = sb.substring(eindPos2, eindPos + 1);
+				double rekenGetal2 = Double.parseDouble(subString);
+				rekenGetal = rekenGetal*Math.pow(10, - rekenGetal2);
+				lengteRekenGetal = lengteRekenGetal + subString.length() + 1;			
+			}
+		}
+		catch(Exception e){
+			syntaxError = true;
+			return;
+		}
+	}
+	
+	/*
+	 * Uitkomst van 'simpele' bewerkingen berekenen:
+	 * +, -, *, /, ^
+	 */
+	public void vindUitkomstBreuk(String s, StringBuffer sb)
+	{
+		double teller1, noemer1, teller2, noemer2;
+		
+		vindBreukTot(vindIndex(s, sb), sb);
+		if(syntaxError)
+		{	return;
+		}
+		teller1 = teller;
+		noemer1 = noemer;
+		lengte1 = lengteBreuk;
+		
+		vindBreukVanaf(vindIndex(s, sb), sb);
+		if(syntaxError)
+		{	return;
+		}
+		teller2 = teller;
+		noemer2 = noemer;
+		lengte2 = lengteBreuk;
+		
+		if(s.equals("+"))
+		{	teller = teller1 * noemer2 + noemer1 * teller2;
+			noemer = noemer1 * noemer2;
+		}
+		else if(s.equals("-"))
+		{	teller = teller1 * noemer2 - noemer1 * teller2;
+			noemer = noemer1 * noemer2;
+		}
+		else if(s.equals("x"))
+		{	teller = teller1 * teller2;
+			noemer = noemer1 * noemer2;
+		}
+		else if(s.equals("/"))
+		{	teller = teller1 * noemer2;
+			noemer = noemer1 * teller2;
+		}
+		//else if(s.equals("^"))
+		//{	vindUitkomstMachtBreuk(s, sb);
+		//}
+		else if(s.equals("E"))
+		{	teller = teller1 * Math.pow(10, teller2/noemer2);
+			noemer = noemer1;		
+		}
+		else if(s.equals("G"))
+		{	teller = teller1 * Math.pow(10, -teller2/noemer2);
+			noemer = noemer1;		
+		}
+	}
+	
+	public void vindUitkomstMachtBreuk(String s, StringBuffer sb)
+	{
+		double teller1, noemer1, teller2, noemer2;
+		
+		if(sb.indexOf("^") > 0 && sb.charAt(sb.indexOf("^") - 1) == ')')
+		{	int index = sb.indexOf("^") - 1;
+			int haakjesTeller = 1;
+			while(index > 0 && haakjesTeller > 0)
+			{	index--;
+				if(sb.charAt(index) == '(')
+					haakjesTeller--;
+				else if(sb.charAt(index) == ')')
+					haakjesTeller++;
+			}
+			vindHaakjesUitdrukking(sb, index);
+			teller1 = teller;
+			noemer1 = noemer;
+			lengte1 = lengteHaakjesUitdrukking;
+		}
+		else
+		{	vindBBreukTot(vindIndex(s, sb), sb, false);
+			teller1 = tellerB;
+			noemer1 = noemerB;
+			lengte1 = lengteBreukB;
+		}
+		if(syntaxError)
+		{	return;
+		}
+		
+		if(sb.indexOf("^") < sb.length() - 1 && sb.charAt(sb.indexOf("^") + 1) == '(')
+		{	vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+			teller2 = teller;
+			noemer2 = noemer;
+			lengte2 = lengteHaakjesUitdrukking;
+		}
+		else
+		{	vindBBreukVanaf(vindIndex(s, sb), sb);
+			teller2 = tellerB;
+			noemer2 = noemerB;
+			lengte2 = lengteBreukB;
+		}
+		if(syntaxError)
+		{	return;
+		}
+		
+		teller = Math.pow(teller1, teller2/noemer2);
+		if(Double.isNaN(teller))
+		{	teller = -Math.pow(-teller1, teller2/noemer2);
+			double test = Math.pow(teller, noemer2/teller2);
+			if(Math.abs(test - teller1) > 0.000000001)
+				teller = Double.NaN;
+		}
+		noemer = Math.pow(noemer1, teller2/noemer2);
+		if(Double.isNaN(noemer))
+		{	noemer = -Math.pow(-noemer1, teller2/noemer2);
+			double test = Math.pow(noemer, noemer2/teller2);
+			if(Math.abs(test - noemer1) > 0.000000001)
+				noemer = Double.NaN;
+		}
+	}
+	
+	public void vervangUitkomstBreuk(String s, StringBuffer sb)
+	{
+		vindUitkomstBreuk(s, sb);		
+		sb.replace(vindIndex(s, sb) - lengte1, vindIndex(s, sb) + lengte2 + 1, teller + "B" + noemer);
+	}
+	
+	public void vindBreukTot(int pos, StringBuffer sb)
+	{
+		vindBBreukTot(pos, sb, false);
+		lengteBreuk = lengteBreukB;
+		if(pos - lengteBreuk - 1 < 0 || sb.charAt(pos - lengteBreuk - 1) != '\u22A5' )
+		{	teller = tellerB;
+			noemer = noemerB;
+		}
+		else 
+		{	teller = noemerB;
+			noemer = tellerB;
+			try{
+				pos = pos - lengteBreukB - 1;
+				vindBBreukTot(pos, sb, false);
+				teller = teller * tellerB;
+				noemer = noemer * noemerB; 
+				lengteBreuk = lengteBreuk + lengteBreukB + 1;
+			}
+			catch(Exception e)
+			{	syntaxError = true;
+			}
+			if(pos - lengteBreukB - 1 >= 0 && sb.charAt(pos - lengteBreukB - 1) == '\u22A5')
+			{	try{
+					pos = pos - lengteBreukB - 1;
+					vindBBreukTot(pos, sb, false);
+					teller = teller * noemerB + noemer * tellerB;
+					noemer = noemer * noemerB;
+					lengteBreuk = lengteBreuk + lengteBreukB + 1;
+				}
+				catch(Exception e)
+				{	syntaxError = true;
+				}
+			}
+		}
+	}
+	
+	public void vindBreukVanaf(int pos, StringBuffer sb)
+	{
+		vindBBreukVanaf(pos, sb);
+		teller = tellerB;
+		noemer = noemerB;
+		lengteBreuk = lengteBreukB;
+		if(pos + lengteBreuk + 1 <= sb.length() - 1 && sb.charAt(pos + lengteBreukB + 1) == '\u22A5' )
+		{	try{
+				pos = pos + lengteBreukB + 1;
+				vindBBreukVanaf(pos, sb);
+				lengteBreuk = lengteBreuk + lengteBreukB + 1;
+			}
+			catch(Exception e)
+			{	syntaxError = true;
+				return;
+			}
+			if(pos + lengteBreukB + 1 >= sb.length() - 1 || sb.charAt(pos + lengteBreukB + 1) != '\u22A5')
+			{	noemer = noemer * tellerB;
+				teller = teller * noemerB;
+			}
+			else
+			{
+				double teller1 = teller * noemerB;
+				double teller2 = noemer * tellerB;
+				noemer = noemerB * noemer;
+				try{
+					pos = pos + lengteBreukB + 1;
+					vindBBreukVanaf(pos, sb);
+					teller = teller1 * tellerB + teller2 * noemerB;
+					noemer = noemer * tellerB;
+					lengteBreuk = lengteBreuk + lengteBreukB + 1;
+				}
+				catch(Exception e)
+				{	syntaxError = true;
+				}
+			}
+		}
+	}
+	
+	public void vindBBreukTot(int pos, StringBuffer sb, boolean minteken)
+	{
+		vindGetalVoorBewerking(pos, sb, true);
+		lengteBreukB = lengteRekenGetal;
+		if(pos - lengteRekenGetal - 1 < 0 || sb.charAt(pos - lengteRekenGetal - 1) != 'B')
+		{	tellerB = rekenGetal;
+			noemerB = 1;
+		}
+		else
+		{	noemerB = rekenGetal;
+			vindGetalVoorBewerking(pos - lengteBreukB - 1, sb, minteken);
+			tellerB = rekenGetal;
+			lengteBreukB += lengteRekenGetal + 1;
+		}
+	}
+	
+	public void vindBBreukVanaf(int pos, StringBuffer sb)
+	{
+		vindGetalNaBewerking(pos, sb);
+		tellerB = rekenGetal;
+		lengteBreukB = lengteRekenGetal;
+		if(pos + lengteRekenGetal + 1 > sb.length() -1 || sb.charAt(pos + lengteRekenGetal + 1) != 'B')
+			noemerB = 1;
+		else
+		{	vindGetalNaBewerking(pos + lengteBreukB + 1, sb);
+			noemerB = rekenGetal;
+			lengteBreukB += lengteRekenGetal + 1;
+		}
+	}
+	
+	public int[] simplify(int nom, int denom)
+    {   if (denom < 0)
+        {   nom = - nom;
+            denom = - denom;
+        }
+        if (nom == 0)
+            denom = 1;
+        else
+        {   int g = gcd(nom, denom);
+            nom = nom / g;
+            denom = denom / g;
+        }
+        int[] breuk = {nom, denom}; 
+        return breuk;
+    }
+  
+	public int gcd(int a, int b)
+	{   int m = Math.abs(a);
+		int n = Math.abs(b);
+		int temp = 0;
+		while ( n != 0 )
+		{   temp = m % n;
+		    m = n;
+		    n = temp;
+		}
+		return m;
+	}
+  
+	public int vindIndex(String s, StringBuffer sb)
+	{	int index;
+		if(s.equals("-"))
+		{	if(sb.substring(1).indexOf(s) > -1)
+				index = sb.substring(1).indexOf(s) + 1;
+			else
+				index = sb.substring(1).indexOf(s);
+		}
+		else
+			index = sb.indexOf(s);
+		return index;
+	  
+	}
+		
+	/*
+	 * Uitdrukking tussen haakjes vinden; haakje links staat op positie n.
+	 * Wordt onder andere gebruikt voor gonioformules. 
+	 */
+	public void vindHaakjesUitdrukking(StringBuffer sb, int n)
+	{	int teller = 1;
+		int j = n;
+		while(teller > 0)
+		{	j++;
+			if(sb.charAt(j) == '(')
+				teller++;
+			else if(sb.charAt(j) == ')')
+				teller --;
+		}
+		StringBuffer sb3 = new StringBuffer();
+		sb3.append(sb.substring(n + 1, j));
+		bereken(sb3);
+		lengteHaakjesUitdrukking = j - n + 1; //dit is nu de lengte inclusief haakjes
+	}
+
+	/*
+	 * de boolean is om aan te geven of Ans moet worden toegevoegd als 
+	 * een nieuwe berekening wordt gestart.
+	 */
+	public void voegTekstIn(String s, boolean ans)
+	{
+		if(nieuweInvoer && ans)
+		{	invoerVeld.setText("Ans");
+			nieuweInvoer = false;
+		}
+		if(nieuweInvoer && !ans)
+		{	invoerVeld.setText("");
+			nieuweInvoer = false;
+		}
+		String str2 = invoerVeld.getText();
+		if(invoerVeld.getCursorPos() == 0)
+		{	invoerVeld.setText(s + str2);
+			invoerVeld.setCursorPos(s.length());
+		}
+		else if(invoerVeld.getCursorPos() == str2.length())
+			invoerVeld.setText(str2 + s);
+		else
+		{	cp = invoerVeld.getCursorPos();
+			invoerVeld.setText(str2.substring(0,invoerVeld.getCursorPos())+ s + str2.substring(invoerVeld.getCursorPos(), str2.length()));
+			invoerVeld.setCursorPos(cp+s.length());
+		}
+	}
+	
+	public void vervangTekst(String s)
+	{
+		String str2 = invoerVeld.getText();
+		cp = invoerVeld.getCursorPos();
+		
+		if(cp == str2.length())
+		{	invoerVeld.setText(str2 + s);
+			invoerVeld.setCursorPos(cp + s.length());
+			return;
+		}
+		
+		char testChar = str2.charAt(cp);
+		// eerste stuk vast terugzetten:
+		invoerVeld.setText(str2.substring(0,invoerVeld.getCursorPos()) + s);
+		
+		//uitrekenen wat er verder nog terugmoet (meestal alles behalve het eerstevolgende karakter)
+		if(testChar=='s' || testChar == 'c' || testChar == 't' || testChar == 'A')
+		{	char testChar2 = str2.charAt(cp + 3);
+			if(testChar2 == '(')
+			{	invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 4));
+			}
+			else
+				invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 6));
+		}
+		else
+			invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 1));
+		
+		invoerVeld.setCursorPos(cp + s.length());
+	}
+	
+	public void voegInOfVervang(String s, boolean ans)
+	{
+		if(insert)
+			voegTekstIn(s, ans);
+		else
+			vervangTekst(s);
+		
+	}
+	
+	public void maakStapNaarRechts()
+	{	String str = invoerVeld.getText();
+		int cp = invoerVeld.getCursorPos();
+		
+		if(nieuweInvoer)
+		{	nieuweInvoer = false;
+			invoerVeld.setCursorPos(str.length());
+		}
+		if(cp == str.length())
+			return;
+		else if(str.charAt(cp)=='A')
+			cp += 3;
+		else if(str.charAt(cp) == 's' || str.charAt(cp) == 'c' || str.charAt(cp) == 't')
+		{	if(str.charAt(cp + 3) == '(' )
+				cp += 4;
+			else
+				cp += 6;
+		}
+		else if(str.charAt(cp) == 'l')
+			if(str.charAt(cp + 1) == 'n')
+				cp += 3;
+			else
+				cp += 4;
+		else if(str.charAt(cp) == '\u207F' || str.charAt(cp) == '\u2081' || str.charAt(cp) == '\u207B')
+			cp += 2;
+		else 
+			cp += 1;
+		
+		invoerVeld.setCursorPos(cp);
+		
+	}
+	
+	public void maakStapNaarLinks()
+	{	String str = invoerVeld.getText();
+		int cp = invoerVeld.getCursorPos();
+		
+		if(nieuweInvoer)
+		{	nieuweInvoer = false;
+			invoerVeld.setCursorPos(str.length());
+		}
+		if(cp == 0)
+			return;
+		else if(str.charAt(cp - 1)=='s')
+			cp -= 3;
+		else if(str.charAt(cp - 1) == '(')
+		{	if(cp < 3)
+				cp -= 1;
+			else if(str.charAt(cp - 2) == '\u00B9')
+				cp -= 6;
+			else if(str.charAt(cp - 2) == 'n' && str.charAt(cp - 3) == 'l')
+				cp -= 3;
+			else if(str.charAt(cp - 2) == 'n' || str.charAt(cp - 3) == 'o')
+				cp -= 4;
+			else 
+				cp -= 1;
+		}
+		else if(cp >= 2 && (str.charAt(cp - 2) == '\u207F' || str.charAt(cp - 1) == '\u2080'
+			|| str.charAt(cp - 1) == '\u00B9'))
+			cp -= 2;
+		else if(str.charAt(cp - 1) == '\u2070')
+			cp -= 2;
+		else 
+			cp -= 1;
+		
+		invoerVeld.setCursorPos(cp);
+	}
+	
+	
+	public void doeActieBackSpace()
+	{	String str = invoerVeld.getText();
+		int cp = invoerVeld.getCursorPos();
+		
+		if(nieuweInvoer)
+		{	nieuweInvoer = false; 
+			invoerVeld.setCursorPos(str.length());
+		}
+		if(cp == 0)
+			return;
+		else if(invoerVeld.getSelectionLength() > 0)
+		{
+			if(str.indexOf(invoerVeld.getSelectedText()) == cp)
+			{	invoerVeld.setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
+				invoerVeld.setCursorPos(cp);
+			}
+			else
+			{	invoerVeld.setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - invoerVeld.getSelectionLength());
+			}
+		}
+		else if(str.charAt(cp - 1) == 's')
+		{	invoerVeld.setText(str.substring(0, cp - 3) + str.substring(cp));
+			invoerVeld.setCursorPos(cp - 3);
+		}
+		else if(str.charAt(cp - 1) == '(' )
+		{	if(cp < 3)
+			{	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - 1);
+			}
+			else if(str.charAt(cp - 2) == '\u00B9')
+			{	invoerVeld.setText(str.substring(0, cp - 6) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - 6);
+			}
+			else if(str.charAt(cp - 2) == 'n' && str.charAt(cp - 3) == 'l')
+			{	invoerVeld.setText(str.substring(0, cp - 3) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - 3);
+			}
+			else if(str.charAt(cp - 2) == 'n' || str.charAt(cp - 3) == 'o')
+			{	invoerVeld.setText(str.substring(0, cp - 4) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - 4);
+			}
+			else
+			{	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
+				invoerVeld.setCursorPos(cp - 1);
+			}
+		}
+		else if(cp >= 2 && str.charAt(cp - 2) == '\u207F')
+		{	invoerVeld.setText(str.substring(0, cp - 2) + str.substring(cp));
+			invoerVeld.setCursorPos(cp - 2);
+		}
+		else if(str.charAt(cp - 1) == '\u2080' || str.charAt(cp - 1) == '\u00B9')
+		{	invoerVeld.setText(str.substring(0, cp - 2) + str.substring(cp));
+			invoerVeld.setCursorPos(cp - 2);
+		}
+		else
+		{ 	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
+			invoerVeld.setCursorPos(cp - 1);
+		}
+		if(invoerVeld.getText().equals(""))
+		{	breuk = false;
+			invers = false;
+			invLabel.setVisible(false);
+		}
+	}
+	
+	public void doeActieDelete()
+	{	String str = invoerVeld.getText();
+		int cp = invoerVeld.getCursorPos();
+		
+		if(nieuweInvoer)
+		{	nieuweInvoer = false;
+			invoerVeld.setCursorPos(str.length());
+		}
+		if(cp == str.length())
+			return;
+		else if(invoerVeld.getSelectionLength() > 0)
+		{	if(str.indexOf(invoerVeld.getSelectedText()) == cp)
+			{	invoerVeld.setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
+				
+			}
+			else
+			{	invoerVeld.setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
+				cp = cp - invoerVeld.getSelectionLength();
+			}
+		}
+		else if(str.charAt(cp)=='A')
+			invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 3));
+		else if(str.charAt(cp) == 's' || str.charAt(cp) == 'c' || str.charAt(cp) == 't')
+		{	if(str.charAt(cp + 3) == '(' )
+				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 4));	
+			else
+				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 6));
+		}
+		else if(str.charAt(cp) == 'l')
+			if(str.charAt(cp + 1) == 'n')
+				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 3));
+			else
+				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 4));
+		else if(str.charAt(cp) == '\u207F' || str.charAt(cp) == '\u2081' || str.charAt(cp) == '\u207B')
+			invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 2));
+		else 
+		invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 1));
+		
+		invoerVeld.setCursorPos(cp);
+		if(invoerVeld.getText().equals(""))
+		{	breuk = false;
+			invers = false;
+			invLabel.setVisible(false);
+		}
+	}
+	
+	public void vindAntwoord(boolean dec)
+	{	syntaxError = false;
+		maakBerekenbaar(invoerVeld.getText());
+		bereken(sb);
+		if(!syntaxError)
+		{	String uitvoerTekst;
+			if(breuk)
+			{	if(teller % 1 == 0  && noemer %1 == 0 && !dec)
+				{	int tellerInt = (int) teller;	
+					int noemerInt = (int) noemer;
+					int[] breuk  = simplify(tellerInt, noemerInt);
+				
+					int gehelenInt = breuk[0]/breuk[1];
+					if(gehelenInt > 0)
+					{	breuk[0] = breuk[0] - gehelenInt * breuk[1];
+						if(breuk[0] == 0)
+							uitvoerTekst = "" + gehelenInt;
+						else
+							uitvoerTekst = gehelenInt + "\u22A5" + breuk[0] + "\u22A5" + breuk[1];
+					}
+					else
+					{	if(breuk[0] == 0)
+							uitvoerTekst = "" + 0;
+						else
+							uitvoerTekst = breuk[0] + "\u22a5" + breuk[1];
+					}
+					if(!syntaxError)
+						bewaardeAns = uitvoerTekst;
+				}
+				else
+				{	eindUitkomst = teller/noemer;
+					if(!syntaxError)
+						bewaardeAns = Double.toString(eindUitkomst);
+					if(eindUitkomst < Math.pow(10, 9))
+						eindUitkomst = (double) Math.round(1000000000 * eindUitkomst)/1000000000;
+					uitvoerTekst = Double.toString(eindUitkomst);
+				}
+			}
+			else
+			{	try{
+				eindUitkomst = Double.parseDouble(sb.toString());}
+				catch(Exception ex) 
+				{	if(sb2.indexOf("E") > -1)
+						try
+						{	vindUitkomst("E", sb2);
+							eindUitkomst = uitkomst;
+						}
+						catch(Exception exc)
+						{	syntaxError = true;
+						}
+					else if(sb2.indexOf("G") > -1)
+						try
+						{	vindUitkomst("G", sb2);
+							eindUitkomst = uitkomst;
+						}
+						catch(Exception exc)
+						{	syntaxError = true;
+						}
+					else if(sb2.indexOf("\u22a5") > -1 || sb2.indexOf("B") > -1)
+					{
+						eindUitkomst = teller/noemer;
+					}
+				}
+				if(!syntaxError)
+					bewaardeAns = Double.toString(eindUitkomst);
+				if(eindUitkomst < Math.pow(10, 9))
+					eindUitkomst = (double) Math.round(1000000000 * eindUitkomst)/1000000000;
+				uitvoerTekst = Double.toString(eindUitkomst);
+			}
+			if(uitvoerTekst.length() > 1 && uitvoerTekst.endsWith(".0"))
+				uitvoerTekst = uitvoerTekst.substring(0, uitvoerTekst.length()-2);
+		
+			int indexE;
+			String tienMachtString;
+			if(uitvoerTekst.contains("E"))
+			{	indexE = uitvoerTekst.indexOf('E');
+				tienMachtString = uitvoerTekst.substring(indexE + 1);
+				tienMachtString = tienMachtString.replaceAll("0", "\u2070");
+				tienMachtString = tienMachtString.replaceAll("1", "\u00B9");
+				tienMachtString = tienMachtString.replaceAll("2", "\u00B2");
+				tienMachtString = tienMachtString.replaceAll("3", "\u00B3");
+				tienMachtString = tienMachtString.replaceAll("4", "\u2074");
+				tienMachtString = tienMachtString.replaceAll("5", "\u2075");
+				tienMachtString = tienMachtString.replaceAll("6", "\u2076");
+				tienMachtString = tienMachtString.replaceAll("7", "\u2077");
+				tienMachtString = tienMachtString.replaceAll("8", "\u2078");
+				tienMachtString = tienMachtString.replaceAll("9", "\u2079");     
+				tienMachtString = tienMachtString.replaceAll("-", "\u207B");
+				
+				if(uitvoerTekst.substring(0, indexE).length() > 1 && uitvoerTekst.substring(0, indexE).endsWith(".0"))
+					uitvoerTekst = uitvoerTekst.substring(0, indexE - 2) + "\u00D710" + tienMachtString;
+				else
+					uitvoerTekst = uitvoerTekst.substring(0, indexE)+ "\u00D710"+ tienMachtString;
+				
+			}
+			if(isNederlands)
+				uitvoerTekst = uitvoerTekst.replace(".", ",");
+			uitvoerVeld.setText(uitvoerTekst);
+		}
+		if(sb2.toString().contains("NaN") || sb.toString().contains("NaN") || sb2.toString().contains("Infinity")
+				|| sb.toString().contains("Infinity"))
+			uitvoerVeld.setText("Math ERROR");
+		else if(syntaxError)
+			uitvoerVeld.setText("Syntax ERROR");
+		nieuweInvoer = true;
+		breuk = false;
+		invers = false;
+		invLabel.setVisible(false);
+		if(!insert)
+		{	insert = true;
+			//invoerVeld.getCaret().setVisible(false);
+			//invoerVeld.setCaret(defaultCaret);
+		}
+		//invoerVeld.getCaret().setBlinkRate(500);
+		//invoerVeld.getCaret().setVisible(false);
+	}
+	
+	class RmClickHandler implements ClickHandler
+	{
+		public void onClick(ClickEvent e)
+		{
+			//invoerVeld.getCaret().setVisible(true);
+			String str = new String("");
+			for(int i = 0; i < 10; i++)
+				if(e.getSource() == getalKnop[i])
+					voegInOfVervang(""+i, false);
+			
+			if(e.getSource() == piKnop)
+				voegInOfVervang("\u03C0", false);
+			else if(e.getSource() == plusKnop)
+				voegInOfVervang("+", true);
+			else if(e.getSource() == minKnop)
+				voegInOfVervang("\u2212", true);
+			else if(e.getSource() == keerKnop)
+				voegInOfVervang("\u00D7", true);
+			else if(e.getSource() == deelKnop)
+				voegInOfVervang("\u00F7", true);
+			else if(e.getSource() == wortelKnop)
+				voegInOfVervang("\u221A", false);
+			else if(e.getSource() == kwadraatKnop)
+				voegInOfVervang("\u00B2", true);
+			else if(e.getSource() == machtKnop)
+				voegInOfVervang("^", true);
+			else if(e.getSource() == eenGedeeldDoorKnop)
+				voegInOfVervang("\u207B\u00B9", true);
+			else if(e.getSource() == expKnop)
+				voegInOfVervang("\u2081\u2080", true);
+			else if(e.getSource() == haakLinksKnop)
+				voegInOfVervang("(", false);
+			else if(e.getSource() == haakRechtsKnop)
+				voegInOfVervang(")", false);
+			else if(e.getSource() == kommaKnop)
+			{	if(isNederlands)
+					voegInOfVervang(",", false);
+				else
+					voegInOfVervang(".", false);
+			}
+			else if(e.getSource() == negatiefKnop)
+				voegInOfVervang("-", false);
+			else if(e.getSource() == ansKnop)
+				voegInOfVervang("Ans", false);
+			else if(e.getSource() == breukKnop)
+			{	if(!invers)
+					voegInOfVervang("\u22A5", false);
+				else
+					vindAntwoord(true);
+			}
+			else if(e.getSource() == sinKnop)
+			{	if(!invers)
+					voegInOfVervang("sin(", false);
+				else
+				{	voegInOfVervang("sin\u207B\u00B9(", false);
+					invers = false;
+					invLabel.setVisible(false);
+				}
+			}
+			else if(e.getSource() == cosKnop)
+			{	if(!invers)
+					voegInOfVervang("cos(", false);
+				else
+				{	voegInOfVervang("cos\u207B\u00B9(", false);
+					invers = false;
+					invLabel.setVisible(false);
+				}
+			}
+			else if(e.getSource() == tanKnop)
+			{	if(!invers)
+					voegInOfVervang("tan(", false);
+				else
+				{	voegInOfVervang("tan\u207B\u00B9(", false);
+					invers = false;
+					invLabel.setVisible(false);
+				}
+			}
+			else if(e.getSource() == logKnop)
+				voegInOfVervang("log(", false);
+			else if(e.getSource() == lnKnop)
+				voegInOfVervang("ln(", false);
+			else if(e.getSource() == eKnop)
+				voegInOfVervang("e", false);
+			else if(e.getSource() == nWortelKnop)
+				voegInOfVervang("\u207F\u221A", false);
+			else if(e.getSource() == invKnop)
+			{	invers = !invers;
+				invLabel.setVisible(invers);
+			}
+			else if(e.getSource() == cKnop)
+			{	nieuweInvoer = false;
+				breuk = false;
+				invers = false;
+				invLabel.setVisible(false);
+				invoerVeld.setText("");
+				uitvoerVeld.setText("0");
+			}
+			else if(e.getSource() == delKnop)
+				doeActieBackSpace();
+			else if(e.getSource() == pijlLinksKnop)
+				maakStapNaarLinks();
+			else if(e.getSource() == pijlRechtsKnop)
+				maakStapNaarRechts();
+			else if(e.getSource() == insKnop)
+			{	str = invoerVeld.getText();
+				//invoerVeld.getCaret().setVisible(false);
+				insert = !insert;
+				if(nieuweInvoer)
+				{	nieuweInvoer = false;
+					invoerVeld.setCursorPos(str.length());
+				}
+				cp = invoerVeld.getCursorPos();
+				//if(insert)
+				//	invoerVeld.setCaret(defaultCaret);
+				//else
+				//	invoerVeld.setCaret(replaceCaret);
+				invoerVeld.setCursorPos(cp);
+				//invoerVeld.getCaret().setBlinkRate(500);
+				//invoerVeld.getCaret().setVisible(true);
+			}
+			else if(e.getSource() == isKnop)
+			{	vindAntwoord(false);
+				
+			}
+			if(e.getSource() != isKnop && (e.getSource() != breukKnop || !invers))
+				invoerVeld.setFocus(true);
+		}
+	}
+	
+	class RmKeyDownHandler implements KeyDownHandler
+	{
+
+		@Override
+		public void onKeyDown(KeyDownEvent event) {
+			kc =event.getNativeKeyCode();
+			
+			if(kc == KeyCodes.KEY_LEFT)
+				maakStapNaarLinks();
+			else if(kc == KeyCodes.KEY_RIGHT)
+				maakStapNaarRechts();
+			else if(kc == KeyCodes.KEY_DELETE)
+				doeActieDelete();
+			else if(kc == KeyCodes.KEY_BACKSPACE)
+				doeActieBackSpace();
+			else if(kc == KeyCodes.KEY_ENTER)
+				vindAntwoord(false);
+			else
+				return;
+			event.stopPropagation();
+			event.preventDefault();
+			
+		}
+	}
+	
+	class RmKeyPressHandler implements KeyPressHandler
+	{
+
+		@Override
+		public void onKeyPress(KeyPressEvent event) {
+			char kch = event.getCharCode();
+			if(kch == '=')
+				vindAntwoord(false);
+			else if(kch == '*')
+				voegInOfVervang("\u00D7", true);
+			else if(kch == '/' || kch == ':')
+				voegInOfVervang("\u00F7", true);
+			else if(kch == ',' || kch == '.')
+			{	if(isNederlands)
+					voegInOfVervang(",", false);
+				else
+					voegInOfVervang(".", false);
+			}
+			else if(kch == '-')
+				voegInOfVervang("\u2212", true);
+			else if(kch == '-')
+				voegInOfVervang("\u2212", true);
+			else if(kch == '+')
+				voegInOfVervang("+", true);
+			else if(kch =='(' || kch == ')' || Character.isDigit(kch))	
+				voegInOfVervang("" + (char)kch, false);
+			
+			else if(event.isShiftKeyDown() && kch == '6')
+				voegInOfVervang("^", true);
+			
+			
+			event.stopPropagation();
+			event.preventDefault();
+		}
+		
+	}
+	
+	class RmMouseUpHandler implements MouseUpHandler
+	{
+
+		@Override
+		public void onMouseUp(MouseUpEvent event) {
+			String str = invoerVeld.getText();
+			int cp = invoerVeld.getCursorPos();
+			
+			if(cp == 0 || cp == str.length() || invoerVeld.getSelectionLength() > 0)
+				return;
+			else if(str.charAt(cp) == 'i' || str.charAt(cp) == 'o' || str.charAt(cp - 1) == 'l' 
+				|| str.charAt(cp - 1) == 't' || (str.charAt(cp) == 'n' && str.charAt(cp + 1) == 's')
+				|| str.charAt(cp - 1) == '\u2081' || str.charAt(cp - 1) == '\u207F'
+				|| (str.charAt(cp - 1) == '\u207B' && cp > 1 && str.charAt(cp-2) != 'n' && (str.charAt(cp - 2) != 's' || (cp > 2 && str.charAt(cp - 3) == 'n'))))
+				cp--;
+			else if(cp < str.length() - 1 && str.charAt(cp + 1) == '\u207B' && (str.charAt(cp) == 'n' || (str.charAt(cp) == 's' && str.charAt(cp - 1) != 'n')))
+				cp -= 2;
+			else if(str.charAt(cp - 1) == 'n' && (str.charAt(cp) == 's' || str.charAt(cp) == '(')
+					|| (cp > 2 && str.charAt(cp - 2) == '\u207B' && (str.charAt(cp - 3) == 'n' || (str.charAt(cp - 3) == 's' && cp > 3 && str.charAt(cp - 4) != 'n')))
+					|| (str.charAt(cp) == '(' && (str.charAt(cp - 1) == 's' || str.charAt(cp - 1) == 'g')))
+				cp++;
+			else if((cp < str.length() - 1 && str.charAt(cp + 1) == '(' && (str.charAt(cp - 1) == 'o' || str.charAt(cp) == 'n')) 
+				|| (cp > 1 && str.charAt(cp - 1) == '\u207B' && (str.charAt(cp - 2) == 'n' || (str.charAt(cp - 2) == 's' && cp > 2 && str.charAt(cp - 3) != 'n'))))
+				cp += 2;
+			else if(str.charAt(cp) == '\u207B' && (str.charAt(cp - 1) == 'n' || (str.charAt(cp - 1) == 's' && cp > 1 && str.charAt(cp - 2) != 'n')))
+				cp += 3;
+					
+			invoerVeld.setCursorPos(cp);
+			
+		}
+		
+	}
+
+	
 }
