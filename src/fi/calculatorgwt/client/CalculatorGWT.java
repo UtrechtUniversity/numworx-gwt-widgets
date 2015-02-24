@@ -139,6 +139,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			hoogte = h.getInt("hoogte");
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
+		basisPanel = new FlowPanel();
 		
 		
 
@@ -150,6 +151,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		init(breedte, hoogte, launchState, randomVarWaarden);
 	}
 	
+	public CalculatorGWT() {
+	}
+
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -166,8 +170,8 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		RootPanel.get(holderId).add(basisPanel); 
 		RootPanel.get(holderId).setStyleName("root");
 		
-		init(breedte, hoogte, null, null);
-		//Stub.publish(this);
+		//init(breedte, hoogte, null, null);
+		Stub.publish(this);
 		
 		}
 	
@@ -668,7 +672,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				logaritmeKnoppen = h.getBoolean("logaritmeKnoppen");
 		}
 		//TODO: boolean isNederlands juiste waarde geven afhankelijk van taal profiel.
-		basisPanel = new FlowPanel();
 		initialize();
 		
 	}
@@ -1276,7 +1279,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			if(Character.isDigit(sb.charAt(pos-1)))
 			{	while(beginPos >= 0 && Character.isDigit(sb.charAt(beginPos)))
 					beginPos --;
-				//doet het één keer te vaak:
+				//doet het ï¿½ï¿½n keer te vaak:
 				beginPos++;
 				
 				if(beginPos != 0 && sb.charAt(beginPos-1)=='.')
@@ -1393,7 +1396,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				//int eindPos = pos+1;
 				while(eindPos <= sb.length()-1 && Character.isDigit(sb.charAt(eindPos)))
 					eindPos ++;
-				//doet het één keer te vaak:
+				//doet het ï¿½ï¿½n keer te vaak:
 				eindPos--;
 								
 				if(eindPos < sb.length()-1 && sb.charAt(eindPos+1)=='.')
