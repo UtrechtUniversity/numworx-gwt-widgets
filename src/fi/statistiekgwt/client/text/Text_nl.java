@@ -98,7 +98,7 @@ public class Text_nl
 		{ "amountLabel", "Aantal" },
 		{ "splitsingleviewCheckBox", "split in één scherm" },
 		{ "addacolumn", "Voeg een kolom toe" },
-		{ "editacolumn", "Voeg een kolom toe" },
+		{ "editacolumn", "Bewerk kolom" },
 		{ "columninfo", "Kolominfo" },
 		{ "columnname", "Kolom naam:" },
 		{ "choosetype", "Kies type:" },
