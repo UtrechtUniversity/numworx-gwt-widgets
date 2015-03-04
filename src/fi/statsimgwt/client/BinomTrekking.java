@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
-public class BinomTrekking implements ClickHandler {
+public class BinomTrekking  extends FlowPanel implements ClickHandler {
 
 
 	static final String upgradeMessage = 
@@ -199,8 +199,11 @@ public class BinomTrekking implements ClickHandler {
 	    panel8.add(scrollPanel);
 	    table.setRowCount(0, true);
 	    
-	    RootPanel.get().add(panel);
-	    RootPanel.get().add(panel7);
+	    //RootPanel.get().add(panel);
+	    //RootPanel.get().add(panel7);
+	    
+	    add(panel);
+	    add(panel7);
 
 	    panel7.add(kladjeHWTCanvas);
 	    panel7.add(binomGrafiekCanvas);

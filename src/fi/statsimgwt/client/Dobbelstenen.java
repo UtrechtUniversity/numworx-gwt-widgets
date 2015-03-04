@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 //import fi.statsimgwt.client.Munten.Experiment;
 
-public class Dobbelstenen implements ClickHandler{
+public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	static final String upgradeMessage = 
 			"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
@@ -336,8 +336,8 @@ public class Dobbelstenen implements ClickHandler{
 	    panel.setWidgetLeftRight(panel6, 240, Unit.PX, 440, Unit.PX);     // Center panel
 	    panel.setWidgetTopBottom(panel6, 5, Unit.PX, 5, Unit.PX);   
 	    
-	    RootPanel.get().add(panel);
-	    
+	    //RootPanel.get().add(panel);
+	    add(panel);
 
 	    // Create a CellTable.
 	    table = new CellTable<Experiment>();
@@ -1020,8 +1020,8 @@ public class Dobbelstenen implements ClickHandler{
 	    table5.setRowCount(0, true);
 	    
 	    panel7.add(kladjeHWTCanvas);
-	    RootPanel.get().add(panel7);
-	    
+	    //RootPanel.get().add(panel7);
+	    add(panel7);
 
 		 elapsedTimer = new Timer () {
 			 public void run() {

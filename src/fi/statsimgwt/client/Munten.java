@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.SingleSelectionModel;
 
-public class Munten implements ClickHandler{
+public class Munten extends FlowPanel implements ClickHandler{
 
 	
 	static final String upgradeMessage = 
@@ -329,8 +329,8 @@ public class Munten implements ClickHandler{
 	    panel.setWidgetLeftRight(panel1, 240, Unit.PX, 440, Unit.PX);     // Center panel
 	    panel.setWidgetTopBottom(panel1, 5, Unit.PX, 5, Unit.PX);
 	    
-	    RootPanel.get().add(panel);
-	    
+	    //RootPanel.get().add(panel);
+	   add(panel);
 		
 		 elapsedTimer = new Timer () {
 			 public void run() {
@@ -443,8 +443,8 @@ public class Munten implements ClickHandler{
 		    frequentie.paint();
 		    
 		    panel5.add(kladjeHWTCanvas);
-		    RootPanel.get().add(panel5);
-		    
+		    //RootPanel.get().add(panel5);
+		    add(panel5);
 			
 			munt= new Boolean[10001];
 			percentageMunt=new double[10001];
