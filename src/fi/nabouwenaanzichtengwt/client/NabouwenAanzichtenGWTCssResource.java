@@ -21,5 +21,7 @@ public	interface NabouwenAanzichtenGWTCssResource extends CssResource
 	String pushbutton();
 	
 	String borderless();
+	
+	//String radioButton();
 }
 

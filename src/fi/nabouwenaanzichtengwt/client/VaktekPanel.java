@@ -54,6 +54,7 @@ class VaktekPanel //Container
 			va.zetSchaduw(false);
 			va.zetBeginHoeken(0,0);
 			va.zetMuisAan(false);
+			va.zetKlikAan(false);
 			va.zetPijlAan(false);
 			va.initContext2d();
 			va.draw();
@@ -73,6 +74,7 @@ class VaktekPanel //Container
 			ra.zetSchaduw(false);
 			ra.zetBeginHoeken(0,-90);
 			ra.zetMuisAan(false);
+			ra.zetKlikAan(false);
 			ra.zetPijlAan(false);
 			ra.initContext2d();
 			ra.draw();
@@ -106,6 +108,7 @@ class VaktekPanel //Container
 			ba.zetSchaduw(false);
 			ba.zetBeginHoeken(90,0);
 			ba.zetMuisAan(false);
+			ba.zetKlikAan(false);
 			ba.zetPijlAan(false);
 			ba.initContext2d();
 			ba.draw();
@@ -126,6 +129,7 @@ class VaktekPanel //Container
 			va.zetSchaduw(false);
 			va.zetBeginHoeken(0,0);
 			va.zetMuisAan(false);
+			va.zetKlikAan(false);
 			va.zetPijlAan(false);
 			va.initContext2d();
 			va.draw();
@@ -145,6 +149,7 @@ class VaktekPanel //Container
 			ra.zetSchaduw(false);
 			ra.zetBeginHoeken(0,-90);
 			ra.zetMuisAan(false);
+			ra.zetKlikAan(false);
 			ra.zetPijlAan(false);
 			ra.initContext2d();
 			ra.draw();
@@ -161,6 +166,93 @@ class VaktekPanel //Container
 			
 			panel.add(grid);
 		}
+		// trukje: 4 = boven
+		else if (aantalViews == 4)
+		{
+			//grid = new Grid(2, 2);
+			//grid.addStyleName(bd.nabouwenAanzichtenCss.borderless());
+			//grid.getElement().getStyle().setProperty("textAlign", "center");
+			vakBreedte = Math.min(2*(breedte-6)/3, 2*(hoogte-40)/3);
+			//grid.getElement().getStyle().setMarginLeft(breedte/2-vakBreedte, Unit.PX);
+			
+			ba = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2-vakBreedte+1, vakBreedte-2, vakBreedte-2, bd);
+			ba.zetAfstand(10000000);
+			ba.zetSchaduw(false);
+			ba.zetBeginHoeken(90,0);
+			ba.zetMuisAan(false);
+			ba.zetKlikAan(false);
+			ba.zetPijlAan(false);
+			ba.initContext2d();
+			ba.draw();
+			VerticalPanel panelB = new VerticalPanel();
+			FlowPanel labelB = new FlowPanel();
+			labelB.getElement().getStyle().setFontSize(14, Unit.PX);
+			labelB.getElement().getStyle().setProperty("lineHeight", "1.2");
+			labelB.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
+			labelB.getElement().getStyle().setProperty("textAlign", "center");
+			labelB.getElement().setInnerHTML("boven");
+			panelB.add(labelB);
+			panelB.add(ba.getCanvas());
+			//grid.setWidget(0,0,panelB);
+			panel.add(panelB);
+		}
+		// trukje: 5 = voor
+		else if (aantalViews == 5)
+		{
+			vakBreedte = Math.min(2*(breedte-6)/3, 2*(hoogte-40)/3);
+			
+			va = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2+1, vakBreedte-2, vakBreedte-2, bd);
+			va.zetAfstand(10000000);
+			va.zetSchaduw(false);
+			va.zetBeginHoeken(0,0);
+			va.zetMuisAan(false);
+			va.zetKlikAan(false);
+			va.zetPijlAan(false);
+			va.initContext2d();
+			va.draw();
+			VerticalPanel panelV = new VerticalPanel();
+			FlowPanel labelV = new FlowPanel();
+			labelV.getElement().getStyle().setFontSize(14, Unit.PX);
+			labelV.getElement().getStyle().setProperty("lineHeight", "1.2");
+			labelV.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
+			labelV.getElement().getStyle().setProperty("textAlign", "center");
+			labelV.getElement().setInnerHTML("voor");
+			panelV.add(va.getCanvas());
+			panelV.add(labelV);
+			//grid.setWidget(1,0,panelV);
+			panel.add(panelV);
+			
+		}
+		// trukje: 6 = rechts
+		else if (aantalViews == 6)
+		{
+			vakBreedte = Math.min(2*(breedte-6)/3, 2*(hoogte-40)/3);
+			
+			ra = new Viewer3d(kr, breedte/2+1, hoogte/2+1, vakBreedte-2, vakBreedte-2, bd);
+			ra.zetAfstand(10000000);
+			ra.zetSchaduw(false);
+			ra.zetBeginHoeken(0,-90);
+			ra.zetMuisAan(false);
+			ra.zetKlikAan(false);
+			ra.zetPijlAan(false);
+			ra.initContext2d();
+			ra.draw();
+			VerticalPanel panelR = new VerticalPanel();
+			FlowPanel labelR = new FlowPanel();
+			labelR.getElement().getStyle().setFontSize(14, Unit.PX);
+			labelR.getElement().getStyle().setProperty("lineHeight", "1.2");
+			labelR.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
+			labelR.getElement().getStyle().setProperty("textAlign", "center");
+			labelR.getElement().setInnerHTML("rechts");
+			panelR.add(ra.getCanvas());
+			panelR.add(labelR);
+			//grid.setWidget(1,1,panelR);
+			
+			panel.add(panelR);
+
+		}
+
+		
 	}	
 	
 	public FlowPanel getPanel()

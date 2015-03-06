@@ -4,11 +4,17 @@ package fi.nabouwenaanzichtengwt.client;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+
 import com.google.gwt.event.dom.client.DoubleClickEvent;
+
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseUpEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+
+//import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
+//import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 
 public class Viewer3d
 {
@@ -26,7 +32,7 @@ public class Viewer3d
 	private boolean pen, vul, leeg, schaduw, grZichtbaar;
 	private int lnummer;
 	private CssColor penkleur, vulkleur, achtergrondkleur;
-	public boolean bezigMetTekenen, muisAan, klikAan, pijlAan;
+	public boolean bezigMetTekenen, muisAan, klikAan, pijlAan, balkAan, maakAanzicht;
 	private double afstand;
 	int aantalVeelvlakken;
 	Veelvlak[] vvRij;
@@ -42,6 +48,7 @@ public class Viewer3d
 	private boolean removing = false;
 	private boolean holdMouse = false;
 	private long holdMouseStartTime = 0;
+	private long holdMouseEndTime = 0;
 
 	public Viewer3d(KubusRooster kr, int x, int y, int b, int h, NabouwenAanzichtenGWT hb)
 	{
@@ -75,19 +82,21 @@ public class Viewer3d
 			}
 		}
 
-		//mb = new MuisBeheerder(this);
-		//canvas.addMouseDownHandler(mb);
-		//canvas.addMouseUpHandler(mb);
-		//canvas.addMouseMoveHandler(mb);
-		//canvas.addTouchStartHandler(mb);
-		//canvas.addTouchEndHandler(mb);
-		//canvas.addTouchMoveHandler(mb);
+		mb = new MuisBeheerder(this);
+		canvas.addMouseDownHandler(mb);
+		canvas.addMouseUpHandler(mb);
+		canvas.addMouseMoveHandler(mb);
+		canvas.addTouchStartHandler(mb);
+		canvas.addTouchEndHandler(mb);
+		canvas.addTouchMoveHandler(mb);
+		
 		achtergrondkleur = CssColor.make("white");
 		leeg = false;
 		schaduw = true;
 		muisAan = true;
 		klikAan = true;
 		pijlAan = true;
+		balkAan = false;
 		grZichtbaar = false;
 		l = new Lichaam3D[5];
 		afstand = 1000;
@@ -158,11 +167,35 @@ public class Viewer3d
 		klikAan = b;
 	}
 
-	public void zetPijlAan(boolean b)
-	{
-		pijlAan = b;
-	}
+    public void zetPijlAan(boolean b)
+    {   pijlAan = b;
+        if (pijlAan)
+        	balkAan = false;
+    }
 
+    public void zetBalkAan(boolean b)
+    {   balkAan = b;
+        if (balkAan)
+            pijlAan = false;
+    }
+   
+    public void zetMaakAanzicht(boolean b)
+    {   maakAanzicht = b;
+	    if (maakAanzicht)
+	    {	zetBeginHoeken(90,0);
+	    	zetAfstand(1000000000);
+	    	zetMuisAan(false);
+	    	zetSchaduw(false);
+	    }
+	    else
+	    {	//zetBeginHoeken(30,-30);
+	    	//zetAfstand(1000);
+	    	//zetMuisAan(true);
+	    	//zetSchaduw(true);
+	    }
+    }
+
+    
 	public void zetKubusRooster(KubusRooster kur)
 	{
 		kr = kur;
@@ -222,9 +255,11 @@ public class Viewer3d
 		if (bool)
 		{
 			int n = kr.maxAantal;
-			int x = breedte * 80 / 300;
-			int b = breedte * 140 / 300;
-			gr = new GetalRooster(n, x, x, b);
+			int x = breedte * 80 / 300 + 12;
+			int y = breedte * 80 / 300 - 11;
+			int b = breedte * 38 / 300;
+			int h = hoogte * 57 / 300;
+			gr = new GetalRooster(n, x, y, b, h, breedte, hoogte);
 			//add(gr);
 		}
 		else
@@ -236,6 +271,64 @@ public class Viewer3d
 		zetSchaduw(false);
 	}
 
+    public void zetGetalRooster2(boolean bool)
+    {   grZichtbaar = bool;
+        if (bool)
+        {   
+        	int n = kr.maxAantal;
+
+            int x = breedte * 80 / 300;
+            int y = hoogte * 80 / 300;
+            int b = Math.min(hoogte,breedte) * 140 / 300;
+            int h = b;
+
+            if (hoogte < breedte)
+            {   x += (breedte - hoogte) * 40 / 300;
+            
+            }
+            else // hoogte > breedte
+            {   y += (hoogte - breedte) * 40 / 300;
+            }
+            
+            gr = new GetalRooster(n, x, y, b, h, breedte, hoogte);
+            //add(gr);
+            
+System.out.println("breedte = " + breedte);
+System.out.println("hoogte = " + hoogte);
+System.out.println("x = " + x);
+System.out.println("y = " + y);
+System.out.println("b = " + b);
+        }
+        else
+        {   if (gr != null)
+            {   //remove(gr);
+                gr = null;
+            }
+        }
+        if (bool)
+        {	zetBeginHoeken(90,0);
+        	zetAfstand(1000000000);
+        	zetMuisAan(false);
+        	zetSchaduw(false);
+        }
+    }
+	
+    public void zetHoogtes()
+    {   if (gr != null)
+        {   for (int i = 0; i < kr.maxAantal; i++)
+            {   for (int j = 0; j < kr.maxAantal; j++)
+                {   for (int k = 0; k < kr.maxAantal; k++)
+                    {   if (kr.kubussen[i][j][k] != null && gr.geefHoogte(i,j) < k + 1)
+                        {   gr.zetHoogte(i, j, k);
+                        }
+                    }
+                }
+            }
+        
+        }
+        
+    }
+     
 	public void voegVeelvlakToe(Veelvlak v)
 	{
 		vvRij[aantalVeelvlakken] = v;
@@ -253,9 +346,14 @@ public class Viewer3d
 	void tekenKubusRooster()
 	{
 		aantalKv = 0;
-		tekenVeelvlak(0, kr.grondvlak);
+		if (!maakAanzicht)
+			tekenVeelvlak(0, kr.grondvlak);
+		//tekenVeelvlak(0, kr.grondvlak);
 		if (pijlAan)
 		{
+			
+//System.out.println("tkr pijlAan");
+
 			for (int i = 0; i < kr.pijl.aantalVlakken; i++)
 			{
 				tekenVlak(1, kr.pijl.vlakken[i]);
@@ -263,13 +361,35 @@ public class Viewer3d
 				aantalKv++;
 			}
 		}
+		if (balkAan)
+	    {
+			
+//System.out.println("tkr balkAan");
 
+	        for (int i = 0; i < kr.balk.aantalVlakken; i++)
+	        {   tekenVlak(1, kr.balk.vlakken[i]);
+	            kv[aantalKv] = new Klikvlak(i, 0, 1, 6);
+	            aantalKv++;
+	        }
+	    }
+
+		
+//System.out.println("tkr");		
 		for (int i = 0; i < kr.maxAantal; i++)
 		{
 			for (int j = 0; j < kr.maxAantal; j++)
-			{
+			{	
+				if (maakAanzicht) 
+        		{	kr.vierkanten[i][j].vlakken[0].vulkleur = "wit";
+        			kr.vierkanten[i][j].vlakken[0].vorigeKleur = "wit";
+        		}
+				else
+				{  	kr.vierkanten[i][j].vlakken[0].vorigeKleur = "lichtgrijs";
+					kr.vierkanten[i][j].vlakken[0].vulkleur = "lichtgrijs";
+				}
 				tekenVlak(1, kr.vierkanten[i][j].vlakken[0]);
 				p[i][j] = geefVlak(1);
+				
 				kv[aantalKv] = new Klikvlak(i, j, 0, 6);
 				aantalKv++;
 				for (int k = 0; k < kr.maxAantal; k++)
@@ -360,6 +480,10 @@ public class Viewer3d
 	{
 		if (gIm == null)
 			return;
+		
+//gIm.setStrokeStyle(CssColor.make(0,0,0));
+//gIm.strokeRect(0, 0, breedte, hoogte);
+		
 		beginpunt = new Punt3D(startpunt);
 		eindpunt = new Punt3D(beginpunt);
 		mat.initialiseer();
@@ -387,6 +511,10 @@ public class Viewer3d
 			l[j].maakNulpunt(breedte / 2, hoogte / 2, 0);
 		}
 		//super.paint(gIm);
+		if (gr != null)
+		{    gr.paint(gIm, p);
+//System.out.println("gr paint");		
+		}
 	}
 
 	//-------------------------------------------------------------------------------------------
@@ -667,6 +795,7 @@ public class Viewer3d
 	}
 
 	public void muisKkActie(MouseUpEvent e, boolean remove)
+	//public void muisKkActie(boolean remove)
 	{
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
@@ -751,7 +880,7 @@ public class Viewer3d
 		}
 	}
 
-	public void muisKkActie(TouchEndEvent e, boolean remove)
+	public void muisKkActie(boolean remove)
 	{
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
@@ -780,7 +909,7 @@ public class Viewer3d
 			else if (kv[n].m != 6 && pp[kv[n].i][kv[n].j][kv[n].k][kv[n].m].contains(mb.geefDrukx(), mb.geefDruky()))
 			{
 				boolean changed = false;
-				if (eigenaar.isBouwen() && !(holdMouse || remove))
+				if (eigenaar.isBouwen() && !(holdMouse || remove) && !maakAanzicht)
 				{
 					if (kv[n].m == 0)
 					{
@@ -840,7 +969,7 @@ public class Viewer3d
 
 	}
 
-	public void muisDrukActie(TouchStartEvent e)
+	public void muisDrukActie()
 	{
 		if (removing)
 			return;
@@ -860,7 +989,7 @@ public class Viewer3d
 			}
 		}
 		holdMouseStartTime = System.currentTimeMillis();
-
+//System.out.println("hmstart " + holdMouseStartTime);
 	}
 
 	public void muisKlikActie()
@@ -868,6 +997,7 @@ public class Viewer3d
 	}
 
 	public void muisLosActie(MouseUpEvent e)
+	//public void muisLosActie()
 	{
 		removing = false;
 		if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) < 16))
@@ -879,24 +1009,35 @@ public class Viewer3d
 		removed = false;
 	}
 
-	public void muisLosActie(TouchEndEvent e)
+	public void muisLosActie()
 	{
+		holdMouseEndTime = System.currentTimeMillis();
+//System.out.println("hmend " + holdMouseEndTime);		
+		long holdMouseTime = holdMouseEndTime - holdMouseStartTime; 
 		removing = false;
 		if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) < 16))
 		{
+		
 			holdMouse = false;
-			muisKkActie(e, false);
+			if (holdMouseTime > 300)
+				holdMouse = true;
+
+//System.out.println("holdMouse " + holdMouse);			
+			
+			muisKkActie(false);
 			tekenOpnieuw();
 			//eigenaar.zetVeranderd();
 		}
-		else if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) > 16 && holdMouse))
-		{
-			muisKkActie(e, false);
-			tekenOpnieuw();
+		//else if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) > 16 && holdMouse))
+		//{
+		//	muisKkActie(false);
+		//	tekenOpnieuw();
 			//eigenaar.zetVeranderd();
-		}
+		//}
 		removed = false;
 		holdMouse = false;
+		
+		eigenaar.ingevuld = true;
 	}
 
 	/*

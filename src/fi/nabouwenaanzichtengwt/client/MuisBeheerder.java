@@ -12,26 +12,32 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-/*import com.google.gwt.event.dom.client.TouchEndEvent;
+
+import com.google.gwt.dom.client.Touch;
+import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.event.dom.client.DoubleClickEvent;*/
+//import com.google.gwt.event.dom.client.DoubleClickHandler;
+
+//import com.google.gwt.event.dom.client.DoubleClickEvent;
 
 import com.google.gwt.user.client.ui.Widget;
+/*
 import com.googlecode.mgwt.dom.client.event.touch.Touch;
 import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
 import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+*/
 
 
-
-class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHandler,*/ TouchHandler
+class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler,
+							   TouchStartHandler, TouchMoveHandler, TouchEndHandler 
+							   //TouchHandler
 {
 	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
 	private Viewer3d eigenaar;
@@ -70,11 +76,12 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 		eerstey = e.getY();
 		laatstex = e.getX();
 		laatstey = e.getY();
-		eigenaar.muisDrukActie(e);
+		eigenaar.muisDrukActie();
 	}
 	
 	public void onMouseMove(MouseMoveEvent e)
-	{	if(!mouseDown)return;
+	{	if (!mouseDown)
+			return;
 		int x = e.getX();
 		int y = e.getY();
 		dx = x - laatstex;
@@ -86,7 +93,7 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 	
 	public void onMouseUp(MouseUpEvent e)
 	{	mouseDown = false;
-		eigenaar.muisLosActie(e);
+		eigenaar.muisLosActie();
 		//if(animatieWasAan)
 		//{	animatieWasAan = false;
 		//	ab.beginAnimatie();
@@ -140,10 +147,12 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 	}
 
 	@Override
-	public void onTouchMove(TouchMoveEvent event) {
+	public void onTouchMove(TouchMoveEvent event) 
+	{
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.getTouches().length() > 0) {
+		if (event.getTouches().length() > 0) 
+		{
 			Touch touch = event.getTouches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
@@ -161,10 +170,12 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 	}
 
 	@Override
-	public void onTouchStart(TouchStartEvent event) {
+	public void onTouchStart(TouchStartEvent event) 
+	{
 		event.preventDefault();
 		event.stopPropagation();
-		if (event.getTouches().length() > 0) {
+		if (event.getTouches().length() > 0) 
+		{
 			Touch touch = event.getTouches().get(0);
 			Widget sender = (Widget) event.getSource();
 		    Element elem = sender.getElement();
@@ -172,7 +183,7 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 			eerstey = touch.getPageY() - eigenaar.getCanvas().getAbsoluteTop();;//getRelativeY(elem);
 			laatstex = touch.getPageX() - eigenaar.getCanvas().getAbsoluteLeft();;//getRelativeX(elem);
 			laatstey = touch.getPageY() - eigenaar.getCanvas().getAbsoluteTop();;//getRelativeY(elem);
-			eigenaar.muisDrukActie(event);
+			eigenaar.muisDrukActie();
 	    }
 		event.preventDefault();
 		event.stopPropagation();
@@ -180,13 +191,14 @@ class MuisBeheerder implements /*MouseDownHandler, MouseUpHandler, MouseMoveHand
 	}
 
 	@Override
-	public void onTouchEnd(TouchEndEvent event) {
-		eigenaar.muisLosActie(event);
+	public void onTouchEnd(TouchEndEvent event) 
+	{
+		eigenaar.muisLosActie();
 	}
 
-	@Override
-	public void onTouchCanceled(TouchCancelEvent event) {
+	//@Override
+	//public void onTouchCanceled(TouchCancelEvent event) {
 		// Not Used	
-	}
+	//}
 
 }	

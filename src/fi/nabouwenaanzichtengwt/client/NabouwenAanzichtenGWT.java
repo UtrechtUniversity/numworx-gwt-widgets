@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 
@@ -12,18 +13,31 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+import com.google.gwt.user.client.ui.Label;
 
-public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+
+//import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+//import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
+//import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+
+
+public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView
 {
 	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
@@ -41,9 +55,24 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 	String[] randomVarNamen = null;
 	Map<String, ?> randomVarWaarden = null;
 
-	FlowPanel panel = new FlowPanel();
-	TouchPanel touchPanel = new TouchPanel();
-	TouchButton nakijkKnop = new TouchButton();
+	LayoutPanel panel = new LayoutPanel();
+	
+	//TouchPanel touchPanel = new TouchPanel();
+	
+	//TouchButton nakijkKnop = new TouchButton();
+	
+	String bouwenSlopenGroup = "bouwenSlopenGroup";
+	RadioButton bouwenButton;
+	RadioButton slopenButton;
+
+	PushButton volButton = new PushButton("Maak vol");
+	PushButton leegButton = new PushButton("Maak leeg");
+	
+	Label blokjesLabel;
+	
+	PushButton kijkNaButton = new PushButton("Kijk Na"); 
+	LayoutPanel kijkNaPanel = new LayoutPanel();
+	
 	private Viewer3d vWerk = null;
 	private VaktekPanel vaktekPanel = null;
 	private NabouwenAanzichtenChecker naChecker;
@@ -53,8 +82,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 	private Boolean correct;
 	private String feedback = "";
 
-	private boolean nagekeken;
-	private boolean ingevuld;
+	boolean nagekeken;
+	boolean ingevuld;
 
 	boolean kijkNaActief = false;
 
@@ -187,16 +216,19 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 		vWerk.draw();
 
-		touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
-		touchPanel.add(canvas);
-		panel.add(touchPanel);
+		//touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
+		//touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
+		//touchPanel.add(canvas);
 		
-		MuisBeheerder mb = new MuisBeheerder(vWerk);
+		//panel.add(touchPanel);
+		panel.add(canvas);
+		
+		//MuisBeheerder mb = new MuisBeheerder(vWerk);
 
-		touchPanel.addTouchHandler( mb);
+		//touchPanel.addTouchHandler(mb);
 	}
 
+/*	
 	private void addCheckButtonHandler(final TouchButton tb)
 	{
 		tb.addTouchStartHandler(new TouchStartHandler()
@@ -211,11 +243,59 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 		});
 	}
-
+*/
+	
+    class PushClickHandler implements ClickHandler
+    {
+    	//public void onMouseDown(MouseDownEvent e)
+    	public void onClick(ClickEvent e)
+    	{
+    		
+    		//if (touchStart)
+    		//	return;
+    		
+			//e.preventDefault();
+			e.stopPropagation();
+    		
+    		if (e.getSource() == kijkNaButton)
+    		{
+//System.out.println("click kijkNaB");    			
+    			check();
+				if (vWerk == null || !ingevuld || !kijkNaActief)
+					comRoot.setChanged(goedHalfFout == NabouwenAanzichtenChecker.FOUT);
+    		}
+    		else if (e.getSource() == volButton)
+    		{
+    			panel.setWidgetVisible(volButton, false);
+    			panel.setWidgetVisible(leegButton, true);
+    			startKr.maakVol();
+    			vWerk.tekenOpnieuw();
+    		}
+    		else if (e.getSource() == leegButton)
+    		{
+    			panel.setWidgetVisible(volButton, true);
+    			panel.setWidgetVisible(leegButton, false);
+    			startKr.maakLeeg();
+    			vWerk.tekenOpnieuw();
+    		}
+    		
+    		
+    	}
+    	
+    }
+	
 	private void check()
 	{
 		if (vWerk == null || !ingevuld || !kijkNaActief)
+		{	
+System.out.println("ingevuld " + ingevuld);
+System.out.println("kijkNaActief " + kijkNaActief);
+
 			return;
+		}
+		
+System.out.println("check");
+
 		KubusRooster useranswer = vWerk.kr;
 		HashMap<String, Object> checkResults = naChecker.checkAnswer(useranswer);
 
@@ -232,19 +312,25 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
-			nakijkKnop.clear();
-			nakijkKnop.add(vinkjeGeelImage);
+			//nakijkKnop.clear();
+			//nakijkKnop.add(vinkjeGeelImage);
+			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
 		{
-			nakijkKnop.clear();
-			nakijkKnop.add(vinkjeGroenImage);
+			//nakijkKnop.clear();
+			//nakijkKnop.add(vinkjeGroenImage);
+			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, true);
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
-			nakijkKnop.clear();
-			nakijkKnop.add(vinkjeRoodImage);
+			//nakijkKnop.clear();
+			//nakijkKnop.add(vinkjeRoodImage);
+			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, true);
 		}
 		nagekeken = true;
 		
@@ -260,8 +346,18 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 	{
 		if (vWerk == null || !kijkNaActief)
 			return;
-		nakijkKnop.clear();
-		nakijkKnop.add(vinkjeGrijsImage);
+		
+		//nakijkKnop.clear();
+		//nakijkKnop.add(vinkjeGrijsImage);
+		if ((blokjesLabel != null) && (vWerk != null))
+		{
+			int aantal = vWerk.kr.geefAantalK();
+			if (aantal == 1)
+				blokjesLabel.setText("" + aantal + " blokje");
+			else
+				blokjesLabel.setText("" + aantal + " blokjes");
+		}
+		
 		correct = null;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
@@ -273,7 +369,10 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 	boolean isBouwen()
 	{
-		return true;
+		if (bouwenButton != null)
+			return bouwenButton.getValue();
+		else
+			return true;
 	}
 
 	@Override
@@ -350,16 +449,22 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 
 	@Override
 	public void init(int width, int height, Map<String, Object> launchData,
-			Map<String, Number> values) {
+			Map<String, Number> values) 
+	{
 		breedte = width;
 		hoogte  = height;
+		
+System.out.println("breedte = " + breedte);
+System.out.println("hoogte = " + hoogte);
+
 		launchState = launchData;
 		randomVarWaarden = values;
 		randomVarNamen   = values.keySet().toArray(new String[values.size()]);
 		
-		panel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
-		panel.getElement().getStyle().setProperty("textAlign", "right");
+		panel.setSize(breedte + "px", hoogte + "px");
+		//panel.getElement().getStyle().setWidth(breedte, Unit.PX);
+		//panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
+		//panel.getElement().getStyle().setProperty("textAlign", "right");
 
 		int maxAantal = 4;
 		Object stateNew = null;
@@ -367,14 +472,17 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 		if (launchState.containsKey("stateNew"))
 		{
 			stateNew = launchState.get("stateNew");
-		} else if (launchState.containsKey("state"))
+		}
+		else if (launchState.containsKey("state"))
 		{
 			stateNew = launchState.get("state");
-			if(stateNew instanceof List) {
+			if (stateNew instanceof List) 
+			{
 				stateNew = ((List)stateNew).get(0);
 				maxAantal = ((List)stateNew).size();
 			}
-			else if(stateNew instanceof Object[]) {
+			else if (stateNew instanceof Object[]) 
+			{
 				stateNew = ((Object[])stateNew)[0];
 				maxAantal = ((Object[])stateNew).length;
 			}
@@ -398,7 +506,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			// Complicaties: stateNew is Object[] als afkomstig via stub
 			// stateNew is List<?> als afkomstig via constructor
 			
-			if(stateNew instanceof List)
+			if (stateNew instanceof List)
 			{
 				List<List<List<Boolean>>> stateLst = (List<List<List<Boolean>>>) stateNew;
 				b = new boolean[maxAantal][maxAantal][maxAantal];
@@ -412,7 +520,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 						}
 					}
 				}
-			} else if (stateNew instanceof Object[]) {
+			} 
+			else if (stateNew instanceof Object[]) 
+			{
 				final boolean[][][] bb = KubusRooster.toBooleanArray((Object[]) stateNew);
 				b = new boolean[maxAantal][maxAantal][maxAantal];
 				for (int i = 0; i < bb.length; i++)
@@ -428,94 +538,310 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub
 			}
 		}
 
-		kijkNaActief = false;
+		
+		boolean rotatieVast = false;		//impl 
+		double beginHoekX = 30;				//impl
+		double beginHoekY = -30;			//impl
+		boolean nietBouwenSlopen = false;	//impl
+		boolean keuzeBouwenSlopen = false;	//impl
+		boolean perspectief = true;			//impl
+		boolean volLeegOptie = false;		//impl
+		boolean aantalBlokjes = false;		//impl
+		
+		boolean pijlAan = true;				//impl
+		boolean balkAan = false;			//impl
+		boolean bovenAanzichtMetHoogtes = false; //impl
+		boolean maakAanzicht = false;		//impl
+		
+	    boolean blokkenBouwsel = true;		//impl
+	    boolean silhouet = false;			//impl
+	    boolean drieAanzichten = false;		//impl
+	    boolean voorZijAanzicht = false;	//impl
+	    boolean bovenAanzicht = false;
+	    boolean voorAanzicht = false;
+	    boolean rechtsAanzicht = false;
+
+	    
+	    boolean kijkNaActief = false;		//impl
+	    
+	    boolean checkBlokkenBouwsel = true;
+	    boolean checkDrieAanzichten = false;
+	    boolean checkVoorZijAanzicht = false;
+	    boolean checkBovenVoorAanzicht = false;
+	    boolean checkBovenZijAanzicht = false;
+	    boolean checkBovenAanzicht = false;
+	    boolean checkVoorAanzicht = false;
+	    boolean checkRechtsAanzicht = false;
+	    
+	    boolean checkAantalKubus = false;
+
+		if (launchState.containsKey("volLeegOptie"))
+			volLeegOptie = ((Boolean) launchState.get("volLeegOptie")).booleanValue();
+		
+		if (launchState.containsKey("keuzeBouwenSlopen"))
+			keuzeBouwenSlopen = ((Boolean) launchState.get("keuzeBouwenSlopen")).booleanValue();
+		
+		if (launchState.containsKey("aantalBlokjes"))
+			aantalBlokjes = ((Boolean) launchState.get("aantalBlokjes")).booleanValue();
+
 		if (launchState.containsKey("kijkNaActief"))
 			kijkNaActief = ((Boolean) launchState.get("kijkNaActief")).booleanValue();
+		
+//System.out.println("init kijkNaActief = " + kijkNaActief);
+		
+		this.kijkNaActief = kijkNaActief; 
 
-		boolean drieAanzichten = false;
+		//boolean drieAanzichten = false;
 		if (launchState.containsKey("drieAanzichten"))
 			drieAanzichten = ((Boolean) launchState.get("drieAanzichten")).booleanValue();
-		boolean voorZijAanzicht = false;
+		//boolean voorZijAanzicht = false;
 		if (launchState.containsKey("voorZijAanzicht"))
 			voorZijAanzicht = ((Boolean) launchState.get("voorZijAanzicht")).booleanValue();
+		
+		if (launchState.containsKey("bovenAanzicht"))
+			bovenAanzicht = ((Boolean) launchState.get("bovenAanzicht")).booleanValue();
+		
+		if (launchState.containsKey("voorAanzicht"))
+			voorAanzicht = ((Boolean) launchState.get("voorAanzicht")).booleanValue();
+				
+		if (launchState.containsKey("rechtsAanzicht"))
+			rechtsAanzicht = ((Boolean) launchState.get("rechtsAanzicht")).booleanValue();
 
 		if (drieAanzichten)
 		{
 			startKr = new KubusRooster(b, 1.5);
 			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 3, this);
-			panel.add(vaktekPanel.getPanel());
+			FlowPanel vkPanel = vaktekPanel.getPanel();
+			panel.add(vkPanel);
+			panel.setWidgetLeftWidth(vkPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(vkPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+
 		}
 		else if (voorZijAanzicht)
 		{
 			startKr = new KubusRooster(b, 1.5);
 			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 2, this);
-			panel.add(vaktekPanel.getPanel());
+			FlowPanel vkPanel = vaktekPanel.getPanel();
+			panel.add(vkPanel);
+			panel.setWidgetLeftWidth(vkPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(vkPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+
 		}
-		else
+		else if (bovenAanzicht)
+		{
+			startKr = new KubusRooster(b, 1.5);
+			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 4, this);
+			FlowPanel vkPanel = vaktekPanel.getPanel();
+			panel.add(vkPanel);
+			panel.setWidgetLeftWidth(vkPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(vkPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		}
+		else if (voorAanzicht)
+		{
+			startKr = new KubusRooster(b, 1.5);
+			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 5, this);
+			FlowPanel vkPanel = vaktekPanel.getPanel();
+			panel.add(vkPanel);
+			panel.setWidgetLeftWidth(vkPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(vkPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		}
+		else if (rechtsAanzicht)
+		{
+			startKr = new KubusRooster(b, 1.5);
+			vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 6, this);
+			FlowPanel vkPanel = vaktekPanel.getPanel();
+			panel.add(vkPanel);
+			panel.setWidgetLeftWidth(vkPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(vkPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		}
+		
+		else // het moet een blokkenbouwsel zijn
 		{
 			startKr = new KubusRooster(b, 1);
+			
+			int vWerkBreedte = breedte;
+			int vWerkHoogte = hoogte;
+			if (kijkNaActief || keuzeBouwenSlopen || volLeegOptie || aantalBlokjes)
+				vWerkHoogte = hoogte - 20;
 
-			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, breedte, hoogte - (kijkNaActief ? 32 : 0), this);
+			vWerk = new Viewer3d(startKr, 351, -30, vWerkBreedte, vWerkHoogte, this);
 			vWerk.zetAfstand(1000);
 			vWerk.zetSchaduw(true);
 			vWerk.zetBeginHoeken(30, -30);
 			vWerk.zetMuisAan(true);
 
-			boolean rotatieVast = false;
+			//boolean rotatieVast = false;
 			if (launchState.containsKey("rotatieVast"))
 				rotatieVast = ((Boolean) launchState.get("rotatieVast")).booleanValue();
 			vWerk.zetMuisAan(!rotatieVast);
 
-			double beginHoekX = 30;
-			double beginHoekY = -30;
+			//double beginHoekX = 30;
+			//double beginHoekY = -30;
 			if (launchState.containsKey("beginHoekX"))
 				beginHoekX = ((Double) launchState.get("beginHoekX")).doubleValue();
 			if (launchState.containsKey("beginHoekY"))
 				beginHoekY = ((Double) launchState.get("beginHoekY")).doubleValue();
 			vWerk.zetBeginHoeken(beginHoekX, beginHoekY);
 
-			boolean nietBouwenSlopen = false;
+			//boolean nietBouwenSlopen = false;
 			if (launchState.containsKey("nietBouwenSlopen"))
 				nietBouwenSlopen = ((Boolean) launchState.get("nietBouwenSlopen")).booleanValue();
 			vWerk.zetKlikAan(!nietBouwenSlopen);
 
+			if (launchState.containsKey("perspectief"))
+				perspectief = ((Boolean) launchState.get("perspectief")).booleanValue();
+			if (!perspectief)
+				vWerk.zetAfstand(1000000000);
+
+			if (launchState.containsKey("pijlAan"))
+				pijlAan = ((Boolean) launchState.get("pijlAan")).booleanValue();
+			if (launchState.containsKey("balkAan"))
+				balkAan = ((Boolean) launchState.get("balkAan")).booleanValue();
+			vWerk.zetPijlAan(pijlAan);
+			vWerk.zetBalkAan(balkAan);
+			
+			if (launchState.containsKey("maakAanzicht"))
+			{	maakAanzicht = ((Boolean) launchState.get("maakAanzicht")).booleanValue();
+				if (maakAanzicht)
+					vWerk.zetMaakAanzicht(maakAanzicht);
+			}	
+			if (launchState.containsKey("bovenAanzichtMetHoogtes"))
+			{	bovenAanzichtMetHoogtes = ((Boolean) launchState.get("bovenAanzichtMetHoogtes")).booleanValue();
+				if (bovenAanzichtMetHoogtes)
+				{	vWerk.zetGetalRooster(bovenAanzichtMetHoogtes);
+					vWerk.zetHoogtes();
+					//vWerk.zetAfstand(1000000000);
+					//vWerk.zetSchaduw(false);
+					//vWerk.zetMuisAan(false);
+				}
+			}
+			if (launchState.containsKey("silhouet"))
+			{	silhouet = ((Boolean) launchState.get("silhouet")).booleanValue();
+				if (silhouet)
+				{	vWerk.zetKlikAan(false);
+					vWerk.zetSchaduw(false);
+					startKr.zetVulkleur("zwart");
+				}
+			}
+			
+			
+			if (keuzeBouwenSlopen)
+			{
+				bouwenButton = new RadioButton(bouwenSlopenGroup, " Bouwen");
+				slopenButton = new RadioButton(bouwenSlopenGroup, " Slopen");
+				panel.add(bouwenButton);
+				panel.add(slopenButton);
+				panel.setWidgetLeftWidth(bouwenButton, 0, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetTopHeight(bouwenButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetLeftWidth(slopenButton, 70, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetTopHeight(slopenButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				bouwenButton.setValue(true);
+				
+			}
+			
+			if (volLeegOptie)
+			{
+				panel.add(volButton);
+				panel.add(leegButton);
+				panel.setWidgetLeftWidth(volButton, 150, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetTopHeight(volButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetLeftWidth(leegButton, 150, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetTopHeight(leegButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetVisible(leegButton, false);
+				volButton.addClickHandler(new PushClickHandler());
+				leegButton.addClickHandler(new PushClickHandler());
+			}
+			
+			if (volLeegOptie)
+			{
+				int aantal = vWerk.kr.geefAantalK();
+				blokjesLabel = new Label();
+				if (aantal == 1)
+					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokje");
+				else
+					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokjes");
+				panel.add(blokjesLabel);
+				panel.setWidgetLeftWidth(blokjesLabel, 250, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetTopHeight(blokjesLabel, hoogte - 17, Style.Unit.PX, 20, Style.Unit.PX);
+			}	
+			
 			vWerk.initContext2d();
 
 			vWerk.draw();
 
 			canvas = vWerk.getCanvas();
 
-			touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-			touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
-			touchPanel.add(canvas);
-			panel.add(touchPanel);
+			//touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
+			//touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
+			//touchPanel.add(canvas);
+			//panel.add(touchPanel);
+			
+			panel.add(canvas);
+			panel.setWidgetLeftWidth(canvas, 0, Style.Unit.PX, vWerkBreedte, Style.Unit.PX);
+			panel.setWidgetTopHeight(canvas, 0, Style.Unit.PX, vWerkHoogte, Style.Unit.PX);
 
 			if (kijkNaActief)
 			{
 				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
 
+				panel.add(kijkNaPanel);
+				kijkNaPanel.add(kijkNaButton);
+				kijkNaPanel.add(vinkjeGroenImage);
+				kijkNaPanel.add(vinkjeGeelImage);
+				kijkNaPanel.add(vinkjeRoodImage);
+				kijkNaPanel.add(vinkjeGrijsImage);
+
+				kijkNaButton.addClickHandler(new PushClickHandler());
+			
+				panel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetTopHeight(kijkNaPanel, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+			
+				kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 20, Style.Unit.PX);
+			
+				kijkNaPanel.setWidgetLeftWidth(vinkjeGroenImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(vinkjeGroenImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
+
+				kijkNaPanel.setWidgetLeftWidth(vinkjeGeelImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(vinkjeGeelImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
+
+				kijkNaPanel.setWidgetLeftWidth(vinkjeRoodImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(vinkjeRoodImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
+
+				kijkNaPanel.setWidgetLeftWidth(vinkjeGrijsImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(vinkjeGrijsImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
+
+				kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
+				kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
+				kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
+
+				
 				//Image image = new Image(clientBundle.vinkjegrijs());
 				//nakijkKnop.add(buttonBgImage);
-				nakijkKnop.add(vinkjeGrijsImage);
-				addCheckButtonHandler(nakijkKnop);
+				
+				//nakijkKnop.add(vinkjeGrijsImage);
+				//addCheckButtonHandler(nakijkKnop);
+				
 				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
 				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
-				nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
-				nakijkKnop.getElement().getStyle().setBorderColor("gray");
-				nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-				nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
-				nakijkKnop.getElement().getStyle().setProperty("display", "inline-block");
-				nakijkKnop.getElement().getStyle().setPaddingTop(3, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingBottom(3, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingLeft(10, Unit.PX);
-				nakijkKnop.getElement().getStyle().setPaddingRight(10, Unit.PX);
-				nakijkKnop.getElement().getStyle().setProperty("borderRadius", "5px");
-				panel.add(nakijkKnop);
+				
+				//nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
+				//nakijkKnop.getElement().getStyle().setBorderColor("gray");
+				//nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+				//nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
+				//nakijkKnop.getElement().getStyle().setProperty("display", "inline-block");
+				//nakijkKnop.getElement().getStyle().setPaddingTop(3, Unit.PX);
+				//nakijkKnop.getElement().getStyle().setPaddingBottom(3, Unit.PX);
+				//nakijkKnop.getElement().getStyle().setPaddingLeft(10, Unit.PX);
+				//nakijkKnop.getElement().getStyle().setPaddingRight(10, Unit.PX);
+				//nakijkKnop.getElement().getStyle().setProperty("borderRadius", "5px");
+				//panel.add(nakijkKnop);
 			}
 
-			MuisBeheerder mb = new MuisBeheerder(vWerk);
+			//MuisBeheerder mb = new MuisBeheerder(vWerk);
 
-			touchPanel.addTouchHandler( mb);
+			//touchPanel.addTouchHandler(mb);
+			
 		}
 
 	}

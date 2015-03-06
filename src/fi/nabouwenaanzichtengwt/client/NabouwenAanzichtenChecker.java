@@ -30,6 +30,11 @@ public class NabouwenAanzichtenChecker {
 	boolean checkBlokkenBouwsel;
 	boolean checkDrieAanzichten;
 	boolean checkVoorZijAanzicht;
+	boolean checkBovenVoorAanzicht;
+	boolean checkBovenZijAanzicht;
+	boolean checkBovenAanzicht;
+	boolean checkVoorAanzicht;
+	boolean checkRechtsAanzicht;
 	boolean checkAantalKubus;
 	
 	public NabouwenAanzichtenChecker(Map<String, Object> launchState, String[] randomVars, Map<String, ?> randomVarWaarden2 )
@@ -111,8 +116,16 @@ public class NabouwenAanzichtenChecker {
 		this.checkBlokkenBouwsel = checkBlokkenBouwsel;
 		this.checkDrieAanzichten = checkDrieAanzichten;
 		this.checkVoorZijAanzicht = checkVoorZijAanzicht;
+		this.checkBovenVoorAanzicht = checkBovenVoorAanzicht;
+		this.checkBovenZijAanzicht = checkBovenZijAanzicht;
+		this.checkBovenAanzicht = checkBovenAanzicht;
+		this.checkVoorAanzicht = checkVoorAanzicht;
+		this.checkRechtsAanzicht = checkRechtsAanzicht;
+		
 		this.checkAantalKubus = checkAantalKubus;
 		
+System.out.println("checkRechts = " + checkRechtsAanzicht);
+System.out.println("checkKubus = " + checkAantalKubus);
 			
 		//zetKijkNaActief(kijkNaActief);
 		//this.kijkNaActief = kijkNaActief;
@@ -151,7 +164,7 @@ public class NabouwenAanzichtenChecker {
 	
 	private void check(KubusRooster answer)
 	{
-		if(checkBlokkenBouwsel)
+		if (checkBlokkenBouwsel)
 		{
 			if (!answer.isGelijk(docentKr))
 			{	score = 0;
@@ -167,7 +180,7 @@ public class NabouwenAanzichtenChecker {
 				goedHalfFout = GOED;
         	}
 		}
-		else if(checkDrieAanzichten)
+		else if (checkDrieAanzichten)
 		{
 			if (!answer.isGelijkAanzichten(docentKr))
 			{	score = 0;
@@ -190,7 +203,7 @@ public class NabouwenAanzichtenChecker {
         		}
         	}
 		}
-		else if(checkVoorZijAanzicht)
+		else if (checkVoorZijAanzicht)
 		{
 			if (!answer.isGelijkVoorEnRechtsAanzicht(docentKr))
 			{	score = 0;
@@ -213,7 +226,123 @@ public class NabouwenAanzichtenChecker {
         		}
         	}
 		}
-		
+		else if (checkBovenVoorAanzicht)
+		{
+			if (!answer.isGelijkBovenEnVoorAanzicht(docentKr))
+			{	score = 0;
+				correct = false;
+				fout = true;
+				goedHalfFout = FOUT;
+			}
+			else
+        	{	if (checkAantalKubus)
+        		{	score = Math.max(scoreMax / 2, scoreMax - Math.abs(answer.aantalKubussen - docentKr.aantalKubussen));
+	        		correct = answer.aantalKubussen <= docentKr.aantalKubussen;
+					fout = false;
+					goedHalfFout = correct?GOED:DOOR;
+        		}
+        		else
+        		{	score = scoreMax;
+	        		correct = true;
+					fout = false;
+					goedHalfFout = GOED;
+        		}
+        	}
+		}
+		else if (checkBovenZijAanzicht)
+		{
+			if (!answer.isGelijkBovenEnRechtsAanzicht(docentKr))
+			{	score = 0;
+				correct = false;
+				fout = true;
+				goedHalfFout = FOUT;
+			}
+			else
+        	{	if (checkAantalKubus)
+        		{	score = Math.max(scoreMax / 2, scoreMax - Math.abs(answer.aantalKubussen - docentKr.aantalKubussen));
+	        		correct = answer.aantalKubussen <= docentKr.aantalKubussen;
+					fout = false;
+					goedHalfFout = correct?GOED:DOOR;
+        		}
+        		else
+        		{	score = scoreMax;
+	        		correct = true;
+					fout = false;
+					goedHalfFout = GOED;
+        		}
+        	}
+		}
+		else if (checkBovenAanzicht)
+		{
+			if (!answer.isGelijkBovenAanzicht(docentKr))
+			{	score = 0;
+				correct = false;
+				fout = true;
+				goedHalfFout = FOUT;
+			}
+			else
+        	{	if (checkAantalKubus)
+        		{	score = Math.max(scoreMax / 2, scoreMax - Math.abs(answer.aantalKubussen - docentKr.aantalKubussen));
+	        		correct = answer.aantalKubussen <= docentKr.aantalKubussen;
+					fout = false;
+					goedHalfFout = correct?GOED:DOOR;
+        		}
+        		else
+        		{	score = scoreMax;
+	        		correct = true;
+					fout = false;
+					goedHalfFout = GOED;
+        		}
+        	}
+		}
+		else if (checkVoorAanzicht)
+		{
+			if (!answer.isGelijkVoorAanzicht(docentKr))
+			{	score = 0;
+				correct = false;
+				fout = true;
+				goedHalfFout = FOUT;
+			}
+			else
+        	{	if (checkAantalKubus)
+        		{	score = Math.max(scoreMax / 2, scoreMax - Math.abs(answer.aantalKubussen - docentKr.aantalKubussen));
+	        		correct = answer.aantalKubussen <= docentKr.aantalKubussen;
+					fout = false;
+					goedHalfFout = correct?GOED:DOOR;
+        		}
+        		else
+        		{	score = scoreMax;
+	        		correct = true;
+					fout = false;
+					goedHalfFout = GOED;
+        		}
+        	}
+		}
+		else if (checkRechtsAanzicht)
+		{
+			if (!answer.isGelijkRechtsAanzicht(docentKr))
+			{	score = 0;
+				correct = false;
+				fout = true;
+				goedHalfFout = FOUT;
+			}
+			else
+        	{	if (checkAantalKubus)
+        		{	score = Math.max(scoreMax / 2, scoreMax - Math.abs(answer.aantalKubussen - docentKr.aantalKubussen));
+	        		correct = answer.aantalKubussen <= docentKr.aantalKubussen;
+					fout = false;
+					goedHalfFout = correct?GOED:DOOR;
+        		}
+        		else
+        		{	score = scoreMax;
+	        		correct = true;
+					fout = false;
+					goedHalfFout = GOED;
+        		}
+        	}
+		}
+
+
 	}
 	
 	private void evaluate()

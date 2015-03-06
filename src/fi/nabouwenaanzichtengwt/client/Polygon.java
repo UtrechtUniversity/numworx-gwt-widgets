@@ -22,7 +22,8 @@ class Polygon
 		this.aantalPunten = aantalPunten;
 		this.puntenX = new int[aantalPunten];
 		this.puntenY = new int[aantalPunten];
-		for (int k = 0; k < geefAantalPunten(); k++) {
+		for (int k = 0; k < geefAantalPunten(); k++) 
+		{
 			this.puntenX[k] = puntenX[k];
 			this.puntenY[k] = puntenY[k];
 		}
@@ -65,6 +66,15 @@ class Polygon
 	
 	public int geefAantalPunten()
 	{	return aantalPunten;
+	}
+	
+	public void translate(int dx, int dy)
+	{
+		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
+		{
+			puntenX[pCnt] += dx;
+			puntenY[pCnt] += dy;
+		}
 	}
 	
 	public boolean contains(int x, int y) {
