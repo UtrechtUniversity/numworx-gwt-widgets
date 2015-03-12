@@ -1520,7 +1520,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				
 				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
 				{
-					String s = getStringValue(this.model.getBinBoundaries().get(i));
+					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 					if (i < this.model.getBinBoundaries().size() - 1)
 					{
 						String s_labelUnderBin;
@@ -1534,7 +1534,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						else
 						{
     						s_labelUnderBin = s + "-<" +
-    							getStringValue(this.model.getBinBoundaries().get(i + 1));
+    							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 //							System.out.println("HistogramView.paintNumberClass(): s_labelUnderBin = " 
 //								+ s_labelUnderBin);
 						}
@@ -1596,7 +1596,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				
 				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
 				{
-					String s = getStringValue(this.model.getBinBoundaries().get(i));
+					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 					if (i < this.model.getBinBoundaries().size() - 1)
 					{
 						String s_labelUnderBin;
@@ -1608,7 +1608,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						else
 						{
     						s_labelUnderBin = s + "-<" +
-    							getStringValue(this.model.getBinBoundaries().get(i + 1));
+    							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 						}
 //						System.out.println("HistogramView.paintNumberClass(): s_labelUnderBin = " + s_labelUnderBin);
 						
@@ -1972,7 +1972,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 					int x = (int) (this.yAxisOffset + i + i * this.verticalBarWidth);
 					
 					// Get the string value (integer or double)
-					String s = getStringValue(this.model.getBinBoundaries().get(i));
+					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 
 					metrics = context.measureText(s);
 					int offset = (int) (metrics.getWidth() / 2);
@@ -1997,7 +1997,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 							else
 							{
 								s_labelUnderBin = s + "-<" +
-									getStringValue(this.model.getBinBoundaries().get(i + 1));
+									StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 								// draw marker
 								context.moveTo(x, y + ySplitOffset);
 								context.lineTo(x, y + 5 + ySplitOffset);
@@ -2056,7 +2056,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 					context.lineTo(x, y + 5 + ySplitOffset);
 					
 					// Get the string value (integer or double)
-					String s = getStringValue(this.model.getBinBoundaries().get(i));
+					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 					metrics = context.measureText(s);
 					int offset = (int) metrics.getWidth();
 					
@@ -2074,7 +2074,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 							else
 							{
 								s_labelUnderBin = s + "-<" +
-									getStringValue(this.model.getBinBoundaries().get(i + 1));
+									StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 							}
 							
 							metrics = context.measureText(s_labelUnderBin);
@@ -2118,7 +2118,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				int y = (int) (i + (i + 0.5) * this.horizontalBarWidth);
 				int x = this.yAxisOffset;
 				// Get the string value (integer or double)
-				String s = getStringValue(this.model.getBinBoundaries().get(i));
+				String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 				
 				if (this.model.getLabelUnderBin())
 				{
@@ -2144,7 +2144,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						else
 						{
 							s_labelUnderBin = s + "-<" +
-								getStringValue(this.model.getBinBoundaries().get(i + 1));
+								StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 							// draw marker
 							context.beginPath();
 							context.moveTo(x - 7, y + ySplitOffset);
@@ -2198,7 +2198,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			int marge = 5;
 			for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
 			{
-				String s = getStringValue(this.model.getBinBoundaries().get(i));
+				String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
 				if (i < this.model.getBinBoundaries().size() - 1)
 				{
 					String s_labelUnderBin;
@@ -2210,7 +2210,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 					else
 					{
 						s_labelUnderBin = s + "-<" +
-								getStringValue(this.model.getBinBoundaries().get(i + 1));
+							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 					}
 					
 					metrics = context.measureText(s_labelUnderBin);
@@ -2236,37 +2236,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		}
 		
 		return normalFit;
-	}
-
-	/**
-	 * Get the string value of d according to the type (Integer or Double).
-	 * @param d
-	 * @return
-	 */
-	private String getStringValue(double d)
-	{
-		String s;
-		int columnIndex = this.model.getColumnIndex();
-		String type = this.model.getStatTableModel().getColumnTypes().get(columnIndex).toString();
-		
-//		System.out.println("HistogramView.getStringValue(d=" + d + "): columnIndex = " 
-//		+ columnIndex + ", type = " + type + ", AllowedTypes.DOUBLE = " + AllowedTypes.DOUBLE);
-	
-		if (type.equals(AllowedTypes.INTEGER.toString()))
-		{
-			s = String.valueOf((int) d);
-//			System.out.println("INTEGER! s = " + s);
-		}
-		else if (type.equals(AllowedTypes.DOUBLE.toString()))
-		{
-//			s = Double.toString(d);
-			s = String.valueOf((double) d);
-//			System.out.println("DOUBLE! s = " + s);
-		}
-		else
-			s = "";
-		
-		return s;
 	}
 
 	private int determineDependentAxisWidth(Context2d context, double scale)
@@ -3899,7 +3868,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 					selectionList);
 			} // enum or string
 			
-			// view statTable moet updaten en de selectie laten zien
+			// view statTable moet updaten en de selectie laten zien -> gebeurt al door setSelectionList, die triggert een SelectionChangeEvent
 			ViewSelectionChangeEvent event = new ViewSelectionChangeEvent(HistogramView.this.controller.getViewName());
 			HistogramView.this.fireEvent(event);
 		}
