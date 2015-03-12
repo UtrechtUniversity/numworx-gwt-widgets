@@ -57,5 +57,7 @@ public interface StatistiekCssResource extends CssResource
 	String dataGridCell();
 	
 	String dataGrid();
+
+	String failMessage();
 }
 
