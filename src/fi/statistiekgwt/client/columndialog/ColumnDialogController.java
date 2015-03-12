@@ -60,124 +60,6 @@ public class ColumnDialogController
 	}
 
 	/**
-	 * ActionListener implementation
-	 */
-//	public void actionPerformed(ActionEvent arg0)
-//	{
-//		String actionCommand = arg0.getActionCommand();
-//		if (actionCommand.equals("addEnumElementField"))
-//		{
-//			if (this.wasEnum())
-//			{
-//				String newElement = this.view.getEnumOption();
-//				this.model.addEnumOption(newElement);
-//			}
-//			else
-//			{
-//				this.view.addStringOption(this.view.getEnumOption());
-//				this.view.update(null, null);
-//			}
-//
-//			// clear the text in the input field
-//			this.view.clearAddEnumElementField();
-//		}
-//		else if (actionCommand.equals("removeSelectedElement"))
-//		{
-//			if (this.wasEnum())
-//			{
-//				// Changes are definitively made in the model
-//				this.model.removeEnumOption(this.view.getSelectedOptionInListIndex());
-//			}
-//			else
-//			{
-//				// Changes are preliminarily made in the view.
-//				// Changes are made definitive after click on OK button.
-//				this.view.removeStringOption(this.view.getSelectedOptionInListIndex());
-//				this.view.update(null, null);
-//			}
-//		}
-//		else if (actionCommand.equals("removeAllElements"))
-//		{
-//			if (this.wasEnum())
-//			{
-//				this.model.removeAllEnumOption();
-//			}
-//			else
-//			{
-//				this.view.removeAllStringOptions();
-//				this.view.update(null, null);
-//			}
-//		}
-//		else if (actionCommand.equals("sortElements"))
-//		{
-//			if (this.wasEnum())
-//			{
-//				this.model.sortEnumOptions();
-//			}
-//			else
-//			{
-//				this.view.sortStringOptions();
-//				this.view.update(null, null);
-//			}
-//		}
-//		else if (actionCommand.equals("moveElementUp"))
-//		{
-//			int index = this.view.getSelectedOptionInListIndex();
-//			
-//			if (this.wasEnum())
-//			{
-//				this.model.swapEnumOptions(index,
-//					index - 1);
-//			}
-//			else
-//			{
-//				this.view.swapStringOptions(index,
-//					index - 1);
-//				this.view.update(null, null);
-//			}
-//			
-//			this.view.setSelectedOptionInListIndex(index - 1);
-//		}
-//		else if (actionCommand.equals("moveElementDown"))
-//		{
-//			int index = this.view.getSelectedOptionInListIndex();
-//			
-//			if (this.wasEnum())
-//			{
-//				this.model.swapEnumOptions(index,
-//					index + 1);
-//			}
-//			else
-//			{
-//				this.view.swapStringOptions(index,
-//					index + 1);
-//				this.view.update(null, null);
-//			}
-//			
-//			this.view.setSelectedOptionInListIndex(index + 1);
-//		}
-//		else if (actionCommand.equals("typeBox"))
-//		{
-//			this.model.setType(this.view.getSelectedType());
-//		}
-//		else if (actionCommand.equals("doneButton"))
-//		{
-//			// als type gewijzigd in enum, update enum options
-//			if (!this.wasEnum() && this.model.getType().equals(AllowedTypes.ENUM))
-//			{
-//				this.view.updateEnumOptions();
-//			}
-//
-//			this.model.setDonePressed(true);
-//			this.view.setVisible(false);
-//		}
-//		else if (actionCommand.equals("nameField"))
-//		{
-//			this.model.setName(this.view.getCurrentName());
-//		}
-//	}
-	
-	/**
 	 * Return whether the column originally was of type enumeration.
 	 * When the type was originally string, a list of stringOptions is generated 
 	 * as possible enum options. Changes in the string options list are
@@ -397,7 +279,7 @@ public class ColumnDialogController
 					ColumnDialogController.this.model.fireEvent(event);
 				}
 				
-				// test syl: remove handler statTableModel from ColumnDialogModel
+				// remove handler statTableModel from ColumnDialogModel
 				HandlerRegistration registration = ColumnDialogController.this.getHandlerRegistration(); 
 				if (registration != null) // null in case of column info mode
 					registration.removeHandler();
@@ -407,10 +289,10 @@ public class ColumnDialogController
 				ColumnDialogController.this.view.setVisible(false);
 				ColumnDialogController.this.view.hide();
 
-				// test syl: TODO reset stringOptions voor het geval er een stringoption verwijderd is
+				// reset stringOptions voor het geval er een stringoption verwijderd is
 				ColumnDialogController.this.view.resetOriginalStringOptions();
 				
-				// test syl: remove handler statTableModel from ColumnDialogModel
+				// remove handler statTableModel from ColumnDialogModel
 				ColumnDialogController.this.getHandlerRegistration().removeHandler();
 			}
 		}
