@@ -155,7 +155,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	}
 
 	/**
-	 * Remove a view by index
+	 * Remove a view and its occurrences as handler by index.
 	 * 
 	 * @param viewIndex
 	 *            the index of the view that will be removed
@@ -165,9 +165,6 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 		this.views.get(viewIndex).removeHandlers();
 		this.views.remove(viewIndex);
 		this.viewInOwnWindow.remove(viewIndex);
-		
-//		super.setChanged();
-//		super.notifyObservers();
 	}
 
 	/**
@@ -255,7 +252,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	}
 
 	/**
-	 * Remove all views without triggering an event.
+	 * Remove all views and their occurrences as handler without triggering an event.
 	 */
 	public void removeViewsWithoutEvent()
 	{
@@ -265,6 +262,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
         	StatistiekView view = iterator.next();
         	if (view != null)
         	{
+        		view.removeHandlers();
         		iterator.remove();
         	}
         }
@@ -274,7 +272,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	}
 
 	/**
-	 * Remove all views
+	 * Remove all views and their occurrences as handler.
 	 */
 	public void removeViews()
 	{
@@ -284,6 +282,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
         	StatistiekView view = iterator.next();
         	if (view != null)
         	{
+        		view.removeHandlers();
         		iterator.remove();
         	}
         }
