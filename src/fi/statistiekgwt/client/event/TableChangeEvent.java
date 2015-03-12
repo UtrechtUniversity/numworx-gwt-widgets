@@ -19,7 +19,7 @@ public class TableChangeEvent extends GwtEvent<TableChangeEventHandler>
 	public static String REMOVE_ROW = "removeRow";
 	public static String SORT_COLUMN = "sortColumn";
 	public static String UPDATE_NUMERICAL_COLUMN_TYPES = "updateNumericalColumnTypes";
-	public static String IMPORT_CSV = "importCSV";
+	public static String IMPORT_DATA = "importData";
 
 	private final String info;
 	/**
