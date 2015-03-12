@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1200,6 +1199,21 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	{
 		this.selectionList.set(rowIndex, b);
 		SelectionChangeEvent event = new SelectionChangeEvent("StatTableModel");
+		this.fireEvent(event);
+	}
+
+	/**
+	 * Set the selection of the row with the given rowIndex to boolean b.
+	 * Fire a selection change event with the given sender.
+	 * 
+	 * @param rowIndex
+	 * @param b
+	 * @param sender
+	 */
+	public void setSelected(int rowIndex, Boolean b, String sender)
+	{
+		this.selectionList.set(rowIndex, b);
+		SelectionChangeEvent event = new SelectionChangeEvent(sender);
 		this.fireEvent(event);
 	}
 
@@ -2700,5 +2714,4 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		SelectionChangeEvent selectionChangeEvent = new SelectionChangeEvent("StatTableModel");
 		this.fireEvent(selectionChangeEvent);
 	}
-
 }
