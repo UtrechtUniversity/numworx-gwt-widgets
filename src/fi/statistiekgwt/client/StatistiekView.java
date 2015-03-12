@@ -5,7 +5,10 @@ import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Interface for statistical representations
+ * Interface for statistical representations.
+ * Please note that in general a representation's controller
+ * implements the StatistiekView interface.
+ *  
  * @author Manu Drijvers, Sylvia van Borkulo
  *
  */
@@ -83,4 +86,10 @@ public interface StatistiekView {
 	 * Set the views height.
 	 */
 	public void setHeight(int h);
+	
+	/**
+	 * Update the view. Used to update table view after switch in tablayoutpanel
+	 * in statinteractiepanel. Views there are only accessible as statistiekViews.
+	 */
+	public void update();
 }
