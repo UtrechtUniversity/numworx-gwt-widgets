@@ -2,12 +2,8 @@ package fi.statistiekgwt.client;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -21,13 +17,11 @@ import fi.statistiekgwt.client.text.Text_nl;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.CssResource.ClassName;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -47,7 +41,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 //	LayoutPanel basisPanel;
 	StatInteractiePanel basisPanel;
 
-	public static NumberFormat df = NumberFormat.getDecimalFormat();
+	public static NumberFormat nf = NumberFormat.getDecimalFormat(); // number format for the default locale
+
 	public static String fontString = "12px sans-serif";
 	public static String fontBoldString = "12px sans-serif bold";;
 	public static int scrollSpeedUnit = 16;
@@ -70,6 +65,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public static int BUTTON_HEIGHT = 40; 
 	
 	boolean nagekeken = false;
+
+	private static String language;
 
 
 	/**
@@ -226,6 +223,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	
 	public StatistiekGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden, int volleBreedte)
 	{	
+		StatistiekGWT.language = "nl";
 		initViews();
 		basisPanel = new StatInteractiePanel();
 
@@ -356,23 +354,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	}
 	
 	/**
-	 * Get the string value of double. If the value is an integer value
-	 * a string is returned without decimals.
-	 * @param d The double value
-	 * @return The string value
-	 */
-	public static String getStringValue(double d)
-	{
-		String s;
-		if ((d == Math.floor(d)) && !Double.isInfinite(d))
-			s = String.valueOf((int) d);
-		else
-			s = String.valueOf(d);
-		
-		return s;
-	}
-
-	/**
 	 * Determine appropriate bin boundaries from given min, max and number of
 	 * bins.
 	 * 
@@ -393,9 +374,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		{
 			// determine the number of decimals of min and max
 			String minString = String.valueOf(min);
-			int decimalPlacesMin = minString.length() - minString.indexOf('.') - 1;
+			int decimalPlacesMin = StatistiekGWT.getNumberOfDecimals(minString);
 			String maxString = String.valueOf(max);
-			int decimalPlacesMax = maxString.length() - maxString.indexOf('.') - 1;
+			int decimalPlacesMax = StatistiekGWT.getNumberOfDecimals(maxString);
 			int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
 			
 			min = min * (Math.pow(10, numberOfDecimals)); 
@@ -470,9 +451,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		ArrayList<Double> boundaries = new ArrayList<Double>();
 		// correct afronden op basis van decimalen in start en binWidth
 		String startString = String.valueOf(start);
-		int decimalPlacesStart = startString.length() - startString.indexOf('.') - 1;
+		int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
 		String binWidthString = String.valueOf(step);
-		int decimalPlacesBinWidth = binWidthString.length() - binWidthString.indexOf('.') - 1;
+		int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
 		int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
 		for (int i = 0; i <= noBins; i++)
 		{
@@ -519,25 +500,46 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			|| (((max - min) < 1) && ((max - min) != 0)))
 		{
 			// determine the number of decimals of min and max
-			String minString = String.valueOf(min);
-			int decimalPlacesMin = minString.length() - minString.indexOf('.') - 1;
-			String maxString = String.valueOf(max);
-			int decimalPlacesMax = maxString.length() - maxString.indexOf('.') - 1;
-			int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
+//			String minString = String.valueOf(min);
+//			int decimalPlacesMin = StatistiekGWT.getNumberOfDecimals(minString);
+//			String maxString = String.valueOf(max);
+//			int decimalPlacesMax = StatistiekGWT.getNumberOfDecimals(maxString);
+//			int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
 			
+			// test syl: alternative... using number of decimals of start and binWidth
+			double start;
+			if (minBoundary <= min)
+			{
+				start = minBoundary;
+			}
+			else
+			{
+				start = min;
+			}
+
+			String startString = String.valueOf(start);
+			int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
+			String binWidthString = String.valueOf(binWidth);
+			int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
+			int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
+
 			min = min * (Math.pow(10, numberOfDecimals)); 
 			max = max * (Math.pow(10, numberOfDecimals));
 			binWidth = binWidth * (Math.pow(10, numberOfDecimals));
 			minBoundary = minBoundary * (Math.pow(10, numberOfDecimals));
 			
 			ArrayList<Double> binBoundaries = appropriateBoundariesFromBinSettings(min, max, binWidth, minBoundary);
-			// divide each bin boundary by Math.pow(10, numberOfDecimals)
-			for (int i = 0; i < binBoundaries.size(); i++)
+			
+			if (binBoundaries != null)
 			{
-				// divide the bin boundary by Math.pow(10, numberOfDecimals)
-				// and round to the correct number of decimals (because of possible rounding errors)
-				double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
-				binBoundaries.set(i, newValue);
+				// divide each bin boundary by Math.pow(10, numberOfDecimals)
+				for (int i = 0; i < binBoundaries.size(); i++)
+				{
+					// divide the bin boundary by Math.pow(10, numberOfDecimals)
+					// and round to the correct number of decimals (because of possible rounding errors)
+					double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
+					binBoundaries.set(i, newValue);
+				}
 			}
 			return binBoundaries; 
 		}
@@ -569,9 +571,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		ArrayList<Double> boundaries = new ArrayList<Double>();
 		// correct afronden op basis van decimalen in start en binWidth
 		String startString = String.valueOf(start);
-		int decimalPlacesStart = startString.length() - startString.indexOf('.') - 1;
+		int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
 		String binWidthString = String.valueOf(binWidth);
-		int decimalPlacesBinWidth = binWidthString.length() - binWidthString.indexOf('.') - 1;
+		int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
 		int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
 		
 		for (int i = 0; i <= noBins; i++)
@@ -683,6 +685,195 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	}
 	
 	/**
+	 * Get the string value of double. If the value is an integer value
+	 * a string is returned without decimals.
+	 * The decimal format related to the language is used,
+	 * with the number of decimals of d.
+	 *  
+	 * @param d The double value
+	 * @return The string value
+	 */
+	public static String getStringValue(double d)
+	{
+		String s;
+		if ((d == Math.floor(d)) && !Double.isInfinite(d))
+			s = String.valueOf((int) d);
+		else
+		{
+			NumberFormat numberFormat = StatistiekGWT.getNumberFormat(d);
+			s = numberFormat.format(d); // use number format for the correct decimal separator
+			
+			// gebruik van locale door numberformat wordt (nog) niet ondersteund
+			// zie: http://stackoverflow.com/questions/9805941/how-to-specify-the-thousands-and-decimal-separator-used-by-gwts-numberformat
+			if (language.equals("nl"))
+			{
+				s = s.replace('.', ',');
+			}
+		}
+		
+		return s;
+	}
+	
+//	/**
+//	 * Get the string value of double. If the value is an integer value
+//	 * a string is returned without decimals.
+//	 * @param d The double value
+//	 * @return The string value
+//	 */
+//	public static String getStringValue(double d)
+//	{
+//		String s;
+//		if ((d == Math.floor(d)) && !Double.isInfinite(d))
+//			s = String.valueOf((int) d);
+//		else
+//			s = String.valueOf(d);
+//		
+//		return s;
+//	}
+
+
+	
+	/**
+	 * Get the string value of double. If the value is an integer value
+	 * a string is returned without decimals.
+	 * The default decimal format related to language is used, with one decimal.
+	 *  
+	 * @param d The double value
+	 * @return The string value
+	 */
+	public static String getStringValueWithOneDecimal(double d)
+	{
+		String s;
+		if ((d == Math.floor(d)) && !Double.isInfinite(d))
+		{
+			s = String.valueOf((int) d);
+		}
+		else
+		{
+			String separator = StatistiekGWT.getDecimalSeparator();
+			NumberFormat.getFormat("0" + separator + "#"); // if there are decimals, show one
+			s = nf.format(d); // use the default decimal format for the correct decimal separator
+		}
+		
+		return s;
+	}
+	
+	/**
+	 * Get the number format for the default locale.
+	 */
+	public static NumberFormat getDefaultNumberFormat()
+	{
+		return nf;
+	}
+	
+	/**
+	 * Get the number format with number of decimals of the given double.
+	 * 
+	 * @param d The double 
+	 */
+	public static NumberFormat getNumberFormat(Double d)
+	{
+		String value = String.valueOf(d);
+		int numberOfDecimals = StatistiekGWT.getNumberOfDecimals(value);
+		String separator;
+		
+		if (StatistiekGWT.language.equals("nl"))
+			separator = ",";
+		else
+			separator = ".";
+
+		String pattern = "0";
+		
+		if (numberOfDecimals > 0)
+			pattern = pattern + ".";
+		for (int i = 0; i < numberOfDecimals; i++)
+		{
+			pattern = pattern + "#"; 
+		}
+		NumberFormat decimalFormat = NumberFormat.getFormat(pattern);
+
+		return decimalFormat;
+	}
+	
+	/**
+	 * Parse the double value in doubleString to double 
+	 * using the locale language settings.
+	 * 
+	 * @param doubleString
+	 * @return
+	 */
+	public static double parseDouble(String doubleString)
+	{
+		double d;
+		
+		d = nf.parse(doubleString);
+
+		return d;
+	}
+	
+	/**
+	 * Get language of statistiek.
+	 * 
+	 * @return
+	 */
+	public static String getLanguage()
+	{
+		return StatistiekGWT.language;
+	}
+	
+	/**
+	 * Set language of statistiek.
+	 * 
+	 * @return
+	 */
+	public static void setLanguage(String l)
+	{
+		StatistiekGWT.language = l;
+	}
+	
+	/**
+	 * Get the number of decimals of the given double string.
+	 * 
+	 * @param d
+	 * @return
+	 */
+	public static int getNumberOfDecimals(String doubleString)
+	{
+		int decimalPlaces = 0;
+		boolean isScientificNotation = doubleString.indexOf("E") > -1;
+		
+		if (!isScientificNotation)
+		{
+			int integerPlaces = doubleString.indexOf('.');
+			if (integerPlaces > -1)
+			{
+				decimalPlaces = doubleString.length() - integerPlaces - 1;
+			}
+		}
+		else
+		{
+			// met regular expressions
+			String patternString = "(?:\\.(\\d+))?(?:[eE]([+-]?\\d+))";
+			
+			RegExp regExp = RegExp.compile(patternString);
+			MatchResult matcher = regExp.exec(doubleString);
+			boolean matchFound = matcher != null; // equivalent to regExp.test(inputStr); 
+			if (matchFound)
+			{
+				// doubleString heeft een goed formaat
+				decimalPlaces = 
+					// Number of digits right of decimal point.
+				    (((matcher.getGroup(1) != null) && Integer.valueOf(matcher.getGroup(1).toString()) != 0) 
+				    	? matcher.getGroup(1).length() : 0)
+				    // Adjust for scientific notation.
+				    - (matcher.getGroup(2) != null ? Integer.valueOf(matcher.getGroup(2).toString()) : 0);
+			}
+		}
+		
+		return decimalPlaces;
+	}
+	
+	/**
 	 * Get the binWidth based on the values in bins. The number of 
 	 * decimals of d will be the maximum number of decimals
 	 * among the values in bins.
@@ -701,13 +892,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		for (int i = 0; i < bins.size(); i++)
 		{
 			binValueString = String.valueOf(bins.get(i));
-			int numberOfDecimals = binValueString.length() - binValueString.indexOf('.') - 1;
+			int numberOfDecimals = StatistiekGWT.getNumberOfDecimals(binValueString);
 			
 			if (numberOfDecimals > maxNumberOfDecimals)
 				maxNumberOfDecimals = numberOfDecimals;
 		}
 
 		// get format with numberOfDecimals
+		String separator = StatistiekGWT.getDecimalSeparator();
 		String pattern = "0";
 		
 		if (maxNumberOfDecimals > 0)
@@ -716,12 +908,26 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			pattern = pattern + ".";
 			for (int i = 0; i < maxNumberOfDecimals; i++)
 			{
-				pattern = pattern + "0";
+				pattern = pattern + "#";
 			}
 		}
-
-		formattedValueString = NumberFormat.getFormat(pattern.toString()).format(d); 
+		NumberFormat nf = NumberFormat.getFormat(pattern);
+		formattedValueString = nf.format(d.doubleValue());
+		
+		if (separator.equals(","))
+			formattedValueString = formattedValueString.replace('.', ',');
 		
 		return formattedValueString;
+	}
+	
+	private static String getDecimalSeparator()
+	{
+		String separator = ".";
+		if (StatistiekGWT.language.equals("nl"))
+		{
+			separator = ",";
+		}
+		
+		return separator;
 	}
 }
