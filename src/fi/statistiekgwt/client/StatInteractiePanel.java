@@ -221,6 +221,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	public void setWidth(int w)
 	{
 		this.width = w;
+		// width doorgeven aan statinteractiepanelview 
+		this.view.setWidth(w);
 	}
 
 	/**
@@ -637,5 +639,15 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	public double getBarHeight()
 	{
 		return this.barHeight;
+	}
+	
+	/**
+	 * Get statmodel.
+	 * 
+	 * @return
+	 */
+	public StatModel getStatModel()
+	{
+		return this.model;
 	}
 }
