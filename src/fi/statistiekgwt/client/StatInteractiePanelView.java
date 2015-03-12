@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Cursor;
-import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
@@ -38,7 +38,6 @@ import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.event.AddViewEvent;
 import fi.statistiekgwt.client.event.AddViewEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -58,7 +57,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	private StatInteractiePanel controller;
 	
 	private static Label NO_VIEWS_LABEL = new Label("No views added.");
-	private TabLayoutPanel tabPanel;
+	private ScrollableTabLayoutPanel tabPanel;
 	private LayoutPanel addViewTab;
 	private ListBox viewsBox, startVarBox, startVar2Box;
 	
@@ -112,14 +111,14 @@ public class StatInteractiePanelView extends LayoutPanel
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
 		
-		this.initTabPanel(barHeight, barUnit);
-
 		this.initModel(model);
 		
 		this.initPopupMenu();
 
 		this.controller = controller;
 		
+		this.initTabPanel(barHeight, barUnit);
+
 		this.dialogs = new ArrayList<SeparateViewDialog>();
 
 		this.addViewTab = new LayoutPanel();
@@ -280,7 +279,12 @@ public class StatInteractiePanelView extends LayoutPanel
 	private void initTabPanel(double barHeight, Unit barUnit)
 	{
 		//super(barHeight, barUnit); // komt van TabLayoutPanel
-		this.tabPanel = new TabLayoutPanel(barHeight, barUnit);
+		this.tabPanel = //new TabLayoutPanel(barHeight, barUnit); // als er teveel tabs zijn, vallen ze buiten beeld
+//			new ScrolledTabLayoutPanel(barHeight, barUnit, 
+//				this.statistiekGWTClientBundle.scrollArrowLeftResource(), 
+//				this.statistiekGWTClientBundle.scrollArrowRightResource()); // met scrollbar als er teveel tabs zijn; lelijk, buttons links
+			new ScrollableTabLayoutPanel(barHeight, barUnit, 
+				this.controller.getWidth(), controller.getHeight()); // met scrollbar als er teveel tabs zijn; alternatief 
 
 		this.tabPanel.addSelectionHandler(new SelectionHandler<Integer>()
 		{
@@ -983,12 +987,12 @@ public class StatInteractiePanelView extends LayoutPanel
 	}
 	
 	/**
-	 * Class that handles right mouse click on label.
+	 * Class that handles right mouse click on tab title label.
 	 * 
 	 * @author borku102
 	 *
 	 */
-	public class LabelClickHandler implements ContextMenuHandler//ClickHandler
+	public class LabelClickHandler implements ContextMenuHandler, ClickHandler
 	{
 		private Widget widget;
 		private String viewName;
@@ -1000,29 +1004,22 @@ public class StatInteractiePanelView extends LayoutPanel
 			this.viewName = viewName;
 		}
 
-//		@Override
-//		public void onClick(ClickEvent event)
-//		{
-//			int button = event.getNativeEvent().getButton();
-//			int widgetIndex = tabPanel.getWidgetIndex(widget);
-//			
-//			if (button == NativeEvent.BUTTON_RIGHT)
-//			{
-//				GWT.log("LabelClickHandler.onClick(): right!");
-//				if (StatInteractiePanelView.this.model.getStatTableModel()
-//					.isViewsEditable()
-//					&& widgetIndex >= 0
-//					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
-//				{
-//					GWT.log("LabelClickHandler.onClick(): TODO show change view name dialog");
-//				}
-//			}
-//		}
+		@Override
+		public void onClick(ClickEvent event)
+		{
+			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+			for (int i = 0; i < model.getViews().size(); i++)
+			{
+				StatistiekView view = model.getViews().get(i);
+				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+					view.update();
+			}
+		}
 
 		@Override
 		public void onContextMenu(ContextMenuEvent event)
 		{
-			// TODO: select tab
+			// select tab
 			tabPanel.selectTab(widget);
 			int viewIndex = getIndexOfViewName(viewName);
 			setSelectedView(viewIndex);
@@ -1338,6 +1335,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
 	    
 	    label.addDomHandler(new LabelClickHandler(widget, title), ContextMenuEvent.getType());
+	    label.addClickHandler(new LabelClickHandler(widget, title)); // to handle click to set focus
 	    label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
 
 	    ImageAnchor closeBtn = new ImageAnchor();
@@ -1359,12 +1357,15 @@ public class StatInteractiePanelView extends LayoutPanel
 						.removeView(StatInteractiePanelView.this.model
 							.mainWindowIndexToGeneralIndex(widgetIndex));
 
-					// set the tabs
-//					if (widgetIndex == tabPanel.getSelectedIndex())
-//					{
-//						tabPanel.selectTab(widgetIndex - 1);
-//					}
 					tabPanel.remove(widgetIndex);
+					
+					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+					for (int i = 0; i < model.getViews().size(); i++)
+					{
+						StatistiekView view = model.getViews().get(i);
+						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+							view.update();
+					}
 				}
 				
 			}
@@ -1421,7 +1422,7 @@ public class StatInteractiePanelView extends LayoutPanel
 		if (info.equals(TableChangeEvent.ADD_COLUMN)
 			|| info.equals(TableChangeEvent.EDIT_COLUMN)
 			|| info.equals(TableChangeEvent.REMOVE_COLUMN)
-			|| info.equals(TableChangeEvent.IMPORT_CSV))
+			|| info.equals(TableChangeEvent.IMPORT_DATA))
 		{
 			GWT.log("StatInteractiePanelView.onTableChange()");
 			this.update();
@@ -1448,5 +1449,15 @@ public class StatInteractiePanelView extends LayoutPanel
 				this.tabPanel.remove(i);
 			}
 		}
+	}
+	
+	public void setWidth(int width)
+	{
+		this.tabPanel.setWidth(width);
+	}
+	
+	public void setHeight(int height)
+	{
+		this.tabPanel.setHeight(height);
 	}
 }
