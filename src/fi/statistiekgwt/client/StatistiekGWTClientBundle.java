@@ -14,6 +14,12 @@ public interface StatistiekGWTClientBundle extends ClientBundle
 	@Source("fi/statistiekgwt/client/images/arrow-199-16_525252down.gif")
 	public ImageResource arrowDownResource();
 	
+	@Source("fi/statistiekgwt/client/images/arrow-102-16left.gif")
+	public ImageResource scrollArrowLeftResource();
+	
+	@Source("fi/statistiekgwt/client/images/arrow-37-16right.gif")
+	public ImageResource scrollArrowRightResource();
+	
 	@Source("fi/statistiekgwt/client/images/cross.png")
 	public ImageResource crossResource();
 	
