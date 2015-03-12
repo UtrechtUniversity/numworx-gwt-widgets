@@ -448,4 +448,11 @@ public class HistogramController implements StatistiekView
 	{
 		this.height = h;
 	}
+
+	@Override
+	public void update()
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }
