@@ -162,3 +162,7 @@
 td div{
    overflow-x:hidden;
 }
+
+.failMessage {
+	color:red;
+}
