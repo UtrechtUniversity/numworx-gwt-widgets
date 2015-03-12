@@ -868,17 +868,19 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 			if (type.equals(AllowedTypes.DOUBLE)
 				|| type.equals(AllowedTypes.INTEGER))
 			{
-				this.minBoundaryField.setText(this.model.getBinBoundaries().get(0).toString());
+				this.minBoundaryField.setText(StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(0)));
 				this.binWidthField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getBinBoundaries()));
 				this.noObjectsLabel.setText(StatistiekGWT.rb
 					.getString("numberLabel")
 					+ this.model.getStatTableModel().getRowCount());
+				String minValue = StatistiekGWT.getStringValue(
+					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()));
 				this.minValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
-					+ this.model.getStatTableModel().getColumnMin(
-						this.model.getColumnIndex()));
+					+ minValue);
+				String maxValue = StatistiekGWT.getStringValue(
+					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
 				this.maxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
-					+ this.model.getStatTableModel().getColumnMax(
-						this.model.getColumnIndex()));
+					+ maxValue);
 				this.binSettingsHR.setVisible(true);
 				this.splitBoundariesHR.setVisible(true);
 				this.labelBetweenBinsRadioItem.setVisible(true);
@@ -910,8 +912,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
     			if (splitType.equals(AllowedTypes.DOUBLE)
     				|| splitType.equals(AllowedTypes.INTEGER))
     			{
-    				this.splitMinBoundaryField.setText(this.model.getSplitOptions().getBinBoundaries()
-    						.get(0).toString());
+    				this.splitMinBoundaryField.setText(
+    					StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(0)));
     				this.splitBinWidthField.setText(
     					StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				
@@ -919,25 +921,25 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
     				for (int i = 0; i < this.model.getSplitOptions()
     					.getBinBoundaries().size() - 1; i++)
     				{
-    					sb.append(this.model.getSplitOptions()
-    						.getBinBoundaries().get(i).toString());
-    					sb.append(" - ");
-    					sb.append(this.model.getSplitOptions()
-    						.getBinBoundaries().get(i + 1).toString());
+    					sb.append(
+    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i)));
+    					sb.append(" -< ");
+    					sb.append(
+    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i + 1)));
     					sb.append("\n");
     				}
     				this.splitBoundariesArea.setText(sb.toString());
     				this.splitNoObjectsLabel.setText(StatistiekGWT.rb
     					.getString("numberLabel")
     					+ this.model.getStatTableModel().getRowCount());
-    				this.splitMinValueLabel.setText(StatistiekGWT.rb
-    					.getString("minLabel")
-    					+ this.model.getStatTableModel().getColumnMin(
-    						this.model.getSplitOptions().getColumnSplitIndex()));
-    				this.splitMaxValueLabel.setText(StatistiekGWT.rb
-    					.getString("maxLabel")
-    					+ this.model.getStatTableModel().getColumnMax(
-    						this.model.getSplitOptions().getColumnSplitIndex()));
+    				String splitMinValue = StatistiekGWT.getStringValue(
+    					this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()));
+    				this.splitMinValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
+    					+ splitMinValue);
+    				String splitMaxValue = StatistiekGWT.getStringValue(
+    					this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
+    				this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+    					+ splitMaxValue);
     				this.splitBinsBox.setVisible(true);
     				this.splitBinsLabel.setVisible(true);
     				setSplitEnumClasses(false);
