@@ -5,6 +5,8 @@ import com.google.gwt.event.shared.GwtEvent;
 public class SelectionChangeEvent extends GwtEvent<SelectionChangeEventHandler>
 {
 	public static Type<SelectionChangeEventHandler> TYPE = new Type<SelectionChangeEventHandler>();
+	
+	public static String STAT_TABLE = "StatTable";
 
 	private final String sender;
 
