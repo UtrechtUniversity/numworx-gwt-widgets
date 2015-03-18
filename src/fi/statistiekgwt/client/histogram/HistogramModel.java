@@ -36,17 +36,19 @@ public class HistogramModel
 	private final boolean frequencyPolygonMode;
 	private boolean frequencyPolygonCumulativeMode;
 
+	/**
+	 *  true for displaying multiple splitgroups in a single view,
+	 *  false to display multiple splitgroups in multiple views in a scrollpane
+	 */
 	private boolean splitInSingleView;
 	private boolean nextToEachOther;
-	// true for displaying multiple splitgroups in a single view,
-	// false to display multiple splitgroups in multiple views in a scrollpane
 
+	/**
+	 *  true: display multiple cumulative frequencyPolygons stacked on top of each other
+	 *  false: display multiple cumulative frequencyPolygons using mixing of colors
+	 */
 	private boolean frequencyPolygonStackMode;
 
-	// true: display multiple cumulative frequencyPolygons stacked on top of
-	// each other
-	// false: display mutiple cumulative frequencyPolygons using mixing of
-	// colors
 
 	/**
 	 * Constructor
@@ -60,8 +62,6 @@ public class HistogramModel
 		boolean frequencyPolygonMode)
 	{
 		this.statTableModel = tableModel;
-		//this.tableModel.addTableModelListener(this);
-		//this.tableModel.addSelectionListener(this);
 
 		this.splitOptions = new SplitOptions();
 
@@ -83,16 +83,6 @@ public class HistogramModel
 		this.frequencyPolygonStackMode = false;
 	}
 
-//	/**
-//	 * Abbreviation of setChanged and notifyObservers
-//	 */
-//	private void changed()
-//	{
-//		// System.out.println("HistogramModel.changed()");
-//		//this.setChanged();
-//		//this.notifyObservers();
-//	}
-
 	public SplitOptions getSplitOptions()
 	{
 		return this.splitOptions;
@@ -101,7 +91,6 @@ public class HistogramModel
 	public void setSplitOptions(SplitOptions splitOptions)
 	{
 		this.splitOptions = splitOptions;
-//		this.changed();
 	}
 
 	/**
@@ -122,8 +111,6 @@ public class HistogramModel
 		this.binBoundaries = copy; 
 			
 		this.noBins = this.binBoundaries.size() - 1;
-//		System.out.println("HistogramModel.setBinBoundaries(): this.getBinBoundaries=" + this.getBinBoundaries());
-//		this.changed();
 	}
 
 	/**
@@ -151,7 +138,6 @@ public class HistogramModel
 		if (b != this.frequencyPolygonCumulativeMode)
 		{
 			this.frequencyPolygonCumulativeMode = b;
-//			this.changed();
 		}
 	}
 
@@ -174,8 +160,6 @@ public class HistogramModel
 				this.noBins);
 			//System.out.println("... setNoBins(): boundaries=" + this.binBoundaries);
 		}
-
-//		this.changed();
 	}
 
 	/**
@@ -197,7 +181,6 @@ public class HistogramModel
 		if (!this.viewName.equals(viewName))
 		{
 			this.viewName = viewName;
-//			this.changed();
 		}
 
 	}
@@ -220,11 +203,7 @@ public class HistogramModel
 	{
 		if (!(this.statTableModel == tableModel))
 		{
-			//this.tableModel.removeTableModelListener(this);
 			this.statTableModel = tableModel;
-			//this.tableModel.addTableModelListener(this);
-			//this.tableModel.addSelectionListener(this);
-//			this.changed();
 		}
 
 	}
@@ -283,8 +262,6 @@ public class HistogramModel
 					setLabelUnderBin(false);
 				}
 			}
-			
-//			this.changed();
 		}
 	}
 
@@ -318,14 +295,12 @@ public class HistogramModel
 		if (this.splitOptions.getColumnSplitIndex() != columnSplitIndex)
 		{
 			this.splitOptions.setColumnSplitIndex(columnSplitIndex);
-//			this.changed();
 		}
 	}
 
 	public void setSplitBoundaries(ArrayList<Double> boundaries)
 	{
 		this.splitOptions.setBinBoundaries(boundaries);
-//		this.changed();
 	}
 
 	/**
@@ -339,7 +314,6 @@ public class HistogramModel
 		if (!(this.showUserOptions == b))
 		{
 			this.showUserOptions = b;
-//			this.changed();
 		}
 	}
 
@@ -414,7 +388,6 @@ public class HistogramModel
 		if (!(this.percentage == b))
 		{
 			this.percentage = b;
-//			this.changed();
 		}
 	}
 
@@ -430,7 +403,6 @@ public class HistogramModel
 		if (!(this.labelUnderBin == b))
 		{
 			this.labelUnderBin = b;
-//			this.changed();
 		}
 	}
 
@@ -462,7 +434,6 @@ public class HistogramModel
 		if (!(this.hasVerticalBars == b))
 		{
 			this.hasVerticalBars = b;
-//			this.changed();
 		}
 	}
 
@@ -473,16 +444,6 @@ public class HistogramModel
 	{
 		return this.hasVerticalBars;
 	}
-
-//	public void tableChanged(TableModelEvent arg0)
-//	{
-//		this.changed();
-//	}
-
-//	public void selectionChanged()
-//	{
-//		this.changed();
-//	}
 
 	/**
 	 * @param splitInSingleView
@@ -503,7 +464,6 @@ public class HistogramModel
 		// dan moeten onderstaande acties ook uitgevoerd worden.
 		if (!splitInSingleView)
 			nextToEachOther = false;
-//		this.changed();
 	}
 
 	public void setNextToEachOther(boolean nextToEachOther)
@@ -513,7 +473,6 @@ public class HistogramModel
 			this.nextToEachOther = nextToEachOther;
 			if (nextToEachOther)
 				splitInSingleView = true;
-//			this.changed();
 		}
 	}
 
@@ -534,7 +493,6 @@ public class HistogramModel
 		if (this.frequencyPolygonStackMode != frequencyPolygonStackMode)
 		{
 			this.frequencyPolygonStackMode = frequencyPolygonStackMode;
-//			this.changed();
 		}
 	}
 
