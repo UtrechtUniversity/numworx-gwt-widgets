@@ -710,10 +710,14 @@ public class StatInteractiePanelView extends LayoutPanel
 	public void update()
 	{
 		GWT.log("StatInteractiePanelView.update()");
+		
+		// onderstaande loop verwijdert alleen de views en niet de +-tab...
 		for (int i = super.getWidgetCount() - 1; i > 0; i--)
 		{
 			super.remove(i);
 		}
+		
+		this.removeAllTabs();
 
 		ArrayList<StatistiekView> views = this.getViews();//this.model.getMainWindowViews();
 		ArrayList<StatistiekView> separateWindowViews = this.model.getSeparateWindowViews();
@@ -754,7 +758,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			{
 				for (StatistiekView view : views)
 				{
-					this.tabPanel.add(view.getWidget(), view.getViewName());
+					this.tabPanel.add(view.getWidget(), this.getTabTitleNonEditable(view.getWidget(), view.getViewName()));//view.getViewName());
 				}
 			}
 
@@ -1012,7 +1016,9 @@ public class StatInteractiePanelView extends LayoutPanel
 			{
 				StatistiekView view = model.getViews().get(i);
 				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+				{
 					view.update();
+				}
 			}
 		}
 
@@ -1326,7 +1332,13 @@ public class StatInteractiePanelView extends LayoutPanel
 		
 	} // class ImageAnchor
 	
-	
+	/**
+	 * Get tab title widget with close button and context menu.
+	 * 
+	 * @param widget
+	 * @param title
+	 * @return
+	 */
 	private Widget getTabTitle(final Widget widget, final String title) 
 	{
 
@@ -1364,7 +1376,9 @@ public class StatInteractiePanelView extends LayoutPanel
 					{
 						StatistiekView view = model.getViews().get(i);
 						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+						{
 							view.update();
+						}
 					}
 				}
 				
@@ -1373,6 +1387,28 @@ public class StatInteractiePanelView extends LayoutPanel
 	    hPanel.add(label);
 	    hPanel.add(new HTML("&nbsp&nbsp&nbsp"));
 	    hPanel.add(closeBtn);
+	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
+	    return hPanel;
+	}
+
+	/**
+	 * Get a non-editable tab title widget, i.e., no close button and no context menu.
+	 * 
+	 * @param widget
+	 * @param title
+	 * @return
+	 */
+	private Widget getTabTitleNonEditable(final Widget widget, final String title) 
+	{
+
+	    final HorizontalPanel hPanel = new HorizontalPanel();
+	    final Label label = new Label(title);
+	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
+	    
+	    label.addClickHandler(new LabelClickHandler(widget, title)); // to handle click to set focus
+	    label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
+
+	    hPanel.add(label);
 	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
 	    return hPanel;
 	}
@@ -1445,6 +1481,21 @@ public class StatInteractiePanelView extends LayoutPanel
 		if (count > 1)
 		{
 			for (int i = this.tabPanel.getWidgetCount() - 2; i > -1; i--)
+			{
+				this.tabPanel.remove(i);
+			}
+		}
+	}
+	
+	/**
+	 * Remove all tabs.
+	 */
+	public void removeAllTabs()
+	{
+		int count = this.tabPanel.getWidgetCount();
+		if (count > 0)
+		{
+			for (int i = this.tabPanel.getWidgetCount() - 1; i > -1; i--)
 			{
 				this.tabPanel.remove(i);
 			}
