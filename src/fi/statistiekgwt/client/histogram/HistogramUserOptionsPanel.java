@@ -849,16 +849,25 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 			// set no split variable selected
 			this.splitVarBox.setSelectedIndex(0);
 		}
-		//this.splitVarBox.addActionListener(this);
 
-		//this.binsBox.removeActionListener(this.controller);
 		this.setSelectedItemInListBox(
 			this.binsBox, String.valueOf(this.model.getNoBins()));
-		//this.splitBinsBox.removeActionListener(this.controller);
+		
+//		int nr;
+//		if (this.model.getSplitOptions().getBinBoundaries() != null)
+//		{
+//			nr = this.model.getSplitOptions().getBinBoundaries().size() - 1;
+//		}
+//		else
+//		{
+//			// default number of split bins
+//			nr = 2;
+//		}
+//		this.splitBinsBox.setSelectedIndex(nr);
+
 		this.setSelectedItemInListBox(
 			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
-		//this.splitBinsBox.addActionListener(this.controller);
 
 		if (this.model.columnIndexValid())
 		{
@@ -1002,6 +1011,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 //		this.setVisibleSplitOptions(split);
 		// test syl: na klik op 'Maak splitsing' is splitOptionsVisible = true, terwijl er geen split is
 		this.setVisibleSplitOptions(this.splitOptionsVisible);
+//		this.setVisibleSplitOptions(split);
 		
 		this.singleViewRadioItem.setValue(this.model.splitInSingleView()
 			&& split && this.model.isFrequencyPolygonMode());
@@ -1141,7 +1151,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		}
 	}
 
-	private void setVisibleSplitOptions(boolean b)
+	void setVisibleSplitOptions(boolean b)
 	{
 		this.splitOptionsVisible = b;
 		
@@ -1434,23 +1444,12 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		}
 
 		/**
-		 * Update the view.
-		 */
-		private void updateView()
-		{
-			// update view
-			HistogramUserOptionsPanel.this.view.update();
-		}
-
-		/**
 		 * Update the view and the user options panel.
 		 */
 		private void update()
 		{
-			// update view
-			this.updateView();
-			// update the user options panel
-			this.updateUserOptionsPanel();
+			// update view and user options panel
+			HistogramUserOptionsPanel.this.view.update();
 		}
 	} // class HistogramUOPClickHandler
 
@@ -1487,8 +1486,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 			// update view
 			HistogramUserOptionsPanel.this.view.update();
-			// update the rest of the user options panel
-			HistogramUserOptionsPanel.this.update();
 		}
 	} // class HistogramUOPBlurHandler
 	
@@ -1523,10 +1520,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 					.getType());			
 			}
 
-			// update view
+			// update view (and uop)
 			HistogramUserOptionsPanel.this.view.update();
-			// update the rest of the user options panel
-			HistogramUserOptionsPanel.this.update();
 		}
 	} // class HistogramUOPChangeHandler
 
@@ -1558,8 +1553,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 			// update view
 			HistogramUserOptionsPanel.this.view.update();
-			// update the rest of the user options panel
-			HistogramUserOptionsPanel.this.update();
 		}
 	} // class HistogramUOPValueChangeHandler
 
@@ -1595,8 +1588,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 				// update view
 				HistogramUserOptionsPanel.this.view.update();
-				// update the rest of the user options panel
-				HistogramUserOptionsPanel.this.update();
 			}
 		}
 	} // class HistogramUOPKeyDownHandler
