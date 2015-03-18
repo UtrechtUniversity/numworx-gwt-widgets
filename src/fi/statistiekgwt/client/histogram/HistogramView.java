@@ -176,7 +176,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		this.setWidgetHidden(this.colorLegend, true);
 
 		HorizontalPanel dialogButtonPanel = new HorizontalPanel();
-		dialogButtonPanel.setSize("100%", "100%");
+		dialogButtonPanel.setWidth("100%");
 		dialogButtonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		this.dialogButton = userOptionsPanel.getDialogButton();
 		dialogButtonPanel.add(this.dialogButton);
@@ -184,6 +184,11 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 //		super.addSouth(this.dialogButton, 3);//em, BorderLayout.SOUTH);
 //		super.addSouth(this.dialogButton, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
 		super.addSouth(dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
+		if (!this.model.getStatTableModel().isViewsEditable())
+		{
+			super.setWidgetSize(dialogButtonPanel, 0);
+		}
+
 		this.add(this.scrollPanel);//, BorderLayout.CENTER);
 		
 		// test syl
@@ -199,10 +204,21 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	private void initializeSize()
 	{
 		this.setWidth(this.controller.getWidth());
-		this.setHeight(this.controller.getHeight());
 		
-		this.scrollPanel.setSize(this.getWidth() + "px", 
-			this.getHeight() + "px");
+		if (this.model.getStatTableModel().isViewsEditable())
+		{
+			this.setHeight(this.controller.getHeight());
+		}
+		else
+		{
+			// test syl: TODO netter height zetten?
+			// take up the space reserved for the user options button
+			this.setHeight(this.controller.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		}
+		
+//		this.scrollPanel.setSize(this.getWidth() + "px", 
+//			this.getHeight() + "px"); // 1e keer is scrollPanel.getOffsetHeight() 0
+		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight()); // is dit nodig?
 
 		this.setSize("100%", "100%");
 	}
@@ -1134,20 +1150,10 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 	private int barAreaWidth()
 	{
-		// breedte verticale scrollbar aftrekken
-//		return this.getWidth() - this.yAxisOffset
-//			- (this.colorLegend.isVisible() ? this.colorLegend.getWidth() : 0)
-//			- this.scrollPanel.getVerticalScrollBar().getWidth();
-		
-//		int w = this.getOffsetWidth() - this.yAxisOffset
-//			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
-//		int w = this.mainPanel.getCanvas().getCoordinateSpaceWidth() - this.yAxisOffset
-//			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
 		int w = this.getWidth() - this.yAxisOffset
-			- (this.colorLegend.isVisible() ? this.colorLegend.getOffsetWidth() : 0);
+			- (this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0);//this.colorLegend.getOffsetWidth() : 0); // offsetWidth 1e keer 0?
 
 		return w;
-//		return Math.max(w, 700);
 	}
 
 	private int barAreaHeight()
@@ -1472,14 +1478,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		double amountScale;
 		
 		int[] frequencies = allFrequencies[splitClass];
-//		g.setFont(super.getFont());
-//		FontMetrics fm = g.getFontMetrics();
 		TextMetrics metrics;
-//		AffineTransform at = new AffineTransform();
 		double theta = Math.PI * 1.75;// 315 graden met de klok mee; 45 graden tegen de klok in
-//		at.rotate(theta); 
-//		Font rotateFont = super.getFont().deriveFont(at);
-		int ySplitOffset = splitClass * (this.scrollPanel.getOffsetHeight() - 5);
+		int ySplitOffset = splitClass * (this.getHeight() - 5);
 
 		// determine scale
 		int max = this.maxFrequency(allFrequencies, splitClass);
@@ -2548,7 +2549,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 		// get frequencies
 		FrequencyTuple[] frequencies = allFrequencies[splitClass];
-		int ySplitOffset = splitClass * (this.scrollPanel.getOffsetHeight() - 5);
+		int ySplitOffset = splitClass * (this.getHeight() - 5);
 
 		// determine scale
 		int max = this.maxFrequency(allFrequencies, splitClass);
@@ -3113,14 +3114,11 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	 */
 	public void update()
 	{
-		// this.userOptionsPanel.setVisible(this.model.getTableModel().isViewsEditable());
 		this.dialogButton.setVisible(this.model.getStatTableModel()
 			.isViewsEditable());
 
 		this.updateColorLegend();
 		this.setMainPanelSize();
-
-		//userOptionsPanel.update(); // loskoppelen! Waar nodig een losse uop.update() aanroepen
 
 //		System.out.println("HistogramView.update(): Size histogram: "
 //			+ this.getBounds().toString() + ", scrollbarVisible="
@@ -3129,7 +3127,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 //			+ scrollPane.getWidth() + ", h=" + scrollPane.getHeight());
 //		System.out.println("HistogramView.update(): mainPanel w=" 
 //			+ this.mainPanel.getWidth() + ", h=" + this.mainPanel.getHeight());
-		
+
+		this.userOptionsPanel.update();
+
 		this.mainPanel.paint();
 	}
 
@@ -3316,7 +3316,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				: splitClasses); i++)
 			{
 				int ySplitOffset = i
-					* (HistogramView.this.scrollPanel.getOffsetHeight() - 5);// - 5); // moet dit -5??
+					* (HistogramView.this.getHeight() - 5);// - 5); // scrollPanel.getOffsetHeight() is 1e keer 0
 
 				if (HistogramView.this.model.hasVerticalBars())
 				{
@@ -3662,10 +3662,10 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 										public void setPosition(
 											int offsetWidth, int offsetHeight)
 										{
-											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
-											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
+											int scrollXPosition = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
+											int scrollYPosition = HistogramView.this.scrollPanel.getVerticalScrollPosition();
 //											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
-											popup.setPopupPosition(clientX - scrollXCorrection, clientY - scrollYCorrection - offsetHeight);
+											popup.setPopupPosition(clientX - scrollXPosition, clientY - offsetHeight);//clientY - scrollYCorrection - offsetHeight);
 										}
 									});
 							}
