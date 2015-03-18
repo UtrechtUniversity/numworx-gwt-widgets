@@ -176,6 +176,9 @@ public class Text_nl
 		{ "importFile", "Importeer bestand" },
 		{ "noFileMessage", "Geen bestand gekozen" },
 		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv)." },
-		{ "emptyTableMessage", "De tabel is leeg"}
+		{ "emptyTableMessage", "De tabel is leeg"},
+		{ "notHTML5ReadyMessage", "Sla de statistiekcomponent opnieuw op in de auteursomgeving "
+			+ "om de component te kunnen bekijken in HTML5." }
+		
 	};
 }
