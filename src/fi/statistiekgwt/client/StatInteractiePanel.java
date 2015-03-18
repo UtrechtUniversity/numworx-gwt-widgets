@@ -1,10 +1,8 @@
 package fi.statistiekgwt.client;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -15,11 +13,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.thirdparty.javascript.jscomp.CssRenamingMap.Style;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
-
-import fi.statistiekgwt.client.types.ColumnType;
 
 /**
  * Statistiek InteractiePanel MVC Controller
@@ -152,7 +147,12 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 			if (launchState.containsKey("tableModel"))
 			{
 				this.model.getStatTableModel().setState((HashMap) launchState.get("tableModel"));
-				// this.view.setModel(this.model);
+				
+				if (!this.model.getStatTableModel().isHTML5Ready())
+				{
+					// if not able to show the statistiek component in HTML stop setting state
+					return;
+				}
 			}
 			if (launchState.containsKey("selectionList"))
 			{
@@ -190,12 +190,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 						{
 							HashMap state = (HashMap) statistiekViewStates.getObjectMap(i);
 							statistiekView.setState(state);
+							// call update to ensure the display of the correct state
+							statistiekView.update();
 						}
 						
 						this.model.addView(statistiekView);
 					}
 				}
-				// this.view.setModel(this.model);
 			}
 	
 			if (launchState.containsKey("selectedView"))
@@ -548,8 +549,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		if (hashMap.containsKey("tableModel"))
 		{
 			this.model.getStatTableModel().setState((HashMap) hashMap.get("tableModel"));
-
 			// this.view.setModel(this.model);
+			
+			if (!this.model.getStatTableModel().isHTML5Ready())
+			{
+				// if not able to show the statistiek component in HTML stop setting state
+				return;
+			}
 		}
 
 		ArrayList<Boolean> selectionList;
@@ -557,8 +563,6 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		{
 			this.model.getStatTableModel().setSelectionList(
 				new ArrayList<Boolean>(map.getBooleanList("selectionList")));
-//			selectionList = (ArrayList<Boolean>) hashMap.get("selectionList");
-//			this.model.getStatTableModel().setSelectionList(selectionList);
 		}
 		else
 		{
@@ -595,24 +599,6 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 					this.model.addView(statistiekView);
 				}
 			}
-
-//			String[] statistiekViewTypes = (String[]) hashMap
-//				.get("statistiekViewTypes");
-//			Object[] statistiekViewStates = (Object[]) hashMap
-//				.get("statistiekViewStates");
-//
-//			for (int i = 0; i < statistiekViewTypes.length; i++)
-//			{
-//				StatistiekView statistiekView = StatistiekGWT.createView(
-//					statistiekViewTypes[i], "", this.model.getStatTableModel(), 0, 0, this);
-//				if (statistiekView != null)
-//				{
-//					statistiekView.setState(statistiekViewStates[i]);
-//					this.model.addView(statistiekView);
-//				}
-//
-//			}
-//			// this.view.setModel(this.model);
 		}
 
 		if (hashMap.containsKey("selectedView"))
@@ -649,5 +635,15 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	public StatModel getStatModel()
 	{
 		return this.model;
+	}
+
+	/**
+	 * Set message that the component can not be shown in HTML5.
+	 */
+	public void setHTML5Message()
+	{
+		super.remove(this.view);
+		Label message = new Label(StatistiekGWT.rb.getString("notHTML5ReadyMessage"));
+		super.add(message);
 	}
 }
