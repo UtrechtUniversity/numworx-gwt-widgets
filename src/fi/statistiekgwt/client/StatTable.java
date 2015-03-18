@@ -149,8 +149,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	// Include field statInteractiePanel to process the reset actions
 	private StatInteractiePanel statInteractiePanel;
 
-//	private CellTable<Object> table;
-//	private CellTable<List<String>> table;
 	private DataGrid<List<String>> table; // datagrid provides fixed header and footer section
 	protected ListDataProvider<List<String>> dataProvider;
 	private ListHandler<List<String>> sortHandler;
@@ -162,7 +160,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private String viewName;
 	private PopupPanel popupMenu;
 	private MenuBar menuBar;
-	//private StackPanel columnOptionsStack;
 	private MenuItem sortItem;
 	private MenuItem editItem;
 	private MenuItem deleteItem;
@@ -173,7 +170,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private Command infoCommand;
 	private int popUpColumnIndex;
 	private CellTable<Object> rowTable; // nodig? Was om regelnummers te tonen in de tabel
-	//private ScrollPanel scrollPanel; // niet nodig met DataGrid
 
 	/**
 	 * Dialog in which data can be pasted and imported into the table. 
@@ -230,6 +226,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * Temporary index used to create columns.
 	 */
 	private int tempColumnIndex;
+
+	/**
+	 * The row index that is currently displayed.
+	 */
+	private int currentRowIndex = 0;
+	/**
+	 * The column index that is currently displayed.
+	 */
+	private int currentColumnIndex = 0;
 	
 	/**
 	 * Constructor without viewname
@@ -293,7 +298,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		if (!this.statTableModel.isDataEditable())
 		{
-			//if (this.popupMenuBar.getSubElements().length == 3)
 			// delete menu items if present
 			if (this.menuBar.getItemIndex(editItem) > -1)
 			{
@@ -346,7 +350,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    this.table.addStyleName(statistiekCss.dataGrid());
 
 		// test syl
-		this.table.getElement().getStyle().setBackgroundColor("powderblue");
+		//this.table.getElement().getStyle().setBackgroundColor("powderblue");
 	    this.dataProvider = new ListDataProvider<List<String>>();
 	    // Add the table to the dataProvider.
 		this.dataProvider.addDataDisplay(this.table);
@@ -388,6 +392,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             public void execute() 
 	        {
 	        	StatTable.this.statTableModel.sort(StatTable.this.popUpColumnIndex);
+	        	
+	        	// test syl
+	        	StatTable.this.setSelectionFromModelInTable();
+	        	
 	        	StatTable.this.hidePopupMenu();
             }
         };
@@ -445,9 +453,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		this.editDataPanel.setVisible(this.statTableModel.isDataEditable());
 
-		// test syl
-		this.editDataPanel.getElement().getStyle().setBackgroundColor("lemonchiffon");
-		super.addSouth(this.editDataPanel, 4);//3);//EM //, BorderLayout.SOUTH);
+		super.addSouth(this.editDataPanel, 4);//3);//EM
+		if (!this.statTableModel.isDataEditable())
+		{
+			super.setWidgetSize(this.editDataPanel, 0);
+		}
 		ResizeLayoutPanel resizePanel = new ResizeLayoutPanel();
 		resizePanel.setHeight("100%");
 		resizePanel.setWidth("100%");
@@ -491,8 +501,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		    {
 		    	if (StatTable.this.importPasteDataMessage.getText().length() > 0)
 		    		StatTable.this.importPasteDataMessage.setText("");
-		    
-		    	//StatTable.this.importPasteDataMessage.setText(event.getValue());
 		    }
 		});
 		
@@ -725,8 +733,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void setCellRenderers()
 	{
-		// System.out.println("Setting cell renderers!");
-		int i = 0;
     	ArrayList<ColumnType> list = StatTable.this.statTableModel.getColumnTypes();
 
 		for (ColumnType type : list)
@@ -739,10 +745,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				{
 					box.addItem(s);
 				}
-//				this.table.getColumnModel().getColumn(i)
-//					.setCellEditor(new DefaultCellEditor(box));
 			}
-			i++;
 		}
 	}
 
@@ -755,8 +758,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public void setModel(StatTableModel model)
 	{
 		this.statTableModel = model;
-
-//		ColumnClickHandler columnClickHandler = new ColumnClickHandler(); // was: MouseListener
 
 		this.editDataPanel.setVisible(this.statTableModel.isDataEditable());
 
@@ -986,7 +987,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void processCSVDataFile(FileList files)
 	{
-		DOM.setStyleAttribute(RootPanel.getBodyElement(), "cursor", "wait");
+		RootPanel.getBodyElement().getStyle().setProperty("cursor", "wait");
 		
 		// read the files
 		//GWT.log("number of files in read queue = " + files.getLength());
@@ -1009,7 +1010,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		if (!(csvText == null) && !csvText.equals("") && !csvText.equals("Error"))
 		{
-			String[] lines = csvText.split("\\r?\\n"); //System.getProperty("line.separator")); // System.getProperty() does not work in gwt 
+			String[] lines = csvText.split("\\r?\\n"); 
 			
 			CSVheaders = lines[0].split(StatTable.DELIMITER);
 
@@ -1074,8 +1075,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				if (type.startsWith("application/vnd.ms-excel"))//text/"))//application/vnd.ms-excel"))//text/csv
 				{
 					// If the file is larger than 1kb, read only the first 1000
-					// characters
-					// to demonstrate file slicing
+					// characters to demonstrate file slicing
 					blob = file;
 //					if (file.getSize() > 0)
 //					{
@@ -1120,54 +1120,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			+ errorDesc);
 	}
 	
-//	/**
-//	 * 
-//	 * @param url
-//	 * @param callback
-//	 */
-//	public static void httpGetFile(final String url,
-//		final AsyncCallback<String> callback)
-//	{
-//		final RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, url);
-//		rb.setCallback(new RequestCallback()
-//		{
-//			public void onResponseReceived(Request request, Response response)
-//			{
-//				try
-//				{
-//					final int responseCode = response.getStatusCode() / 100;
-//					if (url.startsWith("file:/") || (responseCode == 2))
-//					{
-//						callback.onSuccess(response.getText());
-//					}
-//					else
-//					{
-//						callback.onFailure(new IllegalStateException(
-//							"HttpError#" + response.getStatusCode() + " - "
-//								+ response.getStatusText()));
-//					}
-//				}
-//				catch (Throwable e)
-//				{
-//					callback.onFailure(e);
-//				}
-//			}
-//
-//			public void onError(Request request, Throwable exception)
-//			{
-//				callback.onFailure(exception);
-//			}
-//		});
-//		try
-//		{
-//			rb.send();
-//		}
-//		catch (RequestException e)
-//		{
-//			callback.onFailure(e);
-//		}
-//	}
-	
 	/**
 	 * Add the row data to the table.
 	 * @param dataRows
@@ -1175,7 +1127,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void addDataRowsWithoutEvent(ArrayList<String> dataRows)
 	{
         Iterator<String> rowIterator = dataRows.iterator();
-        int rowCount = 0;
         while (rowIterator.hasNext()) 
         {
         	String dataRow = rowIterator.next();
@@ -1222,22 +1173,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		return "Table";
 	}
 
-//	public void valueChanged(ListSelectionEvent arg0)
-//	{
-//		if (!arg0.getValueIsAdjusting())
-//		{
-//			ArrayList<Boolean> newSelection = new ArrayList<Boolean>(
-//				this.statTableModel.getRowCount());
-//			for (int row = 0; row < this.statTableModel.getRowCount(); row++)
-//			{
-//				newSelection.add(this.table.isRowSelected(row));
-//				// System.out.println(this.table.isRowSelected(row));
-//			}
-//			System.out.println();
-//			this.statTableModel.setSelectionList(newSelection);
-//		}
-//	}
-
 	/**
 	 * De selectie uit StatTableModel wordt in de tabel gezet
 	 */
@@ -1252,7 +1187,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			//Object rowObject = this.statTableModel.getValues().get(row);//this.table.getRowElement(row); // hier zit geen rowIndex bij!, dus vergelijkt hij op de laatste (echte) kolom
 //			Object rowObject = list.get(row);
-			List<String> rowObject = list.get(row); // deze bevat geen rijnummer op het eind van de rij...
+			List<String> rowObject = list.get(row);
 			
 			if (this.statTableModel.isRowSelected(row)
 				&& !selectionModel.isSelected(rowObject))
@@ -1299,7 +1234,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				ColumnDialogModel dialogModel = new ColumnDialogModel(
 					StatTable.this.statTableModel);
-				// test syl: TODO dit worden er steeds meer! Bestaande verwijderen, ook al is dialogModel nieuw...
 				HandlerRegistration handlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
 				
 				ColumnDialogView dialogView;
@@ -1312,13 +1246,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 				dialogView.center();
 				dialogView.show();
-
-				// statTableModel.addColumn() wordt uitgevoerd in onAddColumn()
-//				if (dialogModel.getDonePressed())
-//				{
-//					StatTable.this.statTableModel.addColumn(dialogModel.getName(),
-//						new ColumnType(dialogModel));
-//				}
 			}
 			else if (e.getSource() == StatTable.this.deleteRowsButton)
 			{
@@ -1362,13 +1289,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	    			// clear selectionList and listeners
 	    			StatTable.this.statTableModel.clearSelectionList();
-	    			//StatTable.this.statTableModel.clearHandlers();
 	    			
 	    			// remove views (and their occurrences as handler)
 	    			statInteractiePanel.getStatModel().removeViewsWithoutEvent();
-	    
-	    			// System.out.println("reset clicked! this.statInteractiePanel.getModel().getResetHashtable()="
-	    			// + resetHashtable);
 	    
 	    			// Complete reset met zetOpdracht()
 	    			StatTable.this.statInteractiePanel.getView().getController()
@@ -1402,7 +1325,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 				StatTable.this.popupFileUploadPanel.hide();
 				
-				// test syl: TODO clear the table; werkt nog niet
+				// test syl: call startLoading to clear the table
 				StatTable.this.pager.startLoading();
 				
 				// Remove old views
@@ -1525,7 +1448,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			cancelButton.addClickHandler(StatTable.this.clickHandler);
 
 			HorizontalPanel buttonPanel = new HorizontalPanel();
-			//buttonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 			buttonPanel.add(okButton);
 			buttonPanel.add(cancelButton);
 
@@ -1585,6 +1507,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	static class StatTableInputCell extends TextInputCell
 	{
 	    private static Template template;
+		ColumnType type;
 
 	    interface Template extends SafeHtmlTemplates
 	    {   
@@ -1597,9 +1520,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        SafeHtml input(String value, String style);
 	    }
 
-	    public StatTableInputCell()
+	    public StatTableInputCell(ColumnType type)
 	    {
 	        template = GWT.create(Template.class);
+	        this.type = type;
 	    }
 
 	    @Override
@@ -1617,6 +1541,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        String s = (viewData != null) ? viewData.getCurrentValue() : value;
 	        if(s != null)
 	        {
+	        	if (this.type.getType().equals(AllowedTypes.DOUBLE))
+	        	{
+	        		// Get the string value with language dependent separator
+	        		s = StatistiekGWT.getStringValue(s);
+	        	}
 	            // set value, style
 	            sb.append(template.input(s, StatTable.STANDARD_CELL_WIDTH_STYLE));
 	        }
@@ -1754,6 +1683,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public void onTableChange(TableChangeEvent event)
 	{
 		GWT.log("StatTable.onTableChange()");
+		
+		if (event.getInfo().equals(TableChangeEvent.DATA_EDITABLE))
+		{
+			int size = this.statTableModel.isDataEditable() ? 4 : 0;
+			super.setWidgetSize(this.editDataPanel, size);
+		}
+
 		this.update();
 	}
 
@@ -1781,11 +1717,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			List<String> row = new ArrayList<String>();
 			for (int j = 0; j < values.get(0).size(); j ++) // j loops over the columns
 			{
-//				row.add((String) values.get(i).get(j)); // geeft ClassCastException: Ljava.lang.Object; cannot be cast to java.lang.String
 				row.add(values.get(i).get(j).toString());
 			}
 			
+			// test syl: dit gaat mis als values gesorteerd is; dan matcht de key rowIndex niet meer met de key in this.selectionModel...
+			// er moet een gesorteerde index worden toegevoegd
 			row.add("" + i); // add row number to the end as a key
+			
 			rows.add(row);
 		}
 		
@@ -1793,10 +1731,26 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		// add the data
 		this.dataProvider.getList().clear();;
-		this.dataProvider.getList().addAll(rows); // zonder rowNumber op eind van rij?
+		this.dataProvider.getList().addAll(rows);
 		this.dataProvider.refresh();
 		this.dataProvider.flush();
+
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
+		
+		 Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand()
+	        {
+	            public void execute()
+	            {
+	        		// test syl: werkt scroll hier wel?
+	        		if (table.getRowCount() > 0)
+	        		{
+	        			//table.getRowElement(currentRowIndex).getCells().getItem(currentColumnIndex + 1).scrollIntoView(); // dit werkt bij een tabwissel, na edit wordt gescrolld naar de rij
+	        																												// maar niet naar de kolom
+	        			// test
+	        			//table.getRowElement(10).scrollIntoView();
+	        		}
+	            }
+	        });
 	}
 
 	/**
@@ -1862,6 +1816,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				}
 			});
 		
+		// test syl: TODO set check-all header
 		this.table.addColumn(checkColumn,
 			SafeHtmlUtils.fromSafeConstant("<br/>"));
 		this.table.setColumnWidth(checkColumn, StatTable.CHECKBOX_COLUMN_WIDTH, Unit.PX);
@@ -1904,14 +1859,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 							StatTable.this.statTableModel.setValueAt(value,
 								rowIndex, columnIndex);
 							// TODO test syl: scroll to the edit position; geeft JavaScriptException
-							//table.getRowElement(table.getVisibleItems().indexOf(value)).getCells().getItem(columnIndex).scrollIntoView();
+//							table.getRowElement(table.getVisibleItems().indexOf(value)).getCells().getItem(columnIndex).scrollIntoView();
+							//table.getRowElement(rowIndex).getCells().getItem(columnIndex + 1).scrollIntoView();
 						}
 					});
 				
 				enumColumn.setSortable(true);
 				enumColumn.setCellStyleNames(statistiekCss.selectioncell());
 				
-				// test syl: voor iedere kolom een kolomheader met clickabletextcell
+				// voor iedere kolom een kolomheader met clickabletextcell voor popup-options
 				ClickableTextCell headerCell = new ClickableTextCell();
 				Header<String> columnHeader = new Header<String>(headerCell) 
 				{
@@ -1953,7 +1909,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				//AllowedTypes type = this.statTableModel.getColumnTypes().get(i).getType();
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
-				Column<List<String>, String> column = new StatTableColumn(new StatTableInputCell(), type);//new TextInputCell(), type);
+				Column<List<String>, String> column = new StatTableColumn(new StatTableInputCell(type), type);//new TextInputCell(), type);
 
 				column.setFieldUpdater(new FieldUpdater<List<String>, String>()
 				{
@@ -1966,14 +1922,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						GWT.log("StatTable.updateColumns(): rowIndex = " + rowIndex 
 								+ ", s = " + dataRow + ", value = " + value
 								+ ", columnIndex = " + columnIndex);
+						
+						// first set current indices so that onTableChange() that invokes StatTable.update() has the correct values
+						currentRowIndex = rowIndex;
+						currentColumnIndex = columnIndex;
+						
 						StatTable.this.statTableModel.setValueAt(value, rowIndex, columnIndex);
+						
 						// TODO test syl: scroll to the edit position; geeft JavaScriptException 
 						// kan de eigenschap compareDocumentPosition van een niet-gedefinieerde verwijzing of een verwijziging naar een lege waarde niet ophalen
-						//table.getRowElement(rowIndex).getCells().getItem(columnIndex).scrollIntoView(); // Geeft exception: is het probleem dat ik rowIndex aan de data heb toegevoegd?
-						
-						// dataRow is niet geupdate met de nieuwe value!
-//						dataProvider.flush(); // force immediate update of datagrid table
-//						table.getRowElement(18).getCells().getItem(columnIndex).scrollIntoView();
+//						table.getRowElement(rowIndex).getCells().getItem(columnIndex + 1).scrollIntoView();
+//						table.getRowElement(10).scrollIntoView(); // scrollIntoView() scrollt altijd helemaal naar rechts
 					}
 				});
 
