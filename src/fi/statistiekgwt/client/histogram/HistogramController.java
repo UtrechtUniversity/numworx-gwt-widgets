@@ -366,10 +366,19 @@ public class HistogramController implements StatistiekView
 		if (h.containsKey("columnSplitIndex"))
 		{
 			this.model.setColumnSplitIndex(map.getInt("columnSplitIndex"));//(Integer) h.get("columnSplitIndex"));
+			// set visibility split in uop
+			this.view.getUserOptionsPanel().setVisibleSplitOptions(true);
 		}
 		if (h.containsKey("splitBoundaries"))
 		{
-			this.model.setSplitBoundaries(new ArrayList(Arrays.asList(map.getDoubleList("splitBoundaries"))));//(ArrayList<Double>) h.get("splitBoundaries"));
+			ObjectList list = map.getObjectList("splitBoundaries");
+			ArrayList<Double> splitBoundaries = new ArrayList<Double>();
+			for (int i = 0; i < list.size(); i++) 
+			{
+				splitBoundaries.add(list.getDouble(i));
+			}
+
+			this.model.setSplitBoundaries(splitBoundaries);//new ArrayList(Arrays.asList(map.getDoubleList("splitBoundaries"))));//(ArrayList<Double>) h.get("splitBoundaries"));
 		}
 		if (h.containsKey("splitInSingleView"))
 		{
@@ -449,10 +458,12 @@ public class HistogramController implements StatistiekView
 		this.height = h;
 	}
 
+	/**
+	 * Update the view.
+	 */
 	@Override
 	public void update()
 	{
-		// TODO Auto-generated method stub
-		
+		this.view.update();
 	}
 }
