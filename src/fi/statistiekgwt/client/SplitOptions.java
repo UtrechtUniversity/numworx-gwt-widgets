@@ -70,8 +70,10 @@ public class SplitOptions
 			this.columnSplitIndex);
 		if (splitCType.getType().isNumber())
 		{
-			return this.binBoundaries.get(splitClass) + " - "
-				+ this.binBoundaries.get(splitClass + 1);
+			// test syl: hier: als INTEGER en binValue2 - binValue1 == 1, dan return binValue1
+			String binValue1 = StatistiekGWT.getStringValue(this.binBoundaries.get(splitClass));
+			String binValue2 = StatistiekGWT.getStringValue(this.binBoundaries.get(splitClass + 1));
+			return binValue1 + " -< " + binValue2;
 		}
 		else if (splitCType.getType().equals(AllowedTypes.ENUM))
 		{
