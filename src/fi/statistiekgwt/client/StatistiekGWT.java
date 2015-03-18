@@ -60,6 +60,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 	int breedte;
 	int hoogte;
+	boolean volledigeBreedte = false;
 	private static int WIDTH_OFFSET = 5;
 	private static int HEIGHT_OFFSET; 
 	public static int BUTTON_HEIGHT = 40; 
@@ -99,8 +100,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 		this.basisPanel.setWidth(breedte);
 		this.basisPanel.setHeight(hoogte);
-		this.basisPanel.setState(launchState);
+		this.basisPanel.setState(launchState); // in setState wordt bepaald of de component getoond kan worden in HTML5 
 		this.basisPanel.setPixelSize(breedte, hoogte);
+		
+		if (!this.basisPanel.getStatModel().getStatTableModel().isHTML5Ready())
+		{
+			this.basisPanel.setHTML5Message();
+		}
 	}
 
 	static void initViews()
@@ -231,12 +237,17 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	
 		if(map != null)
 		{
-			if(map.containsKey("breedte"))
+			if (map.containsKey("breedte"))
 				breedte = map.getInt("breedte");
-			if(map.containsKey("hoogte"))
+			if (map.containsKey("hoogte"))
 				hoogte = map.getInt("hoogte");
+			if (map.containsKey("volledigeBreedte"))
+				volledigeBreedte = map.getBoolean("volledigeBreedte");
 		}
-		
+
+		if (volledigeBreedte)
+			breedte = volleBreedte;
+	
 		if (h != null && h.get("interactiePanelLaunchState") != null)
 			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
 
@@ -701,7 +712,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		else
 		{
 			NumberFormat numberFormat = StatistiekGWT.getNumberFormat(d);
-			s = numberFormat.format(d); // use number format for the correct decimal separator
+			s = numberFormat.format(d); 
 			
 			// gebruik van locale door numberformat wordt (nog) niet ondersteund
 			// zie: http://stackoverflow.com/questions/9805941/how-to-specify-the-thousands-and-decimal-separator-used-by-gwts-numberformat
@@ -709,6 +720,24 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			{
 				s = s.replace('.', ',');
 			}
+		}
+		
+		return s;
+	}
+	
+	/**
+	 * Get the string value with the language dependent decimal separator.
+	 *  
+	 * @param s The string with the double value
+	 * @return The string value
+	 */
+	public static String getStringValue(String s)
+	{
+		// gebruik van locale door numberformat wordt (nog) niet ondersteund
+		// zie: http://stackoverflow.com/questions/9805941/how-to-specify-the-thousands-and-decimal-separator-used-by-gwts-numberformat
+		if (language.equals("nl"))
+		{
+			s = s.replace('.', ',');
 		}
 		
 		return s;
@@ -775,12 +804,12 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		String value = String.valueOf(d);
 		int numberOfDecimals = StatistiekGWT.getNumberOfDecimals(value);
-		String separator;
-		
-		if (StatistiekGWT.language.equals("nl"))
-			separator = ",";
-		else
-			separator = ".";
+//		String separator;
+//		
+//		if (StatistiekGWT.language.equals("nl"))
+//			separator = ",";
+//		else
+//			separator = ".";
 
 		String pattern = "0";
 		
@@ -790,9 +819,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		{
 			pattern = pattern + "#"; 
 		}
-		NumberFormat decimalFormat = NumberFormat.getFormat(pattern);
+		NumberFormat numberFormat = NumberFormat.getFormat(pattern);
 
-		return decimalFormat;
+		return numberFormat;
 	}
 	
 	/**
