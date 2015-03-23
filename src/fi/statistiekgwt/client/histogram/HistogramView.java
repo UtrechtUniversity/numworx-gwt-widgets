@@ -3552,7 +3552,13 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
     									{
 //        										System.out.println("HistogramBarPanel.mouseMoved(): split gestapeld!");
             								// als gestapeld in 1 view, dan percentage relatief aan totaal per bin 
-                							value = ((double) frequencies_number[i][j * 2] / aantalPerBin[j]) * 100;
+                							//value = ((double) frequencies_number[i][j * 2] / aantalPerBin[j]) * 100;
+    										// bij gestapeld moet de waarde relatief aan totaal 
+    										// en tooltip de waarde aan de as
+    										for (int k = 0; k <= i; k++)
+    										{
+    											value = value + ((double) frequencies_number[k][j*2] / aantal_totaal) * 100;
+    										}
     									}
 
         							}
@@ -3584,7 +3590,14 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
     									{
 //        										System.out.println("HistogramBarPanel.mouseMoved(): split gestapeld!");
             								// als gestapeld in 1 view, dan percentage relatief aan totaal per bin 
-                							value = ((double) frequencies_enum[i][j].frequency / aantalPerBin[j]) * 100;
+                							//value = ((double) frequencies_enum[i][j].frequency / aantalPerBin[j]) * 100;
+    										
+    										// bij gestapeld moet de waarde relatief aan totaal 
+    										// en tooltip de waarde aan de as
+    										for (int k = 0; k <= i; k++)
+    										{
+    											value = value + ((double) frequencies_enum[k][j].frequency / aantal_totaal) * 100;
+    										}
     									}
     								}
     								else
@@ -3607,11 +3620,37 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 							
 							if (frequencies_number != null)
 							{
-								value = frequencies_number[i][j * 2];
+								if (HistogramView.this.hasSplit()
+										&& HistogramView.this.model.isSplitInSingleView()
+										&& !HistogramView.this.isNextToEachOtherSelected())
+								{
+									// voor gestapeld toon tooltip van as-waarde
+									for (int k = 0; k <= i; k++)
+									{
+										value = value + frequencies_number[k][j*2];
+									}
+								}
+								else
+								{
+									value = frequencies_number[i][j * 2];
+								}
 							}
 							else if (frequencies_enum != null)
 							{
-								value = frequencies_enum[i][j].frequency;
+								if (HistogramView.this.hasSplit()
+										&& HistogramView.this.model.isSplitInSingleView()
+										&& !HistogramView.this.isNextToEachOtherSelected())
+								{
+									// voor gestapeld toon tooltip van as-waarde
+									for (int k = 0; k <= i; k++)
+									{
+										value = value + frequencies_enum[k][j].frequency;
+									}
+								}
+								else
+								{
+									value = frequencies_enum[i][j].frequency;
+								}
 							}
 						}
 
