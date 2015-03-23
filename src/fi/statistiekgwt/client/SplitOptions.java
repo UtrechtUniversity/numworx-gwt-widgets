@@ -65,25 +65,38 @@ public class SplitOptions
 	 */
 	public String getSplitClassLabel(int splitClass, StatTableModel model)
 	{
+		String label = "";
+		
 		ArrayList<ColumnType> list = model.getColumnTypes();
 		ColumnType splitCType = list.get(
 			this.columnSplitIndex);
 		if (splitCType.getType().isNumber())
 		{
-			// test syl: hier: als INTEGER en binValue2 - binValue1 == 1, dan return binValue1
 			String binValue1 = StatistiekGWT.getStringValue(this.binBoundaries.get(splitClass));
 			String binValue2 = StatistiekGWT.getStringValue(this.binBoundaries.get(splitClass + 1));
-			return binValue1 + " -< " + binValue2;
+			
+			// als INTEGER en binValue2 - binValue1 == 1, dan return binValue1
+			if (splitCType.getType().equals(AllowedTypes.INTEGER)
+					&& (this.binBoundaries.get(splitClass + 1) - this.binBoundaries.get(splitClass) == 1))
+			{
+				label = binValue1;
+			}
+			else
+			{
+				label = binValue1 + " -< " + binValue2;
+			}
 		}
 		else if (splitCType.getType().equals(AllowedTypes.ENUM))
 		{
-			return splitCType.getEnumOptions()[splitClass];
+			label = splitCType.getEnumOptions()[splitClass];
 		}
 		else
 		{
 			ArrayList<String> options = model.getStringOptions(this.columnSplitIndex);
-			return options.get(splitClass);
+			label = options.get(splitClass);
 		}
+		
+		return label;
 	}
 
 	public SplitOptions clone()
