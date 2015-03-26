@@ -148,7 +148,16 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		h.put("rowCount", new Integer(this.rowCount));
 		h.put("columnCount", new Integer(this.columnCount));
 		h.put("columnNames", this.columnNames);
-		h.put("columnClass", this.columnClass);
+		//h.put("columnClass", this.columnClass);
+		if (this.isHTML5Ready)
+		{
+			List columnClassMap = new ArrayList();
+			for (ColumnType type : this.columnClass)
+			{
+				columnClassMap.add(type.toMap());
+			}
+			h.put("columnClassMapped", columnClassMap);
+		}
 		h.put("values", this.values);
 
 		h.put("viewsEditable", this.viewsEditable);
@@ -1227,6 +1236,19 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		// send an event
 		SelectionChangeEvent event = new SelectionChangeEvent(sender);
 		this.fireEvent(event);
+	}
+
+	/**
+	 * Set the selection of the row with the given rowIndex to boolean b,
+	 * without sending an event.
+	 * 
+	 * @param rowIndex
+	 * @param b
+	 * @param sender
+	 */
+	public void setSelectedWithoutEvent(int rowIndex, Boolean b)
+	{
+		this.selectionList.set(rowIndex, b);
 	}
 
 	/**
