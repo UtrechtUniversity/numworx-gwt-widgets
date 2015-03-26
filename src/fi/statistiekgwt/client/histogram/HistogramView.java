@@ -3993,7 +3993,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				
 				// update both view and user options panel
 				this.update();
-				this.userOptionsPanel.update();
 			}
 		}
 	}
