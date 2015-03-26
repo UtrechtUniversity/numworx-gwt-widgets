@@ -23,7 +23,6 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.HTML;
@@ -32,7 +31,6 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -41,7 +39,6 @@ import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
-import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
@@ -579,7 +576,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		// set position
 		splitSettingsPanel.setWidgetLeftWidth(this.splitSettingsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		splitSettingsPanel.setWidgetTopHeight(this.splitSettingsLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitButton, 20, Style.Unit.PCT, 60, Style.Unit.PCT);
+		splitSettingsPanel.setWidgetLeftWidth(this.splitButton, 20, Style.Unit.PCT, 80, Style.Unit.PCT);
 		splitSettingsPanel.setWidgetTopHeight(this.splitButton, 30, Style.Unit.PX, 30, Style.Unit.PX);
 		splitSettingsPanel.setWidgetLeftWidth(this.splitVarLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 		splitSettingsPanel.setWidgetTopHeight(this.splitVarLabel, 60, Style.Unit.PX, 30, Style.Unit.PX);
@@ -927,16 +924,25 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
     					StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				
     				StringBuilder sb = new StringBuilder();
-    				for (int i = 0; i < this.model.getSplitOptions()
-    					.getBinBoundaries().size() - 1; i++)
+    				// alternatief via SplitOptions.getSplitClassLabel()
+    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    					this.model.getSplitOptions());
+    				for (int i = 0; i < splitClasses; i++)
     				{
-    					sb.append(
-    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i)));
-    					sb.append(" -< ");
-    					sb.append(
-    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i + 1)));
+    					sb.append(this.model.getSplitOptions()
+    						.getSplitClassLabel(i, this.model.getStatTableModel()));
     					sb.append("\n");
     				}
+//    				for (int i = 0; i < this.model.getSplitOptions()
+//    					.getBinBoundaries().size() - 1; i++)
+//    				{
+//    					sb.append(
+//    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i)));
+//    					sb.append(" -< ");
+//    					sb.append(
+//    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i + 1)));
+//    					sb.append("\n");
+//    				}
     				this.splitBoundariesArea.setText(sb.toString());
     				this.splitNoObjectsLabel.setText(StatistiekGWT.rb
     					.getString("numberLabel")
