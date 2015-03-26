@@ -1,8 +1,8 @@
 package fi.statistiekgwt.client.histogram;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
@@ -320,11 +320,12 @@ public class HistogramController implements StatistiekView
 		{
 //			System.out.println("HistogramController.setState(): binBoundaries="
 //				+ (ArrayList<Double>) h.get("binBoundaries"));
-			ObjectList list = map.getObjectList("binBoundaries");
+//			ObjectList list = map.getObjectList("binBoundaries");
+			List<Double> list = map.getDoubleList("binBoundaries");
 			ArrayList<Double> binBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
 			{
-				binBoundaries.add(list.getDouble(i));
+				binBoundaries.add(list.get(i));
 			}
 
 			this.model.setBinBoundaries(binBoundaries);
@@ -365,9 +366,11 @@ public class HistogramController implements StatistiekView
 
 		if (h.containsKey("columnSplitIndex"))
 		{
-			this.model.setColumnSplitIndex(map.getInt("columnSplitIndex"));//(Integer) h.get("columnSplitIndex"));
+			int splitIndex = map.getInt("columnSplitIndex");
+			this.model.setColumnSplitIndex(splitIndex);//(Integer) h.get("columnSplitIndex"));
 			// set visibility split in uop
-			this.view.getUserOptionsPanel().setVisibleSplitOptions(true);
+			boolean validSplitIndex = (splitIndex == -1) ? false : true;
+			this.view.getUserOptionsPanel().setVisibleSplitOptions(validSplitIndex);
 		}
 		if (h.containsKey("splitBoundaries"))
 		{
