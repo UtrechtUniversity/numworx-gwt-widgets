@@ -692,7 +692,10 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	public void selectLastTab()
 	{
-		this.tabPanel.selectTab(this.tabPanel.getWidgetCount() - 2);
+		int lastTabIndex = this.tabPanel.getWidgetCount() - 2;
+		this.tabPanel.selectTab(lastTabIndex);
+		this.setSelectedView(lastTabIndex);
+		this.setSelectedViewInTabPane(lastTabIndex);
 	}
 	
 	/**
@@ -1011,6 +1014,10 @@ public class StatInteractiePanelView extends LayoutPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
+			int viewIndex = getIndexOfViewName(viewName);
+			setSelectedView(viewIndex);
+			setSelectedViewInTabPane(viewIndex);
+			
 			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
 			for (int i = 0; i < model.getViews().size(); i++)
 			{
@@ -1031,13 +1038,24 @@ public class StatInteractiePanelView extends LayoutPanel
 			setSelectedView(viewIndex);
 			setSelectedViewInTabPane(viewIndex);
 			
+			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+			for (int i = 0; i < model.getViews().size(); i++)
+			{
+				StatistiekView view = model.getViews().get(i);
+				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+				{
+					view.update();
+				}
+			}
+			
 			if (StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
 			{
 				int x = event.getNativeEvent().getClientX();
 			    int y = event.getNativeEvent().getClientY();
 				showPopupMenu(x, y);
 			}
-		        event.preventDefault(); 
+		    
+			event.preventDefault(); 
 	    }
 		
 	} // class LabelClickHandler
