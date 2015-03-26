@@ -38,13 +38,14 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -64,6 +65,7 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HeaderPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -75,6 +77,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -149,7 +152,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	// Include field statInteractiePanel to process the reset actions
 	private StatInteractiePanel statInteractiePanel;
 
-	private DataGrid<List<String>> table; // datagrid provides fixed header and footer section
+	//private DataGrid<List<String>> table; // datagrid provides fixed header and footer section
+	private StatTableDataGrid<List<String>> table;
 	protected ListDataProvider<List<String>> dataProvider;
 	private ListHandler<List<String>> sortHandler;
 	private SimplePager pager;
@@ -235,6 +239,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * The column index that is currently displayed.
 	 */
 	private int currentColumnIndex = 0;
+	/**
+	 * The vertical scroll position in the current display.
+	 */
+	private int verticalScrollPosition = 0;
+	/**
+	 * The horizontal scroll position in the current display.
+	 */
+	private int horizontalScrollPosition = 0;
 	
 	/**
 	 * Constructor without viewname
@@ -334,7 +346,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		this.setUpPasteDataDialog();
 		
-		this.table = new DataGrid<List<String>>(KEY_PROVIDER);
+		this.table = new StatTableDataGrid<List<String>>(KEY_PROVIDER);//new DataGrid<List<String>>(KEY_PROVIDER);
 		// test syl: this should make the keyboard selection the same as the contents of the selection model:
 		//this.table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.BOUND_TO_SELECTION); // nu kan ik er maar 1 tegelijk selecteren
 		//this.table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
@@ -1679,6 +1691,71 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	} // class StatTableSelectionCell
 	
+	/**
+	 * Class to provide access to the data grid's scroll panel.
+	 * 
+	 * @author borku102
+	 *
+	 * @param <T>
+	 */
+	class StatTableDataGrid<T> extends DataGrid<T>
+	{
+		ScrollPanel scrollPanel;
+		
+		public StatTableDataGrid(ProvidesKey<T> keyProvider)
+		{
+			super(keyProvider);
+			
+			this.sinkEvents(Event.ONSCROLL);
+			
+			this.scrollPanel = this.getScrollPanel(); 
+			this.scrollPanel.addScrollHandler(new ScrollHandler()
+			{
+				
+				@Override
+				public void onScroll(ScrollEvent event)
+				{
+					// store scroll position
+					verticalScrollPosition = scrollPanel.getVerticalScrollPosition();
+					if (scrollPanel.getHorizontalScrollPosition() > 0)
+					{
+						horizontalScrollPosition = scrollPanel.getHorizontalScrollPosition();
+					}
+					else
+					{
+						// don't jump to 0 unwantedly
+						GWT.log("StatTableDataGrid.scrollPanel.onScroll(): getHorizontalScrollPosition() == 0");
+						// test syl: ugly workaround
+						table.redraw();
+					}
+				}
+			});
+			
+//			this.scrollPanel.addDomHandler(new ClickHandler()
+//			{
+//				
+//				@Override
+//				public void onClick(ClickEvent event)
+//				{
+//					// TODO Auto-generated method stub
+//					
+//				}
+//			}, ClickEvent.getType());
+		}
+
+		 /**
+		  * Method to access the data grid's scrollpanel.
+		  * 
+		  * @return
+		  */
+		public ScrollPanel getScrollPanel()
+		{
+			HeaderPanel header = (HeaderPanel) getWidget();
+			return (ScrollPanel) header.getContentWidget();
+		}
+	} // class StatTableDataGrid
+
+
 	@Override
 	public void onTableChange(TableChangeEvent event)
 	{
@@ -1737,20 +1814,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
 		
-		 Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand()
-	        {
-	            public void execute()
-	            {
-	        		// test syl: werkt scroll hier wel?
-	        		if (table.getRowCount() > 0)
-	        		{
-	        			//table.getRowElement(currentRowIndex).getCells().getItem(currentColumnIndex + 1).scrollIntoView(); // dit werkt bij een tabwissel, na edit wordt gescrolld naar de rij
-	        																												// maar niet naar de kolom
-	        			// test
-	        			//table.getRowElement(10).scrollIntoView();
-	        		}
-	            }
-	        });
+		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand()
+		{
+			public void execute()
+			{
+				// test syl: werkt scroll hier wel?
+				if (table.getRowCount() > 0)
+				{
+//					 table.getRowElement(currentRowIndex).getCells().getItem(currentColumnIndex
+//						 + 1).scrollIntoView(); // dit werkt bij een tabwissel, na
+					// edit wordt gescrolld naar de rij
+					// maar niet naar de kolom
+					// test
+					// table.getRowElement(10).scrollIntoView();
+
+					// werkt wel, maar wordt overschreven...
+					table.getScrollPanel().setVerticalScrollPosition(
+						verticalScrollPosition);
+					table.getScrollPanel().setHorizontalScrollPosition(
+						horizontalScrollPosition);
+				}
+			}
+		});
 	}
 
 	/**
@@ -1811,14 +1896,60 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					
 					// setSelectionList van StatTableModel 
 					StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
-					// test syl
 					selectionModel.setSelected(s, value);
 				}
 			});
 		
-		// test syl: TODO set check-all header
-		this.table.addColumn(checkColumn,
-			SafeHtmlUtils.fromSafeConstant("<br/>"));
+		// test syl: TODO set check all header
+		Header<Boolean> selectAllHeader = new Header<Boolean>(
+			new StatTableCheckboxCell(true, true))//CheckboxCell()) // (new HeaderCheckbox()) 
+			{
+	
+				@Override
+				public Boolean getValue()
+				{
+					for (List<String> item : table.getVisibleItems())
+					{
+						if (!selectionModel.isSelected(item))
+						{
+							return false;
+						}
+					}
+					return table.getVisibleItems().size() > 0;
+				}
+			};
+		selectAllHeader.setUpdater(new ValueUpdater<Boolean>()
+		{
+			@Override
+			public void update(Boolean value)
+			{
+//				for (List<String> object : table.getVisibleItems())
+//				{
+//					int rowIndex = 0;//dataProvider.
+//					// setSelectionList van StatTableModel 
+//					StatTable.this.statTableModel.setSelectedWithoutEvent(rowIndex, value);
+//					selectionModel.setSelected(object, value);
+//				}
+				
+				List<List<String>> list = (List<List<String>>) dataProvider.getList();
+
+				for (int row = 0; row < statTableModel.getRowCount(); row++)
+				{
+					List<String> rowObject = list.get(row);
+					
+					// setSelectionList van StatTableModel 
+					StatTable.this.statTableModel.setSelectedWithoutEvent(row, value);
+					selectionModel.setSelected(rowObject, value);
+				}
+
+				// send an event
+				SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
+				StatTable.this.statTableModel.fireEvent(event);
+			}
+		});
+//		this.table.addColumn(checkColumn,
+//			SafeHtmlUtils.fromSafeConstant("<br/>"));
+		this.table.addColumn(checkColumn, selectAllHeader);
 		this.table.setColumnWidth(checkColumn, StatTable.CHECKBOX_COLUMN_WIDTH, Unit.PX);
 		// add the column's width to total width
 		totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
@@ -1927,12 +2058,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						currentRowIndex = rowIndex;
 						currentColumnIndex = columnIndex;
 						
+						horizontalScrollPosition = table.getScrollPanel().getHorizontalScrollPosition();
+						verticalScrollPosition = table.getScrollPanel().getVerticalScrollPosition();
+
 						StatTable.this.statTableModel.setValueAt(value, rowIndex, columnIndex);
 						
 						// TODO test syl: scroll to the edit position; geeft JavaScriptException 
 						// kan de eigenschap compareDocumentPosition van een niet-gedefinieerde verwijzing of een verwijziging naar een lege waarde niet ophalen
 //						table.getRowElement(rowIndex).getCells().getItem(columnIndex + 1).scrollIntoView();
 //						table.getRowElement(10).scrollIntoView(); // scrollIntoView() scrollt altijd helemaal naar rechts
+						
 					}
 				});
 
