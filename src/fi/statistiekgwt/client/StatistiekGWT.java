@@ -137,15 +137,23 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public HashMap<String, Object> getState()
 	{
-		// TODO Auto-generated method stub
-		return null;
+//		HashMap<String,Object> h = new HashMap<String,Object>();
+//		return h;
+		
+		// we hebben:
+		// tableModel
+		// selectionList
+		// statistiekViewTypes
+		// statistiekViewStates
+		// selectedView
+
+		return this.basisPanel.getState();
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		// TODO Auto-generated method stub
-		
+		this.basisPanel.setState(h);
 	}
 
 	@Override
