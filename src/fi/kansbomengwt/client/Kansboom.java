@@ -104,6 +104,7 @@ public class Kansboom {
 		kansboomCanvas.setHeight(h + "px");
 		kansboomCanvas.setCoordinateSpaceWidth(w);
 		kansboomCanvas.setCoordinateSpaceHeight(h);
+		zetMaten(breedte, hoogte);
 	}
 	
 	public void zetKleur(boolean b)
@@ -412,16 +413,16 @@ public class Kansboom {
 		int n = aantalKolommen;
 		int b = breedte;
 		int h = hoogteKansboom;
-		for(int j=1; j<Math.pow(k,n)+1; j++)
+		for(int j=0; j<Math.pow(k,n); j++)
 		{	volgordeString = bepaalVolgordeString(j);
 			
-			zetTellers(n,j-1);
+			zetTellers(n,j);
 			if(terugleggen)
 				gIm.fillText(volgordeString, b - breedteVolgordekolom + offset, 
-						(int) ((2*j-1)*h/(2*Math.pow(k,n)))+fontHeight/3+rijhoogte);
+						(int) ((2*j+1)*h/(2*Math.pow(k,n)))+fontHeight/3+rijhoogte);
 			else if(bestaanKinderen(aantal,teller))
 				gIm.fillText(volgordeString, b - breedteVolgordekolom + offset, 
-						(int) ((2*j-1)*h/(2*Math.pow(k,n)))+fontHeight/3+rijhoogte);
+						(int) ((2*j+1)*h/(2*Math.pow(k,n)))+fontHeight/3+rijhoogte);
 		}
 		
 	}
@@ -654,7 +655,7 @@ public class Kansboom {
 		gIm.fillText("" + breuk[0], (2*i+1)*b/2 - gIm.measureText("" + breuk[0]).getWidth()/2, 
 			  (int) (h*(4*k*j+k+2*a+1)/(4*Math.pow(k,i+1))) - fontHeight/6 +rijhoogte);
 		gIm.fillText("" + breuk[1], (2*i+1)*b/2  - gIm.measureText("" + breuk[1]).getWidth()/2, 
-			  (int) (h*(4*k*j+k+2*a+1)/(4*Math.pow(k,i+1)))+ 5 * fontHeight/6 +rijhoogte);
+			  (int) (h*(4*k*j+k+2*a+1)/(4*Math.pow(k,i+1)))+ 5 * fontHeight/6 +rijhoogte  +2);
 		gIm.beginPath();
 		gIm.moveTo((2*i+1)*b/2  - breukBreedte(p,q)/2, h*(4*k*j+k+2*a+1)/(4*Math.pow(k,i+1)) + rijhoogte);
 		gIm.lineTo((2*i+1)*b/2  + breukBreedte(p,q)/2, h*(4*k*j+k+2*a+1)/(4*Math.pow(k,i+1)) + rijhoogte);
@@ -673,7 +674,7 @@ public class Kansboom {
 		gIm.fillText("" + breuk[0], b - breedteKansOnderKolom/2 - gIm.measureText("" + breuk[0]).getWidth()/2, 
 			  (int) ((2*j+1)*h/(2*Math.pow(k,n))) - fontHeight/6 +rijhoogte);
 		gIm.fillText("" + breuk[1], b - breedteKansOnderKolom/2  - gIm.measureText("" + breuk[1]).getWidth()/2, 
-			  (int) ((2*j+1)*h/(2*Math.pow(k,n)))+ 5 * fontHeight/6 +rijhoogte);
+			  (int) ((2*j+1)*h/(2*Math.pow(k,n)))+ 5 * fontHeight/6 +rijhoogte + 2);
 		gIm.beginPath();
 		gIm.moveTo(b - breedteKansOnderKolom/2  - breukBreedte(p,q)/2, (2*j+1)*h/(2*Math.pow(k,n)) + rijhoogte);
 		gIm.lineTo(b - breedteKansOnderKolom/2  + breukBreedte(p,q)/2, (2*j+1)*h/(2*Math.pow(k,n)) + rijhoogte);

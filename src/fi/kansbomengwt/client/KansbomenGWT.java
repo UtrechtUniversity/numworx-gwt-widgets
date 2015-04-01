@@ -56,6 +56,7 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	int hoogte = 400;
 	
 	int linkerKolomBreedte = 160;
+	int fontSize = 12;
 	
 	int kansboomBreedte;
 	Kansboom kansboom;
@@ -72,6 +73,7 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	boolean optiesZichtbaar = true;
 	boolean ballenZichtbaar = true;
 	boolean legendaZichtbaar = true;
+	boolean aantallenZichtbaar = true;
 	boolean bovenbalkZichtbaar = true;
 	boolean kleur = true;
 	int kansVolgordeKeuze = 0;
@@ -95,10 +97,11 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	private int score;
 	int scoreMax = 10;
 	
-	Button kijkNaButton;
+	PushButton kijkNaButton;
 	int nakijkKnopBreedte = 95;
 	int nakijkKnopHoogte = 24;
 	LayoutPanel kijkNaPanel;
+	//FlowPanel kijkNaPanel;
 	KansbomenClientBundle kansbomenClientBundle; 
 	ImageResource goedKrulResource, foutKruisResource;
 	Image goedKrulImage, foutKruisImage;
@@ -185,6 +188,8 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 				ballenZichtbaar = h.getBoolean("ballenZichtbaar");
 			if (h.containsKey("legendaZichtbaar"))
 				legendaZichtbaar = h.getBoolean("legendaZichtbaar");
+			if (h.containsKey("aantallenZichtbaar"))
+				aantallenZichtbaar = h.getBoolean("aantallenZichtbaar");
 			if (h.containsKey("bovenbalkZichtbaar"))
 				bovenbalkZichtbaar = h.getBoolean("bovenbalkZichtbaar");
 			if (h.containsKey("kijkNaActief"))
@@ -247,6 +252,8 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 			}
 			if(h.containsKey("scoreMax"))
 				scoreMax = h.getInt("scoreMax");
+			if(!kijkNaActief)
+				scoreMax = 0;
 			if(h.containsKey("trekkingTekst"))
 				trekkingTekst = h.getString("trekkingTekst");
 			if(h.containsKey("trekkingMvTekst"))
@@ -286,12 +293,11 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	{
 		if(teruglegZichtbaar || trekkingZichtbaar || optiesZichtbaar || ballenZichtbaar
 				|| legendaZichtbaar)
-		{	kansboomBreedte = breedte - linkerKolomBreedte - 3 * offset;
+		{	kansboomBreedte = breedte - linkerKolomBreedte - 2 * offset;
 		}
 		else
 		{	kansboomBreedte = breedte - 2 * offset;
 		}
-		
 	}
 	
 	public void initialize()
@@ -307,19 +313,17 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		gekleurdeRij[5] = CssColor.make(220,0,220);
 		
 		bepaalKansboomBreedte();
-		FlowPanel linkerKolom = new FlowPanel();
-		linkerKolom.getElement().getStyle().setVerticalAlign(VerticalAlign.TOP);
-		linkerKolom.getElement().getStyle().setTextAlign(TextAlign.LEFT);
-		linkerKolom.setHeight(hoogte + "px");
+		FlowPanel instellingenKolom = new FlowPanel();
+		instellingenKolom.getElement().getStyle().setTextAlign(TextAlign.LEFT);
+		instellingenKolom.setPixelSize(linkerKolomBreedte, hoogte - nakijkKnopHoogte);
 		
 		terugleggenBox = new ListBox();
 		terugleggenBox.addItem(rb.getString("metTerugleggenTekst"));
 		terugleggenBox.addItem(rb.getString("zonderTerugleggenTekst"));
 		terugleggenBox.setSelectedIndex(terugleggenKeuze);
 		terugleggenBox.getElement().getStyle().setMarginBottom(5, Unit.PX);
-		//terugleggenBox.setFont(theFont);
-		//terugleggenBox.setBounds(currentX, currentY, width, height);
-		linkerKolom.add(terugleggenBox);
+		terugleggenBox.setWidth(linkerKolomBreedte + "px");
+		instellingenKolom.add(terugleggenBox);
 		terugleggenBox.setVisible(teruglegZichtbaar);
 		terugleggenBox.addChangeHandler(new ChangeHandler(){
 
@@ -337,22 +341,16 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		
 		FlowPanel trekkingenPanel = new FlowPanel();
 		aantalTrekkingen = new Label(rb.getString("aantalTekst") + trekkingMvTekst);
-		aantalTrekkingen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-		aantalTrekkingen.getElement().getStyle().setMarginBottom(5, Unit.PX);
-		aantalTrekkingen.getElement().getStyle().setMarginRight(5, Unit.PX);
-		//aantalTrekkingen.setFont(theFont);
-		//aantalTrekkingen.setBounds(currentX, currentY, 100, height);
+		zetLabelLayout(aantalTrekkingen);
 		trekkingenPanel.add(aantalTrekkingen);
-		
-		//currentX += aantalTrekkingen.getWidth()+ offset;
 		
 		trekkingenBox = new ListBox();
 		for(int i = 1; i < 7; i++)
 			trekkingenBox.addItem("" + i);
 		trekkingenBox.setSelectedIndex(trekkingen - 1);
-		trekkingenBox.getElement().getStyle().setProperty("float", "right");
-		//trekkingenBox.setFont(theFont);
-		//trekkingenBox.setBounds(currentX, currentY, width - aantalTrekkingen.getWidth() - offset, height);
+		Style style = trekkingenBox.getElement().getStyle();
+		style.setProperty("float", "right");
+		style.setFontSize(fontSize, Style.Unit.PX);
 		trekkingenPanel.add(trekkingenBox);
 		trekkingenBox.addChangeHandler(new ChangeHandler(){
 			
@@ -363,29 +361,22 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 				kansboom.zetTrekkingen(trekkingen);
 			}
 		});
-		linkerKolom.add(trekkingenPanel);
+		instellingenKolom.add(trekkingenPanel);
 		trekkingenPanel.setVisible(trekkingZichtbaar);
 		
 		FlowPanel optiesPanel = new FlowPanel();
 		aantalOptiesLabel = new Label(rb.getString("aantalOptiesTekst"));
-		aantalOptiesLabel.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-		aantalOptiesLabel.getElement().getStyle().setMarginBottom(5, Unit.PX);
-		aantalOptiesLabel.getElement().getStyle().setMarginRight(5, Unit.PX);
-		
-		//aantalOptiesLabel.setFont(theFont);
-		//aantalOptiesLabel.setBounds(currentX, currentY, 100, height);
+		zetLabelLayout(aantalOptiesLabel);
 		optiesPanel.add(aantalOptiesLabel);
 		
-		String[] optiesKeuzes={"2","3","4","5","6"};
 		optiesBox = new ListBox();
 		for(int i = 2; i < 7; i++)
 			optiesBox.addItem("" + i);
 		optiesBox.setSelectedIndex(aantalOpties - 2);
-		optiesBox.getElement().getStyle().setProperty("float", "right");
-		//optiesBox.setFont(theFont);
-		//optiesBox.setBounds(currentX, currentY, width - aantalOptiesLabel.getWidth() - offset, height);
+		style = optiesBox.getElement().getStyle();
+		style.setProperty("float", "right");
+		style.setFontSize(12, Style.Unit.PX);
 		optiesPanel.add(optiesBox);
-		//optiesBox.addActionListener(this);
 		optiesBox.addChangeHandler(new ChangeHandler()
 		{
 			@Override
@@ -395,23 +386,20 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 				zetOpties(aantalOpties, aantalInt);
 			}
 		});
-		linkerKolom.add(optiesPanel);
+		instellingenKolom.add(optiesPanel);
 		optiesPanel.setVisible(optiesZichtbaar);
 		
-		//currentX -= aantalOptiesLabel.getWidth()+ offset;
-		
 		breedteAantalVeld = 30;
-		//breedteAantalVeld = gIm.measure("000")+ 2 * offset;
 				                       
 		aantalOptieVeld = new TextBox[6];
 		for(int i=0; i<6; i++)
 		{	aantalOptieVeld[i] = new TextBox();
 			aantalOptieVeld[i].setText(""+aantalInt[i]);
 			aantalOptieVeld[i].setWidth(breedteAantalVeld + "px");
-			//aantalOptieVeld[i].getElement().getStyle().setMarginBottom(5, Unit.PX);
-			//aantalOptieVeld[i].getElement().getStyle().setMarginLeft(5, Unit.PX);
-			aantalOptieVeld[i].getElement().getStyle().setPadding(3, Unit.PX);
-			aantalOptieVeld[i].getElement().getStyle().setProperty("float", "right");
+			style = aantalOptieVeld[i].getElement().getStyle();
+			style.setPadding(3, Unit.PX);
+			style.setProperty("float", "right");
+			style.setFontSize(12, Style.Unit.PX);
 			final int index = i;
 			aantalOptieVeld[i].addChangeHandler(new ChangeHandler()
 			{
@@ -421,8 +409,6 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 					actieAantalOptieVeld(index);
 				}
 			});
-			//aantalOptieVeld[i].setFont(theFont);
-			//aantalOptieVeld[i].setBounds(currentX + width - breedteAantalVeld, currentY, breedteAantalVeld, height);
 		}
 			
 		if(naamOptieTekst == null)
@@ -446,15 +432,10 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		aantalOptie = new Label[6];
 		for (int i=0; i<6; i++)
 		{	aantalOptie[i] = new Label(rb.getString("aantalTekst")+naamOptieTekst[i]+":");
-			aantalOptie[i].getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-			aantalOptie[i].getElement().getStyle().setMarginTop(5, Unit.PX);
-			aantalOptie[i].getElement().getStyle().setMarginBottom(5, Unit.PX);
-			//aantalOptie[i].setFont(theFont);
-			//aantalOptie[i].setBounds(currentX, currentY, width - breedteAantalVeld, height);
+			zetLabelLayout(aantalOptie[i]);
 		}
 		for(int i=0; i<6; i++)
 		{	FlowPanel optiePanel = new FlowPanel();
-			//optiePanel.getElement().getStyle().setBackgroundColor(CssColor.make(200+5*i, 200-i, 200-30*i).toString());
 			optiePanel.add(aantalOptie[i]);
 			optiePanel.add(aantalOptieVeld[i]);
 			if(i >= aantalOpties)
@@ -462,18 +443,17 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 				aantalOptie[i].setVisible(false);
 				aantalOptieVeld[i].setVisible(false);
 			}
-			linkerKolom.add(optiePanel);
+			instellingenKolom.add(optiePanel);
 			optiePanel.setVisible(ballenZichtbaar);
-			//aantalOptieVeld[i].addActionListener(this);
-			//aantalOptieVeld[i].addFocusListener(this);
 		}
 		
 		legendaKop = new Label(rb.getString("legendaTekst"));
-		legendaKop.getElement().getStyle().setFontWeight(FontWeight.BOLD);
-		legendaKop.getElement().getStyle().setMarginTop(10, Unit.PX);
-		legendaKop.getElement().getStyle().setMarginBottom(5, Unit.PX);
-		//legendaKop.setBounds(currentX, currentY, width, height);
-		linkerKolom.add(legendaKop);
+		style = legendaKop.getElement().getStyle();
+		style.setFontWeight(FontWeight.BOLD);
+		style.setFontSize(fontSize, Style.Unit.PX);
+		style.setMarginTop(10, Unit.PX);
+		style.setMarginBottom(5, Unit.PX);
+		instellingenKolom.add(legendaKop);
 		legendaKop.setVisible(legendaZichtbaar);
 		
 		legendaOptie = new Label[6];
@@ -493,17 +473,17 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 			FlowPanel legendaRegel = new FlowPanel();
 			legendaRegel.getElement().getStyle().setMarginBottom(3, Unit.PX);
 			legendaKleur[i] = new LijntjeLabel(kleurRij[i], 20);
-			//legendaKleur[i].setBounds(currentX, currentY, width / 5, height);
 			legendaRegel.add(legendaKleur[i].getCanvas());
 			legendaKleur[i].paint();
 			
-			legendaOptie[i] = new Label(naamOptieTekst[i]+" ("+aantalInt[i]+")");
-			legendaOptie[i].getElement().getStyle().setMarginLeft(3, Unit.PX);
-			//legendaOptie[i].setFont(theFont);
-			//legendaOptie[i].setBounds(currentX, currentY, 4* width / 5, height);
+			legendaOptie[i] = new Label();
+			zetLegendaTekst(i);
+			style = legendaOptie[i].getElement().getStyle();
+			style.setMarginLeft(3, Unit.PX);
+			style.setFontSize(fontSize, Style.Unit.PX);
 			legendaRegel.add(legendaOptie[i]);
-			legendaOptie[i].getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-			linkerKolom.add(legendaRegel);
+			style.setDisplay(Display.INLINE_BLOCK);
+			instellingenKolom.add(legendaRegel);
 			if(i >= aantalOpties)
 			{
 				legendaKleur[i].getCanvas().setVisible(false);
@@ -512,10 +492,11 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 			legendaRegel.setVisible(legendaZichtbaar);
 		}
 		
-		kijkNaButton = new Button(rb.getString("kijkNaTekst"));
-		kijkNaButton.setPixelSize(nakijkKnopBreedte, nakijkKnopHoogte);
-		kijkNaButton.getElement().getStyle().setFontSize(12, Style.Unit.PX);
-		kijkNaButton.getElement().getStyle().setTextAlign(TextAlign.CENTER);
+		kijkNaButton = new PushButton(rb.getString("kijkNaTekst"));
+		//kijkNaButton.setSize(nakijkKnopBreedte + "px", nakijkKnopHoogte + "px");
+		style = kijkNaButton.getElement().getStyle();
+		style.setFontSize(fontSize, Style.Unit.PX);
+		style.setTextAlign(TextAlign.CENTER);
 		kijkNaButton.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent e)
 			{	e.stopPropagation();
@@ -524,9 +505,9 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		});
 		
 		kijkNaPanel = new LayoutPanel();
-		kijkNaPanel.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
-		kijkNaPanel.getElement().getStyle().setVerticalAlign(VerticalAlign.BOTTOM);
-		kijkNaPanel.getElement().getStyle().setFloat(Float.RIGHT);
+		style = kijkNaPanel.getElement().getStyle();
+		style.setDisplay(Display.INLINE_BLOCK);
+		style.setFloat(Float.RIGHT);
 		
 		kijkNaPanel.setPixelSize(nakijkKnopBreedte, nakijkKnopHoogte);
 		kijkNaPanel.add(kijkNaButton);
@@ -536,15 +517,21 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		kijkNaPanel.add(goedKrulImage);
 		kijkNaPanel.add(foutKruisImage);
 		kijkNaPanel.setWidgetRightWidth(goedKrulImage, 1, Style.Unit.PX, 15, Style.Unit.PX);
-		kijkNaPanel.setWidgetTopHeight(goedKrulImage, 6, Style.Unit.PX, 20, Style.Unit.PX);
+		kijkNaPanel.setWidgetTopHeight(goedKrulImage, 1, Style.Unit.PX, 20, Style.Unit.PX);
 		kijkNaPanel.setWidgetRightWidth(foutKruisImage, 1, Style.Unit.PX, 15, Style.Unit.PX);
-		kijkNaPanel.setWidgetTopHeight(foutKruisImage, 5, Style.Unit.PX, 20, Style.Unit.PX);
+		kijkNaPanel.setWidgetTopHeight(foutKruisImage, 1, Style.Unit.PX, 20, Style.Unit.PX);
 		goedKrulImage.setVisible(false);
-		foutKruisImage.setVisible(false);
+		foutKruisImage.setVisible(false);		
 		
+		FlowPanel linkerKolom = new FlowPanel();
+		linkerKolom.getElement().getStyle().setVerticalAlign(VerticalAlign.TOP);
 		
+		linkerKolom.add(instellingenKolom);
 		linkerKolom.add(kijkNaPanel);
-		kijkNaPanel.setVisible(kijkNaActief && !checkExternal);
+		
+		//instellingenKolom.add(kijkNaPanel);
+		kijkNaPanel.setVisible(kijkNaActief);
+		kijkNaButton.setVisible(!checkExternal);
 		
 		
 		basisPanel.add(linkerKolom);
@@ -575,6 +562,15 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		beginStatus[7] = terugleggenKeuze;
 		beginStatus[8] = trekkingen;
 		beginStatus[9] = aantalOpties;
+	}
+	
+	public void zetLabelLayout(Label l)
+	{
+		Style style = l.getElement().getStyle();
+		style.setDisplay(Display.INLINE_BLOCK);
+		style.setMarginTop(5, Unit.PX);
+		style.setMarginBottom(8, Unit.PX);
+		style.setFontSize(fontSize, Style.Unit.PX);
 	}
 	
 	public void getImages() 
@@ -637,7 +633,10 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	
 	public void zetLegendaTekst(int i)
 	{
-		legendaOptie[i].setText(naamOptieTekst[i]+" ("+aantalInt[i]+")");
+		if(aantallenZichtbaar)
+			legendaOptie[i].setText(naamOptieTekst[i]+" ("+aantalInt[i]+")");
+		else
+			legendaOptie[i].setText(naamOptieTekst[i]);
 	}
 	
 	public void actieAantalOptieVeld(int i)
@@ -734,6 +733,8 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		}
 		zetTrekkingen(trekkingen); 
 		zetOpties(aantalOpties, aantalInt);
+		for(int i = 0; i < 6; i++)
+			zetLegendaTekst(i);
 		
 		if (map.containsKey("ingevuld")) 
 			ingevuld = map.getBoolean("ingevuld");
@@ -747,6 +748,7 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 	public int getScore() {
 		return score;
 	}
+	
 
 	@Override
 	public Boolean isCorrect() {
@@ -799,12 +801,12 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
 		if(volledigeBreedte)
 		{
 			this.breedte = breedte;
 			bepaalKansboomBreedte();
-			kansboom.setSize(kansboomBreedte , hoogte);
+			kansboom.setSize(kansboomBreedte, hoogte);
+			kansboom.paint();
 		}
 	}
 
