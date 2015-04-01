@@ -75,7 +75,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	
 	CssColor agKleur = CssColor.make(255, 255, 255);
 	
-	public BinomTrekking() {
+	public BinomTrekking(boolean binomTrekkingInstellingen, boolean binomTrekkingGrafiek, boolean binomTrekkingTabel, boolean binomTrekkingRooster) {
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("200px");

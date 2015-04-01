@@ -95,7 +95,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	int geenKop;
 	int eenKop;
 	int tweeKop;
-	
+	boolean muntenTabel1;
 	
 	private static class Experiment {
 		private final String experimentNumber;
@@ -138,7 +138,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 	CssColor agKleur = CssColor.make(255, 255, 255);
 
 	
-	public Munten () {
+	public Munten (boolean muntenInstellingen, boolean muntenResultaten, boolean muntenGrafiek, boolean muntenTabel, boolean muntenFrequentie) {
+		muntenTabel1=muntenTabel;
+		
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("560px");
@@ -179,11 +181,15 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel.setWidgetTopBottom(results2,25,Unit.PX,10,Unit.PX);
 	    
 	    avgResult2=new Label("Gemiddelde");
+	    
 	    minResult2=new Label("Minimum");
 	    maxResult2=new Label("Maximum");
 	    results2.add(avgResult2);
 	    results2.add(minResult2);
 	    results2.add(maxResult2);
+	    
+	    if (muntenResultaten==false)
+	    	results2.setVisible(false);
 	    
 	    VerticalPanel results3=new VerticalPanel();
 	    panel.add(results3);
@@ -199,6 +205,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    results3.add(minResult3);
 	    results3.add(maxResult3);
 	    
+	    if (muntenResultaten==false)
+	    	results3.setVisible(false);
+	    
 	    VerticalPanel results4=new VerticalPanel();
 	    panel.add(results4);
 	    panel.setWidgetLeftRight(results4,570,Unit.PX,100,Unit.PX);
@@ -212,6 +221,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    results4.add(avgResult4);
 	    results4.add(minResult4);
 	    results4.add(maxResult4);
+	    
+	    if (muntenResultaten==false)
+	    	results4.setVisible(false);
 	    
 
 	    VerticalPanel results5=new VerticalPanel();
@@ -228,10 +240,17 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    results5.add(minResult5);
 	    results5.add(maxResult5);
 	    
+	    if (muntenResultaten==false)
+	    	results5.setVisible(false);
+	    
+	    
 	    VerticalPanel results=new VerticalPanel();
 	    panel.add(results);
 	    panel.setWidgetLeftRight(results,570,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(results,10,Unit.PX,10,Unit.PX);
+	    
+	    if (muntenResultaten==false)
+	    	results.setVisible(false);
 	    
 	    avgResult = new Label("Gemiddelde");
 	    minResult=new Label ("Minimum");
@@ -244,6 +263,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel.add(results1);
 	    panel.setWidgetLeftRight(results1,720,Unit.PX,10,Unit.PX);
 	    panel.setWidgetTopBottom(results1,10,Unit.PX,10,Unit.PX);
+	    
+	    if (muntenResultaten==false)
+	    	results1.setVisible(false);
 	    
 	    avgResult1=new Label("0.0");
 	    minResult1=new Label("0.0");
@@ -270,6 +292,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    
 	    VerticalPanel radios=new VerticalPanel();
 	    panel.add(radios);
+	    
+	    if (muntenResultaten==false)
+	    	radios.setVisible(false);
+	    
 	    panel.setWidgetLeftRight(radios,370,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(radios,10,Unit.PX,10,Unit.PX);
 	    
@@ -319,12 +345,16 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel4.add(kansOpKopText);
 	    panel2.add(panel4);
 	    
+	    if (muntenInstellingen==false)
+	    	panel2.setVisible(false);
+	    
 	    		// Add it to the root panel.
 	    VerticalPanel panel1=new VerticalPanel();
+	    
 	    panel1.add(voeruit);
 	    panel1.add(stap);
 	    panel1.add(wis);
-	    panel2.add(label);
+	    //panel2.add(label);
 	    panel.add(panel1);
 	    panel.setWidgetLeftRight(panel1, 240, Unit.PX, 440, Unit.PX);     // Center panel
 	    panel.setWidgetTopBottom(panel1, 5, Unit.PX, 5, Unit.PX);
@@ -420,12 +450,17 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    scrollPanel2 = new ScrollPanel(table2);
 		    scrollPanel2.setSize("230px", "350px");
 		   
+		    if (muntenTabel==false)
+		    	scrollPanel.setVisible(false);
 		    scrollPanel2.setVisible(false);
 		    
 		    HorizontalPanel panel5=new HorizontalPanel();
 		    // Add it to the root panel.
 		    VerticalPanel panel6 = new VerticalPanel();
 		    panel5.add(panel6);
+	
+		    if (muntenFrequentie==false)
+		    	frequentieCanvas.setVisible(false);
 		    
 		    panel6.add(frequentieCanvas);
 		    panel6.add(scrollPanel);
@@ -436,7 +471,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    table.setRowCount(0, true);
 		    table2.setRowCount(0, true);
 		    
-		    grafiek=new Grafiek(this);
+ 		    grafiek=new Grafiek(this);
 		    grafiek.paint();
 		    
 		    frequentie=new Frequentie(this);
@@ -446,8 +481,12 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    //RootPanel.get().add(panel5);
 		    add(panel5);
 			
+		    if (muntenGrafiek==false)
+		    	kladjeHWTCanvas.setVisible(false);
+		    
 			munt= new Boolean[10001];
 			percentageMunt=new double[10001];
+			
 			
 	}
 	
@@ -590,7 +629,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 		}
 		if (event.getSource()==eenMunt) {
 			frequentieCanvas.setVisible(true);
-			scrollPanel.setVisible(true);
+			if (muntenTabel1==true)
+				scrollPanel.setVisible(true);
 			scrollPanel2.setVisible(false);
 			grafiek.paint();
 			frequentie.paint();
@@ -599,7 +639,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 		if (event.getSource()==tweeMunten) {
 			frequentieCanvas.setVisible(false);
 			scrollPanel.setVisible(false);
-			scrollPanel2.setVisible(true);
+			if (muntenTabel1==true)
+				scrollPanel2.setVisible(true);
 			grafiek.paint();
 			setEenMuntTweeMunten();
 		}

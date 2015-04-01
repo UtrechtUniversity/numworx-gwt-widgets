@@ -58,6 +58,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	Boolean stopCounting;
 	double ogenGemiddeld[];
 	DobbelstenenGrafiek dobbelstenenGrafiek;
+	boolean dobbelstenenResultaten1;
+	boolean dobbelstenenTabel1;
 	
 	CssColor lijnenKleur = CssColor.make(0, 0, 0);
 	CssColor agKleur = CssColor.make(255, 255, 255);
@@ -256,7 +258,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	CellTable<Experiment4> table4;
 	CellTable<Experiment5> table5;
 	
-	public Dobbelstenen() {
+	public Dobbelstenen(boolean dobbelstenenInstellingen, boolean dobbelstenenResultaten, boolean dobbelstenenGrafiek1, boolean dobbelstenenTabel) {
+		dobbelstenenResultaten1=dobbelstenenResultaten;
+		dobbelstenenTabel1=dobbelstenenTabel;
+		
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("560px");
@@ -328,7 +333,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	 // Make a new button that does something when you click it.
 	    voeruit = new Button("Voer uit",this);
 	    wis = new Button("Wis",this);
-	    	    
+	    	  
+	    if (dobbelstenenInstellingen==false)
+	    	panel2.setVisible(false);
+	    
 	    VerticalPanel panel6=new VerticalPanel();
 	    panel6.add(voeruit);
 	    panel6.add(wis);
@@ -973,6 +981,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    
 	    scrollPanel = new ScrollPanel(table);
 	    scrollPanel.setSize("230px", "350px");
+	    if (dobbelstenenTabel==false)
+	    	scrollPanel.setVisible(false);
 	    
 	    scrollPanel2 = new ScrollPanel(table1);
 	    scrollPanel2.setSize("230px", "350px");
@@ -986,7 +996,9 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	   
 	    scrollPanel4 = new ScrollPanel(table3);
 	    scrollPanel4.setSize("340px", "100px");
-		   
+		if (dobbelstenenResultaten==false)
+			scrollPanel4.setVisible(false);
+	    
 	    scrollPanel5 = new ScrollPanel(table4);
 	    scrollPanel5.setSize("340px", "100px");
 	   
@@ -1020,6 +1032,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table5.setRowCount(0, true);
 	    
 	    panel7.add(kladjeHWTCanvas);
+	    if (dobbelstenenGrafiek1==false)
+	    	kladjeHWTCanvas.setVisible(false);
 	    //RootPanel.get().add(panel7);
 	    add(panel7);
 
@@ -1074,10 +1088,12 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			dobbelsteenCount=0;
 		}		
 		if (event.getSource()==eenDobbelsteen) {
-			scrollPanel.setVisible(true);
+			if (dobbelstenenTabel1==true)
+				scrollPanel.setVisible(true);
 			scrollPanel2.setVisible(false);
 			scrollPanel3.setVisible(false);
-			scrollPanel4.setVisible(true);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel4.setVisible(true);
 			scrollPanel5.setVisible(false);
 			scrollPanel6.setVisible(false);
 			experiment=0;
@@ -1096,10 +1112,12 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		}
 		if (event.getSource()==tweeDobbelstenen) {
 			scrollPanel.setVisible(false);
-			scrollPanel2.setVisible(true);
+			if (dobbelstenenTabel1==true)
+				scrollPanel2.setVisible(true);
 			scrollPanel3.setVisible(false);
 			scrollPanel4.setVisible(false);
-			scrollPanel5.setVisible(true);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel5.setVisible(true);
 			scrollPanel6.setVisible(false);
 			experiment=0;
 			table.setRowCount(0, true);
@@ -1118,10 +1136,12 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		if (event.getSource()==drieDobbelstenen) {
 			scrollPanel.setVisible(false);
 			scrollPanel2.setVisible(false);
-			scrollPanel3.setVisible(true);
+			if (dobbelstenenTabel1==true)
+				scrollPanel3.setVisible(true);
 			scrollPanel4.setVisible(false);
 			scrollPanel5.setVisible(false);
-			scrollPanel6.setVisible(true);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel6.setVisible(true);
 			experiment=0;
 			table.setRowCount(0, true);
 			table1.setRowCount(0, true);

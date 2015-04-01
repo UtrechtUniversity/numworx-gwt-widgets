@@ -22,6 +22,20 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	boolean dobbelstenenRadio=false;
 	boolean binomTrekkingRadio=false;
 	
+	boolean muntenInstellingen=false;
+	boolean muntenResultaten=false;
+	boolean muntenGrafiek=false;
+	boolean muntenTabel=false;
+	boolean muntenFrequentie=false;
+	boolean dobbelstenenInstellingen=false;
+	boolean dobbelstenenResultaten=false;
+	boolean dobbelstenenGrafiek=false;
+	boolean dobbelstenenTabel=false;
+	boolean binomTrekkingInstellingen=false;
+	boolean binomTrekkingGrafiek=false;
+	boolean binomTrekkingTabel=false;
+	boolean binomTrekkingFrequentie=false;
+	boolean binomTrekkingRooster=false;
 	
 	public void onModuleLoad() {
 
@@ -49,6 +63,35 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			dobbelstenenRadio = l.getBoolean("dobbelstenenRadio");
 		if (l.containsKey("binomTrekkingRadio"))
 			binomTrekkingRadio = l.getBoolean("binomTrekkingRadio");
+		
+		if (l.containsKey("muntenInstellingen"))
+			muntenInstellingen = l.getBoolean("muntenInstellingen");
+		if (l.containsKey("muntenResultaten"))
+			muntenResultaten = l.getBoolean("muntenResultaten");
+		if (l.containsKey("muntenGrafiek"))
+			muntenGrafiek = l.getBoolean("muntenGrafiek");
+		if (l.containsKey("muntenTabel"))
+			muntenTabel = l.getBoolean("muntenTabel");
+		if (l.containsKey("muntenFrequentie"))
+			muntenFrequentie = l.getBoolean("muntenFrequentie");
+		if (l.containsKey("dobbelstenenInstellingen"))
+			dobbelstenenInstellingen = l.getBoolean("dobbelstenenInstellingen");
+		if (l.containsKey("dobbelstenenResultaten"))
+			dobbelstenenResultaten = l.getBoolean("dobbelstenenResultaten");
+		if (l.containsKey("dobbelstenenGrafiek"))
+			dobbelstenenGrafiek = l.getBoolean("dobbelstenenGrafiek");
+		if (l.containsKey("dobbelstenenTabel"))
+			dobbelstenenTabel = l.getBoolean("dobbelstenenTabel");
+		if (l.containsKey("binomTrekkingInstellingen"))
+			binomTrekkingInstellingen = l.getBoolean("binomTrekkingInstellingen");
+		if (l.containsKey("binomTrekkingGrafiek"))
+			binomTrekkingGrafiek = l.getBoolean("binomTrekkingGrafiek");
+		if (l.containsKey("binomTrekkingTabel"))
+			binomTrekkingTabel = l.getBoolean("binomTrekkingTabel");
+		if (l.containsKey("binomTrekkingFrequentie"))
+			binomTrekkingFrequentie = l.getBoolean("binomTrekkingFrequentie");
+		if (l.containsKey("binomTrekkingRooster"))
+			binomTrekkingRooster = l.getBoolean("binomTrekkingRooster");
 	}
 
 	@Override
@@ -59,15 +102,15 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 		//dlp.add(test);
 		
 		if (muntenRadio) {
-			Munten munten=new Munten();
+			Munten munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
 			return munten;
 		}
 		if (dobbelstenenRadio) {
-			Dobbelstenen dobbelstenen=new Dobbelstenen();
+			Dobbelstenen dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
 			return dobbelstenen;
 		}
 		if (binomTrekkingRadio) {
-			BinomTrekking binomtrekking = new BinomTrekking();
+			BinomTrekking binomtrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
 			return binomtrekking;
 		}
 		
