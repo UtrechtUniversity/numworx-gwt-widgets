@@ -639,8 +639,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public int getAsHoogte() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 17; //standaardwaarde, moet eigenlijk gebaseerd zijn op fontsize van omvattende TekstVakPanel.
 	}
 
 	@Override
