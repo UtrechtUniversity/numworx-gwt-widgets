@@ -205,22 +205,28 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		int knopHoogteExtra = 0;
 		if(rmMode < 2)
 		{
-			int hoogteBovendeel = 106;
+			int hoogteBovendeel = 75;
+			int hoogteGraden = 30;
 			if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen && gradenInstelbaar)
 			{
 				knopBreedte = breedte/8 - 3;
-				knopHoogteBasis = (hoogte - hoogteBovendeel)/5 - 3;
+				knopHoogteBasis = (hoogte - hoogteBovendeel - hoogteGraden)/5 - 3;
 			}
 			else if(rmMode == 1 && gonioKnoppen && gradenInstelbaar)
 			{
 				knopBreedte = breedte / 8 - 3;
-				knopHoogteBasis = (hoogte - hoogteBovendeel)/4 - 3;
+				knopHoogteBasis = (hoogte - hoogteBovendeel - hoogteGraden)/4 - 3;
 			}
-			else if(rmMode ==1)
+			else if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen)
 			{
 				knopBreedte = breedte / 8 - 3;
-				knopHoogteBasis = (hoogte - hoogteBovendeel + 30)/4 - 3;
-			}			
+				knopHoogteBasis = (hoogte - hoogteBovendeel)/5 - 3;
+			}	
+			else if(rmMode == 1)
+			{
+				knopBreedte = breedte / 8 - 3;
+				knopHoogteBasis = (hoogte - hoogteBovendeel)/4 - 3;
+			}
 			else
 			{
 				knopBreedte = breedte / 6 - 3;
@@ -231,7 +237,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		}
 		else
 		{
-			knopBreedte = (breedte - 30)/10 - 1;
+			knopBreedte = breedte/10 - 3;//(breedte - 30)/10 - 1;
 			knopHoogteBasis = (hoogte - 56)/5;
 			knopHoogteNavigatie = knopHoogteBasis;
 			knopHoogteExtra = (hoogte - 50) / 6;
@@ -255,17 +261,17 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		haakLinksKnop = maakButton("(", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		haakRechtsKnop = maakButton(")", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		
-		int kolomBreedte = 0;
+		int kolomBreedte = - 2;
 		if(rmMode < 2)
-			kolomBreedte = breedte / 5;
+			kolomBreedte = breedte / 5 - 3;
 		else
-			kolomBreedte = breedte / 10; 
+			kolomBreedte = breedte / 10 - 3; 
 		
-		pijlLinksKnop = maakButton("\u25C4", blauw, witblauw, kolomBreedte -2, knopHoogteNavigatie);
-		pijlRechtsKnop = maakButton("\u25BA", blauw, witblauw, kolomBreedte -2, knopHoogteNavigatie);
-		insKnop = maakButton("INS", blauw, witblauw, kolomBreedte -2, knopHoogteNavigatie);
-		delKnop = maakButton("DEL", blauw, witblauw, kolomBreedte -2, knopHoogteNavigatie);
-		cKnop = maakButton("C", blauw, witblauw, kolomBreedte -2, knopHoogteNavigatie);
+		pijlLinksKnop = maakButton("\u25C4", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
+		pijlRechtsKnop = maakButton("\u25BA", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
+		insKnop = maakButton("INS", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
+		delKnop = maakButton("DEL", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
+		cKnop = maakButton("C", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
 		
 		if(isNederlands)
 			kommaKnop = maakButton(",", grijs, witblauw, knopBreedte, knopHoogteBasis);
@@ -290,10 +296,10 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		leegLabel = new Label[15];
 		for(int i = 0; i<15; i++)
 			leegLabel[i] = new Label("");
-		sinInvLabel = maakLabel("sin\u207B\u00B9", CssColor.make("orange"));
-		cosInvLabel = maakLabel("cos\u207B\u00B9", CssColor.make("orange"));
-		tanInvLabel = maakLabel("tan\u207B\u00B9", CssColor.make("orange"));
-		decLabel = maakLabel("\u2192dec", CssColor.make("orange"));
+		sinInvLabel = maakLabel("sin\u207B\u00B9", CssColor.make("orange"), knopBreedte);
+		cosInvLabel = maakLabel("cos\u207B\u00B9", CssColor.make("orange"), knopBreedte);
+		tanInvLabel = maakLabel("tan\u207B\u00B9", CssColor.make("orange"), knopBreedte);
+		decLabel = maakLabel("\u2192dec", CssColor.make("orange"), knopBreedte);
 		
 		knoppenPanel = new FlowPanel();
 		
@@ -386,12 +392,13 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		return button;
 	}
 	
-	public Label maakLabel(String s, CssColor c)
+	public Label maakLabel(String s, CssColor c, int width)
 	{
 		Label label = new Label(s);
 		label.getElement().getStyle().setColor(c.toString());
 		label.getElement().getStyle().setFontSize(14, Style.Unit.PX);
 		label.getElement().getStyle().setFontWeight(FontWeight.BOLD);
+		label.setWidth(width + "px");
 		return label;
 	}
 	
@@ -528,7 +535,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			linkerKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
 			rechterKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
 			linkerKnoppen.getElement().getStyle().setVerticalAlign(VerticalAlign.TOP);
-			rechterKnoppen.getElement().getStyle().setPaddingLeft(10, Style.Unit.PX);
+			rechterKnoppen.getElement().getStyle().setPaddingLeft(5, Style.Unit.PX);
 			knoppenPanel.add(linkerKnoppen);
 			knoppenPanel.add(rechterKnoppen);
 			
