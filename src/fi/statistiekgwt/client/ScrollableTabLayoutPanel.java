@@ -8,7 +8,6 @@ import com.google.gwt.animation.client.Animation;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -575,12 +574,15 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 						Widget selected = selectionModel.getSelectedObject();
 						ScrollableTabLayoutPanel.this.selectTab(tabBar
 							.getWidgetIndex(selected));
+						Widget panelWithLabel = null;
 						Widget label = null;
 						if (selected instanceof HasWidgets)
 						{
 							// get first child: the label with clickhandler
 							Iterator<Widget> iter = ((HasWidgets) selected).iterator();
-							label = (iter != null && iter.hasNext()) ? iter.next() : null;
+							panelWithLabel = (iter != null && iter.hasNext()) ? iter.next() : null;
+							// panelWithLabel is a horizontal panel containing the tab label as widget 0
+							label = ((HorizontalPanel) panelWithLabel).getWidget(0); // the label
 						}
 						
 						// fire the click event of the label so that StatInteractiePanelView$LabelClickHandler.onClick() is executed 
