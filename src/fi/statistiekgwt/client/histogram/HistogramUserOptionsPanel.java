@@ -3,7 +3,7 @@ package fi.statistiekgwt.client.histogram;
 import java.util.ArrayList;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -25,11 +25,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -46,8 +46,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Sylvia van Borkulo
  *
  */
-public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHandlers
-	//implements ActionListener
+public class HistogramUserOptionsPanel extends FlowPanel
 {
 
 	private HistogramView view;
@@ -56,16 +55,11 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 	private DialogButton dialogButton;
 
-	private LayoutPanel basisPanel;
 	/**
-	 * Panel 'alles' wordt aan DialogButton meegegeven als content.
+	 * Panel 'basisPanel' wordt aan DialogButton meegegeven als content.
 	 */
-	private LayoutPanel alles;
+	private FlowPanel basisPanel;
 	
-	// test syl: waarschijnlijk een of meerdere van dit om de handlers te kunnen verwijderen
-	// heb ik er 1 nodig voor iedere widget met handler?
-//	private HandlerRegistration[] handlerRegistration[];
-//	private HistogramUOPTouchHandler touchHandler;
 	private HistogramUOPClickHandler clickHandler;
 	private HistogramUOPBlurHandler blurHandler;
 	private HistogramUOPChangeHandler changeHandler;
@@ -147,7 +141,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 	private TextBox splitBinWidthField;
 	private Label splitBoundariesLabel;
 	private TextArea splitBoundariesArea;
-//	private ScrollPanel splitBoundariesAreaScrollPanel;
 	private Label splitNoObjectsLabel;
 	private Label splitMinValueLabel;
 	private Label splitMaxValueLabel;
@@ -198,7 +191,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		addHandlers();
 
 		dialogButton = new DialogButton(
-			StatistiekGWT.rb.getString("settingsButton"), this.alles);
+			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
 		
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 	}
@@ -248,14 +241,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 	private void createGuiComponents()
 	{
-		this.alles = new LayoutPanel();
-		this.basisPanel = new LayoutPanel();//new JPanel(new FlowLayout());
-		//this.basisPanel.setPixelSize(this.DEFAULT_WIDTH, this.DEFAULT_HEIGHT);
-		//this.panel.setBackground(CssColor.make(230, 230, 230));
-		//this.panel.addStyleName(statistiekCss.useroptionspanel()");
-
-		this.splitVarLabel = new Label(
-			StatistiekGWT.rb.getString("splitvariableLabel"));
+		this.basisPanel = new FlowPanel();//new LayoutPanel();//new JPanel(new FlowLayout());
 
 		// var settings
 		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
@@ -265,6 +251,7 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		this.varBox.setPixelSize(100, 25); // was: setPreferredSize()
 
 		this.axisLabel = new Label(StatistiekGWT.rb.getString("axisLabel"));
+		this.axisLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		String[] options2 = new String[2];
 		options2[0] = "X";
@@ -302,10 +289,12 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 		this.binWidthLabel = new Label(
 			StatistiekGWT.rb.getString("classwidthLabel"));
+		this.binWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.binWidthField = new TextBox();
 
 		this.noObjectsLabel = new Label("");
+		this.noObjectsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.minValueLabel = new Label("");
 
@@ -317,9 +306,12 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 		this.amountRadioItem = new RadioButton("percAmountGroup",
 			StatistiekGWT.rb.getString("amountLabel"));
+		this.amountRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.percentageRadioItem = new RadioButton("percAmountGroup",
 			StatistiekGWT.rb.getString("percentageRadio"));
+		this.percentageRadioItem.addStyleName(statistiekCss.radioButton());
+		this.percentageRadioItem.addStyleName(statistiekCss.spaceBottomLabel());
 
 		this.cumulativeBox = new CheckBox(
 			StatistiekGWT.rb.getString("cumulativeCheckbox"), false);
@@ -330,24 +322,30 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		// radiobuttons for position labels
 		this.labelBetweenBinsRadioItem = new RadioButton("labelPositionGroup",
 			StatistiekGWT.rb.getString("labelBetweenBinsRadio"));
+		this.labelBetweenBinsRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.labelUnderBinRadioItem = new RadioButton("labelPositionGroup",
 			StatistiekGWT.rb.getString("labelUnderBinRadio"));
+		this.labelUnderBinRadioItem.addStyleName(statistiekCss.radioButton());
 
 		labelSplitHR = new HTML(this.hrString);
 		labelSplitHR.addStyleName(statistiekCss.horizontalrule());
 
 		this.nextToEachOtherRadioItem = new RadioButton("splitViewGroup",
 			StatistiekGWT.rb.getString("nextToEachOtherRadioItem"));
+		this.nextToEachOtherRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.aboveEachOtherRadioItem = new RadioButton("splitViewGroup",
 			StatistiekGWT.rb.getString("aboveEachOtherRadioItem"));
+		this.aboveEachOtherRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.separateRadioItem = new RadioButton("splitViewGroup",
 			StatistiekGWT.rb.getString("separateFromEachOtherRadioItem"));
+		this.separateRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.singleViewRadioItem = new RadioButton("splitViewGroup",
 			StatistiekGWT.rb.getString("splitsingleviewCheckBox"));
+		this.singleViewRadioItem.addStyleName(statistiekCss.radioButton());
 
 		// split settings
 		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
@@ -357,11 +355,13 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 		this.splitVarLabel = new Label(
 			StatistiekGWT.rb.getString("splitvariableLabel"));
+		this.splitVarLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitVarBox = new ListBox();
 
 		this.splitBinsLabel = new Label(
 			StatistiekGWT.rb.getString("noClassesLabel"));
+		this.splitBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinsBox = new ListBox();
 		for (int i = 0; i < options1.length; i++)
@@ -377,29 +377,24 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 		this.splitMinBoundaryLabel = new Label(
 			StatistiekGWT.rb.getString("startvalueLabel"));
+		this.splitMinBoundaryLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitMinBoundaryField = new TextBox();
 
 		this.splitBinWidthLabel = new Label(
 			StatistiekGWT.rb.getString("classwidthLabel"));
+		this.splitBinWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinWidthField = new TextBox();
 
 		this.splitBoundariesLabel = new Label(
 			StatistiekGWT.rb.getString("binsButton"));
+		this.splitBoundariesLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBoundariesArea = new TextArea();
-//		this.splitBoundariesArea.setSize("100%", "100%");
-		//this.splitBoundariesArea.setSize("150px", "150px%");
-		this.splitBoundariesArea.setPixelSize(150, 150);
 		this.splitBoundariesArea.setEnabled(false);
 		this.splitBoundariesArea.addStyleName(statistiekCss.boxsizingborder());
 		
-		// test syl: even zonder scrollpanel, alleen met textarea
-//		this.splitBoundariesAreaScrollPanel = new ScrollPanel(
-//			this.splitBoundariesArea);
-//		this.splitBoundariesAreaScrollPanel.setSize("150px", "150px");
-
 		this.splitNoObjectsLabel = new Label("");
 
 		this.splitMinValueLabel = new Label("");
@@ -415,15 +410,13 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 
 	private void layoutGuiComponents()
 	{
-		LayoutPanel allSettingsPanel;
-//		HorizontalPanel hp1, hp2, hp3, hp3a, hp4, hp5, hp6, hp7, hp8, hp8a, 
-//			hp9, hp10, hp11, hp12, hp13, hp14;
+		HorizontalPanel allSettingsPanel;
 		// Hier geen VerticalPanel; geeft problemen met de gegenereerde HTML
 		// zie: http://mechanitis.blogspot.nl/2011/01/gwt-why-verticalpanel-is-evil.html
-		LayoutPanel variableSettingsPanel, binsSettingsPanel, displaySettingsPanel, splitSettingsPanel;  
+		FlowPanel variableSettingsPanel, binsSettingsPanel, displaySettingsPanel, splitSettingsPanel;
 
 		// Variable settings
-		variableSettingsPanel = new LayoutPanel();
+		variableSettingsPanel = new FlowPanel();//new LayoutPanel();
 		variableSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
@@ -431,18 +424,9 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		variableSettingsPanel.add(this.varBox);
 		variableSettingsPanel.add(this.axisLabel);
 		variableSettingsPanel.add(this.axisBox);
-		// set position
-		variableSettingsPanel.setWidgetLeftWidth(this.varLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		variableSettingsPanel.setWidgetTopHeight(this.varLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		variableSettingsPanel.setWidgetLeftWidth(this.varBox, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		variableSettingsPanel.setWidgetTopHeight(this.varBox, 30, Style.Unit.PX, 30, Style.Unit.PX);
-		variableSettingsPanel.setWidgetLeftWidth(this.axisLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		variableSettingsPanel.setWidgetTopHeight(this.axisLabel, 60, Style.Unit.PX, 30, Style.Unit.PX);
-		variableSettingsPanel.setWidgetLeftWidth(this.axisBox, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		variableSettingsPanel.setWidgetTopHeight(this.axisBox, 90, Style.Unit.PX, 30, Style.Unit.PX);
 
 		// Bins settings
-		binsSettingsPanel = new LayoutPanel();
+		binsSettingsPanel = new FlowPanel();
 		binsSettingsPanel.setTitle(StatistiekGWT.rb.getString("classDivisionLabel")); // tooltip boven panel
 		binsSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
@@ -460,32 +444,9 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		binsSettingsPanel.add(this.noObjectsLabel);
 		binsSettingsPanel.add(this.minValueLabel);
 		binsSettingsPanel.add(this.maxValueLabel);
-		// set position
-		binsSettingsPanel.setWidgetLeftWidth(this.binSettingsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binSettingsLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.minBoundaryLabel, 0, Style.Unit.PCT, 75, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.minBoundaryLabel, 30, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.minBoundaryField, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.minBoundaryField, 30, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.binWidthLabel, 0, Style.Unit.PCT, 75, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binWidthLabel, 60, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.binWidthField, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binWidthField, 60, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.binSettingsHR, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binSettingsHR, 95, Style.Unit.PX, 5, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.binsLabel, 0, Style.Unit.PCT, 75, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binsLabel, 100, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.binsBox, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		binsSettingsPanel.setWidgetTopHeight(this.binsBox, 100, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.noObjectsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		binsSettingsPanel.setWidgetTopHeight(this.noObjectsLabel, 130, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.minValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		binsSettingsPanel.setWidgetTopHeight(this.minValueLabel, 160, Style.Unit.PX, 30, Style.Unit.PX);
-		binsSettingsPanel.setWidgetLeftWidth(this.maxValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		binsSettingsPanel.setWidgetTopHeight(this.maxValueLabel, 190, Style.Unit.PX, 30, Style.Unit.PX);
 
 		// Display settings
-		displaySettingsPanel = new LayoutPanel();
+		displaySettingsPanel = new FlowPanel();
 		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
@@ -497,8 +458,8 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		displaySettingsPanel.add(this.amountLabelHR);
 		displaySettingsPanel.add(this.labelBetweenBinsRadioItem);
 		displaySettingsPanel.add(this.labelUnderBinRadioItem);
-		displaySettingsPanel.add(this.separateRadioItem);
 		displaySettingsPanel.add(this.labelSplitHR);
+		displaySettingsPanel.add(this.separateRadioItem);
 		if (this.model.isFrequencyPolygonMode())
 			displaySettingsPanel.add(this.singleViewRadioItem);
 		else
@@ -506,48 +467,9 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 			displaySettingsPanel.add(this.aboveEachOtherRadioItem);
 			displaySettingsPanel.add(this.nextToEachOtherRadioItem);
 		}
-		// set position
-		int freqPolCorrection = 0;
-		displaySettingsPanel.setWidgetLeftWidth(this.absRelLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.absRelLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		displaySettingsPanel.setWidgetLeftWidth(this.amountRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.amountRadioItem, 30, Style.Unit.PX, 30, Style.Unit.PX);
-		displaySettingsPanel.setWidgetLeftWidth(this.percentageRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.percentageRadioItem, 60, Style.Unit.PX, 30, Style.Unit.PX);
-		if (this.model.isFrequencyPolygonMode())
-		{
-			displaySettingsPanel.setWidgetLeftWidth(this.cumulativeBox, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-			displaySettingsPanel.setWidgetTopHeight(this.cumulativeBox, 90, Style.Unit.PX, 30, Style.Unit.PX);
-			freqPolCorrection = 30;
-		}
-		displaySettingsPanel.setWidgetLeftWidth(this.amountLabelHR, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.amountLabelHR, 95 + freqPolCorrection, Style.Unit.PX, 5, Style.Unit.PX);
-
-		displaySettingsPanel.setWidgetLeftWidth(this.labelBetweenBinsRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.labelBetweenBinsRadioItem, 100 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-		displaySettingsPanel.setWidgetLeftWidth(this.labelUnderBinRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.labelUnderBinRadioItem, 130 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-		displaySettingsPanel.setWidgetLeftWidth(this.labelSplitHR, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.labelSplitHR, 165 + freqPolCorrection, Style.Unit.PX, 5, Style.Unit.PX);
-
-		displaySettingsPanel.setWidgetLeftWidth(this.separateRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		displaySettingsPanel.setWidgetTopHeight(this.separateRadioItem, 170 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-		
-		if (this.model.isFrequencyPolygonMode())
-		{
-			displaySettingsPanel.setWidgetLeftWidth(this.singleViewRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-			displaySettingsPanel.setWidgetTopHeight(this.singleViewRadioItem, 200 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-		}
-		else
-		{
-			displaySettingsPanel.setWidgetLeftWidth(this.aboveEachOtherRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-			displaySettingsPanel.setWidgetTopHeight(this.aboveEachOtherRadioItem, 200 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-			displaySettingsPanel.setWidgetLeftWidth(this.nextToEachOtherRadioItem, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-			displaySettingsPanel.setWidgetTopHeight(this.nextToEachOtherRadioItem, 230 + freqPolCorrection, Style.Unit.PX, 30, Style.Unit.PX);
-		}
 
 		// splitOptions settings
-		splitSettingsPanel = new LayoutPanel();
+		splitSettingsPanel = new FlowPanel();
 		splitSettingsPanel.setTitle(StatistiekGWT.rb.getString("splitsLabel")); // tooltip boven panel
 		splitSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
@@ -573,89 +495,24 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		splitSettingsPanel.add(this.splitNoObjectsLabel);
 		splitSettingsPanel.add(this.splitMinValueLabel);
 		splitSettingsPanel.add(this.splitMaxValueLabel);
-		// set position
-		splitSettingsPanel.setWidgetLeftWidth(this.splitSettingsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitSettingsLabel, 0, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitButton, 20, Style.Unit.PCT, 80, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitButton, 30, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitVarLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitVarLabel, 60, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitVarBox, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitVarBox, 90, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBinsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBinsLabel, 120, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBinsBox, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBinsBox, 150, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesHR, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesHR, 155, Style.Unit.PX, 5, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitChooseBoundariesButton, 20, Style.Unit.PCT, 60, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitChooseBoundariesButton, 190, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitMinBoundaryLabel, 0, Style.Unit.PCT, 75, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitMinBoundaryLabel, 220, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitMinBoundaryField, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitMinBoundaryField, 220, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBinWidthLabel, 0, Style.Unit.PCT, 75, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBinWidthLabel, 250, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBinWidthField, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBinWidthField, 250, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesLabel, 280, Style.Unit.PX, 30, Style.Unit.PX);
-//		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesAreaScrollPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-//		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesAreaScrollPanel, 0, Style.Unit.PX, 150, Style.Unit.PX);
-//		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesAreaScrollPanel, 310, Style.Unit.PX, 150, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitBoundariesArea, 0, Style.Unit.PX, 150, Style.Unit.PX);
-		splitSettingsPanel.setWidgetTopHeight(this.splitBoundariesArea, 310, Style.Unit.PX, 150, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitNoObjectsLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitNoObjectsLabel, 460, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitMinValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitMinValueLabel, 490, Style.Unit.PX, 30, Style.Unit.PX);
-		splitSettingsPanel.setWidgetLeftWidth(this.splitMaxValueLabel, 0, Style.Unit.PCT, 100, Style.Unit.PCT); // in dit label wordt het aantal later achteraan geplakt
-		splitSettingsPanel.setWidgetTopHeight(this.splitMaxValueLabel, 520, Style.Unit.PX, 30, Style.Unit.PX);
 
 		
 		// Put settings panels together on allSettingsPanel
-		allSettingsPanel = new LayoutPanel();
+		allSettingsPanel = new HorizontalPanel();//new LayoutPanel();
+		allSettingsPanel.setBorderWidth(2);
+		allSettingsPanel.addStyleName(this.statistiekCss.horizontalPanel());
 		allSettingsPanel.add(variableSettingsPanel);
 		allSettingsPanel.add(binsSettingsPanel);
 		allSettingsPanel.add(displaySettingsPanel);
 		allSettingsPanel.add(splitSettingsPanel);
-		// set position
-		allSettingsPanel.setWidgetLeftWidth(variableSettingsPanel, 0, Style.Unit.PCT, 25, Style.Unit.PCT);
-		allSettingsPanel.setWidgetTopHeight(variableSettingsPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		allSettingsPanel.setWidgetLeftWidth(binsSettingsPanel, 25, Style.Unit.PCT, 25, Style.Unit.PCT);
-		allSettingsPanel.setWidgetTopHeight(binsSettingsPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		allSettingsPanel.setWidgetLeftWidth(displaySettingsPanel, 50, Style.Unit.PCT, 25, Style.Unit.PCT);
-		allSettingsPanel.setWidgetTopHeight(displaySettingsPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		allSettingsPanel.setWidgetLeftWidth(splitSettingsPanel, 75, Style.Unit.PCT, 25, Style.Unit.PCT);
-		allSettingsPanel.setWidgetTopHeight(splitSettingsPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 
 		this.basisPanel.setHeight("100%");
 		this.basisPanel.setWidth("100%");
+		this.basisPanel.getElement().getStyle().setTextAlign(TextAlign.CENTER);
 		this.basisPanel.add(allSettingsPanel);
 		this.basisPanel.add(this.okButton);
-		// set position
-		this.basisPanel.setWidgetLeftWidth(allSettingsPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		this.basisPanel.setWidgetTopHeight(allSettingsPanel, 0, Style.Unit.PX, 570, Style.Unit.PX);
-		this.basisPanel.setWidgetLeftWidth(this.okButton, 35, Style.Unit.PCT, 30, Style.Unit.PCT);
-		this.basisPanel.setWidgetTopHeight(this.okButton, 570, Style.Unit.PX, 30, Style.Unit.PX);
-
-		this.alles.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		this.alles.add(basisPanel);
-		// set position
-		this.alles.setWidgetLeftWidth(basisPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
-		this.alles.setWidgetTopHeight(basisPanel, 0, Style.Unit.PCT, 100, Style.Unit.PCT);
 
 		init();
-	}
-
-	public void resize(Panel p)
-	{
-		//System.out.println("HistogramUserOptionsPanel.resize(): p = " + p.toString());
-		
-		// dit gaat niet goed...
-//		int w = p.getOffsetWidth();
-//		int h = p.getOffsetHeight();
-//		this.basisPanel.setPixelSize(w + 10, h);
 	}
 
 	public DialogButton getDialogButton()
@@ -1060,9 +917,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 	{
 		this.setVisibleBoundaryOptions();
 		this.setVisibleSplitBoundaryOptions(false);
-		if (this.basisPanel != null)
-			this.resize(this.basisPanel);
-
 	}
 
 	/**
@@ -1100,7 +954,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		this.noObjectsLabel.setVisible(!b);
 		this.minValueLabel.setVisible(!b);
 		this.maxValueLabel.setVisible(!b);
-		this.resize(this.basisPanel);
 	}
 
 	private void setSplitEnumClasses(boolean b)
@@ -1113,7 +966,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		this.splitNoObjectsLabel.setVisible(this.splitBoundariesVisible && !b);
 		this.splitMinValueLabel.setVisible(this.splitBoundariesVisible && !b);
 		this.splitMaxValueLabel.setVisible(this.splitBoundariesVisible && !b);
-		this.resize(this.basisPanel);
 	}
 
 	private void setVisibleBoundaryOptions()
@@ -1163,14 +1015,17 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 		
 		if (this.model.isFrequencyPolygonMode())
 		{
-			this.singleViewRadioItem.setVisible(b);
+			this.singleViewRadioItem.setVisible(this.hasSplit());
 		}
 		else
 		{
-			this.nextToEachOtherRadioItem.setVisible(b);
-			this.aboveEachOtherRadioItem.setVisible(b);
+			this.nextToEachOtherRadioItem.setVisible(this.hasSplit());
+			this.aboveEachOtherRadioItem.setVisible(this.hasSplit());
 		}
-		this.separateRadioItem.setVisible(b);
+		this.separateRadioItem.setVisible(this.hasSplit());
+		this.labelSplitHR.setVisible(this.hasSplit());
+
+		
 		this.splitVarLabel.setVisible(b);
 		this.splitVarBox.setVisible(b);
 		if (!b)
@@ -1377,7 +1232,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 					setVisibleSplitBoundaryOptions(true);
 				}
 
-				resize(basisPanel);
 				this.update();
 			}
 			else if (e.getSource() == splitButton)
@@ -1395,8 +1249,6 @@ public class HistogramUserOptionsPanel extends LayoutPanel // implements HasHand
 					setVisibleSplitOptions(true);
 					this.updateUserOptionsPanel();
 				}
-				
-				resize(basisPanel);
 			}
 			else if (e.getSource() == okButton)
 			{
