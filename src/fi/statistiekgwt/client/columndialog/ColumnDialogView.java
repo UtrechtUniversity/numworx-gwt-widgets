@@ -8,18 +8,15 @@ import java.util.Comparator;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 
@@ -108,7 +105,6 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		super(false, true);
 		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		super.setText(text);
-		this.getElement().getStyle().setBackgroundColor("GREY");
 		
 		if (text.equals(StatistiekGWT.rb.getString("columninfo")))
 		{
@@ -122,58 +118,60 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
 
-		this.initialize();
-	}
-
-	/**
-	 * Constructor with Frame owner
-	 * 
-	 * @param owner
-	 *            Dialog owner
-	 * @param model
-	 *            MVC Model
-	 */
-	public ColumnDialogView(Frame owner, ColumnDialogModel model)
-	{
-		//super(owner, "Add a column", true);
-		super(false, true);
-		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		super.setText(StatistiekGWT.rb.getString("addacolumn"));
-
-		this.model = model;
-		//this.model.addObserver(this);
-		
-		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
-		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
-		this.statistiekCss.ensureInjected();
+		this.addStyleName(statistiekCss.columnDialogView());//getElement().getStyle().setBackgroundColor("GREY");
 
 		this.initialize();
 	}
 
-	/**
-	 * Constructor with Dialog owner
-	 * 
-	 * @param owner
-	 *            Dialog owner
-	 * @param model
-	 *            MVC Model
-	 */
-	public ColumnDialogView(DialogBox owner, ColumnDialogModel model)
-	{
-		//super(owner, StatistiekGWT.rb.getString("addacolumn"), true);
-		super(false, true);
-		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		super.setText(StatistiekGWT.rb.getString("addacolumn"));
+//	/**
+//	 * Constructor with Frame owner
+//	 * 
+//	 * @param owner
+//	 *            Dialog owner
+//	 * @param model
+//	 *            MVC Model
+//	 */
+//	public ColumnDialogView(Frame owner, ColumnDialogModel model)
+//	{
+//		//super(owner, "Add a column", true);
+//		super(false, true);
+//		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+//		super.setText(StatistiekGWT.rb.getString("addacolumn"));
+//
+//		this.model = model;
+//		//this.model.addObserver(this);
+//		
+//		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+//		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+//		this.statistiekCss.ensureInjected();
+//
+//		this.initialize();
+//	}
 
-		this.model = model;
-		//this.model.addObserver(this);
-
-		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
-		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
-		this.statistiekCss.ensureInjected();
-
-		this.initialize();
-	}
+//	/**
+//	 * Constructor with Dialog owner
+//	 * 
+//	 * @param owner
+//	 *            Dialog owner
+//	 * @param model
+//	 *            MVC Model
+//	 */
+//	public ColumnDialogView(DialogBox owner, ColumnDialogModel model)
+//	{
+//		//super(owner, StatistiekGWT.rb.getString("addacolumn"), true);
+//		super(false, true);
+//		super.setPixelSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+//		super.setText(StatistiekGWT.rb.getString("addacolumn"));
+//
+//		this.model = model;
+//		//this.model.addObserver(this);
+//
+//		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+//		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+//		this.statistiekCss.ensureInjected();
+//
+//		this.initialize();
+//	}
 
 	/**
 	 * Set up GUI
