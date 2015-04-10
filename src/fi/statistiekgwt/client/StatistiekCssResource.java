@@ -59,5 +59,25 @@ public interface StatistiekCssResource extends CssResource
 	String dataGrid();
 
 	String failMessage();
+
+	String closeButton();
+
+	String caption();
+
+	String columnDialogView();
+
+	String radioButton();
+	
+	String horizontalPanel();
+
+	String horizontalPanelWithoutBorder();
+	
+	String spaceTopLabel();
+	
+	String spaceBottomLabel();
+
+	String scrollPanel();
+	
+	String splitClassLabel();
 }
 
