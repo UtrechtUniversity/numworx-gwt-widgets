@@ -7,19 +7,19 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 public class DialogButton extends Button implements HasClickHandlers// implements ActionListener,
 											// ComponentListener
 {
 	private DialogBox dialog;
-	private LayoutPanel content;
+	private FlowPanel content;
 	private String title;
 	int preferredWidth = 700;
 	int preferredHeight = 450;
 	private DialogButtonClickHandler clickHandler;
 
-	public DialogButton(String string, LayoutPanel content)
+	public DialogButton(String string, FlowPanel content)
 	{
 		super(string);
 		this.title = string;
@@ -27,8 +27,6 @@ public class DialogButton extends Button implements HasClickHandlers// implement
 		this.preferredWidth = content.getOffsetWidth();
 		this.preferredHeight = content.getOffsetHeight();
 		this.clickHandler = new DialogButtonClickHandler();
-		//this.addClickHandler(this.clickHandler);//addActionListener(this);
-		//.addClickHandler(this.clickHandler);//addActionListener(this);
 	}
 
 	public void setDialogSize(int w, int h)
@@ -46,10 +44,7 @@ public class DialogButton extends Button implements HasClickHandlers// implement
 			this.dialog.setText(this.title);
 		}
 		
-		//this.dialog.add(content);
 		this.dialog.setWidget(content);
-//		this.dialog.setPixelSize(this.preferredWidth, this.preferredHeight);
-		this.dialog.setPixelSize(800, 600);
 		this.getElement().getStyle().setBackgroundColor("GREY");
 		int clientHeight = Window.getClientHeight();
 		int clientWidth = Window.getClientWidth();
