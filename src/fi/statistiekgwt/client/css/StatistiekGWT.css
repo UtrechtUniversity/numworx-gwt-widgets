@@ -19,7 +19,7 @@
 }
 
 .canvas {
-	background-color: white;
+	background-color: white;/*#DCEDFF; /* DWO blue */
 }
 
 .upimage {
@@ -71,7 +71,7 @@
 }
 
 .backgroundblue {
-	background-color: rgb(0, 0, 255);
+	background-color: rgb(220, 237, 255); /* DWO blue #DCEDFF */
 }
 
 .textbox {
@@ -116,12 +116,47 @@
 .titlelabel {
 	font-style: italic;
 	text-align: center;
+	/*margin: 3px;*/
+	padding-bottom: 3px;
 }
+
+.spaceTopLabel {
+	padding-top: 3px;
+}
+
+.spaceBottomLabel {
+	padding-bottom: 3px;
+}
+
+/* set vertical-align in input and label to align checkbox and its text */
+/* Let op: dit heeft invloed op de cell in datagrid... */
+input {
+    vertical-align: middle; 
+    /*padding-top: 7px;*/
+}
+
+/* set vertical-align in input and label to align checkbox and its text */
+/* Let op: dit heeft invloed op de cell in datagrid... */
+label {
+    vertical-align: middle; 
+    /*padding-top: 7px;*/
+}
+
 
 .settingspanel {
 	margin: 2px;
-	padding: 2px;
-	border: 2px solid grey;
+	padding: 5px;
+	/*border: 2px solid grey;*/
+}
+
+.horizontalPanel {
+	border-color: grey;/*#777777;*/
+	margin: 3px;
+}
+
+.horizontalPanelWithoutBorder {
+	margin: 3px;
+	padding: 3px;
 }
 
 .horizontalrule {
@@ -131,11 +166,19 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     width: 90%;
     align: center;
-    text-align:center; margin: 0 auto;
+    text-align:center; 
+    margin: 5px;/* 0 auto;*/
+}
+
+.splitClassLabel {
+	height: 14px;
+    white-space: nowrap;
+    padding-right: 3px;
 }
 
 .colorlegendlabel {
-	font-size: 12px;
+	height: 14px;
+    white-space: nowrap;
 }
 
 .boxsizingborder {
@@ -146,7 +189,7 @@
 
 .dataGridCell td div{
     white-space: nowrap;
-    overflow: hidden;
+    /*overflow: auto;/*hidden; /*effects label?*/
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
     -ms-text-overflow: ellipsis;
@@ -160,9 +203,30 @@
 }
 
 td div{
-   overflow-x:hidden;
+   /*overflow-x: hidden; /*effects label?*/
 }
 
 .failMessage {
 	color:red;
+}
+
+.caption {
+	width:100%;
+	background-color: #DCEDFF; /* DWO blue */
+}
+
+.closeButton {
+	float:right;
+}
+
+.columnDialogView {
+	background-color: gray;
+}
+
+.radioButton {
+	display: block; /* prevent default of showing radiobuttons on one line, instead show each on a new line */
+}
+
+.scrollPanel {
+	/*overflow: auto;*/
 }
