@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
 
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -92,6 +91,11 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 		this.fireEvent(event);
 	}
 
+	/**
+	 * 
+	 * @param mainWindowIndex
+	 * @return
+	 */
 	public int mainWindowIndexToGeneralIndex(int mainWindowIndex)
 	{
 		int mainViews = 0;
@@ -129,8 +133,8 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	 */
 	public void setViewSeparateWindow(int viewIndex, boolean isSeparate)
 	{
-		System.out.println("View " + viewIndex
-			+ " is set to show in separate window: " + isSeparate);
+		System.out.println("StatModel.setViewSeparateWindow(viewIndex " + viewIndex
+			+ ", isSeparate " + isSeparate + ")");
 		this.viewInOwnWindow.set(viewIndex, isSeparate);
 //		super.setChanged();
 //		super.notifyObservers();
