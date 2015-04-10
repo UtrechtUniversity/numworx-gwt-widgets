@@ -23,8 +23,10 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
@@ -57,8 +59,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author borku102
  *
  */
-public class HistogramView extends DockLayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
-//, UpdateViewEventHandler//implements Observer
+public class HistogramView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+//, UpdateViewEventHandler//implements Observer  
 {
 	private HistogramModel model;
 	private HistogramController controller;
@@ -78,6 +80,11 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	 * List of the bar rectangles. For frequency polygons the rectangles correspond to the dots.
 	 */
 	private ArrayList<Rectangle> barRectangles;
+	
+	/**
+	 * Op panel 'alles' staan mainpanel, colorlegend and dialogbutton.
+	 */
+	private DockLayoutPanel alles;
 	private HistogramBarPanel mainPanel;
 	private ScrollPanel scrollPanel;
 	private ColorLegend colorLegend;
@@ -91,10 +98,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	
 	private int width;
 	private int height;
-	
-	private int tempWidth;
-	private int tempHeight;
-	private String tempString;
 	
 	/**
 	 * The event bus to send events to event handlers associated 
@@ -131,10 +134,10 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	 */
 	public HistogramView(HistogramModel model, HistogramController controller)
 	{
-		//super(new BorderLayout());
-//		super(Unit.EM);
-		// test syl: de colorlegend heeft een pixelsize nodig om scroll bars te krijgen (...?)
-		super(Unit.PX);
+		super();
+		
+		this.alles = new DockLayoutPanel(Unit.PX);
+		
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
@@ -155,47 +158,45 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
-//		this.mainPanel.addMouseMotionListener((MouseMotionListener) this.mainPanel);
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel.getCanvas());
-		this.scrollPanel.setWidget(this.mainPanel.getCanvas());
-		//this.scrollPanel.getVerticalScrollBar().setUnitIncrement(StatistiekGWT.scrollSpeedUnit);
+		this.scrollPanel.setSize("100%", "100%");
 		
 		this.userOptionsPanel = new HistogramUserOptionsPanel(this, controller, model);
-//		this.userOptionsPanel.addUpdateViewEventHandler(this);
 		// initial update for setting widgets in user options panel
 		this.userOptionsPanel.update();
 
 		this.initializeSize();
 		
 		this.colorLegend = new ColorLegend("", null, null, 
-			HistogramView.COLOR_LEGEND_WIDTH, this.getHeight() - StatistiekGWT.BUTTON_HEIGHT);
-//		this.addEast(this.colorLegend, 10);//em, BorderLayout.EAST);
-		this.addEast(this.colorLegend, HistogramView.COLOR_LEGEND_WIDTH);//, BorderLayout.EAST);
+			HistogramView.COLOR_LEGEND_WIDTH, this.getHeight());
+		this.alles.addEast(this.colorLegend, HistogramView.COLOR_LEGEND_WIDTH);
 		this.colorLegend.setVisible(false);
-		this.setWidgetHidden(this.colorLegend, true);
+		this.alles.setWidgetHidden(this.colorLegend, true);
 
 		HorizontalPanel dialogButtonPanel = new HorizontalPanel();
 		dialogButtonPanel.setWidth("100%");
+		dialogButtonPanel.setHeight("100%");
 		dialogButtonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		dialogButtonPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		dialogButtonPanel.addStyleName(statistiekCss.backgroundblue());
 		this.dialogButton = userOptionsPanel.getDialogButton();
 		dialogButtonPanel.add(this.dialogButton);
 		
-//		super.addSouth(this.dialogButton, 3);//em, BorderLayout.SOUTH);
-//		super.addSouth(this.dialogButton, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
-		super.addSouth(dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);//50);//px, BorderLayout.SOUTH);
+		this.alles.addSouth(dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);
 		if (!this.model.getStatTableModel().isViewsEditable())
 		{
-			super.setWidgetSize(dialogButtonPanel, 0);
+			this.alles.setWidgetSize(dialogButtonPanel, 0);
 		}
 
-		this.add(this.scrollPanel);//, BorderLayout.CENTER);
+		this.alles.add(this.scrollPanel);// center
 		
-		// test syl
+		this.alles.setPixelSize(this.getWidth(), this.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		
+		// add alles to histogramview (layoutpanel)
+		this.add(this.alles);
+		
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
-		
-		// initial paint gebeurt in HistogramController() - view.update()
-//		this.mainPanel.paint();
 	}
 
 	/**
@@ -211,16 +212,9 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		}
 		else
 		{
-			// test syl: TODO netter height zetten?
 			// take up the space reserved for the user options button
 			this.setHeight(this.controller.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
 		}
-		
-//		this.scrollPanel.setSize(this.getWidth() + "px", 
-//			this.getHeight() + "px"); // 1e keer is scrollPanel.getOffsetHeight() 0
-		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight()); // is dit nodig?
-
-		this.setSize("100%", "100%");
 	}
 
 	/**
@@ -3040,73 +3034,24 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 	{
 		int splitClasses = this.model.getStatTableModel().splitVarClasses(
 			this.model.getSplitOptions());
-		int colorLegendWidth = this.colorLegend.isVisible() ? this.colorLegend
-			.getOffsetWidth() : 0;
+		int colorLegendWidth = this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0;
+
 		if (this.model.isSplitInSingleView())
 		{
-//			this.mainPanel.getCanvas().setPixelSize(
-//				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
-//				this.scrollPanel.getOffsetHeight() - 5);
-//			this.mainPanel.getCanvas().setPixelSize(800, 650);
-//			this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-//			this.mainPanel.getCanvas().setCoordinateSpaceHeight(650);
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
 			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
-
-//			System.out.println("HistogramView.setMainPanelSize(): splitInSingleView=true, "
-//				+ "mainPanel.getPreferredSize()=" + this.mainPanel.getPreferredSize());
 		}
 		else
 		{
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
 			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
-			
-//			if (this.scrollPanel.getOffsetWidth() == 0)
-//			{
-//				// even hardcoded op de gebruikelijke maat... Hoe komt scrollPane 0x0?
-//				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
-//				
-//				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-//				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
-//
-//			}
-//			else
-//			{
-////    			this.mainPanel.getCanvas().setPixelSize(
-////    				this.scrollPanel.getOffsetWidth() - colorLegendWidth - 20, 
-////    				splitClasses * (this.scrollPanel.getOffsetHeight() - 5) + 1);
-//				// test syl: TODO de juiste maat o.b.v. scrollpanel
-//				//this.mainPanel.getCanvas().setPixelSize(800, splitClasses * 600);//653, 677);
-//				
-//				this.mainPanel.getCanvas().setCoordinateSpaceWidth(800);
-//				this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * 650);
-//			}
-
-//			System.out.println("HistogramView.setMainPanelSize(): splitInSingleView=false, "
-//				+ "scrollPanel w=" + this.scrollPanel.getOffsetWidth() + ", h=" + this.scrollPanel.getOffsetHeight() + "; "  
-//				+ "mainPanel.getPixelSize() w=" + this.mainPanel.getCanvas().getOffsetWidth()
-//				+ ", h=" + this.mainPanel.getCanvas().getOffsetHeight());
 		}
 	}
 
 	// Override setBound
 	public void setBounds(int x, int y, int w, int h)
 	{
-//		System.out.println("HistogramView.setBounds(x=" + x + ", y=" + y 
-//			+ ", w=" + w + ", h=" + h + ")");
-
-		//super.setBounds(x, y, w, h);
-
 		this.setMainPanelSize();
-		
-		// System.out.println("HistogramView.setBounds(): Size histogram: " +
-		// this.getBounds().toString()
-		// + ", scrollbarVisible=" +
-		// scrollPane.getVerticalScrollBar().isVisible());
-		
-//		 System.out.println("HistogramView.setBounds(): scrollPane w="
-//			 + scrollPane.getWidth()
-//			 + ", h=" + scrollPane.getHeight());
 	}
 
 	/**
@@ -3119,14 +3064,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 
 		this.updateColorLegend();
 		this.setMainPanelSize();
-
-//		System.out.println("HistogramView.update(): Size histogram: "
-//			+ this.getBounds().toString() + ", scrollbarVisible="
-//			+ scrollPane.getVerticalScrollBar().isVisible());
-//		System.out.println("HistogramView.update(): scrollPane w="
-//			+ scrollPane.getWidth() + ", h=" + scrollPane.getHeight());
-//		System.out.println("HistogramView.update(): mainPanel w=" 
-//			+ this.mainPanel.getWidth() + ", h=" + this.mainPanel.getHeight());
 
 		this.userOptionsPanel.update();
 
@@ -3161,7 +3098,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 			if (!this.colorLegend.isVisible())
 			{
 				this.colorLegend.setVisible(true);
-				this.setWidgetHidden(this.colorLegend, false);
+				this.alles.setWidgetHidden(this.colorLegend, false);
 				visibilityHasChanged = true;
 			}
 			else
@@ -3177,7 +3114,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 				//System.out.println("HistogramView.updateColorLegend(): colorLegend.isVisible() en nu FALSE");
 
 				this.colorLegend.setVisible(false);
-				this.setWidgetHidden(this.colorLegend, true);
+				this.alles.setWidgetHidden(this.colorLegend, true);
 				visibilityHasChanged = true;
 			}
 			else
@@ -3211,14 +3148,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 		public HistogramBarPanel()
 		{
 			this.canvas = Canvas.createIfSupported();
-//			this.canvas.setWidth("100%");
-//			this.canvas.setHeight("100%");
-//			this.canvas.setSize("100%", "100%");
-			// ik zet een vaste maat. Hoe krijg ik dit afhankelijk aan de beschikbare ruimte van scrollPanel?
-			this.canvas.setCoordinateSpaceWidth(800);
-			this.canvas.setCoordinateSpaceHeight(650);
-			// test syl
-			this.canvas.getElement().getStyle().setBackgroundColor("Beige");
+			this.canvas.addStyleName(statistiekCss.canvas());
 			mouseMoveHandler = new HistogramBarMouseMoveHandler(); 
 			this.canvas.addMouseMoveHandler(mouseMoveHandler);
 			this.canvas.addClickHandler(new BarClickHandler());
@@ -3669,16 +3599,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						
 						// Get valueString for showing tooltip text
 						String valueString = "0";
-						// Test of waarde een integer is 
-						if ((value == Math.floor(value)) && !Double.isInfinite(value))
-						{
-							// als integer, dan zonder decimalen
-							valueString = String.valueOf((int) value);
-						}
-						else
-						{
-							valueString = String.valueOf(value);
-						}
+						valueString = StatistiekGWT.getStringValue(value);
 						
 						if (!valueString.equals("0") || HistogramView.this.model.isFrequencyPolygonMode())
 						{
@@ -3694,7 +3615,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 							// show popup
 							if (isPercentage)
 							{
-								this.popup.setTitle(valueString + "%"); // setToolTipText(valueString + "%");
+								valueString = valueString + "%";
 								this.popup.setPopupPositionAndShow(
 									new PopupPanel.PositionCallback()
 									{
@@ -3710,7 +3631,7 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 							}
 							else
 							{
-								this.popup.setTitle("aantal = " + valueString); // setToolTipText("aantal = " + valueString);
+								valueString = "aantal = " + valueString;
 								this.popup.setPopupPositionAndShow(
 									new PopupPanel.PositionCallback()
 									{
@@ -3734,7 +3655,6 @@ public class HistogramView extends DockLayoutPanel implements TableChangeEventHa
 						found = true; // gevonden
 						this.popup.clear();
 						this.popup.add(new Label(valueString));
-						//this.popup.show();
 					} // isOverToolTipArea()
 					else
 					{
