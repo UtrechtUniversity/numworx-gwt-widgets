@@ -43,9 +43,6 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 		this.statTableModel = new StatTableModel();
 		this.resetHashMap = new HashMap();
 
-//		this.data.addTableModelListener(this);
-//		this.data.addChangeHandler(this);
-
 		this.addView(StatistiekGWT.createView("Table",
 			StatistiekGWT.rb.getString("tableOption") + " 1", this.statTableModel, 0, 0, null));
 	}
