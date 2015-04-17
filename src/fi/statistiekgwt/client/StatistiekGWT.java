@@ -58,12 +58,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 											// "Frequentiepolygoon", "Boxplot", "Crosstab",
 											// "Scatterplot", "Descriptive statistics"};
 
-	int breedte;
-	int hoogte;
+	public static int DEFAULT_WIDTH = 700;
+	public static int DEFAULT_HEIGHT = 400;
+	int breedte = StatistiekGWT.DEFAULT_WIDTH;
+	int hoogte = StatistiekGWT.DEFAULT_HEIGHT;
 	boolean volledigeBreedte = false;
 	private static int WIDTH_OFFSET = 5;
 	private static int HEIGHT_OFFSET; 
-	public static int BUTTON_HEIGHT = 40; 
+	public static int BUTTON_HEIGHT = 40;
 	
 	boolean nagekeken = false;
 
@@ -83,8 +85,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public void onModuleLoad()
 	{
+		StatistiekGWT.language = "nl";
+		
 		initViews();
 		basisPanel = new StatInteractiePanel();
+		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
+		this.basisPanel.setWidth(breedte);
+		this.basisPanel.setHeight(hoogte);
+		basisPanel.setPixelSize(breedte, hoogte);
 		
 		// voeg statinteractiepanel toe
 		//RootPanel.get(holderId).add(basisPanel);
