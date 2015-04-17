@@ -151,18 +151,18 @@ label {
 
 .horizontalPanel {
 	border-color: grey;/*#777777;*/
-	margin: 3px;
+	margin: 5px;
 }
 
 .horizontalPanelWithoutBorder {
-	margin: 3px;
-	padding: 3px;
+	margin: 5px;
+	padding: 5px;
 }
 
 .horizontalrule {
 	border: 0;
     height: 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    /*border-top: 1px solid rgba(0, 0, 0, 0.1);*/
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     width: 90%;
     align: center;
@@ -188,7 +188,7 @@ label {
 }
 
 .dataGridCell td div{
-    white-space: nowrap;
+	white-space: nowrap;
     /*overflow: auto;/*hidden; /*effects label?*/
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
@@ -197,9 +197,9 @@ label {
 }
 
 .dataGrid {
-     overflow: hidden;
-     white-space: nowrap;
-     table-layout: auto;
+    overflow: hidden;
+    white-space: nowrap;
+    table-layout: auto;
 }
 
 td div{
@@ -225,8 +225,21 @@ td div{
 
 .radioButton {
 	display: block; /* prevent default of showing radiobuttons on one line, instead show each on a new line */
+	white-space:nowrap;
 }
 
 .scrollPanel {
 	/*overflow: auto;*/
+}
+
+.margin {
+	margin: 5px;
+}
+
+.separateViewDialog {
+	font-size: 12px;	
+}
+
+.button {
+	white-space:nowrap;
 }
