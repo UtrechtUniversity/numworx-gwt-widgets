@@ -306,6 +306,11 @@ public class StatInteractiePanelView extends LayoutPanel
 				TabLayoutPanel panel = (TabLayoutPanel) event.getSource();
 				panel.forceLayout();
 
+				setSelectedView(selectedItem);
+				setSelectedTab(selectedItem);
+				
+				updateViewIfNecessary(selectedItem);
+
 			}
 		});
 	}
@@ -768,6 +773,25 @@ public class StatInteractiePanelView extends LayoutPanel
 	}
 	
 	/**
+	 * Update the view with the given index if it is a table view and it is selected .
+	 * 
+	 * @param viewName
+	 */
+	public void updateViewIfNecessary(int index)
+	{
+		// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+		for (int i = 0; i < model.getViews().size(); i++)
+		{
+			StatistiekView view = model.getViews().get(i);
+			if ((i == index) && view.getViewType().equals(StatistiekGWT.VIEWS[0]) // tabel view
+				&& this.isSelected(view))
+			{
+				view.update();
+			}
+		}
+	}
+	
+	/**
 	 * Returns true if the given view is the selected view in tabPanel.
 	 * 
 	 * @param view
@@ -887,7 +911,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	/*
 	 * Update the startVarBox with the variable names.
 	 */
-	private synchronized void updateStartVarBox()
+	private void updateStartVarBox()
 	{
 //		GWT.log("StatInteractiePanelView.updateStartVarBox()");
 
@@ -922,7 +946,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	/*
 	 * Update the startVar2Box with the variable names.
 	 */
-	private synchronized void updateStartVar2Box()
+	private void updateStartVar2Box()
 	{
 //		GWT.log("StatInteractiePanelView.updateStartVar2Box()");
 
@@ -1819,6 +1843,7 @@ public class StatInteractiePanelView extends LayoutPanel
 
 			this.statistiekView = sv;
 			LayoutPanel panel = new LayoutPanel();
+			panel.addStyleName(statistiekCss.separateViewDialog());
 			panel.add(sv.getWidget());
 			panel.setPixelSize(sv.getWidth(), sv.getHeight() + StatistiekGWT.BUTTON_HEIGHT); // set size explicitely, else panel won't show in dialogbox
 			this.setWidget(panel);
