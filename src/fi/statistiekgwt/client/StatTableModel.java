@@ -389,12 +389,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		return this.columnNames;
 	}
 
-	public synchronized void setColumnName(String name, int columnIndex)
+	public void setColumnName(String name, int columnIndex)
 	{
 		this.columnNames.set(columnIndex, name);
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_COLUMN_NAME, -1);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SET_COLUMN_NAME, columnIndex);
 		this.fireEvent(event);
 	}
 
@@ -519,10 +519,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public int classifyObject(String value, int columnIndex,
 		ArrayList<Double> binBoundaries)
 	{
-		if (!this.isColumnIndexValid(columnIndex)
-			|| ColumnType.WILDCARD.equals(value))
+		if (!this.isColumnIndexValid(columnIndex))
 		{
 			return 0;
+		}
+		if (ColumnType.WILDCARD.equals(value))
+		{
+			return -2;
 		}
 
 		ColumnType cType = this.getColumnTypes().get(columnIndex);
@@ -554,11 +557,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		else if (type.equals(AllowedTypes.ENUM))
 		{
-			int ret = 0;
+			int ret = -1;
 			for (String option : cType.getEnumOptions())
 			{
 				if (option.equals(value))
 				{
+					ret++;
 					break;
 				}
 				else if (!option.equals(ColumnType.WILDCARD))
@@ -657,7 +661,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnIndex
 	 *            the cell's column index
 	 */
-	public synchronized void setValueAtWithoutEvent(Object o, int rowIndex,
+	public void setValueAtWithoutEvent(Object o, int rowIndex,
 		int columnIndex)
 	{
 		// System.out.println("StatTableModel.setValueAtWithoutEvent(object=" + o
@@ -723,7 +727,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnIndex
 	 *            the cell's column index
 	 */
-	public synchronized void setValueAt(Object o, int rowIndex, int columnIndex)
+	public void setValueAt(Object o, int rowIndex, int columnIndex)
 	{
 		this.setValueAtWithoutEvent(o, rowIndex, columnIndex);
 
@@ -741,7 +745,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	/**
 	 * Add an empty row, but don't fire an event.
 	 */
-	public synchronized void addRowWithoutEvent()
+	public void addRowWithoutEvent()
 	{
 		ArrayList<Object> nieuw = new ArrayList<Object>(this.columnCount);
 		for (int i = 0; i < this.columnCount; i++)
@@ -764,7 +768,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	/**
 	 * Add a row with the data of objects without sending an event.
 	 */
-	public synchronized void addRowWithoutEvent(ArrayList<Object> objects)
+	public void addRowWithoutEvent(ArrayList<Object> objects)
 	{
 		this.values.add((objects));
 		this.selectionList.add(false);
@@ -782,7 +786,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	/**
 	 * Add an empty row.
 	 */
-	public synchronized void addRow()
+	public void addRow()
 	{
 		this.addRowWithoutEvent();
 
@@ -799,7 +803,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnType
 	 *            this colum's ColumnType
 	 */
-	public synchronized void addColumn(String columnName, ColumnType columnType)
+	public void addColumn(String columnName, ColumnType columnType)
 	{
 		this.columnClass.add(columnType);
 		this.columnNames.add(columnName);
@@ -814,7 +818,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.stringOptions.add(this.stringColumnOptions(this.columnCount - 1));
 
 		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN, -1);
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN, this.columnCount - 1);
 		this.fireEvent(event);
 	}
 
@@ -826,7 +830,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnType
 	 *            this colum's ColumnType
 	 */
-	public synchronized void addColumnWithoutEvent(String columnName, ColumnType columnType)
+	public void addColumnWithoutEvent(String columnName, ColumnType columnType)
 	{
 		this.columnClass.add(columnType);
 		this.columnNames.add(columnName);
@@ -851,7 +855,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param cType
 	 *            the new column type
 	 */
-	public synchronized void editColumn(int columnIndex, String columnName,
+	public void editColumn(int columnIndex, String columnName,
 		ColumnType cType)
 	{
 		this.editColumnWithoutEvent(columnIndex, columnName, cType);
@@ -871,7 +875,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param cType
 	 *            the new column type
 	 */
-	public synchronized void editColumnWithoutEvent(int columnIndex, String columnName,
+	public void editColumnWithoutEvent(int columnIndex, String columnName,
 		ColumnType cType)
 	{
 		this.columnNames.set(columnIndex, columnName);
@@ -894,7 +898,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			if (!cType.isValidInput(this.getValueAt(row, columnIndex)))
 			{
-				this.setValueAt(ColumnType.WILDCARD, row, columnIndex);
+				this.setValueAtWithoutEvent(ColumnType.WILDCARD, row, columnIndex);
 			}
 			else
 			{
@@ -947,7 +951,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param row
 	 *            index of the row to remove
 	 */
-	public synchronized void removeRow(int row)
+	public void removeRow(int row)
 	{
 //		System.out.println("StatTableModel.removeRow(row=" + row + "), this.hashCode()=" + this.hashCode());
 
@@ -977,7 +981,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param row
 	 *            index of the row to remove
 	 */
-	public synchronized void removeRowWithoutEvent(int row)
+	public void removeRowWithoutEvent(int row)
 	{
 //		System.out.println("StatTableModel.removeRowWithoutEvent(row=" + row + "), this.hashCode()=" + this.hashCode());
 
@@ -1084,7 +1088,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnName
 	 *            name of the column to remove
 	 */
-	public synchronized void removeColumn(String columnName)
+	public void removeColumn(String columnName)
 	{
 		int i = this.getColumnIndexByName(columnName);
 		if (i == -1)
@@ -1103,7 +1107,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnIndex
 	 *            index of the column to remove
 	 */
-	public synchronized void removeColumn(int columnIndex)
+	public void removeColumn(int columnIndex)
 	{
 		if (columnIndex >= 0)
 		{
@@ -1136,7 +1140,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param column
 	 *            index of the column to remove
 	 */
-	public synchronized void removeColumnWithoutEvent(int column)
+	public void removeColumnWithoutEvent(int column)
 	{
 		if (column >= 0)
 		{
@@ -1259,7 +1263,9 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public void sort(int columnIndex)
 	{
-		this.quickSort(columnIndex, 0, this.rowCount - 1);
+		//this.quickSort(columnIndex, 0, this.rowCount - 1);
+		// lots of same values causes StackOverflowError, so better use:
+		this.threeWayQuickSort(columnIndex, 0, this.rowCount - 1);
 
 		// send an event
 		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
@@ -1312,7 +1318,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		for (int j = p; j < r; j++)
 		{
 			if (cType.compare(
-				this.values.get(j).get(columnIndex), x.get(columnIndex)) <= 0)
+//				this.values.get(j).get(columnIndex), x.get(columnIndex)) <= 0)
+				this.values.get(j).get(columnIndex), x.get(columnIndex)) < 0) // no switch if equal
 			{
 				i++;
 				this.switchRows(i, j);
@@ -1322,6 +1329,54 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.switchRows(i + 1, r);
 		return i + 1;
 	}
+	
+	/**
+	 * Three way quicksort suited for data with many the same values. 
+	 * Also called Dijkstra's Dutch national flag problem.
+	 * This variant of quicksort is much faster for data with many 
+	 * same values.
+	 * 
+	 * See also: http://www.isical.ac.in/~pdslab/slides/23Quicksort.pdf 
+	 * (see section Duplicate Keys from p. 33, with code on p. 41)
+	 * 
+	 * @param columnIndex
+	 *            The column to sort by
+	 * @param p
+	 *            start index of the subarray to sort
+	 * @param r
+	 *            end index of the subarray to sort
+	 */
+	private void threeWayQuickSort(int columnIndex, int p, int r)
+	{
+		if (r <= p) return;
+		
+		ColumnType cType = this.columnClass.get(columnIndex);
+		int lt = p;
+		int gt = r;
+		
+		// get the pivot x
+		ArrayList<Object> dataRow = this.values.get(p);
+
+		int i = p;
+		while (i <= gt)
+		{
+			int cmp = cType.compare(
+				this.values.get(i).get(columnIndex), dataRow.get(columnIndex));
+
+			if (cmp < 0)
+			{
+				this.switchRows(lt++, i++);
+			}
+			else if (cmp > 0)
+			{
+				this.switchRows(i, gt--);
+			}
+			else i++;
+		}
+		
+		threeWayQuickSort(columnIndex, p, lt - 1);
+		threeWayQuickSort(columnIndex, gt + 1, r);
+	} 
 
 	/**
 	 * Create a hashtable containing the frequency of all strings in column with
@@ -2263,11 +2318,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 								binFrequency[split][2 * bin + 1]++;
 							}
 						}
-						else
+						else if (split == -1)
 						{
 							System.out.println("StatTableModel.numberClassFrequency() returns null. Objects cannot be classified");
 							return null;
 						}
+						// split == -2 is a wildcard
 					}
 				}
 			}
@@ -2333,11 +2389,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 							frequencySelectionTable[split]);
 					}
 				}
-				else
+				else if (split == -1)
 				{
 					System.out.println("StatTableModel.enumClassFrequency() returns null. Objects cannot be classified");
 					return null;
 				}
+				// split == -2 is a wildcard
 			}
 
 			// create FrequencyTuple array from hashtable
