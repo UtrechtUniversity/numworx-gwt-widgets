@@ -160,7 +160,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel.getCanvas());
-		this.scrollPanel.setSize("100%", "100%");
+		//this.scrollPanel.setSize("100%", "100%");
+		this.scrollPanel.setAlwaysShowScrollBars(false);
 		
 		this.userOptionsPanel = new HistogramUserOptionsPanel(this, controller, model);
 		// initial update for setting widgets in user options panel
@@ -3035,17 +3036,29 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int splitClasses = this.model.getStatTableModel().splitVarClasses(
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0;
+		
+		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
+		int scrollHeight = this.scrollPanel.getElement().getScrollHeight();
+		int widthCorrection = this.getWidth() - colorLegendWidth - scrollWidth;
+		int heightCorrection = this.getHeight() - scrollHeight;
+
+		this.scrollPanel.setPixelSize(this.getWidth() - colorLegendWidth, this.getHeight());
+		this.scrollPanel.setAlwaysShowScrollBars(false);
 
 		if (this.model.isSplitInSingleView())
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8 - colorLegendWidth);//(this.getWidth() - colorLegendWidth);
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight() - 8);//(this.getHeight());
 		}
 		else
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8);//(this.getWidth());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());//(splitClasses * this.getHeight());
 		}
+		
+//		scrollWidth = this.scrollPanel.getElement().getScrollWidth();
+//		scrollHeight = this.scrollPanel.getElement().getScrollHeight();
+
 	}
 
 	// Override setBound
@@ -3828,8 +3841,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			} // enum or string
 			
 			// view statTable moet updaten en de selectie laten zien -> gebeurt al door setSelectionList, die triggert een SelectionChangeEvent
-			ViewSelectionChangeEvent event = new ViewSelectionChangeEvent(HistogramView.this.controller.getViewName());
-			HistogramView.this.fireEvent(event);
+//			ViewSelectionChangeEvent event = new ViewSelectionChangeEvent(HistogramView.this.controller.getViewName());
+//			HistogramView.this.fireEvent(event);
 		}
 		
 	} // private class BarClickListener
