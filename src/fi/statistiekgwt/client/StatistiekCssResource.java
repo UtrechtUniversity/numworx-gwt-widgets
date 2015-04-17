@@ -79,5 +79,11 @@ public interface StatistiekCssResource extends CssResource
 	String scrollPanel();
 	
 	String splitClassLabel();
+
+	String margin();
+
+	String separateViewDialog();
+
+	String button();
 }
 
