@@ -352,6 +352,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
 		this.splitButton = new Button(
 			StatistiekGWT.rb.getString("splitoptionsButton"));
+		this.splitButton.addStyleName(statistiekCss.button());
 
 		this.splitVarLabel = new Label(
 			StatistiekGWT.rb.getString("splitvariableLabel"));
@@ -1253,7 +1254,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			else if (e.getSource() == okButton)
 			{
 				setVisibleBoundaryOptions();
-				setVisibleSplitBoundaryOptions(false);
+				//setVisibleSplitBoundaryOptions(false); waarom moet dit?
 				if (splitVarBox.getSelectedIndex() == 0)
 					setVisibleSplitOptions(false);
 				dialogButton.closeDialog();
