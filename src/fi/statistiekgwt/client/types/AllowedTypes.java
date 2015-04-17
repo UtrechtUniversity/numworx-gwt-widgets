@@ -114,8 +114,9 @@ public class AllowedTypes implements Serializable
 
 	public boolean isNumber()
 	{
-		return this.equals(AllowedTypes.INTEGER)
-			|| this.equals(AllowedTypes.DOUBLE);
+		boolean isNumber = 
+			(this.equals(AllowedTypes.INTEGER) || this.equals(AllowedTypes.DOUBLE)); 
+		return isNumber;
 	}
 
 	public boolean equals(Object o)
