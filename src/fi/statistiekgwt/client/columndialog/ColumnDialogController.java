@@ -26,7 +26,6 @@ public class ColumnDialogController
 {
 	private ColumnDialogModel model;
 	private ColumnDialogView view;
-	// handlers as global field?
 	private ColumnDialogClickHandler clickHandler;
 	private ColumnDialogBlurHandler blurHandler;
 	private ColumnDialogChangeHandler changeHandler;
@@ -57,6 +56,7 @@ public class ColumnDialogController
 		this.view.addChangeHandlers(this.changeHandler);
 		this.view.addValueChangeHandlers(this.valueChangeHandler);
 		this.view.addKeyDownHandlers(this.keyDownHandler);
+		this.view.addBlurHandlers(this.blurHandler);
 	}
 
 	/**
@@ -121,23 +121,25 @@ public class ColumnDialogController
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
 			{
-//				if (ColumnDialogController.this.wasEnum())
-//				{
-					String newElement = ColumnDialogController.this.view.getEnumOption();
-					ColumnDialogController.this.model.addEnumOption(newElement);
-//				}
-//				else
-//				{
-//					ColumnDialogController.this.view.addStringOption(
-//						ColumnDialogController.this.view.getEnumOption());
-//					//ColumnDialogController.this.view.update();
-//				}
+				String newElement = ColumnDialogController.this.view.getEnumOption();
 
-				// clear the text in the input field
-				ColumnDialogController.this.view.clearAddEnumElementField();
-				ColumnDialogController.this.view.update();
-				
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				if (!newElement.equals(""))
+				{
+					if (ColumnDialogController.this.wasEnum())
+					{
+						ColumnDialogController.this.model.addEnumOption(newElement);
+						ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					}
+					else
+					{
+						ColumnDialogController.this.view.addStringOption(
+							ColumnDialogController.this.view.getEnumOption());
+					}
+	
+					// clear the text in the input field
+					ColumnDialogController.this.view.clearAddEnumElementField();
+					ColumnDialogController.this.view.update();
+				}				
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getUitlegArea())
 			{
@@ -246,10 +248,15 @@ public class ColumnDialogController
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getOkButton())
 			{
-//				ColumnDialogController.this.model.setDonePressed(true);
-//				ColumnDialogController.this.view.setVisible(false);
 				ColumnDialogController.this.view.hide();
 				
+				// als type gewijzigd in enum, update enum options
+				if (!ColumnDialogController.this.wasEnum() 
+					&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
+				{
+					ColumnDialogController.this.view.updateEnumOptions();
+				}
+
 				if (ColumnDialogController.this.model.getOldName().equals(""))
 				{
 					// send an add column event
@@ -262,13 +269,6 @@ public class ColumnDialogController
 				}
 				else
 				{
-					// als type gewijzigd in enum, update enum options
-					if (!ColumnDialogController.this.wasEnum() 
-						&& ColumnDialogController.this.model.getType().equals(AllowedTypes.ENUM))
-					{
-						ColumnDialogController.this.view.updateEnumOptions();
-					}
-
 					// send an edit column event
 					EditColumnEvent event = new EditColumnEvent(
 						ColumnDialogController.this.model.getColumnIndex(),
@@ -312,13 +312,24 @@ public class ColumnDialogController
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
 			{
+				// newElement is hier altijd leeg: al afgehandeld door ValueChangeHandler...
 				String newElement = ColumnDialogController.this.view.getEnumOption();
-				ColumnDialogController.this.model.addEnumOption(newElement);
-
-				ColumnDialogController.this.view.clearAddEnumElementField();
-				ColumnDialogController.this.view.update();
 				
-				ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+				if (!newElement.equals(""))
+				{
+					if (ColumnDialogController.this.wasEnum())
+					{
+						ColumnDialogController.this.model.addEnumOption(newElement);
+						ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					}
+					else
+					{
+						ColumnDialogController.this.view.addStringOption(newElement);
+					}
+	
+					ColumnDialogController.this.view.clearAddEnumElementField();
+					ColumnDialogController.this.view.update();
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getUitlegArea())
 			{
@@ -345,13 +356,23 @@ public class ColumnDialogController
 				else if (e.getSource() == ColumnDialogController.this.view.getAddEnumElementField())
 				{
 					String newElement = ColumnDialogController.this.view.getEnumOption();
-					ColumnDialogController.this.model.addEnumOption(newElement);
-
-					// clear the text in the input field
-					ColumnDialogController.this.view.clearAddEnumElementField();
-					ColumnDialogController.this.view.update();
 					
-					ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+					if (!newElement.equals(""))
+					{
+						if (ColumnDialogController.this.wasEnum())
+						{
+							ColumnDialogController.this.model.addEnumOption(newElement);
+							ColumnDialogController.this.model.setHasChangedEnumOptions(true);
+						}
+						else
+						{
+							ColumnDialogController.this.view.addStringOption(newElement);
+						}
+	
+						// clear the text in the input field
+						ColumnDialogController.this.view.clearAddEnumElementField();
+						ColumnDialogController.this.view.update();
+					}
 				}
 			}
 		}
