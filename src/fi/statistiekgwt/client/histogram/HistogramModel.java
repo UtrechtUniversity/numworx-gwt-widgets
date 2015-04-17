@@ -463,7 +463,9 @@ public class HistogramModel
 		// Als je split doet en splitInSingleView blijft false,
 		// dan moeten onderstaande acties ook uitgevoerd worden.
 		if (!splitInSingleView)
+		{
 			nextToEachOther = false;
+		}
 	}
 
 	public void setNextToEachOther(boolean nextToEachOther)
@@ -472,7 +474,9 @@ public class HistogramModel
 		{
 			this.nextToEachOther = nextToEachOther;
 			if (nextToEachOther)
+			{
 				splitInSingleView = true;
+			}
 		}
 	}
 
