@@ -268,7 +268,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	public boolean isNextToEachOtherSelected()
 	{
 		if (this.model.isFrequencyPolygonMode())
+		{
 			return true; // is natuurljk een beetje gek
+		}
 		return userOptionsPanel.isNextToEachOtherSelected();
 	}
 
@@ -329,13 +331,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 */
 	public double getBinWidth()
 	{
-//		double binWidth = -1;
-//		
-//		if ((this.model.getBinBoundaries() != null) && (this.model.getBinBoundaries().size() > 1))
-//		{
-//			binWidth = this.model.getBinBoundaries().get(1) - this.model.getBinBoundaries().get(0);
-//		}
-//		return binWidth;
 		return this.userOptionsPanel.getBinWidth();
 	}
 
@@ -892,7 +887,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		double symmShadingFraction = (double) 1/3; // number indicating the part of the outside of the bar that is shaded
 
-		//GradientPaint gradient;
 		CanvasGradient gradient;
 		
 		if (isVerticalBar)
@@ -915,65 +909,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		if (isVerticalBar)
 		{
 			context.fillRect(x, y, width, height);
-			// teken eerste 1/3
-//			context.fillRect(x, y, (int) (width * symmShadingFraction), height);
 		}
 		else
 		{
 			context.fillRect(x, y, width, height);
 		}
 		
-//		context.setColor(c);
-//		// middelste 1/3 met gewone kleur c
-//		if (isVerticalBar)
-//		{
-//			context.fillRect(x + (int) (width * symmShadingFraction), 
-//				y, (int) (width * ((1/symmShadingFraction) - 1) * symmShadingFraction), height);
-//		}
-//		else
-//		{
-//			context.fillRect(x, y  + (int) (height * symmShadingFraction), 
-//				width, (int) (height * ((1/symmShadingFraction) - 1) * symmShadingFraction));
-//		}
-//
-//		// gradient voor het laatste 1/3 deel
-//		if (isVerticalBar)
-//		{
-//    		gradient = new GradientPaint(
-//    			x + (int) (width * ((1/symmShadingFraction) - 1) * symmShadingFraction), 
-//    			y, 
-//    			c,
-//    			x + width, 
-//    			y, shadingColor, false);
-//		}
-//		else // horizontal bar
-//		{
-//    		gradient = new GradientPaint(
-//    			x, 
-//    			y + (int) (height * ((1/symmShadingFraction) - 1) * symmShadingFraction), 
-//    			c,
-//    			x, 
-//    			y + height, shadingColor, false);
-//		}
-//		context.setPaint(gradient);
-//		
-//		// laatste 1/3
-//		if (isVerticalBar)
-//		{
-//			context.fillRect(
-//    			x + (int) (width * ((1/symmShadingFraction) - 1) * symmShadingFraction) - 1,
-//    			y, 
-//    			(int) (width * symmShadingFraction) + 2,
-//    			height); // door int afrondingen wat extra marge nemen
-//		}
-//		else
-//		{
-//			context.fillRect(
-//				x,
-//    			y  + (int) (height * ((1/symmShadingFraction) - 1) * symmShadingFraction) - 1, 
-//    			width, 
-//    			(int) (height * symmShadingFraction) + 2); // door int afrondingen wat extra marge nemen
-//		}
 	}
 	
 	/**
@@ -1003,26 +944,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int width, int height, Context2d context, CssColor c, CssColor shadingColor, 
 		boolean isVerticalBar)
 	{
-		//GradientPaint gradient;
 		CanvasGradient gradient;
 		
 		if (isVerticalBar)
 		{
     		gradient = context.createLinearGradient(x, y, x + width, y);
-//    		gradient = new GradientPaint(
-//    			x, 
-//    			y, c,
-//    			x + width, 
-//    			y, shadingColor, false);
 		}
 		else // horizontal bar
 		{
 			gradient = context.createLinearGradient(x, y, x, y + height);
-//    		gradient = new GradientPaint(
-//    			x, 
-//    			y, c,
-//    			x, 
-//    			y + height, shadingColor, false);
 		}
 
 		gradient.addColorStop(0, c.toString());
@@ -1055,7 +985,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		context.lineTo(xPoints[3], yPoints[3]);
 		context.fill();
 		context.closePath();
-		//context.fillPolygon(xPoints, yPoints, 4);
 		this.lastPolygonPoint = p3;
 
 		if (!this.model.isFrequencyPolygonStackMode())
@@ -1927,18 +1856,22 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				for (int i = 0; i < frequencies.length / 2; i++)
 				{
 					if (allFrequencies.length > 1)
+					{
 						this.paintBar(
 							context,
 							(int) (frequencies[2 * i] * amountScale),
 							(int) (frequencies[2 * i + 1] * amountScale), 
 							i, ySplitOffset, 0, this.getColor(splitClass), 0, 0,
 							false, splitClass);
+					}
 					else
+					{
 						this.paintBar(
 							context,
 							(int) (frequencies[2 * i] * amountScale),
 							(int) (frequencies[2 * i + 1] * amountScale), 
 							i, ySplitOffset, 0, splitClass);
+					}
 				}
 			}
 		}
@@ -2125,7 +2058,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
 						{
 							if (!HistogramView.this.model.isFrequencyPolygonMode())
+							{
 								s_labelUnderBin = s;
+							}
 							else
 							{
 								s_labelUnderBin = s;
@@ -2873,18 +2808,22 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				for (int i = 0; i < frequencies.length; i++)
 				{
 					if (allFrequencies.length > 1)
+					{
 						this.paintBar(
 							context,
 							(int) (frequencies[i].frequency * amountScale),
 							(int) (frequencies[i].selectionFrequency * amountScale),
 							i, ySplitOffset, 0, this.getColor(splitClass), 0,
 							0, false, splitClass);
+					}
 					else
+					{
 						this.paintBar(
 							context,
 							(int) (frequencies[i].frequency * amountScale),
 							(int) (frequencies[i].selectionFrequency * amountScale),
 							i, ySplitOffset, 0, splitClass);
+					}
 				}
 			}
 		}
@@ -3339,9 +3278,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// System.out.println("... numberOfSplits = " + numberOfSplits);
 			
 			if (frequencies_number != null)
+			{
 				noBins = HistogramView.this.model.getNoBins();
+			}
 			else if (frequencies_enum != null)
+			{
 				noBins = frequencies_enum[0].length;
+			}
 
 			aantalPerSplit = new int[numberOfSplits];
 			aantalPerBin = new int[noBins];
@@ -3450,7 +3393,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							}
 							
 							if (Double.isNaN(value) || Double.isInfinite(value))
+							{
 								value = 0;
+							}
 						} // isPercentage
 						else
 						{
@@ -3606,9 +3551,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						
 						// round to one decimal
 						if (!Double.isNaN(value) && !Double.isInfinite(value))
+						{
 							value = StatistiekGWT.round(value, 1);
+						}
 						else
+						{
 							value = 0;
+						}
 						
 						// Get valueString for showing tooltip text
 						String valueString = "0";
@@ -3867,7 +3816,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				&& (p.getX() <= (this.x + this.w))
 				&& (p.getY() >= this.y) 
 				&& (p.getY() <= (this.y + this.h)))
+			{
 				inRectangle = true;
+			}
 			
 			return inRectangle;
 		}
@@ -4030,7 +3981,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		boolean hasSplit = false;
 		
 		if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
+		{
 			hasSplit = true;
+		}
 		
 		return hasSplit;
 	}
