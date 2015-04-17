@@ -455,14 +455,18 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		displaySettingsPanel.add(this.amountRadioItem);
 		displaySettingsPanel.add(this.percentageRadioItem);
 		if (this.model.isFrequencyPolygonMode())
+		{
 			displaySettingsPanel.add(this.cumulativeBox);
+		}
 		displaySettingsPanel.add(this.amountLabelHR);
 		displaySettingsPanel.add(this.labelBetweenBinsRadioItem);
 		displaySettingsPanel.add(this.labelUnderBinRadioItem);
 		displaySettingsPanel.add(this.labelSplitHR);
 		displaySettingsPanel.add(this.separateRadioItem);
 		if (this.model.isFrequencyPolygonMode())
+		{
 			displaySettingsPanel.add(this.singleViewRadioItem);
+		}
 		else
 		{
 			displaySettingsPanel.add(this.aboveEachOtherRadioItem);
@@ -708,18 +712,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.setSelectedItemInListBox(
 			this.binsBox, String.valueOf(this.model.getNoBins()));
 		
-//		int nr;
-//		if (this.model.getSplitOptions().getBinBoundaries() != null)
-//		{
-//			nr = this.model.getSplitOptions().getBinBoundaries().size() - 1;
-//		}
-//		else
-//		{
-//			// default number of split bins
-//			nr = 2;
-//		}
-//		this.splitBinsBox.setSelectedIndex(nr);
-
 		this.setSelectedItemInListBox(
 			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
@@ -930,7 +922,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		int indexToFind = -1;
 		for (int i=0; i < listBox.getItemCount(); i++) 
 		{
-		    if (listBox.getItemText(i).equals(string)) {
+		    if (listBox.getItemText(i).equals(string)) 
+		    {
 		        indexToFind = i;
 		        break;
 		    }
@@ -1030,9 +1023,13 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitVarLabel.setVisible(b);
 		this.splitVarBox.setVisible(b);
 		if (!b)
+		{
 			this.splitBinsLabel.setVisible(b);
+		}
 		if (!b)
+		{
 			this.splitBinsBox.setVisible(b);
+		}
 		
 		// test syl: alleen als splitvar is gekozen (splitVarBox selectedIndex > 0)
 		if (this.hasSplit())
@@ -1256,7 +1253,9 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				setVisibleBoundaryOptions();
 				//setVisibleSplitBoundaryOptions(false); waarom moet dit?
 				if (splitVarBox.getSelectedIndex() == 0)
+				{
 					setVisibleSplitOptions(false);
+				}
 				dialogButton.closeDialog();
 			}
 			else if (e.getSource() == splitVarBox)
