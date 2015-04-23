@@ -57,7 +57,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	public String findUniqueViewName(String viewTypeName)
 	{
 		int i;
-		findI: for (i = 1; true; i++)
+		findIndex: for (i = 1; true; i++)
 		{
 			String s = viewTypeName + " " + i;
 			for (StatistiekView view : this.views)
@@ -65,7 +65,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 				if (view.getViewName().equals(s))
 				{
 					// try next i
-					continue findI;
+					continue findIndex;
 				}
 			}
 
