@@ -38,6 +38,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -52,6 +53,7 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.DialogBox.Caption;
@@ -105,7 +107,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	private int previousSelectedView = 0;
 
 	// The index of the selected tab in tabPane
-	private int selectedTab = 0;
+	private int selectedTabIndex = 0;
 
 	private ArrayList<SeparateViewDialog> separateViews;//dialogs;
 	
@@ -226,8 +228,8 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	protected String getSelectedViewName()
 	{
-		int selectedTabIndex = this.tabPanel.getSelectedIndex(); 
-		String name = this.getViews().get(selectedTabIndex).getViewName();
+		int selectedIndex = this.tabPanel.getSelectedIndex(); 
+		String name = this.getViews().get(selectedIndex).getViewName();
 		
 		return name;
 	}
@@ -450,13 +452,15 @@ public class StatInteractiePanelView extends LayoutPanel
 				setPreviousSelectedView(selectedView);
 			}
 			else
+			{
 				// GWT.log("view = selectedView!");
 
 				// set the selected view
 				setSelectedView(view);
+			}
 
 			// update the selected view in tabPane
-			setTabPane(selectedTab);
+			this.setTabPane(this.selectedTabIndex);
 		}
 		// GWT.log("*** end *** StatInteractiePanelView.processSelectedView(view="
 		// + view + ")");
@@ -592,7 +596,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	public void setSelectedTab(int index)
 	{
-		selectedTab = index;
+		this.selectedTabIndex = index;
 		this.tabPanel.selectTab(index);
 	}
 
@@ -635,9 +639,13 @@ public class StatInteractiePanelView extends LayoutPanel
 		ArrayList<Boolean> viewInOwnWindow = getModel().getViewInOwnWindow();
 
 		if (viewInOwnWindow.get(view))
+		{
 			return true;
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	public int indexOfTabWidget(Widget widget)
@@ -721,10 +729,15 @@ public class StatInteractiePanelView extends LayoutPanel
 		// test syl: let op: als je een tab selecteert en daarna een extern view sluit, dan is selectedView niet de te sluiten externe view maar de selectedTab!
 		// hier moet: de index van statistiekView
 //		if (selectedView <= oldSelectedTab)
-		if (this.getIndexOfViewName(statistiekView.getViewName()) <= oldSelectedTab)
+		if ((this.getIndexOfViewName(statistiekView.getViewName()) <= oldSelectedTab)
+			&& (this.tabPanel.getWidgetCount() > 1))// check of er meer is dan alleen het +-tab
+		{
 			newSelectedTab = oldSelectedTab + 1;
+		}
 		else
+		{
 			newSelectedTab = oldSelectedTab;
+		}
 		
 		StatInteractiePanelView.this.processSelectedTab(newSelectedTab);
 
@@ -901,7 +914,7 @@ public class StatInteractiePanelView extends LayoutPanel
 		}
 
 		// update the selected tab in tabPanel
-		tabPanel.selectTab(selectedTab);
+		tabPanel.selectTab(selectedTabIndex);
 
 		// Fill boxes with variable names
 		updateStartVarBox();
@@ -1053,8 +1066,10 @@ public class StatInteractiePanelView extends LayoutPanel
 
 		private Widget widget;
 		private String viewName;
-		private int x;
-		private int y;
+		private int startX;
+		private int startY;
+		private int lastMovedX;
+		private int lastMovedY;
 		private boolean hasMoved;
 		
 		boolean mouseDown = false;
@@ -1077,176 +1092,149 @@ public class StatInteractiePanelView extends LayoutPanel
 		@Override
 		public void onTouchStart(TouchStartEvent event)
 		{
-			GWT.log("StatInteractiePanelView.DraggedTabHandler.onTouchStart()!");
-			
-			// --------------------->>>>>>>>>>>>>>>>>>>>>
-			// uit TouchHandler --->
 			event.preventDefault();
 			event.stopPropagation();
 			
 			// set tap time to detect tap & hold
 			taptime = System.currentTimeMillis();
-			// uit TouchHandler <---
-			// <<<<<<<<<<<<<<<<<<<<--------------------
-			
-			
-			// uit mousePressed()... :
-			int tab = tabPanel.getSelectedIndex();
-			//GWT.log("StatInteractiePanelView.DraggedTabTouchHandler.onTouchStart(): tab = " + tab);
-			if (tab < 0)
-			{
-				return;
-			}
-			
-			Touch touch = event.getTouches().get(0);
-			int eventX = touch.getPageX();
-			int eventY = touch.getPageY();				
 
-//			if (event.getSource() == MouseEvent.BUTTON1)
-//			{
-//				this.inDrag = true;
-//				this.startPoint = new Point(eventX, eventY);
-//				this.draggedTab = tab;
-//				if (this.draggedTab >= 0
-//					&& this.draggedTab < StatInteractiePanelView.this.model
-//						.getMainWindowViews().size())
-//				{
-//					// test syl: move cursor blijft
-////					StatInteractiePanelView.super.setCursor(new Cursor(
-////						Cursor.MOVE_CURSOR));
-//				}
-//			}
-			// 'middle click'-optie
-//			else if (event.getSource() == MouseEvent.BUTTON2
-//				&& StatInteractiePanelView.this.model.getStatTableModel()
-//					.isViewsAddable()
-//				&& tab >= 0
-//				&& (tab < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1))
-//			{
-//				StatInteractiePanelView.this.model
-//					.removeView(StatInteractiePanelView.this.model
-//						.mainWindowIndexToGeneralIndex(tab));
-//			}
-			// 'rechtermuisknop'-optie
-//			else if (event.getSource() == MouseEvent.BUTTON3
-//				&& StatInteractiePanelView.this.model.getStatTableModel()
-//					.isViewsEditable())
-//			{
-//				Widget c = StatistiekGWT.getTopLevelAncestor(StatInteractiePanelView.this);
-//				if (c instanceof Frame)
-//				{
-//					ChangeViewNameDialog dialog = new ChangeViewNameDialog(
-//						(Frame) c, StatInteractiePanelView.this.model, tab,
-//						StatInteractiePanelView.this,
-//						StatInteractiePanelView.this.getLocationOnScreen());
-//					dialog.setVisible(true);
-//				}
-//				else if (c instanceof DialogBox)
-//				{
-//					ChangeViewNameDialog dialog = new ChangeViewNameDialog(
-//						(Dialog) c, StatInteractiePanelView.this.model, tab,
-//						StatInteractiePanelView.this,
-//						StatInteractiePanelView.this.getLocationOnScreen());
-//					dialog.setVisible(true);
-//				}
-//			}
+			if (event.getTouches().length() > 0)
+			{
+				Touch touch = event.getTouches().get(0);
+				
+				startX = touch.getPageX();
+				startY = touch.getPageY();				
+				lastMovedX = startX;
+				lastMovedY = startY;
+				mouseDown = true;
+//				this.setSelected();
+			}
 		}
 
 		@Override
 		public void onTouchMove(TouchMoveEvent event)
 		{
-			GWT.log("StatInteractiePanelView.DragTabHandler.onTouchMove()!");
-			
 			event.preventDefault();
 			event.stopPropagation();
 			
-			if (event.getTouches().length() > 0)
+			if (event.getSource() instanceof Label)
 			{
-				Touch touch = event.getTouches().get(0);
-				
-				this.hasMoved = true;
-				
-//			    int eventX = touch.getPageX() - algebraPijlenGWTCanvas.getAbsoluteLeft();
-//				int eventY = touch.getPageY() - algebraPijlenGWTCanvas.getAbsoluteTop();				
-//			    
-//				lastMoveX = eventX; 
-//				lastMoveY = eventY;
-//				
-//				asv.mouseMoveTouchMoveAction(eventX, eventY);
-				
-				// toon gesleepte view...
-				
-		    }
-			event.preventDefault();
-			event.stopPropagation();
+				Label label = (Label) event.getSource();
+	
+				if (event.getTouches().length() > 0)
+				{
+					Touch touch = event.getTouches().get(0);
+					
+					this.hasMoved = true;
+					
+				    int movedX = touch.getPageX();
+					int movedY = touch.getPageY();	
+					
+//					Window.alert("StatInteractiePanel.DragTabHandler.onTouchMove(): movedX = " + movedX
+//						+ ", movedY = " + movedY + ", lastMovedX = " + lastMovedX + ", lastMovedY = " + lastMovedY);
+
+					// set move cursor
+					RootPanel.getBodyElement().getStyle().setCursor(Cursor.MOVE);
+					label.getElement().getStyle().setCursor(Cursor.MOVE);
+
+					this.lastMovedX = movedX;
+					this.lastMovedY = movedY;
+
+					if (this.isDragged(lastMovedX, lastMovedY))
+					{
+						this.setDraggedOutside(lastMovedX, lastMovedY);
+						label.getElement().getStyle().setCursor(Cursor.POINTER);
+						mouseDown = false;
+					}
+					else
+					{
+//						Window.alert("StatInteractiePanel.DragTabHandler.onTouchMove(): not dragged far enough");
+					}
+			    }
+			}
 		}
 
 		@Override
 		public void onTouchEnd(TouchEndEvent event)
 		{
-			GWT.log("StatInteractiePanelView.DragTabHandler.onTouchEnd()!");
+			// prevent scrolling
+			event.preventDefault();
+			event.stopPropagation();
 			
-			// --------------------->>>>>>>>>>>>>>>>>>>
-			// uit TouchHandler --->
-			// select tab; dit moet als tab niet uit gesleept, maar geselecteerd...!
-//			tabPanel.selectTab(widget);
-//			int viewIndex = getIndexOfViewName(viewName);
-//			setSelectedView(viewIndex);
-//			setSelectedViewInTabPane(viewIndex);
-//			
-//			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-//			for (int i = 0; i < model.getViews().size(); i++)
-//			{
-//				StatistiekView view = model.getViews().get(i);
-//				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-//				{
-//					view.update();
-//				}
-//			}
-//			
-//			if (!this.hasMoved 
-//				&& isLongClick() && StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
-//			{
-//				int x = event.getNativeEvent().getClientX();
-//			    int y = event.getNativeEvent().getClientY();
-//				showTabPopupMenu(x, y);
-//			}
-			// uit <--- TouchHandler
-			// <<<<<<<<<<<<<<<<<<<<<<---------------------
+			mouseDown = false;
 			
-						
-			
-			// uit mouseReleased()... :
-			Touch touch = event.getTouches().get(0);
-			int eventX = touch.getPageX();
-			int eventY = touch.getPageY();
+			// reset cursor to default
+			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 
-			this.inDrag = false;
-			//StatInteractiePanelView.super.setCursor(Cursor.DEFAULT);
-//			GWT.log("Drag finished, dragged from " + this.startPoint
-//				+ " to " + arg0.getPoint());
-//			if (this.dragTabIndex >= 0
-//				&& this.dragTabIndex < StatInteractiePanelView.this.model
-//					.getMainWindowViews().size())
-//			{
-//				 GWT.log("This dragged tab: " + this.dragTab);
-
-				// Test if tab is dragged outside of tabPane
-				if (this.isDraggedOutside(eventX, eventY))
-				{
-					this.setDraggedOutside(eventX, eventY);
-				}
-				else
-				{
-					// tab is not dragged but selected
-					// set the selected tab
-					this.setSelected();
-//					 GWT.log("mouseReleased(): setSelectedTab(draggedTab="
-//					 + this.draggedTab + ")");
-				}
-//			}
+			// reset label cursor to pointer
+			if (event.getSource() instanceof Label)
+			{
+				Label label = (Label) event.getSource();
+				label.getElement().getStyle().setCursor(Cursor.POINTER);
+			}
 		}
 
+		private boolean isContinuousMove(int movedX, int movedY)
+		{
+			boolean isContinuousMove;
+			
+			if ((Math.abs(lastMovedX - movedX) <= 1) && (Math.abs(lastMovedY - movedY) <= 1))
+			{
+				isContinuousMove = true;
+			}
+			else
+			{
+				isContinuousMove = false;
+			}
+
+			return isContinuousMove;
+		}
+		
+		private boolean isContinuousTouchMove(int movedX, int movedY)
+		{
+			boolean isContinuousMove;
+			int minDistance = 5;
+			
+			if ((Math.abs(lastMovedX - movedX) <= minDistance) && (Math.abs(lastMovedY - movedY) <= minDistance))
+			{
+				isContinuousMove = true;
+			}
+			else
+			{
+				isContinuousMove = false;
+			}
+
+			return isContinuousMove;
+		}
+		
+		/**
+		 * Returns true if a drag has been performed over a minimal distance.
+		 * 
+		 * @param movedX
+		 * @param movedY
+		 * @return
+		 */
+		private boolean isDragged(int movedX, int movedY)
+		{
+			boolean isDragged;
+			
+			int minDragDistance = 5;
+			
+//			System.out.println("StatInteractiePanelView.DragTabHandler.isDragged(): Math.abs(startX - movedX) = "
+//				+ Math.abs(startX - movedX) + ", Math.abs(startY - movedY) = " + Math.abs(startY - movedY));
+
+			if ((Math.abs(startX - movedX) > minDragDistance) || (Math.abs(startY - movedY) > minDragDistance))
+			{
+				isDragged = true;
+			}
+			else
+			{
+				isDragged = false;
+			}
+			
+			return isDragged;
+		}
+		
 		private boolean isDraggedOutside(int x, int y)
 		{
 			boolean isDraggedOutside;
@@ -1271,29 +1259,29 @@ public class StatInteractiePanelView extends LayoutPanel
 		public void onMouseDown(MouseDownEvent event)
 		{
 			// prevent scrolling 
+			event.preventDefault();
 			event.stopPropagation();
 			
-			x = event.getClientX();
-			y = event.getClientY();
+			startX = event.getClientX();
+			startY = event.getClientY();
+			lastMovedX = startX;
+			lastMovedY = startY;
 			
 			mouseDown = true;
-			this.setSelected();
-			
-			// test syl
-			//System.out.println("StatInteractiePanelView.DragTabHandler.onMouseDown(): mouseDown = true");
+			//this.setSelected();
 		}
 
 		@Override
 		public void onMouseMove(MouseMoveEvent event)
 		{
 			// prevent scrolling
+			event.preventDefault();
 			event.stopPropagation();
 			
 			if (!mouseDown)
+			{
 				return;
-			
-			// test syl: capturing the mouse to the dragged widget
-			//DOM.setCapture(getElement());
+			}
 			
 			int movedX = event.getClientX();
 			int movedY = event.getClientY();
@@ -1301,85 +1289,56 @@ public class StatInteractiePanelView extends LayoutPanel
 			if (event.getSource() instanceof Label)
 			{
 				Label label = (Label) event.getSource();
-				int w = label.getOffsetWidth();
-				int h = label.getOffsetHeight();
-				int top = label.getAbsoluteTop();
-				int bottom = top + h;
-				int left = label.getAbsoluteLeft();
-				int right = left + w;
+				
+				// check for a real continuous mouse move
+				if (this.isContinuousMove(movedX, movedY))
+				{
+					// set move cursor
+					RootPanel.getBodyElement().getStyle().setCursor(Cursor.MOVE);
+					label.getElement().getStyle().setCursor(Cursor.MOVE);
 
-				//System.out.println("StatInteractiePanelView.DragTabHandler.onMouseMove(): instanceof Label, (" + movedX + ", " + movedY + ")");
+					this.lastMovedX = movedX;
+					this.lastMovedY = movedY;
+				}
+				else
+				{
+					// no continuous move, something is wrong (moved out of the label area and returned at some other point), reset move action
+					this.mouseDown = false;
+					RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
+					label.getElement().getStyle().setCursor(Cursor.POINTER);
+					return;
+				}
 
-				// test syl: alternatief: bij iedere mouseMove drag outside
-				this.setSelected();
-				this.setDraggedOutside(movedX, movedY);
-				mouseDown = false;
-				// test syl
-				//System.out.println("StatInteractiePanelView.DragTabHandler.onMouseMove(): outside! mouseDown = false");
-
-//				if ((movedX == left) || (movedX == right)
-//					|| (movedY == top) || (movedY == bottom))
-//				{
-//					this.setDraggedOutside(movedX, movedY);
-//					mouseDown = false;
-//					
-//					// test syl
-//					System.out.println("StatInteractiePanelView.DragTabHandler.onMouseMove(): outside! mouseDown = false");
-//
-//					// test syl
-//					//DOM.releaseCapture(getElement());
-//				}
-//				else
-//				{
-//					this.setSelected();
-//					//System.out.println("StatInteractiePanelView.DragTabHandler.onMouseMove(): NIET outside, setSelected()");
-//				}
+				//this.setSelected();// is in mouseDown() al gebeurd
+//				System.out.println("StatInteractiePanel.DragTabHandler.onMouseMove(): abs(startX - movedX) = " + Math.abs(startX - movedX)
+//					+ ", abs(startY - movedY) = " + Math.abs(startY - movedY));
+				// a minimum drag distance is required; 
+				// buggy: this will fail if the label is dragged on the border and is moved out of the label area
+				if (this.isDragged(lastMovedX, lastMovedY))
+				{
+					this.setDraggedOutside(lastMovedX, lastMovedY);
+					label.getElement().getStyle().setCursor(Cursor.POINTER);
+					mouseDown = false;
+				}
+				else
+				{
+				}
 			}
 			else
 			{
 				
 			}
-			
-//			if (isDraggedOutside(movedX, movedY))
-//			{
-//				GWT.log("StatInteractiePanelView.DragTabHandler.onMouseMove(): outside!");
-//				this.setDraggedOutside(movedX, movedY);
-//				//this.setDraggedOutside(200, 200);
-//				mouseDown = false;
-//			}
-//			else
-//			{
-//				this.setSelected();
-//			}
-
 		}
 
-		private void setSelected()
-		{
-			// test syl: is onderstaande allemaal nodig?
-			tabPanel.selectTab(widget);
-			// test syl: let op: dit is geen tab index maar de index in views
-			int viewIndex = getIndexOfViewName(viewName);
-			int tabIndex = tabPanel.getWidgetIndex(widget);
-//			setSelectedView(viewIndex);
-//			setSelectedTab(viewIndex);
-			
-			// process the setting of selected tab
-			//StatInteractiePanelView.this.controller.setSelectedTab(this.dragTabIndex);
-//			processSelectedTab(viewIndex);
-			processSelectedTab(tabIndex);
-
-			updateViewIfNecessary(this.viewName);
-			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-//			for (int i = 0; i < model.getViews().size(); i++)
-//			{
-//				StatistiekView view = model.getViews().get(i);
-//				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-//				{
-//					view.update();
-//				}
-//			}
-		}
+//		private void setSelected()
+//		{
+//			tabPanel.selectTab(widget);
+//			int tabIndex = tabPanel.getWidgetIndex(widget);
+//
+//			processSelectedTab(tabIndex);
+//
+//			updateViewIfNecessary(this.viewName);
+//		}
 
 		private void setDraggedOutside(int x, int y)
 		{
@@ -1410,6 +1369,9 @@ public class StatInteractiePanelView extends LayoutPanel
 				}
 			}
 			updateViewIfNecessary(selectedTabViewName);// niet this.viewName, maar de selectedTab
+			
+			// reset cursor to default
+			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 		}
 
 		/**
@@ -1419,18 +1381,21 @@ public class StatInteractiePanelView extends LayoutPanel
 		@Override
 		public void onMouseUp(MouseUpEvent event)
 		{
-			int movedX = event.getX();
-			int movedY = event.getY();
-
 			// prevent scrolling
+			event.preventDefault();
 			event.stopPropagation();
 			
 			mouseDown = false;
-			// test syl
-			//DOM.releaseCapture(getElement());
 			
-//			System.out.println("StatInteractiePanelView.DragTabHandler.onMouseUp()! mouseDown = false, movedX = "
-//				+ movedX + ", movedY = " + movedY);
+			// reset cursor to default
+			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
+
+			// reset label cursor to pointer
+			if (event.getSource() instanceof Label)
+			{
+				Label label = (Label) event.getSource();
+				label.getElement().getStyle().setCursor(Cursor.POINTER);
+			}
 		}
 	} //class DragTabHandler
 	
@@ -1468,7 +1433,9 @@ public class StatInteractiePanelView extends LayoutPanel
 			e.stopPropagation();
 			
 			if (!mouseDown)
+			{
 				return;
+			}
 
 			int eventX = e.getX();
 			int eventY = e.getY();
@@ -1499,7 +1466,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	 * @author Sylvia van Borkulo
 	 *
 	 */
-	class TouchHandler implements TouchStartHandler, TouchEndHandler
+	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		private Widget widget;
 		private String viewName;
@@ -1528,26 +1495,12 @@ public class StatInteractiePanelView extends LayoutPanel
 			event.preventDefault();
 			event.stopPropagation();
 			
-			if (event.getTouches().length() > 0)
-			{
-				Touch touch = event.getTouches().get(0);
+//			if (event.getTouches().length() > 0)
+//			{
+//				Touch touch = event.getTouches().get(0);
 				
 				this.hasMoved = true;
-				
-//			    int eventX = touch.getPageX() - algebraPijlenGWTCanvas.getAbsoluteLeft();
-//				int eventY = touch.getPageY() - algebraPijlenGWTCanvas.getAbsoluteTop();				
-//			    
-//				lastMoveX = eventX; 
-//				lastMoveY = eventY;
-//				
-//				asv.mouseMoveTouchMoveAction(eventX, eventY);
-				
-				// toon gesleepte view...
-				
-		    }
-			event.preventDefault();
-			event.stopPropagation();
-			
+//		    }
 		}
 
 		public void onTouchEnd(TouchEndEvent event)
@@ -1750,7 +1703,10 @@ public class StatInteractiePanelView extends LayoutPanel
 		{
 			track = false;
 			if (handle != null)
+			{
 				handle.cancel();
+			}
+			
 			handle = null;
 			box.onMouseMove(box.getCaption().asWidget(), x, y);
 			box.onMouseUp(box.getCaption().asWidget(), x, y);
@@ -1763,6 +1719,8 @@ public class StatInteractiePanelView extends LayoutPanel
 		public void onTouchMove(TouchMoveEvent event)
 		{
 			getXY(event);
+			event.stopPropagation();
+			event.preventDefault();
 			// box.onMouseMove(box.getCaption().asWidget(), x, y);
 			// logger.info("touch move " + x + "," + y);
 		}
@@ -1771,13 +1729,16 @@ public class StatInteractiePanelView extends LayoutPanel
 		{
 			x = event.getTouches().get(0).getRelativeX(box.getElement());
 			y = event.getTouches().get(0).getRelativeY(box.getElement());
-			event.stopPropagation();
-			event.preventDefault();
+//			event.stopPropagation();
+//			event.preventDefault();
 		}
 
 		@Override
 		public void onTouchStart(TouchStartEvent event)
 		{
+//			Window.alert("StatInteractiePanel.DragOnTouch.onTouchStart(): event.source() = "
+//				+ event.getSource());
+			
 			getXY(event);
 			box.onMouseDown(box.getCaption().asWidget(), x, y);
 			track = true;
@@ -1905,8 +1866,14 @@ public class StatInteractiePanelView extends LayoutPanel
 	    
 	    label.addDomHandler(new LabelClickHandler(widget, title), ContextMenuEvent.getType());
 	    label.addClickHandler(new LabelClickHandler(widget, title)); // to handle click to set focus
+	    
+	    // add touch handler for tap & hold contextmenu
+	    TouchHandler touchHandler = new TouchHandler(widget, title);
+	    label.addTouchStartHandler(touchHandler);
+	    label.addTouchMoveHandler(touchHandler);
+	    label.addTouchEndHandler(touchHandler);
 
-	    // make the tab draggable
+	    // make the tab draggable, with mouse and touch
 	    DragTabHandler handler = new DragTabHandler(widget, title);
 	    label.addMouseDownHandler(handler);
 	    label.addMouseMoveHandler(handler);
@@ -2096,5 +2063,11 @@ public class StatInteractiePanelView extends LayoutPanel
 	public void setHeight(int height)
 	{
 		this.tabPanel.setHeight(height);
+	}
+
+	public void updateView(int index)
+	{
+		StatistiekView view = model.getViews().get(index);
+		view.update();
 	}
 }
