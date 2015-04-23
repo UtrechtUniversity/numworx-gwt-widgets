@@ -1,6 +1,10 @@
 package fi.statistiekgwt.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 
@@ -13,4 +17,32 @@ import com.google.gwt.event.shared.SimpleEventBus;
 public class StatistiekUtils
 {
 	public static EventBus EVENT_BUS = GWT.create(SimpleEventBus.class);
+	
+	/**
+	 * Dummy touch handler to avoid that the DragOnTouch handler of an external view
+	 * will prevent click events on stattable. Implements touchstart and touchend handling.
+	 * 
+	 * @author Sylvia van Borkulo
+	 *
+	 */
+	public static class DummyTouchHandler implements TouchStartHandler, TouchEndHandler
+	{
+		@Override
+		public void onTouchStart(TouchStartEvent event)
+		{
+			event.stopPropagation();
+		}
+
+		@Override
+		public void onTouchEnd(TouchEndEvent event)
+		{
+			event.stopPropagation();
+		}
+	}
+	
+	public static DummyTouchHandler getDummyTouchHandler()
+	{
+		return new DummyTouchHandler();
+	}
 }
+
