@@ -389,9 +389,13 @@ public class ColumnDialogModel implements HasHandlers// extends Observable
             {
             	// check for wildcard among the strings
             	if (s1.equals(ColumnType.WILDCARD))
+            	{
             		return 1;
+            	}
             	else if (s2.equals(ColumnType.WILDCARD))
+            	{
             		return -1;
+            	}
             	else 
             	{
             		// apart from '*' sort the enum options alphabetically
@@ -430,8 +434,10 @@ public class ColumnDialogModel implements HasHandlers// extends Observable
 //		if ((this.enumOptions == null) || this.enumOptions.size() == 0)
 //			isValid = false;
 //		else 
-			if ((index > -1) && (index < this.enumOptions.size()))
+		if ((index > -1) && (index < this.enumOptions.size()))
+		{
 			isValid = true;
+		}
 		
 		return isValid;
 	}
