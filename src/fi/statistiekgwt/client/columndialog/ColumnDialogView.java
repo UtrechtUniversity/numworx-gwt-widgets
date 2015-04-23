@@ -32,11 +32,13 @@ import fi.statistiekgwt.client.types.ColumnType;
 /**
  * View for add column dialog
  * 
- * @author Manu Drijvers
+ * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
 public class ColumnDialogView extends DialogBox// implements Observer
 {
+	private static final int MAXIMUM_VISIBLE_IN_ENUM_LIST = 7;
+
 	private ColumnDialogModel model;
 
 	private FlowPanel alles;
@@ -340,13 +342,21 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		AllowedTypes type = null;
 		
 		if (typeString.equals(StatistiekGWT.rb.getString("integer")))
+		{
 			type = AllowedTypes.INTEGER;
+		}
 		else if (typeString.equals(StatistiekGWT.rb.getString("double")))
+		{
 			type = AllowedTypes.DOUBLE;
+		}
 		else if (typeString.equals(StatistiekGWT.rb.getString("string")))
+		{
 			type = AllowedTypes.STRING;
+		}
 		else if (typeString.equals(StatistiekGWT.rb.getString("enum")))
+		{
 			type = AllowedTypes.ENUM;
+		}
 			
 		return type;
 	}
@@ -497,7 +507,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 			this.enumElementsList.addItem(list.get(i));
 		}
 		
-		this.enumElementsList.setVisibleItemCount(Math.min(list.size(), 7));
+		this.enumElementsList.setVisibleItemCount(Math.min(list.size(), ColumnDialogView.MAXIMUM_VISIBLE_IN_ENUM_LIST));
 	}
 
 	/**
@@ -508,19 +518,28 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	{
 		String typeString = "";
 		if (type.equals(AllowedTypes.INTEGER))
+		{
 			typeString = StatistiekGWT.rb.getString("integer");
+		}
 		else if (type.equals(AllowedTypes.DOUBLE))
+		{
 			typeString = StatistiekGWT.rb.getString("double");
+		}
 		else if (type.equals(AllowedTypes.STRING))
+		{
 			typeString = StatistiekGWT.rb.getString("string");
+		}
 		else if (type.equals(AllowedTypes.ENUM))
+		{
 			typeString = StatistiekGWT.rb.getString("enum");
+		}
 
 		// find the index of type
 		int indexToFind = -1;
 		for (int i=0; i < this.typeBox.getItemCount(); i++) 
 		{
-		    if (this.typeBox.getItemText(i).equals(typeString)) {
+		    if (this.typeBox.getItemText(i).equals(typeString)) 
+		    {
 		        indexToFind = i;
 		        break;
 		    }
@@ -611,9 +630,13 @@ public class ColumnDialogView extends DialogBox// implements Observer
             {
             	// check for wildcard among the strings
             	if (s1.equals(ColumnType.WILDCARD))
+            	{
             		return 1;
+            	}
             	else if (s2.equals(ColumnType.WILDCARD))
+            	{
             		return -1;
+            	}
             	else 
             	{
             		// apart from '*' sort the enum options alphabetically
@@ -650,7 +673,9 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		boolean isValid = false;
 		
 		if ((index > -1) && (index < this.stringOptions.size()))
+		{
 			isValid = true;
+		}
 		
 		return isValid;
 	}
