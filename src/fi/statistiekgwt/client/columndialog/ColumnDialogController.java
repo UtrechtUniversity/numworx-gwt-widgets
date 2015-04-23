@@ -282,7 +282,9 @@ public class ColumnDialogController
 				// remove handler statTableModel from ColumnDialogModel
 				HandlerRegistration registration = ColumnDialogController.this.getHandlerRegistration(); 
 				if (registration != null) // null in case of column info mode
+				{
 					registration.removeHandler();
+				}
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getCancelButton())
 			{
