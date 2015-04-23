@@ -17,10 +17,12 @@ import fi.statistiekgwt.client.text.Text_nl;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.CssResource.ClassName;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -44,7 +46,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public static NumberFormat nf = NumberFormat.getDecimalFormat(); // number format for the default locale
 
 	public static String fontString = "12px sans-serif";
-	public static String fontBoldString = "12px sans-serif bold";;
+	public static String fontBoldString = "12px sans-serif bold";
 	public static int scrollSpeedUnit = 16;
 	public static CssColor backgroundColor = CssColor.make(255, 255, 255);
 
@@ -85,6 +87,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public void onModuleLoad()
 	{
+		GWT.setUncaughtExceptionHandler(
+			new GWT.UncaughtExceptionHandler() {
+		        public void onUncaughtException(Throwable e) 
+		        {
+		        	Window.alert("UncaughtException: message = " + e.getMessage() + ", stackTrace = " + e.getStackTrace().toString()
+		        		+ ", cause = " + e.getCause());
+		        }
+		    });
+		
 		StatistiekGWT.language = "nl";
 		
 		initViews();
@@ -251,21 +262,31 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
 	
-		if(map != null)
+		if (map != null)
 		{
 			if (map.containsKey("breedte"))
+			{
 				breedte = map.getInt("breedte");
+			}
 			if (map.containsKey("hoogte"))
+			{
 				hoogte = map.getInt("hoogte");
+			}
 			if (map.containsKey("volledigeBreedte"))
+			{
 				volledigeBreedte = map.getBoolean("volledigeBreedte");
+			}
 		}
 
 		if (volledigeBreedte)
+		{
 			breedte = volleBreedte;
+		}
 	
 		if (h != null && h.get("interactiePanelLaunchState") != null)
+		{
 			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+		}
 
 		//alle gegevens uit launchState halen: 
 		init(breedte, hoogte, launchState, randomVarWaarden);
@@ -429,20 +450,40 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			b = (int) b;
 		}
 		
-		int e;
+		int eValue;
 		if (noBins == 1)
 		{
-			e = (int) Math.ceil(Math.log10(b));
+			eValue = (int) Math.ceil(Math.log10(b));
 		}
 		else
 		{
-			e = (int) Math.floor(Math.log10(b));
+			eValue = (int) Math.floor(Math.log10(b));
 		}
 
-		double step = Math.ceil(b * Math.pow(10, -e)) * Math.pow(10, e);
+		// test syl
+//		boolean isInfinite = Double.isInfinite(eValue);
+//		double firstTerm = Math.ceil(b * Math.pow((double) 10, -eValue));
+////		double pow = Math.pow((double) 10, (double) -e); // in gecompileerde versie geeft dit geen 0, maar infinity
+//		double pow = Math.pow(10.0, (double) -eValue); // in gecompileerde versie geeft dit geen 0, maar infinity
+//		double secondTerm = Math.pow((double) 10, (double) eValue);
+
+//		Window.alert("apprBoundaries(" + min + "," + max + "," + noBins
+//			+ "): b = " + b + ", e = " + eValue + ", pow = " + pow
+//			+ ", firstTerm = " + firstTerm
+//			+ ", secondTerm = " + secondTerm 
+//			+ ", isInfinite = " + isInfinite);
+		
+		double step = Math.ceil(b * Math.pow(10, -eValue)) * Math.pow(10, eValue);
+		
+		if (Double.isNaN(step))
+		{
+			step = 0;
+		}
 		
 		if (step == 0)
+		{
 			step++;
+		}
 
 		// System.out.println("e = " + e);
 		// System.out.println("step = " + step);
@@ -486,6 +527,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		{
 			double d = start + (double) i * step;
 			d = round(d, numberOfDecimals);
+
 			boundaries.add(d);
 		}
 		return boundaries;
@@ -516,11 +558,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		if ((binWidth <= 0) 
 			|| ((binWidth > 1) && (binWidth > 2 * (max - min))) 
 			|| (binWidth < (max - min)/50))
+		{
 			return null;
+		}
 		
 		if ((minBoundary > min) 
 			|| (minBoundary < (min - 1 - 0.5 * max))) // minus 1 to avoid problems in case of small and negative values of min and max
+		{
 			return null;
+		}
 		
 		// calculate decimal bin boundaries smaller than 1 
 		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
@@ -584,7 +630,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		
 		if (binWidth == 0)
+		{
 			binWidth++;
+		}
 		
 		// The maximum bin boundary should be larger than the maximum value
 		// so (max + 1) to determine the number of bins
@@ -679,7 +727,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		boolean divisible = false;
 		
 		if ((int) step % factor == 0)
+		{
 			divisible = true;
+		}
 		
 		return divisible;
 	}
@@ -702,7 +752,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 //		
 //		number = number / (Math.pow(10, decimals));
 
-	    if (decimals < 0) throw new IllegalArgumentException();
+	    if (decimals < 0)
+	    {
+	    	throw new IllegalArgumentException();
+	    }
+	    if (Double.isNaN(number) || Double.isInfinite(number))
+	    {
+	    	return 0;
+	    }
 
 	    BigDecimal bd = new BigDecimal(number);
 	    bd = bd.setScale(decimals, RoundingMode.HALF_UP);
@@ -724,7 +781,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		String s;
 		if ((d == Math.floor(d)) && !Double.isInfinite(d))
+		{
 			s = String.valueOf((int) d);
+		}
 		else
 		{
 			NumberFormat numberFormat = StatistiekGWT.getNumberFormat(d);
@@ -758,25 +817,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		return s;
 	}
-	
-//	/**
-//	 * Get the string value of double. If the value is an integer value
-//	 * a string is returned without decimals.
-//	 * @param d The double value
-//	 * @return The string value
-//	 */
-//	public static String getStringValue(double d)
-//	{
-//		String s;
-//		if ((d == Math.floor(d)) && !Double.isInfinite(d))
-//			s = String.valueOf((int) d);
-//		else
-//			s = String.valueOf(d);
-//		
-//		return s;
-//	}
-
-
 	
 	/**
 	 * Get the string value of double. If the value is an integer value
@@ -820,17 +860,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		String value = String.valueOf(d);
 		int numberOfDecimals = StatistiekGWT.getNumberOfDecimals(value);
-//		String separator;
-//		
-//		if (StatistiekGWT.language.equals("nl"))
-//			separator = ",";
-//		else
-//			separator = ".";
-
 		String pattern = "0";
 		
 		if (numberOfDecimals > 0)
+		{
 			pattern = pattern + ".";
+		}
+		
 		for (int i = 0; i < numberOfDecimals; i++)
 		{
 			pattern = pattern + "#"; 
@@ -940,7 +976,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			int numberOfDecimals = StatistiekGWT.getNumberOfDecimals(binValueString);
 			
 			if (numberOfDecimals > maxNumberOfDecimals)
+			{
 				maxNumberOfDecimals = numberOfDecimals;
+			}
 		}
 
 		// get format with numberOfDecimals
@@ -960,7 +998,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		formattedValueString = nf.format(d.doubleValue());
 		
 		if (separator.equals(","))
+		{
 			formattedValueString = formattedValueString.replace('.', ',');
+		}
 		
 		return formattedValueString;
 	}
