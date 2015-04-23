@@ -387,7 +387,9 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 	{
 		Widget lastTab = getLastTab();
 		if (lastTab == null)
+		{
 			return;
+		}
 
 		int newLeft = getCurrentShift() + diff;
 		int rightOfLastTab = getRightPosition(lastTab);
@@ -474,7 +476,9 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 	private Widget getLastTab()
 	{
 		if (tabBar.getWidgetCount() == 0)
+		{
 			return null;
+		}
 
 		return tabBar.getWidget(tabBar.getWidgetCount() - 1);
 	}
@@ -490,7 +494,9 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 	private static int parsePosition(String positionString)
 	{
 		if (positionString == null || positionString.isEmpty())
+		{
 			return 0;
+		}
 
 		int position = 0;
 		int sign = 1;
@@ -504,7 +510,9 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 		{
 			char c = positionString.charAt(i);
 			if (c < '0' || c > '9')
+			{
 				break;
+			}
 			position = 10 * position + c - '0';
 		}
 
@@ -588,7 +596,9 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 						// fire the click event of the label so that StatInteractiePanelView$LabelClickHandler.onClick() is executed 
 						// and a table gets updated (else an empty datagrid will be shown)
 						if (label != null)
+						{
 							label.fireEvent(new ClickEvent() {}); // programmatically click the label
+						}
 						hide();
 					}
 				});
