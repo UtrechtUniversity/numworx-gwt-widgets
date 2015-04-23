@@ -89,9 +89,13 @@ public class AllowedTypes implements Serializable
 			{
 				String a = (String) o;
 				if (!a.equals(""))
+				{
 					return true;
+				}
 				else
+				{
 					return false;
+				}
 			}
 			catch (ClassCastException e)
 			{
