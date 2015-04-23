@@ -55,7 +55,7 @@ public class ColumnType implements Serializable
 	{
 		if (type.equals(AllowedTypes.ENUM))
 		{
-			System.out.println("Enum zonder opties!");
+			//System.out.println("Enum zonder opties!");
 		}
 		this.type = type;
 	}
@@ -86,7 +86,7 @@ public class ColumnType implements Serializable
 	{
 		if (type.equals(AllowedTypes.ENUM))
 		{
-			System.out.println("Enum zonder opties!");
+			//System.out.println("Enum zonder opties!");
 		}
 		this.type = type;
 		this.uitleg = uitleg;
@@ -112,26 +112,6 @@ public class ColumnType implements Serializable
 		}
 		this.uitleg = uitleg;
 	}
-
-	/**
-	 * Constructor die een AddColumnDialogModel krijgt, dus de informatie uit de
-	 * "maak een nieuwe kolom" dialog
-	 * 
-	 * @param dialogModel
-	 *            Het model uit de AddColumnDialog
-	 */
-//	public ColumnType(AddColumnDialogModel dialogModel)
-//	{
-//		this.type = dialogModel.getType();
-//		if (this.type.equals(AllowedTypes.ENUM))
-//		{
-//			this.enumOptions = new String[dialogModel.getEnumOptions().size()];
-//			this.enumOptions = dialogModel.getEnumOptions().toArray(
-//				this.enumOptions);
-//		}
-//
-//		this.uitleg = dialogModel.getUitleg();
-//	}
 
 	/**
 	 * @return Het AllowedType van deze kolom
@@ -307,9 +287,13 @@ public class ColumnType implements Serializable
             {
             	// check for wildcard among the strings
             	if (s1.equals(ColumnType.WILDCARD))
+            	{
             		return 1;
+            	}
             	else if (s2.equals(ColumnType.WILDCARD))
+            	{
             		return -1;
+            	}
             	else 
             	{
             		// apart from '*' don't sort the enum options
@@ -352,9 +336,13 @@ public class ColumnType implements Serializable
             {
             	// check for wildcard among the strings
             	if (s1.equals(ColumnType.WILDCARD))
+            	{
             		return 1;
+            	}
             	else if (s2.equals(ColumnType.WILDCARD))
+            	{
             		return -1;
+            	}
             	else 
             	{
             		// apart from '*' sort the enum options alphabetically
@@ -391,7 +379,9 @@ public class ColumnType implements Serializable
 		result.put("type", this.type.toString());
 		result.put("uitleg", this.uitleg != null ? this.uitleg : "");
 		if (enumOptions != null)
+		{
 			result.put("enumOptions", this.enumOptions);
+		}
 		else
 		{
 			this.enumOptions = new String[1];
