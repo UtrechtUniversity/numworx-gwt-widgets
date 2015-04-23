@@ -85,6 +85,7 @@ public class Text_nl
 		{ "pasteclipboardButton", "Plak vanaf klembord" },
 		{ "pasteclipboardDialog", "Plak vanaf klembord" },
 		{ "pasteclipboardMessage", "Plak de data in het tekstvak en klik op " },
+		{ "pasteclipboardMessage2", "Scheid de waarden met ';' of tab. Zet iedere rij op een nieuwe regel met 'Enter'." },
 		{ "importPastedDataButton", "Importeer" },
 		{ "importPastedDataFailMessage", "De data heeft niet het goede formaat." },
 		{ "resetButton", "Reset" },
