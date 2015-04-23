@@ -199,13 +199,21 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				String typeString = (String) columnTypeMap.get("type");
 				AllowedTypes allowedType = null;
 				if (typeString.equals(AllowedTypes.INTEGER.toString()))
+				{
 					allowedType = AllowedTypes.INTEGER;
+				}
 				else if (typeString.equals(AllowedTypes.DOUBLE.toString()))
+				{
 					allowedType = AllowedTypes.DOUBLE;
+				}
 				else if (typeString.equals(AllowedTypes.ENUM.toString()))
+				{
 					allowedType = AllowedTypes.ENUM;
+				}
 				else if (typeString.equals(AllowedTypes.STRING.toString()))
+				{
 					allowedType = AllowedTypes.STRING;
+				}
 					
 				ColumnType type = new ColumnType(
 					allowedType, 
@@ -218,27 +226,6 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			this.setHTML5Ready(false);
 			return; // if not HTML5 ready there is no use to proceed
-			
-			// workaround for setting columnClass in html5 if there is no columnClassMapped 
-			// make all columntypes string
-//			if (map.containsKey("columnClass"))
-//			{
-//				ObjectList list = map.getObjectList("columnClass");
-//				int aantalKolommen = list.size();
-//				GWT.log("columnClass bevat GEEN ColumnTypes! Aantal = " + aantalKolommen);
-//				
-//				this.columnClass = new ArrayList<ColumnType>();
-//				String[] enumOptions = new String[0];
-//				String uitleg = "";
-//				for (int i = 0; i < aantalKolommen; i++)
-//				{
-//					ColumnType type = new ColumnType(
-//						AllowedTypes.STRING, 
-//						enumOptions, 
-//						uitleg);
-//					this.columnClass.add(type);
-//				}
-//			}
 		}
 		if (map.containsKey("values"))
 		{
@@ -340,16 +327,6 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.selectionHandlers.add(sh);
 	}
 
-//	private void fireSelectionChanged()
-//	{
-//		// System.out.println("Firing changed update");
-//		for (SelectionHandler<Object> sh : this.selectionHandlers)
-//		{
-//			// System.out.println("fire");
-//			//sh.onSelection(SelectionEvent<Object>);
-//		}
-//	}
-
 	/**
 	 * This method is used by JTable, always returns string so JTable will treat
 	 * all data as strings.
@@ -401,9 +378,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public ArrayList<String> getStringOptions(int column)
 	{
 		if (this.stringOptions.size() != 0)
+		{
 			return this.stringOptions.get(column);
+		}
 		else
+		{
 			return new ArrayList<String>();
+		}
 	}
 
 	public boolean isColumnIndexValid(int columnIndex)
@@ -1121,12 +1102,6 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			this.columnCount--;
 			
-			// Als je een kolom verwijdert, heeft dit mogelijk invloed op de bestaande 
-			// views. Als column < columnindex van view dan 
-			// columnindex - 1 voor ViewModel van alle views!
-			// als column == columnindex, dan verwijder view? of toon leeg
-			this.updateColumnIndexInViews(columnIndex);
-
 			// send an event
 			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_COLUMN, columnIndex);
 			this.fireEvent(event);
@@ -1348,7 +1323,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	private void threeWayQuickSort(int columnIndex, int p, int r)
 	{
-		if (r <= p) return;
+		if (r <= p)
+		{
+			return;
+		}
 		
 		ColumnType cType = this.columnClass.get(columnIndex);
 		int lt = p;
@@ -1662,9 +1640,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 		}
 		if (count > 0)
+		{
 			return sum/count;
+		}
 		else
+		{
 			return 0;
+		}
 	}	
 
 	/**
@@ -1704,9 +1686,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				}
 			}
 			if (count > 0)
+			{
 				meanString = StatistiekGWT.getStringValue(sum/count);
+			}
 			else
+			{
 				meanString = StatistiekGWT.rb.getString("notAvailable");
+			}
 		}
 		
 		return meanString;
@@ -1743,9 +1729,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 		}
 		if (count > 0)
+		{
 			return Math.sqrt(sum/count);
+		}
 		else
+		{
 			return 0;
+		}
 	}	
 
 	/**
@@ -1782,10 +1772,15 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				}
 			}
 		}
+		
 		if (count > 0)
+		{
 			return Math.sqrt(sum/count);
+		}
 		else
+		{
 			return 0;
+		}
 	}	
 
 	/**
@@ -1999,9 +1994,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		
 		if (multipleModes)
+		{
 			return StatistiekGWT.rb.getString("notAvailable");
+		}
 		else
+		{
 			return mode;
+		}
 	}	
 
 	/**
@@ -2093,9 +2092,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		
 		if (multipleModes)
+		{
 			return StatistiekGWT.rb.getString("notAvailable");
+		}
 		else
+		{
 			return mode;
+		}
 	}	
 
 	/**
@@ -2280,6 +2283,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public int[][] numberClassFrequency(ArrayList<Double> binBoundaries,
 		int columnIndex, SplitOptions splitOptions)
 	{
+		if (columnIndex == -1)
+		{
+			return null;
+		}
+		
 		// check if the column type is a number
 		ColumnType cType = this.getColumnTypes().get(columnIndex);
 		if (cType.getType().isNumber())
@@ -2350,6 +2358,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public FrequencyTuple[][] enumClassFrequency(int columnIndex,
 		SplitOptions splitOptions)
 	{
+		if (columnIndex == -1)
+		{
+			return null;
+		}
+		
 		ColumnType cType = this.getColumnTypes().get(columnIndex);
 		if (cType.getType().equals(AllowedTypes.STRING)
 			|| cType.getType().equals(AllowedTypes.ENUM))
