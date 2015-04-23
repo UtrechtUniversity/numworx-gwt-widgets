@@ -9,8 +9,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 
-public class DialogButton extends Button implements HasClickHandlers// implements ActionListener,
-											// ComponentListener
+public class DialogButton extends Button implements HasClickHandlers
 {
 	private DialogBox dialog;
 	private FlowPanel content;
@@ -65,30 +64,6 @@ public class DialogButton extends Button implements HasClickHandlers// implement
 		// System.out.println("DialogButton.closeDialog()");
 		dialog.hide();
 	}
-
-/*	public void componentResized(ComponentEvent e)
-	{
-		// System.out.println("DialogButton.componentResized(): e.getSource=" +
-		// e.getSource());
-		if (e.getSource() == content)
-		{
-			this.preferredWidth = content.getOffsetWidth();
-			this.preferredHeight = content.getOffsetHeight();
-			// test syl
-			if (dialog != null)
-			{
-				// System.out.println("DialogButton.componentResized() dialog != null, e="
-				// + e.toString());
-				dialog.setPixelSize(preferredWidth, preferredHeight);
-			}
-			else
-			{
-				// System.out.println("DialogButton.componentResized() dialog is null, e="
-				// + e.toString());
-			}
-		}
-	}
-*/
 
 	public HandlerRegistration addClickHandler(ClickHandler handler)
     {
