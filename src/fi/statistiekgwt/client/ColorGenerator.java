@@ -2,9 +2,11 @@ package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.user.client.Window;
 
 /**
  * @author Sylvia van Borkulo
@@ -30,8 +32,9 @@ public class ColorGenerator
 	public static final CssColor SELECTION_COLOR = CssColor.make(192,192,192); // darker light grey
 	public static final CssColor BUTTON_TEXT_GREY = CssColor.make(82, 82, 82); // dark grey
 	
-	private static ArrayList<CssColor> colorList = 
-		new ArrayList<CssColor>(Arrays.asList(COLORS));
+	private static List<String> colorList = 
+		//new ArrayList<CssColor>(Arrays.asList(COLORS));
+		ColorGenerator.initializeColorList();
 	
 	private static Random random = new Random();
 
@@ -46,15 +49,27 @@ public class ColorGenerator
 	{
 		if (number < colorList.size())
 		{
-			return colorList.get(number);
+			return CssColor.make(colorList.get(number));
 		}
 		else
 		{
 			CssColor c = CssColor.make(random.nextInt(256),
 				random.nextInt(256), random.nextInt(256));
-			colorList.add(c);
+			colorList.add(c.value());
 			return c;
 		}
+	}
+
+	private static ArrayList<String> initializeColorList()
+	{
+		ArrayList<String> list = new ArrayList<String>();
+		
+		for (int i = 0; i < COLORS.length; i++) 
+		{
+			list.add(COLORS[i].value());
+		}
+		
+		return list;
 	}
 
 	/**
@@ -66,7 +81,7 @@ public class ColorGenerator
 	{
 		CssColor c = CssColor.make(random.nextInt(256),
 			random.nextInt(256), random.nextInt(256));
-		colorList.add(c);
+		colorList.add(c.value());
 		return c;
 	}
 	
