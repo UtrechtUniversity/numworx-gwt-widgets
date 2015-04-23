@@ -14,12 +14,15 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -39,6 +42,7 @@ import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
+import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -60,7 +64,6 @@ import fi.statistiekgwt.client.types.ColumnType;
  *
  */
 public class HistogramView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
-//, UpdateViewEventHandler//implements Observer  
 {
 	private HistogramModel model;
 	private HistogramController controller;
@@ -99,6 +102,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	private int width;
 	private int height;
 	
+	/**
+	 * Dummy touch handler that stops propagation. Used to avoid that an external view 
+	 * in dragontouch dialogbox prevents default touch events, i.e., click events. 
+	 */
+	DummyTouchHandler dummyTouchHandler;
 	/**
 	 * The event bus to send events to event handlers associated 
 	 * with the views using StatTableModel.
@@ -145,6 +153,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.model = model;
 		this.controller = controller;
 		
+		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 		
 		// bind histogramview to stattablemodel: to handle table changes in stattablemodel
@@ -198,6 +207,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.add(this.alles);
 		
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
+		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
+		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
 	}
 
 	/**
@@ -1641,7 +1652,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		// use amountScale to paint the correct bar length
 		amountScale = availableSpace/max;
 
-		ArrayList<CssColor> splitColors = new ArrayList<CssColor>();
+		ArrayList<String> splitColors = new ArrayList<String>();
 		ArrayList<String> splitLabels = new ArrayList<String>();
 
 		if (this.model.isSplitInSingleView()
@@ -1659,7 +1670,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					int splitFreq[] = allFrequencies[split];
 					this.lastPolygonPoint = null;
 					CssColor c = this.getColor(split);
-					splitColors.add(c);
+					splitColors.add(c.value());
 					splitLabels.add(this.model.getSplitOptions()
 						.getSplitClassLabel(splitClass,
 							this.model.getStatTableModel()));
@@ -1715,7 +1726,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						
 						int[] splitFreq = allFrequencies[split];
 						CssColor c = this.getColor(split);
-						splitColors.add(c);
+						splitColors.add(c.value());
 						splitLabels.add(this.model.getSplitOptions()
 							.getSplitClassLabel(splitClass,
 								this.model.getStatTableModel()));
@@ -1750,7 +1761,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					{
 						int[] splitFreq = allFrequencies[split];
 						CssColor c = this.getColor(split);
-						splitColors.add(c);
+						splitColors.add(c.value());
 						splitLabels.add(this.model.getSplitOptions()
 							.getSplitClassLabel(splitClass,
 								this.model.getStatTableModel()));
@@ -1816,7 +1827,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					// split in multiple views
 					CssColor c = this.getColor(splitClass);
-					splitColors.add(c);
+					splitColors.add(c.value());
 					splitLabels.add(this.model.getSplitOptions()
 						.getSplitClassLabel(splitClass,
 							this.model.getStatTableModel()));
@@ -2186,16 +2197,16 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			{
 				switch (base)
 				{
-				case 1:
-					base = 2;
-					break;
-				case 2:
-					base = 5;
-					break;
-				case 5:
-					base = 1;
-					exp++;
-					break;
+					case 1:
+						base = 2;
+						break;
+					case 2:
+						base = 5;
+						break;
+					case 5:
+						base = 1;
+						exp++;
+						break;
 				}
 				step = (int) (base * Math.pow(10, exp));
 			}
@@ -3015,6 +3026,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			.isViewsEditable());
 
 		this.updateColorLegend();
+
 		this.setMainPanelSize();
 
 		this.userOptionsPanel.update();
@@ -3033,20 +3045,25 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		
 		int splitClasses = this.model.getStatTableModel().splitVarClasses(
 			this.model.getSplitOptions());
+		
 		if (splitClasses > 1 && this.model.isSplitInSingleView())
 		{
 			this.colorLegend.setColumnString(this.model.getStatTableModel()
 				.getColumnName(
 					this.model.getSplitOptions().getColumnSplitIndex()));
 			ArrayList<String> splitStrings = new ArrayList<String>(splitClasses);
-			ArrayList<CssColor> splitColors = new ArrayList<CssColor>(splitClasses);
+			ArrayList<String> splitColors = new ArrayList<String>(splitClasses);
+
 			for (int i = 0; i < splitClasses; i++)
 			{
 				splitStrings.add(this.model.getSplitOptions()
 					.getSplitClassLabel(i, this.model.getStatTableModel()));
-				splitColors.add(this.getColor(i));
+
+				splitColors.add(this.getColor(i).value());
 			}
+			
 			this.colorLegend.setColors(splitStrings, splitColors);
+
 			if (!this.colorLegend.isVisible())
 			{
 				this.colorLegend.setVisible(true);
@@ -3063,8 +3080,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// bij geen split of split in 1 view geen colorlegend tonen
 			if (this.colorLegend.isVisible())
 			{
-				//System.out.println("HistogramView.updateColorLegend(): colorLegend.isVisible() en nu FALSE");
-
 				this.colorLegend.setVisible(false);
 				this.alles.setWidgetHidden(this.colorLegend, true);
 				visibilityHasChanged = true;
@@ -3104,6 +3119,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			mouseMoveHandler = new HistogramBarMouseMoveHandler(); 
 			this.canvas.addMouseMoveHandler(mouseMoveHandler);
 			this.canvas.addClickHandler(new BarClickHandler());
+			this.canvas.addDomHandler(dummyTouchHandler, TouchStartEvent.getType());
+			this.canvas.addDomHandler(dummyTouchHandler, TouchEndEvent.getType());
 			this.context = canvas.getContext2d();
 		}
 		
@@ -3850,14 +3867,14 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					// verwijderde waarde kan bins veranderen:
 					// bins opnieuw berekenen
-					this.recalculateBinBoundaries(event.getColumnIndex(), typeHasChanged);
+					this.recalculateBinBoundaries(typeHasChanged);
 
 					if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
 					{
 						// er is een split
 						
 						// split bins opnieuw berekenen
-						this.recalculateSplitBinBoundaries(event.getColumnIndex());
+						this.recalculateSplitBinBoundaries();
 					}
 				}
 				else if (event.getInfo().equals(TableChangeEvent.SET_VALUE_AT)
@@ -3866,13 +3883,17 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					if (event.getColumnIndex() == this.model.getColumnIndex())
 					{
 						// bins opnieuw berekenen
-						this.recalculateBinBoundaries(event.getColumnIndex(), typeHasChanged);
+						this.recalculateBinBoundaries(typeHasChanged);
 					}
 					else if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
 					{
 						// split bins opnieuw berekenen
-						this.recalculateSplitBinBoundaries(event.getColumnIndex());
+						this.recalculateSplitBinBoundaries();
 					}
+				}
+				else if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
+				{
+					this.model.updateColumnIndex(event.getColumnIndex());
 				}
 				
 				// update both view and user options panel
@@ -3882,16 +3903,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 	
 	/**
-	 * Recalculate the bin boundaries for column with columnIndex
+	 * Recalculate the bin boundaries for histogram's columnIndex
 	 * if possible.
 	 * 
-	 * @param columnIndex
-	 * 		The index of the column for which the bin
-	 *      boundaries will be calculated.
 	 * @param typeHasChanged
 	 * 		The type has changed yes/no.
 	 */
-	public void recalculateBinBoundaries(int columnIndex, boolean typeHasChanged)
+	public void recalculateBinBoundaries(boolean typeHasChanged)
 	{
 			if (this.model.columnIndexValid())
 			{
@@ -3946,22 +3964,26 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 * @param typeHasChanged
 	 * 		The type has changed yes/no.
 	 */
-	public void recalculateSplitBinBoundaries(int columnSplitIndex)
+	public void recalculateSplitBinBoundaries()
 	{
-		AllowedTypes splitType = this.model.getStatTableModel().getColumnTypes().get(columnSplitIndex).getType();
-		if (splitType.isNumber())
+		if (this.model.columnIndexValid())
 		{
-			ArrayList<Double> boundaries = new ArrayList<Double>();
-			boundaries = StatistiekGWT.appropriateBoundaries(
-				this.model.getStatTableModel().getColumnMin(
-					this.model.getSplitOptions().getColumnSplitIndex()),
-				this.model.getStatTableModel().getColumnMax(
-					this.model.getSplitOptions().getColumnSplitIndex()),
-				this.getSplitBinsBoxSelectedInt());
-
-			this.model.setSplitBoundaries(boundaries);
-			this.model.setSplitOptions(this.model.getSplitOptions());
-			this.setModel(this.model);
+			int splitIndex = this.model.getSplitOptions().getColumnSplitIndex();
+			AllowedTypes splitType = this.model.getStatTableModel().getColumnTypes().get(splitIndex).getType();
+			if (splitType.isNumber())
+			{
+				ArrayList<Double> boundaries = new ArrayList<Double>();
+				boundaries = StatistiekGWT.appropriateBoundaries(
+					this.model.getStatTableModel().getColumnMin(
+						this.model.getSplitOptions().getColumnSplitIndex()),
+					this.model.getStatTableModel().getColumnMax(
+						this.model.getSplitOptions().getColumnSplitIndex()),
+					this.getSplitBinsBoxSelectedInt());
+	
+				this.model.setSplitBoundaries(boundaries);
+				this.model.setSplitOptions(this.model.getSplitOptions());
+				this.setModel(this.model);
+			}
 		}
 	}
 
