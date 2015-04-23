@@ -23,6 +23,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -668,13 +669,14 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	{
 		//System.out.println("HistogramUserOptionsPanel.update()");
 
-		//this.varBox.removeActionListener(this.controller);
 		this.removeAllItemsFromListBox(this.varBox);
+
 		ArrayList<String> nameList = this.model.getStatTableModel().getColumnNames();
 		for (String varName : nameList)
 		{
 			this.varBox.addItem(varName);
 		}
+
 		if (this.model.columnIndexValid())
 		{
 			this.varBox.setSelectedIndex(this.model.getColumnIndex());
@@ -684,9 +686,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			// set no item selected
 			this.varBox.setSelectedIndex(-1);
 		}
-		//this.varBox.addActionListener(this.controller);
 
-		//this.splitVarBox.removeActionListener(this);
 		this.removeAllItemsFromListBox(this.splitVarBox);
 		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
 		for (int column = 0; column < this.model.getStatTableModel()
@@ -711,7 +711,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		this.setSelectedItemInListBox(
 			this.binsBox, String.valueOf(this.model.getNoBins()));
-		
+
 		this.setSelectedItemInListBox(
 			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
@@ -783,16 +783,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
     						.getSplitClassLabel(i, this.model.getStatTableModel()));
     					sb.append("\n");
     				}
-//    				for (int i = 0; i < this.model.getSplitOptions()
-//    					.getBinBoundaries().size() - 1; i++)
-//    				{
-//    					sb.append(
-//    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i)));
-//    					sb.append(" -< ");
-//    					sb.append(
-//    						StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i + 1)));
-//    					sb.append("\n");
-//    				}
+
     				this.splitBoundariesArea.setText(sb.toString());
     				this.splitNoObjectsLabel.setText(StatistiekGWT.rb
     					.getString("numberLabel")
@@ -817,8 +808,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
     					sb.append(s);
     					sb.append("\n");
     				}
-    				sb.substring(0, sb.length() - 1);
-    				this.splitBoundariesArea.setText(sb.toString());
+    				String stringWithoutWildcard = sb.substring(0, sb.length() - 2);//- 1); -2 voor /n en wildcard
+    				this.splitBoundariesArea.setText(stringWithoutWildcard);//sb.toString());
     				this.splitBinsBox.setVisible(false);
     				this.splitBinsLabel.setVisible(false);
     				setSplitEnumClasses(true);
@@ -827,8 +818,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		}
 
 		if (this.model.isFrequencyPolygonMode()
-			&& this.model.isFrequencyPolygonCumulativeMode() != this
-				.isCumulativeBoxSelected())
+			&& this.model.isFrequencyPolygonCumulativeMode() != this.isCumulativeBoxSelected())
 		{
 			this.cumulativeBox.setValue(this.model
 				.isFrequencyPolygonCumulativeMode());
@@ -1379,7 +1369,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 
 			// update view (and uop)
-			HistogramUserOptionsPanel.this.view.update();
+			view.update();
 		}
 	} // class HistogramUOPChangeHandler
 
