@@ -20,7 +20,7 @@ public class ColorLegend extends FlowPanel
 {
 	private String columnName;
 	private ArrayList<String> splitStrings;
-	private ArrayList<CssColor> splitColors;
+	private ArrayList<String> splitColors;
 
 	private ArrayList<Label> labels;
 	private ArrayList<Label> colorPreviews;
@@ -46,7 +46,7 @@ public class ColorLegend extends FlowPanel
 	 *            Colors of the split groups
 	 */
 	public ColorLegend(String columnName, ArrayList<String> splitStrings,
-		ArrayList<CssColor> splitColors, int width, int height)
+		ArrayList<String> splitColors, int width, int height)
 	{
 		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
@@ -77,7 +77,7 @@ public class ColorLegend extends FlowPanel
 	 *            colors of the split groups
 	 */
 	public void setColors(ArrayList<String> splitStrings,
-		ArrayList<CssColor> splitColors)
+		ArrayList<String> splitColors)
 	{
 		this.splitStrings = splitStrings;
 		this.splitColors = splitColors;
@@ -144,8 +144,10 @@ public class ColorLegend extends FlowPanel
 			}
 			
 			// add the color boxes
-			for (CssColor c : this.splitColors)
+			for (int i = 0; i < this.splitColors.size(); i++)
 			{
+				CssColor c = CssColor.make(this.splitColors.get(i));
+
 				Label colorLabel = new Label();
 				this.colorPreviews.add(colorLabel);
 				colorLabel.addStyleName(statistiekCss.colorlegendlabel());
