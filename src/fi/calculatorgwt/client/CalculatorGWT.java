@@ -816,10 +816,11 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 							Double.toString(Math.asin(teller/noemer)));
 					}
 					else
-					{	if(graden)
-							uitkomst = uitkomst * Math.PI / 180;
+					{	uitkomst = Math.asin(uitkomst);
+						if(graden)
+							uitkomst = uitkomst * 180 / Math.PI;
 						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
-							Double.toString(Math.asin(uitkomst)));
+							Double.toString(uitkomst));
 					}
 				}
 			}
@@ -854,10 +855,11 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 							Double.toString(Math.acos(teller/noemer)));
 					}
 					else
-					{	if(graden)
-							uitkomst = uitkomst * Math.PI / 180;
+					{	uitkomst = Math.acos(uitkomst);
+						if(graden)
+							uitkomst = uitkomst * 180 / Math.PI;
 						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
-							Double.toString(Math.acos(uitkomst)));
+							Double.toString(uitkomst));
 					}
 				}
 			}
@@ -892,10 +894,11 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 							Double.toString(Math.atan(teller/noemer)));
 					}
 					else	
-					{	if(graden)
-							uitkomst = uitkomst * Math.PI / 180;
+					{	uitkomst = Math.atan(uitkomst);
+						if(graden)
+							uitkomst = uitkomst * 180 / Math.PI;
 						sb.replace(i, i + lengteHaakjesUitdrukking + 7,
-							Double.toString(Math.atan(uitkomst)));
+							Double.toString(uitkomst));
 					}
 				}
 			}
