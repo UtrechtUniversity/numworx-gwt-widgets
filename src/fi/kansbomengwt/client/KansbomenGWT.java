@@ -8,6 +8,7 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -162,15 +163,14 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		RootPanel.get(holderId).add(basisPanel); 
 		RootPanel.get(holderId).setStyleName("root");
 		
-		init(breedte, hoogte, null, null);
-		//Stub.publish(this);
+		//init(breedte, hoogte, null, null);
+		Stub.publish(this);
 		
 		}
 	
 	@Override
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
-		
 		breedte = width;
 		hoogte = height;
 		
@@ -533,15 +533,16 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		kijkNaPanel.setVisible(kijkNaActief);
 		kijkNaButton.setVisible(!checkExternal);
 		
-		
-		basisPanel.add(linkerKolom);
+		if(teruglegZichtbaar || trekkingZichtbaar || optiesZichtbaar || ballenZichtbaar
+				|| legendaZichtbaar)
+			basisPanel.add(linkerKolom);
 		linkerKolom.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
 		
 		kansboom = new Kansboom(kansboomBreedte, hoogte);
 		//kansboom.setLocation(currentX, offset);
 		kansboom.getCanvas().getElement().getStyle().setPaddingLeft(5, Unit.PX);
 		basisPanel.add(kansboom.getCanvas());
-		//kansboom.getCanvas().getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+		kansboom.getCanvas().getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
 		
 		
 		kansboom.zetBovenbalkZichtbaar(bovenbalkZichtbaar); //deze moet wel weer zichtbaar!
