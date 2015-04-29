@@ -38,8 +38,9 @@
 .pushbutton {
 
 	background-color: yellow;
-	font-size: 0.875em;
-	padding: 0px;	
+	font-size: 0.975em;
+	padding: 5px;	
+	text-align: center;
 }
 
 

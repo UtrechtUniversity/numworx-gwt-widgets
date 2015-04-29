@@ -79,9 +79,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 
 	private int goedHalfFout;
 	private int score = 0;
-	private Boolean correct;
+	private boolean correct;
 	private String feedback = "";
 
+	boolean silhouet = false;
+	
 	boolean nagekeken;
 	boolean ingevuld;
 
@@ -270,6 +272,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(leegButton, true);
     			startKr.maakVol();
     			vWerk.tekenOpnieuw();
+    			zetVeranderd();
     		}
     		else if (e.getSource() == leegButton)
     		{
@@ -277,6 +280,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(leegButton, false);
     			startKr.maakLeeg();
     			vWerk.tekenOpnieuw();
+    			zetVeranderd();
     		}
     		
     		
@@ -305,9 +309,9 @@ System.out.println("check");
 		this.goedHalfFout = (Integer) checkResults.get("goedHalfFout");
 
 		//System.out.println("userAnswer: "+useranswer);
-		//System.out.println("correct: "+correct);
+System.out.println("correct: "+ correct);
 		//System.out.println("score: "+score);
-		//System.out.println("goedHalfFout: "+goedHalfFout);
+System.out.println("goedHalfFout: " + goedHalfFout);
 		//System.out.println(" feedback: "+ feedback);
 
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
@@ -315,7 +319,11 @@ System.out.println("check");
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeGeelImage);
 			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
+			
+System.out.println("geel");			
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
@@ -323,14 +331,22 @@ System.out.println("check");
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeGroenImage);
 			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, true);
+			
+System.out.println("groen");			
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeRoodImage);
 			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
+			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, true);
+			
+System.out.println("rood");			
 		}
 		nagekeken = true;
 		
@@ -358,7 +374,7 @@ System.out.println("check");
 				blokjesLabel.setText("" + aantal + " blokjes");
 		}
 		
-		correct = null;
+		correct = false;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
 			ingevuld = true;
@@ -386,6 +402,7 @@ System.out.println("check");
 		boolean[][][] stateNew = null;
 		stateNew = vWerk.kr.geefBooleanRooster();
 
+		h.put("silhouet", silhouet);
 		h.put("stateNew", stateNew);
 		h.put("nagekeken", nagekeken);
 		h.put("ingevuld", ingevuld);
@@ -410,13 +427,31 @@ System.out.println("check");
 		if (stateNew != null)
 		{
 			if (stateNew instanceof boolean[][][])
-				vWerk.zetKubusRooster(new KubusRooster((boolean[][][]) stateNew, 1));
+			{	vWerk.zetKubusRooster(new KubusRooster((boolean[][][]) stateNew, 1));
+			}
 			else if (stateNew instanceof Object[])
-				vWerk.zetKubusRooster(new KubusRooster(KubusRooster.toBooleanArray((Object[]) stateNew), 1));
+			{	vWerk.zetKubusRooster(new KubusRooster(KubusRooster.toBooleanArray((Object[]) stateNew), 1));
+			}
 			vWerk.draw();
+			boolean silhouet = false;
+			if (launchState.containsKey("silhouet"))
+			{	silhouet = ((Boolean) launchState.get("silhouet")).booleanValue();
+//System.out.println("contains silhouet " + silhouet);			
+			}
+			this.silhouet = silhouet;
+			if (silhouet)
+			{	
+//System.out.println("if silhouet");				
+				vWerk.zetKlikAan(false);
+				vWerk.zetSchaduw(false);
+				vWerk.kr.zetVulkleur("zwart");
+				vWerk.draw();
+			}
+	
 		}
 		if (nagekeken)
 			check();
+		zetVeranderd();
 	}
 
 	@Override
@@ -717,6 +752,7 @@ System.out.println("hoogte = " + hoogte);
 			}
 			if (launchState.containsKey("silhouet"))
 			{	silhouet = ((Boolean) launchState.get("silhouet")).booleanValue();
+				this.silhouet = silhouet;
 				if (silhouet)
 				{	vWerk.zetKlikAan(false);
 					vWerk.zetSchaduw(false);
@@ -742,17 +778,19 @@ System.out.println("hoogte = " + hoogte);
 			if (volLeegOptie)
 			{
 				panel.add(volButton);
+				volButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				panel.add(leegButton);
-				panel.setWidgetLeftWidth(volButton, 150, Style.Unit.PX, 70, Style.Unit.PX);
-				panel.setWidgetTopHeight(volButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
-				panel.setWidgetLeftWidth(leegButton, 150, Style.Unit.PX, 70, Style.Unit.PX);
-				panel.setWidgetTopHeight(leegButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				leegButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
+				panel.setWidgetLeftWidth(volButton, 150, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetTopHeight(volButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
+				panel.setWidgetLeftWidth(leegButton, 150, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetTopHeight(leegButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				panel.setWidgetVisible(leegButton, false);
 				volButton.addClickHandler(new PushClickHandler());
 				leegButton.addClickHandler(new PushClickHandler());
 			}
 			
-			if (volLeegOptie)
+			if (aantalBlokjes)
 			{
 				int aantal = vWerk.kr.geefAantalK();
 				blokjesLabel = new Label();
@@ -761,7 +799,7 @@ System.out.println("hoogte = " + hoogte);
 				else
 					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokjes");
 				panel.add(blokjesLabel);
-				panel.setWidgetLeftWidth(blokjesLabel, 250, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetLeftWidth(blokjesLabel, 270, Style.Unit.PX, 70, Style.Unit.PX);
 				panel.setWidgetTopHeight(blokjesLabel, hoogte - 17, Style.Unit.PX, 20, Style.Unit.PX);
 			}	
 			

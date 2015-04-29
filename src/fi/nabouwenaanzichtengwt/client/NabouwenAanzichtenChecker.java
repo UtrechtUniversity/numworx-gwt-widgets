@@ -124,8 +124,8 @@ public class NabouwenAanzichtenChecker {
 		
 		this.checkAantalKubus = checkAantalKubus;
 		
-System.out.println("checkRechts = " + checkRechtsAanzicht);
-System.out.println("checkKubus = " + checkAantalKubus);
+//System.out.println("checkRechts = " + checkRechtsAanzicht);
+//System.out.println("checkKubus = " + checkAantalKubus);
 			
 		//zetKijkNaActief(kijkNaActief);
 		//this.kijkNaActief = kijkNaActief;
