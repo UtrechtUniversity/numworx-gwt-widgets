@@ -85,5 +85,21 @@ public interface StatistiekCssResource extends CssResource
 	String separateViewDialog();
 
 	String button();
+
+	String selectedLabel();
+
+	String backgroundgrey();
+
+	String backgroundwhite();
+
+	String flexTable();
+
+	String flexTableSelection();
+
+	String noWrap();
+
+	String descriptivesSplitClassLabel();
+
+	String horizontalPanelDescriptives();
 }
 
