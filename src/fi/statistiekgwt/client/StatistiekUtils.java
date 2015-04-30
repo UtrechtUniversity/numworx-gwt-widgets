@@ -7,6 +7,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  * Class that provides utility classes.
@@ -43,6 +44,19 @@ public class StatistiekUtils
 	public static DummyTouchHandler getDummyTouchHandler()
 	{
 		return new DummyTouchHandler();
+	}
+	
+	/**
+	 * Remove all widgets from the given panel
+	 * @param panel
+	 */
+	public static void removeAllWidgetsFromPanel(FlowPanel panel)
+	{
+		int count = panel.getWidgetCount();
+		for (int i = count - 1; i > -1; i--)
+		{
+			panel.remove(i);
+		}
 	}
 }
 
