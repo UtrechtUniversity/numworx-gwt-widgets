@@ -796,8 +796,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
     					this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
     				this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
     					+ splitMaxValue);
-    				this.splitBinsBox.setVisible(true);
     				this.splitBinsLabel.setVisible(true);
+    				this.splitBinsBox.setVisible(true);
     				setSplitEnumClasses(false);
     			}
     			else if (splitType.equals(AllowedTypes.ENUM))
@@ -903,7 +903,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	}
 
 	/**
-	 * Set the given type selected in typeBox.
+	 * Set the given string item selected in typeBox.
 	 * @param type
 	 */
 	private void setSelectedItemInListBox(ListBox listBox, String string)
@@ -1069,48 +1069,40 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setText("");
 	}
 
-	/**
-	 * Subscribe for events
-	 */
-//	public HandlerRegistration addAddColumnEventHandler(AddColumnEventHandler handler)
-//	{
-//		return this.eventBus.addHandler(AddColumnEvent.TYPE, handler);
-//	}
-	
 	@Override
 	public void fireEvent(GwtEvent<?> e)
 	{
 		this.eventBus.fireEvent(e);
 	}
 
-	/**
-	 * A touchhandler for HistogramUserOptionsPanel
-	 */
-	class HistogramUOPTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
-	{
-
-		@Override
-		public void onTouchEnd(TouchEndEvent event)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onTouchMove(TouchMoveEvent event)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void onTouchStart(TouchStartEvent event)
-		{
-			// TODO Auto-generated method stub
-			
-		}
-		
-	} // class HistogramUOPTouchHandler
+//	/**
+//	 * A touchhandler for HistogramUserOptionsPanel
+//	 */
+//	class HistogramUOPTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
+//	{
+//
+//		@Override
+//		public void onTouchEnd(TouchEndEvent event)
+//		{
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void onTouchMove(TouchMoveEvent event)
+//		{
+//			// TODO Auto-generated method stub
+//			
+//		}
+//
+//		@Override
+//		public void onTouchStart(TouchStartEvent event)
+//		{
+//			// TODO Auto-generated method stub
+//			
+//		}
+//		
+//	} // class HistogramUOPTouchHandler
 	
 	/**
 	 * A clickhandler for HistogramUserOptionsPanel
