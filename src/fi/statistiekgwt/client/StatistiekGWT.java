@@ -12,6 +12,7 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
+import fi.statistiekgwt.client.descriptives.DescriptivesController;
 import fi.statistiekgwt.client.histogram.HistogramController;
 import fi.statistiekgwt.client.text.Text_nl;
 
@@ -349,7 +350,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Frequentiepolygoon"))
 		{
-			return new HistogramController(model, viewName, true, startVar, w, h);
+			view = new HistogramController(model, viewName, true, startVar, w, h);
 		}
 		else if (viewType.equals("Boxplot"))
 		{
@@ -371,7 +372,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		else if (viewType.equals("Kengetallen"))
 		{
 			//System.out.println("Statistiek.createView(): viewName = " + viewName);
-			//return new DescriptivesController(model, viewName, startVar);
+			view = new DescriptivesController(model, viewName, startVar, w, h);
 		}
 		
 		return view;
@@ -733,6 +734,36 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		return divisible;
 	}
+	
+	/**
+	 * Rounds a number to a certain number of decimals
+	 * 
+	 * @param number
+	 *            the number to round
+	 * @param numberOfDecimals
+	 *            the number of decimals to round to. If negative, the number
+	 *            will be rounded to zero decimals.
+	 * @return the rounded number
+	 */
+	public static String round(String number, int numberOfDecimals)
+	{
+		String roundedString;
+		
+		String separator = StatistiekGWT.getDecimalSeparator();
+		int indexSeparator = number.indexOf(separator);
+		
+		if (indexSeparator > -1)
+		{
+			int endIndex = Math.min(indexSeparator + 1 + numberOfDecimals, number.length());
+			roundedString = number.substring(0, endIndex);
+		}
+		else
+		{
+			roundedString = number;
+		}
+		
+		return roundedString;
+	}
 
 	/**
 	 * Rounds a number to a certain number of decimals
@@ -746,12 +777,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public static double round(double number, int decimals)
 	{
-//		number = number * (Math.pow(10, decimals));
-//		
-//		number = Math.round(number);
-//		
-//		number = number / (Math.pow(10, decimals));
-
 	    if (decimals < 0)
 	    {
 	    	throw new IllegalArgumentException();
