@@ -81,21 +81,8 @@ public class ColorLegend extends FlowPanel
 	{
 		this.splitStrings = splitStrings;
 		this.splitColors = splitColors;
-		this.removeAllWidgetsFromPanel(this.labelsPanel);
+		StatistiekUtils.removeAllWidgetsFromPanel(this.labelsPanel);
 		this.makeLabelsPanel();
-	}
-
-	/**
-	 * Remove all widgets from the given panel
-	 * @param labelsPanel2
-	 */
-	private void removeAllWidgetsFromPanel(FlowPanel panel)
-	{
-		int count = panel.getWidgetCount();
-		for (int i = count - 1; i > -1; i--)
-		{
-			panel.remove(i);
-		}
 	}
 
 	/**
