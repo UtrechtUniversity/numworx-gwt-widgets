@@ -74,6 +74,14 @@
 	background-color: rgb(220, 237, 255); /* DWO blue #DCEDFF */
 }
 
+.backgroundgrey {
+	background-color: rgb(192, 192, 192); /* selection color */
+}
+
+.backgroundwhite {
+	background-color: rgb(255, 255, 255);
+}
+
 .textbox {
 	/*font-size: 16px;*/
 	/*font-weight: bold;*/
@@ -159,6 +167,11 @@ label {
 	padding: 5px;
 }
 
+.horizontalPanelDescriptives {
+	margin: 3px;
+	padding: 3px;
+}
+
 .horizontalrule {
 	border: 0;
     height: 0;
@@ -241,5 +254,35 @@ td div{
 }
 
 .button {
-	white-space:nowrap;
+	white-space: nowrap;
+}
+
+.selectedLabel {
+	opacity: ;
+	
+}
+
+.flexTable td {
+	border: 1px solid #BBBBBB;
+	padding: 3px;
+	spacing: 3px;
+	padding-bottom: 0px;
+}
+
+.flexTableSelection td {
+	border: 1px solid #BBBBBB;
+	padding: 3px;
+	spacing: 3px;
+	padding-bottom: 0px;
+	background-color: rgb(192, 192, 192); /* selection color */
+}
+
+.noWrap {
+	white-space: nowrap;
+}
+
+.descriptivesSplitClassLabel {
+	padding-top: 0px;
+	padding-bottom: 7px;
+	padding-left: 5px;
 }
