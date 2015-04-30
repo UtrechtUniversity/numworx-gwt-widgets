@@ -22,7 +22,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -212,7 +211,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Initialize the views size.
+	 * Initialize the view's size.
 	 */
 	private void initializeSize()
 	{
@@ -244,7 +243,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	public void setModel(HistogramModel model)
 	{
 		this.model = model;
-		//this.model.addObserver(this);
 		userOptionsPanel.setModel(model);
 		this.update();
 		this.userOptionsPanel.update();
