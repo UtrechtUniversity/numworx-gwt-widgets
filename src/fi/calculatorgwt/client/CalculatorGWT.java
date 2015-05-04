@@ -38,9 +38,15 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
+import com.googlecode.mgwt.ui.client.MGWT;
+import com.googlecode.mgwt.ui.client.OsDetection;
 
 
 
+
+
+import com.googlecode.mgwt.ui.client.MGWT;
+import com.googlecode.mgwt.ui.client.OsDetection;
 
 //import fi.calculatorgwt.ReplaceCaret;
 import fi.calculatorgwt.client.text.Text_nl;
@@ -123,6 +129,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	//DefaultCaret defaultCaret;
 	
 	int kc;
+	boolean isDesktop;
 
 	public CalculatorGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
@@ -345,6 +352,11 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		invoerVeld.addKeyDownHandler(new RmKeyDownHandler());
 		invoerVeld.addKeyPressHandler(new RmKeyPressHandler());
 		invoerVeld.addMouseUpHandler(new RmMouseUpHandler());
+		
+		OsDetection detection = MGWT.getOsDetection();
+		isDesktop = detection.isDesktop();
+		
+		
 		
 //		//invoerVeld.setCaret(defaultCaret);
 //		invoerVeld.getCaret().setBlinkRate(500);
@@ -733,7 +745,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		else if(linksTeller > rechtsTeller)
 			for(int i = 0; i < linksTeller - rechtsTeller; i++)
 			{	sb.append(')');
-				invoerVeld.setText(invoerVeld.getText()+")");
+				setText(invoerVeld.getText()+")");
 			}
 		
 		//Maaltekens invoegen waar nodig
@@ -1768,7 +1780,34 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		bereken(sb3);
 		lengteHaakjesUitdrukking = j - n + 1; //dit is nu de lengte inclusief haakjes
 	}
-
+	
+	public void setText(String s)
+	{	if(!isDesktop)
+			invoerVeld.setReadOnly(true);
+		
+		invoerVeld.setText(s);
+		if(!isDesktop)
+			invoerVeld.setReadOnly(false);
+	}
+	
+	public void setCursorPos(int pos)
+	{
+		if(!isDesktop)
+			invoerVeld.setReadOnly(true);
+		invoerVeld.setCursorPos(pos);
+		
+		if(!isDesktop)
+			invoerVeld.setReadOnly(false);
+	}
+	
+	public void setFocus(boolean b)
+	{
+		if(!isDesktop)
+			invoerVeld.setReadOnly(true);
+		invoerVeld.setFocus(b);
+		if(!isDesktop)
+			invoerVeld.setReadOnly(false);
+	}
 	/*
 	 * de boolean is om aan te geven of Ans moet worden toegevoegd als 
 	 * een nieuwe berekening wordt gestart.
@@ -1776,24 +1815,24 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	public void voegTekstIn(String s, boolean ans)
 	{
 		if(nieuweInvoer && ans)
-		{	invoerVeld.setText("Ans");
+		{	setText("Ans");
 			nieuweInvoer = false;
 		}
 		if(nieuweInvoer && !ans)
-		{	invoerVeld.setText("");
+		{	setText("");
 			nieuweInvoer = false;
 		}
 		String str2 = invoerVeld.getText();
 		if(invoerVeld.getCursorPos() == 0)
-		{	invoerVeld.setText(s + str2);
-			invoerVeld.setCursorPos(s.length());
+		{	setText(s + str2);
+			setCursorPos(s.length());
 		}
 		else if(invoerVeld.getCursorPos() == str2.length())
-			invoerVeld.setText(str2 + s);
+			setText(str2 + s);
 		else
 		{	cp = invoerVeld.getCursorPos();
-			invoerVeld.setText(str2.substring(0,invoerVeld.getCursorPos())+ s + str2.substring(invoerVeld.getCursorPos(), str2.length()));
-			invoerVeld.setCursorPos(cp+s.length());
+			setText(str2.substring(0,invoerVeld.getCursorPos())+ s + str2.substring(invoerVeld.getCursorPos(), str2.length()));
+			setCursorPos(cp+s.length());
 		}
 	}
 	
@@ -1803,28 +1842,28 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		cp = invoerVeld.getCursorPos();
 		
 		if(cp == str2.length())
-		{	invoerVeld.setText(str2 + s);
-			invoerVeld.setCursorPos(cp + s.length());
+		{	setText(str2 + s);
+			setCursorPos(cp + s.length());
 			return;
 		}
 		
 		char testChar = str2.charAt(cp);
 		// eerste stuk vast terugzetten:
-		invoerVeld.setText(str2.substring(0,invoerVeld.getCursorPos()) + s);
+		setText(str2.substring(0,invoerVeld.getCursorPos()) + s);
 		
 		//uitrekenen wat er verder nog terugmoet (meestal alles behalve het eerstevolgende karakter)
 		if(testChar=='s' || testChar == 'c' || testChar == 't' || testChar == 'A')
 		{	char testChar2 = str2.charAt(cp + 3);
 			if(testChar2 == '(')
-			{	invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 4));
+			{	setText(invoerVeld.getText() + str2.substring(cp + 4));
 			}
 			else
-				invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 6));
+				setText(invoerVeld.getText() + str2.substring(cp + 6));
 		}
 		else
-			invoerVeld.setText(invoerVeld.getText() + str2.substring(cp + 1));
+			setText(invoerVeld.getText() + str2.substring(cp + 1));
 		
-		invoerVeld.setCursorPos(cp + s.length());
+		setCursorPos(cp + s.length());
 	}
 	
 	public void voegInOfVervang(String s, boolean ans)
@@ -1842,7 +1881,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		if(nieuweInvoer)
 		{	nieuweInvoer = false;
-			invoerVeld.setCursorPos(str.length());
+			setCursorPos(str.length());
 		}
 		if(cp == str.length())
 			return;
@@ -1864,7 +1903,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		else 
 			cp += 1;
 		
-		invoerVeld.setCursorPos(cp);
+		setCursorPos(cp);
 		
 	}
 	
@@ -1874,7 +1913,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		if(nieuweInvoer)
 		{	nieuweInvoer = false;
-			invoerVeld.setCursorPos(str.length());
+			setCursorPos(str.length());
 		}
 		if(cp == 0)
 			return;
@@ -1900,7 +1939,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		else 
 			cp -= 1;
 		
-		invoerVeld.setCursorPos(cp);
+		setCursorPos(cp);
 	}
 	
 	
@@ -1910,58 +1949,58 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		if(nieuweInvoer)
 		{	nieuweInvoer = false; 
-			invoerVeld.setCursorPos(str.length());
+			setCursorPos(str.length());
 		}
 		if(cp == 0)
 			return;
 		else if(invoerVeld.getSelectionLength() > 0)
 		{
 			if(str.indexOf(invoerVeld.getSelectedText()) == cp)
-			{	invoerVeld.setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
-				invoerVeld.setCursorPos(cp);
+			{	setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
+				setCursorPos(cp);
 			}
 			else
-			{	invoerVeld.setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - invoerVeld.getSelectionLength());
+			{	setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
+				setCursorPos(cp - invoerVeld.getSelectionLength());
 			}
 		}
 		else if(str.charAt(cp - 1) == 's')
-		{	invoerVeld.setText(str.substring(0, cp - 3) + str.substring(cp));
-			invoerVeld.setCursorPos(cp - 3);
+		{	setText(str.substring(0, cp - 3) + str.substring(cp));
+			setCursorPos(cp - 3);
 		}
 		else if(str.charAt(cp - 1) == '(' )
 		{	if(cp < 3)
-			{	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - 1);
+			{	setText(str.substring(0, cp - 1) + str.substring(cp));
+				setCursorPos(cp - 1);
 			}
 			else if(str.charAt(cp - 2) == '\u00B9')
-			{	invoerVeld.setText(str.substring(0, cp - 6) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - 6);
+			{	setText(str.substring(0, cp - 6) + str.substring(cp));
+				setCursorPos(cp - 6);
 			}
 			else if(str.charAt(cp - 2) == 'n' && str.charAt(cp - 3) == 'l')
-			{	invoerVeld.setText(str.substring(0, cp - 3) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - 3);
+			{	setText(str.substring(0, cp - 3) + str.substring(cp));
+				setCursorPos(cp - 3);
 			}
 			else if(str.charAt(cp - 2) == 'n' || str.charAt(cp - 3) == 'o')
-			{	invoerVeld.setText(str.substring(0, cp - 4) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - 4);
+			{	setText(str.substring(0, cp - 4) + str.substring(cp));
+				setCursorPos(cp - 4);
 			}
 			else
-			{	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
-				invoerVeld.setCursorPos(cp - 1);
+			{	setText(str.substring(0, cp - 1) + str.substring(cp));
+				setCursorPos(cp - 1);
 			}
 		}
 		else if(cp >= 2 && str.charAt(cp - 2) == '\u207F')
-		{	invoerVeld.setText(str.substring(0, cp - 2) + str.substring(cp));
-			invoerVeld.setCursorPos(cp - 2);
+		{	setText(str.substring(0, cp - 2) + str.substring(cp));
+			setCursorPos(cp - 2);
 		}
 		else if(str.charAt(cp - 1) == '\u2080' || str.charAt(cp - 1) == '\u00B9')
-		{	invoerVeld.setText(str.substring(0, cp - 2) + str.substring(cp));
-			invoerVeld.setCursorPos(cp - 2);
+		{	setText(str.substring(0, cp - 2) + str.substring(cp));
+			setCursorPos(cp - 2);
 		}
 		else
-		{ 	invoerVeld.setText(str.substring(0, cp - 1) + str.substring(cp));
-			invoerVeld.setCursorPos(cp - 1);
+		{ 	setText(str.substring(0, cp - 1) + str.substring(cp));
+			setCursorPos(cp - 1);
 		}
 		if(invoerVeld.getText().equals(""))
 		{	breuk = false;
@@ -1976,39 +2015,39 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		if(nieuweInvoer)
 		{	nieuweInvoer = false;
-			invoerVeld.setCursorPos(str.length());
+			setCursorPos(str.length());
 		}
 		if(cp == str.length())
 			return;
 		else if(invoerVeld.getSelectionLength() > 0)
 		{	if(str.indexOf(invoerVeld.getSelectedText()) == cp)
-			{	invoerVeld.setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
+			{	setText(str.substring(0, cp) + str.substring(cp + invoerVeld.getSelectionLength()));
 				
 			}
 			else
-			{	invoerVeld.setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
+			{	setText(str.substring(0, cp - invoerVeld.getSelectionLength()) + str.substring(cp));
 				cp = cp - invoerVeld.getSelectionLength();
 			}
 		}
 		else if(str.charAt(cp)=='A')
-			invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 3));
+			setText(str.substring(0, cp) + str.substring(cp + 3));
 		else if(str.charAt(cp) == 's' || str.charAt(cp) == 'c' || str.charAt(cp) == 't')
 		{	if(str.charAt(cp + 3) == '(' )
-				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 4));	
+				setText(str.substring(0, cp) + str.substring(cp + 4));	
 			else
-				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 6));
+				setText(str.substring(0, cp) + str.substring(cp + 6));
 		}
 		else if(str.charAt(cp) == 'l')
 			if(str.charAt(cp + 1) == 'n')
-				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 3));
+				setText(str.substring(0, cp) + str.substring(cp + 3));
 			else
-				invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 4));
+				setText(str.substring(0, cp) + str.substring(cp + 4));
 		else if(str.charAt(cp) == '\u207F' || str.charAt(cp) == '\u2081' || str.charAt(cp) == '\u207B')
-			invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 2));
+			setText(str.substring(0, cp) + str.substring(cp + 2));
 		else 
-		invoerVeld.setText(str.substring(0, cp) + str.substring(cp + 1));
+		setText(str.substring(0, cp) + str.substring(cp + 1));
 		
-		invoerVeld.setCursorPos(cp);
+		setCursorPos(cp);
 		if(invoerVeld.getText().equals(""))
 		{	breuk = false;
 			invers = false;
@@ -2227,7 +2266,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				breuk = false;
 				invers = false;
 				invLabel.setVisible(false);
-				invoerVeld.setText("");
+				setText("");
 				uitvoerVeld.setText("0");
 			}
 			else if(e.getSource() == delKnop)
@@ -2242,14 +2281,14 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				insert = !insert;
 				if(nieuweInvoer)
 				{	nieuweInvoer = false;
-					invoerVeld.setCursorPos(str.length());
+					setCursorPos(str.length());
 				}
 				cp = invoerVeld.getCursorPos();
 				//if(insert)
 				//	invoerVeld.setCaret(defaultCaret);
 				//else
 				//	invoerVeld.setCaret(replaceCaret);
-				invoerVeld.setCursorPos(cp);
+				setCursorPos(cp);
 				//invoerVeld.getCaret().setBlinkRate(500);
 				//invoerVeld.getCaret().setVisible(true);
 			}
@@ -2258,7 +2297,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				
 			}
 			if(e.getSource() != isKnop && (e.getSource() != breukKnop || !invers))
-				invoerVeld.setFocus(true);
+				setFocus(true);
 		}
 	}
 	
@@ -2351,7 +2390,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			else if(str.charAt(cp) == '\u207B' && (str.charAt(cp - 1) == 'n' || (str.charAt(cp - 1) == 's' && cp > 1 && str.charAt(cp - 2) != 'n')))
 				cp += 3;
 					
-			invoerVeld.setCursorPos(cp);
+			setCursorPos(cp);
 			
 		}
 		

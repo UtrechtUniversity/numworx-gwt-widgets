@@ -20,8 +20,8 @@
 
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' /> 
+  <inherits name="com.googlecode.mgwt.MGWTMin"/>
   
-
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.calculatorgwt.client.CalculatorGWT'/>
 
