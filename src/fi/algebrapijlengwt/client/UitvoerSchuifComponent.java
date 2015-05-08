@@ -796,6 +796,9 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 //GWT			
 			//zoomInKnop.setVisible(false);
 			//zoomUitKnop.setVisible(false);
+			//asv.owner.kijkNa();
+			
+			pijlUit[0].im = null;
 		}
 		else if (!isBeginExpressie)
 		{	if (scrollable && expressie != null && !Double.isNaN(expressie.geefWaarde().doubleValue()))

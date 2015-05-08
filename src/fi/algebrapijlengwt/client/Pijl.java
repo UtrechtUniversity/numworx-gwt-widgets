@@ -46,7 +46,7 @@ public class Pijl //extends JComponent
 	private int laatstey = 0;
 	boolean actief;
 	boolean vast;
-	private boolean isStapel;
+	boolean isStapel;
 	private boolean links = false;
 	
 	CssColor black = CssColor.make(0,0,0);
@@ -56,6 +56,7 @@ public class Pijl //extends JComponent
 	private CssColor color = CssColor.make(0,0,0);
 	
 	//Image im;
+	String im = null;
 	
 	Context2d pijlContext2d;
 	
@@ -119,6 +120,9 @@ public class Pijl //extends JComponent
   	{
 		if (!visible)
 			return;
+
+//if (im != null)	
+//System.out.println("pijl paint");
 
 		// pijl naar rechts, alleen deze kan je aan de grafiek vastmaken
 		if(!links)
@@ -369,9 +373,19 @@ public class Pijl //extends JComponent
 			gIm.lineTo(pijlpuntEind.doubleX[0], pijlpuntEind.doubleY[0]);
 			gIm.stroke();
 			
-//GWT			
-			//if (!isStapel && !vast && !actief && (im != null))
-			//	gIm.drawImage(im, x0, y0, this);
+			if (!isStapel && !vast && !actief && (im != null))
+			{
+//System.out.println("im = " + im);				
+				if (im.equals("V"))
+					gIm.setFillStyle(CssColor.make(41,156,57));
+				else if (im.equals("X"))
+					gIm.setFillStyle(CssColor.make(255,0,0));
+				String oldFont = gIm.getFont();
+				gIm.setFont("26px sans-serif");
+				gIm.fillText(im,x0+5,y0+10);
+				gIm.setFont(oldFont);
+				
+			}
 		}
 		else // pijl naar links
 		{	//gIm.setColor(Color.black);
@@ -590,9 +604,20 @@ public class Pijl //extends JComponent
 			gIm.stroke();
 			
 			
-//GWT: waar moet dit heen?			
-			//if (!isStapel && !vast && !actief && (im != null))
-			//	gIm.drawImage(im,x0,y0, this);			
+		
+			if (!isStapel && !vast && !actief && (im != null))
+			{
+//System.out.println("im = " + im);				
+				if (im.equals("V"))
+					gIm.setFillStyle(CssColor.make(41,156,57));
+				else if (im.equals("X"))
+					gIm.setFillStyle(CssColor.make(255,0,0));
+				String oldFont = gIm.getFont();
+				gIm.setFont("26px sans-serif");
+				gIm.fillText(im,x0-25,y0+10);
+				gIm.setFont("oldFont");
+				
+			}
 		}	
 			
 		
@@ -791,6 +816,8 @@ public class Pijl //extends JComponent
 			return;
 		
 		mouseDown = false;
+		
+		asv.changed = true;
 	
 		plaatsOpGridEind();
 		for (int i = 0 ; i < asv.aantalSc; i++)

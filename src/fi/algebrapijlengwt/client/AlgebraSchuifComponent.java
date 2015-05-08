@@ -511,6 +511,8 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			{	pijlUit[i].ontvanger.zetVeranderd(max-1);
 			}
 		}
+	
+		asv.changed = true;
 	}
 	
 	public void mouseDownTouchStartAction(int eventX, int eventY)
@@ -585,6 +587,8 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			return;		
 		if (asv.frozen)
 			return;
+		
+		asv.changed = true;
 		
 		mouseDown = false;
 		dragging = false;

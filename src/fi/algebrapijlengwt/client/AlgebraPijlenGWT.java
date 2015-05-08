@@ -2,6 +2,10 @@ package fi.algebrapijlengwt.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+//import java.util.Vector;
 
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -49,6 +53,9 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+//import fi.algebrapijlengwt.client.opdr.UitvoerSchuifComponent;
+import fi.algebrapijlengwt.client.expressies_ap.*;
+
 
 public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //InteractionView 
 {
@@ -84,6 +91,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	
 	AlgebraPijlenGWTClientBundle algebraPijlenGWTClientBundle;
 	AlgebraPijlenGWTCssResource algebraPijlenGWTCss;
+	//ImageResource foutKruisResource, goedKrulResource;
+	//Image foutKruisImage, goedKrulImage;
 	
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
@@ -102,12 +111,30 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	boolean grafiekOptie =  true;
 	
 	boolean standAlone = false;
+	
+	boolean kijkNaActief = false;
+	PushButton kijkNaButton = new PushButton("Kijk Na");
+	List<String> docentExpressieStrings = new ArrayList<String>();
+	List<Expressie> docentExpressies = new ArrayList<Expressie>();
+	int scoreMax = 10;
+	int score = 0;
+	boolean correct = false;
+	boolean ingevuld = false;
+	boolean nagekeken = false;
+	
+	private int mode;
+	private OpdrNavIF comRoot;
 
 	public void getImages() 
 	{
 		algebraPijlenGWTClientBundle = GWT.create(AlgebraPijlenGWTClientBundle.class);
 		algebraPijlenGWTCss = algebraPijlenGWTClientBundle.getAlgebraPijlenGWTCSS();
 		algebraPijlenGWTCss.ensureInjected();
+		
+//		foutKruisResource = algebraPijlenGWTClientBundle.foutKruisResource();
+//		goedKrulResource = algebraPijlenGWTClientBundle.goedKrulResource();
+//		foutKruisImage = new Image(foutKruisResource);
+//		goedKrulImage = new Image(goedKrulResource);
 		
 //System.out.println("getImages");		
 	}
@@ -126,8 +153,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	
 		standAlone = true;
 		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 			
 	}
 
@@ -454,6 +481,12 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 				asv.toonGrafiekComponent(checked);
 				asv.zetVeranderd();
 			}
+			else if (e.getSource() == kijkNaButton)
+			{
+//System.out.println("kijkNaButton");
+
+				kijkNa();
+			}
 
 		}	
 	}
@@ -467,34 +500,193 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	@Override
 	public HashMap<String, Object> getState()
 	{
-		return asv.getState();
+		HashMap<String, Object> h = asv.getState();
+		h.put("nagekeken", new Boolean(nagekeken));
+		h.put("ingevuld", new Boolean(ingevuld));
+		
+		return h;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
 		asv.setState(h);
+
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		if (h.containsKey("ingevuld"))
+		{	ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+		}
+
+		if (!ingevuld)
+			asv.changed = false;
+		
+		if (ingevuld && (mode == 0 || nagekeken)) 
+			kijkNa();
+					
+		
+		//asv.setState(h);
+
 	}
 
 	@Override
 	public int getScore()
 	{
-		return 0;
+
+		return score;
 	}
 
 	@Override
 	public Boolean isCorrect()
 	{
-		return Boolean.TRUE;
+		return correct;
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
+
+		this.comRoot = comRoot;
+		zetMode(comRoot.getMode());
+
 	}
 	
+	public void zetMode(int mode)
+	{	this.mode = mode;
+	}
+
+    public void maakDocentExpressies()
+    {	docentExpressies.clear();
+    	for (int i = 0; i < docentExpressieStrings.size(); i++)
+    	{	String text = docentExpressieStrings.get(i);
+    		String formuleText = "$f" + text + "@";
+    		Expressie exp = FormuleParser_ap.geefExpressie(formuleText);
+    		docentExpressies.add(exp);
+    		
+//System.out.println("exp = " + exp.toString());    		
+    	}
+    	
+    }
+	
 	@Override
-	public void kijkNa() {
+	public void kijkNa() 
+	{
+		if (!kijkNaActief)
+    		return;
+  
+//System.out.println("kijkNa");
+
+    	//ingevuld = !asv.veldIsLeeg();
+		ingevuld = asv.changed;
+    	
+    	if (!ingevuld)
+    		return;
+    	
+//System.out.println("ingevuld");
+
+    	maakDocentExpressies();
+    	
+    	// geen opdracht, alles goed
+    	if (docentExpressies.size() == 0)
+    	{	score = scoreMax;
+    		//fireChangeEvent();
+    		return;
+    	}
+
+//System.out.println("docentExpressies");
+
+    	Vector leerlingExpressieUVS = asv.vindExpressieUVS();
+//System.out.println("llgUVS = " + leerlingExpressieUVS.size());    	
+//System.out.println("docS = " + docentExpressieStrings.size());
+//System.out.println("docE = " + docentExpressies.size());
+    	
+    	
+
+		int hits = 0;
+		// hier zijn er docent expressies
+		for (int lCnt = 0; lCnt < leerlingExpressieUVS.size(); lCnt++)
+		{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
+			Expressie llgExp = null;
+			if (uvs.geefUitvoer(0) != null)
+				llgExp = uvs.geefUitvoer(0);
+			else if (uvs.geefVerborgenUitvoer(0) != null)
+				llgExp = uvs.geefVerborgenUitvoer(0);
+
+			String llgExpStr = llgExp.toString();
+//System.out.println(llgExpStr);
+//System.out.println(uvs.geefBronDefaultVarnaam());
+			String llgExpStrC = llgExpStr.replaceAll(uvs.geefBronDefaultVarnaam(), "x");
+//System.out.println(llgExpStrC);
+			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
+
+			boolean correct = false;
+			if (llgExp != null)
+			{	
+				
+				for (int dCnt = 0; dCnt < docentExpressies.size(); dCnt++)
+				{	Expressie docExp = docentExpressies.get(dCnt);
+//System.out.println("docExp = " + docExp.toString());
+//System.out.println("llgExp = " + llgExp.toString());
+					if (Algebra.isGelijkwaardig(docExp, llgExp))
+					{	hits++;
+						correct = true;
+					}
+				}
+				
+				if (correct)
+				{	if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) // && (im != null))
+					{	
+//System.out.println("correct");					
+						uvs.pijlUit[0].im = "V";
+						
+						uvs.pijlUit[0].paint();
+					}
+				}
+				else
+				{	if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) // && (im != null))
+					{	
+//System.out.println("!correct");					
+						uvs.pijlUit[0].im = "X";
+						
+						uvs.pijlUit[0].paint();
+					}
+				}
+			}
+		}	
+//System.out.println("hits = " + hits);
+		
+		int scorePerExpressie = scoreMax / docentExpressies.size();
+		if (hits == 0)
+			score = 0;
+		else if (hits == docentExpressies.size())
+			score = scoreMax;
+		else
+			score = hits * scorePerExpressie;
+		
+/*		
+		// leerlingExpressieUVS.size() - hits is aantal foute expressies
+		if (leerlingExpressieUVS.size() >= docentExpressies.size())
+			score = Math.max(0, scoreMax - (leerlingExpressieUVS.size() - hits));
+		else
+			score = Math.max(0, scoreMax - (docentExpressies.size() - leerlingExpressieUVS.size() - hits));
+*/			
+
+		asv.tekenOpnieuw();
+		nagekeken = true;
+		
+		//fireChangeEvent();
+
+/*
+    	//fire actionEvent
+		ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
+		for (int lCnt = 0; lCnt < listeners.size(); lCnt++)
+		{
+			((ActionListener) listeners.elementAt(lCnt)).actionPerformed(event);
+		}
+*/		
+
+		
 	}
 
 	@Override
@@ -553,6 +745,19 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (launchState.containsKey("grafiekOptie"))
 			grafiekOptie = launchState.getBoolean("grafiekOptie");
 		
+		if (launchState.containsKey("docentExpressieStrings"))
+		{	docentExpressieStrings = launchState.getStringList("docentExpressieStrings");
+//System.out.println("contains dES " + docentExpressieStrings.size());		
+		}
+		
+		if (launchState.containsKey("kijkNaActief"))
+			kijkNaActief = launchState.getBoolean("kijkNaActief");
+//GWT		
+		//zetKijkNaActief(kijkNaActief);
+
+		if (launchState.containsKey("scoreMax"))
+			scoreMax = launchState.getInt("scoreMax");
+
 		
 		canvasPanel = new LayoutPanel();
 		dlp.add(canvasPanel);
@@ -600,14 +805,34 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (!standAlone && (map != null))
 		{	asv.setState(map);
 		}
-		
+
+		if (kijkNaActief)
+		{	
+			canvasPanel.add(kijkNaButton);
+			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+			kijkNaButton.addClickHandler(new PushClickHandler());
+/*			
+			canvasPanel.add(goedKrulImage);
+			canvasPanel.setWidgetLeftWidth(goedKrulImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(goedKrulImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
+			canvasPanel.setWidgetVisible(goedKrulImage, false);
+			canvasPanel.add(foutKruisImage);
+			canvasPanel.setWidgetLeftWidth(foutKruisImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(foutKruisImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
+			canvasPanel.setWidgetVisible(foutKruisImage, false);
+*/
+
+		}
+			
+			
 		asv.paint();
 		
-
+		asv.changed = false;
 	}
 
 
-	@Override
+	//@Override
 	public void zetNagekeken(boolean b) {
 	}
 

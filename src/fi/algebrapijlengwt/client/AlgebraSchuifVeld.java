@@ -13,6 +13,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class AlgebraSchuifVeld 
 {	
+	public boolean changed = false;
+	
 	int aantalSc;	
 	AlgebraSchuifComponent[] schuifcomponenten;
 	AlgebraSchuifComponent actieveComponent;
