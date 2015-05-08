@@ -22,6 +22,7 @@ public class AlgebraSchuifVeld //extends SchuifVeld
 							              //MouseListener, MouseMotionListener,ActionListener
 {	
 
+	public boolean changed = false;
 	//Image GOEDKRUL,FOUTKRUIS, GOEDKRULHALF;	
 	//private JButton wisKnop;
 	//InvulPanel ip;
@@ -524,6 +525,8 @@ String testString = "test";
 		{	
 			verwijder(schuifcomponenten[0]);
 		}
+		
+System.out.println("classNamesList " + classNamesList.size());		
 		
 		this.aantalSc = aantalSc;
 		

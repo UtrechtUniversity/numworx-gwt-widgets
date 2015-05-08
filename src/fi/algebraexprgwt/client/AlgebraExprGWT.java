@@ -1,7 +1,10 @@
 package fi.algebraexprgwt.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -50,6 +53,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import fi.algebraexprgwt.client.expressies_ap.*;
 
 public class AlgebraExprGWT implements EntryPoint, InteractionStub 
 {
@@ -106,6 +110,20 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	boolean zoomOptie = true; 
 
 	boolean standAlone = false;
+	
+	boolean kijkNaActief = false;
+	PushButton kijkNaButton = new PushButton("Kijk Na");
+	List<String> docentExpressieStrings = new ArrayList<String>();
+	List<Expressie> docentExpressies = new ArrayList<Expressie>();
+	int scoreMax = 10;
+	int score = 0;
+	boolean correct = false;
+	boolean ingevuld = false;
+	boolean nagekeken = false;
+	
+	private int mode;
+	private OpdrNavIF comRoot;
+
 	
 	public void getImages() 
 	{
@@ -258,7 +276,13 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 				asv.toonWaarde = checked;
 				asv.zetVeranderd();
 			}
-    		
+			else if (e.getSource() == kijkNaButton)
+			{
+//System.out.println("kijkNaButton");
+
+				kijkNa();
+			}
+
     	}
     }
     
@@ -422,41 +446,182 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	@Override
 	public HashMap<String, Object> getState()
 	{
-		return asv.getState();
+		HashMap<String, Object> h = asv.getState();
+		
+		h.put("nagekeken", new Boolean(nagekeken));
+		h.put("ingevuld", new Boolean(ingevuld));
+		
+		return h;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
 		asv.setState(h);
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		if (h.containsKey("ingevuld"))
+		{	ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+		}
+
+		if (!ingevuld)
+			asv.changed = false;
+		
+		if (ingevuld && (mode == 0 || nagekeken)) 
+			kijkNa();
+
 
 	}
 
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return score;
 	}
 
 	@Override
 	public Boolean isCorrect()
 	{
-		return Boolean.TRUE;
+		return correct;
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// TODO Auto-generated method stub
+		this.comRoot = comRoot;
+		zetMode(comRoot.getMode());
 
 	}
-	
-	@Override
-	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
+
+	public void zetMode(int mode)
+	{	this.mode = mode;
 	}
+
+    public void maakDocentExpressies()
+    {	docentExpressies.clear();
+    	for (int i = 0; i < docentExpressieStrings.size(); i++)
+    	{	String text = docentExpressieStrings.get(i);
+    		String formuleText = "$f" + text + "@";
+    		Expressie exp = FormuleParser_ap.geefExpressie(formuleText);
+    		docentExpressies.add(exp);
+    		
+//System.out.println("exp = " + exp.toString());    		
+    	}
+    	
+    }
+
+	@Override
+	public void kijkNa()
+    {	if (!kijkNaActief)
+    		return;
+
+System.out.println("kijkNa");
+
+    	//ingevuld = !asv.veldIsLeeg();
+    	ingevuld = asv.changed;
+
+System.out.println("ingevuld  " + ingevuld);
+
+    	if (!ingevuld)
+    		return;
+    	
+    	maakDocentExpressies();
+    	
+    	// geen opdracht, alles goed
+    	if (docentExpressies.size() == 0)
+    	{	score = scoreMax;
+    		//fireChangeEvent();
+    		return;
+    	}
+    	
+    	Vector leerlingExpressieUVS = asv.vindExpressieUVS();
+//System.out.println("llgUVS = " + leerlingExpressieUVS.size());    	
+//System.out.println("docS = " + docentExpressieStrings.size());
+//System.out.println("docE = " + docentExpressies.size());    
+
+		int hits = 0;
+		// hier zijn er docent expressies
+		for (int lCnt = 0; lCnt < leerlingExpressieUVS.size(); lCnt++)
+		{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
+			Expressie llgExp = null;
+			if (uvs.geefUitvoer(0) != null)
+				llgExp = uvs.geefUitvoer(0);
+//			else if (uvs.geefVerborgenUitvoer(0) != null)
+//				llgExp = uvs.geefVerborgenUitvoer(0);
+
+			if (llgExp == null)
+				return;
+			
+			String llgExpStr = llgExp.toString();
+//System.out.println(llgExpStr);
+			Vector varNamen = Algebra.geefVarN(llgExp);
+			String llgExpStrC = new String(llgExpStr);
+			for (int i = 0; i < varNamen.size(); i++)
+			{
+				String varNaam = (String) varNamen.elementAt(i);
+				llgExpStrC = llgExpStr.replaceAll(varNaam, "x");
+			}
+
+//System.out.println(llgExpStrC);
+			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
+
+			boolean correct = false;
+			if (llgExp != null)
+			{	
+				
+				for (int dCnt = 0; dCnt < docentExpressies.size(); dCnt++)
+				{	Expressie docExp = (Expressie) docentExpressies.get(dCnt);
+
+				
+//System.out.println("docExp = " + docExp.toString());
+
+//if (llgExp != null)
+//System.out.println("llgExp = " + llgExp.toString());
+//else
+//System.out.println("llgExp = null");
+					if (Algebra.isGelijkwaardig(docExp, llgExp))
+					{	hits++;
+						correct = true;
+					}
+				}
+				
+				if (correct)
+				{	uvs.pijlUit[0].im = "V";
+					uvs.pijlUit[0].paint();
+				}
+				else
+				{
+					uvs.pijlUit[0].im = "X";
+					uvs.pijlUit[0].paint();
+					
+				}
+			}
+		}	
+//System.out.println("hits = " + hits);
+		
+		int scorePerExpressie = scoreMax / docentExpressies.size();
+		if (hits == 0)
+			score = 0;
+		else if (hits == docentExpressies.size())
+			score = scoreMax;
+		else
+			score = hits * scorePerExpressie;
+    	
+		asv.tekenOpnieuw();
+		nagekeken = true;
+		
+		//fireChangeEvent();
+/*    	
+    	//fire actionEvent
+		ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
+		for (int lCnt = 0; lCnt < listeners.size(); lCnt++)
+		{
+			((ActionListener) listeners.elementAt(lCnt)).actionPerformed(event);
+		}
+*/		
+    	
+    }
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
@@ -516,6 +681,19 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (launchState.containsKey("grafiekOptie"))
 			grafiekOptie = launchState.getBoolean("grafiekOptie");
 
+		if (launchState.containsKey("docentExpressieStrings"))
+		{	docentExpressieStrings = launchState.getStringList("docentExpressieStrings");
+//System.out.println("contains dES " + docentExpressieStrings.size());		
+		}
+		
+		if (launchState.containsKey("kijkNaActief"))
+			kijkNaActief = launchState.getBoolean("kijkNaActief");
+//GWT		
+		//zetKijkNaActief(kijkNaActief);
+
+		if (launchState.containsKey("scoreMax"))
+			scoreMax = launchState.getInt("scoreMax");
+		
 		canvasPanel = new LayoutPanel();
 		dlp.add(canvasPanel);
 		
@@ -560,9 +738,29 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (!standAlone && (map != null))
 			asv.setState(map);
 		
+		if (kijkNaActief)
+		{	
+			canvasPanel.add(kijkNaButton);
+			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+			kijkNaButton.addClickHandler(new PushClickHandler());
+/*			
+			canvasPanel.add(goedKrulImage);
+			canvasPanel.setWidgetLeftWidth(goedKrulImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(goedKrulImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
+			canvasPanel.setWidgetVisible(goedKrulImage, false);
+			canvasPanel.add(foutKruisImage);
+			canvasPanel.setWidgetLeftWidth(foutKruisImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(foutKruisImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
+			canvasPanel.setWidgetVisible(foutKruisImage, false);
+*/
+
+		}
+		
+		
 		asv.paint();
 
-
+		asv.changed = false;
 		
 	}
 

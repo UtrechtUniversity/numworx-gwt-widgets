@@ -36,6 +36,7 @@ public class Pijl //extends JComponent //Component
 	//private Color color = Color.black;	
 	
 	//Image im;
+	String im = null;	
 	
 	Context2d pijlContext2d;
 		
@@ -445,10 +446,20 @@ public class Pijl //extends JComponent //Component
 		}
 		
 //GWT: waar moet dit heen?		
-//		if (!isStapel && !vast && !actief && (im != null))
-//		{	gIm.drawImage(im, x0, y0, this);
-//System.out.println("im");		
-//		}
+		if (!isStapel && !vast && !actief && (im != null))
+		{	//gIm.drawImage(im, x0, y0, this);
+			//System.out.println("im = " + im);				
+			if (im.equals("V"))
+				gIm.setFillStyle(CssColor.make(41,156,57));
+			else if (im.equals("X"))
+				gIm.setFillStyle(CssColor.make(255,0,0));
+			String oldFont = gIm.getFont();
+			gIm.setFont("26px sans-serif");
+			gIm.fillText(im,x0-10,y0+25);
+			gIm.setFont(oldFont);
+			
+		
+		}
 		
 	}
 	
@@ -620,6 +631,8 @@ public class Pijl //extends JComponent //Component
 			return;
 		if (asv.frozen)
 			return;
+		
+		asv.changed = true;
 		
 		mouseDown = false;
 		

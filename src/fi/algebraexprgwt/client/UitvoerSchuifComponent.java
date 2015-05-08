@@ -644,6 +644,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			zoomUitKnop.visible = false;			
 			//zoomInKnop.setVisible(false);
 			//zoomUitKnop.setVisible(false);
+			
+			pijlUit[0].im = null;
 		}
 		else 
 		{	

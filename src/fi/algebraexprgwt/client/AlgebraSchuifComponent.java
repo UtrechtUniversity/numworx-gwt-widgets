@@ -297,6 +297,8 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			{	pijlUit[i].ontvanger.zetVeranderd(max - 1);
 			}
 		}
+	
+		asv.changed = true;
 	}
 	
 	//public void mousePressed(MouseEvent e)
@@ -375,6 +377,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			return;
 		
 		//super.mouseReleased(e);
+		asv.changed = true;
 		
 		mouseDown = false;
 		dragging = false;
