@@ -571,6 +571,8 @@ public class DescriptivesModel
 
 	/**
 	 * Get the mean value of column columnIndex for the given split class.
+	 * The returned string contains a double with language specific separator.
+	 * 
 	 * If there is no split, the mean value of column columnIndex
 	 * for the complete data set is returned.
 	 * If forSelection is true, the mean value is determined for the 
@@ -657,6 +659,96 @@ public class DescriptivesModel
 	}
 
 	/**
+	 * Get the mean value of column columnIndex for the given split class.
+	 * The returned string contains a double without language specific separator.
+	 * This method is used when the mean value is used in a calculation.
+	 * 
+	 * If there is no split, the mean value of column columnIndex
+	 * for the complete data set is returned.
+	 * If forSelection is true, the mean value is determined for the 
+	 * selected values within the given split class.
+	 * 
+	 * @param columnIndex
+	 *            The column index
+	 * @param splitClass
+	 *            The split class
+	 * @param forSelection
+	 *            Only look at the selection y/n
+	 * @return 
+	 * 		The mean value of column columnIndex for the given split class.
+	 * 		Returns "Not available" if column is not numerical or if the mean cannot be calculated.
+	 */
+	public String getColumnMeanDoubleValue(int columnIndex, int splitClass, boolean forSelection)
+	{
+		double mean;
+		String meanString = null;
+
+		AllowedTypes type = this.statTableModel.getColumnTypes().get(columnIndex).getType();
+		int splitColumnIndex = this.splitOptions.getColumnSplitIndex();
+		
+		if (!(type.equals(AllowedTypes.DOUBLE) 
+			|| type.equals(AllowedTypes.INTEGER)))
+		{
+			// type is not numerical
+			meanString = StatistiekGWT.rb.getString("notAvailable");
+		}
+		else if (splitColumnIndex == -1)
+		{
+			// there is no split
+			if (forSelection)
+			{
+				meanString = this.statTableModel.getColumnMeanOfSelectionDoubleValue(columnIndex);
+			}
+			else
+			{
+				meanString = String.valueOf(this.statTableModel.getColumnMean(columnIndex));
+			}
+		}
+		else
+		{
+			// there is a split
+			AllowedTypes splitType = this.statTableModel.getColumnTypes().get(splitColumnIndex).getType();	
+			boolean valueInSplit = false;
+			String valueString, splitValueString;
+
+			Double sum = 0.0;
+			int count = 0; // number of valid values
+			for (int i = 0; i < this.statTableModel.getRowCount(); i++)
+			{
+				if ((forSelection && this.statTableModel.getSelectionList().get(i))
+					|| (!forSelection))
+				{
+					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
+					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
+	
+					if (!valueString.equals(ColumnType.WILDCARD))
+					{
+						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
+						
+						if (valueInSplit)
+						{
+							Double d = Double.parseDouble(valueString);
+							sum += d;
+							count++;
+						}
+					}
+				}
+			}
+			
+			if (count > 0)
+			{
+				meanString = String.valueOf(sum/count);
+			}
+			else
+			{
+				meanString = StatistiekGWT.rb.getString("notAvailable");
+			}
+		} // there is a split
+		
+		return meanString;
+	}
+
+	/**
 	 * Get the standard deviation of column columnIndex, excluding missing values,
 	 * for the given split class.
 	 * If there is no split, the standard deviation of column columnIndex
@@ -713,7 +805,7 @@ public class DescriptivesModel
 			int count = 0; // number of valid values
 			double mean;
 			
-			String meanString = this.getColumnMean(columnIndex, splitClass, forSelection);
+			String meanString = this.getColumnMeanDoubleValue(columnIndex, splitClass, forSelection);//this.getColumnMean(columnIndex, splitClass, forSelection); // hier zit een komma in!
 			if (meanString.equals(notAvailable))
 			{
 				sdString = notAvailable;
@@ -743,7 +835,7 @@ public class DescriptivesModel
 					}
 				}
 				
-				if (count > 0) // dit kan eigenlijk niet voorkomen; als er een gemiddelde is, is er ook een SD
+				if (count > 0) // count == 0 kan eigenlijk niet voorkomen; als er een gemiddelde is, is er ook een SD
 				{
 					sdString = StatistiekGWT.getStringValue(Math.sqrt(sum/count));
 				}
