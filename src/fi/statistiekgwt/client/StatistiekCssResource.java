@@ -101,5 +101,7 @@ public interface StatistiekCssResource extends CssResource
 	String descriptivesSplitClassLabel();
 
 	String horizontalPanelDescriptives();
+
+	String checkBox();
 }
 
