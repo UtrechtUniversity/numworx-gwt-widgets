@@ -102,6 +102,7 @@ public class HistogramModel
 	public void setBinBoundaries(ArrayList<Double> bins)
 	{
 		// Make a deep copy, not only copy the reference, since this will cause strange behavior
+		// -->> nodig??
 		ArrayList<Double> copy = new ArrayList<Double>(bins.size());
 		for (Double d: bins)
 		{
@@ -205,7 +206,6 @@ public class HistogramModel
 		{
 			this.statTableModel = tableModel;
 		}
-
 	}
 
 	/**
