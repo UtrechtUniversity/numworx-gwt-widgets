@@ -1651,6 +1651,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	/**
 	 * Get the mean value of column columnIndex of the current selection, excluding missing values.
+	 * The string value includes the separator of the language setting. 
 	 * 
 	 * @param columnIndex
 	 *            The column index
@@ -1688,6 +1689,56 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			if (count > 0)
 			{
 				meanString = StatistiekGWT.getStringValue(sum/count);
+			}
+			else
+			{
+				meanString = StatistiekGWT.rb.getString("notAvailable");
+			}
+		}
+		
+		return meanString;
+	}	
+
+	/**
+	 * Get the mean value of column columnIndex of the current selection, excluding missing values.
+	 * The string value contains the double value (without language specific separator).
+	 * 
+	 * @param columnIndex
+	 *            The column index
+	 * @return The mean value of a numerical column. 
+	 * 		Returns "Not available" if column is not numerical or if the mean cannot be calculated.
+	 */
+	public String getColumnMeanOfSelectionDoubleValue(int columnIndex)
+	{
+		String meanString = StatistiekGWT.rb.getString("notAvailable");
+		
+		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
+		if (!(type.equals(AllowedTypes.DOUBLE) 
+			|| type.equals(AllowedTypes.INTEGER)))
+		{
+			meanString = StatistiekGWT.rb.getString("notAvailable");
+		}
+		else
+		{
+			Double sum = 0.0;
+			int count = 0; // number of valid values
+			
+			for (int i = 0; i < this.rowCount; i++)
+			{
+				if (this.selectionList.get(i))
+				{
+					Object o = this.getValueAt(i, columnIndex);
+					if (!o.equals(ColumnType.WILDCARD))
+					{
+						Double d = Double.parseDouble((String) o);
+						sum += d;
+						count++;
+					}
+				}
+			}
+			if (count > 0)
+			{
+				meanString = String.valueOf(sum/count);
 			}
 			else
 			{
@@ -1757,7 +1808,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		Double sum = 0.0;
 		int count = 0; // number of valid values
-		double mean = Double.parseDouble(this.getColumnMeanOfSelection(columnIndex));
+		double mean = Double.parseDouble(this.getColumnMeanOfSelectionDoubleValue(columnIndex));
 		
 		for (int i = 0; i < this.rowCount; i++)
 		{
