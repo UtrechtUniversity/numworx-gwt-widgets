@@ -12,7 +12,9 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
+import fi.statistiekgwt.client.crosstabulationtable.CrossTabulationTableController;
 import fi.statistiekgwt.client.descriptives.DescriptivesController;
+import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
 import fi.statistiekgwt.client.histogram.HistogramController;
 import fi.statistiekgwt.client.text.Text_nl;
 
@@ -346,7 +348,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Frequentietabel"))
 		{
-			//return new FrequencyTableController(model, viewName, startVar);
+			return new FrequencyTableController(model, viewName, startVar, w, h);
 		}
 		else if (viewType.equals("Frequentiepolygoon"))
 		{
@@ -358,11 +360,11 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Kruistabel"))
 		{
-//			System.out.println("Statistiek.createView(): viewName = " + viewName);
-//			CrossTabulationTableController controller = new CrossTabulationTableController(model, viewName, startVar, startVar2);
-//			// set the split variable (i.e., the column variable)
-//			controller.setSplit(startVar2);
-//			return controller;
+			CrossTabulationTableController controller = new CrossTabulationTableController(
+				model, viewName, startVar, startVar2, w, h);
+			// set the split variable (i.e., the column variable)
+			controller.setSplit(startVar2);
+			view = controller;
 		}
 		else if (viewType.equals("Spreidingsdiagram"))
 		{
@@ -807,7 +809,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		String s;
 		if ((d == Math.floor(d)) && !Double.isInfinite(d))
 		{
-			s = String.valueOf((int) d);
+			s = String.valueOf((long)Math.floor(d));
 		}
 		else
 		{
@@ -860,9 +862,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else
 		{
-			String separator = StatistiekGWT.getDecimalSeparator();
-			NumberFormat.getFormat("0" + separator + "#"); // if there are decimals, show one
-			s = nf.format(d); // use the default decimal format for the correct decimal separator
+			char separator = StatistiekGWT.getDecimalSeparatorChar();
+			NumberFormat numberFormat = NumberFormat.getFormat("0.#");//("0" + separator + "#"); // if there are decimals, show one
+			s = numberFormat.format(d).replace('.', separator); // use the default decimal format for the correct decimal separator
 		}
 		
 		return s;
@@ -1036,6 +1038,17 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		if (StatistiekGWT.language.equals("nl"))
 		{
 			separator = ",";
+		}
+		
+		return separator;
+	}
+	
+	private static char getDecimalSeparatorChar()
+	{
+		char separator = '.';
+		if (StatistiekGWT.language.equals("nl"))
+		{
+			separator = ',';
 		}
 		
 		return separator;
