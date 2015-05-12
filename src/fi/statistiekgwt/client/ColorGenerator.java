@@ -1,12 +1,10 @@
 package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.user.client.Window;
 
 /**
  * @author Sylvia van Borkulo
@@ -29,7 +27,9 @@ public class ColorGenerator
 	private static final CssColor LIGHT_GREY = CssColor.make(240, 240, 240);
 	private static final CssColor GREY = CssColor.make(220, 220, 220);
 	public static final CssColor DEFAULT_VIEW_ELEMENT_COLOR = CssColor.make(67,147,195); // blue
+	public static final RGBColor WHITE = new RGBColor(255, 255, 255);
 	public static final CssColor SELECTION_COLOR = CssColor.make(192,192,192); // darker light grey
+	public static final RGBColor SELECTION_COLOR_RGB = new RGBColor(192,192,192); // darker light grey
 	public static final CssColor BUTTON_TEXT_GREY = CssColor.make(82, 82, 82); // dark grey
 	
 	private static List<String> colorList = 
