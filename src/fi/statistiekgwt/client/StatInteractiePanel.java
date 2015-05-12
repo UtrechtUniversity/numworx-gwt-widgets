@@ -465,11 +465,15 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		    				// startVarBox index -1 vanwege de eerste default 'Kies een variabele'
 		    				statistiekView = StatistiekGWT.createView(t,
 		    					this.model.findUniqueViewName(s), model.getStatTableModel(),
-		    					this.view.getStartVarBoxSelectedIndex()-1, 
-		    					this.view.getStartVar2BoxSelectedIndex()-1, this);
-							this.model.addView(statistiekView);
-		    				this.view.selectLastTab();
-		    				this.view.clearAddViewTab();
+		    					this.view.getStartVarBoxSelectedIndex() - 1, 
+		    					this.view.getStartVar2BoxSelectedIndex() - 1, this);
+		    				
+		    				if (statistiekView != null)
+		    				{
+								this.model.addView(statistiekView);
+			    				this.view.selectLastTab();
+			    				this.view.clearAddViewTab();
+		    				}
 						}
 					}
 					else
@@ -477,10 +481,14 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	    				// startVarBox index -1 vanwege de eerste default 'Kies een variabele'
 	    				statistiekView = StatistiekGWT.createView(t,
 	    					this.model.findUniqueViewName(s), model.getStatTableModel(),
-	    					this.view.getStartVarBoxSelectedIndex()-1, 0, this);
-						this.model.addView(statistiekView);
-	    				this.view.selectLastTab();
-	    				this.view.clearAddViewTab();
+	    					this.view.getStartVarBoxSelectedIndex() - 1, 0, this);
+						
+	    				if (statistiekView != null)
+	    				{
+		    				this.model.addView(statistiekView);
+		    				this.view.selectLastTab();
+		    				this.view.clearAddViewTab();
+	    				}
 					}
 				}
 			}
