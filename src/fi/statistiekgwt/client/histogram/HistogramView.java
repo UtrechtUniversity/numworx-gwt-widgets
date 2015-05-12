@@ -3171,7 +3171,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					int[][] frequencies = HistogramView.this.model
 						.numberClassFrequency();
-					HistogramView.this.paintNumberClass(context, frequencies, 0);
+					if (frequencies != null)
+					{
+						HistogramView.this.paintNumberClass(context, frequencies, 0);
+					}
 				}
 				else
 				{
