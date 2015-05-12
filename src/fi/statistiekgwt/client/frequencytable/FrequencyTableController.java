@@ -2,9 +2,9 @@ package fi.statistiekgwt.client.frequencytable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.user.client.ui.DialogBox;
@@ -150,11 +150,11 @@ public class FrequencyTableController implements StatistiekView
 		}
 		if (map.containsKey("binBoundaries"))
 		{
-			ObjectList list = map.getObjectList("binBoundaries");
+			List<Double> list = map.getDoubleList("binBoundaries");
 			ArrayList<Double> binBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
 			{
-				binBoundaries.add(list.getDouble(i));
+				binBoundaries.add(list.get(i));
 			}
 
 			this.model.setBinBoundaries(binBoundaries);
@@ -165,11 +165,11 @@ public class FrequencyTableController implements StatistiekView
 		}
 		if (map.containsKey("splitBoundaries"))
 		{
-			ObjectList list = map.getObjectList("splitBoundaries");
+			List<Double> list = map.getDoubleList("splitBoundaries");
 			ArrayList<Double> splitBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
 			{
-				splitBoundaries.add(list.getDouble(i));
+				splitBoundaries.add(list.get(i));
 			}
 
 			this.model.setSplitBoundaries(splitBoundaries);
