@@ -241,6 +241,11 @@ td div{
 	white-space:nowrap;
 }
 
+.checkBox {
+	display: block; /* prevent default of showing checkboxes on one line, instead show each on a new line */
+	white-space:nowrap;
+}
+
 .scrollPanel {
 	/*overflow: auto;*/
 }
