@@ -4,14 +4,12 @@ import java.util.ArrayList;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -35,7 +33,6 @@ import fi.statistiekgwt.client.event.TableChangeEvent;
 import fi.statistiekgwt.client.event.TableChangeEventHandler;
 import fi.statistiekgwt.client.event.ViewSelectionChangeEvent;
 import fi.statistiekgwt.client.event.ViewSelectionChangeEventHandler;
-import fi.statistiekgwt.client.histogram.HistogramView;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
@@ -222,7 +219,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		this.scrollPanel.setAlwaysShowScrollBars(false);
 		this.scrollPanel.addStyleName(statistiekCss.backgroundwhite());
 		
-		this.alles.add(this.scrollPanel);// center
+		this.alles.add(this.scrollPanel);
 		
 		this.userOptionsPanel = new DescriptivesUserOptionsPanel(this, controller, model);
 		// initial update for setting widgets in user options panel
@@ -254,8 +251,6 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
-
-		//this.update();
 	}
 	
 	/**
@@ -610,23 +605,16 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				minimumString = this.getMinimumValue(columnIndex, splitClass, false);
 				maximumString = this.getMaximumValue(columnIndex, splitClass, false);
 				
-				meanString = this.model.getColumnMean(columnIndex, splitClass, false); // string bevat komma voor nl, dus geen double; 
-				//kan ik hier niet numberOfDecimals meegeven en alles in getColumnMean regelen?
+				meanString = this.model.getColumnMean(columnIndex, splitClass, false); 
 				
 				if (!meanString.equals(StatistiekGWT.rb.getString("notAvailable")))
 				{
-//					meanString = StatistiekGWT.getStringValue(
-//						StatistiekGWT.round(StatistiekGWT.parseDouble(meanString), numberOfDecimals));
-					
 					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, false);
 				if (!sdString.equals(StatistiekGWT.rb.getString("notAvailable")))
 				{
-//					sdString = StatistiekGWT.getStringValue(
-//						StatistiekGWT.round(StatistiekGWT.parseDouble(sdString), numberOfDecimals));
-
 					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
 				}
 				medianString = getMedianValue(columnIndex, splitClass, false);
@@ -639,18 +627,12 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				meanString = this.model.getColumnMean(columnIndex, splitClass, true);
 				if (!meanString.equals(StatistiekGWT.rb.getString("notAvailable")))
 				{
-//					meanString = StatistiekGWT.getStringValue(
-//						StatistiekGWT.round(StatistiekGWT.parseDouble(meanString), numberOfDecimals));
-					
 					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, true);
-				if (!meanString.equals(StatistiekGWT.rb.getString("notAvailable")))
+				if (!sdString.equals(StatistiekGWT.rb.getString("notAvailable")))
 				{
-//					sdString = StatistiekGWT.getStringValue(
-//						StatistiekGWT.round(StatistiekGWT.parseDouble(sdString), numberOfDecimals));
-
 					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
 				}
 				medianString = getMedianValue(columnIndex, splitClass, true);
@@ -822,9 +804,6 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		FlexTable flexTable = new FlexTable();
 		FlexCellFormatter cellFormatter = flexTable.getFlexCellFormatter();
 	    flexTable.addStyleName(statistiekCss.flexTable());
-	    //flexTable.setWidth("32em");
-	    //flexTable.setCellSpacing(2);
-	    //flexTable.setCellPadding(2);
 
 		// add the selected variable name to the first column
 		String label = this.model.getStatTableModel().getColumnName(this.model.getColumnIndex());
@@ -978,20 +957,6 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		
 		return hasSelection;
 	}
-
-//	public void paintComponent(Graphics g)
-//	{
-//		super.paintComponent(g);
-//
-//		// clear panel
-//		g.clearRect(0, 0, this.getWidth(), this.getHeight());
-//
-//		if (!this.model.columnIndexValid())
-//		{
-//			// variable is not valid, so there is nothing to paint
-//			return;
-//		}
-//	}
 	
 	// Override setBound
 	public void setBounds(int x, int y, int w, int h)
@@ -1182,6 +1147,4 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
 	}
-
-
 }
