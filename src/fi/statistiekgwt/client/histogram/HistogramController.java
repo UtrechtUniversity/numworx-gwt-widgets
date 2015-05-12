@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.user.client.ui.DialogBox;
@@ -274,8 +273,7 @@ public class HistogramController implements StatistiekView
 		HashMap h = (HashMap) state;
 		ObjectMap map = JSONUtilities.wrapMap(h);
 
-
-		if (h.containsKey("columnIndex"))
+		if (map.containsKey("columnIndex"))
 		{
 			// Let op: setColumnIndex() zet ook de binBoundaries
 			// Dat wordt hieronder goed gemaakt als de binBoundaries
@@ -284,11 +282,8 @@ public class HistogramController implements StatistiekView
 			
 			// set size??
 		}
-		if (h.containsKey("binBoundaries"))
+		if (map.containsKey("binBoundaries"))
 		{
-//			System.out.println("HistogramController.setState(): binBoundaries="
-//				+ (ArrayList<Double>) h.get("binBoundaries"));
-//			ObjectList list = map.getObjectList("binBoundaries");
 			List<Double> list = map.getDoubleList("binBoundaries");
 			ArrayList<Double> binBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
@@ -297,42 +292,35 @@ public class HistogramController implements StatistiekView
 			}
 
 			this.model.setBinBoundaries(binBoundaries);
-			
-//			this.model.setBinBoundaries(new ArrayList(Arrays.asList(map.getObjectList("binBoundaries"))));//(ArrayList<Double>) h.get("binBoundaries"));
-//			System.out.println("... (setState) identityHashCode(this.model)=" + identityHashCode(this.model));
-//			System.out.println("... (setState) identityHashCode(this.model.getBinBoundaries())=" + identityHashCode(this.model.getBinBoundaries()));
-//			System.out.println("... (setState) identityHashCode(this.view)=" + identityHashCode(this.view));
-//			System.out.println("... (setState) identityHashCode(this.view.getModel().getBinBoundaries())=" + identityHashCode(this.view.getModel().getBinBoundaries()));
-//			System.out.println("... (setState) identityHashCode(this)=" + identityHashCode(this));
 		}
-		if (h.containsKey("percentage"))
+		if (map.containsKey("percentage"))
 		{
 			this.model.setPercentage(map.getBoolean("percentage"));//((Boolean) h.get("percentage")).booleanValue());
 		}
-		if (h.containsKey("labelUnderBin"))
+		if (map.containsKey("labelUnderBin"))
 		{
 			this.model.setLabelUnderBin(map.getBoolean("labelUnderBin"));//((Boolean) h.get("labelUnderBin")).booleanValue());
 //			System.out.println("HistogramController.setState(): labelUnderBin="
 //				+ ((Boolean) h.get("labelUnderBin")).booleanValue());
 		}
-		if (h.containsKey("showUserOptions"))
+		if (map.containsKey("showUserOptions"))
 		{
 			this.model.setShowUserOptions(map.getBoolean("showUserOptions"));//((Boolean) h.get("showUserOptions")).booleanValue());
 		}
-		if (h.containsKey("verticalBars"))
+		if (map.containsKey("verticalBars"))
 		{
 			this.model.setVerticalBars(map.getBoolean("verticalBars"));//((Boolean) h.get("verticalBars")).booleanValue());
 		}
-		if (h.containsKey("viewName"))
+		if (map.containsKey("viewName"))
 		{
 			this.model.setViewName(map.getString("viewName"));//(String) h.get("viewName"));
 		}
-		if (h.containsKey("frequencyPolygonCumulativeMode"))
+		if (map.containsKey("frequencyPolygonCumulativeMode"))
 		{
 			this.model.setFrequencyPolygonCumulativeMode(map.getBoolean("frequencyPolygonCumulativeMode"));//((Boolean) h.get("frequencyPolygonCumulativeMode")).booleanValue());
 		}
 
-		if (h.containsKey("columnSplitIndex"))
+		if (map.containsKey("columnSplitIndex"))
 		{
 			int splitIndex = map.getInt("columnSplitIndex");
 			this.model.setColumnSplitIndex(splitIndex);//(Integer) h.get("columnSplitIndex"));
@@ -340,22 +328,22 @@ public class HistogramController implements StatistiekView
 			boolean validSplitIndex = (splitIndex == -1) ? false : true;
 			this.view.getUserOptionsPanel().setVisibleSplitOptions(validSplitIndex);
 		}
-		if (h.containsKey("splitBoundaries"))
+		if (map.containsKey("splitBoundaries"))
 		{
-			ObjectList list = map.getObjectList("splitBoundaries");
+			List<Double> list = map.getDoubleList("splitBoundaries");
 			ArrayList<Double> splitBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
 			{
-				splitBoundaries.add(list.getDouble(i));
+				splitBoundaries.add(list.get(i));
 			}
 
 			this.model.setSplitBoundaries(splitBoundaries);//new ArrayList(Arrays.asList(map.getDoubleList("splitBoundaries"))));//(ArrayList<Double>) h.get("splitBoundaries"));
 		}
-		if (h.containsKey("splitInSingleView"))
+		if (map.containsKey("splitInSingleView"))
 		{
 			this.model.setSplitInSingleView(map.getBoolean("splitInSingleView"));//((Boolean) h.get("splitInSingleView")).booleanValue());
 		}
-		if (h.containsKey("nextToEachOther"))
+		if (map.containsKey("nextToEachOther"))
 		{
 			this.model.setNextToEachOther(map.getBoolean("nextToEachOther"));//((Boolean) h.get("nextToEachOther")).booleanValue());
 		}
