@@ -8,6 +8,9 @@ public interface StatistiekGWTClientBundle extends ClientBundle
 	@Source("fi/statistiekgwt/client/images/reseticon.gif")
 	public ImageResource resetResource();
 	
+	@Source("fi/statistiekgwt/client/images/reseticon.gif")
+	public ImageResource swapResource();
+	
 	@Source("fi/statistiekgwt/client/images/arrow-137-16_525252up.gif")
 	public ImageResource arrowUpResource();
 	
