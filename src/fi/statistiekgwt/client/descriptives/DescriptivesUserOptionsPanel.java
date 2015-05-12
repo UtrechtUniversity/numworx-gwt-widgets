@@ -2,7 +2,6 @@ package fi.statistiekgwt.client.descriptives;
 
 import java.util.ArrayList;
 
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -61,9 +60,6 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 	private DescriptivesUOPValueChangeHandler valueChangeHandler;
 	private DescriptivesUOPKeyDownHandler keyDownHandler;
 
-	//private Box vb0;
-	private CssColor backgroundColor = CssColor.make(230, 230, 230);
-
 	// variable settings
 	private Label varLabel;
 	/**
@@ -107,6 +103,9 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
 	
+	/**
+	 * hr element, used to create a separator.
+	 */
 	private static final String hrString = new String("<hr  style=\"width:100%;\" />");
 
 	public DescriptivesUserOptionsPanel(DescriptivesView view,
@@ -126,11 +125,11 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		this.valueChangeHandler = new DescriptivesUOPValueChangeHandler();
 		this.keyDownHandler = new DescriptivesUOPKeyDownHandler();
 
-		createGuiComponents();
-		layoutGuiComponents();
-		addHandlers();
+		this.createGuiComponents();
+		this.layoutGuiComponents();
+		this.addHandlers();
 
-		dialogButton = new DialogButton(
+		this.dialogButton = new DialogButton(
 			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
 
 		this.eventBus = StatistiekUtils.EVENT_BUS;
@@ -139,9 +138,9 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 	private void addHandlers()
 	{
 		// click handlers
-		this.splitButton.addClickHandler(this.clickHandler);//addActionListener(this);
-		this.splitChooseBoundariesButton.addClickHandler(this.clickHandler);//addActionListener(this);
-		this.okButton.addClickHandler(this.clickHandler);//addActionListener(this);
+		this.splitButton.addClickHandler(this.clickHandler);
+		this.splitChooseBoundariesButton.addClickHandler(this.clickHandler);
+		this.okButton.addClickHandler(this.clickHandler);
 		
 		// blur handlers
 		this.splitMinBoundaryField.addBlurHandler(this.blurHandler);
@@ -153,8 +152,8 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		
 		// change handlers
 		this.columnIndexBox.addChangeHandler(this.changeHandler);
-		this.splitVarBox.addChangeHandler(this.changeHandler);//addActionListener(this);
-		this.splitNoBinsBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
+		this.splitVarBox.addChangeHandler(this.changeHandler);
+		this.splitNoBinsBox.addChangeHandler(this.changeHandler);
 		
 		// value change handlers
 		this.splitMinBoundaryField.addValueChangeHandler(this.valueChangeHandler);
