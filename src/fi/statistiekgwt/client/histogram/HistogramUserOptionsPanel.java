@@ -13,17 +13,10 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-import com.google.gwt.event.dom.client.TouchMoveEvent;
-import com.google.gwt.event.dom.client.TouchMoveHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -69,7 +62,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	// variable settings
 	private Label varLabel;
-	private ListBox varBox;
+	private ListBox columnIndexBox;
 	private Label axisLabel;
 	private ListBox axisBox;
 
@@ -166,6 +159,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	public static final int DEFAULT_WIDTH = 800;
 	public static final int DEFAULT_HEIGHT = 600;
+
+	/**
+	 * hr element, used to create a separator.
+	 */
 	private static final String hrString = new String("<hr  style=\"width:100%;\" />");
 
 
@@ -227,7 +224,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitBinWidthField.addKeyDownHandler(this.keyDownHandler);
 		
 		// change handlers
-		this.varBox.addChangeHandler(this.changeHandler);
+		this.columnIndexBox.addChangeHandler(this.changeHandler);
 		this.axisBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
 		this.binsBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
 		this.splitVarBox.addChangeHandler(this.changeHandler);//addActionListener(this);
@@ -248,8 +245,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
-		this.varBox = new ListBox();
-		this.varBox.setPixelSize(100, 25); // was: setPreferredSize()
+		this.columnIndexBox = new ListBox();
+		this.columnIndexBox.setWidth("100px");//setPixelSize(100, 25); // was: setPreferredSize()
 
 		this.axisLabel = new Label(StatistiekGWT.rb.getString("axisLabel"));
 		this.axisLabel.addStyleName(statistiekCss.spaceTopLabel());
@@ -351,6 +348,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		// split settings
 		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
+
 		this.splitButton = new Button(
 			StatistiekGWT.rb.getString("splitoptionsButton"));
 		this.splitButton.addStyleName(statistiekCss.button());
@@ -374,8 +372,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitChooseBoundariesButton = new Button(
 			StatistiekGWT.rb.getString("binsButton"));
 
-		splitBoundariesHR = new HTML(this.hrString);
-		splitBoundariesHR.addStyleName(statistiekCss.horizontalrule());
+		this.splitBoundariesHR = new HTML(this.hrString);
+		this.splitBoundariesHR.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
 			StatistiekGWT.rb.getString("startvalueLabel"));
@@ -423,7 +421,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableSettingsPanel.add(this.varLabel);
-		variableSettingsPanel.add(this.varBox);
+		variableSettingsPanel.add(this.columnIndexBox);
 		variableSettingsPanel.add(this.axisLabel);
 		variableSettingsPanel.add(this.axisBox);
 
@@ -528,7 +526,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	public int getVarBoxSelectedIndex()
 	{
-		return this.varBox.getSelectedIndex();
+		return this.columnIndexBox.getSelectedIndex();
 	}
 
 	public int getSplitVarBoxSelectedIndex()
@@ -667,27 +665,25 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	public void update()
 	{
-		//System.out.println("HistogramUserOptionsPanel.update()");
-
-		this.removeAllItemsFromListBox(this.varBox);
+		StatistiekUtils.removeAllItemsFromListBox(this.columnIndexBox);
 
 		ArrayList<String> nameList = this.model.getStatTableModel().getColumnNames();
 		for (String varName : nameList)
 		{
-			this.varBox.addItem(varName);
+			this.columnIndexBox.addItem(varName);
 		}
 
 		if (this.model.columnIndexValid())
 		{
-			this.varBox.setSelectedIndex(this.model.getColumnIndex());
+			this.columnIndexBox.setSelectedIndex(this.model.getColumnIndex());
 		}
 		else
 		{
 			// set no item selected
-			this.varBox.setSelectedIndex(-1);
+			this.columnIndexBox.setSelectedIndex(-1);
 		}
 
-		this.removeAllItemsFromListBox(this.splitVarBox);
+		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
 		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
 		for (int column = 0; column < this.model.getStatTableModel()
 			.getColumnCount(); column++)
@@ -1221,7 +1217,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 					// verwijder splitsing...
 					model.setColumnSplitIndex(-1);
 					setVisibleSplitOptions(false);
-					HistogramUserOptionsPanel.this.clearGUISplitComponents();
+					clearGUISplitComponents();
 					this.update();
 				}
 				else
@@ -1270,7 +1266,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else
 			{
-				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.actionPerformed(): Unknown action source! " + e);
+				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): Unknown action source! " + e);
 			}
 		}
 		
@@ -1334,7 +1330,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		@Override
 		public void onChange(ChangeEvent e)
 		{
-			if (e.getSource() == varBox)
+			if (e.getSource() == columnIndexBox)
 			{
 				model.setColumnIndex(HistogramUserOptionsPanel.this.getVarBoxSelectedIndex());
 			}
