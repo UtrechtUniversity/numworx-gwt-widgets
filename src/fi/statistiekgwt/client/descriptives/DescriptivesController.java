@@ -2,9 +2,9 @@ package fi.statistiekgwt.client.descriptives;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.user.client.ui.DialogBox;
@@ -201,11 +201,11 @@ public class DescriptivesController implements StatistiekView
 		}
 		if (map.containsKey("splitBoundaries"))
 		{
-			ObjectList list = map.getObjectList("splitBoundaries");
+			List<Double> list = map.getDoubleList("splitBoundaries");
 			ArrayList<Double> splitBoundaries = new ArrayList<Double>();
 			for (int i = 0; i < list.size(); i++) 
 			{
-				splitBoundaries.add(list.getDouble(i));
+				splitBoundaries.add(list.get(i));
 			}
 
 			this.model.setSplitBoundaries(splitBoundaries);
