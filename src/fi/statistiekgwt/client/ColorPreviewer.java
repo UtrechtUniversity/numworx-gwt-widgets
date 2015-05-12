@@ -2,8 +2,6 @@ package fi.statistiekgwt.client;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.user.client.ui.FlowPanel;
-
 import fi.statistiekgwt.client.ColorGenerator.RGBColor;
 
 /**
@@ -92,6 +90,27 @@ public class ColorPreviewer
 		
 		RGBColor mixColor = new RGBColor(red, green, blue);
 		return (mixColor);
+	}
+
+	/**
+	 * Mix two colors
+	 * 
+	 * @param c1
+	 *            Color 1
+	 * @param c2
+	 *            Color 2
+	 * @param d
+	 *            How to mix; 0 is just color 1, 1 is just color 2
+	 * @return The mixed color in cssColor string format
+	 */
+	public static String mixColorsToString(RGBColor c1, RGBColor c2, double d)
+	{
+		int red = (int) (d * c2.getRed() + (1 - d) * c1.getRed());
+		int green = (int) (d * c2.getGreen() + (1 - d) * c1.getGreen());
+		int blue = (int) (d * c2.getBlue() + (1 - d) * c1.getBlue());
+		
+		RGBColor mixColor = new RGBColor(red, green, blue);
+		return (mixColor.getCssColor().value());
 	}
 
 	/**
