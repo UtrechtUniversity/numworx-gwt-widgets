@@ -132,8 +132,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(tekenVeelvlakGWTCssResource.root());
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 		
 	}	
@@ -588,34 +588,29 @@ System.out.println("kijkNa profiles");
 		
 	}
 
-	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
 	}
 
-	@Override
 	public int getAsHoogte() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
-	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
-	@Override
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
+		// TODO Auto-generated method stub	
+	}
+
+	public void zetNagekeken(boolean b) {
+		// TODO Auto-generated method stub	
 	}
 	
     
