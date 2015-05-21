@@ -1,5 +1,8 @@
 /** Dit file staat niet in de css map */
-
+body {
+	overflow: hidden;
+	margin: 0px !important;
+}
 
 .root {
 /**	background-color: yellow; */
