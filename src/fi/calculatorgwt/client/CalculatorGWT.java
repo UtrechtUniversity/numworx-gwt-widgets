@@ -624,7 +624,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public Boolean isCorrect() {
-		return null;
+		return Boolean.TRUE;
 	}
 
 	@Override
@@ -634,14 +634,10 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -666,8 +662,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
