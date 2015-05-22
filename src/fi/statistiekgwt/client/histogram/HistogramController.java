@@ -207,58 +207,23 @@ public class HistogramController implements StatistiekView
 
 	public Object getState()
 	{
-//		System.out.println("HistogramController.getState()...");
-
-		HashMap h = new HashMap();
+		HashMap<String, Object> h = new HashMap<String, Object>();
 
 		h.put("binBoundaries", this.model.getBinBoundaries());
-//		System.out.println("   binBoundaries=" +
-//			this.model.getBinBoundaries());
-
 		h.put("columnIndex", this.model.getColumnIndex());
-		// System.out.println("   columnIndex=" + this.model.getColumnIndex());
-
 		h.put("percentage", this.model.getPercentage());
-		// System.out.println("   percentage=" + this.model.getPercentage());
-
 		h.put("labelUnderBin", this.model.getLabelUnderBin());
-		//System.out.println("   labelUnderBin=" + this.model.getLabelUnderBin());
-
 		h.put("showUserOptions", this.model.getShowUserOptions());
-		// System.out.println("   showUserOptions=" +
-		// this.model.getShowUserOptions());
-
 		h.put("verticalBars", this.model.hasVerticalBars());
-		// System.out.println("   verticalBars=" +
-		// this.model.getVerticalBars());
-
 		h.put("viewName", this.model.getViewName());
-		// System.out.println("   viewName=" + this.model.getViewName());
-
 		h.put("frequencyPolygonCumulativeMode",
 			this.model.isFrequencyPolygonCumulativeMode());
-		// System.out.println("   frequencyPolygonCumulativeMode=" +
-		// this.model.isFrequencyPolygonCumulativeMode());
-
 		h.put("columnSplitIndex", this.model.getSplitOptions()
 			.getColumnSplitIndex());
-		// System.out.println("   columnSplitIndex=" +
-		// this.model.getSplitOptions().getColumnSplitIndex());
-
 		h.put("splitBoundaries", this.model.getSplitOptions()
 			.getBinBoundaries());
-		// System.out.println("   splitBoundaries=" +
-		// this.model.getSplitOptions().getBinBoundaries());
-
 		h.put("splitInSingleView", this.model.isSplitInSingleView());
-		// System.out.println("   splitInSingleView=" +
-		// this.model.isSplitInSingleView());
-
 		h.put("nextToEachOther", this.model.isNextToEachOther());
-		// System.out.println("   nextToEachOther=" +
-		// this.model.isNextToEachOther());
-
-		// System.out.println("END HistogramController.getState()...");
 
 		return h;
 	}
@@ -270,7 +235,7 @@ public class HistogramController implements StatistiekView
 			return;
 		}
 
-		HashMap h = (HashMap) state;
+		HashMap<String, Object> h = (HashMap<String, Object>) state;
 		ObjectMap map = JSONUtilities.wrapMap(h);
 
 		if (map.containsKey("columnIndex"))
@@ -278,7 +243,7 @@ public class HistogramController implements StatistiekView
 			// Let op: setColumnIndex() zet ook de binBoundaries
 			// Dat wordt hieronder goed gemaakt als de binBoundaries
 			// uit de hashtable worden gezet.
-			this.model.setColumnIndex(map.getInt("columnIndex"));//((Integer) h.get("columnIndex")).intValue());
+			this.model.setColumnIndex(map.getInt("columnIndex"));
 			
 			// set size??
 		}
@@ -295,35 +260,33 @@ public class HistogramController implements StatistiekView
 		}
 		if (map.containsKey("percentage"))
 		{
-			this.model.setPercentage(map.getBoolean("percentage"));//((Boolean) h.get("percentage")).booleanValue());
+			this.model.setPercentage(map.getBoolean("percentage"));
 		}
 		if (map.containsKey("labelUnderBin"))
 		{
-			this.model.setLabelUnderBin(map.getBoolean("labelUnderBin"));//((Boolean) h.get("labelUnderBin")).booleanValue());
-//			System.out.println("HistogramController.setState(): labelUnderBin="
-//				+ ((Boolean) h.get("labelUnderBin")).booleanValue());
+			this.model.setLabelUnderBin(map.getBoolean("labelUnderBin"));
 		}
 		if (map.containsKey("showUserOptions"))
 		{
-			this.model.setShowUserOptions(map.getBoolean("showUserOptions"));//((Boolean) h.get("showUserOptions")).booleanValue());
+			this.model.setShowUserOptions(map.getBoolean("showUserOptions"));
 		}
 		if (map.containsKey("verticalBars"))
 		{
-			this.model.setVerticalBars(map.getBoolean("verticalBars"));//((Boolean) h.get("verticalBars")).booleanValue());
+			this.model.setVerticalBars(map.getBoolean("verticalBars"));
 		}
 		if (map.containsKey("viewName"))
 		{
-			this.model.setViewName(map.getString("viewName"));//(String) h.get("viewName"));
+			this.model.setViewName(map.getString("viewName"));
 		}
 		if (map.containsKey("frequencyPolygonCumulativeMode"))
 		{
-			this.model.setFrequencyPolygonCumulativeMode(map.getBoolean("frequencyPolygonCumulativeMode"));//((Boolean) h.get("frequencyPolygonCumulativeMode")).booleanValue());
+			this.model.setFrequencyPolygonCumulativeMode(map.getBoolean("frequencyPolygonCumulativeMode"));
 		}
 
 		if (map.containsKey("columnSplitIndex"))
 		{
 			int splitIndex = map.getInt("columnSplitIndex");
-			this.model.setColumnSplitIndex(splitIndex);//(Integer) h.get("columnSplitIndex"));
+			this.model.setColumnSplitIndex(splitIndex);
 			// set visibility split in uop
 			boolean validSplitIndex = (splitIndex == -1) ? false : true;
 			this.view.getUserOptionsPanel().setVisibleSplitOptions(validSplitIndex);
@@ -337,15 +300,15 @@ public class HistogramController implements StatistiekView
 				splitBoundaries.add(list.get(i));
 			}
 
-			this.model.setSplitBoundaries(splitBoundaries);//new ArrayList(Arrays.asList(map.getDoubleList("splitBoundaries"))));//(ArrayList<Double>) h.get("splitBoundaries"));
+			this.model.setSplitBoundaries(splitBoundaries);
 		}
 		if (map.containsKey("splitInSingleView"))
 		{
-			this.model.setSplitInSingleView(map.getBoolean("splitInSingleView"));//((Boolean) h.get("splitInSingleView")).booleanValue());
+			this.model.setSplitInSingleView(map.getBoolean("splitInSingleView"));
 		}
 		if (map.containsKey("nextToEachOther"))
 		{
-			this.model.setNextToEachOther(map.getBoolean("nextToEachOther"));//((Boolean) h.get("nextToEachOther")).booleanValue());
+			this.model.setNextToEachOther(map.getBoolean("nextToEachOther"));
 		}
 	}
 
@@ -365,7 +328,7 @@ public class HistogramController implements StatistiekView
 	 * Return the widget containing the graphical representation
 	 */
 	@Override
-	public Widget getWidget() // was: getComponent()
+	public Widget getWidget()
 	{
 		return this.view;
 	}
