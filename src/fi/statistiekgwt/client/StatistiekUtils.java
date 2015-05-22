@@ -7,8 +7,11 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
+import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 
 /**
  * Class that provides utility classes.
@@ -48,20 +51,6 @@ public class StatistiekUtils
 	}
 	
 	/**
-	 * Remove all widgets from the given panel.
-	 * 
-	 * @param panel
-	 */
-	public static void removeAllWidgetsFromPanel(FlowPanel panel)
-	{
-		int count = panel.getWidgetCount();
-		for (int i = count - 1; i > -1; i--)
-		{
-			panel.remove(i);
-		}
-	}
-	
-	/**
 	 * Remove all items from the given listbox.
 	 * 
 	 * @param listBox
@@ -71,6 +60,20 @@ public class StatistiekUtils
 		for (int i = listBox.getItemCount() - 1; i > -1; i--)
 		{
 			listBox.removeItem(i);
+		}
+	}
+
+	/**
+	 * Remove all widgets from the given panel.
+	 * 
+	 * @param panel
+	 */
+	public static void removeAllWidgetsFromPanel(ComplexPanel panel)
+	{
+		int count = panel.getWidgetCount();
+		for (int i = count - 1; i > -1; i--)
+		{
+			panel.remove(i);
 		}
 	}
 }
