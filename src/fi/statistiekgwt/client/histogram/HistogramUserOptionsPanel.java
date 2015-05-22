@@ -76,7 +76,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	/**
 	 * Separator between bin boundaries settings and number of bins settings. 
 	 */
-	private HTML binSettingsHR;
+	private HTML separatorBinSettings;
 	private Label minBoundaryLabel;
 	private TextBox minBoundaryField;
 	private Label binWidthLabel;
@@ -128,7 +128,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	/**
 	 * Separator between number of split bins settings and split bin boundaries settings
 	 */
-	private HTML splitBoundariesHR;
+	private HTML separatorSplitBoundaries;
 	private Label splitMinBoundaryLabel;
 	private TextBox splitMinBoundaryField;
 	private Label splitBinWidthLabel;
@@ -194,26 +194,29 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 	}
 
+	/**
+	 * Add the handlers to the user options panel GUI components.
+	 */
 	private void addHandlers()
 	{
 		// click handlers
-		this.amountRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.percentageRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.cumulativeBox.addClickHandler(this.clickHandler);//addActionListener(controller);
-		this.labelBetweenBinsRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.labelUnderBinRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.nextToEachOtherRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.aboveEachOtherRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.separateRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.singleViewRadioItem.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.splitButton.addClickHandler(this.clickHandler);//addActionListener(this);
-		this.splitChooseBoundariesButton.addClickHandler(this.clickHandler);//addActionListener(this);
-		this.stackModeBox.addClickHandler(this.clickHandler);//addActionListener(this.controller);
-		this.okButton.addClickHandler(this.clickHandler);//addActionListener(this);
+		this.amountRadioItem.addClickHandler(this.clickHandler);
+		this.percentageRadioItem.addClickHandler(this.clickHandler);
+		this.cumulativeBox.addClickHandler(this.clickHandler);
+		this.labelBetweenBinsRadioItem.addClickHandler(this.clickHandler);
+		this.labelUnderBinRadioItem.addClickHandler(this.clickHandler);
+		this.nextToEachOtherRadioItem.addClickHandler(this.clickHandler);
+		this.aboveEachOtherRadioItem.addClickHandler(this.clickHandler);
+		this.separateRadioItem.addClickHandler(this.clickHandler);
+		this.singleViewRadioItem.addClickHandler(this.clickHandler);
+		this.splitButton.addClickHandler(this.clickHandler);
+		this.splitChooseBoundariesButton.addClickHandler(this.clickHandler);
+		this.stackModeBox.addClickHandler(this.clickHandler);
+		this.okButton.addClickHandler(this.clickHandler);
 		
 		// blur handlers
-		this.minBoundaryField.addBlurHandler(this.blurHandler);//addFocusListener(controller);
-		this.binWidthField.addBlurHandler(this.blurHandler);//addFocusListener(controller);
+		this.minBoundaryField.addBlurHandler(this.blurHandler);
+		this.binWidthField.addBlurHandler(this.blurHandler);
 		this.splitMinBoundaryField.addBlurHandler(this.blurHandler);
 		this.splitBinWidthField.addBlurHandler(this.blurHandler);
 		
@@ -225,10 +228,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		
 		// change handlers
 		this.columnIndexBox.addChangeHandler(this.changeHandler);
-		this.axisBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
-		this.binsBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
-		this.splitVarBox.addChangeHandler(this.changeHandler);//addActionListener(this);
-		this.splitBinsBox.addChangeHandler(this.changeHandler);//addActionListener(this.controller);
+		this.axisBox.addChangeHandler(this.changeHandler);
+		this.binsBox.addChangeHandler(this.changeHandler);
+		this.splitVarBox.addChangeHandler(this.changeHandler);
+		this.splitBinsBox.addChangeHandler(this.changeHandler);
 		
 		// value change handlers
 		this.minBoundaryField.addValueChangeHandler(this.valueChangeHandler);
@@ -239,14 +242,14 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	private void createGuiComponents()
 	{
-		this.basisPanel = new FlowPanel();//new LayoutPanel();//new JPanel(new FlowLayout());
+		this.basisPanel = new FlowPanel();
 
 		// var settings
 		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.columnIndexBox = new ListBox();
-		this.columnIndexBox.setWidth("100px");//setPixelSize(100, 25); // was: setPreferredSize()
+		this.columnIndexBox.setWidth("100px");
 
 		this.axisLabel = new Label(StatistiekGWT.rb.getString("axisLabel"));
 		this.axisLabel.addStyleName(statistiekCss.spaceTopLabel());
@@ -277,8 +280,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			this.binsBox.addItem(options1[i].toString());
 		}
 		
-		binSettingsHR = new HTML(this.hrString);
-		binSettingsHR.addStyleName(statistiekCss.horizontalrule());
+		separatorBinSettings = new HTML(this.hrString);
+		separatorBinSettings.addStyleName(statistiekCss.horizontalrule());
 
 		this.minBoundaryLabel = new Label(
 			StatistiekGWT.rb.getString("startvalueLabel"));
@@ -372,8 +375,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitChooseBoundariesButton = new Button(
 			StatistiekGWT.rb.getString("binsButton"));
 
-		this.splitBoundariesHR = new HTML(this.hrString);
-		this.splitBoundariesHR.addStyleName(statistiekCss.horizontalrule());
+		this.separatorSplitBoundaries = new HTML(this.hrString);
+		this.separatorSplitBoundaries.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
 			StatistiekGWT.rb.getString("startvalueLabel"));
@@ -437,7 +440,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		binsSettingsPanel.add(this.binWidthLabel);
 		binsSettingsPanel.add(this.binWidthField);
 		
-		binsSettingsPanel.add(this.binSettingsHR);
+		binsSettingsPanel.add(this.separatorBinSettings);
 
 		binsSettingsPanel.add(this.binsLabel);
 		binsSettingsPanel.add(this.binsBox);
@@ -484,7 +487,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		splitSettingsPanel.add(this.splitBinsLabel);
 		splitSettingsPanel.add(this.splitBinsBox);
 		
-		splitSettingsPanel.add(this.splitBoundariesHR);
+		splitSettingsPanel.add(this.separatorSplitBoundaries);
 		splitSettingsPanel.add(this.splitChooseBoundariesButton);
 
 		splitSettingsPanel.add(this.splitMinBoundaryLabel);
@@ -494,13 +497,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		splitSettingsPanel.add(this.splitBinWidthField);
 
 		splitSettingsPanel.add(this.splitBoundariesLabel);
-//		splitSettingsPanel.add(this.splitBoundariesAreaScrollPanel);
 		splitSettingsPanel.add(this.splitBoundariesArea);
 		splitSettingsPanel.add(this.splitNoObjectsLabel);
 		splitSettingsPanel.add(this.splitMinValueLabel);
 		splitSettingsPanel.add(this.splitMaxValueLabel);
 
-		
 		// Put settings panels together on allSettingsPanel
 		allSettingsPanel = new HorizontalPanel();//new LayoutPanel();
 		allSettingsPanel.setBorderWidth(2);
@@ -695,7 +696,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		// check of columnindex valid
 		if (this.model.columnIndexValid())
 		{
-			//System.out.println("HistogramUserOptionsPanel.update(): COLUMN INDEX VALID!");
 			this.splitVarBox.setSelectedIndex(this.model.getSplitOptions()
 				.getColumnSplitIndex() + 1);
 		}
@@ -733,8 +733,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
 				this.maxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
 					+ maxValue);
-				this.binSettingsHR.setVisible(true);
-				this.splitBoundariesHR.setVisible(true);
+				this.separatorBinSettings.setVisible(true);
+				this.separatorSplitBoundaries.setVisible(true);
 				this.labelBetweenBinsRadioItem.setVisible(true);
 				this.labelUnderBinRadioItem.setVisible(true);
 				this.binsBox.setVisible(true);
@@ -743,8 +743,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (type.equals(AllowedTypes.ENUM) || type.equals(AllowedTypes.STRING))
 			{
-				this.binSettingsHR.setVisible(false);
-				this.splitBoundariesHR.setVisible(false);
+				this.separatorBinSettings.setVisible(false);
+				this.separatorSplitBoundaries.setVisible(false);
 				this.labelBetweenBinsRadioItem.setVisible(false);
 				this.labelUnderBinRadioItem.setVisible(false);
 				this.binsBox.setVisible(false);
@@ -770,7 +770,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
     					StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				
     				StringBuilder sb = new StringBuilder();
-    				// alternatief via SplitOptions.getSplitClassLabel()
     				int splitClasses = this.model.getStatTableModel().splitVarClasses(
     					this.model.getSplitOptions());
     				for (int i = 0; i < splitClasses; i++)
@@ -805,7 +804,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
     					sb.append("\n");
     				}
     				String stringWithoutWildcard = sb.substring(0, sb.length() - 2);//- 1); -2 voor /n en wildcard
-    				this.splitBoundariesArea.setText(stringWithoutWildcard);//sb.toString());
+    				this.splitBoundariesArea.setText(stringWithoutWildcard);
     				this.splitBinsBox.setVisible(false);
     				this.splitBinsLabel.setVisible(false);
     				setSplitEnumClasses(true);
@@ -926,7 +925,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// set visibility of the components
 		this.amountLabelHR.setVisible(!b);
-		this.splitBoundariesHR.setVisible(!b);
+		this.separatorSplitBoundaries.setVisible(!b);
 		this.minBoundaryLabel.setVisible(!b);
 		this.minBoundaryField.setVisible(!b);
 		this.binWidthLabel.setVisible(!b);
@@ -950,7 +949,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	private void setVisibleBoundaryOptions()
 	{
-		this.binSettingsHR.setVisible(!this.enumClasses);
+		this.separatorBinSettings.setVisible(!this.enumClasses);
 		this.minBoundaryLabel.setVisible(!this.enumClasses);
 		this.minBoundaryField.setVisible(!this.enumClasses);
 		this.binWidthLabel.setVisible(!this.enumClasses);
@@ -1017,16 +1016,16 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			this.splitBinsBox.setVisible(b);
 		}
 		
-		// test syl: alleen als splitvar is gekozen (splitVarBox selectedIndex > 0)
+		// alleen als splitvar is gekozen (splitVarBox selectedIndex > 0)
 		if (this.hasSplit())
 		{
 			this.splitChooseBoundariesButton.setVisible(true);
-			this.splitBoundariesHR.setVisible(true);
+			this.separatorSplitBoundaries.setVisible(true);
 		}
 		else
 		{
 			this.splitChooseBoundariesButton.setVisible(false);
-			this.splitBoundariesHR.setVisible(false);
+			this.separatorSplitBoundaries.setVisible(false);
 		}
 		
 		if (!b)
@@ -1055,7 +1054,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	 */
 	private void clearGUISplitComponents()
 	{
-		//System.out.println("HistogramUserOptionsPanel.clearGUISplitComponents()");
 		this.splitVarBox.setSelectedIndex(0);
 		this.splitBinWidthField.setText("");
 		this.splitMinBoundaryField.setText("");
@@ -1065,11 +1063,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setText("");
 	}
 
-	@Override
-	public void fireEvent(GwtEvent<?> e)
-	{
-		this.eventBus.fireEvent(e);
-	}
+//	@Override
+//	public void fireEvent(GwtEvent<?> e)
+//	{
+//		this.eventBus.fireEvent(e);
+//	}
 
 //	/**
 //	 * A touchhandler for HistogramUserOptionsPanel
@@ -1124,21 +1122,21 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setLabelUnderBin(view.labelUnderBinItemSelected());
 				this.update();
 			}
-			else if (e.getSource() == minBoundaryField)
-			{
-				controller.updateBoundariesFromBinSettings();
-				this.update();
-			}
-			else if (e.getSource() == binWidthField)
-			{
-				controller.updateBoundariesFromBinSettings();
-				this.update();
-			}
-			else if (e.getSource() == axisBox)
-			{
-				model.setVerticalBars(view.xAxisSelected());
-				this.update();
-			}
+//			else if (e.getSource() == minBoundaryField)
+//			{
+//				controller.updateBoundariesFromBinSettings();
+//				this.update();
+//			}
+//			else if (e.getSource() == binWidthField)
+//			{
+//				controller.updateBoundariesFromBinSettings();
+//				this.update();
+//			}
+//			else if (e.getSource() == axisBox)
+//			{
+//				model.setVerticalBars(view.xAxisSelected());
+//				this.update();
+//			}
 			else if (e.getSource() == cumulativeBox)
 			{
 				model.setFrequencyPolygonCumulativeMode(
@@ -1180,23 +1178,23 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setFrequencyPolygonStackMode(view.isStackModeBoxSelected());
 				this.update();
 			}
-			else if (e.getSource() == splitBinsBox)
-			{
-				ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
-				controller.setSplitType(list.get(model.getSplitOptions().getColumnSplitIndex())
-					.getType());
-				this.update();
-			}
-			else if (e.getSource() == splitMinBoundaryField)
-			{
-				controller.updateSplitBoundariesFromBinSettings();
-				this.update();
-			}
-			else if (e.getSource() == splitBinWidthField)
-			{
-				controller.updateSplitBoundariesFromBinSettings();
-				this.update();
-			}
+//			else if (e.getSource() == splitBinsBox)
+//			{
+//				ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
+//				controller.setSplitType(list.get(model.getSplitOptions().getColumnSplitIndex())
+//					.getType());
+//				this.update();
+//			}
+//			else if (e.getSource() == splitMinBoundaryField) // waarom onClick?
+//			{
+//				controller.updateSplitBoundariesFromBinSettings();
+//				this.update();
+//			}
+//			else if (e.getSource() == splitBinWidthField)
+//			{
+//				controller.updateSplitBoundariesFromBinSettings();
+//				this.update();
+//			}
 			else if (e.getSource() == splitChooseBoundariesButton)
 			{
 				if (splitBoundariesVisible)
@@ -1236,34 +1234,30 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				}
 				dialogButton.closeDialog();
 			}
-			else if (e.getSource() == splitVarBox)
-			{
-				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): splitVarBox, SplitColumnUpdate!");
-				if (view.getSplitVarBoxSelectedIndex() - 1 
-						!= model.getSplitOptions().getColumnSplitIndex())
-				{
-					if (view.getSplitVarBoxSelectedIndex() != -1)
-					{
-						model.setColumnSplitIndex(
-							view.getSplitVarBoxSelectedIndex() - 1);
-					}
-					
-					model.setSplitOptions(model.getSplitOptions());
-					if (view.getSplitVarBoxSelectedIndex() > 0)
-					{
-						ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
-						controller.setSplitType(
-							list.get(model.getSplitOptions().getColumnSplitIndex())
-							.getType());
-					}
-				}
-
-				this.update();
-			}
-			else if (e.getSource() == dialogButton)
-			{
-				init();
-			}
+//			else if (e.getSource() == splitVarBox)
+//			{
+//				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): splitVarBox, SplitColumnUpdate!");
+//				if (view.getSplitVarBoxSelectedIndex() - 1 
+//						!= model.getSplitOptions().getColumnSplitIndex())
+//				{
+//					if (view.getSplitVarBoxSelectedIndex() != -1)
+//					{
+//						model.setColumnSplitIndex(
+//							view.getSplitVarBoxSelectedIndex() - 1);
+//					}
+//					
+//					model.setSplitOptions(model.getSplitOptions());
+//					if (view.getSplitVarBoxSelectedIndex() > 0)
+//					{
+//						ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
+//						controller.setSplitType(
+//							list.get(model.getSplitOptions().getColumnSplitIndex())
+//							.getType());
+//					}
+//				}
+//
+//				this.update();
+//			}
 			else
 			{
 				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): Unknown action source! " + e);
