@@ -63,15 +63,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	private FlowPanel mainPanel;
 	private ScrollPanel scrollPanel;
 	private HorizontalPanel dialogButtonPanel;
-//	private FrequencyTablePanel[] splitClassPanels;
-//	private FlowPanel[] splitClassPanels;
-	/**
-	 * If the frequency table has a split, splitClassLabelPanel contains a
-	 * panel with the split label (e.g., "Geslacht: m"; actually, the last panel
-	 * is stored). It is used to determine the height of the panel when determining 
-	 * the row clicked 
-	 */
-	private FlowPanel splitClassLabelPanel;
 	private int numberOfSplitClasses = 1;
 
 	/**
@@ -79,12 +70,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	 * header and total row.
 	 */
 	private int frequencyTableRows;
-	private int mainPanelColumns;
-//	/**
-//	 * Array of maximum column widths, to be used to paint 
-//	 * row selection.
-//	 */
-//	private int[] maxColumnWidth;
 	/**
 	 * Row colors contains an array of colors in css color string format.
 	 */
@@ -172,8 +157,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		this.scrollPanel.addStyleName(statistiekCss.backgroundwhite());
 		
 		this.alles.add(this.scrollPanel);
-
-//		this.mainPanel.addMouseListener(new RowClickListener());
 
 		this.userOptionsPanel = new FrequencyTableUserOptionsPanel(this, controller, model);
 		// initial update for setting widgets in user options panel
@@ -424,25 +407,10 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 					.get(this.model.getColumnIndex());
 				AllowedTypes type = cType.getType();
 	
-				this.mainPanelColumns = 2;
-				if (this.model.isShowCumulative())
-				{
-					this.mainPanelColumns++;
-				}
-				if (this.model.isShowPercentage())
-				{
-					this.mainPanelColumns++;
-					if (this.model.isShowCumulative())
-					{
-						this.mainPanelColumns++;
-					}
-				}
-	
 				FrequencyTuple[][] frequencyTuple = null;
 				int[] frequencies = null;
 				numberOfSplitClasses = this.model.getStatTableModel().splitVarClasses(
 					this.model.getSplitOptions());
-//				this.splitClassPanels = new FlowPanel[numberOfSplitClasses];
 				
 				if (type.isNumber())
 				{
@@ -558,9 +526,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 						label.addStyleName(statistiekCss.spaceBottomLabel());
 						labelPanel.add(label);
 						this.mainPanel.add(labelPanel);
-						
-						// store a labelPanel in order to be able to access its height when painting row selection 
-						this.splitClassLabelPanel = labelPanel;
 					}
 				}
 			} //columnIndexValid()
@@ -647,7 +612,8 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	}
 
 	/**
-	 * Make the header, middle part and total row of the frequency table view on panel.
+	 * Make a flextable with the header, middle part and total row of the frequency table view 
+	 * and add to mainpanel.
 	 * 
 	 * @param panel
 	 * @param type
@@ -665,48 +631,34 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		RowClickHandler rowClickHandler = new RowClickHandler(flexTable, splitClass);
 		flexTable.addClickHandler(rowClickHandler);
 		FlexCellFormatter cellFormatter = flexTable.getFlexCellFormatter();
-	    // test syl: for setting row background
 	    HTMLTable.RowFormatter rowFormatter = flexTable.getRowFormatter();
 	    flexTable.addStyleName(statistiekCss.flexTable());
 	    
-//		this.maxColumnWidth = new int[this.getNumberOfColumns()];
-
 		Label variableName = new Label(this.model.getStatTableModel()
 			.getColumnName(this.model.getColumnIndex()));
 	    flexTable.setWidget(0, 0, variableName);
 
-//	    // administer the maximum column width
-//		this.updateMaxColumnWidth(0, variableName);
-//		// update table height with the height of the first label in the first row
-//		this.updateTableHeight(variableName);
-		
 		Label freq = new Label("Freq.");
 	    flexTable.setWidget(0, 1, freq);
-//		this.updateMaxColumnWidth(1, freq);
 
 		int percentage = 0;
 		if (this.model.isShowPercentage())
 		{
 			Label freqPerc = new Label("Freq.%");
 		    flexTable.setWidget(0, 2, freqPerc);
-//			this.updateMaxColumnWidth(2, freqPerc);
 			percentage++;
 		}
 		if (this.model.isShowCumulative())
 		{
 			Label cumul = new Label("Cumul.");
 		    flexTable.setWidget(0, 2 + percentage, cumul);
-//			this.updateMaxColumnWidth(2 + percentage, cumul);
     	}
     	
     	if (this.model.isShowPercentage() && this.model.isShowCumulative())
     	{
 			Label cumulPerc = new Label("Cumul.%");
 		    flexTable.setWidget(0, 4, cumulPerc);
-//			this.updateMaxColumnWidth(4, cumulPerc);
 		}
-    	
-
 		
 		
 		// ********************* makeMiddlePart ********************* 
@@ -719,10 +671,22 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 			if (type.isNumber())
 			{
 				frequency = frequencies[bin * 2];
-				Label label = new Label(
-					StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(bin))
-					+ " -< "
-					+ StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(bin + 1)));
+				Label label;
+				
+				ArrayList<Double> binBoundaries = this.model.getBinBoundaries();
+				if (type.equals(AllowedTypes.INTEGER)
+					&& (binBoundaries.get(1) - binBoundaries.get(0) == 1))
+				{
+					// bin width is 1
+					label = new Label(binBoundaries.get(bin).toString());
+				}
+				else
+				{
+					label = new Label(
+						StatistiekGWT.getStringValue(binBoundaries.get(bin))
+						+ " -< "
+						+ StatistiekGWT.getStringValue(binBoundaries.get(bin + 1)));
+				}
 				flexTable.setWidget(bin + 1, 0, label);
 				
 		    	// set selection color
