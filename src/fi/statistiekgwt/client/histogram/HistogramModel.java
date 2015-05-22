@@ -183,7 +183,6 @@ public class HistogramModel
 		{
 			this.viewName = viewName;
 		}
-
 	}
 
 	/**
@@ -241,9 +240,7 @@ public class HistogramModel
     						this.statTableModel.getColumnMax(this.columnIndex),
     						this.noBins);
     				
-    				// test syl: kan mooier, maar het werkt wel: opnieuw berekenen 
-    				// met de berekende binboundaries, omdat er mogelijk minder bins nodig zijn
-    				// TODO appropriateBoundaries(min, max) implementeren die binwidth en het aantal klassen bepaalt 
+    				// opnieuw berekenen met de berekende bin width, omdat er mogelijk minder bins nodig zijn
     				this.binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(this.statTableModel.getColumnMin(this.columnIndex),
     					this.statTableModel.getColumnMax(this.columnIndex), 
     					this.binBoundaries.get(1) - this.binBoundaries.get(0), this.binBoundaries.get(0));
