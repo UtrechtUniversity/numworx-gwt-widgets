@@ -689,15 +689,15 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 			CrossTabulationTableView view = CrossTabulationTableUserOptionsPanel.this.view;
 			CrossTabulationTableController controller = CrossTabulationTableUserOptionsPanel.this.controller;
 			
-			if (e.getSource() == rowIndexBox)
+			if (e.getSource() == rowIndexBox) // moet dit? Zit al in ChangeHandler
 			{
 				model.setColumnIndex(view.varRowsBoxSelectedIndex());
 			}
-			else if (e.getSource() == minBoundaryRowsField)
+			else if (e.getSource() == minBoundaryRowsField) // moet dit? Zit al in valueChangeHandler
 			{
 				controller.updateBoundariesFromRowsBinSettings();
 			}
-			else if (e.getSource() == binWidthRowsField)
+			else if (e.getSource() == binWidthRowsField) // moet dit? Zit al in valueChangeHandler
 			{
 				controller.updateBoundariesFromRowsBinSettings();
 			}
@@ -705,15 +705,15 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 			{
 				model.swapVariables();
 			}
-			else if (e.getSource() == columnIndexBox)
+			else if (e.getSource() == columnIndexBox) // moet dit? Zit al in ChangeHandler
 			{
 				controller.setSplit(view.varColumnsBoxSelectedIndex());
 			}
-			else if (e.getSource() == minBoundaryColumnsField)
+			else if (e.getSource() == minBoundaryColumnsField) // moet dit? Zit al in valueChangeHandler
 			{
 				controller.updateBoundariesFromColumnsBinSettings();
 			}
-			else if (e.getSource() == binWidthColumnsField)
+			else if (e.getSource() == binWidthColumnsField) // moet dit? Zit al in valueChangeHandler
 			{
 				controller.updateBoundariesFromColumnsBinSettings();
 			}
