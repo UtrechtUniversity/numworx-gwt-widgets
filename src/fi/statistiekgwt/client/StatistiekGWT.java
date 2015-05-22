@@ -12,6 +12,7 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
+import fi.statistiekgwt.client.boxplot.BoxplotController;
 import fi.statistiekgwt.client.crosstabulationtable.CrossTabulationTableController;
 import fi.statistiekgwt.client.descriptives.DescriptivesController;
 import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
@@ -344,7 +345,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Dotplot"))
 		{
-			//return new DotplotController(model, viewName, startVar);
+			//view = new DotplotController(model, viewName, startVar, w, h);
 		}
 		else if (viewType.equals("Frequentietabel"))
 		{
@@ -356,7 +357,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Boxplot"))
 		{
-			//return new BoxplotController(model, viewName, startVar);
+			view = new BoxplotController(model, viewName, startVar, w, h);
 		}
 		else if (viewType.equals("Kruistabel"))
 		{
@@ -369,7 +370,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		else if (viewType.equals("Spreidingsdiagram"))
 		{
 			//System.out.println("Statistiek.createView(): viewName = " + viewName);
-			//return new DotplotController(model, viewName, startVar, startVar2);
+			//view = new DotplotController(model, viewName, startVar, startVar2, w, h);
 		}
 		else if (viewType.equals("Kengetallen"))
 		{
