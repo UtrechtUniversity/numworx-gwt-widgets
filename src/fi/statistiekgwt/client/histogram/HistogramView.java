@@ -412,7 +412,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 	
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	public int getWidth()
 	{
@@ -420,7 +420,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	public int getHeight()
 	{
@@ -446,14 +446,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		this.height = h;
 	}
-
-//	private AlphaComposite makeComposite(int splitClasses)
-//	{
-////		System.out.println("Making composite for " + splitClasses
-////			+ " splitClasses.");
-//		int type = AlphaComposite.SRC_ATOP;
-//		return (AlphaComposite.getInstance(type, (float) (1.0 / splitClasses)));
-//	}
 
 	/**
 	 * Get the location of the dot for given dot number and height
