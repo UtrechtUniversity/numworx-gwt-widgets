@@ -1086,6 +1086,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			}
 			experiment=0;
 			dobbelsteenCount=0;
+			dobbelstenenGrafiek.paint();
+			table3.setRowCount(0, true);
+			table4.setRowCount(0, true);
+			table5.setRowCount(0, true);		
 		}		
 		if (event.getSource()==eenDobbelsteen) {
 			if (dobbelstenenTabel1==true)

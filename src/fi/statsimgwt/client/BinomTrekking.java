@@ -135,6 +135,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    panel2.add(panel3);
 	    panel2.add(panel4);
 	    
+	    if (binomTrekkingInstellingen==false)
+	    	panel2.setVisible(false);
+	    
 	    voeruit = new Button("Voer uit",this);
 	    stap = new Button("Stap",this);
 	    keer = new Button("keer uit",this);
@@ -197,6 +200,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    panel7.add(panel8);
 	    
 	    panel8.add(scrollPanel);
+	    if (binomTrekkingTabel==false)
+	    	scrollPanel.setVisible(false);
+	    
 	    table.setRowCount(0, true);
 	    
 	    //RootPanel.get().add(panel);
@@ -207,6 +213,12 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 
 	    panel7.add(kladjeHWTCanvas);
 	    panel7.add(binomGrafiekCanvas);
+	    
+	    if (binomTrekkingRooster==false)
+	    	kladjeHWTCanvas.setVisible(false);
+	    
+	    if (binomTrekkingGrafiek==false)
+	    	binomGrafiekCanvas.setVisible(false);
 	    
 		 elapsedTimer = new Timer () {
 			 public void run() {
@@ -295,6 +307,8 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			stapStarted=false;
 			trekkingCount=0;
 			totaal=0;
+			binomRooster.paint();
+			binomGrafiek.paint();
 		}
 	}
 	

@@ -609,6 +609,24 @@ public class Munten extends FlowPanel implements ClickHandler{
 			totaalmunt=0;
 			table.setRowCount(0, true);
 			table2.setRowCount(0, true);
+			geenKop=0;
+			eenKop=0;
+			tweeKop=0;
+			grafiek.paint();
+			frequentie.paint();
+			avgResult3.setText("");
+			maxResult3.setText("");
+			minResult3.setText("");
+			avgResult4.setText("");
+			maxResult4.setText("");
+			minResult4.setText("");
+			avgResult5.setText("");
+			maxResult5.setText("");
+			minResult5.setText("");			
+			avgResult1.setText("");
+			maxResult1.setText("");
+			minResult1.setText("");
+
 		}
 		if (event.getSource()==stap) {
 			wis.setEnabled(true);
