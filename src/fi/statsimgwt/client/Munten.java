@@ -724,7 +724,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 				   geenKop++;
 			   
 			   muntCount++;
-			   
+
 			   List<Experiment2> ADDEXP2 = Arrays.asList(
 						new Experiment2(Integer.toString(experiment+1), Integer.toString(geenKop),Integer.toString(eenKop),Integer.toString(tweeKop)));
 

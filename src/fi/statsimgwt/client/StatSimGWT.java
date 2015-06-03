@@ -1,6 +1,7 @@
 package fi.statsimgwt.client;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
@@ -12,6 +13,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.ListDataProvider;
 
 public class StatSimGWT implements EntryPoint, InteractionView {
 	
@@ -36,6 +39,14 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	boolean binomTrekkingTabel=false;
 	boolean binomTrekkingFrequentie=false;
 	boolean binomTrekkingRooster=false;
+	protected ListDataProvider<List<String>> dataProvider;
+	
+	boolean muntenSelected=false;
+	boolean dobbelstenenSelected=false;
+	boolean binomTrekkingSelected=false;
+	Munten munten;
+	Dobbelstenen dobbelstenen;
+	BinomTrekking binomTrekking;
 	
 	public void onModuleLoad() {
 
@@ -102,16 +113,19 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 		//dlp.add(test);
 		
 		if (muntenRadio) {
-			Munten munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
+			muntenSelected=true;
+			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
 			return munten;
 		}
 		if (dobbelstenenRadio) {
-			Dobbelstenen dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
+			dobbelstenenSelected=true;
+			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
 			return dobbelstenen;
 		}
 		if (binomTrekkingRadio) {
-			BinomTrekking binomtrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
-			return binomtrekking;
+			binomTrekkingSelected=true;
+			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
+			return binomTrekking;
 		}
 		
 		return null;
@@ -144,13 +158,24 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	@Override
 	public HashMap<String, Object> getState() {
 		// TODO Auto-generated method stub
+		
+		this.dataProvider = new ListDataProvider<List<String>>();
+	    // Add the table to the dataProvider.
+		
+		if (muntenSelected)
+			this.dataProvider.addDataDisplay(munten.table);
+		
+		List<List<String>> list = (List<List<String>>) this.dataProvider.getList();
+		
 		return null;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
 		// TODO Auto-generated method stub
-		
+	
+
+
 	}
 
 	@Override
