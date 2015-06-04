@@ -8,8 +8,6 @@ import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.SplitOptions;
 import fi.statistiekgwt.client.StatTableModel;
 import fi.statistiekgwt.client.StatistiekGWT;
-import fi.statistiekgwt.client.event.ColorChangeEvent;
-import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 
 /**
  * MVC Model for StatistiekView Dotplot and Scatterplot
