@@ -41,9 +41,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -51,9 +49,7 @@ import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.touch.client.Point;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
@@ -1254,25 +1250,20 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		GWT.log("StatTable.setSelectionFromModelInTable()");
 
-//		MultiSelectionModel<Object> selectionModel = (MultiSelectionModel<Object>) this.table.getSelectionModel(); // er is toch een field selectionModel?
 		List<List<String>> list = (List<List<String>>) this.dataProvider.getList();
 
 		for (int row = 0; row < this.statTableModel.getRowCount(); row++)
 		{
-			//Object rowObject = this.statTableModel.getValues().get(row);//this.table.getRowElement(row); // hier zit geen rowIndex bij!, dus vergelijkt hij op de laatste (echte) kolom
-//			Object rowObject = list.get(row);
 			List<String> rowObject = list.get(row);
 			
 			if (this.statTableModel.isRowSelected(row)
 				&& !selectionModel.isSelected(rowObject))
 			{
-				// System.out.println("Selecting row " + row);
 				selectionModel.setSelected(rowObject, true);
 			}
 			else if (!this.statTableModel.isRowSelected(row)
 				&& selectionModel.isSelected(rowObject))
 			{
-				// System.out.println("Deselecting row " + row);
 				selectionModel.setSelected(rowObject, false);
 			}
 		}
@@ -1365,7 +1356,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    			StatTable.this.statTableModel.clearSelectionList();
 	    			
 	    			// remove views (and their occurrences as handler)
-	    			statInteractiePanel.getStatModel().removeViewsWithoutEvent();
+	    			statInteractiePanel.getStatModel().removeViews();
 	    
 	    			// Complete reset met zetOpdracht()
 	    			StatTable.this.statInteractiePanel.getView().getController()
