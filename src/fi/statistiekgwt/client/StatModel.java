@@ -89,6 +89,18 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	}
 
 	/**
+	 * Add a StatistiekView without triggering an AddViewEvent.
+	 * 
+	 * @param view
+	 *            The view that will be added
+	 */
+	public void addViewWithoutEvent(StatistiekView view)
+	{
+		this.views.add(view);
+		this.viewInOwnWindow.add(false);
+	}
+
+	/**
 	 * 
 	 * @param mainWindowIndex
 	 * @return
@@ -247,29 +259,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	 */
 	public HashMap getResetHashMap()
 	{
-		// System.out.println("StatModel.getResetHashtable(): resetHashtable=" +
-		// resetHashtable);
 		return this.resetHashMap;
-	}
-
-	/**
-	 * Remove all views and their occurrences as handler without triggering an event.
-	 */
-	public void removeViewsWithoutEvent()
-	{
-        Iterator<StatistiekView> iterator = this.views.iterator();
-        while (iterator.hasNext()) 
-        {
-        	StatistiekView view = iterator.next();
-        	if (view != null)
-        	{
-        		view.removeHandlers();
-        		iterator.remove();
-        	}
-        }
-
-		this.views = new ArrayList<StatistiekView>();
-		this.viewInOwnWindow = new ArrayList<Boolean>();
 	}
 
 	/**
