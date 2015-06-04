@@ -32,8 +32,8 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
-import fi.statistiekgwt.client.ColorGenerator;
-import fi.statistiekgwt.client.ColorGenerator.RGBColor;
+import fi.statistiekgwt.client.ColorUtils;
+import fi.statistiekgwt.client.ColorUtils.RGBColor;
 import fi.statistiekgwt.client.ColorLegend;
 import fi.statistiekgwt.client.ColorPreviewer;
 import fi.statistiekgwt.client.DialogButton;
@@ -91,8 +91,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	private ScrollPanel scrollPanel;
 	private ColorLegend colorLegend;
 
-	public static final CssColor BAR_COLOR = ColorGenerator.DEFAULT_VIEW_ELEMENT_COLOR;
-	public static final CssColor SELECTED_BAR_COLOR = ColorGenerator.SELECTION_COLOR;
+	public static final CssColor BAR_COLOR = ColorUtils.DEFAULT_VIEW_ELEMENT_COLOR;
+	public static final CssColor SELECTED_BAR_COLOR = ColorUtils.SELECTION_COLOR;
 	
 	private int xAxisOffset;
 	private int yAxisOffset;
@@ -161,9 +161,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		// bind histogramview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
 		
-		// bind stattablemodel to histogramview: to handle selection changes in histogramview
-		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
-
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
 		
@@ -189,7 +186,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		dialogButtonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		dialogButtonPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		dialogButtonPanel.addStyleName(statistiekCss.backgroundblue());
-		this.dialogButton = userOptionsPanel.getDialogButton();
+		this.dialogButton = this.userOptionsPanel.getDialogButton();
 		dialogButtonPanel.add(this.dialogButton);
 		
 		this.alles.addSouth(dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);
@@ -237,7 +234,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 */
 	private CssColor getColor(int number)
 	{
-		return ColorGenerator.getColor(number);
+		return ColorUtils.getColor(number);
 	}
 
 	public void setModel(HistogramModel model)
@@ -633,7 +630,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 			CssColor colorSelectedBar = HistogramView.SELECTED_BAR_COLOR;
 			double darkerFactor = 0.25;
-			RGBColor cRGB = ColorGenerator.getRGBColor(c);
+			RGBColor cRGB = ColorUtils.getRGBColor(c);
 			int r = cRGB.getRed();
 			int g = cRGB.getGreen();
 			int b = cRGB.getBlue();
@@ -3126,17 +3123,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		
 		public void paint()
 		{
-			//Graphics2D g2D = (Graphics2D) context;
-//			context.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-//				RenderingHints.VALUE_ANTIALIAS_ON);
-
 			// clear panel
 			this.context = canvas.getContext2d();
 			context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 			
-//			System.out.println("mainPanel.paintComponent(): this.w=" +
-//				this.getWidth() + ", h=" + this.getHeight());
-
 			HistogramView.this.lastPolygonPoint = null;
 
 			// clear locations of bars
