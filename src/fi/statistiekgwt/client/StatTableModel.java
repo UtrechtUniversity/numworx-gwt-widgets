@@ -36,7 +36,7 @@ import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
 /**
- * data model, implements TableModel for JTable
+ * data model, implements TableModel for Table
  * 
  * @author Manu Drijvers, Sylvia van Borkulo
  * @param <T>
@@ -47,7 +47,6 @@ import fi.statistiekgwt.client.types.ColumnType;
  *
  */
 public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditColumnEventHandler, ViewSelectionChangeEventHandler
-//HasValueChangeHandlers //implements TableModel
 {
 	private boolean isHTML5Ready = false;
 	private int rowCount;
@@ -113,6 +112,17 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.fireEvent(event);
 	}
 
+	/**
+	 * Set the views editable field without triggering an event.
+	 * Is used when setting the state in setState().
+	 * 
+	 * @param viewsEditable
+	 */
+	public void setViewsEditableWithoutEvent(boolean viewsEditable)
+	{
+		this.viewsEditable = viewsEditable;
+	}
+
 	public boolean isDataEditable()
 	{
 		return dataEditable;
@@ -127,6 +137,17 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.fireEvent(event);
 	}
 
+	/**
+	 * Set the data editable field without triggering an event.
+	 * Is used when setting the state in setState().
+	 * 
+	 * @param dataEditable
+	 */
+	public void setDataEditableWithoutEvent(boolean dataEditable)
+	{
+		this.dataEditable = dataEditable;
+	}
+
 	public boolean isViewsAddable()
 	{
 		return viewsAddable;
@@ -139,6 +160,17 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		// send an event
 		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.VIEWS_ADDABLE, -1);
 		this.fireEvent(event);
+	}
+
+	/**
+	 * Set the views addable field without triggering an event.
+	 * Is used when setting the state in setState().
+	 * 
+	 * @param viewsAddable
+	 */
+	public void setViewsAddableWithoutEvent(boolean viewsAddable)
+	{
+		this.viewsAddable = viewsAddable;
 	}
 
 	public HashMap getState()
@@ -235,21 +267,18 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			{
 				this.values.add(new ArrayList<Object>(list.getStringList(i)));
 			}
-			
-//			System.out.println("StatTableModel.setState(): values.size()=" +
-//				this.values.size());
 		}
 		if (map.containsKey("viewsEditable"))
 		{
-			this.setViewsEditable(map.getBoolean("viewsEditable"));
+			this.setViewsEditableWithoutEvent(map.getBoolean("viewsEditable"));
 		}
 		if (map.containsKey("dataEditable"))
 		{
-			this.setDataEditable(map.getBoolean("dataEditable"));
+			this.setDataEditableWithoutEvent(map.getBoolean("dataEditable"));
 		}
 		if (map.containsKey("viewsAddable"))
 		{
-			this.setViewsAddable(map.getBoolean("viewsAddable"));
+			this.setViewsAddableWithoutEvent(map.getBoolean("viewsAddable"));
 		}
 
 		// this.selectionListeners = new ArrayList<SelectionListener>();
@@ -2161,7 +2190,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public double[][] getDataColumnsForCorrelation(int columnAIndex, int columnBIndex)
 	{
-		double[][] data = new double[this.getRowCount()][2];
+		double[][] data = new double[2][this.getRowCount()]; // flip matrix to make it easier to extract the data columns
 		
 		// count the valid pairs of values
 		int count = 0;
@@ -2171,9 +2200,9 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			try
 			{
 				// column A value
-				data[count][0] = Double.parseDouble(((String) this.getValueAt(i, columnAIndex)));
+				data[0][count] = Double.parseDouble(((String) this.getValueAt(i, columnAIndex)));
 				// column B value
-				data[count][1] = Double.parseDouble(((String) this.getValueAt(i, columnBIndex)));
+				data[1][count] = Double.parseDouble(((String) this.getValueAt(i, columnBIndex)));
 				// if both column values are valid, increase count
 				count++;
 			}
@@ -2184,11 +2213,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		
 		// return the data with non-valid pairs of values excluded
-		double[][] data_missingExcluded = new double[count][2];
+		double[][] data_missingExcluded = new double[2][count];
 		
-		for (int i = 0; i < count; i++)
+		for (int j = 0; j < count; j++)
 		{
-			for (int j = 0; j < 2; j++)
+			for (int i = 0; i < 2; i++)
 			{
 				data_missingExcluded[i][j] = data[i][j];
 			}
@@ -2310,13 +2339,22 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	public synchronized void setSelectionList(ArrayList<Boolean> selectionList)
 	{
-		// System.out.println("StatTableModel.setSelectionList(selectionList="
-		// + selectionList + ")");
 		this.selectionList = selectionList;
 		
 		// send an event
 		SelectionChangeEvent event = new SelectionChangeEvent("StatTableModel");
 		this.fireEvent(event);
+	}
+
+	/**
+	 * Set the selection list without triggering an event.
+	 * Is used when setting the state in StatInteractiePanel.setState().
+	 * 
+	 * @param selectionList
+	 */
+	public synchronized void setSelectionListWithoutEvent(ArrayList<Boolean> selectionList)
+	{
+		this.selectionList = selectionList;
 	}
 
 	public ArrayList<Boolean> getSelectionList()
