@@ -1,12 +1,13 @@
 package fi.statistiekgwt.client;
 
 import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.CanvasGradient;
 import com.google.gwt.canvas.dom.client.Context2d;
-import fi.statistiekgwt.client.ColorGenerator.RGBColor;
+import fi.statistiekgwt.client.ColorUtils.RGBColor;
 
 /**
  * 
- * Extended JPanel that shows a color gradient
+ * Canvas that shows a color gradient.
  * 
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
@@ -16,7 +17,7 @@ public class ColorPreviewer
 	private RGBColor c1;
 	private RGBColor c2;
 	private Canvas canvas;
-	private Context2d g;
+	private Context2d context;
 
 	/**
 	 * Constructor
@@ -34,41 +35,41 @@ public class ColorPreviewer
 		this.initContext2d();
 	}
 
+
 	public void initContext2d() 
 	{
-		this.g = canvas.getContext2d();	
+		this.context = canvas.getContext2d();	
 	}
 
-	public void paint()
+	public Canvas getCanvas()
 	{
-		paint(g);
+		return this.canvas;
 	}
 	
-	public void paint(Context2d context)
+	public void paint()
 	{
-		int w = this.canvas.getOffsetWidth();
-		int h = this.canvas.getOffsetHeight();
+		int w = this.canvas.getCoordinateSpaceWidth();
+		int h = this.canvas.getCoordinateSpaceHeight();
 		
 		 // black
 		RGBColor black = new RGBColor(0,0,0);
 		context.setStrokeStyle(black.getCssColor());
 		context.clearRect(0, 0, w, h);
 		context.strokeRect(0, 0, w - 1, h - 1);
-		int width = w - 2;
+		
+		// met gradient
+		CanvasGradient gradient;
+		gradient = context.createLinearGradient(0, 0, w, 0);
+		
+		String c1String = c1.getCssColor().value();
+		String c2String = c2.getCssColor().value();
+		
+		gradient.addColorStop(0, c1String);
+		gradient.addColorStop(1, c2String);
+		
+		context.setFillStyle(gradient);
 
-		for (int x = 0; x < width; x++)
-		{
-			RGBColor mixColor = ColorPreviewer.mixColors(c1, c2, (double) x
-				/ (double) width);
-			context.beginPath();
-			 // change to color c
-			context.setStrokeStyle(mixColor.getCssColor());
-			// stroke from (x + 1, 1)
-			context.moveTo(x + 1, 1);
-			// ... to (x + 1, h - 2)
-			context.lineTo(x + 1, h - 2);
-			context.stroke();
-		}
+		context.fillRect(0, 0, w, h);
 	}
 
 	/**
