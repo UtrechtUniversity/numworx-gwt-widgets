@@ -13,7 +13,6 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
-import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
@@ -25,8 +24,8 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 
-import fi.statistiekgwt.client.ColorGenerator;
-import fi.statistiekgwt.client.ColorGenerator.RGBColor;
+import fi.statistiekgwt.client.ColorUtils;
+import fi.statistiekgwt.client.ColorUtils.RGBColor;
 import fi.statistiekgwt.client.ColorPreviewer;
 import fi.statistiekgwt.client.DialogButton;
 import fi.statistiekgwt.client.StatistiekCssResource;
@@ -113,7 +112,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 	 */
 	private String[][] cellColors;
 	
-	public static final RGBColor SELECTED_COLOR = ColorGenerator.SELECTION_COLOR_RGB;
+	public static final RGBColor SELECTED_COLOR = ColorUtils.SELECTION_COLOR_RGB;
 	public static final int GRID_TOPGAP = 5;
 	public static final int GRID_BOTTOMGAP = 5;
 	public static final int GRID_LEFTGAP = 5;
@@ -180,9 +179,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		// bind frequencytableview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
 		
-		// bind stattablemodel to frequencytableview: to handle selection changes in frequencytableview
-		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
-
+		// create GUI
 		this.mainPanel = new FlowPanel();
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel);
@@ -508,7 +505,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 								: (double) frequencies_number[i][j * 2 + 1] / (double) frequencies_number[i][j * 2]);
 
 							this.cellColors[i][j] = ColorPreviewer.mixColorsToString(
-								ColorGenerator.WHITE, SELECTED_COLOR, d);
+								ColorUtils.WHITE_RGB, SELECTED_COLOR, d);
 						}
 					}
 				}
@@ -527,7 +524,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 									/ (double) ft[j].frequency);
 
 							this.cellColors[i][j] = ColorPreviewer.mixColorsToString(
-								ColorGenerator.WHITE, SELECTED_COLOR, d);
+								ColorUtils.WHITE_RGB, SELECTED_COLOR, d);
 						}
 					}
 				}
