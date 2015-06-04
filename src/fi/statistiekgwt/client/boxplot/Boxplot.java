@@ -14,7 +14,7 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 
-import fi.statistiekgwt.client.ColorGenerator;
+import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
@@ -119,7 +119,7 @@ public class Boxplot
 
 	public static double WIDTH_FILL_FRACTION = 0.8;
 	public static double FILL_FRACTION = 0.8;
-	public static final CssColor BOX_COLOR = ColorGenerator.DEFAULT_VIEW_ELEMENT_COLOR;
+	public static final CssColor BOX_COLOR = ColorUtils.DEFAULT_VIEW_ELEMENT_COLOR;
 	public static final int MAX_BOX_HEIGHT = 40;
 	public static final int AXIS_OFFSET = 25;
 	public static final int AXIS_LABEL_OFFSET = 10;
@@ -464,7 +464,7 @@ public class Boxplot
 					{
 						int x = this.valueToScreenLocation(p);
 						// Zet hulplijnkleur
-						context.setStrokeStyle(ColorGenerator.GREY);
+						context.setStrokeStyle(ColorUtils.GREY);
 						// Teken hulplijn
 						context.beginPath();
 						context.moveTo(this.dependentAxisWidth, x);
@@ -482,7 +482,7 @@ public class Boxplot
 				{
 					int x = this.valueToScreenLocation(p);
 					// Zet hulplijnkleur
-					context.setStrokeStyle(ColorGenerator.GREY);
+					context.setStrokeStyle(ColorUtils.GREY);
 					// Teken hulplijn
 					context.beginPath();
 					context.moveTo(x, 0);
@@ -496,8 +496,8 @@ public class Boxplot
 		} // if (splitClass == 0) paint markers
 		
 		// Zet kleur weer terug op zwart
-		context.setStrokeStyle(ColorGenerator.BLACK);
-		context.setFillStyle(ColorGenerator.BLACK);
+		context.setStrokeStyle(ColorUtils.BLACK);
+		context.setFillStyle(ColorUtils.BLACK);
 
 		
 		// PAINT THE BOXPLOT FOR THE GIVEN SPLITCLASS
@@ -544,7 +544,7 @@ public class Boxplot
 			context.setFillStyle(BOX_COLOR);
 			context.fillRect(x, locationUpperQuartiles[splitClass], width, 
 				locationLowerQuartiles[splitClass] - locationUpperQuartiles[splitClass]);
-			context.setFillStyle(ColorGenerator.BLACK);
+			context.setFillStyle(ColorUtils.BLACK);
 			
 			// paint lower quartile
 			if (highlightLowerQuartiles.get(splitClass))
@@ -826,12 +826,10 @@ public class Boxplot
 			context.save();
 			metrics = context.measureText(this.columnName);
 			// set the painting position
-			context.translate(Boxplot.FONT_HEIGHT/2 + 4, this.getHeight()
-				/ 2 + metrics.getWidth() / 2); // the desired position of the text
+			context.translate(Boxplot.FONT_HEIGHT/2 + 4, 
+				this.getHeight() / 2 + metrics.getWidth() / 2); // the desired position of the text
 			context.rotate(Math.PI * 1.5);
-			context.fillText(this.columnName, 
-					0, 
-					0);
+			context.fillText(this.columnName, 0, 0);
 			context.restore();
 			
 		} // vertical boxplot
@@ -866,7 +864,7 @@ public class Boxplot
 				}
 				
 				metrics = context.measureText(pString);
-				context.setFillStyle(ColorGenerator.BLACK);
+				context.setFillStyle(ColorUtils.BLACK);
 				context.fillText(pString,
 					x - (int) (metrics.getWidth() / 2),
 					this.canvas.getCoordinateSpaceHeight() - Boxplot.AXIS_OFFSET 
@@ -882,7 +880,7 @@ public class Boxplot
 			context.closePath();
 			context.stroke();
 
-			context.setFillStyle(ColorGenerator.BLACK);
+			context.setFillStyle(ColorUtils.BLACK);
 			metrics = context.measureText(this.columnName);
 			context.fillText(this.columnName,
 				this.getWidth() / 2 - metrics.getWidth() / 2,
@@ -908,7 +906,7 @@ public class Boxplot
 		}
 
 		this.determineNormalFitIndependentAxis(context);
-		context.setFillStyle(ColorGenerator.BLACK);
+		context.setFillStyle(ColorUtils.BLACK);
 
 		if (this.verticalBoxplots)
 		{
