@@ -429,7 +429,6 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
 
-
 		if (this.model.columnIndexValid())
 		{
 			if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
