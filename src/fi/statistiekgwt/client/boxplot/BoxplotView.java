@@ -112,10 +112,8 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 
 		// bind boxplotview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
-		
-		// bind stattablemodel to boxplotview: to handle selection changes in boxplotview
-		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
 
+		// create GUI
 		userOptionsPanel = new BoxplotUserOptionsPanel(this, controller, model);
 		// initial update for setting widgets in user options panel
 		this.userOptionsPanel.update();
