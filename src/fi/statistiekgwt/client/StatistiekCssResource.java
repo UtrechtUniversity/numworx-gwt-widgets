@@ -103,5 +103,7 @@ public interface StatistiekCssResource extends CssResource
 	String horizontalPanelDescriptives();
 
 	String checkBox();
+
+	String block();
 }
 
