@@ -105,6 +105,9 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 
 	public HashMap<String, Object> getState()
 	{
+		// remove handlers
+		this.removeHandlers();
+		
 		HashMap h = new HashMap();
 
 		h.put("tableModel", this.model.getStatTableModel().getState());
@@ -135,7 +138,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 
 	public void setState(Map<String, Object> launchState)
 	{
-		this.model.removeViewsWithoutEvent();
+		this.model.removeViews();
 		this.view.removeViewTabs();
 		
 		ObjectMap map = JSONUtilities.wrapMap(launchState);
@@ -156,7 +159,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 			}
 			if (launchState.containsKey("selectionList"))
 			{
-				this.model.getStatTableModel().setSelectionList(
+				this.model.getStatTableModel().setSelectionListWithoutEvent(
 					new ArrayList<Boolean>(map.getBooleanList("selectionList")));
 			}
 			else
@@ -167,7 +170,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 				{
 					selectionList.add(false);
 				}
-				this.model.getStatTableModel().setSelectionList(selectionList);
+				
+				this.model.getStatTableModel().setSelectionListWithoutEvent(selectionList);
 			}
 	
 			if (launchState.containsKey("statistiekViewTypes")
@@ -194,8 +198,14 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 							statistiekView.update();
 						}
 						
-						this.model.addView(statistiekView);
+						this.model.addViewWithoutEvent(statistiekView);
 					}
+				} // for loop
+				
+				if (statistiekViewTypes.length > 0)
+				{
+					// update statinteractiepanelview for the views added 
+					this.view.update();
 				}
 			}
 	
@@ -207,6 +217,23 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 				this.view.processSelectedTab(index);
 			}
 		}
+	}
+
+	/**
+	 * Remove all of statistiekinteractiepanel's handler occurrences.
+	 */
+	private void removeHandlers()
+	{
+		// remove statinteractiepanelview's handler occurrences
+		this.view.removeHandlers();
+		
+		// remove all statistiekview's handler occurrences
+		for (int i = 0; i < this.model.getViews().size(); i++)
+		{
+			StatistiekView view = model.getViews().get(i);
+			view.removeHandlers();
+		}
+
 	}
 
 	public void setBounds(int x, int y, int b, int h)
@@ -497,20 +524,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 
 	public void zetOpdracht(HashMap hashMap, String[] randomVars, HashMap randomValues)
 	{
-		// Waarom randomVars en randomValues?
-//		System.out.println("StatInteractiePanel.zetOpdracht(hashtable=" + hashtable
-//		 + ", randomVars=" + randomVars + ", randomValues=" + randomValues);
-		
-//		Hashtable b = deepCopy(hashtable);
-//		Hashtable resetHashtable = deepCopy(hashtable);
-		
 		ObjectMap map = JSONUtilities.wrapMap(hashMap);
 
 		// Deep copy the hashtable, else references will be copied and fields
 		// within resetHashtable can be changed.
 		this.model.setResetHashtable(hashMap);
 
-		this.model.removeViewsWithoutEvent();
+		this.model.removeViews();
 		this.view.removeViewTabs();
 
 		if (hashMap.containsKey("tableModel"))
@@ -528,7 +548,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		ArrayList<Boolean> selectionList;
 		if (hashMap.containsKey("selectionList"))
 		{
-			this.model.getStatTableModel().setSelectionList(
+			this.model.getStatTableModel().setSelectionListWithoutEvent(
 				new ArrayList<Boolean>(map.getBooleanList("selectionList")));
 		}
 		else
@@ -538,7 +558,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 			{
 				selectionList.add(false);
 			}
-			this.model.getStatTableModel().setSelectionList(selectionList);
+			
+			this.model.getStatTableModel().setSelectionListWithoutEvent(selectionList);
 		}
 
 		if (hashMap.containsKey("statistiekViewTypes")
@@ -563,8 +584,14 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 						statistiekView.setState(state);
 					}
 					
-					this.model.addView(statistiekView);
+					this.model.addViewWithoutEvent(statistiekView);
 				}
+			} // for loop
+			
+			if (statistiekViewTypes.length > 0)
+			{
+				// update statinteractiepanelview for the views added 
+				this.view.update();
 			}
 		}
 
