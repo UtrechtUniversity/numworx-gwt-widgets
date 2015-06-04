@@ -2,7 +2,6 @@ package fi.statistiekgwt.client.dotplot;
 
 import java.util.ArrayList;
 
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -28,8 +27,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
-
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.ColorPreviewer;
 import fi.statistiekgwt.client.DialogButton;
@@ -38,8 +35,6 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.colorpicker.ColorPickerDialog;
-import fi.statistiekgwt.client.event.ColorChangeEvent;
-import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
 
