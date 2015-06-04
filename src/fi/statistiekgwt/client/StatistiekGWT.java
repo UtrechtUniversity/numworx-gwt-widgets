@@ -15,6 +15,7 @@ import fi.statistiekgwt.client.StatInteractiePanel;
 import fi.statistiekgwt.client.boxplot.BoxplotController;
 import fi.statistiekgwt.client.crosstabulationtable.CrossTabulationTableController;
 import fi.statistiekgwt.client.descriptives.DescriptivesController;
+import fi.statistiekgwt.client.dotplot.DotplotController;
 import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
 import fi.statistiekgwt.client.histogram.HistogramController;
 import fi.statistiekgwt.client.text.Text_nl;
@@ -345,7 +346,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Dotplot"))
 		{
-			//view = new DotplotController(model, viewName, startVar, w, h);
+			view = new DotplotController(model, viewName, startVar, w, h);
 		}
 		else if (viewType.equals("Frequentietabel"))
 		{
@@ -369,12 +370,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		else if (viewType.equals("Spreidingsdiagram"))
 		{
-			//System.out.println("Statistiek.createView(): viewName = " + viewName);
-			//view = new DotplotController(model, viewName, startVar, startVar2, w, h);
+			view = new DotplotController(model, viewName, startVar, startVar2, w, h);
 		}
 		else if (viewType.equals("Kengetallen"))
 		{
-			//System.out.println("Statistiek.createView(): viewName = " + viewName);
 			view = new DescriptivesController(model, viewName, startVar, w, h);
 		}
 		
