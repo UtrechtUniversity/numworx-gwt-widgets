@@ -8,10 +8,7 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.ComplexPanel;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.Panel;
 
 /**
  * Class that provides utility classes.
@@ -43,7 +40,7 @@ public class StatistiekUtils
 		{
 			event.stopPropagation();
 		}
-	}
+	} // class DummyTouchHandler
 	
 	public static DummyTouchHandler getDummyTouchHandler()
 	{
