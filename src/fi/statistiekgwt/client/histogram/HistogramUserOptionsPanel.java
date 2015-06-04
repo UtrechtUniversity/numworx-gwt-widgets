@@ -16,7 +16,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -280,7 +279,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			this.binsBox.addItem(options1[i].toString());
 		}
 		
-		separatorBinSettings = new HTML(this.hrString);
+		separatorBinSettings = new HTML(HistogramUserOptionsPanel.hrString);
 		separatorBinSettings.addStyleName(statistiekCss.horizontalrule());
 
 		this.minBoundaryLabel = new Label(
@@ -317,7 +316,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.cumulativeBox = new CheckBox(
 			StatistiekGWT.rb.getString("cumulativeCheckbox"), false);
 
-		amountLabelHR = new HTML(this.hrString);
+		amountLabelHR = new HTML(HistogramUserOptionsPanel.hrString);
 		amountLabelHR.addStyleName(statistiekCss.horizontalrule());
 
 		// radiobuttons for position labels
@@ -329,7 +328,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			StatistiekGWT.rb.getString("labelUnderBinRadio"));
 		this.labelUnderBinRadioItem.addStyleName(statistiekCss.radioButton());
 
-		labelSplitHR = new HTML(this.hrString);
+		labelSplitHR = new HTML(HistogramUserOptionsPanel.hrString);
 		labelSplitHR.addStyleName(statistiekCss.horizontalrule());
 
 		this.nextToEachOtherRadioItem = new RadioButton("splitViewGroup",
@@ -375,7 +374,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitChooseBoundariesButton = new Button(
 			StatistiekGWT.rb.getString("binsButton"));
 
-		this.separatorSplitBoundaries = new HTML(this.hrString);
+		this.separatorSplitBoundaries = new HTML(HistogramUserOptionsPanel.hrString);
 		this.separatorSplitBoundaries.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
