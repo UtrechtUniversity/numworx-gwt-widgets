@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
@@ -13,6 +12,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLTable;
 import com.google.gwt.user.client.ui.HTMLTable.Cell;
@@ -22,11 +22,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 
-import fi.statistiekgwt.client.ColorGenerator;
-import fi.statistiekgwt.client.ColorGenerator.RGBColor;
 import fi.statistiekgwt.client.ColorPreviewer;
+import fi.statistiekgwt.client.ColorUtils;
+import fi.statistiekgwt.client.ColorUtils.RGBColor;
 import fi.statistiekgwt.client.DialogButton;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
@@ -83,11 +82,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	public static final int GRID_BOTTOMGAP = 5;
 	public static final int GRID_LEFTGAP = 5;
 	public static final int GRID_RIGHTGAP = 5;
-	public static final RGBColor SELECTED_COLOR = ColorGenerator.SELECTION_COLOR_RGB;
-//	private int rowHeight;
-//	private int tableWidth;
-//	private int tableHeight;
-//	private boolean isTableHeightSet;
+	public static final RGBColor SELECTED_COLOR = ColorUtils.SELECTION_COLOR_RGB;
 
 	private int width;
 	private int height;
@@ -147,9 +142,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		// bind frequencytableview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
 		
-		// bind stattablemodel to frequencytableview: to handle selection changes in frequencytableview
-		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
-
 		this.mainPanel = new FlowPanel();
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel);
@@ -481,7 +473,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 								double d = (frequencies[j] == 0 ? 0.0
 									: (double) frequencies[j + 1] / (double) frequencies[j]);
 								this.rowColors[j / 2][i] = ColorPreviewer.mixColorsToString(
-									ColorGenerator.WHITE, SELECTED_COLOR, d);
+									ColorUtils.WHITE_RGB, SELECTED_COLOR, d);
 							}
 						}
 					}
@@ -495,8 +487,8 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 								double d = (ft.frequency == 0 ? 0
 									: (double) ft.selectionFrequency
 										/ (double) ft.frequency);
-								this.rowColors[k][i] = ColorPreviewer.mixColorsToString(ColorGenerator.WHITE,
-									SELECTED_COLOR, d);
+								this.rowColors[k][i] = ColorPreviewer.mixColorsToString(
+									ColorUtils.WHITE_RGB, SELECTED_COLOR, d);
 							}
 						}
 					}
