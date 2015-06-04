@@ -38,11 +38,11 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DialogBox.Caption;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -56,7 +56,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.DialogBox.Caption;
 
 import fi.statistiekgwt.client.event.AddViewEvent;
 import fi.statistiekgwt.client.event.AddViewEventHandler;
@@ -113,6 +112,16 @@ public class StatInteractiePanelView extends LayoutPanel
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
+	/**
+	 * The handler registration used to remove statinteractiepanelview's 
+	 * table change event handler occurrence.
+	 */
+	private HandlerRegistration tableChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove statinteractiepanelview's 
+	 * add view event handler occurrence.
+	 */
+	private HandlerRegistration addViewEventHandlerRegistration;
 
 	/**
 	 * Constructor
@@ -267,8 +276,6 @@ public class StatInteractiePanelView extends LayoutPanel
     	this.changeViewNamePopupMenu.show();
 	}
 
-
-
 	/**
 	 * Set the model and add event handlers.
 	 * 
@@ -277,8 +284,24 @@ public class StatInteractiePanelView extends LayoutPanel
 	private void initModel(StatModel model)
 	{
 		this.model = model;
-		this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
-		this.model.addAddViewEventHandler(this);
+		
+		this.tableChangeEventHandlerRegistration = this.model.getStatTableModel().addTableChangeEventHandler(this);
+		this.addViewEventHandlerRegistration = this.model.addAddViewEventHandler(this);
+	}
+
+	/**
+	 * Remove all of statinteractiepanelview's handler occurrences.
+	 */
+	public void removeHandlers()
+	{
+		if (this.tableChangeEventHandlerRegistration != null)
+		{
+			this.tableChangeEventHandlerRegistration.removeHandler();
+		}
+		if (this.addViewEventHandlerRegistration != null)
+		{
+			this.addViewEventHandlerRegistration.removeHandler();
+		}
 	}
 
 	/**
@@ -310,9 +333,6 @@ public class StatInteractiePanelView extends LayoutPanel
 
 				setSelectedView(selectedItem);
 				setSelectedTab(selectedItem);
-				
-				updateViewIfNecessary(selectedItem);
-
 			}
 		});
 	}
@@ -473,7 +493,6 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	private void setSelectedView(int view)
 	{
-		// GWT.log("setSelectedView(view=" + view + ")");
 		selectedView = view;
 	}
 
@@ -598,6 +617,17 @@ public class StatInteractiePanelView extends LayoutPanel
 	{
 		this.selectedTabIndex = index;
 		this.tabPanel.selectTab(index);
+	}
+
+	/**
+	 * Set the field selectedTab to keep track of the visible
+ 	 * tab in tabPane in case of views in own window.
+	 * 
+	 * @param index
+	 */
+	public void setSelectedTabIndex(int index)
+	{
+		this.selectedTabIndex = index;
 	}
 
 	/**
