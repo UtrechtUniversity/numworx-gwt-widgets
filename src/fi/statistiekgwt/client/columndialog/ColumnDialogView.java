@@ -35,7 +35,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class ColumnDialogView extends DialogBox// implements Observer
+public class ColumnDialogView extends DialogBox
 {
 	private static final int MAXIMUM_VISIBLE_IN_ENUM_LIST = 7;
 
@@ -236,7 +236,7 @@ public class ColumnDialogView extends DialogBox// implements Observer
 		this.uitlegPanel.add(this.uitlegLabel);
 		this.uitlegPanel.add(this.uitlegArea);
 
-		this.okCancelPanel = new FlowPanel();//LayoutPanel();
+		this.okCancelPanel = new FlowPanel();
 		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
 		this.okButton.addStyleName(statistiekCss.margin());
 		this.cancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
@@ -403,12 +403,12 @@ public class ColumnDialogView extends DialogBox// implements Observer
 	}
 
 	/**
-	 * Add a clickhandler to all buttons and fields
+	 * Add a clickhandler to all buttons and fields.
 	 * 
 	 * @param handler
 	 *            the attached clickhandler
 	 */
-	public void addClickHandlers(ClickHandler handler) // was: addActionListeners()
+	public void addClickHandlers(ClickHandler handler)
 	{
 		this.removeSelectedElement.addClickHandler(handler);
 		this.removeAllElements.addClickHandler(handler);
