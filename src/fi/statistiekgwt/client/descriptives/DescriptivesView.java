@@ -20,7 +20,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 
-import fi.statistiekgwt.client.ColorGenerator;
+import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.DialogButton;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
@@ -58,7 +58,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	private ScrollPanel scrollPanel;
 	private HorizontalPanel dialogButtonPanel;
 
-	public static final CssColor SELECTED_COLOR = ColorGenerator.SELECTION_COLOR;
+	public static final CssColor SELECTED_COLOR = ColorUtils.SELECTION_COLOR;
 	public static final int GRID_TOPGAP = 5;
 	public static final int GRID_BOTTOMGAP = 5;
 	public static final int GRID_LEFTGAP = 5;
@@ -208,11 +208,8 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 		// bind descriptivesview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
-		
-		// bind stattablemodel to descriptivesview: to handle selection changes in descriptivesview
-		this.addViewSelectionChangeEventHandler(this.model.getStatTableModel());
 
-
+		// create GUI
 		this.mainPanel = new FlowPanel();
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel);
