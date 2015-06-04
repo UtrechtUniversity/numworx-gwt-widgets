@@ -179,7 +179,8 @@ public class Text_nl
 		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv)." },
 		{ "emptyTableMessage", "De tabel is leeg"},
 		{ "notHTML5ReadyMessage", "Sla de statistiekcomponent opnieuw op in de auteursomgeving "
-			+ "om de component te kunnen bekijken in HTML5." }
+			+ "om de component te kunnen bekijken in HTML5." },
+		{ "selectColors", "Selecteer kleuren"}
 		
 	};
 }
