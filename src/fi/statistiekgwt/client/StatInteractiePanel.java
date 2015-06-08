@@ -48,6 +48,15 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		this.model = new StatModel();
 		this.view = new StatInteractiePanelView(this.model, this, barHeight, Unit.PX);
 		
+		// koppel statinteractiepanel aan de default aangemaakte StatTable
+		if (this.model.getViews().size() > 0)
+		{
+			if (this.model.getViews().get(0) instanceof StatTable)
+			{
+				((StatTable) this.model.getViews().get(0)).setStatInteractiePanel(this);
+			}
+		}
+		
 		super.add(this.view);
 	}
 
