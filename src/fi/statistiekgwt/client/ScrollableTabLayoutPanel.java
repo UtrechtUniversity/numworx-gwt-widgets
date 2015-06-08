@@ -584,13 +584,18 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 							.getWidgetIndex(selected));
 						Widget panelWithLabel = null;
 						Widget label = null;
+
 						if (selected instanceof HasWidgets)
 						{
 							// get first child: the label with clickhandler
 							Iterator<Widget> iter = ((HasWidgets) selected).iterator();
 							panelWithLabel = (iter != null && iter.hasNext()) ? iter.next() : null;
-							// panelWithLabel is a horizontal panel containing the tab label as widget 0
-							label = ((HorizontalPanel) panelWithLabel).getWidget(0); // the label
+
+							// for view-tabs panelWithLabel is a horizontal panel containing the tab label as widget 0
+							if (panelWithLabel instanceof HorizontalPanel)
+							{
+								label = ((HorizontalPanel) panelWithLabel).getWidget(0); // the label
+							}
 						}
 						
 						// fire the click event of the label so that StatInteractiePanelView$LabelClickHandler.onClick() is executed 
@@ -616,7 +621,7 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 
 			table.addColumn(column);
 
-			// put the table into the scroll panel for the case if it height
+			// put the table into the scroll panel for the case if it's height
 			// exceeds the window height
 			setWidget(new ScrollPanel(table));
 		}
