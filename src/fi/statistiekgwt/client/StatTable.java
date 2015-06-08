@@ -762,7 +762,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				if (readQueue.size() > 0)
 				{
 					File file = readQueue.get(0);
-					handleError(file);
+					handleError(file, event.toDebugString());
 					readQueue.remove(0);
 					readNextFile();
 				}
@@ -1168,14 +1168,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				// Necessary for FF (see bug
 				// https://bugzilla.mozilla.org/show_bug.cgi?id=701154)
 				// Standard-complying browsers will not go in this branch
-				handleError(file);
+				handleError(file, t.getMessage() + ", " + t.getStackTrace());
 				readQueue.remove(0);
 				readNextFile();
 			}
 		}
 	}
 
-	private void handleError(File file)
+	private void handleError(File file, String message)
 	{
 		FileError error = reader.getError();
 		String errorDesc = "";
@@ -1188,7 +1188,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 		}
 		Window.alert("File loading error for file: " + file.getName() + "\n"
-			+ errorDesc);
+			+ errorDesc + ", message: " + message);
 	}
 	
 	/**
