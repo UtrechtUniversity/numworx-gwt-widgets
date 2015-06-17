@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
 import fi.statistiekgwt.client.boxplot.BoxplotController;
@@ -113,6 +114,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		// voeg statinteractiepanel toe
 		//RootPanel.get(holderId).add(basisPanel);
 		RootLayoutPanel.get().add(basisPanel);
+		Stub.publish(this);
 	}
 	
 	/**
@@ -161,16 +163,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public HashMap<String, Object> getState()
 	{
-//		HashMap<String,Object> h = new HashMap<String,Object>();
-//		return h;
-		
-		// we hebben:
-		// tableModel
-		// selectionList
-		// statistiekViewTypes
-		// statistiekViewStates
-		// selectedView
-
 		return this.basisPanel.getState();
 	}
 
@@ -183,7 +175,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -307,19 +298,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		breedte = width - 2 * WIDTH_OFFSET;
 		hoogte = height;
 		
-		ObjectMap launchData = JSONUtilities.wrapMap(launchDataMap);
 		launchState = launchDataMap;
-		
-		if (launchData != null)
-		{
-			// we hebben:
-			// tableModel
-			// selectionList
-			// statistiekViewTypes
-			// statistiekViewStates
-			// selectedView
-			// 
-		}
 		
 		// in initialize() wordt de launchState in statInteractiePanel gezet
 		this.initialize();
@@ -329,9 +308,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		StatTableModel model, int startVar, int startVar2,
 		StatInteractiePanel statInteractiePanel)
 	{
-//		System.out.println("Statistiek.createView(viewType=" + viewType + ", viewName=" + viewName 
-//			+ ", identityHashCode(statTableModel)=" + identityHashCode(model) + ")");
-
 		StatistiekView view = null;
 		int w = statInteractiePanel != null ? statInteractiePanel.getWidth() : 0;
 		int h = statInteractiePanel != null ? Math.max(0, statInteractiePanel.getHeight() - HEIGHT_OFFSET) : 0;
@@ -575,14 +551,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
 			|| (((max - min) < 1) && ((max - min) != 0)))
 		{
-			// determine the number of decimals of min and max
-//			String minString = String.valueOf(min);
-//			int decimalPlacesMin = StatistiekGWT.getNumberOfDecimals(minString);
-//			String maxString = String.valueOf(max);
-//			int decimalPlacesMax = StatistiekGWT.getNumberOfDecimals(maxString);
-//			int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
-			
-			// test syl: alternative... using number of decimals of start and binWidth
+			// use number of decimals of start and binWidth
 			double start;
 			if (minBoundary <= min)
 			{
@@ -661,10 +630,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			boundaries.add(d);
 		}
 
-//		System.out.println("Statistiek.appropriateBoundariesFromBinSettings(min = "
-//			+ min + ", max = " + max + ", binWidth = " + binWidth + ", minBoundary = " 
-//			+ minBoundary + "): " + boundaries);
-		
 		return boundaries;
 	}
 
