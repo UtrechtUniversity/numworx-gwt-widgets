@@ -9,6 +9,7 @@ import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -215,12 +216,27 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		
 		// add alles to crosstabulationtableview (layoutpanel)
 		this.add(this.alles);
-		
+
+		this.addHandlers();
+	}
+	
+	/**
+	 * Add handlers, i.e., click and touch handlers to the buttons.
+	 * Also add dummy handlers to stop propagation when view 
+	 * is shown in its own window in a touch environment.
+	 */
+	private void addHandlers()
+	{
+		// let the view stay scrollable and clickable when shown in own window on a touch screen
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchMoveEvent.getType());
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
+
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
 	}
-	
+
 	/**
 	 * Initialize the view's size.
 	 */
