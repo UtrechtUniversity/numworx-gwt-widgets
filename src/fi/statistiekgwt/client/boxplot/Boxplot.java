@@ -418,6 +418,8 @@ public class Boxplot
 		Context2d context = canvas.getContext2d();
 		context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 		
+		this.setSingleBoxAreaWidth();
+
 		if (boxplotView.hasSplit())
 		{
 			// PAINT INDEPENDENT AXIS
@@ -962,8 +964,7 @@ public class Boxplot
 				
 				for (int splitClass = 0; splitClass < model.getSplitClasses(); splitClass++)
 				{
-					int x1 = (int) Math.round((splitClass + 0.5) * singleBoxAreaWidth)
-						+ this.dependentAxisWidth;
+					int x1 = (int) Math.round((splitClass + 0.5) * singleBoxAreaWidth) + this.dependentAxisWidth;
 
 					int x = (int) Math.round((double) (splitClass + 0.5) * this.singleBoxAreaWidth + this.dependentAxisWidth); 
 
@@ -1173,6 +1174,25 @@ public class Boxplot
 		}
 	}
 	
+	private void setSingleBoxAreaWidth()
+	{
+		BoxplotModel model = this.boxplotView.getModel();
+
+		if (this.verticalBoxplots)
+		{
+			singleBoxAreaWidth = (double) (this.boxplotView.getWidth()
+				- this.dependentAxisWidth - BoxplotView.KEEP_CLEAR_WIDTH)
+				/ (double) model.getSplitClasses();
+		}
+		else
+		{
+			this.singleBoxAreaWidth = (double) (this.canvas.getCoordinateSpaceHeight() 
+				- BoxplotView.KEEP_CLEAR_WIDTH 
+				- this.dependentAxisHeight) 
+				/ (double) model.getSplitClasses();
+		}
+	}
+	
 	/**
 	 * Determine an appropriate scale,
 	 * i.e. step, firstMarker and max values.
@@ -1358,8 +1378,7 @@ public class Boxplot
 					int width = Math.min(Boxplot.MAX_BOX_HEIGHT,
 						(int) Math.round(WIDTH_FILL_FRACTION * getWidth()));
 
-					int lower_x = (int) Math.round((double) splitClass * singleBoxAreaWidth)
-						+ dependentAxisWidth + width;
+					int lower_x = (int) Math.round((double) (splitClass + 0.5) * singleBoxAreaWidth + dependentAxisWidth) - (int) (0.5 * width);
 					int upper_x = lower_x + widthBoxplot;
 					
 		    		if (x > lower_x && x < upper_x
