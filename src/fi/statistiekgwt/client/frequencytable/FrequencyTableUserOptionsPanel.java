@@ -51,9 +51,6 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 	 * Panel 'basisPanel' wordt aan DialogButton meegegeven als content.
 	 */
 	private FlowPanel basisPanel;
-//	private JPanel panel;
-//	private Box vb0;
-//	private Color backgroundColor = new Color(230, 230, 230);
 
 	private FrequencyTableUOPClickHandler clickHandler;
 	private FrequencyTableUOPBlurHandler blurHandler;
@@ -79,7 +76,6 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 	private TextBox binWidthField;
 	private Label boundariesLabel;
 	private TextArea boundariesArea;
-//	private JScrollPane boundariesAreaScrollPane;
 	private Label noObjectsLabel;
 	private Label minValueLabel;
 	private Label maxValueLabel;
@@ -107,7 +103,6 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 	private TextBox splitBinWidthField;
 	private Label splitBoundariesLabel;
 	private TextArea splitBoundariesArea;
-//	private JScrollPane splitBoundariesAreaScrollPane;
 	private Label splitNoObjectsLabel;
 	private Label splitMinValueLabel;
 	private Label splitMaxValueLabel;
@@ -569,8 +564,9 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 			this.splitVarBox.setSelectedIndex(0);
 		}
 	
-		this.splitBinsBox.setSelectedIndex(this.model
-			.getSplitOptions().getBinBoundaries().size() - 1);
+		this.setSelectedItemInListBox(
+			this.splitBinsBox, 
+			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
 		
 		if (this.model.columnIndexValid())
 		{
@@ -578,9 +574,6 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
     		{
     			ColumnType cSplitType = this.model.getStatTableModel().getColumnTypes()
     				.get(this.model.getSplitOptions().getColumnSplitIndex());
-    			
-//    			System.out.println("FrequencyTableUserOptionsPanel.update(): cSplitType = " +
-//    				cSplitType);
     			
     			AllowedTypes splitType = cSplitType.getType();
     			if (splitType.equals(AllowedTypes.DOUBLE)
@@ -629,12 +622,49 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
     				this.splitBinsLabel.setVisible(false);
     				setSplitEnumClasses(true);
     			}
+    			else if (splitType.equals(AllowedTypes.STRING))
+    			{
+    				StringBuilder sb = new StringBuilder();
+    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    					this.model.getSplitOptions());
+    				for (int i = 0; i < splitClasses; i++)
+    				{
+    					sb.append(this.model.getSplitOptions()
+    						.getSplitClassLabel(i, this.model.getStatTableModel()));
+    					sb.append("\n");
+    				}
+    				
+    				this.splitBoundariesArea.setText(sb.toString());
+    				this.separatorSplitBoundaries.setVisible(false);
+    				this.splitBinsBox.setVisible(false);
+    				this.splitBinsLabel.setVisible(false);
+    				setSplitEnumClasses(true);
+    			}
     		}
 		}
 		
 		boolean split = this.model.getSplitOptions().getColumnSplitIndex() > -1;
 		//this.setVisibleSplitOptions(split);
 		this.setVisibleSplitOptions(this.splitOptionsVisible);
+	}
+
+	/**
+	 * Set the given string item selected in typeBox.
+	 * @param type
+	 */
+	private void setSelectedItemInListBox(ListBox listBox, String string)
+	{
+		// find the index of string
+		int indexToFind = -1;
+		for (int i=0; i < listBox.getItemCount(); i++) 
+		{
+		    if (listBox.getItemText(i).equals(string)) 
+		    {
+		        indexToFind = i;
+		        break;
+		    }
+		}
+		listBox.setSelectedIndex(indexToFind);
 	}
 
 	public double getBinWidth()
