@@ -2071,6 +2071,31 @@ public class StatInteractiePanelView extends LayoutPanel
 	}
 	
 	/**
+	 * Remove all view tabs except (one) table view
+	 */
+	public void removeViewTabsExceptTable()
+	{
+		boolean tableSaved = false;
+		
+		int count = this.tabPanel.getWidgetCount();
+		
+		if (count > 1)
+		{
+			for (int i = this.tabPanel.getWidgetCount() - 2; i > -1; i--)
+			{
+				if (!tableSaved && (this.tabPanel.getWidget(i) instanceof StatTable))
+				{
+					tableSaved = true;
+				}
+				else
+				{
+					this.tabPanel.remove(i);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Remove all tabs.
 	 */
 	public void removeAllTabs()
