@@ -105,5 +105,7 @@ public interface StatistiekCssResource extends CssResource
 	String checkBox();
 
 	String block();
+
+	String waitCursor();
 }
 
