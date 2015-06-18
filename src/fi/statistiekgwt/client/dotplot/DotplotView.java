@@ -80,6 +80,8 @@ public class DotplotView extends LayoutPanel implements
 	public static final double KEEP_CLEAR_PART = 0.05;
 	public static final CssColor SELECTION_RECTANGLE_COLOR = 
 		CssColor.make(153, 204, 255); // blue
+	public static final CssColor SELECTION_RECTANGLE_COLOR_TRANSPARENT = 
+		CssColor.make("rgba(153, 204, 255, 0.5)"); // blue
 	public static final int COLOR_LEGEND_WIDTH = 125;
 	
 	// Table with critical values of the Pearson's product-moment 
@@ -272,6 +274,21 @@ public class DotplotView extends LayoutPanel implements
 		// add alles to dotplotview (layoutpanel)
 		this.add(this.alles);
 		
+		this.addHandlers();
+	}
+
+	/**
+	 * Add handlers, i.e., click and touch handlers to the buttons.
+	 * Also add dummy handlers to stop propagation when view 
+	 * is shown in its own window in a touch environment.
+	 */
+	private void addHandlers()
+	{
+		// let the view stay scrollable and clickable when shown in own window on a touch screen
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchMoveEvent.getType());
+	    this.alles.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
+
 		this.dialogButton.addClickHandler(this.dialogButton.getClickHandler());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
 		this.dialogButton.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
@@ -767,17 +784,17 @@ public class DotplotView extends LayoutPanel implements
 	/**
 	 * Determine what color the dot representing an object should be.
 	 * 
-	 * @param pointIndex
+	 * @param rowIndex
 	 *            The index of the object
 	 * @return The color in which the dot representing the object will be
 	 *         painted
 	 */
-	private CssColor determineColor(int pointIndex)
+	private CssColor determineColor(int rowIndex)
 	{
 		if (this.model.columnSplitIndexValid())
 		{
 			String s = (String) this.model.getStatTableModel().getValueAt(
-				pointIndex, this.model.getColumnSplitIndex());
+				rowIndex, this.model.getColumnSplitIndex());
 			if (s.equals(ColumnType.WILDCARD))
 			{
 				return ColorUtils.getWildCardColor();
@@ -788,7 +805,7 @@ public class DotplotView extends LayoutPanel implements
 					|| this.splitType.equals(AllowedTypes.INTEGER))
 				{
 					// determine color for numeric type objects
-					return ColorUtils.getColor(getSplitClass(pointIndex));
+					return ColorUtils.getColor(getSplitClass(rowIndex));
 				}
 				else if (this.splitType.equals(AllowedTypes.ENUM))
 				{
@@ -812,12 +829,12 @@ public class DotplotView extends LayoutPanel implements
 					return ColorUtils.getColor(index);
 				}
 			}
-		}
+		} // columnSplitIndexValid()
 
 		else if (this.model.isUseColorScale() && this.model.columnColorIndexValid())//this.model.isUseColorScale()
 		{
 			String s = (String) this.model.getStatTableModel().getValueAt(
-				pointIndex, this.model.getColumnColorIndex());
+				rowIndex, this.model.getColumnColorIndex());
 			if (s.equals(ColumnType.WILDCARD))
 			{
 				return ColorUtils.getWildCardColor();
@@ -1217,6 +1234,48 @@ public class DotplotView extends LayoutPanel implements
 	}
 
 	/**
+	 * Draw a single non-selected point (dot) at a given location.
+	 * 
+	 * @param context
+	 *            the graphics in which the point will be painted
+	 * @param x
+	 *            the x-coordinate of the painting location
+	 * @param y
+	 *            the y-coordinate of the painting location
+	 * @param rowIndex
+	 *            the index of the object that will be painted
+	 */
+	private void drawNonSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex)
+	{
+		// determine the color of the dot depending on the split class
+		CssColor c = this.determineColor(rowIndex);
+		
+		// draw the point with the given color
+		this.drawNonSelectedPointAtLocation(context, x, y, rowIndex, c);
+	}
+
+	/**
+	 * Draw a single selected point (dot) at a given location.
+	 * 
+	 * @param context
+	 *            the graphics in which the point will be painted
+	 * @param x
+	 *            the x-coordinate of the painting location
+	 * @param y
+	 *            the y-coordinate of the painting location
+	 * @param rowIndex
+	 *            the index of the object that will be painted
+	 */
+	private void drawSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex)
+	{
+		// determine the color of the dot depending on the split class
+		CssColor c = this.determineColor(rowIndex);
+		
+		// draw the point with the given color
+		this.drawSelectedPointAtLocation(context, x, y, rowIndex, c);
+	}
+
+	/**
 	 * Draw a single point (dot) at a given location with the given color.
 	 * 
 	 * @param context
@@ -1229,7 +1288,7 @@ public class DotplotView extends LayoutPanel implements
 		CssColor c)
 	{
 		double alpha;
-		CssColor transparentColor ;
+		CssColor transparentColor;
 
 		if (this.model.getStatTableModel().isRowSelected(rowIndex))
 		{
@@ -1264,6 +1323,47 @@ public class DotplotView extends LayoutPanel implements
 			context.stroke();
 			context.setLineWidth(1);
 		}
+
+		this.objectLocations.set(rowIndex, new Point(x, y));
+	}
+
+	/**
+	 * Draw a single non-selected point (dot) at a given location with the given color.
+	 * 
+	 * @param context
+	 * @param x
+	 * @param y
+	 * @param rowIndex
+	 * @param c
+	 */
+	private void drawNonSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex,
+		CssColor c)
+	{
+		context.beginPath();
+		context.arc(x, y, this.dotRadius, 0, Math.PI * 2.0, true);
+		context.closePath();
+		context.fill();
+
+		this.objectLocations.set(rowIndex, new Point(x, y));
+	}
+
+	/**
+	 * Draw a single selected point (dot) at a given location with the given color.
+	 * 
+	 * @param context
+	 * @param x
+	 * @param y
+	 * @param rowIndex
+	 * @param c
+	 */
+	private void drawSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex,
+		CssColor c)
+	{
+		context.beginPath();
+		context.arc(x, y, this.dotRadius, 0, Math.PI * 2.0, true);
+		context.closePath();
+		context.fill();
+		context.stroke();
 
 		this.objectLocations.set(rowIndex, new Point(x, y));
 	}
@@ -2121,7 +2221,9 @@ public class DotplotView extends LayoutPanel implements
 
 			// voor verdeling binnen 1 veld:
 			if (DotplotView.this.model.splitInSingleView())
+			{
 				splitClasses[i] = 0;
+			}
 
 			coords[i][0] = this.determineXCoord(i);
 		}
@@ -2663,6 +2765,7 @@ public class DotplotView extends LayoutPanel implements
 	private class DotPanel
 	{
 		private Canvas canvas;
+		private Context2d bufferContext;
 		private Context2d context;
 		private DotHandler dotHandler;
 
@@ -2698,10 +2801,18 @@ public class DotplotView extends LayoutPanel implements
 		
 		public void paint()
 		{
+			GWT.log("DotPanel.paint()");
+			
 			// clear panel
 			this.context = canvas.getContext2d();
-			context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
-
+			this.context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+			
+			Canvas tempCanvas = Canvas.createIfSupported();
+			tempCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+			tempCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
+			Context2d tempContext = tempCanvas.getContext2d();
+			tempContext.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+			
 			// if the user is dragging the mouse, draw the rectangle that will
 			// be selected if
 			// the user would release the mouse
@@ -2711,214 +2822,344 @@ public class DotplotView extends LayoutPanel implements
 				double y1 = this.dotHandler.startDrag.getY();
 				double x2 = this.dotHandler.currentDragLocation.getX();
 				double y2 = this.dotHandler.currentDragLocation.getY();
-
-				context.setFillStyle(SELECTION_RECTANGLE_COLOR);
-				context.fillRect(Math.min(x1, x2), Math.min(y1, y2),
+				
+				// set the buffered context
+				Canvas dragCanvas = Canvas.createIfSupported();
+				dragCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+				dragCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
+				Context2d dragContext = dragCanvas.getContext2d();
+				
+				dragContext.setFillStyle(SELECTION_RECTANGLE_COLOR_TRANSPARENT);
+				dragContext.fillRect(Math.min(x1, x2), Math.min(y1, y2),
 					Math.abs(x1 - x2), Math.abs(y1 - y2));
-				context.fill();
+				dragContext.fill();
+				
+				context.drawImage(bufferContext.getCanvas(), 0, 0);
+				context.drawImage(dragContext.getCanvas(), 0, 0);
 			}
+			else
+			{
+				tempContext.setFillStyle(ColorUtils.BLACK);
+				
+				// sorteer de rij-indices zodat selected rijen op het eind staan
+				// en de bijbehorende dots als laatste worden getekend
+				final StatTableModel tableModel = DotplotView.this.model.getStatTableModel();
+				int nrRows = tableModel.getRowCount();
+				Integer[] indexSortedOnSelected = new Integer[nrRows];
+				for (int i = 0; i < nrRows; i++)
+				{
+					indexSortedOnSelected[i] = i;
+				}
+				
+				Arrays.sort(indexSortedOnSelected, new Comparator<Integer>() {
+		            @Override
+		            /**
+		             * Compare integers i1 and i2 on being selected.
+		             * and split. 
+		             * @param i1
+		             * @param i2
+		             * @return
+		             */
+		            public int compare(Integer i1, Integer i2) 
+		            {
+		            	// if both rows are selected, the order is based on color //doesn't matter
+	            		if (tableModel.isRowSelected(i1) && tableModel.isRowSelected(i2))
+	            		{
+	            			//return determineColor(i1).value().compareTo(determineColor(i2).value());
+	            			return 0;
+	            		}
+		            	// indices of selected rows are always larger 
+	            		else if (tableModel.isRowSelected(i2))
+	            		{
+		            		return -1;
+	            		}
+		            	else if (tableModel.isRowSelected(i1))
+		            	{
+		            		return 1;
+		            	}
+		            	else // if none of the rows is selected, the order doesn't matter
+		            	{
+	            			return 0;
+		            	}
+		            }
+		        });
+				
+				int startIndexSelected = this.getStartIndexSelected(indexSortedOnSelected);
+				
+				if (DotplotView.this.model.columnXIndexValid()
+					&& DotplotView.this.model.columnYIndexValid())
+				{
+					// all variables are valid, draw a scatterplot
+					DotplotView.this.determineDotSize();
+					DotplotView.this.objectLocations = new ArrayList<Point>(
+						DotplotView.this.model.getStatTableModel().getRowCount());
+					for (int i = 0; i < DotplotView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						DotplotView.this.objectLocations.add(null);
+					}
+	
+					DotplotView.this.paintCorrelation(tempContext);
+	
+					for (int i = 0; i < DotplotView.this.splitClasses; i++)
+					{
+						DotplotView.this.paintXAxis(tempContext, 
+							i * (DotplotView.this.getHeight() - 5));
+						DotplotView.this.paintYAxis(tempContext, 
+							i * (DotplotView.this.getHeight() - 5));
+					}
+	
+					for (int row = 0; row < DotplotView.this.model.getStatTableModel()
+						.getRowCount(); row++)
+					{
+						// use the ordered indices so that selected dots will be drawn at last
+						// test syl TODO: in elke drawPoint() wordt setFillStyle gedaan voor de geselecteerde; dit zorgt voor slechte performance
+						DotplotView.this.drawPoint(tempContext, indexSortedOnSelected[row]);
+					}
+				} // SCATTERPLOT
+				else if (DotplotView.this.model.columnXIndexValid())
+				{
+					// X variable is valid, so draw DOTPLOT
+					for (int i = 0; i < DotplotView.this.splitClasses; i++)
+					{
+						DotplotView.this.paintXAxis(tempContext, 
+							i * (DotplotView.this.getHeight() - 5));
+					}
+					
+					// only the x-column variable is valid, draw a single variable
+					// dot plot with the variable on the x-axis
+					DotplotView.this.determineDotSize();
+					DotplotView.this.dotRadius = DotplotView.this.dotRadius * 2; // ??
+					DotplotView.this.objectLocations = new ArrayList<Point>(
+						DotplotView.this.model.getStatTableModel().getRowCount());
+					for (int i = 0; i < DotplotView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						DotplotView.this.objectLocations.add(null);
+					}
+	
+					CssColor previousColor = null;
+					CssColor currentColor = null;
+					
+					// dit duurt even bij grote dataset...
+					int[][] coords = DotplotView.this.determineCoordsXSingleVar();
+					
+					// DRAW THE DOTS
+					for (int i = 0; i < coords.length; i++)
+					{
+						// use the ordered indices so that selected dots will be drawn at last
+						int index = indexSortedOnSelected[i];
+	
+						if (!DotplotView.this.model
+							.getStatTableModel()
+							.getValueAt(index, DotplotView.this.model.getColumnXIndex())
+							.equals(ColumnType.WILDCARD))
+						{
+							int splitClass = DotplotView.this.getSplitClass(index);
+							if (DotplotView.this.model.splitInSingleView())
+							{
+								splitClass = 0;
+							}
+							
+							if (splitClass >= 0)
+							{
+								int heightOffset;
+								if (DotplotView.this.model.getColumnSplitIndex() > -1
+									&& DotplotView.this.model.splitInSingleView())
+								{
+									heightOffset = 0;
+								}
+								else
+								{
+									heightOffset = (splitClass)
+										* (DotplotView.this.getHeight() - 5);
+								}
+	
+								// startIndexSelected
+								if (i < startIndexSelected)//(index < startIndexSelected)
+								{
+									currentColor = determineColor(index);
+									
+									if ((previousColor == null) ||
+										(!currentColor.equals(previousColor)))
+									{
+										// only set fill style if necessary to improve performance
+										double alpha;
+										CssColor transparentColor ;
+	
+										// set default transparency
+										alpha = 0.5;
+										transparentColor = CssColor.make("rgba(" 
+											+ ColorUtils.getRed(currentColor) + ", " 
+											+ ColorUtils.getGreen(currentColor) + "," 
+											+ ColorUtils.getBlue(currentColor) + ", " 
+											+ alpha + ")");
+	
+										tempContext.setFillStyle(transparentColor);
+	
+										tempContext.setLineWidth(1);
+										tempContext.setStrokeStyle(ColorUtils.BLACK);
+										
+										previousColor = currentColor;
+									}
+									
+									DotplotView.this.drawNonSelectedPointAtLocation(tempContext,
+										coords[index][0], coords[index][1] + heightOffset,
+										index, currentColor);
+								}
+								else
+								{ // the selected part, index >= startIndexSelected
+									if (i == startIndexSelected)//(index == startIndexSelected) // moet dit i zijn?!
+									{
+										// only once for performance reasons!
+										tempContext.setLineWidth(2);
+										tempContext.setStrokeStyle(ColorUtils.BLACK);
+										
+										// reset previousColor
+										previousColor = null;
+									}
+									
+									currentColor = determineColor(index);
+									
+									if ((previousColor == null) ||
+										(!currentColor.equals(previousColor)))
+									{
+										// only set fill style if necessary to improve performance
+										double alpha;
+										CssColor transparentColor ;
+	
+										// set non transparent for selected dot
+										alpha = 1;
+										transparentColor = CssColor.make("rgba(" 
+											+ ColorUtils.getRed(currentColor) + ", " 
+											+ ColorUtils.getGreen(currentColor) + "," 
+											+ ColorUtils.getBlue(currentColor) + ", " 
+											+ alpha + ")");
+	
+										tempContext.setFillStyle(transparentColor);
+																			
+										previousColor = currentColor;
+									}
+	
+									DotplotView.this.drawSelectedPointAtLocation(tempContext,
+										coords[index][0], coords[index][1] + heightOffset,
+										index, currentColor);
+								}
+							}
+						}
+					} // for-loop DRAW THE DOTS
+				} // dotplot
+				else if (DotplotView.this.model.columnYIndexValid())
+				{
+					// Y variable is valid, so draw dotplot with only y variable (not possible yet in current version)
+	
+					for (int i = 0; i < DotplotView.this.splitClasses; i++)
+					{
+						DotplotView.this.paintYAxis(tempContext, 
+							i * (DotplotView.this.getHeight() - 5));
+					}
+					
+					// only the y-column variable is valid, draw a single variable
+					// dot plot with the variable on the y-axis
+					DotplotView.this.determineDotSize();
+					DotplotView.this.dotRadius = DotplotView.this.dotRadius * 2; // ??
+					DotplotView.this.objectLocations = new ArrayList<Point>(
+						DotplotView.this.model.getStatTableModel().getRowCount());
+					for (int i = 0; i < DotplotView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						DotplotView.this.objectLocations.add(null);
+					}
+	
+					int[][] coords = DotplotView.this.determineCoordsYSingleVar();
+					for (int i = 0; i < coords.length; i++)
+					{
+						// use the ordered indices so that selected dots will be drawn at last
+						int index = indexSortedOnSelected[i];
+	
+						if (!DotplotView.this.model
+							.getStatTableModel()
+							.getValueAt(index, DotplotView.this.model.getColumnYIndex())
+							.equals(ColumnType.WILDCARD))
+						{
+							int splitClass = DotplotView.this.getSplitClass(index);
+							if (DotplotView.this.model.splitInSingleView())
+								splitClass = 0;
+							if (splitClass >= 0)
+							{
+								int heightOffset;
+								if (DotplotView.this.model.getColumnSplitIndex() > -1
+									&& DotplotView.this.model.splitInSingleView())
+								{
+									heightOffset = 0;
+								}
+								else
+								{
+									heightOffset = (splitClass)
+										* (DotplotView.this.getHeight() - 5);
+								}
+	
+								DotplotView.this.drawPointAtLocation(tempContext,
+									coords[index][0], coords[index][1] + heightOffset,
+									index);
+							}
+						}
+					}
+				}
+	
+				// draw the bottom line and labels
+				for (int i = 0; i < (DotplotView.this.isSplitSingleViewSelected() ? 1
+					: splitClasses); i++)
+				{
+					int ySplitOffset = i
+						* (DotplotView.this.getHeight() - 5);
+					DotplotView.this.paintAxisLabels(tempContext, ySplitOffset, i);
+				}
+				
+				// finally draw the buffer to the canvas
+				context.drawImage(tempContext.getCanvas(), 0, 0);
+				this.bufferContext = tempContext;
+			} // no inDrag
+		}
 
-			context.setFillStyle(ColorUtils.BLACK);
+		/**
+		 * Get the the first index in the array with indices that indicates 
+		 * a selected row.
+		 * 
+		 * @param indexSortedOnSelected
+		 * @return
+		 */
+		private int getStartIndexSelected(Integer[] indexSortedOnSelected)
+		{
+			int startIndex;
 			
-			// sorteer de rij-indices zodat selected rijen op het eind staan
-			// en de bijbehorende dots als laatste worden getekend
 			final StatTableModel tableModel = DotplotView.this.model.getStatTableModel();
 			int nrRows = tableModel.getRowCount();
-			Integer[] indexSortedOnSelected = new Integer[nrRows];
+			startIndex = nrRows;
+			
 			for (int i = 0; i < nrRows; i++)
 			{
-				indexSortedOnSelected[i] = i;
+				if (tableModel.isRowSelected(indexSortedOnSelected[i]))
+				{
+					startIndex = i;
+					break;
+				}
 			}
 			
-			Arrays.sort(indexSortedOnSelected, new Comparator<Integer>() {
-	            @Override
-	            /**
-	             * Compare integers i1 and i2 on being selected.
-	             * and split. 
-	             * @param i1
-	             * @param i2
-	             * @return
-	             */
-	            public int compare(Integer i1, Integer i2) 
-	            {
-	            	// if both rows are selected, the order doesn't matter
-            		if (tableModel.isRowSelected(i1) && tableModel.isRowSelected(i2))
-            		{
-            			return 0;
-            		}
-	            	// indices of selected rows are always larger 
-            		else if (tableModel.isRowSelected(i2))
-            		{
-	            		return -1;
-            		}
-	            	else if (tableModel.isRowSelected(i1))
-	            	{
-	            		return 1;
-	            	}
-	            	else // if none of the rows is selected, the order doesn't matter
-	            	{
-            			return 0;
-	            	}
-	            }
-	        });
-
-			if (DotplotView.this.model.columnXIndexValid()
-				&& DotplotView.this.model.columnYIndexValid())
-			{
-				// all variables are valid, draw a scatterplot
-				DotplotView.this.determineDotSize();
-				DotplotView.this.objectLocations = new ArrayList<Point>(
-					DotplotView.this.model.getStatTableModel().getRowCount());
-				for (int i = 0; i < DotplotView.this.model.getStatTableModel()
-					.getRowCount(); i++)
-				{
-					DotplotView.this.objectLocations.add(null);
-				}
-
-				DotplotView.this.paintCorrelation(context);
-
-				for (int i = 0; i < DotplotView.this.splitClasses; i++)
-				{
-					DotplotView.this.paintXAxis(context, i
-						* (DotplotView.this.getHeight() - 5));
-					DotplotView.this.paintYAxis(context, i
-						* (DotplotView.this.getHeight() - 5));
-				}
-
-				for (int row = 0; row < DotplotView.this.model.getStatTableModel()
-					.getRowCount(); row++)
-				{
-					// use the ordered indices so that selected dots will be drawn at last
-					DotplotView.this.drawPoint(context, indexSortedOnSelected[row]);
-				}
-			} // scatterplot
-			else if (DotplotView.this.model.columnXIndexValid())
-			{
-				// X variable is valid, so draw dotplot
-				for (int i = 0; i < DotplotView.this.splitClasses; i++)
-				{
-					DotplotView.this.paintXAxis(context, 
-						i * (DotplotView.this.getHeight() - 5));
-
-				}
-				
-				// only the x-column variable is valid, draw a single variable
-				// dot plot with the variable on the x-axis
-				DotplotView.this.determineDotSize();
-				DotplotView.this.dotRadius = DotplotView.this.dotRadius * 2; // ??
-				DotplotView.this.objectLocations = new ArrayList<Point>(
-					DotplotView.this.model.getStatTableModel().getRowCount());
-				for (int i = 0; i < DotplotView.this.model.getStatTableModel()
-					.getRowCount(); i++)
-				{
-					DotplotView.this.objectLocations.add(null);
-				}
-
-				int[][] coords = DotplotView.this.determineCoordsXSingleVar();
-				for (int i = 0; i < coords.length; i++)
-				{
-					// use the ordered indices so that selected dots will be drawn at last
-					int index = indexSortedOnSelected[i];
-
-					if (!DotplotView.this.model
-						.getStatTableModel()
-						.getValueAt(index, DotplotView.this.model.getColumnXIndex())
-						.equals(ColumnType.WILDCARD))
-					{
-						int splitClass = DotplotView.this.getSplitClass(index);
-						if (DotplotView.this.model.splitInSingleView())
-							splitClass = 0;
-						if (splitClass >= 0)
-						{
-							int heightOffset;
-							if (DotplotView.this.model.getColumnSplitIndex() > -1
-								&& DotplotView.this.model.splitInSingleView())
-							{
-								heightOffset = 0;
-							}
-							else
-							{
-								heightOffset = (splitClass)
-									* (DotplotView.this.getHeight() - 5);
-							}
-
-							DotplotView.this.drawPointAtLocation(context,
-								coords[index][0], coords[index][1] + heightOffset,
-								index);
-						}
-					}
-				}
-			} // dotplot
-			else if (DotplotView.this.model.columnYIndexValid())
-			{
-				// Y variable is valid, so draw dotplot with only y variable (not possible yet in current version)
-
-				for (int i = 0; i < DotplotView.this.splitClasses; i++)
-				{
-					DotplotView.this.paintYAxis(context, 
-						i * (DotplotView.this.getHeight() - 5));
-				}
-				
-				// only the y-column variable is valid, draw a single variable
-				// dot plot with the variable on the y-axis
-				DotplotView.this.determineDotSize();
-				DotplotView.this.dotRadius = DotplotView.this.dotRadius * 2; // ??
-				DotplotView.this.objectLocations = new ArrayList<Point>(
-					DotplotView.this.model.getStatTableModel().getRowCount());
-				for (int i = 0; i < DotplotView.this.model.getStatTableModel()
-					.getRowCount(); i++)
-				{
-					DotplotView.this.objectLocations.add(null);
-				}
-
-				int[][] coords = DotplotView.this.determineCoordsYSingleVar();
-				for (int i = 0; i < coords.length; i++)
-				{
-					// use the ordered indices so that selected dots will be drawn at last
-					int index = indexSortedOnSelected[i];
-
-					if (!DotplotView.this.model
-						.getStatTableModel()
-						.getValueAt(index, DotplotView.this.model.getColumnYIndex())
-						.equals(ColumnType.WILDCARD))
-					{
-						int splitClass = DotplotView.this.getSplitClass(index);
-						if (DotplotView.this.model.splitInSingleView())
-							splitClass = 0;
-						if (splitClass >= 0)
-						{
-							int heightOffset;
-							if (DotplotView.this.model.getColumnSplitIndex() > -1
-								&& DotplotView.this.model.splitInSingleView())
-							{
-								heightOffset = 0;
-							}
-							else
-							{
-								heightOffset = (splitClass)
-									* (DotplotView.this.getHeight() - 5);
-							}
-
-							// test syl: TODO use sorted indices indexdataRows[]?
-							DotplotView.this.drawPointAtLocation(context,
-								coords[index][0], coords[index][1] + heightOffset,
-								index);
-						}
-					}
-				}
-			}
-
-			// draw the bottom line and labels
-			for (int i = 0; i < (DotplotView.this.isSplitSingleViewSelected() ? 1
-				: splitClasses); i++)
-			{
-				int ySplitOffset = i
-					* (DotplotView.this.getHeight() - 5);
-				DotplotView.this.paintAxisLabels(context, ySplitOffset, i);
-			}
+			return startIndex;
 		}
 		
 	} // DotPanel class
+	
+	private class CopyContext2d
+	{
+		private Context2d context;
+		
+		public CopyContext2d(Context2d context)
+		{
+			this.context = context;
+		}
+	}
 
 	@Override
 	public void onSelectionChange(SelectionChangeEvent event)
