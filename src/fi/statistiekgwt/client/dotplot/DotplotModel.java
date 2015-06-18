@@ -53,8 +53,8 @@ public class DotplotModel
 		this.useColorScale = false;
 
 		// set default colors
-		this.setColorA(ColorUtils.WHITE);
-		this.setColorB(ColorUtils.BLACK);
+		this.setColorA(ColorUtils.getDefaultColorA());
+		this.setColorB(ColorUtils.getDefaultColorB());
 
 		this.columnColorIndex = -1;
 		this.columnXIndex = -1;
