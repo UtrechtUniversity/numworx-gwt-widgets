@@ -30,6 +30,10 @@ public class ColorUtils
 	public static final CssColor GREY = CssColor.make(220, 220, 220);
 	public static final CssColor DEFAULT_VIEW_ELEMENT_COLOR = CssColor.make(67,147,195); // blue
 	public static final CssColor BLACK = CssColor.make(0, 0, 0);
+	public static final CssColor RED = CssColor.make(255, 0, 0);
+	public static final CssColor BLUE = CssColor.make(0, 0, 255);
+	public static final CssColor YELLOW = CssColor.make(255, 255, 0);
+	public static final CssColor PURPLE = CssColor.make(102, 0, 204);
 	public static final CssColor WHITE = CssColor.make(255, 255, 255);
 	public static final RGBColor WHITE_RGB = new RGBColor(255, 255, 255);
 	public static final CssColor SELECTION_COLOR = CssColor.make(192,192,192); // darker light grey
@@ -75,6 +79,28 @@ public class ColorUtils
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * Get the default color A in a color scale, for example,
+	 * to be used in scatterplot.
+	 * 
+	 * @return
+	 */
+	public static CssColor getDefaultColorA()
+	{
+		return YELLOW;
+	}
+
+	/**
+	 * Get the default color B in a color scale, for example,
+	 * to be used in scatterplot.
+	 * 
+	 * @return
+	 */
+	public static CssColor getDefaultColorB()
+	{
+		return PURPLE;
 	}
 
 	/**
