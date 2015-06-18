@@ -231,7 +231,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 	/**
 	 * Remove all of statistiekinteractiepanel's handler occurrences.
 	 */
-	private void removeHandlers()
+	public void removeHandlers()
 	{
 		// remove statinteractiepanelview's handler occurrences
 		this.view.removeHandlers();
