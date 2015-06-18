@@ -297,3 +297,7 @@ td div{
 	white-space:nowrap;
 }
 
+.waitCursor {
+	cursor: wait !important;
+	pointerEvents: none;
+}
