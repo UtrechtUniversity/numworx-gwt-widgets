@@ -808,6 +808,24 @@ public class HistogramUserOptionsPanel extends FlowPanel
     				this.splitBinsLabel.setVisible(false);
     				setSplitEnumClasses(true);
     			}
+				else if (splitType.equals(AllowedTypes.STRING))
+				{
+					StringBuilder sb = new StringBuilder();
+					int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    					this.model.getSplitOptions());
+					for (int i = 0; i < splitClasses; i++)
+					{
+    					sb.append(this.model.getSplitOptions()
+    						.getSplitClassLabel(i, this.model.getStatTableModel()));
+						sb.append("\n");
+					}
+					
+    				this.splitBoundariesArea.setText(sb.toString());
+    				this.separatorSplitBoundaries.setVisible(false);
+					this.splitBinsBox.setVisible(false);
+					this.splitBinsLabel.setVisible(false);
+					setSplitEnumClasses(true);
+				}
     		}
 		}
 
@@ -963,14 +981,12 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	{
 		this.splitBoundariesVisible = b;
 		this.labelSplitHR.setVisible(b);
-		//this.splitBoundariesHR.setVisible(b);
 		this.splitMinBoundaryLabel.setVisible(b && !this.splitEnumClasses);
 		this.splitMinBoundaryField.setVisible(b && !this.splitEnumClasses);
 		this.splitBinWidthLabel.setVisible(b && !this.splitEnumClasses);
 		this.splitBinWidthField.setVisible(b && !this.splitEnumClasses);
 		this.splitBoundariesLabel.setVisible(b);
 		this.splitBoundariesArea.setVisible(b);
-//		this.splitBoundariesAreaScrollPanel.setVisible(b);
 		this.splitBoundariesArea.setVisible(b);
 		this.splitNoObjectsLabel.setVisible(b && !this.splitEnumClasses);
 		this.splitMinValueLabel.setVisible(b && !this.splitEnumClasses);
