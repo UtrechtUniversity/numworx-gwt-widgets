@@ -482,6 +482,24 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 					this.splitBinsLabel.setVisible(false);
 					setSplitEnumClasses(true);
 				}
+				else if (splitType.equals(AllowedTypes.STRING))
+				{
+					StringBuilder sb = new StringBuilder();
+					int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    					this.model.getSplitOptions());
+					for (int i = 0; i < splitClasses; i++)
+					{
+    					sb.append(this.model.getSplitOptions()
+    						.getSplitClassLabel(i, this.model.getStatTableModel()));
+						sb.append("\n");
+					}
+					
+    				this.splitBoundariesArea.setText(sb.toString());
+    				this.separatorSplitBoundaries.setVisible(false);
+					this.splitBinsBox.setVisible(false);
+					this.splitBinsLabel.setVisible(false);
+					setSplitEnumClasses(true);
+				}
 			}
 		}
 
@@ -524,53 +542,53 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 	private void setSplitEnumClasses(boolean b)
 	{
-		splitEnumClasses = b;
-		splitMinBoundaryLabel.setVisible(splitBoundariesVisible && !b);
-		splitMinBoundaryField.setVisible(splitBoundariesVisible && !b);
-		splitBinWidthLabel.setVisible(splitBoundariesVisible && !b);
-		splitBinWidthField.setVisible(splitBoundariesVisible && !b);
-		splitNoObjectsLabel.setVisible(splitBoundariesVisible && !b);
-		splitMinValueLabel.setVisible(splitBoundariesVisible && !b);
-		splitMaxValueLabel.setVisible(splitBoundariesVisible && !b);
+		this.splitEnumClasses = b;
+		this.splitMinBoundaryLabel.setVisible(this.splitBoundariesVisible && !b);
+		this.splitMinBoundaryField.setVisible(this.splitBoundariesVisible && !b);
+		this.splitBinWidthLabel.setVisible(this.splitBoundariesVisible && !b);
+		this.splitBinWidthField.setVisible(this.splitBoundariesVisible && !b);
+		this.splitNoObjectsLabel.setVisible(this.splitBoundariesVisible && !b);
+		this.splitMinValueLabel.setVisible(this.splitBoundariesVisible && !b);
+		this.splitMaxValueLabel.setVisible(this.splitBoundariesVisible && !b);
 	}
 
 	private void setVisibleSplitBoundaryOptions(boolean b)
 	{
-		splitBoundariesVisible = b;
-		separatorSplitBoundaries.setVisible(b);
-		splitMinBoundaryLabel.setVisible(b && !splitEnumClasses);
-		splitMinBoundaryField.setVisible(b && !splitEnumClasses);
-		splitBinWidthLabel.setVisible(b && !splitEnumClasses);
-		splitBinWidthField.setVisible(b && !splitEnumClasses);
-		splitBoundariesLabel.setVisible(b);
-		splitBoundariesArea.setVisible(b);
-		splitNoObjectsLabel.setVisible(b && !splitEnumClasses);
-		splitMinValueLabel.setVisible(b && !splitEnumClasses);
-		splitMaxValueLabel.setVisible(b && !splitEnumClasses);
+		this.splitBoundariesVisible = b;
+		this.separatorSplitBoundaries.setVisible(b);
+		this.splitMinBoundaryLabel.setVisible(b && !this.splitEnumClasses);
+		this.splitMinBoundaryField.setVisible(b && !this.splitEnumClasses);
+		this.splitBinWidthLabel.setVisible(b && !this.splitEnumClasses);
+		this.splitBinWidthField.setVisible(b && !this.splitEnumClasses);
+		this.splitBoundariesLabel.setVisible(b);
+		this.splitBoundariesArea.setVisible(b);
+		this.splitNoObjectsLabel.setVisible(b && !this.splitEnumClasses);
+		this.splitMinValueLabel.setVisible(b && !this.splitEnumClasses);
+		this.splitMaxValueLabel.setVisible(b && !this.splitEnumClasses);
 		if (!b)
 		{
-			splitChooseBoundariesButton.setText(StatistiekGWT.rb
+			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
 				.getString("binsButton"));
 		}
 		else
 		{
-			splitChooseBoundariesButton.setText(StatistiekGWT.rb
+			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
 				.getString("hideButtonLabel"));
 		}
 	}
 
 	void setVisibleSplitOptions(boolean b)
 	{
-		splitOptionsVisible = b;
-		splitVarLabel.setVisible(b);
-		splitVarBox.setVisible(b);
+		this.splitOptionsVisible = b;
+		this.splitVarLabel.setVisible(b);
+		this.splitVarBox.setVisible(b);
 		if (!b)
 		{
-			splitBinsLabel.setVisible(b);
+			this.splitBinsLabel.setVisible(b);
 		}
 		if (!b)
 		{
-			splitBinsBox.setVisible(b);
+			this.splitBinsBox.setVisible(b);
 		}
 
 		// alleen als splitvar is gekozen (splitVarBox selectedIndex > 0)
@@ -587,12 +605,12 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		
 		if (!b)
 		{
-			splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
-			setVisibleSplitBoundaryOptions(false);
+			this.splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
+			this.setVisibleSplitBoundaryOptions(false);
 		}
 		else
 		{
-			splitButton.setText(StatistiekGWT.rb
+			this.splitButton.setText(StatistiekGWT.rb
 				.getString("removeSplitoptionsButton"));
 		}
 	}
