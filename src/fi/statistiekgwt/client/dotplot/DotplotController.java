@@ -219,7 +219,7 @@ public class DotplotController implements StatistiekView
 		else
 		{
 			// set default color A
-			this.model.setColorA(ColorUtils.WHITE);
+			this.model.setColorA(ColorUtils.getDefaultColorA());
 		}
 		if (map.containsKey("colorBString"))
 		{
@@ -228,7 +228,7 @@ public class DotplotController implements StatistiekView
 		else
 		{
 			// set default color B 
-			this.model.setColorB(ColorUtils.BLACK);
+			this.model.setColorB(ColorUtils.getDefaultColorB());
 		}
 		if (map.containsKey("viewName"))
 		{
