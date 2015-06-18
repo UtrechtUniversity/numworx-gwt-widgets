@@ -3,6 +3,8 @@ package fi.statistiekgwt.client;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
+import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -27,10 +29,16 @@ public class StatistiekUtils
 	 * @author Sylvia van Borkulo
 	 *
 	 */
-	public static class DummyTouchHandler implements TouchStartHandler, TouchEndHandler
+	public static class DummyTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		@Override
 		public void onTouchStart(TouchStartEvent event)
+		{
+			event.stopPropagation();
+		}
+
+		@Override
+		public void onTouchMove(TouchMoveEvent event)
 		{
 			event.stopPropagation();
 		}
