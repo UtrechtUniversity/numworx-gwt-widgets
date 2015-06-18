@@ -48,7 +48,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.Header;
@@ -76,7 +75,6 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ResizeLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -511,8 +509,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
-	 * Add handlers, i.e., sort handler on table
-	 * and click and touch handlers to the buttons.
+	 * Add handlers, i.e., click and touch handlers to the buttons.
+	 * Also add dummy handlers to prevent propagation when view 
+	 * is shown in its own window in a touch environment.
 	 */
 	private void addHandlers()
 	{
@@ -771,18 +770,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		readQueue = new ArrayList<File>();
 	}
 
-	class ColumnClickHandler implements ClickHandler//TouchStartHandler //extends MouseAdapter
-	{
-		public void onClick(ClickEvent e)//mouseReleased(MouseEvent e)
-		{
-			Point p = new Point(e.getClientX(),
-				e.getClientY());
-
-			StatTable.this.popupMenu.setPopupPosition((int) p.getX(), (int) p.getY());
-			StatTable.this.popupMenu.show();
-		}
-	}
-
 	/**
 	 * Change this view's model
 	 * 
@@ -980,9 +967,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void removeViews()
 	{
-		// test syl
-		//System.out.println("StatTable.removeViews()");
-		
 		ArrayList<StatistiekView> views = new ArrayList<StatistiekView>();
 		
 		// In edit-mode en standalone is statInteractiePanel null... De tabs blijven daar gewoon staan
@@ -990,16 +974,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			views = this.statInteractiePanel.getModel().getViews();
 		
-	        Iterator<StatistiekView> iterator = views.iterator();
-	        while (iterator.hasNext()) 
-	        {
-	        	StatistiekView view = iterator.next();
+			for (int i = views.size() - 1; i >= 0; i--)
+			{
+	        	StatistiekView view = views.get(i);
 	        	if (!view.getViewName().equals(this.viewName))
 	        	{
-	        		iterator.remove();
 	        		this.statInteractiePanel.getModel().removeView(view.getViewName());
 	        	}
-	        }
+			}
 		}
 	}
 
@@ -1055,9 +1037,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void processCSVDataFile(FileList files)
 	{
-		RootPanel.getBodyElement().getStyle().setProperty("cursor", "wait");
-		DOM.setStyleAttribute(RootPanel.get().getElement(), "cursor", "wait");
-		
 		// read the files
 		//GWT.log("number of files in read queue = " + files.getLength());
 		for (File file : files)
@@ -1100,14 +1079,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.addDataRowsWithoutEvent(dataRows);
 			
 			this.statTableModel.updateNumericalColumnTypesWithoutEvent();
-
+			
 			this.fireEvent(TableChangeEvent.IMPORT_DATA, -1);
 			
-			RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
+//			RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
 		}
 		else
 		{
-			RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
+//			RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
 			GWT.log("CSV file is empty!");
 		}		
 	}
@@ -1193,6 +1172,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	
 	/**
 	 * Add the row data to the table.
+	 * Used in processCSVText()
 	 * @param dataRows
 	 */
 	private void addDataRowsWithoutEvent(ArrayList<String> dataRows)
@@ -1208,6 +1188,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
         	
         	this.statTableModel.addRowWithoutEvent(valuesList);
         }
+
+        // finally sort the string options all at once, for performance reason
+        this.statTableModel.sortStringOptions();
 	}
 
 	/**
@@ -1286,6 +1269,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	class StatTableClickHandler implements ClickHandler//TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
+		private FileList fileList;
+		
 		@Override
 		public void onClick(ClickEvent e)
 		{
@@ -1389,26 +1374,54 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 			else if (e.getSource() == StatTable.this.fileUploadSelectButton)
 			{
-				FileList fileList = StatTable.this.fileUpload.getFiles();
+				fileList = StatTable.this.fileUpload.getFiles();
 
-				StatTable.this.popupFileUploadPanel.hide();
-				
-				// test syl: call startLoading to clear the table
-				StatTable.this.pager.startLoading();
-				
-				// Remove old views
-				StatTable.this.removeViews();
-				
-				if (StatTable.this.statInteractiePanel != null)
+				if (fileList.getLength() > 0)
 				{
-					StatTable.this.statInteractiePanel.getView().removeViewTabs();
+					statInteractiePanel.getView().addStyleName(statistiekCss.waitCursor());
+					table.addStyleName(statistiekCss.waitCursor());
+
+					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+
+						@Override
+						public void execute() 
+						{
+							clearStatTableModel();
+							
+							table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
+							
+							// Remove old views except table
+							StatTable.this.removeViews();
+							
+							if (StatTable.this.statInteractiePanel != null)
+							{
+								StatTable.this.statInteractiePanel.getView().removeViewTabsExceptTable();
+							}
+							
+							// update to see the empty table while loading
+							update();
+							StatTable.this.popupFileUploadPanel.hide();
+//							table.addStyleName(statistiekCss.waitCursor());
+														
+							Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+
+								@Override
+								public void execute() 
+								{
+									StatTable.this.processCSVDataFile(fileList);
+									
+									statInteractiePanel.getView().removeStyleName(statistiekCss.waitCursor());
+									table.removeStyleName(statistiekCss.waitCursor());
+								}
+							});
+						}
+					});
+
 				}
-				
-				StatTable.this.processCSVDataFile(fileList);
-				
-				StatTable.this.table.setVisible(true);
-				
-				RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
+				else
+				{
+					StatTable.this.popupFileUploadPanel.hide();
+				}
 			}
 			else if (e.getSource() == StatTable.this.fileUploadCancelButton)
 			{
@@ -1986,6 +1999,24 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.update();
 	}
 
+	/**
+	 * Add empty table when importing data.
+	 */
+	public void addEmptyTable()
+	{
+		String t = StatistiekGWT.VIEWS[0];
+
+		StatistiekView statistiekView = StatistiekGWT.createView(t,
+			this.statInteractiePanel.getStatModel().findUniqueViewName(t), 
+			this.statTableModel,
+			0, 0, this.statInteractiePanel);
+		this.statInteractiePanel.getStatModel().addView(statistiekView);
+		this.statInteractiePanel.getView().selectLastTab();
+		this.statInteractiePanel.getView().clearAddViewTab();
+		
+		((StatTable) statistiekView).table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
+	}
+
 	public int[] getMaxColumnWidth()
 	{
 		return this.maxColumnWidth;
@@ -2102,7 +2133,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				@Override
 				public Boolean getValue()
 				{
-					for (List<String> item : table.getVisibleItems())
+					for (List<String> item : dataProvider.getList())
 					{
 						if (!selectionModel.isSelected(item))
 						{
@@ -2193,7 +2224,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 								.getItem(columnIndex + 1).getAbsoluteTop();							
 						}
 						
-						popupMenu.setPopupPosition(x, y);
+						int scrollYPosition = table.getScrollPanel().getVerticalScrollPosition();
+
+						popupMenu.setPopupPosition(x, y + scrollYPosition);
 						popupMenu.show();
 					}
 				}; // ValueUpdater
