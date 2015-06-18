@@ -20,6 +20,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.user.client.Window;
 
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
@@ -777,6 +778,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	/**
 	 * Add a row with the data of objects without sending an event.
+	 * Used to import bulk data. Please note that string options are not sorted.
 	 */
 	public void addRowWithoutEvent(ArrayList<Object> objects)
 	{
@@ -788,7 +790,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			if (!this.getColumnTypes().get(i).getType().isNumber())
 			{
-				this.increaseKeyHashMap(objects.get(i).toString(), i);
+				this.increaseKeyHashMapWithoutSortingStringOptions(objects.get(i).toString(), i);
 			}
 		}
 	}
@@ -1022,6 +1024,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 	}
 
+	/**
+	 * Increase the frequency of key in the hashmap of columnIndex.
+	 * If the key did not exist yet, it is also added to stringOptions
+	 * and stringOptions are sorted.
+	 * 
+	 * @param key
+	 * @param columnIndex
+	 */
 	private void increaseKeyHashMap(String key, int columnIndex)
 	{
 		boolean b = StatTableModel.increaseKeyHashMap(key,
@@ -1034,10 +1044,66 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	}
 
 	/**
+	 * Increase the frequency of key in the hashmap of columnIndex.
+	 * If the key did not exist yet, it is also added to stringOptions.
+	 * For performance reasons stringOptions are not sorted.
+	 * 
+	 * @param key
+	 * @param columnIndex
+	 */
+	private void increaseKeyHashMapWithoutSortingStringOptions(String key, int columnIndex)
+	{
+		boolean b = StatTableModel.increaseKeyHashMap(key,
+			this.stringFrequencies.get(columnIndex));
+		if (b)
+		{
+			this.stringOptions.get(columnIndex).add(key);
+		}
+	}
+	
+	/**
+	 * Sort the string options for each column.
+	 */
+	public void sortStringOptions()
+	{
+		for (int i = 0; i < this.getColumnCount(); i++)
+		{
+			Collections.sort(this.stringOptions.get(i));
+		}
+	}
+
+//	/**
+//	 * Increases the value of key 'key' in a hashmap of type <T, Integer>. 
+//	 * Return true if the hashmap did not contain the key yet.
+//	 * 
+//	 * @param <T>
+//	 *            The type of keys in this hashmap
+//	 * @param key
+//	 *            the key
+//	 * @param hashMap
+//	 *            the hashmap in which a value will be increased
+//	 * @return true iff the hashmap did not contain the key yet
+//	 */
+//	private static <T> boolean increaseKeyHashMap(T key,
+//		HashMap<T, Integer> hashMap)
+//	{
+//		if (hashMap.containsKey(key))
+//		{
+//			hashMap.put(key, hashMap.get(key) + 1);
+//			return false;
+//		}
+//		else
+//		{
+//			hashMap.put(key, 1);
+//			return true;
+//		}
+//	}
+
+	/**
 	 * Increases the value of key 'key' in a hashmap of type <T, Integer>. 
 	 * Return true if the hashmap did not contain the key yet.
 	 * 
-	 * @param <T>
+	 * @param <String>
 	 *            The type of keys in this hashmap
 	 * @param key
 	 *            the key
@@ -1045,8 +1111,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 *            the hashmap in which a value will be increased
 	 * @return true iff the hashmap did not contain the key yet
 	 */
-	private static <T> boolean increaseKeyHashMap(T key,
-		HashMap<T, Integer> hashMap)
+	private static <String> boolean increaseKeyHashMap(String key,
+		HashMap<String, Integer> hashMap)
 	{
 		if (hashMap.containsKey(key))
 		{
@@ -2317,8 +2383,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	public boolean isRowSelected(int rowIndex)
 	{
-//		return this.selectionList.get(rowIndex);
-		return this.selectionList.get(rowIndex).booleanValue();
+		if (this.selectionList.size() > rowIndex)
+		{
+			return this.selectionList.get(rowIndex).booleanValue();
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 	/**
