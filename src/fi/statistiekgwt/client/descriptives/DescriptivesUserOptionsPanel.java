@@ -72,8 +72,8 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 	private Button splitButton;
 	private Label splitVarLabel;
 	private ListBox splitVarBox;
-	private Label splitNoBinsLabel;
-	private ListBox splitNoBinsBox;
+	private Label splitBinsLabel;
+	private ListBox splitBinsBox;
 	private Button splitChooseBoundariesButton;
 	/**
 	 * Separator between number of split bins settings and split bin boundaries settings
@@ -153,7 +153,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		// change handlers
 		this.columnIndexBox.addChangeHandler(this.changeHandler);
 		this.splitVarBox.addChangeHandler(this.changeHandler);
-		this.splitNoBinsBox.addChangeHandler(this.changeHandler);
+		this.splitBinsBox.addChangeHandler(this.changeHandler);
 		
 		// value change handlers
 		this.splitMinBoundaryField.addValueChangeHandler(this.valueChangeHandler);
@@ -185,19 +185,19 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		this.splitVarBox = new ListBox();
 		this.splitVarBox.setWidth("100px");
 
-		this.splitNoBinsLabel = new Label(
+		this.splitBinsLabel = new Label(
 			StatistiekGWT.rb.getString("noClassesLabel"));
-		this.splitNoBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
+		this.splitBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		Integer[] options1 = new Integer[50];
 		for (int i = 0; i < 50; i++)
 		{
 			options1[i] = i + 1;
 		}
-		this.splitNoBinsBox = new ListBox();
+		this.splitBinsBox = new ListBox();
 		for (int i = 0; i < options1.length; i++)
 		{
-			this.splitNoBinsBox.addItem(options1[i].toString());
+			this.splitBinsBox.addItem(options1[i].toString());
 		}
 
 		this.splitChooseBoundariesButton = new Button(
@@ -257,8 +257,8 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		splitSettingsPanel.add(this.splitButton);
 		splitSettingsPanel.add(this.splitVarLabel);
 		splitSettingsPanel.add(this.splitVarBox);
-		splitSettingsPanel.add(this.splitNoBinsLabel);
-		splitSettingsPanel.add(this.splitNoBinsBox);
+		splitSettingsPanel.add(this.splitBinsLabel);
+		splitSettingsPanel.add(this.splitBinsBox);
 		
 		splitSettingsPanel.add(this.separatorSplitBoundaries);
 		splitSettingsPanel.add(this.splitChooseBoundariesButton);
@@ -384,7 +384,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		}
 		
 		this.setSelectedItemInListBox(
-			this.splitNoBinsBox, 
+			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
 		
 		// check of column index valid
@@ -402,14 +402,6 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
     					StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(0)));
     				this.splitBinWidthField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				StringBuilder sb = new StringBuilder();
-//    				for (int i = 0; i < this.model.getSplitOptions()
-//    					.getBinBoundaries().size() - 1; i++)
-//    				{
-//    					sb.append(StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i)));
-//    					sb.append(" -< ");
-//    					sb.append(StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(i + 1)));
-//    					sb.append("\n");
-//    				}
     				int splitClasses = this.model.getStatTableModel().splitVarClasses(
     					this.model.getSplitOptions());
     				for (int i = 0; i < splitClasses; i++)
@@ -429,9 +421,9 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
     				String splitMaxValue = StatistiekGWT.getStringValue(this.model.getStatTableModel().getColumnMax(
 						this.model.getSplitOptions().getColumnSplitIndex()));
     				this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel") + splitMaxValue);
-    				setVisibleSplitEnumClasses(false);
-    				this.splitNoBinsLabel.setVisible(true);
-    				this.splitNoBinsBox.setVisible(true);
+    				setSplitEnumClasses(false);
+    				this.splitBinsLabel.setVisible(true);
+    				this.splitBinsBox.setVisible(true);
     			}
     			else if (splitType.equals(AllowedTypes.ENUM))
     			{
@@ -443,9 +435,27 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
     				}
     				String stringWithoutWildcard = sb.substring(0, sb.length() - 2);//-2 voor /n en wildcard
     				this.splitBoundariesArea.setText(stringWithoutWildcard);
-    				this.splitNoBinsLabel.setVisible(false);
-    				this.splitNoBinsBox.setVisible(false);
-    				setVisibleSplitEnumClasses(true);
+    				this.splitBinsLabel.setVisible(false);
+    				this.splitBinsBox.setVisible(false);
+    				setSplitEnumClasses(true);
+    			}
+    			else if (splitType.equals(AllowedTypes.STRING))
+    			{
+    				StringBuilder sb = new StringBuilder();
+    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    					this.model.getSplitOptions());
+    				for (int i = 0; i < splitClasses; i++)
+    				{
+    					sb.append(this.model.getSplitOptions()
+    						.getSplitClassLabel(i, this.model.getStatTableModel()));
+    					sb.append("\n");
+    				}
+    				
+    				this.splitBoundariesArea.setText(sb.toString());
+    				this.separatorSplitBoundaries.setVisible(false);
+    				this.splitBinsBox.setVisible(false);
+    				this.splitBinsLabel.setVisible(false);
+    				setSplitEnumClasses(true);
     			}
     		} // er is een split variabele ingesteld
 		}
@@ -481,7 +491,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		listBox.setSelectedIndex(indexToFind);
 	}
 
-	private void setVisibleSplitEnumClasses(boolean b)
+	private void setSplitEnumClasses(boolean b)
 	{
 		splitEnumClasses = b;
 		
@@ -506,8 +516,8 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 
 		if (!b)
 		{
-			this.splitNoBinsLabel.setVisible(b);
-			this.splitNoBinsBox.setVisible(b);
+			this.splitBinsLabel.setVisible(b);
+			this.splitBinsBox.setVisible(b);
 			this.splitChooseBoundariesButton.setVisible(b);
 			this.splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
 			this.setVisibleSplitBoundaryOptions(false);
@@ -594,8 +604,8 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 	
 	public int getSplitBinsBoxSelectedInt()
 	{
-		int selectedIndex = this.splitNoBinsBox.getSelectedIndex();
-		String itemText = this.splitNoBinsBox.getItemText(selectedIndex);
+		int selectedIndex = this.splitBinsBox.getSelectedIndex();
+		String itemText = this.splitBinsBox.getItemText(selectedIndex);
 		return Integer.parseInt(itemText);
 	}
 
@@ -730,7 +740,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 			{
 				model.setColumnIndex(DescriptivesUserOptionsPanel.this.getColumnIndexBoxSelectedIndex());
 			}
-			else if (e.getSource() == splitNoBinsBox)
+			else if (e.getSource() == splitBinsBox)
 			{
 				controller.setSplitType(model.getStatTableModel().getColumnTypes()
 					.get(model.getSplitOptions().getColumnSplitIndex())
