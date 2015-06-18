@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.ColorPreviewer;
 import fi.statistiekgwt.client.DialogButton;
@@ -600,6 +601,24 @@ public class DotplotUserOptionsPanel extends FlowPanel
 				}
 				String stringWithoutWildcard = sb.substring(0, sb.length() - 2);//- 1); -2 voor /n en wildcard
 				this.splitBoundariesArea.setText(stringWithoutWildcard);
+				this.separatorSplitBoundaries.setVisible(false);
+				this.splitBinsBox.setVisible(false);
+				this.splitBinsLabel.setVisible(false);
+				setSplitEnumClasses(true);
+			}
+			else if (splitType.equals(AllowedTypes.STRING))
+			{
+				StringBuilder sb = new StringBuilder();
+				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+					this.model.getSplitOptions());
+				for (int i = 0; i < splitClasses; i++)
+				{
+					sb.append(this.model.getSplitOptions()
+						.getSplitClassLabel(i, this.model.getStatTableModel()));
+					sb.append("\n");
+				}
+				
+				this.splitBoundariesArea.setText(sb.toString());
 				this.separatorSplitBoundaries.setVisible(false);
 				this.splitBinsBox.setVisible(false);
 				this.splitBinsLabel.setVisible(false);
