@@ -1730,29 +1730,23 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	static class StatTableInputCell extends TextInputCell
 	{
 	    private static Template template;
-		ColumnType type;
-		int columnWidth;
+	    private ColumnType type;
+		private int columnWidth;
+		private boolean editable;
 
 	    interface Template extends SafeHtmlTemplates
 	    {   
-	        // {0}, {1}, {2} relate to value, size, style
-//	        @Template("<input type=\"text\" value=\"{0}\" tabindex=\"-1\" size=\"{1}\" maxlength=\"{1}\" style=\"{2}\"></input>")
-//	        SafeHtml input(String value, String size, String style);
-
 	    	// {0}, {1} relate to value, style
 	        @Template("<input type=\"text\" value=\"{0}\" tabindex=\"-1\" style=\"{1}\"></input>")
 	        SafeHtml input(String value, String style);
-
-	    	// {0} relates to value
-//	        @Template("<input type=\"text\" value=\"{0}\" tabindex=\"-1\"></input>")
-//	        SafeHtml input(String value);
 	    }
 
-	    public StatTableInputCell(ColumnType type, int columnWidth)
+	    public StatTableInputCell(ColumnType type, int columnWidth, boolean editable)
 	    {
 	        template = GWT.create(Template.class);
 	        this.type = type;
 	        this.columnWidth = columnWidth;
+	        this.editable = editable;
 	    }
 
 	    @Override
@@ -1776,17 +1770,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					s = StatistiekGWT.getStringValue(s);
 				}
 				// set value, style
-				// sb.append(template.input(s,
-				// StatTable.this.getMaxColumnWidth()[columnIndex] + "px"));
 				sb.append(template.input(s, "width: " + this.columnWidth
 					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE));
-				// sb.append(template.input(s));
 			}
 	        else
 	        {
 	            sb.appendHtmlConstant("<input type=\"text\" tabindex=\"-1\"></input>");
 	        }
-	    }
+	    } // render()
+	    
+	    @Override
+        public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> valueUpdater) 
+        {
+            if (!this.editable)
+            {
+                event.preventDefault();
+            }
+            else
+            {
+                super.onBrowserEvent(context, parent, value, event, valueUpdater);
+            }
+        } // onBrowserEvent()
+	    
 	} // class StatTableInputCell
 
 	
@@ -1857,8 +1862,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 			
 			sb.append(template.endSelect());
-		}
-
+		} // render()
+		
 	} // class StatTableSelectionCell
 	
 	
@@ -2260,15 +2265,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 			// check column type
 			if (this.statTableModel.getColumnTypes().get(i).getType()
-				.equals(AllowedTypes.ENUM))
+				.equals(AllowedTypes.ENUM)
+				&& this.getStatTableModel().isDataEditable())
 			{
 				String[] enumOptions = StatTable.this.statTableModel
 					.getColumnTypes().get(i).getEnumOptions();
 
 				SelectionCell enumCell = new StatTableSelectionCell(Arrays.asList(enumOptions));
-
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
-				
 				Column<List<String>, String> enumColumn = new StatTableColumn(enumCell, type);
 
 				enumColumn.setFieldUpdater(fieldUpdater);
@@ -2285,11 +2289,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			else
 			{
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
-				Column<List<String>, String> column = new StatTableColumn(
-					new StatTableInputCell(
-						type, 
-						Math.max(this.maxCellWidth[i], this.maxColumnWidth[i] - StatTable.COLUMN_INPUT_DATA_PADDING))
-					, type);
+				StatTableInputCell inputCell = new StatTableInputCell(
+					type, 
+					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i] - StatTable.COLUMN_INPUT_DATA_PADDING), 
+					this.getStatTableModel().isDataEditable());
+				Column<List<String>, String> column = new StatTableColumn(inputCell, type);
 
 				column.setFieldUpdater(fieldUpdater);
 				column.setSortable(true);
@@ -2680,5 +2684,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public void setHeight(int h)
 	{
 		this.height = h;
+	}
+	
+	public StatTableModel getStatTableModel()
+	{
+		return this.statTableModel;
 	}
 }
