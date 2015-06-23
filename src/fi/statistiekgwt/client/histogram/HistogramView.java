@@ -563,14 +563,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int barNumber, int ySplitOffset, int xSplitOffset, CssColor c,
 		int numberOfBars, int totalBars, boolean drawNextToEachOther, int splitClass)
 	{
-//		System.out.println("HistogramView.paintBar(): barLength = " + barLength 
-//			+ ", barNumber = " + barNumber
-//			+ ", numberOfBars = " + numberOfBars
-//			+ ", splitClass = " + splitClass
-//			+ ", ySplitOffset = " + ySplitOffset);
-		
-		CssColor blackCss = CssColor.make(0, 0, 0);
-
 		if (this.model.isFrequencyPolygonMode())
 		{
 			// set color
@@ -580,16 +572,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			Point p = this.dotLocation(barLength, barNumber);
 			int size = 4;
 			
-			// test syl: dit wordt normaal gesproken niet meer gepaint. onMouseMove toont de popup, maar doet geen paint()
+			// dit wordt normaal gesproken niet meer gepaint. onMouseMove toont de popup, maar doet geen paint()
 			if ((highlightedBar == barNumber) && (highlightInSplit == splitClass))
 			{
-//				System.out.println("HIGHLIGHT! HistogramView.paintBar(): barNumber = " + barNumber
-//					+ ", splitClass = " + splitClass + ", numberOfBars = "
-//					+ numberOfBars + ", totalBars = " + totalBars);
-
 		        context.setLineWidth(3);
-//				context.drawOval(p.x - size, p.y - size + ySplitOffset, 2 * size,
-//					2 * size);
 				context.arc(p.getX(), p.getY(), size, 0, 2 * Math.PI);
 		        context.setLineWidth(1);
 			}
@@ -622,7 +608,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			this.lastPolygonPoint = p;
 			
 			// reset color
-			context.setStrokeStyle(blackCss);
+			context.setStrokeStyle(ColorUtils.BLACK);
 
 		} // frequency polygon
 		else
@@ -638,30 +624,17 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				spacing = 4;
 			}
 			
-//			System.out.println("HistogramView.paintBar(): type = " + type + ", binWidth = " 
-//				+ getBinWidth() + ", spacing = " + spacing);
-
 			double colorMixSymm = 0.5; // t.b.v. shading
 			double colorMix = 0.7;
 
-			CssColor colorSelectedBar = HistogramView.SELECTED_BAR_COLOR;
 			double darkerFactor = 0.25;
 			RGBColor cRGB = ColorUtils.getRGBColor(c);
 			int r = cRGB.getRed();
 			int g = cRGB.getGreen();
 			int b = cRGB.getBlue();
 			
-			// test syl
-//			System.out.println("HistogramView.paintBar(barNumber = " + barNumber
-//				+ ", splitClass = " + splitClass 
-//				+ ", selectedLength = " + selectedLength
-//				+ "): c = " + c 
-//				+ ", rgb = (" + r + "," + g + "," + b + ")");
-			
 			RGBColor cRGBDarker =  new RGBColor((int) (r * darkerFactor), 
 				(int) (g * darkerFactor), (int) (b * darkerFactor));
-			RGBColor white = new RGBColor(255, 255, 255);
-			RGBColor black = new RGBColor(0, 0, 0);
 
 			if (this.model.hasVerticalBars())
 			{
@@ -683,10 +656,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				
 
 				if (type.equals(AllowedTypes.ENUM) 
+					|| type.equals(AllowedTypes.STRING)
 					|| (type.equals(AllowedTypes.INTEGER)) && getBinWidth() == 1 && labelUnderBinItemSelected())
 				{
 					// Symmetrical shading
-    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, white,// CssColor.make(255, 255, 255),//WHITE
+    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, ColorUtils.WHITE_RGB,
 						colorMixSymm);
     				
     				int x_coordinate = x1 + barOffset + spacing;
@@ -705,7 +679,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	    				height = selectedLength;
 	
 	    				// draw the selected bar darker in its original color c
-	    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, white,
+	    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, ColorUtils.WHITE_RGB,
 							colorMixSymm);
 	    				fillRectWithSymmShade(x_coordinate, y_coordinate, 
 	    					width, height, context, 
@@ -716,8 +690,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					// shading to the right 
 					// in order to support visually that the upper bin boundary is not included
-					
-    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, white,
+    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, ColorUtils.WHITE_RGB,
 						colorMix);
 
     				// paint bar
@@ -731,32 +704,19 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     				// paint selected bar
     				y_coordinate = y + barLength - selectedLength + ySplitOffset;
     				height = selectedLength;
-//    				shadingColor = ColorPreviewer.mixColors(colorSelectedBar, Color.WHITE, colorMix);
-//    				fillRectWithShadeToUpperBinSide(x_coordinate, y_coordinate, 
-//    					width, height, g, colorSelectedBar, shadingColor,
-//    					true);
 
     				// draw the selected bar darker in its original color c, but darker
-    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, white, colorMix);
+    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, ColorUtils.WHITE_RGB, colorMix);
     				fillRectWithShadeToUpperBinSide(x_coordinate, y_coordinate, 
     					width, height, context, cRGBDarker.getCssColor(), shadingColor.getCssColor(),
     					true);
 				} // right shading
 				
-				// fill the rectangle above the bar white to get the correct
-				// color mixing when using alpha values
-				// g.setColor(Color.WHITE);
-				// g.fillRect(x1, ySplitOffset, x2-x1,
-				// this.barAreaHeight()-barLength);
-				context.setStrokeStyle(black.getCssColor());
+				context.setStrokeStyle(ColorUtils.BLACK);
 				
 				// test syl: dit wordt normaal gesproken niet meer gepaint. onMouseMove toont de popup, maar doet geen paint()
 				if ((highlightedBar == barNumber) && (highlightInSplit == splitClass))
 				{
-//					System.out.println("HIGHLIGHT! HistogramView.paintBar(): barNumber = " + barNumber
-//						+ ", splitClass = " + splitClass + ", numberOfBars = "
-//						+ numberOfBars + ", totalBars = " + totalBars);
-
 					context.beginPath();
     		        context.setLineWidth(3);
     				context.moveTo(x1 - 1 + barOffset + spacing, y + ySplitOffset);
@@ -794,7 +754,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				if (type.equals(AllowedTypes.ENUM) 
 					|| (getBinWidth() == 1 && type.equals(AllowedTypes.INTEGER) && labelUnderBinItemSelected()))
 				{
- 					RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, white,
+ 					RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, ColorUtils.WHITE_RGB,
 						colorMixSymm);
     				
     				int x_coordinate = x1 + xSplitOffset + selectedLength;
@@ -810,7 +770,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     				width = selectedLength;
     				
     				// draw the selected bar darker in its original color c, but darker
-    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, white, colorMixSymm);
+    				shadingColor = ColorPreviewer.mixColors(cRGBDarker, ColorUtils.WHITE_RGB, colorMixSymm);
     				fillRectWithSymmShade(x_coordinate, y_coordinate, 
     					width, height, context, cRGBDarker.getCssColor(), shadingColor.getCssColor(), false);
 
@@ -819,8 +779,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					// shading to the down side 
 					// in order to support visually that the upper bin boundary is not included
-
-    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, white,
+    				RGBColor shadingColor = ColorPreviewer.mixColors(cRGB, ColorUtils.WHITE_RGB,
 						colorMix);
     				
     				// paint bar
@@ -832,7 +791,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     					width, height, context, cRGB.getCssColor(), shadingColor.getCssColor(), false);
 
 					// paint selected bar
-					shadingColor = ColorPreviewer.mixColors(cRGBDarker, white,
+					shadingColor = ColorPreviewer.mixColors(cRGBDarker, ColorUtils.WHITE_RGB,
 						colorMix);
 					x_coordinate = x1 + xSplitOffset;
 					width = selectedLength;
@@ -840,14 +799,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						width, height, context, cRGBDarker.getCssColor(), shadingColor.getCssColor(), false);
 				}
 
-				context.setStrokeStyle(black.getCssColor());
+				context.setStrokeStyle(ColorUtils.BLACK);
 
 				if ((highlightedBar == barNumber) && (highlightInSplit == splitClass))
 				{
-//					System.out.println("HIGHLIGHT! HistogramView.paintBar(): barNumber = " + barNumber
-//						+ ", splitClass = " + splitClass + ", numberOfBars = "
-//						+ numberOfBars + ", totalBars = " + totalBars);
-
 					context.beginPath();
     		        context.setLineWidth(3);
     				context.moveTo(x1 + xSplitOffset - 1 + barLength, 
@@ -1396,7 +1351,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Paint the axes (??) and bars for numerical data.
+	 * Paint the bars for numerical data.
 	 * 
 	 * @param context
 	 *	The graphics in which the bars will be painted
@@ -1454,9 +1409,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
 				AllowedTypes type = list.get(columnIndex).getType();
 				
-//				System.out.println("HistogramView.paintNumberClass(): type = " + type
-//					+ ", getBinWidth() = " + getBinWidth());
-				
 				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
 				{
 					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
@@ -1467,15 +1419,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						{
 							// Voor gehele getallen met 1 waarde per klasse, 1 getal tonen onder de staaf
 							s_labelUnderBin = s;
-//							System.out.println("HistogramView.paintNumberClass(): INT & binwidth = 1, s_labelUnderBin = " 
-//								+ s_labelUnderBin);
 						}
 						else
 						{
     						s_labelUnderBin = s + "-<" +
     							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
-//							System.out.println("HistogramView.paintNumberClass(): s_labelUnderBin = " 
-//								+ s_labelUnderBin);
 						}
 						
 						metrics = context.measureText(s_labelUnderBin);
@@ -2131,7 +2079,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				}
 			}
 		} // horizontal bars
-	}
+	} // paintNumberClass()
 
 	private boolean determineNormalFitForVerticalBars(Context2d context, AllowedTypes type)
 	{
@@ -2377,12 +2325,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			{
 				int y = this.barAreaHeight()
 					- (int) (i * minorStep * scale);
-				context.setStrokeStyle(CssColor.make(240, 240, 240));
+				// paint light grey help line
+				context.setStrokeStyle(ColorUtils.LIGHT_GREY);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset, y + ySplitOffset);
 				context.lineTo(this.barAreaWidth(), y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
 				context.closePath();
 				context.stroke();
+
+				// paint small marker
 				context.setStrokeStyle(black);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset - 2, y + ySplitOffset);
@@ -2395,12 +2346,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			for (int i = 0; i < majorStepsFloor + 1; i++)
 			{
 				int y = this.barAreaHeight() - (int) (i * step * scale);
-				context.setStrokeStyle(CssColor.make(220, 220, 220));
+				// paint grey help line
+				context.setStrokeStyle(ColorUtils.GREY);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset, y + ySplitOffset);
 				context.lineTo(this.barAreaWidth(), y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
 				context.closePath();
 				context.stroke();
+
+				// paint small marker
 				context.setStrokeStyle(black);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset - 5, y + ySplitOffset);
@@ -2432,18 +2386,38 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// paint the small markers
 			for (int i = 0; i < majorStepsFloor * minorStepsPerMajorStep; i++)
 			{
-				int x = this.yAxisOffset + (int) (i * minorStep * scale)
-					- 1;
+				int x = this.yAxisOffset + (int) (i * minorStep * scale) - 1;
+				// paint light grey help line
+				context.setStrokeStyle(ColorUtils.LIGHT_GREY);
+				context.beginPath();
+				context.moveTo(x, ySplitOffset);
+				context.lineTo(x, ySplitOffset + y);
+				context.closePath();
+				context.stroke();
+
+				// paint small marker
+				context.setStrokeStyle(black);
+				context.beginPath();
 				context.moveTo(x, y + ySplitOffset);
 				context.lineTo(x, y + 2 + ySplitOffset);
+				context.closePath();
+				context.stroke();
 			}
-			context.closePath();
-			context.stroke();
 
 			// paint the large markers with their value
 			for (int i = 0; i < majorStepsFloor + 1; i++)
 			{
 				int x = this.yAxisOffset + (int) (i * step * scale) - 1;
+				// paint grey help line
+				context.setStrokeStyle(ColorUtils.GREY);
+				context.beginPath();
+				context.moveTo(x, ySplitOffset);
+				context.lineTo(x, ySplitOffset + y);
+				context.closePath();
+				context.stroke();
+
+				// paint small marker
+				context.setStrokeStyle(black);
 				context.beginPath();
 				context.moveTo(x, y + ySplitOffset);
 				context.lineTo(x, y + 5 + ySplitOffset);
@@ -2464,7 +2438,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * paint the bars for enum or string data
+	 * Paint the bars for enum or string data
 	 * 
 	 * @param context
 	 *            The graphics in which the bars will be painted
@@ -3209,12 +3183,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				}
 			}
 
-			// draw the x axis
+			// draw the axis with the values of the bars (for vertical bars the x axis, for horizontal bars the y axis)
 			for (int i = 0; i < (HistogramView.this.isSplitSingleViewSelected() ? 1
 				: splitClasses); i++)
 			{
 				int ySplitOffset = i
-					* (HistogramView.this.getHeight() - 5);// - 5); // scrollPanel.getOffsetHeight() is 1e keer 0
+					* (HistogramView.this.getHeight() - 5);
 
 				if (HistogramView.this.model.hasVerticalBars())
 				{
@@ -3222,7 +3196,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					{
 						context.moveTo(HistogramView.this.yAxisOffset,
 							HistogramView.this.barAreaHeight() + ySplitOffset);
-						context.lineTo(canvas.getCoordinateSpaceWidth(), 
+						context.lineTo(HistogramView.this.barAreaWidth(), 
 							HistogramView.this.barAreaHeight() + ySplitOffset);
 						context.stroke();
 					}
@@ -3238,16 +3212,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				HistogramView.this.paintAxisLabels(context, ySplitOffset, i);
 			}
 			
-			// test syl
-//			for (int i = 0; i < HistogramView.this.barRectangles.size(); i++)
-//			{
-//				System.out.println("HistogramView.HistogramBarPanel.paint(): rectangles(" + i + ") x, y, w, h = " 
-//					+ HistogramView.this.barRectangles.get(i).x + ", "
-//					+ HistogramView.this.barRectangles.get(i).y + ", "
-//					+ HistogramView.this.barRectangles.get(i).w + ", "
-//					+ HistogramView.this.barRectangles.get(i).h
-//					);
-//			}
 		} // paint()
 		
 	} // class HistogramBarPanel
