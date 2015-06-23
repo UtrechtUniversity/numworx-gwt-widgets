@@ -43,13 +43,17 @@ public class CrossTabulationTableController implements StatistiekView
 	{
 		this.model = new CrossTabulationTableModel(tableModel, viewName);
 		this.model.setColumnIndex(startVarRows);
-		setSplit(startVarColumns);
+		
 		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
 		
 		this.view = new CrossTabulationTableView(this.model, this);
+		
+		// setSplit after the view has been created
+		setSplit(startVarColumns);
+
 		this.view.update();
 	}
 	
