@@ -37,6 +37,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 public class Munten extends FlowPanel implements ClickHandler{
@@ -97,7 +98,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	int tweeKop;
 	boolean muntenTabel1;
 	
-	private static class Experiment {
+	public static class Experiment {
 		private final String experimentNumber;
 	    private final String kopValue;
 	    private final String muntValue;
@@ -107,9 +108,20 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	this.kopValue = kopValue;
 	    	this.muntValue=muntValue;
 	    }
+	    
+	    public String getExpNumber()
+	    {
+	    	return experimentNumber;
+	    }
+	    public String getKopValue() {
+	    	return kopValue;
+	    }
+	    public String getMuntValue() {
+	    	return muntValue;
+	    }
 	}
 
-	private static class Experiment2 {
+	public static class Experiment2 {
 		private final String experimentNumber;
 	    private final String geenKop;
 	    private final String eenKop;
@@ -121,10 +133,26 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	this.eenKop=eenKop;
 	    	this.tweeKop=tweeKop;
 	    }
+	    
+	    public String getExpNumber() {
+	    	return experimentNumber;
+	    }
+	    public String getGeenKop() {
+	    	return geenKop;
+	    }
+	    public String getEenKop() {
+	    	return eenKop;
+	    }
+	    public String getTweeKop() {
+	    	return tweeKop;
+	    }
 	}
 
 	CellTable<Experiment> table;
 	CellTable<Experiment2> table2;
+	
+	protected ListDataProvider<Experiment> dataProvider;
+	protected ListDataProvider<Experiment2> dataProvider1;
 	/**
 	 * The list of data to display.
 	 */
@@ -376,6 +404,11 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 		    table.setPageSize(1000);
 		    
+		    dataProvider = new ListDataProvider<Experiment>();
+			// 	Add the table to the dataProvider.
+			dataProvider.addDataDisplay(table);
+			
+		    
 		    // Add a text column to show the name.
 		    TextColumn<Experiment> expColumn = new TextColumn<Experiment>() {
 		      @Override
@@ -407,6 +440,12 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    table2 = new CellTable<Experiment2>();
 		    table2.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 		    table2.setPageSize(1000);
+		    
+
+		    dataProvider1 = new ListDataProvider<Experiment2>();
+			// 	Add the table to the dataProvider.
+			dataProvider1.addDataDisplay(table2);
+			
 		    
 		    // Add a text column to show the name.
 		    TextColumn<Experiment2> expColumn2 = new TextColumn<Experiment2>() {
@@ -596,6 +635,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 			} else {
 				stapStarted=false;
 			}
+			//Window.alert(Integer.toString(table.getRowCount()));
 			elapsedTimer.scheduleRepeating(10);
 		}
 		if (event.getSource()==wis) {
@@ -607,8 +647,12 @@ public class Munten extends FlowPanel implements ClickHandler{
 			experiment=0;
 			muntCount=0;
 			totaalmunt=0;
-			table.setRowCount(0, true);
-			table2.setRowCount(0, true);
+			//table.setRowCount(0, true);
+			List dataList=dataProvider.getList();
+			dataList.clear();
+			//table2.setRowCount(0, true);
+			List dataList1=dataProvider1.getList();
+			dataList1.clear();
 			geenKop=0;
 			eenKop=0;
 			tweeKop=0;
@@ -709,10 +753,19 @@ public class Munten extends FlowPanel implements ClickHandler{
 			}
 			muntCount++;
 
-			List<Experiment> ADDEXP = Arrays.asList(
-					new Experiment(Integer.toString(experiment+1), Integer.toString(muntCount-totaalmunt),Integer.toString(totaalmunt)));
+			//List<Experiment> ADDEXP = Arrays.asList(
+			//		new Experiment(Integer.toString(experiment+1), Integer.toString(muntCount-totaalmunt),Integer.toString(totaalmunt)));
 
-			table.setRowData(experiment,ADDEXP);
+			//table.setRowData(experiment,ADDEXP);
+			
+			
+			Experiment ADDEXP = new Experiment(Integer.toString(experiment+1), Integer.toString(muntCount-totaalmunt),Integer.toString(totaalmunt));
+
+			List dataList=dataProvider.getList();
+			if (dataList.size()==experiment)
+				dataList.add(ADDEXP);
+			else
+				dataList.set(experiment, ADDEXP);
 		} else {
 			   double s = Math.random();
 			   
@@ -725,10 +778,21 @@ public class Munten extends FlowPanel implements ClickHandler{
 			   
 			   muntCount++;
 
-			   List<Experiment2> ADDEXP2 = Arrays.asList(
-						new Experiment2(Integer.toString(experiment+1), Integer.toString(geenKop),Integer.toString(eenKop),Integer.toString(tweeKop)));
+			   //List<Experiment2> ADDEXP2 = Arrays.asList(
+				//		new Experiment2(Integer.toString(experiment+1), Integer.toString(geenKop),Integer.toString(eenKop),Integer.toString(tweeKop)));
 
-				table2.setRowData(experiment,ADDEXP2);
+				//table2.setRowData(experiment,ADDEXP2);
+				
+				
+				Experiment2 ADDEXP2 = new Experiment2(Integer.toString(experiment+1), Integer.toString(geenKop),Integer.toString(eenKop),Integer.toString(tweeKop));
+
+				
+				List dataList1=dataProvider1.getList();
+				if (dataList1.size()==experiment)
+					dataList1.add(ADDEXP2);
+				else
+					dataList1.set(experiment, ADDEXP2);
+
 		   }
 			
 		   if (muntCount>=maxCount) {
