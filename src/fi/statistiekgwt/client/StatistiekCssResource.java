@@ -107,5 +107,7 @@ public interface StatistiekCssResource extends CssResource
 	String block();
 
 	String waitCursor();
+
+	String moveCursor();
 }
 
