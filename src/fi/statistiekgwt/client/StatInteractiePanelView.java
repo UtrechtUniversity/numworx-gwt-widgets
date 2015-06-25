@@ -1,12 +1,12 @@
 package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
+import org.vectomatic.file.FileList;
 
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Cursor;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -43,8 +43,10 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DialogBox.Caption;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -53,8 +55,8 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.statistiekgwt.client.event.AddViewEvent;
@@ -80,10 +82,6 @@ public class StatInteractiePanelView extends LayoutPanel
 	private FlowPanel addViewTab;
 	private ListBox viewsBox, startVarBox, startVar2Box;
 	
-	private HandlerRegistration viewsBoxHandlerRegistration;
-	private HandlerRegistration startVarBoxHandlerRegistration;
-	private HandlerRegistration startVar2BoxHandlerRegistration;
-	
 	protected long taptime;
 	
 	private Label addViewLabel;
@@ -93,6 +91,8 @@ public class StatInteractiePanelView extends LayoutPanel
 	private MenuBar menuBar;
 	private MenuItem changeNameItem;
 	private Command changeNameCommand;
+	
+	private RemoveViewDialogBox removeViewBox;
 
 	// button to reset the data -> button now implemented in StatTable for
 	// layout reasons
@@ -122,6 +122,12 @@ public class StatInteractiePanelView extends LayoutPanel
 	 * add view event handler occurrence.
 	 */
 	private HandlerRegistration addViewEventHandlerRegistration;
+	
+	private HandlerRegistration viewsBoxHandlerRegistration;
+	private HandlerRegistration startVarBoxHandlerRegistration;
+	private HandlerRegistration startVar2BoxHandlerRegistration;
+	
+	private StatInteractiePanelViewClickHandler clickHandler;
 
 	/**
 	 * Constructor
@@ -189,6 +195,11 @@ public class StatInteractiePanelView extends LayoutPanel
 		addViewTab.add(this.chooseStartVar2Label);
 		addViewTab.add(this.startVar2Box);
 		
+		this.clickHandler = new StatInteractiePanelViewClickHandler();
+		
+		// initialize the dialogbox for showing a warning when removing a view
+		this.removeViewBox = new RemoveViewDialogBox(new Label(""));
+
 		this.update();
 	}
 
@@ -1164,8 +1175,8 @@ public class StatInteractiePanelView extends LayoutPanel
 //						+ ", movedY = " + movedY + ", lastMovedX = " + lastMovedX + ", lastMovedY = " + lastMovedY);
 
 					// set move cursor
-					RootPanel.getBodyElement().getStyle().setCursor(Cursor.MOVE);
-					label.getElement().getStyle().setCursor(Cursor.MOVE);
+//					RootPanel.getBodyElement().getStyle().setCursor(Cursor.MOVE);
+					label.addStyleName(statistiekCss.moveCursor());
 
 					this.lastMovedX = movedX;
 					this.lastMovedY = movedY;
@@ -1173,7 +1184,10 @@ public class StatInteractiePanelView extends LayoutPanel
 					if (this.isDragged(lastMovedX, lastMovedY))
 					{
 						this.setDraggedOutside(lastMovedX, lastMovedY);
-						label.getElement().getStyle().setCursor(Cursor.POINTER);
+
+						// remove move cursor
+						label.removeStyleName(statistiekCss.moveCursor());
+						
 						mouseDown = false;
 					}
 					else
@@ -1194,13 +1208,15 @@ public class StatInteractiePanelView extends LayoutPanel
 			mouseDown = false;
 			
 			// reset cursor to default
-			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
+//			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 
 			// reset label cursor to pointer
 			if (event.getSource() instanceof Label)
 			{
 				Label label = (Label) event.getSource();
-				label.getElement().getStyle().setCursor(Cursor.POINTER);
+
+				// remove move cursor
+				label.removeStyleName(statistiekCss.moveCursor());
 			}
 		}
 
@@ -1298,7 +1314,15 @@ public class StatInteractiePanelView extends LayoutPanel
 			lastMovedY = startY;
 			
 			mouseDown = true;
-			//this.setSelected();
+			this.setSelected();
+			
+			if (event.getSource() instanceof Label)
+			{
+				Label label = (Label) event.getSource();
+				
+				// set move cursor
+				label.addStyleName(statistiekCss.moveCursor());
+			}
 		}
 
 		@Override
@@ -1316,6 +1340,9 @@ public class StatInteractiePanelView extends LayoutPanel
 			int movedX = event.getClientX();
 			int movedY = event.getClientY();
 			
+			GWT.log("StatInteractiePanelView.DragTabHandler.onMouseMove(): movedXY = (" + movedX
+				+ "," + movedY + ")");
+			
 			if (event.getSource() instanceof Label)
 			{
 				Label label = (Label) event.getSource();
@@ -1324,51 +1351,58 @@ public class StatInteractiePanelView extends LayoutPanel
 				if (this.isContinuousMove(movedX, movedY))
 				{
 					// set move cursor
-					RootPanel.getBodyElement().getStyle().setCursor(Cursor.MOVE);
-					label.getElement().getStyle().setCursor(Cursor.MOVE);
+					label.addStyleName(statistiekCss.moveCursor());
 
 					this.lastMovedX = movedX;
 					this.lastMovedY = movedY;
 				}
 				else
 				{
+					GWT.log("StatInteractiePanelView.DragTabHandler.onMouseMove(): NO continuous move...");
+
 					// no continuous move, something is wrong (moved out of the label area and returned at some other point), reset move action
 					this.mouseDown = false;
-					RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
-					label.getElement().getStyle().setCursor(Cursor.POINTER);
+
+					// remove move cursor
+					label.removeStyleName(statistiekCss.moveCursor());
 					return;
 				}
 
-				//this.setSelected();// is in mouseDown() al gebeurd
 //				System.out.println("StatInteractiePanel.DragTabHandler.onMouseMove(): abs(startX - movedX) = " + Math.abs(startX - movedX)
 //					+ ", abs(startY - movedY) = " + Math.abs(startY - movedY));
 				// a minimum drag distance is required; 
 				// buggy: this will fail if the label is dragged on the border and is moved out of the label area
 				if (this.isDragged(lastMovedX, lastMovedY))
 				{
+					GWT.log("StatInteractiePanelView.DragTabHandler.onMouseMove(): continuous move and dragged outside");
+
 					this.setDraggedOutside(lastMovedX, lastMovedY);
-					label.getElement().getStyle().setCursor(Cursor.POINTER);
+
+					// remove move cursor
+					label.removeStyleName(statistiekCss.moveCursor());
+					
 					mouseDown = false;
 				}
 				else
 				{
+					GWT.log("StatInteractiePanelView.DragTabHandler.onMouseMove(): continuous move, not dragged far enough...");
 				}
 			}
 			else
 			{
 				
 			}
-		}
+		} // onMouseMove
 
-//		private void setSelected()
-//		{
-//			tabPanel.selectTab(widget);
-//			int tabIndex = tabPanel.getWidgetIndex(widget);
-//
-//			processSelectedTab(tabIndex);
-//
-//			updateViewIfNecessary(this.viewName);
-//		}
+		private void setSelected()
+		{
+			tabPanel.selectTab(widget);
+			int tabIndex = tabPanel.getWidgetIndex(widget);
+
+			processSelectedTab(tabIndex);
+
+			updateViewIfNecessary(this.viewName);
+		}
 
 		private void setDraggedOutside(int x, int y)
 		{
@@ -1398,10 +1432,8 @@ public class StatInteractiePanelView extends LayoutPanel
 					selectedTabViewName = ((Label) ((HorizontalPanel) tabPanel.getTabWidget(tabPanel.getSelectedIndex())).getWidget(0)).getText();
 				}
 			}
+
 			updateViewIfNecessary(selectedTabViewName);// niet this.viewName, maar de selectedTab
-			
-			// reset cursor to default
-			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
 		}
 
 		/**
@@ -1411,21 +1443,20 @@ public class StatInteractiePanelView extends LayoutPanel
 		@Override
 		public void onMouseUp(MouseUpEvent event)
 		{
+			// reset label cursor to pointer
+			if (event.getSource() instanceof Label)
+			{
+				Label label = (Label) event.getSource();
+
+				// remove move cursor
+				label.removeStyleName(statistiekCss.moveCursor());
+			}
+			
 			// prevent scrolling
 			event.preventDefault();
 			event.stopPropagation();
 			
 			mouseDown = false;
-			
-			// reset cursor to default
-			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
-
-			// reset label cursor to pointer
-			if (event.getSource() instanceof Label)
-			{
-				Label label = (Label) event.getSource();
-				label.getElement().getStyle().setCursor(Cursor.POINTER);
-			}
 		}
 	} //class DragTabHandler
 	
@@ -1804,12 +1835,9 @@ public class StatInteractiePanelView extends LayoutPanel
 	 * @author Manu Drijvers, Sylvia van Borkulo
 	 * 
 	 */
-	public class SeparateViewDialog extends DialogBox //implements WindowListener
+	public class SeparateViewDialog extends DialogBox
 	{
 		private StatistiekView statistiekView;
-//		HTML close = new HTML("[X]");
-//		HTML title;
-//		HorizontalPanel captionPanel = new HorizontalPanel();
 		
 		StatistiekGWTClientBundle statistiekGWTClientBundle;
 		StatistiekCssResource statistiekCss;
@@ -1843,10 +1871,6 @@ public class StatInteractiePanelView extends LayoutPanel
 
 		public void onWindowClosing(ClosingEvent arg0)
 		{
-			// GWT.log("windowClosing(): previousSelectedView="
-			// + StatInteractiePanelView.this.previousSelectedView +
-			// ", selectedView=" + selectedView);
-
 			processCloseSeparateView(this.statistiekView);
 		}
 		
@@ -1870,6 +1894,95 @@ public class StatInteractiePanelView extends LayoutPanel
 		
 	} // class ImageAnchor
 	
+	
+	/**
+	 * A dialogbox that shows a warning message when a view
+	 * is about to be removed.  
+	 * 
+	 * @author Sylvia van Borkulo
+	 *
+	 */
+	class RemoveViewDialogBox extends DialogBox
+	{
+		private Label message = new Label();
+		private Button okButton = new Button(
+			StatistiekGWT.rb.getString("yesRemove"));
+		private Button cancelButton = new Button(
+			StatistiekGWT.rb.getString("noCancel"));
+		private Widget widget;
+
+		public RemoveViewDialogBox(Label label)
+		{
+			super();
+			setTitle(label.getText());
+			message.setText(StatistiekGWT.rb.getString("removeViewWarning"));
+			okButton.addClickHandler(clickHandler);
+			okButton.addStyleName(statistiekCss.margin());
+			cancelButton.addClickHandler(StatInteractiePanelView.this.clickHandler);
+			cancelButton.addStyleName(statistiekCss.margin());
+
+			HorizontalPanel buttonPanel = new HorizontalPanel();
+			buttonPanel.add(okButton);
+			buttonPanel.add(cancelButton);
+
+			VerticalPanel vPanel = new VerticalPanel();
+			vPanel.add(message);
+			vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+			vPanel.add(buttonPanel);
+
+			setWidget(vPanel);
+		}
+
+		public void setWidgetField(Widget widget)
+		{
+			this.widget = widget;
+		}
+		
+	} // class RemoveViewDialogBox
+	
+
+	class StatInteractiePanelViewClickHandler implements ClickHandler
+	{
+		private FileList fileList;
+		
+		@Override
+		public void onClick(ClickEvent e)
+		{
+			if (e.getSource() == removeViewBox.okButton)
+			{
+				int widgetIndex = tabPanel.getWidgetIndex(removeViewBox.widget);
+				
+				if (model.getStatTableModel().isViewsAddable()
+					&& widgetIndex >= 0
+					&& (widgetIndex < tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
+				{
+					model.removeView(model.mainWindowIndexToGeneralIndex(widgetIndex));
+
+					tabPanel.remove(widgetIndex);
+					
+					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+					for (int i = 0; i < model.getViews().size(); i++)
+					{
+						StatistiekView view = model.getViews().get(i);
+						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+						{
+							view.update();
+						}
+					}
+				}
+				
+				removeViewBox.hide();
+			}
+			else if (e.getSource() == removeViewBox.cancelButton)
+			{
+				removeViewBox.hide();
+			}
+
+		} // onClick()
+
+	} // class StatInteractiePanelViewClickHandler
+
+	
 	/**
 	 * Detect whether there has been a loong click or 'tap & hold'.
 	 * 
@@ -1892,6 +2005,7 @@ public class StatInteractiePanelView extends LayoutPanel
 
 	    final HorizontalPanel hPanel = new HorizontalPanel();
 	    final Label label = new Label(title);
+	    label.setSize("100%", "100%");
 	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
 	    
 	    label.addDomHandler(new LabelClickHandler(widget, title), ContextMenuEvent.getType());
@@ -1904,13 +2018,13 @@ public class StatInteractiePanelView extends LayoutPanel
 	    label.addTouchEndHandler(touchHandler);
 
 	    // make the tab draggable, with mouse and touch
-	    DragTabHandler handler = new DragTabHandler(widget, title);
-	    label.addMouseDownHandler(handler);
-	    label.addMouseMoveHandler(handler);
-	    label.addMouseUpHandler(handler);
-	    label.addTouchStartHandler(handler);
-	    label.addTouchMoveHandler(handler);
-	    label.addTouchEndHandler(handler);
+	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
+	    label.addMouseDownHandler(dragHandler);
+	    label.addMouseMoveHandler(dragHandler);
+	    label.addMouseUpHandler(dragHandler);
+	    label.addTouchStartHandler(dragHandler);
+	    label.addTouchMoveHandler(dragHandler);
+	    label.addTouchEndHandler(dragHandler);
 	    
 	    // add handler to the horizontal panel 
 //	    hPanel.addDomHandler(handler, MouseDownEvent.getType());
@@ -1920,7 +2034,7 @@ public class StatInteractiePanelView extends LayoutPanel
 //	    hPanel.addDomHandler(handler, TouchMoveEvent.getType());
 //	    hPanel.addDomHandler(handler, TouchEndEvent.getType());
 	    
-	    label.getElement().getStyle().setCursor(Cursor.POINTER);//DEFAULT);  
+	    //label.getElement().getStyle().setCursor(Cursor.POINTER);  
 
 	    ImageAnchor closeBtn = new ImageAnchor();
 	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
@@ -1928,32 +2042,37 @@ public class StatInteractiePanelView extends LayoutPanel
 	    closeBtn.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event)
 			{
-				int widgetIndex = tabPanel.getWidgetIndex(widget);
-				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex
-					+ ", widgetCount = " + StatInteractiePanelView.this.tabPanel.getWidgetCount());
+				StatInteractiePanelView.this.removeViewBox.setWidgetField(widget);
+				StatInteractiePanelView.this.removeViewBox.center();
+				StatInteractiePanelView.this.removeViewBox.show();
 				
-				if (StatInteractiePanelView.this.model.getStatTableModel()
-						.isViewsAddable()
-					&& widgetIndex >= 0
-					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
-				{
-					StatInteractiePanelView.this.model
-						.removeView(StatInteractiePanelView.this.model
-							.mainWindowIndexToGeneralIndex(widgetIndex));
+//				int widgetIndex = tabPanel.getWidgetIndex(widget);
+//				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex
+//					+ ", widgetCount = " + StatInteractiePanelView.this.tabPanel.getWidgetCount());
+//				
+//				if (StatInteractiePanelView.this.model.getStatTableModel()
+//						.isViewsAddable()
+//					&& widgetIndex >= 0
+//					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
+//				{
+//					StatInteractiePanelView.this.model
+//						.removeView(StatInteractiePanelView.this.model
+//							.mainWindowIndexToGeneralIndex(widgetIndex));
+//
+//					tabPanel.remove(widgetIndex);
+//					
+//					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+//					for (int i = 0; i < model.getViews().size(); i++)
+//					{
+//						StatistiekView view = model.getViews().get(i);
+//						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+//						{
+//							view.update();
+//						}
+//					}
+//				}
+				
 
-					tabPanel.remove(widgetIndex);
-					
-					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-					for (int i = 0; i < model.getViews().size(); i++)
-					{
-						StatistiekView view = model.getViews().get(i);
-						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-						{
-							view.update();
-						}
-					}
-				}
-				
 			}
 		});
 	    hPanel.add(label);
@@ -1983,7 +2102,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	    // make the tab draggable
 	    DragTabHandler handler = new DragTabHandler(widget, title);
 
-	    label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
+	    //label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
 
 	    hPanel.add(label);
 	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
