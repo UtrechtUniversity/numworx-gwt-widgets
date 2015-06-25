@@ -62,7 +62,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -135,8 +134,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 	};
 	
-	private static final int TABLE_PAGE_SIZE = 20;
-	private static final String DELIMITER = ";";
+	private static final int TABLE_PAGE_SIZE = 100;
+	private static final String DEFAULT_SEPARATOR = ";";
 	private static final String CHECKBOX_CELL_WIDTH_STYLE = "width: 30px";
 	private static final int CHECKBOX_COLUMN_WIDTH = 50;
 	private static final int COLUMN_ENUM_DATA_PADDING = 50;//45;
@@ -146,6 +145,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * consider all rows, but only the first LARGE_DATASET_ROWCOUNT.
 	 */
 	private static final int LARGE_DATASET_LIMITED_ROWCOUNT = 250;
+	/**
+	 * The string representing the type of an excel file saved as CSV.
+	 * 
+	 * Note: Old excel files (with .xls extension) have the same file type
+	 * "application/vnd.ms-excel". When trying to import an xls file, an
+	 * error message will appear in the table instead of in a popup window 
+	 * in the import dialog.
+	 */
+	private static final String CSV_FROM_EXCEL_FILE_TYPE = "application/vnd.ms-excel";
 
 	private static final int WIDTH_PASTE_DIALOG = 300;
 	private static final int HEIGHT_PASTE_DIALOG = 230;
@@ -161,11 +169,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	private StatTableDataGrid<List<String>> table; // datagrid provides fixed header and footer section
 	protected ListDataProvider<List<String>> dataProvider;
-	//private ListHandler<List<String>> sortHandler;
 	private SimplePager pager;
 	private MultiSelectionModel<List<String>> selectionModel;
 	ArrayList<String> headers;
 	
+	private Label tableMessageLabel;
 	/**
 	 * Array with the maximum column width for each data column in table
 	 * considering the column header and the table data in the column.
@@ -228,21 +236,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private PushButton resetButton;
 	private Button importButton;
 	private FileUploadExt fileUpload;
-	private PopupPanel popupFileUploadPanel;
-	private Button fileUploadSelectButton;
+	private DialogBox fileUploadDialogBox;
+	private Button fileUploadImportButton;
 	private Button fileUploadCancelButton;
-	private FormPanel formPanel;
+//	private FormPanel formPanel;
 	
 	private StatTableClickHandler clickHandler;
 	private DummyTouchHandler dummyTouchHandler;
 	private ImportMessageDialogBox importBox;
+	private MessageDialogBox messageBox;
 	
 	// fields for reading import data from CSV file
 	protected FileReader reader;
 	protected Blob blob;
 	protected List<File> readQueue;
 	String csvText;
-	String[] CSVheaders;
+	String[] csvHeaders;
 	ArrayList<String> dataRows;
 	
 	/**
@@ -370,10 +379,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	     */
 	    this.table.setAutoHeaderRefreshDisabled(true);
 	    // Set the message to display when the table is empty
-	    Label emptyLabel = new Label(StatistiekGWT.rb.getString("emptyTableMessage"));
+	    tableMessageLabel = new Label(StatistiekGWT.rb.getString("emptyTableMessage"));
 	    // set large width for horizontal scrollbar, because an empty table (e.g., with many columns) won't show a horizontal scrollbar
-	    emptyLabel.setWidth("20000px");
-	    this.table.setEmptyTableWidget(emptyLabel);
+	    tableMessageLabel.setWidth("20000px");
+	    this.table.setEmptyTableWidget(tableMessageLabel);
 	    // set style
 	    this.table.addStyleName(statistiekCss.dataGrid());
 	    this.table.addStyleName(statistiekCss.backgroundblue());
@@ -383,19 +392,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    // Add the table to the dataProvider.
 		this.dataProvider.addDataDisplay(this.table);
 		
-		// Attach a column sort handler to the ListDataProvider to sort the list.
-//	    sortHandler =
-//	        new ListHandler<List<String>>(this.dataProvider.getList());
-	    
-//	    this.table.addColumnSortHandler(sortHandler);
-
 	    // Create a Pager to control the table.
 	    HorizontalPanel pagerPanel = new HorizontalPanel();
 	    pagerPanel.setSize("100%", "100%");
 	    pagerPanel.addStyleName(statistiekCss.backgroundblue());
 		pagerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
-	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+//	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
+	    pager = new StatTablePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	    pager.setDisplay(this.table);
 	    pager.setPageSize(StatTable.TABLE_PAGE_SIZE);
 	    pager.setRangeLimited(true);
@@ -483,7 +487,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		this.resetButton = new PushButton(new Image(statistiekGWTClientBundle.resetResource().getSafeUri()));
 		this.resetButton.addStyleName(statistiekCss.pushbutton());
-		this.editDataPanel.add(this.resetButton);
+		if (StatTable.this.statInteractiePanel != null)
+		{
+    		HashMap resetHashMap = StatTable.this.statInteractiePanel.getModel().getResetHashMap();
+    		if (resetHashMap.size() > 0)
+    		{
+    			this.editDataPanel.add(this.resetButton);
+    		}
+		}
 		
 		this.editDataPanel.setVisible(this.statTableModel.isDataEditable());
 
@@ -492,11 +503,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			super.setWidgetSize(this.editDataPanel, 0);
 		}
+		
+		// resizeLayoutPanel voor horizontal scrollbar van table
 		ResizeLayoutPanel resizePanel = new ResizeLayoutPanel();
 		resizePanel.setHeight("100%");
 		resizePanel.setWidth("100%");
 		resizePanel.add(tablePanel);
-		super.add(resizePanel); // resizeLayoutPanel voor horizontal scrollbar van table
+		super.add(resizePanel);
 		
 		Label label = new Label(StatistiekGWT.rb.getString("importDialogLabel"));
 	    importBox = new ImportMessageDialogBox(label);
@@ -565,6 +578,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		// text area
 		this.pasteDataArea = new ExtendedTextArea();
+		this.pasteDataArea.setPixelSize(WIDTH_PASTE_DIALOG, HEIGHT_PASTE_DIALOG);
 		this.pasteDataArea.addValueChangeHandler(new ValueChangeHandler<String>() {
 
 		    @Override
@@ -691,34 +705,38 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	private void setUpFileUpload()
 	{
-		this.fileUpload = new FileUploadExt();
+		this.fileUpload = new FileUploadExt(false);
+		this.fileUpload.addStyleName(statistiekCss.margin());
 		
 		Label selectLabel = new Label(StatistiekGWT.rb.getString("selectCSVFile"));
-	    this.fileUploadSelectButton = new Button(StatistiekGWT.rb.getString("importFile"));
-	    this.fileUploadSelectButton.addClickHandler(this.clickHandler);
+		selectLabel.addStyleName(statistiekCss.margin());
+		
+	    this.fileUploadImportButton = new Button(StatistiekGWT.rb.getString("importFile"));
+		this.fileUploadImportButton.addStyleName(statistiekCss.margin());
+	    this.fileUploadImportButton.addClickHandler(this.clickHandler);
+
 	    this.fileUploadCancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
+		this.fileUploadCancelButton.addStyleName(statistiekCss.margin());
 	    this.fileUploadCancelButton.addClickHandler(this.clickHandler);
 
-	    this.popupFileUploadPanel = new PopupPanel(false);
-		VerticalPanel panel = new VerticalPanel();
-		panel.add(selectLabel);
-		panel.add(this.fileUpload);
-		
 		HorizontalPanel buttonPanel = new HorizontalPanel();
-		buttonPanel.add(fileUploadSelectButton);
+		//buttonPanel.setWidth("100%");
+		//buttonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		buttonPanel.add(fileUploadImportButton);
 		buttonPanel.add(fileUploadCancelButton);
-		panel.add(buttonPanel);
-		
-		this.popupFileUploadPanel.add(panel);
-		this.popupFileUploadPanel.hide();
-		this.add(this.popupFileUploadPanel);
-		
-		this.formPanel = new FormPanel(); 
-		this.formPanel.setAction(com.google.gwt.core.client.GWT.getModuleBaseURL() + "/myFormHandler");// TODO hier moet iets mee...
-		this.formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
-		this.formPanel.setMethod(FormPanel.METHOD_POST);
-		this.formPanel.setWidget(this.popupFileUploadPanel);
-		
+
+		VerticalPanel alles = new VerticalPanel();
+		//alles.getElement().getStyle().setTextAlign(TextAlign.CENTER);
+		alles.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+
+		alles.add(selectLabel);
+		alles.add(this.fileUpload);
+		alles.add(buttonPanel);
+
+	    this.fileUploadDialogBox = new DialogBox(false, true);
+		this.fileUploadDialogBox.add(alles);
+		this.fileUploadDialogBox.hide();
+
 		// Create a file reader a and queue of files to read.
 		// UI event handler will populate this queue by calling queueFiles()
 		reader = new FileReader();
@@ -740,7 +758,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				{
 					if (readQueue.size() > 0)
 					{
-						// test syl
 						readQueue.remove(0);
 						readNextFile();
 					}
@@ -768,6 +785,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 		});
 		readQueue = new ArrayList<File>();
+
+		// initialize the messagebox for showing error messages
+		this.messageBox = new MessageDialogBox(new Label(""));
 	}
 
 	/**
@@ -959,7 +979,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void openFileChooserDialog()
 	{
-		this.popupFileUploadPanel.show();
+		this.fileUploadDialogBox.center();
+		this.fileUploadDialogBox.show();
 	}
 
 	/**
@@ -1054,13 +1075,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void processCSVText()
 	{
 		// process the first file: getStringResult() is only available onLoadEnd()!!
-		csvText = reader.getStringResult();
+		this.csvText = this.reader.getStringResult();
+		//Charset.forName(CharEncoding.ISO_8859_1).newEncoder().canEncode("string"); werkt niet in gwt
+//		boolean isText = this.csvText.matches("\\w+|\\s+|[.]+|[,]+|[;]+"); // niet correct
 		
-		if (!(csvText == null) && !csvText.equals("") && !csvText.equals("Error"))
+		if (!(this.csvText == null) 
+			&& !this.csvText.equals("") 
+			&& !this.csvText.equals("Error"))
 		{
-			String[] lines = csvText.split("\\r?\\n"); 
+			String[] lines = csvText.split("\\r?\\n");
 			
-			CSVheaders = lines[0].split(StatTable.DELIMITER);
+			// check for an incorrect data file
+			if (!this.isCorrectFormat(lines))
+			{
+				this.csvText = "";
+				this.tableMessageLabel.setText(StatistiekGWT.rb.getString("errorLoadingTable"));
+				this.table.setEmptyTableWidget(tableMessageLabel);
+				
+				return;
+			}
+			
+			String separator = this.getSeparator(lines[0]);
+			csvHeaders = lines[0].split(separator);
 
 			dataRows = new ArrayList<String>();
 
@@ -1073,7 +1109,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.clearStatTableModel();
 			
 			// create string columns from headers
-			this.createColumns(CSVheaders);
+			this.createColumns(csvHeaders);
 			
 			// add row data
 			this.addDataRowsWithoutEvent(dataRows);
@@ -1091,6 +1127,49 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}		
 	}
 	
+	/**
+	 * Checks whether the first two data lines are of equal length (so, excluding first header row 0,
+	 * reading from row 1). 
+	 * Used to check for a correct format for importing data.
+	 * 
+	 * @param lines
+	 * @return
+	 */
+	private boolean isCorrectFormat(String[] lines)
+	{
+		boolean isCorrect = true;
+		
+		int length = 0;
+		String separator;
+		
+		if (lines.length > 0)
+		{
+			separator = this.getSeparator(lines[0]);
+		}
+		else
+		{
+			separator = StatTable.DEFAULT_SEPARATOR;
+		}
+		
+		for (int i = 1; (i < lines.length) && (i <= 2); i++)
+		{
+			int lengthRow = lines[i].split(separator, -1).length;
+			
+			if (i == 1)
+			{
+				length = lengthRow;
+			}
+			
+			if (lengthRow != length)
+			{
+				isCorrect = false;
+				break;
+			}
+		}
+		
+		return isCorrect;
+	}
+
 	/**
 	 * Make statTableModel fire a table change event.
 	 * 
@@ -1117,10 +1196,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			File file = readQueue.get(0);
 			String type = file.getType();
-			GWT.log("StatTable.readNextFile(): file type = " + type);
+			String name = file.getName();
+			
 			try
 			{
-				if (type.startsWith("application/vnd.ms-excel"))//text/"))//application/vnd.ms-excel"))//text/csv
+				if (type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE))
 				{
 					// If the file is larger than 1kb, read only the first 1000
 					// characters to demonstrate file slicing
@@ -1136,7 +1216,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				}
 				else
 				{
-					// melding geen CSV?
 					GWT.log("type = " + type);
 					readQueue.remove(0);
 					readNextFile();
@@ -1277,8 +1356,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			if (e.getSource() == StatTable.this.addRowButton)
 			{
 				StatTable.this.statTableModel.addRow();
-				// show the row added
-				StatTable.this.pager.lastPage();
 			}
 			else if (e.getSource() == StatTable.this.addColumnButton)
 			{
@@ -1333,7 +1410,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				{
 	    			HashMap resetHashMap = StatTable.this.statInteractiePanel.getModel()
 	    				.getResetHashMap();
-	    
+	    			
 	    			// clear stringFrequencies
 	    			StatTable.this.statTableModel.clearStringFrequencies();
 
@@ -1349,13 +1426,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    			
 	    			int selectedView = statInteractiePanel.getSelectedView();
 	    			statInteractiePanel.getView().updateView(selectedView);
+	    			
 				} // else the button is clicked in edit-mode: do nothing
 			}
 			else if (e.getSource() == StatTable.this.importButton)
 			{
 				if (StatTable.this.statTableModel.getRowCount() > 0)
 				{
-					StatTable.this.importBox.center();
+					importBox.center();
 		            importBox.show();
 				}
 				else
@@ -1372,60 +1450,78 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				importBox.hide();
 			}
-			else if (e.getSource() == StatTable.this.fileUploadSelectButton)
+			else if (e.getSource() == StatTable.this.messageBox.closeButton)
+			{
+				messageBox.hide();
+			}
+			else if (e.getSource() == StatTable.this.fileUploadImportButton)
 			{
 				fileList = StatTable.this.fileUpload.getFiles();
 
 				if (fileList.getLength() > 0)
 				{
-					statInteractiePanel.getView().addStyleName(statistiekCss.waitCursor());
-					table.addStyleName(statistiekCss.waitCursor());
-
-					Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-
-						@Override
-						public void execute() 
-						{
-							clearStatTableModel();
-							
-							table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
-							
-							// Remove old views except table
-							StatTable.this.removeViews();
-							
-							if (StatTable.this.statInteractiePanel != null)
+					String fileType = fileList.getItem(0).getType();
+					if (fileType.startsWith("application/vnd.ms-excel"))
+					{
+						statInteractiePanel.getView().addStyleName(statistiekCss.waitCursor());
+						table.addStyleName(statistiekCss.waitCursor());
+	
+						Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+	
+							@Override
+							public void execute() 
 							{
-								StatTable.this.statInteractiePanel.getView().removeViewTabsExceptTable();
-							}
-							
-							// update to see the empty table while loading
-							update();
-							StatTable.this.popupFileUploadPanel.hide();
-//							table.addStyleName(statistiekCss.waitCursor());
-														
-							Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-
-								@Override
-								public void execute() 
+								clearStatTableModel();
+								
+								table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
+								
+								// Remove old views except table
+								StatTable.this.removeViews();
+								
+								if (StatTable.this.statInteractiePanel != null)
 								{
-									StatTable.this.processCSVDataFile(fileList);
-									
-									statInteractiePanel.getView().removeStyleName(statistiekCss.waitCursor());
-									table.removeStyleName(statistiekCss.waitCursor());
+									StatTable.this.statInteractiePanel.getView().removeViewTabsExceptTable();
 								}
-							});
-						}
-					});
-
+								
+								// update to see the empty table while loading
+								update();
+								StatTable.this.fileUploadDialogBox.hide();
+	//							table.addStyleName(statistiekCss.waitCursor());
+															
+								Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+	
+									@Override
+									public void execute() 
+									{
+										StatTable.this.processCSVDataFile(fileList);
+										
+										statInteractiePanel.getView().removeStyleName(statistiekCss.waitCursor());
+										table.removeStyleName(statistiekCss.waitCursor());
+									}
+								});
+							}
+						});
+					}
+					else
+					{
+						// TODO clear fileUpload selected file
+						
+						messageBox.setMessage(StatistiekGWT.rb.getString("noCSVMessage"));
+						messageBox.center();
+						messageBox.show();
+					}
 				}
 				else
 				{
-					StatTable.this.popupFileUploadPanel.hide();
+					// no file selected
+					messageBox.setMessage(StatistiekGWT.rb.getString("noFileMessage"));
+					messageBox.center();
+					messageBox.show();
 				}
 			}
 			else if (e.getSource() == StatTable.this.fileUploadCancelButton)
 			{
-				StatTable.this.popupFileUploadPanel.hide();				
+				StatTable.this.fileUploadDialogBox.hide();				
 			}
 		} // onClick()
 
@@ -1654,6 +1750,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	} // class StatTableTextHeader
 	
 	
+	/**
+	 * A dialogbox that shows a warning message that the imported data
+	 * will overwrite existing data and remove views.  
+	 * 
+	 * @author Sylvia van Borkulo
+	 *
+	 */
 	class ImportMessageDialogBox extends DialogBox
 	{
 		private Label message = new Label();
@@ -1668,7 +1771,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			setTitle(label.getText());
 			message.setText(StatistiekGWT.rb.getString("importWarning"));
 			okButton.addClickHandler(StatTable.this.clickHandler);
+			okButton.addStyleName(statistiekCss.margin());
 			cancelButton.addClickHandler(StatTable.this.clickHandler);
+			cancelButton.addStyleName(statistiekCss.margin());
 
 			HorizontalPanel buttonPanel = new HorizontalPanel();
 			buttonPanel.add(okButton);
@@ -1681,7 +1786,39 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 			setWidget(vPanel);
 		}
-	} // class ImportDialogBox
+	} // class ImportMessageDialogBox
+	
+	class MessageDialogBox extends DialogBox
+	{
+		private Label message = new Label();
+		private Button closeButton = new Button(
+			StatistiekGWT.rb.getString("closeButtonText"));
+
+		public MessageDialogBox(Label title)
+		{
+			super();
+			setTitle(title.getText());
+			closeButton.addClickHandler(StatTable.this.clickHandler);
+
+			HorizontalPanel buttonPanel = new HorizontalPanel();
+			buttonPanel.setWidth("100%");
+			buttonPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+			buttonPanel.add(closeButton);
+
+			VerticalPanel vPanel = new VerticalPanel();
+			vPanel.add(message);
+			//vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+			vPanel.add(buttonPanel);
+
+			setWidget(vPanel);
+		}
+		
+		public void setMessage(String text)
+		{
+			this.message.setText(text);
+		}
+		
+	} // class MessageDialogBox
 	
 	/**
 	 * Textarea that fires a value change event when text is pasted.
@@ -1952,6 +2089,46 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 	} // class StatTableDataGrid
 
+	
+	public class StatTablePager extends SimplePager
+	{
+
+		public StatTablePager(TextLocation center, Resources pagerResources,
+			boolean b, int i, boolean c)
+		{
+			super(TextLocation.CENTER, pagerResources, false, 0, true);
+		}
+
+		protected String createText()
+		{
+			String text;
+			
+			if (getDisplay().getRowCount() == 0)
+			{
+				if (StatistiekGWT.getLanguage().equals("nl"))
+				{
+					text = "0 van 0";
+				}
+				else
+				{
+					// default is English
+					text = "0 of 0";
+				}
+			}
+			else
+			{
+				text = super.createText();
+			}
+			
+			if (StatistiekGWT.getLanguage().equals("nl"))
+			{
+				String replacement = "van";
+				text = text.replaceAll("of", replacement);
+			}
+
+			return text;
+		} 
+	} // class StatTablePager
 
 	@Override
 	public void onTableChange(TableChangeEvent event)
@@ -1977,11 +2154,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.updateMaxColumnWidth(event.getColumnIndex());
 			this.updateMaxCellWidth(event.getColumnIndex());
 		}
-		else if ((event.getInfo().equals(TableChangeEvent.ADD_ROW) && this.statTableModel.getRowCount() == 1)) // first row added 
+		else if (event.getInfo().equals(TableChangeEvent.ADD_ROW))
 		{
-			// all maxColumn/CellWidths must be recalculated
-			this.updateMaxColumnWidth();
-			this.updateMaxCellWidth();
+			if (this.statTableModel.getRowCount() == 1) // first row added
+			{
+				// all maxColumn/CellWidths must be recalculated
+				this.updateMaxColumnWidth();
+				this.updateMaxCellWidth();
+			}
+			else
+			{
+				this.update();
+				
+				// show the row added
+				StatTable.this.pager.lastPage();
+				//int lastIndex = StatTable.this.statTableModel.getRowCount() - 1;
+				int lastIndex = StatTable.this.table.getVisibleItemCount() - 1;
+				//StatTable.this.table.getRowElement(lastIndex).scrollIntoView(); // scrolls to the right
+				StatTable.this.table.getRowElement(lastIndex).getCells().getItem(0).scrollIntoView();
+				
+				// update has been done, so return
+				return;
+			}
 		}
 		else if (event.getInfo().equals(TableChangeEvent.IMPORT_DATA)) // import data from file
 		{
@@ -2065,7 +2259,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.dataProvider.getList().addAll(rows);
 		this.dataProvider.refresh();
 		this.dataProvider.flush();
-
+		
+		if (rows.size() == 0)
+		{
+			this.pager.setVisible(false);
+		}
+		else
+		{
+			this.pager.setVisible(true);
+		}
+		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
 	}
 
@@ -2093,86 +2296,91 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		// variable to determine the table's width
 		int totalWidth = 0;
 		
-		StatTableCheckboxCell cell = new StatTableCheckboxCell(true, true);//false); 
-
-		Column<List<String>, Boolean> checkColumn = new Column<List<String>, Boolean>(
-			cell)// false))
+		// if there are rows and/or columns add the check column 
+		if ((this.statTableModel.getColumnCount() > 0)
+			&& (this.statTableModel.getRowCount() > 0))
 		{
-			@Override
-			public Boolean getValue(List<String> s)
-			{
-				// Get the value from the selection model.
-				// Add row number to s
-				int rowIndex = dataProvider.getList().indexOf(s);
-
-				// add rowIndex to s if necessary
-				if (s.size() == table.getColumnCount() - 1) // table has extra checkbox column, so -1
-				{
-					s.add(String.valueOf(rowIndex));
-				}
-				return selectionModel.isSelected(s);
-			}
-		};
-		
-		checkColumn
-			.setFieldUpdater(new FieldUpdater<List<String>, Boolean>()
-			{
-				@Override
-				public void update(int rowIndex, List<String> s,
-					Boolean value)
-				{
-//					GWT.log("StatTable.updateColumns(): checkbox, rowIndex = "
-//						+ rowIndex + ", value = " + value
-//						+ ", columnIndex = " + 0);
-					
-					// setSelectionList van StatTableModel 
-					StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
-					selectionModel.setSelected(s, value);
-				}
-			});
-		
-		Header<Boolean> selectAllHeader = new Header<Boolean>(
-			new StatTableCheckboxCell(true, true)) 
-			{
+			StatTableCheckboxCell cell = new StatTableCheckboxCell(true, true);//false);
 	
+			Column<List<String>, Boolean> checkColumn = new Column<List<String>, Boolean>(
+				cell)// false))
+			{
 				@Override
-				public Boolean getValue()
+				public Boolean getValue(List<String> s)
 				{
-					for (List<String> item : dataProvider.getList())
+					// Get the value from the selection model.
+					// Add row number to s
+					int rowIndex = dataProvider.getList().indexOf(s);
+	
+					// add rowIndex to s if necessary
+					if (s.size() == table.getColumnCount() - 1) // table has extra checkbox column, so -1
 					{
-						if (!selectionModel.isSelected(item))
-						{
-							return false;
-						}
+						s.add(String.valueOf(rowIndex));
 					}
-					return table.getVisibleItems().size() > 0;
+					return selectionModel.isSelected(s);
 				}
 			};
-		selectAllHeader.setUpdater(new ValueUpdater<Boolean>()
-		{
-			@Override
-			public void update(Boolean value)
-			{
-				List<List<String>> list = (List<List<String>>) dataProvider.getList();
-
-				for (int row = 0; row < statTableModel.getRowCount(); row++)
+			
+			checkColumn
+				.setFieldUpdater(new FieldUpdater<List<String>, Boolean>()
 				{
-					List<String> rowObject = list.get(row);
-					
-					// setSelectionList van StatTableModel 
-					StatTable.this.statTableModel.setSelectedWithoutEvent(row, value);
-					selectionModel.setSelected(rowObject, value);
+					@Override
+					public void update(int rowIndex, List<String> s,
+						Boolean value)
+					{
+	//					GWT.log("StatTable.updateColumns(): checkbox, rowIndex = "
+	//						+ rowIndex + ", value = " + value
+	//						+ ", columnIndex = " + 0);
+						
+						// setSelectionList van StatTableModel 
+						StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
+						selectionModel.setSelected(s, value);
+					}
+				});
+			
+			Header<Boolean> selectAllHeader = new Header<Boolean>(
+				new StatTableCheckboxCell(true, true)) 
+				{
+		
+					@Override
+					public Boolean getValue()
+					{
+						for (List<String> item : dataProvider.getList())
+						{
+							if (!selectionModel.isSelected(item))
+							{
+								return false;
+							}
+						}
+						return table.getVisibleItems().size() > 0;
+					}
+				};
+			selectAllHeader.setUpdater(new ValueUpdater<Boolean>()
+			{
+				@Override
+				public void update(Boolean value)
+				{
+					List<List<String>> list = (List<List<String>>) dataProvider.getList();
+	
+					for (int row = 0; row < statTableModel.getRowCount(); row++)
+					{
+						List<String> rowObject = list.get(row);
+						
+						// setSelectionList van StatTableModel 
+						StatTable.this.statTableModel.setSelectedWithoutEvent(row, value);
+						selectionModel.setSelected(rowObject, value);
+					}
+	
+					// send an event
+					SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
+					StatTable.this.statTableModel.fireEvent(event);
 				}
-
-				// send an event
-				SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
-				StatTable.this.statTableModel.fireEvent(event);
-			}
-		});
-		this.table.addColumn(checkColumn, selectAllHeader);
-		this.table.setColumnWidth(checkColumn, StatTable.CHECKBOX_COLUMN_WIDTH, Unit.PX);
-		// add the column's width to total width
-		totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
+			});
+			this.table.addColumn(checkColumn, selectAllHeader);
+			this.table.setColumnWidth(checkColumn, StatTable.CHECKBOX_COLUMN_WIDTH, Unit.PX);
+			// add the column's width to total width
+			totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
+		} // add checkColumn
 
 		// put the data of statTableModel into this.table
 		this.headers = this.statTableModel.getColumnNames();
