@@ -32,6 +32,7 @@ public class Text_nl
 	{
 		{ "OKButtonText", "OK" },
 		{ "cancelButtonText", "Annuleren" },
+		{ "closeButtonText", "Sluiten" },
 		{ "addaviewKnopTekst", "Voeg een view toe: " },
 		{ "chooseaviewOption", "Kies een view" },
 		{ "changeviewnameDialog", "Wijzig viewnaam" },
@@ -175,13 +176,19 @@ public class Text_nl
 		{ "selection", "selectie" },
 		{ "selectCSVFile", "Selecteer een CSV bestand: " },
 		{ "importFile", "Importeer bestand" },
-		{ "noFileMessage", "Geen bestand gekozen" },
-		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv)." },
+		{ "noFileMessage", "Er is geen bestand gekozen." },
+		{ "noCSVMessage", "Het gekozen bestand is geen CSV-bestand. Kies een CSV-bestand (.csv). "
+			+ "Een excelbestand kan worden omgezet naar een CSV-bestand door 'Opslaan als...' in formaat 'CSV'." },
 		{ "emptyTableMessage", "De tabel is leeg"},
 		{ "notHTML5ReadyMessage", "Sla de statistiekcomponent opnieuw op in de auteursomgeving "
 			+ "om de component te kunnen bekijken in HTML5." },
 		{ "selectColors", "Selecteer kleuren"},
-		{ "loadingTable", "De tabel wordt geladen..."}
+		{ "loadingTable", "De tabel wordt geladen..."},
+		{ "errorLoadingTable", "Er is iets misgegaan. "
+			+ "Het geselecteerde databestand had niet het goede formaat. Kies een CSV-bestand."},
+		{ "removeViewWarning", "Weet je zeker dat je deze view wilt verwijderen?"},
+		{ "yesRemove", "Ja, verwijder"},
+		{ "noCancel", "Nee, annuleren"}
 
 	};
 }
