@@ -301,3 +301,8 @@ td div{
 	cursor: wait !important;
 	pointerEvents: none;
 }
+
+.moveCursor {
+	cursor: move !important;
+	pointerEvents: none;
+}
