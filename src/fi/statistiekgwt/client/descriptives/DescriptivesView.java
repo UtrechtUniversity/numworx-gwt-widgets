@@ -1160,4 +1160,12 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
 	}
+	
+	/**
+	 * @return the userOptionsPanel
+	 */
+	public DescriptivesUserOptionsPanel getUserOptionsPanel()
+	{
+		return userOptionsPanel;
+	}
 }
