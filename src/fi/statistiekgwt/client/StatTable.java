@@ -2298,7 +2298,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		// if there are rows and/or columns add the check column 
 		if ((this.statTableModel.getColumnCount() > 0)
-			&& (this.statTableModel.getRowCount() > 0))
+			|| (this.statTableModel.getRowCount() > 0))
 		{
 			StatTableCheckboxCell cell = new StatTableCheckboxCell(true, true);//false);
 	
