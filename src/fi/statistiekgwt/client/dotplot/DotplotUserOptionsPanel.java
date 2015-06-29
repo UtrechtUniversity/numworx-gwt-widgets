@@ -759,7 +759,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		}
 	}
 
-	private void setVisibleSplitOptions(boolean b)
+	void setVisibleSplitOptions(boolean b)
 	{
 		this.splitOptionsVisible = b;
 		this.singleViewRadioItem.setVisible(b);
