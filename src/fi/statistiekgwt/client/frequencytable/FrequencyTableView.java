@@ -1156,6 +1156,14 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
 	}
+	
+	/**
+	 * @return the userOptionsPanel
+	 */
+	public FrequencyTableUserOptionsPanel getUserOptionsPanel()
+	{
+		return userOptionsPanel;
+	}
 
 	
 //	/*
