@@ -3275,4 +3275,11 @@ public class DotplotView extends LayoutPanel implements
 		this.update();
 	}
 
+	/**
+	 * @return the userOptionsPanel
+	 */
+	public DotplotUserOptionsPanel getUserOptionsPanel()
+	{
+		return userOptionsPanel;
+	}
 }
