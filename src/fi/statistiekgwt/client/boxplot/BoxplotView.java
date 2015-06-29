@@ -341,6 +341,8 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 
 	public void update()
 	{
+		model.setPercentileValues();
+		
 		// check for empty data set
 		if (this.model.getDataMinValue() != null)
 		{
