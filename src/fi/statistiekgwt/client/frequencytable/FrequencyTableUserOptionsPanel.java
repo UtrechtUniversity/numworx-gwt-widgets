@@ -770,7 +770,7 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 		return (this.showCumulativeBox != null && this.showCumulativeBox.getValue());
 	}
 	
-	private void setVisibleSplitOptions(boolean b)
+	void setVisibleSplitOptions(boolean b)
 	{
 		this.splitOptionsVisible = b;
 		this.splitVarLabel.setVisible(b);
