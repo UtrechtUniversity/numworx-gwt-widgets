@@ -507,7 +507,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		splitMaxValueLabel.setVisible(splitBoundariesVisible && !b);
 	}
 
-	private void setVisibleSplitOptions(boolean b)
+	void setVisibleSplitOptions(boolean b)
 	{
 		this.splitOptionsVisible = b;
 
