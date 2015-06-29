@@ -284,14 +284,32 @@ public class Boxplot
 	 * Determines the y coordinate (vertical boxplot) or the
 	 * x coordinate (horizontal boxplot) on the screen in the boxplot of value d.
 	 * 
-	 * @return the y-coordinate on the screen in the boxplot of value d
+	 * @return the y coordinate (vertical boxplot) or x coordinate (horizontal
+	 * boxplot) on the screen in the boxplot of value d
 	 */
 	private int valueToScreenLocation(double d)
 	{
 		// bepaal de fractie van de waarde op de as
-		// (bijv. minimum is 1 en maximum is 0, uitgaande van verticale boxplots) 
+		// (bijv. d = minimum geeft 1 en d = maximum geeft 0, uitgaande van verticale boxplots) 
 		double a = (this.dataMaxValue - d)
 			/ (this.dataMaxValue - this.dataMinValue);
+		
+		if (this.dataMinValue == this.dataMaxValue)
+		{
+			// er zijn 3 waarden mogelijk voor d: dataMinValue = dataMaxValue, dataMinValue - 1, dataMinValue + 1
+			if (d < this.dataMinValue)
+			{
+				a = 1; 
+			}
+			else if (d == this.dataMinValue)
+			{
+				a = 0.5;
+			}
+			else
+			{
+				a = 0;
+			}
+		}
 		
 		// bepaal de locatie op basis van de berekende a en de beschikbare ruimte
 		double y = (a * FILL_FRACTION)
@@ -1202,6 +1220,13 @@ public class Boxplot
 		int base = 1;
 		int exp = (int) Math.log10(this.dataMaxValue - this.dataMinValue) - 1;
 		this.step = (int) (base * Math.pow(10, exp));
+
+		if (this.dataMinValue == this.dataMaxValue)
+		{
+			exp = -1;
+			this.step = 1;
+		}
+		
 		while ((this.dataMaxValue - this.dataMinValue) / this.step > 8)
 		{
 			switch (base)
@@ -1227,6 +1252,14 @@ public class Boxplot
 			+ (1 - Boxplot.FILL_FRACTION) * 0.5
 			* (this.dataMaxValue - this.dataMinValue);
 		this.firstMarker = Math.ceil(min / this.step) * this.step;
+		
+		if (this.dataMinValue == this.dataMaxValue)
+		{
+			// when min = max the scale values will be min - 1, min, min + 1
+			firstMarker = this.dataMinValue - 1;
+			// max moet groter zijn dan dataMaxValue + 1
+			max = this.dataMaxValue + 2;
+		}
 
 		// Math.ceil can give -0.0, this step turns that into 0.0
 		if (firstMarker == 0)
@@ -1340,6 +1373,11 @@ public class Boxplot
 		@Override
 		public void onMouseMove(MouseMoveEvent event)
 		{
+			if (!drawable)
+			{
+				return;
+			}
+			
 			x = event.getX();
 			y = event.getY();
 
