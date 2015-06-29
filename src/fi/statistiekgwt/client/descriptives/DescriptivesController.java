@@ -197,7 +197,11 @@ public class DescriptivesController implements StatistiekView
 		}
 		if (map.containsKey("columnSplitIndex"))
 		{
-			this.model.setColumnSplitIndex(map.getInt("columnSplitIndex"));
+			int splitIndex = map.getInt("columnSplitIndex");
+			this.model.setColumnSplitIndex(splitIndex);
+			// set visibility split in uop
+			boolean validSplitIndex = (splitIndex == -1) ? false : true;
+			this.view.getUserOptionsPanel().setVisibleSplitOptions(validSplitIndex);
 		}
 		if (map.containsKey("splitBoundaries"))
 		{
