@@ -1070,14 +1070,14 @@ public class StatInteractiePanelView extends LayoutPanel
 			setSelectedTab(viewIndex);
 			
 			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-			for (int i = 0; i < model.getViews().size(); i++)
-			{
-				StatistiekView view = model.getViews().get(i);
-				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-				{
-					view.update();
-				}
-			}
+//			for (int i = 0; i < model.getViews().size(); i++)
+//			{
+//				StatistiekView view = model.getViews().get(i);
+//				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+//				{
+//					view.update();
+//				}
+//			}
 			
 			if (StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
 			{
@@ -1587,6 +1587,11 @@ public class StatInteractiePanelView extends LayoutPanel
 			{
 				int x = event.getNativeEvent().getClientX();
 			    int y = event.getNativeEvent().getClientY();
+			    
+			    x = tabPanel.getTabWidget(viewIndex).getAbsoluteLeft();
+			    y = tabPanel.getTabWidget(viewIndex).getAbsoluteTop();
+			    
+//			    Window.alert("StatInteractiePanelView.TouchHandler.onTouchEnd(): (x, y) = (" + x + ", " + y + ")");
 				showTabPopupMenu(x, y);
 			}
 
@@ -2046,10 +2051,16 @@ public class StatInteractiePanelView extends LayoutPanel
 				StatInteractiePanelView.this.removeViewBox.center();
 				StatInteractiePanelView.this.removeViewBox.show();
 				
-//				int widgetIndex = tabPanel.getWidgetIndex(widget);
-//				GWT.log("StatInteractiePanelView.getTabTitle().onClick(): tab index " + widgetIndex
-//					+ ", widgetCount = " + StatInteractiePanelView.this.tabPanel.getWidgetCount());
-//				
+				// update the clicked view in case of a table, else an empty table will be shown
+				int widgetIndex = tabPanel.getWidgetIndex(widget);
+				int selectedIndex = tabPanel.getSelectedIndex();
+				if (tabPanel.getWidget(widgetIndex) instanceof StatTable && ((StatistiekView) widget).getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+				{
+					((StatistiekView) widget).update();
+				}
+
+				
+				
 //				if (StatInteractiePanelView.this.model.getStatTableModel()
 //						.isViewsAddable()
 //					&& widgetIndex >= 0
