@@ -606,10 +606,6 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	public void processSelectedTab(int tab)
 	{
-		// GWT.log("...begin... StatInteractiePanelView.processSelectedTab(tab="
-		// + tab + "): this.model.getViews().size() = " +
-		// this.model.getViews().size());
-
 		if (tab < this.model.getViews().size()
 			&& this.model.getViews().size() > 1)
 		{
@@ -625,16 +621,14 @@ public class StatInteractiePanelView extends LayoutPanel
 			{
 				setPreviousSelectedView(selectedView);
 			}
-			// else
-			// GWT.log("tab = selectedView!");
 
 			setSelectedView(view);
-
-			//this.tabPanel.selectTab(tab); // gebeurt in setSelectedTab()
-			// GWT.log("StatInteractiePanelView.processSelectedTab(): tabPane.setSelectedIndex(tab="
-			// + tab + ")");
 		}
-		// GWT.log("...end.... StatInteractiePanelView.processSelectedTab");
+		else if (tab == this.model.getViews().size())
+		{
+			// select the add view tab
+			this.tabPanel.selectTab(this.model.getViews().size());
+		}
 	}
 
 	/**
@@ -1004,6 +998,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			{
 			    HorizontalPanel hPanel = new HorizontalPanel();
 				Label plusLabel = new Label("+");
+			    plusLabel.addClickHandler(new LabelClickHandler(this.addViewTab, "+")); // to handle click to set focus
 			    plusLabel.setSize("100%", "100%");
 			    hPanel.add(plusLabel);
 				this.tabPanel.add(this.addViewTab, hPanel);
