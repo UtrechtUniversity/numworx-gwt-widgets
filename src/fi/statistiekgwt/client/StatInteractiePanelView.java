@@ -71,7 +71,7 @@ import fi.statistiekgwt.client.event.TableChangeEventHandler;
  * 
  */
 public class StatInteractiePanelView extends LayoutPanel 
-	implements TableChangeEventHandler, AddViewEventHandler//TabLayoutPanel// implements Observer
+	implements TableChangeEventHandler, AddViewEventHandler
 {
 	private static final String RESET_ICON_PATH = "resources/reseticon.gif";
 	protected StatModel model;
@@ -91,6 +91,8 @@ public class StatInteractiePanelView extends LayoutPanel
 	private MenuBar menuBar;
 	private MenuItem changeNameItem;
 	private Command changeNameCommand;
+	private MenuItem showInDialogItem;
+	private Command showInDialogCommand;
 	
 	private RemoveViewDialogBox removeViewBox;
 
@@ -218,11 +220,17 @@ public class StatInteractiePanelView extends LayoutPanel
 		
 		this.createChangeNameCommand();
 		this.changeNameItem = new MenuItem(StatistiekGWT.rb.getString("changeViewName"), true, changeNameCommand);
+		
+		this.createShowInDialogCommand();
+		this.showInDialogItem = new MenuItem(StatistiekGWT.rb.getString("showInDialog"), true, showInDialogCommand);
+
+		// add the items
 		this.menuBar.addItem(changeNameItem);
+		this.menuBar.addItem(showInDialogItem);
 	}
 
 	/**
-	 * Create the column info command for the column's menu bar.
+	 * Create the column info command for the view tab's menu bar.
 	 */
 	private void createChangeNameCommand()
 	{
@@ -238,6 +246,21 @@ public class StatInteractiePanelView extends LayoutPanel
 				
 				dialogView.center();
 				dialogView.show();
+            }
+        };
+	}
+	
+	/**
+	 * Create the show in dialog command for the view tab's menu bar.
+	 */
+	private void createShowInDialogCommand()
+	{
+        this.showInDialogCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	hideTabPopupMenu();
+	        	setDraggedOutside(getSelectedViewName(), -1, -1);
             }
         };
 	}
@@ -260,9 +283,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	protected int getSelectedTabIndex()
 	{
-		int selectedTabIndex = this.tabPanel.getSelectedIndex(); 
-		
-		return selectedTabIndex;
+		return this.selectedTabIndex;
 	}
 
 	/**
@@ -343,7 +364,6 @@ public class StatInteractiePanelView extends LayoutPanel
 				panel.forceLayout();
 
 				setSelectedView(selectedItem);
-				setSelectedTab(selectedItem);
 			}
 		});
 	}
@@ -714,6 +734,45 @@ public class StatInteractiePanelView extends LayoutPanel
 
 		return false;
 	}
+	
+	/**
+	 * Set the view with the given name dragged outside in its own window.
+	 * The dragged view is selected.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	private void setDraggedOutside(String viewName, int x, int y)
+	{
+		// tab is dragged outside of tabPane
+		int viewIndex = getIndexOfViewName(viewName);
+		int originalViewIndex = StatInteractiePanelView.this.model
+			.mainWindowIndexToGeneralIndex(viewIndex);
+		StatInteractiePanelView.this.showViewInDialog(
+			StatInteractiePanelView.this.model.getViews().get(originalViewIndex), x, y);
+
+		StatInteractiePanelView.this.model.setViewSeparateWindow(
+			originalViewIndex,
+			true);
+		
+		// set the dragged view selected
+		setSelectedView(originalViewIndex);
+		
+		// update table view if that is the selected view in tabPanel
+		String selectedTabViewName = "";
+		if (tabPanel.getTabWidget(tabPanel.getSelectedIndex()) instanceof HorizontalPanel)
+		{
+			if (((HorizontalPanel) tabPanel.getTabWidget(tabPanel.getSelectedIndex())).getWidget(0) instanceof Label)
+			{
+				// get the tab text of the selected tab
+				// test syl: moet dit met selectedTab??
+				// The tab widget is a horizontal panel containing the tab label as widget 0
+				selectedTabViewName = ((Label) ((HorizontalPanel) tabPanel.getTabWidget(tabPanel.getSelectedIndex())).getWidget(0)).getText();
+			}
+		}
+
+		updateViewIfNecessary(selectedTabViewName);// niet this.viewName, maar de selectedTab
+	}
 
 	/**
 	 * Shows a StatistiekView in a separate dialog
@@ -738,9 +797,17 @@ public class StatInteractiePanelView extends LayoutPanel
 		dialog.addDomHandler(t, TouchCancelEvent.getType());
 		
 		this.separateViews.add(dialog);
-		dialog.setPopupPosition(x, y);
+		
+		if((x == -1) || (y == -1))
+		{
+			dialog.center();
+		}
+		else
+		{
+			dialog.setPopupPosition(x, y);
+		}
+
 		dialog.setVisible(true);
-		//dialog.center();
 		dialog.show();
 	}
 	
@@ -905,8 +972,14 @@ public class StatInteractiePanelView extends LayoutPanel
 		else
 		{
 			// GWT.log(">1 views added");
-			if (this.model.getStatTableModel().isViewsAddable())
+			if (this.model.getStatTableModel().isViewsEditable())
 			{
+				if (!(this.menuBar.getItemIndex(changeNameItem) > -1))
+				{
+					// if it's not already there, add it
+					this.menuBar.addItem(changeNameItem);
+				}
+				
 				for (int i = 0; i < mainWindowViews.size(); i++)
 				{
 					StatistiekView view = mainWindowViews.get(i);
@@ -915,6 +988,12 @@ public class StatInteractiePanelView extends LayoutPanel
 			}
 			else
 			{
+				if (this.menuBar.getItemIndex(changeNameItem) > -1)
+				{
+					// if it's there, remove it
+					this.menuBar.removeItem(changeNameItem);
+				}
+
 				for (StatistiekView view : mainWindowViews)
 				{
 					this.tabPanel.add(view.getWidget(), this.getTabTitleNonEditable(view.getWidget(), view.getViewName()));//view.getViewName());
@@ -923,10 +1002,14 @@ public class StatInteractiePanelView extends LayoutPanel
 
 			if (this.model.getStatTableModel().isViewsAddable())
 			{
-				this.tabPanel.add(this.addViewTab, "+");
+			    HorizontalPanel hPanel = new HorizontalPanel();
+				Label plusLabel = new Label("+");
+			    plusLabel.setSize("100%", "100%");
+			    hPanel.add(plusLabel);
+				this.tabPanel.add(this.addViewTab, hPanel);
 			}
 
-			this.tabPanel.addStyleName(statistiekCss.backgroundblue());//getElement().getStyle().setBackgroundColor("Azure");
+			this.tabPanel.addStyleName(statistiekCss.backgroundblue());
 			this.tabPanel.removeFromParent();
 			super.add(this.tabPanel);
 		}
@@ -1053,10 +1136,16 @@ public class StatInteractiePanelView extends LayoutPanel
 		@Override
 		public void onClick(ClickEvent event)
 		{
-			int viewIndex = getIndexOfViewName(viewName);
-			setSelectedView(viewIndex);
-			setSelectedTab(viewIndex);
-			
+			setSelected();
+		}
+
+		private void setSelected()
+		{
+			//tabPanel.selectTab(widget);
+			int tabIndex = tabPanel.getWidgetIndex(widget);
+
+			processSelectedTab(tabIndex);
+
 			updateViewIfNecessary(this.viewName);
 		}
 
@@ -1066,25 +1155,12 @@ public class StatInteractiePanelView extends LayoutPanel
 			// select tab
 			tabPanel.selectTab(widget);
 			int viewIndex = getIndexOfViewName(viewName);
-			setSelectedView(viewIndex);
-			setSelectedTab(viewIndex);
 			
-			// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-//			for (int i = 0; i < model.getViews().size(); i++)
-//			{
-//				StatistiekView view = model.getViews().get(i);
-//				if (view.getViewName().equals(this.viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-//				{
-//					view.update();
-//				}
-//			}
+			setSelected();
 			
-			if (StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
-			{
-				int x = event.getNativeEvent().getClientX();
-			    int y = event.getNativeEvent().getClientY();
-				showTabPopupMenu(x, y);
-			}
+			int x = event.getNativeEvent().getClientX();
+		    int y = event.getNativeEvent().getClientY();
+			showTabPopupMenu(x, y);
 		    
 			event.preventDefault(); 
 	    }
@@ -1314,15 +1390,6 @@ public class StatInteractiePanelView extends LayoutPanel
 			lastMovedY = startY;
 			
 			mouseDown = true;
-			this.setSelected();
-			
-			if (event.getSource() instanceof Label)
-			{
-				Label label = (Label) event.getSource();
-				
-				// set move cursor
-				label.addStyleName(statistiekCss.moveCursor());
-			}
 		}
 
 		@Override
@@ -1396,7 +1463,6 @@ public class StatInteractiePanelView extends LayoutPanel
 
 		private void setSelected()
 		{
-			tabPanel.selectTab(widget);
 			int tabIndex = tabPanel.getWidgetIndex(widget);
 
 			processSelectedTab(tabIndex);
@@ -1583,7 +1649,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			}
 			
 			if (!this.hasMoved 
-				&& isLongClick() && StatInteractiePanelView.this.model.getStatTableModel().isViewsEditable())
+				&& isLongClick())
 			{
 				int x = event.getNativeEvent().getClientX();
 			    int y = event.getNativeEvent().getClientY();
@@ -1591,7 +1657,6 @@ public class StatInteractiePanelView extends LayoutPanel
 			    x = tabPanel.getTabWidget(viewIndex).getAbsoluteLeft();
 			    y = tabPanel.getTabWidget(viewIndex).getAbsoluteTop();
 			    
-//			    Window.alert("StatInteractiePanelView.TouchHandler.onTouchEnd(): (x, y) = (" + x + ", " + y + ")");
 				showTabPopupMenu(x, y);
 			}
 
@@ -1891,7 +1956,6 @@ public class StatInteractiePanelView extends LayoutPanel
 		public void setResource(ImageResource imageResource)
 		{
 			Image img = new Image(imageResource);
-			img.setStyleName("navbarimg");
 			DOM.insertBefore(getElement(), 
 				img.getElement(),
 				DOM.getFirstChild(getElement()));
@@ -2031,16 +2095,6 @@ public class StatInteractiePanelView extends LayoutPanel
 	    label.addTouchMoveHandler(dragHandler);
 	    label.addTouchEndHandler(dragHandler);
 	    
-	    // add handler to the horizontal panel 
-//	    hPanel.addDomHandler(handler, MouseDownEvent.getType());
-//	    hPanel.addDomHandler(handler, MouseMoveEvent.getType());
-//	    hPanel.addDomHandler(handler, MouseUpEvent.getType());
-//	    hPanel.addDomHandler(handler, TouchStartEvent.getType());
-//	    hPanel.addDomHandler(handler, TouchMoveEvent.getType());
-//	    hPanel.addDomHandler(handler, TouchEndEvent.getType());
-	    
-	    //label.getElement().getStyle().setCursor(Cursor.POINTER);  
-
 	    ImageAnchor closeBtn = new ImageAnchor();
 	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
 
@@ -2089,13 +2143,13 @@ public class StatInteractiePanelView extends LayoutPanel
 	    hPanel.add(label);
 	    hPanel.add(new HTML("&nbsp&nbsp&nbsp"));
 	    hPanel.add(closeBtn);
-	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
 	    
 	    return hPanel;
 	}
 
 	/**
-	 * Get a non-editable tab title widget, i.e., no close button and no context menu.
+	 * Get a non-editable tab title widget, i.e., no close button and with 
+	 * context menu only containing the option to set dragged outside.
 	 * 
 	 * @param widget
 	 * @param title
@@ -2108,15 +2162,25 @@ public class StatInteractiePanelView extends LayoutPanel
 	    final Label label = new Label(title);
 	    DOM.setStyleAttribute(label.getElement(), "whiteSpace", "nowrap");
 	    
+	    label.addDomHandler(new LabelClickHandler(widget, title), ContextMenuEvent.getType());
 	    label.addClickHandler(new LabelClickHandler(widget, title)); // to handle click to set focus
 	    
-	    // make the tab draggable
-	    DragTabHandler handler = new DragTabHandler(widget, title);
+	    // add touch handler for tap & hold contextmenu
+	    TouchHandler touchHandler = new TouchHandler(widget, title);
+	    label.addTouchStartHandler(touchHandler);
+	    label.addTouchMoveHandler(touchHandler);
+	    label.addTouchEndHandler(touchHandler);
 
-	    //label.getElement().getStyle().setCursor(Cursor.DEFAULT);  
-
+	    // make the tab draggable, with mouse and touch
+	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
+	    label.addMouseDownHandler(dragHandler);
+	    label.addMouseMoveHandler(dragHandler);
+	    label.addMouseUpHandler(dragHandler);
+	    label.addTouchStartHandler(dragHandler);
+	    label.addTouchMoveHandler(dragHandler);
+	    label.addTouchEndHandler(dragHandler);
+	    
 	    hPanel.add(label);
-	    hPanel.setStyleName("gwt-TabLayoutPanelTab");
 	    return hPanel;
 	}
 
@@ -2175,6 +2239,17 @@ public class StatInteractiePanelView extends LayoutPanel
 		{
 			GWT.log("StatInteractiePanelView.onTableChange()");
 			this.update();
+		}
+		else if (info.equals(TableChangeEvent.DATA_EDITABLE))
+		{
+			if (this.model.getStatTableModel().isDataEditable())
+			{
+				this.menuBar.addItem(changeNameItem);
+			}
+			else
+			{
+				this.menuBar.removeItem(changeNameItem);
+			}
 		}
 	}
 
