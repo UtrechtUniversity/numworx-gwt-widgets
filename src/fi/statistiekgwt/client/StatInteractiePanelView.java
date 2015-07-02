@@ -1932,6 +1932,7 @@ public class StatInteractiePanelView extends LayoutPanel
 
 			this.statistiekView = sv;
 			LayoutPanel panel = new LayoutPanel();
+			panel.addStyleName(statistiekCss.backgroundblue());
 			panel.addStyleName(statistiekCss.separateViewDialog());
 			panel.add(sv.getWidget());
 			panel.setPixelSize(sv.getWidth(), sv.getHeight() + StatistiekGWT.BUTTON_HEIGHT); // set size explicitely, else panel won't show in dialogbox
