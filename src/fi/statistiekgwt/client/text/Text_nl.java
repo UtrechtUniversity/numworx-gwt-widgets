@@ -37,6 +37,7 @@ public class Text_nl
 		{ "chooseaviewOption", "Kies een view" },
 		{ "changeviewnameDialog", "Wijzig viewnaam" },
 		{ "changeViewName", "Wijzig naam" },
+		{ "showInDialog", "Toon in los window" },
 		{ "enternameLabel", "Geef een nieuwe naam" },
 		{ "namealreadyinuseLabel",
 			"Deze naam is al in gebruik. Geef een andere naam" },
