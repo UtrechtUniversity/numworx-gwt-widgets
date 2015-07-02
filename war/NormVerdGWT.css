@@ -1,4 +1,8 @@
 /** Dit file staat niet in de css map */
+body {
+	margin: 0 !important;
+	overflow: hidden !important;
+}
 
 
 .root {
