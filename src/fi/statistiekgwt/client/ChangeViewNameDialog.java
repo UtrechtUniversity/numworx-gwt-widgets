@@ -150,9 +150,6 @@ public class ChangeViewNameDialog extends DialogBox // implements ActionListener
 					model.getViews().get(selectedTabIndex).setViewName(nameField.getText());
 
 					// set the currently selected view
-					// syl: tabPane is not showing correctly,
-					// while the field selectedView is properly updated (e.g.,
-					// change page to check this)
 					view.processSelectedView(selectedTabIndex);
 
 					view.update();
