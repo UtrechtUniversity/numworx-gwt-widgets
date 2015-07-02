@@ -69,9 +69,8 @@ public class DotplotView extends LayoutPanel implements
 	private DialogButton dialogButton;
 
 	// Constants
-	public static final int KEUZEBALK_HOOGTE = 50;
 	public static final int X_AS_OFFSET = 25;
-	private static final int FONT_HEIGHT = 20;
+	private static final int FONT_HEIGHT = 10;
 	/**
 	 * The part below the minimum value and above the maximum value respectively 
 	 * that serves to create extra space. For example, 0.05 is 5% of the 
@@ -423,10 +422,7 @@ public class DotplotView extends LayoutPanel implements
 		{
 			h -= DotplotView.X_AS_OFFSET;
 		}
-		if (this.model.getStatTableModel().isViewsEditable())
-		{
-			h -= DotplotView.KEUZEBALK_HOOGTE;
-		}
+		
 		return h;
 	}
 
@@ -447,7 +443,7 @@ public class DotplotView extends LayoutPanel implements
 	{
 		int splitClasses = this.model.getStatTableModel().splitVarClasses(
 			this.model.getSplitOptions());
-		int colorLegendWidth = this.colorLegend.isVisible() ? DotplotView.COLOR_LEGEND_WIDTH : 0;
+		int colorLegendWidth = this.getColorLegendWidth();
 		
 		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
 		int scrollHeight = this.scrollPanel.getElement().getScrollHeight();
@@ -467,6 +463,19 @@ public class DotplotView extends LayoutPanel implements
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8);
 			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
 		}
+	}
+	
+	/**
+	 * Get the width of the color legend. If color legend is not visible, 
+	 * 0 is returned.
+	 * 
+	 * @return
+	 */
+	private int getColorLegendWidth()
+	{
+		int width = this.colorLegend.isVisible() ? DotplotView.COLOR_LEGEND_WIDTH : 0;
+		
+		return width;
 	}
 
 //	private int determinePreferredHeight()
@@ -1383,33 +1392,33 @@ public class DotplotView extends LayoutPanel implements
 
 		if (this.model.columnYIndexValid())
 		{
-			String s1 = this.model.getStatTableModel().getColumnName(
+			String columnNameY = this.model.getStatTableModel().getColumnName(
 				this.model.getColumnYIndex());
 			
 			double theta = Math.PI * 1.5;
 
 			// draw label y-axis rotated
-			metrics = context.measureText(s1);
+			metrics = context.measureText(columnNameY);
 			// set the painting position
 			context.save();
 			context.translate(DotplotView.FONT_HEIGHT - 2, 
 				this.getHeight() / 2 + metrics.getWidth() / 2 + yOffset); // the desired position of the text
 			context.rotate(theta);
-			context.fillText(s1, 0, 0);
+			context.fillText(columnNameY, 0, 0);
 			context.restore();
 		}
 		
 		if (this.model.columnXIndexValid())
 		{
-			String s2 = this.model.getStatTableModel().getColumnName(
+			String columnNameX = this.model.getStatTableModel().getColumnName(
 				this.model.getColumnXIndex());
 			
-			// draw label x-axis
-			metrics = context.measureText(s2);
-			context.fillText(s2,
+			// draw column name label x-axis
+			metrics = context.measureText(columnNameX);
+			context.fillText(columnNameX,
 				(this.dotAreaWidth() - this.yAxisOffset - metrics.getWidth()) / 2
 					+ this.yAxisOffset, 
-					this.getHeight() - DotplotView.X_AS_OFFSET + yOffset);
+					this.getHeight() - 2 + yOffset);
 		}
 
 		// draw split variable class (e.g., "geslacht: m")
@@ -1417,14 +1426,14 @@ public class DotplotView extends LayoutPanel implements
 			this.model.getSplitOptions()) > 1
 			&& !this.model.splitInSingleView())
 		{
-			String name = this.model.getStatTableModel().getColumnName(
+			String columnNameSplit = this.model.getStatTableModel().getColumnName(
 				this.model.getSplitOptions().getColumnSplitIndex());
 			String splitClassLabel = this.model.getSplitOptions().getSplitClassLabel(splitClass,
 				this.model.getStatTableModel());
-			String s = name
+			String s = columnNameSplit
 				+ ": " + splitClassLabel;
 			context.fillText(s, 10, 
-				this.getHeight() - DotplotView.X_AS_OFFSET + yOffset);
+				this.getHeight() - 2 + yOffset);
 		}
 
 		// draw horizontal axis line
@@ -1452,9 +1461,7 @@ public class DotplotView extends LayoutPanel implements
 		ColumnType columnType = this.model.getStatTableModel().getColumnTypes()
 			.get(this.model.getColumnXIndex());
 
-		int y = this.model.getStatTableModel().isViewsEditable() ? this.getHeight()
-			- DotplotView.KEUZEBALK_HOOGTE - DotplotView.X_AS_OFFSET : this
-			.getHeight() - DotplotView.X_AS_OFFSET;
+		int y = this.getHeight() - DotplotView.X_AS_OFFSET;
 		
 		// draw x-axis
 		context.beginPath();
@@ -1499,7 +1506,7 @@ public class DotplotView extends LayoutPanel implements
 					context.save();
 					// set the painting position
 					context.translate(x - (int) (0.5 * metrics.getWidth()),
-						y + 5 + DotplotView.FONT_HEIGHT + heightOffset); // the desired position of the text
+						y + heightOffset + 5 + DotplotView.FONT_HEIGHT); // the desired position of the text
 					context.rotate(theta);
 					context.fillText(option, 0, 0);
 					context.restore();
@@ -1507,7 +1514,7 @@ public class DotplotView extends LayoutPanel implements
 				else
 				{
 					context.fillText(option, x - (int) (0.5 * metrics.getWidth()),
-						y + 5 + DotplotView.FONT_HEIGHT + heightOffset);					
+						y + heightOffset + 5 + DotplotView.FONT_HEIGHT);					
 				}
 			}
 
@@ -1633,7 +1640,9 @@ public class DotplotView extends LayoutPanel implements
 				
 				// check for invalid value of minorStep
 				if (minorStep == 0)
+				{
 					break;
+				}
 			}
 
 			p = Math.ceil(min / step) * step;
@@ -1661,14 +1670,14 @@ public class DotplotView extends LayoutPanel implements
 				String pString = StatistiekGWT.getStringValue(p);
 				metrics = context.measureText(pString);
 				context.fillText(pString,
-					x - (int) (0.5 * metrics.getWidth()), y + 5
-						+ DotplotView.FONT_HEIGHT + heightOffset);
+					x - (int) (0.5 * metrics.getWidth()), 
+					y + heightOffset + 5 + DotplotView.FONT_HEIGHT);
 
 				p += step;
 			}
 		} // numerical xType
 	}
-
+	
 	private boolean determineNormalFitForString(Context2d context)
 	{
 		TextMetrics metrics;
