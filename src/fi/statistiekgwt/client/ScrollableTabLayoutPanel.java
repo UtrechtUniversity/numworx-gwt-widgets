@@ -56,23 +56,30 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 	private HorizontalPanel scrollPanel;
 
 	private static Resources DEFAULT_RESOURCES;
+	
+	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	StatistiekCssResource statistiekCss;
 
-//	public ScrollableTabLayoutPanel()
-//	{
-//		this(30, Unit.PX);
-//	}
 
 	public ScrollableTabLayoutPanel(double barHeight, Unit barUnit, int width, int height)
 	{
 		this(barHeight, barUnit, getDefaultResources());
 		this.width = width;
 		this.height = height;
+		
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
 	}
 
 	public ScrollableTabLayoutPanel(double barHeight, Unit barUnit,
 		Resources resources)
 	{
 		super(barHeight, barUnit);
+		
+		this.statistiekGWTClientBundle = GWT.create(StatistiekGWTClientBundle.class);
+		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
+		this.statistiekCss.ensureInjected();
 
 		this.barUnit = barUnit;
 		this.barHeight = barHeight;
@@ -175,6 +182,10 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 						// Resizing or adding / removing tabs, recompute the
 						// scroll
 						adjustScroll(0);
+						
+						// select tab, including scroll to selected tab; 
+						// this can only be done after the component is visible, so do it here
+						selectTab(getSelectedIndex(), false);
 					}
 				}
 
@@ -580,8 +591,6 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 					public void onSelectionChange(SelectionChangeEvent event)
 					{
 						Widget selected = selectionModel.getSelectedObject();
-						ScrollableTabLayoutPanel.this.selectTab(tabBar
-							.getWidgetIndex(selected));
 						Widget panelWithLabel = null;
 						Widget label = null;
 
