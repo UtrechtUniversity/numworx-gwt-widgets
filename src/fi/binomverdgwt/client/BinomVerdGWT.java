@@ -100,8 +100,8 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName("root");
 	
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 		
 
 			
