@@ -1016,19 +1016,29 @@ System.out.println("h12 = " + vlakdelen[index].getHeight());
 		int relXMax = veldXMax - cX;
 		int relYMin = cY - veldYMin;
 		int relYMax = veldYMax - cY;
+
+System.out.println("veldXMin = " + veldXMin);
+System.out.println("veldXMax = " + veldXMax);
+System.out.println("veldYMin = " + veldYMin);
+System.out.println("veldYMax = " + veldYMax);
+
+System.out.println("cX = " + cX);
+System.out.println("cY = " + cY);
 		
 System.out.println("relXMin = " + relXMin);
 System.out.println("relXMax = " + relXMax);
 System.out.println("relYMin = " + relYMin);
 System.out.println("relYMax = " + relYMax);
 
+System.out.println("avdslx = " + actiefVlakdeel.sleeppunt.x);
+System.out.println("avdsly = " + actiefVlakdeel.sleeppunt.y);
 		
 		//if (!actiefVlakdeel.nieuw && (actiefVlakdeel.draaipunt.x < -400 || actiefVlakdeel.draaipunt.x > 200 ||
 		//                              actiefVlakdeel.draaipunt.y < -250 || actiefVlakdeel.draaipunt.y > 250))
 		//if (!actiefVlakdeel.nieuw && (actiefVlakdeel.draaipunt.x < -relXMin || actiefVlakdeel.draaipunt.x > relXMax ||
 		//                              actiefVlakdeel.draaipunt.y < -relYMax || actiefVlakdeel.draaipunt.y > relYMin))
-		if (!actiefVlakdeel.nieuw && (actiefVlakdeel.sleeppunt.x < -relXMin || actiefVlakdeel.sleeppunt.x > relXMax ||
-                    actiefVlakdeel.sleeppunt.y < -relYMax || actiefVlakdeel.sleeppunt.y > relYMin))	
+		if (!actiefVlakdeel.nieuw && (actiefVlakdeel.sleeppunt.x < veldXMin || actiefVlakdeel.sleeppunt.x > veldXMax ||
+                    actiefVlakdeel.sleeppunt.y < -veldYMax || actiefVlakdeel.sleeppunt.y > veldYMax))	
 		{	for (int j = actiefVlakdeelNummer; j < aantalVlakdelen - 1; j++)
 			{	vlakdelen[j] = vlakdelen[j + 1];
 			}
