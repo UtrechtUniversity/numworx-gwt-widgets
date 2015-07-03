@@ -914,11 +914,17 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	@Override
 	public void onTouchEnd(TouchEndEvent event) 
 	{
+		event.preventDefault();
+		event.stopPropagation();
+		
 		if (eigenaar != null)
 			eigenaar.muisLosActie();
 		
 		if (eigenaar1 != null)
 			eigenaar1.muisLosActie();
+		
+		event.preventDefault();
+		event.stopPropagation();
 		
 	}
 	
