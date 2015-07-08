@@ -26,7 +26,7 @@ public class ColorLegend extends FlowPanel
 	private ArrayList<Label> colorPreviews;
 
 	private Label columnLabel;
-	private FlowPanel labelsPanel;
+	private FlowPanel colorLegendPanel;
 	private ScrollPanel scrollPanel;
 
 	public static final int COLOR_PREVIEW_WIDTH = 25;
@@ -57,11 +57,11 @@ public class ColorLegend extends FlowPanel
 
 		this.splitStrings = splitStrings;
 		this.splitColors = splitColors;
-		this.labelsPanel = new FlowPanel();
-		this.labelsPanel.addStyleName(statistiekCss.backgroundblue());
+		this.colorLegendPanel = new FlowPanel();
+		this.colorLegendPanel.addStyleName(statistiekCss.backgroundblue());
 		this.makeLabelsPanel();
 		
-		this.scrollPanel = new ScrollPanel(this.labelsPanel);
+		this.scrollPanel = new ScrollPanel(this.colorLegendPanel);
 		this.scrollPanel.addStyleName(statistiekCss.scrollPanel());
 		this.scrollPanel.setSize("100%", "100%"); // dit zorgt voor de verticale scrollbar
 		this.add(this.scrollPanel);
@@ -81,7 +81,7 @@ public class ColorLegend extends FlowPanel
 	{
 		this.splitStrings = splitStrings;
 		this.splitColors = splitColors;
-		StatistiekUtils.removeAllWidgetsFromPanel(this.labelsPanel);
+		StatistiekUtils.removeAllWidgetsFromPanel(this.colorLegendPanel);
 		this.makeLabelsPanel();
 	}
 
@@ -102,10 +102,14 @@ public class ColorLegend extends FlowPanel
 	 */
 	private void makeLabelsPanel()
 	{
+		FlowPanel columnNamePanel = new FlowPanel();
+		columnNamePanel.addStyleName(statistiekCss.margin());
+		
 		HorizontalPanel horizontalPanel = new HorizontalPanel();
 		horizontalPanel.addStyleName(statistiekCss.horizontalPanelWithoutBorder());
-		FlowPanel labelsFlowPanel = new FlowPanel();
-		FlowPanel colorsFlowPanel = new FlowPanel();
+		
+		FlowPanel labelsPanel = new FlowPanel();
+		FlowPanel colorsPanel = new FlowPanel();
 		
 		this.labels = new ArrayList<Label>();
 		this.colorPreviews = new ArrayList<Label>();
@@ -114,10 +118,7 @@ public class ColorLegend extends FlowPanel
 		this.columnLabel = new Label(this.columnName);
 		this.columnLabel.addStyleName(statistiekCss.spaceBottomLabel());
 		this.columnLabel.addStyleName(statistiekCss.colorlegendlabel());
-		labelsFlowPanel.add(this.columnLabel);
-		Label dummy = new Label("");
-		dummy.addStyleName(statistiekCss.colorlegendlabel());
-		colorsFlowPanel.add(dummy);
+		columnNamePanel.add(this.columnLabel);
 		
 		if (this.splitColors != null && this.splitStrings != null)
 		{
@@ -127,7 +128,7 @@ public class ColorLegend extends FlowPanel
 				Label label = new Label(s);
 				label.addStyleName(statistiekCss.splitClassLabel());
 				this.labels.add(label);
-				labelsFlowPanel.add(label);
+				labelsPanel.add(label);
 			}
 			
 			// add the color boxes
@@ -141,12 +142,13 @@ public class ColorLegend extends FlowPanel
 				colorLabel.getElement().getStyle().setWidth(ColorLegend.COLOR_PREVIEW_WIDTH, Unit.PX);
 				colorLabel.getElement().getStyle().setBackgroundColor(c.toString()); // Het kleurvakje
 
-				colorsFlowPanel.add(colorLabel);
+				colorsPanel.add(colorLabel);
 			}
 			
-			horizontalPanel.add(labelsFlowPanel);
-			horizontalPanel.add(colorsFlowPanel);
-			this.labelsPanel.add(horizontalPanel);
+			horizontalPanel.add(labelsPanel);
+			horizontalPanel.add(colorsPanel);
+			this.colorLegendPanel.add(columnNamePanel);
+			this.colorLegendPanel.add(horizontalPanel);
 		}
 	}
 
