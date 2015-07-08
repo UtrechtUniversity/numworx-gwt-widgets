@@ -42,6 +42,7 @@ import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
+import fi.statistiekgwt.client.StatistiekUtils.CustomScrollPanel;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
@@ -89,7 +90,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 */
 	private DockLayoutPanel alles;
 	private HistogramBarPanel mainPanel;
-	private ScrollPanel scrollPanel;
+	private CustomScrollPanel scrollPanel;
 	private ColorLegend colorLegend;
 
 	public static final CssColor BAR_COLOR = ColorUtils.DEFAULT_VIEW_ELEMENT_COLOR;
@@ -165,9 +166,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
 		
-		this.scrollPanel = new ScrollPanel(this.mainPanel.getCanvas());
-		//this.scrollPanel.setSize("100%", "100%");
-		this.scrollPanel.setAlwaysShowScrollBars(false);
+		this.scrollPanel = new CustomScrollPanel(this.mainPanel.getCanvas());
+		this.scrollPanel.setAlwaysHideHorizontalScrollBar(true);
 		
 		this.userOptionsPanel = new HistogramUserOptionsPanel(this, controller, model);
 		// initial update for setting widgets in user options panel
@@ -2952,8 +2952,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		{
 			max = Math.max(max, this.maxFrequency(allFrequencies, i));
 		}
-		
-		//System.out.println("HistogramView.getMaxFrequenciesofBins(): max = " + max);
 
 		return max;
 	}
@@ -2963,29 +2961,30 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int splitClasses = this.model.getStatTableModel().splitVarClasses(
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0;
-		
-		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
-		int scrollHeight = this.scrollPanel.getElement().getScrollHeight();
-		int widthCorrection = this.getWidth() - colorLegendWidth - scrollWidth;
-		int heightCorrection = this.getHeight() - scrollHeight;
 
 		this.scrollPanel.setPixelSize(this.getWidth() - colorLegendWidth, this.getHeight());
-		this.scrollPanel.setAlwaysShowScrollBars(false);
 
 		if (this.model.isSplitInSingleView())
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8 - colorLegendWidth);//(this.getWidth() - colorLegendWidth);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight() - 8);//(this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
+			
+			this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
 		}
 		else
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8);//(this.getWidth());
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());//(splitClasses * this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
+			
+			if (splitClasses > 1)
+			{
+				this.scrollPanel.setAlwaysHideVerticalScrollBar(false);
+			}
+			else
+			{
+				this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
+			}
 		}
-		
-//		scrollWidth = this.scrollPanel.getElement().getScrollWidth();
-//		scrollHeight = this.scrollPanel.getElement().getScrollHeight();
-
 	}
 
 	// Override setBound
