@@ -31,8 +31,6 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.ColorLegend;
 import fi.statistiekgwt.client.ColorPreviewer;
@@ -43,6 +41,7 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.StatistiekUtils.CustomScrollPanel;
 import fi.statistiekgwt.client.event.ColorChangeEvent;
 import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
@@ -171,7 +170,7 @@ public class DotplotView extends LayoutPanel implements
 	 */
 	private DockLayoutPanel alles;
 	private DotPanel mainPanel;
-	private ScrollPanel scrollPanel;
+	private CustomScrollPanel scrollPanel;
 	private ColorLegend colorLegend;
 	
 	private int width;
@@ -234,8 +233,8 @@ public class DotplotView extends LayoutPanel implements
 		// create GUI
 		this.mainPanel = new DotPanel();
 		
-		this.scrollPanel = new ScrollPanel(this.mainPanel.getCanvas());
-		this.scrollPanel.setAlwaysShowScrollBars(false);
+		this.scrollPanel = new CustomScrollPanel(this.mainPanel.getCanvas());
+		this.scrollPanel.setAlwaysHideHorizontalScrollBar(true);
 		
 		// initialize types
 		this.setTypes();
@@ -445,23 +444,28 @@ public class DotplotView extends LayoutPanel implements
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.getColorLegendWidth();
 		
-		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
-		int scrollHeight = this.scrollPanel.getElement().getScrollHeight();
-		int widthCorrection = this.getWidth() - colorLegendWidth - scrollWidth;
-		int heightCorrection = this.getHeight() - scrollHeight;
-
 		this.scrollPanel.setPixelSize(this.getWidth() - colorLegendWidth, this.getHeight());
-		this.scrollPanel.setAlwaysShowScrollBars(false);
 
 		if (this.model.isSplitInSingleView())
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8 - colorLegendWidth);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight() - 8);
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
+			
+			this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
 		}
 		else
 		{
-			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8);
+			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
 			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
+			
+			if (splitClasses > 1)
+			{
+				this.scrollPanel.setAlwaysHideVerticalScrollBar(false);
+			}
+			else
+			{
+				this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
+			}
 		}
 	}
 	
@@ -572,6 +576,15 @@ public class DotplotView extends LayoutPanel implements
 		updateOffsets();
 		
 		this.mainPanel.paint();
+	}
+	
+	/**
+	 * Update the correlation setting in the view.
+	 * 
+	 */
+	public void updateCorrelation()
+	{
+		this.mainPanel.paintCorrelation();
 	}
 
 	/**
@@ -2031,7 +2044,7 @@ public class DotplotView extends LayoutPanel implements
 			}
 			
 			context.fillText(correlationInfoString,
-				3, this.getHeight() - DotplotView.X_AS_OFFSET);
+				3, this.getHeight() - 2);
 		}
 	}
 
@@ -2798,6 +2811,24 @@ public class DotplotView extends LayoutPanel implements
 			this.context = canvas.getContext2d();
 		}
 		
+		public void paintCorrelation()
+		{
+			this.context = canvas.getContext2d();
+			this.context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+
+			Canvas correlationCanvas = Canvas.createIfSupported();
+			correlationCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+			correlationCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
+			Context2d correlationContext = correlationCanvas.getContext2d();
+			correlationContext.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+
+			DotplotView.this.paintCorrelation(correlationContext);
+			
+			// draw the drag context and the saved buffer context
+			context.drawImage(bufferContext.getCanvas(), 0, 0);
+			context.drawImage(correlationContext.getCanvas(), 0, 0);
+		}
+
 		public Canvas getCanvas()
 		{
 			return this.canvas;
@@ -2816,12 +2847,6 @@ public class DotplotView extends LayoutPanel implements
 			this.context = canvas.getContext2d();
 			this.context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 			
-			Canvas tempCanvas = Canvas.createIfSupported();
-			tempCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
-			tempCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
-			Context2d tempContext = tempCanvas.getContext2d();
-			tempContext.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
-			
 			// if the user is dragging the mouse, draw the rectangle that will
 			// be selected if
 			// the user would release the mouse
@@ -2832,7 +2857,7 @@ public class DotplotView extends LayoutPanel implements
 				double x2 = this.dotHandler.currentDragLocation.getX();
 				double y2 = this.dotHandler.currentDragLocation.getY();
 				
-				// set the buffered context
+				// set the drag context
 				Canvas dragCanvas = Canvas.createIfSupported();
 				dragCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
 				dragCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
@@ -2843,13 +2868,26 @@ public class DotplotView extends LayoutPanel implements
 					Math.abs(x1 - x2), Math.abs(y1 - y2));
 				dragContext.fill();
 				
+				// draw the drag context and the saved buffer context
 				context.drawImage(bufferContext.getCanvas(), 0, 0);
 				context.drawImage(dragContext.getCanvas(), 0, 0);
 			}
 			else
 			{
+				Canvas tempCanvas = Canvas.createIfSupported();
+				tempCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+				tempCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
+				Context2d tempContext = tempCanvas.getContext2d();
+				tempContext.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+				
 				tempContext.setFillStyle(ColorUtils.BLACK);
 				
+				// correlation heeft eigen context, niet in buffercontext
+				Canvas tempCorrelationCanvas = Canvas.createIfSupported();
+				tempCorrelationCanvas.setCoordinateSpaceWidth(canvas.getCoordinateSpaceWidth());
+				tempCorrelationCanvas.setCoordinateSpaceHeight(canvas.getCoordinateSpaceHeight());
+				Context2d tempCorrelationContext = tempCorrelationCanvas.getContext2d();
+
 				// sorteer de rij-indices zodat selected rijen op het eind staan
 				// en de bijbehorende dots als laatste worden getekend
 				final StatTableModel tableModel = DotplotView.this.model.getStatTableModel();
@@ -2908,7 +2946,7 @@ public class DotplotView extends LayoutPanel implements
 						DotplotView.this.objectLocations.add(null);
 					}
 	
-					DotplotView.this.paintCorrelation(tempContext);
+					DotplotView.this.paintCorrelation(tempCorrelationContext);
 	
 					for (int i = 0; i < DotplotView.this.splitClasses; i++)
 					{
@@ -3127,6 +3165,7 @@ public class DotplotView extends LayoutPanel implements
 				
 				// finally draw the buffer to the canvas
 				context.drawImage(tempContext.getCanvas(), 0, 0);
+				context.drawImage(tempCorrelationContext.getCanvas(), 0, 0);
 				this.bufferContext = tempContext;
 			} // no inDrag
 		}
@@ -3158,8 +3197,8 @@ public class DotplotView extends LayoutPanel implements
 			return startIndex;
 		}
 		
-	} // DotPanel class
-	
+	} // class DotPanel
+
 	private class CopyContext2d
 	{
 		private Context2d context;
