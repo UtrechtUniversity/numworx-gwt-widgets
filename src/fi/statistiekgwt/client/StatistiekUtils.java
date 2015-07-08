@@ -1,6 +1,8 @@
 package fi.statistiekgwt.client;
 
+import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
@@ -11,6 +13,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.ComplexPanel;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.ScrollPanel;
 
 /**
  * Class that provides utility classes.
@@ -49,6 +52,39 @@ public class StatistiekUtils
 			event.stopPropagation();
 		}
 	} // class DummyTouchHandler
+	
+	/**
+	 * A custom scrollpanel class to enable the hiding of scrollbars.
+	 * 
+	 * @author Sylvia van Borkulo
+	 *
+	 */
+	public static class CustomScrollPanel extends ScrollPanel
+	{
+		public CustomScrollPanel(Canvas canvas)
+		{
+			super(canvas);
+		}
+
+		public void setAlwaysHideHorizontalScrollBar(boolean alwaysHide)
+		{
+			getScrollableElement().getStyle().setOverflowX(
+				alwaysHide ? Overflow.HIDDEN : Overflow.AUTO);
+		}
+		
+		public void setAlwaysHideVerticalScrollBar(boolean alwaysHide)
+		{
+			getScrollableElement().getStyle().setOverflowY(
+				alwaysHide ? Overflow.HIDDEN : Overflow.AUTO);
+		}
+		
+		public void setAlwaysHideScrollBars(boolean alwaysHide)
+		{
+			this.setAlwaysHideHorizontalScrollBar(alwaysHide);
+			this.setAlwaysHideVerticalScrollBar(alwaysHide);
+		}
+		
+	} // class MyScrollPanel
 	
 	public static DummyTouchHandler getDummyTouchHandler()
 	{
