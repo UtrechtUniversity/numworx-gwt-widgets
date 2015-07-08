@@ -871,7 +871,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 			else if (e.getSource() == showCorrelationBox)
 			{
 				model.setShowCorrelation(view.getShowCorrelationBoxSelected());
-				this.update();
+				view.updateCorrelation();
 			}
 			else if (e.getSource() == singleViewRadioItem)
 			{
