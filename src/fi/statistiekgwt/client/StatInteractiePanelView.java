@@ -999,7 +999,6 @@ public class StatInteractiePanelView extends LayoutPanel
 			    HorizontalPanel hPanel = new HorizontalPanel();
 				Label plusLabel = new Label("+");
 			    plusLabel.addClickHandler(new LabelClickHandler(this.addViewTab, "+")); // to handle click to set focus
-			    plusLabel.setSize("100%", "100%");
 			    hPanel.add(plusLabel);
 				this.tabPanel.add(this.addViewTab, hPanel);
 			}
