@@ -122,8 +122,6 @@ public class ColumnDialogView extends DialogBox
 		this.statistiekCss = this.statistiekGWTClientBundle.getStatistiekGWTCSS();
 		this.statistiekCss.ensureInjected();
 
-		this.addStyleName(statistiekCss.columnDialogView());
-
 		this.initialize();
 	}
 
@@ -213,8 +211,8 @@ public class ColumnDialogView extends DialogBox
 		this.enumEastPanel.add(this.sortElements);
 
 		HorizontalPanel enumScrollAndButtonsPanel = new HorizontalPanel();
-		enumScrollAndButtonsPanel.setBorderWidth(2);
-		enumScrollAndButtonsPanel.addStyleName(statistiekCss.horizontalPanelWithoutBorder());
+		enumScrollAndButtonsPanel.setBorderWidth(1);
+		enumScrollAndButtonsPanel.addStyleName(statistiekCss.horizontalPanel());
 		enumScrollAndButtonsPanel.add(this.enumListPanel);
 		enumScrollAndButtonsPanel.add(this.enumEastPanel);
 		this.createEnumPanel = new FlowPanel();
@@ -248,8 +246,8 @@ public class ColumnDialogView extends DialogBox
 		this.alles.getElement().getStyle().setTextAlign(TextAlign.CENTER);
 		
 		HorizontalPanel hPanel = new HorizontalPanel();
-		hPanel.setBorderWidth(2); // zonder dit gaat het mis...
-		hPanel.addStyleName(this.statistiekCss.horizontalPanelWithoutBorder());
+		hPanel.setBorderWidth(1);
+		hPanel.addStyleName(this.statistiekCss.horizontalPanel());
 
 		hPanel.add(this.typePanel);
 		hPanel.add(this.uitlegPanel);
