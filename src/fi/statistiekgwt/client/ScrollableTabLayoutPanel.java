@@ -96,6 +96,7 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 			if (widget instanceof FlowPanel)
 			{
 				tabBar = (FlowPanel) widget;
+				// test syl: dit staat uitgecommentarieerd want width = 0 
 				//tabBar.setPixelSize(width, height); // zelf de size zetten
 				break;
 			}
@@ -453,6 +454,14 @@ public class ScrollableTabLayoutPanel extends TabLayoutPanel
 	{
 		int left = widget.getElement().getOffsetLeft();
 		int width = widget.getElement().getOffsetWidth(); 
+		
+		// check for unreasonable value of width; for some reason this occurs when
+		// initializing an activity in dwo/tablet
+		if (width > 16000)
+		{
+			width = 0;
+		}
+		
 		int position = left + width;
 		
 		return position;
