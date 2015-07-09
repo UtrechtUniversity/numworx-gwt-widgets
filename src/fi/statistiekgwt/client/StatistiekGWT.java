@@ -158,6 +158,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		VIEWS[6] = "Kruistabel";
 		VIEWS[7] = "Spreidingsdiagram";
 		VIEWS[8] = "Kengetallen";
+		
+		// sort the arrays
+//		Arrays.sort(VIEWS_translated);
+//		Arrays.sort(VIEWS);
 	}
 
 	@Override
@@ -936,7 +940,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 				// doubleString heeft een goed formaat
 				decimalPlaces = 
 					// Number of digits right of decimal point.
-				    (((matcher.getGroup(1) != null) && Integer.valueOf(matcher.getGroup(1).toString()) != 0) 
+				    (((matcher.getGroup(1) != null) && getDefaultNumberFormat().parse(matcher.getGroup(1).toString()) != 0) 
 				    	? matcher.getGroup(1).length() : 0)
 				    // Adjust for scientific notation.
 				    - (matcher.getGroup(2) != null ? Integer.valueOf(matcher.getGroup(2).toString()) : 0);
