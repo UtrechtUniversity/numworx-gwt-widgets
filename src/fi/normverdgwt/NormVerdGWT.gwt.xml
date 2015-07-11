@@ -19,6 +19,7 @@
 
   <!-- Other module inherits                                      -->
     <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+  <add-linker name='xsiframe' />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.normverdgwt.client.NormVerdGWT'/>
