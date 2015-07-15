@@ -62,7 +62,6 @@ public class ColorLegend extends FlowPanel
 		this.makeLabelsPanel();
 		
 		this.scrollPanel = new ScrollPanel(this.colorLegendPanel);
-		this.scrollPanel.addStyleName(statistiekCss.scrollPanel());
 		this.scrollPanel.setSize("100%", "100%"); // dit zorgt voor de verticale scrollbar
 		this.add(this.scrollPanel);
 		this.setPixelSize(width, height);
