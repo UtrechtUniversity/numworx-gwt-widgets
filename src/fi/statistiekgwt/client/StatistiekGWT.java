@@ -181,6 +181,12 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		return 0;
 	}
+	
+	public int[][] getScoreObjectives()
+	{
+		return null;
+	}
+
 
 	@Override
 	public Boolean isCorrect()
