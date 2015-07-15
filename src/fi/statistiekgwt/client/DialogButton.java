@@ -36,38 +36,35 @@ public class DialogButton extends Button implements HasClickHandlers
 
 	public void makeDialog()
 	{
-		// System.out.println("DialogButton.makeDialog()");
 		if (this.dialog == null)
 		{
-			this.dialog = new DialogBox(false, true); //JDialog((Frame) null, title, true);
+			this.dialog = new DialogBox(false, true);
 			this.dialog.setText(this.title);
 		}
 		
 		this.dialog.setWidget(content);
 		this.getElement().getStyle().setBackgroundColor("GREY");
-		int clientHeight = Window.getClientHeight();
-		int clientWidth = Window.getClientWidth();
-		int x = this.getAbsoluteLeft()
-			+ Math.min(0, clientWidth
-				- (this.getAbsoluteLeft() + this.getOffsetWidth()));
-		int y = this.getAbsoluteTop()
-			+ Math.min(0, clientHeight
-				- (this.getAbsoluteTop() + this.getOffsetHeight()));
-		dialog.setPopupPosition(x, y);
+//		int clientHeight = Window.getClientHeight();
+//		int clientWidth = Window.getClientWidth();
+//		int x = this.getAbsoluteLeft()
+//			+ Math.min(0, clientWidth
+//				- (this.getAbsoluteLeft() + this.getOffsetWidth()));
+//		int y = this.getAbsoluteTop()
+//			+ Math.min(0, clientHeight
+//				- (this.getAbsoluteTop() + this.getOffsetHeight()));
+//		dialog.setPopupPosition(x, y);
+		dialog.setPopupPosition(0, 0);
 
-		dialog.center();
 		dialog.show();
 	}
 
 	public void closeDialog()
 	{
-		// System.out.println("DialogButton.closeDialog()");
 		dialog.hide();
 	}
 
 	public HandlerRegistration addClickHandler(ClickHandler handler)
     {
-//        return addDomHandler(handler, ClickEvent.getType());
         return super.addClickHandler(handler);
     }
 	
@@ -76,7 +73,7 @@ public class DialogButton extends Button implements HasClickHandlers
 		return this.clickHandler;
 	}
 
-	class DialogButtonClickHandler implements ClickHandler//TouchStartHandler, TouchMoveHandler, TouchEndHandler
+	class DialogButtonClickHandler implements ClickHandler
 	{
 		@Override
 		public void onClick(ClickEvent event)
@@ -84,5 +81,5 @@ public class DialogButton extends Button implements HasClickHandlers
 			makeDialog();
 		}
 		
-	} // class DialogButtonTouchHandler
+	} // class DialogButtonClickHandler
 }
