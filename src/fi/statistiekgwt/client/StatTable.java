@@ -27,6 +27,7 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SelectionCell;
+import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.cell.client.TextInputCell;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.client.Scheduler;
@@ -53,6 +54,7 @@ import com.google.gwt.user.cellview.client.DataGrid;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DOM;
@@ -134,12 +136,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 	};
 	
-	private static final int TABLE_PAGE_SIZE = 100;
+	private static final int TABLE_PAGE_SIZE = 1000;
 	private static final String DEFAULT_SEPARATOR = ";";
-	private static final String CHECKBOX_CELL_WIDTH_STYLE = "width: 30px";
-	private static final int CHECKBOX_COLUMN_WIDTH = 50;
+	private static final String CHECKBOX_CELL_WIDTH_STYLE = "width: 20px";//30px";
+	private static final int CHECKBOX_COLUMN_WIDTH = 35;//50;
 	private static final int COLUMN_ENUM_DATA_PADDING = 50;//45;
-	private static final int COLUMN_INPUT_DATA_PADDING = 30;//45;
+	private static final int COLUMN_INPUT_DATA_PADDING = 0;//30;//45;
 	/**
 	 * For large datasets determining the column and cell width will not
 	 * consider all rows, but only the first LARGE_DATASET_ROWCOUNT.
@@ -187,6 +189,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private int[] maxCellWidth;	
 	
+	/**
+	 * The width of the row number column.
+	 */
+	private int rowNumberWidth;
+
 	private String viewName;
 	private PopupPanel popupMenu;
 	private MenuBar menuBar;
@@ -258,6 +265,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * Temporary index used to create columns.
 	 */
 	private int tempColumnIndex;
+
+	/**
+	 * Temporary index used when handling edit column events.
+	 */
+	private int editColumnIndex;
 
 	/**
 	 * Constructor without viewname, the initial table view.
@@ -417,6 +429,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    
 	    this.table.setSelectionModel(selectionModel, DefaultSelectionEventManager
 	        .<List<String>> createCheckboxManager(0));
+	    // set the row number column width
+	    this.updateRowNumberWidth();
 	    // initialize the maximum column width for each column
 	    this.initializeMaxColumnWidth();
 	    this.initializeMaxCellWidth();
@@ -461,7 +475,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.menuBar.addItem(editItem);
 			this.menuBar.addItem(deleteItem);
 		}
-		this.menuBar.addItem(infoItem);
+		else
+		{
+			this.menuBar.addItem(infoItem);
+		}
 
 		// maak editDataPanel met 6 buttons
 		this.editDataPanel = new HorizontalPanel();//new LayoutPanel();
@@ -1678,6 +1695,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			//this.setCellStyleNames(statistiekCss.dataGridCell());
 		}
 
+		public StatTableColumn(TextCell cell, ColumnType type)
+		{
+			super(cell);
+			this.columnIndex = StatTable.this.getTempColumnIndex();
+			// type can be numerical or string
+			this.type = type;
+			//this.setCellStyleNames(statistiekCss.dataGridCell());
+		}
+
 		public StatTableColumn(SelectionCell enumCell, ColumnType type)
 		{
 			super(enumCell);
@@ -1861,7 +1887,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * Class for setting the style of TextInputCell, else the width of the table column
 	 * will not effect the cell's width.
 	 * 
-	 * @author borku102
+	 * @author Sylvia van Borkulo
 	 *
 	 */
 	static class StatTableInputCell extends TextInputCell
@@ -1930,6 +1956,57 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
         } // onBrowserEvent()
 	    
 	} // class StatTableInputCell
+
+	
+	/**
+	 * Class for setting the style of TextCell, else the width of the table column
+	 * will not effect the cell's width.
+	 * 
+	 * @author Sylvia van Borkulo
+	 *
+	 */
+	static class StatTableTextCell extends TextCell
+	{
+	    private static Template template;
+	    private ColumnType type;
+		private int columnWidth;
+
+	    interface Template extends SafeHtmlTemplates
+	    {   
+	    	// {0}, {1} relate to value, style
+	        @Template("<div style=\"{1}\">{0}</div>")
+	        SafeHtml cell(String value, String style);
+	    }
+
+	    public StatTableTextCell(ColumnType type, int columnWidth)
+	    {
+	        template = GWT.create(Template.class);
+	        this.type = type;
+	        this.columnWidth = columnWidth;
+	    }
+
+	    @Override
+	    public void render(Context context, String value, SafeHtmlBuilder sb)
+	    {
+			if (value != null)
+			{
+				if (this.type.getType().equals(AllowedTypes.DOUBLE))
+				{
+					// Get the string value with language dependent separator
+					value = StatistiekGWT.getStringValue(value);
+				}
+				// set value, style
+				sb.append(template.cell(value, "width: " + this.columnWidth
+					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE));
+			}
+	        else
+	        {
+	            sb.appendHtmlConstant("<input type=\"text\" tabindex=\"-1\"></input>");
+	        }
+	    } // render()
+
+	    
+	} // class StatTableTextCell
 
 	
 	/**
@@ -2066,7 +2143,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	/**
 	 * Class to provide access to the data grid's scroll panel.
 	 * 
-	 * @author borku102
+	 * @author Sylvia van Borkulo
 	 *
 	 * @param <T>
 	 */
@@ -2148,16 +2225,39 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			this.addMaxColumnWidth();
 			this.addMaxCellWidth();
+
+			this.update();
+			
+			this.editColumnIndex = event.getColumnIndex();
+			
+			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+				
+				@Override
+				public void execute() 
+				{
+					StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex).scrollIntoView(); // set wel de horizontalScrollPosition, maar behoudt het niet...
+				}
+			});
+
+//			StatTable.this.table.getRowElement(0).getCells().getItem(event.getColumnIndex()).scrollIntoView(); // set wel de horizontalScrollPosition, maar behoudt het niet...
+			// update has been done, make sure the scroll is right
+			return;
 		}
 		else if (event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
 		{
 			this.updateMaxColumnWidth(event.getColumnIndex());
 			this.updateMaxCellWidth(event.getColumnIndex());
+
+			this.update();
+			StatTable.this.table.getRowElement(0).getCells().getItem(event.getColumnIndex()).scrollIntoView(); // werkt niet...
+			// update has been done, make sure the scroll is right
+			return;
 		}
 		else if (event.getInfo().equals(TableChangeEvent.ADD_ROW))
 		{
 			if (this.statTableModel.getRowCount() == 1) // first row added
 			{
+				this.updateRowNumberWidth();
 				// all maxColumn/CellWidths must be recalculated
 				this.updateMaxColumnWidth();
 				this.updateMaxCellWidth();
@@ -2179,6 +2279,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 		else if (event.getInfo().equals(TableChangeEvent.IMPORT_DATA)) // import data from file
 		{
+			this.updateRowNumberWidth();
 			this.initializeMaxColumnWidth();
 			this.initializeMaxCellWidth();
 		}
@@ -2193,6 +2294,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.removeMaxCellWidth();
 			this.updateMaxColumnWidthFromIndex(event.getColumnIndex());
 			this.updateMaxCellWidthFromIndex(event.getColumnIndex());
+		}
+		else if (event.getInfo().equals(TableChangeEvent.REMOVE_ROW) || event.getInfo().equals(TableChangeEvent.REMOVE_ROWS))
+		{
+			this.updateRowNumberWidth();
 		}
 
 		this.update();
@@ -2260,7 +2365,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.dataProvider.refresh();
 		this.dataProvider.flush();
 		
-		if (rows.size() == 0)
+		if ((rows.size() == 0) || (rows.size() <= TABLE_PAGE_SIZE))
 		{
 			this.pager.setVisible(false);
 		}
@@ -2296,11 +2401,29 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		// variable to determine the table's width
 		int totalWidth = 0;
 		
-		// if there are rows and/or columns add the check column 
+		// if there are rows and/or columns add the row number column and check column 
 		if ((this.statTableModel.getColumnCount() > 0)
 			|| (this.statTableModel.getRowCount() > 0))
 		{
-			StatTableCheckboxCell cell = new StatTableCheckboxCell(true, true);//false);
+			// row number column
+			TextColumn<List<String>> rowNumberColumn = new TextColumn<List<String>>() {
+
+			    @Override
+			    public String getValue(List<String> s) {
+			        return Integer.toString(dataProvider.getList().indexOf(s) + 1);
+			    }
+			};
+			
+			rowNumberColumn.setCellStyleNames(statistiekCss.datagridcell());
+			
+			this.table.addColumn(rowNumberColumn);
+			this.table.setColumnWidth(rowNumberColumn, this.rowNumberWidth, Unit.PX);
+			// add the column's width to total width
+			totalWidth = totalWidth + this.rowNumberWidth;
+
+			
+			// check column
+			StatTableCheckboxCell cell = new StatTableCheckboxCell(true, true);
 	
 			Column<List<String>, Boolean> checkColumn = new Column<List<String>, Boolean>(
 				cell)// false))
@@ -2313,7 +2436,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					int rowIndex = dataProvider.getList().indexOf(s);
 	
 					// add rowIndex to s if necessary
-					if (s.size() == table.getColumnCount() - 1) // table has extra checkbox column, so -1
+					if (s.size() == table.getColumnCount() - 2) // table has extra row number and checkbox column, so -2
 					{
 						s.add(String.valueOf(rowIndex));
 					}
@@ -2328,15 +2451,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					public void update(int rowIndex, List<String> s,
 						Boolean value)
 					{
-	//					GWT.log("StatTable.updateColumns(): checkbox, rowIndex = "
-	//						+ rowIndex + ", value = " + value
-	//						+ ", columnIndex = " + 0);
-						
 						// setSelectionList van StatTableModel 
 						StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
 						selectionModel.setSelected(s, value);
 					}
 				});
+			
+			checkColumn.setCellStyleNames(statistiekCss.datagridcell());
 			
 			Header<Boolean> selectAllHeader = new Header<Boolean>(
 				new StatTableCheckboxCell(true, true)) 
@@ -2376,6 +2497,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					StatTable.this.statTableModel.fireEvent(event);
 				}
 			});
+			
+			selectAllHeader.setHeaderStyleNames(statistiekCss.datagridcell());
 			this.table.addColumn(checkColumn, selectAllHeader);
 			this.table.setColumnWidth(checkColumn, StatTable.CHECKBOX_COLUMN_WIDTH, Unit.PX);
 			// add the column's width to total width
@@ -2421,9 +2544,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 							// get position from row
 							x = table.getRowElement(0).getCells()
-								.getItem(columnIndex + 1).getAbsoluteLeft();
+								.getItem(columnIndex + 2).getAbsoluteLeft(); // table has a row number and check column, so + 2
 							y = table.getRowElement(0).getCells()
-								.getItem(columnIndex + 1).getAbsoluteTop();
+								.getItem(columnIndex + 2).getAbsoluteTop(); // table has a row number and check column, so + 2
 
 							// remove dummy row
 							dataProvider.getList().clear();
@@ -2432,9 +2555,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						{
 							// get position from row
 							x = table.getRowElement(0).getCells()
-								.getItem(columnIndex + 1).getAbsoluteLeft();
+								.getItem(columnIndex + 2).getAbsoluteLeft(); // table has a row number and check column, so + 2
 							y = table.getRowElement(0).getCells()
-								.getItem(columnIndex + 1).getAbsoluteTop();							
+								.getItem(columnIndex + 2).getAbsoluteTop(); // table has a row number and check column, so + 2
 						}
 						
 						int scrollYPosition = table.getScrollPanel().getVerticalScrollPosition();
@@ -2468,13 +2591,33 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			        return headers.get(this.columnIndex);
 			    }
 			};
-
+			columnHeader.setHeaderStyleNames(statistiekCss.datagridcell());
 			columnHeader.setUpdater(valueUpdater);
 
-			// check column type
-			if (this.statTableModel.getColumnTypes().get(i).getType()
-				.equals(AllowedTypes.ENUM)
-				&& this.getStatTableModel().isDataEditable())
+			// different column types for different situations
+			if (!this.getStatTableModel().isDataEditable())
+			{
+				ColumnType type = this.statTableModel.getColumnTypes().get(i);
+				StatTableTextCell textCell = new StatTableTextCell(
+					type, 
+					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i] - StatTable.COLUMN_INPUT_DATA_PADDING));
+				Column<List<String>, String> column = new StatTableColumn(textCell, type);
+
+				//column.setFieldUpdater(fieldUpdater);
+				column.setSortable(true);
+				//column.setCellStyleNames(statistiekCss.textinputcell());
+				column.setCellStyleNames(statistiekCss.datagridcell());
+				
+				this.table.addColumn(column, columnHeader);
+//				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
+				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]);
+				this.table.setColumnWidth(column, width, Unit.PX);
+				// add the column's width to total width
+				totalWidth = totalWidth + width;				
+			}
+			else if (this.statTableModel.getColumnTypes().get(i).getType()
+				.equals(AllowedTypes.ENUM))
+				//&& this.getStatTableModel().isDataEditable())
 			{
 				String[] enumOptions = StatTable.this.statTableModel
 					.getColumnTypes().get(i).getEnumOptions();
@@ -2486,7 +2629,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				enumColumn.setFieldUpdater(fieldUpdater);
 				
 				enumColumn.setSortable(true);
-				enumColumn.setCellStyleNames(statistiekCss.selectioncell());
+				//enumColumn.setCellStyleNames(statistiekCss.selectioncell());
+				enumColumn.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(enumColumn, columnHeader);
 				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
@@ -2495,7 +2639,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				totalWidth = totalWidth + width;
 			} // ENUM
 			else
-			{
+			{ // NUMERIC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableInputCell inputCell = new StatTableInputCell(
 					type, 
@@ -2505,7 +2649,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 				column.setFieldUpdater(fieldUpdater);
 				column.setSortable(true);
-				column.setCellStyleNames(statistiekCss.textinputcell());
+				//column.setCellStyleNames(statistiekCss.textinputcell());
+				column.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(column, columnHeader);
 				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
@@ -2517,7 +2662,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		// set minimum table width to enable horizontal scrollbar
 		// with some extra padding for the vertical scrollbar not to overlay the last column
-		int padding = 50;
+		int padding = 75;//50;
 	    this.table.setMinimumTableWidth(totalWidth + padding, Unit.PX);
         
 		// add handler for right mouse click
@@ -2682,6 +2827,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		return maxWidth;
 	}
 
+	/**
+	 * Update the width of the row number column in table.
+	 *  
+	 */
+	private void updateRowNumberWidth()
+	{
+		TextMetrics metrics;
+		Canvas canvas = Canvas.createIfSupported();
+		Context2d context = canvas.getContext2d();
+		context.setFont(StatTable.CELL_STYLE_FONT_SIZE);
+		
+		int maxRow = this.statTableModel.getRowCount();
+		metrics = context.measureText(String.valueOf(maxRow));
+		this.rowNumberWidth = (int) metrics.getWidth() + 22;
+	}
+	
 	/**
 	 * Initialize the max cell width for each column in table.
 	 *  
