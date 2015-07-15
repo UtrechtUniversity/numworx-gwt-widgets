@@ -1067,7 +1067,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Paint the axis labels
+	 * Paint the axis text labels (not the values).
 	 * 
 	 * @param context
 	 *            The graphics in which the labels will be painted
@@ -1351,7 +1351,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Paint the bars for numerical data.
+	 * Paint the bars for numerical data and the axis values and markers.
 	 * 
 	 * @param context
 	 *	The graphics in which the bars will be painted
@@ -1392,7 +1392,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 		if (this.model.hasVerticalBars())
 		{
-			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 15;// + fm.getHeight();
+			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 20;
 
 			// set bar width
 			this.setBarWidth(frequencies.length / 2);
@@ -1458,11 +1458,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 			if (normalFit)
 			{
-				this.xAxisOffset = 50;
+				this.xAxisOffset = 40;
 			}
 			else
 			{
-				this.xAxisOffset = (int) (longest + 15);// + fm.getHeight();
+				this.xAxisOffset = (int) (longest + 15);
 			}
 		} // vertical bars
 		else // horizontal bars
@@ -1497,7 +1497,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     						s_labelUnderBin = s + "-<" +
     							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
 						}
-//						System.out.println("HistogramView.paintNumberClass(): s_labelUnderBin = " + s_labelUnderBin);
 						
 						metrics = context.measureText(s_labelUnderBin);
 						width = metrics.getWidth();
@@ -1522,7 +1521,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				}
 			}
 
-			this.yAxisOffset = (int) (longest + 15);// + fm.getHeight();
+			this.yAxisOffset = (int) (longest + 15);
 		} // horizontal bars
 
 		// correct scales
@@ -1851,8 +1850,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// check if the bin boundary strings will fit
 			normalFit = determineNormalFitForVerticalBars(context, type);
 			
-//			System.out.println("HistogramView.paintNumberClass(): normalFit = " + normalFit);
-
 			// paint bin boundaries
 			if (normalFit)
 			{
@@ -1878,33 +1875,25 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
 							{
 								s_labelUnderBin = s;
-								// for frequency polygon always
-								// draw marker
-								context.moveTo(x, y + ySplitOffset);
-								context.lineTo(x, y + 5 + ySplitOffset);
-//								System.out.println("HistogramView.paintNumberClass(): INT & binwidth = 1, s_labelUnderBin = " 
-//									+ s_labelUnderBin);
 							}
 							else
 							{
 								s_labelUnderBin = s + "-<" +
 									StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
-								// draw marker
-								context.moveTo(x, y + ySplitOffset);
-								context.lineTo(x, y + 5 + ySplitOffset);
 							}
 							
+							// draw marker
+							context.moveTo(x, y + ySplitOffset);
+							context.lineTo(x, y + 5 + ySplitOffset);
 							context.closePath();
 							context.stroke();
 
 							int x2 = (int) (this.yAxisOffset + (i + 1) + (i + 1)
 								* this.verticalBarWidth);
 							metrics = context.measureText(s_labelUnderBin);
+							String font = context.getFont();
 							int offset_labelUnderBin = (int) (metrics.getWidth() / 2);
-							context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 20 + ySplitOffset);
-//							System.out.println("HistogramView.paintNumberClass(): fm.stringWidth(s_labelUnderBin) = "
-//								+ fm.stringWidth(s_labelUnderBin)
-//								+ ", x2-x = " + (x2 - x) + ", this.verticalBarWidth = " + this.verticalBarWidth);
+							context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 15 + ySplitOffset);
 						}
 						else
 						{
@@ -1929,7 +1918,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						context.closePath();
 						context.stroke();
 						// put label between bins
-						context.fillText(s, x - offset, y + 20 + ySplitOffset);
+						context.fillText(s, x - offset, y + 15 + ySplitOffset);
 					}
 				} // for loop over bins
 			} // normal fit
@@ -2438,7 +2427,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Paint the bars for enum or string data
+	 * Paint the bars for enum or string data and the axis values and markers.
 	 * 
 	 * @param context
 	 *            The graphics in which the bars will be painted
@@ -2519,7 +2508,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				this.xAxisOffset = (int) (longest + 5 + height);
 			}
 
-			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 10 + highest;
+			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 20;
 		}
 		else
 		{ // horizontal bars
@@ -2841,6 +2830,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						+ i + 1;
 
 					String s = frequencies[i].label;
+					String font = context.getFont();
 					metrics = context.measureText(s);
 					context.fillText(s, x - (int) (metrics.getWidth() / 2.0), y + 5
 						+ height + ySplitOffset);
@@ -3193,6 +3183,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					if (canvas.getCoordinateSpaceWidth() > 0)
 					{
+						// x axis
 						context.moveTo(HistogramView.this.yAxisOffset,
 							HistogramView.this.barAreaHeight() + ySplitOffset);
 						context.lineTo(HistogramView.this.barAreaWidth(), 
@@ -3202,6 +3193,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				}
 				else
 				{
+					// y axis
 					context.moveTo(HistogramView.this.yAxisOffset - 1,
 						ySplitOffset - 1);
 					context.lineTo(HistogramView.this.yAxisOffset - 1,
