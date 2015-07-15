@@ -4,46 +4,16 @@ import com.google.gwt.resources.client.CssResource;
 
 public interface StatistiekCssResource extends CssResource
 {
-	String root();
-	
-	String dock();
-	
-	String vertical();
-	
-	String bottom();
-	
 	String canvas();
 	
-	String upimage();
-	
-	String downimage();
-	
-	String pushimage();
-	
-	String pushimage2();
-	
-	String togglebutton();
-	
 	String pushbutton();
-	
-	String colorpanel();
-	
-	String backgroundred();
 	
 	String backgroundblue();
 	
 	String textbox();
 	
-	String textblack();
-	
-	String textgray();
-	
 	String textarea();
 	
-	String selectioncell();
-	
-	String textinputcell();
-
 	String titlelabel();
 
 	String settingspanel();
@@ -54,17 +24,11 @@ public interface StatistiekCssResource extends CssResource
 
 	String boxsizingborder();
 
-	String dataGridCell();
-	
+	String datagridcell();
+
 	String dataGrid();
 
 	String failMessage();
-
-	String closeButton();
-
-	String caption();
-
-	String columnDialogView();
 
 	String radioButton();
 	
@@ -76,8 +40,6 @@ public interface StatistiekCssResource extends CssResource
 	
 	String spaceBottomLabel();
 
-	String scrollPanel();
-	
 	String splitClassLabel();
 
 	String margin();
@@ -85,8 +47,6 @@ public interface StatistiekCssResource extends CssResource
 	String separateViewDialog();
 
 	String button();
-
-	String selectedLabel();
 
 	String backgroundgrey();
 
