@@ -73,7 +73,6 @@ import fi.statistiekgwt.client.event.TableChangeEventHandler;
 public class StatInteractiePanelView extends LayoutPanel 
 	implements TableChangeEventHandler, AddViewEventHandler
 {
-	private static final String RESET_ICON_PATH = "resources/reseticon.gif";
 	protected StatModel model;
 	private StatInteractiePanel controller;
 	
@@ -91,8 +90,8 @@ public class StatInteractiePanelView extends LayoutPanel
 	private MenuBar menuBar;
 	private MenuItem changeNameItem;
 	private Command changeNameCommand;
-	private MenuItem showInDialogItem;
-	private Command showInDialogCommand;
+//	private MenuItem showInDialogItem;
+//	private Command showInDialogCommand;
 	
 	private RemoveViewDialogBox removeViewBox;
 
@@ -221,12 +220,12 @@ public class StatInteractiePanelView extends LayoutPanel
 		this.createChangeNameCommand();
 		this.changeNameItem = new MenuItem(StatistiekGWT.rb.getString("changeViewName"), true, changeNameCommand);
 		
-		this.createShowInDialogCommand();
-		this.showInDialogItem = new MenuItem(StatistiekGWT.rb.getString("showInDialog"), true, showInDialogCommand);
+//		this.createShowInDialogCommand();
+//		this.showInDialogItem = new MenuItem(StatistiekGWT.rb.getString("showInDialog"), true, showInDialogCommand);
 
 		// add the items
 		this.menuBar.addItem(changeNameItem);
-		this.menuBar.addItem(showInDialogItem);
+//		this.menuBar.addItem(showInDialogItem);
 	}
 
 	/**
@@ -250,20 +249,20 @@ public class StatInteractiePanelView extends LayoutPanel
         };
 	}
 	
-	/**
-	 * Create the show in dialog command for the view tab's menu bar.
-	 */
-	private void createShowInDialogCommand()
-	{
-        this.showInDialogCommand = new Command() {
-	        @Override
-            public void execute() 
-	        {
-	        	hideTabPopupMenu();
-	        	setDraggedOutside(getSelectedViewName(), -1, -1);
-            }
-        };
-	}
+//	/**
+//	 * Create the show in dialog command for the view tab's menu bar.
+//	 */
+//	private void createShowInDialogCommand()
+//	{
+//        this.showInDialogCommand = new Command() {
+//	        @Override
+//            public void execute() 
+//	        {
+//	        	hideTabPopupMenu();
+//	        	setDraggedOutside(getSelectedViewName(), -1, -1);
+//            }
+//        };
+//	}
 	
 	/**
 	 * Get the view name of the selected tab.
@@ -1277,9 +1276,6 @@ public class StatInteractiePanelView extends LayoutPanel
 			
 			mouseDown = false;
 			
-			// reset cursor to default
-//			RootPanel.getBodyElement().getStyle().setCursor(Cursor.DEFAULT);
-
 			// reset label cursor to pointer
 			if (event.getSource() instanceof Label)
 			{
@@ -2081,14 +2077,14 @@ public class StatInteractiePanelView extends LayoutPanel
 	    label.addTouchMoveHandler(touchHandler);
 	    label.addTouchEndHandler(touchHandler);
 
-	    // make the tab draggable, with mouse and touch
-	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
-	    label.addMouseDownHandler(dragHandler);
-	    label.addMouseMoveHandler(dragHandler);
-	    label.addMouseUpHandler(dragHandler);
-	    label.addTouchStartHandler(dragHandler);
-	    label.addTouchMoveHandler(dragHandler);
-	    label.addTouchEndHandler(dragHandler);
+	    // make the tab draggable, with mouse and touch -> not usable when showing in iframe
+//	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
+//	    label.addMouseDownHandler(dragHandler);
+//	    label.addMouseMoveHandler(dragHandler);
+//	    label.addMouseUpHandler(dragHandler);
+//	    label.addTouchStartHandler(dragHandler);
+//	    label.addTouchMoveHandler(dragHandler);
+//	    label.addTouchEndHandler(dragHandler);
 	    
 	    ImageAnchor closeBtn = new ImageAnchor();
 	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
