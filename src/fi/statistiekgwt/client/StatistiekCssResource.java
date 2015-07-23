@@ -69,5 +69,7 @@ public interface StatistiekCssResource extends CssResource
 	String waitCursor();
 
 	String moveCursor();
+	
+	String dataGridSelectedRow();
 }
 
