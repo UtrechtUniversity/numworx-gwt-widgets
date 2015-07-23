@@ -597,6 +597,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 			if (this.lastPolygonPoint != null)
 			{
+				// draw the connecting line
 				context.beginPath();
 				context.moveTo(this.lastPolygonPoint.getX(), 
 					this.lastPolygonPoint.getY() + ySplitOffset);
@@ -606,9 +607,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 
 			this.lastPolygonPoint = p;
-			
-			// reset color
-			context.setStrokeStyle(ColorUtils.BLACK);
 
 		} // frequency polygon
 		else
@@ -1075,7 +1073,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	private void paintAxisLabels(Context2d context, int yOffset, int splitClass)
 	{
 		TextMetrics metrics;
-		CssColor black = CssColor.make(0, 0, 0);
 
 		String s1 = this.model.hasVerticalBars() ? (this.model.getPercentage() ? StatistiekGWT.rb
 			.getString("percentageLabel") : StatistiekGWT.rb
@@ -1090,8 +1087,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		
 		// metrics van s1
 		metrics = context.measureText(s1);
-		//GWT.log("HistogramView.paintAxisLabels(): context.measureText(s1).getWidth() = " + context.measureText(s1).getWidth());
-		context.setFillStyle(black);
+		context.setFillStyle(ColorUtils.BLACK);
 		context.save();
 		// set the drawing position 
 		context.translate(
@@ -1704,6 +1700,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				else
 				{
 					// niet-cumulatief frequentiepolygoon
+					// en histogram met split in single view
 					
 					// Hier worden de samengestelde staafjes getekend.
 					int[] cumHeight = new int[frequencies.length / 2];
@@ -1837,8 +1834,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 		}
 
-		CssColor black = CssColor.make(0, 0, 0);
-		context.setFillStyle(black);
+		context.beginPath(); // required to push a new state
+		context.setFillStyle(ColorUtils.BLACK);
+		context.setStrokeStyle(ColorUtils.BLACK);
 
 		int columnIndex = this.model.getColumnIndex();
 		ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
@@ -2242,7 +2240,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	}
 
 	/**
-	 * Paint scale on the axis with the amounts or percentages.
+	 * Paint scale on the axis with the amounts or percentages,
+	 * and the markers and grey help lines.
 	 * 
 	 * @param context
 	 *            Context in which it will be painted
@@ -2253,9 +2252,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int ySplitOffset)
 	{
 		int height = this.getCurrentFontHeight(context);
-		CssColor black = CssColor.make(0, 0, 0);
-		//context.setFont(super.getFont());
-		context.setFillStyle(black);
+		context.setFillStyle(ColorUtils.BLACK);
 		TextMetrics metrics;
 
 		// Determine the interval for markers on the axis
@@ -2318,12 +2315,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				context.setStrokeStyle(ColorUtils.LIGHT_GREY);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset, y + ySplitOffset);
-				context.lineTo(this.barAreaWidth(), y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
+				context.lineTo(this.barAreaWidth() + this.yAxisOffset, y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
 				context.closePath();
 				context.stroke();
 
 				// paint small marker
-				context.setStrokeStyle(black);
+				context.setStrokeStyle(ColorUtils.BLACK);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset - 2, y + ySplitOffset);
 				context.lineTo(this.yAxisOffset, y + ySplitOffset);
@@ -2339,12 +2336,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				context.setStrokeStyle(ColorUtils.GREY);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset, y + ySplitOffset);
-				context.lineTo(this.barAreaWidth(), y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
+				context.lineTo(this.barAreaWidth() + this.yAxisOffset, y + ySplitOffset);//this.getOffsetWidth(), y + ySplitOffset);
 				context.closePath();
 				context.stroke();
 
 				// paint small marker
-				context.setStrokeStyle(black);
+				context.setStrokeStyle(ColorUtils.BLACK);
 				context.beginPath();
 				context.moveTo(this.yAxisOffset - 5, y + ySplitOffset);
 				context.lineTo(this.yAxisOffset, y + ySplitOffset);
@@ -2385,7 +2382,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				context.stroke();
 
 				// paint small marker
-				context.setStrokeStyle(black);
+				context.setStrokeStyle(ColorUtils.BLACK);
 				context.beginPath();
 				context.moveTo(x, y + ySplitOffset);
 				context.lineTo(x, y + 2 + ySplitOffset);
@@ -2406,7 +2403,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				context.stroke();
 
 				// paint small marker
-				context.setStrokeStyle(black);
+				context.setStrokeStyle(ColorUtils.BLACK);
 				context.beginPath();
 				context.moveTo(x, y + ySplitOffset);
 				context.lineTo(x, y + 5 + ySplitOffset);
@@ -2440,19 +2437,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		double scale;
 		double amountScale;
 
-		//context.setFont(super.getFont());
-		CssColor black = CssColor.make(0, 0, 0);
-		context.setStrokeStyle(black);
+		context.setStrokeStyle(ColorUtils.BLACK);
 		TextMetrics metrics;
 		int height = this.getCurrentFontHeight(context);
 		double width;
 		
-		// in css of context.rotate(angle)
-		//AffineTransform at = new AffineTransform();
 		double theta = Math.PI * 1.75;
-		//at.rotate(theta); // 315 graden met de klok mee; 45 graden tegen de klok in
-		//context.rotate(theta);
-		//Font rotateFont = super.getFont().deriveFont(at);
 
 		// get frequencies
 		FrequencyTuple[] frequencies = allFrequencies[splitClass];
@@ -2477,9 +2467,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 		if (this.model.hasVerticalBars())
 		{
-			// set bar width
-			this.setBarWidth(frequencies.length);
-
 			// check if the bin boundary strings will fit
 			boolean normalFit = true;
 			double longest = 0;
@@ -2513,9 +2500,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		else
 		{ // horizontal bars
 			this.xAxisOffset = this.determineDependentAxisWidth(context, scale);
-
-			// set bar width
-			this.setBarWidth(frequencies.length);
 
 			// find longest binboundary
 			double longest = 0;
@@ -2806,7 +2790,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 
 		// paint bar labels
-		context.setFillStyle(black);
+		context.beginPath(); // required to push a new state
+		context.setStrokeStyle(ColorUtils.BLACK);
+		context.setFillStyle(ColorUtils.BLACK);
 		if (this.model.hasVerticalBars())
 		{
 			int y = this.barAreaHeight() - 2;
@@ -2818,6 +2804,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				if (width > this.verticalBarWidth)
 				{
 					normalFit = false;
+					break;
 				}
 			}
 
@@ -3172,7 +3159,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				}
 			}
 
-			// draw the axis with the values of the bars (for vertical bars the x axis, for horizontal bars the y axis)
+			context.setStrokeStyle(ColorUtils.BLACK);
+			// draw the axis for each split with the text labels (for vertical bars the x axis, for horizontal bars the y axis)
 			for (int i = 0; i < (HistogramView.this.isSplitSingleViewSelected() ? 1
 				: splitClasses); i++)
 			{
@@ -3186,7 +3174,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						// x axis
 						context.moveTo(HistogramView.this.yAxisOffset,
 							HistogramView.this.barAreaHeight() + ySplitOffset);
-						context.lineTo(HistogramView.this.barAreaWidth(), 
+						context.lineTo(HistogramView.this.barAreaWidth() + HistogramView.this.yAxisOffset,
 							HistogramView.this.barAreaHeight() + ySplitOffset);
 						context.stroke();
 					}
@@ -3225,9 +3213,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			clientX = e.getClientX();
 			clientY = e.getClientY();
 			
-			// test syl
-			//System.out.println("HistogramView.HistogramBarMouseMoveHandler.onMouseMove(): (" + x + ", " + y +")");
-			
 			FrequencyTuple[][] frequencies_enum = HistogramView.this.model
 				.enumClassFrequency();
 			int[][] frequencies_number = HistogramView.this.model
@@ -3238,16 +3223,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			int aantal_totaal = 0;
 			boolean found = false;
 
-//    			System.out.println("HistogramBarPanel.mouseMoved(): (" + p.x
-//    				+ ", " + p.y + "): frequencies=" + frequencies_number +
-//    				", barRectangles=" + HistogramView.this.barRectangles);
-
 			int noBins = 0;
 			int numberOfSplits = HistogramView.this.model.getStatTableModel()
 				.splitVarClasses(HistogramView.this.model.getSplitOptions());
 
-			// System.out.println("... numberOfSplits = " + numberOfSplits);
-			
 			if (frequencies_number != null)
 			{
 				noBins = HistogramView.this.model.getNoBins();
@@ -3293,8 +3272,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 								+ frequencies_enum[i][j].frequency;
 						}
 					}
-//						System.out.println("... aantalPerBin[" + j + "] = " +
-//							aantalPerBin[j]);
 				}
 				
 				// bepaal aantal per split
@@ -3316,13 +3293,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 								+ frequencies_enum[i][j].frequency;
 						}
 					}    					
-//    					System.out.println("... aantalPerSplit[" + i + "] = " +
-//    						aantalPerSplit[i]);
 				}
 			} // percentage
 			
-			//System.out.println("HistogramView.HistogramBarPanel.mouseMoved(): aantal_totaal = " + aantal_totaal);
-
 			Rectangle rect;
 			double value = 0;
 			double[] cumulativeValuePerSplit = new double[numberOfSplits];
@@ -3386,10 +3359,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 					if (isOverToolTipArea(x, y, rect))
 					{
-//    						System.out.println("HistogramBarPanel.mouseMoved(): ("
-//    							+ p.x + ", " + p.y + "): bij bovenkant van staaf "
-//    							+ (j + i * noBins + 1) + ", isOverToolTipArea!");
-
 						if (isPercentage)
 						{
 							value = 0;
@@ -3403,13 +3372,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
         							{
 										if (HistogramView.this.isNextToEachOtherSelected())
     									{
-//        										System.out.println("HistogramBarPanel.mouseMoved(): split nextToEachOther!");
     										// als naast elkaar, dan percentage relatief aan totaalaantal
     										value = ((double) frequencies_number[i][j*2] / aantal_totaal) * 100;
     									}
     									else
     									{
-//        										System.out.println("HistogramBarPanel.mouseMoved(): split gestapeld!");
             								// als gestapeld in 1 view, dan percentage relatief aan totaal per bin 
                 							//value = ((double) frequencies_number[i][j * 2] / aantalPerBin[j]) * 100;
     										// bij gestapeld moet de waarde relatief aan totaal 
@@ -3441,13 +3408,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     								{
     									if (HistogramView.this.isNextToEachOtherSelected())
     									{
-//        										System.out.println("HistogramBarPanel.mouseMoved(): split nextToEachOther!");
     										// als naast elkaar, dan percentage relatief aan totaalaantal
     										value = ((double) frequencies_enum[i][j].frequency / aantal_totaal) * 100;
     									}
     									else
     									{
-//        										System.out.println("HistogramBarPanel.mouseMoved(): split gestapeld!");
             								// als gestapeld in 1 view, dan percentage relatief aan totaal per bin 
                 							//value = ((double) frequencies_enum[i][j].frequency / aantalPerBin[j]) * 100;
     										
@@ -3513,8 +3478,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							}
 						}
 
-						//System.out.println("... valueString = " + valueString);
-						
 						if (HistogramView.this.model.isFrequencyPolygonCumulativeMode())
 						{
 							value = cumulativeValuePerSplit[i]; 
@@ -3541,10 +3504,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							highlightedBar = j;
 							highlightInSplit = i;
 
-//    							System.out.println("... highlightedBar = "
-//    								+ highlightedBar + ", highlightInSplit = "
-//    								+ highlightInSplit);
-
 							// show popup
 							if (isPercentage)
 							{
@@ -3555,10 +3514,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 										public void setPosition(
 											int offsetWidth, int offsetHeight)
 										{
-											int scrollXPosition = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
-											int scrollYPosition = HistogramView.this.scrollPanel.getVerticalScrollPosition();
-//											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
-											popup.setPopupPosition(clientX - scrollXPosition, clientY - offsetHeight);//clientY - scrollYCorrection - offsetHeight);
+//											int scrollXPosition = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
+//											int scrollYPosition = HistogramView.this.scrollPanel.getVerticalScrollPosition();
+											popup.setPopupPosition(clientX - offsetWidth, clientY - offsetHeight);
 										}
 									});
 							}
@@ -3571,11 +3529,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 										public void setPosition(
 											int offsetWidth, int offsetHeight)
 										{
-											int scrollXCorrection = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
-											int scrollYCorrection = HistogramView.this.scrollPanel.getVerticalScrollPosition();
-//											popup.setPopupPosition(x - scrollXCorrection, y - scrollYCorrection);
-											//popup.setPopupPosition(clientX - scrollXCorrection, clientY - scrollYCorrection - offsetHeight);
-											popup.setPopupPosition(clientX, clientY - offsetHeight);// no correction needed?
+//											int scrollXPosition = HistogramView.this.scrollPanel.getHorizontalScrollPosition();
+//											int scrollYPosition = HistogramView.this.scrollPanel.getVerticalScrollPosition();
+											popup.setPopupPosition(clientX - offsetWidth, clientY - offsetHeight);// no correction needed?
 										}
 									});
 							}
