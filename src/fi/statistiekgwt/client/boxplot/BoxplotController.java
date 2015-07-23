@@ -154,7 +154,6 @@ public class BoxplotController implements StatistiekView
 			// set visibility split in uop
 			boolean validSplitIndex = (splitIndex == -1) ? false : true;
 			this.view.getUserOptionsPanel().setVisibleSplitOptions(validSplitIndex);
-
 		}
 		if (map.containsKey("name"))
 		{
