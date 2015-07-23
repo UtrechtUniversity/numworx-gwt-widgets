@@ -221,9 +221,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 			if (launchState.containsKey("selectedView"))
 			{
 				int index = map.getInt("selectedView");
-				// System.out.println("StatInteractiePanel.setState(): selectedView in launchState = "
-				// + index);
-				this.view.processSelectedTab(index);
+				
+				if ((this.view.model.getViews().size() > 1)
+					|| this.model.getStatTableModel().isViewsAddable())
+				{
+					this.view.processSelectedTab(index);
+				}
+				// if there is only one view and views not addable, no tabs are shown
 			}
 		}
 	}
