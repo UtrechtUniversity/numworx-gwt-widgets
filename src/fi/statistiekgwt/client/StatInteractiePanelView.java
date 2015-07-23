@@ -989,7 +989,7 @@ public class StatInteractiePanelView extends LayoutPanel
 
 				for (StatistiekView view : mainWindowViews)
 				{
-					this.tabPanel.add(view.getWidget(), this.getTabTitleNonEditable(view.getWidget(), view.getViewName()));//view.getViewName());
+					this.tabPanel.add(view.getWidget(), this.getTabTitleNonEditable(view.getWidget(), view.getViewName()));
 				}
 			}
 
@@ -1031,7 +1031,16 @@ public class StatInteractiePanelView extends LayoutPanel
 		}
 
 		// update the selected tab in tabPanel
-		tabPanel.selectTab(selectedTabIndex);
+		// but only if there is a tabbar
+		if ((mainWindowViews.size() != 1) || this.model.getStatTableModel().isViewsAddable())
+		{
+			tabPanel.selectTab(selectedTabIndex);
+		}
+		else
+		{
+			this.tabPanel.removeStyleName(statistiekCss.backgroundblue());
+			this.tabPanel.addStyleName(statistiekCss.backgroundwhite());
+		}
 
 		// Fill boxes with variable names
 		updateStartVarBox();
