@@ -56,17 +56,19 @@ public class ColorUtils
 	 */
 	public static CssColor getColor(int number)
 	{
+		CssColor color;
 		if (number < colorList.size())
 		{
-			return CssColor.make(colorList.get(number));
+			color = CssColor.make(colorList.get(number));
 		}
 		else
 		{
-			CssColor c = CssColor.make(random.nextInt(256),
+			color = CssColor.make(random.nextInt(256),
 				random.nextInt(256), random.nextInt(256));
-			colorList.add(c.value());
-			return c;
+			colorList.add(color.value());
 		}
+		
+		return color;
 	}
 
 	private static ArrayList<String> initializeColorList()
