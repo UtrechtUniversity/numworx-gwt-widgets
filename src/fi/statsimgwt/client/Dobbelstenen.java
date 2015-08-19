@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.view.client.ListDataProvider;
+
 
 //import fi.statsimgwt.client.Munten.Experiment;
 
@@ -64,7 +66,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	CssColor lijnenKleur = CssColor.make(0, 0, 0);
 	CssColor agKleur = CssColor.make(255, 255, 255);
 
-	private static class Experiment {
+	public static class Experiment {
 		private final String experimentNumber;
 	    private final String een;
 	    private final String twee;
@@ -82,10 +84,31 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.vijf=vijf;
 	    	this.zes=zes;
 	    }
-	    	    
+	    
+	    public String getExpNumber() {
+	    	return experimentNumber;
+	    }
+	    public String getEen() {
+	    	return een;
+	    }
+	    public String getTwee() {
+	    	return twee;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
 	}
 
-	private static class Experiment1 {
+	public static class Experiment1 {
 		private final String experimentNumber;
 	    private final String twee;
 	    private final String drie;
@@ -113,10 +136,46 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.elf=elf;
 	    	this.twaalf=twaalf;
 	    }
-	    	    
+
+	    public String getExpNumber() {
+	    	return experimentNumber;
+	    }
+	    public String getTwee() {
+	    	return twee;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
+	    public String getZeven() {
+	    	return zeven;
+	    }
+	    public String getAcht() {
+	    	return acht;
+	    }
+	    public String getNegen() {
+	    	return negen;
+	    }
+	    public String getTien() {
+	    	return tien;
+	    }
+	    public String getElf() {
+	    	return elf;
+	    }
+	    public String getTwaalf() {
+	    	return twaalf;
+	    }
 	}
 
-	private static class Experiment2 {
+	public static class Experiment2 {
 		private final String experimentNumber;
 	    private final String drie;
 	    private final String vier;
@@ -154,10 +213,61 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.zeventien=zeventien;
 	    	this.achttien=achttien;
 	    }
-	    	    
+
+	    public String getExpNumber() {
+	    	return experimentNumber;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
+	    public String getZeven() {
+	    	return zeven;
+	    }
+	    public String getAcht() {
+	    	return acht;
+	    }
+	    public String getNegen() {
+	    	return negen;
+	    }
+	    public String getTien() {
+	    	return tien;
+	    }
+	    public String getElf() {
+	    	return elf;
+	    }
+	    public String getTwaalf() {
+	    	return twaalf;
+	    }
+	    public String getDertien() {
+	    	return dertien;
+	    }
+	    public String getVeertien() {
+	    	return veertien;
+	    }
+	    public String getVijftien() {
+	    	return vijftien;
+	    }
+	    public String getZestien() {
+	    	return zestien;
+	    }
+	    public String getZeventien() {
+	    	return zeventien;
+	    }
+	    public String getAchttien() {
+	    	return achttien;
+	    }
 	}
 
-	private static class Experiment3 {
+	public static class Experiment3 {
 		private final String eyes;
 	    private final String een;
 	    private final String twee;
@@ -175,10 +285,32 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.vijf=vijf;
 	    	this.zes=zes;
 	    }
+	    
+	    public String getEyes() {
+	    	return eyes;
+	    }
+	    public String getEen() {
+	    	return een;
+	    }
+	    public String getTwee() {
+	    	return twee;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
 	    	    
 	}
 
-	private static class Experiment4 {
+	public static class Experiment4 {
 		private final String eyes;
 	    private final String twee;
 	    private final String drie;
@@ -207,9 +339,45 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.twaalf=twaalf;
 	    }
 	    	    
+	    public String getEyes() {
+	    	return eyes;
+	    }
+	    public String getTwee() {
+	    	return twee;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
+	    public String getZeven() {
+	    	return zeven;
+	    }
+	    public String getAcht() {
+	    	return acht;
+	    }
+	    public String getNegen() {
+	    	return negen;
+	    }
+	    public String getTien() {
+	    	return tien;
+	    }
+	    public String getElf() {
+	    	return elf;
+	    }
+	    public String getTwaalf() {
+	    	return twaalf;
+	    }
 	}
 
-	private static class Experiment5 {
+	public static class Experiment5 {
 		private final String eyes;
 	    private final String drie;
 	    private final String vier;
@@ -248,6 +416,57 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    	this.achttien=achttien;
 	    }
 	    	    
+	    public String getEyes() {
+	    	return eyes;
+	    }
+	    public String getDrie() {
+	    	return drie;
+	    }
+	    public String getVier() {
+	    	return vier;
+	    }
+	    public String getVijf() {
+	    	return vijf;
+	    }
+	    public String getZes() {
+	    	return zes;
+	    }
+	    public String getZeven() {
+	    	return zeven;
+	    }
+	    public String getAcht() {
+	    	return acht;
+	    }
+	    public String getNegen() {
+	    	return negen;
+	    }
+	    public String getTien() {
+	    	return tien;
+	    }
+	    public String getElf() {
+	    	return elf;
+	    }
+	    public String getTwaalf() {
+	    	return twaalf;
+	    }
+	    public String getDertien() {
+	    	return dertien;
+	    }
+	    public String getVeertien() {
+	    	return veertien;
+	    }
+	    public String getVijftien() {
+	    	return vijftien;
+	    }
+	    public String getZestien() {
+	    	return zestien;
+	    }
+	    public String getZeventien() {
+	    	return zeventien;
+	    }
+	    public String getAchttien() {
+	    	return achttien;
+	    }
 	}
 
 	
@@ -257,6 +476,13 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	CellTable<Experiment3> table3;
 	CellTable<Experiment4> table4;
 	CellTable<Experiment5> table5;
+
+	protected ListDataProvider<Experiment> dataProvider;
+	protected ListDataProvider<Experiment1> dataProvider1;
+	protected ListDataProvider<Experiment2> dataProvider2;
+	protected ListDataProvider<Experiment3> dataProvider3;
+	protected ListDataProvider<Experiment4> dataProvider4;
+	protected ListDataProvider<Experiment5> dataProvider5;
 	
 	public Dobbelstenen(boolean dobbelstenenInstellingen, boolean dobbelstenenResultaten, boolean dobbelstenenGrafiek1, boolean dobbelstenenTabel) {
 		dobbelstenenResultaten1=dobbelstenenResultaten;
@@ -352,6 +578,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table.setPageSize(1000);
 	    
+	    dataProvider = new ListDataProvider<Experiment>();
+		// 	Add the table to the dataProvider.
+		dataProvider.addDataDisplay(table);
+		
+	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment> expColumn = new TextColumn<Experiment>() {
 	      @Override
@@ -417,6 +648,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table1 = new CellTable<Experiment1>();
 	    table1.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table1.setPageSize(1000);
+	    
+	    dataProvider1 = new ListDataProvider<Experiment1>();
+		// 	Add the table to the dataProvider.
+		dataProvider1.addDataDisplay(table1);
+		
 	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment1> expColumn1 = new TextColumn<Experiment1>() {
@@ -522,6 +758,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table2 = new CellTable<Experiment2>();
 	    table2.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table2.setPageSize(1000);
+	    
+	    dataProvider2 = new ListDataProvider<Experiment2>();
+		// 	Add the table to the dataProvider.
+		dataProvider2.addDataDisplay(table2);
+		
 	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment2> expColumn2 = new TextColumn<Experiment2>() {
@@ -667,6 +908,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table3.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table3.setPageSize(1000);
 	    
+	    dataProvider3 = new ListDataProvider<Experiment3>();
+		// 	Add the table to the dataProvider.
+		dataProvider3.addDataDisplay(table3);
+		
+	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment3> eyesColumn3 = new TextColumn<Experiment3>() {
 	      @Override
@@ -733,6 +979,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table4 = new CellTable<Experiment4>();
 	    table4.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table4.setPageSize(1000);
+	    
+	    dataProvider4 = new ListDataProvider<Experiment4>();
+		// 	Add the table to the dataProvider.
+		dataProvider4.addDataDisplay(table4);
+		
 	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment4> eyesColumn4 = new TextColumn<Experiment4>() {
@@ -838,6 +1089,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    table5.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table5.setPageSize(1000);
 	    
+	    dataProvider5 = new ListDataProvider<Experiment5>();
+		// 	Add the table to the dataProvider.
+		dataProvider5.addDataDisplay(table5);
+			    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment5> eyesColumn5 = new TextColumn<Experiment5>() {
 	      @Override
@@ -1056,6 +1311,39 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    
 	}
 	
+	public void doEenTweeDrieDobbelstenen() {
+		if (eenDobbelsteen.getValue()==true) {
+			if (dobbelstenenTabel1==true)
+				scrollPanel.setVisible(true);
+			scrollPanel2.setVisible(false);
+			scrollPanel3.setVisible(false);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel4.setVisible(true);
+			scrollPanel5.setVisible(false);
+			scrollPanel6.setVisible(false);
+		}
+		if (tweeDobbelstenen.getValue()==true) {
+			scrollPanel.setVisible(false);
+			if (dobbelstenenTabel1==true)
+				scrollPanel2.setVisible(true);
+			scrollPanel3.setVisible(false);
+			scrollPanel4.setVisible(false);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel5.setVisible(true);
+			scrollPanel6.setVisible(false);
+		}
+		if (drieDobbelstenen.getValue()==true) {
+			scrollPanel.setVisible(false);
+			scrollPanel2.setVisible(false);
+			if (dobbelstenenTabel1==true)
+				scrollPanel3.setVisible(true);
+			scrollPanel4.setVisible(false);
+			scrollPanel5.setVisible(false);
+			if (dobbelstenenResultaten1==true)
+				scrollPanel6.setVisible(true);
+		}
+	}
+	
 	public void onClick (ClickEvent event) {
 		if (event.getSource()==voeruit) {
 			voeruit.setEnabled(false);
@@ -1074,9 +1362,18 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			wis.setEnabled(false);
 			aantalWorpenText.setEnabled(true);
 			experiment=0;
-			table.setRowCount(0, true);
-			table1.setRowCount(0, true);
-			table2.setRowCount(0, true);
+			//table.setRowCount(0, true);
+			//table1.setRowCount(0, true);
+			//table2.setRowCount(0, true);
+			List dataList=dataProvider.getList();
+			dataList.clear();
+			List dataList1=dataProvider1.getList();
+			dataList1.clear();
+			List dataList2=dataProvider2.getList();
+			dataList2.clear();
+
+			
+			
 			for (int i=0;i<19;i++) {
 				ogen[i]=0;
 			}
@@ -1092,18 +1389,14 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			table5.setRowCount(0, true);		
 		}		
 		if (event.getSource()==eenDobbelsteen) {
-			if (dobbelstenenTabel1==true)
-				scrollPanel.setVisible(true);
-			scrollPanel2.setVisible(false);
-			scrollPanel3.setVisible(false);
-			if (dobbelstenenResultaten1==true)
-				scrollPanel4.setVisible(true);
-			scrollPanel5.setVisible(false);
-			scrollPanel6.setVisible(false);
+			doEenTweeDrieDobbelstenen();
+			List dataList=dataProvider.getList();
+			dataList.clear();
+			List dataList1=dataProvider1.getList();
+			dataList1.clear();
+			List dataList2=dataProvider2.getList();
+			dataList2.clear();
 			experiment=0;
-			table.setRowCount(0, true);
-			table1.setRowCount(0, true);
-			table2.setRowCount(0, true);
 			for (int i=0;i<19;i++) {
 				ogen[i]=0;
 			}
@@ -1113,20 +1406,17 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			}
 			experiment=0;
 			dobbelsteenCount=0;
+
 		}
 		if (event.getSource()==tweeDobbelstenen) {
-			scrollPanel.setVisible(false);
-			if (dobbelstenenTabel1==true)
-				scrollPanel2.setVisible(true);
-			scrollPanel3.setVisible(false);
-			scrollPanel4.setVisible(false);
-			if (dobbelstenenResultaten1==true)
-				scrollPanel5.setVisible(true);
-			scrollPanel6.setVisible(false);
+			doEenTweeDrieDobbelstenen();
+			List dataList=dataProvider.getList();
+			dataList.clear();
+			List dataList1=dataProvider1.getList();
+			dataList1.clear();
+			List dataList2=dataProvider2.getList();
+			dataList2.clear();
 			experiment=0;
-			table.setRowCount(0, true);
-			table1.setRowCount(0, true);
-			table2.setRowCount(0, true);
 			for (int i=0;i<19;i++) {
 				ogen[i]=0;
 			}
@@ -1136,20 +1426,17 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			}
 			experiment=0;
 			dobbelsteenCount=0;
+
 		}
 		if (event.getSource()==drieDobbelstenen) {
-			scrollPanel.setVisible(false);
-			scrollPanel2.setVisible(false);
-			if (dobbelstenenTabel1==true)
-				scrollPanel3.setVisible(true);
-			scrollPanel4.setVisible(false);
-			scrollPanel5.setVisible(false);
-			if (dobbelstenenResultaten1==true)
-				scrollPanel6.setVisible(true);
+			doEenTweeDrieDobbelstenen();
+			List dataList=dataProvider.getList();
+			dataList.clear();
+			List dataList1=dataProvider1.getList();
+			dataList1.clear();
+			List dataList2=dataProvider2.getList();
+			dataList2.clear();
 			experiment=0;
-			table.setRowCount(0, true);
-			table1.setRowCount(0, true);
-			table2.setRowCount(0, true);
 			for (int i=0;i<19;i++) {
 				ogen[i]=0;
 			}
@@ -1159,6 +1446,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			}
 			experiment=0;
 			dobbelsteenCount=0;
+
 		}
 		if (event.getSource()==toonSom) {
 			dobbelstenenGrafiek.paint();
@@ -1179,11 +1467,21 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
         //Window.alert("How high?");
 		if (eenDobbelsteen.getValue()==true) {
 			ogen[r1]++;
-			List<Experiment> ADDEXP = Arrays.asList(
-					new Experiment(Integer.toString(experiment+1), Integer.toString(ogen[1]),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6])));
+			//List<Experiment> ADDEXP = Arrays.asList(
+			//		new Experiment(Integer.toString(experiment+1), Integer.toString(ogen[1]),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6])));
 
-			table.setRowData(experiment,ADDEXP);
+			//table.setRowData(experiment,ADDEXP);
 
+			
+			Experiment ADDEXP = new Experiment(Integer.toString(experiment+1), Integer.toString(ogen[1]),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]));
+
+			List dataList=dataProvider.getList();
+			if (dataList.size()==experiment)
+				dataList.add(ADDEXP);
+			else
+				dataList.set(experiment, ADDEXP);
+
+			
 			//table.setValueAt(experiment+1, experiment, 0);
 			//for (int i=0;i<6;i++) {
 			//	table.setValueAt(ogen[i+1], experiment, i+1);
@@ -1191,11 +1489,21 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		}
 		if (tweeDobbelstenen.getValue()==true) {
 			ogen[r1+r3]++;
-			List<Experiment1> ADDEXP1 = Arrays.asList(
-					new Experiment1(Integer.toString(experiment+1),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12])));
+			//List<Experiment1> ADDEXP1 = Arrays.asList(
+			//		new Experiment1(Integer.toString(experiment+1),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12])));
 
-			table1.setRowData(experiment,ADDEXP1);
+			//table1.setRowData(experiment,ADDEXP1);
 
+			Experiment1 ADDEXP1 = new Experiment1(Integer.toString(experiment+1),Integer.toString(ogen[2]),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12]));
+
+			List dataList1=dataProvider1.getList();
+			if (dataList1.size()==experiment)
+				dataList1.add(ADDEXP1);
+			else
+				dataList1.set(experiment, ADDEXP1);
+			
+			
+			
 			//table1.setValueAt(experiment+1, experiment, 0);
 			//for (int i=0;i<11;i++) {
 			//	table1.setValueAt(ogen[i+2], experiment, i+1);
@@ -1203,11 +1511,21 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		}
 		if (drieDobbelstenen.getValue()==true) {
 			ogen[r1+r3+r5]++;
-			List<Experiment2> ADDEXP2 = Arrays.asList(
-					new Experiment2(Integer.toString(experiment+1),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12]),Integer.toString(ogen[13]),Integer.toString(ogen[14]),Integer.toString(ogen[15]),Integer.toString(ogen[16]),Integer.toString(ogen[17]),Integer.toString(ogen[18])));
+			//List<Experiment2> ADDEXP2 = Arrays.asList(
+			//		new Experiment2(Integer.toString(experiment+1),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12]),Integer.toString(ogen[13]),Integer.toString(ogen[14]),Integer.toString(ogen[15]),Integer.toString(ogen[16]),Integer.toString(ogen[17]),Integer.toString(ogen[18])));
 
-			table2.setRowData(experiment,ADDEXP2);
+			//table2.setRowData(experiment,ADDEXP2);
 
+			Experiment2 ADDEXP2 = new Experiment2(Integer.toString(experiment+1),Integer.toString(ogen[3]),Integer.toString(ogen[4]),Integer.toString(ogen[5]),Integer.toString(ogen[6]),Integer.toString(ogen[7]),Integer.toString(ogen[8]),Integer.toString(ogen[9]),Integer.toString(ogen[10]),Integer.toString(ogen[11]),Integer.toString(ogen[12]),Integer.toString(ogen[13]),Integer.toString(ogen[14]),Integer.toString(ogen[15]),Integer.toString(ogen[16]),Integer.toString(ogen[17]),Integer.toString(ogen[18]));
+
+			List dataList2=dataProvider2.getList();
+			if (dataList2.size()==experiment)
+				dataList2.add(ADDEXP2);
+			else
+				dataList2.set(experiment, ADDEXP2);
+
+			
+			
 			//table2.setValueAt(experiment+1, experiment, 0);
 			//for (int i=0;i<16;i++) {
 			//	table2.setValueAt(ogen[i+3], experiment, i+1);
@@ -1235,11 +1553,19 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 					double dummy4=Math.round(ogenGemiddeld[5]*100);
 					double dummy5=Math.round(ogenGemiddeld[6]*100);
 					
-					List<Experiment3> ADDEXP3 = Arrays.asList(
-							new Experiment3("Gemiddelde", Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100)));
+					//List<Experiment3> ADDEXP3 = Arrays.asList(
+					//		new Experiment3("Gemiddelde", Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100)));
 
-					table3.setRowData(0,ADDEXP3);
+					//table3.setRowData(0,ADDEXP3);
 
+					Experiment3 ADDEXP3 = new Experiment3("Gemiddelde", Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100));
+
+					List dataList3=dataProvider3.getList();
+					dataList3.clear();
+					dataList3.add(ADDEXP3);
+					
+					
+					
 				//	table3.setValueAt(Double.toString(dummy/100), 0,i+1);
 				//}
 			}
@@ -1258,11 +1584,18 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 					double dummy10=Math.round(ogenGemiddeld[12]*100);
 					
 					
-					List<Experiment4> ADDEXP4 = Arrays.asList(
-							new Experiment4("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100)));
+					//List<Experiment4> ADDEXP4 = Arrays.asList(
+					//		new Experiment4("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100)));
 
-					table4.setRowData(0,ADDEXP4);
+					//table4.setRowData(0,ADDEXP4);
 
+					Experiment4 ADDEXP4 = new Experiment4("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100));
+
+					List dataList4=dataProvider4.getList();
+					dataList4.clear();
+					dataList4.add(ADDEXP4);
+
+					
 				//	table4.setValueAt(Double.toString(dummy/100), 0,i+1);
 				//}
 			}
@@ -1285,11 +1618,18 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 					double dummy14=Math.round(ogenGemiddeld[17]*100);
 					double dummy15=Math.round(ogenGemiddeld[18]*100);
 					
-					List<Experiment5> ADDEXP5 = Arrays.asList(
-							new Experiment5("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100),Double.toString(dummy11/100),Double.toString(dummy12/100),Double.toString(dummy13/100),Double.toString(dummy14/100),Double.toString(dummy15/100)));
+					//List<Experiment5> ADDEXP5 = Arrays.asList(
+					//		new Experiment5("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100),Double.toString(dummy11/100),Double.toString(dummy12/100),Double.toString(dummy13/100),Double.toString(dummy14/100),Double.toString(dummy15/100)));
 
-					table5.setRowData(0,ADDEXP5);
+					//table5.setRowData(0,ADDEXP5);
 
+					Experiment5 ADDEXP5 = new Experiment5("Gemiddelde",Double.toString(dummy/100),Double.toString(dummy1/100),Double.toString(dummy2/100),Double.toString(dummy3/100),Double.toString(dummy4/100),Double.toString(dummy5/100),Double.toString(dummy6/100),Double.toString(dummy7/100),Double.toString(dummy8/100),Double.toString(dummy9/100),Double.toString(dummy10/100),Double.toString(dummy11/100),Double.toString(dummy12/100),Double.toString(dummy13/100),Double.toString(dummy14/100),Double.toString(dummy15/100));
+
+					List dataList5=dataProvider5.getList();
+					dataList5.clear();
+					dataList5.add(ADDEXP5);
+
+					
 				//	table5.setValueAt(Double.toString(dummy/100), 0,i+1);
 				//}
 			}

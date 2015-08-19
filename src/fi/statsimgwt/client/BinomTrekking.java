@@ -25,6 +25,9 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.view.client.ListDataProvider;
+
+import fi.statsimgwt.client.Dobbelstenen.Experiment;
 
 public class BinomTrekking  extends FlowPanel implements ClickHandler {
 
@@ -61,7 +64,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	BinomRooster binomRooster;
 	BinomGrafiek binomGrafiek;
 	
-	private static class Experiment {
+	public static class Experiment {
 		private final String experimentNumber;
 	    private final String outcome;
 	    
@@ -69,9 +72,18 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    	this.experimentNumber = experimentNumber;
 	    	this.outcome = outcome;
 	    }
+	    
+	    public String getExpNumber() {
+	    	return experimentNumber;
+	    }
+	    public String getOutcome () {
+	    	return outcome;
+	    }
 	}
 
 	CellTable<Experiment> table;
+	
+	protected ListDataProvider<Experiment> dataProvider;
 	
 	CssColor agKleur = CssColor.make(255, 255, 255);
 	
@@ -172,6 +184,11 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    table = new CellTable<Experiment>();
 	    table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 	    table.setPageSize(1000);
+	    
+	    dataProvider = new ListDataProvider<Experiment>();
+		// 	Add the table to the dataProvider.
+		dataProvider.addDataDisplay(table);
+		
 	    
 	    // Add a text column to show the name.
 	    TextColumn<Experiment> expColumn = new TextColumn<Experiment>() {
@@ -303,7 +320,8 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			keer.setEnabled(true);
 			setStartStop();
 			experiment=0;
-			table.setRowCount(0, true);
+			List dataList=dataProvider.getList();
+			dataList.clear();
 			stapStarted=false;
 			trekkingCount=0;
 			totaal=0;
@@ -330,10 +348,19 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 		}
 		trekkingCount=trekkingCount+1;
 		
-		List<Experiment> ADDEXP = Arrays.asList(
-				new Experiment(Integer.toString(experiment+1), Integer.toString(totaal)));
+		//List<Experiment> ADDEXP = Arrays.asList(
+		//		new Experiment(Integer.toString(experiment+1), Integer.toString(totaal)));
         //Window.alert(Integer.toString(totaal));
-		table.setRowData(experiment,ADDEXP);
+		//table.setRowData(experiment,ADDEXP);
+		
+		Experiment ADDEXP = new Experiment(Integer.toString(experiment+1), Integer.toString(totaal));
+
+		List dataList=dataProvider.getList();
+		if (dataList.size()==experiment)
+			dataList.add(ADDEXP);
+		else
+			dataList.set(experiment, ADDEXP);
+
 		
 		if (trekkingCount==maxCount) {
 			trekkingen[experiment]=totaal;
