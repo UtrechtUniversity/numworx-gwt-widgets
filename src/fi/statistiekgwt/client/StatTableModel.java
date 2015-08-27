@@ -20,6 +20,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 
 import fi.statistiekgwt.client.event.AddColumnEvent;
@@ -2103,7 +2104,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (freq_i > maxFreq)
 				{
 					maxFreq = freq_i;
-					mode = String.valueOf(data.get(i));
+					// in development mode is String.valueOf(new Double(156)) = "156.0",
+					// in production mode in String.valueOf(new Double(156)) = "156"
+//					mode = String.valueOf(data.get(i));
+
+					// Voor een consistente unit test met NumberFormat
+					Double d = data.get(i);
+					NumberFormat nf = StatistiekGWT.getNumberFormat(d);
+					mode = nf.format(d);
 					multipleModes = false;
 				}
 				else if ((freq_i != 0) && (freq_i == maxFreq) && (!data.get(i).equals(data.get(i - 1))))
@@ -2201,7 +2209,15 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (freq_i > maxFreq)
 				{
 					maxFreq = freq_i;
-					mode = String.valueOf(data.get(i));
+					// in development mode is String.valueOf(new Double(156)) = "156.0",
+					// in production mode in String.valueOf(new Double(156)) = "156"
+//					mode = String.valueOf(data.get(i));
+
+					// Voor een consistente unit test met NumberFormat
+					Double d = data.get(i);
+					NumberFormat nf = StatistiekGWT.getNumberFormat(d);
+					mode = nf.format(d);
+
 					multipleModes = false;
 				}
 				else if ((freq_i != 0) && (freq_i == maxFreq) && (!data.get(i).equals(data.get(i - 1))))
