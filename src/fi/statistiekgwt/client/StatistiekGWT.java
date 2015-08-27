@@ -257,7 +257,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public StatistiekGWT()
 	{
-		
+		StatistiekGWT.language = "nl";
+		initViews();
 	}
 	
 	public StatistiekGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden, int volleBreedte)
@@ -729,10 +730,18 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		String separator = StatistiekGWT.getDecimalSeparator();
 		int indexSeparator = number.indexOf(separator);
 		
+		NumberFormat numberFormat = StatistiekGWT.getNumberFormat(0.0);
+		String numberWithPeriodSeparator = number.replace(separator.charAt(0), '.');
+		double d = numberFormat.parse(numberWithPeriodSeparator);
+
+		
 		if (indexSeparator > -1)
 		{
-			int endIndex = Math.min(indexSeparator + 1 + numberOfDecimals, number.length());
-			roundedString = number.substring(0, endIndex);
+			// use round(double) for correct half up rounding
+			d = StatistiekGWT.round(d, numberOfDecimals);
+			roundedString = String.valueOf(d);
+			// replace with the correct separator
+			roundedString = roundedString.replace('.', separator.charAt(0));
 		}
 		else
 		{
@@ -889,6 +898,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		double d;
 		
+		// let op: deze houdt geen rekening met de nl "," separator!
 		d = nf.parse(doubleString);
 
 		return d;
