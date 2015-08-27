@@ -2527,6 +2527,11 @@ public class DotplotView extends LayoutPanel implements
 		return this.yType;
 	}
 	
+	public CustomScrollPanel getScrollPanel()
+	{
+		return this.scrollPanel;
+	}
+	
 	private class Rectangle
 	{
 		private double x;
