@@ -12,8 +12,10 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.ComplexPanel;
+import com.google.gwt.user.client.ui.HorizontalScrollbar;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.VerticalScrollbar;
 
 /**
  * Class that provides utility classes.
@@ -82,6 +84,16 @@ public class StatistiekUtils
 		{
 			this.setAlwaysHideHorizontalScrollBar(alwaysHide);
 			this.setAlwaysHideVerticalScrollBar(alwaysHide);
+		}
+
+		public HorizontalScrollbar getHorizontalScrollbar()
+		{
+			return this.getHorizontalScrollbar();
+		}
+
+		public VerticalScrollbar getVerticalScrollbar()
+		{
+			return this.getVerticalScrollbar();
 		}
 		
 	} // class MyScrollPanel
