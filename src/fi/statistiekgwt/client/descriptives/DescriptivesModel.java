@@ -166,8 +166,14 @@ public class DescriptivesModel
 	 */
 	public boolean columnIndexValid()
 	{
-		return (this.columnIndex >= 0
-			&& this.columnIndex < this.statTableModel.getColumnCount());
+		boolean valid = false;
+		
+		if (this.statTableModel != null)
+		{
+			valid = (this.columnIndex >= 0
+				&& this.columnIndex < this.statTableModel.getColumnCount()); 
+		}
+		return valid;
 	}
 
 	/**
@@ -852,7 +858,7 @@ public class DescriptivesModel
 	/**
 	 * Get the median value of column columnIndex, excluding missing values,
 	 * for the given split class.
-	 * If there is no split, the standard deviation of column columnIndex
+	 * If there is no split, the median value of column columnIndex
 	 * for the complete data set is returned.
 	 * If forSelection is true, the median value is determined for the 
 	 * selected values within the given split class.
