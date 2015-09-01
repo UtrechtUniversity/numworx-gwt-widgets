@@ -214,31 +214,34 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		{
 			int hoogteBovendeel = 75;
 			int hoogteGraden = 30;
+			int aantalKnoppenRij = 8;
 			if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen && gradenInstelbaar)
 			{
-				knopBreedte = breedte/8 - 3;
+				//knopBreedte = breedte/8 - 3;
 				knopHoogteBasis = (hoogte - hoogteBovendeel - hoogteGraden)/5 - 3;
 			}
 			else if(rmMode == 1 && gonioKnoppen && gradenInstelbaar)
 			{
-				knopBreedte = breedte / 8 - 3;
+				//knopBreedte = breedte / 8 - 3;
 				knopHoogteBasis = (hoogte - hoogteBovendeel - hoogteGraden)/4 - 3;
 			}
 			else if(rmMode == 1 && gonioKnoppen && logaritmeKnoppen)
 			{
-				knopBreedte = breedte / 8 - 3;
+				//knopBreedte = breedte / 8 - 3;
 				knopHoogteBasis = (hoogte - hoogteBovendeel)/5 - 3;
 			}	
 			else if(rmMode == 1)
 			{
-				knopBreedte = breedte / 8 - 3;
+				//knopBreedte = breedte / 8 - 3;
 				knopHoogteBasis = (hoogte - hoogteBovendeel)/4 - 3;
 			}
 			else
 			{
-				knopBreedte = breedte / 6 - 3;
+				aantalKnoppenRij = 6;
+				//knopBreedte = breedte / 6 - 3;
 				knopHoogteBasis = (hoogte - hoogteBovendeel) / 4 - 3;
 			}
+			knopBreedte = (breedte - aantalKnoppenRij * 2)/aantalKnoppenRij;
 			knopHoogteNavigatie = 25;
 			knopHoogteExtra = knopHoogteBasis;
 		}
@@ -270,9 +273,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 		int kolomBreedte = - 2;
 		if(rmMode < 2)
-			kolomBreedte = breedte / 5 - 3;
+			kolomBreedte = (breedte - 5*2) / 5;
 		else
-			kolomBreedte = breedte / 10 - 3; 
+			kolomBreedte = (breedte - 3 * 10) / 10; 
 		
 		pijlLinksKnop = maakButton("\u25C4", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
 		pijlRechtsKnop = maakButton("\u25BA", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
@@ -451,6 +454,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			
 			knoppenPanel.add(bovensteKnoppen);
 			knoppenPanel.add(ondersteKnoppen);
+			
+			bovensteKnoppen.setCellPadding(1);
+			ondersteKnoppen.setCellPadding(1);
 		
 			if(gradenInstelbaar)
 			{	instellingenPanel.add(gradenButton);
