@@ -74,13 +74,13 @@ public class WortelSchuifComponent extends AlgebraSchuifComponent
 			g.fillText(s1,xPos + 24,yPos + hoogte-4);
 			
 			//(new Wortelteken(20,12)).paint(g, 17,getSize().height-15);
-			(new Wortelteken(20,12)).paint(g, xPos + 17,yPos + hoogte-15);
+			(new Wortelteken(20,12)).paint(g, xPos + 17,yPos + 4);// + hoogte-15);
 		}
 		else 
 		{	//g.drawString(s1,14,getSize().height-4);
 			g.fillText(s1,xPos + 14,yPos + hoogte-4);
 			//(new Wortelteken(20,12)).paint(g, 7,getSize().height-15);
-			(new Wortelteken(20,12)).paint(g, xPos + 7,yPos + hoogte-15);
+			(new Wortelteken(20,12)).paint(g, xPos + 7,yPos + 4);// + hoogte-15);
 		}
 	}
 	

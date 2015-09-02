@@ -20,7 +20,7 @@ public class Wortel extends Expressie
 	//public void teken(Graphics g, int x, int y)
 	public void teken(Context2d g, int x, int y)
   	{ 	Wortelteken wt = new Wortelteken(breedte,hoogte-4);
-		wt.paint(g,x,y+2);
+		wt.paint(g,x,y-8);//+2);
 		kind1.teken(g,x+(hoogte-4)/2 + 2, y+ashoogte-kind1.ashoogte);
 	}
 	

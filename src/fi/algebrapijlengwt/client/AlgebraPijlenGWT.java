@@ -320,7 +320,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -336,7 +336,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -353,7 +353,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();

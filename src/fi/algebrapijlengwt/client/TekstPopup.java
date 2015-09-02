@@ -5,6 +5,9 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+
 
 public class TekstPopup extends PopupPanel
 {
@@ -33,6 +36,7 @@ public class TekstPopup extends PopupPanel
 		textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		setWidget(textBox);
 		
+		addCloseHandler(new PopupCloseHandler());
 	}
 	
 	
@@ -60,4 +64,16 @@ public class TekstPopup extends PopupPanel
 			}
 		}
 	}
+	
+	class PopupCloseHandler implements CloseHandler<PopupPanel>
+	{
+		public void onClose(CloseEvent<PopupPanel> e)
+		{
+			if ((owner instanceof UitvoerSchuifComponent) && isForLabel)
+				((UitvoerSchuifComponent) owner).zetLabelTekst();
+			else
+				owner.zetInvulWaarde();
+		}
+	}
+
 }	
