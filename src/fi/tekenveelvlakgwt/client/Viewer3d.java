@@ -326,6 +326,8 @@ if (k > 0)
 		double dry =  geefDraaiY();
 		double tol = 20;
 	
+//System.out.println("docX = " + UF.format(gevraagdX, 0) + " llX = " + UF.format(drx, 0));
+//System.out.println("docY = " + UF.format(gevraagdY, 0) + " llY = " + UF.format(dry, 0));
 		if ((Math.abs(gevraagdX - drx) < tol) && (Math.abs(gevraagdY - dry) < tol))
 			return true;
 		else

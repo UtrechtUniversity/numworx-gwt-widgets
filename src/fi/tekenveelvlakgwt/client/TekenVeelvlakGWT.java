@@ -95,6 +95,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	String[] docentKleuren = null;
 	double docentDraaihoekX = 1e5d;
 	double docentDraaihoekY = 1e5d;
+	int score;
+	int scoreMax = 10;
 	
     static int MOVEABLE = 0;
     static int FRONTVIEW = 1;
@@ -132,8 +134,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(tekenVeelvlakGWTCssResource.root());
 		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 		
 	}	
@@ -442,7 +444,9 @@ System.out.println("tvGWT setState");
         List<String> docentKleurenAL = new ArrayList<String>();
 //        String[] docentKleuren = null;
         if (launchState.containsKey("docentKleuren"))
-         	 docentKleurenAL = launchState.getStringList("docentKleuren");
+        { 	 docentKleurenAL = launchState.getStringList("docentKleuren");
+System.out.println("contains docentKleuren");        
+        }
     	if (docentKleurenAL != null)
     	{	docentKleuren = new String[docentKleurenAL.size()];
     		for (int dk = 0; dk < docentKleurenAL.size(); dk++)
@@ -567,11 +571,13 @@ System.out.println("kijkNa profiles");
     		
     		vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelGoed, correct);
     		vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelFout, !correct);
-
+    		
     		
     	}
     	else if (kijkVlakkenNa && viewerOnly)
     	{
+    		
+System.out.println("kijkNa viewer");    		
     		correct = v3d.evalueer(docentKleuren);
     		nagekeken = true;
     		v3d.kijkNaPanel.setWidgetVisible(goedKrulImage, correct);
@@ -579,9 +585,15 @@ System.out.println("kijkNa profiles");
     	}
     	else if (kijkDraaihoekNa)
     	{
+    		
+//System.out.println("kijkNa draaihoek");    		
     		correct = v3d.evalueer(docentDraaihoekX, docentDraaihoekY);
+//System.out.println("correct = " + correct);    		
     		nagekeken = true;
     	}
+
+		if (correct)
+			score = scoreMax;
 
     	comRoot.setChanged(isCorrect().booleanValue());
 
