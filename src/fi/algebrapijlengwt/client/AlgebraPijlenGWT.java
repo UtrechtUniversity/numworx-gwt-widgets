@@ -685,7 +685,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			((ActionListener) listeners.elementAt(lCnt)).actionPerformed(event);
 		}
 */		
-
+		comRoot.setChanged(isCorrect().booleanValue());
 		
 	}
 
