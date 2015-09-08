@@ -798,17 +798,31 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			//zoomUitKnop.setVisible(false);
 			//asv.owner.kijkNa();
 			
-			pijlUit[0].im = null;
+			for (int pCnt = 0; pCnt < pijlUit.length; pCnt++)
+			{ 	if (pijlUit[pCnt] != null)
+					pijlUit[pCnt].im = null;
+			
+			}
+
 		}
 		else if (!isBeginExpressie)
-		{	if (scrollable && expressie != null && !Double.isNaN(expressie.geefWaarde().doubleValue()))
+		{	
+			
+			for (int pCnt = 0; pCnt < pijlUit.length; pCnt++)
+			{ 	if (pijlUit[pCnt] != null)
+					pijlUit[pCnt].im = null;
+			
+			}
+			
+			
+			if (scrollable && expressie != null && !Double.isNaN(expressie.geefWaarde().doubleValue()))
 			{	if (scrollCorr == 0)
 				{	
 //GWT				
 					//add(plusMinKnop);
 				
 				}
-System.out.println("scrll");
+//System.out.println("scrll");
 
 				scrollCorr = 10;
 			}

@@ -118,7 +118,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
 	int score = 0;
-	boolean correct = false;
+	boolean correct = true;
 	boolean ingevuld = false;
 	boolean nagekeken = false;
 	
@@ -568,6 +568,16 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
     	}
     	
     }
+    
+    public void answerChanged()
+    {
+    	if (comRoot != null)
+		{	correct = false;
+			comRoot.setChanged(isCorrect().booleanValue());
+		}	
+    	
+    }
+
 	
 	@Override
 	public void kijkNa() 
@@ -601,6 +611,13 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 //System.out.println("docS = " + docentExpressieStrings.size());
 //System.out.println("docE = " + docentExpressies.size());
     	
+		// geen valide expressie
+		if (leerlingExpressieUVS.size() == 0)
+		{
+			correct = false;
+			comRoot.setChanged(isCorrect().booleanValue());
+			return;
+		}
     	
 
 		int hits = 0;
@@ -620,7 +637,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 //System.out.println(llgExpStrC);
 			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
 
-			boolean correct = false;
+			correct = false;
 			if (llgExp != null)
 			{	
 				

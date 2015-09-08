@@ -373,7 +373,11 @@ public class Pijl //extends JComponent
 			gIm.lineTo(pijlpuntEind.doubleX[0], pijlpuntEind.doubleY[0]);
 			gIm.stroke();
 			
-			if (!isStapel && !vast && !actief && (im != null))
+			boolean isEinde = false;
+			if ((zender != null) && (zender instanceof UitvoerSchuifComponent))
+				isEinde = asv.isEindUVS((UitvoerSchuifComponent) zender);
+
+			if (isEinde && (im != null))
 			{
 //System.out.println("im = " + im);				
 				if (im.equals("V"))
