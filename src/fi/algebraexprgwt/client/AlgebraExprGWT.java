@@ -117,7 +117,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
 	int score = 0;
-	boolean correct = false;
+	boolean correct = true;
 	boolean ingevuld = false;
 	boolean nagekeken = false;
 	
@@ -305,7 +305,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -321,7 +321,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -338,7 +338,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -511,6 +511,15 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
     	
     }
 
+    public void answerChanged()
+    {
+    	if (comRoot != null)
+		{	correct = false;
+			comRoot.setChanged(isCorrect().booleanValue());
+		}	
+    	
+    }
+    
 	@Override
 	public void kijkNa()
     {	if (!kijkNaActief)
@@ -541,6 +550,15 @@ System.out.println("ingevuld  " + ingevuld);
 //System.out.println("docE = " + docentExpressies.size());    
 
 		int hits = 0;
+		
+		// geen valide expressie
+		if (leerlingExpressieUVS.size() == 0)
+		{
+			correct = false;
+			comRoot.setChanged(isCorrect().booleanValue());
+			return;
+		}
+		
 		// hier zijn er docent expressies
 		for (int lCnt = 0; lCnt < leerlingExpressieUVS.size(); lCnt++)
 		{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
@@ -566,7 +584,7 @@ System.out.println("ingevuld  " + ingevuld);
 //System.out.println(llgExpStrC);
 			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
 
-			boolean correct = false;
+			correct = false;
 			if (llgExp != null)
 			{	
 				
@@ -574,10 +592,10 @@ System.out.println("ingevuld  " + ingevuld);
 				{	Expressie docExp = (Expressie) docentExpressies.get(dCnt);
 
 				
-//System.out.println("docExp = " + docExp.toString());
+System.out.println("docExp = " + docExp.toString());
 
-//if (llgExp != null)
-//System.out.println("llgExp = " + llgExp.toString());
+if (llgExp != null)
+System.out.println("llgExp = " + llgExp.toString());
 //else
 //System.out.println("llgExp = null");
 					if (Algebra.isGelijkwaardig(docExp, llgExp))
@@ -589,11 +607,13 @@ System.out.println("ingevuld  " + ingevuld);
 				if (correct)
 				{	uvs.pijlUit[0].im = "V";
 					uvs.pijlUit[0].paint();
+					//asv.paint();
 				}
 				else
 				{
 					uvs.pijlUit[0].im = "X";
 					uvs.pijlUit[0].paint();
+					//asv.paint();
 					
 				}
 			}
@@ -620,6 +640,10 @@ System.out.println("ingevuld  " + ingevuld);
 			((ActionListener) listeners.elementAt(lCnt)).actionPerformed(event);
 		}
 */		
+		
+//System.out.println("corr = " + isCorrect().booleanValue());
+
+		comRoot.setChanged(isCorrect().booleanValue());
     	
     }
 

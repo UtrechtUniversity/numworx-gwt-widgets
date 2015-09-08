@@ -445,9 +445,14 @@ public class Pijl //extends JComponent //Component
 		
 		}
 		
-//GWT: waar moet dit heen?		
-		if (!isStapel && !vast && !actief && (im != null))
-		{	//gIm.drawImage(im, x0, y0, this);
+		boolean isEinde = false;
+		if ((zender != null) && (zender instanceof UitvoerSchuifComponent))
+			isEinde = asv.isEindUVS((UitvoerSchuifComponent) zender);
+		
+		if (isEinde && (im != null))	
+		{	
+			
+			//gIm.drawImage(im, x0, y0, this);
 			//System.out.println("im = " + im);				
 			if (im.equals("V"))
 				gIm.setFillStyle(CssColor.make(41,156,57));

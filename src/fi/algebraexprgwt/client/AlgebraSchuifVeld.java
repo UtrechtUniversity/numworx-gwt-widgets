@@ -134,6 +134,32 @@ String testString = "test";
 	}
 */	
 	
+	public void answerChanged()
+	{
+		removeGoedFout();
+		owner.answerChanged();
+	}
+	
+	public void removeGoedFout()
+	{	 
+		for (int cCnt = 0; cCnt < aantalSc; cCnt++)
+		{
+			if (schuifcomponenten[cCnt] != null)
+			{
+				for (int pCnt = 0; pCnt < schuifcomponenten[cCnt].pijlUit.length; pCnt++)
+   				{
+   					if (schuifcomponenten[cCnt].pijlUit[pCnt] != null)	
+   					{
+   						schuifcomponenten[cCnt].pijlUit[pCnt].im = null;
+   					}
+   					
+   				}
+   				
+			}
+		}	
+	}
+
+	
 	public boolean isEindUVS(UitvoerSchuifComponent uvs)
 	{	if (uvs.isStapel)
 			return false;
@@ -148,7 +174,8 @@ String testString = "test";
 				&&
 				!(uvs.pijlUit[pCnt].ontvanger instanceof GrafiekComponent)
 				)
-				einde = false;
+			{	einde = false;
+			}
 			
 		}
 		return einde;
@@ -1340,7 +1367,7 @@ System.out.println("after " + this.aantalSc);
 					 schuifcomponenten[cCnt].pijlIn2.visible &&	
 					 schuifcomponenten[cCnt].pijlIn2.contains(eventX, eventY))	
 				{
-	  						return schuifcomponenten[cCnt].pijlIn1;
+	  				    return schuifcomponenten[cCnt].pijlIn2;
 	   			}
 			} // if
 		} // for
