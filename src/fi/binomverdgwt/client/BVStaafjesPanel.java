@@ -814,7 +814,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -833,7 +833,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -859,7 +859,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();

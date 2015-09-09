@@ -67,6 +67,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	
 	private int mode;
 	private OpdrNavIF comRoot;
+	boolean correct = true;
 
 	// images
 	BinomVerdGWTClientBundle binomVerdGWTClientBundle;
@@ -198,7 +199,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	@Override
 	public Boolean isCorrect()
 	{
-		return binomVerdPanel.score == binomVerdPanel.maxScore; //Boolean.TRUE;
+		return correct; //binomVerdPanel.score == binomVerdPanel.maxScore; //Boolean.TRUE;
 	}
 
 	@Override

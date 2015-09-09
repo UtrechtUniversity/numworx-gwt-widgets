@@ -357,7 +357,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -374,7 +374,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -398,7 +398,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();

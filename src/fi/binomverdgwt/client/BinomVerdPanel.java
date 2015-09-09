@@ -59,6 +59,9 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
+
 /**
  * InteractiePanel van BinomVerdeling
  * Model, view en controller nu bij elkaar gevoegd.
@@ -592,6 +595,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				
 				this.nText.setReadOnly(!nVeranderbaar);
 				nText.addKeyDownHandler(new TextBoxKeyDownHandler(nText));
+				nText.addBlurHandler(new TextBoxBlurHandler(nText));
 				
 				nSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "n");
 				ynPos += TEXTBOXHEIGHT + 4;
@@ -613,6 +617,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				
 				this.pText.setReadOnly(!pVeranderbaar);
 				pText.addKeyDownHandler(new TextBoxKeyDownHandler(pText));
+				pText.addBlurHandler(new TextBoxBlurHandler(pText));
 				
 				pSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "p");
 				ynPos += TEXTBOXHEIGHT + 4;
@@ -634,6 +639,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				
 				this.MText.setReadOnly(!MVeranderbaar);
 				MText.addKeyDownHandler(new TextBoxKeyDownHandler(MText));
+				MText.addBlurHandler(new TextBoxBlurHandler(MText));
 				
 				MSlider = new Slider(this, breedte / 3 - 10 - 2 * NOORDBALKGAP, 50, 0, 0, null, "M");
 				ynPos += TEXTBOXHEIGHT + 4;
@@ -655,6 +661,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				
 				this.populatieText.setReadOnly(!populatieVeranderbaar);
 				populatieText.addKeyDownHandler(new TextBoxKeyDownHandler(populatieText));
+				populatieText.addBlurHandler(new TextBoxBlurHandler(populatieText));
 				
 				populatieSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "populatie");
 				ynPos += TEXTBOXHEIGHT + 4;
@@ -1862,6 +1869,43 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		
 	}
 
+	class TextBoxBlurHandler implements BlurHandler
+	{	
+		TextBox inputTextField;
+		
+		public TextBoxBlurHandler(TextBox input)
+		{	inputTextField = input;
+		}
+		
+		public void onBlur(BlurEvent e)
+		{
+			
+//System.out.println("okd");
+
+			//if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			//{
+//System.out.println("ke");
+				//String text = inputTextField.getText();
+			
+				if (inputTextField == nText)
+				{	nTextUpdate();
+				}
+				else if (inputTextField == pText)
+				{	pTextUpdate();
+				}
+				else if (inputTextField == MText)
+				{	MTextUpdate();
+				}
+				else if (inputTextField == populatieText)
+				{	populatieTextUpdate();
+				}
+			
+			//} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			
+		} // onBlur 
+		
+	}
+
 	public void processNSlider(boolean finished)
 	{
 		setN((int)(getPercentageFromSlider(nSlider)*(BinomVerdPanel.N_MAX - BinomVerdPanel.N_MIN) + BinomVerdPanel.N_MIN));
@@ -2340,6 +2384,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		kijkNaPanel.setWidgetVisible(owner.goedKrulImage, correct);
 		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, !correct);
 		
+		
+		owner.correct = correct;
 		//fire actionEvent
 		//ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
 		//Iterator<ActionListener> iterator = this.listeners.iterator();
@@ -2674,7 +2720,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
     		
     		if (e.getSource() == kijkNaButton)
     		{
-    			 kijkNa();   			
+    			 owner.kijkNa();   			
     		}
 
     	}	
