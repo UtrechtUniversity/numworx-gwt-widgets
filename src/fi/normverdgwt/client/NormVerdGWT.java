@@ -76,6 +76,9 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	private int mode;
 	private OpdrNavIF comRoot;
 	
+	//boolean kijkOpdrachtNa = false;
+	boolean correct = true;
+	
 	public void getImages() 
 	{
 		normVerdGWTClientBundle = GWT.create(NormVerdGWTClientBundle.class);
@@ -155,7 +158,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
     	
     	public void onMouseDown(MouseDownEvent e)
     	{
-			//e.preventDefault();
+			e.preventDefault();
 			e.stopPropagation();
     		
     		
@@ -206,7 +209,12 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public Boolean isCorrect()
 	{
-		return normaalPanel.score == normaalPanel.maxScore; //Boolean.TRUE;
+//		if (kijkOpdrachtNa)
+//			return normaalPanel.score == normaalPanel.maxScore; //Boolean.TRUE;
+//		else
+//			return Boolean.TRUE;
+		
+		return correct;
 	}
 
 	@Override
@@ -224,8 +232,14 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public void kijkNa() 
 	{
+//System.out.println("NV KijkNa");
+
+		// dit verandert correct
 		normaalPanel.kijkNa();
-		comRoot.setChanged(isCorrect().booleanValue());
+		
+//System.out.println("cor " + isCorrect().booleanValue());		
+
+	comRoot.setChanged(isCorrect().booleanValue());
 		
 	}
 

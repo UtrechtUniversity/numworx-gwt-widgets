@@ -28,6 +28,11 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
+
+import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.event.dom.client.BlurEvent;
+
+
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -305,6 +310,8 @@ public class NormaalPanel extends LayoutPanel
 		nvCanvas.addMouseDownHandler(mouseHandler);
 		nvCanvas.addMouseMoveHandler(mouseHandler);
 		nvCanvas.addMouseUpHandler(mouseHandler);
+		
+		nvCanvas.addClickHandler(new PushClickHandler());
 		
 		//TouchWidgetMobileImpl twmi = new TouchWidgetMobileImpl();		
 	
@@ -1182,6 +1189,7 @@ public class NormaalPanel extends LayoutPanel
 		{	add(muLabel);
 			add(muTextField);
 			muTextField.addKeyDownHandler(new TextBoxKeyDownHandler(muTextField));
+			muTextField.addBlurHandler(new TextBoxBlurHandler(muTextField));
 			add(muWaardeLabel);
 		}
 		if (muZichtbaarOptie)
@@ -1250,6 +1258,7 @@ public class NormaalPanel extends LayoutPanel
 		{	add(sigmaLabel);
 			add(sigmaTextField);
 			sigmaTextField.addKeyDownHandler(new TextBoxKeyDownHandler(sigmaTextField));
+			sigmaTextField.addBlurHandler(new TextBoxBlurHandler(sigmaTextField));
 			add(sigmaWaardeLabel);
 		}
 		if (sigmaZichtbaarOptie)
@@ -1318,14 +1327,17 @@ public class NormaalPanel extends LayoutPanel
 		{	add(grensLabel);
 			add(grensTextField);
 			grensTextField.addKeyDownHandler(new TextBoxKeyDownHandler(grensTextField));
+			grensTextField.addBlurHandler(new TextBoxBlurHandler(grensTextField));
 			add(grensWaardeLabel);
 			add(grensLinksLabel);
 			add(grensLinksTextField);
 			grensLinksTextField.addKeyDownHandler(new TextBoxKeyDownHandler(grensLinksTextField));
+			grensLinksTextField.addBlurHandler(new TextBoxBlurHandler(grensLinksTextField));
 			add(grensLinksWaardeLabel);
 			add(grensRechtsLabel);
 			add(grensRechtsTextField);
 			grensRechtsTextField.addKeyDownHandler(new TextBoxKeyDownHandler(grensRechtsTextField));
+			grensRechtsTextField.addBlurHandler(new TextBoxBlurHandler(grensRechtsTextField));
 			add(grensRechtsWaardeLabel);
 
 		}
@@ -1475,6 +1487,7 @@ public class NormaalPanel extends LayoutPanel
 		{	add(kansLabel);
 			add(kansTextField);
 			kansTextField.addKeyDownHandler(new TextBoxKeyDownHandler(kansTextField));
+			kansTextField.addBlurHandler(new TextBoxBlurHandler(kansTextField));
 			add(kansWaardeLabel);
 		}
 		
@@ -4418,6 +4431,88 @@ grensDecimals = findGrensDecimals();
 		
 	}
 
+	class TextBoxBlurHandler implements BlurHandler
+	{	
+		TextBox inputTextField;
+		
+		public TextBoxBlurHandler(TextBox input)
+		{	inputTextField = input;
+		}
+		
+		public void onBlur(BlurEvent e)
+		{
+		
+//System.out.println("onBlur");
+
+			//if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			//{
+
+				String text = inputTextField.getText();
+			
+				// komma gebruikt
+				if (text.indexOf(',') >= 0)
+				{	String text1 = trimTrailingZeros(text, ',');
+					boolean changed1 = (text.length() != text1.length());
+					String text2 = addLeadingZero(text1, ',');
+					boolean changed2 = (text1.length() != text2.length());
+					if (changed1 || changed2)
+					{	text = text2;
+					}
+				}
+				// punt gebruikt
+				if (text.indexOf('.') >= 0)
+				{	String text1 = trimTrailingZeros(text, '.');
+					boolean changed1 = (text.length() != text1.length());
+					String text2 = addLeadingZero(text1, '.');
+					boolean changed2 = (text1.length() != text2.length());
+					if (changed1 || changed2)
+					{	text = text2;
+					}
+				}	
+				inputTextField.setText(text);				
+
+				String format = new String(text);		
+				format = format.replace(',', '.');		
+
+				double userInput = 0;
+				boolean error = false;
+				try
+				{	userInput = Double.parseDouble(format);
+				}
+				catch (NumberFormatException nfe)
+				{	error = true;
+				}
+				// dit zou niet moeten gebeuren  
+				// Peter: nu wel bij de definitie van een random variabele ipv een double
+				if (error)
+				{	return;
+				}
+			
+				if (inputTextField == muTextField)
+				{	zetMu(userInput, true, true);
+				}
+				else if (inputTextField == sigmaTextField)
+				{	zetSigma(userInput, true, true);
+				}
+				else if (inputTextField == grensTextField)
+				{	zetGrens(userInput, true);
+				}
+				else if (inputTextField == grensLinksTextField)
+				{	zetGrensLinks(userInput, true);
+				}
+				else if (inputTextField == grensRechtsTextField)
+				{	zetGrensRechts(userInput, true);
+				}
+				else if (inputTextField == kansTextField)
+				{	zetKans(userInput, true);
+				}
+			
+			//} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			
+		} // onBlur 
+		
+	}
+
 	public String trimTrailingZeros(String s, char decSep)
 	{	String txt = new String(s);
 		if (txt.indexOf(decSep) < 0)
@@ -5378,7 +5473,7 @@ grensDecimals = findGrensDecimals();
     public void kijkNa()
     {
     	
-System.out.println("kijkNa");
+//System.out.println("NP kijkNa");
 
 		boolean correct = true;
 		if (kijkOpdrachtNa) 
@@ -5417,8 +5512,8 @@ System.out.println("kijkNa");
 			{	double kansIn = round(kans, kansDecimals);
 				double kansAn = round(antwoordKans, kansDecimals);
 				correct = correct && (Math.abs(kansIn - kansAn) < NZERO);
-System.out.println("kansIn " + kansIn);
-System.out.println("kansAn " + kansAn);
+//System.out.println("kansIn " + kansIn);
+//System.out.println("kansAn " + kansAn);
 			}
 			
 			
@@ -5436,7 +5531,7 @@ System.out.println("kansAn " + kansAn);
 		kijkNaPanel.setWidgetVisible(owner.goedKrulImage, correct);
 		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, !correct);
 
-		
+		owner.correct = correct;
 		
 		//fire actionEvent
 		//ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
@@ -5543,8 +5638,6 @@ System.out.println("kansAn " + kansAn);
     
     public void mouseDownTouchStartAction(int eventX, int eventY)
     {
-    	
-//System.out.println("np mdtsaction");
 
     	if ((muSlider != null) && muSlider.sliderRectangle.contains(eventX, eventY))
     		muSlider.mouseDownTouchStartAction(eventX, eventY);
@@ -5591,7 +5684,7 @@ System.out.println("kansAn " + kansAn);
 		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -5608,7 +5701,7 @@ System.out.println("kansAn " + kansAn);
 		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -5632,7 +5725,7 @@ System.out.println("kansAn " + kansAn);
 		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -5720,9 +5813,14 @@ System.out.println("kansAn " + kansAn);
     		
     		if (e.getSource() == kijkNaButton)
     		{
-    			 kijkNa();   			
+    			 owner.kijkNa();   			
+    		}
+    		else if (e.getSource() == nvCanvas)
+    		{
+    			System.out.println("clicked on Canvas");    			
     		}
 
     	}	
     }	
+
 }
