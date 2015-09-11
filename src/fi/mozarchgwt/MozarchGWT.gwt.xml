@@ -25,6 +25,8 @@
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
+ <!-- gebruik deze linker voor CDPLogica -->
+  <add-linker name='xsiframe' />
   
 
 </module>
