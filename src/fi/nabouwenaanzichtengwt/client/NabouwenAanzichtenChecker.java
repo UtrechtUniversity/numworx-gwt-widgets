@@ -111,7 +111,7 @@ public class NabouwenAanzichtenChecker {
 		int scoreMax = 10;
 		if (launchState.containsKey("scoreMax"))
 			scoreMax = ((Number) launchState.get("scoreMax")).intValue();
-		//this.scoreMax = scoreMax;
+		this.scoreMax = scoreMax;
 		
 		this.checkBlokkenBouwsel = checkBlokkenBouwsel;
 		this.checkDrieAanzichten = checkDrieAanzichten;
