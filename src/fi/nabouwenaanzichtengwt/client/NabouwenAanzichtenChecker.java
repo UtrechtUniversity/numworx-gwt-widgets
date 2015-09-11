@@ -174,7 +174,6 @@ public class NabouwenAanzichtenChecker {
 			}
         	else
         	{	score = scoreMax;
-				score = 0;
 				correct = true;
 				fout = false;
 				goedHalfFout = GOED;

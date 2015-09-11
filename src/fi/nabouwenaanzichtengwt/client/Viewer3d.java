@@ -902,7 +902,7 @@ System.out.println("b = " + b);
 				}
 				tekenOpnieuw();
 				if (changed)
-					eigenaar.zetVeranderd();
+					eigenaar.zetVeranderd(false);
 				return;
 
 			}
@@ -939,7 +939,7 @@ System.out.println("b = " + b);
 					}
 					tekenOpnieuw();
 					if (changed)
-						eigenaar.zetVeranderd();
+						eigenaar.zetVeranderd(false);
 				}
 				else
 				{
@@ -948,7 +948,7 @@ System.out.println("b = " + b);
 						gr.verlaag(kv[n].i, kv[n].j);
 					tekenOpnieuw();
 					if (changed)
-						eigenaar.zetVeranderd();
+						eigenaar.zetVeranderd(false);
 				}
 				return;
 			}

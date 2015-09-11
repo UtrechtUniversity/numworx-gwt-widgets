@@ -263,7 +263,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     		{
 //System.out.println("click kijkNaB");    			
     			check();
-				if (vWerk == null || !ingevuld || !kijkNaActief)
+				boolean b = vWerk == null || !ingevuld || !kijkNaActief;
+				if (!b)
 					comRoot.setChanged(goedHalfFout == NabouwenAanzichtenChecker.FOUT);
     		}
     		else if (e.getSource() == volButton)
@@ -272,7 +273,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(leegButton, true);
     			startKr.maakVol();
     			vWerk.tekenOpnieuw();
-    			zetVeranderd();
+    			zetVeranderd(false);
     		}
     		else if (e.getSource() == leegButton)
     		{
@@ -280,7 +281,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(leegButton, false);
     			startKr.maakLeeg();
     			vWerk.tekenOpnieuw();
-    			zetVeranderd();
+    			zetVeranderd(false);
     		}
     		
     		
@@ -358,7 +359,7 @@ System.out.println("rood");
 		return panel;
 	}
 
-	void zetVeranderd()
+	void zetVeranderd(boolean state)
 	{
 		if (vWerk == null || !kijkNaActief)
 			return;
@@ -373,7 +374,7 @@ System.out.println("rood");
 			else
 				blokjesLabel.setText("" + aantal + " blokjes");
 		}
-		
+		if(state) return;
 		correct = false;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
@@ -451,7 +452,7 @@ System.out.println("rood");
 		}
 		if (nagekeken)
 			check();
-		zetVeranderd();
+		zetVeranderd(nagekeken);
 	}
 
 	@Override
