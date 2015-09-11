@@ -134,8 +134,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(tekenVeelvlakGWTCssResource.root());
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 		
 	}	
