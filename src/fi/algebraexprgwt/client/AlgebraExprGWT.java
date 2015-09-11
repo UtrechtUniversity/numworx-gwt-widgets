@@ -145,8 +145,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
 		standAlone = true;
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 	
 	}
 	
