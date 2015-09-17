@@ -55,6 +55,7 @@
 
 /** Used to set the cell style of columns and column headers in datagrid. */
 .datagridcell {
+	font-size: 13px;
 	color: gray;
 	padding: 2px 5px !important;
 	width: 100%;
