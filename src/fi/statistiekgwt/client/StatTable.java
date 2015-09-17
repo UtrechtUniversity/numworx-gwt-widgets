@@ -141,7 +141,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private static final String CHECKBOX_CELL_WIDTH_STYLE = "width: 20px";//30px";
 	private static final int CHECKBOX_COLUMN_WIDTH = 35;//50;
 	private static final int COLUMN_ENUM_DATA_PADDING = 50;//45;
-	private static final int COLUMN_INPUT_DATA_PADDING = 0;//30;//45;
 	/**
 	 * For large datasets determining the column and cell width will not
 	 * consider all rows, but only the first LARGE_DATASET_ROWCOUNT.
@@ -162,6 +161,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public static final String CELL_STYLE_FONT_SIZE = "font-size: 13px";//0.875em";
 	public static final String TABLE_HEADER_FONT = "bold 13px sans-serif";//"bold Arial Unicode MS, Arial, sans-serif small";
 	private static final int HEADER_PADDING = 25;
+	/**
+	 * Some extra padding used for comboboxes.
+	 */
+	private static final int ENUM_PADDING = 10;
 	private static final int MINIMUM_CELL_WIDTH = 30;
 
 	private StatTableModel statTableModel;
@@ -703,8 +706,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					list.get(popUpColumnIndex),
 					StatTable.this.popUpColumnIndex);
 				
-				dialogModel.addEditColumnEventHandler(StatTable.this.statTableModel);
-				HandlerRegistration handlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
+	        	HandlerRegistration editColumnHandlerRegistration = dialogModel.addEditColumnEventHandler(StatTable.this.statTableModel);
+				HandlerRegistration addColumnHandlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
 				
 				ColumnDialogView dialogView;
 
@@ -712,7 +715,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
-				dialogController.setHandlerRegistration(handlerRegistration);
+				dialogController.setAddColumnHandlerRegistration(addColumnHandlerRegistration);
+				dialogController.setEditColumnHandlerRegistration(editColumnHandlerRegistration);
 
 				dialogView.center();
 				dialogView.show();
@@ -1386,7 +1390,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
-				dialogController.setHandlerRegistration(handlerRegistration);
+				dialogController.setAddColumnHandlerRegistration(handlerRegistration);
 
 				dialogView.center();
 				dialogView.show();
@@ -2229,18 +2233,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.update();
 			
 			this.editColumnIndex = event.getColumnIndex();
-			
-			Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-				
-				@Override
-				public void execute() 
-				{
-					StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex).scrollIntoView(); // set wel de horizontalScrollPosition, maar behoudt het niet...
-				}
-			});
+			this.scrollEditColumnIntoView();
 
-//			StatTable.this.table.getRowElement(0).getCells().getItem(event.getColumnIndex()).scrollIntoView(); // set wel de horizontalScrollPosition, maar behoudt het niet...
-			// update has been done, make sure the scroll is right
 			return;
 		}
 		else if (event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
@@ -2249,8 +2243,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.updateMaxCellWidth(event.getColumnIndex());
 
 			this.update();
-			StatTable.this.table.getRowElement(0).getCells().getItem(event.getColumnIndex()).scrollIntoView(); // werkt niet...
-			// update has been done, make sure the scroll is right
+
+			this.editColumnIndex = event.getColumnIndex();
+			this.scrollEditColumnIntoView();
+			
 			return;
 		}
 		else if (event.getInfo().equals(TableChangeEvent.ADD_ROW))
@@ -2287,6 +2283,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		{
 			this.updateMaxColumnWidth(event.getColumnIndex());
 			this.updateMaxCellWidth(event.getColumnIndex());
+			
+			this.update();
+
+			this.editColumnIndex = event.getColumnIndex();
+			this.scrollEditColumnIntoView();
+			
+			return;
 		}
 		else if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
 		{
@@ -2301,6 +2304,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 
 		this.update();
+	}
+	
+	private void scrollEditColumnIntoView()
+	{
+		Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+			
+			@Override
+			public void execute() 
+			{
+				if (StatTable.this.statTableModel.getRowCount() > 0)
+				{
+					StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex + 2).scrollIntoView(); // + 2 voor rownumber en check columns; set wel de horizontalScrollPosition, maar behoudt het niet...
+				}
+			}
+		});
+
 	}
 
 	/**
@@ -2600,24 +2619,20 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableTextCell textCell = new StatTableTextCell(
 					type, 
-					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i] - StatTable.COLUMN_INPUT_DATA_PADDING));
+					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]));
 				Column<List<String>, String> column = new StatTableColumn(textCell, type);
 
-				//column.setFieldUpdater(fieldUpdater);
 				column.setSortable(true);
-				//column.setCellStyleNames(statistiekCss.textinputcell());
 				column.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(column, columnHeader);
-//				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]);
+				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
 				this.table.setColumnWidth(column, width, Unit.PX);
 				// add the column's width to total width
 				totalWidth = totalWidth + width;				
 			}
 			else if (this.statTableModel.getColumnTypes().get(i).getType()
 				.equals(AllowedTypes.ENUM))
-				//&& this.getStatTableModel().isDataEditable())
 			{
 				String[] enumOptions = StatTable.this.statTableModel
 					.getColumnTypes().get(i).getEnumOptions();
@@ -2629,60 +2644,48 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				enumColumn.setFieldUpdater(fieldUpdater);
 				
 				enumColumn.setSortable(true);
-				//enumColumn.setCellStyleNames(statistiekCss.selectioncell());
 				enumColumn.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(enumColumn, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
+				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING + StatTable.ENUM_PADDING;
 				this.table.setColumnWidth(enumColumn, width, Unit.PX);
 				// add the column's width to total width
 				totalWidth = totalWidth + width;
 			} // ENUM
 			else
-			{ // NUMERIC
+			{ // STRING OR NUMERIC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableInputCell inputCell = new StatTableInputCell(
 					type, 
-					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i] - StatTable.COLUMN_INPUT_DATA_PADDING), 
+					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]), 
 					this.getStatTableModel().isDataEditable());
 				Column<List<String>, String> column = new StatTableColumn(inputCell, type);
 
 				column.setFieldUpdater(fieldUpdater);
 				column.setSortable(true);
-				//column.setCellStyleNames(statistiekCss.textinputcell());
 				column.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(column, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i] + StatTable.HEADER_PADDING);
+				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
 				this.table.setColumnWidth(column, width, Unit.PX);
 				// add the column's width to total width
 				totalWidth = totalWidth + width;				
 			}
 		} // for-loop over columns
 		
-		// set minimum table width to enable horizontal scrollbar
-		// with some extra padding for the vertical scrollbar not to overlay the last column
-		int padding = 75;//50;
-	    this.table.setMinimumTableWidth(totalWidth + padding, Unit.PX);
-        
 		// add handler for right mouse click
 		this.table.addHandler(new MouseDownHandler() {
 			@Override
 			public void onMouseDown(MouseDownEvent event)
 			{
-		        //Cell cell = StatTable.this.table.getCellForEvent(event);
 		        int button = event.getNativeEvent().getButton();
 		        
 		        if (button == NativeEvent.BUTTON_LEFT) 
 		        {
-//		        	System.out.println("StatTable.updateColumns().onMouseDown(): left!");
-		            //doLeftClick(cell);
 		        }
 		        else if (button == NativeEvent.BUTTON_RIGHT) 
 		        {
-//		        	System.out.println("StatTable.updateColumns().onMouseDown(): right!");
 		            event.preventDefault();
-		            //doRightClick(cell);
 		        }
 			}
 		}, MouseDownEvent.getType());
@@ -2785,7 +2788,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		context.setFont(StatTable.TABLE_HEADER_FONT);
 		metrics = context.measureText(header);
 		// initialize maxWidth with the header width
-		int maxWidth = (int) metrics.getWidth() + StatTable.HEADER_PADDING; // + some extra for padding etc
+		int maxWidth = (int) metrics.getWidth();
 
 		if (this.statTableModel.getColumnTypes().get(columnIndex).getType()
 			.equals(AllowedTypes.ENUM))
@@ -2795,14 +2798,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			
 			if (enumOptions != null)
 			{
-//				for (String s : enumOptions)
 				// loop over all values in enumOptions.
 				// for large datasets, take a limited number of enumOptions into account
 				for (int i = 0; i < Math.min(enumOptions.length, StatTable.LARGE_DATASET_LIMITED_ROWCOUNT); i++)
 				{
 					String s = enumOptions[i];
 					metrics = context.measureText(s);
-					maxWidth = (int) Math.max(maxWidth, metrics.getWidth() + StatTable.COLUMN_ENUM_DATA_PADDING); // + some extra for combobox width
+					maxWidth = (int) Math.max(maxWidth, metrics.getWidth());
 				}
 			}
 		}
@@ -2819,7 +2821,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					String s = StatistiekGWT.getStringValue(values.get(i).get(columnIndex).toString());
 					metrics = context.measureText(s);
 					int w = (int) metrics.getWidth(); // for debugging
-					maxWidth = (int) Math.max(maxWidth, w + StatTable.COLUMN_INPUT_DATA_PADDING);
+					maxWidth = (int) Math.max(maxWidth, w);
 				}
 			}
 		}
