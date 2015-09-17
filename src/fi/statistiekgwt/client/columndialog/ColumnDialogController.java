@@ -31,7 +31,8 @@ public class ColumnDialogController
 	private ColumnDialogChangeHandler changeHandler;
 	private ColumnDialogValueChangeHandler valueChangeHandler;
 
-	private HandlerRegistration handlerRegistration;
+	private HandlerRegistration addColumnhandlerRegistration;
+	private HandlerRegistration editColumnhandlerRegistration;
 	private ColumnDialogKeyDownHandler keyDownHandler;
 
 	/**
@@ -78,9 +79,29 @@ public class ColumnDialogController
 	 * 
 	 * @return the handlerRegistration
 	 */
-	public HandlerRegistration getHandlerRegistration()
+	public HandlerRegistration getAddColumnHandlerRegistration()
 	{
-		return handlerRegistration;
+		return this.addColumnhandlerRegistration;
+	}
+
+	/**
+	 * Set handler registration. Used to manage EditColumnEventHandlers.
+	 * 
+	 * @param handlerRegistration the handlerRegistration to set
+	 */
+	public void setEditColumnHandlerRegistration(HandlerRegistration handlerRegistration)
+	{
+		this.editColumnhandlerRegistration = handlerRegistration;
+	}
+
+	/**
+	 * Get handler registration. Used to manage EditColumnEventHandlers.
+	 * 
+	 * @return the handlerRegistration
+	 */
+	public HandlerRegistration getEditColumnHandlerRegistration()
+	{
+		return this.editColumnhandlerRegistration;
 	}
 
 	/**
@@ -88,9 +109,9 @@ public class ColumnDialogController
 	 * 
 	 * @param handlerRegistration the handlerRegistration to set
 	 */
-	public void setHandlerRegistration(HandlerRegistration handlerRegistration)
+	public void setAddColumnHandlerRegistration(HandlerRegistration handlerRegistration)
 	{
-		this.handlerRegistration = handlerRegistration;
+		this.addColumnhandlerRegistration = handlerRegistration;
 	}
 
 	class ColumnDialogChangeHandler implements ChangeHandler
@@ -279,12 +300,7 @@ public class ColumnDialogController
 					ColumnDialogController.this.model.fireEvent(event);
 				}
 				
-				// remove handler statTableModel from ColumnDialogModel
-				HandlerRegistration registration = ColumnDialogController.this.getHandlerRegistration(); 
-				if (registration != null) // null in case of column info mode
-				{
-					registration.removeHandler();
-				}
+				this.removeHandlers();
 			}
 			else if (e.getSource() == ColumnDialogController.this.view.getCancelButton())
 			{
@@ -294,8 +310,25 @@ public class ColumnDialogController
 				// reset stringOptions voor het geval er een stringoption verwijderd is
 				ColumnDialogController.this.view.resetOriginalStringOptions();
 				
-				// remove handler statTableModel from ColumnDialogModel
-				ColumnDialogController.this.getHandlerRegistration().removeHandler();
+				this.removeHandlers();
+			}
+		}
+		
+		/**
+		 * Remove the handlers for adding and editing a column from ColumnDialogModel.
+		 */
+		private void removeHandlers()
+		{
+			// remove handler statTableModel from ColumnDialogModel
+			HandlerRegistration addColumnRegistration = ColumnDialogController.this.getAddColumnHandlerRegistration();
+			HandlerRegistration editColumnRegistration = ColumnDialogController.this.getEditColumnHandlerRegistration();
+			if (addColumnRegistration != null) // null in case of column info mode
+			{
+				addColumnRegistration.removeHandler();
+			}
+			if (editColumnRegistration != null) // null in case of column info mode
+			{
+				editColumnRegistration.removeHandler();
 			}
 		}
 		
