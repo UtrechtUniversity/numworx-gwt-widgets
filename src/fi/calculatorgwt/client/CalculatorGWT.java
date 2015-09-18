@@ -2402,5 +2402,13 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		
 	}
 
+	@Override
+	public int[][] getScoreObjectives() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
+
 	
 }
