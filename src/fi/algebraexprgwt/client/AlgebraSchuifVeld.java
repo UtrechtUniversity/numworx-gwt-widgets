@@ -136,6 +136,7 @@ String testString = "test";
 	
 	public void answerChanged()
 	{
+		changed = true;
 		removeGoedFout();
 		owner.answerChanged();
 	}

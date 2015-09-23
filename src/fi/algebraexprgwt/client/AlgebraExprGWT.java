@@ -117,13 +117,14 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
 	int score = 0;
-	boolean correct = true;
+	Boolean correct = null;
 	boolean ingevuld = false;
 	boolean nagekeken = false;
 	
 	private int mode;
 	private OpdrNavIF comRoot;
 
+	boolean asvSetState = false;
 	
 	public void getImages() 
 	{
@@ -457,7 +458,11 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		
+		asvSetState = true;
 		asv.setState(h);
+		asvSetState = false;
+		
 		if (h.containsKey("nagekeken"))
 		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
 		}
@@ -468,7 +473,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (!ingevuld)
 			asv.changed = false;
 		
-		if (ingevuld && (mode == 0 || nagekeken)) 
+		if (ingevuld && (mode == 0 || nagekeken))
+		//if (nagekeken)
 			kijkNa();
 
 
@@ -513,9 +519,15 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
     public void answerChanged()
     {
-    	if (comRoot != null)
-		{	correct = false;
-			comRoot.setChanged(isCorrect().booleanValue());
+    	if ((comRoot != null) && kijkNaActief && !asvSetState)
+		{	correct = null;
+			nagekeken = false;
+			score = 0;
+			ingevuld = true;
+			asv.changed = true;
+
+			comRoot.setChanged(true);
+
 		}	
     	
     }
