@@ -512,7 +512,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 			}
 		}
 	
-		asv.changed = true;
+		asv.answerChanged();
 	}
 	
 	public void mouseDownTouchStartAction(int eventX, int eventY)
@@ -588,7 +588,7 @@ public class AlgebraSchuifComponent extends SchuifComponent
 		if (asv.frozen)
 			return;
 		
-		asv.changed = true;
+		//asv.answerChanged();
 		
 		mouseDown = false;
 		dragging = false;

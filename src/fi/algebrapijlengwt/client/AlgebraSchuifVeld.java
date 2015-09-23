@@ -140,6 +140,7 @@ public class AlgebraSchuifVeld
 */	
 	public void answerChanged()
 	{
+		changed = true;
 		removeGoedFout();
 		owner.answerChanged();
 	}

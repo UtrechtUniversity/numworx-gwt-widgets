@@ -803,6 +803,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 					pijlUit[pCnt].im = null;
 			
 			}
+			if (asv.owner.kijkNaActief)
+				asv.answerChanged();
 
 		}
 		else if (!isBeginExpressie)
@@ -813,7 +815,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 					pijlUit[pCnt].im = null;
 			
 			}
-			
+			if (asv.owner.kijkNaActief)
+				asv.answerChanged();
 			
 			if (scrollable && expressie != null && !Double.isNaN(expressie.geefWaarde().doubleValue()))
 			{	if (scrollCorr == 0)
@@ -1411,7 +1414,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		}
 	}
 	
-	
+/*	
 	class TextBoxKeyDownHandler implements KeyDownHandler
 	{
 		public void onKeyDown(KeyDownEvent e)
@@ -1424,5 +1427,6 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 		}
 	}
+*/	
 		
 }

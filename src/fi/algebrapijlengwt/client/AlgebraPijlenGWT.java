@@ -118,12 +118,14 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
 	int score = 0;
-	boolean correct = true;
+	Boolean correct = null;
 	boolean ingevuld = false;
 	boolean nagekeken = false;
 	
 	private int mode;
 	private OpdrNavIF comRoot;
+	
+	boolean asvSetState = false;
 
 	public void getImages() 
 	{
@@ -510,7 +512,14 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		
+//System.out.println("setState");
+
+		asvSetState= true;
 		asv.setState(h);
+		asvSetState= false;
+		
+//System.out.println("after asv setState");		
 
 		if (h.containsKey("nagekeken"))
 		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
@@ -522,7 +531,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (!ingevuld)
 			asv.changed = false;
 		
-		if (ingevuld && (mode == 0 || nagekeken)) 
+		if (ingevuld && (mode == 0 || nagekeken))
+		//if (nagekeken)
 			kijkNa();
 					
 		
@@ -540,13 +550,15 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	@Override
 	public Boolean isCorrect()
 	{
-		return correct;
+		if (kijkNaActief)
+			return correct;
+		else
+			return new Boolean(true);
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 
@@ -571,9 +583,19 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
     
     public void answerChanged()
     {
-    	if (comRoot != null)
-		{	correct = false;
-			comRoot.setChanged(isCorrect().booleanValue());
+
+    	if ((comRoot != null) && kijkNaActief && !asvSetState)
+		{	
+//System.out.println("changed");    		
+    		correct = null;
+    		nagekeken = false;
+    		score = 0;
+    		ingevuld = true;
+    		asv.changed = true;
+			//comRoot.setChanged(isCorrect());
+    		comRoot.setChanged(true);
+			
+//System.out.println("corr " + isCorrect());			
 		}	
     	
     }
@@ -691,6 +713,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 		asv.tekenOpnieuw();
 		nagekeken = true;
+
 		
 		//fireChangeEvent();
 
@@ -703,6 +726,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		}
 */		
 		comRoot.setChanged(isCorrect().booleanValue());
+		
+//System.out.println("comRoot " + isCorrect().booleanValue());		
 		
 	}
 

@@ -2,7 +2,7 @@ package fi.algebrapijlengwt.client;
 
 //import java.awt.*;
 //import java.awt.event.*;
-import fi.algebrapijlengwt.client.UitvoerSchuifComponent.TextBoxKeyDownHandler;
+
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
 //import javax.swing.*;
@@ -375,6 +375,7 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implement
 		
 	}
 
+/*	
 	class TextBoxKeyDownHandler implements KeyDownHandler
 	{
 		public void onKeyDown(KeyDownEvent e)
@@ -387,7 +388,7 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implement
 			}
 		}
 	}
-	
+*/	
 //GWT
 /*	
 	public void actionPerformed(ActionEvent e)
