@@ -348,6 +348,8 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 			//{
 			//	actionListener.actionPerformed(new ActionEvent(this, 0, "stop"));
 			//}
+			
+			owner.changed();
 		}
 	}
 

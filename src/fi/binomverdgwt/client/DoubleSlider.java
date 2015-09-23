@@ -392,6 +392,8 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 
 		//owner.paint();
 		
+		owner.changed();
+		
 	}
 //	public void mouseClicked(MouseEvent e)
 //	{}

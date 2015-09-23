@@ -204,6 +204,11 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	int antwoordPopulatie = 100;
 	
 	int score;
+	//private boolean nagekeken;
+	//private int mode;
+	//Boolean correct = null;
+	//boolean fout = false;
+
 	
 	int breedte, hoogte;
 	
@@ -1829,6 +1834,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				setGrenzenOptie(GrenzenOptie.RECHTS);
 			}
 			
+			changed();
 		}
 	}
 	
@@ -1862,9 +1868,12 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				else if (inputTextField == populatieText)
 				{	populatieTextUpdate();
 				}
+				
+				changed();
 			
 			} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
 			
+						
 		} // onKeyDown 
 		
 	}
@@ -1902,6 +1911,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 			
 			//} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
 			
+				changed();
 		} // onBlur 
 		
 	}
@@ -2094,17 +2104,19 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	/**
 	 * @return De huidige score voor deze opgave
 	 */
+/*	
 	public int getScore() {
 		return this.score;
 	}
-	
+*/	
 	/**
 	 * @return De te behalen score voor deze opgave
 	 */
+/*	
 	public int getScoreMax() {
 		return this.maxScore;
 	}
-
+*/
 	/**
 	 * Geeft de volledige toestand in de vorm van een Hashtable
 	 */
@@ -2306,6 +2318,20 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	 * Vergelijk de ingevulde waarden met het opgegeven antwoordmodel, zet de score in this.score en vuur een actionEvent naar alle listeners.
 	 */
 	
+    public void changed()
+    {
+	   	if (kijkOpdrachtNa) 
+		{
+	   		
+//System.out.println("BVPanel changed");
+
+    		score = 0;
+	   		kijkNaPanel.setWidgetVisible(owner.goedKrulImage, false);
+	   		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, false);
+
+	   		owner.changed();
+		}
+	}
 
 	
 	public void kijkNa() 
@@ -2472,12 +2498,13 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 
 	public void zetMaat() {
 	}
-
-	public void zetMode(int mode) {
+/*
+	public void zetMode(int mode) 
+	{	this.mode = mode;
+		if (kijkOpdrachtNa)    
+			kijkOpdrachtNa = (mode == 0 || mode == 1);
 	}
-
-	public void zetNagekeken(boolean b) {
-	}
+*/
 
 	/**
 	 * Initialiseer zoals in de BVInteractieEditPanel is ingesteld, met evt. randomvars.

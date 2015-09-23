@@ -67,7 +67,10 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	
 	private int mode;
 	private OpdrNavIF comRoot;
-	boolean correct = true;
+	Boolean correct = null;
+	boolean nagekeken = false;
+	
+	boolean bvSetState = false;
 
 	// images
 	BinomVerdGWTClientBundle binomVerdGWTClientBundle;
@@ -177,15 +180,26 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	@Override
 	public HashMap<String, Object> getState()
 	{
-		// TODO Auto-generated method stub
-		return binomVerdPanel.getState();
+		HashMap<String, Object> h = binomVerdPanel.getState();
+		h.put("nagekeken", new Boolean(nagekeken));
+		return h;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		// let even op: als kanskeuze == TWEEGRENZEN actualMu/SigmaBerekenbaar = false;
+		bvSetState = true;
 		binomVerdPanel.setState(h);
+		bvSetState = false;
+		
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		
+		if (mode == 0 || nagekeken)
+		//if (nagekeken)
+			kijkNa();
+		
 
 	}
 
@@ -199,7 +213,11 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	@Override
 	public Boolean isCorrect()
 	{
-		return correct; //binomVerdPanel.score == binomVerdPanel.maxScore; //Boolean.TRUE;
+		if (binomVerdPanel.kijkOpdrachtNa)
+			return correct;
+		else
+			return new Boolean(true);
+
 	}
 
 	@Override
@@ -211,14 +229,36 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 
 	}
 	
+	public void zetNagekeken(boolean b) 
+	{	nagekeken = true;
+	}
+	
 	public void zetMode(int mode)
 	{	this.mode = mode;
+		if (binomVerdPanel.kijkOpdrachtNa)    
+			binomVerdPanel.kijkOpdrachtNa = (mode == 0 || mode == 1);
+
+	}
+
+    public void changed()
+	{
+    	
+	  	if (binomVerdPanel.kijkOpdrachtNa && !bvSetState) 
+		{
+//System.out.println("changed");	  		
+	   		correct = null;
+    		nagekeken = false;
+    		
+    		comRoot.setChanged(true);
+		   	
+		}
 	}
 
 	@Override
 	public void kijkNa() 
 	{
 		binomVerdPanel.kijkNa();
+		nagekeken = true;
 		comRoot.setChanged(isCorrect().booleanValue());
 		
 	}
@@ -664,6 +704,6 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		if (Double.isNaN(d)) 
 			d = def;
 		return d;
-}
+	}
 
 }
