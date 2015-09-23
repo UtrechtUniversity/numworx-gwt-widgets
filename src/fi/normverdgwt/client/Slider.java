@@ -265,6 +265,9 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 	//public void mouseReleased(MouseEvent e)
 	public void mouseUpTouchEndAction()
 	{	
+		
+		owner.changed();
+		
 //GWT??		
 		//if (actionListener != null)
 		//{	actionListener.actionPerformed( new ActionEvent(this, 0, "stop") );

@@ -77,7 +77,8 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	private OpdrNavIF comRoot;
 	
 	//boolean kijkOpdrachtNa = false;
-	boolean correct = true;
+	Boolean correct = true;
+	boolean nagekeken = false;
 	
 	public void getImages() 
 	{
@@ -186,8 +187,11 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public HashMap<String, Object> getState()
 	{
+		HashMap<String, Object> h = normaalPanel.getState();
+		h.put("nagekeken", new Boolean(nagekeken));
+		//h.put("ingevuld", new Boolean(ingevuld));
 //System.out.println("nvgwt getState");		
-		return normaalPanel.getState();
+		return h;
 	}
 
 	@Override
@@ -197,6 +201,14 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 
 		// let even op: als kanskeuze == TWEEGRENZEN actualMu/SigmaBerekenbaar = false;
 		normaalPanel.setState(h);
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		
+		if (mode == 0 || nagekeken)
+		//if (nagekeken)
+			kijkNa();
+		
 	}
 
 	@Override
@@ -209,12 +221,11 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public Boolean isCorrect()
 	{
-//		if (kijkOpdrachtNa)
-//			return normaalPanel.score == normaalPanel.maxScore; //Boolean.TRUE;
-//		else
-//			return Boolean.TRUE;
-		
-		return correct;
+		if (normaalPanel.kijkOpdrachtNa)
+			return correct;
+		else
+			return Boolean.TRUE;
+
 	}
 
 	@Override
@@ -227,8 +238,22 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	public void zetMode(int mode)
 	{	this.mode = mode;
+		if (normaalPanel.kijkOpdrachtNa)    
+			normaalPanel.kijkOpdrachtNa = (mode == 0 || mode == 1);
 	}
 	
+	public void changed()
+	{
+	  	if (normaalPanel.kijkOpdrachtNa) 
+		{
+	   		correct = null;
+	   		nagekeken = false;
+	    		
+	   		comRoot.setChanged(true);
+			   	
+		}
+	}
+
 	@Override
 	public void kijkNa() 
 	{
@@ -236,10 +261,10 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 
 		// dit verandert correct
 		normaalPanel.kijkNa();
-		
+		nagekeken = true;
 //System.out.println("cor " + isCorrect().booleanValue());		
 
-	comRoot.setChanged(isCorrect().booleanValue());
+		comRoot.setChanged(isCorrect().booleanValue());
 		
 	}
 

@@ -4185,6 +4185,7 @@ grensDecimals = findGrensDecimals();
 		
 			bereken();	
 			
+			changed();
 			//paint();
 		}
 	}
@@ -4261,6 +4262,7 @@ grensDecimals = findGrensDecimals();
 			zetBerekenKeuze(false);
 			paint();
 			
+			changed();
 		}
 	}
 	
@@ -4425,6 +4427,7 @@ grensDecimals = findGrensDecimals();
 				{	zetKans(userInput, true);
 				}
 			
+				changed();
 			} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
 			
 		} // onKeyDown 
@@ -4507,6 +4510,7 @@ grensDecimals = findGrensDecimals();
 				{	zetKans(userInput, true);
 				}
 			
+				changed();
 			//} //if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
 			
 		} // onBlur 
@@ -5468,7 +5472,16 @@ grensDecimals = findGrensDecimals();
     public void opnieuw()
     {}
 
-//GWT    
+    public void changed()
+    {
+    	if (kijkOpdrachtNa) 
+		{
+    		kijkNaPanel.setWidgetVisible(owner.goedKrulImage, false);
+    		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, false);
+    		
+    		owner.changed();
+		}
+    }
     
     public void kijkNa()
     {
@@ -5672,15 +5685,25 @@ grensDecimals = findGrensDecimals();
     	
 }
     
-    public void mouseUpTouchEndAction()
+    public void mouseUpTouchEndAction(int eventX, int eventY)
     {
-    	//if ((muSlider != null) && muSlider.sliderRectangle.contains(eventX, eventY))
-    	//	muSlider.mouseUpTouchEndAction();
+    	if ((muSlider != null) && muSlider.sliderRectangle.contains(eventX, eventY))
+			muSlider.mouseUpTouchEndAction();
+    	if ((sigmaSlider != null) && sigmaSlider.sliderRectangle.contains(eventX, eventY))
+    		sigmaSlider.mouseUpTouchEndAction();
+    	if ((grensSlider != null) && grensSlider.sliderRectangle.contains(eventX, eventY))
+    		grensSlider.mouseUpTouchEndAction();
+    	if ((kansSlider != null) && kansSlider.sliderRectangle.contains(eventX, eventY))
+    		kansSlider.mouseUpTouchEndAction();
+
+    	if ((tweeGrenzenSlider != null) && tweeGrenzenSlider.sliderRectangle.contains(eventX, eventY))
+    		tweeGrenzenSlider.mouseUpTouchEndAction();
+
     }	
     	
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
-		
+		int lastX, lastY;
 		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
@@ -5691,6 +5714,9 @@ grensDecimals = findGrensDecimals();
 			
 			int eventX = e.getX();
 			int eventY = e.getY();
+			
+			lastX = e.getX();
+			lastY = e.getY();
 			
 			mouseDown = true;
 			
@@ -5714,6 +5740,9 @@ grensDecimals = findGrensDecimals();
 			int eventX = e.getX();
 			int eventY = e.getY();
 			
+			lastX = e.getX();
+			lastY = e.getY();
+			
 //System.out.println("sp = " + shiftPressed);
 
 			mouseMoveTouchMoveAction(eventX, eventY);
@@ -5731,8 +5760,8 @@ grensDecimals = findGrensDecimals();
 			e.stopPropagation();
 			
 			mouseDown = false;
-		
-			mouseUpTouchEndAction();
+			
+			mouseUpTouchEndAction(lastX, lastY);
 
 		}
 
@@ -5742,6 +5771,7 @@ grensDecimals = findGrensDecimals();
 	// tablet, dwo 
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
+		int lastX, lastY;
 		
 		public void onTouchStart(TouchStartEvent e)
 		{
@@ -5758,7 +5788,10 @@ grensDecimals = findGrensDecimals();
 				//int eventY = touch.getRelativeY(elem);
 				
 				int eventX = touch.getPageX() - nvCanvas.getAbsoluteLeft();
-				int eventY = touch.getPageY() - nvCanvas.getAbsoluteTop();				
+				int eventY = touch.getPageY() - nvCanvas.getAbsoluteTop();
+				
+				lastX = eventX;
+				lastY = eventY;
 				
 				mouseDownTouchStartAction(eventX, eventY);
 				
@@ -5784,6 +5817,8 @@ grensDecimals = findGrensDecimals();
 
 			    int eventX = touch.getPageX() - nvCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - nvCanvas.getAbsoluteTop();				
+				lastX = eventX;
+				lastY = eventY;
 			    
 				mouseMoveTouchMoveAction(eventX, eventY);
 				
@@ -5794,7 +5829,7 @@ grensDecimals = findGrensDecimals();
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
-			mouseUpTouchEndAction();
+			mouseUpTouchEndAction(lastX, lastY);
 		}
 
 	}

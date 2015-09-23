@@ -370,7 +370,9 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 	
 	//public void mouseReleased(MouseEvent e)
 	public void mouseUpTouchEndAction()
-	{	//if (actionListener != null)
+	{	
+		owner.changed();
+		//if (actionListener != null)
 		//{	actionListener.actionPerformed( new ActionEvent(this, 0, "stop") );
 		//}
 		
