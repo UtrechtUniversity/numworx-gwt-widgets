@@ -502,6 +502,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
 	public void zetMode(int mode)
 	{	this.mode = mode;
+		if (kijkNaActief)    
+			kijkNaActief = (mode == 0 || mode == 1);
 	}
 
     public void maakDocentExpressies()
