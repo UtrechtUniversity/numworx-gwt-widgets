@@ -71,6 +71,9 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		//{	animatieWasAan = true;
 		//	ab.onderbreekAnimatie();
 		//}
+		e.preventDefault();
+		e.stopPropagation();
+		
 		mouseDown = true;
 		eerstex = e.getX();
 		eerstey = e.getY();
@@ -80,8 +83,12 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	}
 	
 	public void onMouseMove(MouseMoveEvent e)
-	{	if (!mouseDown)
+	{	e.preventDefault();
+		e.stopPropagation();
+		
+		if (!mouseDown)
 			return;
+
 		int x = e.getX();
 		int y = e.getY();
 		dx = x - laatstex;
@@ -92,7 +99,11 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	}
 	
 	public void onMouseUp(MouseUpEvent e)
-	{	mouseDown = false;
+	{	
+		e.preventDefault();
+		e.stopPropagation();
+	
+		mouseDown = false;
 		eigenaar.muisLosActie();
 		//if(animatieWasAan)
 		//{	animatieWasAan = false;

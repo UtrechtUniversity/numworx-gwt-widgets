@@ -79,7 +79,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 
 	private int goedHalfFout;
 	private int score = 0;
-	private boolean correct;
+	Boolean correct = null;
 	private String feedback = "";
 
 	boolean silhouet = false;
@@ -137,7 +137,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		makeResources();
 		//initOnLoad();
 		RootPanel.get().add(panel);
+		
 		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 	}
 
 	// 2 aanzichten
@@ -350,7 +352,8 @@ System.out.println("groen");
 System.out.println("rood");			
 		}
 		nagekeken = true;
-		
+
+		comRoot.setChanged(isCorrect().booleanValue());
 
 	}
 
@@ -375,6 +378,12 @@ System.out.println("rood");
 				blokjesLabel.setText("" + aantal + " blokjes");
 		}
 		if(state) return;
+		
+		kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, true);
+		kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
+		kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
+		kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
+		
 		correct = false;
 		score = 0;
 		if (!startKr.isGelijk(vWerk.kr))
