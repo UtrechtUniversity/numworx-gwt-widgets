@@ -69,6 +69,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	private OpdrNavIF comRoot;
 	Boolean correct = null;
 	boolean nagekeken = false;
+	boolean ingevuld = false;
 	
 	boolean bvSetState = false;
 
@@ -182,6 +183,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	{
 		HashMap<String, Object> h = binomVerdPanel.getState();
 		h.put("nagekeken", new Boolean(nagekeken));
+		h.put("ingevuld",new Boolean(ingevuld));
 		return h;
 	}
 
@@ -191,12 +193,16 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		bvSetState = true;
 		binomVerdPanel.setState(h);
 		bvSetState = false;
+		ingevuld = false;
 		
 		if (h.containsKey("nagekeken"))
 		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
 		}
+		if (h.containsKey("ingevuld"))
+			ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+
 		
-		if (mode == 0 || nagekeken)
+		if (ingevuld && (mode == 0 || nagekeken))
 		//if (nagekeken)
 			kijkNa();
 		
@@ -248,6 +254,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 //System.out.println("changed");	  		
 	   		correct = null;
     		nagekeken = false;
+    		ingevuld = true;
     		
     		comRoot.setChanged(true);
 		   	
@@ -259,6 +266,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	{
 		binomVerdPanel.kijkNa();
 		nagekeken = true;
+		ingevuld = true;
 		comRoot.setChanged(isCorrect().booleanValue());
 		
 	}
@@ -681,6 +689,8 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		binomVerdPanel.plaatsComponenten(false);
 		
 		binomVerdPanel.paint();
+		
+		ingevuld = false;
 
 
 	}
