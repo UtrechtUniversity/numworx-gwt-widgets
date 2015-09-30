@@ -463,6 +463,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		asv.setState(h);
 		asvSetState = false;
 		
+		ingevuld = false;
+		
 		if (h.containsKey("nagekeken"))
 		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
 		}
@@ -539,15 +541,15 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
     {	if (!kijkNaActief)
     		return;
 
-System.out.println("kijkNa");
+//System.out.println("kijkNa");
 
     	//ingevuld = !asv.veldIsLeeg();
-    	ingevuld = asv.changed;
+    	ingevuld = true;//asv.changed;
 
-System.out.println("ingevuld  " + ingevuld);
+//System.out.println("ingevuld  " + ingevuld);
 
-    	if (!ingevuld)
-    		return;
+ //   	if (!ingevuld)
+ //   		return;
     	
     	maakDocentExpressies();
     	
@@ -799,6 +801,8 @@ System.out.println("llgExp = " + llgExp.toString());
 		asv.paint();
 
 		asv.changed = false;
+		
+		ingevuld = false;
 		
 	}
 
