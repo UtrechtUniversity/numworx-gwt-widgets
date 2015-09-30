@@ -44,6 +44,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	Canvas canvas;
 	int mouseX, mouseY;
 	OpdrNavIF comRoot;
+	int mode;
 
 	static final int refreshRate = 25;
 
@@ -352,6 +353,7 @@ System.out.println("groen");
 System.out.println("rood");			
 		}
 		nagekeken = true;
+		ingevuld = true;
 
 		comRoot.setChanged(isCorrect().booleanValue());
 
@@ -377,7 +379,10 @@ System.out.println("rood");
 			else
 				blokjesLabel.setText("" + aantal + " blokjes");
 		}
-		if(state) return;
+		
+		ingevuld = true;
+		
+		if (state) return;
 		
 		kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, true);
 		kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
@@ -428,10 +433,6 @@ System.out.println("rood");
 
 		Object stateNew = null;
 
-		if (h.containsKey("nagekeken"))
-			nagekeken = (Boolean) h.get("nagekeken");
-		if (h.containsKey("ingevuld"))
-			ingevuld = (Boolean) h.get("ingevuld");
 		if (h.containsKey("stateNew"))
 			stateNew = h.get("stateNew");
 		if (stateNew != null)
@@ -459,7 +460,15 @@ System.out.println("rood");
 			}
 	
 		}
-		if (nagekeken)
+
+		ingevuld = false;
+		if (h.containsKey("nagekeken"))
+			nagekeken = (Boolean) h.get("nagekeken");
+		if (h.containsKey("ingevuld"))
+			ingevuld = (Boolean) h.get("ingevuld");
+
+
+		if (ingevuld && (nagekeken || mode == 0))
 			check();
 		zetVeranderd(nagekeken);
 	}
@@ -483,8 +492,16 @@ System.out.println("rood");
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
+		zetMode(comRoot.getMode());
 
 	}
+	
+	public void zetMode(int mode)
+	{	this.mode = mode;
+		if (kijkNaActief)    
+			kijkNaActief = (mode == 0 || mode == 1);
+	}
+
 
 	@Override
 	public Widget asWidget()
@@ -889,7 +906,8 @@ System.out.println("hoogte = " + hoogte);
 			//MuisBeheerder mb = new MuisBeheerder(vWerk);
 
 			//touchPanel.addTouchHandler(mb);
-			
+		
+			ingevuld = false;
 		}
 
 	}
