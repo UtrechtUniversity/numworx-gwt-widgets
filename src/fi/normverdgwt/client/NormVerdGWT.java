@@ -79,6 +79,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	//boolean kijkOpdrachtNa = false;
 	Boolean correct = true;
 	boolean nagekeken = false;
+	boolean ingevuld = false; 
 	
 	public void getImages() 
 	{
@@ -189,7 +190,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	{
 		HashMap<String, Object> h = normaalPanel.getState();
 		h.put("nagekeken", new Boolean(nagekeken));
-		//h.put("ingevuld", new Boolean(ingevuld));
+		h.put("ingevuld", new Boolean(ingevuld));
 //System.out.println("nvgwt getState");		
 		return h;
 	}
@@ -201,11 +202,17 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 
 		// let even op: als kanskeuze == TWEEGRENZEN actualMu/SigmaBerekenbaar = false;
 		normaalPanel.setState(h);
+		
+		ingevuld = false;
+		
 		if (h.containsKey("nagekeken"))
 		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
 		}
+		if (h.containsKey("ingevuld"))
+			ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+
 		
-		if (mode == 0 || nagekeken)
+		if (ingevuld &&(mode == 0 || nagekeken))
 		//if (nagekeken)
 			kijkNa();
 		
@@ -249,6 +256,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	   		correct = null;
 	   		nagekeken = false;
 	    		
+	   		ingevuld = true;
 	   		comRoot.setChanged(true);
 			   	
 		}
@@ -262,6 +270,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		// dit verandert correct
 		normaalPanel.kijkNa();
 		nagekeken = true;
+   		ingevuld = true;
 //System.out.println("cor " + isCorrect().booleanValue());		
 
 		comRoot.setChanged(isCorrect().booleanValue());
@@ -666,6 +675,8 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		normaalPanel.setInitState();
 		
 		normaalPanel.paint();
+		
+		ingevuld = false;
 
 
 	}
