@@ -519,6 +519,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		asv.setState(h);
 		asvSetState= false;
 		
+		ingevuld = false;
+		
 //System.out.println("after asv setState");		
 
 		if (h.containsKey("nagekeken"))
@@ -612,10 +614,10 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 //System.out.println("kijkNa");
 
     	//ingevuld = !asv.veldIsLeeg();
-		ingevuld = asv.changed;
+		ingevuld = true;//asv.changed;
     	
-    	if (!ingevuld)
-    		return;
+//    	if (!ingevuld)
+//    		return;
     	
 //System.out.println("ingevuld");
 
@@ -873,6 +875,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		asv.paint();
 		
 		asv.changed = false;
+		ingevuld = false;
 	}
 
 
