@@ -1198,6 +1198,7 @@ System.out.println("v3d muisKkActie");
 							
 						}
 						//updateViewerKleuren();
+						tvGWT.answerChanged();
 					}// leerling
 					updateViewerKleuren();
 				}//vlakkenkleurenOptie
@@ -1221,6 +1222,14 @@ System.out.println("v3d muisKkActie");
 			}	
 			yhoek += 0.5*mb.geefSleepdx();
 			tekenOpnieuw();
+			
+			if (!klikAan)
+			{	kijkNaPanel.setWidgetVisible(tvGWT.goedKrulImage,false);
+				kijkNaPanel.setWidgetVisible(tvGWT.foutKruisImage,false);
+
+				tvGWT.answerChanged();
+			}	
+
 		}
 	}
 	public void muisDrukActie(){}

@@ -90,8 +90,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	boolean kijkVlakkenNa = false;
 	boolean kijkDraaihoekNa = false;
 	boolean kijkNaActief = false;
-	boolean correct = false;
+	Boolean correct = null;
 	boolean nagekeken = false;
+	boolean ingevuld = false;
+	
 	String[] docentKleuren = null;
 	double docentDraaihoekX = 1e5d;
 	double docentDraaihoekY = 1e5d;
@@ -236,7 +238,7 @@ System.out.println("tvGWT getState");
     		h.put("leerlingKleuren", leerlingKleurenAL);
     	}
     	h.put("nagekeken", new Boolean(nagekeken));
-    	h.put("correct", new Boolean(correct));
+    	h.put("ingevuld", new Boolean(ingevuld));
     			
     			
 
@@ -307,16 +309,17 @@ System.out.println("tvGWT setState");
     		}
     	}	
     	
-    	boolean nagekeken = false;
-    	boolean correct = false;
+    	ingevuld = false;
+    	
     	if (h.containsKey("nagekeken"))
-    		nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
-    	if (h.containsKey("correct"))
-    		correct = ((Boolean) h.get("correct")).booleanValue();
+    		nagekeken = h.getBoolean("nagekeken");
+    	if (h.containsKey("ingevuld"))
+    		ingevuld = h.getBoolean("ingevuld");
     	
-    	this.nagekeken = nagekeken;
-    	this.correct = correct; 
+    	if (ingevuld && (nagekeken || mode == 0))
+    		kijkNa();
     	
+/*    	
     	if (kijkNaActief && nagekeken)
     	{
     		if (correct && viewerOnly)
@@ -341,7 +344,7 @@ System.out.println("tvGWT setState");
     		}
     	}
 		
-
+*/
 	}
 
 	@Override
@@ -353,7 +356,10 @@ System.out.println("tvGWT setState");
 	@Override
 	public Boolean isCorrect()
 	{
-		return correct;
+		if (kijkNaActief)
+			return correct;
+		else
+			return new Boolean(true);
 	}
 
 	@Override
@@ -366,6 +372,8 @@ System.out.println("tvGWT setState");
 	
 	public void zetMode(int mode)
 	{	this.mode = mode;
+		if (kijkNaActief)    
+			kijkNaActief = (mode == 0 || mode == 1);
 	}
 	
 	public Veelvlak maakPijl()
@@ -551,7 +559,25 @@ System.out.println("contains docentKleuren");
 			tvv.tekenOpnieuw();
 		}	
 		
+		ingevuld = false;
+		
 	}
+	
+	   public void answerChanged()
+	    {
+	    	if (kijkNaActief)
+	    	{	
+	    		
+	System.out.println("answerChanged");
+
+	    		correct = null;
+	    		score = 0;
+	    		nagekeken = false;
+	    		ingevuld = true;
+	    		comRoot.setChanged(true);
+	    	}	
+	    }
+
 
 	@Override
 	public void kijkNa() 
@@ -594,6 +620,29 @@ System.out.println("kijkNa viewer");
 
 		if (correct)
 			score = scoreMax;
+		
+		if (correct && viewerOnly)
+		{	//viewer.vinkjeLabel.setVisible(true);
+			v3d.kijkNaPanel.setWidgetVisible(goedKrulImage,true);
+			//vaktek.vinkjeLabel.setVisible(true);
+		}
+		else if (!correct && viewerOnly)
+		{
+			v3d.kijkNaPanel.setWidgetVisible(foutKruisImage,true);
+		}
+		else if (correct && profilesOnly)
+		{
+			//viewer.kruisjeLabel.setVisible(true);
+			//v3d.kijkNaPanel.setWidgetVisible(tvGWT.goedKrulImage,false);
+			//vaktek.kruisjeLabel.setVisible(true);
+			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelGoed,true);
+		}
+		else if (!correct && profilesOnly)
+		{
+			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelFout,true);
+		}
+		
+		ingevuld = true;
 
     	comRoot.setChanged(isCorrect().booleanValue());
 
