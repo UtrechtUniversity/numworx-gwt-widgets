@@ -399,6 +399,7 @@ System.out.println("tvGWT setState");
 		
 		this.breedte = width;
 		this.hoogte = height;
+		dlp.setPixelSize(width, height);
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
