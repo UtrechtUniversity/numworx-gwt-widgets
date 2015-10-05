@@ -1139,6 +1139,15 @@ public class StatInteractiePanelView extends LayoutPanel
 		public void onClick(ClickEvent event)
 		{
 			setSelected();
+			
+			if (event.isControlKeyDown())
+			{
+				int x = event.getNativeEvent().getClientX();
+			    int y = event.getNativeEvent().getClientY();
+				showTabPopupMenu(x, y);
+			    
+				event.preventDefault(); 
+			}
 		}
 
 		private void setSelected()
