@@ -765,6 +765,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	{
 		this.breedte = width;
 		this.hoogte = height;
+		dlp.setPixelSize(breedte , hoogte ); // Wim: nu zijn pas de maten bekend. 
+
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
