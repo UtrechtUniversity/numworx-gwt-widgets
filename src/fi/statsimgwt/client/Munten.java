@@ -532,6 +532,12 @@ public class Munten extends FlowPanel implements ClickHandler{
 
 	public void setEenMuntTweeMunten() {
 		if (eenMunt.getValue()==true) {
+			frequentieCanvas.setVisible(true);
+			frequentie.paint();
+			if (muntenTabel1==true)
+				scrollPanel.setVisible(true);
+			scrollPanel2.setVisible(false);
+			grafiek.paint();
 			aantalKopRadio.setVisible(true);
 			percentageKopRadio.setVisible(true);
 			avgResult.setVisible(true);
@@ -556,6 +562,11 @@ public class Munten extends FlowPanel implements ClickHandler{
 			minResult5.setVisible(false);
 			maxResult5.setVisible(false);
 		} else {
+			frequentieCanvas.setVisible(false);
+			scrollPanel.setVisible(false);
+			if (muntenTabel1==true)
+				scrollPanel2.setVisible(true);
+			grafiek.paint();
 			aantalKopRadio.setVisible(false);
 			percentageKopRadio.setVisible(false);
 			avgResult.setVisible(false);
@@ -690,20 +701,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 			doeStap();
 		}
 		if (event.getSource()==eenMunt) {
-			frequentieCanvas.setVisible(true);
-			if (muntenTabel1==true)
-				scrollPanel.setVisible(true);
-			scrollPanel2.setVisible(false);
-			grafiek.paint();
-			frequentie.paint();
 			setEenMuntTweeMunten();
 		}
 		if (event.getSource()==tweeMunten) {
-			frequentieCanvas.setVisible(false);
-			scrollPanel.setVisible(false);
-			if (muntenTabel1==true)
-				scrollPanel2.setVisible(true);
-			grafiek.paint();
 			setEenMuntTweeMunten();
 		}
 		if (event.getSource()==aantalKopRadio) {

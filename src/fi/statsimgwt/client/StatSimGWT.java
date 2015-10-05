@@ -118,22 +118,60 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	
 		if (muntenSelected)
 			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
+			Boolean eenMuntTweeMunt=false;
+			if (l.containsKey("eenMuntTweeMunt"))
+				eenMuntTweeMunt = l.getBoolean("eenMuntTweeMunt");
+			munten.eenMunt.setValue(eenMuntTweeMunt);
+			munten.tweeMunten.setValue(!eenMuntTweeMunt);
+			munten.setEenMuntTweeMunten();
+			String aantalWorpen="";
+			if (l.containsKey("aantalWorpen"))
+				aantalWorpen = l.getString("aantalWorpen");
+			munten.aantalWorpenText.setText(aantalWorpen);
+			String kansOpMunt="";
+			if (l.containsKey("kansOpMunt"))
+				kansOpMunt = l.getString("kansOpMunt");
+			munten.kansOpKopText.setText(kansOpMunt);			
 		if (dobbelstenenSelected)
 			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
+			Boolean eenDobbelsteenRadio=false;
+			if (l.containsKey("eenDobbelsteenRadio"))
+				eenDobbelsteenRadio = l.getBoolean("eenDobbelsteenRadio");
+			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteenRadio);
+			Boolean tweeDobbelstenenRadio=false;
+			if (l.containsKey("tweeDobbelstenenRadio"))
+				tweeDobbelstenenRadio = l.getBoolean("tweeDobbelstenenRadio");
+			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenenRadio);
+			Boolean drieDobbelstenenRadio=false;
+			if (l.containsKey("drieDobbelstenenRadio"))
+				drieDobbelstenenRadio = l.getBoolean("drieDobbelstenenRadio");
+			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenenRadio);
+			dobbelstenen.doEenTweeDrieDobbelstenen();
+			String aantalWorpenDobbelsteen="";
+			if (l.containsKey("aantalWorpenDobbelsteen"))
+				aantalWorpenDobbelsteen = l.getString("aantalWorpenDobbelsteen");
+			dobbelstenen.aantalWorpenText.setText(aantalWorpenDobbelsteen);
+			Boolean toonSom=false;
+			if (l.containsKey("toonSom"))
+				toonSom = l.getBoolean("toonSom");
+			dobbelstenen.toonSom.setValue(toonSom);
+			dobbelstenen.dobbelstenenGrafiek.paint();
+			
+			
 		if (binomTrekkingSelected) {
 			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
 			String binomKans="";
 			if (l.containsKey("kans"))
 				binomKans = l.getString("kans");
 			binomTrekking.kansText.setText(binomKans);
-			Integer aantalTrekkingen=0;
+			String aantalTrekkingen="";
 			if (l.containsKey("aantalTrekkingen"))
-				aantalTrekkingen = l.getInt("aantalTrekkingen");
-			binomTrekking.aantalTrekkingenText.setText(Integer.toString(aantalTrekkingen));
-			Integer aantalKeer=0;
+				aantalTrekkingen = l.getString("aantalTrekkingen");
+			binomTrekking.aantalTrekkingenText.setText(aantalTrekkingen);
+			String aantalKeer="";
 			if (l.containsKey("aantalKeer"))
-				aantalKeer = l.getInt("aantalKeer");
-			binomTrekking.keerText.setText(Integer.toString(aantalKeer));
+				aantalKeer = l.getString("aantalKeer");
+			binomTrekking.keerText.setText(aantalKeer);
 
 		}
 		
@@ -209,7 +247,8 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				list3.add(Arrays.asList(list2.get(i).getExpNumber(),list2.get(i).getGeenKop(),list2.get(i).getEenKop(),list2.get(i).getTweeKop()));
 			}
 			
-			h.put("table2", list3);
+			h.put("table2", list3);					
+			
 			
 			h.put("eenMunt", new Boolean(munten.eenMunt.getValue()));
 			h.put("tweeMunten", new Boolean(munten.tweeMunten.getValue()));
@@ -313,6 +352,18 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 		
 		
 		if (muntenSelected) {
+			
+			Boolean eenMunt=false;
+			if (h.containsKey("eenMunt"))
+				eenMunt = h.getBoolean("eenMunt");
+			munten.eenMunt.setValue(eenMunt);
+			
+			Boolean tweeMunten=false;
+			if (h.containsKey("tweeMunten"))
+				tweeMunten = h.getBoolean("tweeMunten");
+			munten.tweeMunten.setValue(tweeMunten);
+			munten.setEenMuntTweeMunten();
+			
 			if (h.containsKey("table")){
 				List<List<String>> list;
 				
@@ -328,6 +379,11 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				munten.dataProvider.getList().addAll(list1);
 				munten.dataProvider.refresh();
 				munten.dataProvider.flush();
+				
+				if (eenMunt==true) {
+					munten.experiment=list.size();
+					//Window.alert("1:"+Integer.toString(list.size()));
+				}
 			}
 			
 			if (h.containsKey("table2")){
@@ -345,18 +401,14 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				munten.dataProvider1.getList().addAll(list3);
 				munten.dataProvider1.refresh();
 				munten.dataProvider1.flush();
+				
+				if (eenMunt==false) {
+					munten.experiment=list2.size();
+					//Window.alert(Integer.toString(list2.size()));
+				}
 			}
 			
-			Boolean eenMunt=false;
-			if (h.containsKey("eenMunt"))
-				eenMunt = h.getBoolean("eenMunt");
-			munten.eenMunt.setValue(eenMunt);
-			
-			Boolean tweeMunten=false;
-			if (h.containsKey("tweeMunten"))
-				eenMunt = h.getBoolean("tweeMunten");
-			munten.tweeMunten.setValue(tweeMunten);
-			munten.setEenMuntTweeMunten();
+						
 			
 			String aantalWorpen="";
 			if (h.containsKey("aantalWorpen"))
@@ -384,6 +436,24 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 		
 		
 		if (dobbelstenenSelected) {
+			
+			Boolean eenDobbelsteen=false;
+			if (h.containsKey("eenDobbelsteen"))
+				eenDobbelsteen = h.getBoolean("eenDobbelsteen");
+			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteen);
+			
+			Boolean tweeDobbelstenen=false;
+			if (h.containsKey("tweeDobbelstenen"))
+				tweeDobbelstenen = h.getBoolean("tweeDobbelstenen");
+			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenen);
+			
+			Boolean drieDobbelstenen=false;
+			if (h.containsKey("drieDobbelstenen"))
+				drieDobbelstenen = h.getBoolean("drieDobbelstenen");
+			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenen);
+			
+			dobbelstenen.doEenTweeDrieDobbelstenen();
+			
 			if (h.containsKey("table3")){
 				List<List<String>> list3;
 				
@@ -399,6 +469,9 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				dobbelstenen.dataProvider.getList().addAll(list4);
 				dobbelstenen.dataProvider.refresh();
 				dobbelstenen.dataProvider.flush();
+				
+				if (eenDobbelsteen==true) 
+					dobbelstenen.experiment=list3.size();
 			}
 			if (h.containsKey("table4")){
 				List<List<String>> list5;
@@ -415,6 +488,9 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				dobbelstenen.dataProvider1.getList().addAll(list6);
 				dobbelstenen.dataProvider1.refresh();
 				dobbelstenen.dataProvider1.flush();
+
+				if (tweeDobbelstenen==true) 
+					dobbelstenen.experiment=list5.size();
 			}
 			if (h.containsKey("table5")){
 				List<List<String>> list7;
@@ -431,6 +507,9 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				dobbelstenen.dataProvider2.getList().addAll(list8);
 				dobbelstenen.dataProvider2.refresh();
 				dobbelstenen.dataProvider2.flush();
+
+				if (drieDobbelstenen==true) 
+					dobbelstenen.experiment=list7.size();
 			}
 			if (h.containsKey("table6")){
 				List<List<String>> list9;
@@ -481,24 +560,6 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				dobbelstenen.dataProvider5.flush();
 			}
 			
-			Boolean eenDobbelsteen=false;
-			if (h.containsKey("eenDobbelsteen"))
-				eenDobbelsteen = h.getBoolean("eenDobbelsteen");
-			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteen);
-			
-			Boolean tweeDobbelstenen=false;
-			if (h.containsKey("tweeDobbelstenen"))
-				tweeDobbelstenen = h.getBoolean("tweeDobbelstenen");
-			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenen);
-			
-			Boolean drieDobbelstenen=false;
-			if (h.containsKey("drieDobbelstenen"))
-				drieDobbelstenen = h.getBoolean("drieDobbelstenen");
-			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenen);
-			
-			dobbelstenen.doEenTweeDrieDobbelstenen();
-			
-			
 			String aantalWorpenDobbelstenen="";
 			if (h.containsKey("aantalWorpenDobbelstenen"))
 				aantalWorpenDobbelstenen = h.getString("aantalWorpenDobbelstenen");
@@ -527,6 +588,8 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				binomTrekking.dataProvider.getList().addAll(list16);
 				binomTrekking.dataProvider.refresh();
 				binomTrekking.dataProvider.flush();
+				
+				binomTrekking.experiment=list15.size();
 			}
 			
 			String binomKans="";
