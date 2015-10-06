@@ -153,7 +153,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(algebraPijlenGWTCss.root());
 	
-		standAlone = true;
+		//standAlone = true; // Wim een debuggertje was is blijven hangen?
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
@@ -883,6 +883,12 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 	//@Override
 	public void zetNagekeken(boolean b) {
+	}
+
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
 	}
 
 
