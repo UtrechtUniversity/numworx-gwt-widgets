@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -14,27 +15,22 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 //import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import com.google.gwt.canvas.client.Canvas;
-
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -109,6 +105,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     static int RIGHTVIEW = 6;
     static int TEACHER = 7;
 
+    // logger
+    Logger logger = Logger.getLogger("TekenVeelvlakGWT");
 
 	public void getImages() 
 	{
@@ -250,7 +248,7 @@ System.out.println("tvGWT getState");
 	public void setState(HashMap<String, Object> map)
 	{
 // hier onderscheid maken tussen TVV, Viewer, Profiles?		
-System.out.println("tvGWT setState");    	
+logger.info("tvGWT setState: " + map);    	
 		
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
@@ -291,16 +289,12 @@ System.out.println("tvGWT setState");
 	    	tvv.zetBeginHoeken(tekenVeelvlakDraaiX, tekenVeelvlakDraaiY);
 		}
 		
-    	ArrayList<String> leerlingKleurenAL = null; 
+    	String[] leerlingKleuren = null; 
     	if (h.containsKey("leerlingKleuren"))
-    		leerlingKleurenAL = (ArrayList<String>) h.get("leerlingKleuren");
+    		leerlingKleuren = h.getStringArray("leerlingKleuren");
     	
-    	if (leerlingKleurenAL != null)
+    	if (leerlingKleuren != null)
     	{	
-    		String[] leerlingKleuren = new String[leerlingKleurenAL.size()];
-    		for (int lk = 0; lk < leerlingKleurenAL.size(); lk++)
-    			leerlingKleuren[lk] = leerlingKleurenAL.get(lk);
-
     		if (vlakkenKleurenOptie && viewerOnly)
     		{	v3d.setKleuren(leerlingKleuren);
     		}
@@ -350,7 +344,7 @@ System.out.println("tvGWT setState");
 	@Override
 	public int getScore()
 	{
-		return 0;
+		return score;
 	}
 
 	@Override
@@ -402,6 +396,11 @@ System.out.println("tvGWT setState");
 		dlp.setPixelSize(width, height);
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		
+// Wim: scoreMax uit launchstate halen.
+		if(launchState.containsKey("scoreMax"))
+			scoreMax = launchState.getInt("scoreMax");
+		
 		
 		boolean viewerOnly = false;
 		boolean profilesOnly = false;
@@ -651,11 +650,9 @@ System.out.println("kijkNa viewer");
 	}
 
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub	
 	}
 
 	public int getAsHoogte() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -668,11 +665,13 @@ System.out.println("kijkNa viewer");
 	}
 
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub	
 	}
 
 	public void zetNagekeken(boolean b) {
-		// TODO Auto-generated method stub	
+	}
+
+	public int[][] getScoreObjectives() {
+		return null;
 	}
 	
     
