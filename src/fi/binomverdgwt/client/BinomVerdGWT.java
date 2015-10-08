@@ -301,12 +301,20 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		
 	}
 
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
 		// edit state variabelen
