@@ -5490,7 +5490,7 @@ panel3D.testString = "";
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
 			
@@ -5505,7 +5505,7 @@ panel3D.testString = "";
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
 			
@@ -5522,7 +5522,7 @@ panel3D.testString = "";
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
 			

@@ -1782,7 +1782,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		// TODO Auto-generated method stub
 
 	}
+
 	
+
 	@Override
 	public void init(int width, int height, Map<String, Object> map, //launchState, 
 			    Map<String, Number> values) 
@@ -1790,6 +1792,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
 		if (launchState.containsKey("lijnTekenOptie"))
