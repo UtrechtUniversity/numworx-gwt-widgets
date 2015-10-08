@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -224,8 +225,8 @@ boolean touchStart = false;
 		
 		paint();
 */
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 			
 	}
@@ -511,7 +512,7 @@ boolean touchStart = false;
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling 
 			e.stopPropagation();
@@ -527,7 +528,7 @@ boolean touchStart = false;
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -544,7 +545,7 @@ boolean touchStart = false;
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -741,7 +742,6 @@ boolean touchStart = false;
 	@Override
 	public Boolean isCorrect()
 	{
-		// TODO Auto-generated method stub
 		return Boolean.TRUE;
 	}
 
@@ -751,6 +751,8 @@ boolean touchStart = false;
 		// TODO Auto-generated method stub
 
 	}
+
+	
 	
 	@Override
 	public void init(int width, int height, Map<String, Object> map, //launchState,
@@ -758,6 +760,9 @@ boolean touchStart = false;
 	{
 		this.breedte = width;
 		this.hoogte = height;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
@@ -889,7 +894,6 @@ boolean touchStart = false;
 		
 		paint();
 
-
 	}
 
 	@Override
@@ -927,6 +931,17 @@ boolean touchStart = false;
 		// TODO Auto-generated method stub
 		
 	}	
+	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 }
 
 class Point
