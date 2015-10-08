@@ -945,4 +945,14 @@ System.out.println("hoogte = " + hoogte);
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
 }
