@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import java.util.logging.Logger;
+
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -22,6 +24,8 @@ public class AlgebraSchuifVeld //extends SchuifVeld
 							              //MouseListener, MouseMotionListener,ActionListener
 {	
 
+	private static Logger logger = Logger.getLogger("AEGWT");
+	
 	public boolean changed = false;
 	//Image GOEDKRUL,FOUTKRUIS, GOEDKRULHALF;	
 	//private JButton wisKnop;
@@ -494,6 +498,8 @@ String testString = "test";
 		
     public void setState(Map<String,Object> map)
     {	
+    	
+logger.info("ASV setState begin");    	
     	ObjectMap h = JSONUtilities.wrapMap(map);
     	
 // niet echt nodig, want de leerling kan dit niet veranderen    	
@@ -881,6 +887,8 @@ System.out.println("after " + this.aantalSc);
 		zetZoomOptie(zoomOptie);
 		
 		tekenOpnieuw();
+		
+		logger.info("ASV setState einde");
 			
     }
 

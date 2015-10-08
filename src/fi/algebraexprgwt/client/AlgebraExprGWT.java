@@ -109,7 +109,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	boolean scrollOptie = true;
 	boolean zoomOptie = true; 
 
-	boolean standAlone = false;
+	//boolean standAlone = false;
 	
 	boolean kijkNaActief = false;
 	PushButton kijkNaButton = new PushButton("Kijk Na");
@@ -144,7 +144,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(algebraExprGWTCss.root());
 
-		standAlone = true;
+		//standAlone = true;
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
@@ -700,6 +700,9 @@ System.out.println("llgExp = " + llgExp.toString());
 	{
 		this.breedte = width;
 		this.hoogte = height;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
@@ -775,8 +778,18 @@ System.out.println("llgExp = " + llgExp.toString());
 
 		makeLeft();
 		
-		if (!standAlone && (map != null))
-			asv.setState(map);
+		//if (!standAlone && (map != null))
+		//	asv.setState(map);
+		
+		// map is altijd != null
+		int aantalSc = 0;
+		if (launchState.containsKey("aantalSc"))
+			aantalSc = launchState.getInt("aantalSc");
+ 
+		if (aantalSc > 0)	
+		{	asv.setState(map);
+		}
+
 		
 		if (kijkNaActief)
 		{	
@@ -806,5 +819,15 @@ System.out.println("llgExp = " + llgExp.toString());
 		
 	}
 
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
 
 }
