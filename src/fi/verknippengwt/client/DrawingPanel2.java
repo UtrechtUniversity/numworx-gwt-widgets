@@ -2819,7 +2819,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 			
 //System.out.println("mouseDown");
 
-			//e.preventDefault();
+			e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
 			
@@ -2835,7 +2835,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			
 			// prevent scrolling
 			e.stopPropagation();
@@ -2857,7 +2857,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
+			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
 
