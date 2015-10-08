@@ -110,7 +110,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	boolean tabelOptie = true;
 	boolean grafiekOptie =  true;
 	
-	boolean standAlone = false;
+	//boolean standAlone = false;
 	
 	boolean kijkNaActief = false;
 	PushButton kijkNaButton = new PushButton("Kijk Na");
@@ -767,6 +767,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		this.hoogte = height;
 		dlp.setPixelSize(breedte , hoogte ); // Wim: nu zijn pas de maten bekend. 
 
+		
+		
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
@@ -850,7 +852,12 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		makeLeft();
 		
-		if (!standAlone && (map != null))
+		// map is altijd != null
+		int aantalSc = 0;
+		if (launchState.containsKey("aantalSc"))
+			aantalSc = launchState.getInt("aantalSc");
+ 
+		if (aantalSc > 0)	
 		{	asv.setState(map);
 		}
 
@@ -885,13 +892,12 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	public void zetNagekeken(boolean b) {
 	}
 
+	
 
 	//@Override
 	public int[][] getScoreObjectives() {
 		return null;
 	}
-
-
 
 }
 

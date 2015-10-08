@@ -4,6 +4,8 @@ import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import java.util.*;
 
+import java.util.logging.Logger;
+
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
@@ -13,6 +15,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class AlgebraSchuifVeld 
 {	
+	private static Logger logger = Logger.getLogger("APGWT");
+	
 	public boolean changed = false;
 	
 	int aantalSc;	
@@ -912,11 +916,15 @@ else // alleenInvullen || isDemo
     
     public void paint()
     {
+    	
     	paint(asvContext2d);
     }
 	//public void paint(Graphics g)
     public void paint(Context2d g)
 	{	
+    	
+logger.info("ASV paint " + aantalSc);
+
     	tekenAchtergrond(g);
     	
 
@@ -990,7 +998,8 @@ else // alleenInvullen || isDemo
 	{	
 		
 //System.out.println("maakStapel");
-
+logger.info("maakStapel");
+		
 		aantalSc = 0;
 		int b = basisB; //50;
 		int h = basisH; //20;
