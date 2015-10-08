@@ -3,7 +3,7 @@ package fi.draaibankgwt.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.uu.fi.dwo.interaction.client.InteractionView;
+//import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 
-public class DraaibankGWT implements EntryPoint, InteractionView 
+public class DraaibankGWT implements EntryPoint, InteractionStub 
 {
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
@@ -98,8 +98,8 @@ public class DraaibankGWT implements EntryPoint, InteractionView
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName("root");
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 				
 	}
 	
@@ -244,10 +244,10 @@ public class DraaibankGWT implements EntryPoint, InteractionView
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
 		// TODO Auto-generated method stub
-		return false;
+		return Boolean.TRUE;
 	}
 
 	@Override
@@ -266,6 +266,9 @@ public class DraaibankGWT implements EntryPoint, InteractionView
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
 		if (launchState.containsKey("demoVersion"))
@@ -301,4 +304,50 @@ public class DraaibankGWT implements EntryPoint, InteractionView
 		tekenPanel.tekenOpnieuw();
 
 	}	
+	
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getWidth() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
+	}	
+
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 }

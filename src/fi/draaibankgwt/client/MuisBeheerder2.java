@@ -52,6 +52,7 @@ class MuisBeheerder2 implements MouseDownHandler, MouseMoveHandler, MouseUpHandl
 	//public void mousePressed(MouseEvent e)
 	public void onMouseDown(MouseDownEvent e)
 	{	
+		e.preventDefault();
 		e.stopPropagation();
 		
 		mouseDown = true;
@@ -67,6 +68,7 @@ class MuisBeheerder2 implements MouseDownHandler, MouseMoveHandler, MouseUpHandl
 	//public void mouseDragged(MouseEvent e)
 	public void onMouseMove(MouseMoveEvent e)
 	{	
+		e.preventDefault();
 		e.stopPropagation();
 		
 		if (!mouseDown)
@@ -84,6 +86,7 @@ class MuisBeheerder2 implements MouseDownHandler, MouseMoveHandler, MouseUpHandl
 	//public void mouseReleased(MouseEvent e)
 	public void onMouseUp(MouseUpEvent e)
 	{	
+		e.preventDefault();
 		e.stopPropagation();
 		
 		mouseDown = false;
