@@ -307,6 +307,17 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		
 	}
 	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+	
 	public int getMode() {
 		return 0; //mode;
 	}
@@ -320,6 +331,9 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		
 		this.breedte = width;
 		this.hoogte = height;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
