@@ -142,6 +142,9 @@ public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView
 	{		this.breedte = width;
 			this.hoogte = height;
 			//this.launchState = launchState;
+			
+			dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+			
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
 			
 			// parametrisatie			
@@ -523,5 +526,17 @@ public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 
 }
