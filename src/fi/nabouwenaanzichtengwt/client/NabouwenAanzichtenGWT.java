@@ -948,6 +948,8 @@ System.out.println("hoogte = " + hoogte);
 	
 	//@Override
 	public void zetNagekeken(boolean b) {
+		if (ingevuld) 
+			nagekeken = b;
 	}
 
 	
