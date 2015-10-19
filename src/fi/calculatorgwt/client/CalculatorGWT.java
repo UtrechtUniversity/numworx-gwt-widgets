@@ -1005,7 +1005,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				{	return sb;
 				}
 				if(sb.indexOf("^") < sb.length() - 1 && sb.charAt(sb.indexOf("^") + 1) == '(')
-				{	vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+				{	int lengte1 = this.lengte1;
+					vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+					this.lengte1 = lengte1;
 					rekenKind2 = uitkomst;
 					lengte2 = lengteHaakjesUitdrukking;
 				}
@@ -1577,7 +1579,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		}
 		
 		if(sb.indexOf("^") < sb.length() - 1 && sb.charAt(sb.indexOf("^") + 1) == '(')
-		{	vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+		{	int lengte1 = this.lengte1;
+			vindHaakjesUitdrukking(sb, sb.indexOf("^") + 1);
+			this.lengte1 = lengte1;
 			teller2 = teller;
 			noemer2 = noemer;
 			lengte2 = lengteHaakjesUitdrukking;
@@ -2404,7 +2408,6 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public int[][] getScoreObjectives() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
