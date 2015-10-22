@@ -1005,6 +1005,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		
 		this.breedte = width;
 		this.hoogte = height;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
@@ -1090,10 +1092,18 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		this.asHoogte = ashoogte;
 	}
 
-	@Override
+	
+	//@Override
 	public void zetNagekeken(boolean b) {
 	}
+
 	
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
     
 
 }
