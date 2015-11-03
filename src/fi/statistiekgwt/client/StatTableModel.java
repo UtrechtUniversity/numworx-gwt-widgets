@@ -2878,6 +2878,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				break;
 			}	
 		}
+		
+		if (this.rowCount == 0)
+		{
+			hasDoubleValues = false;
+		}
 
 		return hasDoubleValues;
 	}
@@ -2904,6 +2909,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}	
 		}
 
+		if (this.rowCount == 0)
+		{
+			hasIntegerValues = false;
+		}
+		
 		return hasIntegerValues;
 	}
 	
