@@ -155,6 +155,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * in the import dialog.
 	 */
 	private static final String CSV_FROM_EXCEL_FILE_TYPE = "application/vnd.ms-excel";
+	private static final String CSV_FROM_EXCEL_FILE_TYPE2 = "text/csv";
 
 	private static final int WIDTH_PASTE_DIALOG = 300;
 	private static final int HEIGHT_PASTE_DIALOG = 230;
@@ -1221,7 +1222,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			
 			try
 			{
-				if (type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE))
+				if (type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2))
 				{
 					// If the file is larger than 1kb, read only the first 1000
 					// characters to demonstrate file slicing
@@ -1482,7 +1483,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				if (fileList.getLength() > 0)
 				{
 					String fileType = fileList.getItem(0).getType();
-					if (fileType.startsWith("application/vnd.ms-excel"))
+					if (fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2))
 					{
 						statInteractiePanel.getView().addStyleName(statistiekCss.waitCursor());
 						table.addStyleName(statistiekCss.waitCursor());
