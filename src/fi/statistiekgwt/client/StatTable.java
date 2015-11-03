@@ -2394,6 +2394,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.pager.setVisible(true);
 		}
 		
+		if (rows.size() == 0)
+		{
+			table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("emptyTableMessage")));
+		}
+		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
 	}
 
