@@ -2828,12 +2828,14 @@ grensDecimals = findGrensDecimals();
 		else // KANSLINKS of KANSRECHTS
 		{	// berekenlijst
 			//grensButton.setVisible(true);
+			if (berekenbaarZichtbaar)
+			{	
 			setWidgetVisible(grensButton, true);
 			//grensLinksButton.setVisible(false);
 			setWidgetVisible(grensLinksButton, false);
 			//grensRechtsButton.setVisible(false);
 			setWidgetVisible(grensRechtsButton, false);
-				
+			}	
 			// parameterlijst
 			//grensLabel.setVisible(true);
 			setWidgetVisible(grensLabel, true);
@@ -2888,10 +2890,12 @@ grensDecimals = findGrensDecimals();
 			actualMuBerekenbaarOptie = muBerekenbaarOptie && !muVastOptie;
 			actualSigmaBerekenbaarOptie = sigmaBerekenbaarOptie && !sigmaVastOptie;
 			//muButton.setVisible(muBerekenbaarOptie && berekenbaarZichtbaar);
+			if (berekenbaarZichtbaar)
+			{
 			setWidgetVisible(muButton, muBerekenbaarOptie && berekenbaarZichtbaar);
 			//sigmaButton.setVisible(sigmaBerekenbaarOptie && berekenbaarZichtbaar);
 			setWidgetVisible(sigmaButton, sigmaBerekenbaarOptie && berekenbaarZichtbaar);
-						
+			}			
 			zetBerekenKeuze(true);			
 			plaatsComponenten(false);			
 				
@@ -2960,7 +2964,7 @@ grensDecimals = findGrensDecimals();
 		plaatsComponenten(false);
 		
 	}
-	
+/*	
 	public void zetberekenbaarZichtbaar(boolean b)
 	{	berekenbaarZichtbaar = b;
 		//berekenLabel.setVisible(b);
@@ -2985,7 +2989,7 @@ grensDecimals = findGrensDecimals();
 		
 		plaatsComponenten(false);
 	}
-	
+*/	
 	public void zetMuBerekenbaarOptie(boolean b)
 	{	muBerekenbaarOptie = b;
 		if (!b)
