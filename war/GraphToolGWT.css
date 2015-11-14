@@ -1,0 +1,14 @@
+/** Add css rules here for your application. */
+
+
+.root {
+/**	background-color: yellow; */
+}	
+
+.dock {
+/**	background-color: orange; */
+}
+
+.canvas {
+	background-color: white;	
+}
