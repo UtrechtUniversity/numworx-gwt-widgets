@@ -347,17 +347,18 @@ public class NoSer
 			figurenHash = h.getMapList("figurenrij");
 		Figuur[] figurenrij = new Figuur[aantalFg];
 		for (int i = 0; i < aantalFg; i++)
-		{	figurenrij[i] = setFiguurState2((Map<String,Object>) figurenHash.get(i));
+		{	figurenrij[i] = setFiguurState2( figurenHash.get(i));
 		}
 	
 		int[] var = new int[4];
-		ArrayList<Integer> varList = new ArrayList<Integer>();
+		List<Integer> varList = new ArrayList<Integer>();
 		
 		if (h.containsKey("varList"))
-		{	//varList = (ArrayList<Integer>) h.get("varList");
-			varList = (ArrayList<Integer>) h.getIntegerList("varList");
-			for (int vCnt = 0; vCnt < varList.size(); vCnt++)
-				var[vCnt] = ((Integer) varList.get(vCnt)).intValue();
+		{	
+//			varList =  h.getIntegerList("varList");
+//			for (int vCnt = 0; vCnt < varList.size(); vCnt++)
+//				var[vCnt] =  varList.get(vCnt).intValue();
+			var = h.getIntArray("varList");
 		}
 
 		State s = new State(aantalFg, figurenrij, var);
