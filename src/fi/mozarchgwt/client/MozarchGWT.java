@@ -511,14 +511,12 @@ public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override
