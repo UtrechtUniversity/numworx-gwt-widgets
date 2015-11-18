@@ -295,8 +295,8 @@ public class TekenPanel //extends JPanel
 	}
 	void tekenPunten()
 	{	
-		tb.gIm.setFillStyle(CssColor.make(255,0,0));
-		
+		//tb.gIm.setFillStyle(CssColor.make(255,0,0));
+		tb.gIm.setFillStyle(CssColor.make(0,0,0));
 		
 		for(int i=0 ; i<aantalNieuwHp ; i++)
 		{	//tb.gIm.fillOval(posBasis.x+(int)nieuwHp[i].x-3,posBasis.y+(int)nieuwHp[i].y-3,6,6 );
@@ -487,8 +487,8 @@ public class TekenPanel //extends JPanel
 		
 		h.put("aantalNieuwHp", new Integer(aantalNieuwHp));
 		
-		ArrayList<Double> nieuwHpX = new ArrayList<Double>();
-		ArrayList<Double> nieuwHpY = new ArrayList<Double>();
+		List<Double> nieuwHpX = new ArrayList<Double>();
+		List<Double> nieuwHpY = new ArrayList<Double>();
 		
 		for (int hpCnt = 0; hpCnt < aantalNieuwHp; hpCnt++)
 		{

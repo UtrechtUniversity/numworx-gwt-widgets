@@ -7,12 +7,14 @@ import com.google.gwt.resources.client.ClientBundle.Source;
 public interface DraaibankGWTClientBundle extends ClientBundle 
 {
 
-
    @Source("fi/draaibankgwt/client/images/zoominknop.gif")
    public ImageResource vergrootResource();
 
    @Source("fi/draaibankgwt/client/images/zoomuitknop.gif")
    public ImageResource verkleinResource();
 
+   @Source("fi/draaibankgwt/client/css/DraaibankGWT.css")
+   public DraaibankGWTCssResource getDraaibankGWTCssResource();
 
+   
 }

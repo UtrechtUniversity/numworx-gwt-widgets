@@ -34,9 +34,12 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class DraaibankGWT implements EntryPoint, InteractionStub 
 {
+	private static Logger logger = Logger.getLogger("DraaibankGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -63,6 +66,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 //	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
 	
 	DraaibankGWTClientBundle draaibankGWTClientBundle;
+	DraaibankGWTCssResource draaibankGWTCssResource;
 	ImageResource vergrootResource, verkleinResource;
 	Image vergrootImage, verkleinImage;
 	
@@ -77,14 +81,17 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	public void getImages()
 	{
 		draaibankGWTClientBundle = GWT.create(DraaibankGWTClientBundle.class);
+		draaibankGWTCssResource = draaibankGWTClientBundle.getDraaibankGWTCssResource();
+		draaibankGWTCssResource.ensureInjected();
+
 		
 		vergrootResource = draaibankGWTClientBundle.vergrootResource();
 		vergrootImage = new Image(vergrootResource);
-		vergrootImage.addStyleName("pushimage");
+		vergrootImage.addStyleName(draaibankGWTCssResource.pushimage());
 		
 		verkleinResource = draaibankGWTClientBundle.verkleinResource();
 		verkleinImage = new Image(verkleinResource);
-		verkleinImage.addStyleName("pushimage");
+		verkleinImage.addStyleName(draaibankGWTCssResource.pushimage());
 	}
 	
 	public void onModuleLoad() 
@@ -92,11 +99,11 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		getImages();
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
-		dlp.addStyleName("dock");
+		dlp.addStyleName(draaibankGWTCssResource.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		RootPanel.get(holderId).add(dlp);
-		RootPanel.get(holderId).addStyleName("root");
+		RootPanel.get(holderId).addStyleName(draaibankGWTCssResource.root());
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
@@ -141,9 +148,9 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		int currentY = hoogte - topOffset - buttonHeight; 
 		
 		terugButton = new PushButton("terug");
-		terugButton.addStyleName("pushbutton");
+		terugButton.addStyleName(draaibankGWTCssResource.pushbutton());
 		canvasPanel.add(terugButton);
-		canvasPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
+		canvasPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth + 5, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(terugButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 		terugButton.addClickHandler(new PushClickHandler());
@@ -151,7 +158,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		currentX += buttonWidth + 3 * leftOffset;		
 
 		wisButton = new PushButton("wis");
-		wisButton.addStyleName("pushbutton");
+		wisButton.addStyleName(draaibankGWTCssResource.pushbutton());
 		canvasPanel.add(wisButton);
 		canvasPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(wisButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
@@ -165,7 +172,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 			currentY = hoogte - topOffset - pushSize;
 			
 			vergrootButton = new PushButton(vergrootImage);
-			vergrootButton.addStyleName("pushbutton");
+			vergrootButton.addStyleName(draaibankGWTCssResource.pushbutton());
 			canvasPanel.add(vergrootButton);
 			canvasPanel.setWidgetLeftWidth(vergrootButton, currentX, Style.Unit.PX, pushSize, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(vergrootButton, currentY, Style.Unit.PX, pushSize, Style.Unit.PX);
@@ -175,7 +182,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 			currentX += pushSize + 3 * leftOffset;
 
 			verkleinButton = new PushButton(verkleinImage);
-			verkleinButton.addStyleName("pushbutton");
+			verkleinButton.addStyleName(draaibankGWTCssResource.pushbutton());
 			canvasPanel.add(verkleinButton);
 			canvasPanel.setWidgetLeftWidth(verkleinButton, currentX, Style.Unit.PX, pushSize, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(verkleinButton, currentY, Style.Unit.PX, pushSize, Style.Unit.PX);
@@ -225,14 +232,13 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	@Override
 	public HashMap<String, Object> getState()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return tekenPanel.getState();
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		// TODO Auto-generated method stub
+		tekenPanel.setState(h);
 
 	}
 
@@ -262,6 +268,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	{
 		
 // launchdata/state		
+logger.info("DraaibankGWT init");		
 		
 		this.breedte = width;
 		this.hoogte = height;
@@ -291,7 +298,7 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		
 		tekenPanel.demoVersion = demoVersion;
 		
-		tekenPanel.draaibankGWTCanvas.addStyleName("canvas");
+		tekenPanel.draaibankGWTCanvas.addStyleName(draaibankGWTCssResource.canvas());
 		
 		canvasPanel.add(tekenPanel.draaibankGWTCanvas);
 		canvasPanel.setWidgetLeftWidth(tekenPanel.draaibankGWTCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
@@ -326,13 +333,13 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	@Override
 	public int getHeight() {
 		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
 		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override
