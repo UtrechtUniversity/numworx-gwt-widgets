@@ -37,9 +37,12 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	private static Logger logger = Logger.getLogger("MozarchGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -139,7 +142,10 @@ public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView
 
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
-	{		this.breedte = width;
+	{		
+logger.info("MozarchGWT init");
+
+			this.breedte = width;
 			this.hoogte = height;
 			//this.launchState = launchState;
 			
