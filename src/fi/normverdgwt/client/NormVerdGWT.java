@@ -39,9 +39,12 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	private static Logger logger = Logger.getLogger("NormVerdGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -76,7 +79,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	private int mode;
 	private OpdrNavIF comRoot;
 	
-	//boolean kijkOpdrachtNa = false;
+	boolean kijkOpdrachtNa = false;
 	Boolean correct = true;
 	boolean nagekeken = false;
 	boolean ingevuld = false; 
@@ -266,6 +269,9 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	public void kijkNa() 
 	{
 //System.out.println("NV KijkNa");
+		
+		if (!kijkOpdrachtNa)
+			return;
 
 		// dit verandert correct
 		normaalPanel.kijkNa();
@@ -290,15 +296,13 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	}
 
 	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getHeight() 
+	{	return hoogte;
 	}
 
 	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getWidth() 
+	{	return breedte;
 	}
 
 	@Override
@@ -328,6 +332,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		getImages();
 		
 //System.out.println("normverd init");		
+logger.info("NormVerdGWT init");		
 		
 		this.breedte = width;
 		this.hoogte = height;
@@ -508,7 +513,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 			berekenbaarZichtbaar = launchState.getBoolean("berekenbaarZichtbaar");
 
 		// nakijkopties
-		boolean kijkOpdrachtNa = true; //false;
+		//boolean kijkOpdrachtNa = false;
 		boolean kijkMuNa = false;
 		String checkMu = "0";
 		double antwoordMu = 0;

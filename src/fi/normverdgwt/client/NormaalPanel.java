@@ -378,9 +378,9 @@ public class NormaalPanel extends LayoutPanel
 		//kansGroup.add(tweeGrenzenButton);
 		
 //test		
-		linksButton.addStyleName("radiobutton");
-		rechtsButton.addStyleName("radiobutton");
-		tweeGrenzenButton.addStyleName("radiobutton");
+		linksButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		rechtsButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		tweeGrenzenButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
 
 // dit in plaatsComponenten		
 		//add(linksButton);
@@ -473,12 +473,12 @@ public class NormaalPanel extends LayoutPanel
 
 //test		
 		berekenLabel.addStyleName("radiobutton");
-		muButton.addStyleName("radiobutton");
-		sigmaButton.addStyleName("radiobutton");
-		grensButton.addStyleName("radiobutton");
-		grensLinksButton.addStyleName("radiobutton");
-		grensRechtsButton.addStyleName("radiobutton");
-		kansButton.addStyleName("radiobutton");
+		muButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		sigmaButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		grensButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		grensLinksButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		grensRechtsButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
+		kansButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
 
 // in plaatsComponenten		
 /*		

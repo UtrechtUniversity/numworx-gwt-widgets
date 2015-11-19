@@ -19,6 +19,7 @@
 
 .radiobutton {
 	text-align: left;
+	font-family: Helvetica, sans serif;
 	/** background-color: yellow; */
 }	
 
@@ -26,6 +27,7 @@
 	background-color: rgb(198, 239, 247);
 	color: blue;
 	text-align: left;
+	font-family: Helvetica, sans serif;
 }
 
 .upimage {
@@ -60,5 +62,6 @@
 	background-color: yellow;
 	font-size: 0.875em;
 	padding: 0px;	
+	font-family: Helvetica, sans serif;
 }	
 
