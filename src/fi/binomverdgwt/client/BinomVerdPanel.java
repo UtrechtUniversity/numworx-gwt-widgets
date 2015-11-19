@@ -276,7 +276,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
         //this.kansLabelLinks.setHorizontalAlignment(SwingConstants.CENTER);
         
         this.kansLabelMidden = new Label();
-        kansLabelMidden.addStyleName("labelon");
+        kansLabelMidden.addStyleName(BinomVerdGWT.binomVerdGWTCss.label());
 //GWT (4)        
         //this.kansLabelMidden.setBackground(this.LABEL_ACTIEF);
         //this.kansLabelMidden.setOpaque(true);
@@ -302,11 +302,11 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
         String kansGroep = "kansGroep";
         
 		this.kansRadioLinks = new RadioButton(kansGroep);
-		kansRadioLinks.setStyleName("radiobuttonon");		
+		kansRadioLinks.setStyleName(BinomVerdGWT.binomVerdGWTCss.radiobuttonon());		
 		this.kansRadioMidden = new RadioButton(kansGroep);
-		kansRadioMidden.setStyleName("radiobutton");		
+		kansRadioMidden.setStyleName(BinomVerdGWT.binomVerdGWTCss.radiobuttonon());		
 		this.kansRadioRechts = new RadioButton(kansGroep);
-		kansRadioRechts.setStyleName("radiobutton");
+		kansRadioRechts.setStyleName(BinomVerdGWT.binomVerdGWTCss.radiobuttonon());
 
 		kansRadioLinks.setValue(true, false);
 
@@ -345,7 +345,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		//tm = staafjesPanel.binomVerdGWTContext2d.measureText("Twee grenswaarden");
 		grenzenBoxWidth = 170;
 		this.grenzenBox = new CheckBox("Twee grenswaarden");
-		grenzenBox.addStyleName("checkbox");		
+		//grenzenBox.addStyleName(BinomVerdGWT.binomVerdGWTCss.checkbox());		
 //GWT (2)		
 		//this.grenzenBox.setFont(this.font);
 		//this.grenzenBox.setBackground(Color.WHITE);
@@ -354,6 +354,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		//this.grenzenBox.addActionListener(this);
 		
 		kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton.addStyleName(BinomVerdGWT.binomVerdGWTCss.pushbutton());
 		kijkNaPanel = new LayoutPanel();
 //GWT later		
 /*		
@@ -518,6 +519,9 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	
 	public void paint()
 	{
+		
+//System.out.println("BinomVerdPanel paint");
+
 		staafjesPanel.paint();
 		nSlider.paint();
 		pSlider.paint();
@@ -581,13 +585,13 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 			if (init)
 			{
 				add(noordLinks);
-				noordLinks.addStyleName("noordpanel");
+				noordLinks.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
 				add(noordMidden);
-				noordMidden.addStyleName("noordpanel");
+				noordMidden.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
 				add(noordRechtsBV);
-				noordRechtsBV.addStyleName("noordpanel");
+				noordRechtsBV.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
 				add(noordRechtsHyp);
-				noordRechtsHyp.addStyleName("noordpanel");
+				noordRechtsHyp.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
 				
 				noordLinks.add(nLabel);
 				noordLinks.add(nText);

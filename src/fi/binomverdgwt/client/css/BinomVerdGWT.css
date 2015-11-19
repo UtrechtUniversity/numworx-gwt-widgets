@@ -20,11 +20,13 @@
 .radiobuttonon {
 	text-align: left;
 	background-color: rgb(188,239,247);
+	font-family: Helvetica, sans serif;
 }
 
 .radiobutton {
 	text-align: left;
 	background-color: rgb(220,239,247);
+	font-family: Helvetica, sans serif;
 }	
 		
 .noordpanel {
@@ -35,6 +37,7 @@
 	background-color: rgb(198, 239, 247);
 	color: blue;
 	text-align: left;
+	font-family: Helvetica, sans serif;
 }
 
 .upimage {
@@ -69,5 +72,6 @@
 	background-color: yellow;
 	font-size: 0.875em;
 	padding: 0px;	
+	font-family: Helvetica, sans serif;
 }	
 

@@ -280,7 +280,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 	{
 		this.showXAs = b;
 		this.updateSliderBounds();
-		this.paint();
+		//this.paint();
 	}
 	public boolean getShowYAs() {
 		return this.showYAs;
@@ -289,7 +289,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 	{
 		this.showYAs = b;
 		this.updateSliderBounds();
-		this.paint();
+		//this.paint();
 	}
 	public void setShowGrensSlider(boolean b) 
 	{
@@ -697,6 +697,7 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 	public void paint()
 	{
 		paintComponent(binomVerdGWTContext2d);
+//System.out.println("staafjespanel paint");		
 	}
 	
 	/**

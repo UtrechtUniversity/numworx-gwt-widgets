@@ -19,7 +19,10 @@
 
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
-  <add-linker name='xsiframe' />
+  <!-- <add-linker name='xsiframe' /> -->
+
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
+  <set-property name="gwt.logging.logLevel" value="FINEST"/>
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.binomverdgwt.client.BinomVerdGWT'/>

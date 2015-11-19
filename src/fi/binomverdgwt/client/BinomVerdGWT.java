@@ -38,9 +38,12 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class BinomVerdGWT implements EntryPoint, InteractionStub 
 {
+	private static Logger logger = Logger.getLogger("BinomVerdGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -96,6 +99,9 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 
 	public void onModuleLoad() 
 	{
+		
+//System.out.println("onModuleLoad");		
+
 		getImages();
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
@@ -119,6 +125,9 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	
 	public BinomVerdGWT(HashMap<String,Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		
+//System.out.println("constructor");
+
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
 		this.randomVarNamen = randomVarNamen;
@@ -130,7 +139,9 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 
-		//getImages();
+		getImages();
+		
+//System.out.println("b = " + breedte + " h = " + hoogte);		
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName("dock");
@@ -284,15 +295,13 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	}
 
 	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getHeight() 
+	{	return hoogte;
 	}
 
 	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getWidth() 
+	{	return breedte;
 	}
 
 	@Override
@@ -309,67 +318,20 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
+		
+logger.info("BinomVerdGWT init");
+		
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
 		
-		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		dlp.setPixelSize(breedte,hoogte);
+		
+//System.out.println("init " + breedte + " " + hoogte);		
 		
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
-		// edit state variabelen
-		//boolean nVeranderbaar = false; //true;
-		//boolean pVeranderbaar = true;
-		//boolean MVeranderbaar = true;
-		//boolean populatieVeranderbaar = true;
-
-		//if (launchState.containsKey("nVeranderbaar"))
-		//	nVeranderbaar = launchState.getBoolean("nVeranderbaar");
-		//if (launchState.containsKey("pVeranderbaar"))
-		//	pVeranderbaar = launchState.getBoolean("pVeranderbaar");
-		//if (launchState.containsKey("MVeranderbaar"))
-		//	MVeranderbaar = launchState.getBoolean("MVeranderbaar");
-		//if (launchState.containsKey("populatieVeranderbaar"))
-		//	populatieVeranderbaar = launchState.getBoolean("populatieVeranderbaar");
-		
-		//boolean showNSlider;
-		//boolean showPSlider;
-		//boolean showMSlider;
-		//boolean showPopulatieSlider;
-
-		//if (launchState.containsKey("showNSlider"))
-		//	showNSlider = launchState.getBoolean("showNSlider");
-		//if (launchState.containsKey("showPSlider"))
-		//	showPSlider = launchState.getBoolean("showPSlider");
-		//if (launchState.containsKey("showMSlider"))
-		//	showMSlider = launchState.getBoolean("showMSlider");
-		//if (launchState.containsKey("showPopulatieSlider"))
-		//	showPopulatieSlider = launchState.getBoolean("showPopulatieSlider");
-		
-		//boolean tweeGrenzen;
-		//boolean showGrensSlider;
-		
-		//if (launchState.containsKey("tweeGrenzen"))
-		//	tweeGrenzen = launchState.getBoolean("tweeGrenzen");
-		//if (launchState.containsKey("showGrensSlider"))
-		//	showGrensSlider = launchState.getBoolean("showGrensSlider");
-		
-		
-		//boolean showNoordBalk;
-		//boolean showTweeGrenzenKeuze;
-		//boolean showKansBalk;
-		//boolean showHyperKeuze;
-
-		//if (launchState.containsKey("showNoordBalk"))
-		//	showNoordBalk = launchState.getBoolean("showNoordBalk");
-		//if (launchState.containsKey("showTweeGrenzenKeuze"))
-		//	showTweeGrenzenKeuze = launchState.getBoolean("showTweeGrenzenKeuze");
-		//if (launchState.containsKey("showKansBalk"))
-		//	showKansBalk = launchState.getBoolean("showKansBalk");
-		//if (launchState.containsKey("showHyperKeuze"))
-		//	showHyperKeuze = launchState.getBoolean("showHyperKeuze");
-		
-		dlp.setSize(breedte + "px", hoogte + "px");		
+		// edit state variabelen in BinomVerdPanel
 		
 		getImages();
 		
@@ -384,6 +346,8 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		
 		binomVerdPanel.plaatsComponenten(true);
 		
+logger.info("BinomVerdGWT componenten geplaatst");		
+		
 		Canvas binomVerdGWTCanvas = binomVerdPanel.getCanvas();
 		
 		if (binomVerdGWTCanvas == null) 
@@ -392,26 +356,11 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	      return;
 	    }
 		
+logger.info("BinomVerdGWT pre setState");
+
 		binomVerdPanel.setState(map);
-		
-/*		
-		//nakijken:
-		boolean kijkOpdrachtNa;
-		int maxScore = 10;
-		boolean kijkGrenzenNa;
-		int antwoordGrensLinks = 5;
-		int antwoordGrensRechts = 10;
-		boolean kijkVerdelingNa;
-		int antwoordVerdeling = 0; //0 = BV, 1 = Hyp
-		boolean kijkNNa;
-		int antwoordN = 30;
-		boolean kijkPNa;
-		BVInvoer antwoordP = new BVInvoer("0.5");
-		boolean kijkMNa;
-		int antwoordM = 50;
-		boolean kijkPopulatieNa;
-		int antwoordPopulatie = 100;
-*/
+
+logger.info("BinomVerdGWT post setState");		
 
 		BVInvoer invoer = new BVInvoer("");
 		
@@ -680,15 +629,6 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 			binomVerdPanel.kijkPNa = false;
 		}
 		
-		
-		//System.out.println("AntwoordP = " + this.antwoordP.getInput());
-		//System.out.println("invoerP = " + this.pInvoer.getInput());
-		
-		//if (binomVerdPanel.kijkOpdrachtNa)
-		//	binomVerdPanel.plaatsComponenten(false);
-		//binomVerdPanel.staafjesPanel.berekenStaafBreedte();
-		//binomVerdPanel.staafjesPanel.bepaalGrenzenMetSlider();
-		
 
 		binomVerdPanel.vernieuw();
 		
@@ -696,6 +636,9 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 
 		binomVerdPanel.plaatsComponenten(false);
 		
+		
+//System.out.println("init binomVerdPanel.paint()");
+
 		binomVerdPanel.paint();
 		
 		ingevuld = false;
