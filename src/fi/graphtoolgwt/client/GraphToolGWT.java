@@ -4086,109 +4086,99 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 			}
 			
 			//* Animation Part */
-			if (!manualScalingX && !manualScalingY) {
-				// Not executed in case of manual Scaling, since eenheidx can become too small
-				final double stapx = Math.pow(factorx,0.1);
-				final double stapy = Math.pow(factory,0.1);
+			final double stapx = Math.pow(factorx,0.1);
+			final double stapy = Math.pow(factory,0.1);
 			
-				long t = System.currentTimeMillis();
+			long t = System.currentTimeMillis();
 				
-				for(int i = 0; i < 5; i++) {
-					int delay = 20*(i+1);
-					long t2 = t + delay;
-					Timer timer = new Timer() {
-						public void run() { 
-							eenheidxD = eenheidxD/stapx;
-							eenheidyD = eenheidyD/stapy;
-							eenheidx = (int) Math.round(eenheidxD);
-							eenheidy = (int) Math.round(eenheidyD);
-							beginx =  middenx -(middenx - beginx)/stapx;
-							beginy =  middeny -(middeny - beginy)/stapy;
+			for(int i = 0; i < 5; i++) {
+				int delay = 20*(i+1);
+				long t2 = t + delay;
+				Timer timer = new Timer() {
+					public void run() { 
+						eenheidxD = eenheidxD/stapx;
+						eenheidyD = eenheidyD/stapy;
+						eenheidx = (int) Math.round(eenheidxD);
+						eenheidy = (int) Math.round(eenheidyD);
+						beginx =  middenx -(middenx - beginx)/stapx;
+						beginy =  middeny -(middeny - beginy)/stapy;
 						
-							grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+						grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+					
+						beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+						grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
 						
-							beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-							grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
-						
-						
-							grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
-							grafiekGWTVeld.paint();  
-						} 
-					};
+						grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+						grafiekGWTVeld.paint();  
+					} 
+				};
 				
 				
-					timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
+				timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
 				/*
-					eenheidxD = eenheidxD/stapx;
-					eenheidyD = eenheidyD/stapy;
-					eenheidx = (int) Math.round(eenheidxD);
-					eenheidy = (int) Math.round(eenheidyD);
-					beginx =  middenx -(middenx - beginx)/stapx;
-					beginy =  middeny -(middeny - beginy)/stapy;
+				eenheidxD = eenheidxD/stapx;
+				eenheidyD = eenheidyD/stapy;
+				eenheidx = (int) Math.round(eenheidxD);
+				eenheidy = (int) Math.round(eenheidyD);
+				beginx =  middenx -(middenx - beginx)/stapx;
+				beginy =  middeny -(middeny - beginy)/stapy;
 				
-					grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+				grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
 				
-					beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-					grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
+				beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+				grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
 				
 				
-					timer.schedule(20*(i+1));
+				timer.schedule(20*(i+1));
 				*/
 				
-				}
+			}
 			
-				long t3 = t + 100;
-				Timer timer2 = new Timer() { 
-					public void run() {
-						schaalFactorX*=factorx;
-						if(in && x)factorRijNummerX--;
-						if(!in && x)factorRijNummerX++;
-						schaalFactorY*=factory;
-						if(in && y)factorRijNummerY--;
-						if(!in && y)factorRijNummerY++;
+			long t3 = t + 100;
+			Timer timer2 = new Timer() { 
+				public void run() {
+					schaalFactorX*=factorx;
+					if(in && x)factorRijNummerX--;
+					if(!in && x)factorRijNummerX++;
+					schaalFactorY*=factory;
+					if(in && y)factorRijNummerY--;
+					if(!in && y)factorRijNummerY++;
 					
+					if (!manualScalingX) {
 						eenheidxD = eenheidxD*factorx;
+					}
+					if (!manualScalingY) {
 						eenheidyD = eenheidyD*factory;
 					}
-				};
-				timer2.schedule((int) Math.max(1, t3 - System.currentTimeMillis()));
-			
-				for(int i=0 ; i<5 ; i++) {
-					int delay = 20*(i+6);
-					long t2 = t + delay;
-					//t = t + delay;
-					Timer timer = new Timer() {
-						public void run() { 
-							eenheidxD = eenheidxD/stapx;
-							eenheidyD = eenheidyD/stapy;
-							eenheidx = (int) Math.round(eenheidxD);
-							eenheidy = (int) Math.round(eenheidyD);
-							beginx =  middenx -(middenx - beginx)/stapx;
-							beginy =  middeny -(middeny - beginy)/stapy;
-						
-							grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
-						
-							beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-							grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
-						
-						
-							grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
-							grafiekGWTVeld.paint();  
-				    	} 
-					};
-					timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
 				}
-				/* End of Animation part */
-			} 
-			if (x && manualScalingX) {
-				eenheidxD = eenheidxD / factorx;
-				eenheidx = (int) Math.round(eenheidxD);
+			};
+			timer2.schedule((int) Math.max(1, t3 - System.currentTimeMillis()));
+			
+			for(int i=0 ; i<5 ; i++) {
+				int delay = 20*(i+6);
+				long t2 = t + delay;
+				//t = t + delay;
+				Timer timer = new Timer() {
+					public void run() { 
+						eenheidxD = eenheidxD/stapx;
+						eenheidyD = eenheidyD/stapy;
+						eenheidx = (int) Math.round(eenheidxD);
+						eenheidy = (int) Math.round(eenheidyD);
+						beginx =  middenx -(middenx - beginx)/stapx;
+						beginy =  middeny -(middeny - beginy)/stapy;
+					
+						grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+					
+						beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+						grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
+						
+						grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+						grafiekGWTVeld.paint();  
+			    	} 
+				};
+				timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
 			}
-
-			if (y && manualScalingY) {
-				eenheidyD = eenheidyD / factory;
-				eenheidy = (int) Math.round(eenheidyD);
-			}
+			/* End of Animation part */
 			
 			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
 			double beginwaardeD = 1.0-(beginx/eenheidx);
@@ -4315,27 +4305,6 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 	
 			beginyDocent = beginy;			
 		}
-		//grafiekGWTVeld.paint();
-		
-//		System.out.println(":::::::::: zetAssenDefinitie ::::::::::");
-//		System.out.println("manualScalingX=" + manualScalingX);
-//		System.out.println("manualScalingY=" + manualScalingY);
-//		System.out.println("asDefXMin=" + asDefXMin);
-//		System.out.println("asDefXMax=" + asDefXMax);
-//		System.out.println("asDefXStap=" + asDefXStap);
-//		System.out.println("asDefYMin=" + asDefYMin);
-//		System.out.println("asDefYMax=" + asDefYMax);
-//		System.out.println("asDefYStap=" + asDefYStap);
-//		System.out.println("beginxReal=" + (-asDefXMin/asDefXStap * eenheidxD));
-//		System.out.println("beginyReal=" + (-asDefYMin/asDefYStap * eenheidyD));
-//		System.out.println("beginx=" + beginx);
-//		System.out.println("beginy=" + beginy);
-//		System.out.println("veldb=" + veldb);
-//		System.out.println("veldh=" + veldh);
-//		System.out.println("eenheidxD=" + eenheidxD);
-//		System.out.println("eenheidyD=" + eenheidyD);
-//		System.out.println("eenheidx=" + eenheidx);
-//		System.out.println("eenheidy=" + eenheidy);
 		
 	}
 
