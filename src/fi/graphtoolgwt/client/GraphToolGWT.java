@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 
 
 
+
+
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
@@ -43,6 +45,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
+
 
 
 
@@ -125,6 +129,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	OpdrNavIF comRoot;
 	
+	final double asDefaultXMin=-8, asDefaultXMax=10, asDefaultXStap=2;
+	final double asDefaultYMin=-7, asDefaultYMax=2, asDefaultYStap=2;
+
+	
 	//UI
 	FlowPanel basisPanel = new FlowPanel();
 	//protected FormuleKeyboardIF kb = null;
@@ -153,7 +161,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	int tabelComponentHoogte = 60;
 	int offset = 5;
 	int grafiekVeldHoogte = hoogte - 2 - 2 * offset;
-	private int eenheid = 16;
+	final int eenheid = 16;
 	
 	private static double[] DEFAULTDOMEIN = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
 	
@@ -199,7 +207,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	//int veldh = hoogte - veldy - 2 * offset;
 	double docentSchaalFactorX = 1;
 	double docentSchaalFactorY = 1;
-	double schaalFactorX = 1;
+	double schaalFactorX = 1;   
 	double schaalFactorY = 1;
 	int factorRijNummerX = 99;
 	int factorRijNummerY = 99;
@@ -231,6 +239,18 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean krommeZonderExtrapolatie = true;
 	boolean krommeMetExtrapolatie = true;
 	boolean zoomInTabel = true;
+	
+	// manual Scaling variables
+	boolean manualScalingX;
+	boolean manualScalingY;
+	double eenheidxValue;
+	double eenheidyValue;
+	double asDefXMin; 
+	double asDefXMax;
+	double asDefXStap;
+	double asDefYMin;
+	double asDefYMax;
+	double asDefYStap;
 	
 	boolean zoomOptie = true; 
 	boolean traceOptie = true; 
@@ -418,7 +438,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if((typeOpdracht == 3 || typeOpdracht == 4) && mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS && !checkExternal) 
 		{	grafiekVeldHoogte -= kijkNaPanelHoogte + offset;
 		}
-		
 		getImages();
 		
 		for(int i = 0; i < maxAantalExpressies; i++)
@@ -588,6 +607,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		tekenComponent.setState(launchState);
 		formuleComponent.setState(launchState, randomVarNamen, randomVarWaarden);
 		
+		// Initialiseer the schaal parameters in geval van manual scaling 
+    	if (manualScalingX || manualScalingY) {
+    		zetAssenDefinitie(asDefXMin, asDefXMax, asDefXStap, asDefYMin, asDefYMax, asDefYStap);
+    	}
 		
 		tabelComponent.setState(launchState);
 		if(tabelAlsTekenTool)
@@ -1174,22 +1197,68 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				
 	}
 	
-	public Point realPointToPixels(RealPoint rp)
-	{	if (Double.isNaN(rp.getX()) || Double.isNaN(rp.getY()))
+	public Point realPointToPixels(RealPoint rp) {  
+	if (Double.isNaN(rp.getX()) || Double.isNaN(rp.getY()))
 			return null;
+//pix.x = (int) Math.round(beginx + eenheidxD * (xAsLog?Math.log10(rp.x):rp.x) / schaalFactorX);
+//pix.y = (int) Math.round(grafiekGWTVeld.hoogte -
+//					(beginy + eenheidyD * (yAsLog?Math.log10(rp.y):rp.y) / schaalFactorY));
+//	Point pix = new Point(Math.round(beginx + eenheidxD * (xAsLog?Math.log10(rp.getX()):rp.getX()) / schaalFactorX), Math.round(grafiekGWTVeld.hoogte -
+//	(beginy + eenheidyD * (yAsLog?Math.log10(rp.getY()):rp.getY()) / schaalFactorY)));
+
+		double pixX;
+		double sourceX = rp.getX();
+		if (manualScalingX) {
+			pixX = Math.round(beginx + eenheidxD * (sourceX) / eenheidxValue);
+		} else {
+			if (xAsLog) {
+				sourceX = Math.log10(sourceX);
+			}
+			pixX = Math.round(beginx + eenheidxD * (sourceX) / schaalFactorX);
+		}
 		
-		Point pix = new Point(Math.round(beginx + eenheidxD * (xAsLog?Math.log10(rp.getX()):rp.getX()) / schaalFactorX), Math.round(grafiekGWTVeld.hoogte -
-				(beginy + eenheidyD * (yAsLog?Math.log10(rp.getY()):rp.getY()) / schaalFactorY)));
-		//pix.x = (int) Math.round(beginx + eenheidxD * (xAsLog?Math.log10(rp.x):rp.x) / schaalFactorX);
-		//pix.y = (int) Math.round(grafiekGWTVeld.hoogte -
-			//					(beginy + eenheidyD * (yAsLog?Math.log10(rp.y):rp.y) / schaalFactorY));
+		double pixY;
+		double sourceY = rp.getY();
+		if (manualScalingY) {
+			pixY = Math.round(grafiekGWTVeld.hoogte - (beginy + eenheidyD * (sourceY) / eenheidyValue) );
+		} else {
+			if (yAsLog) {
+				sourceY = Math.log10(sourceY);
+			}
+			pixY = Math.round(grafiekGWTVeld.hoogte - (beginy + eenheidyD * (sourceY) / schaalFactorY) );
+		}
+		Point pix = new Point(pixX, pixY);
 		return pix;
 	}
 	
-	public RealPoint realPointToRealPixels(RealPoint rp)
-	{	RealPoint realPix = new RealPoint(
-			beginx + eenheidxD * (xAsLog?Math.log10(rp.getX()):rp.getX()) / schaalFactorX,
-			grafiekGWTVeld.hoogte - (beginy + eenheidyD * (yAsLog?Math.log10(rp.getY()):rp.getY()) / schaalFactorY));
+	public RealPoint realPointToRealPixels(RealPoint rp) {
+//		RealPoint realPix = new RealPoint(
+//			beginx + eenheidxD * (xAsLog?Math.log10(rp.getX()):rp.getX()) / schaalFactorX,
+//			grafiekGWTVeld.hoogte - (beginy + eenheidyD * (yAsLog?Math.log10(rp.getY()):rp.getY()) / schaalFactorY));
+
+		double pixX;
+		double sourceX = rp.getX();
+		if (manualScalingX) {
+			pixX = (beginx + eenheidxD * (sourceX) / eenheidxValue);
+		} else {
+			if (xAsLog) {
+				sourceX = Math.log10(sourceX);
+			}
+			pixX = (beginx + eenheidxD * (sourceX) / schaalFactorX);
+		}
+		
+		double pixY;
+		double sourceY = rp.getY();
+		if (manualScalingY) {
+			pixY = (grafiekGWTVeld.hoogte - (beginy + eenheidyD * (sourceY) / eenheidyValue) );
+		} else {
+			if (yAsLog) {
+				sourceY = Math.log10(sourceY);
+			}
+			pixY = (grafiekGWTVeld.hoogte - (beginy + eenheidyD * (sourceY) / schaalFactorY) );
+		}
+		
+		RealPoint realPix = new RealPoint(pixX, pixY); 
 		return realPix;
 	}
 	
@@ -1473,7 +1542,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 									for(int k = 1; k < nauwkeurigheid[j]; k++)
 									{
 										double xWaarde = lPixel.getX() - k;
-										dPoint.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * xWaarde / eenheidxD);
+										if (manualScalingX) {
+											dPoint.setX(eenheidxValue * (-beginx)/eenheidxD + eenheidxValue * xWaarde / eenheidxD); 
+											
+										} else {
+											dPoint.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * xWaarde / eenheidxD); 
+										}
 										if(xAsLog)
 											dPoint.setX(Math.pow(10, dPoint.getX()));
 										
@@ -1499,7 +1573,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 											break;
 										}
 										xWaarde = lPixel.getX() + k;
-										dPoint.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * xWaarde / eenheidxD);
+										if (manualScalingX) {
+											dPoint.setX(eenheidxValue * (-beginx)/eenheidxD + eenheidxValue * xWaarde / eenheidxD); 
+										} else {
+											dPoint.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * xWaarde / eenheidxD); 
+										}
 										if(xAsLog)
 											dPoint.setX(Math.pow(10, dPoint.getX()));
 										
@@ -1972,6 +2050,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public HashMap<String, Object> getState() {
+		// TODO (aftesten)
 		
 		double beginx = 1;
 		double beginy = 1;
@@ -2238,6 +2317,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		double beginy = 1;
 		double schaalFactorX = 1;
 		double schaalFactorY = 1;
+
 		int activeIndex = 1;
 		String grafiekXAsNaam = "x";
 		String grafiekYAsNaam = "y";
@@ -2255,6 +2335,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     		schaalFactorX = map.getDouble("schaalFactorX");
     	if(map.containsKey("schaalFactorY")) 
     		schaalFactorY = map.getDouble("schaalFactorY");
+    	
     	if(map.containsKey("activeIndex"))
     		activeIndex = map.getInt("activeIndex");
     	if(map.containsKey("grafiekXAsNaam"))
@@ -2274,6 +2355,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     	this.beginy = beginy;
     	this.schaalFactorX = schaalFactorX;
     	this.schaalFactorY = schaalFactorY;
+    	
     	this.activeIndex = activeIndex;
     	this.grafiekXAsNaam = grafiekXAsNaam;
     	this.grafiekYAsNaam = grafiekYAsNaam;
@@ -2458,6 +2540,24 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				eenheidy = (int) Math.round(eenheidyD);
 			}
 			
+	    	if(launchData.containsKey("asDefXMin")) 
+	    		asDefXMin = launchData.getDouble("asDefXMin");
+	    	if(launchData.containsKey("asDefXMax")) 
+	    		asDefXMax = launchData.getDouble("asDefXMax");
+	    	if(launchData.containsKey("asDefXStap")) 
+	    		asDefXStap = launchData.getDouble("asDefXStap");
+	    	if(launchData.containsKey("asDefYMin")) 
+	    		asDefYMin = launchData.getDouble("asDefYMin");
+	    	if(launchData.containsKey("asDefYMax")) 
+	    		asDefYMax = launchData.getDouble("asDefYMax");
+	    	if(launchData.containsKey("asDefYStap")) 
+	    		asDefYStap = launchData.getDouble("asDefYStap");
+	    	
+			if(launchData.containsKey("manualScalingX"))
+				manualScalingX =  launchData.getBoolean("manualScalingX");
+			if(launchData.containsKey("manualScalingY"))
+				manualScalingY =  launchData.getBoolean("manualScalingY");
+
 			if(launchData.containsKey("xVarEditable"))
 				xVarEditable =  launchData.getBoolean("xVarEditable");
 			if(launchData.containsKey("yVarEditable"))
@@ -2890,15 +2990,24 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return null;
 	}
 
-	public RealPoint pixelsToRealPoint(Point pix)
-	{	RealPoint rp = new RealPoint(0, 0);
-		rp.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * pix.getX() / eenheidxD);
-		if(xAsLog)
-			rp.setX(Math.pow(10, rp.getX()));
-		rp.setY((schaalFactorY * (-beginy) / eenheidyD +
+	public RealPoint pixelsToRealPoint(Point pix) {	
+		RealPoint rp = new RealPoint(0, 0);
+		if (manualScalingX) {
+			rp.setX(eenheidxValue * (-beginx)/eenheidxD + eenheidxValue * pix.getX() / eenheidxD);			
+		} else {
+			rp.setX(schaalFactorX * (-beginx)/eenheidxD + schaalFactorX * pix.getX() / eenheidxD);
+			if(xAsLog)
+				rp.setX(Math.pow(10, rp.getX()));
+		}
+		if (manualScalingY) {
+			rp.setY((eenheidyValue * (-beginy) / eenheidyD +
+					eenheidyValue * (grafiekGWTVeld.hoogte - pix.getY()) / eenheidyD));
+		} else {
+			rp.setY((schaalFactorY * (-beginy) / eenheidyD +
 				    schaalFactorY * (grafiekGWTVeld.hoogte - pix.getY()) / eenheidyD));
-		if(yAsLog)
-			rp.setY(Math.pow(10, rp.getY()));
+			if(yAsLog)
+				rp.setY(Math.pow(10, rp.getY()));
+		}
 		rp.setxString(Double.toString(rp.getX()));
 		rp.setyString(Double.toString(rp.getY()));
 		return rp;
@@ -3466,10 +3575,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			return;
 		}
 		zooming = false;
-		if(!tekenComponentAan && source == grafiekGWTCanvas)
-		{	double beginxR = beginx;
-			beginx = eenheidx*Math.round(beginx/eenheidx);
-			beginy = eenheidy*Math.round(beginy/eenheidy);
+		if(!tekenComponentAan && source == grafiekGWTCanvas) {	
+			double beginxR = beginx;
+			if (!manualScalingX && !manualScalingY) {
+				beginx = eenheidx*Math.round(beginx/eenheidx);
+				beginy = eenheidy*Math.round(beginy/eenheidy);
+			}
 			
 			if(traceOptie && grafiekGWTVeld.tracex!=-2) 
 			{	grafiekGWTVeld.tracexD += beginx-beginxR;
@@ -3480,8 +3591,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		else if (source == grafiekGWTCanvas)
 		{	if (tekenComponent.getCursorMode() == tekenComponent.NOCUR)
 			{	double beginxR = beginx;
-				beginx = eenheidx*Math.round(beginx/eenheidx);
-				beginy = eenheidy*Math.round(beginy/eenheidy);
+				if (!manualScalingX && !manualScalingY) {
+					beginx = eenheidx*Math.round(beginx/eenheidx);
+					beginy = eenheidy*Math.round(beginy/eenheidy);
+				}
 				
 				if(traceOptie && grafiekGWTVeld.tracex!=-2) 
 				{	grafiekGWTVeld.tracexD += beginx-beginxR;
@@ -3534,10 +3647,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					
 				}
 				// grafiek slepen
-				else if ((dragPoint == null) && (otherPoint == null) && dragOptie)
-				{	double beginxR = beginx;
-					beginx = eenheidx*Math.round(beginx/eenheidx);
-					beginy = eenheidy*Math.round(beginy/eenheidy);
+				else if ((dragPoint == null) && (otherPoint == null) && dragOptie) {	
+					double beginxR = beginx;
+				
+					if (!manualScalingX && !manualScalingY) {
+						beginx = eenheidx*Math.round(beginx/eenheidx);
+						beginy = eenheidy*Math.round(beginy/eenheidy);
+					}
 
 					if(traceOptie && grafiekGWTVeld.tracex!=-2) 
 					{	grafiekGWTVeld.tracexD += beginx-beginxR;
@@ -3839,8 +3955,7 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 															
 					mouseMoveTouchMoveAction(e.getSource(), event1X, event1Y, pinchState, pinchStartDistance, pinchMoveDistance, pinchMoveDirection);
 					
-					pinchStartDistance = pinchMoveDistance;
-					
+					pinchStartDistance = pinchMoveDistance;					
 				
 				}
 				
@@ -3899,10 +4014,8 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 		}
 
 	}
-
 		
-		
-	public void runZoom(boolean isX, boolean isY, boolean isIn)
+	public void runZoom(boolean isX, boolean isY, boolean isIn) 
 	{
 		{	
 			final boolean x = isX;
@@ -3913,10 +4026,15 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 			{
 				selectnummer = 999;
 			}
-	        eenheidxD = xAsLog?2*eenheid:eenheid;
-			eenheidyD = yAsLog?2*eenheid:eenheid;
-			eenheidx = xAsLog?2*eenheid:eenheid;
-			eenheidy = yAsLog?2*eenheid:eenheid;
+			if (!manualScalingX) {
+		        eenheidxD = xAsLog?2*eenheid:eenheid;
+				eenheidy = yAsLog?2*eenheid:eenheid;
+			}
+			
+			if (!manualScalingY) {
+				eenheidyD = yAsLog?2*eenheid:eenheid;
+				eenheidx = xAsLog?2*eenheid:eenheid;
+			}
 			
 			factorx = 1;
 			factory = 1;
@@ -3967,96 +4085,111 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 				}
 			}
 			
-			final double stapx = Math.pow(factorx,0.1);
-			final double stapy = Math.pow(factory,0.1);
+			//* Animation Part */
+			if (!manualScalingX && !manualScalingY) {
+				// Not executed in case of manual Scaling, since eenheidx can become too small
+				final double stapx = Math.pow(factorx,0.1);
+				final double stapy = Math.pow(factory,0.1);
 			
-			long t = System.currentTimeMillis();
+				long t = System.currentTimeMillis();
 				
-			for(int i = 0; i < 5; i++)
-			{	int delay = 20*(i+1);
-				long t2 = t + delay;
-				Timer timer = new Timer() {
-					public void run() { 
-						eenheidxD = eenheidxD/stapx;
-						eenheidyD = eenheidyD/stapy;
-						eenheidx = (int) Math.round(eenheidxD);
-						eenheidy = (int) Math.round(eenheidyD);
-						beginx =  middenx -(middenx - beginx)/stapx;
-						beginy =  middeny -(middeny - beginy)/stapy;
+				for(int i = 0; i < 5; i++) {
+					int delay = 20*(i+1);
+					long t2 = t + delay;
+					Timer timer = new Timer() {
+						public void run() { 
+							eenheidxD = eenheidxD/stapx;
+							eenheidyD = eenheidyD/stapy;
+							eenheidx = (int) Math.round(eenheidxD);
+							eenheidy = (int) Math.round(eenheidyD);
+							beginx =  middenx -(middenx - beginx)/stapx;
+							beginy =  middeny -(middeny - beginy)/stapy;
 						
-						grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+							grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
 						
-						beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-						grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
+							beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+							grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
 						
 						
-						grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
-						grafiekGWTVeld.paint();  
-				    } 
-				};
+							grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+							grafiekGWTVeld.paint();  
+						} 
+					};
 				
 				
-				timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
+					timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
 				/*
-				eenheidxD = eenheidxD/stapx;
-				eenheidyD = eenheidyD/stapy;
-				eenheidx = (int) Math.round(eenheidxD);
-				eenheidy = (int) Math.round(eenheidyD);
-				beginx =  middenx -(middenx - beginx)/stapx;
-				beginy =  middeny -(middeny - beginy)/stapy;
+					eenheidxD = eenheidxD/stapx;
+					eenheidyD = eenheidyD/stapy;
+					eenheidx = (int) Math.round(eenheidxD);
+					eenheidy = (int) Math.round(eenheidyD);
+					beginx =  middenx -(middenx - beginx)/stapx;
+					beginy =  middeny -(middeny - beginy)/stapy;
 				
-				grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+					grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
 				
-				beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-				grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
+					beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+					grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
 				
 				
-				timer.schedule(20*(i+1));
+					timer.schedule(20*(i+1));
 				*/
 				
-			}
-			
-			long t3 = t + 100;
-			Timer timer2 = new Timer() { 
-				public void run() {
-					schaalFactorX*=factorx;
-					if(in && x)factorRijNummerX--;
-					if(!in && x)factorRijNummerX++;
-					schaalFactorY*=factory;
-					if(in && y)factorRijNummerY--;
-					if(!in && y)factorRijNummerY++;
-					
-					eenheidxD = eenheidxD*factorx;
-					eenheidyD = eenheidyD*factory;
 				}
-			};
-			timer2.schedule((int) Math.max(1, t3 - System.currentTimeMillis()));
 			
-			for(int i=0 ; i<5 ; i++)
-			{	int delay = 20*(i+6);
-				long t2 = t + delay;
-				//t = t + delay;
-				Timer timer = new Timer() {
-					public void run() { 
-						eenheidxD = eenheidxD/stapx;
-						eenheidyD = eenheidyD/stapy;
-						eenheidx = (int) Math.round(eenheidxD);
-						eenheidy = (int) Math.round(eenheidyD);
-						beginx =  middenx -(middenx - beginx)/stapx;
-						beginy =  middeny -(middeny - beginy)/stapy;
-						
-						grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
-						
-						beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-						grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
-						
-						
-						grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
-						grafiekGWTVeld.paint();  
-				    } 
+				long t3 = t + 100;
+				Timer timer2 = new Timer() { 
+					public void run() {
+						schaalFactorX*=factorx;
+						if(in && x)factorRijNummerX--;
+						if(!in && x)factorRijNummerX++;
+						schaalFactorY*=factory;
+						if(in && y)factorRijNummerY--;
+						if(!in && y)factorRijNummerY++;
+					
+						eenheidxD = eenheidxD*factorx;
+						eenheidyD = eenheidyD*factory;
+					}
 				};
-				timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
+				timer2.schedule((int) Math.max(1, t3 - System.currentTimeMillis()));
+			
+				for(int i=0 ; i<5 ; i++) {
+					int delay = 20*(i+6);
+					long t2 = t + delay;
+					//t = t + delay;
+					Timer timer = new Timer() {
+						public void run() { 
+							eenheidxD = eenheidxD/stapx;
+							eenheidyD = eenheidyD/stapy;
+							eenheidx = (int) Math.round(eenheidxD);
+							eenheidy = (int) Math.round(eenheidyD);
+							beginx =  middenx -(middenx - beginx)/stapx;
+							beginy =  middeny -(middeny - beginy)/stapy;
+						
+							grafiekGWTVeld.tracexD = middenx -(middenx - grafiekGWTVeld.tracexD)/stapx;
+						
+							beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+							grafiekGWTVeld.tracex = (int) Math.round(grafiekGWTVeld.tracexD);
+						
+						
+							grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+							grafiekGWTVeld.paint();  
+				    	} 
+					};
+					timer.schedule((int) Math.max(1, t2 - System.currentTimeMillis()));
+				}
+				/* End of Animation part */
+			} 
+			if (x && manualScalingX) {
+				eenheidxD = eenheidxD / factorx;
+				eenheidx = (int) Math.round(eenheidxD);
 			}
+
+			if (y && manualScalingY) {
+				eenheidyD = eenheidyD / factory;
+				eenheidy = (int) Math.round(eenheidyD);
+			}
+			
 			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
 			double beginwaardeD = 1.0-(beginx/eenheidx);
 			
@@ -4087,15 +4220,18 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
     {
     	public void onClick(ClickEvent e)
     	{
-    		if(e.getSource()==zoomUitYButton && factorRijNummerY<120)
+    		if( (e.getSource()==zoomUitYButton && factorRijNummerY<120) &&
+    				!(manualScalingY && eenheidy<2) )
 				runZoom(false,true,false);
-			else if(e.getSource()==zoomInYButton  && factorRijNummerY>87)
+			else if (e.getSource()==zoomInYButton  && factorRijNummerY>87) 
 				runZoom(false,true,true);
-			else if(e.getSource()==zoomUitXButton && factorRijNummerX<120)
+			else if( (e.getSource()==zoomUitXButton && factorRijNummerX<120) &&
+				    		!(manualScalingX && eenheidx<2) )
 				runZoom(true,false,false);
-			else if(e.getSource()==zoomInXButton  && factorRijNummerX>87)
+			else if(e.getSource()==zoomInXButton  && factorRijNummerX>87) 
 				runZoom(true,false,true);
-			else if(e.getSource()==zoomUitButton && factorRijNummerX<120 && factorRijNummerY<120)
+			else if( (e.getSource()==zoomUitButton && factorRijNummerX<120 && factorRijNummerY<120) &&
+							( !(manualScalingX && eenheidx<2) && !(manualScalingY && eenheidy<2) ) )
 				runZoom(true,true,false);
 			else if(e.getSource()==zoomInButton && factorRijNummerX>87 && factorRijNummerY>87)
 				runZoom(true,true,true);
@@ -4107,7 +4243,11 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 				factorRijNummerX = 99;
 				factorRijNummerY = 99;
 				schaalFactorX = docentSchaalFactorX;
-				schaalFactorY = docentSchaalFactorY;
+				schaalFactorY = docentSchaalFactorY; 
+				if (manualScalingX || manualScalingY) {
+					zetAssenDefinitie( asDefXMin,  asDefXMax,  asDefXStap,  asDefYMin,  asDefYMax,  asDefYStap);
+				}
+				
 				beginwaarde = 0;
 				selectnummer = 999;
 				
@@ -4150,4 +4290,54 @@ logger.severe("touch down rel " + eventX + " , " + eventY);
 		if(comRoot != null && fromuser)
 			comRoot.setChanged(b);
 	}
+	
+	public void zetAssenDefinitie(double asDefXMin, double asDefXMax, double asDefXStap, double asDefYMin, double asDefYMax, double asDefYStap) {
+		
+		if (manualScalingX) {
+			// Calculate graph-parameters X
+			double rangeX = asDefXMax-asDefXMin;
+			eenheidxD = breedte/(rangeX/asDefXStap)/2; // gedeeld door 2 tbv een kleinere schaling dan de grove 
+			eenheidx = (int) Math.round(eenheidxD);
+			eenheidxValue = Math.abs(asDefXStap/2);  // we don't allow negative step-sizes (yet) 
+			beginx = -Math.round(asDefXMin/eenheidxValue * eenheidxD);
+
+			beginxDocent = beginx;
+		}
+
+		if (manualScalingY) {
+			
+			// Calculate graph-parameters Y
+			double rangeY = asDefYMax-asDefYMin;
+			eenheidyD = grafiekVeldHoogte/(rangeY/asDefYStap)/2;
+			eenheidy = (int) Math.round(eenheidyD);
+			eenheidyValue = Math.abs(asDefYStap/2);  // gedeeld door 2 tbv een kleinere schaling dan de grove
+			beginy = -Math.round(asDefYMin/eenheidyValue * eenheidyD);			
+	
+			beginyDocent = beginy;			
+		}
+		//grafiekGWTVeld.paint();
+		
+//		System.out.println(":::::::::: zetAssenDefinitie ::::::::::");
+//		System.out.println("manualScalingX=" + manualScalingX);
+//		System.out.println("manualScalingY=" + manualScalingY);
+//		System.out.println("asDefXMin=" + asDefXMin);
+//		System.out.println("asDefXMax=" + asDefXMax);
+//		System.out.println("asDefXStap=" + asDefXStap);
+//		System.out.println("asDefYMin=" + asDefYMin);
+//		System.out.println("asDefYMax=" + asDefYMax);
+//		System.out.println("asDefYStap=" + asDefYStap);
+//		System.out.println("beginxReal=" + (-asDefXMin/asDefXStap * eenheidxD));
+//		System.out.println("beginyReal=" + (-asDefYMin/asDefYStap * eenheidyD));
+//		System.out.println("beginx=" + beginx);
+//		System.out.println("beginy=" + beginy);
+//		System.out.println("veldb=" + veldb);
+//		System.out.println("veldh=" + veldh);
+//		System.out.println("eenheidxD=" + eenheidxD);
+//		System.out.println("eenheidyD=" + eenheidyD);
+//		System.out.println("eenheidx=" + eenheidx);
+//		System.out.println("eenheidy=" + eenheidy);
+		
+	}
+
+	
 }
