@@ -1,5 +1,8 @@
+body {
+        margin: 0 !important;
+        overflow: hidden !important;
+}
 /** Add css rules here for your application. */
-
 
 .root {
 	background-color: yellow; 
