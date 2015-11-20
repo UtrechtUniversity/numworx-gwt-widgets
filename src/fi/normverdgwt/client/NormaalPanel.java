@@ -794,6 +794,7 @@ public class NormaalPanel extends LayoutPanel
 //GWT kijkNa-gebeuren		
 		
 		kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton.addStyleName(NormVerdGWT.normVerdGWTCss.pushbutton());
 		kijkNaPanel = new LayoutPanel();
 		//kijkNaButton.setFont(theFont);
 		//kijkNaButton.setBounds(0, 0, 100, 20);
