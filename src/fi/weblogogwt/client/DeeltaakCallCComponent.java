@@ -133,8 +133,8 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 	
 	private void checkParameterList()
 	{
-//GWT
-		int np = 0; //deeltaakBody.getParameterCount();
+
+		int np = deeltaakBody.getParameterCount();
 		if ( np > noParameters )
 		{
 			for ( int i=noParameters; i<np; i++ )
@@ -168,9 +168,16 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 			varSet.setParameter(deeltaakBody.getParameterName(i), ((NumericParameter)parameters[i]).getValue());		
 		}
 		
-		traceKleur  = deeltaakBody.execute(trb, ub, varSet);
+		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if ( traceKleur ) 
+		{	
+			trb.setCommandInfo(getActualCall(), varSet);
+			return traceKleur;
+		}
 //dit niet		
 		//if (traceKleur ) schuifveld.traceVariables(varSet);
+		// execution may also stop at a command in the body. Call will be pink then, too.
+		traceKleur = deeltaakBody.execute(trb, ub, varSet);
 		varSet.decreaseLevel();
 		return traceKleur;
 	}

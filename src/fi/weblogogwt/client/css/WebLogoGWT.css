@@ -54,3 +54,23 @@
 	padding: 0px;	
 }	
 
+.label {
+	background-color: rgb(255, 255, 255);
+	text-align: left;
+	text-indent: 10px;
+}
+
+.varlabel {
+	background-color: rgb(161, 255, 161);
+	font-size: 0.975em;
+	font-weight: bold;
+	
+}
+
+.vardisplay {
+	font-size: 0.875em;
+	background-color: rgb(221, 255, 221);
+	text-align: left;
+	white-space: pre;
+	
+}	

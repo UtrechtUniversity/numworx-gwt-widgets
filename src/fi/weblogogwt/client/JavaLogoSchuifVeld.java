@@ -120,9 +120,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	
 	private DeeltaakBodyComponent[] deeltaakComponenten;
 	private Uitvoerblad uitvoerblad;
-//GWT	
+	
 	//private VardisplayPanel vartracer = null;
-	private boolean isVartracing = false;
+	//private boolean isVartracing = false;
 	private boolean gesloten;
 	
 	private CommandComponent vooruitCC;
@@ -142,7 +142,8 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	private CommandComponent keuzeCC;
 	private CommandComponent[] deeltaakCC;
 	
-	private HashMap<String, Double> inputVars = new HashMap<String, Double>();
+	//private HashMap<String, Double> inputVars = new HashMap<String, Double>();
+	private HashMap<String, Object> inputVars = new HashMap<String, Object>();
 	
 	int xPos, yPos, breedte, hoogte;
 	Canvas jlsvCanvas;
@@ -213,11 +214,11 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	{	inputVars.put("input"+name, new Double(value));
 	}
 	
-	public void setInputVars(HashMap<String, Double> inputVars)
+	public void setInputVars(HashMap<String, Object> inputVars)
 	{	this.inputVars = inputVars;
 	}
 	
-	public HashMap<String, Double> getInputVars()
+	public HashMap<String, Object> getInputVars()
 	{	return inputVars;
 	}
 	
@@ -227,7 +228,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		Iterator iter = (inputVars.keySet()).iterator();
 		while (iter.hasNext()) {
 			String key = (String)iter.next();
-			double value = ((Double)inputVars.get(key).doubleValue());
+			double value = ((Double) inputVars.get(key)).doubleValue();
 			varSet.setParameter(key, value);
 		}
 		programmaComponent.execute(trb,ub, varSet);
@@ -251,8 +252,11 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		//programmaPanel.add(programmaComponent);
 		ccs.addElement(programmaComponent);
 				
-//GWT2		
-		//vartracer = new VardisplayPanel();
+		
+		//vartracer = new VardisplayPanel(2*ccsw+10, 515);
+		//add(vartracer);
+		//setWidgetLeftWidth(vartracer, ccx, Style.Unit.PX, 2*ccsw+10, Style.Unit.PX);
+		//setWidgetTopHeight(vartracer, ccy, Style.Unit.PX, 515, Style.Unit.PX);
 		//vartracer.setBounds(ccx, ccy, 2*ccsw+10, 515);
 		
 		vooruitCC = new VooruitCComponent(ccx,ccy,ccsw,ccsh, this);
@@ -761,35 +765,35 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	{
 		programmaComponent.clearProgram();
 		
-//GWT		
-		//for ( int i=0; i<aantalDeeltaken; i++ )
-		//{
-		//	deeltaakComponenten[i].clearProgram();
-		//	deeltaakComponenten[i].setDeeltaakHeader("deeltaak"+(i+1), "");
-		//}
+		
+		for ( int i=0; i<aantalDeeltaken; i++ )
+		{
+			deeltaakComponenten[i].clearProgram();
+			deeltaakComponenten[i].setDeeltaakHeader("deeltaak"+(i+1), "");
+		}
 	}
 	
-//GWT	
-	//DeeltaakBodyComponent getDeeltaakBody(int i)
-	//{
-	//	return deeltaakComponenten[i];
-	//}
+	
+	DeeltaakBodyComponent getDeeltaakBody(int i)
+	{
+		return deeltaakComponenten[i];
+	}
 	
 	ProgrammaComponent getProgramma()
 	{
 		return programmaComponent;
 	}
 	
-//GWT
-/*	
+
+	
 	void importeer(String s)
 	{
 		clearProgram();
-		repaint();
+		paint();
 		ProgrammaImporter pi = new ProgrammaImporter(this);
 		pi.importProgramma(s);
 	}
-*/
+
 /*
 	void importFrame() 
 	{
@@ -810,12 +814,13 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	{	String s0 = programmaComponent.getCode("");
 		for(int i=0 ; i<aantalDeeltaken ; i++)
 		{
-//GWT			
-			//s0 = s0 + deeltaakComponenten[i].getCode("");
+			
+			s0 = s0 + deeltaakComponenten[i].getCode("");
 		}
 		return s0+"\n";
 	}
 	
+/*	
 	public void setVartracing(boolean vt)
 	{
 		if ( vt )
@@ -833,7 +838,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		}
 		paint();
 	}
-	
+*/	
 	public boolean isGesloten()
 	{	return gesloten;
 	}
@@ -887,16 +892,16 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	 * 
 	 * @param varset	the current set of variables in tracing mode
 	 */
+/*	
 	void updateView(VarSet varset)
 	{
 		if ( isVartracing )
 		{
-//GWT			
-			//vartracer.setContent(varset.toString());
+			vartracer.setContent(varset.toString());
 		}
 		paint();
 	}
-	
+*/	
 //GWT niet nodig?	
 /*	
 	public void setSize(int b, int h)

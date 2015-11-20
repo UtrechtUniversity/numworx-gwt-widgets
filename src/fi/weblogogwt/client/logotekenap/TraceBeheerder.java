@@ -14,6 +14,9 @@ package fi.weblogogwt.client.logotekenap;
 import fi.weblogogwt.client.JavaLogoSchuifVeld;
 import fi.weblogogwt.client.WebLogoGWT;
 import fi.weblogogwt.client.VarSet;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
+
 //GWT
 //import fi.weblogogwt.client.VardisplayPanel;
 
@@ -32,15 +35,19 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 	private boolean traceAan;
 	
 	private boolean isVartracing = false;
-//GWT	
+	
 	//private VardisplayPanel vartracer = null;
 	
 	private int currentlevel;
 	private boolean isSkipping;
 	private int skipLevel;
 	
-	public TraceBeheerder(Uitvoerblad tb, JavaLogoSchuifVeld v)
+	WebLogoGWT owner; 
+	
+	public TraceBeheerder(Uitvoerblad tb, JavaLogoSchuifVeld v, WebLogoGWT o)
 	{	
+		owner = o;
+		
 		//setLayout(null);
 		//setOpaque(false);
 		makeGUI();
@@ -202,12 +209,12 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 	public void setCommandInfo(String actualCommand, VarSet varset)
 	{
 		currentlevel = varset.getLevel();
-//GWT		
-		//methodeVeld.setText(actualCommand);
+//verhuisd		
+		owner.methodeLabel.setText(actualCommand);
 		if ( isVartracing )
 		{
-//GWT			
-			//vartracer.setContent(varset.toString());
+//verhuisd			
+			owner.vartracer.setContent(varset.toString());
 		}
 	}
 	
@@ -219,51 +226,79 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 	@Override
 	public void actionPerformed(ActionEvent e)
 	{	if(e.getSource() == stapKnop)
-		{	
+		{
+*/
+		public void stapAction()
+		{
 			maxAantalStappen++;
 			tb.paintDrawing(true);
 		}
+/*		
 		if(e.getSource() == terugKnop)
-		{	
+		{
+*/
+		public void terugAction()
+		{
 			maxAantalStappen--;
 			if(maxAantalStappen<0)maxAantalStappen=0;
 			tb.paintDrawing(true);
 		}
+/*		
 		if(e.getSource() == skipKnop)
 		{	
+*/		
+		public void skipAction()
+		{
 			skipLevel = currentlevel;
 			isSkipping = true;
 			tb.paintDrawing(true);
 		}
+/*		
 		if(e.getSource() == beginKnop)
 		{	
-			vartracer.setContent("");
-			methodeVeld.setText("");
+*/
+		public void beginAction()
+		{
+//GWT			
+			//vartracer.setContent("");
+//verhuisd			
+			//methodeVeld.setText("");
 			isSkipping = false;					// previous trace may have stopped in skip
 			maxAantalStappen = 0;
 			tb.paintDrawing(true);
 		}
+/*		
 		if(e.getSource() == traceKnop)
 		{	
 			if(!traceAan)
-			{	
+			{
+*/			
+			public void traceAanAction()
+			{
 				traceAan = true;
 				isSkipping = false;
 				maxAantalStappen = 0;
-				methodeVeld.setText("");
+//verhuisd				
+				//methodeVeld.setText("");
 				tb.paintDrawing(true);
-				traceKnop.setText(JavaLogoWeb.rb.getString("traceOffLabel"));
-				setComponentVisibilty(true);
+				//traceKnop.setText(JavaLogoWeb.rb.getString("traceOffLabel"));
+				//setComponentVisibilty(true);
 			}
+			
+/*			
 			else
-			{	
+			{
+*/			public void traceUitAction()
+			{
 				traceAan = false;
 				tb.paintDrawing(false);
-				showVariables.setSelected(false);
+//verhuisd				
+				//showVariables.setSelected(false);
 				setVartracing(false);
-				setComponentVisibilty(false);
-				traceKnop.setText(JavaLogoWeb.rb.getString("traceOnLabel"));
+				//setComponentVisibilty(false);
+				//traceKnop.setText(JavaLogoWeb.rb.getString("traceOnLabel"));
 			}
+/*
 			repaint();
 		}
 	}
@@ -278,20 +313,25 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 		setVartracing(b);
 	}
 */	
-	private void setVartracing(boolean b)
+	public void setVartracing(boolean b)
 	{
 		if ( b )
 		{
 			isVartracing = true;
 //GWT naar WebLogoGWT			
-			//jlsveld.add(vartracer, 0);
+			jlsveld.add(owner.vartracer);
+			//vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
+			jlsveld.setWidgetLeftWidth(owner.vartracer, JavaLogoSchuifVeld.ccx-1, Style.Unit.PX, owner.vartracerWidth, Style.Unit.PX);
+			jlsveld.setWidgetTopHeight(owner.vartracer, JavaLogoSchuifVeld.ccy - 1, Style.Unit.PX, owner.vartracerHeight, Style.Unit.PX);
+			//vartracer.setBounds(ccx, ccy, 2*ccsw+10, 515);
+			
 		} else
 		{
 			isVartracing = false;
 //GWT naar WebLogoGWT 			
-			//jlsveld.remove(vartracer);
-//GWT			
-			//vartracer.setContent("");
+			jlsveld.remove(owner.vartracer);
+			
+			owner.vartracer.setContent("");
 		}
 		jlsveld.paint();
 	}

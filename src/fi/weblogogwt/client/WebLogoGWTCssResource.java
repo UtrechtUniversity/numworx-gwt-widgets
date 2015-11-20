@@ -22,4 +22,9 @@ public interface WebLogoGWTCssResource extends CssResource
 	
 	String pushbutton();
 	
+	String label();
+	
+	String varlabel();
+	
+	String vardisplay();
 }

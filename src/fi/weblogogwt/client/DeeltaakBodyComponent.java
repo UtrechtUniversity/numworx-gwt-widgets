@@ -39,6 +39,14 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		//fm = getFontMetrics(JavaLogoWeb.boldfont);
 		//separatorX = 10+fm.stringWidth(pn+"(");
 		//add(naamEditor);
+		
+		schuifveld.jlsvContext2d.setFont(WebLogoGWT.fontString);
+		
+		tm = schuifveld.jlsvContext2d.measureText(commandName+"(");
+		int width = (int) Math.round(tm.getWidth());
+				
+		separatorX = 10+width;
+		
 		isHeightFixed = false; 			// allow height changes
 	}
 	
@@ -71,6 +79,12 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 			pmParam.setParameter(text);
 			isEditingParamName = false;
 		}
+		
+		// tekstPopup weg
+		if (naamEditor != null)
+		{	naamEditor.hide();
+		}
+
 		schuifveld.paint();
 	}
 
@@ -91,6 +105,35 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 			//naamEditor.vulIn(pmParam.getParameterText());
 			isEditingParamName = true;
 		}
+		
+		showParamEditor(name);
+	}
+
+	public void showParamEditor(boolean name)
+	{
+		int popupX = xPos + schuifveld.getAbsoluteLeft();
+		if (!name)
+			popupX = xPos + separatorX + schuifveld.getAbsoluteLeft();
+		
+		int popupY = yPos + headerHeight + schuifveld.getAbsoluteTop();
+		
+		// kijk of er ergens nog een popup open is
+		if ((schuifveld.paramEditor != null) && schuifveld.paramEditor.isVisible())
+		{
+			if ((!isEditingName && !isEditingParamName) || (schuifveld.paramEditor != naamEditor))
+				schuifveld.paramEditor.owner.parameterEdited(schuifveld.paramEditor.getText());
+		}
+
+		schuifveld.paramEditor = new ParameterTextField(breedte, hoogte, this, schuifveld);
+		naamEditor = schuifveld.paramEditor; //new ParameterTextField(breedte, hoogte, this, schuifveld);
+		if (name)
+			naamEditor.vulIn(deeltaaknaamParam.getParameterText());
+		else
+			naamEditor.vulIn(pmParam.getParameterText());
+		naamEditor.setPopupPosition(popupX, popupY);
+		naamEditor.show();
+		naamEditor.textBox.setFocus(true);
+
 	}
 
 	/**
@@ -107,14 +150,14 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		if ( isEditingName )
 		{
 			newEdit = !onName;				// newEdit true: going from name to value
-//GWT			
-			//parameterEdited(naamEditor.getText());
+			
+			parameterEdited(naamEditor.getText());
 		}
 		else if ( isEditingParamName )
 		{
 			newEdit = onName;				// newEdit true: going from value to name
-//GWT			
-			//parameterEdited(naamEditor.getText());
+			
+			parameterEdited(naamEditor.getText());
 		} 
 		else
 		{
@@ -126,7 +169,12 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		} 
 		else
 		{
-//GWT2			
+		// tekstPopup weg
+			if (naamEditor != null)
+			{	naamEditor.hide();
+			
+			}	
+			
 			//naamEditor.setVisible(false);
 			//naamEditor.setEnabled(false);
 		}

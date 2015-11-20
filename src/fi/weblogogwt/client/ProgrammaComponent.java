@@ -93,6 +93,8 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 	protected int previousX;
 	protected int previousY;
 	
+	boolean widthIsChangable = false;
+	
 	public ProgrammaComponent(int x, int y, int b, int h, String pn, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
@@ -100,6 +102,8 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 		isStapel = false;
 		isWide = false;
 		narrowX = x;
+		
+		widthIsChangable = schuifveld.breedte == WebLogoGWT.jlsBreedteGroot;
 		
 		commandName = defaultName;
 		
@@ -224,15 +228,20 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 		int newh;
 		if ( isOpen )
 		{
+			
+//System.out.println("isOpen");			
 			newh = pcclosedh;
+			commandBlock.componentsVisible = false;
 		} 
 		else
 		{
+//System.out.println("!isOpen");			
 			newh = Math.min(schuifveld.getHeight()-20, Math.max(pcminoh, commandBlock.getContentHeight()+headerHeight+20));
+			commandBlock.componentsVisible = true;
 		}
 		isOpen = !isOpen;
 		setSize(getWidth(), newh);
-//GWT		
+//GWT?		
 		setLocation(getX(), Math.min(getY(), Math.max(0,JavaLogoSchuifVeld.pph-newh)));
 	}
 	
@@ -292,7 +301,7 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 			g.fill();
 
 		} 
-		else
+		else if (widthIsChangable)
 		{
 			//g.fillPolygon(arrowOut);
 			g.setFillStyle(CssColor.make(0,0,0));
@@ -482,12 +491,13 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 		// remember location in case of dragging
 		previousX = getX();
 		previousY = getY();
-		// check if click is inside rectangle in the top right corner or the PC for resize.
+		// check if click is inside rectangle in the top right corner of the PC for resize.
 		//if ( e.getX() > getWidth()-2*headerHeight && e.getY() < headerHeight )
-		if ( x > xPos+getWidth()-2*headerHeight && y < yPos + headerHeight )
+		if (x > xPos+getWidth()-2*headerHeight && y < yPos + headerHeight )
 		{
 			//if ( e.getX() > getWidth()-headerHeight )
-			if ( x > xPos+getWidth()-headerHeight )
+			// gedrukt op out of in arrow
+			if (widthIsChangable && x > xPos+getWidth()-headerHeight )
 			{
 				changeWidth();
 				widthChanged = true;
@@ -495,7 +505,7 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 				// after resize, no further mouse handling
 				return;
 			} 
-			else
+			else //gedrukt op - of blokje
 			{
 				if ( !isHeightFixed )
 				{	changeHeight();

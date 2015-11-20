@@ -14,6 +14,7 @@ import javax.swing.JCheckBox;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -24,6 +25,9 @@ import com.google.gwt.dom.client.Style.Unit;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
@@ -55,7 +59,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
 	WebLogoGWTClientBundle webLogoGWTClientBundle;
-	WebLogoGWTCssResource webLogoGWTCssResource;
+	static WebLogoGWTCssResource webLogoGWTCssResource;
 
 	// UI
 	DockLayoutPanel dlp;
@@ -68,12 +72,12 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	int buttonWidth = 45;
 	int buttonHeight = 22;
 
-	int jlsBreedteKlein = 390;
-	int jlsBreedteGroot = 620;
+	static int jlsBreedteKlein = 390;
+	static int jlsBreedteGroot = 620;
 	int offSet = 4;
 	int breedteGroot = 930;
 	int breedteKlein = 700;
-	int breedte = 900;
+	int breedte = 930;
 	int hoogte = 575;
 	int bottomHeight = 32;
 	int jlsHoogte = hoogte - bottomHeight - offSet;
@@ -97,12 +101,12 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	// parametrisatie
 	boolean uitvoerVeldZichtbaar = true;
 	boolean programmaVeldZichtbaar = true;
-	boolean deeltakenZichtbaar = false; //true;
+	boolean deeltakenZichtbaar = true;
 	boolean whileLoopZichtbaar = true;
 	boolean keuzeCommandZichtbaar = true;
 	boolean printCommandsZichtbaar = true;
 	boolean tekenCommandsZichtbaar = true;
-	boolean traceZichtbaar = false; //true;
+	boolean traceZichtbaar = true;
 	boolean codeIOZichtbaar = false; //true;
 	
 	Map state = null;
@@ -117,6 +121,11 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	PushButton importButton, exportButton, runButton;
 	PushButton traceAanKnop, traceUitKnop, beginKnop, stapKnop, terugKnop, skipKnop;
 	CheckBox showVariables;
+	public Label methodeLabel;
+	
+	public VardisplayPanel vartracer = null;
+	
+	public int vartracerWidth, vartracerHeight;
 	
 	public void getImages() 
 	{
@@ -182,6 +191,9 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	{
 			this.breedte = width;
 			this.hoogte = height;
+			
+			dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+			
 			//this.launchState = launchState;
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
 			
@@ -265,7 +277,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			jlsVeld.zetPrintCommandsZichtbaar(printCommandsZichtbaar);
 			jlsVeld.zetTekenCommandsZichtbaar(tekenCommandsZichtbaar);
 			
-			trb = new TraceBeheerder(uitvoerblad, jlsVeld);
+			trb = new TraceBeheerder(uitvoerblad, jlsVeld, this);
 			
 			bottomPanel = new LayoutPanel();
 			bottomPanel.setSize("" + breedte + "px", "" + bottomHeight + "px");
@@ -282,7 +294,12 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			dlp.add(webLogoPanel);
 			
 			jlsVeld.paint();
-			uitvoerblad.initializeDrawing(false);			
+			uitvoerblad.initializeDrawing(false);
+			
+			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;
+			vartracerHeight = 515;
+			vartracer = new VardisplayPanel(vartracerWidth, vartracerHeight);
+			//vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
 	}
 	
 	public void	makeBottom()
@@ -327,7 +344,9 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			bottomPanel.add(traceAanKnop);
 			bottomPanel.setWidgetLeftWidth(traceAanKnop, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(traceAanKnop, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
-			traceAanKnop.addClickHandler(new PushClickHandler());		
+			traceAanKnop.addClickHandler(new PushClickHandler());
+			
+			currentX = leftOffset;
 		
 			traceUitKnop = new PushButton("trace uit");
 			traceUitKnop.addStyleName(webLogoGWTCssResource.pushbutton());
@@ -338,14 +357,14 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			bottomPanel.setWidgetVisible(traceUitKnop, false);
 	
 			currentX += leftOffset + buttonWidth + 20;
-		
+			
 			beginKnop = new PushButton("begin");
 			beginKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(beginKnop);
 			bottomPanel.setWidgetLeftWidth(beginKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(beginKnop, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			beginKnop.addClickHandler(new PushClickHandler());
-			//bottomPanel.setWidgetVisible(beginKnop, false);
+			bottomPanel.setWidgetVisible(beginKnop, false);
 		
 			currentX += leftOffset + buttonWidth;
 			
@@ -355,7 +374,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			bottomPanel.setWidgetLeftWidth(stapKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(stapKnop, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			stapKnop.addClickHandler(new PushClickHandler());
-			//bottomPanel.setWidgetVisible(stapKnop, false);
+			bottomPanel.setWidgetVisible(stapKnop, false);
 		
 			currentX += leftOffset + buttonWidth;
 
@@ -365,7 +384,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			bottomPanel.setWidgetLeftWidth(terugKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(terugKnop, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			terugKnop.addClickHandler(new PushClickHandler());
-			//bottomPanel.setWidgetVisible(terugKnop, false);
+			bottomPanel.setWidgetVisible(terugKnop, false);
 		
 			currentX += leftOffset + buttonWidth;
 
@@ -375,19 +394,26 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			bottomPanel.setWidgetLeftWidth(skipKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(skipKnop, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			skipKnop.addClickHandler(new PushClickHandler());
-			//bottomPanel.setWidgetVisible(skipKnop, false);
+			bottomPanel.setWidgetVisible(skipKnop, false);
 		
 			currentX += leftOffset + buttonWidth;
 			
 			showVariables = new CheckBox("Toon vars");
-			//skipKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(showVariables);
 			bottomPanel.setWidgetLeftWidth(showVariables, currentX, Style.Unit.PX, 2 * buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(showVariables, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
-			showVariables.addClickHandler(new PushClickHandler());
-			//bottomPanel.setWidgetVisible(skipKnop, false);
+			showVariables.addValueChangeHandler(new ShowVariablesVCH());
+			bottomPanel.setWidgetVisible(showVariables, false);
 		
 			currentX += leftOffset + 2 * buttonWidth;
+			
+			// hier nog een label/noneditable TextBox
+			methodeLabel = new Label("");
+			methodeLabel.addStyleName(webLogoGWTCssResource.label());
+			bottomPanel.add(methodeLabel);
+			bottomPanel.setWidgetLeftWidth(methodeLabel, currentX, Style.Unit.PX, 4 * buttonWidth, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(methodeLabel, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+			bottomPanel.setWidgetVisible(methodeLabel, false);
 			
 		}
 		
@@ -421,25 +447,87 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			{
 //System.out.println("click traceAan");
 
+				if (codeIOZichtbaar)
+				{	bottomPanel.setWidgetVisible(importButton, false);
+					bottomPanel.setWidgetVisible(exportButton, false);
+				}
+				
+				bottomPanel.setWidgetVisible(runButton, false);
+				
 				bottomPanel.setWidgetVisible(traceAanKnop, false);
 				bottomPanel.setWidgetVisible(traceUitKnop, true);
 				traceAan = true;
+				
+				bottomPanel.setWidgetVisible(beginKnop, true);
+				bottomPanel.setWidgetVisible(stapKnop, true);
+				bottomPanel.setWidgetVisible(terugKnop, true);
+				bottomPanel.setWidgetVisible(skipKnop, true);
+				bottomPanel.setWidgetVisible(showVariables, true);
+				bottomPanel.setWidgetVisible(methodeLabel, true);
+				methodeLabel.setText("");
+				
+				trb.traceAanAction();
 			} 
 			else if (e.getSource() == traceUitKnop)
 			{
 //System.out.println("click traceUit");
 
+				if (codeIOZichtbaar)
+				{	bottomPanel.setWidgetVisible(importButton, true);
+					bottomPanel.setWidgetVisible(exportButton, true);
+				}
+				
+				bottomPanel.setWidgetVisible(runButton, true);
+				
 				bottomPanel.setWidgetVisible(traceAanKnop, true);
 				bottomPanel.setWidgetVisible(traceUitKnop, false);
 				traceAan = false;
-			} 
+				
+				bottomPanel.setWidgetVisible(beginKnop, false);
+				bottomPanel.setWidgetVisible(stapKnop, false);
+				bottomPanel.setWidgetVisible(terugKnop, false);
+				bottomPanel.setWidgetVisible(skipKnop, false);
+				bottomPanel.setWidgetVisible(showVariables, false);
+				bottomPanel.setWidgetVisible(methodeLabel, false);
+				
+				showVariables.setValue(false);
+				
+				trb.traceUitAction();
+				
+			}
+			else if (e.getSource() == beginKnop)
+			{
+				methodeLabel.setText("");
+				trb.beginAction();
+			}
+			else if (e.getSource() == stapKnop)
+			{
+				trb.stapAction();
+			}
+			else if (e.getSource() == terugKnop)
+			{
+				trb.terugAction();
+			}
+			else if (e.getSource() == skipKnop)
+			{
+				trb.skipAction();
+			}
     		
 			
     		
     	}
     }
     
-	
+	class ShowVariablesVCH implements ValueChangeHandler<Boolean>
+	{	//public void actionPerformed(ActionEvent e)
+		public void onValueChange(ValueChangeEvent<Boolean> e)
+		{
+			if (e.getSource() == showVariables) 
+			{	trb.setVartracing(showVariables.getValue());
+			}
+		}
+	}
+
 	public Widget asWidget()
 	{
 		return dlp;
@@ -451,8 +539,18 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 		
 System.out.println("getState");
 
-		HashMap<String, Object> h = new HashMap<String, Object>(); 
+		HashMap<String, Object> h = new HashMap<String, Object>();
 		
+		String code = "";
+		//int scheidingX = 615;
+	
+		code = jlsVeld.getCode();
+		//scheidingX = this.scheidingX;
+		HashMap<String,Object> inputVars = jlsVeld.getInputVars();
+		 
+	    h.put("code", code);
+	    //h.put("scheidingX", new Integer(scheidingX));
+	    h.put("inputVars", inputVars);
     	
 		return h;
 
@@ -465,6 +563,22 @@ System.out.println("getState");
 System.out.println("setState");
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
+		
+		String code = "";
+		//int scheidingX = 615;
+		HashMap<String, Object> inputVars = null;
+		
+		if (map.containsKey("code")) 
+			code = map.getString("code");
+		//if(h.containsKey("scheidingX")) scheidingX = ((Integer)h.get("scheidingX")).intValue();
+		if (map.containsKey("inputVars")) 
+			inputVars = (HashMap) map.getMap("inputVars");
+		
+		if (inputVars != null)
+			jlsVeld.setInputVars(inputVars);
+		jlsVeld.importeer(code);
+		//this.scheidingX = scheidingX;
+		//setBounds(getBounds());
 		
 	}
 
@@ -530,5 +644,15 @@ System.out.println("setState");
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 
 }

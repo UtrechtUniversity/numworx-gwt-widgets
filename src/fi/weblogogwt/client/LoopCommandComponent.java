@@ -4,6 +4,8 @@ package fi.weblogogwt.client;
 //import java.awt.FontMetrics;
 //import java.awt.Graphics;
 
+import java.awt.Color;
+
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.parameters.TAParameter;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
@@ -241,8 +243,20 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	//protected void paintBackground(Graphics g)
 	protected void paintBackground(Context2d g)
 	{
-		//g.setColor(Color.orange);
-		g.setFillStyle(CssColor.make(255, 127, 0));
+		if(traceKleur)
+		{
+			//g.setColor(traceActiveColor);
+			g.setFillStyle(traceActiveColor);
+			traceKleur = false;
+		} 
+		else
+		{
+			//g.setColor(Color.orange);
+			g.setFillStyle(CssColor.make(255, 127, 0));
+		}	
+		
+		
+		
 		g.fillRect(xPos+0,yPos+0,getSize().width-1,getSize().height-1);
 		
 		//g.setColor(Color.black);
@@ -270,7 +284,10 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 			
 			//g.drawString(commandName+" ", 10, 18);
 			g.fillText(commandName+" ",xPos+10, yPos+18);
-			//g.drawString(naStringTranslated, loopEditor.getX()+loopEditor.getWidth()+1, 18);		
+			//g.drawString(naStringTranslated, loopEditor.getX()+loopEditor.getWidth()+1, 18);
+			TextMetrics tm = g.measureText(commandName);//+" "+loopCondition.getParameterText());
+			int textWidth = (int) Math.round(tm.getWidth());
+			g.fillText(naString, xPos+textWidth + 40, yPos+18);
 		} 
 		else
 		{

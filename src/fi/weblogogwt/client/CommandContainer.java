@@ -52,6 +52,8 @@ public class CommandContainer // extends JPanel
 	CommandComponent parent = null;
 	
 	String containerName = "";
+	
+	boolean componentsVisible = true;
 		
 	public CommandContainer(int x, int y, int b, int h, CompositeCommandComponent cc)
 	{	
@@ -403,12 +405,13 @@ public class CommandContainer // extends JPanel
 			caretUp = false;
 		}
 		
-		
-		for (int cCnt = 0; cCnt < components.size(); cCnt++)
-		{
-			((CommandComponent) components.elementAt(cCnt)).paintComponent(g);
+		if (componentsVisible)
+		{	
+			for (int cCnt = 0; cCnt < components.size(); cCnt++)
+			{
+				((CommandComponent) components.elementAt(cCnt)).paintComponent(g);
+			}
 		}
-		
 
 	}
 	
