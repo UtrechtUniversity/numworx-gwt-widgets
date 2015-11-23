@@ -491,9 +491,9 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("560px");
-		kladjeHWTCanvas.setHeight("350px");
+		kladjeHWTCanvas.setHeight("330px");
 		kladjeHWTCanvas.setCoordinateSpaceWidth(560);
-		kladjeHWTCanvas.setCoordinateSpaceHeight(350);
+		kladjeHWTCanvas.setCoordinateSpaceHeight(330);
 
 		if (kladjeHWTCanvas == null) 
 		{
@@ -504,7 +504,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		gIm = kladjeHWTCanvas.getContext2d();		
 
 	    LayoutPanel panel = new LayoutPanel();
-	    panel.setSize("790px", "100px");
+	    panel.setSize("790px", "120px");
 	    
 	    FlowPanel panel2=new FlowPanel();
 	    panel.add(panel2);
@@ -519,9 +519,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    panel.setWidgetTopBottom(panel2,0,Unit.PX,0,Unit.PX);
 	    
 	    Label instellingenLabel=new Label("Instellingen");
+	    instellingenLabel.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel2.add(instellingenLabel);
 	    
 	    Label aantalDobbelstenenLabel=new Label("Aantal dobbelstenen");
+	    aantalDobbelstenenLabel.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel2.add(aantalDobbelstenenLabel);
 	    
 	    VerticalPanel panel3=new VerticalPanel();
@@ -531,9 +533,11 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    panel3.add(panel4);
 	    
 	    eenDobbelsteen=new RadioButton("myGroup","Een");
+	    eenDobbelsteen.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    eenDobbelsteen.setValue(true);
 	    eenDobbelsteen.addClickHandler(this);
 	    tweeDobbelstenen=new RadioButton("myGroup","Twee");
+	    tweeDobbelstenen.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    tweeDobbelstenen.addClickHandler(this);
 	    drieDobbelstenen=new RadioButton("myGroup","Drie");
 	    drieDobbelstenen.addClickHandler(this);
@@ -542,6 +546,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    panel4.add(drieDobbelstenen);
 	    
 	    HorizontalPanel panel5=new HorizontalPanel();
+	    panel5.getElement().getStyle().setMarginTop(5, Unit.PX);
+	    panel5.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel5.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 	    panel3.add(panel5);
 	    
@@ -558,6 +564,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    
 	 // Make a new button that does something when you click it.
 	    voeruit = new Button("Voer uit",this);
+	    voeruit.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    wis = new Button("Wis",this);
 	    	  
 	    if (dobbelstenenInstellingen==false)
@@ -1235,17 +1242,17 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    
 	    
 	    scrollPanel = new ScrollPanel(table);
-	    scrollPanel.setSize("230px", "350px");
+	    scrollPanel.setSize("230px", "330px");
 	    if (dobbelstenenTabel==false)
 	    	scrollPanel.setVisible(false);
 	    
 	    scrollPanel2 = new ScrollPanel(table1);
-	    scrollPanel2.setSize("230px", "350px");
+	    scrollPanel2.setSize("230px", "330px");
 	   
 	    scrollPanel2.setVisible(false);
 	   
 	    scrollPanel3 = new ScrollPanel(table2);
-	    scrollPanel3.setSize("230px", "350px");
+	    scrollPanel3.setSize("230px", "330px");
 	   
 	    scrollPanel3.setVisible(false);
 	   

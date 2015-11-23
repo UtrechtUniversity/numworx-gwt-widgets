@@ -22,7 +22,7 @@ public class DobbelstenenGrafiek {
 		
 		ssg.gIm.beginPath();
 
-		int height=350;
+		int height=330;
 		if (ssg.toonSom.getValue()==true) {
 			height=175;
 		}

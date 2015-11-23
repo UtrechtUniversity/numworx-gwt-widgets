@@ -17,7 +17,7 @@ public class BinomGrafiek {
 	
 	public void paint() {
 		int width=360;
-		int height=350;
+		int height=340;
 		
 		ssg.gIm2.setFillStyle(ssg.agKleur);
 		ssg.gIm2.fillRect(0,0,width,height);

@@ -27,6 +27,7 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	boolean muntenRadio=false;
 	boolean dobbelstenenRadio=false;
 	boolean binomTrekkingRadio=false;
+	boolean steekproefRadio=false;
 	
 	boolean muntenInstellingen=false;
 	boolean muntenResultaten=false;
@@ -42,15 +43,17 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	boolean binomTrekkingTabel=false;
 	boolean binomTrekkingFrequentie=false;
 	boolean binomTrekkingRooster=false;
-	
+	boolean binomTrekkingKans=true;
+	boolean binomTrekkingPopulatieProportie=false;
 	
 	boolean muntenSelected=false;
 	boolean dobbelstenenSelected=false;
 	boolean binomTrekkingSelected=false;
+	boolean steekproefSelected=false;
 	Munten munten;
 	Dobbelstenen dobbelstenen;
 	BinomTrekking binomTrekking;
-	
+	Steekproef steekproef;
 	
 	
 	public void onModuleLoad() {
@@ -86,7 +89,10 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			binomTrekkingRadio = l.getBoolean("binomTrekkingRadio");
 			binomTrekkingSelected=true;
 		}
-		
+		if (l.containsKey("steekproefRadio")) {
+			steekproefRadio = l.getBoolean("steekproefRadio");
+			steekproefSelected=true;
+		}
 		if (l.containsKey("muntenInstellingen"))
 			muntenInstellingen = l.getBoolean("muntenInstellingen");
 		if (l.containsKey("muntenResultaten"))
@@ -107,6 +113,10 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			dobbelstenenTabel = l.getBoolean("dobbelstenenTabel");
 		if (l.containsKey("binomTrekkingInstellingen"))
 			binomTrekkingInstellingen = l.getBoolean("binomTrekkingInstellingen");
+		if (l.containsKey("binomTrekkingKans"))
+			binomTrekkingKans = l.getBoolean("binomTrekkingKans");
+		if (l.containsKey("binomTrekkingPopulatieProportie"))
+			binomTrekkingPopulatieProportie = l.getBoolean("binomTrekkingPopulatieProportie");		
 		if (l.containsKey("binomTrekkingGrafiek"))
 			binomTrekkingGrafiek = l.getBoolean("binomTrekkingGrafiek");
 		if (l.containsKey("binomTrekkingTabel"))
@@ -172,11 +182,21 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			if (l.containsKey("aantalKeer"))
 				aantalKeer = l.getString("aantalKeer");
 			binomTrekking.keerText.setText(aantalKeer);
-
+			binomTrekking.showKans=binomTrekkingKans;
+			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
 		}
-		
-		
-		
+		if (steekproefSelected) {
+			steekproef = new Steekproef();
+			String steekproefMu="";
+			if (l.containsKey("mu"))
+				steekproefMu = l.getString("mu");
+			steekproef.muText.setText(steekproefMu);
+			String steekproefSigma="";
+			if (l.containsKey("sigma"))
+				steekproefSigma = l.getString("sigma");
+			steekproef.sigmaText.setText(steekproefSigma);
+			
+		}
 	}
 
 	@Override
@@ -195,7 +215,9 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 		if (binomTrekkingRadio) {
 			return binomTrekking;
 		}
-		
+		if (steekproefRadio) {
+			return steekproef;
+		}
 		return null;
 	}
 
@@ -246,6 +268,7 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			for (int i=0;i<list2.size();i++) {
 				list3.add(Arrays.asList(list2.get(i).getExpNumber(),list2.get(i).getGeenKop(),list2.get(i).getEenKop(),list2.get(i).getTweeKop()));
 			}
+			
 			
 			h.put("table2", list3);					
 			
@@ -338,6 +361,29 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			h.put("kans", new String(binomTrekking.kansText.getText()));
 			h.put("binomAantalTrekkingen", new String(binomTrekking.aantalTrekkingenText.getText()));
 			h.put("binomKeer", new String(binomTrekking.keerText.getText()));
+		}
+		if (steekproefSelected) {
+			
+			List<Steekproef.Experiment> list18 = (List<Steekproef.Experiment>) steekproef.dataProvider.getList();	
+			List<List<String>> list19 = new ArrayList<List<String>>();
+			
+			for (int i=0;i<list18.size();i++) {
+				list19.add(Arrays.asList(list18.get(i).getExpNumber(),list18.get(i).getValue()));
+			}
+			
+			h.put("table10", list19);
+			
+			List<Steekproef.Experiment1> list20 = (List<Steekproef.Experiment1>) steekproef.dataProvider1.getList();	
+			List<List<String>> list21 = new ArrayList<List<String>>();
+			
+			for (int i=0;i<list20.size();i++) {
+				list21.add(Arrays.asList(list20.get(i).getExpNumber(),list20.get(i).getMu(),list20.get(i).getSigma()));
+			}
+			
+			h.put("table11", list21);
+			
+			h.put("mu", new String(steekproef.muText.getText()));
+			h.put("sigma", new String(steekproef.sigmaText.getText()));
 		}
 			
 		return h;
@@ -607,6 +653,56 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 				binomKeer = h.getString("binomKeer");
 			binomTrekking.keerText.setText(binomKeer);	
 		}
+		
+		if (steekproefSelected) {
+			if (h.containsKey("table10")){
+				List<List<String>> list17;
+				
+				list17 =  (List<List<String>>) h.get("table10");
+			
+				List<Steekproef.Experiment> list18=new ArrayList<Steekproef.Experiment>();
+				
+				for (int i=0;i<list17.size();i++) {
+					list18.add(new Steekproef.Experiment(list17.get(i).get(0),list17.get(i).get(1)));
+				}
+				
+				steekproef.dataProvider.getList().clear();
+				steekproef.dataProvider.getList().addAll(list18);
+				steekproef.dataProvider.refresh();
+				steekproef.dataProvider.flush();
+				
+				//steekproef.experiment=list17.size();
+			}
+			if (h.containsKey("table11")){
+				List<List<String>> list19;
+				
+				list19 =  (List<List<String>>) h.get("table11");
+			
+				List<Steekproef.Experiment1> list20=new ArrayList<Steekproef.Experiment1>();
+				
+				for (int i=0;i<list19.size();i++) {
+					list20.add(new Steekproef.Experiment1(list19.get(i).get(0),list19.get(i).get(1),list19.get(i).get(2)));
+				}
+				
+				steekproef.dataProvider1.getList().clear();
+				steekproef.dataProvider1.getList().addAll(list20);
+				steekproef.dataProvider1.refresh();
+				steekproef.dataProvider1.flush();
+				
+				steekproef.experiment=list19.size();
+			}
+			String mu="";
+			if (h.containsKey("mu"))
+				mu = h.getString("mu");
+			steekproef.muText.setText(mu);
+			
+			String sigma="";
+			if (h.containsKey("sigma"))
+				sigma = h.getString("sigma");
+			steekproef.sigmaText.setText(sigma);
+				
+		}
+
 	}
 
 	@Override

@@ -63,6 +63,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	Boolean stopCounting;
 	BinomRooster binomRooster;
 	BinomGrafiek binomGrafiek;
+	Boolean showKans=true;
+	Boolean showPopulatieProportie=false;
+	Label kansLabel;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -91,14 +94,14 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("200px");
-		kladjeHWTCanvas.setHeight("350px");
+		kladjeHWTCanvas.setHeight("340px");
 		kladjeHWTCanvas.setCoordinateSpaceWidth(200);
 		kladjeHWTCanvas.setCoordinateSpaceHeight(350);
 
 		binomGrafiekCanvas = Canvas.createIfSupported(); 
 
 		binomGrafiekCanvas.setWidth("360px");
-		binomGrafiekCanvas.setHeight("350px");
+		binomGrafiekCanvas.setHeight("340px");
 		binomGrafiekCanvas.setCoordinateSpaceWidth(360);
 		binomGrafiekCanvas.setCoordinateSpaceHeight(350);
 
@@ -115,7 +118,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 		
 		
 		LayoutPanel panel = new LayoutPanel();
-	    panel.setSize("790px", "100px");
+	    panel.setSize("790px", "110px");
 
 	    FlowPanel panel2=new FlowPanel();
 	    panel.add(panel2);
@@ -124,12 +127,15 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    panel.setWidgetTopBottom(panel2,0,Unit.PX,0,Unit.PX);
 	    
 	    Label instellingenLabel=new Label("Instellingen");
+	    instellingenLabel.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel2.add(instellingenLabel);
 	    
 	    HorizontalPanel panel3=new HorizontalPanel();
+	    panel3.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel3.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-	    Label kansLabel=new Label("Kans");
-	    kansText=new TextBox();
+	    kansLabel=new Label("Kans");
+	    kansLabel.getElement().getStyle().setMarginRight(10, Unit.PX);
+	    kansText=new TextBox();	    
 	    kansText.setText("0.2");
 	    kansText.setVisibleLength(2);
 	    panel3.add(kansLabel);
@@ -138,6 +144,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    HorizontalPanel panel4=new HorizontalPanel();
 	    panel4.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 	    Label aantalTrekkingenLabel=new Label("Aantal trekkingen");
+	    aantalTrekkingenLabel.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    aantalTrekkingenText=new TextBox();
 	    aantalTrekkingenText.setText("20");
 	    aantalTrekkingenText.setVisibleLength(2);
@@ -151,22 +158,27 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    	panel2.setVisible(false);
 	    
 	    voeruit = new Button("Voer uit",this);
+	    voeruit.getElement().getStyle().setMarginRight(5, Unit.PX);
 	    stap = new Button("Stap",this);
 	    keer = new Button("keer uit",this);
 	    wis = new Button("Wis resultaten",this);
 	    
 	    VerticalPanel panel1=new VerticalPanel();
 	    HorizontalPanel panel5=new HorizontalPanel();
+	    panel5.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel1.add(panel5);
 	    panel5.add(voeruit);
 	    panel5.add(stap);
 	    
 	    HorizontalPanel panel6=new HorizontalPanel();
+	    panel6.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel6.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 	    panel1.add(panel6);
 	    
 	    Label voeruitLabel=new Label("Voer");
 	    keerText=new TextBox();
+	    keerText.getElement().getStyle().setMarginRight(5, Unit.PX);
+	    keerText.getElement().getStyle().setMarginLeft(5, Unit.PX);
 	    keerText.setText("20");
 	    keerText.setVisibleLength(1);
 	    
@@ -209,7 +221,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    table.addColumn(outcomeColumn, "Uitkomst");
    
 	    scrollPanel = new ScrollPanel(table);
-	    scrollPanel.setSize("230px", "250px");
+	    scrollPanel.setSize("230px", "240px");
 	    
 	    HorizontalPanel panel7=new HorizontalPanel();
 	    // Add it to the root panel.
@@ -256,7 +268,14 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	     binomGrafiek.paint();
 	}
 	
-
+	public void setZichtbaar() {
+		if (showKans)
+			kansLabel.setText("Kans");
+		if (showPopulatieProportie)
+			kansLabel.setText("PopulatieProportie");
+		
+	}
+	
 	public void setStartStop() {
 		if (wis.isEnabled()==true) {
 			kansText.setEnabled(false);

@@ -16,7 +16,7 @@ public class BinomRooster {
 		
 		ssg.gIm.beginPath();
 		
-		int height=350;
+		int height=340;
 		int width=200;
 
 		ssg.gIm.setLineWidth(1);

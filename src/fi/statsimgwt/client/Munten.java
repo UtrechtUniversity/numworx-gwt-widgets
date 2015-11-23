@@ -172,7 +172,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("560px");
-		kladjeHWTCanvas.setHeight("350px");
+		kladjeHWTCanvas.setHeight("340px");
 		kladjeHWTCanvas.setCoordinateSpaceWidth(560);
 		kladjeHWTCanvas.setCoordinateSpaceHeight(350);
 
@@ -196,12 +196,14 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    // Make a new button that does something when you click it.
 	    voeruit = new Button("Voer uit",this);
 	    stap = new Button("Stap",this);
+	    stap.getElement().getStyle().setMarginTop(5, Unit.PX);
+	    stap.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    wis = new Button("Wis",this);
 	    
 	    label = new Label("Label");
 	    
 	    LayoutPanel panel = new LayoutPanel();
-	    panel.setSize("790px", "100px");
+	    panel.setSize("790px", "110px");
 
 	    VerticalPanel results2=new VerticalPanel();
 	    panel.add(results2);
@@ -327,10 +329,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel.setWidgetLeftRight(radios,370,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(radios,10,Unit.PX,10,Unit.PX);
 	    
-	    aantalKopRadio = new RadioButton("myRadioGroup1","Aantal kop");
+	    aantalKopRadio = new RadioButton("myRadioGroup1"," Aantal kop");
 	    aantalKopRadio.setValue(true);
 	    aantalKopRadio.addClickHandler(this);
-	    percentageKopRadio = new RadioButton ("myRadioGroup1","Percentage kop");
+	    percentageKopRadio = new RadioButton ("myRadioGroup1"," Percentage kop");
 	    percentageKopRadio.addClickHandler(this);
 	    
 	    radios.add(aantalKopRadio);
@@ -343,9 +345,11 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel.setWidgetTopBottom(panel2,0,Unit.PX,0,Unit.PX);
 	    
 	    Label instellingenLabel=new Label("Instellingen");
-	    eenMunt=new RadioButton("myRadioGroup","Een munt");
+	    instellingenLabel.getElement().getStyle().setMarginBottom(5, Unit.PX);
+	    eenMunt=new RadioButton("myRadioGroup"," Een munt");
+	    eenMunt.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    eenMunt.addClickHandler(this);
-	    tweeMunten=new RadioButton("myRadioGroup","Twee munten");
+	    tweeMunten=new RadioButton("myRadioGroup"," Twee munten");
 	    tweeMunten.addClickHandler(this);
 	    eenMunt.setValue(true);
 	    
@@ -355,6 +359,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	
 	    Label aantalWorpenLabel=new Label("Aantal worpen");
 	    Label kansOpKopLabel=new Label("Kans op kop");
+	    aantalWorpenLabel.getElement().getStyle().setMarginRight(10, Unit.PX);
+	    kansOpKopLabel.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    aantalWorpenText=new TextBox();
 	    aantalWorpenText.setText("100");
 	    aantalWorpenText.setVisibleLength(2);
@@ -363,6 +369,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    kansOpKopText.setVisibleLength(2);
 	    
 	    HorizontalPanel panel3=new HorizontalPanel();
+	    panel3.getElement().getStyle().setMarginTop(5, Unit.PX);
+	    panel3.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel3.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
 	    panel3.add(aantalWorpenLabel);
 	    panel3.add(aantalWorpenText);
@@ -484,10 +492,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    table2.addColumn(tweeKopValueColumn, "2 kop");
 		    
 		    scrollPanel = new ScrollPanel(table);
-		    scrollPanel.setSize("230px", "250px");
+		    scrollPanel.setSize("230px", "240px");
 		    
 		    scrollPanel2 = new ScrollPanel(table2);
-		    scrollPanel2.setSize("230px", "350px");
+		    scrollPanel2.setSize("230px", "340px");
 		   
 		    if (muntenTabel==false)
 		    	scrollPanel.setVisible(false);
