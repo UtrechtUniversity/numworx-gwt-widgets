@@ -152,6 +152,20 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		int popupX = xPos + breedte + inputOwner.getAbsoluteLeft();
 		int popupY = yPos + inputOwner.getAbsoluteTop();
 		menuPopup = new PopupPanel(true);
+		if (labelZichtbaar)
+			labelItem.setText("verberg label");
+		else
+			labelItem.setText("toon label");
+		if (tabelZichtbaar)
+			tabelItem.setText("verberg tabel");
+		else
+			tabelItem.setText("toon tabel");
+		if (kettingZichtbaar)
+			kettingItem.setText("verberg ketting");
+		else
+			kettingItem.setText("toon ketting");
+	
+		
 		menuPopup.setWidget(menuBar);
 		menuPopup.setPopupPosition(popupX, popupY);
 		menuPopup.show();
@@ -292,6 +306,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
         
         //zetScroll(scrollable);
         zetZoomInTabel(zoomInTabel);
+        
         
         if (h.containsKey("isBeginExpressie")) 
         	isBeginExpressie = ((Boolean) h.get("isBeginExpressie")).booleanValue();
@@ -580,17 +595,26 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	{	labelZichtbaar = b;
 		if(b)
 		{	
-//GWT			
+//GWT		
+			
+//asv.owner.logger.info("zetLabel");
+			if (zoomInKnop.yPos == yPos+50)
+				zoomInKnop.translate(0,20);
+			if (zoomUitKnop.yPos == yPos+100)
+				zoomUitKnop.translate(0,20);
 			//add(label);
 			zetMaat();
 		}
 		else
 		{	
 //GWT			
+			//zoomInKnop.translate(0,-20);
+			//zoomUitKnop.translate(0,-20);
 			//remove(label);
 			zetMaat();
 		}
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 	}
 	
 	public void toonLabel(boolean b)
@@ -598,17 +622,26 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		super.toonLabel(b);
 		if(b)
 		{	
-//GWT			
+//GWT		
+			if (zoomInKnop.yPos == yPos+50)
+				zoomInKnop.translate(0,20);
+			if (zoomUitKnop.yPos == yPos+100)
+				zoomUitKnop.translate(0,20);
 			//add(label);
 			zetMaat();
 		}
 		else
 		{	
-//GWT			
+//GWT		
+			if (zoomInKnop.yPos == yPos+70)
+				zoomInKnop.translate(0,-20);
+			if (zoomUitKnop.yPos == yPos+120)
+				zoomUitKnop.translate(0,-20);
 			//remove(label);
 			zetMaat();
 		}
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 	}
 	
 	public void toonTabel(boolean b)
@@ -629,7 +662,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			tabel = null;
 			zetMaat();
 		}
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 
 	
 		GrafiekComponent gc = vindGrafiekComponent();
@@ -707,7 +741,13 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 //System.out.println("labelWidth = " + labelWidth);			
 		
 			b = Math.max(b,labelWidth+15);
+			
 		}
+		else
+		{
+			
+		}
+		
 		if (tabelZichtbaar)
 		{	h=h+152;
 	
@@ -1116,7 +1156,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
         asv.zoomStateHolder.setBeginx(varnaam, beginx);
         asv.zoomStateHolder.setZoomStates(varnaam);
         //System.out.println("test1"+varnaam);
-        asv.tekenOpnieuw();
+        //if (!asv.owner.asvSetState)
+        	asv.tekenOpnieuw();
     	
     }
 	

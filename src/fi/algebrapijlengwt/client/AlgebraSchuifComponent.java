@@ -102,7 +102,8 @@ public class AlgebraSchuifComponent extends SchuifComponent
 	{
 		visible = b;
 		
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 		
 	}
 	

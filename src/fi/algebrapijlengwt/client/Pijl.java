@@ -106,7 +106,8 @@ public class Pijl //extends JComponent
 	{
 		visible = b;
 		
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 		
 	}
 	
@@ -743,7 +744,8 @@ public class Pijl //extends JComponent
 		p.zetLinks(links);
 		zender.voegPijlToe(p);		
 		
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 	}
 	
 	//public void mousePressed(MouseEvent e)

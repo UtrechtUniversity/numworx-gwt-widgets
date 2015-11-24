@@ -17,8 +17,10 @@
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
+  
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+
 
   <!-- Specify the app entry point class.                         -->
   <!-- <entry-point class='fi.algebrapijlenhwt.client.AlgebraPijlenGWT'/> -->

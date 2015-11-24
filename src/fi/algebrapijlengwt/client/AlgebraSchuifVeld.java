@@ -1,5 +1,6 @@
 package fi.algebrapijlengwt.client;
 
+//import fi.algebrapijlengwt.client.UitvoerSchuifComponent.MenuCommand;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import java.util.*;
@@ -9,13 +10,18 @@ import java.util.logging.Logger;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.PopupPanel;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class AlgebraSchuifVeld 
 {	
-	private static Logger logger = Logger.getLogger("APGWT");
+	//private static Logger logger = Logger.getLogger("ASV");
 	
 	public boolean changed = false;
 	
@@ -78,7 +84,12 @@ public class AlgebraSchuifVeld
 	AlgebraPijlenGWT owner;
 	
 	boolean toonTabellen = false;
-		
+
+	PopupPanel menuPopup;
+	MenuBar menuBar;
+	MenuItem copyItem, pasteItem;
+
+	LayoutPanel inputOwner;
 	
 	public AlgebraSchuifVeld(int x, int y, int b, int h, Context2d ct2d, AlgebraPijlenGWT o)
 	{	//super(x, y, b, h);
@@ -88,6 +99,8 @@ public class AlgebraSchuifVeld
 		hoogte = h;
 		asvContext2d = ct2d;
 		owner = o;
+	
+		inputOwner = owner.canvasPanel;
 		
 		zoomStateHolder = new ZoomStateHolder(this);
 
@@ -122,6 +135,13 @@ public class AlgebraSchuifVeld
 
 		brugklas = owner.brugklas;
 		
+		menuBar = new MenuBar(true);
+		copyItem = new MenuItem("kopieren", new MenuCommand("copy"));
+		pasteItem = new MenuItem("plakken", new MenuCommand("paste"));
+		menuBar.addItem(copyItem);
+		menuBar.addItem(pasteItem);
+
+		
 		if (toolkit)
 			maakStapel();
 		
@@ -144,6 +164,8 @@ public class AlgebraSchuifVeld
 */	
 	public void answerChanged()
 	{
+		
+//logger.info("ASV answerChanged");		
 		changed = true;
 		removeGoedFout();
 		owner.answerChanged();
@@ -377,25 +399,25 @@ public class AlgebraSchuifVeld
 		
 		//layoutKnoppen();
 		
-		tekenOpnieuw();
+		//tekenOpnieuw();
 	}
 	
 	public void zetTerugHeen(boolean b)
 	{
 		terugHeen = b;
-		tekenOpnieuw();
+		//tekenOpnieuw();
 	}
 	
 	public void zetTabelOptie(boolean b)
 	{
 		tabelOptie = b;
-		tekenOpnieuw();
+		//tekenOpnieuw();
 	}
 
 	public void zetGrafiekOptie(boolean b)
 	{
 		grafiekOptie = b;
-		tekenOpnieuw();
+		//tekenOpnieuw();
 	}
 	
 	public void zetScrollOptie(boolean b)
@@ -424,7 +446,7 @@ public class AlgebraSchuifVeld
 			}
 		}
 		
-		tekenOpnieuw();
+		//tekenOpnieuw();
 		
 	}
 	
@@ -460,6 +482,121 @@ public class AlgebraSchuifVeld
 	
 		return result;
 	}
+
+	public void copy()
+	{
+//System.out.println("copy");		
+		//HashMap<String,Object> h = getCopyTable();
+//owner.logger.info("pre encode");		
+		//String s = StringCodeObject.encodeObjectToString(h);
+//owner.logger.info("post encode");		
+		AlgebraPijlenGWT.clipBoard = getCopyTable();
+		
+//if ((s != null) && !s.equals(""))
+//System.out.println("s not null");	
+	}
+
+	public HashMap<String,Object> getCopyTable()
+	{	int aantalSc = 0;
+		List<String> classNamesList = new ArrayList<String>();
+		List<Integer> posXList = new ArrayList<Integer>();
+		List<Integer> posYList = new ArrayList<Integer>();
+		List<Map<String,Object>> scStatesList = new ArrayList<Map<String,Object>>();
+		List<Boolean> connectionsList = new ArrayList<Boolean>();
+		List<Integer> graphConnectionsList = new ArrayList<Integer>();
+		boolean tabel = false;
+		boolean grafiek = false;
+		//boolean expressie = false;
+		//boolean links = false;
+		Map<String,Object> zoomStateHolderState = null;
+	
+		aantalSc = this.aantalSc;
+		
+int stapelsCnt = 0;
+
+		for (int i = 0; i < aantalSc; i++)
+	    {	
+			classNamesList.add(getClassName(schuifcomponenten[i]));
+	    	posXList.add(new Integer(schuifcomponenten[i].xPos));
+	    	posYList.add(new Integer(schuifcomponenten[i].yPos));
+	    	scStatesList.add(schuifcomponenten[i].getState());
+	    	
+if (schuifcomponenten[i].isStapel)
+stapelsCnt++;	
+	    }
+		//connections = new boolean[aantalSc][aantalSc];
+		for (int i = 0; i < aantalSc; i++)
+	    {	for (int j = 0; j < aantalSc; j++)
+			{	//connections[i][j] = schuifcomponenten[j].pijlIn1 != null && 
+	    		//					schuifcomponenten[j].pijlIn1.zender == schuifcomponenten[i];
+				boolean b = schuifcomponenten[j].pijlIn1 != null && 
+							schuifcomponenten[j].pijlIn1.zender == schuifcomponenten[i];
+				connectionsList.add(new Boolean(b));
+			}
+	    }
+	    
+		
+		if (owner.tabelBox != null)
+			tabel = owner.tabelBox.getValue();
+		if (owner.grafiekBox != null)
+			grafiek = owner.grafiekBox.getValue();
+			
+//ip is er niet		
+//	    expressie = ip.isExpr();
+		
+	    //links = this.links;
+	    zoomStateHolderState = zoomStateHolder.getState();
+	    	
+	    //graphConnections = new int[10];
+	    for (int i = 0; i < 10; i++)
+		{	//graphConnections[i] = -1;
+			graphConnectionsList.add(new Integer(-1));
+		}
+	    
+	    
+		if (grafiek)
+	    {	for (int i = 0; i < 10; i++)
+			{	Pijl p = grafiekComponent.pijlenIn[i];
+				for (int j = 0; j < aantalSc; j++)
+		   		{	if (p != null && schuifcomponenten[j] == p.zender)
+		   			{	//graphConnections[i] = j;
+		   				graphConnectionsList.set(i, new Integer(j));
+		   			}
+				}
+			}
+	    }
+		
+	    HashMap<String,Object> h = new HashMap<String,Object>();
+	    h.put("aantalSc", new Integer(aantalSc));
+//owner.logger.info("ASV getCopyTable " + aantalSc);
+//owner.logger.info("ASV getCopyTable " + stapelsCnt);
+	    h.put("classNamesList", classNamesList);
+	    h.put("posXList", posXList);
+	    h.put("posYList", posYList);
+	    h.put("scStatesList", scStatesList);
+	    h.put("connectionsList", connectionsList);
+	    h.put("graphConnectionsList", graphConnectionsList);
+	    h.put("tabel", new Boolean(tabel));
+	    h.put("grafiek", new Boolean(grafiek));
+	    //h.put("expressie", new Boolean(expressie));
+	    //h.put("links", new Boolean(links));
+	    h.put("zoomStateHolderState", zoomStateHolderState);
+	    
+	    //h.put("toolkit", new Boolean(toolkit));
+	    //h.put("alleenInvullen", new Boolean(alleenInvullen));
+	    //h.put("isDemo", new Boolean(isDemo));
+	    
+	    //h.put("brugklas", new Boolean(brugklas));
+	    //h.put("terugHeen", new Boolean(terugHeen));
+	    //h.put("tabelOptie", new Boolean(tabelOptie));
+	    //h.put("grafiekOptie", new Boolean(grafiekOptie));
+	    
+	    //h.put("scrollOptie", new Boolean(scrollOptie));
+	    //h.put("zoomOptie", new Boolean(zoomOptie));
+	    
+	    return h;
+	}
+
 	
 	public HashMap<String,Object> getState()
 	{	int aantalSc = 0;
@@ -559,9 +696,303 @@ public class AlgebraSchuifVeld
 	{	editmodeState = h;
 		setState(h);
 	}
-*/		
+*/	
+	
+    public void paste()
+    {
+    	if (AlgebraPijlenGWT.clipBoard != null)
+    	{
+    		
+//System.out.println("paste");    		
+    		//Object o = StringCodeObject.decodeStringToObject(AlgebraPijlenGWT.clipBoard);
+    		//if (o == null)
+    		//	return;
+    		//HashMap<String,Object> h = (HashMap<String,Object>) o;
+    		setPasteTable(AlgebraPijlenGWT.clipBoard);
+//System.out.println("o not null");    		
+    	}
+    }
+
+    public void setPasteTable(Map<String,Object> map)
+    {	
+    	
+//owner.logger.info("ASV setPasteTable");    	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    	
+    	int aantalPasteSc = 0;
+    	List<String> classNamesList = new ArrayList<String>();
+		List<Integer> posXList = new ArrayList<Integer>();
+		List<Integer> posYList = new ArrayList<Integer>();
+		List<Map<String,Object>> scStatesList = new ArrayList<Map<String,Object>>();
+		List<Boolean> connectionsList = new ArrayList<Boolean>();
+		List<Integer> graphConnectionsList = new ArrayList<Integer>();
+		boolean tabel = false;
+		boolean grafiek = false;
+		//boolean expressie = false;
+		//boolean links = false;
+		Map<String,Object> zoomStateHolderState = null;
+		
+		if (h.containsKey("aantalSc"))
+			aantalPasteSc = h.getInt("aantalSc");
+		if (h.containsKey("classNamesList"))
+			classNamesList = h.getStringList("classNamesList");
+		if (h.containsKey("posXList"))
+			posXList = h.getIntegerList("posXList");
+		if (h.containsKey("posYList"))
+			posYList = h.getIntegerList("posYList");
+		if (h.containsKey("scStatesList"))		
+			scStatesList = h.getMapList("scStatesList");
+		if (h.containsKey("connectionsList"))			
+			connectionsList = h.getBooleanList("connectionsList");
+		if (h.containsKey("graphConnectionsList"))			
+			graphConnectionsList = h.getIntegerList("graphConnectionsList");
+		//if (h.containsKey("tabel"))	
+		//	tabel = h.getBoolean("tabel");
+		if (h.containsKey("grafiek"))		
+			grafiek = h.getBoolean("grafiek");
+		//if (h.containsKey("expressie"))	
+		//	expressie = h.getBoolean("expressie");
+		//if (h.containsKey("links"))		
+		//	links = h.getBoolean("links");
+		if (h.containsKey("zoomStateHolderState"))	
+			zoomStateHolderState = h.getMap("zoomStateHolderState");
+		
+		zoomStateHolder.setState(zoomStateHolderState);
+		
+//System.out.println("constr " + this.aantalSc);
+//System.out.println("state " + aantalSc);
+		
+//owner.logger.info("ASV setPasteTable pasted " + aantalPasteSc);		
+		
+		int aantalStapels = aantalSc;
+		
+		
+//owner.logger.info("ASV setPasteTable orig" + aantalStapels);		
+				
+		for (int i = 0; i < aantalPasteSc; i++)
+	    {	
+				String className = (String) classNamesList.get(i);
+				int posX = ((Integer) posXList.get(i)).intValue();
+				int posY = ((Integer) posYList.get(i)).intValue();
+
+//System.out.println("posX = " + posX);
+
+//if (alleenInvullen || isDemo)
+//posX -= 110;	
+
+	    		if (className.equals("AftrekSchuifComponent"))
+	    			//|| 
+	    			//className.equals("fi.algebrapijlenopdr.AftrekSchuifComponent"))
+	    		{
+	    			AlgebraSchuifComponent asv = new AftrekSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+	    		}
+	    		else if (className.equals("DeelSchuifComponent"))
+	    				//||
+	    				// className.equals("fi.algebrapijlenopdr.DeelSchuifComponent"))
+	    		{	
+	    			AlgebraSchuifComponent asv = new DeelSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+	    		}
+				else if (className.equals("MachtSchuifComponent"))
+						//||
+						// className.equals("fi.algebrapijlenopdr.MachtSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new MachtSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("OmkeringSchuifComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.OmkeringSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new OmkeringSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("OptelSchuifComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.OptelSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new OptelSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("UitvoerSchuifComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.UitvoerSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new UitvoerSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("VermenigvuldigSchuifComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.VermenigvuldigSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new VermenigvuldigSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("WortelSchuifComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.WortelSchuifComponent"))
+				{
+					AlgebraSchuifComponent asv = new WortelSchuifComponent(this, posX, posY, 50, 20);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+				}
+				else if (className.equals("GrafiekComponent"))
+					//||
+					//	 className.equals("fi.algebrapijlenopdr.GrafiekComponent"))
+				{
+					AlgebraSchuifComponent asv = new GrafiekComponent(this, posX, posY, 210, 200);
+	    			schuifcomponenten[aantalStapels + i] = asv;
+	    			aantalSc++;
+	    			grafiekComponent = (GrafiekComponent) schuifcomponenten[i];
+	    			
+				}
+	    	
+	    }
+//owner.logger.info("paste componenten gemaakt " + (aantalSc - aantalStapels));
+	    for (int i = 0; i < (aantalSc - aantalStapels); i++)
+	    {	
+	    	
+	    	if (!(schuifcomponenten[aantalStapels + i] instanceof GrafiekComponent)) 
+	    	{	//schuifcomponenten[i].setState(scStates[i]);
+//owner.logger.info("paste componenten " + (aantalStapels+i) + " setState");	    		
+	    		schuifcomponenten[aantalStapels + i].setState((HashMap<String,Object>)scStatesList.get(i));
+	    		
+	    	}
+	    	// bij een GrafiekComponent lukt dit niet omdat die bij setState de parent nodig heeft en die heeft ie nog niet
+	    }
+	    
+//owner.logger.info("paste state componenten gezet");	    
+		int max = aantalSc;
+		for (int i = 0; i < (max - aantalStapels); i++)
+		{	
+			
+			if (!(schuifcomponenten[aantalStapels + i] instanceof GrafiekComponent))
+			{	
+				Pijl p = new Pijl(this);
+				if (schuifcomponenten[aantalStapels + i].isStapel) 
+				{	schuifcomponenten[aantalStapels + i].zetLinks(links);
+					p.zetLinks(links);
+				}	
+				schuifcomponenten[aantalStapels + i].voegPijlToe(p);
+			}	
+			//add(schuifcomponenten[i]);
+		}
+		
+//owner.logger.info("paste pijlen gemaakt");
+
+	    for (int i = 0; i < (aantalSc - aantalStapels); i++)
+	    {	for(int j = 0; j < (aantalSc - aantalStapels); j++)
+			{	boolean cij = ((Boolean) connectionsList.get(i*(aantalSc-aantalStapels)+j)).booleanValue();
+	    		//if (connections[i][j])
+				if (cij)
+				{	Pijl p = schuifcomponenten[aantalStapels + i].pijlUit[schuifcomponenten[aantalStapels + i].aantalPu - 1];
+					//schuifcomponenten[j].zetLinks(links);
+					schuifcomponenten[aantalStapels + j].verbind(p);
+					p.zetVerbonden(schuifcomponenten[aantalStapels + j]);
+				}
+			}
+	    }
+	    
+//owner.logger.info("paste connecties gemaakt");
+	    
+	    if (grafiek)
+	    {  	for (int i = 0; i < 10; i++)
+			{	int gc = ((Integer) graphConnectionsList.get(i)).intValue(); 
+	    		//if (graphConnections[i] != -1)
+				if (gc != -1)
+				{	//Pijl p = schuifcomponenten[graphConnections[i]].pijlUit[schuifcomponenten[graphConnections[i]].aantalPu - 1];
+					Pijl p = schuifcomponenten[aantalStapels + gc].pijlUit[schuifcomponenten[aantalStapels + gc].aantalPu - 1];
+					grafiekComponent.verbind(p, i);
+					p.zetVerbonden(grafiekComponent);
+				}
+		    }
+		}
+		
+		for (int i = 0; i < (aantalSc - aantalStapels); i++)
+	    {	//schuifcomponenten[i].setState(scStates[i]);
+	    	schuifcomponenten[aantalStapels + i].setState((HashMap<String,Object>)scStatesList.get(i));
+	    }
+	    
+	    for (int i = 0; i < (aantalSc - aantalStapels); i++)
+	    {	schuifcomponenten[aantalStapels + i].zetVeranderd(20);
+	    	if (schuifcomponenten[aantalStapels + i] instanceof UitvoerSchuifComponent)
+	    	{	((UitvoerSchuifComponent) schuifcomponenten[aantalStapels + i]).zetToonWaarde(true);
+	    		((UitvoerSchuifComponent) schuifcomponenten[aantalStapels + i]).zetScroll(true);
+	    		schuifcomponenten[aantalStapels + i].zetVeranderd(20);
+	    	}
+	    }
+	    
+
+	    
+	    for (int i = 0; i < (aantalSc - aantalStapels); i++)
+	    {	if (schuifcomponenten[aantalStapels + i] instanceof GrafiekComponent)
+	    	{	//schuifcomponenten[i].setState(scStates[i]);
+	    		schuifcomponenten[aantalStapels + i].setState((HashMap<String,Object>)scStatesList.get(i));
+	    		schuifcomponenten[aantalStapels + i].zetVeranderd(20);
+	    	}
+	    }
+    
+	    if (owner.tabelBox != null)
+	    	owner.tabelBox.setValue(tabel);
+	    if (owner.grafiekBox != null)
+	    	owner.grafiekBox.setValue(grafiek);	    
+	    
+/*	    
+	    this.links = links;
+	    if (links)
+		{	for (int i = 0; i < aantalSc; i++)
+			{	if (schuifcomponenten[i].isStapel)
+				{	//schuifcomponenten[i].setLocation(schuifcomponenten[i].getLocation().x+10, schuifcomponenten[i].getLocation().y);
+					schuifcomponenten[i].zetLinks(true);
+				}
+			}
+		}
+*/	    
+	    
+	    //Enumeration en = zoomStateHolder.keys();
+	    Set keySet = zoomStateHolder.keySet();
+		Object[] keys = keySet.toArray();
+//owner.logger.info("zoomStateHolder keys = " + keys.length);	    
+		//while(en.hasMoreElements())
+		for (int kCnt = 0; kCnt < keys.length; kCnt++)	
+		{	
+			//String key = (String) en.nextElement();
+			String key = (String) keys[kCnt];
+			
+			setZoomStates(key, zoomStateHolder.getZoomState(key));
+		}
+
+//owner.logger.info("paste zoomStates gezet");
+
+//owner.logger.info("paste pre " + aantalSc);		
+
+		for (int i = (aantalSc - 1); i >= aantalStapels; i--)
+	    {	if (schuifcomponenten[i].isStapel)
+	    		verwijder(schuifcomponenten[i]);
+	    }
+		
+//owner.logger.info("paste post " + aantalSc);
+		
+//System.out.println("setState end");		
+//System.out.println("b = " + getSize().width);
+//owner.logger.info("ASV setPasteTable einde");		
+		
+		tekenOpnieuw();
+			
+    }
+
     public void setState(Map<String,Object> map)
     {	
+    	
+//owner.logger.info("ASV setState");    	
     	ObjectMap h = JSONUtilities.wrapMap(map);
     	
     	int aantalSc = 0;
@@ -599,10 +1030,10 @@ public class AlgebraSchuifVeld
 			expressie = h.getBoolean("expressie");
 		if (h.containsKey("links"))		
 			links = h.getBoolean("links");
-		//if (h.containsKey("zoomStateHolderState"))	
-		//	zoomStateHolderState = h.getMap("zoomStateHolderState");
+		if (h.containsKey("zoomStateHolderState"))	
+			zoomStateHolderState = h.getMap("zoomStateHolderState");
 		
-		//zoomStateHolder.setState(zoomStateHolderState);
+		zoomStateHolder.setState(zoomStateHolderState);
 		
 //System.out.println("constr " + this.aantalSc);
 //System.out.println("state " + aantalSc);
@@ -611,7 +1042,7 @@ public class AlgebraSchuifVeld
 		for (int i = 0; i < n; i++)
 		{	verwijder(schuifcomponenten[0]);
 		}
-		
+//owner.logger.info("verwijderd");		
 		this.aantalSc = aantalSc;
 		schuifcomponenten = new AlgebraSchuifComponent[200];
 		for (int i = 0; i < aantalSc; i++)
@@ -683,17 +1114,20 @@ public class AlgebraSchuifVeld
 				}
 	    	
 	    }
-	    
+//owner.logger.info("componenten gemaakt " + aantalSc);
 	    for (int i = 0; i < aantalSc; i++)
 	    {	
 	    	
 	    	if (!(schuifcomponenten[i] instanceof GrafiekComponent)) 
 	    	{	//schuifcomponenten[i].setState(scStates[i]);
+//owner.logger.info("componenten " + i + " setState");	    		
 	    		schuifcomponenten[i].setState((HashMap<String,Object>)scStatesList.get(i));
+	    		
 	    	}
 	    	// bij een GrafiekComponent lukt dit niet omdat die bij setState de parent nodig heeft en die heeft ie nog niet
 	    }
 	    
+//owner.logger.info("state componenten gezet");	    
 		int max = aantalSc;
 		for (int i = 0; i < max; i++)
 		{	
@@ -710,7 +1144,8 @@ public class AlgebraSchuifVeld
 			//add(schuifcomponenten[i]);
 		}
 		
-	    
+//owner.logger.info("pijlen gemaakt");
+
 	    for (int i = 0; i < aantalSc; i++)
 	    {	for(int j = 0; j < aantalSc; j++)
 			{	boolean cij = ((Boolean) connectionsList.get(i*aantalSc+j)).booleanValue();
@@ -724,7 +1159,7 @@ public class AlgebraSchuifVeld
 			}
 	    }
 	    
-
+//owner.logger.info("connecties gemaakt");
 	    
 	    if (grafiek)
 	    {  	for (int i = 0; i < 10; i++)
@@ -782,6 +1217,7 @@ public class AlgebraSchuifVeld
 	    
 if (toolkit)	    
 {	    
+//owner.logger.info("toolkit");	
 	    // nodig voor launchdata, bij de Java versie staan de componenten iets hoger
 	    for (int i = 0; i < aantalSc; i++)
 		{	if (schuifcomponenten[i].isStapel)
@@ -795,9 +1231,11 @@ if (toolkit)
 				if(schuifcomponenten[i] instanceof MachtSchuifComponent)schuifcomponenten[i].zetPlaats(20, 240);
 			}
 		}
+//owner.logger.info("einde toolkit");	    
 }
 else // alleenInvullen || isDemo
 {
+//owner.logger.info("alleen");	
 //System.out.println("before " + this.aantalSc);	
 	boolean launching = verwijderStapels();
 //System.out.println("after " + this.aantalSc);	
@@ -835,7 +1273,7 @@ else // alleenInvullen || isDemo
 	    //Enumeration en = zoomStateHolder.keys();
 	    Set keySet = zoomStateHolder.keySet();
 		Object[] keys = keySet.toArray();
-	    
+//owner.logger.info("zoomStateHolder keys = " + keys.length);	    
 		//while(en.hasMoreElements())
 		for (int kCnt = 0; kCnt < keys.length; kCnt++)	
 		{	
@@ -844,6 +1282,8 @@ else // alleenInvullen || isDemo
 			
 			setZoomStates(key, zoomStateHolder.getZoomState(key));
 		}
+
+//owner.logger.info("zoomStates gezet");
 
 		zetToolkit(toolkit);
 		zetAlleenInvullen(alleenInvullen);
@@ -881,6 +1321,7 @@ else // alleenInvullen || isDemo
 		
 //System.out.println("setState end");		
 //System.out.println("b = " + getSize().width);
+//owner.logger.info("ASV setState einde");		
 		
 		tekenOpnieuw();
 			
@@ -910,20 +1351,21 @@ else // alleenInvullen || isDemo
 
     public void tekenOpnieuw()
     {
+//owner.logger.info("ASV tekenOpnieuw");    	
     	paint(asvContext2d);
     }
     
     
     public void paint()
     {
-    	
+//owner.logger.info("ASV paint");    	
     	paint(asvContext2d);
     }
 	//public void paint(Graphics g)
     public void paint(Context2d g)
 	{	
     	
-logger.info("ASV paint " + aantalSc);
+//logger.info("ASV paint " + aantalSc);
 
     	tekenAchtergrond(g);
     	
@@ -998,7 +1440,7 @@ logger.info("ASV paint " + aantalSc);
 	{	
 		
 //System.out.println("maakStapel");
-logger.info("maakStapel");
+//owner.logger.info("maakStapel");
 		
 		aantalSc = 0;
 		int b = basisB; //50;
@@ -1231,7 +1673,9 @@ logger.info("maakStapel");
 				{	schuifcomponenten[j] = schuifcomponenten[j + 1];
 				}
 				aantalSc--;
-				tekenOpnieuw();
+				
+				if (!owner.asvSetState)
+					tekenOpnieuw();
 				
 //GWT				
 				//copyItem.setEnabled(!veldIsLeeg());
@@ -1269,7 +1713,8 @@ logger.info("maakStapel");
 				{	((GrafiekComponent) schuifcomponenten[i]).setZoomState(varnaam, zoomState);
 				}
 			}
-		tekenOpnieuw();
+		if (!owner.asvSetState)
+			tekenOpnieuw();
 	}
 	
 	public void linksRechtsAction()
@@ -1445,6 +1890,21 @@ logger.info("maakStapel");
 		return ap; 
 	}
 
+	protected boolean press;
+    protected long taptime;
+    protected List<Long> doubletap = new ArrayList<Long>();
+    
+    protected boolean isLongClick() 
+    {
+    	return System.currentTimeMillis() - taptime > 300;
+	}
+
+	protected boolean isDoubleClick() 
+	{
+	    return doubletap.size() >= 2 && doubletap.get(1) - doubletap.get(0) < 700;
+		//return (doubletap.size() >= 2) && doubletap.get(doubletap.size() - 1) - doubletap.get(doubletap.size() - 2) < 700;
+	}
+
 	
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{	
@@ -1470,6 +1930,11 @@ logger.info("maakStapel");
 				((GrafiekComponent) actieveComponent).mouseDownTouchStartAction(eventX, eventY);
 			else	
 				actieveComponent.mouseDownTouchStartAction(eventX, eventY);
+		}
+		else
+		{
+			taptime = System.currentTimeMillis();
+	        doubletap.add(taptime);
 		}
 		
 		
@@ -1523,6 +1988,27 @@ logger.info("maakStapel");
 		{
 			actieveComponent.mouseUpTouchEndAction();
 		}
+		else
+		{
+			if (isDoubleClick()) 
+			{
+	            doubletap.clear();
+	        } 
+			else if (isLongClick()) 
+			{
+				//showPopupMenu(eventX, eventY);
+		
+				doubletap.clear();
+	        } 
+			else 
+			{
+	            if (doubletap.size() >= 2) 
+	            {	//doubletap.clear();
+	            	doubletap.remove(0);
+	            }
+	        }
+
+		}
 
 		
 		if (selecterenBezig)
@@ -1531,4 +2017,62 @@ logger.info("maakStapel");
 //			setCursor(new Cursor(Cursor.DEFAULT_CURSOR ));
 		}
 	}
+
+	public void showPopupMenu(int x, int y)
+	{
+		int popupX = x + inputOwner.getAbsoluteLeft();
+		int popupY = y + inputOwner.getAbsoluteTop();
+		menuPopup = new PopupPanel(true);
+		
+		menuPopup.setWidget(menuBar);
+		menuPopup.setPopupPosition(popupX, popupY);
+		menuPopup.show();
+	}	
+
+	public void menuAction(String s)
+	{
+		
+		if (s.equals("copy"))
+		{	
+			if (!veldIsLeeg())
+			{
+owner.logger.info("pre copy");				
+				copy();
+owner.logger.info("post copy");				
+			}
+		}
+		
+		else if (s.equals("paste"))
+		{	
+			if (AlgebraPijlenGWT.clipBoard != null)
+			{	
+				maakVeldLeeg();  
+owner.logger.info("pre paste");			
+				paste();
+owner.logger.info("post paste");				
+				
+			}
+			else
+			{
+owner.logger.info("clip = null");				
+			}
+
+		}
+		menuPopup.setVisible(false);
+	}
+
+	class MenuCommand implements Command
+	{
+		String cmdString = "";
+		
+		public MenuCommand(String s)
+		{
+			cmdString = s;
+		}
+		public void execute()
+		{
+			menuAction(cmdString);
+		}
+	}
+
 }

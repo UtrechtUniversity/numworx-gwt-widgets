@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 //import java.util.Vector;
 
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
@@ -59,6 +60,9 @@ import fi.algebrapijlengwt.client.expressies_ap.*;
 
 public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //InteractionView 
 {
+	
+	static Logger logger = Logger.getLogger("APGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -126,6 +130,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	private OpdrNavIF comRoot;
 	
 	boolean asvSetState = false;
+	
+	public static HashMap<String,Object> clipBoard = null;
 
 	public void getImages() 
 	{
@@ -146,11 +152,15 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	{
 		getImages();
 		
-		dlp = new DockLayoutPanel(Style.Unit.PX);
-		dlp.addStyleName(algebraPijlenGWTCss.dock());
-		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		//dlp = new DockLayoutPanel(Style.Unit.PX);
+		//dlp.addStyleName(algebraPijlenGWTCss.dock());
+		//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		
+		canvasPanel = new LayoutPanel(); 
+		canvasPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 
-		RootPanel.get(holderId).add(dlp);
+		RootPanel.get(holderId).add(canvasPanel);
+		//RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(algebraPijlenGWTCss.root());
 	
 		//standAlone = true; // Wim een debuggertje was is blijven hangen?
@@ -160,10 +170,10 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			
 	}
 
-
+/*
 	private void initCanvas() {
-		canvasPanel = new LayoutPanel();
-		dlp.add(canvasPanel);
+		//canvasPanel = new LayoutPanel();
+		//dlp.add(canvasPanel);
 		
 		int canvasBreedte = breedte;
 		int canvasHoogte = hoogte;
@@ -204,6 +214,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		makeLeft();
 	
 	}
+*/	
 	
 	public void makeLeft()
 	{
@@ -304,9 +315,12 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 		getImages();
 		
-		dlp = new DockLayoutPanel(Style.Unit.PX);
-		dlp.addStyleName(algebraPijlenGWTCss.dock());
-		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		//dlp = new DockLayoutPanel(Style.Unit.PX);
+		//dlp.addStyleName(algebraPijlenGWTCss.dock());
+		//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
+		canvasPanel = new LayoutPanel(); 
+		canvasPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		//RootPanel.get(holderId).add(dlp);
 		//RootPanel.get(holderId).addStyleName(algebraPijlenHWTCss.root());
@@ -496,7 +510,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 	public Widget asWidget()
 	{
-		return dlp;
+		return canvasPanel; //dlp;
 	}
 	
 	@Override
@@ -505,6 +519,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		HashMap<String, Object> h = asv.getState();
 		h.put("nagekeken", new Boolean(nagekeken));
 		h.put("ingevuld", new Boolean(ingevuld));
+		if (clipBoard != null)
+			h.put("clipBoard", clipBoard);
 		
 		return h;
 	}
@@ -513,11 +529,11 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	public void setState(HashMap<String, Object> h)
 	{
 		
-//System.out.println("setState");
+logger.info("AP setState");
 
-		asvSetState= true;
+		asvSetState = true;
 		asv.setState(h);
-		asvSetState= false;
+		asvSetState = false;
 		
 		ingevuld = false;
 		
@@ -539,6 +555,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 					
 		
 		//asv.setState(h);
+		asv.paint();
 
 	}
 
@@ -763,12 +780,14 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 					 Map<String, Number> values) 
 	{
+logger.info("AlgebraPijlenGWT init");		
+		
 		this.breedte = width;
 		this.hoogte = height;
-		dlp.setPixelSize(breedte , hoogte ); // Wim: nu zijn pas de maten bekend. 
-
-		
-		
+		//dlp.setPixelSize(breedte , hoogte ); // Wim: nu zijn pas de maten bekend. 
+		 
+		canvasPanel.setPixelSize(breedte, hoogte);
+	
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
@@ -809,8 +828,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			scoreMax = launchState.getInt("scoreMax");
 
 		
-		canvasPanel = new LayoutPanel();
-		dlp.add(canvasPanel);
+		//canvasPanel = new LayoutPanel();
+		//dlp.add(canvasPanel);
 		
 		int canvasBreedte = breedte;
 		int canvasHoogte = hoogte;
@@ -848,9 +867,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 		asv = new AlgebraSchuifVeld(0, 0, breedte, hoogte, algebraPijlenGWTContext2d, this);
 		
-		//asv.paint();
-		
-		makeLeft();
+		//makeLeft();
 		
 		// map is altijd != null
 		int aantalSc = 0;
@@ -858,25 +875,19 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			aantalSc = launchState.getInt("aantalSc");
  
 		if (aantalSc > 0)	
-		{	asv.setState(map);
+		{	asvSetState = true;
+			asv.setState(map);
+			asvSetState = false;
 		}
 
+		makeLeft();
+		
 		if (kijkNaActief)
 		{	
 			canvasPanel.add(kijkNaButton);
 			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, 20, Style.Unit.PX);
 			kijkNaButton.addClickHandler(new PushClickHandler());
-/*			
-			canvasPanel.add(goedKrulImage);
-			canvasPanel.setWidgetLeftWidth(goedKrulImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(goedKrulImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
-			canvasPanel.setWidgetVisible(goedKrulImage, false);
-			canvasPanel.add(foutKruisImage);
-			canvasPanel.setWidgetLeftWidth(foutKruisImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(foutKruisImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
-			canvasPanel.setWidgetVisible(foutKruisImage, false);
-*/
 
 		}
 			
