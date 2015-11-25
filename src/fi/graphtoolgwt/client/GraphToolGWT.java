@@ -3377,25 +3377,28 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			startyv = eventY;
 		}
 		else
-		{	if(!dragOptie)
+		{	
+			if(!dragOptie)
 				return;
 			
-			int dx = eventX - startxv;
-			int dy =  eventY - startyv;					
-			beginx = beginx+dx;
-			beginy = beginy-dy;
+			if (dragPoint == null) { // Move Graph if no point selected
+				int dx = eventX - startxv;
+				int dy =  eventY - startyv;					
+				beginx = beginx+dx;
+				beginy = beginy-dy;
 			
-			int b = beginwaarde;
-			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-			selectnummer = selectnummer + b - beginwaarde;
+				int b = beginwaarde;
+				beginwaarde = 1-(int)Math.round(beginx/eenheidx);
+				selectnummer = selectnummer + b - beginwaarde;
 			
-			startxv = eventX;
-			startyv = eventY;
+				startxv = eventX;
+				startyv = eventY;
 			
-			if(traceOptie && grafiekGWTVeld.tracex > 0) 
-			{	grafiekGWTVeld.tracexD = grafiekGWTVeld.tracexD+dx;
-				grafiekGWTVeld.tracex = grafiekGWTVeld.tracex+dx;
-				grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+				if(traceOptie && grafiekGWTVeld.tracex > 0) 
+				{	grafiekGWTVeld.tracexD = grafiekGWTVeld.tracexD+dx;
+					grafiekGWTVeld.tracex = grafiekGWTVeld.tracex+dx;
+					grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+				}
 			}
 			
 		}
@@ -3427,8 +3430,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				*/
 		if (tekenComponentAan && tekenComponent.getCursorMode() == tekenComponent.DRAW)
 		{	// punt slepen
+			
 			if (dragPoint != null)
 			{	// schermpositie voor drag-event
+
 				Point pix = realPointToPixels(dragPoint);
 				int dx = eventX - startxv;
 				int dy = eventY - startyv;	
@@ -3458,6 +3463,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			// punt slepen
 			if (dragPoint != null)
 			{	// schermpositie voor drag-event
+
 				Point pix = realPointToPixels(dragPoint);
 				int dx = eventX - startxv;
 				int dy = eventY - startyv;	
@@ -3723,8 +3729,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				}
 			}
 
-			if ( mouseDown && (tekenComponent.getCursorMode() != tekenComponent.DELETE) && (tekenComponent.getCursorMode() != tekenComponent.DRAW) ) {
-				// only move action needs to be taken during drag or default mode
+			if ( mouseDown && (tekenComponent.getCursorMode() != tekenComponent.DELETE) ) {
+				// only move action needs to be taken during drag, draw or default mode
 				int eventX = e.getX();
 				int eventY = e.getY();
 				
@@ -3797,10 +3803,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 				int eventX = touch.getPageX() - grafiekGWTCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - grafiekGWTCanvas.getAbsoluteTop();
-logger.severe("touch down abs " + eventX + " , " + eventY);
 				eventX = touch.getRelativeX(grafiekGWTCanvas.getCanvasElement());
 				eventY = touch.getRelativeY(grafiekGWTCanvas.getCanvasElement());
-logger.severe("touch down rel " + eventX + " , " + eventY);
 				pinchState = ONE_FINGER;
 				
 				mouseDownTouchStartAction(e.getSource(), eventX, eventY, pinchState);
