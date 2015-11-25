@@ -399,7 +399,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 	private void setMainPanelSize()
 	{
-		int splitClasses = this.model.getStatTableModel().splitVarClasses(
+		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
 		
 		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
@@ -417,7 +417,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	private void setData()
 	{
 		int numberOfSplits = DescriptivesView.this.model.getStatTableModel()
-			.splitVarClasses(DescriptivesView.this.model.getSplitOptions());
+			.numberOfSplitVarClasses(DescriptivesView.this.model.getSplitOptions());
 		
 		int columnIndex = this.model.getColumnIndex(); // this.varBoxSelectedIndex() is nog niet geupdate!
 
@@ -561,7 +561,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	private void setDataLabels()
 	{
 		int numberOfSplits = DescriptivesView.this.model.getStatTableModel()
-			.splitVarClasses(DescriptivesView.this.model.getSplitOptions());
+			.numberOfSplitVarClasses(DescriptivesView.this.model.getSplitOptions());
 
 		if (this.hasSelection())
 		{
@@ -791,7 +791,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	private void makeDescritivesTable()
 	{
 		int numberOfSplits = DescriptivesView.this.model.getStatTableModel()
-			.splitVarClasses(DescriptivesView.this.model.getSplitOptions());
+			.numberOfSplitVarClasses(DescriptivesView.this.model.getSplitOptions());
 
 		for (int i = 0; i < numberOfSplits; i++)
 		{
@@ -938,7 +938,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	private boolean lastRowInView(int splitClass)
 	{
 		int numberOfSplits = DescriptivesView.this.model.getStatTableModel()
-			.splitVarClasses(DescriptivesView.this.model.getSplitOptions());
+			.numberOfSplitVarClasses(DescriptivesView.this.model.getSplitOptions());
 		
 		return (splitClass == numberOfSplits - 1);
 	}
