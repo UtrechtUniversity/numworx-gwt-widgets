@@ -736,40 +736,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		setActiveIndex(activeIndex, true);
 		grafiekGWTVeld.paint();
 		
-		basisPanel.addDomHandler(new MouseMoveHandler(){
-			public void onMouseMove(MouseMoveEvent e)
-			{	if(e.getX() < grafiekGWTCanvas.getAbsoluteLeft() - basisPanel.getAbsoluteLeft() 
-						|| e.getX() > grafiekGWTCanvas.getAbsoluteLeft() - basisPanel.getAbsoluteLeft() + grafiekGWTCanvas.getOffsetWidth()
-					|| e.getY() < grafiekGWTCanvas.getAbsoluteTop() - basisPanel.getAbsoluteTop() || 
-					e.getY() > grafiekGWTCanvas.getAbsoluteTop() - basisPanel.getAbsoluteTop() + grafiekGWTCanvas.getOffsetHeight())
-				{	RootPanel.get().removeStyleName("gumcursor");
-					RootPanel.get().removeStyleName("pencursor");
-				}
-			/*
-				else if(tekenComponent.getCursorMode() == tekenComponent.DRAW)
-				{	System.out.println("draw");
-					RootPanel.get().removeStyleName("gumcursor");
-					RootPanel.get().addStyleName("pencursor");
-				}
-				else if(tekenComponent.getCursorMode() == tekenComponent.DELETE)
-				{	System.out.println("delete");
-					RootPanel.get().removeStyleName("pencursor");
-					RootPanel.get().addStyleName("gumcursor");
-				}
-				else
-				{
-					RootPanel.get().removeStyleName("gumcursor");
-					RootPanel.get().removeStyleName("pencursor");
-				}
-				*/
-				
-				
-			}
-		}, MouseMoveEvent.getType());
-			
-		
-		
-		
 		//kijkNaPanel.setOpaque(false);
 		
 		
@@ -3713,8 +3679,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	//	if(yAsNaamTF.isVisible())yAsNaamTF.requestFocus();
 	}
 	
-	
-	
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		boolean mouseDown = false;
@@ -3743,7 +3707,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			// prevent scrolling
 			e.stopPropagation();
 			
-//System.out.println("mouse move veld");			
 			
 			RealPoint drp = null;
 			Vector points = getPoints(getActiveIndex(), false);
@@ -3759,37 +3722,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					
 				}
 			}
-			
-			if (!mouseDown)
-			{	if(tekenComponent.getCursorMode() == tekenComponent.DELETE && !RootPanel.get().getStyleName().contains("gumcursor"))
-				{	
-				//iets proberen met de sender? Ik lijk nu niet het (juiste) rootPanel te pakken te krijgen. Maar wel als ik direct de cursor zet!
-					RootPanel.get().removeStyleName("pencursor");
-					RootPanel.get().addStyleName("gumcursor");
-					//RootPanel.get().getElement().getStyle().setCursor("gumcursor");	
-				//RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.COL_RESIZE);//cursor gum
-					//RootPanel.get().addStyleName("custom");
-				}
-				else if(tekenComponent.getCursorMode() == tekenComponent.DRAW && drp == null && !RootPanel.get().getStyleName().contains("pencursor")) 
-				{	RootPanel.get().removeStyleName("gumcursor");
-					RootPanel.get().addStyleName("pencursor");
-					//RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.MOVE);//cursor potloodje.
-				}
-				else
-				{	RootPanel.get().getElement().getStyle().setCursor(Style.Cursor.DEFAULT);
-				}
+
+			if ( mouseDown && (tekenComponent.getCursorMode() != tekenComponent.DELETE) && (tekenComponent.getCursorMode() != tekenComponent.DRAW) ) {
+				// only move action needs to be taken during drag or default mode
+				int eventX = e.getX();
+				int eventY = e.getY();
 				
-				return;
+				mouseMoveTouchMoveAction(e.getSource(), eventX, eventY, ONE_FINGER, 0, 0, 0);
 			}
-
-			int eventX = e.getX();
-			int eventY = e.getY();
-			//boolean shiftPressed = e.isShiftKeyDown();
-
-//System.out.println("sp = " + shiftPressed);
-
-			mouseMoveTouchMoveAction(e.getSource(), eventX, eventY, ONE_FINGER, 0, 0, 0);
-			
 			
 			
 		} // onMouseMove

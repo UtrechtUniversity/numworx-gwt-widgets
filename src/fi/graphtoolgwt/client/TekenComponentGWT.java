@@ -1,41 +1,8 @@
 package fi.graphtoolgwt.client;
 
-//import java.awt.AWTEventMulticaster;
-//import java.awt.Color;
-//import java.awt.Component;
-//import java.awt.Graphics;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//import java.awt.event.ItemEvent;
-//import java.awt.event.ItemListener;
-//import java.awt.event.MouseEvent;
-//import java.awt.event.MouseListener;
-//import java.io.Serializable;
-//import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-//import java.util.Hashtable;
-import java.util.Vector;
 
-/*
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.ListCellRenderer;
-*/
-
-
-
-
-
-
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.NodeList;
@@ -571,6 +538,14 @@ public class TekenComponentGWT extends LayoutPanel {
 			cursorMode = NOCUR;
 		else
 			cursorMode = mode;
+		
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag"))
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_drag");
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum"))
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_gum");
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken"))
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_teken");
+		
 		if(cursorMode == NONE)
 		{
 			drawButton.setDown(false);
@@ -580,14 +555,18 @@ public class TekenComponentGWT extends LayoutPanel {
 		else if(cursorMode == DRAW)
 		{
 			drawButton.setDown(true);
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_teken");
 		}
 		else if(cursorMode == DELETE)
 		{
 			deleteButton.setDown(true);
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_gum");
+
 		}
 		else if(cursorMode == DRAG)
 		{
 			dragButton.setDown(true);
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_drag");
 		}
 		
 	}
@@ -703,22 +682,35 @@ public class TekenComponentGWT extends LayoutPanel {
 			// deze zorgt dat je niet scrollt in de DWOPlayer
 			e.stopPropagation();
 			
+			if (e.getSource() == drawButton || e.getSource() == deleteButton || e.getSource() == dragButton) {
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag"))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_drag");
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum"))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_gum");
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken"))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_teken");
+			}
+			
 			if (e.getSource() == drawButton && drawButton.isDown())
     		{
     			drawButtonsUp(drawButton);
+    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_teken");
     			cursorMode = DRAW;
     		}
     		else if (e.getSource() == deleteButton && deleteButton.isDown())
     		{
     			drawButtonsUp(deleteButton);
+    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_gum");
     			cursorMode = DELETE;
     		}
     		else if (e.getSource() == dragButton && dragButton.isDown())
     		{	drawButtonsUp(dragButton);
+				grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_drag");
     			cursorMode = DRAG;
     		}
-    		else if(!drawButton.isDown() && !deleteButton.isDown() && !dragButton.isDown())
+    		else if(!drawButton.isDown() && !deleteButton.isDown() && !dragButton.isDown()) {
     			cursorMode = NOCUR;
+    		}
     		
     		if (e.getSource() == puntenButton)
     		{
