@@ -402,7 +402,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
     					StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(0)));
     				this.splitBinWidthField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				StringBuilder sb = new StringBuilder();
-    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    				int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
     					this.model.getSplitOptions());
     				for (int i = 0; i < splitClasses; i++)
     				{
@@ -442,7 +442,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
     			else if (splitType.equals(AllowedTypes.STRING))
     			{
     				StringBuilder sb = new StringBuilder();
-    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    				int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
     					this.model.getSplitOptions());
     				for (int i = 0; i < splitClasses; i++)
     				{
