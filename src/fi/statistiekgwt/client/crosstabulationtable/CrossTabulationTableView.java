@@ -484,7 +484,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 			}
 			
 						
-			numberOfColumnBins = this.model.getStatTableModel().splitVarClasses(
+			numberOfColumnBins = this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions());
 			
 			if (typeRows.isNumber())
@@ -561,7 +561,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		aantalTotaal = 0;
 		
 		int numberOfSplits = CrossTabulationTableView.this.model.getStatTableModel()
-			.splitVarClasses(CrossTabulationTableView.this.model.getSplitOptions());
+			.numberOfSplitVarClasses(CrossTabulationTableView.this.model.getSplitOptions());
 
 		aantalPerColumnBin = new int[numberOfSplits];
 		aantalPerRowBin = new int[numberOfRowBins];
