@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.junit.client.GWTTestCase;
 
 import fi.statistiekgwt.client.StatTableModel;
@@ -379,8 +380,29 @@ public class StatTableModelTest extends GWTTestCase
 
 	public void testGetColumnModeLengte()
 	{
-		String expected = "156.0";
+		String expected = "156";
 		String actual = this.statTableModel.getColumnMode(2);
+		assertEquals("", expected, actual);
+	}
+	
+	/**
+	 * In development mode is
+	 * 		String.valueOf(156) = "156.0"
+	 * in production mode is
+	 * 		String.valueOf(156) = "156"
+	 * 
+	 * Kwam naar voren in this.statTableModel.getColumnMode().
+	 * 
+	 * Met NumberFormat is er geen verschil tussen development
+	 * en production mode.
+	 */
+	public void testDoubleToString()
+	{
+		String expected = "156";
+		Double d = new Double(156);
+		NumberFormat nf = StatistiekGWT.getNumberFormat(d);
+		String actual = nf.format(d);
+
 		assertEquals("", expected, actual);
 	}
 
@@ -443,7 +465,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = "156.0";
+		String expected = "156";
 		String actual = this.statTableModel.getColumnModeOfSelection(2);
 		assertEquals("", expected, actual);
 		
@@ -578,7 +600,7 @@ public class StatTableModelTest extends GWTTestCase
 
 	public void testGetColumnMaxProfiel()
 	{
-		double expected = 100;
+		double expected = 0;
 		double actual = this.statTableModel.getColumnMax(4);
 		assertEquals("", expected, actual, delta);
 	}
