@@ -38,10 +38,11 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, InteractionView 
 {
-    static final String holderId = "dockholder";
+	static final String holderId = "dockholder";
 
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -106,7 +107,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     static int TEACHER = 7;
 
     // logger
-    Logger logger = Logger.getLogger("TekenVeelvlakGWT");
+    static Logger logger = Logger.getLogger("TekenVeelvlakGWT");
 
 	public void getImages() 
 	{
@@ -248,7 +249,7 @@ System.out.println("tvGWT getState");
 	public void setState(HashMap<String, Object> map)
 	{
 // hier onderscheid maken tussen TVV, Viewer, Profiles?		
-logger.info("tvGWT setState: " + map);    	
+//logger.info("tvGWT setState: " + map);    	
 		
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
@@ -390,6 +391,8 @@ logger.info("tvGWT setState: " + map);
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
+		
+logger.info("TekenVeelvlakGWT init");
 		
 		this.breedte = width;
 		this.hoogte = height;
@@ -588,7 +591,7 @@ System.out.println("contains docentKleuren");
     	//if (vlakkenKleurenOptie && profielenKleurenOptie && profilesOnly)
     	if (kijkVlakkenNa && profilesOnly)
     	{
-System.out.println("kijkNa profiles");    		
+//System.out.println("kijkNa profiles");    		
     		
     		correct = vaktek.evalueer(docentKleuren);
     		nagekeken = true;
@@ -603,7 +606,7 @@ System.out.println("kijkNa profiles");
     	else if (kijkVlakkenNa && viewerOnly)
     	{
     		
-System.out.println("kijkNa viewer");    		
+//System.out.println("kijkNa viewer");    		
     		correct = v3d.evalueer(docentKleuren);
     		nagekeken = true;
     		v3d.kijkNaPanel.setWidgetVisible(goedKrulImage, correct);
