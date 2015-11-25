@@ -560,7 +560,7 @@ logger.info("ASV setState begin");
 			verwijder(schuifcomponenten[0]);
 		}
 		
-System.out.println("classNamesList " + classNamesList.size());		
+//System.out.println("classNamesList " + classNamesList.size());		
 		
 		this.aantalSc = aantalSc;
 		
@@ -1209,7 +1209,8 @@ System.out.println("after " + this.aantalSc);
 				{	schuifcomponenten[j] = schuifcomponenten[j + 1];
 				}
 				aantalSc--;
-				tekenOpnieuw();
+				if (!owner.asvSetState)
+					tekenOpnieuw();
 				
 //GWT				
 				//copyItem.setEnabled(!veldIsLeeg());
@@ -1243,7 +1244,8 @@ System.out.println("after " + this.aantalSc);
 				}
 				
 			}
-		tekenOpnieuw();
+		if (!owner.asvSetState)
+			tekenOpnieuw();
 	}
 	
 	

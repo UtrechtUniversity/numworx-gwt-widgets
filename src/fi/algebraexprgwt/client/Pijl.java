@@ -78,7 +78,8 @@ public class Pijl //extends JComponent //Component
 	{
 		visible = b;
 		
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 		
 	}
 	
@@ -567,6 +568,9 @@ public class Pijl //extends JComponent //Component
 		ontvanger = asc;
 		Pijl p = new Pijl(asv);
 		zender.voegPijlToe(p);		
+		
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 	}
 	
 	//public void mousePressed(MouseEvent e)

@@ -55,8 +55,12 @@ import com.google.gwt.resources.client.ImageResource;
 
 import fi.algebraexprgwt.client.expressies_ap.*;
 
+import java.util.logging.Logger;
+
 public class AlgebraExprGWT implements EntryPoint, InteractionStub 
 {
+	static Logger logger = Logger.getLogger("AEGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -696,6 +700,9 @@ System.out.println("llgExp = " + llgExp.toString());
 	public void init(int width, int height, Map<String, Object> map,//launchState,
 					 Map<String, Number> values) 
 	{
+		
+logger.info("AlgebraExprGWT init");		
+
 		this.breedte = width;
 		this.hoogte = height;
 		
@@ -785,7 +792,9 @@ System.out.println("llgExp = " + llgExp.toString());
 			aantalSc = launchState.getInt("aantalSc");
  
 		if (aantalSc > 0)	
-		{	asv.setState(map);
+		{	asvSetState = true;
+			asv.setState(map);
+			asvSetState = false;
 		}
 
 		

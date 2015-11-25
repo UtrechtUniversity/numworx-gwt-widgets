@@ -36,16 +36,18 @@
 }		
 
 .togglebutton {
-	
+	text-align: center;
+	font-family: Helvetica, sans serif;	
 	border-style: none;
-	margin: 0px;
-	padding: 0px;
+/**	margin: 0px;*/
+/**	padding: 0px;*/
 /**	color: red;*/
 	
 }
 
 .pushbutton {
 	text-align: center;
+	font-family: Helvetica, sans serif;
 /**	background-color: yellow;*/
 /**	font-size: 0.875em;*/
 /**	padding: 0px;*/	
@@ -53,6 +55,7 @@
 
 .checkbox {
 	text-align: center;
+	font-family: Helvetica, sans serif;
 	/** background-color: yellow; */
 }	
 

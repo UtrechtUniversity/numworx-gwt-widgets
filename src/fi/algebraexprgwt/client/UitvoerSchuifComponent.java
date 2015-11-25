@@ -463,15 +463,25 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		{	
 //GWT			
 			//add(label);
+			if (zoomInKnop.yPos == yPos+50)
+				zoomInKnop.translate(0,20);
+			if (zoomUitKnop.yPos == yPos+100)
+				zoomUitKnop.translate(0,20);
+
 			zetMaat();
 		}
 		else
 		{	
 //GWT			
 			//remove(label);
+			if (zoomInKnop.yPos == yPos+70)
+				zoomInKnop.translate(0,-20);
+			if (zoomUitKnop.yPos == yPos+120)
+				zoomUitKnop.translate(0,-20);
 			zetMaat();
 		}
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 	}
 	
 	
@@ -494,7 +504,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			tabel = null;
 			zetMaat();
 		}
-		asv.tekenOpnieuw();
+		if (!asv.owner.asvSetState)
+			asv.tekenOpnieuw();
 		
 		GrafiekComponent gc = vindGrafiekComponent();
 		if (gc != null)
@@ -1142,6 +1153,20 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		int popupX = xPos + breedte + inputOwner.getAbsoluteLeft();
 		int popupY = yPos + inputOwner.getAbsoluteTop();
 		menuPopup = new PopupPanel(true);
+		
+		if (labelZichtbaar)
+			labelItem.setText("verberg label");
+		else
+			labelItem.setText("toon label");
+		if (tabelZichtbaar)
+			tabelItem.setText("verberg tabel");
+		else
+			tabelItem.setText("toon tabel");
+		if (kettingZichtbaar)
+			kettingItem.setText("verberg ketting");
+		else
+			kettingItem.setText("toon ketting");
+		
 		menuPopup.setWidget(menuBar);
 		menuPopup.setPopupPosition(popupX, popupY);
 		menuPopup.show();
