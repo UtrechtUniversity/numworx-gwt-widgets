@@ -100,7 +100,7 @@ public class HistogramModel
 		this.binBoundaries.add(new Double(0));
 		this.binBoundaries.add(new Double(0));
 		this.percentage = false;
-		this.percentage_splitTotal = false;
+		this.percentage_splitTotal = true;
 		this.hasVerticalBars = true;
 		this.showUserOptions = false;
 
