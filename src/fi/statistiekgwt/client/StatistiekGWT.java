@@ -74,6 +74,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private static int WIDTH_OFFSET = 5;
 	private static int HEIGHT_OFFSET; 
 	public static int BUTTON_HEIGHT = 40;
+	public static double BIN_WIDTH_DEFAULT = 1;
 	
 	boolean nagekeken = false;
 
@@ -406,120 +407,133 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public static ArrayList<Double> appropriateBoundaries(double min,
 		double max, int noBins)
 	{
-		// calculate decimal bin boundaries smaller than 1 
-		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
-			|| (((max - min) < 1) && ((max - min) != 0)))
-		{
-			// determine the number of decimals of min and max
-			String minString = String.valueOf(min);
-			int decimalPlacesMin = StatistiekGWT.getNumberOfDecimals(minString);
-			String maxString = String.valueOf(max);
-			int decimalPlacesMax = StatistiekGWT.getNumberOfDecimals(maxString);
-			int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
-			
-			min = min * (Math.pow(10, numberOfDecimals)); 
-			max = max * (Math.pow(10, numberOfDecimals));
-			
-			ArrayList<Double> binBoundaries = appropriateBoundaries(min, max, noBins);
-			// divide each bin boundary by Math.pow(10, numberOfDecimals)
-			for (int i = 0; i < binBoundaries.size(); i++)
-			{
-				// divide the bin boundary by Math.pow(10, numberOfDecimals)
-				// and round to the correct number of decimals (because of possible rounding errors)
-				double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
-				binBoundaries.set(i, newValue);
-			}
-			return binBoundaries; 
-		}
+		ArrayList<Double> boundaries;
 		
-		double b = (max - min) / (double) (Math.max(noBins - 1, 1));
-		
-		if ((Math.abs(min) > 1) || (Math.abs(max) > 1))
+		if ((min == 0) && (max == 0))
 		{
-			// neem integer waarde
-			b = (int) b;
-		}
-		
-		int eValue;
-		if (noBins == 1)
-		{
-			eValue = (int) Math.ceil(Math.log10(b));
+			boundaries = new ArrayList<Double>();
+			boundaries.add(0.0);
+			boundaries.add(0.0);
 		}
 		else
 		{
-			eValue = (int) Math.floor(Math.log10(b));
-		}
 
-		// test syl
-//		boolean isInfinite = Double.isInfinite(eValue);
-//		double firstTerm = Math.ceil(b * Math.pow((double) 10, -eValue));
-////		double pow = Math.pow((double) 10, (double) -e); // in gecompileerde versie geeft dit geen 0, maar infinity
-//		double pow = Math.pow(10.0, (double) -eValue); // in gecompileerde versie geeft dit geen 0, maar infinity
-//		double secondTerm = Math.pow((double) 10, (double) eValue);
-
-//		Window.alert("apprBoundaries(" + min + "," + max + "," + noBins
-//			+ "): b = " + b + ", e = " + eValue + ", pow = " + pow
-//			+ ", firstTerm = " + firstTerm
-//			+ ", secondTerm = " + secondTerm 
-//			+ ", isInfinite = " + isInfinite);
-		
-		double step = Math.ceil(b * Math.pow(10, -eValue)) * Math.pow(10, eValue);
-		
-		if (Double.isNaN(step))
-		{
-			step = 0;
-		}
-		
-		if (step == 0)
-		{
-			step++;
-		}
-
-		// System.out.println("e = " + e);
-		// System.out.println("step = " + step);
-
-		double start;
-		
-		if (min == Math.round(min) || ((Math.abs(min) < 1) && (Math.abs(max) < 1)))
-		{
-			start = min;
-		}
-		else
-		{
-			start = (Math.ceil(min / step) - 1) * step;
-		}
-
-		// make sure step is not too large
-		// use min value instead of start to be more constraining 
-		if (step > 1)
-		{
-			while (min + step >= max)
+			// calculate decimal bin boundaries smaller than 1 
+			if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
+				|| (((max - min) < 1) && ((max - min) != 0)))
 			{
-				step = Math.ceil(step / 2);
+				// determine the number of decimals of min and max
+				String minString = String.valueOf(min);
+				int decimalPlacesMin = StatistiekGWT.getNumberOfDecimals(minString);
+				String maxString = String.valueOf(max);
+				int decimalPlacesMax = StatistiekGWT.getNumberOfDecimals(maxString);
+				int numberOfDecimals = Math.max(decimalPlacesMin, decimalPlacesMax);
+				
+				min = min * (Math.pow(10, numberOfDecimals)); 
+				max = max * (Math.pow(10, numberOfDecimals));
+				
+				ArrayList<Double> binBoundaries = appropriateBoundaries(min, max, noBins);
+				// divide each bin boundary by Math.pow(10, numberOfDecimals)
+				for (int i = 0; i < binBoundaries.size(); i++)
+				{
+					// divide the bin boundary by Math.pow(10, numberOfDecimals)
+					// and round to the correct number of decimals (because of possible rounding errors)
+					double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
+					binBoundaries.set(i, newValue);
+				}
+				return binBoundaries; 
+			}
+			
+			double b = (max - min) / (double) (Math.max(noBins - 1, 1));
+			
+			if ((Math.abs(min) > 1) || (Math.abs(max) > 1))
+			{
+				// neem integer waarde
+				b = (int) b;
+			}
+			
+			int eValue;
+			if (noBins == 1)
+			{
+				eValue = (int) Math.ceil(Math.log10(b));
+			}
+			else
+			{
+				eValue = (int) Math.floor(Math.log10(b));
+			}
+	
+			// test syl
+	//		boolean isInfinite = Double.isInfinite(eValue);
+	//		double firstTerm = Math.ceil(b * Math.pow((double) 10, -eValue));
+	////		double pow = Math.pow((double) 10, (double) -e); // in gecompileerde versie geeft dit geen 0, maar infinity
+	//		double pow = Math.pow(10.0, (double) -eValue); // in gecompileerde versie geeft dit geen 0, maar infinity
+	//		double secondTerm = Math.pow((double) 10, (double) eValue);
+	
+	//		Window.alert("apprBoundaries(" + min + "," + max + "," + noBins
+	//			+ "): b = " + b + ", e = " + eValue + ", pow = " + pow
+	//			+ ", firstTerm = " + firstTerm
+	//			+ ", secondTerm = " + secondTerm 
+	//			+ ", isInfinite = " + isInfinite);
+			
+			double step = Math.ceil(b * Math.pow(10, -eValue)) * Math.pow(10, eValue);
+			
+			if (Double.isNaN(step))
+			{
+				step = 0;
+			}
+			
+			if (step == 0)
+			{
+				step++;
+			}
+	
+			// System.out.println("e = " + e);
+			// System.out.println("step = " + step);
+	
+			double start;
+			
+			if (min == Math.round(min) || ((Math.abs(min) < 1) && (Math.abs(max) < 1)))
+			{
+				start = min;
+			}
+			else
+			{
+				start = (Math.ceil(min / step) - 1) * step;
+			}
+	
+			// make sure step is not too large
+			// use min value instead of start to be more constraining 
+			if (step > 1)
+			{
+				while (min + step >= max)
+				{
+					step = Math.ceil(step / 2);
+				}
+			}
+			
+			// make sure the maximum value is covered by the bins
+			while ((start + noBins * step) <= max)
+			{
+				step = increaseStep(step);
+			}
+	
+			// build arraylist
+			boundaries = new ArrayList<Double>();
+			// correct afronden op basis van decimalen in start en binWidth
+			String startString = String.valueOf(start);
+			int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
+			String binWidthString = String.valueOf(step);
+			int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
+			int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
+			for (int i = 0; i <= noBins; i++)
+			{
+				double d = start + (double) i * step;
+				d = round(d, numberOfDecimals);
+	
+				boundaries.add(d);
 			}
 		}
 		
-		// make sure the maximum value is covered by the bins
-		while ((start + noBins * step) <= max)
-		{
-			step = increaseStep(step);
-		}
-
-		// build arraylist
-		ArrayList<Double> boundaries = new ArrayList<Double>();
-		// correct afronden op basis van decimalen in start en binWidth
-		String startString = String.valueOf(start);
-		int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
-		String binWidthString = String.valueOf(step);
-		int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
-		int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
-		for (int i = 0; i <= noBins; i++)
-		{
-			double d = start + (double) i * step;
-			d = round(d, numberOfDecimals);
-
-			boundaries.add(d);
-		}
 		return boundaries;
 	}
 
@@ -544,26 +558,78 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public static ArrayList<Double> appropriateBoundariesFromBinSettings(
 		double min, double max, double binWidth, double minBoundary)
 	{
-		// check if parameters are valid
-		if ((binWidth <= 0) 
-			|| ((binWidth > 1) && (binWidth > 2 * (max - min))) 
-			|| (binWidth < (max - min)/50))
+		ArrayList<Double> boundaries;
+
+		if ((min == 0) && (max == 0))
 		{
-			return null;
+			boundaries = new ArrayList<Double>();
+			boundaries.add(0.0);
+			boundaries.add(0.0);
 		}
-		
-		if ((minBoundary > min) 
-			|| (minBoundary < (min - 1 - 0.5 * max))) // minus 1 to avoid problems in case of small and negative values of min and max
+		else
 		{
-			return null;
-		}
-		
-		// calculate decimal bin boundaries smaller than 1 
-		if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
-			|| (((max - min) < 1) && ((max - min) != 0)))
-		{
-			// use number of decimals of start and binWidth
+
+			// check if parameters are valid
+			if (((binWidth <= 0) 
+				|| ((binWidth > 1) && (binWidth > 2 * (max - min) + 1)) 
+				|| (binWidth < (max - min)/50))
+				&& (max != min)) // if max = min binwidth is not restricted
+			{
+				return null;
+			}
+			
+			if ((minBoundary > min) 
+				|| (minBoundary < (min - 1 - 0.5 * max)) // minus 1 to avoid problems in case of small and negative values of min and max
+				&& (max != min)) // if max = min binwidth is not restricted
+			{
+				return null;
+			}
+			
+			// calculate decimal bin boundaries smaller than 1 
+			if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
+				|| (((max - min) < 1) && ((max - min) != 0)))
+			{
+				// use number of decimals of start and binWidth
+				double start;
+				if (minBoundary <= min)
+				{
+					start = minBoundary;
+				}
+				else
+				{
+					start = min;
+				}
+	
+				String startString = String.valueOf(start);
+				int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
+				String binWidthString = String.valueOf(binWidth);
+				int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
+				int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
+	
+				min = min * (Math.pow(10, numberOfDecimals)); 
+				max = max * (Math.pow(10, numberOfDecimals));
+				binWidth = binWidth * (Math.pow(10, numberOfDecimals));
+				minBoundary = minBoundary * (Math.pow(10, numberOfDecimals));
+				
+				ArrayList<Double> binBoundaries = appropriateBoundariesFromBinSettings(min, max, binWidth, minBoundary);
+				
+				if (binBoundaries != null)
+				{
+					// divide each bin boundary by Math.pow(10, numberOfDecimals)
+					for (int i = 0; i < binBoundaries.size(); i++)
+					{
+						// divide the bin boundary by Math.pow(10, numberOfDecimals)
+						// and round to the correct number of decimals (because of possible rounding errors)
+						double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
+						binBoundaries.set(i, newValue);
+					}
+				}
+				return binBoundaries; 
+			}
+			
 			double start;
+			int noBins;
+			
 			if (minBoundary <= min)
 			{
 				start = minBoundary;
@@ -572,75 +638,37 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			{
 				start = min;
 			}
-
+			
+			if (binWidth == 0)
+			{
+				binWidth++;
+			}
+			
+			// The maximum bin boundary should be larger than the maximum value
+			// so (max + 1) to determine the number of bins
+			noBins = (int) Math.ceil(((max + 1) - start)/binWidth);
+			while (start + noBins * binWidth <= max)
+			{
+				noBins++;
+			}
+	
+			// build arraylist
+			boundaries = new ArrayList<Double>();
+			// correct afronden op basis van decimalen in start en binWidth
 			String startString = String.valueOf(start);
 			int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
 			String binWidthString = String.valueOf(binWidth);
 			int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
 			int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
-
-			min = min * (Math.pow(10, numberOfDecimals)); 
-			max = max * (Math.pow(10, numberOfDecimals));
-			binWidth = binWidth * (Math.pow(10, numberOfDecimals));
-			minBoundary = minBoundary * (Math.pow(10, numberOfDecimals));
 			
-			ArrayList<Double> binBoundaries = appropriateBoundariesFromBinSettings(min, max, binWidth, minBoundary);
-			
-			if (binBoundaries != null)
+			for (int i = 0; i <= noBins; i++)
 			{
-				// divide each bin boundary by Math.pow(10, numberOfDecimals)
-				for (int i = 0; i < binBoundaries.size(); i++)
-				{
-					// divide the bin boundary by Math.pow(10, numberOfDecimals)
-					// and round to the correct number of decimals (because of possible rounding errors)
-					double newValue = round(binBoundaries.get(i) / (Math.pow(10, numberOfDecimals)), numberOfDecimals);
-					binBoundaries.set(i, newValue);
-				}
+				double d = start + (double) i * binWidth;
+				d = round(d, numberOfDecimals);
+				boundaries.add(d);
 			}
-			return binBoundaries; 
 		}
-		
-		double start;
-		int noBins;
-		
-		if (minBoundary <= min)
-		{
-			start = minBoundary;
-		}
-		else
-		{
-			start = min;
-		}
-		
-		if (binWidth == 0)
-		{
-			binWidth++;
-		}
-		
-		// The maximum bin boundary should be larger than the maximum value
-		// so (max + 1) to determine the number of bins
-		noBins = (int) Math.ceil(((max + 1) - start)/binWidth);
-		while (start + noBins * binWidth <= max)
-		{
-			noBins++;
-		}
-
-		// build arraylist
-		ArrayList<Double> boundaries = new ArrayList<Double>();
-		// correct afronden op basis van decimalen in start en binWidth
-		String startString = String.valueOf(start);
-		int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
-		String binWidthString = String.valueOf(binWidth);
-		int decimalPlacesBinWidth = StatistiekGWT.getNumberOfDecimals(binWidthString);
-		int numberOfDecimals = Math.max(decimalPlacesStart, decimalPlacesBinWidth);
-		
-		for (int i = 0; i <= noBins; i++)
-		{
-			double d = start + (double) i * binWidth;
-			d = round(d, numberOfDecimals);
-			boundaries.add(d);
-		}
-
+	
 		return boundaries;
 	}
 
