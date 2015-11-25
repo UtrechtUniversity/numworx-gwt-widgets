@@ -36,9 +36,14 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 //import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
 //import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
+import java.util.logging.Logger;
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView
 {
+	
+    // logger
+    static Logger logger = Logger.getLogger("NabouwenaanzichtenGWT");
+
 	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
 	Canvas canvas;
@@ -515,9 +520,10 @@ System.out.println("rood");
 	{
 		breedte = width;
 		hoogte  = height;
-		
-System.out.println("breedte = " + breedte);
-System.out.println("hoogte = " + hoogte);
+
+logger.info("TekenVeelvlakGWT init");
+//System.out.println("breedte = " + breedte);
+//System.out.println("hoogte = " + hoogte);
 
 		launchState = launchData;
 		randomVarWaarden = values;
@@ -724,7 +730,7 @@ System.out.println("hoogte = " + hoogte);
 			int vWerkBreedte = breedte;
 			int vWerkHoogte = hoogte;
 			if (kijkNaActief || keuzeBouwenSlopen || volLeegOptie || aantalBlokjes)
-				vWerkHoogte = hoogte - 20;
+				vWerkHoogte = hoogte - 25;
 
 			vWerk = new Viewer3d(startKr, 351, -30, vWerkBreedte, vWerkHoogte, this);
 			vWerk.zetAfstand(1000);
@@ -790,14 +796,16 @@ System.out.println("hoogte = " + hoogte);
 			
 			if (keuzeBouwenSlopen)
 			{
-				bouwenButton = new RadioButton(bouwenSlopenGroup, " Bouwen");
-				slopenButton = new RadioButton(bouwenSlopenGroup, " Slopen");
+				bouwenButton = new RadioButton(bouwenSlopenGroup, "Bouwen");
+				slopenButton = new RadioButton(bouwenSlopenGroup, "Slopen");
+				bouwenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
+				slopenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
 				panel.add(bouwenButton);
 				panel.add(slopenButton);
 				panel.setWidgetLeftWidth(bouwenButton, 0, Style.Unit.PX, 70, Style.Unit.PX);
-				panel.setWidgetTopHeight(bouwenButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetTopHeight(bouwenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				panel.setWidgetLeftWidth(slopenButton, 70, Style.Unit.PX, 70, Style.Unit.PX);
-				panel.setWidgetTopHeight(slopenButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetTopHeight(slopenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				bouwenButton.setValue(true);
 				
 			}
@@ -827,7 +835,7 @@ System.out.println("hoogte = " + hoogte);
 					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokjes");
 				panel.add(blokjesLabel);
 				panel.setWidgetLeftWidth(blokjesLabel, 270, Style.Unit.PX, 70, Style.Unit.PX);
-				panel.setWidgetTopHeight(blokjesLabel, hoogte - 17, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetTopHeight(blokjesLabel, hoogte - 20, Style.Unit.PX, 25, Style.Unit.PX);
 			}	
 			
 			vWerk.initContext2d();
@@ -849,6 +857,8 @@ System.out.println("hoogte = " + hoogte);
 			{
 				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
 
+				kijkNaButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
+				
 				panel.add(kijkNaPanel);
 				kijkNaPanel.add(kijkNaButton);
 				kijkNaPanel.add(vinkjeGroenImage);
@@ -859,10 +869,10 @@ System.out.println("hoogte = " + hoogte);
 				kijkNaButton.addClickHandler(new PushClickHandler());
 			
 				panel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 90, Style.Unit.PX);
-				panel.setWidgetTopHeight(kijkNaPanel, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+				panel.setWidgetTopHeight(kijkNaPanel, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 			
 				kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 20, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 25, Style.Unit.PX);
 			
 				kijkNaPanel.setWidgetLeftWidth(vinkjeGroenImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
 				kijkNaPanel.setWidgetTopHeight(vinkjeGroenImage, 0, Style.Unit.PX, 20, Style.Unit.PX);

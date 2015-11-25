@@ -35,11 +35,18 @@
 	
 }
 
+.radiobutton {
+	text-align: left;
+	font-family: Helvetica, sans serif;
+	/** background-color: yellow; */
+}	
+
 .pushbutton {
 
 	background-color: yellow;
 	font-size: 0.975em;
-	padding: 5px;	
+	font-family: Helvetica, sans serif;	
+	/**padding: 2px;*/ 	
 	text-align: center;
 }
 
