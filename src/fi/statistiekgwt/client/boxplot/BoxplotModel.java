@@ -323,7 +323,7 @@ public class BoxplotModel
 	 */
 	public int getSplitClasses()
 	{
-		return this.statTableModel.splitVarClasses(this.splitOptions);
+		return this.statTableModel.numberOfSplitVarClasses(this.splitOptions);
 	}
 
 	/**
