@@ -440,7 +440,7 @@ public class DotplotView extends LayoutPanel implements
 
 	private void setMainPanelSize()
 	{
-		int splitClasses = this.model.getStatTableModel().splitVarClasses(
+		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.getColorLegendWidth();
 		
@@ -503,7 +503,7 @@ public class DotplotView extends LayoutPanel implements
 	{
 		boolean visibilityHasChanged = false;
 
-		int splitClasses = this.model.getStatTableModel().splitVarClasses(
+		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
 		if (splitClasses > 1)
 		{
@@ -1435,7 +1435,7 @@ public class DotplotView extends LayoutPanel implements
 		}
 
 		// draw split variable class (e.g., "geslacht: m")
-		if (this.model.getStatTableModel().splitVarClasses(
+		if (this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions()) > 1
 			&& !this.model.splitInSingleView())
 		{
