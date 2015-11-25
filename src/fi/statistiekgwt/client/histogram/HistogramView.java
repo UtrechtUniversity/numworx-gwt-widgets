@@ -301,6 +301,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		return userOptionsPanel.isStackModeBoxSelected();
 	}
 
+	public boolean isOptimizeScale()
+	{
+		return userOptionsPanel.isOptimizeScale();
+	}
+
 	/**
 	 * Gets currently selected item of the combobox allowing you to choose the
 	 * number of bins
@@ -356,6 +361,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		return this.userOptionsPanel.getBinWidth();
 	}
 
+	public void setBinWidth()
+	{
+		this.userOptionsPanel.setBinWidth();
+	}
+
 	public void setBinWidth(double d)
 	{
 		this.userOptionsPanel.setBinWidth(d);
@@ -398,6 +408,18 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	public boolean percentageItemSelected()
 	{
 		return userOptionsPanel.percentageItemSelected();
+	}
+
+	/**
+	 * Gets which item the user selected from the radiogroup
+	 * choosing between percentage in split category relative
+	 * to split total or end total.
+	 * 
+	 * @return true if percentage in split is relative to split total
+	 */
+	public boolean percentageSplitTotalSelected()
+	{
+		return userOptionsPanel.percentageSplitTotalSelected();
 	}
 
 	/**
@@ -982,6 +1004,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 	}
 
+	/**
+	 * Get the maximum value in the array.
+	 * 
+	 * @param array
+	 * @return
+	 */
 	private int arrayMax(int[] array)
 	{
 		if (array.length == 0)
@@ -994,6 +1022,29 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			if (array[i] > max)
 			{
 				max = array[i];
+			}
+		}
+		return max;
+	}
+
+	/**
+	 * Get the maximum frequency value in the array.
+	 * 
+	 * @param array
+	 * @return
+	 */
+	private int arrayMax(FrequencyTuple[] array)
+	{
+		if (array.length == 0)
+		{
+			return -1;
+		}
+		int max = array[0].frequency;
+		for (int i = 1; i < array.length; i++)
+		{
+			if (array[i].frequency > max)
+			{
+				max = array[i].frequency;
 			}
 		}
 		return max;
@@ -1043,25 +1094,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		int w = this.getWidth() - this.yAxisOffset
 			- (this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0);//this.colorLegend.getOffsetWidth() : 0); // offsetWidth 1e keer 0?
-
+		
 		return w;
 	}
 
 	private int barAreaHeight()
 	{
-		// return this.getHeight() - HistogramView.X_AS_OFFSET -
-		// (this.model.getTableModel().isViewsEditable() ?
-		// HistogramView.KEUZEBALK_HOOGTE : 0);
-		// return this.getHeight() - this.xAxisOffset-
-		// (this.model.getTableModel().isViewsEditable() ?
-		// HistogramView.KEUZEBALK_HOOGTE : 0);
-
-//		int h = this.mainPanel.getCanvas().getCoordinateSpaceHeight() - this.xAxisOffset; // bij split wordt dit veel te groot...
-//		int h = this.scrollPanel.getOffsetHeight() - this.xAxisOffset;
 		int h = this.getHeight() - this.xAxisOffset;
 
 		return h;
-//		return Math.max(h, 550);
 	}
 
 	/**
@@ -1107,7 +1148,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				+ this.yAxisOffset, 
 			this.barAreaHeight() + this.xAxisOffset - 10 + yOffset);
 
-		if (this.model.getStatTableModel().splitVarClasses(
+		if (this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions()) > 1
 			&& !this.model.isSplitInSingleView())
 		{
@@ -1120,12 +1161,14 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			context.fillText(s, 10, this.barAreaHeight() + this.xAxisOffset - 10
 				+ yOffset);
 		}
-
-		// test syl: wat doet dit?
-//		context.fillRect(0, this.barAreaHeight() + this.xAxisOffset - 2 + yOffset,
-//			super.getOffsetWidth(), 1);
 	}
 
+	/**
+	 * Get the max frequency in the given array.
+	 * 
+	 * @param frequencies
+	 * @return
+	 */
 	private int maxFrequency(int[] frequencies)
 	{
 		int max;
@@ -1184,14 +1227,18 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		return max;
 	}
 
+	/**
+	 * Bepaalt de max frequency voor de gegeven split class.
+	 * 
+	 * @param frequencies
+	 * @param splitClass
+	 * @return
+	 */
 	private int maxFrequency(int[][] frequencies, int splitClass)
 	{
 		int max = 0;
 		if (this.model.isSplitInSingleView())
 		{
-			// if(this.model.isFrequencyPolygonMode() &&
-			// this.model.isFrequencyPolygonCumulativeMode() &&
-			// this.model.isFrequencyPolygonStackMode()) {
 			if (!isNextToEachOtherSelected())
 			{ // gestapeld
 				for (int[] splitFreq : frequencies)
@@ -1242,6 +1289,92 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 	}
 
+	/**
+	 * Get the max percentage in the given array.
+	 * 
+	 * @param frequencies
+	 * @return
+	 */
+	private int maxPercentage(int[] frequencies)
+	{
+		double max;
+		if (this.model.isFrequencyPolygonMode()
+			&& this.model.isFrequencyPolygonCumulativeMode())
+		{
+			// max percentage is 100%, because we're in cumulative
+			// mode
+			max = 100;
+		}
+		else
+		{
+			double freq = this.arrayMax(frequencies);
+			double totalFrequency = this.arrayEvenSum(frequencies);
+			max = 100 * freq / totalFrequency;
+		}
+		return (int) max;
+	}
+	
+	/**
+	 * Get the max percentage in the given array.
+	 * 
+	 * @param frequencies
+	 * @return
+	 */
+	private int maxPercentage(FrequencyTuple[] frequencies)
+	{
+		double max;
+		if (this.model.isFrequencyPolygonMode()
+			&& this.model.isFrequencyPolygonCumulativeMode())
+		{
+			// max percentage is 100%, because we're in cumulative
+			// mode
+			max = 100;
+		}
+		else
+		{
+			double freq = this.arrayMax(frequencies);
+			double totalFrequency = this.tupleArraySum(frequencies);
+			max = 100 * freq / totalFrequency;
+		}
+		return (int) max;
+	}
+	
+	/**
+	 * Get the maximum percentage relative to the split (split total = 100%) over all splits.
+	 * 
+	 * @param frequenciesArray
+	 * @return
+	 */
+	private int maxPercentageOverAllSplits(int[][] frequenciesArray)
+	{
+		int max = 0;
+		
+		for (int[] splitFreq : frequenciesArray)
+		{
+			max = Math.max(max, this.maxPercentage(splitFreq));
+		}
+		
+		return max;
+	}
+	
+	/**
+	 * Get the maximum percentage relative to the split (split total = 100%) over all splits.
+	 * 
+	 * @param frequenciesArray
+	 * @return
+	 */
+	private int maxPercentageOverAllSplits(FrequencyTuple[][] frequenciesArray)
+	{
+		int max = 0;
+		
+		for (int i = 0; i < frequenciesArray.length; i++)
+		{
+			max = Math.max(max, this.maxPercentage(frequenciesArray[i]));
+		}
+		
+		return max;
+	}
+	
 	/**
 	 * Get the sum of the frequencies in the given split class.
 	 * 
@@ -1371,33 +1504,68 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		double theta = Math.PI * 1.75;// 315 graden met de klok mee; 45 graden tegen de klok in
 		int ySplitOffset = splitClass * (this.getHeight() - 5);
 
-		// determine scale
-		int max = this.maxFrequency(allFrequencies, splitClass);
-		
 		availableSpace = HistogramView.MAX_SCREEN_FRACTION_FOR_BARS *
         	(this.model.hasVerticalBars() ? 
         		this.barAreaHeight() : 
         		this.barAreaWidth()); // if vertical then availableSpace represents height, if horizontal then width
 		
-		maxValueOnAxis = this.model.getPercentage() ? 
-			(100.0 * max / (this.getFrequenciesSum(allFrequencies, splitClass))) : 
-			max;
+		// determine max value on axis
+		double max = this.maxFrequencyOverAllSplits(allFrequencies);
+		if (this.model.getPercentage()
+			&& this.model.getPercentageSplitTotal()) // split total is 100%
+		{
+			maxValueOnAxis = this.maxPercentageOverAllSplits(allFrequencies);
+		}
+		else if (this.model.getPercentage()) // end total is 100%
+		{
+			maxValueOnAxis = 100.0 * max / (this.getFrequenciesSum(allFrequencies)); 
+		}
+		else
+		{
+			maxValueOnAxis = max;
+		}
 			
-		// scale variable to derive the correct size for percentages or amounts
-		scale =  availableSpace/maxValueOnAxis;
+		// determine scale for the axis with percentages or amounts; should be the same for splits in multiple views
+		if (maxValueOnAxis == 0)
+		{
+			scale = 0;
+		}
+		else
+		{
+			scale =  availableSpace/maxValueOnAxis;
+		}
+		
+		if (this.model.hasVerticalBars())
+		{
+			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 20;
+		}
+		else
+		{
+			this.xAxisOffset = this.determineDependentAxisWidth(context, scale);
+		}
+
+		// set bar width
+		int numberOfBars = frequencies.length / 2;
+		if (isOptimizeScale())
+		{
+			this.setBarWidth(numberOfBars);
+		}
+		else
+		{
+			int numberOfBinsOnScale = this.getNumberOfBinsfromBinsSettings(); 
+			this.setBarWidth(numberOfBinsOnScale);
+		}
 
 		if (this.model.hasVerticalBars())
 		{
 			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 20;
-
-			// set bar width
-			this.setBarWidth(frequencies.length / 2);
 
 			// check if the bin boundary strings will fit and determine the longest
 			normalFit = true;
 			double longest = 0;
 			double width;
 			
+			// bepaal normalFit (of labels bij as onder staven passen of gekanteld moeten worden)
 			if (this.model.getLabelUnderBin())
 			{
 				int marge = 5;
@@ -1411,7 +1579,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					if (i < this.model.getBinBoundaries().size() - 1)
 					{
 						String s_labelUnderBin;
-						if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
+						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
 						{
 							// Voor gehele getallen met 1 waarde per klasse, 1 getal tonen onder de staaf
 							s_labelUnderBin = s;
@@ -1465,12 +1633,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		{
 			this.xAxisOffset = this.determineDependentAxisWidth(context, scale);
 
-			// set bar width
-			this.setBarWidth(frequencies.length / 2);
-
 			double longest = 0;
 			double width;
 
+			// bepaal normalFit (of labels bij as onder staven passen of gekanteld moeten worden)
 			if (this.model.getLabelUnderBin())
 			{
 				int columnIndex = this.model.getColumnIndex();
@@ -1483,7 +1649,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					if (i < this.model.getBinBoundaries().size() - 1)
 					{
 						String s_labelUnderBin;
-						if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
+						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
 						{
 							// Voor gehele getallen met 1 waarde per klasse, 1 getal tonen bij de staaf
 							s_labelUnderBin = s;
@@ -1521,9 +1687,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		} // horizontal bars
 
 		// correct scales
+		// bepaal de amountscale om de bar-lengtes per split te kunnen berekenen
 		if (this.model.getPercentage())
 		{
-			if (this.model.getStatTableModel().splitVarClasses(
+			if (this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 			{
 				// er is een split
@@ -1552,18 +1719,20 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					scale = availableSpace/maxValueOnAxis;
 				} // split in single view
 				else
-				{
-        			int maxInSplitClass = this.maxFrequency(allFrequencies, splitClass);
-        
-        			maxValueOnAxis = (100.0 * maxInSplitClass / (this.getFrequenciesSum(allFrequencies, splitClass))); 
-        			
-    	            scale = availableSpace/maxValueOnAxis;
+				{ // split in multiple views
+					if (this.model.getPercentageSplitTotal())
+					{
+						// amountScale = de beschikbare ruimte (die toont maxValueOnScale) gedeeld door de frequentie (in de huidige splitClass) die deze maxValueOnScale-waarde geeft.
+						// Let op: voor split total = 100% is max dus de frequentie (in de huidige splitClass) die deze maxValueOnScale-waarde geeft
+						// maar dat is niet perse een frequentie die voorkomt in de huidige splitClass. Het is daarom een decimale waarde.
+						max = maxValueOnAxis * this.getFrequenciesSum(allFrequencies, splitClass) / 100;
+					}
 				}
 			}
 		} // percentage
 		else
 		{ // aantallen
-			if (this.model.getStatTableModel().splitVarClasses(
+			if (this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 			{
 				// er is een split
@@ -1580,14 +1749,16 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					maxValueOnAxis = maxInSplit;
 					max = maxInSplit;
 			        
-					scale = availableSpace/maxValueOnAxis;
+
+					if (maxValueOnAxis == 0)
+					{
+						scale = 0;
+					}
+					else
+					{
+						scale = availableSpace / maxValueOnAxis;
+					}
 				} // split in single view
-				else
-				{ // split in multiple views
-        			int maxInSplitClass = this.maxFrequency(allFrequencies, splitClass);
-        
-    	            scale = availableSpace/maxInSplitClass;
-				}
 			}
 		}
 		
@@ -1595,14 +1766,21 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.paintScale(context, scale, ySplitOffset);
 
 		// PAINT BARS
-		// use amountScale to paint the correct bar length
-		amountScale = availableSpace/max;
+		// use amountScale to paint the correct bar length for each split
+		if (max == 0)
+		{
+			amountScale = availableSpace;
+		}
+		else
+		{
+			amountScale = availableSpace/max;
+		}
 
 		ArrayList<String> splitColors = new ArrayList<String>();
 		ArrayList<String> splitLabels = new ArrayList<String>();
 
 		if (this.model.isSplitInSingleView()
-			&& this.model.getStatTableModel().splitVarClasses(
+			&& this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 		{
 			if (this.model.isFrequencyPolygonMode()
@@ -1769,7 +1947,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			if (this.model.isFrequencyPolygonMode()
 				&& this.model.isFrequencyPolygonCumulativeMode())
 			{
-				if (this.model.getStatTableModel().splitVarClasses(
+				if (this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 				{
 					// split in multiple views
@@ -1808,9 +1986,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							i, ySplitOffset, 0, splitClass);
 					}
 				}
-			}
+			} // frequentiepolygoon cumulatief
 			else
-			{
+			{ // frequentiepolygoon niet-cumulatief of split in multiple views
 				for (int i = 0; i < frequencies.length / 2; i++)
 				{
 					if (allFrequencies.length > 1)
@@ -1842,189 +2020,61 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
 		AllowedTypes type = list.get(columnIndex).getType();
 
+		// bepaal de bins
+		ArrayList<Double> binsOnScale = this.getBinsOnScale();
+
 		// PAINT BIN BOUNDARY LABELS
 		if (this.model.hasVerticalBars())
 		{
 			// check if the bin boundary strings will fit
 			normalFit = determineNormalFitForVerticalBars(context, type);
 			
-			// paint bin boundaries
-			if (normalFit)
-			{
-				int y = this.barAreaHeight();
-
-				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
-				{
-					int x = (int) (this.yAxisOffset + i + i * this.verticalBarWidth);
-					
-					// Get the string value (integer or double)
-					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-
-					metrics = context.measureText(s);
-					int offset = (int) (metrics.getWidth() / 2);
-					if (this.model.getLabelUnderBin())
-					{
-						// put label under bin
-						if (i < this.model.getBinBoundaries().size() - 1)
-						{
-							context.beginPath();
-
-							String s_labelUnderBin;
-							if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
-							{
-								s_labelUnderBin = s;
-							}
-							else
-							{
-								s_labelUnderBin = s + "-<" +
-									StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
-							}
-							
-							// draw marker
-							context.moveTo(x, y + ySplitOffset);
-							context.lineTo(x, y + 5 + ySplitOffset);
-							context.closePath();
-							context.stroke();
-
-							int x2 = (int) (this.yAxisOffset + (i + 1) + (i + 1)
-								* this.verticalBarWidth);
-							metrics = context.measureText(s_labelUnderBin);
-							String font = context.getFont();
-							int offset_labelUnderBin = (int) (metrics.getWidth() / 2);
-							context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 15 + ySplitOffset);
-						}
-						else
-						{
-							if (!type.equals(AllowedTypes.INTEGER) || ((int) getBinWidth()) != 1)
-							{
-								// draw last marker
-								// test syl: kan dit weg? Markers worden altijd al getekend...?
-								context.beginPath();
-								context.moveTo(x, y + ySplitOffset);
-								context.lineTo(x, y + 5 + ySplitOffset);
-								context.closePath();
-								context.stroke();
-							}
-						}
-					}
-					else
-					{
-						// draw marker
-						context.beginPath();
-						context.moveTo(x, y + ySplitOffset);
-						context.lineTo(x, y + 5 + ySplitOffset);
-						context.closePath();
-						context.stroke();
-						// put label between bins
-						context.fillText(s, x - offset, y + 15 + ySplitOffset);
-					}
-				} // for loop over bins
-			} // normal fit
-			else
-			{
-				// the boundary labels won't fit the normal way, so rotate
-				//context.setFont(rotateFont);
-				
-				int y = this.barAreaHeight();
-				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
-				{
-					int x = (int) (this.yAxisOffset + i + i
-						* this.verticalBarWidth);
-					context.moveTo(x, y + ySplitOffset);
-					context.lineTo(x, y + 5 + ySplitOffset);
-					
-					// Get the string value (integer or double)
-					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-					metrics = context.measureText(s);
-					int offset = (int) metrics.getWidth();
-					
-					if (this.model.getLabelUnderBin())
-					{
-						// put label under bin
-						if (i < this.model.getBinBoundaries().size() - 1)
-						{
-							String s_labelUnderBin;
-							if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
-							{
-								// Voor gehele getallen met 1 waarde per klasse, 1 getal tonen onder de staaf
-								s_labelUnderBin = s;
-							}
-							else
-							{
-								s_labelUnderBin = s + "-<" +
-									StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
-							}
-							
-							metrics = context.measureText(s_labelUnderBin);
-							double offset_labelUnderBin = metrics.getWidth();
-							int widthRotatedLabel = (int) (offset_labelUnderBin * Math.cos(theta));
-							int heightRotatedLabel = (int) (offset_labelUnderBin * -Math.sin(theta));
-							
-							context.save();
-							// set the drawing position 
-							context.translate(
-								(int) (x + 5 + (this.verticalBarWidth/2) - widthRotatedLabel), 
-								y + 7 + heightRotatedLabel + 5 + ySplitOffset); // the desired position of the text
-							context.rotate(theta);
-							context.fillText(s_labelUnderBin, 
-									0, 
-									0);
-							context.restore();
-						}
-					}
-					else
-					{
-						// put label between bins
-						metrics = context.measureText(s);
-						double offset_labelBetweenBins = metrics.getWidth();
-						int widthRotatedLabel = (int) (offset_labelBetweenBins * Math.cos(theta));
-						context.save();
-						// set the drawing position 
-						context.translate(x + 5 - widthRotatedLabel, y + 7 + offset + ySplitOffset);
-						context.rotate(theta);
-						context.fillText(s, 0, 0);
-						context.restore();
-					}
-				} // for loop over bins
-			} // no normal fit
+			paintVerticalBinBoundaryLabels(context, normalFit, theta,
+				ySplitOffset, type, binsOnScale);
 		} // vertical bars
 		else
 		{ // horizontal bars
-			// paint bin boundaries
-			for (int i = 0; i <= frequencies.length / 2; i++)
+			paintHorizontalBinBoundaryLabels(context, frequencies,
+				ySplitOffset, type, binsOnScale);
+		} // horizontal bars
+	} // paintNumberClass()
+
+	/**
+	 * Paint the bin boundary labels on the scale for a vertical histogram.
+	 * 
+	 * @param g
+	 * @param fm
+	 * @param ySplitOffset
+	 * @param type
+	 * @param binsOnScale
+	 */
+	private void paintHorizontalBinBoundaryLabels(Context2d context,
+		int[] frequencies, int ySplitOffset, AllowedTypes type, ArrayList<Double> binsOnScale)
+	{
+		TextMetrics metrics;
+		// paint bin boundaries
+		for (int i = 0; i < binsOnScale.size(); i++)
+		{
+			int y = (int) (i + (i + 0.5) * this.horizontalBarWidth);
+			int x = this.yAxisOffset;
+			// Get the string value (integer or double)
+			String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+			
+			if (this.model.getLabelUnderBin())
 			{
-				int y = (int) (i + (i + 0.5) * this.horizontalBarWidth);
-				int x = this.yAxisOffset;
-				// Get the string value (integer or double)
-				String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-				
-				if (this.model.getLabelUnderBin())
+				// put label under bin
+				if (i < binsOnScale.size() - 1)
 				{
-					// put label under bin
-					if (i < this.model.getBinBoundaries().size() - 1)
+					String s_labelUnderBin;
+					if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
 					{
-						String s_labelUnderBin;
-						if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
+						if (!HistogramView.this.model.isFrequencyPolygonMode())
 						{
-							if (!HistogramView.this.model.isFrequencyPolygonMode())
-							{
-								s_labelUnderBin = s;
-							}
-							else
-							{
-								s_labelUnderBin = s;
-								// draw marker
-								context.beginPath();
-								context.moveTo(x - 7, y + ySplitOffset);
-								context.lineTo(x - 2, y + ySplitOffset);
-								context.closePath();
-								context.stroke();
-							}
+							s_labelUnderBin = s;
 						}
 						else
 						{
-							s_labelUnderBin = s + "-<" +
-								StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
+							s_labelUnderBin = s;
 							// draw marker
 							context.beginPath();
 							context.moveTo(x - 7, y + ySplitOffset);
@@ -2032,65 +2082,325 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							context.closePath();
 							context.stroke();
 						}
-						
-						metrics = context.measureText(s_labelUnderBin);
-						int offset_labelUnderBin = (int) metrics.getWidth();
-						context.fillText(s_labelUnderBin, x - offset_labelUnderBin - 7, y
-//							+ (int) (fm.getHeight() / 2.0) - 2 + ySplitOffset + (int) this.horizontalBarWidth/2);
-							- 2 + ySplitOffset + (int) this.horizontalBarWidth/2);
 					}
 					else
 					{
-						// draw last marker
+						s_labelUnderBin = s + "-<" +
+							StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
+						// draw marker
 						context.beginPath();
 						context.moveTo(x - 7, y + ySplitOffset);
 						context.lineTo(x - 2, y + ySplitOffset);
 						context.closePath();
 						context.stroke();
 					}
+					
+					metrics = context.measureText(s_labelUnderBin);
+					int offset_labelUnderBin = (int) metrics.getWidth();
+					context.fillText(s_labelUnderBin, x - offset_labelUnderBin - 7, y
+						- 2 + ySplitOffset + (int) this.horizontalBarWidth/2);
 				}
 				else
 				{
-					// draw marker
+					// draw last marker
 					context.beginPath();
 					context.moveTo(x - 7, y + ySplitOffset);
 					context.lineTo(x - 2, y + ySplitOffset);
 					context.closePath();
 					context.stroke();
-					// put label between bins
-					metrics = context.measureText(s);
-					int offset = (int) metrics.getWidth();
-					context.fillText(s, x - offset - 7, y
-//						+ (int) (fm.getHeight() / 2.0) - 2 + ySplitOffset);
-						- 2 + ySplitOffset);
 				}
 			}
-		} // horizontal bars
-	} // paintNumberClass()
+			else
+			{
+				// draw marker
+				context.beginPath();
+				context.moveTo(x - 7, y + ySplitOffset);
+				context.lineTo(x - 2, y + ySplitOffset);
+				context.closePath();
+				context.stroke();
+				// put label between bins
+				metrics = context.measureText(s);
+				int offset = (int) metrics.getWidth();
+				context.fillText(s, x - offset - 7, y - 2 + ySplitOffset);
+			}
+		}
+	}
+
+	/**
+	 * Paint the bin boundary labels on the scale for a vertical histogram.
+	 * 
+	 * @param g
+	 * @param normalFit
+	 * @param fm
+	 * @param theta
+	 * @param rotateFont
+	 * @param ySplitOffset
+	 * @param type
+	 * @param binsOnScale
+	 */
+	private void paintVerticalBinBoundaryLabels(Context2d context,
+		boolean normalFit, double theta, int ySplitOffset, AllowedTypes type, ArrayList<Double> binsOnScale)
+	{
+		TextMetrics metrics;
+		// paint bin boundaries
+		if (normalFit)
+		{
+			int y = this.barAreaHeight();
+
+			for (int i = 0; i < binsOnScale.size(); i++)
+			{
+				int x = (int) (this.yAxisOffset + i + i * this.verticalBarWidth);
+				
+				// Get the string value (integer or double)
+				String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+
+				metrics = context.measureText(s);
+				int offset = (int) (metrics.getWidth() / 2);
+				if (this.model.getLabelUnderBin())
+				{
+					// put label under bin
+					if (i < binsOnScale.size() - 1)
+					{
+						context.beginPath();
+
+						String s_labelUnderBin;
+						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
+						{
+							s_labelUnderBin = s;
+						}
+						else
+						{
+							s_labelUnderBin = s + "-<" +
+								StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
+						}
+						
+						// draw marker
+						context.moveTo(x, y + ySplitOffset);
+						context.lineTo(x, y + 5 + ySplitOffset);
+						context.closePath();
+						context.stroke();
+
+						int x2 = (int) (this.yAxisOffset + (i + 1) + (i + 1)
+							* this.verticalBarWidth);
+						metrics = context.measureText(s_labelUnderBin);
+						String font = context.getFont();
+						int offset_labelUnderBin = (int) (metrics.getWidth() / 2);
+						context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 15 + ySplitOffset);
+					}
+					else
+					{
+						if (!type.equals(AllowedTypes.INTEGER) || ((int) model.getBinWidth()) != 1)
+						{
+							// draw last marker
+							// test syl: kan dit weg? Markers worden altijd al getekend...?
+							context.beginPath();
+							context.moveTo(x, y + ySplitOffset);
+							context.lineTo(x, y + 5 + ySplitOffset);
+							context.closePath();
+							context.stroke();
+						}
+					}
+				}
+				else
+				{
+					// draw marker
+					context.beginPath();
+					context.moveTo(x, y + ySplitOffset);
+					context.lineTo(x, y + 5 + ySplitOffset);
+					context.closePath();
+					context.stroke();
+					// put label between bins
+					context.fillText(s, x - offset, y + 15 + ySplitOffset);
+				}
+			} // for loop over bins
+		} // normal fit
+		else
+		{
+			// the boundary labels won't fit the normal way, so rotate
+			//context.setFont(rotateFont);
+			
+			int y = this.barAreaHeight();
+			for (int i = 0; i < binsOnScale.size(); i++)
+			{
+				int x = (int) (this.yAxisOffset + i + i
+					* this.verticalBarWidth);
+				context.moveTo(x, y + ySplitOffset);
+				context.lineTo(x, y + 5 + ySplitOffset);
+				
+				// Get the string value (integer or double)
+				String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+				metrics = context.measureText(s);
+				int offset = (int) metrics.getWidth();
+				
+				if (this.model.getLabelUnderBin())
+				{
+					// put label under bin
+					if (i < binsOnScale.size() - 1)
+					{
+						String s_labelUnderBin;
+						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
+						{
+							// Voor gehele getallen met 1 waarde per klasse, 1 getal tonen onder de staaf
+							s_labelUnderBin = s;
+						}
+						else
+						{
+							s_labelUnderBin = s + "-<" +
+								StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
+						}
+						
+						metrics = context.measureText(s_labelUnderBin);
+						double offset_labelUnderBin = metrics.getWidth();
+						int widthRotatedLabel = (int) (offset_labelUnderBin * Math.cos(theta));
+						int heightRotatedLabel = (int) (offset_labelUnderBin * -Math.sin(theta));
+						
+						context.save();
+						// set the drawing position 
+						context.translate(
+							(int) (x + 5 + (this.verticalBarWidth/2) - widthRotatedLabel), 
+							y + 7 + heightRotatedLabel + 5 + ySplitOffset); // the desired position of the text
+						context.rotate(theta);
+						context.fillText(s_labelUnderBin, 
+								0, 
+								0);
+						context.restore();
+					}
+				}
+				else
+				{
+					// put label between bins
+					metrics = context.measureText(s);
+					double offset_labelBetweenBins = metrics.getWidth();
+					int widthRotatedLabel = (int) (offset_labelBetweenBins * Math.cos(theta));
+					context.save();
+					// set the drawing position 
+					context.translate(x + 5 - widthRotatedLabel, y + 7 + offset + ySplitOffset);
+					context.rotate(theta);
+					context.fillText(s, 0, 0);
+					context.restore();
+				}
+			} // for loop over bins
+		} // no normal fit
+	}
+
+	/**
+	 * Get the upper value of the upper bin on the scale.
+	 * @return
+	 */
+	public double getMaxBinOnScale()
+	{
+		double max;
+		
+		ArrayList<Double> binsOnScale = getBinsOnScale();
+		max = binsOnScale.get(binsOnScale.size() - 1);
+		
+		return max;
+	}
+
+	/**
+	 * Get the bin boundaries on the histogram's scale.
+	 * 
+	 * @return
+	 */
+	ArrayList<Double> getBinsOnScale()
+	{
+		ArrayList<Double> bins = new ArrayList<Double>(model.getBinBoundaries());
+		
+		if (!model.isOptimizeScale())
+		{
+			bins = this.getBinsfromBinsSettings();
+		}
+		
+		return bins;
+	}
+
+	/**
+	 * Get the bin boundaries based on the settings in the user options panel.
+	 * 
+	 * @return
+	 */
+	private ArrayList<Double> getBinsfromBinsSettings()
+	{
+		ArrayList<Double> bins = new ArrayList<Double>();
+		double maxOnScale = model.getMaxOnScale();
+		double binWidth = model.getBinWidth();
+		
+		if (this.model.getStatTableModel().isEmptyColumn(this.model.getColumnIndex()))
+		{
+			// use the settings without check for valid values
+			double minOnScale = model.getMinOnScale();
+			double binValue = minOnScale;
+			for (int i = 0; binValue < maxOnScale; i++)
+			{
+				binValue = minOnScale + i * binWidth;
+				bins.add(binValue);
+			}
+			
+			if (minOnScale == maxOnScale)
+			{
+				bins.add(minOnScale);
+				bins.add(maxOnScale);
+			}
+			else if (bins.isEmpty())
+			{
+				bins.add(0.0);
+				bins.add(0.0);
+			}
+		}
+		else
+		{
+			// use the settings, check for valid values
+			double binValue;
+			double startValue = model.getMinOnScale();
+			double min = this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex());
+			double max = this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex());
+			
+			if (startValue > min)
+			{
+				startValue = min;
+			}
+			binValue = startValue;
+			
+			if (maxOnScale <= max)
+			{
+				maxOnScale = max + 1; // bins do not include the upper boundary, so max + 1
+			}
+			
+			for (int i = 0; binValue < maxOnScale; i++)
+			{
+				binValue = startValue + i * binWidth;
+				bins.add(binValue);
+			}
+		}
+
+		return bins;
+	}
 
 	private boolean determineNormalFitForVerticalBars(Context2d context, AllowedTypes type)
 	{
 		boolean normalFit = true;
 		TextMetrics metrics;
 
+		ArrayList<Double> binsOnScale = this.getBinsOnScale();
+
 		if (this.model.getLabelUnderBin())
 		{
 			int marge = 5;
-			for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
+			for (int i = 0; i < binsOnScale.size(); i++)
 			{
-				String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-				if (i < this.model.getBinBoundaries().size() - 1)
+				String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+				if (i < binsOnScale.size() - 1)
 				{
 					String s_labelUnderBin;
 					
-					if (type.equals(AllowedTypes.INTEGER) && ((int) getBinWidth()) == 1)
+					if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
 					{
 						s_labelUnderBin = s;
 					}
 					else
 					{
 						s_labelUnderBin = s + "-<" +
-							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
+							StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
 					}
 					
 					metrics = context.measureText(s_labelUnderBin);
@@ -2104,7 +2414,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 		else // label between bins
 		{
-			for (Double d : this.model.getBinBoundaries())
+			for (Double d : binsOnScale)
 			{
 				metrics = context.measureText(d.toString());
 				if (metrics.getWidth() > this.verticalBarWidth)
@@ -2120,9 +2430,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 	private int determineDependentAxisWidth(Context2d context, double scale)
 	{
-//		System.out.println("HistogramView.determineDependentAxisWidth(scale = " + scale + ")");
-		
-		if (this.model.hasVerticalBars())
+		if (this.model.hasVerticalBars() && (scale != 0))
 		{
 			int width = 5;
 
@@ -2149,7 +2457,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				step = (int) (base * Math.pow(10, exp));
 			}
 
-			// how kom ik aan de font-height?
+			// hoe kom ik aan de font-height?
 			int h = this.getCurrentFontHeight(context);
 			int majorSteps = (int) Math.floor(
 				(panelHeight - 0.5 * h) / (step * scale));
@@ -2251,6 +2559,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	private void paintScale(Context2d context, double scale,
 		int ySplitOffset)
 	{
+		if (scale == 0)
+		{
+			return;
+		}
+		
 		int height = this.getCurrentFontHeight(context);
 		context.setFillStyle(ColorUtils.BLACK);
 		TextMetrics metrics;
@@ -2448,22 +2761,39 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		FrequencyTuple[] frequencies = allFrequencies[splitClass];
 		int ySplitOffset = splitClass * (this.getHeight() - 5);
 
-		// determine scale
-		int max = this.maxFrequency(allFrequencies, splitClass);
-		
 		availableSpace = HistogramView.MAX_SCREEN_FRACTION_FOR_BARS *
         	(this.model.hasVerticalBars() ? 
         		this.barAreaHeight() : 
         		this.barAreaWidth()); // if vertical then availableSpace represents height, if horizontal then width
 		
-		maxValueOnAxis = this.model.getPercentage() ? 
-			(100.0 * max / (this.getFrequenciesSum(allFrequencies, splitClass))) : 
-			max; 
+		// determine max on scale
+		double max = this.maxFrequencyOverAllSplits(allFrequencies);
+		if (this.model.getPercentage()
+			&& this.model.getPercentageSplitTotal()) // split total is 100%
+		{
+			maxValueOnAxis = this.maxPercentageOverAllSplits(allFrequencies);
+		}
+		else if (this.model.getPercentage()) // end total is 100%
+		{
+			maxValueOnAxis = 100.0 * max / (this.getFrequenciesSum(allFrequencies)); 
+		}
+		else
+		{
+			maxValueOnAxis = max;
+		}
 		
-		// scale variable to derive the correct size for percentages or amounts
-		scale =  availableSpace/maxValueOnAxis;
+		// determine scale for the axis with percentages or amounts; should be the same for splits in multiple views
+		if (maxValueOnAxis == 0)
+		{
+			scale = 0;
+		}
+		else
+		{
+			scale =  availableSpace/maxValueOnAxis;
+		}
 
-		amountScale = availableSpace / (double) max;
+		// set bar width
+		this.setBarWidth(frequencies.length);
 
 		if (this.model.hasVerticalBars())
 		{
@@ -2474,8 +2804,8 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			for (FrequencyTuple ft : frequencies)
 			{
 				metrics = context.measureText(ft.label);
-				width = metrics.getWidth();//fm.stringWidth(ft.label);
-				//int height = ft.label.getElement().getClientHeight();
+				width = metrics.getWidth();
+
 				if (width > this.verticalBarWidth)
 				{
 					normalFit = false;
@@ -2516,11 +2846,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			this.yAxisOffset = (int) (longest + 5 + height);
 		}
 
-		this.setBarWidth(frequencies.length);
-
+		// ---- correct scales ---- 
+		// bepaal de amountscale om de bar-lengtes per split te kunnen berekenen
 		if (this.model.getPercentage())
 		{
-			if (this.model.getStatTableModel().splitVarClasses(
+			if (this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 			{
 				// er is een split
@@ -2549,17 +2879,46 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				} // split in single view
 				else
 				{ // split in multiple views of geen split
-					int maxInSplitClass = this.maxFrequency(allFrequencies,
-						splitClass);
-
-					maxValueOnAxis = (100.0 * maxInSplitClass / (this
-						.getFrequenciesSum(allFrequencies, splitClass)));
-
-					scale = availableSpace / maxValueOnAxis;
+					if (this.model.getPercentageSplitTotal())
+					{
+						// amountScale = de beschikbare ruimte (die toont maxValueOnScale) gedeeld door de frequentie (in de huidige splitClass) die deze maxValueOnScale-waarde geeft.
+						// Let op: voor split total = 100% is max dus de frequentie (in de huidige splitClass) die deze maxValueOnScale-waarde geeft
+						// maar dat is niet perse een frequentie die voorkomt in de huidige splitClass. Het is daarom een decimale waarde.
+						max = maxValueOnAxis * this.getFrequenciesSum(allFrequencies, splitClass) / 100;
+					}
 				}
 			}
 		} // percentage
+		else
+		{ // aantallen
+			if (this.model.getStatTableModel().numberOfSplitVarClasses(
+				this.model.getSplitOptions()) > 1)
+			{
+				// er is een split
+				if (this.model.isSplitInSingleView())
+				{
+					int maxInSplit = 0;
+					for (int split = 0; split < allFrequencies.length; split++)
+					{
+						maxInSplit = Math.max(maxInSplit,
+							this.maxFrequency(allFrequencies, split));
+						max = Math.max(max, maxInSplit);
+					}
 
+					maxValueOnAxis = maxInSplit;
+					max = maxInSplit;
+
+					if (maxValueOnAxis == 0)
+					{
+						scale = 0;
+					}
+					else
+					{
+						scale = availableSpace / maxValueOnAxis;
+					}
+				} // split in single view
+			}
+		}
 
 		// PAINT AMOUNT SCALE
 		this.paintScale(context, scale, ySplitOffset);
@@ -2572,7 +2931,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		ArrayList<String> splitLabels = new ArrayList<String>();
 
 		if (this.model.isSplitInSingleView()
-			&& this.model.getStatTableModel().splitVarClasses(
+			&& this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 		{
 			if (this.model.isFrequencyPolygonMode()
@@ -2613,7 +2972,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					{
 						totalFrequencies[i] += frequencySum[i];
 					}
-					//System.out.println(Arrays.toString(totalFrequencies));
 				}
 			} // frequentiepolygoon, cumulatief, stapelen
 			else
@@ -2635,7 +2993,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							amountScale = availableSpace/this.maxFrequencyOverAllSplits(allFrequencies);
 						}
 						
-						//g.setComposite(this.makeComposite(split + 1)); // test syl: wat doet dit?
 						FrequencyTuple[] splitFreq = allFrequencies[split];
 						int frequencySum = 0;
 						int frequencySelectedSum = 0;
@@ -2654,7 +3011,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						}
 						this.lastPolygonPoint = null;
 					}
-					//context.setComposite(this.makeComposite(1));
 				}
 				else
 				{
@@ -2662,10 +3018,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					for (int split = 0; split < allFrequencies.length; split++)
 					{
 						FrequencyTuple[] splitFreq = allFrequencies[split];
-						if (!this.model.isFrequencyPolygonMode())
-						{
-							// g.setComposite(this.makeComposite(split+1));
-						}
 						CssColor c = this.getColor(split);
 						for (int i = 0; i < frequencies.length; i++)
 						{
@@ -2714,7 +3066,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						}
 						this.lastPolygonPoint = null;
 					}
-					//context.setComposite(this.makeComposite(1));
 				}
 			}
 		} // split in single view
@@ -2723,7 +3074,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			if (this.model.isFrequencyPolygonMode()
 				&& this.model.isFrequencyPolygonCumulativeMode())
 			{
-				if (this.model.getStatTableModel().splitVarClasses(
+				if (this.model.getStatTableModel().numberOfSplitVarClasses(
 					this.model.getSplitOptions()) > 1)
 					{
 						// split in multiple views
@@ -2826,7 +3177,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			else
 			{
 				// too wide, so rotate labels
-				//context.setFont(rotateFont);
 				for (int i = 0; i < frequencies.length; i++)
 				{
 					int x = this.yAxisOffset
@@ -2844,8 +3194,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						this.barAreaHeight() + 15 + heightRotatedLabel + ySplitOffset);
 					context.rotate(theta);
 					context.fillText(s, 0, 0); 
-//						x - widthRotatedLabel,
-//						this.barAreaHeight() + 15 + heightRotatedLabel + ySplitOffset);
 					context.restore();
 				}
 			}
@@ -2888,8 +3236,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			sum = sum + this.tupleArraySum(splitFreq);
 		}
 
-		//System.out.println("HistogramView.getTotalSumOfFrequencies(): sum = " + sum);
-		
 		return sum;
 	}
 
@@ -2902,8 +3248,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			sum = sum + arrayEvenSum(allFrequencies[i]);
 		}
 
-		//System.out.println("HistogramView.getTotalSumOfFrequencies(): sum = " + sum);
-		
 		return sum;
 	}
 
@@ -2916,8 +3260,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			max = Math.max(max, this.maxFrequency(allFrequencies, i));
 		}
 		
-		//System.out.println("HistogramView.getMaxFrequenciesofBins(): max = " + max);
-
 		return max;
 	}
 	
@@ -2935,7 +3277,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 	private void setMainPanelSize()
 	{
-		int splitClasses = this.model.getStatTableModel().splitVarClasses(
+		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0;
 
@@ -2996,7 +3338,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		boolean visibilityHasChanged = false;
 		
-		int splitClasses = this.model.getStatTableModel().splitVarClasses(
+		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
 		
 		if (splitClasses > 1 && this.model.isSplitInSingleView())
@@ -3098,7 +3440,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// clear locations of bars
 			HistogramView.this.barRectangles = new ArrayList<Rectangle>(
 				HistogramView.this.model.getNoBins()
-					* HistogramView.this.model.getStatTableModel().splitVarClasses(
+					* HistogramView.this.model.getStatTableModel().numberOfSplitVarClasses(
 						HistogramView.this.model.getSplitOptions()));
 
 			if (!HistogramView.this.model.columnIndexValid())
@@ -3111,7 +3453,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			AllowedTypes type = list.get(HistogramView.this.model.getColumnIndex()).getType();
 
 			int splitClasses = HistogramView.this.model.getStatTableModel()
-				.splitVarClasses(HistogramView.this.model.getSplitOptions());
+				.numberOfSplitVarClasses(HistogramView.this.model.getSplitOptions());
 
 			if (HistogramView.this.model.isSplitInSingleView())
 			{
@@ -3225,7 +3567,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 			int noBins = 0;
 			int numberOfSplits = HistogramView.this.model.getStatTableModel()
-				.splitVarClasses(HistogramView.this.model.getSplitOptions());
+				.numberOfSplitVarClasses(HistogramView.this.model.getSplitOptions());
 
 			if (frequencies_number != null)
 			{
@@ -3315,7 +3657,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							{
 								if (HistogramView.this.hasSplit())
 								{
-           							value = ((double) frequencies_number[i][j * 2] / aantalPerSplit[i]) * 100;
+									if (HistogramView.this.model.getPercentageSplitTotal())
+									{
+										value = ((double) frequencies_number[i][j * 2] / aantalPerSplit[i]) * 100;
+									}
+									else
+									{
+										value = ((double) frequencies_number[i][j * 2] / aantal_totaal) * 100;
+									}
+
 								}
 								else // geen split
 								{
@@ -3367,8 +3717,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							{
 								if (HistogramView.this.hasSplit())
 								{
-									if (HistogramView.this.model.isSplitInSingleView() 
-										&& !HistogramView.this.model.isFrequencyPolygonMode())
+									if (HistogramView.this.model.isSplitInSingleView())
         							{
 										if (HistogramView.this.isNextToEachOtherSelected())
     									{
@@ -3379,6 +3728,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     									{
             								// als gestapeld in 1 view, dan percentage relatief aan totaal per bin 
                 							//value = ((double) frequencies_number[i][j * 2] / aantalPerBin[j]) * 100;
+    										// percentage relatief aan totaalaantal
+    										//value = ((double) frequencies_number[i][j*2] / aantal_totaal) * 100;
+    										
     										// bij gestapeld moet de waarde relatief aan totaal 
     										// en tooltip de waarde aan de as
     										for (int k = 0; k <= i; k++)
@@ -3386,12 +3738,16 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     											value = value + ((double) frequencies_number[k][j*2] / aantal_totaal) * 100;
     										}
     									}
-
+        							}
+        							else if (HistogramView.this.model.getPercentageSplitTotal())
+        							{ 
+        								// split in meerdere views en percentage per split relatief aan split
+            							value = ((double) frequencies_number[i][j * 2] / aantalPerSplit[i]) * 100;
         							}
         							else
-        							{ // Voor frequentiepolygoon bij split altijd deze waarde
-        								// split in meerdere views
-            							value = ((double) frequencies_number[i][j * 2] / aantalPerSplit[i]) * 100;
+        							{
+        								// split met meerdere views en percentage per split relatief aan totaal
+        								value = ((double) frequencies_number[i][j*2] / aantal_totaal) * 100;
         							}
 								}
 								else // geen split
@@ -3404,7 +3760,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							{
 								if (HistogramView.this.hasSplit())
 								{
-    								if (HistogramView.this.model.isSplitInSingleView())
+									if (HistogramView.this.model.isSplitInSingleView())
     								{
     									if (HistogramView.this.isNextToEachOtherSelected())
     									{
@@ -3424,10 +3780,15 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     										}
     									}
     								}
+        							else if (HistogramView.this.model.getPercentageSplitTotal())
+        							{
+        								// split in meerdere views en percentage per split relatief aan split
+            							value = ((double) frequencies_enum[i][j].frequency / aantalPerSplit[i]) * 100;
+        							}
     								else
     								{
-        								// split in meerdere views
-            							value = ((double) frequencies_enum[i][j].frequency / aantalPerSplit[i]) * 100;
+        								// split met meerdere views en percentage per split relatief aan totaal
+            							value = ((double) frequencies_enum[i][j].frequency / aantal_totaal) * 100;
     								}
 								}
 								else // geen split
@@ -3435,11 +3796,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     								// percentage berekenen t.o.v. totaal
         							value = ((double) frequencies_enum[i][j].frequency / aantal_totaal) * 100;
 								}
-							}
+							} // enum
 						} // isPercentage
 						else
 						{
-//    							int waarde = 0;
 							value = 0;
 							
 							if (frequencies_number != null)
@@ -3644,13 +4004,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 
 			int bins = HistogramView.this.model.getStatTableModel()
-				.splitVarClasses(HistogramView.this.model.getColumnIndex(),
+				.numberOfSplitVarClasses(HistogramView.this.model.getColumnIndex(),
 					HistogramView.this.model.getBinBoundaries());
 			int bin = bar % bins;
 			int splitClass = bar / bins;
 
-//			System.out.println("HistogramView.BarClickListener.barClicked(): bin " + bin + " clicked");
-//			System.out.println("HistogramView.BarClickListener.barClicked(): splitClass " + splitClass + " clicked");
 			ArrayList<ColumnType> list = HistogramView.this.model.getStatTableModel().getColumnTypes();
 			ColumnType cType = list.get(HistogramView.this.model.getColumnIndex());
 			AllowedTypes type = cType.getType();
@@ -3717,8 +4075,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			} // enum or string
 			
 			// view statTable moet updaten en de selectie laten zien -> gebeurt al door setSelectionList, die triggert een SelectionChangeEvent
-//			ViewSelectionChangeEvent event = new ViewSelectionChangeEvent(HistogramView.this.controller.getViewName());
-//			HistogramView.this.fireEvent(event);
 		}
 		
 	} // private class BarClickListener
@@ -3824,28 +4180,52 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			if (this.model.columnIndexValid())
 			{
 				ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
+				ArrayList<Double> binBoundaries = null;
 				if (list.get(this.model.getColumnIndex())
 					.getType().isNumber())
 				{
-    				// binBoundaries worden hier standaard gezet
-    				ArrayList<Double> binBoundaries = StatistiekGWT
-    					.appropriateBoundaries(
-    						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
-    						this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()),
-    						this.model.getNoBins());
-    				this.model.setBinBoundaries(binBoundaries);
-    				
-    				
-    				// test syl: kan mooier, maar het werkt wel: opnieuw berekenen 
-    				// met de berekende binboundaries, omdat er mogelijk minder bins nodig zijn
-    				// TODO appropriateBoundaries(min, max) implementeren die binwidth en het aantal klassen bepaalt 
     				binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
     					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
     					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()), 
-    					binBoundaries.get(1) - binBoundaries.get(0), binBoundaries.get(0));
-    				this.model.setBinBoundaries(binBoundaries);
+    					this.getBinWidth(), this.getMinBoundary()); // met invoervelden
     				
-    				this.model.setNoBins(binBoundaries.size() - 1);
+    				if (binBoundaries == null) // ongeldige waarden in invoervelden
+    				{
+        				binBoundaries = StatistiekGWT.appropriateBoundaries(
+    						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
+    						this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()),
+    						this.model.getNoBins());
+        				
+        				int bin0Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(0).toString());
+        				int bin1Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(1).toString());
+        				int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
+
+        				binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+        					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
+        					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()), 
+        					StatistiekGWT.round(binBoundaries.get(1) - binBoundaries.get(0), maxNumberOfDecimals), binBoundaries.get(0));
+    				}
+    				
+    				if (binBoundaries == null)
+    				{
+    					System.out.println("HistogramView.recalculateBinBoundaries(typeHasChanged = " + typeHasChanged + "): binBoundaries is null");
+    				}
+    				else
+    				{
+    					this.model.setBinBoundaries(binBoundaries);
+    					this.model.setNoBinsWithoutUpdatingBinBoundaries(binBoundaries.size() - 1);
+    					
+    					// update minOnScale and maxOnScale if necessary
+    					if (this.model.getMinOnScale() > binBoundaries.get(0))
+    					{
+    						this.model.setMinOnScale(binBoundaries.get(0));
+    					}
+    					int last = binBoundaries.size() - 1;
+    					if (this.model.getMaxOnScale() <= binBoundaries.get(last))
+    					{
+    						this.model.setMaxOnScale(binBoundaries.get(last));
+    					}
+    				}
 				}
 
 				if (typeHasChanged)
@@ -3971,6 +4351,19 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+	}
+	
+	/**
+	 * Get the number of bin boundaries based on the settings in the user options panel.
+	 * 
+	 * @return
+	 */
+	private int getNumberOfBinsfromBinsSettings()
+	{
+		ArrayList<Double> binBoundaries = getBinsfromBinsSettings();
+		int number = binBoundaries.size() - 1;
+
+		return number;
 	}
 
 //	@Override
