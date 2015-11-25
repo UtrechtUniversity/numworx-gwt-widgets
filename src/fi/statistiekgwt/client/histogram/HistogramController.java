@@ -109,13 +109,15 @@ public class HistogramController implements StatistiekView
 		// if result is valid, set boundaries
 		if (boundaries != null)
 		{
+			this.model.setMinOnScale(view.getMinBoundary());
 			this.model.setBinBoundaries(boundaries);
+			this.model.setBinWidth(view.getBinWidth());
 		}
 		else
 		{
 			// reset to old values
 			ArrayList<Double> oldBoundaries = this.model.getBinBoundaries(); 
-			this.view.setBinWidth(oldBoundaries.get(1) - oldBoundaries.get(0));
+			this.view.setBinWidth();
 			this.view.setMinBoundary(oldBoundaries.get(0));
 		}
 	}
@@ -212,6 +214,7 @@ public class HistogramController implements StatistiekView
 		h.put("binBoundaries", this.model.getBinBoundaries());
 		h.put("columnIndex", this.model.getColumnIndex());
 		h.put("percentage", this.model.getPercentage());
+		h.put("percentage_splitTotal", this.model.getPercentageSplitTotal());
 		h.put("labelUnderBin", this.model.getLabelUnderBin());
 		h.put("showUserOptions", this.model.getShowUserOptions());
 		h.put("verticalBars", this.model.hasVerticalBars());
@@ -224,6 +227,10 @@ public class HistogramController implements StatistiekView
 			.getBinBoundaries());
 		h.put("splitInSingleView", this.model.isSplitInSingleView());
 		h.put("nextToEachOther", this.model.isNextToEachOther());
+		h.put("optimizeScale", this.model.isOptimizeScale());
+		h.put("minOnScale", this.model.getMinOnScale());
+		h.put("maxOnScale", this.model.getMaxOnScale());
+		h.put("binWidth", this.model.getBinWidth());
 
 		return h;
 	}
@@ -261,6 +268,15 @@ public class HistogramController implements StatistiekView
 		if (map.containsKey("percentage"))
 		{
 			this.model.setPercentage(map.getBoolean("percentage"));
+		}
+		if (h.containsKey("percentage_splitTotal"))
+		{
+			this.model.setPercentageSplitTotal(map.getBoolean("percentage_splitTotal"));
+		}
+		else
+		{
+			// default is true (split total 100%)
+			this.model.setPercentageSplitTotal(true);
 		}
 		if (map.containsKey("labelUnderBin"))
 		{
@@ -309,6 +325,22 @@ public class HistogramController implements StatistiekView
 		if (map.containsKey("nextToEachOther"))
 		{
 			this.model.setNextToEachOther(map.getBoolean("nextToEachOther"));
+		}
+		if (h.containsKey("optimizeScale"))
+		{
+			this.model.setOptimizeScale(map.getBoolean("optimizeScale"));
+		}
+		if (h.containsKey("minOnScale"))
+		{
+			this.model.setMinOnScale(map.getDouble("minOnScale"));
+		}
+		if (h.containsKey("maxOnScale"))
+		{
+			this.model.setMaxOnScale(map.getDouble("maxOnScale"));
+		}
+		if (h.containsKey("binWidth"))
+		{
+			this.model.setBinWidth(map.getDouble("binWidth"));
 		}
 	}
 
