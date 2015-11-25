@@ -417,7 +417,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	
 				FrequencyTuple[][] frequencyTuple = null;
 				int[] frequencies = null;
-				numberOfSplitClasses = this.model.getStatTableModel().splitVarClasses(
+				numberOfSplitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 					this.model.getSplitOptions());
 				
 				if (type.isNumber())
@@ -927,13 +927,9 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 			}
 
 			int bins = FrequencyTableView.this.model.getStatTableModel()
-				.splitVarClasses(FrequencyTableView.this.model.getColumnIndex(),
+				.numberOfSplitVarClasses(FrequencyTableView.this.model.getColumnIndex(),
 					FrequencyTableView.this.model.getBinBoundaries());
 			int row = rowNumber % bins;
-//			int splitClass = rowNumber / bins;
-
-//			System.out.println("FrequencyTableView.RowClickListener.rowClicked(): rowNumber = " 
-//				+ rowNumber + ", row " + row + " in splitClass " + splitClass);
 
 			ColumnType cType = FrequencyTableView.this.model.getStatTableModel()
 				.getColumnTypes()
