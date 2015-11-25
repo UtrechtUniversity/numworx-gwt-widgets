@@ -66,6 +66,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	private ListBox axisBox;
 
 	// bin settings
+	private CheckBox optimizeScaleBox;
 	private Label binSettingsLabel;
 	private Label binsLabel;
 	/**
@@ -80,6 +81,12 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	private TextBox minBoundaryField;
 	private Label binWidthLabel;
 	private TextBox binWidthField;
+	private Label maxOnScaleLabel;
+	/**
+	 * Max boundary input field. To be used when the
+	 * scale is not automatically optimized.
+	 */
+	private TextBox maxOnScaleField;
 	/**
 	 * Dit label bevat "Aantal: " en het aantal
 	 */
@@ -112,6 +119,20 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	private RadioButton aboveEachOtherRadioItem;
 	private RadioButton separateRadioItem;
 	private RadioButton singleViewRadioItem;
+	/**
+	 * Separator between split view setting and split percentage
+	 */
+	private HTML splitViewPercentageHR;
+	/**
+	 * Indicates that the percentage in the split is
+	 * relative to the end total.
+	 */
+	private RadioButton percentage_endTotal;
+	/**
+	 * Indicates that the percentage in the split is
+	 * relative to the split total.
+	 */
+	private RadioButton percentage_splitTotal;
 
 	// split settings
 	private Label splitSettingsLabel;
@@ -201,6 +222,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		// click handlers
 		this.amountRadioItem.addClickHandler(this.clickHandler);
 		this.percentageRadioItem.addClickHandler(this.clickHandler);
+		this.percentage_splitTotal.addClickHandler(this.clickHandler);
+		this.percentage_endTotal.addClickHandler(this.clickHandler);
 		this.cumulativeBox.addClickHandler(this.clickHandler);
 		this.labelBetweenBinsRadioItem.addClickHandler(this.clickHandler);
 		this.labelUnderBinRadioItem.addClickHandler(this.clickHandler);
@@ -211,17 +234,20 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitButton.addClickHandler(this.clickHandler);
 		this.splitChooseBoundariesButton.addClickHandler(this.clickHandler);
 		this.stackModeBox.addClickHandler(this.clickHandler);
+		this.optimizeScaleBox.addClickHandler(this.clickHandler);
 		this.okButton.addClickHandler(this.clickHandler);
 		
 		// blur handlers
 		this.minBoundaryField.addBlurHandler(this.blurHandler);
 		this.binWidthField.addBlurHandler(this.blurHandler);
+		this.maxOnScaleField.addBlurHandler(this.blurHandler);
 		this.splitMinBoundaryField.addBlurHandler(this.blurHandler);
 		this.splitBinWidthField.addBlurHandler(this.blurHandler);
 		
 		// key down handlers
 		this.minBoundaryField.addKeyDownHandler(this.keyDownHandler);
 		this.binWidthField.addKeyDownHandler(this.keyDownHandler);
+		this.maxOnScaleField.addKeyDownHandler(this.keyDownHandler);
 		this.splitMinBoundaryField.addKeyDownHandler(this.keyDownHandler);
 		this.splitBinWidthField.addKeyDownHandler(this.keyDownHandler);
 		
@@ -235,6 +261,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		// value change handlers
 		this.minBoundaryField.addValueChangeHandler(this.valueChangeHandler);
 		this.binWidthField.addValueChangeHandler(this.valueChangeHandler);
+		this.maxOnScaleField.addValueChangeHandler(this.valueChangeHandler);
 		this.splitMinBoundaryField.addValueChangeHandler(this.valueChangeHandler);
 		this.splitBinWidthField.addValueChangeHandler(this.valueChangeHandler);
 	}
@@ -243,7 +270,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	{
 		this.basisPanel = new FlowPanel();
 
-		// var settings
+		// VARIABLE SETTINGS
 		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
@@ -263,7 +290,9 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		}
 		this.axisBox.setPixelSize(100, 25);
 
-		// bin settings
+		// BIN SETTINGS
+		this.optimizeScaleBox = new CheckBox(
+			StatistiekGWT.rb.getString("optimizeScaleBox"), true);
 		this.binSettingsLabel = new Label(StatistiekGWT.rb.getString("classDivisionLabel"));
 		this.binSettingsLabel.addStyleName(statistiekCss.titlelabel());
 		this.binsLabel = new Label(StatistiekGWT.rb.getString("noClassesLabel"));
@@ -287,6 +316,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		this.minBoundaryField = new TextBox();
 
+		this.maxOnScaleLabel = new Label(
+			StatistiekGWT.rb.getString("maxValueLabel"));
+		this.maxOnScaleField = new TextBox();
+		
 		this.binWidthLabel = new Label(
 			StatistiekGWT.rb.getString("classwidthLabel"));
 		this.binWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
@@ -300,7 +333,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		this.maxValueLabel = new Label("");
 
-		// display settings
+		// DISPLAY SETTINGS
 		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
 
@@ -346,8 +379,19 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.singleViewRadioItem = new RadioButton("splitViewGroup",
 			StatistiekGWT.rb.getString("splitsingleviewCheckBox"));
 		this.singleViewRadioItem.addStyleName(statistiekCss.radioButton());
+		
+		splitViewPercentageHR = new HTML(HistogramUserOptionsPanel.hrString);
+		splitViewPercentageHR.addStyleName(statistiekCss.horizontalrule());
+		
+		this.percentage_splitTotal = new RadioButton("percentageSplitTotalGroup",
+			StatistiekGWT.rb.getString("percentage_splitTotal"));
+		this.percentage_splitTotal.addStyleName(statistiekCss.radioButton());
+		
+		this.percentage_endTotal = new RadioButton("percentageSplitTotalGroup",
+			StatistiekGWT.rb.getString("percentage_endTotal"));
+		this.percentage_endTotal.addStyleName(statistiekCss.radioButton());
 
-		// split settings
+		// SPLIT SETTINGS
 		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
 
@@ -417,7 +461,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		// zie: http://mechanitis.blogspot.nl/2011/01/gwt-why-verticalpanel-is-evil.html
 		FlowPanel variableSettingsPanel, binsSettingsPanel, displaySettingsPanel, splitSettingsPanel;
 
-		// Variable settings
+		// VARIABLE SETTINGS
 		variableSettingsPanel = new FlowPanel();//new LayoutPanel();
 		variableSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
@@ -427,14 +471,17 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		variableSettingsPanel.add(this.axisLabel);
 		variableSettingsPanel.add(this.axisBox);
 
-		// Bins settings
+		// BIN SETTINGS
 		binsSettingsPanel = new FlowPanel();
 		binsSettingsPanel.setTitle(StatistiekGWT.rb.getString("classDivisionLabel")); // tooltip boven panel
 		binsSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		binsSettingsPanel.add(this.binSettingsLabel);
+		binsSettingsPanel.add(this.optimizeScaleBox);
 		binsSettingsPanel.add(this.minBoundaryLabel);
 		binsSettingsPanel.add(this.minBoundaryField);
+		binsSettingsPanel.add(this.maxOnScaleLabel);
+		binsSettingsPanel.add(this.maxOnScaleField);
 
 		binsSettingsPanel.add(this.binWidthLabel);
 		binsSettingsPanel.add(this.binWidthField);
@@ -447,7 +494,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		binsSettingsPanel.add(this.minValueLabel);
 		binsSettingsPanel.add(this.maxValueLabel);
 
-		// Display settings
+		// DISPLAY
 		displaySettingsPanel = new FlowPanel();
 		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
@@ -473,8 +520,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			displaySettingsPanel.add(this.aboveEachOtherRadioItem);
 			displaySettingsPanel.add(this.nextToEachOtherRadioItem);
 		}
+		displaySettingsPanel.add(this.splitViewPercentageHR);
+		displaySettingsPanel.add(this.percentage_endTotal);
+		displaySettingsPanel.add(this.percentage_splitTotal);
 
-		// splitOptions settings
+		// SPLIT OPTIONS
 		splitSettingsPanel = new FlowPanel();
 		splitSettingsPanel.setTitle(StatistiekGWT.rb.getString("splitsLabel")); // tooltip boven panel
 		splitSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
@@ -579,6 +629,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		return Double.parseDouble(s);
 	}
 
+	public TextBox getMinBoundaryTextField()
+	{
+		return this.minBoundaryField;
+	}
+	
 	public void setMinBoundary(double d)
 	{
 		this.minBoundaryField.setText(String.valueOf(d));
@@ -596,6 +651,28 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMinBoundaryField.setText(String.valueOf(d));
 	}
 
+	public double getMaxOnScale()
+	{
+		String s = this.maxOnScaleField.getText();
+		s = s.replace(',', '.');
+		return Double.parseDouble(s);
+	}
+	
+	public TextBox getMaxOnScaleField()
+	{
+		return this.maxOnScaleField;
+	}
+
+	public void setMaxOnScale(double d)
+	{
+		this.maxOnScaleField.setText(String.valueOf(d));
+	}
+
+	public TextBox getBinWidthTextField()
+	{
+		return this.binWidthField;
+	}
+	
 	public double getBinWidth()
 	{
 		double d = 1;
@@ -611,6 +688,22 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			//e.printStackTrace();
 		}
 		return d;
+	}
+	
+	/**
+	 *Set the bin width based on the model's bin boundaries. 
+	 */
+	public void setBinWidth()
+	{
+		String w;
+		if (this.model.getStatTableModel().isEmptyColumn(this.model.getColumnIndex()))
+		{
+			w = StatistiekGWT.getStringValue(this.model.getBinWidth());
+		}
+		else
+		{
+			this.binWidthField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getBinBoundaries()));
+		}
 	}
 	
 	public void setBinWidth(double d)
@@ -648,6 +741,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		return this.percentageRadioItem.getValue();
 	}
 	
+	public boolean percentageSplitTotalSelected()
+	{
+		return this.percentage_splitTotal.getValue();
+	}
+	
 	public boolean labelUnderBinSelected()
 	{
 		return this.labelUnderBinRadioItem.getValue();
@@ -665,44 +763,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 	public void update()
 	{
-		StatistiekUtils.removeAllItemsFromListBox(this.columnIndexBox);
-
-		ArrayList<String> nameList = this.model.getStatTableModel().getColumnNames();
-		for (String varName : nameList)
-		{
-			this.columnIndexBox.addItem(varName);
-		}
-
-		if (this.model.columnIndexValid())
-		{
-			this.columnIndexBox.setSelectedIndex(this.model.getColumnIndex());
-		}
-		else
-		{
-			// set no item selected
-			this.columnIndexBox.setSelectedIndex(-1);
-		}
-
-		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
-		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
-		for (int column = 0; column < this.model.getStatTableModel()
-			.getColumnCount(); column++)
-		{
-			splitVarBox.addItem(this.model.getStatTableModel()
-				.getColumnName(column));
-		}
+		this.optimizeScaleBox.setValue(this.model.isOptimizeScale());
 		
-		// check of columnindex valid
-		if (this.model.columnIndexValid())
-		{
-			this.splitVarBox.setSelectedIndex(this.model.getSplitOptions()
-				.getColumnSplitIndex() + 1);
-		}
-		else
-		{
-			// set no split variable selected
-			this.splitVarBox.setSelectedIndex(0);
-		}
+		updateVarBox();
+
+		updateSplitVarBox();
 
 		this.setSelectedItemInListBox(
 			this.binsBox, String.valueOf(this.model.getNoBins()));
@@ -711,47 +776,66 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			this.splitBinsBox, 
 			String.valueOf(this.model.getSplitOptions().getBinBoundaries().size() - 1));
 
-		if (this.model.columnIndexValid())
+		updateBinSettings();
+
+		updateSplitBinSettings();
+
+		if (this.model.isFrequencyPolygonMode()
+			&& this.model.isFrequencyPolygonCumulativeMode() != this.isCumulativeBoxSelected())
 		{
-			ArrayList<ColumnType> typeList = this.model.getStatTableModel().getColumnTypes(); 
-			ColumnType cType = typeList.get(this.model.getColumnIndex());
-			AllowedTypes type = cType.getType();
-			if (type.equals(AllowedTypes.DOUBLE)
-				|| type.equals(AllowedTypes.INTEGER))
-			{
-				this.minBoundaryField.setText(StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(0)));
-				this.binWidthField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getBinBoundaries()));
-				this.noObjectsLabel.setText(StatistiekGWT.rb
-					.getString("numberLabel")
-					+ this.model.getStatTableModel().getRowCount());
-				String minValue = StatistiekGWT.getStringValue(
-					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()));
-				this.minValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
-					+ minValue);
-				String maxValue = StatistiekGWT.getStringValue(
-					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
-				this.maxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
-					+ maxValue);
-				this.separatorBinSettings.setVisible(true);
-				this.separatorSplitBoundaries.setVisible(true);
-				this.labelBetweenBinsRadioItem.setVisible(true);
-				this.labelUnderBinRadioItem.setVisible(true);
-				this.binsBox.setVisible(true);
-				this.binsLabel.setVisible(true);
-				setEnumClasses(false);
-			}
-			else if (type.equals(AllowedTypes.ENUM) || type.equals(AllowedTypes.STRING))
-			{
-				this.separatorBinSettings.setVisible(false);
-				this.separatorSplitBoundaries.setVisible(false);
-				this.labelBetweenBinsRadioItem.setVisible(false);
-				this.labelUnderBinRadioItem.setVisible(false);
-				this.binsBox.setVisible(false);
-				this.binsLabel.setVisible(false);
-				setEnumClasses(true);
-			}
+			this.cumulativeBox.setValue(this.model
+				.isFrequencyPolygonCumulativeMode());
+		}
+		
+		if (this.model.getLabelUnderBin())
+		{
+			this.labelUnderBinRadioItem.setValue(true);
+		}
+		else
+		{
+			this.labelBetweenBinsRadioItem.setValue(true);
 		}
 
+		if (this.model.getPercentage())
+		{
+			this.percentageRadioItem.setValue(true);
+		}
+		else
+		{
+			this.amountRadioItem.setValue(true);
+		}
+
+		if (this.model.hasVerticalBars())
+		{
+			this.axisBox.setSelectedIndex(0);
+		}
+		else
+		{
+			this.axisBox.setSelectedIndex(1);
+		}
+
+		boolean split = this.hasSplit();
+		this.setVisibleSplitOptions(this.splitOptionsVisible);
+		this.setVisiblePercentageSettings(this.model.getPercentage() && split && !model.isSplitInSingleView());
+		
+		this.singleViewRadioItem.setValue(this.model.splitInSingleView()
+			&& split && this.model.isFrequencyPolygonMode());
+		this.separateRadioItem.setValue(!this.model.splitInSingleView()
+			&& split);
+
+		this.nextToEachOtherRadioItem.setValue(this.model
+			.splitInSingleView() && this.model.isNextToEachOther() && split);
+
+		this.aboveEachOtherRadioItem.setValue(this.model.splitInSingleView()
+			&& !this.model.isNextToEachOther() && split && !this.model.isFrequencyPolygonMode());
+
+		this.stackModeBox.setValue(this.model.isFrequencyPolygonStackMode());
+		this.stackModeBox.setEnabled(this.model.isFrequencyPolygonMode()
+			&& this.model.isFrequencyPolygonCumulativeMode());
+	}
+
+	private void updateSplitBinSettings()
+	{
 		// check of column index valid
 		if (this.model.columnIndexValid())
 		{
@@ -769,7 +853,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
     					StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
     				
     				StringBuilder sb = new StringBuilder();
-    				int splitClasses = this.model.getStatTableModel().splitVarClasses(
+    				int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
     					this.model.getSplitOptions());
     				for (int i = 0; i < splitClasses; i++)
     				{
@@ -811,7 +895,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				else if (splitType.equals(AllowedTypes.STRING))
 				{
 					StringBuilder sb = new StringBuilder();
-					int splitClasses = this.model.getStatTableModel().splitVarClasses(
+					int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
     					this.model.getSplitOptions());
 					for (int i = 0; i < splitClasses; i++)
 					{
@@ -828,72 +912,110 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				}
     		}
 		}
+	}
 
-		if (this.model.isFrequencyPolygonMode()
-			&& this.model.isFrequencyPolygonCumulativeMode() != this.isCumulativeBoxSelected())
+	private void updateBinSettings()
+	{
+		if (this.model.columnIndexValid())
 		{
-			this.cumulativeBox.setValue(this.model
-				.isFrequencyPolygonCumulativeMode());
+			ArrayList<ColumnType> typeList = this.model.getStatTableModel().getColumnTypes(); 
+			ColumnType cType = typeList.get(this.model.getColumnIndex());
+			AllowedTypes type = cType.getType();
+			if (type.equals(AllowedTypes.DOUBLE)
+				|| type.equals(AllowedTypes.INTEGER))
+			{
+				this.minBoundaryField.setText(StatistiekGWT.getStringValue(this.view.getBinsOnScale().get(0)));
+				int last = this.view.getBinsOnScale().size() - 1;
+				this.maxOnScaleField.setText(StatistiekGWT.getStringValue(this.view.getBinsOnScale().get(last)));
+				String binWidth;
+				if (this.model.isOptimizeScale())
+				{
+					binWidth = StatistiekGWT.getFormattedBinWidth(this.model.getBinBoundaries());
+				}
+				else
+				{
+					binWidth = StatistiekGWT.getStringValue(this.model.getBinWidth());
+				}				
+				this.binWidthField.setText(binWidth);
+				this.noObjectsLabel.setText(StatistiekGWT.rb
+					.getString("numberLabel")
+					+ this.model.getStatTableModel().getNumberOfValidDataRows(this.model.getColumnIndex()));
+				String minValue = StatistiekGWT.getStringValue(
+					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()));
+				this.minValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
+					+ minValue);
+				String maxValue = StatistiekGWT.getStringValue(
+					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
+				this.maxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+					+ maxValue);
+				this.separatorBinSettings.setVisible(true);
+				this.separatorSplitBoundaries.setVisible(true);
+				this.labelBetweenBinsRadioItem.setVisible(true);
+				this.labelUnderBinRadioItem.setVisible(true);
+				this.binsBox.setVisible(true);
+				this.binsLabel.setVisible(true);
+				this.optimizeScaleBox.getParent().setVisible(true);
+				this.optimizeScaleBox.setVisible(true);
+				setEnumClasses(false);
+			}
+			else if (type.equals(AllowedTypes.ENUM) || type.equals(AllowedTypes.STRING))
+			{
+				this.separatorBinSettings.setVisible(false);
+				this.separatorSplitBoundaries.setVisible(false);
+				this.labelBetweenBinsRadioItem.setVisible(false);
+				this.labelUnderBinRadioItem.setVisible(false);
+				this.binsBox.setVisible(false);
+				this.binsLabel.setVisible(false);
+				this.optimizeScaleBox.getParent().setVisible(false); // voor enum/string geen indeling-settings, dus hele blok (parent) verbergen
+				this.optimizeScaleBox.setVisible(false);
+				setEnumClasses(true);
+			}
+		}
+	}
+
+	private void updateSplitVarBox()
+	{
+		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
+		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
+		for (int column = 0; column < this.model.getStatTableModel()
+			.getColumnCount(); column++)
+		{
+			splitVarBox.addItem(this.model.getStatTableModel()
+				.getColumnName(column));
 		}
 		
-//		System.out.println("HistogramUserOptionsPanel.update(): this.model.getLabelUnderBin() = "
-//			+ this.model.getLabelUnderBin());
-		if (this.model.getLabelUnderBin())
+		// check of columnindex valid
+		if (this.model.columnIndexValid())
 		{
-			this.labelUnderBinRadioItem.setValue(true);
+			this.splitVarBox.setSelectedIndex(this.model.getSplitOptions()
+				.getColumnSplitIndex() + 1);
 		}
 		else
 		{
-			this.labelBetweenBinsRadioItem.setValue(true);
+			// set no split variable selected
+			this.splitVarBox.setSelectedIndex(0);
+		}
+	}
+
+	private void updateVarBox()
+	{
+		StatistiekUtils.removeAllItemsFromListBox(this.columnIndexBox);
+
+		ArrayList<String> nameList = this.model.getStatTableModel().getColumnNames();
+		for (String varName : nameList)
+		{
+			this.columnIndexBox.addItem(varName);
 		}
 
-		if (this.model.getPercentage())
+		if (this.model.columnIndexValid())
 		{
-			this.percentageRadioItem.setValue(true);
+			this.columnIndexBox.setSelectedIndex(this.model.getColumnIndex());
 		}
 		else
 		{
-			this.amountRadioItem.setValue(true);
+			// set no item selected
+			this.columnIndexBox.setSelectedIndex(-1);
 		}
-
-		if (this.model.hasVerticalBars())
-		{
-			this.axisBox.setSelectedIndex(0);
-		}
-		else
-		{
-			this.axisBox.setSelectedIndex(1);
-		}
-
-		boolean split = this.hasSplit();
-//		this.setVisibleSplitOptions(split);
-		// test syl: na klik op 'Maak splitsing' is splitOptionsVisible = true, terwijl er geen split is
-		this.setVisibleSplitOptions(this.splitOptionsVisible);
-//		this.setVisibleSplitOptions(split);
-		
-		this.singleViewRadioItem.setValue(this.model.splitInSingleView()
-			&& split && this.model.isFrequencyPolygonMode());
-		this.separateRadioItem.setValue(!this.model.splitInSingleView()
-			&& split);
-		// System.out.println("HistogramUserOptionsPanel.update(): this.separateRadioItem.setSelected("
-		// + (!this.model.splitInSingleView() && split) +
-		// "); !this.model.splitInSingleView()="
-		// + !this.model.splitInSingleView() + ", split=" + split);
-
-		this.nextToEachOtherRadioItem.setValue(this.model
-			.splitInSingleView() && this.model.isNextToEachOther() && split);
-		// System.out.println("HistogramUserOptionsPanel.update(): nextToEachOtherRadioItem.setSelected(splitInSingleView="
-		// + this.model.splitInSingleView() + " && isNextToEachOther=" +
-		// this.model.isNextToEachOther()
-		// + " && split=" + split
-		// + ")");
-
-		this.aboveEachOtherRadioItem.setValue(this.model.splitInSingleView()
-			&& !this.model.isNextToEachOther() && split && !this.model.isFrequencyPolygonMode());
-
-		this.stackModeBox.setValue(this.model.isFrequencyPolygonStackMode());
-		this.stackModeBox.setEnabled(this.model.isFrequencyPolygonMode()
-			&& this.model.isFrequencyPolygonCumulativeMode());
 	}
 
 	/**
@@ -945,8 +1067,14 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.separatorSplitBoundaries.setVisible(!b);
 		this.minBoundaryLabel.setVisible(!b);
 		this.minBoundaryField.setVisible(!b);
+		this.maxOnScaleLabel.setVisible(!b && !isOptimizeScale());
+		this.maxOnScaleField.setVisible(!b && !isOptimizeScale());
 		this.binWidthLabel.setVisible(!b);
 		this.binWidthField.setVisible(!b);
+		
+		this.binsLabel.setVisible(!b && isOptimizeScale());
+		this.binsBox.setVisible(!b && isOptimizeScale());
+		
 		this.noObjectsLabel.setVisible(!b);
 		this.minValueLabel.setVisible(!b);
 		this.maxValueLabel.setVisible(!b);
@@ -967,8 +1095,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	private void setVisibleBoundaryOptions()
 	{
 		this.separatorBinSettings.setVisible(!this.enumClasses);
+		this.optimizeScaleBox.setVisible(!this.enumClasses);
 		this.minBoundaryLabel.setVisible(!this.enumClasses);
 		this.minBoundaryField.setVisible(!this.enumClasses);
+		this.maxOnScaleLabel.setVisible(!this.enumClasses && !isOptimizeScale());
+		this.maxOnScaleField.setVisible(!this.enumClasses && !isOptimizeScale());
 		this.binWidthLabel.setVisible(!this.enumClasses);
 		this.binWidthField.setVisible(!this.enumClasses);
 		this.noObjectsLabel.setVisible(!this.enumClasses);
@@ -1055,6 +1186,21 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		}
 	}
 
+	/**
+	 * Set the visibility of components related to percentage.
+	 * 
+	 * @param percentage
+	 */
+	private void setVisiblePercentageSettings(boolean b)
+	{
+		splitViewPercentageHR.setVisible(b);
+		percentage_splitTotal.setVisible(b);
+		percentage_endTotal.setVisible(b);
+		
+		percentage_splitTotal.setValue(this.model.getPercentageSplitTotal());
+		percentage_endTotal.setValue(!this.model.getPercentageSplitTotal());
+	}
+
 	private boolean hasSplit()
 	{
 		boolean split = this.model.getSplitOptions().getColumnSplitIndex() > -1;
@@ -1077,6 +1223,17 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMinValueLabel.setText("");
 		this.splitMaxValueLabel.setText("");
 	}
+	
+	public boolean isOptimizeScale()
+	{
+		return this.optimizeScaleBox.getValue();
+	}
+	
+	public CheckBox getOptimizeScaleBox()
+	{
+		return this.optimizeScaleBox;
+	}
+
 
 //	@Override
 //	public void fireEvent(GwtEvent<?> e)
@@ -1131,27 +1288,22 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setPercentage(view.percentageItemSelected());
 				this.update();
 			}
+			else if ((e.getSource() == percentage_splitTotal) || (e.getSource() == percentage_endTotal))
+			{
+				model.setPercentageSplitTotal(view.percentageSplitTotalSelected());
+				this.update();
+			}
 			else if ((e.getSource() == labelBetweenBinsRadioItem) ||
 				e.getSource() == labelUnderBinRadioItem)
 			{
 				model.setLabelUnderBin(view.labelUnderBinItemSelected());
 				this.update();
 			}
-//			else if (e.getSource() == minBoundaryField)
-//			{
-//				controller.updateBoundariesFromBinSettings();
-//				this.update();
-//			}
-//			else if (e.getSource() == binWidthField)
-//			{
-//				controller.updateBoundariesFromBinSettings();
-//				this.update();
-//			}
-//			else if (e.getSource() == axisBox)
-//			{
-//				model.setVerticalBars(view.xAxisSelected());
-//				this.update();
-//			}
+			else if (e.getSource() == optimizeScaleBox)
+			{
+				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
+				this.update();
+			}
 			else if (e.getSource() == cumulativeBox)
 			{
 				model.setFrequencyPolygonCumulativeMode(
@@ -1193,23 +1345,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setFrequencyPolygonStackMode(view.isStackModeBoxSelected());
 				this.update();
 			}
-//			else if (e.getSource() == splitBinsBox)
-//			{
-//				ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
-//				controller.setSplitType(list.get(model.getSplitOptions().getColumnSplitIndex())
-//					.getType());
-//				this.update();
-//			}
-//			else if (e.getSource() == splitMinBoundaryField) // waarom onClick?
-//			{
-//				controller.updateSplitBoundariesFromBinSettings();
-//				this.update();
-//			}
-//			else if (e.getSource() == splitBinWidthField)
-//			{
-//				controller.updateSplitBoundariesFromBinSettings();
-//				this.update();
-//			}
+			else if (e.getSource() == optimizeScaleBox)
+			{
+				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
+				this.update();
+			}
 			else if (e.getSource() == splitChooseBoundariesButton)
 			{
 				if (splitBoundariesVisible)
@@ -1230,49 +1370,26 @@ public class HistogramUserOptionsPanel extends FlowPanel
 					// verwijder splitsing...
 					model.setColumnSplitIndex(-1);
 					setVisibleSplitOptions(false);
+					setVisiblePercentageSettings(false);
 					clearGUISplitComponents();
 					this.update();
 				}
 				else
 				{
 					setVisibleSplitOptions(true);
+					setVisiblePercentageSettings(model.getPercentage() && !model.isSplitInSingleView());
 					this.updateUserOptionsPanel();
 				}
 			}
 			else if (e.getSource() == okButton)
 			{
 				setVisibleBoundaryOptions();
-				//setVisibleSplitBoundaryOptions(false); waarom moet dit?
 				if (splitVarBox.getSelectedIndex() == 0)
 				{
 					setVisibleSplitOptions(false);
 				}
 				dialogButton.closeDialog();
 			}
-//			else if (e.getSource() == splitVarBox)
-//			{
-//				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): splitVarBox, SplitColumnUpdate!");
-//				if (view.getSplitVarBoxSelectedIndex() - 1 
-//						!= model.getSplitOptions().getColumnSplitIndex())
-//				{
-//					if (view.getSplitVarBoxSelectedIndex() != -1)
-//					{
-//						model.setColumnSplitIndex(
-//							view.getSplitVarBoxSelectedIndex() - 1);
-//					}
-//					
-//					model.setSplitOptions(model.getSplitOptions());
-//					if (view.getSplitVarBoxSelectedIndex() > 0)
-//					{
-//						ArrayList<ColumnType> list = model.getStatTableModel().getColumnTypes();
-//						controller.setSplitType(
-//							list.get(model.getSplitOptions().getColumnSplitIndex())
-//							.getType());
-//					}
-//				}
-//
-//				this.update();
-//			}
 			else
 			{
 				//System.out.println("HistogramUserOptionsPanel.HistogramUOPClickHandler.onClick(): Unknown action source! " + e);
@@ -1312,11 +1429,83 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			{
 				// update column index bin settings
 				controller.updateBoundariesFromBinSettings();
+				
+				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+				double maxBinValue = view.getMaxBinOnScale();
+				
+				if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
+					&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
+				{
+					if (model.getMaxOnScale() < maxBinValue)
+					{
+						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+						model.setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+					}
+				}
+				else
+				{
+					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+				}
+			}
+			else if (e.getSource() == maxOnScaleField)
+			{
+				if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
+				{
+					// max < min is niet toegestaan
+					if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
+				}
+				else
+				{
+					double maxBinValue = model.getMaxBinBoundaryValue();
+					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+					{
+						if (model.getMaxOnScale() < maxBinValue)
+						{
+							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+							model.setMaxOnScale(maxBinValue);
+						}
+						else
+						{
+							// reset to latest value
+							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+						}
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
+				}
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				// update column index bin settings
+				model.setBinWidth(view.getBinWidth());
+				
+				// column index bin settings
 				controller.updateBoundariesFromBinSettings();
+
+				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+				double maxBinValue = view.getMaxBinOnScale();
+				if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+				{
+					view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+				}
+				else
+				{
+					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+				}
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
@@ -1341,6 +1530,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == columnIndexBox)
 			{
+				model.setOptimizeScale(true); // default
 				model.setColumnIndex(HistogramUserOptionsPanel.this.getVarBoxSelectedIndex());
 			}
 			else if (e.getSource() == binsBox)
@@ -1379,11 +1569,83 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			{
 				// update column index bin settings
 				controller.updateBoundariesFromBinSettings();
+				
+				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+				double maxBinValue = view.getMaxBinOnScale();
+				
+				if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
+					&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
+				{
+					if (model.getMaxOnScale() < maxBinValue)
+					{
+						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+						model.setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+					}
+				}
+				else
+				{
+					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+				}
+			}
+			else if (e.getSource() == maxOnScaleField)
+			{
+				if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
+				{
+					// max < min is niet toegestaan
+					if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
+				}
+				else
+				{
+					double maxBinValue = model.getMaxBinBoundaryValue();
+					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+					{
+						if (model.getMaxOnScale() < maxBinValue)
+						{
+							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+							model.setMaxOnScale(maxBinValue);
+						}
+						else
+						{
+							// reset to latest value
+							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+						}
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
+				}
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				// update column index bin settings
+				model.setBinWidth(view.getBinWidth());
+				
+				// column index bin settings
 				controller.updateBoundariesFromBinSettings();
+
+				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+				double maxBinValue = view.getMaxBinOnScale();
+				if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+				{
+					view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+				}
+				else
+				{
+					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+				}
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
@@ -1414,11 +1676,83 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				{
 					// update column index bin settings
 					controller.updateBoundariesFromBinSettings();
+					
+					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+					double maxBinValue = view.getMaxBinOnScale();
+					
+					if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
+						&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
+					{
+						if (model.getMaxOnScale() < maxBinValue)
+						{
+							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+							model.setMaxOnScale(maxBinValue);
+						}
+						else
+						{
+							// reset to latest value
+							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+						}
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
+				}
+				else if (e.getSource() == maxOnScaleField)
+				{
+					if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
+					{
+						// max < min is niet toegestaan
+						if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
+						{
+							// reset to latest value
+							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+						}
+						else
+						{
+							model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+						}
+					}
+					else
+					{
+						double maxBinValue = model.getMaxBinBoundaryValue();
+						if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+						{
+							if (model.getMaxOnScale() < maxBinValue)
+							{
+								// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+								model.setMaxOnScale(maxBinValue);
+							}
+							else
+							{
+								// reset to latest value
+								view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+							}
+						}
+						else
+						{
+							model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+						}
+					}
 				}
 				else if (e.getSource() == binWidthField)
 				{
-					// update column index bin settings
+					model.setBinWidth(view.getBinWidth());
+					
+					// column index bin settings
 					controller.updateBoundariesFromBinSettings();
+
+					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+					double maxBinValue = view.getMaxBinOnScale();
+					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+					{
+						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
 				}
 				else if (e.getSource() == splitMinBoundaryField)
 				{
