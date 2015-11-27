@@ -3,7 +3,7 @@
   <groupId>fi.draaibankgwt</groupId>
   <artifactId>DraaibankGWT</artifactId>
   <packaging>war</packaging>
-  <name>De rekenmachine</name>
+  <name>De draaibank</name>
   <build>
   	<finalName>${project.artifactId}</finalName>
 	<sourceDirectory>src</sourceDirectory>
