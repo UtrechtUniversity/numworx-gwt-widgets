@@ -15,6 +15,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.statsimgwt.client.Munten.Experiment;
@@ -24,7 +25,7 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	int breedte;
 	int hoogte;
 	private Map<String, Object> launchState;
-	boolean muntenRadio=false;
+	boolean muntenRadio=true;
 	boolean dobbelstenenRadio=false;
 	boolean binomTrekkingRadio=false;
 	boolean steekproefRadio=false;
@@ -46,7 +47,7 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	boolean binomTrekkingKans=true;
 	boolean binomTrekkingPopulatieProportie=false;
 	
-	boolean muntenSelected=false;
+	boolean muntenSelected=true;
 	boolean dobbelstenenSelected=false;
 	boolean binomTrekkingSelected=false;
 	boolean steekproefSelected=false;
@@ -58,9 +59,15 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	
 	public void onModuleLoad() {
 
-			//Munten munten = new Munten();
+			 munten=new Munten(true, true, true, true, true);
+			
 			//Dobbelstenen dobbelstenen = new Dobbelstenen();
-            //BinomTrekking binomtrekking = new BinomTrekking();			
+           // BinomTrekking binomtrekking = new BinomTrekking();
+			RootPanel.get("dockholder").add(asWidget());
+	}
+	
+	public StatSimGWT()
+	{
 	}
 	
 	public StatSimGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden) {
