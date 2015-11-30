@@ -177,6 +177,10 @@ public class DotplotController implements StatistiekView
 			.getColumnSplitIndex());
 		h.put("splitBoundaries", this.model.getSplitBinBoundaries());
 		h.put("splitInSingleView", this.model.splitInSingleView());
+		h.put("optimizeScaleX", this.model.isOptimizeScaleX());
+		h.put("minXOnScale", this.model.getMinXOnScale());
+		h.put("maxXOnScale", this.model.getMaxXOnScale());
+
 
 		return h;
 	}
@@ -256,6 +260,33 @@ public class DotplotController implements StatistiekView
 			}
 
 			this.model.setSplitBoundaries(splitBoundaries);
+		}
+
+		if (h.containsKey("optimizeScaleX"))
+		{
+			this.model.setOptimizeScaleX(map.getBoolean("optimizeScaleX"));
+		}
+		
+		if (h.containsKey("minXOnScale"))
+		{
+			this.model.setMinXOnScale(map.getDouble("minXOnScale"));
+		}
+		else
+		{
+			// default is the columnX's minimum value
+			double minColumnXValue = this.model.getStatTableModel().getColumnMin(this.model.getColumnXIndex());
+			this.model.setMinXOnScale(minColumnXValue);
+		}
+		
+		if (h.containsKey("maxXOnScale"))
+		{
+			this.model.setMaxXOnScale(map.getDouble("maxXOnScale"));
+		}
+		else
+		{
+			// default is the columnX's maximum value
+			double maxColumnXValue = this.model.getStatTableModel().getColumnMax(this.model.getColumnXIndex());
+			this.model.setMaxXOnScale(maxColumnXValue);
 		}
 	}
 
