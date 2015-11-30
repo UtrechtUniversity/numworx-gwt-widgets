@@ -4151,7 +4151,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						// bins opnieuw berekenen
 						this.recalculateBinBoundaries(typeHasChanged);
 					}
-					else if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
+					if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
 					{
 						// split bins opnieuw berekenen
 						this.recalculateSplitBinBoundaries();
