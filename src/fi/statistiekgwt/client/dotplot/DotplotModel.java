@@ -24,6 +24,20 @@ public class DotplotModel
 
 	private SplitOptions splitOptions;
 
+	/**
+	 * Whether or not the scale of variable X is optimized. Only available in dotplot,
+	 * not in scatterplot.
+	 */
+	private boolean optimizeScaleX;
+	/**
+	 * The minimum value of columnX that is used on the scale of the dotplot.
+	 */
+	private double minXOnScale;
+	/**
+	 * The maximum value of columnX that is used on the scale of the dotplot.
+	 */
+	private double maxXOnScale;
+
 	private boolean useColorScale;
 	private CssColor colorA;
 	private CssColor colorB;
@@ -128,6 +142,62 @@ public class DotplotModel
 	public int getColumnXIndex()
 	{
 		return columnXIndex;
+	}
+
+	/**
+	 * Get the minimum value of columnX on the scale.
+	 * 
+	 * @return
+	 */
+	public double getMinXOnScale()
+	{
+		return this.minXOnScale;
+	}
+	
+	/**
+	 * Set the minimum value of columnX on the scale.
+	 * 
+	 * @param min
+	 *            the new minimum value
+	 */
+	public void setMinXOnScale(double min)
+	{
+		double minColumnValue = this.getStatTableModel().getColumnMin(
+			this.getColumnXIndex());
+
+		if (this.getStatTableModel().isEmptyColumn(this.getColumnXIndex())
+			|| ((min <= minColumnValue) && (min != this.minXOnScale)))
+		{
+			this.minXOnScale = min;
+		}
+	}
+
+	/**
+	 * Set the maximum value of columnX on the scale.
+	 * 
+	 * @param max
+	 *            the new maximum value
+	 */
+	public void setMaxXOnScale(double max)
+	{
+		double maxColumnValue = this.getStatTableModel().getColumnMax(
+			this.getColumnXIndex());
+
+		if (this.getStatTableModel().isEmptyColumn(this.getColumnXIndex())
+			|| ((max >= maxColumnValue) && (max != this.maxXOnScale)))
+		{
+			this.maxXOnScale = max;
+		}
+	}
+
+	/**
+	 * Get the maximum value of columnX on the scale.
+	 * 
+	 * @return
+	 */
+	public double getMaxXOnScale()
+	{
+		return this.maxXOnScale;
 	}
 
 	/**
@@ -303,6 +373,11 @@ public class DotplotModel
 		this.showCorrelation = showCorrelation;
 	}
 
+	public void setOptimizeScaleX(boolean b)
+	{
+		this.optimizeScaleX = b;
+	}
+
 	public ArrayList<Double> getSplitBinBoundaries()
 	{
 		return this.splitOptions.getBinBoundaries();
@@ -360,6 +435,15 @@ public class DotplotModel
 		return this.scatterplotMode;
 	}
 	
+	/**
+	 * Returns whether the scale of columnX is optimized.
+	 * @return
+	 */
+	public boolean isOptimizeScaleX()
+	{
+		return optimizeScaleX;
+	}
+
 	public void setSplitBoundaries(ArrayList<Double> boundaries)
 	{
 		this.splitOptions.setBinBoundaries(boundaries);
