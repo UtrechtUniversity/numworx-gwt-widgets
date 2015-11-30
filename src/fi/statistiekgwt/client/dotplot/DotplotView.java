@@ -765,11 +765,20 @@ public class DotplotView extends LayoutPanel implements
 	{
 		if (this.model.columnXIndexValid() && this.xType.isNumber())
 		{
-			xMin = this.model.getStatTableModel().getColumnMin(
-				this.model.getColumnXIndex());
-			xMax = this.model.getStatTableModel().getColumnMax(
-				this.model.getColumnXIndex());
+			if (this.model.isOptimizeScaleX())
+			{
+				xMin = this.model.getStatTableModel().getColumnMin(
+					this.model.getColumnXIndex());
+				xMax = this.model.getStatTableModel().getColumnMax(
+					this.model.getColumnXIndex());
+			}
+			else
+			{
+				xMin = this.model.getMinXOnScale();
+				xMax = this.model.getMaxXOnScale();
+			}
 		}
+		
 		if (this.model.columnYIndexValid() && this.yType.isNumber())
 		{
 			yMin = this.model.getStatTableModel().getColumnMin(
@@ -777,6 +786,7 @@ public class DotplotView extends LayoutPanel implements
 			yMax = this.model.getStatTableModel().getColumnMax(
 				this.model.getColumnYIndex());
 		}
+		
 		if(this.model.isUseColorScale() && this.model.columnColorIndexValid() && this.zType.isNumber())
 		{
 			zMin = this.model.getStatTableModel().getColumnMin(
@@ -784,6 +794,7 @@ public class DotplotView extends LayoutPanel implements
 			zMax = this.model.getStatTableModel().getColumnMax(
 				this.model.getColumnColorIndex());
 		}
+		
 		if (this.model.columnSplitIndexValid() && this.splitType.isNumber())
 		{
 			splitMin = this.model.getStatTableModel().getColumnMin(
@@ -3255,6 +3266,12 @@ public class DotplotView extends LayoutPanel implements
 				else if (event.getInfo().equals(TableChangeEvent.SET_VALUE_AT)
 					|| event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
 				{
+					if (event.getColumnIndex() == this.model.getColumnXIndex())
+					{
+						// schaal instellingen opnieuw berekenen
+						this.recalculateScaleXSettings();
+					}
+					
 					if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
 					{
 						// split bins opnieuw berekenen
@@ -3272,6 +3289,22 @@ public class DotplotView extends LayoutPanel implements
 		}
 	}
 	
+	void recalculateScaleXSettings()
+	{
+		// update minOnScale and maxOnScale if necessary
+		double minValueX = this.model.getStatTableModel().getColumnMin(this.model.getColumnXIndex()); 
+		if (this.model.getMinXOnScale() > minValueX)
+		{
+			this.model.setMinXOnScale(minValueX);
+		}
+
+		double maxValueX = this.model.getStatTableModel().getColumnMax(this.model.getColumnXIndex());
+		if (this.model.getMaxXOnScale() <= maxValueX)
+		{
+			this.model.setMaxXOnScale(maxValueX);
+		}
+	}
+
 	/**
 	 * Recalculate the split bin boundaries for column with columnSplitIndex
 	 * if possible.
