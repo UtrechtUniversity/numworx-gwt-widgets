@@ -37,9 +37,13 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	// logger
+    static Logger logger = Logger.getLogger("VerknippenGWT");
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -362,7 +366,11 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
-	{		this.breedte = width;
+	{		
+		
+logger.info("VerknippenGWT init");
+
+			this.breedte = width;
 			this.hoogte = height;
 			//this.launchState = launchState;
 			
@@ -729,14 +737,12 @@ System.out.println("setState");
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override

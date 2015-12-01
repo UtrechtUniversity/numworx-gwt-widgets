@@ -19,6 +19,7 @@
 
 .radiobutton {
 	text-align: left;
+	font-family: Helvetica, sans serif;
 	/** background-color: yellow; */
 }	
 
@@ -26,6 +27,7 @@
 	background-color: rgb(198, 239, 247);
 	color: blue;
 	text-align: left;
+	font-family: Helvetica, sans serif;
 }
 
 .upimage {
@@ -51,6 +53,7 @@
 	border-style: none;
 	margin: 0px;
 	padding: 0px;
+	font-family: Helvetica, sans serif;
 	color: red;
 	
 }
@@ -60,6 +63,7 @@
 	/** background-color: yellow; */
 	font-size: 0.975em;
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 	color: black;
 	text-align: center;
 /**	padding: 0px; */ 	
@@ -70,6 +74,7 @@
 	/** background-color: yellow; */
 	font-size: 1.175em;
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 	color: green;
 	text-align: center;
 /**	padding: 0px; */ 	
@@ -80,6 +85,7 @@
 	/** background-color: yellow; */
 	font-size: 1.175em;
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 	color: red;
 	text-align: center;
 /**	padding: 0px; */ 	
@@ -90,6 +96,7 @@
 	/** background-color: yellow; */
 	font-size: 0.875em;
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 	color: red;
 /**	padding: 0px; */ 	
 }	

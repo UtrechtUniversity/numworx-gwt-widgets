@@ -490,6 +490,23 @@ public class KnipPolygon2
 		return result;
 	}
 	
+	public Vector gridPointsOnEdges()
+	{	Vector result = new Vector();
+	
+		for (int rpCnt = 0; rpCnt < aantalPunten; rpCnt++)
+		{	RealPoint e1 = realPoints[rpCnt];
+			RealPoint e2 = realPoints[(rpCnt + 1) % aantalPunten];
+			Vector gridPointsOnEdge = gridPointsOnEdge(e1, e2, true);
+			for (int i = 0; i < gridPointsOnEdge.size(); i++)
+			{	RealPoint edgePoint = (RealPoint) gridPointsOnEdge.elementAt(i);
+				result.addElement(edgePoint);
+			}
+		}
+	
+		return result;
+	}
+	
+	
 	public Rectangle getBoundingBox()
 	{	int xMin = 10000;
 		int xMax = 0;

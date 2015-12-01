@@ -2019,7 +2019,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 					if (edgeClickedPolygon == oldEdgeClickedPolygon)
 					{	
 //System.out.println("same Polygon");						
-						
+/*						
 						// ja: kijk of een dezelfde edge aangeklikt is
 						edgeClickedIndex = edgeClickedPolygon.edgeContainsPoint(pointClicked);
 						if (edgeClickedIndex == oldEdgeClickedIndex)
@@ -2041,25 +2041,30 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 							gridPointsOnEdge = edgeClickedPolygon.gridPointsOnEdge(e1, e2, true);
 							paint(); 
 							return;
-						}	
+						}
+*/							
+						gridPointsOnEdge = edgeClickedPolygon.gridPointsOnEdges();
 					}
-					else
+					else // nieuw polygon aangeklikt
 					{	
 //System.out.println("other Polygon");
-						edgeClickedIndex = edgeClickedPolygon.edgeContainsPoint(pointClicked);
 						// nee: balletjes oude weg, balletjes nieuwe verschijnen, return?
 						gridPointsOnEdge.removeAllElements();
+/*						
+						edgeClickedIndex = edgeClickedPolygon.edgeContainsPoint(pointClicked);
 						// maak de nieuwe balletjes mbv edgeClickedPolygon en edgeClickedIndex
 						RealPoint e1 = edgeClickedPolygon.realPoints[edgeClickedIndex];
 						RealPoint e2 = 
 							edgeClickedPolygon.realPoints[(edgeClickedIndex + 1) % edgeClickedPolygon.aantalPunten];
 						gridPointsOnEdge = edgeClickedPolygon.gridPointsOnEdge(e1, e2, true);
+*/
+						gridPointsOnEdge = edgeClickedPolygon.gridPointsOnEdges();
 //System.out.println("balletjes: " + gridPointsOnEdge.size());						
 						paint();
 						return;
 					}
 				}	
-				else
+				else // niet op een edgePoint geklikt
 				{	
 //System.out.println("pointClicked == null");					
 					removeGridOnEdge();
@@ -2331,6 +2336,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 						knippen = false;
 						oval1Pos = null;
 						oval2Pos = null;
+						gridPointsOnEdge.removeAllElements();
 						paint();
 						return;
 					}
@@ -2352,6 +2358,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 							knippen = false;
 							oval1Pos = null;
 							oval2Pos = null;
+							gridPointsOnEdge.removeAllElements();
 							paint();
 							return;
 						}	
@@ -2363,6 +2370,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 						knippen = false;
 						oval1Pos = null;
 						oval2Pos = null;
+						gridPointsOnEdge.removeAllElements();
 						paint();
 						return;
 					}	
@@ -2380,6 +2388,7 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 				oval3Pos = null;
 				firstCutPoint = null;				
 				knippen = false;
+				gridPointsOnEdge.removeAllElements();
 				paint();
 			} // if knippen
 		

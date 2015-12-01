@@ -19,8 +19,12 @@
 
   <!-- Other module inherits -->   
   <!-- <inherits name="com.googlecode.mgwt.MGWT"/> -->
-  <inherits name='nl.uu.fi.dwo.interaction.Interaction' />                                   
-  <add-linker name='xsiframe' />
+  <inherits name='nl.uu.fi.dwo.interaction.Interaction' />                           
+  
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
+  <set-property name="gwt.logging.logLevel" value="FINEST"/>
+          
+  <!-- <add-linker name='xsiframe' /> -->
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.verknippengwt.client.VerknippenGWT'/>
