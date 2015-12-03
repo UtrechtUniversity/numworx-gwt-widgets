@@ -438,7 +438,7 @@ public class Algebra
 	} 
 	
 	/*toevoeging voor "Herleiden" 
-	 *Geeft het aantal factoren in alle termen samen. Machten worden als één factor geteld.
+	 *Geeft het aantal factoren in alle termen samen. Machten worden als Ã©Ã©n factor geteld.
 	 */
 	public static Vector geefFactorenBeperkt(Expressie e, Vector v)
 	{	if(e instanceof Aftrekking && e.kind1.geefWaarde().doubleValue()==0)
