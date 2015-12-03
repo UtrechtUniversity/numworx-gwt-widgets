@@ -23,7 +23,7 @@
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
 
-  <!--<add-linker name='xsiframe' />-->
+  <add-linker name='xsiframe' /> <!-- essentieel! -->
 
   
   <!-- Specify the app entry point class.                         -->
