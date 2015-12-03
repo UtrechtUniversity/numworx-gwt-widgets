@@ -59,10 +59,6 @@
   		<scope>system</scope>
   		<systemPath>${project.basedir}/lib/interaction.jar</systemPath>
   	</dependency>
-  	<dependency>
-  		<groupId>com.googlecode.mgwt</groupId>
-  		<artifactId>MGWT</artifactId>
-  	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>

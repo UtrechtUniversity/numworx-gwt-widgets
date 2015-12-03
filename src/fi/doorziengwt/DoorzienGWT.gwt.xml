@@ -20,7 +20,7 @@
   <!-- Other module inherits -->      
   <!--  <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
-  <!-- <add-linker name='xsiframe' /> -->
+  <add-linker name='xsiframe' /> <!-- huub: deze instructie laten staan, aub. mail me anders, wim -->
                                  
 
   <!-- Specify the app entry point class.                         -->
