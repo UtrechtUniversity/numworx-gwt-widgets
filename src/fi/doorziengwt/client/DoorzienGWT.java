@@ -1940,5 +1940,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		// TODO Auto-generated method stub
 		
 	}
+	
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
 }
 
