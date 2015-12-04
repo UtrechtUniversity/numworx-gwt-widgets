@@ -1,6 +1,7 @@
 package fi.doorziengwt.client;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
@@ -32,9 +33,11 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Logger;
 
 public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionView 
 {
+	private static Logger logger = Logger.getLogger("DoorzienGWT");
 	
 	MenuBar menuBar;
 	MenuBar figurenMenu, optiesMenu;
@@ -97,14 +100,14 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
 	// UI
-	DockLayoutPanel dlp;
+	LayoutPanel dlp;
 	LayoutPanel bottomPanel;
 	LayoutPanel canvasPanel;
 	DrawingShell drawingShell;
 	
 	// Popup met inhoud
-	PopupPanel doorzienGWTPopup;
-	DockLayoutPanel doorzienGWTDock;
+	//PopupPanel doorzienGWTPopup;
+	DockLayoutPanel doorzienGWTDock; //tool
 	
 	int breedte = 500;
 	int hoogte = 450;
@@ -112,8 +115,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	int leftOffset = 5;
 	int topOffset = 5;
 	
-	int popupBreedte = 600;
-	int popupHoogte = 550;
+	//int popupBreedte = 600;
+	//int popupHoogte = 550;
 	
 	int topBarHeight;
 	int menuHeight = 25;
@@ -168,7 +171,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	boolean designOption = true;
 	boolean resetOption = true;
 	
-	//boolean demo = false;
+	boolean borderOption = false;
 	
 	boolean letters = false;
 	boolean hulpPunten = false;
@@ -287,8 +290,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	{
 		getImages();
 		
-		dlp = new DockLayoutPanel(Style.Unit.PX);
-		//dlp.addStyleName("dock");
+		dlp = new LayoutPanel();
+		dlp.addStyleName(doorzienGWTCss.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		RootPanel.get(holderId).add(dlp);
@@ -300,10 +303,10 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 	}
 
-	public void makePopup()
+	public void makeTool()
 	{
-		if (doorzienGWTPopup != null)
-			return;
+		//if (doorzienGWTPopup != null)
+		//	return;
 		
 		if (figurenMenuOptie || optiesMenuOptie)
 			topBarHeight = menuHeight + topToolBarHeight;
@@ -312,22 +315,22 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		doorzienGWTDock = new DockLayoutPanel(Style.Unit.PX);
 		doorzienGWTDock.addStyleName(doorzienGWTCss.dock());
-		doorzienGWTDock.setSize("" + popupBreedte + "px", "" + popupHoogte + "px");
+		doorzienGWTDock.setSize("" + breedte + "px", "" + hoogte + "px");
 		
 		topBar = new LayoutPanel();
-		topBar.setSize("" + popupBreedte + "px", "" + topBarHeight + "px");
+		topBar.setSize("" + breedte + "px", "" + topBarHeight + "px");
 		
 		if (figurenMenuOptie || optiesMenuOptie)
 		{	makeMenus();
 			topBar.add(menuBar);
-			topBar.setWidgetLeftWidth(menuBar, 0, Style.Unit.PX, popupBreedte, Style.Unit.PX);
+			topBar.setWidgetLeftWidth(menuBar, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 			topBar.setWidgetTopHeight(menuBar, 0, Style.Unit.PX, menuHeight, Style.Unit.PX);
 		}
 		
-		topToolBar = new TopToolBar2(this, popupBreedte);
+		topToolBar = new TopToolBar2(this, breedte);
 		topToolBar.addStyleName(doorzienGWTCss.toolbar());
 		topBar.add(topToolBar);
-		topBar.setWidgetLeftWidth(topToolBar, 0, Style.Unit.PX, popupBreedte, Style.Unit.PX);
+		topBar.setWidgetLeftWidth(topToolBar, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		if (figurenMenuOptie || optiesMenuOptie)
 			topBar.setWidgetTopHeight(topToolBar, menuHeight, Style.Unit.PX, topBarHeight, Style.Unit.PX);
 		else
@@ -340,11 +343,12 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		rightToolBar.addStyleName(doorzienGWTCss.toolbar());
 		doorzienGWTDock.addEast(rightToolBar, rightToolBarWidth);
 		
-		drawingPanel = new DrawingPanel2(this, popupBreedte - rightToolBarWidth,
-										 popupHoogte - topBarHeight, CUBE);
+		drawingPanel = new DrawingPanel2(this, breedte - rightToolBarWidth,
+										 hoogte - topBarHeight, CUBE);
 		//doorzienGWTDock.add(drawingPanel.drawingPanelCanvas);
 		doorzienGWTDock.add(drawingPanel);
 		
+/*		
 		figureToPopup();
 			
 		int popupX = dlp.getAbsoluteLeft();
@@ -355,7 +359,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		doorzienGWTPopup.setWidget(doorzienGWTDock);
 		doorzienGWTPopup.setPopupPosition(popupX, popupY);
 		doorzienGWTPopup.show();
-
+*/
 	}
 	
 	public void makeMenus()
@@ -699,7 +703,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		getImages();
 		
-		dlp = new DockLayoutPanel(Style.Unit.PX);
+		dlp = new LayoutPanel();
 		dlp.addStyleName(doorzienGWTCss.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
@@ -835,13 +839,16 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	
     public void figureToViewer()
     {
-    	Map<String,Object> h = getPopupState();
+    	Map<String,Object> h = getToolState();
     	setViewerState(h);
     	
-    	if (doorzienGWTPopup != null)
-    		doorzienGWTPopup.setVisible(false);
-    	doorzienGWTPopup = null;
+    	dlp.setWidgetVisible(doorzienGWTDock,false);
+    	dlp.setWidgetVisible(canvasPanel,true);
+    	//if (doorzienGWTPopup != null)
+    	//	doorzienGWTPopup.setVisible(false);
+    	//doorzienGWTPopup = null;
     	popupVisible = false;
+    	drawingShell.panel3D.repaint();
     }
     
     public void figureToPopup()
@@ -849,8 +856,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	popupVisible = true;
     	
     	Map<String,Object> h = getViewerState();
-    	setPopupState(h);
+    	setToolState(h);
     	
+    	dlp.setWidgetVisible(doorzienGWTDock,true);
+    	dlp.setWidgetVisible(canvasPanel,false);
+    	drawingPanel.paint();
     }
 
     
@@ -1249,7 +1259,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	
     }
 
-    public void setPopupState(Map<String,Object> map)
+    public void setToolState(Map<String,Object> map)
     {
 //		boolean letters = false;
 //		boolean hulpPunten = false;
@@ -1536,7 +1546,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
     } // setPopupState
     
-    public Map<String,Object> getPopupState()
+    public Map<String,Object> getToolState()
     {
     	Map<String,Object> h = new HashMap<String,Object>();
     	
@@ -1666,7 +1676,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	    	
 	   		if (e.getSource() == toolsButton)
 	   		{
-	   			makePopup();
+	   			figureToPopup();
 	   		}
 	   		else if (e.getSource() == resetButton)
 	   		{
@@ -1754,11 +1764,17 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		//this.popupVisible = popupVisible;
 		
 		if (popupVisible)
-		{	makePopup();
-			setPopupState(state);
+		{	//makePopup();
+			setToolState(state);
+			dlp.setWidgetVisible(doorzienGWTDock,true);
+			dlp.setWidgetVisible(canvasPanel,false);
+			drawingPanel.paint();
 		}
 		else
 		{	setViewerState(state);
+			dlp.setWidgetVisible(doorzienGWTDock,false);
+			dlp.setWidgetVisible(canvasPanel,true);
+			drawingShell.panel3D.repaint();
 		}
 		 
 	}
@@ -1789,6 +1805,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	public void init(int width, int height, Map<String, Object> map, //launchState, 
 			    Map<String, Number> values) 
 	{
+		
+logger.info("DoorzienGWT init");
+
 		this.breedte = width;
 		this.hoogte = height;
 		//this.launchState = launchState;
@@ -1823,6 +1842,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 		if (launchState.containsKey("resetOption"))
 			resetOption = launchState.getBoolean("resetOption");
+
+		if (launchState.containsKey("borderOption"))
+			borderOption = launchState.getBoolean("borderOption");
 
 		if (launchState.containsKey("demo"))
 			popupVisible = !(launchState.getBoolean("demo"));
@@ -1872,6 +1894,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		drawingShell.slider.setVisible(false);
 		
 		drawingShell.flatButton = new PushButton("plat");
+		drawingShell.flatButton.addStyleName(doorzienGWTCss.pushbutton());
 		canvasPanel.add(drawingShell.flatButton);
 		canvasPanel.setWidgetLeftWidth(drawingShell.flatButton, breedte - 40 - 1, Style.Unit.PX, 40, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(drawingShell.flatButton, 1 + Slider2.vertSize, Style.Unit.PX, 22, Style.Unit.PX);
@@ -1880,6 +1903,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		drawingShell.flatButton.addClickHandler(new PushClickHandler());
       
 		makeBottom();
+		
+		drawingShell.panel3D.setBordered(borderOption);
+		
+		makeTool();
+		dlp.add(doorzienGWTDock);
+		dlp.setWidgetLeftWidth(doorzienGWTDock, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+		dlp.setWidgetTopHeight(doorzienGWTDock, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		dlp.setWidgetVisible(doorzienGWTDock, false);
+		
 		
 		if (resetState != null)
 			setState(resetState);
@@ -1924,15 +1956,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	}
 
 	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getHeight() 
+	{
+		return hoogte;
 	}
 
 	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getWidth() 
+	{
+		return breedte;
 	}
 
 	@Override

@@ -31,15 +31,18 @@
 
 	background-color: yellow;
 	text-align: center;
-	font-size: 0.875em;
-	padding: 0px;	
+	font-size: 0.975em;
+	font-family: Helvetica, sans serif;
+	/** padding: 0px; */	
 }
 
 .normalmenuitem {
 	font-weight: normal;
+	font-family: Helvetica, sans serif;
 }
 
 .boldmenuitem {
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 }	
 

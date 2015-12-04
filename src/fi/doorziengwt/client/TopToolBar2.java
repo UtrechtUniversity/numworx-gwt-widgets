@@ -290,6 +290,7 @@ public class TopToolBar2 extends LayoutPanel
         //}
         
         closeButton = new PushButton("sluit");
+        closeButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		add(closeButton);
 		setWidgetLeftWidth(closeButton, breedte - buttonWidth - leftOffset, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 		setWidgetTopHeight(closeButton, topOffset, Style.Unit.PX, 22, Style.Unit.PX);

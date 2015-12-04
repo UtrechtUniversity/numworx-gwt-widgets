@@ -2428,8 +2428,8 @@ panel3D.testString = "";
 					
 					mouseDownTouchStartAction(eventX, eventY, pinchState);
 					
-panel3D.testString2 = "down tc " + touchCnt + " ps " + pinchState;
-panel3D.repaint();
+//panel3D.testString2 = "down tc " + touchCnt + " ps " + pinchState;
+//panel3D.repaint();
 					
 					
 				}
@@ -2449,8 +2449,8 @@ panel3D.repaint();
 					
 					mouseDownTouchStartAction(event1X, event1Y, pinchState);
 					
-panel3D.testString2 = "down tc " + touchCnt + " ps " + pinchState;
-panel3D.repaint();
+//panel3D.testString2 = "down tc " + touchCnt + " ps " + pinchState;
+//panel3D.repaint();
 					
 				}
 				
@@ -2477,8 +2477,8 @@ panel3D.repaint();
 				
 					mouseMoveTouchMoveAction(eventX, eventY, pinchState, 0, 0);
 					
-panel3D.testString2 = "move tc " + touchCnt + " ps " + pinchState;
-panel3D.repaint();
+//panel3D.testString2 = "move tc " + touchCnt + " ps " + pinchState;
+//panel3D.repaint();
 					
 					
 				}
@@ -2499,8 +2499,8 @@ panel3D.repaint();
 					
 					pinchStartDistance = pinchMoveDistance;
 					
-panel3D.testString2 = "move tc " + touchCnt + " ps " + pinchState;
-panel3D.repaint();
+//panel3D.testString2 = "move tc " + touchCnt + " ps " + pinchState;
+//panel3D.repaint();
 					
 				
 				}
@@ -2540,8 +2540,8 @@ panel3D.repaint();
 			
 			mouseUpTouchEndAction();
 			
-panel3D.testString2 = "up tc " + touchCnt + " ps " + pinchState;
-panel3D.repaint();
+//panel3D.testString2 = "up tc " + touchCnt + " ps " + pinchState;
+//panel3D.repaint();
 			
 		}
 		
@@ -2603,7 +2603,8 @@ panel3D.repaint();
 			// grootste afmeting canvas in pixels
 			double size = Math.sqrt(breedte * breedte + hoogte * hoogte);
 			//zoom-eenheid per pixel
-			double zoomStep = 3 * ZOOMSTEP / size;
+			//double zoomStep = 3 * ZOOMSTEP / size;
+			double zoomStep = 6 * ZOOMSTEP / size;
 			if (newDistance > startDistance)
 			{
 				int deltaDist = newDistance - startDistance;

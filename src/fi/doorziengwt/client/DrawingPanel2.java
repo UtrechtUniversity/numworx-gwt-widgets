@@ -368,6 +368,7 @@ public static void showTime(String comment)
 		slider.setVisible(false);
 		
 		flatButton = new PushButton("plat");
+		flatButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		add(flatButton);
     	setWidgetLeftWidth(flatButton, breedte - 40 - 1, Style.Unit.PX, 40, Style.Unit.PX);
 		setWidgetTopHeight(flatButton, 1 + Slider2.vertSize, Style.Unit.PX, 22, Style.Unit.PX);
@@ -403,6 +404,13 @@ public static void showTime(String comment)
     public void setLetters(boolean b)
     {   DrawConstants.letters = b;
         panel3D.repaint();
+        if (cutPanel != null)
+            cutPanel.repaint();
+    }
+    
+    public void paint()
+    {
+    	panel3D.repaint();
         if (cutPanel != null)
             cutPanel.repaint();
     }
