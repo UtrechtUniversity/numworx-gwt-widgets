@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 
 
 
+
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
@@ -45,6 +46,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 
 
@@ -723,8 +725,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		else if(typeOpdracht == TEKENTABELPUNTEN)
 		{
 			//zetTabelComponent(leerlingZietTabel);
+// dit stond er (23-1-2014)
+//			tekenComponent.zetAantalGrafieken(1);
+//			tekenComponent.zetLijnenKnoppen(false, false, false);
+
+// dit staat in GraphToolInteractiePanel op deze plaats			
 			tekenComponent.zetAantalGrafieken(1);
-			tekenComponent.zetLijnenKnoppen(false, false, false);
+			tekenComponent.setConnectMode(TekenComponentGWT.NONE);
+			tekenComponent.zetLijnenKnoppen(rechteVerbindingen, krommeZonderExtrapolatie, krommeMetExtrapolatie);
+
+			
 			tabelComponent.zetEenTabel(true);
 			tabelComponent.zetTabelPunten(docentGraphPoints, true);
 			tabelComponent.zetReset(false);
