@@ -1358,7 +1358,7 @@ gIm.setFillStyle(CssColor.make(255, 0, 0));
 		else
 		{	aantalFg = s.geefAantalFiguren();
 
-//testString += " af = " + aantalFg;
+owner.logger.info("aantalFg = " + aantalFg);
 			fg = s.geefFigurenRij();
 			var = s.geefVars();
 			basisLijnstukX.zetVar(varHuidig, var[varHuidig]);

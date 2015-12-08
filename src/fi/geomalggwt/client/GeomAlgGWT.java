@@ -222,8 +222,8 @@ boolean touchStart = false;
 		
 		paint();
 */
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 			
 	}
@@ -261,9 +261,10 @@ boolean touchStart = false;
 		
 		directBox = new CheckBox();
 		directBox.setText("direct samenvoegen");
+		directBox.addStyleName(geomAlgGWTCss.pushbutton());
 		bottomPanel.add(directBox);
-		bottomPanel.setWidgetLeftWidth(directBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
-		bottomPanel.setWidgetTopHeight(directBox, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+				bottomPanel.setWidgetLeftWidth(directBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(directBox, currentY + 3, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 
 		//directBox.addTouchStartHandler(new PushTouchStartHandler());
 		
@@ -755,6 +756,9 @@ boolean touchStart = false;
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 					 Map<String, Number> values) 
 	{
+		
+logger.info("GeomAlgGWT init");
+
 		this.breedte = width;
 		this.hoogte = height;
 		
@@ -787,11 +791,11 @@ boolean touchStart = false;
 		Map<String,Object> stateHM = new HashMap<String,Object>();
 		if (launchState.containsKey("stateHM"))
 		{	stateHM = launchState.getMap("stateHM");
-//testString += " found";		
+//logger.info("stateHM found " + stateHM.isEmpty());		
 		}
 		else
 		{
-//testString += " not found";
+//logger.info("stateHM !found");
 		}
 		
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
@@ -874,6 +878,11 @@ boolean touchStart = false;
 		}
 		
 		State state = NoSer.setStateState(stateHM);
+//if (state == null)		
+//	logger.info("state null");
+//else
+//	logger.info("state not null");
+
 		av.setState(state);		
 		av.docentState = new State(av.aantalFg, av.fg, av.var);
 		
@@ -913,14 +922,12 @@ boolean touchStart = false;
 
 	@Override
 	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+		return hoogte;
 	}
 
 	@Override
 	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+		return breedte;
 	}
 
 	@Override

@@ -335,8 +335,14 @@ public class NoSer
 		
 		int aantalFg = 0;
 		if (h.containsKey("aantalFg"))
-			aantalFg = h.getInt("aantalFg");
+		{	aantalFg = h.getInt("aantalFg");
+//GeomAlgGWT.logger.info("contains " + aantalFg);			
 			//aantalFg = ((Integer) h.get("aantalFg")).intValue();
+		}
+		else
+		{
+//GeomAlgGWT.logger.info("!contains aantalFg");			
+		}
 
 		List<Map<String,Object>> figurenHash = new ArrayList<Map<String,Object>>();
 	
@@ -344,7 +350,13 @@ public class NoSer
 //VERANDEREN???		
 		//ObjectList figurenHash = h.getObjectList("figurenrij");
 		if (h.containsKey("figurenrij"))
-			figurenHash = h.getMapList("figurenrij");
+		{	figurenHash = h.getMapList("figurenrij");
+//GeomAlgGWT.logger.info("contains figurenrij");		
+		}
+		else
+		{
+//GeomAlgGWT.logger.info("!contains figurenrij");			
+		}
 		Figuur[] figurenrij = new Figuur[aantalFg];
 		for (int i = 0; i < aantalFg; i++)
 		{	figurenrij[i] = setFiguurState2( figurenHash.get(i));
