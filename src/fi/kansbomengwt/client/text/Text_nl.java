@@ -2,11 +2,16 @@ package fi.kansbomengwt.client.text;
 
 import java.util.Vector;
 
+import com.google.gwt.core.shared.GWT;
+
 public class Text_nl {
 	
-			private Vector<String> keys = new Vector<String>();
+		private Vector<String> keys = new Vector<String>();
 		private Vector<String> values = new Vector<String>();
 
+		public final TextConstants constants = GWT.create(TextConstants.class);
+		
+		
 		public Text_nl()
 		{
 			Object[][] items = this.getContents();
@@ -22,10 +27,12 @@ public class Text_nl {
 			return contents;
 		}
 
+@Deprecated
 		public String getString(String key)
 		{
-			int keyint = keys.indexOf(key);
-			return values.get(keyint);
+//			int keyint = keys.indexOf(key);
+//			return values.get(keyint);
+			return constants.getString(key);
 		}
 
 		static final Object[][] contents =

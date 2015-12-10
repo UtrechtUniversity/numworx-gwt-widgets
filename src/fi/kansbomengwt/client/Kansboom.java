@@ -50,7 +50,7 @@ public class Kansboom {
 	boolean breukOnder = false;
 	String volgordeString;
 	String[] letter = {"b","g","r","c","o","m"};
-	String trekkingTekst = KansbomenGWT.rb.getString("trekkingBalkTekst");
+	String trekkingTekst = KansbomenGWT.rb.constants.trekkingBalkTekst();
 	
 	CssColor backgroundColor = CssColor.make("white");
 	
@@ -570,7 +570,7 @@ public class Kansboom {
 		
 		
 		for(int i=0; i<n; i++)
-		{	TextMetrics tm = gIm.measureText(KansbomenGWT.rb.getString("trekkingBalkTekst")+" "+(i+1));
+		{	TextMetrics tm = gIm.measureText(KansbomenGWT.rb.constants.trekkingBalkTekst()+" "+(i+1));
 			double width = tm.getWidth();
 			xpos = (2*i+1) * breedteKolom / 2 - width/2;
 			ypos = rijhoogte;

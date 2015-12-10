@@ -20,6 +20,14 @@
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' /> 
   <add-linker name='xsiframe' />
+  <extend-property name="locale" values="en"/>
+  <extend-property name="locale" values="es"/> 	
+<!-- TODO other languages -->
+<!--     <extend-property name="locale" values="de"/> 	 -->
+<!--     <extend-property name="locale" values="fr"/> 	 -->
+<!--     <extend-property name="locale" values="gr"/> 	 -->
+<!-- insert if nl is not the default language -->
+<!--     <extend-property name="locale" values="nl"/> 	 -->
   
 
   <!-- Specify the app entry point class.                         -->
