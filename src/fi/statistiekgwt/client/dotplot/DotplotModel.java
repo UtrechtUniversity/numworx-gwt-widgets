@@ -83,6 +83,7 @@ public class DotplotModel
 		splitBoundaries.add(100.0);
 		this.splitOptions.setBinBoundaries(splitBoundaries);
 		this.scatterplotMode = scatterplotMode;
+		this.optimizeScaleX = true;
 	}
 
 	/**
