@@ -44,6 +44,8 @@ public class DotplotController implements StatistiekView
 	{
 		this.model = new DotplotModel(tableModel, viewName, false);
 		model.setColumnXIndex(startVar);
+		model.initializeMinXOnScale();
+		model.initializeMaxXOnScale();
 		
 		// set size
 		this.setWidth(width);
@@ -68,6 +70,8 @@ public class DotplotController implements StatistiekView
 		this.model = new DotplotModel(tableModel, viewName, true);
 		model.setColumnXIndex(startVar1);
 		model.setColumnYIndex(startVar2);
+		model.initializeMinXOnScale();
+		model.initializeMaxXOnScale();
 
 		// set size
 		this.setWidth(width);
