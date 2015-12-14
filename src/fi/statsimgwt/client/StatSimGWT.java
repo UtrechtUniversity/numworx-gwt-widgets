@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -20,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import fi.statsimgwt.client.Munten.Experiment;
 
-public class StatSimGWT implements EntryPoint, InteractionView {
+public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub {
 	
 	int breedte;
 	int hoogte;
@@ -59,11 +61,15 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	
 	public void onModuleLoad() {
 
-			 munten=new Munten(true, true, true, true, true);
+			munten=new Munten(true, true, true, true, true);
 			
 			//Dobbelstenen dobbelstenen = new Dobbelstenen();
            // BinomTrekking binomtrekking = new BinomTrekking();
-			RootPanel.get("dockholder").add(asWidget());
+		//Window.alert("test");	
+		RootPanel.get("dockholder").add(asWidget());
+		//RootPanel.get("dockholder").getElement().setInnerText("textand");
+			//Stub.publish(this);
+			
 	}
 	
 	public StatSimGWT()
@@ -81,6 +87,7 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			hoogte = h.getInt("hoogte");
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
+
 
 		ObjectMap l=JSONUtilities.wrapMap(launchState);
 		
@@ -204,6 +211,8 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 			steekproef.sigmaText.setText(steekproefSigma);
 			
 		}
+		
+		
 	}
 
 	@Override
@@ -746,5 +755,11 @@ public class StatSimGWT implements EntryPoint, InteractionView {
 	public void zetVolledigeBreedte(int breedte) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void init(int width, int height, Map<String, Object> launchData,
+			Map<String, Number> values) {
+		// TODO Auto-generated method stub
 	}
 }
