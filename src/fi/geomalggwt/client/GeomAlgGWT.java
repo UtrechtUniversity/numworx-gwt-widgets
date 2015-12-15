@@ -1,7 +1,9 @@
 package fi.geomalggwt.client;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -50,8 +52,16 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import fi.geomalggwt.client.expressies.Algebra;
+import fi.geomalggwt.client.expressies.Expressie;
+import fi.geomalggwt.client.formuleobjects.FormuleParser;
+
+
+
 public class GeomAlgGWT implements EntryPoint, InteractionStub
 {
+	public static String language = "nl";
+	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -100,9 +110,26 @@ public class GeomAlgGWT implements EntryPoint, InteractionStub
 	boolean negatieveWaarden = true;
 	boolean puzzelen = false;
 
-	ImageResource resetResource;
-	Image resetImage;
+	ImageResource resetResource, foutKruisResource, goedKrulResource, goedKrulHalfResource;
+	Image resetImage, foutKruisImage, goedKrulImage, goedKrulHalfImage;
 	PushButton resetButton;
+	
+	boolean kijkNaActief = false;
+	PushButton kijkNaButton;
+	LayoutPanel kijkNaPanel;
+	int scoreMax = 10;
+	int score = 0;
+	Boolean correct = null;
+	boolean ingevuld = false;
+	boolean nagekeken = false;
+	boolean equivalent = true;
+	String antwoordFormuleStringCorrect = "";
+	
+	private int mode;
+	private OpdrNavIF comRoot;
+	
+	boolean settingState = false;
+
 	
 int testY = hoogte / 2; 
 
@@ -114,6 +141,15 @@ boolean touchStart = false;
 		geomAlgGWTCss = geomAlgGWTClientBundle.getGeomAlgGWTCSS();
 		geomAlgGWTCss.ensureInjected();
 		
+		foutKruisResource = geomAlgGWTClientBundle.foutKruisResource();
+		foutKruisImage = new Image(foutKruisResource);
+
+		goedKrulResource = geomAlgGWTClientBundle.goedKrulResource();
+		goedKrulImage = new Image(goedKrulResource);
+
+		goedKrulHalfResource = geomAlgGWTClientBundle.goedKrulHalfResource();
+		goedKrulHalfImage = new Image(goedKrulHalfResource);
+
 		resetResource = geomAlgGWTClientBundle.resetResource();
 		resetImage = new Image(resetResource);
 		resetImage.addStyleName(geomAlgGWTCss.pushimage());
@@ -131,99 +167,8 @@ boolean touchStart = false;
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(geomAlgGWTCss.root());
 
-/*		
-		bottomPanel = new LayoutPanel();
-		bottomPanel.addStyleName(geomAlgGWTCss.bottom());
-
-		int canvasBreedte = breedte;
-		int canvasHoogte = hoogte;
-		
-		if (constructieTools)
-		{	dlp.addSouth(bottomPanel, bottomHeight);
-			canvasHoogte -= bottomHeight;
-		}
-		
-		canvasPanel = new LayoutPanel();
-		dlp.add(canvasPanel);
-		
-		geomAlgGWTCanvas = Canvas.createIfSupported();
-		geomAlgGWTCanvas.setWidth(canvasBreedte + "px");
-		geomAlgGWTCanvas.setHeight(canvasHoogte + "px");
-		geomAlgGWTCanvas.setCoordinateSpaceWidth(canvasBreedte);
-		geomAlgGWTCanvas.setCoordinateSpaceHeight(canvasHoogte);
-		geomAlgGWTCanvas.addStyleName("canvas");
-		
-		if (geomAlgGWTCanvas == null) 
-		{   RootPanel.get(holderId).add(new Label(upgradeMessage));
-	        return;
-	    }
-		
-		//dlp.add(geomAlgGWTCanvas);
-		
-		canvasPanel.add(geomAlgGWTCanvas);
-		canvasPanel.setWidgetLeftWidth(geomAlgGWTCanvas, 0, Style.Unit.PX, canvasBreedte, Style.Unit.PX);
-		canvasPanel.setWidgetTopHeight(geomAlgGWTCanvas, 0, Style.Unit.PX, canvasHoogte, Style.Unit.PX);
-		
-		resetButton = new PushButton(resetImage);
-		
-		if (!constructieTools)
-		{
-			resetButton = new PushButton(resetImage);
-			
-			canvasPanel.add(resetButton);
-			canvasPanel.setWidgetLeftWidth(resetButton, canvasBreedte - leftOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(resetButton, canvasHoogte - topOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
-		
-			resetButton.addClickHandler(new PushClickHandler());
-		}
-
-	
-		
-		geomAlgGWTContext2d = geomAlgGWTCanvas.getContext2d();
-		
-		av = new AlgebraVeld(breedte, hoogte, geomAlgGWTContext2d, this);
-		av.zetVarWaardeZichtbaar(varWaardeZichtbaar);
-		av.zetOppWaardeZichtbaar(oppWaardeZichtbaar);
-		av.zetFormuleZichtbaar(formuleZichtbaar);
-		av.zetConstructieTools(constructieTools);
-		av.zetAlleenOppervlaktes(alleenOppervlaktes);
-		av.zetWerkBlad(werkblad);
-		av.zetOppervlaktesZichtbaar(oppervlaktesZichtbaar);
-		av.zetLengtesBreedtesZichtbaar(lengtesBreedtesZichtbaar);
-		av.zetNegatieveWaarden(negatieveWaarden);
-		av.zetPuzzelen(puzzelen);
-		
-		av.setSize(breedte, hoogte);
-		
-		Figuur.zetGeslotenVeld(!constructieTools || alleenOppervlaktes);
-		Figuur.zetVeldSizes(breedte, hoogte);
-		
-		if (constructieTools)
-		{
-			lineaalVer = new LineaalVer(hoogte, geomAlgGWTContext2d);
-			lineaalVer.zetNegatieveWaarden(negatieveWaarden);
-			
-			lineaalHor = new LineaalHor(breedte, hoogte, geomAlgGWTContext2d);
-			lineaalHor.zetNegatieveWaarden(negatieveWaarden);
-			
-		}
-		
-		MouseHandler mouseHandler = new MouseHandler();
-		geomAlgGWTCanvas.addMouseDownHandler(mouseHandler);
-		geomAlgGWTCanvas.addMouseMoveHandler(mouseHandler);
-		geomAlgGWTCanvas.addMouseUpHandler(mouseHandler);
-	  
-	  	TouchHandler touchHandler = new TouchHandler();
-	  	geomAlgGWTCanvas.addTouchStartHandler(touchHandler);
-	  	geomAlgGWTCanvas.addTouchMoveHandler(touchHandler);
-	  	geomAlgGWTCanvas.addTouchEndHandler(touchHandler);
-		
-		makeBottom();
-		
-		paint();
-*/
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 			
 	}
@@ -662,6 +607,10 @@ boolean touchStart = false;
 			{
 				av.reset();
 			}
+			if (e.getSource() == kijkNaButton)
+			{
+				kijkNa();
+			}
 			
 		}
 	}
@@ -720,37 +669,221 @@ boolean touchStart = false;
 	{
 		State state = av.getStateState();
 		HashMap stateHM = (HashMap) NoSer.getStateState(state);
+		stateHM.put("nagekeken", new Boolean(nagekeken));
+		stateHM.put("ingevuld", new Boolean(ingevuld));
 		return stateHM;
 	}
 
 	public void setState(HashMap<String, Object> h)
 	{
+		settingState = true;
 		State state = NoSer.setStateState(h);
 		av.setState(state);
 		paint();
+		settingState = false;
+		
+		
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		if (h.containsKey("ingevuld"))
+			ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+
+		if (ingevuld && (mode == 0 || nagekeken))
+			//if (nagekeken)
+		{		
+logger.info("pre kijkNa");			
+			kijkNa();
+logger.info("post kijkNa");		
+		}
+
 	}
 
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return score;
 	}
 
-	@Override
 	public Boolean isCorrect()
 	{
-		return Boolean.TRUE;
+		if (kijkNaActief)
+			return correct;
+		else
+			return new Boolean(true);
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// TODO Auto-generated method stub
+		
+logger.info("GeomAlgGWT setComRoot");
+
+		this.comRoot = comRoot;
+		zetMode(comRoot.getMode());
 
 	}
 
+	public void zetMode(int mode)
+	{	this.mode = mode;
+		if (kijkNaActief)    
+			kijkNaActief = (mode == 0 || mode == 1);
+	}
+
+	public int getMode()
+	{
+		return mode;
+	}
 	
+	public void changed()
+	{
+		if (kijkNaActief && !settingState)
+		{
+logger.info("changed");
+
+			kijkNaPanel.setWidgetVisible(goedKrulImage, false);
+    		kijkNaPanel.setWidgetVisible(goedKrulHalfImage, false);
+    		kijkNaPanel.setWidgetVisible(foutKruisImage, false);
+    		
+    		score = 0; 
+    		correct = null;
+    		nagekeken = false;
+    		
+    		if (comRoot != null)
+    			comRoot.setChanged(true);
+    		
+    		
+		}
+	}
+	
+    public void kijkNa()
+    {
+    	
+//System.out.println("kijkNa");
+
+    	if (!kijkNaActief)
+    	{	
+//System.out.println("!kijkNaActief");    		
+    		return;
+    	
+    	}
+    	
+    	ingevuld = av.aantalFg > 0;
+    	
+    	if (!ingevuld)
+    	{	
+//System.out.println("!ingevuld");    		
+    		return;
+    	
+    	}
+    	
+    	if (antwoordFormuleStringCorrect.equals(""))
+    	{
+//System.out.println("afs = ");    		
+    		return;
+    	}
+    	
+
+    	String formule = av.formule;
+		if ((formule.length() > 1) && (formule.charAt(0) == '(') && (formule.charAt(formule.length() - 1) == ')'))
+		{
+			formule = formule.substring(1);
+			formule = formule.substring(0, formule.length() - 1);
+		}
+				
+    	
+    	String antwoordFormuleStringCorrected = "$f" + antwoordFormuleStringCorrect + "@";
+    	String leerlingExpressieString = "$f" + formule + "@";
+    	if (leerlingExpressieString.equals(""))
+    	{
+//System.out.println("les = ");    		
+    		return;
+    	}
+    	else
+    	{
+//System.out.println("lesstr = " + leerlingExpressieString);    		
+    	}
+    	
+    	Expressie antwoordExpressie = FormuleParser.geefExpressie(antwoordFormuleStringCorrected);
+    	Expressie leerlingExpressie = FormuleParser.geefExpressie(leerlingExpressieString);
+    	
+    	
+    	
+    	if (antwoordExpressie == null || leerlingExpressie == null)
+    	{	
+    		if (leerlingExpressie == null)
+    		{
+//System.out.println("les = null");
+    		}
+    		if (antwoordExpressie == null)
+    		{
+//System.out.println("aes = null");
+    		}
+    		
+    		return;
+    	
+    	}
+    	
+    	boolean goed = false;
+    	boolean halfGoed = false;
+    	if (equivalent && Algebra.isGelijkwaardig(antwoordExpressie, leerlingExpressie))
+    	{	goed = true;
+    	}
+    	if (!equivalent && Algebra.zijnGelijk(antwoordExpressie, leerlingExpressie))
+    	{	goed = true;
+    	}
+    	if (!equivalent && Algebra.isGelijkwaardig(antwoordExpressie, leerlingExpressie))
+    	{	halfGoed = true;
+    	}
+    	
+    	if (goed)
+    	{
+//System.out.println("goed");
+
+    		score = scoreMax;
+    		//groenVinkjeLabel.setVisible(true);
+    		//geelVinkjeLabel.setVisible(false);
+    		//kruisjeLabel.setVisible(false);
+    		kijkNaPanel.setWidgetVisible(goedKrulImage, true);
+    		kijkNaPanel.setWidgetVisible(goedKrulHalfImage, false);
+    		kijkNaPanel.setWidgetVisible(foutKruisImage, false);
+    		correct = new Boolean(true);
+    	}
+    	else if (halfGoed)
+    	{
+    		score = scoreMax / 2;
+    		//groenVinkjeLabel.setVisible(false);
+    		//geelVinkjeLabel.setVisible(true);
+    		//kruisjeLabel.setVisible(false);
+    		kijkNaPanel.setWidgetVisible(goedKrulImage, false);
+    		kijkNaPanel.setWidgetVisible(goedKrulHalfImage, true);
+    		kijkNaPanel.setWidgetVisible(foutKruisImage, false);
+    		
+    		correct = new Boolean(false);
+    	}
+    	else 
+    	{
+//System.out.println("niet goed");    		
+    		score = 0;
+    		//groenVinkjeLabel.setVisible(false);
+    		//geelVinkjeLabel.setVisible(false);
+    		//kruisjeLabel.setVisible(true);
+    		kijkNaPanel.setWidgetVisible(goedKrulImage, false);
+    		kijkNaPanel.setWidgetVisible(goedKrulHalfImage, false);
+    		kijkNaPanel.setWidgetVisible(foutKruisImage, true);
+    		
+    		correct = new Boolean(false);
+    	}
+    	nagekeken = true;
+    	ingevuld = true;
+    	
+    	
+logger.info("isCorrect" + isCorrect());    	
+    	
+	comRoot.setChanged(isCorrect().booleanValue());
+    	
+    }
+
 	
 	@Override
 	public void init(int width, int height, Map<String, Object> map, //launchState,
@@ -788,6 +921,16 @@ logger.info("GeomAlgGWT init");
 		if (launchState.containsKey("puzzelen"))
 			puzzelen = launchState.getBoolean("puzzelen");
 
+		if (launchState.containsKey("kijkNaActief"))
+			kijkNaActief = launchState.getBoolean("kijkNaActief");
+		if (launchState.containsKey("equivalent"))
+			equivalent = launchState.getBoolean("equivalent");
+		if (launchState.containsKey("antwoordFormuleStringCorrect"))
+			antwoordFormuleStringCorrect = launchState.getString("antwoordFormuleStringCorrect");
+		if (launchState.containsKey("scoreMax"))
+			scoreMax = launchState.getInt("scoreMax");
+		
+		
 		Map<String,Object> stateHM = new HashMap<String,Object>();
 		if (launchState.containsKey("stateHM"))
 		{	stateHM = launchState.getMap("stateHM");
@@ -842,6 +985,38 @@ logger.info("GeomAlgGWT init");
 			canvasPanel.setWidgetTopHeight(resetButton, canvasHoogte - topOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
 		
 			resetButton.addClickHandler(new PushClickHandler());
+		}
+		
+		if (kijkNaActief)
+		{
+			kijkNaPanel = new LayoutPanel();
+			canvasPanel.add(kijkNaPanel);
+			kijkNaButton = new PushButton("Kijk Na");
+			kijkNaButton.addStyleName(geomAlgGWTCss.pushbutton());
+			kijkNaPanel.add(kijkNaButton);
+			kijkNaPanel.add(goedKrulImage);
+			kijkNaPanel.add(goedKrulHalfImage);
+			kijkNaPanel.add(foutKruisImage);
+			kijkNaButton.addClickHandler(new PushClickHandler());
+			
+			canvasPanel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 120, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaPanel, canvasHoogte - 60, Style.Unit.PX, 25, Style.Unit.PX);
+			
+			kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
+			kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 20, Style.Unit.PX);
+			
+			kijkNaPanel.setWidgetLeftWidth(goedKrulImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetTopHeight(goedKrulImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(goedKrulHalfImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetTopHeight(goedKrulHalfImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(foutKruisImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetTopHeight(foutKruisImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
+		
+			kijkNaPanel.setWidgetVisible(goedKrulImage, false);
+			kijkNaPanel.setWidgetVisible(goedKrulHalfImage, false);
+			kijkNaPanel.setWidgetVisible(foutKruisImage, false);
+	
+
 		}
 		
 //		dlp.add(geomAlgGWTCanvas);
@@ -903,12 +1078,6 @@ logger.info("GeomAlgGWT init");
 	}
 
 	@Override
-	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void zetVolledigeBreedte(int breedte) {
 		// TODO Auto-generated method stub
 		
@@ -938,6 +1107,8 @@ logger.info("GeomAlgGWT init");
 	
 	//@Override
 	public void zetNagekeken(boolean b) {
+		if (ingevuld)
+			nagekeken = b;
 	}
 
 	

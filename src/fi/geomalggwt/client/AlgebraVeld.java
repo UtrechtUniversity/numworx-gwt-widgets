@@ -497,7 +497,8 @@ gIm.setFillStyle(CssColor.make(255, 0, 0));
 		
 		if (maakLos)
 		{	//gIm.drawString(GeomAlgebra.rb.getString("menuMLLabel"), cursorx, cursory + 30);
-			gIm.fillText("Maak los", cursorx, cursory + 30);
+//GWT geen cursorx			
+			gIm.fillText("Maak los", 50, 50);
 		}
 	}
 	
@@ -812,9 +813,9 @@ gIm.setFillStyle(CssColor.make(255, 0, 0));
 			}
 		}
 
-//GWT		
-//		if (!formule.equals(oudeFormule))
-//			fireChangeEvent();
+
+		if (!formule.equals(oudeFormule))
+			owner.changed();
 		
 	}
 	void tekenVarPunt()

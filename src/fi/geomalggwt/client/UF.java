@@ -1,7 +1,7 @@
 package fi.geomalggwt.client;
 
 // universal formatter
-class UF
+public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)
     public static String format(double val, int decs)
