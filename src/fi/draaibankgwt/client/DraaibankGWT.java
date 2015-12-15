@@ -36,8 +36,12 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
+import fi.draaibankgwt.client.text.Text;
+
 public class DraaibankGWT implements EntryPoint, InteractionStub 
 {
+	public static Text rb;
+	
 	private static Logger logger = Logger.getLogger("DraaibankGWT");
 	
     static final String holderId = "dockholder";
@@ -80,6 +84,8 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	
 	public void getImages()
 	{
+		rb = GWT.create(Text.class);
+		
 		draaibankGWTClientBundle = GWT.create(DraaibankGWTClientBundle.class);
 		draaibankGWTCssResource = draaibankGWTClientBundle.getDraaibankGWTCssResource();
 		draaibankGWTCssResource.ensureInjected();
@@ -147,7 +153,9 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		int currentX = 185;
 		int currentY = hoogte - topOffset - buttonHeight; 
 		
-		terugButton = new PushButton("terug");
+		//terugButton = new PushButton("terug");
+		terugButton = new PushButton(rb.terugKnopLabel());
+//logger.info(terugButton.getText());		
 		terugButton.addStyleName(draaibankGWTCssResource.pushbutton());
 		canvasPanel.add(terugButton);
 		canvasPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth + 5, Style.Unit.PX);
@@ -157,10 +165,12 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 		
 		currentX += buttonWidth + 3 * leftOffset;		
 
-		wisButton = new PushButton("wis");
+		//wisButton = new PushButton("wis");
+		wisButton = new PushButton(rb.wisKnopLabel());
+//logger.info(wisButton.getText());
 		wisButton.addStyleName(draaibankGWTCssResource.pushbutton());
 		canvasPanel.add(wisButton);
-		canvasPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
+		canvasPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth + 2, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(wisButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 		wisButton.addClickHandler(new PushClickHandler());
