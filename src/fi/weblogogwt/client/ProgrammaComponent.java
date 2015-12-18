@@ -144,7 +144,8 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 
 	public void addCComponent(CommandComponent cc)
 	{	
-		commandBlock.addCComponent(cc);
+		//commandBlock.addCComponent(cc);
+		commandBlock.addCCompAtBottom(cc);
 	}
 	
 	/**

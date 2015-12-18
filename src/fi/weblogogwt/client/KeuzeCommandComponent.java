@@ -178,11 +178,13 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	{	
 		if ( inIfBlock )
 		{
-			ifBlock.addCComponent(cc);					
+			//ifBlock.addCComponent(cc);
+			ifBlock.addCCompAtBottom(cc);
 		} 
 		else
 		{	
-			elseBlock.addCComponent(cc);		
+			//elseBlock.addCComponent(cc);
+			elseBlock.addCCompAtBottom(cc);
 		}
 	}
 	
@@ -502,7 +504,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 				}
 			}
 		}
-		else
+		else if (elseBlock != null)
 		{	for(int j=0 ; j<elseBlock.getComponentCount() ; j++)
 			{	Object c = elseBlock.getComponent(j);
 				if(c instanceof CommandComponent)

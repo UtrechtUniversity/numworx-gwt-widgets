@@ -390,7 +390,8 @@ public class Tekenblad extends Uitvoerblad
 	{	
 		//gIm.setFont(JavaLogoWeb.defaultfont);
 		gIm.setFont(WebLogoGWT.fontString);
-		gIm.setFillStyle(CssColor.make(0,0,0));
+		//gIm.setFillStyle(CssColor.make(0,0,0));
+		gIm.setFillStyle(penkleur);
 		//gIm.drawString(s, consoleX, consoleY);
 		gIm.fillText(s, consoleX, consoleY);
 	}

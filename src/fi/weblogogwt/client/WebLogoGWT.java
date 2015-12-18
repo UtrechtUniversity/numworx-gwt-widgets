@@ -52,8 +52,13 @@ import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.logotekenap.Tekenblad;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
+import java.util.logging.Logger;
+
 public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	// logger
+    static Logger logger = Logger.getLogger("WebLogoGWT");
+
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -74,20 +79,24 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 
 	static int jlsBreedteKlein = 390;
 	static int jlsBreedteGroot = 620;
+	
 	int offSet = 4;
-	int breedteGroot = 930;
+	int leftOffset = 5;
+	int topOffset = 5;
+	
+	int breedteGroot = 784; //784 is maximale breedte in popupFacade;
 	int breedteKlein = 700;
-	int breedte = 930;
+	int breedte = 784;
 	int hoogte = 575;
 	int bottomHeight = 32;
 	int jlsHoogte = hoogte - bottomHeight - offSet;
 	int ubxKlein = jlsBreedteKlein + 2 * offSet; //programmaVeldZichtbaar ? scheidingX+5 : 5;
 	int ubxGroot = jlsBreedteGroot + 2 * offSet;
 	int uby = offSet;
-	int ubb = breedteKlein - jlsBreedteKlein - 3 * offSet; //getWidth()-(programmaVeldZichtbaar ? scheidingX+10 : 10);
+	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; //getWidth()-(programmaVeldZichtbaar ? scheidingX+10 : 10);
+	int ubbGroot = breedteGroot - jlsBreedteGroot - 3 * offSet;
+	int ubb = 0;
 	int ubh = jlsHoogte; //programmaVeldZichtbaar ? getHeight()-77 : getHeight()-10;
-	int leftOffset = 5;
-	int topOffset = 5;
 	
 	public static String fontString = "12px sans-serif";
 	public static String boldFontString = "bold 12px sans-serif";
@@ -109,7 +118,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	boolean traceZichtbaar = true;
 	boolean codeIOZichtbaar = false; //true;
 	
-	Map state = null;
+	HashMap state = null;
 
 	boolean traceAan = false;
 	
@@ -138,11 +147,15 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	}	
 	public void onModuleLoad() 
 	{
+		
+logger.info("WebLogoGWT onModuleLoad");		
+		
 		getImages();
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(webLogoGWTCssResource.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
 
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(webLogoGWTCssResource.root());
@@ -162,6 +175,9 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	public WebLogoGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
+		
+logger.info("WebLogoGWT constructor");
+
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
 		this.randomVarNamen = randomVarNamen;
@@ -189,10 +205,13 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 
 	public void init(int width, int height, Map<String,Object> map, Map<String,Number> values) 
 	{
-			this.breedte = width;
-			this.hoogte = height;
+		
+logger.info("WebLogoGWT uncompiled init");
+
+			//this.breedte = width;
+			//this.hoogte = height;
 			
-			dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+			//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 			
 			//this.launchState = launchState;
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
@@ -217,10 +236,49 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 				codeIOZichtbaar = launchState.getBoolean("codeIOZichtbaar");			
 			
 			if (launchState != null && launchState.containsKey("state")) 
-				state = launchState.getMap("state");
+				state = (HashMap) launchState.getMap("state");
+			
+			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar)
+			{
+				if (deeltakenZichtbaar)
+				{
+					this.breedte = breedteGroot;
+					ubb = ubbGroot;
+logger.info("bg = " + breedte);
+logger.info("ubb = " + ubb);
+				}
+				else
+				{
+					this.breedte = breedteKlein;
+					ubb = ubbKlein;
+				}
+				// hoogte is al gezet
+			}
+			else if (!uitvoerVeldZichtbaar && programmaVeldZichtbaar)
+			{
+				if (deeltakenZichtbaar)
+				{
+					this.breedte = jlsBreedteGroot + 2 * offSet;
+				}
+				else
+				{
+					this.breedte = jlsBreedteKlein + 2 * offSet;
+				}
+				
+				// hoogte is al gezet
+			}
+			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
+			{
+				this.breedte = width;
+				this.hoogte = height;
+				ubb = this.breedte;
+				ubh = this.hoogte;
+				
+			}
+			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			
 			webLogoPanel = new LayoutPanel();
-			webLogoPanel.setSize("" + breedte + "px", "" + hoogte + "px");
+			webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
 			
 			uitvoerblad = new Tekenblad(this,ubb,ubh);
@@ -233,17 +291,26 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			
 			uitvoerblad.initContext2d();
 			
+			
 			webLogoPanel.add(uitvoerblad);
-			if (deeltakenZichtbaar)
+			if (!uitvoerVeldZichtbaar)
+				webLogoPanel.setWidgetVisible(uitvoerblad,false);
+			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && deeltakenZichtbaar)
 			{	
 				webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxGroot, Style.Unit.PX, ubb, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
 			}
-			else
+			else if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && !deeltakenZichtbaar)
 			{
 				webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxKlein, Style.Unit.PX, ubb, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
 			}
+			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
+			{
+				webLogoPanel.setWidgetLeftWidth(uitvoerblad, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+				webLogoPanel.setWidgetTopHeight(uitvoerblad, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+			}
+			
 			
 			if (deeltakenZichtbaar)
 				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteGroot,jlsHoogte,uitvoerblad);
@@ -260,17 +327,19 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			jlsVeld.initContext2d();
 			jlsVeld.initialize();
 
-			webLogoPanel.add(jlsVeld);
-			if (deeltakenZichtbaar)
-			{	webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteGroot, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
-			}	
-			else
-			{
-				webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteKlein, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
+			if (programmaVeldZichtbaar)
+			{	
+				webLogoPanel.add(jlsVeld);
+				if (deeltakenZichtbaar)
+				{	webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteGroot, Style.Unit.PX);
+					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
+				}	
+				else
+				{
+					webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteKlein, Style.Unit.PX);
+					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
+				}
 			}
-			
 			jlsVeld.zetDeeltaken(deeltakenZichtbaar);
 			jlsVeld.zetWhileLoopZichtbaar(whileLoopZichtbaar);
 			jlsVeld.zetKeuzeCommandZichtbaar(keuzeCommandZichtbaar);
@@ -285,16 +354,23 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 			
 			makeBottom();
 			
-			webLogoPanel.add(bottomPanel);
-			webLogoPanel.setWidgetLeftWidth(bottomPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-			webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte-bottomHeight, Style.Unit.PX, bottomHeight, Style.Unit.PX);
-
+			if (programmaVeldZichtbaar)
+			{	
+				webLogoPanel.add(bottomPanel);
+				webLogoPanel.setWidgetLeftWidth(bottomPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+				webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte-bottomHeight, Style.Unit.PX, bottomHeight, Style.Unit.PX);
+			}
 			
 			
 			dlp.add(webLogoPanel);
 			
 			jlsVeld.paint();
 			uitvoerblad.initializeDrawing(false);
+
+			if (state != null)
+				setState(state);
+			
+			jlsVeld.paint();			
 			
 			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;
 			vartracerHeight = 515;
@@ -442,6 +518,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 				if ((jlsVeld.paramEditor != null) && jlsVeld.paramEditor.isVisible())
 					jlsVeld.paramEditor.owner.parameterEdited(jlsVeld.paramEditor.getText());	
 				uitvoerblad.paintDrawing(false);
+				jlsVeld.paint();
 			} 
 			else if (e.getSource() == traceAanKnop)
 			{
@@ -491,6 +568,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 				bottomPanel.setWidgetVisible(methodeLabel, false);
 				
 				showVariables.setValue(false);
+				trb.setVartracing(false);
 				
 				trb.traceUitAction();
 				
@@ -537,7 +615,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	public HashMap<String, Object> getState()
 	{
 		
-System.out.println("getState");
+logger.info("getState");
 
 		HashMap<String, Object> h = new HashMap<String, Object>();
 		
@@ -545,6 +623,8 @@ System.out.println("getState");
 		//int scheidingX = 615;
 	
 		code = jlsVeld.getCode();
+		
+//logger.info("code = " + code);		
 		//scheidingX = this.scheidingX;
 		HashMap<String,Object> inputVars = jlsVeld.getInputVars();
 		 
@@ -560,7 +640,7 @@ System.out.println("getState");
 	public void setState(HashMap<String, Object> h)
 	{
 		
-System.out.println("setState");
+logger.info("setState");
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		
@@ -570,6 +650,9 @@ System.out.println("setState");
 		
 		if (map.containsKey("code")) 
 			code = map.getString("code");
+		
+//logger.info("code = " + code);
+
 		//if(h.containsKey("scheidingX")) scheidingX = ((Integer)h.get("scheidingX")).intValue();
 		if (map.containsKey("inputVars")) 
 			inputVars = (HashMap) map.getMap("inputVars");
@@ -579,7 +662,8 @@ System.out.println("setState");
 		jlsVeld.importeer(code);
 		//this.scheidingX = scheidingX;
 		//setBounds(getBounds());
-		
+		jlsVeld.paint();
+		uitvoerblad.paintDrawing(false);
 	}
 
 	@Override
@@ -605,6 +689,7 @@ System.out.println("setState");
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
+logger.info("WebLogoGWT setComRoot");		
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 
@@ -628,15 +713,15 @@ System.out.println("setState");
 	}
 
 	@Override
-	public int getHeight() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getHeight() 
+	{
+		return hoogte;
 	}
 
 	@Override
-	public int getWidth() {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getWidth() 
+	{
+		return breedte;
 	}
 
 	@Override

@@ -353,13 +353,13 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 			TextMetrics tm = g.measureText(getCommandName() + strOpen +  getFullParameterText() + strClose);
 			int textWidth = (int) Math.round(tm.getWidth());
 			if (textWidth > breedte - 10)
-			{	tm = g.measureText(commandName);
+			{	tm = g.measureText(getCommandName());
 				textWidth = (int) Math.round(tm.getWidth()); 
 				if (textWidth > breedte - 10)
-				{	g.fillText(commandName.substring(0,1),xPos+10,yPos+18);
+				{	g.fillText(getCommandName().substring(0,1),xPos+10,yPos+18);
 				}
 				else
-					g.fillText(commandName,xPos+10,yPos+18);
+					g.fillText(getCommandName(),xPos+10,yPos+18);
 			}
 			else
 				g.fillText(getCommandName() + strOpen +  getFullParameterText() + strClose,xPos+10, yPos+18);

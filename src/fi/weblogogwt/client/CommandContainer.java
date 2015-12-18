@@ -162,11 +162,21 @@ public class CommandContainer // extends JPanel
 		//super.add(cc, insertPos);
 		add(cc, insertPos);
 		 
-//System.out.println("CCont addCC" + getComponentCount());		
+//WebLogoGWT.logger.info("CCont addCC " + cc.commandName + " at " + insertPos);
+
 		cc.parent = this;
 		reArrange();
 	}
 
+	public void addCCompAtBottom(CommandComponent cc)
+	{
+		cc.setBounds(xPos,yPos, getSize().width, cc.getSize().height);
+		components.addElement(cc);
+		
+//WebLogoGWT.logger.info("CCont addCC " + cc.commandName + " at bottom");		
+		cc.parent = this;
+		reArrange();
+	}
 	public CommandComponent findCComponentAt(int x, int y, CommandComponent sc)
 	{
 		CommandComponent result = null;

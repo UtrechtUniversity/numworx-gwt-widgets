@@ -41,6 +41,7 @@
 	margin: 0px;
 	padding: 0px;
 	color: red;
+	font-family: Helvetica, sans serif;
 	
 }
 
@@ -50,20 +51,22 @@
 
 	font-size: 0.975em;
 	font-weight: bold;
-
-	padding: 0px;	
+	font-family: Helvetica, sans serif;
+	/** padding: 0px; */	
 }	
 
 .label {
 	background-color: rgb(255, 255, 255);
 	text-align: left;
 	text-indent: 10px;
+	font-family: Helvetica, sans serif;
 }
 
 .varlabel {
 	background-color: rgb(161, 255, 161);
 	font-size: 0.975em;
 	font-weight: bold;
+	font-family: Helvetica, sans serif;
 	
 }
 
@@ -71,6 +74,7 @@
 	font-size: 0.875em;
 	background-color: rgb(221, 255, 221);
 	text-align: left;
+	font-family: Helvetica, sans serif;
 	white-space: pre;
 	
 }	

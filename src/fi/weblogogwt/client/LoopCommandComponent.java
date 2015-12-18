@@ -89,7 +89,8 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	@Override
 	void addCComponent(CommandComponent cc)
 	{	
-		loopBlock.addCComponent(cc);
+		//loopBlock.addCComponent(cc);
+		loopBlock.addCCompAtBottom(cc);
 	}
 	
 	public void setSize(int w, int h)
