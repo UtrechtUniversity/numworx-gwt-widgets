@@ -11,6 +11,7 @@ import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -27,7 +28,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	int breedte;
 	int hoogte;
 	private Map<String, Object> launchState;
-	boolean muntenRadio=true;
+	boolean muntenRadio=false;
 	boolean dobbelstenenRadio=false;
 	boolean binomTrekkingRadio=false;
 	boolean steekproefRadio=false;
@@ -49,7 +50,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	boolean binomTrekkingKans=true;
 	boolean binomTrekkingPopulatieProportie=false;
 	
-	boolean muntenSelected=true;
+	boolean muntenSelected=false;
 	boolean dobbelstenenSelected=false;
 	boolean binomTrekkingSelected=false;
 	boolean steekproefSelected=false;
@@ -61,14 +62,14 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	
 	public void onModuleLoad() {
 
-			munten=new Munten(true, true, true, true, true);
+			//munten=new Munten(true, true, true, true, true);
 			
 			//Dobbelstenen dobbelstenen = new Dobbelstenen();
            // BinomTrekking binomtrekking = new BinomTrekking();
 		//Window.alert("test");	
-		RootPanel.get("dockholder").add(asWidget());
+		
 		//RootPanel.get("dockholder").getElement().setInnerText("textand");
-			//Stub.publish(this);
+			Stub.publish(this);
 			
 	}
 	
@@ -88,131 +89,8 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 
-
-		ObjectMap l=JSONUtilities.wrapMap(launchState);
-		
-		if (l.containsKey("muntenRadio")) {
-			muntenRadio = l.getBoolean("muntenRadio");
-			muntenSelected=true;
-		}
-		if (l.containsKey("dobbelstenenRadio")) {
-			dobbelstenenRadio = l.getBoolean("dobbelstenenRadio");
-			dobbelstenenSelected=true;
-		}
-		if (l.containsKey("binomTrekkingRadio")) {
-			binomTrekkingRadio = l.getBoolean("binomTrekkingRadio");
-			binomTrekkingSelected=true;
-		}
-		if (l.containsKey("steekproefRadio")) {
-			steekproefRadio = l.getBoolean("steekproefRadio");
-			steekproefSelected=true;
-		}
-		if (l.containsKey("muntenInstellingen"))
-			muntenInstellingen = l.getBoolean("muntenInstellingen");
-		if (l.containsKey("muntenResultaten"))
-			muntenResultaten = l.getBoolean("muntenResultaten");
-		if (l.containsKey("muntenGrafiek"))
-			muntenGrafiek = l.getBoolean("muntenGrafiek");
-		if (l.containsKey("muntenTabel"))
-			muntenTabel = l.getBoolean("muntenTabel");
-		if (l.containsKey("muntenFrequentie"))
-			muntenFrequentie = l.getBoolean("muntenFrequentie");
-		if (l.containsKey("dobbelstenenInstellingen"))
-			dobbelstenenInstellingen = l.getBoolean("dobbelstenenInstellingen");
-		if (l.containsKey("dobbelstenenResultaten"))
-			dobbelstenenResultaten = l.getBoolean("dobbelstenenResultaten");
-		if (l.containsKey("dobbelstenenGrafiek"))
-			dobbelstenenGrafiek = l.getBoolean("dobbelstenenGrafiek");
-		if (l.containsKey("dobbelstenenTabel"))
-			dobbelstenenTabel = l.getBoolean("dobbelstenenTabel");
-		if (l.containsKey("binomTrekkingInstellingen"))
-			binomTrekkingInstellingen = l.getBoolean("binomTrekkingInstellingen");
-		if (l.containsKey("binomTrekkingKans"))
-			binomTrekkingKans = l.getBoolean("binomTrekkingKans");
-		if (l.containsKey("binomTrekkingPopulatieProportie"))
-			binomTrekkingPopulatieProportie = l.getBoolean("binomTrekkingPopulatieProportie");		
-		if (l.containsKey("binomTrekkingGrafiek"))
-			binomTrekkingGrafiek = l.getBoolean("binomTrekkingGrafiek");
-		if (l.containsKey("binomTrekkingTabel"))
-			binomTrekkingTabel = l.getBoolean("binomTrekkingTabel");
-		if (l.containsKey("binomTrekkingFrequentie"))
-			binomTrekkingFrequentie = l.getBoolean("binomTrekkingFrequentie");
-		if (l.containsKey("binomTrekkingRooster"))
-			binomTrekkingRooster = l.getBoolean("binomTrekkingRooster");
-	
-		if (muntenSelected)
-			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
-			Boolean eenMuntTweeMunt=false;
-			if (l.containsKey("eenMuntTweeMunt"))
-				eenMuntTweeMunt = l.getBoolean("eenMuntTweeMunt");
-			munten.eenMunt.setValue(eenMuntTweeMunt);
-			munten.tweeMunten.setValue(!eenMuntTweeMunt);
-			munten.setEenMuntTweeMunten();
-			String aantalWorpen="";
-			if (l.containsKey("aantalWorpen"))
-				aantalWorpen = l.getString("aantalWorpen");
-			munten.aantalWorpenText.setText(aantalWorpen);
-			String kansOpMunt="";
-			if (l.containsKey("kansOpMunt"))
-				kansOpMunt = l.getString("kansOpMunt");
-			munten.kansOpKopText.setText(kansOpMunt);			
-		if (dobbelstenenSelected)
-			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
-			Boolean eenDobbelsteenRadio=false;
-			if (l.containsKey("eenDobbelsteenRadio"))
-				eenDobbelsteenRadio = l.getBoolean("eenDobbelsteenRadio");
-			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteenRadio);
-			Boolean tweeDobbelstenenRadio=false;
-			if (l.containsKey("tweeDobbelstenenRadio"))
-				tweeDobbelstenenRadio = l.getBoolean("tweeDobbelstenenRadio");
-			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenenRadio);
-			Boolean drieDobbelstenenRadio=false;
-			if (l.containsKey("drieDobbelstenenRadio"))
-				drieDobbelstenenRadio = l.getBoolean("drieDobbelstenenRadio");
-			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenenRadio);
-			dobbelstenen.doEenTweeDrieDobbelstenen();
-			String aantalWorpenDobbelsteen="";
-			if (l.containsKey("aantalWorpenDobbelsteen"))
-				aantalWorpenDobbelsteen = l.getString("aantalWorpenDobbelsteen");
-			dobbelstenen.aantalWorpenText.setText(aantalWorpenDobbelsteen);
-			Boolean toonSom=false;
-			if (l.containsKey("toonSom"))
-				toonSom = l.getBoolean("toonSom");
-			dobbelstenen.toonSom.setValue(toonSom);
-			dobbelstenen.dobbelstenenGrafiek.paint();
-			
-			
-		if (binomTrekkingSelected) {
-			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
-			String binomKans="";
-			if (l.containsKey("kans"))
-				binomKans = l.getString("kans");
-			binomTrekking.kansText.setText(binomKans);
-			String aantalTrekkingen="";
-			if (l.containsKey("aantalTrekkingen"))
-				aantalTrekkingen = l.getString("aantalTrekkingen");
-			binomTrekking.aantalTrekkingenText.setText(aantalTrekkingen);
-			String aantalKeer="";
-			if (l.containsKey("aantalKeer"))
-				aantalKeer = l.getString("aantalKeer");
-			binomTrekking.keerText.setText(aantalKeer);
-			binomTrekking.showKans=binomTrekkingKans;
-			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
-		}
-		if (steekproefSelected) {
-			steekproef = new Steekproef();
-			String steekproefMu="";
-			if (l.containsKey("mu"))
-				steekproefMu = l.getString("mu");
-			steekproef.muText.setText(steekproefMu);
-			String steekproefSigma="";
-			if (l.containsKey("sigma"))
-				steekproefSigma = l.getString("sigma");
-			steekproef.sigmaText.setText(steekproefSigma);
-			
-		}
-		
-		
+		//init(breedte,hoogte,launchState,randomVarWaarden);
+				
 	}
 
 	@Override
@@ -410,6 +288,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	public void setState(HashMap<String, Object> map) {
 		// TODO Auto-generated method stub
 	
+		
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
 		
@@ -427,14 +306,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 			munten.setEenMuntTweeMunten();
 			
 			if (h.containsKey("table")){
-				List<List<String>> list;
+				ObjectList list;
 				
-				list =  (List<List<String>>) h.get("table");
+				list = h.getObjectList("table");
 			
 				List<Munten.Experiment> list1=new ArrayList<Munten.Experiment>();
 				
 				for (int i=0;i<list.size();i++) {
-					list1.add(new Munten.Experiment(list.get(i).get(0),list.get(i).get(1), list.get(i).get(2)));
+					List<String> list30 = list.getStringList(i);
+					list1.add(new Munten.Experiment(list30.get(0),list30.get(1), list30.get(2)));
 				}
 				
 				munten.dataProvider.getList().clear();
@@ -449,14 +329,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 			}
 			
 			if (h.containsKey("table2")){
-				List<List<String>> list2;
+				ObjectList list2;
 				
-				list2 =  (List<List<String>>) h.get("table2");
+				list2 = h.getObjectList("table2");
 				
 				List<Munten.Experiment2> list3=new ArrayList<Munten.Experiment2>();
 				
 				for (int i=0;i<list2.size();i++) {
-					list3.add(new Munten.Experiment2(list2.get(i).get(0),list2.get(i).get(1), list2.get(i).get(2), list2.get(i).get(3)));
+					List<String> list31 = list2.getStringList(i);
+					list3.add(new Munten.Experiment2(list31.get(0),list31.get(1), list31.get(2), list31.get(3)));
 				}
 				
 				munten.dataProvider1.getList().clear();
@@ -517,14 +398,17 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 			dobbelstenen.doEenTweeDrieDobbelstenen();
 			
 			if (h.containsKey("table3")){
-				List<List<String>> list3;
+				ObjectList list3;
 				
-				list3 =  (List<List<String>>) h.get("table3");
+				list3 =  h.getObjectList("table3");
+					
+				//Window.alert(list3.toString()+list);
 			
 				List<Dobbelstenen.Experiment> list4=new ArrayList<Dobbelstenen.Experiment>();
 				
 				for (int i=0;i<list3.size();i++) {
-					list4.add(new Dobbelstenen.Experiment(list3.get(i).get(0),list3.get(i).get(1), list3.get(i).get(2), list3.get(i).get(3), list3.get(i).get(4), list3.get(i).get(5), list3.get(i).get(6)));
+					List<String> list21 = list3.getStringList(i);
+					list4.add(new Dobbelstenen.Experiment(list21.get(0),list21.get(1), list21.get(2), list21.get(3), list21.get(4), list21.get(5), list21.get(6)));
 				}
 				
 				dobbelstenen.dataProvider.getList().clear();
@@ -535,15 +419,17 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 				if (eenDobbelsteen==true) 
 					dobbelstenen.experiment=list3.size();
 			}
+			
 			if (h.containsKey("table4")){
-				List<List<String>> list5;
+				ObjectList list5;
 				
-				list5 =  (List<List<String>>) h.get("table4");
+				list5 = h.getObjectList("table4");
 			
 				List<Dobbelstenen.Experiment1> list6=new ArrayList<Dobbelstenen.Experiment1>();
 				
 				for (int i=0;i<list5.size();i++) {
-					list6.add(new Dobbelstenen.Experiment1(list5.get(i).get(0),list5.get(i).get(1), list5.get(i).get(2), list5.get(i).get(3), list5.get(i).get(4), list5.get(i).get(5), list5.get(i).get(6),list5.get(i).get(7),list5.get(i).get(8),list5.get(i).get(9),list5.get(i).get(10),list5.get(i).get(11)));
+					List<String> list22 = list5.getStringList(i);
+					list6.add(new Dobbelstenen.Experiment1(list22.get(0),list22.get(1), list22.get(2), list22.get(3), list22.get(4), list22.get(5), list22.get(6),list22.get(7),list22.get(8),list22.get(9),list22.get(10),list22.get(11)));
 				}
 				
 				dobbelstenen.dataProvider1.getList().clear();
@@ -555,14 +441,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 					dobbelstenen.experiment=list5.size();
 			}
 			if (h.containsKey("table5")){
-				List<List<String>> list7;
+				ObjectList list7;
 				
-				list7 =  (List<List<String>>) h.get("table5");
+				list7 = h.getObjectList("table5");
 			
 				List<Dobbelstenen.Experiment2> list8=new ArrayList<Dobbelstenen.Experiment2>();
 				
 				for (int i=0;i<list7.size();i++) {
-					list8.add(new Dobbelstenen.Experiment2(list7.get(i).get(0),list7.get(i).get(1), list7.get(i).get(2), list7.get(i).get(3), list7.get(i).get(4), list7.get(i).get(5), list7.get(i).get(6),list7.get(i).get(7),list7.get(i).get(8),list7.get(i).get(9),list7.get(i).get(10),list7.get(i).get(11),list7.get(i).get(12),list7.get(i).get(13),list7.get(i).get(14),list7.get(i).get(15),list7.get(i).get(16)));
+					List<String> list23 = list7.getStringList(i);
+					list8.add(new Dobbelstenen.Experiment2(list23.get(0),list23.get(1), list23.get(2), list23.get(3), list23.get(4), list23.get(5), list23.get(6),list23.get(7),list23.get(8),list23.get(9),list23.get(10),list23.get(11),list23.get(12),list23.get(13),list23.get(14),list23.get(15),list23.get(16)));
 				}
 				
 				dobbelstenen.dataProvider2.getList().clear();
@@ -574,14 +461,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 					dobbelstenen.experiment=list7.size();
 			}
 			if (h.containsKey("table6")){
-				List<List<String>> list9;
+				ObjectList list9;
 				
-				list9 =  (List<List<String>>) h.get("table6");
+				list9 = h.getObjectList("table6");
 			
 				List<Dobbelstenen.Experiment3> list10=new ArrayList<Dobbelstenen.Experiment3>();
 				
 				for (int i=0;i<list9.size();i++) {
-					list10.add(new Dobbelstenen.Experiment3(list9.get(i).get(0),list9.get(i).get(1), list9.get(i).get(2), list9.get(i).get(3), list9.get(i).get(4), list9.get(i).get(5), list9.get(i).get(6)));
+					List<String> list24 = list9.getStringList(i);
+					list10.add(new Dobbelstenen.Experiment3(list24.get(0),list24.get(1), list24.get(2), list24.get(3), list24.get(4), list24.get(5), list24.get(6)));
 				}
 				
 				dobbelstenen.dataProvider3.getList().clear();
@@ -590,14 +478,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 				dobbelstenen.dataProvider3.flush();
 			}
 			if (h.containsKey("table7")){
-				List<List<String>> list11;
+				ObjectList list11;
 				
-				list11 =  (List<List<String>>) h.get("table7");
+				list11 = h.getObjectList("table7");
 			
 				List<Dobbelstenen.Experiment4> list12=new ArrayList<Dobbelstenen.Experiment4>();
 				
 				for (int i=0;i<list11.size();i++) {
-					list12.add(new Dobbelstenen.Experiment4(list11.get(i).get(0),list11.get(i).get(1), list11.get(i).get(2), list11.get(i).get(3), list11.get(i).get(4), list11.get(i).get(5), list11.get(i).get(6), list11.get(i).get(7), list11.get(i).get(8), list11.get(i).get(9), list11.get(i).get(10), list11.get(i).get(11)));
+					List<String> list25 = list11.getStringList(i);
+					list12.add(new Dobbelstenen.Experiment4(list25.get(0),list25.get(1), list25.get(2), list25.get(3), list25.get(4), list25.get(5), list25.get(6), list25.get(7), list25.get(8), list25.get(9), list25.get(10), list25.get(11)));
 				}
 				
 				dobbelstenen.dataProvider4.getList().clear();
@@ -606,14 +495,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 				dobbelstenen.dataProvider4.flush();
 			}
 			if (h.containsKey("table8")){
-				List<List<String>> list13;
+				ObjectList list13;
 				
-				list13 =  (List<List<String>>) h.get("table8");
+				list13 = h.getObjectList("table8");
 			
 				List<Dobbelstenen.Experiment5> list14=new ArrayList<Dobbelstenen.Experiment5>();
 				
 				for (int i=0;i<list13.size();i++) {
-					list14.add(new Dobbelstenen.Experiment5(list13.get(i).get(0),list13.get(i).get(1), list13.get(i).get(2), list13.get(i).get(3), list13.get(i).get(4), list13.get(i).get(5), list13.get(i).get(6), list13.get(i).get(7), list13.get(i).get(8), list13.get(i).get(9), list13.get(i).get(10), list13.get(i).get(11), list13.get(i).get(12), list13.get(i).get(13), list13.get(i).get(14), list13.get(i).get(15), list13.get(i).get(16)));
+					List<String> list26 = list13.getStringList(i);
+					list14.add(new Dobbelstenen.Experiment5(list26.get(0),list26.get(1), list26.get(2), list26.get(3), list26.get(4), list26.get(5), list26.get(6), list26.get(7), list26.get(8), list26.get(9), list26.get(10), list26.get(11), list26.get(12), list26.get(13), list26.get(14), list26.get(15), list26.get(16)));
 				}
 				
 				dobbelstenen.dataProvider5.getList().clear();
@@ -636,14 +526,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 
 		if (binomTrekkingSelected) {
 			if (h.containsKey("table9")){
-				List<List<String>> list15;
+				ObjectList list15;
 				
-				list15 =  (List<List<String>>) h.get("table9");
+				list15 = h.getObjectList("table9");
 			
 				List<BinomTrekking.Experiment> list16=new ArrayList<BinomTrekking.Experiment>();
 				
 				for (int i=0;i<list15.size();i++) {
-					list16.add(new BinomTrekking.Experiment(list15.get(i).get(0),list15.get(i).get(1)));
+					List<String> list27 = list15.getStringList(i);
+					list16.add(new BinomTrekking.Experiment(list27.get(0),list27.get(1)));
 				}
 				
 				binomTrekking.dataProvider.getList().clear();
@@ -672,14 +563,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		
 		if (steekproefSelected) {
 			if (h.containsKey("table10")){
-				List<List<String>> list17;
+				ObjectList list17;
 				
-				list17 =  (List<List<String>>) h.get("table10");
+				list17 = h.getObjectList("table10");
 			
 				List<Steekproef.Experiment> list18=new ArrayList<Steekproef.Experiment>();
 				
 				for (int i=0;i<list17.size();i++) {
-					list18.add(new Steekproef.Experiment(list17.get(i).get(0),list17.get(i).get(1)));
+					List<String> list28 = list17.getStringList(i);
+					list18.add(new Steekproef.Experiment(list28.get(0),list28.get(1)));
 				}
 				
 				steekproef.dataProvider.getList().clear();
@@ -690,14 +582,15 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 				//steekproef.experiment=list17.size();
 			}
 			if (h.containsKey("table11")){
-				List<List<String>> list19;
+				ObjectList list19;
 				
-				list19 =  (List<List<String>>) h.get("table11");
+				list19 = h.getObjectList("table11");
 			
 				List<Steekproef.Experiment1> list20=new ArrayList<Steekproef.Experiment1>();
 				
 				for (int i=0;i<list19.size();i++) {
-					list20.add(new Steekproef.Experiment1(list19.get(i).get(0),list19.get(i).get(1),list19.get(i).get(2)));
+					List<String> list29 = list19.getStringList(i);
+					list20.add(new Steekproef.Experiment1(list29.get(0),list29.get(1),list29.get(2)));
 				}
 				
 				steekproef.dataProvider1.getList().clear();
@@ -761,5 +654,138 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
 		// TODO Auto-generated method stub
+		
+ObjectMap l=JSONUtilities.wrapMap(launchData);
+		
+		if (l.containsKey("muntenRadio")) {
+			muntenRadio = l.getBoolean("muntenRadio");
+			muntenSelected=muntenRadio;
+		}
+		if (l.containsKey("dobbelstenenRadio")) {
+			dobbelstenenRadio = l.getBoolean("dobbelstenenRadio");
+			dobbelstenenSelected=dobbelstenenRadio;
+		}
+		if (l.containsKey("binomTrekkingRadio")) {
+			binomTrekkingRadio = l.getBoolean("binomTrekkingRadio");
+			binomTrekkingSelected=binomTrekkingRadio;
+		}
+		if (l.containsKey("steekproefRadio")) {
+			steekproefRadio = l.getBoolean("steekproefRadio");
+			steekproefSelected=steekproefRadio;
+		}
+		if (l.containsKey("muntenInstellingen"))
+			muntenInstellingen = l.getBoolean("muntenInstellingen");
+		if (l.containsKey("muntenResultaten"))
+			muntenResultaten = l.getBoolean("muntenResultaten");
+		if (l.containsKey("muntenGrafiek"))
+			muntenGrafiek = l.getBoolean("muntenGrafiek");
+		if (l.containsKey("muntenTabel"))
+			muntenTabel = l.getBoolean("muntenTabel");
+		if (l.containsKey("muntenFrequentie"))
+			muntenFrequentie = l.getBoolean("muntenFrequentie");
+		if (l.containsKey("dobbelstenenInstellingen"))
+			dobbelstenenInstellingen = l.getBoolean("dobbelstenenInstellingen");
+		if (l.containsKey("dobbelstenenResultaten"))
+			dobbelstenenResultaten = l.getBoolean("dobbelstenenResultaten");
+		if (l.containsKey("dobbelstenenGrafiek"))
+			dobbelstenenGrafiek = l.getBoolean("dobbelstenenGrafiek");
+		if (l.containsKey("dobbelstenenTabel"))
+			dobbelstenenTabel = l.getBoolean("dobbelstenenTabel");
+		if (l.containsKey("binomTrekkingInstellingen"))
+			binomTrekkingInstellingen = l.getBoolean("binomTrekkingInstellingen");
+		if (l.containsKey("binomTrekkingKans"))
+			binomTrekkingKans = l.getBoolean("binomTrekkingKans");
+		if (l.containsKey("binomTrekkingPopulatieProportie"))
+			binomTrekkingPopulatieProportie = l.getBoolean("binomTrekkingPopulatieProportie");		
+		if (l.containsKey("binomTrekkingGrafiek"))
+			binomTrekkingGrafiek = l.getBoolean("binomTrekkingGrafiek");
+		if (l.containsKey("binomTrekkingTabel"))
+			binomTrekkingTabel = l.getBoolean("binomTrekkingTabel");
+		if (l.containsKey("binomTrekkingFrequentie"))
+			binomTrekkingFrequentie = l.getBoolean("binomTrekkingFrequentie");
+		if (l.containsKey("binomTrekkingRooster"))
+			binomTrekkingRooster = l.getBoolean("binomTrekkingRooster");
+	
+		if (muntenSelected) {
+			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
+			Boolean eenMuntTweeMunt=false;
+			if (l.containsKey("eenMuntTweeMunt"))
+				eenMuntTweeMunt = l.getBoolean("eenMuntTweeMunt");
+			munten.eenMunt.setValue(eenMuntTweeMunt);
+			munten.tweeMunten.setValue(!eenMuntTweeMunt);
+			munten.setEenMuntTweeMunten();
+			String aantalWorpen="";
+			if (l.containsKey("aantalWorpen"))
+				aantalWorpen = l.getString("aantalWorpen");
+			munten.aantalWorpenText.setText(aantalWorpen);
+			String kansOpMunt="";
+			if (l.containsKey("kansOpMunt"))
+				kansOpMunt = l.getString("kansOpMunt");
+			munten.kansOpKopText.setText(kansOpMunt);
+		}
+		if (dobbelstenenSelected) {
+			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
+			Boolean eenDobbelsteenRadio=false;
+			if (l.containsKey("eenDobbelsteenRadio"))
+				eenDobbelsteenRadio = l.getBoolean("eenDobbelsteenRadio");
+			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteenRadio);
+			Boolean tweeDobbelstenenRadio=false;
+			if (l.containsKey("tweeDobbelstenenRadio"))
+				tweeDobbelstenenRadio = l.getBoolean("tweeDobbelstenenRadio");
+			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenenRadio);
+			Boolean drieDobbelstenenRadio=false;
+			if (l.containsKey("drieDobbelstenenRadio"))
+				drieDobbelstenenRadio = l.getBoolean("drieDobbelstenenRadio");
+			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenenRadio);
+			dobbelstenen.doEenTweeDrieDobbelstenen();
+			String aantalWorpenDobbelsteen="";
+			if (l.containsKey("aantalWorpenDobbelsteen"))
+				aantalWorpenDobbelsteen = l.getString("aantalWorpenDobbelsteen");
+			dobbelstenen.aantalWorpenText.setText(aantalWorpenDobbelsteen);
+			Boolean toonSom=false;
+			if (l.containsKey("toonSom"))
+				toonSom = l.getBoolean("toonSom");
+			dobbelstenen.toonSom.setValue(toonSom);
+			dobbelstenen.dobbelstenenGrafiek.paint();
+			
+		}
+		if (binomTrekkingSelected) {
+			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
+			String binomKans="";
+			if (l.containsKey("kans"))
+				binomKans = l.getString("kans");
+			binomTrekking.kansText.setText(binomKans);
+			String aantalTrekkingen="";
+			if (l.containsKey("aantalTrekkingen"))
+				aantalTrekkingen = l.getString("aantalTrekkingen");
+			binomTrekking.aantalTrekkingenText.setText(aantalTrekkingen);
+			String aantalKeer="";
+			if (l.containsKey("aantalKeer"))
+				aantalKeer = l.getString("aantalKeer");
+			binomTrekking.keerText.setText(aantalKeer);
+			binomTrekking.showKans=binomTrekkingKans;
+			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
+		}
+		if (steekproefSelected) {
+			steekproef = new Steekproef();
+			String steekproefMu="";
+			if (l.containsKey("mu"))
+				steekproefMu = l.getString("mu");
+			steekproef.muText.setText(steekproefMu);
+			String steekproefSigma="";
+			if (l.containsKey("sigma"))
+				steekproefSigma = l.getString("sigma");
+			steekproef.sigmaText.setText(steekproefSigma);
+			
+		}
+		
+		RootPanel.get("dockholder").add(asWidget());
+
+	}
+
+	@Override
+	public int[][] getScoreObjectives() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
