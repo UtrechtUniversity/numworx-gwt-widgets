@@ -57,9 +57,11 @@ import com.google.gwt.resources.client.ImageResource;
 //import fi.algebrapijlengwt.client.opdr.UitvoerSchuifComponent;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
+import fi.algebrapijlengwt.client.text.Text;
 
 public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //InteractionView 
 {
+	public static Text rb;
 	
 	static Logger logger = Logger.getLogger("APGWT");
 	
@@ -117,7 +119,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	//boolean standAlone = false;
 	
 	boolean kijkNaActief = false;
-	PushButton kijkNaButton = new PushButton("Kijk Na");
+	PushButton kijkNaButton;
 	List<String> docentExpressieStrings = new ArrayList<String>();
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
@@ -135,6 +137,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		algebraPijlenGWTClientBundle = GWT.create(AlgebraPijlenGWTClientBundle.class);
 		algebraPijlenGWTCss = algebraPijlenGWTClientBundle.getAlgebraPijlenGWTCSS();
 		algebraPijlenGWTCss.ensureInjected();
@@ -226,7 +230,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (brugklas)
 			currentY = topOffset + 195;
 		
-		linksRechtsButton = new ToggleButton("links", "rechts");
+		//linksRechtsButton = new ToggleButton("links", "rechts");
+		linksRechtsButton = new ToggleButton(rb.linksLabel(), rb.rechtsLabel());
 		linksRechtsButton.addStyleName(algebraPijlenGWTCss.togglebutton());
 		if (terugHeen)
 		{	
@@ -242,7 +247,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
 		
 		tabelBox = new CheckBox();
-		tabelBox.setText("tabel");
+		//tabelBox.setText("tabel");
+		tabelBox.setText(rb.tabelLabel());
 		tabelBox.addStyleName(algebraPijlenGWTCss.checkbox());
 		if (tabelOptie)
 		{	
@@ -258,7 +264,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
 		
 		grafiekBox = new CheckBox();
-		grafiekBox.setText("grafiek");
+		//grafiekBox.setText("grafiek");
+		grafiekBox.setText(rb.grafiekLabel());
 		grafiekBox.addStyleName(algebraPijlenGWTCss.checkbox());
 		if (grafiekOptie)
 		{	
@@ -273,7 +280,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		
 		currentX = (asv.toolsWidth - buttonWidth) / 2; //leftOffset;
 		
-		wisButton = new PushButton("wis");
+		//wisButton = new PushButton("wis");
+		wisButton = new PushButton(rb.wisKnopLabel());
 		wisButton.addStyleName(algebraPijlenGWTCss.pushbutton());
 		canvasPanel.add(wisButton);
 		canvasPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -657,7 +665,7 @@ logger.info("AP setState");
 		// geen valide expressie
 		if (leerlingExpressieUVS.size() == 0)
 		{
-			correct = false;
+			correct = new Boolean(false);
 			comRoot.setChanged(isCorrect().booleanValue());
 			return;
 		}
@@ -680,7 +688,7 @@ logger.info("AP setState");
 //System.out.println(llgExpStrC);
 			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
 
-			correct = false;
+			correct = new Boolean(false);
 			if (llgExp != null)
 			{	
 				
@@ -694,7 +702,7 @@ logger.info("AP setState");
 					}
 				}
 				
-				if (correct)
+				if (correct.equals(Boolean.TRUE))
 				{	if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) // && (im != null))
 					{	
 //System.out.println("correct");					
@@ -884,9 +892,11 @@ logger.info("AlgebraPijlenGWT init");
 		
 		if (kijkNaActief)
 		{	
+			kijkNaButton = new PushButton("kijk na");
+			kijkNaButton.addStyleName(algebraPijlenGWTCss.pushbutton());
 			canvasPanel.add(kijkNaButton);
 			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, 20, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			kijkNaButton.addClickHandler(new PushClickHandler());
 
 		}

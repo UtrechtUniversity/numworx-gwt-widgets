@@ -1548,7 +1548,8 @@ else // alleenInvullen || isDemo
 			g.setFillStyle(CssColor.make(0, 0, 0));
 		
 			//String s = AlgebraPijlenOpdr.rb.getString("invoerVakLabel");
-			String s = "In-/Uitvoer";
+			//String s = "In-/Uitvoer";
+			String s = AlgebraPijlenGWT.rb.invoerLabel();
 			TextMetrics tm = g.measureText(s);
 		
 			//int lengte = fm.stringWidth(s);
@@ -1558,7 +1559,8 @@ else // alleenInvullen || isDemo
 			g.fillText(s, 55 - lengte / 2, 25);
 		
 			//s = AlgebraPijlenOpdr.rb.getString("bewerkingenLabel");
-			s = "Bewerkingen";
+			//s = "Bewerkingen";
+			s = AlgebraPijlenGWT.rb.bewerkingenLabel();
 			tm = g.measureText(s);
 		
 			//lengte = fm.stringWidth(s);

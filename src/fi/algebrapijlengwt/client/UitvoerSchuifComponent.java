@@ -112,9 +112,13 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		inputOwner = asv.owner.canvasPanel;
 		
 		menuBar = new MenuBar(true);
-		labelItem = new MenuItem("toon label", new MenuCommand("label"));
-		tabelItem = new MenuItem("toon tabel", new MenuCommand("tabel"));
-		kettingItem = new MenuItem("verberg ketting", new MenuCommand("ketting"));
+		//labelItem = new MenuItem("toon label", new MenuCommand("label"));
+		//tabelItem = new MenuItem("toon tabel", new MenuCommand("tabel"));
+		//kettingItem = new MenuItem("verberg ketting", new MenuCommand("ketting"));
+		labelItem = new MenuItem(AlgebraPijlenGWT.rb.toonLabel(), new MenuCommand("label"));
+		tabelItem = new MenuItem(AlgebraPijlenGWT.rb.toonTabel(), new MenuCommand("tabel"));
+		kettingItem = new MenuItem(AlgebraPijlenGWT.rb.verbergKetting(), new MenuCommand("ketting"));
+		
 		menuBar.addItem(labelItem);
 		menuBar.addItem(tabelItem);
 		menuBar.addItem(kettingItem);
@@ -153,17 +157,33 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		int popupY = yPos + inputOwner.getAbsoluteTop();
 		menuPopup = new PopupPanel(true);
 		if (labelZichtbaar)
-			labelItem.setText("verberg label");
+		{	//labelItem.setText("verberg label");
+			labelItem.setText(AlgebraPijlenGWT.rb.verbergLabel());
+		
+		}
 		else
-			labelItem.setText("toon label");
+		{	//labelItem.setText("toon label");
+			labelItem.setText(AlgebraPijlenGWT.rb.toonLabel());
+		
+		}
 		if (tabelZichtbaar)
-			tabelItem.setText("verberg tabel");
+		{	//tabelItem.setText("verberg tabel");
+			tabelItem.setText(AlgebraPijlenGWT.rb.verbergTabel());
+		
+		}
 		else
-			tabelItem.setText("toon tabel");
+		{	//tabelItem.setText("toon tabel");
+			tabelItem.setText(AlgebraPijlenGWT.rb.toonTabel());
+		
+		}
 		if (kettingZichtbaar)
-			kettingItem.setText("verberg ketting");
+		{	//kettingItem.setText("verberg ketting");
+			kettingItem.setText(AlgebraPijlenGWT.rb.verbergKetting());
+		}
 		else
-			kettingItem.setText("toon ketting");
+		{	//kettingItem.setText("toon ketting");
+			kettingItem.setText(AlgebraPijlenGWT.rb.toonKetting());
+		}
 	
 		
 		menuPopup.setWidget(menuBar);
@@ -1397,42 +1417,60 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	{
 		
 		if (s.equals("label"))
-		{	if (labelItem.getText().equals("toon label"))
+		{	if (labelItem.getText().equals("toon label") || 
+				labelItem.getText().equals("show label") ||
+				labelItem.getText().equals("montrer label"))
 			{
-				labelItem.setText("verberg label");
+				//labelItem.setText("verberg label");
+				labelItem.setText(AlgebraPijlenGWT.rb.verbergLabel());
 				toonLabel(true);
 			}
-			else if (labelItem.getText().equals("verberg label"))
+			else if (labelItem.getText().equals("verberg label") ||
+					 labelItem.getText().equals("hide label") ||
+					 labelItem.getText().equals("cacher label"))
 			{
-				labelItem.setText("toon label");
+				//labelItem.setText("toon label");
+				labelItem.setText(AlgebraPijlenGWT.rb.toonLabel());
 				toonLabel(false);
 			}
 		}
 		
 		else if (s.equals("tabel"))
-		{	if (tabelItem.getText().equals("toon tabel"))
+		{	if (tabelItem.getText().equals("toon tabel") ||
+				tabelItem.getText().equals("show table") ||
+				tabelItem.getText().equals("montrer table"))
 			{
-				tabelItem.setText("verberg tabel");
+				//tabelItem.setText("verberg tabel");
+				tabelItem.setText(AlgebraPijlenGWT.rb.verbergTabel());
 				zetTabelAan(true);
 			}
-			else if (tabelItem.getText().equals("verberg tabel"))
+			else if (tabelItem.getText().equals("verberg tabel") ||
+					 tabelItem.getText().equals("hide table") ||
+					 tabelItem.getText().equals("cacher table"))
 			{
-				tabelItem.setText("toon tabel");
+				//tabelItem.setText("toon tabel");
+				tabelItem.setText(AlgebraPijlenGWT.rb.toonTabel());
 				zetTabelAan(false);
 			}
 		}
 		else if (s.equals("ketting"))
 		{
-			if (kettingItem.getText().equals("toon ketting"))
+			if (kettingItem.getText().equals("toon ketting") ||
+				kettingItem.getText().equals("show chain") ||
+				kettingItem.getText().equals("montrer fleche"))
 			{
-				kettingItem.setText("verberg ketting");
+				//kettingItem.setText("verberg ketting");
+				kettingItem.setText(AlgebraPijlenGWT.rb.verbergKetting());
 				zetKettingZichtbaarHier(true);
 				//zoomInKnop.setVisible(false);
 				//zoomUitKnop.setVisible(false);
 			}
-			else if (kettingItem.getText().equals("verberg ketting"))
+			else if (kettingItem.getText().equals("verberg ketting") ||
+					 kettingItem.getText().equals("hide chain") ||
+					 kettingItem.getText().equals("cacher fleche"))
 			{
-				kettingItem.setText("toon ketting");
+				//kettingItem.setText("toon ketting");
+				kettingItem.setText(AlgebraPijlenGWT.rb.toonKetting());
 				zetKettingZichtbaarHier(false);
 				//zoomInKnop.setVisible(true);
 				//zoomUitKnop.setVisible(true);
