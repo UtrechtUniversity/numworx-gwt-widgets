@@ -1074,7 +1074,8 @@ System.out.println("after " + this.aantalSc);
 			g.setFillStyle(CssColor.make(0, 0, 0));
 		
 			//s = AlgebraExpressies.rb.getString("invoerVakLabel");
-			String s = "In-/Uitvoer";
+			//String s = "In-/Uitvoer";
+			String s = AlgebraExprGWT.rb.invoerLabel();
 			TextMetrics tm = g.measureText(s);
 		
 			//lengte = fm.stringWidth(s);
@@ -1084,7 +1085,8 @@ System.out.println("after " + this.aantalSc);
 			g.fillText(s, 50 - lengte / 2, 25);
 		
 			//s = AlgebraExpressies.rb.getString("bewerkingenLabel");
-			s = "Bewerkingen";
+			//s = "Bewerkingen";
+			s = AlgebraExprGWT.rb.bewerkingenLabel();
 			tm = g.measureText(s);
 		
 			lengte = (int) Math.round(tm.getWidth());

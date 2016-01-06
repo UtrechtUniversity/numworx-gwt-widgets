@@ -54,11 +54,14 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 import fi.algebraexprgwt.client.expressies_ap.*;
+import fi.algebraexprgwt.client.text.Text;
 
 import java.util.logging.Logger;
 
 public class AlgebraExprGWT implements EntryPoint, InteractionStub 
 {
+	public static Text rb;
+	
 	static Logger logger = Logger.getLogger("AEGWT");
 	
     static final String holderId = "dockholder";
@@ -78,7 +81,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	CheckBox tabelBox, grafiekBox;
 	
 	int toggleSize = 22;
-	int buttonWidth = 40;
+	int buttonWidth = 60;
 	int buttonHeight = 22;
 	int checkBoxWidth = 80;
 
@@ -116,7 +119,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	//boolean standAlone = false;
 	
 	boolean kijkNaActief = false;
-	PushButton kijkNaButton = new PushButton("Kijk Na");
+	PushButton kijkNaButton; 
 	List<String> docentExpressieStrings = new ArrayList<String>();
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
@@ -132,6 +135,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		algebraExprGWTClientBundle = GWT.create(AlgebraExprGWTClientBundle.class);
 		algebraExprGWTCss = algebraExprGWTClientBundle.getAlgebraExprGWTCSS();
 		algebraExprGWTCss.ensureInjected();
@@ -188,7 +193,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (!toolkit || isDemo || alleenInvullen)
 			return;
 		
-		int currentX = (asv.toolsWidth - checkBoxWidth) / 2;
+		//int currentX = (asv.toolsWidth - checkBoxWidth) / 2;
+		int currentX = 2 * leftOffset; //(asv.toolsWidth - checkBoxWidth) / 2;
 		int currentY = topOffset + 280;
 		if (brugklas)
 			currentY = topOffset + 195;
@@ -196,10 +202,11 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (grafiekOptie)
 		{	
 			grafiekBox = new CheckBox();
-			grafiekBox.setText("grafiek");
+			//grafiekBox.setText("grafiek");
+			grafiekBox.setText(rb.grafiekLabel());
 			grafiekBox.addStyleName(algebraExprGWTCss.checkbox());
 			canvasPanel.add(grafiekBox);
-			canvasPanel.setWidgetLeftWidth(grafiekBox, currentX, Style.Unit.PX, checkBoxWidth - 12, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(grafiekBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(grafiekBox, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 			grafiekBox.addClickHandler(new PushClickHandler());
@@ -209,8 +216,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		currentX = (asv.toolsWidth - buttonWidth) / 2; //leftOffset;
 		
-		
-		wisButton = new PushButton("wis");
+		//wisButton = new PushButton("wis");
+		wisButton = new PushButton(rb.wisKnopLabel());
 		wisButton.addStyleName(algebraExprGWTCss.pushbutton());
 		canvasPanel.add(wisButton);
 		canvasPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -220,10 +227,12 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		currentY += buttonHeight + topOffset;
 		
-		currentX = (asv.toolsWidth - checkBoxWidth) / 2;
+		//currentX = (asv.toolsWidth - checkBoxWidth) / 2;
+		currentX = 2 * leftOffset;
 		
 		expressieBox = new CheckBox();
-		expressieBox.setText("expressie");
+		//expressieBox.setText("expressie");
+		expressieBox.setText(rb.expressieLabel());
 		expressieBox.addStyleName(algebraExprGWTCss.checkbox());
 		canvasPanel.add(expressieBox);
 		canvasPanel.setWidgetLeftWidth(expressieBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
@@ -235,10 +244,11 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		currentY += buttonHeight + topOffset;
 		
 		waardeBox = new CheckBox();
-		waardeBox.setText("waarde");
+		//waardeBox.setText("waarde");
+		waardeBox.setText(rb.waardeLabel());
 		waardeBox.addStyleName(algebraExprGWTCss.checkbox());
 		canvasPanel.add(waardeBox);
-		canvasPanel.setWidgetLeftWidth(waardeBox, currentX, Style.Unit.PX, checkBoxWidth - 12, Style.Unit.PX);
+		canvasPanel.setWidgetLeftWidth(waardeBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(waardeBox, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 		waardeBox.addClickHandler(new PushClickHandler());
@@ -574,7 +584,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		// geen valide expressie
 		if (leerlingExpressieUVS.size() == 0)
 		{
-			correct = false;
+			correct = new Boolean(false);
 			comRoot.setChanged(isCorrect().booleanValue());
 			return;
 		}
@@ -604,7 +614,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 //System.out.println(llgExpStrC);
 			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
 
-			correct = false;
+			correct = new Boolean(false);
 			if (llgExp != null)
 			{	
 				
@@ -620,11 +630,11 @@ System.out.println("llgExp = " + llgExp.toString());
 //System.out.println("llgExp = null");
 					if (Algebra.isGelijkwaardig(docExp, llgExp))
 					{	hits++;
-						correct = true;
+						correct = new Boolean(true);
 					}
 				}
 				
-				if (correct)
+				if (correct.equals(Boolean.TRUE))
 				{	uvs.pijlUit[0].im = "V";
 					uvs.pijlUit[0].paint();
 					//asv.paint();
@@ -800,9 +810,12 @@ logger.info("AlgebraExprGWT init");
 		
 		if (kijkNaActief)
 		{	
+			//kijkNaButton = new PushButton("kijk na");
+			kijkNaButton = new PushButton(rb.kijkNa());
+			kijkNaButton.addStyleName(algebraExprGWTCss.pushbutton());
 			canvasPanel.add(kijkNaButton);
-			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 70)/2, Style.Unit.PX, 70, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			kijkNaButton.addClickHandler(new PushClickHandler());
 /*			
 			canvasPanel.add(goedKrulImage);
