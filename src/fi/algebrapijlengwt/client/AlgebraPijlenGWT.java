@@ -89,7 +89,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	int leftOffset = 5;
 	int topOffset = 10;
 	
-	int buttonWidth = 50;
+	int buttonWidth = 60;
 	int buttonHeight = 22;
 	int checkBoxWidth = 60;
 
@@ -254,7 +254,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (tabelOptie)
 		{	
 			canvasPanel.add(tabelBox);
-			canvasPanel.setWidgetLeftWidth(tabelBox, currentX, Style.Unit.PX, checkBoxWidth - 10, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(tabelBox, currentX, Style.Unit.PX, checkBoxWidth + 10, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(tabelBox, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 			tabelBox.addClickHandler(new PushClickHandler());
@@ -898,7 +898,7 @@ logger.info("AlgebraPijlenGWT init");
 			kijkNaButton = new PushButton(rb.kijkNa());
 			kijkNaButton.addStyleName(algebraPijlenGWTCss.pushbutton());
 			canvasPanel.add(kijkNaButton);
-			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 70)/2, Style.Unit.PX, 70, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			kijkNaButton.addClickHandler(new PushClickHandler());
 

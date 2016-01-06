@@ -1419,7 +1419,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		if (s.equals("label"))
 		{	if (labelItem.getText().equals("toon label") || 
 				labelItem.getText().equals("show label") ||
-				labelItem.getText().equals("montrer label"))
+				labelItem.getText().equals("montrer label") ||
+				labelItem.getText().equals("zeige Label"))
 			{
 				//labelItem.setText("verberg label");
 				labelItem.setText(AlgebraPijlenGWT.rb.verbergLabel());
@@ -1427,7 +1428,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 			else if (labelItem.getText().equals("verberg label") ||
 					 labelItem.getText().equals("hide label") ||
-					 labelItem.getText().equals("cacher label"))
+					 labelItem.getText().equals("cacher label")  ||
+					 labelItem.getText().equals("verberge Label"))
 			{
 				//labelItem.setText("toon label");
 				labelItem.setText(AlgebraPijlenGWT.rb.toonLabel());
@@ -1438,7 +1440,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		else if (s.equals("tabel"))
 		{	if (tabelItem.getText().equals("toon tabel") ||
 				tabelItem.getText().equals("show table") ||
-				tabelItem.getText().equals("montrer table"))
+				tabelItem.getText().equals("montrer table") ||
+				tabelItem.getText().equals("zeige Tabelle"))
 			{
 				//tabelItem.setText("verberg tabel");
 				tabelItem.setText(AlgebraPijlenGWT.rb.verbergTabel());
@@ -1446,7 +1449,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 			else if (tabelItem.getText().equals("verberg tabel") ||
 					 tabelItem.getText().equals("hide table") ||
-					 tabelItem.getText().equals("cacher table"))
+					 tabelItem.getText().equals("cacher table") ||
+					 tabelItem.getText().equals("verberge Tabelle"))
 			{
 				//tabelItem.setText("toon tabel");
 				tabelItem.setText(AlgebraPijlenGWT.rb.toonTabel());
@@ -1457,7 +1461,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		{
 			if (kettingItem.getText().equals("toon ketting") ||
 				kettingItem.getText().equals("show chain") ||
-				kettingItem.getText().equals("montrer flèche"))
+				kettingItem.getText().equals("montrer flèche") ||
+				kettingItem.getText().equals("zeige Baum"))
 			{
 				//kettingItem.setText("verberg ketting");
 				kettingItem.setText(AlgebraPijlenGWT.rb.verbergKetting());
@@ -1467,7 +1472,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 			else if (kettingItem.getText().equals("verberg ketting") ||
 					 kettingItem.getText().equals("hide chain") ||
-					 kettingItem.getText().equals("cacher flèche"))
+					 kettingItem.getText().equals("cacher flèche") ||
+					 kettingItem.getText().equals("verberge Baum"))
 			{
 				//kettingItem.setText("toon ketting");
 				kettingItem.setText(AlgebraPijlenGWT.rb.toonKetting());

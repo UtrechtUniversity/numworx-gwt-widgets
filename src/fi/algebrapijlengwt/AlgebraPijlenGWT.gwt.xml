@@ -25,6 +25,7 @@
 
   <extend-property name="locale" values="en"/>
   <extend-property name="locale" values="fr"/>
+  <extend-property name="locale" values="de"/>
   
   <add-linker name='xsiframe' />
   
