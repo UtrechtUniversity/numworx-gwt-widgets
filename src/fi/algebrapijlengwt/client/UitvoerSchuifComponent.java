@@ -1457,7 +1457,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		{
 			if (kettingItem.getText().equals("toon ketting") ||
 				kettingItem.getText().equals("show chain") ||
-				kettingItem.getText().equals("montrer fleche"))
+				kettingItem.getText().equals("montrer flèche"))
 			{
 				//kettingItem.setText("verberg ketting");
 				kettingItem.setText(AlgebraPijlenGWT.rb.verbergKetting());
@@ -1467,7 +1467,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 			else if (kettingItem.getText().equals("verberg ketting") ||
 					 kettingItem.getText().equals("hide chain") ||
-					 kettingItem.getText().equals("cacher fleche"))
+					 kettingItem.getText().equals("cacher flèche"))
 			{
 				//kettingItem.setText("toon ketting");
 				kettingItem.setText(AlgebraPijlenGWT.rb.toonKetting());

@@ -244,7 +244,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			currentY += buttonHeight + topOffset;
 		}
 		
-		currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
+		//currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
+		currentX = 2 * leftOffset;
 		
 		tabelBox = new CheckBox();
 		//tabelBox.setText("tabel");
@@ -261,7 +262,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			currentY += buttonHeight + topOffset;
 		}
 		
-		currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
+		//currentX = (asv.toolsWidth - checkBoxWidth) / 2; //leftOffset;
+		currentX = 2 * leftOffset;
 		
 		grafiekBox = new CheckBox();
 		//grafiekBox.setText("grafiek");
