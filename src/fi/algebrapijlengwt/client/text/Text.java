@@ -43,6 +43,8 @@ public interface Text extends ConstantsWithLookup {
 	@DefaultStringValue("verberg ketting")
 	String verbergKetting();
 	
+	@DefaultStringValue("Kijk na")
+	String kijkNa();
 	
 	
 

@@ -272,7 +272,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		if (grafiekOptie)
 		{	
 			canvasPanel.add(grafiekBox);
-			canvasPanel.setWidgetLeftWidth(grafiekBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(grafiekBox, currentX, Style.Unit.PX, checkBoxWidth + 20, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(grafiekBox, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 		
 			grafiekBox.addClickHandler(new PushClickHandler());
@@ -894,7 +894,8 @@ logger.info("AlgebraPijlenGWT init");
 		
 		if (kijkNaActief)
 		{	
-			kijkNaButton = new PushButton("kijk na");
+			//kijkNaButton = new PushButton("kijk na");
+			kijkNaButton = new PushButton(rb.kijkNa());
 			kijkNaButton.addStyleName(algebraPijlenGWTCss.pushbutton());
 			canvasPanel.add(kijkNaButton);
 			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 60)/2, Style.Unit.PX, 60, Style.Unit.PX);
