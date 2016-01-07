@@ -55,9 +55,6 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.0.0</version>
-  		<scope>system</scope>
-  		<systemPath>${project.basedir}/lib/interaction.jar</systemPath>
   	</dependency>
   </dependencies>
   <parent>
