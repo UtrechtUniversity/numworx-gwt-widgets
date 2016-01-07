@@ -589,6 +589,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			basisPanel.add(tabelComponent);
 		}
 		tabelComponent.zetZooming(zoomInTabel);
+		tabelComponent.zetXAsNaam(xAsNaam);
+		tabelComponent.zetYAsNaam(yAsNaam, true);
 		
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
 		formuleComponent.setPixelSize( breedte  , (formuleComponentHoogte - 2 - offset) );
