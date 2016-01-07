@@ -1,5 +1,10 @@
 package fi.graphtoolgwt.client;
 
+import java.util.logging.Logger;
+
+import org.eclipse.jetty.util.log.Log;
+import java.lang.Character;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
@@ -24,6 +29,7 @@ import fi.graphtoolgwt.client.TekenComponentGWT.PushClickHandler;
 
 
 public class TabelVakGWT extends LayoutPanel{
+
 
 
 	// attributen
@@ -66,7 +72,6 @@ public class TabelVakGWT extends LayoutPanel{
 	    tabelVakTextField.addKeyDownHandler(new KeyDownHandler() {
 	      public void onKeyDown(KeyDownEvent event) {
 	    	  if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-	        	System.out.println("onKeyDown Enter aangeroepen");
 	        	text = tabelVakTextField.getText();
 	        	String text1 = trimTrailingZeros(text);
 				boolean changed1 = (text.length() != text1.length());
@@ -82,15 +87,6 @@ public class TabelVakGWT extends LayoutPanel{
 				// of verwijderen			
 				owner.processTabelPunt(vakIndex);
 	        }
-	    	  //Dit zou niet moeten hoeven en werkt ook niet lekker:
-	    	  else
-	    	  {		String txt = tabelVakTextField.getText();
-	    	  		try{
-	    	  			txt = txt + (char) event.getNativeKeyCode();
-	    	  		}
-	    	  		catch(Exception e){}
-	    	  		tabelVakTextField.setText(txt);
-	    	  }
 	      }
 	    });
 	    tabelVakTextField.addKeyUpHandler(new KeyUpHandler() {
@@ -184,8 +180,8 @@ public class TabelVakGWT extends LayoutPanel{
 				
 	}
 	
-	public boolean isLegal(char c)
-	{	return Character.isDigit(c) || (c == '-') || (c == '.');
+	public boolean isLegal(char c) {	
+		return Character.isDigit(c) || (c == '-') || (c == '.');
 	}
 
 	public void zetBreedte(int breedte)
