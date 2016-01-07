@@ -8,16 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-
-
-
-
-
-
-
-
-
-
+import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 
@@ -51,6 +42,9 @@ import fi.wiskopdr.expressies.Expressie;
 
 
 public class TabelComponentGWT extends LayoutPanel{
+	
+	private static Logger logger = Logger.getLogger("TabelComponentGWT");
+
 
 		private int hoogte = 60;
 	
