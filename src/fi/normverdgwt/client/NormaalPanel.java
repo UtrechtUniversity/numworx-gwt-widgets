@@ -337,7 +337,7 @@ public class NormaalPanel extends LayoutPanel
 		//theFM = getFontMetrics(theFont);
 
 		//cHeight = 3 * theFM.getHeight() / 2;
-//GWT		
+		
 		cHeight = 20;
 		cHeight1 = cHeight + offSet;
 		cHeight2 = cHeight + offSet / 2;
@@ -348,27 +348,32 @@ public class NormaalPanel extends LayoutPanel
 		// kansGroup
 				
 		//rechtsButton = new JRadioButton(NormaleVerdeling.rb.getString("kansRechtsTekst"));
-		rechtsButton = new RadioButton(kansGroup, "Kans rechts");
-//GWT (2)		
+		//rechtsButton = new RadioButton(kansGroup, "Kans rechts");
+		rechtsButton = new RadioButton(kansGroup, NormVerdGWT.rb.kansRechtsTekst());
+		
 		//rechtsButton.setFont(theFont);
 		//rechtsButton.setOpaque(false);
-		tm = nvContext2d.measureText("Kans rechts");
+		//tm = nvContext2d.measureText("Kans rechts");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.kansRechtsTekst());
 		width = (int) Math.round(tm.getWidth());
 		rechtsButtonWidth = 2 * width;
 		
-		linksButton = new RadioButton(kansGroup, "Kans links");
-//GWT(2)		
+		//linksButton = new RadioButton(kansGroup, "Kans links");
+		linksButton = new RadioButton(kansGroup, NormVerdGWT.rb.kansLinksTekst());
+		
 		//linksButton.setFont(theFont);
 		//linksButton.setOpaque(false);
-		tm = nvContext2d.measureText("Kans links");
+		//tm = nvContext2d.measureText("Kans links");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.kansLinksTekst());
 		width = (int) Math.round(tm.getWidth());
 		linksButtonWidth = 2 * width;					 
 		
-		tweeGrenzenButton = new RadioButton(kansGroup, "2 grenzen");
-//GWT(2)		
+		//tweeGrenzenButton = new RadioButton(kansGroup, "2 grenzen");
+		tweeGrenzenButton = new RadioButton(kansGroup, NormVerdGWT.rb.tweeGrenzenTekst());
 		//tweeGrenzenButton.setFont(theFont);
 		//tweeGrenzenButton.setOpaque(false);		
-		tm = nvContext2d.measureText("2 grenzen");
+		//tm = nvContext2d.measureText("2 grenzen");
+		tm = nvContext2d.measureText("NormVerdGWT.rb.tweeGrenzenTekst()");
 		width = (int) Math.round(tm.getWidth());
 		tweeGrenzenButtonWidth = 2 * width;					 
 		
@@ -393,11 +398,13 @@ public class NormaalPanel extends LayoutPanel
 		// berekenGroup
 
 		//width = theFM.stringWidth(NormaleVerdeling.rb.getString("grensRechtsTekst")) + 30;
-		tm = nvContext2d.measureText("Bereken");
+		//tm = nvContext2d.measureText("Bereken");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.berekenTekst());
 		width = (int) Math.round(tm.getWidth());
 		berekenLabelWidth = 2 * width;
-		berekenLabel = new Label("Bereken");
-//GWT		
+		//berekenLabel = new Label("Bereken");
+		berekenLabel = new Label(NormVerdGWT.rb.berekenTekst());
+		
 		//berekenLabel.setFont(theFont);
 		
 		//berekenLabel.setSize(width, cHeight);
@@ -408,7 +415,7 @@ public class NormaalPanel extends LayoutPanel
 		muButtonWidth = 2 * width + 20;
 		//muButton = new RadioButton(berekenGroup, "mu"); // "\u03BC";
 		muButton = new RadioButton(berekenGroup, "\u03BC"); // "\u03BC";
-//GWT		
+		
 		//muButton.setFont(theFont);
 		//muButton.setOpaque(false);
 		
@@ -418,46 +425,52 @@ public class NormaalPanel extends LayoutPanel
 		sigmaButtonWidth = 2 * width + 20;
 		//sigmaButton = new RadioButton(berekenGroup, "sigma"); // "\u03C3"
 		sigmaButton = new RadioButton(berekenGroup, "\u03C3"); // "\u03C3"
-//GWT		
+		
 		//sigmaButton.setFont(theFont);
 		//sigmaButton.setOpaque(false);		
 		
 		//sigmaButton.setSize(width, cHeight);					 
 		
-		tm = nvContext2d.measureText("Grens");
+		//tm = nvContext2d.measureText("Grens");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensTekst());
 		width = (int) Math.round(tm.getWidth());
 		grensButtonWidth = 2 * width + 20;
-		grensButton = new RadioButton(berekenGroup, "Grens");
-//GWT
+		//grensButton = new RadioButton(berekenGroup, "Grens");
+		grensButton = new RadioButton(berekenGroup, NormVerdGWT.rb.grensTekst());
 		//grensButton.setFont(theFont);
 		//grensButton.setOpaque(false);
 		
 		//grensButton.setSize(width, cHeight);					 
-		tm = nvContext2d.measureText("Kans");
+		//tm = nvContext2d.measureText("Kans");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.kansTekst());
 		width = (int) Math.round(tm.getWidth());
 		kansButtonWidth = 2 * width + 20;
-		kansButton = new RadioButton(berekenGroup, "Kans");
-//GWT
+		//kansButton = new RadioButton(berekenGroup, "Kans");
+		kansButton = new RadioButton(berekenGroup, NormVerdGWT.rb.kansTekst());
 		//kansButton.setFont(theFont);
 		//kansButton.setOpaque(false);
 		
 		//kansButton.setSize(width, cHeight);					 
 		
-		tm = nvContext2d.measureText("Linkergrens");
+		//tm = nvContext2d.measureText("Linkergrens");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensLinksTekst());
+
 		width = (int) Math.round(tm.getWidth());
 		grensLinksButtonWidth = 2 * width + 20;
-		grensLinksButton = new RadioButton(berekenGroup, "Linkergrens");
-//GWT		
+		grensLinksButton = new RadioButton(berekenGroup, NormVerdGWT.rb.grensLinksTekst());
+		
 		//grensLinksButton.setFont(theFont);
 		//grensLinksButton.setOpaque(false);
 		//grensLinksButton.setSize(width, cHeight);					 
 
 		
-		tm = nvContext2d.measureText("Rechtergrens");
+		//tm = nvContext2d.measureText("Rechtergrens");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensRechtsTekst());
+
 		width = (int) Math.round(tm.getWidth());
 		grensRechtsButtonWidth = 2 * width + 20;
-		grensRechtsButton = new RadioButton(berekenGroup, "Rechtergrens");
-//GWT		
+		grensRechtsButton = new RadioButton(berekenGroup, NormVerdGWT.rb.grensRechtsTekst());
+		
 		//grensRechtsButton.setFont(theFont);
 		//grensRechtsButton.setOpaque(false);
 		
@@ -472,7 +485,7 @@ public class NormaalPanel extends LayoutPanel
 		//berekenGroup.add(grensRechtsButton);				
 
 //test		
-		berekenLabel.addStyleName("radiobutton");
+		berekenLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
 		muButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
 		sigmaButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
 		grensButton.addStyleName(NormVerdGWT.normVerdGWTCss.radiobutton());
@@ -583,10 +596,11 @@ public class NormaalPanel extends LayoutPanel
 		//add(sigmaSlider);	
 		//sigmaSlider.addActionListener(this);		
 
-		tm = nvContext2d.measureText("Grens G = ");
+		//tm = nvContext2d.measureText("Grens G = ");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensGTekst() + " = ");
 		width = (int) Math.round(tm.getWidth());
 		grensLabelWidth = width + 20;
-		grensLabel = new Label("Grens G = ");
+		grensLabel = new Label(NormVerdGWT.rb.grensGTekst() + " = ");
 		
 		//grensLabel.setFont(theFont);
 		//width = theFM.stringWidth(grensLabel.getText()) + 3;
@@ -621,10 +635,11 @@ public class NormaalPanel extends LayoutPanel
 		//add(grensSlider);
 		//grensSlider.addActionListener(this);
 
-		tm = nvContext2d.measureText("Linkergrens L = ");
+		//tm = nvContext2d.measureText("Linkergrens L = ");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensLinksLTekst() + " = ");
 		width = (int) Math.round(tm.getWidth());
-		grensLinksLabelWidth = width + 30;
-		grensLinksLabel = new Label("Linkergrens L = ");
+		grensLinksLabelWidth = width + 20;
+		grensLinksLabel = new Label(NormVerdGWT.rb.grensLinksLTekst() + " = ");
 		
 		//grensLinksLabel.setFont(theFont);
 		//width = theFM.stringWidth(grensLinksLabel.getText()) + 3;
@@ -652,10 +667,12 @@ public class NormaalPanel extends LayoutPanel
 		//grensLinksWaardeLabel.setSize(width, cHeight);
 		//add(grensLinksWaardeLabel);	
 
-		tm = nvContext2d.measureText("Rechtergrens R = ");
+		//tm = nvContext2d.measureText("Rechtergrens R = ");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.grensRechtsRTekst() + " = ");
 		width = (int) Math.round(tm.getWidth());
-		grensRechtsLabelWidth = width + 30;
-		grensRechtsLabel = new Label("Rechtergrens R = ");
+		grensRechtsLabelWidth = width + 20;
+		//grensRechtsLabel = new Label("Rechtergrens R = ");
+		grensRechtsLabel = new Label(NormVerdGWT.rb.grensRechtsRTekst() + " = ");
 		
 		//grensRechtsLabel.setFont(theFont);
 		//width = theFM.stringWidth(grensRechtsLabel.getText()) + 3;
@@ -692,11 +709,13 @@ public class NormaalPanel extends LayoutPanel
 		//add(tweeGrenzenSlider);
 		//tweeGrenzenSlider.addActionListener(this);
 		
-		tm = nvContext2d.measureText("Kans = ");
+		//tm = nvContext2d.measureText("Kans = ");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.kansTekst() + " = ");
 		width = (int) Math.round(tm.getWidth());
 		kansLabelWidth = width + 5;
-		kansLabel = new Label("Kans = ");
-//GWT(4)		
+		//kansLabel = new Label("Kans = ");
+		kansLabel = new Label(NormVerdGWT.rb.kansTekst() + " = ");
+		
 		//kansLabel.setFont(theFont);	
 		//width = theFM.stringWidth(kansLabel.getText()) + 3;
 		//kansLabel.setSize(width, cHeight);
@@ -730,12 +749,12 @@ public class NormaalPanel extends LayoutPanel
 		//add(kansSlider);	
 		//kansSlider.addActionListener(this);
 		
-		muWaardeLabel.addStyleName("label");
-		sigmaWaardeLabel.addStyleName("label");
-		grensWaardeLabel.addStyleName("label");
-		grensLinksWaardeLabel.addStyleName("label");
-		grensRechtsWaardeLabel.addStyleName("label");
-		kansWaardeLabel.addStyleName("label");
+		muWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
+		sigmaWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
+		grensWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
+		grensLinksWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
+		grensRechtsWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
+		kansWaardeLabel.addStyleName(NormVerdGWT.normVerdGWTCss.label());
 		
 		
 		
@@ -793,7 +812,8 @@ public class NormaalPanel extends LayoutPanel
 	
 //GWT kijkNa-gebeuren		
 		
-		kijkNaButton = new PushButton("Kijk Na");
+		//kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton = new PushButton(NormVerdGWT.rb.kijkNaTekst());
 		kijkNaButton.addStyleName(NormVerdGWT.normVerdGWTCss.pushbutton());
 		kijkNaPanel = new LayoutPanel();
 		//kijkNaButton.setFont(theFont);
@@ -2767,7 +2787,8 @@ grensDecimals = findGrensDecimals();
 			//grensSlider.setVisible(false);
 			grensSlider.zetEnabled(false);
 			
-			kansLabel.setText("Kans " + " = ");
+			//kansLabel.setText("Kans " + " = ");
+			kansLabel.setText(NormVerdGWT.rb.kansTekst() + " = ");
 						
 			plaatsComponenten(false);			
 			
@@ -2871,12 +2892,14 @@ grensDecimals = findGrensDecimals();
 			//paint();
 			
 			if (kansKeuze == KANSLINKS)
-			{	kansLabel.setText("Kans links" + " = ");
+			{	//kansLabel.setText("Kans links" + " = ");
+				kansLabel.setText(NormVerdGWT.rb.kansLinksTekst() + " = ");
 				if (wasTweeGrenzen)
 					zetGrens(grensRechts, true);
 			}
 			else // kansKeuze == KANSRECHTS
-			{	kansLabel.setText("Kans rechts" + " = ");
+			{	//kansLabel.setText("Kans rechts" + " = ");
+				kansLabel.setText(NormVerdGWT.rb.kansRechtsTekst() + " = ");
 				if (wasTweeGrenzen)
 					zetGrens(grensLinks, true);
 			}
@@ -3675,7 +3698,8 @@ grensDecimals = findGrensDecimals();
 				g.fillText(grensWaarde, grensWaardePos, yMin + vSpace);
 			}
 			
-			String gString = "G";
+			//String gString = "G";
+			String gString = NormVerdGWT.rb.gTekst();
 			tm = g.measureText(gString);
 			
 			//width = theFM.stringWidth(gString);
@@ -3751,7 +3775,8 @@ grensDecimals = findGrensDecimals();
 				g.fillText(grensWaarde, grensWaardePos, yMin + vSpace);
 			}
 			
-			String gString = "G";
+			//String gString = "G";
+			String gString = NormVerdGWT.rb.gTekst();
 			tm = g.measureText(gString);
 			
 			//width = theFM.stringWidth(gString);
@@ -3874,8 +3899,10 @@ grensDecimals = findGrensDecimals();
 				g.fillText(grensRechtsWaarde, grensRechtsWaardePos,  yMin + vRechtsSpace);
 			}
 			
-			String lString = "L";			 
-			String rString = "R";			 
+			//String lString = "L";			 
+			String lString = NormVerdGWT.rb.lTekst();
+			//String rString = "R";			 
+			String rString = NormVerdGWT.rb.rTekst();
 			
 			tmLinks = g.measureText(lString);
 			tmRechts = g.measureText(rString);
@@ -5549,7 +5576,7 @@ grensDecimals = findGrensDecimals();
 		kijkNaPanel.setWidgetVisible(owner.goedKrulImage, correct);
 		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, !correct);
 
-		owner.correct = correct;
+		owner.correct = new Boolean(correct);
 		
 		//fire actionEvent
 		//ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");

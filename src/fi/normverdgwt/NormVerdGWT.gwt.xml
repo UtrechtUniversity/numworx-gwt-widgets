@@ -20,12 +20,13 @@
   <!-- Other module inherits                                      -->
     <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
     
-  <!--  <add-linker name='xsiframe' /> -->
-  
+  <add-linker name='xsiframe' />
+    
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
   
-
+  <extend-property name="locale" values="en"/>
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.normverdgwt.client.NormVerdGWT'/>
 

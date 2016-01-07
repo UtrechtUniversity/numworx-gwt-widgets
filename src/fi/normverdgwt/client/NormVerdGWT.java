@@ -41,8 +41,13 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
+import fi.normverdgwt.client.text.Text;
+
 public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	
+	public static Text rb;
+	
 	private static Logger logger = Logger.getLogger("NormVerdGWT");
 	
     static final String holderId = "dockholder";
@@ -86,6 +91,8 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		normVerdGWTClientBundle = GWT.create(NormVerdGWTClientBundle.class);
 		normVerdGWTCss = normVerdGWTClientBundle.getNormVerdGWTCSS();
 		normVerdGWTCss.ensureInjected();
@@ -231,8 +238,13 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public Boolean isCorrect()
 	{
+		
+		
 		if (normaalPanel.kijkOpdrachtNa)
+		{
+logger.info("isCorrect " + correct.toString());			
 			return correct;
+		}
 		else
 			return Boolean.TRUE;
 
@@ -241,6 +253,8 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
+logger.info("setCommRoot");
+				
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 
@@ -279,7 +293,12 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
    		ingevuld = true;
 //System.out.println("cor " + isCorrect().booleanValue());		
 
-		comRoot.setChanged(isCorrect().booleanValue());
+logger.info("pre setChanged " + correct.toString());
+if (comRoot == null)
+logger.info("comRoot == null");	
+		//comRoot.setChanged(isCorrect().booleanValue());
+		comRoot.setChanged(isCorrect());
+logger.info("pre setChanged " + correct.toString());		
 		
 	}
 
