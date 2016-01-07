@@ -69,7 +69,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		//Window.alert("test");	
 		
 		//RootPanel.get("dockholder").getElement().setInnerText("textand");
-			Stub.publish(this);
+		//	Stub.publish(this);
 			
 	}
 	
@@ -89,7 +89,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 
-		//init(breedte,hoogte,launchState,randomVarWaarden);
+		init(breedte,hoogte,launchState,randomVarWaarden);
 				
 	}
 
@@ -708,6 +708,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 	
 		if (muntenSelected) {
 			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
+			munten.setGrootte(breedte,hoogte);
 			Boolean eenMuntTweeMunt=false;
 			if (l.containsKey("eenMuntTweeMunt"))
 				eenMuntTweeMunt = l.getBoolean("eenMuntTweeMunt");
@@ -722,9 +723,11 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			if (l.containsKey("kansOpMunt"))
 				kansOpMunt = l.getString("kansOpMunt");
 			munten.kansOpKopText.setText(kansOpMunt);
+			
 		}
 		if (dobbelstenenSelected) {
 			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
+			dobbelstenen.setGrootte(breedte,hoogte);
 			Boolean eenDobbelsteenRadio=false;
 			if (l.containsKey("eenDobbelsteenRadio"))
 				eenDobbelsteenRadio = l.getBoolean("eenDobbelsteenRadio");
@@ -779,7 +782,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		RootPanel.get("dockholder").add(asWidget());
+		//RootPanel.get("dockholder").add(asWidget());
 
 	}
 

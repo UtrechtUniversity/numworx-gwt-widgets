@@ -97,6 +97,16 @@ public class Munten extends FlowPanel implements ClickHandler{
 	int eenKop;
 	int tweeKop;
 	boolean muntenTabel1;
+	LayoutPanel panel;
+	FlowPanel panel2;
+	VerticalPanel panel1;
+	VerticalPanel results2;
+	VerticalPanel results;
+	VerticalPanel results3;
+	VerticalPanel results1;
+	VerticalPanel results4;
+	VerticalPanel results5;
+	VerticalPanel radios;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -202,10 +212,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    
 	    label = new Label("Label");
 	    
-	    LayoutPanel panel = new LayoutPanel();
+	    panel = new LayoutPanel();
 	    panel.setSize("790px", "110px");
 
-	    VerticalPanel results2=new VerticalPanel();
+	    results2=new VerticalPanel();
 	    panel.add(results2);
 	    panel.setWidgetLeftRight(results2,400,Unit.PX,200,Unit.PX);
 	    panel.setWidgetTopBottom(results2,25,Unit.PX,10,Unit.PX);
@@ -221,7 +231,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    if (muntenResultaten==false)
 	    	results2.setVisible(false);
 	    
-	    VerticalPanel results3=new VerticalPanel();
+	    results3=new VerticalPanel();
 	    panel.add(results3);
 	    panel.setWidgetLeftRight(results3,500,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(results3,10,Unit.PX,10,Unit.PX);
@@ -238,7 +248,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    if (muntenResultaten==false)
 	    	results3.setVisible(false);
 	    
-	    VerticalPanel results4=new VerticalPanel();
+	    results4=new VerticalPanel();
 	    panel.add(results4);
 	    panel.setWidgetLeftRight(results4,570,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(results4,10,Unit.PX,10,Unit.PX);
@@ -256,7 +266,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	results4.setVisible(false);
 	    
 
-	    VerticalPanel results5=new VerticalPanel();
+	    results5=new VerticalPanel();
 	    panel.add(results5);
 	    panel.setWidgetLeftRight(results5,640,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(results5,10,Unit.PX,10,Unit.PX);
@@ -274,7 +284,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	results5.setVisible(false);
 	    
 	    
-	    VerticalPanel results=new VerticalPanel();
+	    results=new VerticalPanel();
 	    panel.add(results);
 	    panel.setWidgetLeftRight(results,570,Unit.PX,100,Unit.PX);
 	    panel.setWidgetTopBottom(results,10,Unit.PX,10,Unit.PX);
@@ -289,7 +299,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    results.add(minResult);
 	    results.add(maxResult);
 	    
-	    VerticalPanel results1=new VerticalPanel();
+	    results1=new VerticalPanel();
 	    panel.add(results1);
 	    panel.setWidgetLeftRight(results1,720,Unit.PX,10,Unit.PX);
 	    panel.setWidgetTopBottom(results1,10,Unit.PX,10,Unit.PX);
@@ -320,7 +330,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 		minResult5.setVisible(false);
 		maxResult5.setVisible(false);
 	    
-	    VerticalPanel radios=new VerticalPanel();
+	    radios=new VerticalPanel();
 	    panel.add(radios);
 	    
 	    if (muntenResultaten==false)
@@ -338,7 +348,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    radios.add(aantalKopRadio);
 	    radios.add(percentageKopRadio);
 	    
-	    FlowPanel panel2=new FlowPanel();
+	    panel2=new FlowPanel();
 	    panel.add(panel2);
 	    
 	    panel.setWidgetLeftRight(panel2,10,Unit.PX,560,Unit.PX);
@@ -385,7 +395,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    	panel2.setVisible(false);
 	    
 	    		// Add it to the root panel.
-	    VerticalPanel panel1=new VerticalPanel();
+	    panel1=new VerticalPanel();
 	    
 	    panel1.add(voeruit);
 	    panel1.add(stap);
@@ -537,7 +547,27 @@ public class Munten extends FlowPanel implements ClickHandler{
 			
 	}
 	
-
+	public void setGrootte(int breedte,int hoogte)
+	{
+		scrollPanel.setSize("230px", Integer.toString(hoogte-210)+"px");
+		scrollPanel2.setSize("230px", Integer.toString(hoogte-110)+"px");
+		panel.setSize(Integer.toString(breedte)+"px","110px");
+		panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
+		panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
+		panel.setWidgetLeftRight(results,570,Unit.PX,breedte-690,Unit.PX);
+		panel.setWidgetLeftRight(results1,720,Unit.PX,breedte-780,Unit.PX);
+		panel.setWidgetLeftRight(radios,370,Unit.PX,breedte-690,Unit.PX);
+		panel.setWidgetLeftRight(results2,400,Unit.PX,breedte-590,Unit.PX);
+		panel.setWidgetLeftRight(results3,500,Unit.PX,breedte-690,Unit.PX);
+		panel.setWidgetLeftRight(results4,570,Unit.PX,breedte-690,Unit.PX);
+		panel.setWidgetLeftRight(results5,640,Unit.PX,breedte-690,Unit.PX);
+		kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
+		kladjeHWTCanvas.setHeight(Integer.toString(hoogte-110)+"px");
+		kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
+		kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-110);
+		grafiek.setGrootte(breedte-230, hoogte-110);
+	}
+	
 	public void setEenMuntTweeMunten() {
 		if (eenMunt.getValue()==true) {
 			frequentieCanvas.setVisible(true);

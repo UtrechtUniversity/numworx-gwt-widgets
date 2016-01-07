@@ -62,6 +62,9 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	DobbelstenenGrafiek dobbelstenenGrafiek;
 	boolean dobbelstenenResultaten1;
 	boolean dobbelstenenTabel1;
+	LayoutPanel panel;
+	FlowPanel panel2;
+	VerticalPanel panel6;
 	
 	CssColor lijnenKleur = CssColor.make(0, 0, 0);
 	CssColor agKleur = CssColor.make(255, 255, 255);
@@ -503,10 +506,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 		
 		gIm = kladjeHWTCanvas.getContext2d();		
 
-	    LayoutPanel panel = new LayoutPanel();
+	    panel = new LayoutPanel();
 	    panel.setSize("790px", "120px");
 	    
-	    FlowPanel panel2=new FlowPanel();
+	    panel2=new FlowPanel();
 	    panel.add(panel2);
 	    
 	    VerticalPanel panel9=new VerticalPanel();
@@ -570,7 +573,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    if (dobbelstenenInstellingen==false)
 	    	panel2.setVisible(false);
 	    
-	    VerticalPanel panel6=new VerticalPanel();
+	    panel6=new VerticalPanel();
 	    panel6.add(voeruit);
 	    panel6.add(wis);
 	    panel.add(panel6);
@@ -1315,6 +1318,25 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 
 		 dobbelstenenGrafiek = new DobbelstenenGrafiek(this);
 		 dobbelstenenGrafiek.paint();
+	    
+	}
+	
+	public void setGrootte(int breedte, int hoogte) {
+		kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
+		kladjeHWTCanvas.setHeight(Integer.toString(hoogte-120)+"px");
+		kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
+		kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-120);
+		dobbelstenenGrafiek.setGrootte(breedte-230,hoogte-120);
+	    scrollPanel.setSize("230px", Integer.toString(hoogte-120)+"px");
+	    scrollPanel2.setSize("230px", Integer.toString(hoogte-120)+"px");
+	    scrollPanel3.setSize("230px", Integer.toString(hoogte-120)+"px");
+	    scrollPanel4.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    scrollPanel5.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    scrollPanel6.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    //panel.setWidgetLeftRight(panel9,360,Unit.PX,0,Unit.PX);
+	    panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
+	    panel.setWidgetLeftRight(panel6, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
+	    
 	    
 	}
 	

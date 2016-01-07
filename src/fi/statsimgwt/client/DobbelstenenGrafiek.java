@@ -8,9 +8,17 @@ public class DobbelstenenGrafiek {
 	Dobbelstenen ssg;
 	
 	CssColor red = CssColor.make(255, 0, 0);
-		
+	int hoogte=330;
+	int breedte=560;
+	
 	public DobbelstenenGrafiek (Dobbelstenen dobbelstenen) {
 		this.ssg=dobbelstenen;
+	}
+	
+	public void setGrootte(int breedte, int hoogte) {
+		this.breedte=breedte;
+		this.hoogte=hoogte;
+		paint();
 	}
 	
 	public void paint() {
@@ -22,11 +30,11 @@ public class DobbelstenenGrafiek {
 		
 		ssg.gIm.beginPath();
 
-		int height=330;
+		int height=hoogte;
 		if (ssg.toonSom.getValue()==true) {
-			height=175;
+			height=hoogte/2;
 		}
-		int width=560;
+		int width=breedte;
 
 		ssg.gIm.moveTo(50,20);
 		ssg.gIm.lineTo(50,height-30);

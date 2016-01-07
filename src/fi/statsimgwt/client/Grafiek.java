@@ -9,13 +9,22 @@ public class Grafiek {
 	CssColor red = CssColor.make(255, 0, 0);
 	CssColor green = CssColor.make(0, 255, 0);
 	
+	int breedte=560;
+	int hoogte=340;
+	
 	public Grafiek(Munten munten) {
 		this.ssg=munten;
 	}
 	
+	public void setGrootte(int breedte, int hoogte) {
+		this.breedte=breedte;
+		this.hoogte=hoogte;
+		paint();
+	}
+	
 	public void paint() {
 		ssg.gIm.setFillStyle(ssg.agKleur);
-		ssg.gIm.fillRect(0,0,560,340);
+		ssg.gIm.fillRect(0,0,breedte,hoogte);
 		ssg.gIm.setLineWidth(1.0d);
 		ssg.gIm.setStrokeStyle(ssg.lijnenKleur);
 		ssg.gIm.setFillStyle(ssg.lijnenKleur);
@@ -29,19 +38,19 @@ public class Grafiek {
 		
 		if (ssg.eenMunt.getValue()==true) {
 			for (int i=1;i<ssg.muntCount;i++) {
-				ssg.gIm.moveTo(i*(560-90)/ssg.maxCount+80, (int) (ssg.percentageMunt[i-1]*(340-50))+25);
-				ssg.gIm.lineTo((i+1)*(560-90)/ssg.maxCount+80,(int) (ssg.percentageMunt[i]*(340-50))+25);
+				ssg.gIm.moveTo(i*(breedte-90)/ssg.maxCount+80, (int) (ssg.percentageMunt[i-1]*(hoogte-50))+25);
+				ssg.gIm.lineTo((i+1)*(breedte-90)/ssg.maxCount+80,(int) (ssg.percentageMunt[i]*(hoogte-50))+25);
 			}
 			ssg.gIm.moveTo(80, 25);
-			ssg.gIm.lineTo(80,340-25);
-			ssg.gIm.moveTo(80, 340/2);
-			ssg.gIm.lineTo(560-10,340/2);
-			ssg.gIm.moveTo(80, 340-25);
-			ssg.gIm.lineTo(560-10,340-25);
+			ssg.gIm.lineTo(80,hoogte-25);
+			ssg.gIm.moveTo(80, hoogte/2);
+			ssg.gIm.lineTo(breedte-10,hoogte/2);
+			ssg.gIm.moveTo(80, hoogte-25);
+			ssg.gIm.lineTo(breedte-10,hoogte-25);
 			for (int i=5;i>=0;i--) {
-				ssg.gIm.fillText(i*20+"%",40,(5-i)*(340-50)/5+30);
-				ssg.gIm.moveTo(75,(5-i)*(340-50)/5+25);
-				ssg.gIm.lineTo(80,(5-i)*(340-50)/5+25);
+				ssg.gIm.fillText(i*20+"%",40,(5-i)*(hoogte-50)/5+30);
+				ssg.gIm.moveTo(75,(5-i)*(hoogte-50)/5+25);
+				ssg.gIm.lineTo(80,(5-i)*(hoogte-50)/5+25);
 			}
 			int a=ssg.maxCount;
 			int b=0;
@@ -67,10 +76,10 @@ public class Grafiek {
 			}
 			int numMarks=a/c;
 			for (int i=0;i<=numMarks;i++) {
-				ssg.gIm.moveTo((560-90)*(i*c)/(a)+80, (340-25));
-				ssg.gIm.lineTo((560-90)*(i*c)/(a)+80, (340-20));
+				ssg.gIm.moveTo((breedte-90)*(i*c)/(a)+80, (hoogte-25));
+				ssg.gIm.lineTo((breedte-90)*(i*c)/(a)+80, (hoogte-20));
 				String s=(i*c)+"";
-				ssg.gIm.fillText(s, (560-90)*(i*c)/(a)+70, (340-5));
+				ssg.gIm.fillText(s, (breedte-90)*(i*c)/(a)+70, (hoogte-5));
 			}
 			/*Graphics2D g2 = (Graphics2D) g;
 			AffineTransform orig = g2.getTransform();
@@ -81,19 +90,19 @@ public class Grafiek {
 			g2.drawString(StatSim.rb.getString("percentageHeads"),200,-90);
 			g2.setTransform(orig);*/
 		} else {
-			ssg.gIm.moveTo(80,340-25);
-			ssg.gIm.lineTo(560-60,340-25);
+			ssg.gIm.moveTo(80,hoogte-25);
+			ssg.gIm.lineTo(breedte-60,hoogte-25);
 			ssg.gIm.moveTo(80, 25);
-			ssg.gIm.lineTo(80, 340-25);
-			ssg.gIm.moveTo(80+(560-90)/6,340-25);
-			ssg.gIm.lineTo(80+(560-90)/6,340-20);
-			ssg.gIm.fillText("0 kop",80+(560-90)/6-30,340-5);
-			ssg.gIm.moveTo(80+ (560-90)*3/6, 340-25);
-			ssg.gIm.lineTo(80+(560-90)*3/6,340-20);
-			ssg.gIm.fillText("1 kop",80+(560-90)*3/6-25,340-5);
-			ssg.gIm.moveTo(80+(560-90)*5/6, 340-25);
-			ssg.gIm.lineTo(80+(560-90)*5/6, 340-20);
-			ssg.gIm.fillText("2 kop",80+(560-90)*5/6-30,340-5);
+			ssg.gIm.lineTo(80, hoogte-25);
+			ssg.gIm.moveTo(80+(breedte-90)/6,hoogte-25);
+			ssg.gIm.lineTo(80+(breedte-90)/6,hoogte-20);
+			ssg.gIm.fillText("0 kop",80+(breedte-90)/6-30,hoogte-5);
+			ssg.gIm.moveTo(80+ (breedte-90)*3/6, hoogte-25);
+			ssg.gIm.lineTo(80+(breedte-90)*3/6,hoogte-20);
+			ssg.gIm.fillText("1 kop",80+(breedte-90)*3/6-25,hoogte-5);
+			ssg.gIm.moveTo(80+(breedte-90)*5/6, hoogte-25);
+			ssg.gIm.lineTo(80+(breedte-90)*5/6, hoogte-20);
+			ssg.gIm.fillText("2 kop",80+(breedte-90)*5/6-30,hoogte-5);
 			
 			int a;			
 			if (Double.parseDouble(ssg.kansOpKopText.getText())>0.75 || Double.parseDouble(ssg.kansOpKopText.getText())<0.25)
@@ -123,10 +132,10 @@ public class Grafiek {
 			}
 			int numMarks=a/c;
 			for (int i=0;i<=numMarks;i++) {
-				ssg.gIm.moveTo(75,(340-30)-(340-50)*(i*c)/(a)+5);
-				ssg.gIm.lineTo(80, (340-30)-(340-50)*(i*c)/(a)+5);
+				ssg.gIm.moveTo(75,(hoogte-30)-(hoogte-50)*(i*c)/(a)+5);
+				ssg.gIm.lineTo(80, (hoogte-30)-(hoogte-50)*(i*c)/(a)+5);
 				String s=(i*c)+"";
-				ssg.gIm.fillText(s, 50,(340-30)-(340-50)*(i*c)/(a)+10);
+				ssg.gIm.fillText(s, 50,(hoogte-30)-(hoogte-50)*(i*c)/(a)+10);
 			}
 			/*Graphics2D g2 = (Graphics2D) g;
 			AffineTransform orig = g2.getTransform();
@@ -138,17 +147,17 @@ public class Grafiek {
 			g2.setTransform(orig);*/
 			
 			ssg.gIm.setFillStyle(red);
-			ssg.gIm.fillRect(85, 5+(340-30)-ssg.geenKop*(340-50)/a, (560-90)/3-10, ssg.geenKop*(340-50)/a);
+			ssg.gIm.fillRect(85, 5+(hoogte-30)-ssg.geenKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.geenKop*(hoogte-50)/a);
 			ssg.gIm.setFillStyle(ssg.lijnenKleur);
-			ssg.gIm.strokeRect(85, 5+(340-30)-ssg.geenKop*(340-50)/a, (560-90)/3-10, ssg.geenKop*(340-50)/a);
+			ssg.gIm.strokeRect(85, 5+(hoogte-30)-ssg.geenKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.geenKop*(hoogte-50)/a);
 			ssg.gIm.setFillStyle(yellow);
-			ssg.gIm.fillRect(85+(560-90)*1/3, 5+(340-30)-ssg.eenKop*(340-50)/a, (560-90)/3-10, ssg.eenKop*(340-50)/a);
+			ssg.gIm.fillRect(85+(breedte-90)*1/3, 5+(hoogte-30)-ssg.eenKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.eenKop*(hoogte-50)/a);
 			ssg.gIm.setFillStyle(ssg.lijnenKleur);
-			ssg.gIm.strokeRect(85+(560-90)*1/3, 5+(340-30)-ssg.eenKop*(340-50)/a, (560-90)/3-10, ssg.eenKop*(340-50)/a);
+			ssg.gIm.strokeRect(85+(breedte-90)*1/3, 5+(hoogte-30)-ssg.eenKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.eenKop*(hoogte-50)/a);
 			ssg.gIm.setFillStyle(green);
-			ssg.gIm.fillRect(85+(560-90)*2/3, 5+(340-30)-ssg.tweeKop*(340-50)/a, (560-90)/3-10, ssg.tweeKop*(340-50)/a);
+			ssg.gIm.fillRect(85+(breedte-90)*2/3, 5+(hoogte-30)-ssg.tweeKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.tweeKop*(hoogte-50)/a);
 			ssg.gIm.setFillStyle(ssg.lijnenKleur);
-			ssg.gIm.strokeRect(85+(560-90)*2/3, 5+(340-30)-ssg.tweeKop*(340-50)/a, (560-90)/3-10, ssg.tweeKop*(340-50)/a);
+			ssg.gIm.strokeRect(85+(breedte-90)*2/3, 5+(hoogte-30)-ssg.tweeKop*(hoogte-50)/a, (breedte-90)/3-10, ssg.tweeKop*(hoogte-50)/a);
 		}
 		ssg.gIm.stroke();
 	}
