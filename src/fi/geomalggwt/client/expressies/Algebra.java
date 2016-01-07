@@ -1012,7 +1012,7 @@ public class Algebra
 */	
 	/*Bepaalt of twee polynoom expressies evenredig zijn. e1 = k*e2
 	 *Dit gebeurde door de standaardvorm te maken en de coefficienten
-	 *te vergelijken (daardoor slecht één variabele magoelijk).
+	 *te vergelijken (daardoor slecht Ã©Ã©n variabele mogelijk).
 	 *Nu wordt: zijnEvenredig aangeroepen. Hierdoor werkt het 
 	 *ook op expressies met meer variabelen 
 	 */
@@ -1046,10 +1046,10 @@ public class Algebra
 		}
 		return false;*/
 	}
-	/*Bepaalt of de oplossing van vergelijking e1 = 0 één van de oplossingen is
+	/*Bepaalt of de oplossing van vergelijking e1 = 0 Ã©Ã©n van de oplossingen is
 	 *van e2 = 0.
 	 *Werkt alleen als e1 lineair en e2 kwadratisch, beide polynomen met 
-	 *één variabele. Geeft exception bij expressies van meer variabelen.
+	 *Ã©Ã©n variabele. Geeft exception bij expressies van meer variabelen.
 	 */ 
 /*	
 	public static boolean isDeeloplossingVan(Expressie e1,Expressie e2)
@@ -1213,7 +1213,7 @@ public class Algebra
 		
 	}
 */	
-	/*Geeft de coefficienten van een polynoom van één variabele.
+	/*Geeft de coefficienten van een polynoom van Ã©Ã©n variabele.
 	 *coefficienten worden teruggegeven in een array met doubles
 	 */	
 /*	
@@ -1227,7 +1227,7 @@ public class Algebra
 		return coeff;
 	}
 */	
-	/* Geeft de coefficienten van een polynoom in één variabele.
+	/* Geeft de coefficienten van een polynoom in Ã©Ã©n variabele.
 	 *De coefficienten worden teruggegeven als een array van (getals)expressies.
 	 */
 /*	
@@ -1465,7 +1465,7 @@ public class Algebra
 	} 
 	
 	/*toevoeging voor "Herleiden" 
-	 *Geeft het aantal factoren in alle termen samen. Machten worden als één factor geteld.
+	 *Geeft het aantal factoren in alle termen samen. Machten worden als ï¿½ï¿½n factor geteld.
 	 */
 	public static Vector geefFactorenBeperkt(Expressie e, Vector v)
 	{	if(e instanceof Aftrekking && e.kind1.geefWaarde()==0)
@@ -2360,7 +2360,7 @@ public class Algebra
 	}
 */	
 	/*Brengt factoren buiten haakjes van een willekeurige expressie evt met 
-	 *meer variabelen. Brengt ook onder één noemer indien nodig.
+	 *meer variabelen. Brengt ook onder ï¿½ï¿½n noemer indien nodig.
 	 */
 /*	
 	public static Expressie ontbind(Expressie e)

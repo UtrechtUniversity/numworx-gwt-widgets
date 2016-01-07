@@ -329,10 +329,10 @@ public class FormuleParser
 		{	s = s.substring(0,n) + ")" + s.substring(n+1);
 			n = s.indexOf("@");
 		}
-		n = s.indexOf("·");
+		n = s.indexOf("Â·");
 		while(n>-1)
 		{	s = s.substring(0,n) + "*" + s.substring(n+1);
-			n = s.indexOf("·");
+			n = s.indexOf("Â·");
 		}
 		n = s.indexOf("\u00d7");
 		while(n>-1)
@@ -1759,8 +1759,8 @@ public class FormuleParser
 			{	int index = s.substring(0,i).lastIndexOf("$f");
 				String formString = s.substring(index,i+1);
 				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='©')
-					{	int index1 = formString.substring(0,j).lastIndexOf("©");
+				{	if(formString.charAt(j)=='Â©')
+					{	int index1 = formString.substring(0,j).lastIndexOf("Â©");
 						String parseString = formString.substring(index1+1,j);
 						parseString = substitueerRandom(parseString, randomVars, randomValues, false);
 						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
@@ -1810,8 +1810,8 @@ public class FormuleParser
 					}	
 				}	
 				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='©')
-					{	int index1 = formString.substring(0,j).lastIndexOf("©");
+				{	if(formString.charAt(j)=='Â©')
+					{	int index1 = formString.substring(0,j).lastIndexOf("Â©");
 						String parseString = formString.substring(index1+1,j);
 						parseString = FormuleParser.substitueerRandom(parseString, randomVars, randomValues,false);
 						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
