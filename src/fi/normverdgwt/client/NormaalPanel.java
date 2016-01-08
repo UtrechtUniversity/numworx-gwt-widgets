@@ -373,7 +373,7 @@ public class NormaalPanel extends LayoutPanel
 		//tweeGrenzenButton.setFont(theFont);
 		//tweeGrenzenButton.setOpaque(false);		
 		//tm = nvContext2d.measureText("2 grenzen");
-		tm = nvContext2d.measureText("NormVerdGWT.rb.tweeGrenzenTekst()");
+		tm = nvContext2d.measureText(NormVerdGWT.rb.tweeGrenzenTekst());
 		width = (int) Math.round(tm.getWidth());
 		tweeGrenzenButtonWidth = 2 * width;					 
 		
@@ -927,14 +927,15 @@ public class NormaalPanel extends LayoutPanel
 //System.out.println("lbw = " + linksButtonWidth);
 
 			}
-			//setWidgetLeftWidth(linksButton, breedte - 2 * rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
-			//setWidgetTopHeight(linksButton, hoogte - cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
-			setWidgetLeftWidth(linksButton, breedte - rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
-			setWidgetTopHeight(linksButton, hoogte - 2 * cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
+			setWidgetLeftWidth(linksButton, breedte - 2 * rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
+			setWidgetTopHeight(linksButton, hoogte - cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
+			//setWidgetLeftWidth(linksButton, breedte - rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
+			//setWidgetTopHeight(linksButton, hoogte - 2 * cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
 			
 			if (init)
 			{	add(tweeGrenzenButton);
 				tweeGrenzenButton.addValueChangeHandler(new KansKeuzeVCH());
+//System.out.println("tgbw = " + tweeGrenzenButtonWidth);				
 			}
 			setWidgetLeftWidth(tweeGrenzenButton, offSet, Style.Unit.PX, tweeGrenzenButtonWidth, Style.Unit.PX);
 			setWidgetTopHeight(tweeGrenzenButton, hoogte - cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
