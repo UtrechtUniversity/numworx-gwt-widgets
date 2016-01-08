@@ -922,9 +922,15 @@ public class NormaalPanel extends LayoutPanel
 			if (init)
 			{	add(linksButton);
 				linksButton.addValueChangeHandler(new KansKeuzeVCH());
+//System.out.println("init linksButton");				
+//System.out.println(linksButton.isEnabled());
+//System.out.println("lbw = " + linksButtonWidth);
+
 			}
-			setWidgetLeftWidth(linksButton, breedte - 2 * rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
-			setWidgetTopHeight(linksButton, hoogte - cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
+			//setWidgetLeftWidth(linksButton, breedte - 2 * rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
+			//setWidgetTopHeight(linksButton, hoogte - cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
+			setWidgetLeftWidth(linksButton, breedte - rechtsButtonWidth, Style.Unit.PX, linksButtonWidth, Style.Unit.PX);
+			setWidgetTopHeight(linksButton, hoogte - 2 * cHeight, Style.Unit.PX, cHeight, Style.Unit.PX);
 			
 			if (init)
 			{	add(tweeGrenzenButton);
@@ -2756,12 +2762,14 @@ grensDecimals = findGrensDecimals();
 			//oldBerekenMuOptie = actualBerekenMuOptie;
 			actualMuBerekenbaarOptie = false;
 			//muButton.setVisible(false);
-			setWidgetVisible(muButton, false);
+			if (berekenbaarZichtbaar)
+				setWidgetVisible(muButton, false);
 			
 			//oldBerekenSigmaOptie = berekenSigmaOptie;
 			actualSigmaBerekenbaarOptie = false;
 			//sigmaButton.setVisible(false);
-			setWidgetVisible(sigmaButton, false);
+			if (berekenbaarZichtbaar)
+				setWidgetVisible(sigmaButton, false);
 		
 			if ((berekenKeuze == BEREKENMU)	||
 				(berekenKeuze == BEREKENSIGMA))
@@ -2769,13 +2777,15 @@ grensDecimals = findGrensDecimals();
 				bereken();
 			}	
 		
-			//grensButton.setVisible(false);
-			setWidgetVisible(grensButton, false);
-			//grensLinksButton.setVisible(true);
-			setWidgetVisible(grensLinksButton, true);
-			//grensRechtsButton.setVisible(true);
-			setWidgetVisible(grensRechtsButton, true);	
-			
+			if (berekenbaarZichtbaar)
+			{	
+				//grensButton.setVisible(false);
+				setWidgetVisible(grensButton, false);
+				//grensLinksButton.setVisible(true);
+				setWidgetVisible(grensLinksButton, true);
+				//grensRechtsButton.setVisible(true);
+				setWidgetVisible(grensRechtsButton, true);	
+			}
 			// parameterlijst
 			//grensLabel.setVisible(false);	
 			setWidgetVisible(grensLabel, false);
@@ -4203,14 +4213,18 @@ grensDecimals = findGrensDecimals();
 	{	//public void actionPerformed(ActionEvent e)
 		public void onValueChange(ValueChangeEvent<Boolean> e)
 		{	
+//System.out.println("VCH");			
 			if (e.getSource() == linksButton)
 			{	kansKeuze = KANSLINKS;
+//System.out.println("linksButton");			
 			}
 			else if (e.getSource() == rechtsButton)
 			{	kansKeuze = KANSRECHTS;
+//System.out.println("rechtsButton");			
 			}
 			else if (e.getSource() == tweeGrenzenButton)	
 			{	kansKeuze = TWEEGRENZEN;
+//System.out.println("tweegrenzenButton");			
 			}
 
 			zetKansKeuze(false);	

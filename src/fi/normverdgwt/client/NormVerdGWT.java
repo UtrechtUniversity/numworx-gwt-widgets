@@ -242,7 +242,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 		
 		if (normaalPanel.kijkOpdrachtNa)
 		{
-logger.info("isCorrect " + correct.toString());			
+//logger.info("isCorrect " + correct.toString());			
 			return correct;
 		}
 		else
