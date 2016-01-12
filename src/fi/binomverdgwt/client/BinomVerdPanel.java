@@ -344,7 +344,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		
 		//tm = staafjesPanel.binomVerdGWTContext2d.measureText("Twee grenswaarden");
 		grenzenBoxWidth = 170;
-		this.grenzenBox = new CheckBox("Twee grenswaarden");
+		//this.grenzenBox = new CheckBox("Twee grenswaarden");
+		this.grenzenBox = new CheckBox(BinomVerdGWT.rb.tweeGrenswaardenTekst());
 		//grenzenBox.addStyleName(BinomVerdGWT.binomVerdGWTCss.checkbox());		
 //GWT (2)		
 		//this.grenzenBox.setFont(this.font);
@@ -353,7 +354,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 //in plaatsComponenten		
 		//this.grenzenBox.addActionListener(this);
 		
-		kijkNaButton = new PushButton("Kijk Na");
+		//kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton = new PushButton(BinomVerdGWT.rb.kijkNaTekst());
 		kijkNaButton.addStyleName(BinomVerdGWT.binomVerdGWTCss.pushbutton());
 		kijkNaPanel = new LayoutPanel();
 //GWT later		
@@ -410,7 +412,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
         
         this.nLabel = new Label("n = ");
         this.MLabel = new Label("M = ");
-        this.populatieLabel = new Label("populatie = ");
+        //this.populatieLabel = new Label("populatie = ");
+        this.populatieLabel = new Label(BinomVerdGWT.rb.populatieTekst()+ " = ");
         this.pLabel = new Label("p = ");
         
 //in plaatsComponenten
@@ -431,8 +434,10 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
         
         //String[] keuzes = {"Binomiaal", "Hypergeometrisch"};
         hyperComboBox = new ListBox();
-        hyperComboBox.addItem("Binomiaal");
-        hyperComboBox.addItem("Hypergeometrisch");
+        //hyperComboBox.addItem("Binomiaal");
+        hyperComboBox.addItem(BinomVerdGWT.rb.binomiaalTekst());
+        //hyperComboBox.addItem("Hypergeometrisch");
+        hyperComboBox.addItem(BinomVerdGWT.rb.hypergeometrischTekst());
         hyperComboBox.setVisibleItemCount(1);
         if (hypergeometrisch)
         	hyperComboBox.setItemSelected(1, true);
@@ -1616,7 +1621,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	}
 	
 	/**
-	 * Verander of de keuze tussen één en twee grenzen zichtbaar is of niet
+	 * Verander of de keuze tussen ï¿½ï¿½n en twee grenzen zichtbaar is of niet
 	 * @param show true als keuze zichtbaar moet zijn, anders false
 	 */
 	public void setShowTweeGrenzenKeuze(boolean show) 
@@ -2028,7 +2033,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	}
 */	
 	/**
-	 * Gekopiëerd uit Normale Verdeling, kleine aanpassingen gemaakt
+	 * Gekopiï¿½erd uit Normale Verdeling, kleine aanpassingen gemaakt
 	 */
 	public static double substitueerRandom(double defaultValue, String s, String[] randomVars, HashMap randomValues) {
 		System.out.println("Randomvalues: " + randomValues);
@@ -2415,7 +2420,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		kijkNaPanel.setWidgetVisible(owner.foutKruisImage, !correct);
 		
 		
-		owner.correct = correct;
+		owner.correct = new Boolean(correct);
 		//fire actionEvent
 		//ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
 		//Iterator<ActionListener> iterator = this.listeners.iterator();

@@ -40,8 +40,12 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
+import fi.binomverdgwt.client.text.Text;
+
 public class BinomVerdGWT implements EntryPoint, InteractionStub 
 {
+	public static Text rb;
+	
 	private static Logger logger = Logger.getLogger("BinomVerdGWT");
 	
     static final String holderId = "dockholder";
@@ -85,6 +89,8 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		binomVerdGWTClientBundle = GWT.create(BinomVerdGWTClientBundle.class);
 		binomVerdGWTCss = binomVerdGWTClientBundle.getBinomVerdGWTCSS();
 		binomVerdGWTCss.ensureInjected();

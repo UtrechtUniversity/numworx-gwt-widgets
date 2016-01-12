@@ -24,6 +24,8 @@
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
 
+  <extend-property name="locale" values="en"/>
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.binomverdgwt.client.BinomVerdGWT'/>
 
