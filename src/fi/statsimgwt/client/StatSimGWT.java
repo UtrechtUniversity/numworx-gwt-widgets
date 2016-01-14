@@ -69,7 +69,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		//Window.alert("test");	
 		
 		//RootPanel.get("dockholder").getElement().setInnerText("textand");
-		//	Stub.publish(this);
+		Stub.publish(this);
 			
 	}
 	
@@ -782,7 +782,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		//RootPanel.get("dockholder").add(asWidget());
+		RootPanel.get("dockholder").add(asWidget());
 
 	}
 
