@@ -1301,6 +1301,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (e.getSource() == optimizeScaleBox)
 			{
+				model.setBinWidth(view.getBinWidth());
+				model.setMinOnScale(view.getMinBoundary());
 				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
 				this.update();
 			}
