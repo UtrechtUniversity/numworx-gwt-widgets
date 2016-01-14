@@ -1556,10 +1556,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			this.setBarWidth(numberOfBinsOnScale);
 		}
 
+		// bepaal de bins
+		ArrayList<Double> binsOnScale = this.getBinsOnScale();
+
 		if (this.model.hasVerticalBars())
 		{
-			this.yAxisOffset = this.determineDependentAxisWidth(context, scale) + 20;
-
 			// check if the bin boundary strings will fit and determine the longest
 			normalFit = true;
 			double longest = 0;
@@ -1573,10 +1574,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
 				AllowedTypes type = list.get(columnIndex).getType();
 				
-				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
+				for (int i = 0; i < binsOnScale.size(); i++)
 				{
-					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-					if (i < this.model.getBinBoundaries().size() - 1)
+					String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+					if (i < binsOnScale.size() - 1)
 					{
 						String s_labelUnderBin;
 						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
@@ -1587,7 +1588,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						else
 						{
     						s_labelUnderBin = s + "-<" +
-    							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
+								StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
 						}
 						
 						metrics = context.measureText(s_labelUnderBin);
@@ -1605,7 +1606,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			} // label under bin
 			else // label between bins
 			{
-				for (Double d : this.model.getBinBoundaries())
+				for (Double d : binsOnScale)
 				{
 					metrics = context.measureText(d.toString());
 					width = metrics.getWidth();
@@ -1631,8 +1632,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		} // vertical bars
 		else // horizontal bars
 		{
-			this.xAxisOffset = this.determineDependentAxisWidth(context, scale);
-
 			double longest = 0;
 			double width;
 
@@ -1643,10 +1642,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
 				AllowedTypes type = list.get(columnIndex).getType();
 				
-				for (int i = 0; i < this.model.getBinBoundaries().size(); i++)
+				for (int i = 0; i < binsOnScale.size(); i++)
 				{
-					String s = StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i));
-					if (i < this.model.getBinBoundaries().size() - 1)
+					String s = StatistiekGWT.getStringValue(binsOnScale.get(i));
+					if (i < binsOnScale.size() - 1)
 					{
 						String s_labelUnderBin;
 						if (type.equals(AllowedTypes.INTEGER) && ((int) model.getBinWidth()) == 1)
@@ -1657,7 +1656,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						else
 						{
     						s_labelUnderBin = s + "-<" +
-    							StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(i + 1));
+								StatistiekGWT.getStringValue(binsOnScale.get(i + 1));
 						}
 						
 						metrics = context.measureText(s_labelUnderBin);
@@ -1672,7 +1671,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			else // labels between bins
 			{
 				// find longest binboundary label
-				for (Double d : this.model.getBinBoundaries())
+				for (Double d : binsOnScale)
 				{
 					metrics = context.measureText(d.toString());
 					width = metrics.getWidth();
@@ -2020,9 +2019,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		ArrayList<ColumnType> list = this.model.getStatTableModel().getColumnTypes();
 		AllowedTypes type = list.get(columnIndex).getType();
 
-		// bepaal de bins
-		ArrayList<Double> binsOnScale = this.getBinsOnScale();
-
 		// PAINT BIN BOUNDARY LABELS
 		if (this.model.hasVerticalBars())
 		{
@@ -2304,9 +2300,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 */
 	ArrayList<Double> getBinsOnScale()
 	{
-		ArrayList<Double> bins = new ArrayList<Double>(model.getBinBoundaries());
+		ArrayList<Double> bins;
 		
-		if (!model.isOptimizeScale())
+		if (model.isOptimizeScale())
+		{
+			bins = new ArrayList<Double>(model.getBinBoundaries());
+		}
+		else
 		{
 			bins = this.getBinsfromBinsSettings();
 		}
@@ -2328,7 +2328,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		if (this.model.getStatTableModel().isEmptyColumn(this.model.getColumnIndex()))
 		{
 			// use the settings without check for valid values
-			double minOnScale = model.getMinOnScale();
+			double minOnScale = this.getMinBoundary();//model.getMinOnScale(); // voor lege kolom is minOnScale mogelijk op 0 gezet
 			double binValue = minOnScale;
 			for (int i = 0; binValue < maxOnScale; i++)
 			{
@@ -2430,62 +2430,72 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 	private int determineDependentAxisWidth(Context2d context, double scale)
 	{
-		if (this.model.hasVerticalBars() && (scale != 0))
+		int width;
+		
+		if (this.model.hasVerticalBars())
 		{
-			int width = 5;
-
-			int panelHeight = (int) ((this.model.hasVerticalBars() ? this
-				.barAreaHeight() : this.barAreaWidth()));
-			int base = 1;
-			int exp = 0;
-			int step = (int) (base * Math.pow(10, exp));
-			while (step * 6 * scale < panelHeight)
+			if (scale == 0)
 			{
-				switch (base)
-				{
-					case 1:
-						base = 2;
-						break;
-					case 2:
-						base = 5;
-						break;
-					case 5:
-						base = 1;
-						exp++;
-						break;
-				}
-				step = (int) (base * Math.pow(10, exp));
+				width = 7;//14; 14 voor breedte van 2-cijferige y-aswaarden
 			}
-
-			// hoe kom ik aan de font-height?
-			int h = this.getCurrentFontHeight(context);
-			int majorSteps = (int) Math.floor(
-				(panelHeight - 0.5 * h) / (step * scale));
-
-			// determine the width of the axis labels
-
-			TextMetrics metrics;
-			for (int i = 0; i < majorSteps + 1; i++)
+			else
 			{
-				String s = new Integer(i * step).toString();
-				if (this.model.getPercentage())
+				width = 5;
+	
+				int panelHeight = (int) ((this.model.hasVerticalBars() ? this
+					.barAreaHeight() : this.barAreaWidth()));
+				int base = 1;
+				int exp = 0;
+				int step = (int) (base * Math.pow(10, exp));
+				while (step * 6 * scale < panelHeight)
 				{
-					s = s + "%";
+					switch (base)
+					{
+						case 1:
+							base = 2;
+							break;
+						case 2:
+							base = 5;
+							break;
+						case 5:
+							base = 1;
+							exp++;
+							break;
+					}
+					step = (int) (base * Math.pow(10, exp));
 				}
-				
-				metrics = context.measureText(s);
-				int stringWidth = (int) metrics.getWidth();
-				if (stringWidth > width)
+	
+				// hoe kom ik aan de font-height?
+				int h = this.getCurrentFontHeight(context);
+				int majorSteps = (int) Math.floor(
+					(panelHeight - 0.5 * h) / (step * scale));
+	
+				// determine the width of the axis labels
+	
+				TextMetrics metrics;
+				for (int i = 0; i < majorSteps + 1; i++)
 				{
-					width = stringWidth;
+					String s = new Integer(i * step).toString();
+					if (this.model.getPercentage())
+					{
+						s = s + "%";
+					}
+					
+					metrics = context.measureText(s);
+					int stringWidth = (int) metrics.getWidth();
+					if (stringWidth > width)
+					{
+						width = stringWidth;
+					}
 				}
 			}
-			return width;
 		}
 		else
 		{
-			return 40;
+			width = 40;
 		}
+		
+		return width;
 	}
 
 	/**
