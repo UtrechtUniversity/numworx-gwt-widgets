@@ -571,7 +571,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 			// check if parameters are valid
 			if (((binWidth <= 0) 
-				|| ((binWidth > 1) && (binWidth > 2 * (max - min) + 1)) 
 				|| (binWidth < (max - min)/50))
 				&& (max != min)) // if max = min binwidth is not restricted
 			{
@@ -579,7 +578,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			}
 			
 			if ((minBoundary > min) 
-				|| (minBoundary < (min - 1 - 0.5 * max)) // minus 1 to avoid problems in case of small and negative values of min and max
 				&& (max != min)) // if max = min binwidth is not restricted
 			{
 				return null;
