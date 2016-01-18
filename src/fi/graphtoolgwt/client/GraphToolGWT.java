@@ -12,6 +12,7 @@ package fi.graphtoolgwt.client;
 //import java.util.ArrayList;
 
 
+import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 //import java.util.Hashtable;
@@ -21,6 +22,8 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 //import javax.imageio.ImageIO;
+
+
 
 
 
@@ -46,6 +49,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
+
 
 
 
@@ -1374,6 +1379,80 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return response;
 	}
 	
+	private CssColor verwerkAsNaamBijNakijken(boolean show, CssColor color, boolean correctLogica) {
+		CssColor returnColor = color;
+		if(!grafiekXAsNaam.equals(xAsNaam) || !grafiekYAsNaam.equals(yAsNaam)) {
+			if ( (score > 0) && (correctLogica) )
+				returnColor = CssColor.make(255, 193, 0);
+			score = Math.max(score - 2, 0);
+			if (correctLogica) {	
+				correct = false; 
+				goedkrulImage.setVisible(false);
+				goedkrulHalfImage.setVisible(show);
+				if(show)
+					setFeedback(GraphToolGWT.rb.getString("feedbackTekstLabelsAssen"),true);
+			}
+		}
+		return (returnColor);
+		
+//		if(!grafiekXAsNaam.equals(xAsNaam) || !grafiekYAsNaam.equals(yAsNaam))
+//		{	if(score > 0)
+//			color = CssColor.make(255, 193, 0);
+//			score = Math.max(score - 2, 0);
+//			if(correct || goedkrulHalfImage.isVisible() && puntenCorrect)
+//			{	correct = false; 
+//				goedkrulImage.setVisible(false);
+//				goedkrulHalfImage.setVisible(show);
+//				if(show)
+//					setFeedback(GraphToolGWT.rb.getString("feedbackTekstLabelsAssen"),true);
+//			}
+//		}
+
+	}
+	
+	private CssColor verwerkTekenModusBijNakijken(boolean show, CssColor color, boolean correctLogica) {
+		CssColor returnColor = color;
+		//	if((rechteVerbindingen || krommeMetExtrapolatie || krommeZonderExtrapolatie) && 
+		//	tekenComponent.getConnectMode() != tekenComponent.CURVE_EXTRA && 
+		//	tekenComponent.getConnectMode() != tekenComponent.CURVE &&
+		//	tekenComponent.getConnectMode() != tekenComponent.LINES) {	
+		if ( !( ( rechteVerbindingen && tekenComponent.getConnectMode() == tekenComponent.LINES) || 
+				( krommeZonderExtrapolatie && tekenComponent.getConnectMode() == tekenComponent.CURVE) ||
+				( krommeMetExtrapolatie && tekenComponent.getConnectMode() == tekenComponent.CURVE_EXTRA)
+			  ) 
+		   ) {
+			if ( (score > 0) && (correctLogica) )
+				returnColor = CssColor.make(255, 193, 0);
+			score = Math.max(score - 2, 0);
+			if (correctLogica) {	
+				correct = false;
+				goedkrulImage.setVisible(false);
+				goedkrulHalfImage.setVisible(show);
+				if(show)
+					setFeedback(GraphToolGWT.rb.getString("feedbackTekstTekenGrafiek"),true);
+			} 
+		}
+		return (returnColor);
+		
+//		if((rechteVerbindingen || krommeMetExtrapolatie || krommeZonderExtrapolatie) &&
+//				tekenComponent.getConnectMode() != tekenComponent.CURVE_EXTRA && 
+//				tekenComponent.getConnectMode() != tekenComponent.CURVE &&
+//				tekenComponent.getConnectMode() != tekenComponent.LINES)
+//		{	if(score > 0)
+//				color = CssColor.make(255, 193, 0);
+//			score = Math.max(score - 2, 0);
+//			if(correct || goedkrulHalfImage.isVisible() && puntenCorrect)
+//			{	correct = false;
+//				goedkrulImage.setVisible(false);
+//				goedkrulHalfImage.setVisible(show);
+//				if(show)
+//					setFeedback(GraphToolGWT.rb.getString("feedbackTekstTekenGrafiek"),true);
+//			} 
+//		}	
+		
+	}
+
+	
 	public void kijkNa(boolean show)
 	{	ingevuld = false;
 		if(feedbackPanel != null)
@@ -1677,34 +1756,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					}
 					//if(show)setFeedback(GraphToolGWT.rb.getString("feedbackTekstPuntenDeels"),true);
 				}
-				if(!grafiekXAsNaam.equals(xAsNaam) || !grafiekYAsNaam.equals(yAsNaam))
-				{	if(score > 0)
-					color = CssColor.make(255, 193, 0);
-					score = Math.max(score - 2, 0);
-					if(correct || goedkrulHalfImage.isVisible() && puntenCorrect)
-					{	correct = false; 
-						goedkrulImage.setVisible(false);
-						goedkrulHalfImage.setVisible(show);
-						if(show)
-							setFeedback(GraphToolGWT.rb.getString("feedbackTekstLabelsAssen"),true);
-					}
-				}
-				if((rechteVerbindingen || krommeMetExtrapolatie || krommeZonderExtrapolatie) &&
-						tekenComponent.getConnectMode() != tekenComponent.CURVE_EXTRA && 
-						tekenComponent.getConnectMode() != tekenComponent.CURVE &&
-						tekenComponent.getConnectMode() != tekenComponent.LINES)
-				{	if(score > 0)
-						color = CssColor.make(255, 193, 0);
-					score = Math.max(score - 2, 0);
-					if(correct || goedkrulHalfImage.isVisible() && puntenCorrect)
-					{	correct = false;
-						goedkrulImage.setVisible(false);
-						goedkrulHalfImage.setVisible(show);
-						if(show)
-							setFeedback(GraphToolGWT.rb.getString("feedbackTekstTekenGrafiek"),true);
-					} 
-				}	
 				
+				boolean correctLogica = (correct || goedkrulHalfImage.isVisible() && puntenCorrect);
+				color = verwerkAsNaamBijNakijken(show, color, correctLogica);
+				color = verwerkTekenModusBijNakijken(show, color, correctLogica);
+
 				if(show) 
 				{	//leerlingcolor op juiste kleur zetten.
 					for(int i = 0; i < aantalFuncties; i++)
@@ -1819,15 +1875,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					goedkrulHalfImage.setVisible(false);
 					foutkruisImage.setVisible(show);
 				}
-				if(!grafiekXAsNaam.equals(xAsNaam) || !grafiekYAsNaam.equals(yAsNaam))
-				{	score = Math.max(score - 2, 0);
-					if(correct)
-					{	correct = false; 
-						goedkrulImage.setVisible(false);
-						goedkrulHalfImage.setVisible(false);
-						foutkruisImage.setVisible(show);
-					}
-				}
+				
+				color = verwerkTekenModusBijNakijken(show, color, correct);
+				color = verwerkAsNaamBijNakijken(show, color, correct);
+
 				if(show)
 					setColor(0, color, true);
 				
