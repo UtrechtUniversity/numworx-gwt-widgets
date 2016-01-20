@@ -269,6 +269,7 @@ public final class BalansFruitGWT extends AbsolutePanel implements InteractionSt
 		if(BALANSVERGELIJKING.equals(event.getCommand())) {
 			String equation = event.getParameter(BALANSVERGELIJKING).toString();
 			Logger.getLogger("BalansFruitGWT").info("accept "  + equation);
+			// TODO wat moet hier komen?
 		}
 	}
 
