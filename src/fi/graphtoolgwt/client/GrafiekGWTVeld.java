@@ -2384,7 +2384,7 @@ public class GrafiekGWTVeld {
 		else stand = std;
 		
 		
-		//paint();
+	//	paint(); 
 	}
 	
 	//om de schaalverdeling bij logschalen in orde te krijgen; 

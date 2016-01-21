@@ -23,7 +23,7 @@ public class SchuifParameter {
 		x = 5;
 		y = 5;
 		slider.setLocation(x, y);
-		slider.zetNaam(naam);
+//		slider.zetNaam(naam);
 		slider.zetGrenzen(onderGrensWaarde, bovenGrensWaarde);
 	}
 	

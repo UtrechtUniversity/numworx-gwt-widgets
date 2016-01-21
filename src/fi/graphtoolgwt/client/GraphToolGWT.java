@@ -22,19 +22,6 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 //import javax.imageio.ImageIO;
-
-
-
-
-
-
-
-
-
-
-
-
-
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
@@ -49,20 +36,6 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -119,8 +92,6 @@ import fi.wiskopdr.expressies.repr.ContentMathML;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text_nl;
 //import fi.graphtoolgwt.client.ui.KeyHandler;
-
-
 
 
 /**
@@ -3421,6 +3392,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			grafiekGWTVeld.tracexD = grafiekGWTVeld.tracexD+dx;
 			grafiekGWTVeld.tracex = grafiekGWTVeld.tracex+dx;
 			grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
+//			grafiekGWTVeld.tracexD = eventX;
+//			grafiekGWTVeld.tracex = eventX;
+//			grafiekGWTVeld.zetSliderStand(eventX);
 			/*
 			if(stand>breedte) 
 			{	stand = breedte;
@@ -3754,15 +3728,22 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
+			// e.preventDefault();
 			
 			// prevent scrolling 
-			e.stopPropagation();
+		//	e.stopPropagation();
 			
 			int eventX = e.getX();
 			int eventY = e.getY();
 			
-			mouseDown = true;
+			mouseDown = true; // TODO
+			logger.info("Mouse Down on ("+eventX+","+eventY+") :: Source = "+ e.getSource());
+			for (int i=0; i<schuifParameters.length; i++) {
+				logger.info("SP Naam ("+i+") = "+schuifParameters[i].geefNaam());
+				logger.info("SP Positie =  ("+schuifParameters[i].getX()+","+schuifParameters[i].getY()+")");
+				schuifParameters[i].geefSlider().setLocation(eventX, eventY);		
+//				schuifParameters[i].
+			}
 			
 			mouseDownTouchStartAction(e.getSource(), eventX, eventY, ONE_FINGER);
 			
@@ -3775,7 +3756,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			// prevent scrolling
 			e.stopPropagation();
-			
 			
 			RealPoint drp = null;
 			Vector points = getPoints(getActiveIndex(), false);
