@@ -279,7 +279,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	private int numGraphs = maxGraphs;
 	private int activeIndex = 1;
 	Vector<RealPoint> graphPoints = new Vector<RealPoint>();
-	SchuifParameter[] schuifParameters = new SchuifParameter[0];
+	SchuifParameterGWT[] schuifParameters = new SchuifParameterGWT[0];
 	
 	Vector<RealPoint> docentGraphPoints = new Vector<RealPoint>();
 	//boolean docent = false;
@@ -2284,7 +2284,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     	
     	if(schuifParameters != null)
     	{	for (int i = 0; i < schuifParameters.length; i++)
-    			schuifParameters[i].zetWaarde(paramWaarden[i], false);
+    			schuifParameters[i].zetWaarde(paramWaarden[i]);
     	}
     	
 		int[][] colorRGBsGewoon = null;
@@ -2693,12 +2693,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 	    	if(paramNamen != null)
 	    	{
-	    		this.schuifParameters = new SchuifParameter[paramNamen.length];
+	    		this.schuifParameters = new SchuifParameterGWT[paramNamen.length];
 				for(int i = 0; i < schuifParameters.length; i++)
-				{	schuifParameters[i] = new SchuifParameter(paramLengtes[i], paramNamen[i]);
+				{	schuifParameters[i] = new SchuifParameterGWT(paramLengtes[i], paramNamen[i]);
 					schuifParameters[i].zetGrensWaarden(paramOnderGrensWaarden[i], paramBovenGrensWaarden[i]);
 					schuifParameters[i].zetStapGrootte(paramStapGroottes[i]);
-					schuifParameters[i].zetWaarde(paramWaarden[i], false);
+					schuifParameters[i].zetWaarde(paramWaarden[i]);
 					schuifParameters[i].zetLocatie(paramX[i], paramY[i]);
 				}
 	    	}
@@ -3137,11 +3137,25 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return pressedX;
 	}
 	
-	public void mouseDownTouchStartAction(Object source, int eventX, int eventY, int pinchState)
-	{	//mouseDown = true;
+	public void mouseDownTouchStartAction(Object source, int eventX, int eventY, int pinchState) {	
+		//mouseDown = true;
 		//requestFocus(); //nodig?
 		if (pinchState == TWO_FINGERS)
 			return;
+
+		boolean schuifParameterTouched = false;
+		// Check schuifParameters
+		if (schuifParameters != null) {	
+			for(int i = 0; i < schuifParameters.length; i++) {	
+				schuifParameterTouched = schuifParameterTouched || schuifParameters[i].mouseTouchPressed(eventX, eventY);;
+			}
+		}
+		
+		if (schuifParameterTouched) {
+			// SchuifParameter is aangeraakt, verder hoeft er niets te gebeuren
+			// grafiekGWTVeld.paint();
+			return;
+		}
 		
 		if(eventX >= grafiekGWTVeld.xAsNaamLinks && eventX <= grafiekGWTVeld.xAsNaamRechts && 
 				eventY >= grafiekGWTVeld.xAsNaamBoven - 5 && eventY <= grafiekGWTVeld.xAsNaamOnder && xVarEditable)
@@ -3315,12 +3329,28 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		startxv = eventX;
 		startyv = eventY;
+		
+
 		grafiekGWTVeld.paint();
 	}
 	
 	public void mouseMoveTouchMoveAction(Object source, int eventX, int eventY, int pinchState, int startDistance, int newDistance, int direction)
 	{	//if (!mouseDown)
 		//return;
+
+		boolean schuifParameterTouched = false;
+		// Check schuifParameters
+		if (schuifParameters != null) {	
+			for(int i = 0; i < schuifParameters.length; i++) {	
+				schuifParameterTouched = schuifParameterTouched || schuifParameters[i].mouseTouchMoved(eventX, eventY);;
+			}
+		}
+		
+		if (schuifParameterTouched) {
+			// SchuifParameter is aangeraakt, verder hoeft er niets te gebeuren
+			grafiekGWTVeld.paint();
+			return;
+		}
 		
 		if(zooming)
 			return;
@@ -3547,6 +3577,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				startyv = eventY;
 			}
 		}
+		
 		grafiekGWTVeld.paint();
 	}
 			
@@ -3578,8 +3609,24 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		*/
 	
-	public void mouseUpTouchEndAction(Object source)
-	{	if(zooming)
+	public void mouseUpTouchEndAction(Object source, int eventX, int eventY) {	
+		
+		boolean schuifParameterTouched = false;
+		// Check schuifParameters
+		if (schuifParameters != null) {	
+			for(int i = 0; i < schuifParameters.length; i++) {	
+				schuifParameterTouched = schuifParameterTouched || schuifParameters[i].mouseTouchUp(eventX, eventY);;
+			}
+		}
+		
+		if (schuifParameterTouched) {
+			// SchuifParameter is aangeraakt, verder hoeft er niets te gebeuren
+			grafiekGWTVeld.paint();
+			return;
+		}
+
+		
+		if(zooming)
 		{	zooming = false;
 			return;
 		}
@@ -3737,13 +3784,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			int eventY = e.getY();
 			
 			mouseDown = true; // TODO
-			logger.info("Mouse Down on ("+eventX+","+eventY+") :: Source = "+ e.getSource());
-			for (int i=0; i<schuifParameters.length; i++) {
-				logger.info("SP Naam ("+i+") = "+schuifParameters[i].geefNaam());
-				logger.info("SP Positie =  ("+schuifParameters[i].getX()+","+schuifParameters[i].getY()+")");
-				schuifParameters[i].geefSlider().setLocation(eventX, eventY);		
-//				schuifParameters[i].
-			}
 			
 			mouseDownTouchStartAction(e.getSource(), eventX, eventY, ONE_FINGER);
 			
@@ -3793,7 +3833,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			mouseDown = false;
 		
-			mouseUpTouchEndAction(e.getSource());
+			mouseUpTouchEndAction(e.getSource(), e.getX(), e.getY());
 
 		}
 	}
@@ -3997,7 +4037,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					}
 				}
 			}
-			mouseUpTouchEndAction(e.getSource());
+			int eventX = -1;
+			int eventY = -1;
+			if (e.getTouches().length() > 0) {
+				Touch touch = e.getTouches().get(0);
+			    eventX = touch.getPageX() - grafiekGWTCanvas.getAbsoluteLeft();
+				eventY = touch.getPageY() - grafiekGWTCanvas.getAbsoluteTop();				
+		    }
+
+			mouseUpTouchEndAction(e.getSource(), eventX, eventY);
 		}
 
 	}
@@ -4185,12 +4233,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 	
 	}
-	
-	
-	
-	
-	
-		
 	
 	
 	class PushClickHandler implements ClickHandler

@@ -32,8 +32,6 @@ public class SliderGWT {
 	private final static int cDefault_x = 15;
 	private final static int cDefault_y = 15;
 	private final static int cDefault_marge = 3;
-	private final static double cDefault_onderGrensWaarde = 0.0;
-	private final static double cDefault_bovenGrensWaarde = 1.0;
 
 	private final static int cKnobSize = 3;
 
@@ -45,9 +43,11 @@ public class SliderGWT {
 	
 	private int lengte;
 	private int stand;
+	private double waarde;
 	
-	private double onderGrensWaarde = cDefault_onderGrensWaarde;
-	private double bovenGrensWaarde = cDefault_bovenGrensWaarde;
+	private double onderGrensWaarde = SchuifParameterGWT.cDefault_onderGrensWaarde;
+	private double bovenGrensWaarde = SchuifParameterGWT.cDefault_bovenGrensWaarde;
+	private double stapGrootte = SchuifParameterGWT.cDefault_stapGrootte;
 	
 	static CssColor rood = CssColor.make(255, 0, 0);
 	static CssColor zwart = CssColor.make(0, 0, 0);
@@ -72,8 +72,9 @@ public class SliderGWT {
 	}
 	
 	public boolean isRaak(int xPos, int yPos) {
-		boolean xRaak = ((xPos >= x+stand-marge) && (xPos <= x+stand-marge));
-		boolean yRaak = ((yPos >= y+-marge) && (yPos <= x-marge));
+		boolean xRaak = ((xPos >= x+stand-marge) && (xPos <= x+stand+marge));
+		boolean yRaak = ((yPos >= y-marge) && (yPos <= y+marge));
+
 		return (xRaak && yRaak);
 	}
 	
@@ -94,50 +95,39 @@ public class SliderGWT {
 		g.fill();
 		g.stroke();
 		
-		if(naam.length() > 0)
-		{	String fontString = "10px sans-serif";
+		if(naam.length() > 0) {	
+			String fontString = "10px sans-serif";
 			g.setFont(fontString);
 			TextMetrics tm = g.measureText(naam);
 			
 			int naamBreedte = (int) Math.round(tm.getWidth());
 			
-			double waarde = (double) stand/ (double) lengte * (bovenGrensWaarde - onderGrensWaarde) + onderGrensWaarde;
-			
-			int aantalStappen = (int) ((bovenGrens - onderGrens)/stapGrootte);
-			for(int i = 0; i < aantalStappen; i++)
-			{	if(waarde - onderGrens < i * stapGrootte + stapGrootte/2)
-				{	waarde = onderGrens + i * stapGrootte;
-					break;
-				}
-			}
-			if(waarde - onderGrens > (aantalStappen - 1) * stapGrootte + stapGrootte/2)
-				waarde = bovenGrens;
-			
-			//g.setFont(font);
 			g.setFillStyle(zwart);
-			if(Math.round(stapGrootte) == stapGrootte)
-			{
-				int intWaarde = (int) Math.round(waarde);
-				g.fillText(naam + "=" + intWaarde, stand + linksMarge - naamBreedte, 10);
-			}
+			waarde = (double) Math.round(1000 * waarde) / 1000;
+			g.fillText(naam + "=" + waarde, stand + x - naamBreedte, y-10);
 			
-			else
-			{	waarde = (double) Math.round(10*waarde)/10;
-				g.fillText(naam + "=" + waarde, stand + linksMarge - naamBreedte, 10);
-			}
 		}		
 	}
 	
-	public void update(Context2d gIm)
-	{	paint(gIm);
+	public void update(Context2d gIm) {	
+		paint(gIm);
 	}
 	
-	public int geefStand()
-	{	return stand;
+	public int geefStand() {	
+		return stand;
+	}
+	
+	public String geefNaam() {	
+		return naam;
 	}
 	
 	public double geefWaarde() {
-		return 0.0;
+		return waarde;
+	}
+	
+	public void zetStapGrootte(double stapGrootte)
+	{
+		this.stapGrootte = stapGrootte;
 	}
 	
 	public void zetGrensWaarden (double onderGrensWaarde, double bovenGrensWaarde) {
@@ -149,23 +139,46 @@ public class SliderGWT {
 		
 		if (xPos <= x) {
 			stand = 0;
+			waarde = onderGrensWaarde;
 			return;
 		}
 		
 		if (xPos >= x + lengte -1) {
 			stand = lengte - 1;
+			waarde = bovenGrensWaarde;
 			return;
 		}		
+
+		// Afronden op stapGrootte & pixels
+		double deltaWaarde = (double) ( (double) (xPos-x) / lengte) * (bovenGrensWaarde-onderGrensWaarde);
+		deltaWaarde = Math.round(deltaWaarde / stapGrootte) * stapGrootte;
+		stand = (int) Math.round(deltaWaarde / (bovenGrensWaarde-onderGrensWaarde) * lengte);
+		waarde = deltaWaarde + onderGrensWaarde;
 		
-		// Stand bepalen afgerond naar stapGrootte en pixels
-		double waarde =  ( ( double) (xPos - x) / lengte) * (bovenGrensWaarde-onderGrensWaarde) + onderGrensWaarde;  
-		waarde = Math.Round((waarde - onderGrensWaarde) / stapGrootte) * stapGrootte + onderGrensWaarde;
-		
-		if(std>lengte)stand = lengte;
-		else if(std<minimum)stand = minimum;
-		else stand = std;
-//		paint(gIm);
 	}
+	
+	public void zetWaarde(double waarde) {
+		if (waarde >= bovenGrensWaarde) {
+			this.waarde = bovenGrensWaarde;
+			stand = lengte - 1;
+			return;
+		}
+		
+		if (waarde <= onderGrensWaarde) {
+			this.waarde = onderGrensWaarde;
+			stand = 0;
+			return;
+		}
+
+		this.waarde = waarde;
+		stand = (int) Math.round( (waarde - onderGrensWaarde) / lengte);
+//		this.waarde = waarde;
+//		int pixStand = (int) (lengte * (waarde - onderGrensWaarde)/(bovenGrensWaarde - onderGrensWaarde));
+//		if(!actie)
+//			slider.zetStand(pixStand);
+	}
+
+	
 	/*
 	
 	public void mousePressed(MouseEvent e)
