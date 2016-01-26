@@ -30,6 +30,8 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
+	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
 
@@ -708,16 +710,24 @@ public class GrafiekGWTVeld {
 				(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)))
 				//|| interactiePanel.mode == 0 || interactiePanel.mode == 1) 
 			//gaat dit niet fout bij toetsen waarbij leerling vrij moet kunnen tekenen? Jawel en ook als docent al functies klaarzet en daarna ander type opdrachten zet. Daarom if-statement veranderd. 
-			for(int j=0 ; j<interactiePanel.functies.length ; j++)
-			{	if(interactiePanel.functies[j]!=null && interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam))
-				{	
+			for(int j=0 ; j<interactiePanel.functies.length ; j++) {	
+				
+				if(interactiePanel.functies[j]!=null && interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam)) {	
+					
 					int xMin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
 					tekenFunctie(gIm, xMin, interactiePanel.functies[j], interactiePanel.domeinen[j],
 							(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN 
 							|| interactiePanel.grafiekKleuren)?interactiePanel.colors[j]:interactiePanel.colors[0]);
 				
-					if(interactiePanel.traceOptie)	
-					{	gIm.setStrokeStyle(grijs);
+					if(interactiePanel.traceOptie) {
+						Expressie expressie;
+						expressie = interactiePanel.functies[j];
+						
+						for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
+							expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
+						}
+						
+						gIm.setStrokeStyle(grijs);
 						gIm.setFillStyle(grijs);
 						fontString = "10px sans-serif";
 						gIm.setFont(fontString);
@@ -729,11 +739,15 @@ public class GrafiekGWTVeld {
 //							(selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
 						double d0;
 						if (interactiePanel.manualScalingX) {
-							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
+//							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
+//								 (selectnummer+beginwaarde)*interactiePanel.eenheidxValue); 
+							d0 = expressie.geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
 								 (selectnummer+beginwaarde)*interactiePanel.eenheidxValue); 
 							
 						} else {
-							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
+//							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
+//								 (selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
+							d0 = expressie.geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
 								 (selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
 						}
 						
@@ -779,7 +793,8 @@ public class GrafiekGWTVeld {
 							} else {
 								dTraceX = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD; 
 							}
-							double dTraceY = interactiePanel.functies[j].geefWaarde(dTraceX);
+							// double dTraceY = interactiePanel.functies[j].geefWaarde(dTraceX);
+							double dTraceY = expressie.geefWaarde(dTraceX);
 							dTraceX = Math.round(100*dTraceX)/100.0;
 							dTraceY = Math.round(100*dTraceY)/100.0;
 //							int tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
@@ -833,8 +848,10 @@ public class GrafiekGWTVeld {
 //								/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
 							double dTraceX = pixelsXtoValue(tracexD);
 
-							double dTraceY = interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
-								(interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
+//							double dTraceY = interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
+//								(interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
+							double dTraceY = interactiePanel.yAsLog?Math.log10((expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
+								(expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
 
 							if(!Double.isNaN(dTraceY) && tracex<interactiePanel.breedte && tracex>-1 && (!interactiePanel.xPositief || tracex>bx)
 									&& dTraceX >= interactiePanel.domeinen[j][0] && dTraceX <= interactiePanel.domeinen[j][1])
@@ -952,11 +969,9 @@ public class GrafiekGWTVeld {
 		}
 		
 		//schuifParameters tekenen.
-		if(interactiePanel.schuifParameters != null)
-		{	for(int i = 0; i < interactiePanel.schuifParameters.length; i++)
-			{	SchuifParameter p = interactiePanel.schuifParameters[i];
-				p.geefSlider().paint(gIm);
-				
+		if(interactiePanel.schuifParameters != null) {	
+			for(int i = 0; i < interactiePanel.schuifParameters.length; i++) {	
+				interactiePanel.schuifParameters[i].paint(gIm);
 			}
 		}
 		
@@ -1224,7 +1239,7 @@ public class GrafiekGWTVeld {
 			double linkerGrens;
 			if (interactiePanel.manualScalingX) {
 				linkerGrens = interactiePanel.xPositief?0:(interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-			}
+			}	
 			else {
 				linkerGrens = interactiePanel.xPositief?0:(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
 			}
@@ -1689,8 +1704,12 @@ public class GrafiekGWTVeld {
 		return parabool;
 	}
 	
-	public void tekenFunctie(Context2d g, int xMin, Expressie exp, double[] domein, CssColor kleur)
+	public void tekenFunctie(Context2d g, int xMin, Expressie expressie, double[] domein, CssColor kleur)
 	{
+		Expressie exp = expressie;
+		for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
+			exp = exp.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
+		}
 		//Logger.getLogger("grafiekGWTVeld").info("tekenFunctie: " + exp.toString());
 		g.beginPath();
 		//int xMin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
@@ -1802,10 +1821,19 @@ public class GrafiekGWTVeld {
 		int bx = (int)Math.round(interactiePanel.beginx);			
 		int maxWoordBreedteY = 0;
 		boolean witruimteY = false;
-		
-		for(int j=0 ; j<interactiePanel.ongelijkheden.length ; j++)
-		{	if(interactiePanel.ongelijkheden[j]!=null && interactiePanel.isY[j])
-			{	GeneralPath curve = new GeneralPath();
+
+
+		for(int j=0 ; j<interactiePanel.ongelijkheden.length ; j++) {	
+			Expressie expressie = interactiePanel.ongelijkheden[j];
+			if (expressie != null ) {
+				for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
+					expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
+				}
+			}
+			if(interactiePanel.ongelijkheden[j]!=null && interactiePanel.isY[j]) {	
+				
+
+				GeneralPath curve = new GeneralPath();
 				int xMin = Math.max(witruimteY?maxWoordBreedteY:-1, interactiePanel.xPositief?bx:-1);
 				int xMax = breedte +1;
 				double horizontaleGrens = -1;
@@ -1818,8 +1846,9 @@ public class GrafiekGWTVeld {
 //						interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();//dd0.doubleValue();
 //					double d1 = (interactiePanel.ongelijkheden[j].substitueer(interactiePanel.xAsLog?Math.pow(10, interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)/interactiePanel.eenheidxD):
 //						interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();//dd0.doubleValue();
-					double d0 = interactiePanel.ongelijkheden[j].substitueer(pixelsXtoValue(ii), interactiePanel.grafiekXAsNaam).geefWaarde();//dd0.doubleValue();
-					double d1 = interactiePanel.ongelijkheden[j].substitueer(pixelsXtoValue(ii+1), interactiePanel.grafiekXAsNaam).geefWaarde();//dd0.doubleValue();
+					double d0 = expressie.substitueer(pixelsXtoValue(ii), interactiePanel.grafiekXAsNaam).geefWaarde();//dd0.doubleValue();
+					double d1 = expressie.substitueer(pixelsXtoValue(ii+1), interactiePanel.grafiekXAsNaam).geefWaarde();//dd0.doubleValue();
+
 					if(!Double.isNaN(d0) && !Double.isNaN(d1))
 					{	int x0 = i;
 						int x1 = i+1;
@@ -1868,7 +1897,7 @@ public class GrafiekGWTVeld {
 				areas[j] = new Area(curve);
 			}
 			if(interactiePanel.ongelijkheden[j] != null && !interactiePanel.isY[j])
-			{	double grens = interactiePanel.ongelijkheden[j].geefWaarde();
+			{	double grens = expressie.geefWaarde();
 //				int pixelGrens = (int)((interactiePanel.xAsLog?Math.log10(grens):grens)*interactiePanel.eenheidxD/interactiePanel.schaalFactorX + interactiePanel.beginx);
 				int pixelGrens = (int) Math.round(valueXtoPixels(grens));
 				
@@ -2354,9 +2383,17 @@ public class GrafiekGWTVeld {
 	
 	public void tekenVerticaleLijnen(Context2d g) {
 		//Graphics2D g = (Graphics2D) gr;
+		Expressie expressie;
         for(int j=0 ; j<interactiePanel.verticaleLijnen.length ; j++) {
         	if(interactiePanel.verticaleLijnen[j]!=null) { 
-        		double xWaarde = interactiePanel.verticaleLijnen[j].geefWaarde();
+        		expressie = interactiePanel.verticaleLijnen[j];
+    			if (expressie != null ) {
+    				for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
+    					expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
+    				}
+    			}
+
+        		double xWaarde = expressie.geefWaarde();
 //              double xWaardePixels = interactiePanel.beginx + interactiePanel.eenheidxD*(interactiePanel.xAsLog?Math.log10(xWaarde):xWaarde)/interactiePanel.schaalFactorX;
 				double xWaardePixels = valueXtoPixels(xWaarde);
 
@@ -2384,7 +2421,7 @@ public class GrafiekGWTVeld {
 		else stand = std;
 		
 		
-		//paint();
+	//	paint(); 
 	}
 	
 	//om de schaalverdeling bij logschalen in orde te krijgen; 
