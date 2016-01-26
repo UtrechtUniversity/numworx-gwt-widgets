@@ -99,8 +99,9 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
+//	private static Logger logger = Logger.getLogger("GraphTool");
+
 	public static Text_nl rb = new Text_nl();
-	private static Logger logger = Logger.getLogger("GraphTool");
 
 	static final String holderId = "dockholder";
 	static final String upgradeMessage = 
@@ -2282,7 +2283,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     	
     	if(schuifParameters != null) {	
     		for (int i = 0; i < schuifParameters.length; i++) {
-				logger.info("setState :: SchuifParameter ["+i+"] - Waarde = "+paramWaarden[i]);
     			schuifParameters[i].zetWaarde(paramWaarden[i]);
     		}
     	}
@@ -2392,6 +2392,17 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		fromuser = true;
 		
 		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
+		
+		if (!tekenComponentAan) {
+			// Omdat de tekencomponent altijd geactiveerd is (ook als deze niet wordt gebruikt) moeten we ::
+			// In het geval dat de default cursor-mode van de tekencomponent niet de standaard-default is ::
+			// de gezette cursor verwijderen wanneer de tekenComponent niet wordt gebruikt
+			String styleString = grafiekGWTVeld.grafiekGWTCanvas.getStyleName();
+			if (!styleString.isEmpty()) {
+				grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(styleString);
+			}
+		}
+		
 	}
 
 		@Override
@@ -2985,8 +2996,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		// Deze procedure controleert de positie van de schuifparameters tegen de grootte van het grafiekveld
 		// Wanneer de schuifparameter niet past wordt hij naar een standaard-positie verplaatst
 		
-		
-		logger.info("herlokeerSchuifParameters");
 		if (schuifParameters != null) { // er zijn schuifParameters
 			
 			int marge = 10; // contstante (minimale afstant tot een rand)

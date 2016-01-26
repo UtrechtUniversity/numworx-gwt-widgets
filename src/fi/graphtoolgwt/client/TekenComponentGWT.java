@@ -33,14 +33,17 @@ public class TekenComponentGWT extends LayoutPanel {
 	public static int DRAW = 1;
 	public static int DELETE = 2;
 	public static int DRAG = 3;
-	private int cursorMode = DRAW;	
+	
+	private static int cDefault_cursorMode = DRAW;
+	private int cursorMode = cDefault_cursorMode;	
 	
 	// verbindingen	
 	public static int NONE = 0;
 	public static int LINES = 1;	
 	public static int CURVE = 2;	
 	public static int CURVE_EXTRA = 3;
-	private int connectMode = NONE;
+	private static int cDefault_connectMode = NONE;
+	private int connectMode = cDefault_connectMode;
 	
 	private FlowPanel[] rechtHoekPanels;
 	private ToggleButton drawButton, deleteButton, dragButton;//, noneButton;
@@ -109,8 +112,7 @@ public class TekenComponentGWT extends LayoutPanel {
 		rechtHoekPanels[0] = addRechthoekPanel(-1, 3*knopBreedte + 2);
 		rechtHoekPanels[1] = addRechthoekPanel(3*knopBreedte + 8, aantalLijnKnoppen * knopBreedte + 2);
 		rechtHoekPanels[2] = addRechthoekPanel((3 + aantalLijnKnoppen) * knopBreedte + 16, breedte - ((3 + aantalLijnKnoppen) * knopBreedte + 15));
-		rechtHoekPanels[3] = addRechthoekPanel(0, breedte);
-		
+		rechtHoekPanels[3] = addRechthoekPanel(0, breedte);		
 		
 		drawButton = new ToggleButton(drawButtonUpImage, drawButtonDownImage);
 		drawButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -539,15 +541,20 @@ public class TekenComponentGWT extends LayoutPanel {
 		else
 			cursorMode = mode;
 		
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag"))
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag")) {
 			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_drag");
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum"))
+			dragButton.setDown(false);
+		}
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum")) {
 			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_gum");
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken"))
+			deleteButton.setDown(false);
+		}
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken")) {
 			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_teken");
+			drawButton.setDown(false);
+		}
 		
-		if(cursorMode == NONE)
-		{
+		if(cursorMode == NONE) { // waarschijnlijk nu overbodig
 			drawButton.setDown(false);
 			deleteButton.setDown(false);
 			dragButton.setDown(false);
@@ -571,9 +578,6 @@ public class TekenComponentGWT extends LayoutPanel {
 		
 	}
 	
-	
-	
-	
 
 	public int getConnectMode()
 	{	return connectMode;
@@ -596,9 +600,9 @@ public class TekenComponentGWT extends LayoutPanel {
 		return h;
 	}
 	
-	public void setState(Map<String, Object> launchState)
-	{	int connectMode = NONE;
-		int cursorMode =  DRAW;
+	public void setState(Map<String, Object> launchState) {	
+		int connectMode = cDefault_connectMode;
+		int cursorMode =  cDefault_cursorMode;
 		
 		if(launchState != null)
 		{	if(launchState.containsKey("connectMode"))
