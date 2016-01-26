@@ -1266,8 +1266,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			grafiekGWTVeld.paint();
 		}
 		
-		
-	
 	}
 
 	public void zetNagekeken(boolean b) {
@@ -2084,8 +2082,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//ArrayList<ArrayList<Integer>> colorRGBs = new ArrayList<ArrayList<Integer>>();
 		
 		double[] paramWaarden = null;
-		if(schuifParameters != null)
-		{	paramWaarden = new double[schuifParameters.length];
+		if(schuifParameters != null) {	
+			paramWaarden = new double[schuifParameters.length];
 			for(int i = 0; i < schuifParameters.length; i++)
 				paramWaarden[i] = schuifParameters[i].geefWaarde();
 		}
@@ -2282,9 +2280,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     	if(map.containsKey("paramWaarden"))
     		paramWaarden = map.getDoubleArray("paramWaarden");
     	
-    	if(schuifParameters != null)
-    	{	for (int i = 0; i < schuifParameters.length; i++)
+    	if(schuifParameters != null) {	
+    		for (int i = 0; i < schuifParameters.length; i++) {
+				logger.info("setState :: SchuifParameter ["+i+"] - Waarde = "+paramWaarden[i]);
     			schuifParameters[i].zetWaarde(paramWaarden[i]);
+    		}
     	}
     	
 		int[][] colorRGBsGewoon = null;
@@ -2390,6 +2390,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		grafiekGWTVeld.paint();
 		
 		fromuser = true;
+		
+		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
 	}
 
 		@Override
@@ -2691,11 +2693,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	    	if(launchData.containsKey("paramY"))
 	    		paramY = launchData.getIntArray("paramY");
 			
-	    	if(paramNamen != null)
-	    	{
+	    	if(paramNamen != null) {
+	    		int maxX = breedte;
+	    		int maxY = hoogte;
+	    		
+	    		
 	    		this.schuifParameters = new SchuifParameterGWT[paramNamen.length];
-				for(int i = 0; i < schuifParameters.length; i++)
-				{	schuifParameters[i] = new SchuifParameterGWT(paramLengtes[i], paramNamen[i]);
+				for(int i = 0; i < schuifParameters.length; i++) {	
+					schuifParameters[i] = new SchuifParameterGWT(paramLengtes[i], paramNamen[i]);
 					schuifParameters[i].zetGrensWaarden(paramOnderGrensWaarden[i], paramBovenGrensWaarden[i]);
 					schuifParameters[i].zetStapGrootte(paramStapGroottes[i]);
 					schuifParameters[i].zetWaarde(paramWaarden[i]);
@@ -2974,6 +2979,52 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		
 		initialize();
 		fromuser = true;
+	}
+	
+	private void herlokeerSchuifParameters() {
+		// Deze procedure controleert de positie van de schuifparameters tegen de grootte van het grafiekveld
+		// Wanneer de schuifparameter niet past wordt hij naar een standaard-positie verplaatst
+		
+		
+		logger.info("herlokeerSchuifParameters");
+		if (schuifParameters != null) { // er zijn schuifParameters
+			
+			int marge = 10; // contstante (minimale afstant tot een rand)
+			int initY = 20;
+			int afstand = 25; // constante (minimale afstand tussen schuifparameters)
+			int standaardPos = 0; // eerste standaard-positie
+			int maxX = grafiekGWTVeld.breedte;
+			int maxY = grafiekGWTVeld.hoogte;
+			
+			for (int i=0; i<schuifParameters.length; i++) {
+				int[] positie = schuifParameters[i].geefPositie();
+				int lengte = schuifParameters[i].geefLengte();
+				
+				if ( (positie == null) ||
+					 (positie[0] - marge < 0) ||   // positie[0] = X
+					 (positie[0] + marge + lengte > maxX) ||
+					 (positie[1] - marge < 0) ||   // positie[1] = Y
+					 (positie[1] + marge > maxY)
+				   ) { // Wijzig positie
+					int newPosX = marge;
+					int newPosY = initY + standaardPos * afstand;
+					schuifParameters[i].zetLocatie(newPosX, newPosY);
+					standaardPos++;
+				}
+			}
+			if (standaardPos > 0) {
+				grafiekGWTVeld.paint();
+			}
+		}
+		
+//		this.schuifParameters = new SchuifParameterGWT[paramNamen.length];
+//		for(int i = 0; i < schuifParameters.length; i++) {	
+//			schuifParameters[i] = new SchuifParameterGWT(paramLengtes[i], paramNamen[i]);
+//			schuifParameters[i].zetGrensWaarden(paramOnderGrensWaarden[i], paramBovenGrensWaarden[i]);
+//			schuifParameters[i].zetStapGrootte(paramStapGroottes[i]);
+//			schuifParameters[i].zetWaarde(paramWaarden[i]);
+//			schuifParameters[i].zetLocatie(paramX[i], paramY[i]);
+//		}
 	}
 	
 	
