@@ -55,10 +55,10 @@
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
   	</dependency>
-  	<dependency>
-  		<groupId>com.googlecode.mgwt</groupId>
-  		<artifactId>MGWT</artifactId>
-  	</dependency>
+<!--   	<dependency> -->
+<!--   		<groupId>com.googlecode.mgwt</groupId> -->
+<!--   		<artifactId>MGWT</artifactId> -->
+<!--   	</dependency> -->
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
