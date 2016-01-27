@@ -2,11 +2,11 @@
 
 
 .root {
-	background-color: yellow; 
+/**	background-color: yellow; */ 
 }	
 
 .dock {
-/**	background-color: orange; */
+/**	background-color: orange; */ 
 }
 
 .bottom {
@@ -14,7 +14,7 @@
 }
 
 .canvas {
-	background-color: white;	
+/**	background-color: white; */	
 }
 
 .upimage {

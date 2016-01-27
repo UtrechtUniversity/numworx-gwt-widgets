@@ -639,11 +639,11 @@ public class KladjeGWTVeld
 		g.setLineWidth(1.0d);
 
 		
-		g.setFillStyle(backgroundColor);
-		g.fillRect(0, 0, breedte, hoogte);
+		//g.setFillStyle(backgroundColor);
+		//g.fillRect(0, 0, breedte, hoogte);
 		
 		
-//		g.clearRect(0, 0, breedte, hoogte);
+		g.clearRect(0, 0, breedte, hoogte);
 	
 		
 		
