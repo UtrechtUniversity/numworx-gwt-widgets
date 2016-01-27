@@ -34,6 +34,10 @@ public class GrafiekGWTVeld {
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
+	
+	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
+	                        // range is used
+	int drawYmin, drawYmax;
 
 	public Canvas grafiekGWTCanvas;
 	public Context2d gIm;
@@ -76,8 +80,6 @@ public class GrafiekGWTVeld {
 	static CssColor grijs = CssColor.make(100,100,100);
 
 	//boolean mouseDown;
-	
-	
 	//private DecimalFormatSymbols dfs;
 	//private Font font = new Font("SansSerif", Font.PLAIN, 10);
 	//private FontMetrics fm = new FontMetrics(font);
@@ -85,13 +87,9 @@ public class GrafiekGWTVeld {
 	
 	private final GraphToolGWT interactiePanel;
 	
-	
-	
-	
-	public GrafiekGWTVeld(GraphToolGWT interactiePanel, int w, int h)
-	{	this.interactiePanel = interactiePanel;
+	public GrafiekGWTVeld(GraphToolGWT interactiePanel, int w, int h) {	
+		this.interactiePanel = interactiePanel;
 		grafiekGWTCanvas = Canvas.createIfSupported();
-		
 		
 		setSize(w, h);
 		
@@ -233,8 +231,8 @@ public class GrafiekGWTVeld {
 			scalingMultiplyY *= 2;
 		}
 
-		if (interactiePanel.roosterZichtbaar || interactiePanel.schaalZichtbaar)
-		{	int imin = -(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX)); 
+		if (interactiePanel.roosterZichtbaar || interactiePanel.schaalZichtbaar) {	
+			int imin = -(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX)); 
 			int imax = 1+breedte/(interactiePanel.eenheidx * scalingMultiplyX)-(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX));
 			int jmin = -(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy * scalingMultiplyY)); 
 			int jmax = 1+hoogte/(interactiePanel.eenheidy* scalingMultiplyY)-(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy*scalingMultiplyY));
@@ -290,8 +288,8 @@ public class GrafiekGWTVeld {
 			{	gIm.beginPath();
 				for(int j = jmin; j < jmax; j++)
 				{	if((!interactiePanel.yPositief || j > 0) && interactiePanel.yAsLog && !interactiePanel.roosterGrof)
-					{	for(int k = 1; k < 10; k++)
-						{	gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
+					{	for(int k = 1; k < 10; k++) {	
+							gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
 							gIm.lineTo(breedte, (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
 						}
 					}
@@ -301,8 +299,7 @@ public class GrafiekGWTVeld {
 			//gewone roosterlijnen tekenen:
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
-			for(int i=imin+1 ; i<imax ; i++)
-			{	
+			for(int i=imin+1 ; i<imax ; i++) {	
 //				String getal = Double.toString(interactiePanel.schaalFactorX*(i));
 //				if(interactiePanel.xAsLog)
 //					getal = 10 + toSuperScript(getal);
@@ -331,7 +328,7 @@ public class GrafiekGWTVeld {
 				int woordbreedte = (int) Math.round(tm.getWidth());
 				int xLabel = (int)(interactiePanel.beginx+i*interactiePanel.eenheidxD * scalingMultiplyX -woordbreedte/2);
 //				int yLabel = Math.min(hoogte-1, hoogte-by+11);
-				int yLabel = Math.max(11, Math.min(hoogte-4, hoogte-by+11));
+				int yLabel = Math.max(9, Math.min(hoogte-2, hoogte-by+11));
 
 				boolean schaalTekenen = (i%2 == 0 || interactiePanel.xAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalX;
 				//witruimteX = yLabel==hoogte-1;
@@ -387,7 +384,7 @@ public class GrafiekGWTVeld {
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
 //				int xLabel = Math.max(maxWoordBreedteY-woordbreedte,bx-2-woordbreedte);
-				int xLabel = Math.min(breedte-3-woordbreedte,Math.max(maxWoordBreedteY-woordbreedte+4,bx-2-woordbreedte));
+				int xLabel = Math.min(breedte-1-woordbreedte,Math.max(maxWoordBreedteY-woordbreedte+2,bx-2-woordbreedte));
 				int yLabel = (int)(hoogte+5-(interactiePanel.beginy+j*interactiePanel.eenheidyD * scalingMultiplyY ));
 				witruimteY = xLabel==maxWoordBreedteY-woordbreedte;
 				int minimaalBegin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
@@ -521,8 +518,8 @@ public class GrafiekGWTVeld {
 				for (int rCnt = 1; rCnt <= maxRCnt; rCnt++) {	
 					//int piX = (int) Math.round(beginx + rCnt * Math.PI * eenheidxD / schaalFactorX); 
 					int piX = (int) Math.round(interactiePanel.beginx + rCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider) );
-					if ((piX > 0) && (piX < breedte))
-					{	gIm.beginPath();
+					if ((piX > 0) && (piX < breedte)) {	
+						gIm.beginPath();
 						for (int dCnt = 0; dCnt < dashes; dCnt++)
 						{	if ((dCnt % 2) == 0)
 								if(dCnt * dashStep + dashStep < hoogte - by || !interactiePanel.yPositief)
@@ -598,62 +595,62 @@ public class GrafiekGWTVeld {
 			gIm.setFillStyle(zwart);
 			
 			/* Y-as */
-//			if(bx>1 && bx<breedte) {	
-//				gIm.beginPath(); 
-//				gIm.moveTo(bx, 0);
-//				gIm.lineTo(bx, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
-//				gIm.stroke();
-//			}
-			
-			if (bx<=1) {
+			if(bx>1 && bx<breedte) {	
 				gIm.beginPath(); 
-				gIm.moveTo(1, 0);
-				gIm.lineTo(1, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
+				gIm.moveTo(bx, 0);
+				gIm.lineTo(bx, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
 				gIm.stroke();
-			} 
-			else { // bx >1
-				if (bx<breedte) { //(bx>1 && bx<breedte)
-					gIm.beginPath(); 
-					gIm.moveTo(bx, 0);
-					gIm.lineTo(bx, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
-					gIm.stroke();
-				}
-				else { //bx >=breedte
-					gIm.beginPath(); 
-					gIm.moveTo(breedte-1, 0);
-					gIm.lineTo(breedte-1, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
-					gIm.stroke();
-				}
 			}
+			
+//			if (bx<=1) {
+//				gIm.beginPath(); 
+//				gIm.moveTo(1, 0);
+//				gIm.lineTo(1, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
+//				gIm.stroke();
+//			} 
+//			else { // bx >1
+//				if (bx<breedte) { //(bx>1 && bx<breedte)
+//					gIm.beginPath(); 
+//					gIm.moveTo(bx, 0);
+//					gIm.lineTo(bx, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
+//					gIm.stroke();
+//				}
+//				else { //bx >=breedte
+//					gIm.beginPath(); 
+//					gIm.moveTo(breedte-1, 0);
+//					gIm.lineTo(breedte-1, hoogte-Math.max(witruimteX?maxWoordHoogteX:0,(interactiePanel.yPositief?by:0)));
+//					gIm.stroke();
+//				}
+//			}
 			
 			/* X-as */
-//			if(by>0 && by<hoogte) {	
-//				gIm.beginPath();
-//				gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-by);
-//				gIm.lineTo(breedte,hoogte-by);
-//				gIm.stroke();
-//			}
-			
-			if (by<=0) {// by<=0
+			if(by>0 && by<hoogte) {	
 				gIm.beginPath();
-				gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-1);
-				gIm.lineTo(breedte,hoogte-1);
+				gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-by);
+				gIm.lineTo(breedte,hoogte-by);
 				gIm.stroke();
 			}
-			else { // by>0
-				if (by<hoogte) { // (by>0 && by<hoogte)
-					gIm.beginPath();
-					gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-by);
-					gIm.lineTo(breedte,hoogte-by);
-					gIm.stroke();
-				} 
-				else { // by>=hoogte
-					gIm.beginPath();
-					gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), 1);
-					gIm.lineTo(breedte, 1);
-					gIm.stroke();
-				}
-			}
+			
+//			if (by<=0) {// by<=0
+//				gIm.beginPath();
+//				gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-1);
+//				gIm.lineTo(breedte,hoogte-1);
+//				gIm.stroke();
+//			}
+//			else { // by>0
+//				if (by<hoogte) { // (by>0 && by<hoogte)
+//					gIm.beginPath();
+//					gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), hoogte-by);
+//					gIm.lineTo(breedte,hoogte-by);
+//					gIm.stroke();
+//				} 
+//				else { // by>=hoogte
+//					gIm.beginPath();
+//					gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), 1);
+//					gIm.lineTo(breedte, 1);
+//					gIm.stroke();
+//				}
+//			}
 
 						
 			fontString = "italic 10px sans-serif";
