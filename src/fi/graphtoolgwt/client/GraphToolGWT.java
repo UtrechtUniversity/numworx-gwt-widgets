@@ -99,7 +99,8 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-//	private static Logger logger = Logger.getLogger("GraphTool");
+	private static Logger logger = Logger.getLogger("GraphTool");
+	final static int cSelectMarge = 5;
 
 	public static Text_nl rb = new Text_nl();
 
@@ -2998,9 +2999,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		
 		if (schuifParameters != null) { // er zijn schuifParameters
 			
-			int marge = 10; // contstante (minimale afstant tot een rand)
-			int initY = 20;
-			int afstand = 25; // constante (minimale afstand tussen schuifparameters)
+			int marge = SliderGWT.cDefault_x; // contstante (minimale afstant tot een rand)
+			int initY = SliderGWT.cDefault_y;
+			int afstand = SliderGWT.cDefault_distance; // constante (minimale afstand tussen schuifparameters)
 			int standaardPos = 0; // eerste standaard-positie
 			int maxX = grafiekGWTVeld.breedte;
 			int maxY = grafiekGWTVeld.hoogte;
@@ -3216,15 +3217,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			// grafiekGWTVeld.paint();
 			return;
 		}
-		
-		if(eventX >= grafiekGWTVeld.xAsNaamLinks && eventX <= grafiekGWTVeld.xAsNaamRechts && 
-				eventY >= grafiekGWTVeld.xAsNaamBoven - 5 && eventY <= grafiekGWTVeld.xAsNaamOnder && xVarEditable)
+		logger.info("Event = ["+ eventX + ","+ eventY +"]");
+		if ( eventX >= grafiekGWTVeld.xAsNaamLinks - cSelectMarge && eventX <= grafiekGWTVeld.xAsNaamRechts + cSelectMarge && 
+			 eventY >= grafiekGWTVeld.xAsNaamBoven - cSelectMarge && eventY <= grafiekGWTVeld.xAsNaamOnder + cSelectMarge && xVarEditable)
 		{	showTekstPopup(true);
 			return;
 		}
-		else if(eventX >= grafiekGWTVeld.yAsNaamLinks && eventX <= grafiekGWTVeld.yAsNaamRechts && 
-				eventY >= grafiekGWTVeld.yAsNaamBoven - 5 && eventY <= grafiekGWTVeld.yAsNaamOnder && yVarEditable)	
-		{	showTekstPopup(false);
+		else if(eventX >= grafiekGWTVeld.yAsNaamLinks - cSelectMarge && eventX <= grafiekGWTVeld.yAsNaamRechts+cSelectMarge && 
+				eventY >= grafiekGWTVeld.yAsNaamBoven - cSelectMarge && eventY <= grafiekGWTVeld.yAsNaamOnder +cSelectMarge && yVarEditable)	{	showTekstPopup(false);
 			return;
 		}
 		if (!tekenComponentAan && source == grafiekGWTCanvas) 
@@ -3379,17 +3379,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//slider:
 		//misschien aanpassen nu ook schuifparameters erbij komen: raak toch weer in slider zelf laten bijhouden 
 		//zoals ook in de gewone graphtool gebeurt.
-		grafiekGWTVeld.sliderRaak = (eventX >= grafiekGWTVeld.stand - 5 && eventX <= grafiekGWTVeld.stand + 5 
-				&& eventY >= hoogte - beginy - 5 && eventY <= hoogte - beginy + 5);
-		//muisStartX = eventX;
-		if (grafiekGWTVeld.sliderRaak)
-		{	grafiekGWTVeld.tracing = true;
+		double  traceBase = Math.min(grafiekGWTVeld.drawYmax, Math.max( (grafiekVeldHoogte - beginy), grafiekGWTVeld.drawYmin));
+		grafiekGWTVeld.sliderRaak = (eventX >= grafiekGWTVeld.stand - SliderGWT.cSelectMarge && eventX <= grafiekGWTVeld.stand + SliderGWT.cSelectMarge 
+				&& eventY >= traceBase - SliderGWT.cSelectMarge && eventY <= traceBase + SliderGWT.cSelectMarge);
+		if (grafiekGWTVeld.sliderRaak) {	
+			grafiekGWTVeld.tracing = true;
 			grafiekGWTVeld.tracex = grafiekGWTVeld.geefSliderStand();
 			grafiekGWTVeld.tracexD = grafiekGWTVeld.tracex;
 		}
 		startxv = eventX;
 		startyv = eventY;
-		
 
 		grafiekGWTVeld.paint();
 	}
@@ -3465,16 +3464,17 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		*/
 		
-		if(!grafiekGWTVeld.sliderRaak && (eventX >= grafiekGWTVeld.stand - 5 && eventX <= grafiekGWTVeld.stand + 5 
-			&& eventY >= grafiekVeldHoogte - beginy - 5 && eventY <= grafiekVeldHoogte - beginy + 5))
-			{	grafiekGWTVeld.sliderRaak = true;
-				//muisStartX = eventX;
-			if (grafiekGWTVeld.sliderRaak)
-			{	grafiekGWTVeld.tracing = true;
-				grafiekGWTVeld.tracex = grafiekGWTVeld.geefSliderStand();
-				grafiekGWTVeld.tracexD = grafiekGWTVeld.tracex;
-			}
-		}
+//		if(!grafiekGWTVeld.sliderRaak && (eventX >= grafiekGWTVeld.stand - 5 && eventX <= grafiekGWTVeld.stand + 5 
+//			&& eventY >= grafiekVeldHoogte - beginy - 5 && eventY <= grafiekVeldHoogte - beginy + 5))
+//			{	grafiekGWTVeld.sliderRaak = true;
+//				//muisStartX = eventX;
+//			if (grafiekGWTVeld.sliderRaak)
+//			{	grafiekGWTVeld.tracing = true;
+//				grafiekGWTVeld.tracex = grafiekGWTVeld.geefSliderStand();
+//				grafiekGWTVeld.tracexD = grafiekGWTVeld.tracex;
+//			}
+//		}
+//		logger.info("sliderRaak 2 = " + grafiekGWTVeld.sliderRaak);
 		if(grafiekGWTVeld.sliderRaak )
 		{	int x = eventX;
 			int dx = x - startxv;

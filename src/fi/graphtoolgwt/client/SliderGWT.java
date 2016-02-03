@@ -10,14 +10,14 @@ public class SliderGWT {
 	
 //	private static Logger logger = Logger.getLogger("SliderGWT");
 	
-	private final static int cDefault_x = 15;
-	private final static int cDefault_y = 15;
-	private final static int cDefault_marge = 3;
+	final static int cDefault_x = 20;
+	final static int cDefault_y = 40;
+	final static int cDefault_distance = 25;
+	final static int cSelectMarge = 5;
 
 	private final static int cTekstYOffset = 5;
 	private final static int cKnobSize = 3;
 
-	private int marge = cDefault_marge;
 	private int x = cDefault_x; 
 	private int y = cDefault_y;
 	
@@ -55,8 +55,8 @@ public class SliderGWT {
 	}
 	
 	public boolean isRaak(int xPos, int yPos) {
-		boolean xRaak = ((xPos >= x+stand-marge) && (xPos <= x+stand+marge));
-		boolean yRaak = ((yPos >= y-marge) && (yPos <= y+marge));
+		boolean xRaak = ((xPos >= x+stand-cSelectMarge) && (xPos <= x+stand+cSelectMarge));
+		boolean yRaak = ((yPos >= y-cSelectMarge) && (yPos <= y+cSelectMarge));
 
 		return (xRaak && yRaak);
 	}
