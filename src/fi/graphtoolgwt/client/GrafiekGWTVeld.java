@@ -37,6 +37,7 @@ public class GrafiekGWTVeld {
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
 	private final int cExtraAxisMarge = 4;
+	private final int cAxesThickness = 1;
 	private final String cFontString = "10px sans-serif";
 	private final String cFontStringItalic = "italic 10px sans-serif";
 	private final int cFontHeight = 10;
@@ -451,8 +452,8 @@ public class GrafiekGWTVeld {
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
 //				int xLabel = Math.max(maxWoordBreedteY-woordbreedte,bx-2-woordbreedte);
-				int xLabel = Math.min(breedte-1-woordbreedte,Math.max(maxWoordBreedteY-woordbreedte+2,bx-2-woordbreedte));
-				int yLabel = (int)(hoogte+5-(interactiePanel.beginy+j*interactiePanel.eenheidyD * scalingMultiplyY ));
+				int xLabel = Math.min(breedte-cExtraAxisMarge-woordbreedte,Math.max(maxWoordBreedteY-woordbreedte+cExtraAxisMarge,bx-cExtraAxisMarge-woordbreedte));
+				int yLabel = (int)(hoogte+cExtraAxisMarge-(interactiePanel.beginy+j*interactiePanel.eenheidyD * scalingMultiplyY ));
 				witruimteY = xLabel==maxWoordBreedteY-woordbreedte;
 				int minimaalBegin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
 				boolean schaalTekenen = (j%2 == 0 || interactiePanel.yAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalY;
