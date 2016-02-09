@@ -38,6 +38,8 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import fi.tekenveelvlakgwt.client.text.Text;
+
 import java.util.logging.Logger;
 
 public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, InteractionView 
@@ -51,6 +53,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	DockLayoutPanel dlp;
 	LayoutPanel bottomPanel;
 	
+	public static Text rb;
 	
 	int breedte = 500;
 	int hoogte = 450;
@@ -111,6 +114,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		tekenVeelvlakGWTClientBundle = GWT.create(TekenVeelvlakGWTClientBundle.class);
 		tekenVeelvlakGWTCssResource = tekenVeelvlakGWTClientBundle.getTekenVeelvlakGWTCssResource();
 		tekenVeelvlakGWTCssResource.ensureInjected();

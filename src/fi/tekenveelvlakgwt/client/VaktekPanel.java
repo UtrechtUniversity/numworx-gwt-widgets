@@ -103,7 +103,8 @@ class VaktekPanel extends LayoutPanel
 		setWidgetLeftWidth(ra.canvas,breedte/2-vakBreedte/2+vakBreedte+1,Style.Unit.PX,vakBreedte-1,Style.Unit.PX);
 		setWidgetTopHeight(ra.canvas,hoogte/2+1,Style.Unit.PX,vakBreedte-1,Style.Unit.PX);
 
-		kijkNaButton = new PushButton("Kijk Na");
+		//kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton = new PushButton(TekenVeelvlakGWT.rb.kijkNaLabel());
 		kijkNaLabelGoed = new Label("V");
 		kijkNaLabelFout = new Label("X");
 		kijkNaPanel = new LayoutPanel();

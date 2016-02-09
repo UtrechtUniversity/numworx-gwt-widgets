@@ -136,7 +136,8 @@ public class Viewer3d extends LayoutPanel
 		beginy = -30;
 
 
-		kijkNaButton = new PushButton("Kijk Na");
+		//kijkNaButton = new PushButton("Kijk Na");
+		kijkNaButton = new PushButton(TekenVeelvlakGWT.rb.kijkNaLabel());
 		kijkNaPanel = new LayoutPanel();
 		//kijkNaButton = new JButton(TekenVeelvlakOpdr.rb.getString("kijkNaLabel"));
 		//kijkNaButton.setBounds(0, 0, 100, 20);

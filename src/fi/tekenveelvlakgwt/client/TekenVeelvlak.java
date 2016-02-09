@@ -74,7 +74,8 @@ System.out.println("initialiseer");
 
 		int currentY = bStarH;
 	    
-		zoomLabel = new Label("zoom");
+		//zoomLabel = new Label("zoom");
+		zoomLabel = new Label(TekenVeelvlakGWT.rb.zijdeLabel());
 		rg.add(zoomLabel);
 		rg.setWidgetLeftWidth(zoomLabel, 15, Style.Unit.PX, 100, Style.Unit.PX);
 		rg.setWidgetTopHeight(zoomLabel, currentY, Style.Unit.PX, 20, Style.Unit.PX);
@@ -91,7 +92,8 @@ System.out.println("initialiseer");
 		
 		currentY += 30;
 		
-		lijnKnop = new ToggleButton("Maak lijn","MAAK LIJN");
+		//lijnKnop = new ToggleButton("Maak lijn","MAAK LIJN");
+		lijnKnop = new ToggleButton(TekenVeelvlakGWT.rb.lijnKnopLabel(),TekenVeelvlakGWT.rb.lijnKnopCapLabel());
 		rg.add(lijnKnop);
 		rg.setWidgetLeftWidth(lijnKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(lijnKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -102,7 +104,8 @@ System.out.println("initialiseer");
 		
 		currentY += 35;
 				
-		vlakKnop = new ToggleButton("Maak vlak","MAAK VLAK");
+		//vlakKnop = new ToggleButton("Maak vlak","MAAK VLAK");
+		vlakKnop = new ToggleButton(TekenVeelvlakGWT.rb.vlakKnopLabel(), TekenVeelvlakGWT.rb.vlakKnopCapLabel());
 		rg.add(vlakKnop);
 		rg.setWidgetLeftWidth(vlakKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(vlakKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -113,7 +116,8 @@ System.out.println("initialiseer");
 		
 		currentY += 35;
 		
-		basisKnop = new PushButton("Verberg basis");
+		//basisKnop = new PushButton("Verberg basis");
+		basisKnop = new PushButton(TekenVeelvlakGWT.rb.verbergBasisKnopLabel());
 		rg.add(basisKnop);
 		rg.setWidgetLeftWidth(basisKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(basisKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -124,7 +128,8 @@ System.out.println("initialiseer");
 		
 		currentY += 35;
 		
-		terugKnop = new PushButton("Maak ongedaan");
+		//terugKnop = new PushButton("Maak ongedaan");
+		terugKnop = new PushButton(TekenVeelvlakGWT.rb.terugKnopLabel());
 		rg.add(terugKnop);
 		rg.setWidgetLeftWidth(terugKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(terugKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -135,7 +140,8 @@ System.out.println("initialiseer");
 		
 		currentY += 35;
 
-		wisKnop = new PushButton("Wis lijnen");
+		//wisKnop = new PushButton("Wis lijnen");
+		wisKnop = new PushButton(TekenVeelvlakGWT.rb.wisLijnKnopLabel());
 		rg.add(wisKnop);
 		rg.setWidgetLeftWidth(wisKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(wisKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -146,7 +152,8 @@ System.out.println("initialiseer");
 		
 		currentY += 35;
 		
-		wisVKnop = new PushButton("Wis vlakken");
+		//wisVKnop = new PushButton("Wis vlakken");
+		wisVKnop = new PushButton(TekenVeelvlakGWT.rb.wisVlakKnopLabel());
 		rg.add(wisVKnop);
 		rg.setWidgetLeftWidth(wisVKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(wisVKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
@@ -804,15 +811,18 @@ if (k > 0)
 			if (e.getSource() == basisKnop)
 			{	
 
-				if (basisKnop.getText().equals("Verberg basis"))
+				//if (basisKnop.getText().equals("Verberg basis"))
+				if (basisKnop.getText().equals(TekenVeelvlakGWT.rb.verbergBasisKnopLabel()))
 				{	
 					basisZichtbaar = false;
-					basisKnop.setText("Toon basis");
+					basisKnop.setText(TekenVeelvlakGWT.rb.toonBasisKnopLabel());
 					
 				}
 				else
 				{	basisZichtbaar = true;
-					basisKnop.setText("Verberg basis");
+					//basisKnop.setText("Verberg basis");
+					basisKnop.setText(TekenVeelvlakGWT.rb.verbergBasisKnopLabel());
+					
 				}
 			}	
 			else if (e.getSource() == terugKnop)
