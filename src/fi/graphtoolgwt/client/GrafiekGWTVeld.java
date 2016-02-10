@@ -1989,8 +1989,9 @@ public class GrafiekGWTVeld {
 				
 
 				GeneralPath curve = new GeneralPath();
-				int xMin = Math.max(witruimteY?maxWoordBreedteY:-1, interactiePanel.xPositief?bx:-1);
-				int xMax = breedte +1;
+				int xMin = drawXmin;
+				int xMax = drawXmax;
+
 				double horizontaleGrens = -1;
 				if(!interactiePanel.isGroterGelijk[j])
 					horizontaleGrens = interactiePanel.yPositief?(hoogte - interactiePanel.beginy):hoogte+1;
