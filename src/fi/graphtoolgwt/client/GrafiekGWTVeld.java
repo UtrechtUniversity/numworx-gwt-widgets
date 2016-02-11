@@ -42,7 +42,10 @@ public class GrafiekGWTVeld {
 	private final int cFontHeight = 10;
 	private final int cFontHeightItalic = 10;
 	private final int cSliderBoxBorderMargin = 2;
-	private final double cLineWidth = 0.5d;
+//	private final double cLineWidth = 0.5d;
+	private final double cLineWidth = 0.25d;
+	private final double cLineWidthAxes = 1.00d;
+	
 	
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
 	                        // range is used
@@ -81,8 +84,10 @@ public class GrafiekGWTVeld {
 	
 	public int xAsNaamLinks, xAsNaamRechts, xAsNaamBoven, xAsNaamOnder, yAsNaamLinks, yAsNaamRechts, yAsNaamBoven, yAsNaamOnder;
 	
-	CssColor roosterKleur = CssColor.make(210, 210, 210);
-	CssColor roosterKleurLicht = CssColor.make(240, 240, 240);
+//	CssColor roosterKleur = CssColor.make(210, 210, 210);
+	CssColor roosterKleur = CssColor.make(100, 100, 100);
+//	CssColor roosterKleurLicht = CssColor.make(240, 240, 240);
+	CssColor roosterKleurLicht = CssColor.make(175, 175, 175);
 	static CssColor zwart = CssColor.make(0, 0, 0);
 	static CssColor wit = CssColor.make(255, 255, 255);
 	static CssColor rood = CssColor.make(255, 0, 0);
@@ -357,13 +362,15 @@ public class GrafiekGWTVeld {
 			witruimteY = maxWoordBreedteY >= bx - 2;
 			//log-roosterlijnen tekenen (iets lichter dan gewone roosterlijnen):
 			gIm.setStrokeStyle(roosterKleurLicht);
-			if(interactiePanel.roosterX)
-			{	gIm.beginPath();
-				for(int i = imin+1; i < imax; i++)
-				{	if((!interactiePanel.xPositief || i > 0) && interactiePanel.xAsLog && !interactiePanel.roosterGrof)
-					{	for(int k = 1; k < 10; k++)
-						{	gIm.moveTo((int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD), 0);
-							gIm.lineTo((int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD), maxHoogteLijn);
+			if(interactiePanel.roosterX)	{	
+				gIm.beginPath();
+				for(int i = imin-1; i < imax+1; i++) {
+					logger.info("Log Y : "+ i);
+					if((!interactiePanel.xPositief || i > 0) && interactiePanel.xAsLog && !interactiePanel.roosterGrof) {	
+						for(int k = 1; k < 10; k++) {	
+							logger.info("Log Y : "+ i + " : k : "+ k + " : Pos = "+ ((int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD)));
+							gIm.moveTo((int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD), drawYmin);
+							gIm.lineTo((int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD), drawYmax);
 						}
 					}
 				}
@@ -371,7 +378,7 @@ public class GrafiekGWTVeld {
 			}
 			if(interactiePanel.roosterY)
 			{	gIm.beginPath();
-				for(int j = jmin; j < jmax; j++)
+				for(int j = jmin-1; j < jmax+1; j++)
 				{	if((!interactiePanel.yPositief || j > 0) && interactiePanel.yAsLog && !interactiePanel.roosterGrof)
 					{	for(int k = 1; k < 10; k++) {	
 							gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
@@ -385,7 +392,7 @@ public class GrafiekGWTVeld {
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
 
-			for(int i=imin+1 ; i<imax ; i++) {	
+			for(int i=imin ; i<imax ; i++) {	
 //				String getal = Double.toString(interactiePanel.schaalFactorX*(i));
 //				if(interactiePanel.xAsLog)
 //					getal = 10 + toSuperScript(getal);
@@ -689,7 +696,7 @@ public class GrafiekGWTVeld {
 		
 		if (interactiePanel.assenZichtbaar) 
 		{
-			gIm.setLineWidth(1.0d);
+			gIm.setLineWidth(cLineWidthAxes);
 			gIm.setStrokeStyle(zwart);
 			gIm.setFillStyle(zwart);
 			
