@@ -4,7 +4,6 @@ package fi.algebrapijlengwt.client;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import java.util.*;
-
 import java.util.logging.Logger;
 
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -17,6 +16,7 @@ import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PopupPanel;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class AlgebraSchuifVeld 
@@ -1012,16 +1012,32 @@ stapelsCnt++;
 			aantalSc = h.getInt("aantalSc");
 		if (h.containsKey("classNamesList"))
 			classNamesList = h.getStringList("classNamesList");
+		else if (h.containsKey("classNames"))
+			classNamesList = h.getStringList("classNames");			
 		if (h.containsKey("posXList"))
 			posXList = h.getIntegerList("posXList");
+		else if (h.containsKey("posX"))
+			posXList = h.getIntegerList("posX");
 		if (h.containsKey("posYList"))
 			posYList = h.getIntegerList("posYList");
+		else if (h.containsKey("posY"))
+			posYList = h.getIntegerList("posY");
 		if (h.containsKey("scStatesList"))		
 			scStatesList = h.getMapList("scStatesList");
+		else if (h.containsKey("scStates"))
+			scStatesList = h.getMapList("scStates");
 		if (h.containsKey("connectionsList"))			
 			connectionsList = h.getBooleanList("connectionsList");
+		else if (h.containsKey("connections"))
+		{  // connections is boolean[][], flatten
+			ObjectList list = h.getObjectList("connections");
+			int size = list.size();
+			for(int i = 0; i < size;i++) connectionsList.addAll(list.getBooleanList(i));
+		}
 		if (h.containsKey("graphConnectionsList"))			
 			graphConnectionsList = h.getIntegerList("graphConnectionsList");
+		else if (h.containsKey("graphConnections")) 
+			graphConnectionsList = h.getIntegerList("graphConnections");
 		if (h.containsKey("tabel"))	
 			tabel = h.getBoolean("tabel");
 		if (h.containsKey("grafiek"))		
