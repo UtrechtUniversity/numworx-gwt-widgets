@@ -12,6 +12,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.dom.client.Style.FontWeight;
@@ -26,6 +27,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -37,25 +39,16 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-
 import com.googlecode.mgwt.ui.client.MGWT;
 import com.googlecode.mgwt.ui.client.OsDetection;
 
-
-
-
-
-import com.googlecode.mgwt.ui.client.MGWT;
-import com.googlecode.mgwt.ui.client.OsDetection;
-
-//import fi.calculatorgwt.ReplaceCaret;
-import fi.calculatorgwt.client.text.Text_nl;
-
+import fi.calculatorgwt.client.text.Text;
 
 public class CalculatorGWT implements EntryPoint, InteractionStub {
 	
-	public static Text_nl rb = new Text_nl();
+	public static Text rb = GWT.create(Text.class);
 	private boolean isNederlands = true;
+	private String DECIMAL = LocaleInfo.getCurrentLocale().getNumberConstants().decimalSeparator();
 	//protected static Locale language;
 	
 	private Map<String, Object> launchState;
@@ -284,7 +277,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		cKnop = maakButton("C", blauw, witblauw, kolomBreedte, knopHoogteNavigatie);
 		
 		if(isNederlands)
-			kommaKnop = maakButton(",", grijs, witblauw, knopBreedte, knopHoogteBasis);
+			kommaKnop = maakButton(DECIMAL, grijs, witblauw, knopBreedte, knopHoogteBasis);
 		else
 			kommaKnop = maakButton(".", grijs, witblauw, knopBreedte, knopHoogteBasis);
 		negatiefKnop = maakButton("(-)", grijs, witblauw, knopBreedte, knopHoogteBasis);
@@ -317,7 +310,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		instellingenPanel.getElement().getStyle().setMarginTop(10, Style.Unit.PX);
 		
 		String groep =  "groep";
-		gradenButton = new RadioButton(groep, rb.getString("gradenButton"));
+		gradenButton = new RadioButton(groep, rb.gradenButton());
 		gradenButton.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent e)
 			{
@@ -327,7 +320,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		gradenButton.getElement().getStyle().setPadding(5, Style.Unit.PX);
 		
 		
-		radialenButton = new RadioButton(groep, rb.getString("radialenButton"));
+		radialenButton = new RadioButton(groep, rb.radialenButton());
 		radialenButton.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent e)
 			{
@@ -1819,7 +1812,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	public void voegTekstIn(String s, boolean ans)
 	{
 		if(nieuweInvoer && ans)
-		{	setText("Ans");
+		{	setText(rb.ans());
 			nieuweInvoer = false;
 		}
 		if(nieuweInvoer && !ans)
@@ -2155,7 +2148,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				
 			}
 			if(isNederlands)
-				uitvoerTekst = uitvoerTekst.replace(".", ",");
+				uitvoerTekst = uitvoerTekst.replace(".", DECIMAL);
 			uitvoerVeld.setText(uitvoerTekst);
 		}
 		if(sb2.toString().contains("NaN") || sb.toString().contains("NaN") || sb2.toString().contains("Infinity")
@@ -2212,7 +2205,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				voegInOfVervang(")", false);
 			else if(e.getSource() == kommaKnop)
 			{	if(isNederlands)
-					voegInOfVervang(",", false);
+					voegInOfVervang(DECIMAL, false);
 				else
 					voegInOfVervang(".", false);
 			}
@@ -2342,9 +2335,9 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				voegInOfVervang("\u00D7", true);
 			else if(kch == '/' || kch == ':')
 				voegInOfVervang("\u00F7", true);
-			else if(kch == ',' || kch == '.')
+			else if(kch == ',' || kch == '.' || kch == DECIMAL.charAt(0))
 			{	if(isNederlands)
-					voegInOfVervang(",", false);
+					voegInOfVervang(DECIMAL, false);
 				else
 					voegInOfVervang(".", false);
 			}

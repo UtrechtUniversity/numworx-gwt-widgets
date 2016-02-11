@@ -28,5 +28,6 @@
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
 
-  <!-- allow Super Dev Mode -->
+  <extend-property name="locale" values="nl"/> 	
+  
 </module>
