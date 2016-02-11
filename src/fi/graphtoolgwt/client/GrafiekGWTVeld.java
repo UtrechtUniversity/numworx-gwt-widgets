@@ -27,9 +27,6 @@ import gwt.awt.Rectangle;
 import gwt.awt.geom.GeneralPath;
 import gwt.awt.geom.PathIterator;
 
-
-
-
 public class GrafiekGWTVeld {
 	
 	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
@@ -248,8 +245,6 @@ public class GrafiekGWTVeld {
 		String fontString = "10px sans-serif";
 		gIm.setFont(cFontString);
 		gIm.setLineWidth(cLineWidth);
-		logger.info("Rooster X = "+ interactiePanel.roosterX);
-		logger.info("Rooster Y = "+ interactiePanel.roosterY);
 		
 		drawXmin = 0; drawXmax = breedte;
 		drawYmin = 0; drawYmax = hoogte;
@@ -293,7 +288,7 @@ public class GrafiekGWTVeld {
 		while ( (interactiePanel.manualScalingX) && (interactiePanel.eenheidxD * scalingMultiplyX) < (0.2 * interactiePanel.eenheid) ) {
 			scalingMultiplyX *= 2;
 		}
-		while ( (interactiePanel.manualScalingX) && (interactiePanel.eenheidyD * scalingMultiplyY) < (0.2 * interactiePanel.eenheid) ) {
+		while ( (interactiePanel.manualScalingY) && (interactiePanel.eenheidyD * scalingMultiplyY) < (0.2 * interactiePanel.eenheid) ) {
 			scalingMultiplyY *= 2;
 		}
 
@@ -362,7 +357,6 @@ public class GrafiekGWTVeld {
 			witruimteY = maxWoordBreedteY >= bx - 2;
 			//log-roosterlijnen tekenen (iets lichter dan gewone roosterlijnen):
 			gIm.setStrokeStyle(roosterKleurLicht);
-			logger.info("Draw Log - Start");
 			if(interactiePanel.roosterX)
 			{	gIm.beginPath();
 				for(int i = imin+1; i < imax; i++)
@@ -387,10 +381,10 @@ public class GrafiekGWTVeld {
 				}
 				gIm.stroke();
 			}
-			logger.info("Draw Log - End");
 			//gewone roosterlijnen tekenen:
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
+
 			for(int i=imin+1 ; i<imax ; i++) {	
 //				String getal = Double.toString(interactiePanel.schaalFactorX*(i));
 //				if(interactiePanel.xAsLog)
@@ -464,7 +458,9 @@ public class GrafiekGWTVeld {
 					//gIm.setColor(lijnenKleur);
 				}
 			}
+
 			for(int j=jmin ; j<jmax ; j++) {	
+
 //				String getal = Double.toString(interactiePanel.schaalFactorY*(j)); 
 //				if(interactiePanel.yAsLog)
 //					getal = 10 + toSuperScript(getal);
@@ -545,22 +541,21 @@ public class GrafiekGWTVeld {
 				}
 			}
 		}
-		
-		double rangeX = pixelsXtoValue(breedte)-pixelsXtoValue(0);
-		int piMultiplier = 1;
-		while ( rangeX/(Math.PI*piMultiplier)>(double) cMaxPiLinesOnScreen) {
-			piMultiplier++;
-		}
-		
-		double piScalingDivider;
-		if (interactiePanel.manualScalingX) {
-			piScalingDivider = interactiePanel.eenheidxValue;
-		} else {
-			piScalingDivider = interactiePanel.schaalFactorX;
-		}
 
-		if (interactiePanel.piLijnenZichtbaar)
-		{	
+		if (interactiePanel.piLijnenZichtbaar) {
+			double rangeX = pixelsXtoValue(drawXmax)-pixelsXtoValue(drawXmin);
+			long piMultiplier = 1;
+			if ( rangeX/(Math.PI*piMultiplier)>(double) cMaxPiLinesOnScreen) {
+				piMultiplier = (long) Math.ceil(rangeX/((cMaxPiLinesOnScreen)*Math.PI));
+			}
+			
+			double piScalingDivider;
+			if (interactiePanel.manualScalingX) {
+				piScalingDivider = interactiePanel.eenheidxValue;
+			} else {
+				piScalingDivider = interactiePanel.schaalFactorX;
+			}
+
 			int dashStep = 5;
 			int dashes = hoogte / dashStep;
 			
@@ -774,13 +769,13 @@ public class GrafiekGWTVeld {
 			tm = gIm.measureText(yAsNaam);
 			int woordBreedteY = (int) Math.round(tm.getWidth());
 			
-			xAsNaamLinks = drawXmax - woordBreedteX - cExtraAxisMarge;
+			xAsNaamLinks = drawXmax - woordBreedteX - 3 * cExtraAxisMarge;
 			xAsNaamOnder = Math.max(drawYmin + 0 *cExtraAxisMarge + cFontHeightItalic, Math.min(drawYmax - cExtraAxisMarge, hoogte - by - cExtraAxisMarge) );
 			xAsNaamRechts = xAsNaamLinks + woordBreedteX;
 			xAsNaamBoven = xAsNaamOnder - cFontHeightItalic;
 
 			yAsNaamLinks = Math.max( drawXmin+ 1 * cExtraAxisMarge, Math.min(drawXmax - woordBreedteY - 1 * cExtraAxisMarge, bx+ 1 * cExtraAxisMarge + cAxesThickness) );
-			yAsNaamOnder = drawYmin + cFontHeightItalic + 0 * cExtraAxisMarge;
+			yAsNaamOnder = drawYmin + cFontHeightItalic +3 * cExtraAxisMarge;
 			yAsNaamRechts = yAsNaamLinks + woordBreedteY;
 			yAsNaamBoven = yAsNaamOnder - cFontHeightItalic;
 //			logger.info("X Name Range = [" + xAsNaamLinks + "," + xAsNaamBoven +"," + xAsNaamRechts + "," + xAsNaamOnder + "]" );
@@ -806,7 +801,6 @@ public class GrafiekGWTVeld {
 			
 		}	
 
-		logger.info("Rooster klaar");
 
 		if (interactiePanel.tekenDocentFuncties != null && (interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK
 				|| interactiePanel.typeOpdracht == GraphToolGWT.TEKENPUNTENBIJFORMULE && interactiePanel.score > 0 && (interactiePanel.mode == 0 || interactiePanel.mode == 1 || interactiePanel.nagekeken)))
@@ -818,9 +812,6 @@ public class GrafiekGWTVeld {
 				}
 			}
 		}
-		
-		logger.info("Functies getekend.");
-
 		
 		if(!((interactiePanel.mode == 2 || interactiePanel.mode == 3) && !interactiePanel.nagekeken && 
 				(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)))
@@ -1075,12 +1066,9 @@ public class GrafiekGWTVeld {
 			}
 		
 
-		logger.info("Speciale modus checked.");
 
 		tekenOngelijkheden(gIm);
-		logger.info("Na ongelijkheden.");
 		tekenVerticaleLijnen(gIm);
-		logger.info("Verticale lijnen klaar,");
 
 		
 		//Punten en grafieken uit tekenEditor;
@@ -1113,18 +1101,12 @@ public class GrafiekGWTVeld {
 //			gIm.fill();
 //			gIm.stroke();
 //		}
-		
-		logger.info("Alleen nog maar schuifparameters");
-
 		//schuifParameters tekenen.
 		if(interactiePanel.schuifParameters != null) {	
 			for(int i = 0; i < interactiePanel.schuifParameters.length; i++) {	
 				interactiePanel.schuifParameters[i].paint(gIm);
 			}
 		}
-
-		logger.info("Paint klaar.");
-
 		
 	}
 
