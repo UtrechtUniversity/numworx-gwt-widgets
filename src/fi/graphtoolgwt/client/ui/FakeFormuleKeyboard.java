@@ -6,6 +6,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import nl.uu.fi.dwo.interaction.client.FormuleEditorIF;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 
 public class FakeFormuleKeyboard implements FormuleKeyboardIF, IsWidget {
 
@@ -54,6 +55,18 @@ public class FakeFormuleKeyboard implements FormuleKeyboardIF, IsWidget {
 
 	@Override
 	public void blur() {
+	}
+
+	@Override
+	public void functionKey(int minF) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setEnterType(EnterType type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	
