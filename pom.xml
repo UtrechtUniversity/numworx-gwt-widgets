@@ -74,11 +74,9 @@
   		<systemPath>${project.basedir}/lib/geom.jar</systemPath>
   	</dependency>
   	<dependency>
-  		<groupId>nl.uu.fi.dwo.formule</groupId>
-  		<artifactId>Formule</artifactId>
-  		<version>0.0.0</version>
-  		<scope>system</scope>
-  		<systemPath>${project.basedir}/lib/formule.jar</systemPath>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>formule</artifactId>
+  		<version>0.0.1</version>
   	</dependency>
   </dependencies>
   <parent>
