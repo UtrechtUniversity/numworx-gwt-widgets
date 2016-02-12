@@ -6,8 +6,10 @@ import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -25,16 +27,22 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.Label;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 
 //import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 //import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
 //import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+
+
+
+
+
+
+import fi.nabouwenaanzichtengwt.client.text.Msgs;
+import fi.nabouwenaanzichtengwt.client.text.Text;
 
 import java.util.logging.Logger;
 
@@ -43,6 +51,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	
     // logger
     static Logger logger = Logger.getLogger("NabouwenaanzichtenGWT");
+	static final Text rb = GWT.create(Text.class);
 
 	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
@@ -71,12 +80,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	RadioButton bouwenButton;
 	RadioButton slopenButton;
 
-	PushButton volButton = new PushButton("Maak vol");
-	PushButton leegButton = new PushButton("Maak leeg");
+	PushButton volButton = new PushButton(rb.maakVol());
+	PushButton leegButton = new PushButton(rb.maakLeeg());
 	
 	Label blokjesLabel;
 	
-	PushButton kijkNaButton = new PushButton("Kijk Na"); 
+	PushButton kijkNaButton = new PushButton(rb.kijkNa()); 
 	LayoutPanel kijkNaPanel = new LayoutPanel();
 	
 	private Viewer3d vWerk = null;
@@ -378,11 +387,10 @@ System.out.println("rood");
 		//nakijkKnop.add(vinkjeGrijsImage);
 		if ((blokjesLabel != null) && (vWerk != null))
 		{
+			Msgs msgs = GWT.create(Msgs.class);
+			
 			int aantal = vWerk.kr.geefAantalK();
-			if (aantal == 1)
-				blokjesLabel.setText("" + aantal + " blokje");
-			else
-				blokjesLabel.setText("" + aantal + " blokjes");
+			blokjesLabel.setText(msgs.blokjes(aantal));
 		}
 		
 		ingevuld = true;
@@ -526,6 +534,7 @@ logger.info("TekenVeelvlakGWT init");
 //System.out.println("hoogte = " + hoogte);
 
 		launchState = launchData;
+		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
 		randomVarWaarden = values;
 		randomVarNamen   = values.keySet().toArray(new String[values.size()]);
 		
@@ -675,6 +684,14 @@ logger.info("TekenVeelvlakGWT init");
 		if (launchState.containsKey("rechtsAanzicht"))
 			rechtsAanzicht = ((Boolean) launchState.get("rechtsAanzicht")).booleanValue();
 
+		if (launchMap.containsKey("bovenAanzichtMetHoogtes"))
+		{
+			bovenAanzichtMetHoogtes = launchMap.getBoolean("bovenAanzichtMetHoogtes");
+			if(bovenAanzichtMetHoogtes)
+				rechtsAanzicht = false;
+		}
+		
+		
 		if (drieAanzichten)
 		{
 			startKr = new KubusRooster(b, 1.5);
@@ -829,10 +846,8 @@ logger.info("TekenVeelvlakGWT init");
 			{
 				int aantal = vWerk.kr.geefAantalK();
 				blokjesLabel = new Label();
-				if (aantal == 1)
-					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokje");
-				else
-					blokjesLabel.setText("" + vWerk.kr.geefAantalK() + " blokjes");
+				Msgs msgs = GWT.create(Msgs.class);
+				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
 				panel.add(blokjesLabel);
 				panel.setWidgetLeftWidth(blokjesLabel, 270, Style.Unit.PX, 70, Style.Unit.PX);
 				panel.setWidgetTopHeight(blokjesLabel, hoogte - 20, Style.Unit.PX, 25, Style.Unit.PX);

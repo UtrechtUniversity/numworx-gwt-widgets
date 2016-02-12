@@ -2,6 +2,7 @@ package fi.nabouwenaanzichtengwt.client;
 
 import java.awt.*;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.FontStyle;
@@ -10,9 +11,12 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import fi.nabouwenaanzichtengwt.client.text.Text;
+
 
 class VaktekPanel //Container
 {	
+	static final Text rb = GWT.create(Text.class);
 	int breedte, hoogte;
 	int vakBreedte;
 	Viewer3d va, ba, ra, la;
@@ -64,7 +68,7 @@ class VaktekPanel //Container
 			labelV.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelV.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelV.getElement().getStyle().setProperty("textAlign", "center");
-			labelV.getElement().setInnerHTML("voor");
+			labelV.getElement().setInnerHTML(rb.voor());
 			panelV.add(va.getCanvas());
 			panelV.add(labelV);
 			grid.setWidget(0,0,panelV);
@@ -84,7 +88,7 @@ class VaktekPanel //Container
 			labelR.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelR.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelR.getElement().getStyle().setProperty("textAlign", "center");
-			labelR.getElement().setInnerHTML("rechts");
+			labelR.getElement().setInnerHTML(rb.rechts());
 			panelR.add(ra.getCanvas());
 			panelR.add(labelR);
 			grid.setWidget(0,1,panelR);
@@ -119,7 +123,7 @@ class VaktekPanel //Container
 			labelB.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			
 			labelB.getElement().getStyle().setProperty("textAlign", "center");
-			labelB.getElement().setInnerHTML("boven");
+			labelB.getElement().setInnerHTML(rb.boven());
 			panelB.add(labelB);
 			panelB.add(ba.getCanvas());
 			grid.setWidget(0,0,panelB);
@@ -139,7 +143,7 @@ class VaktekPanel //Container
 			labelV.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelV.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelV.getElement().getStyle().setProperty("textAlign", "center");
-			labelV.getElement().setInnerHTML("voor");
+			labelV.getElement().setInnerHTML(rb.voor());
 			panelV.add(va.getCanvas());
 			panelV.add(labelV);
 			grid.setWidget(1,0,panelV);
@@ -159,7 +163,7 @@ class VaktekPanel //Container
 			labelR.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelR.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelR.getElement().getStyle().setProperty("textAlign", "center");
-			labelR.getElement().setInnerHTML("rechts");
+			labelR.getElement().setInnerHTML(rb.rechts());
 			panelR.add(ra.getCanvas());
 			panelR.add(labelR);
 			grid.setWidget(1,1,panelR);
@@ -190,7 +194,7 @@ class VaktekPanel //Container
 			labelB.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelB.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelB.getElement().getStyle().setProperty("textAlign", "center");
-			labelB.getElement().setInnerHTML("boven");
+			labelB.getElement().setInnerHTML(rb.boven());
 			panelB.add(labelB);
 			panelB.add(ba.getCanvas());
 			//grid.setWidget(0,0,panelB);
@@ -216,7 +220,7 @@ class VaktekPanel //Container
 			labelV.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelV.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelV.getElement().getStyle().setProperty("textAlign", "center");
-			labelV.getElement().setInnerHTML("voor");
+			labelV.getElement().setInnerHTML(rb.voor());
 			panelV.add(va.getCanvas());
 			panelV.add(labelV);
 			//grid.setWidget(1,0,panelV);
@@ -243,7 +247,7 @@ class VaktekPanel //Container
 			labelR.getElement().getStyle().setProperty("lineHeight", "1.2");
 			labelR.getElement().getStyle().setFontWeight(Style.FontWeight.BOLD);
 			labelR.getElement().getStyle().setProperty("textAlign", "center");
-			labelR.getElement().setInnerHTML("rechts");
+			labelR.getElement().setInnerHTML(rb.rechts());
 			panelR.add(ra.getCanvas());
 			panelR.add(labelR);
 			//grid.setWidget(1,1,panelR);
