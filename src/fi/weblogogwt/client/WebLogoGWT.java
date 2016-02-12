@@ -86,6 +86,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	int breedteGroot = 784; //784 is maximale breedte in popupFacade;
 	int breedteKlein = 700;
+	int breedtePaul = 950; //maximale breedte stand-alone 
 	int breedte = 784;
 	int hoogte = 575;
 	int bottomHeight = 32;
@@ -95,6 +96,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	int uby = offSet;
 	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; //getWidth()-(programmaVeldZichtbaar ? scheidingX+10 : 10);
 	int ubbGroot = breedteGroot - jlsBreedteGroot - 3 * offSet;
+	int ubbPaul = breedtePaul - jlsBreedteGroot - 3 * offSet;
 	int ubb = 0;
 	int ubh = jlsHoogte; //programmaVeldZichtbaar ? getHeight()-77 : getHeight()-10;
 	
@@ -116,7 +118,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	boolean printCommandsZichtbaar = true;
 	boolean tekenCommandsZichtbaar = true;
 	boolean traceZichtbaar = true;
-	boolean codeIOZichtbaar = false; //true;
+	boolean codeIOZichtbaar = true;
 	
 	HashMap state = null;
 
@@ -275,6 +277,15 @@ logger.info("ubb = " + ubb);
 				ubh = this.hoogte;
 				
 			}
+			
+			// stand-alone
+			if (launchState != null && !launchState.containsKey("breedte"))
+			{
+				breedte = breedtePaul;
+				// hoogte is al gezet
+				ubb = ubbPaul;
+			}
+			
 			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			
 			webLogoPanel = new LayoutPanel();
@@ -368,7 +379,9 @@ logger.info("ubb = " + ubb);
 			uitvoerblad.initializeDrawing(false);
 
 			if (state != null)
-				setState(state);
+			{	setState(state);
+logger.info("state != null");			
+			}
 			
 			jlsVeld.paint();			
 			
@@ -388,20 +401,20 @@ logger.info("ubb = " + ubb);
 			importButton = new PushButton("import");
 			importButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(importButton);
-			bottomPanel.setWidgetLeftWidth(importButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
+			bottomPanel.setWidgetLeftWidth(importButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(importButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			importButton.addClickHandler(new PushClickHandler());
 		
-			currentX += leftOffset + buttonWidth;
+			currentX += leftOffset + buttonWidth + 20;
 		
 			exportButton = new PushButton("export");
 			exportButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(exportButton);
-			bottomPanel.setWidgetLeftWidth(exportButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
+			bottomPanel.setWidgetLeftWidth(exportButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(exportButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			exportButton.addClickHandler(new PushClickHandler());
 		
-			currentX += leftOffset + buttonWidth;
+			currentX += leftOffset + buttonWidth + 20;
 		}
 
 		runButton = new PushButton("run");
@@ -507,11 +520,11 @@ logger.info("ubb = " + ubb);
 			
 			if (e.getSource() == importButton)
 			{
-				
+				jlsVeld.importFrame();
 			}
 			else if (e.getSource() == exportButton)
 			{
-				
+				jlsVeld.exportFrame(jlsVeld.getCode());
 			} 
 			else if (e.getSource() == runButton)
 			{
@@ -527,6 +540,7 @@ logger.info("ubb = " + ubb);
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, false);
 					bottomPanel.setWidgetVisible(exportButton, false);
+					//if ((jlsVeld.exportPopup != null) && jlsVeld.exportPopup.isVisible()) 
 				}
 				
 				bottomPanel.setWidgetVisible(runButton, false);

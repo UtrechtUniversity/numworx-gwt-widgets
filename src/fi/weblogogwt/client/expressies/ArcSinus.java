@@ -13,15 +13,18 @@ public class ArcSinus extends Expressie
 	}
 	
 	public double geefWaarde()
-	{	return Math.asin(kind1.geefWaarde());
+	{	if(hoekGraden) return 180.0/Math.PI*Math.asin(kind1.geefWaarde());
+		return Math.asin(kind1.geefWaarde());
 	}
 	
 	public double geefWaarde(double subst)
-	{	return Math.asin(kind1.geefWaarde(subst));
+	{	if(hoekGraden) return 180.0/Math.PI*Math.asin(kind1.geefWaarde(subst));
+		return Math.asin(kind1.geefWaarde(subst));
 	}
 	
 	public double geefWaarde(double[] subst, String[] vars)
-	{	return Math.asin(kind1.geefWaarde(subst,vars));
+	{	if(hoekGraden) return 180.0/Math.PI*Math.asin(kind1.geefWaarde(subst,vars));
+		return Math.asin(kind1.geefWaarde(subst,vars));
 	}
 	
 	public Expressie substitueer(double subst, String var)

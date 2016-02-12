@@ -2,7 +2,7 @@
 
 
 .root {
-	background-color: yellow; 
+/**	background-color: yellow;*/ 
 }	
 
 .dock {
@@ -52,6 +52,7 @@
 	font-size: 0.975em;
 	font-weight: bold;
 	font-family: Helvetica, sans serif;
+	text-align: center;
 	/** padding: 0px; */	
 }	
 
@@ -60,6 +61,14 @@
 	text-align: left;
 	text-indent: 10px;
 	font-family: Helvetica, sans serif;
+}
+
+.codelabel {
+	background-color: rgb(220, 220, 220);
+	text-align: left;
+	text-indent: 10px;
+	font-family: Helvetica, sans serif;
+	font-weight: bold;
 }
 
 .varlabel {

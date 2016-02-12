@@ -23,6 +23,8 @@ public class Expressie
 	public static String fontType =  "sans-serif";
 	public static int fontSize = 12; //px
 	
+	public static boolean hoekGraden = true;
+	
 	public Expressie()
 	{	//dfs = new DecimalFormatSymbols();
 		//dfs.setDecimalSeparator('.');

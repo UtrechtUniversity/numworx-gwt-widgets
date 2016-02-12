@@ -13,15 +13,18 @@ public class Sinus extends Expressie
 	}
 	
 	public double geefWaarde()
-	{	return Math.sin(kind1.geefWaarde());
+	{	if(hoekGraden)return Math.sin(kind1.geefWaarde()/180.0*Math.PI);
+		return Math.sin(kind1.geefWaarde());
 	}
 	
 	public double geefWaarde(double subst)
-	{	return Math.sin(kind1.geefWaarde(subst));
+	{	if(hoekGraden)return Math.sin(kind1.geefWaarde(subst)/180.0*Math.PI);
+		return Math.sin(kind1.geefWaarde(subst));
 	}
 	
 	public double geefWaarde(double[] subst, String[] vars)
-	{	return Math.sin(kind1.geefWaarde(subst,vars));
+	{	if(hoekGraden) return Math.sin(kind1.geefWaarde(subst,vars)/180.0*Math.PI);
+		return Math.sin(kind1.geefWaarde(subst,vars));
 	}
 	
 	public Expressie substitueer(double subst, String var)

@@ -152,6 +152,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	Vector ccs = new Vector();
 	
 	ParameterTextField paramEditor;
+	
+	ExportPopup exportPopup;
+	ImportPopup importPopup;
 		
 	public JavaLogoSchuifVeld(int x, int y, int b, int h, Uitvoerblad tb)
 	{	
@@ -517,7 +520,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	
 	public void paint()
 	{
+//System.out.println("JLSV paint");		
 		paintComponent(jlsvContext2d);
+//System.out.println("JLSV painted");		
 	}
 	
 	//public void paintComponent(Graphics g)
@@ -737,6 +742,29 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	
 	void exportFrame(String contents) 
 	{
+		
+		int popupX = xPos + getAbsoluteLeft();
+		
+		int popupY = yPos + getAbsoluteTop();
+		
+		
+		// kijk of er ergens nog een popup open is
+		if ((paramEditor != null) && paramEditor.isVisible())
+		{
+			paramEditor.owner.parameterEdited(paramEditor.getText());
+			paramEditor.setVisible(false);
+		}
+		if ((importPopup != null) && importPopup.isVisible())
+			importPopup.setVisible(false);
+
+		exportPopup = new ExportPopup(220, 520, this);
+		exportPopup.export(contents);
+		exportPopup.setPopupPosition(popupX, popupY);
+		exportPopup.show();
+		//paramEditor.textBox.setFocus(true);
+		
+		paint();
+
 //GWT
 /*		
 		final TextArea area = new TextArea(contents, 0, 0, TextArea.SCROLLBARS_NONE);
@@ -788,15 +816,44 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	
 	void importeer(String s)
 	{
+		
+System.out.println("importeer");
+
+System.out.println("code = " + s);
 		clearProgram();
 		paint();
 		ProgrammaImporter pi = new ProgrammaImporter(this);
 		pi.importProgramma(s);
+		
+		paint();
 	}
 
-/*
+
 	void importFrame() 
 	{
+		
+		int popupX = xPos + getAbsoluteLeft();
+		
+		int popupY = yPos + getAbsoluteTop();
+		
+		
+		// kijk of er ergens nog een popup open is
+		if ((paramEditor != null) && paramEditor.isVisible())
+		{
+			paramEditor.owner.parameterEdited(paramEditor.getText());
+			paramEditor.setVisible(false);
+		}
+		if ((exportPopup != null) && exportPopup.isVisible())
+			exportPopup.setVisible(false);
+
+		importPopup = new ImportPopup(300, 520, this);
+		importPopup.setPopupPosition(popupX, popupY);
+		importPopup.show();
+		//paramEditor.textBox.setFocus(true);
+		
+		paint();
+
+/*	
 		try
 		{
 			ImporterFrame imf = new ImporterFrame("Importeer code", this);
@@ -808,8 +865,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		{ 
 			System.out.println("Mis!  "+e.getMessage());
 		}
+*/		
 	}
-*/
+
 	public String getCode()
 	{	String s0 = programmaComponent.getCode("");
 		for(int i=0 ; i<aantalDeeltaken ; i++)

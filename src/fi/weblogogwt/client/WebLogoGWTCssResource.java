@@ -24,6 +24,8 @@ public interface WebLogoGWTCssResource extends CssResource
 	
 	String label();
 	
+	String codelabel();
+	
 	String varlabel();
 	
 	String vardisplay();
