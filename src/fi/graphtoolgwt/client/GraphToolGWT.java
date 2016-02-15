@@ -99,7 +99,7 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-	private static Logger logger = Logger.getLogger("GraphTool");
+//	private static Logger logger = Logger.getLogger("GraphTool");
 	final static int cSelectMarge = 5;
 
 	public static Text_nl rb = new Text_nl();
@@ -3217,7 +3217,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			// grafiekGWTVeld.paint();
 			return;
 		}
-		logger.info("Event = ["+ eventX + ","+ eventY +"]");
+	
 		if ( eventX >= grafiekGWTVeld.xAsNaamLinks - cSelectMarge && eventX <= grafiekGWTVeld.xAsNaamRechts + cSelectMarge && 
 			 eventY >= grafiekGWTVeld.xAsNaamBoven - cSelectMarge && eventY <= grafiekGWTVeld.xAsNaamOnder + cSelectMarge && xVarEditable)
 		{	showTekstPopup(true);
