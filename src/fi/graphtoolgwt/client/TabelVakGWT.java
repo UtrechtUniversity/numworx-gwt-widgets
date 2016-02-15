@@ -2,7 +2,6 @@ package fi.graphtoolgwt.client;
 
 import java.util.logging.Logger;
 
-import org.eclipse.jetty.util.log.Log;
 import java.lang.Character;
 
 import com.google.gwt.canvas.client.Canvas;
