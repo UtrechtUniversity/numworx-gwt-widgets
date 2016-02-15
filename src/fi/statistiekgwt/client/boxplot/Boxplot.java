@@ -1424,7 +1424,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("mediaan = " + medians.get(splitClass)));
+						this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
 		    			setHighlightValues(false, false, true, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1433,7 +1433,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("minimum = " + minValues.get(splitClass)));
+						this.popup.add(new Label(StatistiekGWT.rb.getString("minimumIs") + StatistiekGWT.getStringValue(minValues.get(splitClass))));
 		    			setHighlightValues(true, false, false, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1444,7 +1444,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("1e kwartiel = " + lowerQuartiles.get(splitClass)));
+						this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
 		    			setHighlightValues(false, true, false, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1453,7 +1453,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("3e kwartiel = " + upperQuartiles.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
 		    			setHighlightValues(false, false, false, true, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1462,7 +1462,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("maximum = " + maxValues.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("maximumIs") + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
 		    			setHighlightValues(false, false, false, false, true, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1494,7 +1494,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("mediaan = " + medians.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
 		    			setHighlightValues(false, false, true, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1503,7 +1503,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("minimum = " + minValues.get(splitClass)));
+						this.popup.add(new Label(StatistiekGWT.rb.getString("minimumIs") + StatistiekGWT.getStringValue(minValues.get(splitClass))));
 		    			setHighlightValues(true, false, false, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1512,7 +1512,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("1e kwartiel = " + lowerQuartiles.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
 		    			setHighlightValues(false, true, false, false, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1521,7 +1521,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("3e kwartiel = " + upperQuartiles.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
 		    			setHighlightValues(false, false, false, true, false, splitClass);
 		    			showPopup = true;
 		    		}
@@ -1530,7 +1530,7 @@ public class Boxplot
 		    		{
 						this.popup.setPopupPositionAndShow(positionCallBack);
 						this.popup.clear();
-						this.popup.add(new Label("maximum = " + maxValues.get(splitClass)));			
+						this.popup.add(new Label(StatistiekGWT.rb.getString("maximumIs") + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
 		    			setHighlightValues(false, false, false, false, true, splitClass);
 		    			showPopup = true;
 		    		}
