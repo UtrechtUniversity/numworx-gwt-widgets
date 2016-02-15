@@ -603,18 +603,23 @@ public class TekenComponentGWT extends LayoutPanel {
 	public void setState(Map<String, Object> launchState) {	
 		int connectMode = cDefault_connectMode;
 		int cursorMode =  cDefault_cursorMode;
-		
+		boolean tekenComponentAan = true;
 		if(launchState != null)
 		{	if(launchState.containsKey("connectMode"))
 				connectMode = ((Number)launchState.get("connectMode")).intValue();
 			if(launchState.containsKey("cursorMode"))
 				cursorMode = ((Number)launchState.get("cursorMode")).intValue();
-		
+			if(launchState.containsKey("tekenComponentAan"))
+				tekenComponentAan = Boolean.TRUE.equals(launchState.get("tekenComponentAan"));
+			
 			this.connectMode = connectMode;
 			this.cursorMode = cursorMode;
+			
 		}
-		setConnectMode(this.connectMode);
-		setCursorMode(this.cursorMode);
+		if(tekenComponentAan)
+		{ 	setConnectMode(this.connectMode);
+			setCursorMode(this.cursorMode);
+		}
 	}
 	
 	/*
