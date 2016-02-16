@@ -435,7 +435,8 @@ public class GrafiekGWTVeld {
 				boolean schaalTekenen = (i%2 == 0 || interactiePanel.xAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalX;
 				//witruimteX = yLabel==hoogte-1;
 				if (interactiePanel.roosterZichtbaar && interactiePanel.roosterX && (!interactiePanel.xPositief || i > 0) && 
-						(bx+i*interactiePanel.eenheidxD >= drawXmin) &&  (bx+i*interactiePanel.eenheidxD <= drawXmax)) {	
+						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX >= drawXmin) &&  
+						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX <= drawXmax)) {	
 					if(schaalTekenen) {	
 						gIm.beginPath();
 						if ( (drawYmin < yLabel - cFontHeight) ) { 
@@ -501,8 +502,8 @@ public class GrafiekGWTVeld {
 				int minimaalBegin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
 				boolean schaalTekenen = (j%2 == 0 || interactiePanel.yAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalY;
 				if ( interactiePanel.roosterZichtbaar && interactiePanel.roosterY && (!interactiePanel.yPositief || j>0) && 
-						(hoogte-(by+j*interactiePanel.eenheidyD) <= drawYmax) && 
-						(hoogte-(by+j*interactiePanel.eenheidyD) >= drawYmin) )  {
+						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) <= drawYmax) && 
+						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) >= drawYmin) )  {
 //					if(schaalTekenen) 
 //					{	gIm.beginPath();
 //						if(xLabel - 1 > minimaalBegin)
