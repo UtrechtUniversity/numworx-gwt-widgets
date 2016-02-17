@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import org.eclipse.jetty.util.log.Log;
-
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
