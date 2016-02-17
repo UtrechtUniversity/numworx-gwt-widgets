@@ -1,0 +1,112 @@
+/** Dit file staat in de css map */
+
+
+.root {
+	background-color: yellow; 
+}	
+
+.dock {
+	background-color: orange; 
+}
+
+.bottom {
+	background-color: rgb(192,192,192);	
+}
+
+.canvas {
+	background-color: white;	
+}
+
+.radiobutton {
+	text-align: left;
+	font-family: Helvetica, sans serif;
+	/** background-color: yellow; */
+}	
+
+.label {
+	background-color: rgb(255, 255, 255);
+	font-family: Helvetica, sans serif;
+	color: black;
+	text-align: left;
+}
+
+.upimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.downimage {
+	position: relative;
+	top: -4px;
+	left: -6px;
+}		
+
+.pushimage {
+	position: relative;
+	top: -1px;
+	left: -3px;
+}		
+
+.pushimage2 {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.togglebutton {
+	
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+	background-color: red;
+	
+}
+
+.pushbutton {
+
+	/** background-color: yellow; */
+	font-size: 0.975em;
+	/**font-weight: bold; */
+	font-family: Helvetica, sans serif;
+	color: black;
+	text-align: center;
+/**	padding: 0px; */ 	
+}
+
+.labelgoed {
+
+	/** background-color: yellow; */
+	font-size: 1.175em;
+	font-weight: bold;
+	color: green;
+	text-align: center;
+	font-family: Helvetica, sans serif;
+/**	padding: 0px; */ 	
+}
+
+.labelfout {
+
+	/** background-color: yellow; */
+	font-size: 1.175em;
+	font-weight: bold;
+	color: red;
+	text-align: center;
+	font-family: Helvetica, sans serif;
+/**	padding: 0px; */ 	
+}
+
+.pushbuttondown {
+
+	/** background-color: yellow; */
+	font-size: 0.875em;
+	font-weight: bold;
+	font-family: Helvetica, sans serif;
+	color: red;
+/**	padding: 0px; */ 	
+}	
+
+.regelaar {
+	
+	background-color: rgb(208, 228, 255);
+}	
