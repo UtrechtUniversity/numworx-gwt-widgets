@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.vectomatic.file.Blob;
 import org.vectomatic.file.ErrorCode;
@@ -39,6 +41,8 @@ import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
@@ -46,6 +50,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.resources.client.CssResource.ClassName;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -80,6 +85,8 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.CellPreviewEvent;
+import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
@@ -89,6 +96,8 @@ import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
 import fi.statistiekgwt.client.columndialog.ColumnDialogView;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -104,8 +113,10 @@ import fi.statistiekgwt.client.types.ColumnType;
  * 
  */
 public class StatTable extends DockLayoutPanel implements StatistiekView, TableChangeEventHandler,
-	SelectionChangeEventHandler
+	SelectionChangeEventHandler, OutlierChangeEventHandler
 {
+	private static final Logger logger = Logger.getLogger(ClassName.class.getName());
+
 	/**
 	 * The handler registration used to remove the view's 
 	 * table change event handler occurrence.
@@ -116,6 +127,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -199,8 +215,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private int rowNumberWidth;
 
 	private String viewName;
-	private PopupPanel popupMenu;
-	private MenuBar menuBar;
+	private PopupPanel headerPopupMenu;
+	private MenuBar headerMenuBar;
 	private MenuItem sortItem;
 	private MenuItem editItem;
 	private MenuItem deleteItem;
@@ -209,9 +225,41 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private Command editCommand;
 	private Command deleteCommand;
 	private Command infoCommand;
-	private int popUpColumnIndex;
-	//private CellTable<Object> rowTable; // nodig? Was om regelnummers te tonen in de tabel
+	private int popupColumnIndex;
 
+	/**
+	 * A popup menu with options for marking the cell and the row as outlier.
+	 */
+	private PopupPanel outlierPopupMenu;
+	private MenuBar outlierMenuBar;
+	/**
+	 * Item in the outlierPopupMenu.
+	 */
+	private MenuItem outlierCellItem;
+	/**
+	 * Item in the outlierPopupMenu.
+	 */
+	private MenuItem outlierRowItem;
+	/**
+	 * A popup with only the option for marking the row as outlier.
+	 * Used for right clicking the row numbers and the selection
+	 * checkbox in the table.
+	 */
+	private PopupPanel rowOutlierPopupMenu;
+	private MenuBar rowOutlierMenuBar;
+	/**
+	 * Item in the rowOutlierPopupMenu.
+	 */
+	private MenuItem rowOutlierRowItem;
+
+	private Command markOutlierCellCommand;
+	private Command markOutlierRowCommand;
+	private Command demarkOutlierCellCommand;
+	private Command demarkOutlierRowCommand;
+	private int outlierPopupRowIndex;
+	private int outlierPopupColumnIndex;
+	
+	
 	/**
 	 * Dialog in which data can be pasted and imported into the table. 
 	 */
@@ -253,6 +301,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //	private FormPanel formPanel;
 	
 	private StatTableClickHandler clickHandler;
+	private StatTableMouseHandler mouseHandler;
 	private DummyTouchHandler dummyTouchHandler;
 	private ImportMessageDialogBox importBox;
 	private MessageDialogBox messageBox;
@@ -295,6 +344,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statTableModel = statTableModel;
 		this.tableChangeEventHandlerRegistration = this.statTableModel.addTableChangeEventHandler(this);
 		this.selectionChangeEventHandlerRegistration = this.statTableModel.addSelectionChangeEventHandler(this);
+		this.outlierChangeEventHandlerRegistration = this.statTableModel.addOutlierChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = "";
@@ -323,6 +373,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statTableModel = statTableModel;
 		this.tableChangeEventHandlerRegistration = this.statTableModel.addTableChangeEventHandler(this);
 		this.selectionChangeEventHandlerRegistration = this.statTableModel.addSelectionChangeEventHandler(this);
+		this.outlierChangeEventHandlerRegistration = this.statTableModel.addOutlierChangeEventHandler(this);
 
 		this.statInteractiePanel = statInteractiePanel;
 		this.viewName = viewName;
@@ -338,25 +389,25 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		if (!this.statTableModel.isDataEditable())
 		{
 			// delete menu items if present
-			if (this.menuBar.getItemIndex(editItem) > -1)
+			if (this.headerMenuBar.getItemIndex(editItem) > -1)
 			{
-				this.menuBar.removeItem(editItem);
+				this.headerMenuBar.removeItem(editItem);
 			}
-			if (this.menuBar.getItemIndex(deleteItem) > -1)
+			if (this.headerMenuBar.getItemIndex(deleteItem) > -1)
 			{
-				this.menuBar.removeItem(deleteItem);
+				this.headerMenuBar.removeItem(deleteItem);
 			}
 		}
 		else
 		{ // data is editable
 			// add menu items if not present
-			if (this.menuBar.getItemIndex(editItem) == -1)
+			if (this.headerMenuBar.getItemIndex(editItem) == -1)
 			{
-				this.menuBar.addItem(editItem);
+				this.headerMenuBar.addItem(editItem);
 			}
-			if (this.menuBar.getItemIndex(deleteItem) == -1)
+			if (this.headerMenuBar.getItemIndex(deleteItem) == -1)
 			{
-				this.menuBar.addItem(deleteItem);
+				this.headerMenuBar.addItem(deleteItem);
 			}
 		}
 	}
@@ -367,6 +418,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setUp()
 	{
 		this.clickHandler = new StatTableClickHandler();
+		this.mouseHandler = new StatTableMouseHandler();
 		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
 		
 		if (this.statInteractiePanel != null)
@@ -439,24 +491,24 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    this.initializeMaxColumnWidth();
 	    this.initializeMaxCellWidth();
 
-	    // create vertical menubar
-		this.menuBar = new MenuBar(true);
-		this.popupMenu = new PopupPanel(true);
-		this.popupMenu.add(this.menuBar);
+	    // create vertical header menubar
+		this.headerMenuBar = new MenuBar(true);
+		this.headerPopupMenu = new PopupPanel(true);
+		this.headerPopupMenu.add(this.headerMenuBar);
 
-		this.popupMenu.setVisible(false);
-		this.popupMenu.hide();
+		this.headerPopupMenu.setVisible(false);
+		this.headerPopupMenu.hide();
 		
 		sortCommand = new Command() {
 	        @Override
             public void execute() 
 	        {
-	        	StatTable.this.statTableModel.sort(StatTable.this.popUpColumnIndex);
+	        	StatTable.this.statTableModel.sort(StatTable.this.popupColumnIndex);
 	        	
 	        	// test syl
 	        	StatTable.this.setSelectionFromModelInTable();
 	        	
-	        	StatTable.this.hidePopupMenu();
+	        	StatTable.this.hideHeaderPopupMenu();
             }
         };
         this.createEditCommand();
@@ -464,8 +516,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        @Override
             public void execute() 
 	        {
-				StatTable.this.statTableModel.removeColumn(StatTable.this.popUpColumnIndex);
-	        	StatTable.this.hidePopupMenu();
+				StatTable.this.statTableModel.removeColumn(StatTable.this.popupColumnIndex);
+	        	StatTable.this.hideHeaderPopupMenu();
             }
         };
         this.createInfoCommand();
@@ -473,17 +525,47 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		editItem = new MenuItem(StatistiekGWT.rb.getString("editcolumnItem"), true, editCommand);
 		deleteItem = new MenuItem(StatistiekGWT.rb.getString("deletecolumnItem"), true, deleteCommand);
 		infoItem = new MenuItem(StatistiekGWT.rb.getString("infocolumnItem"), true, infoCommand);
-		this.menuBar.addItem(sortItem);
+		this.headerMenuBar.addItem(sortItem);
 		if (this.statTableModel.isDataEditable())
 		{
-			this.menuBar.addItem(editItem);
-			this.menuBar.addItem(deleteItem);
+			this.headerMenuBar.addItem(editItem);
+			this.headerMenuBar.addItem(deleteItem);
 		}
 		else
 		{
-			this.menuBar.addItem(infoItem);
+			this.headerMenuBar.addItem(infoItem);
 		}
+		
+	    // create vertical outlier popup menubar
+		this.outlierMenuBar = new MenuBar(true);
+		this.outlierPopupMenu = new PopupPanel(true);
+		this.outlierPopupMenu.add(this.outlierMenuBar);
 
+		this.outlierPopupMenu.setVisible(false);
+		this.outlierPopupMenu.hide();
+		
+		createOutlierCommands();
+		
+		this.outlierCellItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierCell"), true, markOutlierCellCommand);
+		this.outlierRowItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierRow"), true, markOutlierRowCommand);
+		
+		this.outlierMenuBar.addItem(outlierCellItem);
+		this.outlierMenuBar.addItem(outlierRowItem);
+
+	    // create vertical row outlier popup menubar (only one option for marking row as outlier)
+		this.rowOutlierMenuBar = new MenuBar(true);
+		this.rowOutlierPopupMenu = new PopupPanel(true);
+		this.rowOutlierPopupMenu.add(this.rowOutlierMenuBar);
+
+		this.outlierPopupMenu.setVisible(false);
+		this.outlierPopupMenu.hide();
+		
+		this.rowOutlierRowItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierRow"), true, markOutlierRowCommand);
+
+		this.rowOutlierMenuBar.addItem(rowOutlierRowItem);
+
+		
+		
 		// maak editDataPanel met 6 buttons
 		this.editDataPanel = new HorizontalPanel();//new LayoutPanel();
 		this.editDataPanel.setSize("100%", "100%");
@@ -543,6 +625,74 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
+	 * Create the commands for the outlier popup menu.
+	 */
+	private void createOutlierCommands()
+	{
+		this.markOutlierCellCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	getStatTableModel().markCellAsOutlier(
+	        		outlierPopupRowIndex, 
+	        		outlierPopupColumnIndex, 
+	        		true);
+	        	
+	        	table.getRowElement(outlierPopupRowIndex).getCells().getItem(outlierPopupColumnIndex + 2).scrollIntoView();
+	        	
+	        	hideOutlierPopupMenu();
+            }
+        };
+        
+		this.demarkOutlierCellCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	getStatTableModel().markCellAsOutlier(
+	        		outlierPopupRowIndex, 
+	        		outlierPopupColumnIndex, 
+	        		false);
+	        	
+	        	table.getRowElement(outlierPopupRowIndex).getCells().getItem(outlierPopupColumnIndex + 2).scrollIntoView();
+	        	
+	        	hideOutlierPopupMenu();
+            }
+        };
+        
+		this.markOutlierRowCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	getStatTableModel().markRowAsOutlier(
+	        		outlierPopupRowIndex, 
+	        		true);
+	        	
+	        	table.getRowElement(outlierPopupRowIndex).getCells().getItem(outlierPopupColumnIndex + 2).scrollIntoView();
+	        	
+	        	// the command is connected to either one of the popupmenus, so hide both
+	        	hideOutlierPopupMenu();
+	        	hideRowOutlierPopupMenu();
+            }
+        };
+        
+		this.demarkOutlierRowCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	getStatTableModel().markRowAsOutlier(
+	        		outlierPopupRowIndex, 
+	        		false);
+	        	
+	        	table.getRowElement(outlierPopupRowIndex).getCells().getItem(outlierPopupColumnIndex + 2).scrollIntoView();
+	        	
+	        	// the command is connected to either one of the popupmenus, so hide both
+	        	hideOutlierPopupMenu();
+	        	hideRowOutlierPopupMenu();
+            }
+        };
+	}
+
+	/**
 	 * Add handlers, i.e., click and touch handlers to the buttons.
 	 * Also add dummy handlers to prevent propagation when view 
 	 * is shown in its own window in a touch environment.
@@ -552,6 +702,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    //this.table.addColumnSortHandler(sortHandler);
 	    this.table.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
 	    this.table.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
+//	    this.table.addDomHandler(this.dummyTouchHandler, ContextMenuEvent.getType());
 
 	    // click handlers
 		this.importButton.addClickHandler(this.clickHandler);
@@ -638,21 +789,59 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
-	 * Hide the column's popup menu.
+	 * Hide the column's header popup menu.
 	 */
-	protected void hidePopupMenu()
+	protected void hideHeaderPopupMenu()
 	{
-    	StatTable.this.popupMenu.setVisible(false);
-    	StatTable.this.popupMenu.hide();
+    	StatTable.this.headerPopupMenu.setVisible(false);
+    	StatTable.this.headerPopupMenu.hide();
+	}
+	
+//	/**
+//	 * Show the column's header popup menu.
+//	 */
+//	protected void showHeaderPopupMenu()
+//	{
+//    	StatTable.this.headerPopupMenu.setVisible(true);
+//    	StatTable.this.headerPopupMenu.show();
+//	}
+
+	/**
+	 * Hide the outlier popup menu.
+	 */
+	protected void hideOutlierPopupMenu()
+	{
+    	StatTable.this.outlierPopupMenu.setVisible(false);
+    	StatTable.this.outlierPopupMenu.hide();
+	}
+	
+//	/**
+//	 * Show the outlier popup menu.
+//	 */
+//	protected void showOutlierPopupMenu()
+//	{
+//    	StatTable.this.outlierPopupMenu.setVisible(true);
+//    	StatTable.this.outlierPopupMenu.show();
+//	}
+
+	/**
+	 * Hide the row outlier popup menu (with only the option for marking
+	 * the row as an outlier).
+	 */
+	protected void hideRowOutlierPopupMenu()
+	{
+    	StatTable.this.rowOutlierPopupMenu.setVisible(false);
+    	StatTable.this.rowOutlierPopupMenu.hide();
 	}
 	
 	/**
-	 * Show the column's popup menu.
+	 * Show the row outlier popup menu (with only the option for marking
+	 * the row as an outlier).
 	 */
-	protected void showPopupMenu()
+	protected void showRowOutlierPopupMenu()
 	{
-    	StatTable.this.popupMenu.setVisible(true);
-    	StatTable.this.popupMenu.show();
+    	StatTable.this.rowOutlierPopupMenu.setVisible(true);
+    	StatTable.this.rowOutlierPopupMenu.show();
 	}
 
 	/**
@@ -664,15 +853,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        @Override
             public void execute() 
 	        {
-	        	StatTable.this.hidePopupMenu();
+	        	StatTable.this.hideHeaderPopupMenu();
 	        	
 	        	ArrayList<ColumnType> list = StatTable.this.statTableModel.getColumnTypes();
 				
 	        	ColumnDialogModel dialogModel = new ColumnDialogModel(
 					StatTable.this.statTableModel,
-					StatTable.this.statTableModel.getColumnName(StatTable.this.popUpColumnIndex),
-					list.get(popUpColumnIndex),
-					StatTable.this.popUpColumnIndex);
+					StatTable.this.statTableModel.getColumnName(StatTable.this.popupColumnIndex),
+					list.get(popupColumnIndex),
+					StatTable.this.popupColumnIndex);
 				
 				ColumnDialogView dialogView;
 
@@ -697,15 +886,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        @Override
             public void execute() 
 	        {
-	        	StatTable.this.hidePopupMenu();
+	        	StatTable.this.hideHeaderPopupMenu();
 	        	
 	        	ArrayList<ColumnType> list = StatTable.this.statTableModel.getColumnTypes();
 				
 	        	ColumnDialogModel dialogModel = new ColumnDialogModel(
 					StatTable.this.statTableModel,
-					StatTable.this.statTableModel.getColumnName(StatTable.this.popUpColumnIndex),
-					list.get(popUpColumnIndex),
-					StatTable.this.popUpColumnIndex);
+					StatTable.this.statTableModel.getColumnName(StatTable.this.popupColumnIndex),
+					list.get(popupColumnIndex),
+					StatTable.this.popupColumnIndex);
 				
 	        	HandlerRegistration editColumnHandlerRegistration = dialogModel.addEditColumnEventHandler(StatTable.this.statTableModel);
 				HandlerRegistration addColumnHandlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
@@ -1434,10 +1623,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    				.getResetHashMap();
 	    			
 	    			// clear stringFrequencies
-	    			StatTable.this.statTableModel.clearStringFrequencies();
+	    			StatTable.this.getStatTableModel().clearStringFrequencies();
 
 	    			// clear selectionList and listeners
-	    			StatTable.this.statTableModel.clearSelectionList();
+	    			StatTable.this.getStatTableModel().clearSelectionList();
+	    			
+	    			// clear the cellOutlierList and rowOutlierList
+	    			StatTable.this.getStatTableModel().clearOutlierLists();
 	    			
 	    			// remove views (and their occurrences as handler)
 	    			statInteractiePanel.getStatModel().removeViews();
@@ -1548,6 +1740,96 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		} // onClick()
 
 	} // class StatTableClickHandler
+	
+	class StatTableMouseHandler implements MouseDownHandler, ContextMenuHandler//TouchStartHandler, TouchMoveHandler, TouchEndHandler
+	{
+		private int rowIndex;
+		private int columnIndex;
+		
+		public StatTableMouseHandler()
+		{
+			super();
+		}
+		
+		public StatTableMouseHandler(int rowIndex, int columnIndex)
+		{
+			super();
+			this.rowIndex = rowIndex;
+			this.columnIndex = columnIndex;
+		}
+
+		@Override
+		public void onMouseDown(MouseDownEvent event)
+		{
+		} // onMouseDown()
+		
+		@Override
+		public void onContextMenu(ContextMenuEvent event)
+		{
+            event.preventDefault();
+			event.stopPropagation();
+			
+			System.out.println("StatTable.StatTableMouseHandler.onContextMenu()");
+			
+//			if (table.getRowCount() != 0)
+//			{
+//				StatTableDataGrid<List<String>> selectedcell = (StatTableDataGrid<List<String>>)  event.getSource();
+//	            System.out.println("---- StatTable.StatTableMouseHandler.onContextMenu():  Current Selected Row = " + selectedcell.getKeyboardSelectedRow());
+//	            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  Current Selected Column = " + selectedcell.getKeyboardSelectedColumn());
+//	
+//	            outlierPopupRowIndex = selectedcell.getKeyboardSelectedRow();
+//	            outlierPopupColumnIndex = selectedcell.getKeyboardSelectedColumn();
+//	
+//		        int button = event.getNativeEvent().getButton();
+//		        
+//		        if (button == NativeEvent.BUTTON_LEFT) 
+//		        {
+//		        }
+//		        else if (button == NativeEvent.BUTTON_RIGHT) 
+//		        {
+//		        	int clientX = event.getNativeEvent().getClientX();
+//		        	int clientY = event.getNativeEvent().getClientY();
+//		        	
+//		        	// TODO hoe detecteer ik click op header? y-coordinaat?
+//		            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  clientX = " + clientX);
+//		            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  clientY = " + clientY);
+//
+//		            if (clientY < 70)
+//		            	// outlierPopupColumnIndex loopt af en toe achter...
+//		            	//&& (outlierPopupColumnIndex > 1)) // voor eerste twee headerkolommen geen header popup menu, alleen voor de 'echte' datakolommen
+//		            {
+//		            	if (clientX > 70)
+//		            	{
+//			            	popupColumnIndex = selectedcell.getKeyboardSelectedColumn() - 2;
+//			            	
+//			            	// open header popup
+//							headerPopupMenu.setVisible(true);
+//							headerPopupMenu.setPopupPosition(clientX, clientY);
+//							headerPopupMenu.show();
+//		            	}
+//		            }
+//		            else
+//		            {
+//		            	// no click on header row
+//		            	
+//			        	if (outlierPopupColumnIndex < 2) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
+//			        	{
+//							rowOutlierPopupMenu.setVisible(true);
+//							rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
+//							rowOutlierPopupMenu.show();
+//			        	}
+//			        	else
+//			        	{
+//							outlierPopupMenu.setVisible(true);
+//				        	outlierPopupMenu.setPopupPosition(clientX, clientY);
+//							outlierPopupMenu.show();
+//			        	}
+//		            }
+//		        }
+//			}
+		} // onContextMenu()
+		
+	} // StatTableMouseHandler
 	
 //	class StatTableTouchHandler implements TouchStartHandler
 //	{
@@ -1755,7 +2037,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		public void onBrowserEvent(Context context, final Element elem,
 			final NativeEvent event)
 		{
-
+			System.out.println("StatTable.StatTableTextHeader.onBrowserEvent()");
+			
 			// maybe hijack click event
 			if (handler != null)
 			{
@@ -1870,6 +2153,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		public void onBrowserEvent(Event event)
 		{
 			super.onBrowserEvent(event);
+			System.out.println("StatTable.ExtendedTextArea.onBrowserEvent()");
+			
 			switch (DOM.eventGetType(event))
 			{
 				case Event.ONPASTE:
@@ -1901,20 +2186,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    private ColumnType type;
 		private int columnWidth;
 		private boolean editable;
+		private StatTable statTable;
 
 	    interface Template extends SafeHtmlTemplates
 	    {   
-	    	// {0}, {1} relate to value, style
+	    	// {0}, {1}, {2} relate to value, style, color
 	        @Template("<input type=\"text\" value=\"{0}\" tabindex=\"-1\" style=\"{1}\"></input>")
 	        SafeHtml input(String value, String style);
 	    }
 
-	    public StatTableInputCell(ColumnType type, int columnWidth, boolean editable)
+	    public StatTableInputCell(ColumnType type, int columnWidth, boolean editable, StatTable statTable)
 	    {
 	        template = GWT.create(Template.class);
 	        this.type = type;
 	        this.columnWidth = columnWidth;
 	        this.editable = editable;
+	        this.statTable = statTable;
 	    }
 
 	    @Override
@@ -1937,9 +2224,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					// Get the string value with language dependent separator
 					s = StatistiekGWT.getStringValue(s);
 				}
+				
+				String colorString = "color: black";// default
+				
+				if (statTable.getStatTableModel().isOutlier(context.getIndex(), context.getColumn() - 2))
+					colorString = "color: red";
+				
+				String styleString = "width: " + this.columnWidth
+					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE + ";" + colorString;
 				// set value, style
-				sb.append(template.input(s, "width: " + this.columnWidth
-					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE));
+				sb.append(template.input(s, styleString));
 			}
 	        else
 	        {
@@ -1950,6 +2244,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    @Override
         public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> valueUpdater) 
         {
+	    	System.out.println("StatTable.StatTableInputCell.onBrowserEvent()");
+	    	
             if (!this.editable)
             {
                 event.preventDefault();
@@ -2316,7 +2612,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				if (StatTable.this.statTableModel.getRowCount() > 0)
 				{
-					StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex + 2).scrollIntoView(); // + 2 voor rownumber en check columns; set wel de horizontalScrollPosition, maar behoudt het niet...
+					try
+					{
+						if (StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex + 2) != null)
+						{
+							StatTable.this.table.getRowElement(0).getCells().getItem(editColumnIndex + 2).scrollIntoView(); // + 2 voor rownumber en check columns; set wel de horizontalScrollPosition, maar behoudt het niet...
+						}
+					}
+					catch(Exception e)
+					{
+						logger.log(Level.INFO, "Error while scrolling column into view.");
+					}
 				}
 			}
 		});
@@ -2538,6 +2844,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			this.setTempColumnIndex(i);
 
 			// value updater for the column header
+			// Bij een klik op een column header wordt headerPopupMenu getoond met sorteer, bewerk etc. opties.
 			ValueUpdater<String> valueUpdater = new ValueUpdater<String>()
 				{
 					int columnIndex = StatTable.this.getTempColumnIndex();
@@ -2546,9 +2853,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					public void update(String value)
 					{
 						// set the popup index
-						StatTable.this.popUpColumnIndex = columnIndex; // StatTable.this.table.convertColumnIndexToModel(column);
+						StatTable.this.popupColumnIndex = columnIndex; // StatTable.this.table.convertColumnIndexToModel(column);
 
-						popupMenu.setVisible(true);
+						headerPopupMenu.setVisible(true);
 						// get position of current column
 						int x;
 						int y;
@@ -2587,8 +2894,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						
 						int scrollYPosition = table.getScrollPanel().getVerticalScrollPosition();
 
-						popupMenu.setPopupPosition(x, y + scrollYPosition);
-						popupMenu.show();
+						headerPopupMenu.setPopupPosition(x, y + scrollYPosition);
+						headerPopupMenu.show();
 					}
 				}; // ValueUpdater
 				
@@ -2619,7 +2926,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			columnHeader.setHeaderStyleNames(statistiekCss.datagridcell());
 			columnHeader.setUpdater(valueUpdater);
 
-			// different column types for different situations
+			// different column types for different situations/settings
 			if (!this.getStatTableModel().isDataEditable())
 			{
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
@@ -2664,7 +2971,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				StatTableInputCell inputCell = new StatTableInputCell(
 					type, 
 					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]), 
-					this.getStatTableModel().isDataEditable());
+					this.getStatTableModel().isDataEditable(), this);
 				Column<List<String>, String> column = new StatTableColumn(inputCell, type);
 
 				column.setFieldUpdater(fieldUpdater);
@@ -2680,23 +2987,117 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		} // for-loop over columns
 		
 		// add handler for right mouse click
-		this.table.addHandler(new MouseDownHandler() {
+		//this.table.addHandler(this.mouseHandler, MouseDownEvent.getType());
+		this.table.addCellPreviewHandler(new Handler<List<String>>(){
+
 			@Override
-			public void onMouseDown(MouseDownEvent event)
+			public void onCellPreview(CellPreviewEvent<List<String>> event)
 			{
+//	            event.getNativeEvent().preventDefault();
+//				event.getNativeEvent().stopPropagation();
+
+				int rowIndex = event.getIndex();				
+				int columnIndex = event.getColumn();
+				
+				if (!rowOutlierPopupMenu.isShowing() && !outlierPopupMenu.isShowing())
+				{
+		            outlierPopupRowIndex = rowIndex;
+		            outlierPopupColumnIndex = columnIndex - 2;
+		            System.out.println("StatTable.onCellPreview(): rowIndex = " + rowIndex + ", columnIndex = " + columnIndex);
+				}
+				
 		        int button = event.getNativeEvent().getButton();
 		        
-		        if (button == NativeEvent.BUTTON_LEFT) 
+		        if ("click".equals(event.getNativeEvent().getType())) 
 		        {
+		            if (event.getNativeEvent().getCtrlKey()) 
+		            {
+		                // CTRL button was pressed during the click
+		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
+		            }
 		        }
+//		        if (button == NativeEvent.BUTTON_LEFT)
+//		        {
+//		        	if (event.getNativeEvent().getCharCode() == KeyCodes.KEY_CTRL)// check + control
+//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
+//		        }
 		        else if (button == NativeEvent.BUTTON_RIGHT) 
 		        {
-		            event.preventDefault();
+		        	event.getNativeEvent().stopPropagation();
+		        	event.getNativeEvent().preventDefault();
+		        	
+		        	int clientX = event.getNativeEvent().getClientX();
+		        	int clientY = event.getNativeEvent().getClientY();
+		        	
+		        	if (outlierPopupColumnIndex < 0) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
+		        	{
+						updateRowOutlierPopup(outlierPopupRowIndex);
+
+						rowOutlierPopupMenu.setVisible(true);
+						rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
+						rowOutlierPopupMenu.show();
+		        	}
+		        	else
+		        	{
+						updateOutlierPopup(outlierPopupRowIndex, outlierPopupColumnIndex);
+
+						outlierPopupMenu.setVisible(true);
+			        	outlierPopupMenu.setPopupPosition(clientX, clientY);
+						outlierPopupMenu.show();
+		            }
 		        }
 			}
-		}, MouseDownEvent.getType());
+			
+		});
+		
+		this.table.addDomHandler(this.mouseHandler, ContextMenuEvent.getType());
 	}
 	
+	/**
+	 * Update the outlier popup.
+	 */
+	private void updateOutlierPopup(int rowIndex, int columnIndex)
+	{
+		if (this.statTableModel.isOutlier(rowIndex, columnIndex))
+		{
+			this.outlierCellItem.setText(StatistiekGWT.rb.getString("demarkOutlierCell"));
+			this.outlierCellItem.setScheduledCommand(demarkOutlierCellCommand);
+		}
+		else
+		{
+			this.outlierCellItem.setText(StatistiekGWT.rb.getString("markOutlierCell"));
+			this.outlierCellItem.setScheduledCommand(markOutlierCellCommand);
+		}
+		
+		if (this.statTableModel.isOutlier(rowIndex))
+		{
+			this.outlierRowItem.setText(StatistiekGWT.rb.getString("demarkOutlierRow"));
+			this.outlierRowItem.setScheduledCommand(demarkOutlierRowCommand);
+		}
+		else
+		{
+			this.outlierRowItem.setText(StatistiekGWT.rb.getString("markOutlierRow"));
+			this.outlierRowItem.setScheduledCommand(markOutlierRowCommand);
+		}
+	}
+
+	/**
+	 * Update the row outlier popup.
+	 */
+	private void updateRowOutlierPopup(int rowIndex)
+	{
+		if (this.statTableModel.isOutlier(rowIndex))
+		{
+			this.rowOutlierRowItem.setText(StatistiekGWT.rb.getString("demarkOutlierRow"));
+			this.rowOutlierRowItem.setScheduledCommand(demarkOutlierRowCommand);
+		}
+		else
+		{
+			this.rowOutlierRowItem.setText(StatistiekGWT.rb.getString("markOutlierRow"));
+			this.rowOutlierRowItem.setScheduledCommand(markOutlierRowCommand);
+		}
+	}
+
 	/**
 	 * Initialize the max column width for each column in table
 	 * considering the column header width and the table data in the column. 
@@ -2998,6 +3399,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
+	 * Set the outlier popup row index.
+	 * Used to be able to mark the clicked row.
+	 * 
+	 * @param i
+	 */
+	private void setOutlierPopupRowIndex(int i)
+	{
+		this.outlierPopupRowIndex = i;
+	}
+
+	/**
+	 * Set the outlier popup column index.
+	 * Used to be able to mark the clicked cell.
+	 * 
+	 * @param i
+	 */
+	private void setOutlierPopupColumnIndex(int i)
+	{
+		this.outlierPopupColumnIndex = i;
+	}
+
+	/**
 	 * Set temporary column index.
 	 * Used to create columns and get the correct value from the row string list.
 	 * 
@@ -3029,6 +3452,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 
 	/**
@@ -3067,4 +3491,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		return this.statTableModel;
 	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
+	}
 }
+
