@@ -567,9 +567,6 @@ public class GrafiekGWTVeld {
 				piScalingDivider = interactiePanel.schaalFactorX;
 			}
 
-			int dashStep = 5;
-			int dashes = hoogte / dashStep;
-			
 			int piTextX = 0;
 			int piTextY = Math.min(Math.max(drawYmin+cExtraAxisMarge+cFontHeight, drawYmax - cExtraAxisMarge), Math.max( drawYmin+cExtraAxisMarge+cFontHeight, hoogte - by + cPiFromAxis));
 
