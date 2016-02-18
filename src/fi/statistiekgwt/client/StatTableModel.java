@@ -21,12 +21,12 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.user.client.Window;
-
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
 import fi.statistiekgwt.client.event.EditColumnEvent;
 import fi.statistiekgwt.client.event.EditColumnEventHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -63,6 +63,16 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 	// this arraylist contains all used strings in a column for each column
 	private ArrayList<ArrayList<String>> stringOptions;
+	
+	/**
+	 * Array of booleans indicating which rows are marked as outliers.
+	 */
+	private ArrayList<Boolean> rowOutlierList;
+	
+	/**
+	 *  This arraylist contains an array of booleans indicating which values are marked as outlier in a column for each column.
+	 */
+	private ArrayList<ArrayList<Boolean>> cellOutlierList;
 
 	private ArrayList<Boolean> selectionList;
 	private ArrayList<SelectionHandler<Object>> selectionHandlers;
@@ -87,6 +97,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.columnClass = new ArrayList<ColumnType>();
 		this.values = new ArrayList<ArrayList<Object>>();
 		this.selectionList = new ArrayList<Boolean>();
+		this.rowOutlierList = new ArrayList<Boolean>();
+		this.cellOutlierList = new ArrayList<ArrayList<Boolean>>();
 
 		this.selectionHandlers = new ArrayList<SelectionHandler<Object>>();
 
@@ -348,6 +360,14 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public HandlerRegistration addSelectionChangeEventHandler(SelectionChangeEventHandler handler)
 	{
 		return this.eventBus.addHandler(SelectionChangeEvent.TYPE, handler);
+	}
+
+	/**
+	 * Subscribe for events
+	 */
+	public HandlerRegistration addOutlierChangeEventHandler(OutlierChangeEventHandler handler)
+	{
+		return this.eventBus.addHandler(OutlierChangeEvent.TYPE, handler);
 	}
 
 	/**
@@ -766,6 +786,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		this.values.add(nieuw);
 		this.selectionList.add(false);
+		
+		// update row outlier list
+		this.rowOutlierList.add(false);
+
 		this.rowCount++;
 
 		for (int i = 0; i < this.columnCount; i++)
@@ -774,6 +798,9 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			{
 				this.increaseKeyHashMap(ColumnType.WILDCARD, i);
 			}
+			
+			// update cell outlier list
+			this.cellOutlierList.get(i).add(false);
 		}
 	}
 
@@ -785,6 +812,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	{
 		this.values.add((objects));
 		this.selectionList.add(false);
+		
+		// update row outlier list
+		this.rowOutlierList.add(false);
+		
 		this.rowCount++;
 
 		for (int i = 0; i < this.columnCount; i++)
@@ -793,6 +824,9 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			{
 				this.increaseKeyHashMapWithoutSortingStringOptions(objects.get(i).toString(), i);
 			}
+			
+			// update cell outlier list
+			this.cellOutlierList.get(i).add(false);
 		}
 	}
 
@@ -830,6 +864,19 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.stringFrequencies.add(this.buildColumnStringOptions(this.columnCount - 1));
 		this.stringOptions.add(this.stringColumnOptions(this.columnCount - 1));
 
+		
+		// update cell outlier list; add an arraylist for the new column
+		ArrayList<Boolean> newArray = new ArrayList<Boolean>(this.rowCount);
+		for (int i = 0; i < this.rowCount; i++)
+		{
+			if (this.isOutlier(i))
+				newArray.add(true);
+			else
+				newArray.add(false);
+		}
+		
+		this.cellOutlierList.add(newArray);
+
 		// send an event
 		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN, this.columnCount - 1);
 		this.fireEvent(event);
@@ -856,8 +903,108 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 		this.stringFrequencies.add(this.buildColumnStringOptions(this.columnCount - 1));
 		this.stringOptions.add(this.stringColumnOptions(this.columnCount - 1));
+		
+		// update cell outlier list; add an arraylist for the new column
+		ArrayList<Boolean> newArray = new ArrayList<Boolean>(this.rowCount);
+		for (int i = 0; i < this.rowCount; i++)
+		{
+			if (this.isOutlier(i))
+				newArray.add(true);
+			else
+				newArray.add(false);
+		}
+		
+		this.cellOutlierList.add(newArray);
 	}
 
+	/**
+	 * Returns whether or not the row with the given index is marked as
+	 * an outlier.
+	 * 
+	 * @param rowIndex
+	 * @return
+	 */
+	public boolean isOutlier(int rowIndex)
+	{
+		boolean b = this.rowOutlierList.get(rowIndex);
+		
+		return b;
+	}
+
+	/**
+	 * Returns whether or not the cell with the given row and column index is marked as
+	 * an outlier.
+	 * 
+	 * @param rowIndex
+	 * @param columnIndex
+	 * @return
+	 */
+	public boolean isOutlier(int rowIndex, int columnIndex)
+	{
+		boolean b = false;
+		
+		if (this.cellOutlierList.size() > 0)
+			b = this.cellOutlierList.get(columnIndex).get(rowIndex);
+		
+		return b;
+	}
+
+	/**
+	 * Remove the row with the given index from the row outlier
+	 * and the cell outlier lists.
+	 * 
+	 * @param index
+	 */
+	private void removeRowFromOutlierLists(int index)
+	{
+		this.rowOutlierList.remove(index);
+		
+		for (int i = 0; i < this.columnCount; i++)
+		{
+			this.cellOutlierList.get(i).remove(index);
+		}
+	}
+
+	public void setCellOutlierList(ArrayList<ArrayList<Boolean>> list)
+	{
+		this.cellOutlierList = list;
+
+		// TODO Nodig? Deze methode wordt gebruikt in setState/zetOpdracht/setEditState()
+		// send an event
+		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
+		this.fireEvent(event);
+	}
+
+	/**
+	 * Get the array of booleans indicating which row is marked as an outlier.
+	 * 
+	 * @return
+	 */
+	public ArrayList<Boolean> getRowOutlierList()
+	{
+		return this.rowOutlierList;
+	}
+	
+	public void setRowOutlierList(ArrayList<Boolean> list)
+	{
+		this.rowOutlierList = list;
+
+		// TODO Nodig? Deze methode wordt gebruikt in setState/zetOpdracht/setEditState()
+		// send an event
+		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
+		this.fireEvent(event);
+	}
+
+	/**
+	 * Get the array of arrays booleans indicating which cell value is marked as an outlier.
+	 * 
+	 * @return
+	 */
+	public ArrayList<ArrayList<Boolean>> getCellOutlierList()
+	{
+		return this.cellOutlierList;
+	}
+	
 	/**
 	 * Edit a column
 	 * 
@@ -980,6 +1127,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 			this.values.remove(row);
 			this.selectionList.remove(row);
+			this.removeRowFromOutlierLists(row);
 			this.rowCount--;
 
 			// send an event
@@ -1010,6 +1158,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 
 			this.values.remove(row);
 			this.selectionList.remove(row);
+			this.removeRowFromOutlierLists(row);
 			this.rowCount--;
 		}
 	}
@@ -1198,6 +1347,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			this.columnCount--;
 			
+			this.cellOutlierList.remove(columnIndex);
+			
 			// send an event
 			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_COLUMN, columnIndex);
 			this.fireEvent(event);
@@ -1224,6 +1375,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				row.remove(column);
 			}
 			this.columnCount--;
+			
+			this.cellOutlierList.remove(column);			
 		}
 	}
 
@@ -1268,7 +1421,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	}
 
 	/**
-	 * Switch two rows in values and selectionlist.
+	 * Switch two rows in values, selectionlist, and outlier lists.
 	 */
 	private void switchRows(int rowA, int rowB)
 	{
@@ -1279,6 +1432,20 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		boolean tempSelection = this.selectionList.get(rowA);
 		this.selectionList.set(rowA, this.selectionList.get(rowB));
 		this.selectionList.set(rowB, tempSelection);
+		
+		boolean tempRowOutlier = this.rowOutlierList.get(rowA);
+		this.rowOutlierList.set(rowA, this.rowOutlierList.get(rowB));
+		this.rowOutlierList.set(rowB, tempRowOutlier);
+		
+		boolean tempCellOutlier;
+		ArrayList<Boolean> list;
+		for (int i = 0; i < this.cellOutlierList.size(); i++)
+		{
+			list = this.cellOutlierList.get(i);
+			tempCellOutlier = list.get(rowA);
+			list.set(rowA, list.get(rowB));
+			list.set(rowB, tempCellOutlier);
+		}
 	}
 	
 	/**
@@ -1334,13 +1501,16 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public void sort(int columnIndex)
 	{
-		//this.quickSort(columnIndex, 0, this.rowCount - 1);
-		// lots of same values causes StackOverflowError, so better use:
-		this.threeWayQuickSort(columnIndex, 0, this.rowCount - 1);
-
-		// send an event
-		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
-		this.fireEvent(event);
+		if (columnIndex >= 0)
+		{
+			//this.quickSort(columnIndex, 0, this.rowCount - 1);
+			// lots of same values causes StackOverflowError, so better use:
+			this.threeWayQuickSort(columnIndex, 0, this.rowCount - 1);
+	
+			// send an event
+			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
+			this.fireEvent(event);
+		}
 	}
 
 	/**
@@ -2425,6 +2595,15 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.selectionList = new ArrayList<Boolean>();
 	}
 
+	/**
+	 * Clear outlier lists.
+	 */
+	public void clearOutlierLists()
+	{
+		this.rowOutlierList = new ArrayList<Boolean>();
+		this.cellOutlierList = new ArrayList<ArrayList<Boolean>>();
+	}
+
 	public synchronized void setSelectionList(ArrayList<Boolean> selectionList)
 	{
 		this.selectionList = selectionList;
@@ -3057,5 +3236,49 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 
 		return count;
-	}	
+	}
+	
+	/**
+	 * Mark the value in the cell with the given column and row index as an outlier.
+	 * 
+	 * @param rowIndex
+	 * @param columnIndex
+	 * @param b
+	 */
+	public void markCellAsOutlier(int rowIndex, int columnIndex, boolean b)
+	{
+		this.cellOutlierList.get(columnIndex).set(rowIndex, b);
+		
+		// Als een rij een cell bevat die geen outlier is, 
+		// dan is de rij als geheel ook niet meer gemarkeerd als outlier 
+		if (b == false)
+		{
+			this.rowOutlierList.set(rowIndex, false);
+		}
+		
+		// send an event
+		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
+		this.fireEvent(event);
+	}
+	
+	/**
+	 * Mark the row with the given index as an outlier.
+	 * 
+	 * @param rowIndex
+	 * @param b
+	 */
+	public void markRowAsOutlier(int rowIndex, boolean b)
+	{
+		this.rowOutlierList.set(rowIndex, b);
+
+		// also update the cell outlier list
+		for (int i = 0; i < this.getColumnCount(); i++)
+		{
+			this.cellOutlierList.get(i).set(rowIndex, b);
+		}
+		
+		// send an event
+		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
+		this.fireEvent(event);
+	}
 }
