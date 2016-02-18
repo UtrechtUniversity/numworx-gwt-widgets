@@ -34,7 +34,7 @@ public class StatistiekUtils
 	 * @author Sylvia van Borkulo
 	 *
 	 */
-	public static class DummyTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
+	public static class DummyTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler//, ContextMenuHandler
 	{
 		@Override
 		public void onTouchStart(TouchStartEvent event)
@@ -53,6 +53,12 @@ public class StatistiekUtils
 		{
 			event.stopPropagation();
 		}
+
+//		@Override
+//		public void onContextMenu(ContextMenuEvent event)
+//		{
+//			event.preventDefault();
+//		}
 	} // class DummyTouchHandler
 	
 	/**
