@@ -501,6 +501,9 @@ logger.info("TegelsLeggenGWT init");
 			canvasPanel.setWidgetVisible(cp,false);
 		}
 
+		dlp.forceLayout();
+		
+logger.info("canvas width = " + canvasPanel.getOffsetWidth());
 		
 		tegelsPanel.aantalSs = schuifStukkenList.size();
 
@@ -613,6 +616,7 @@ logger.info("TegelsLeggenGWT init");
 			if (tegelsPanel.basisVormen.size() > 1)
 				cp.downButton.setEnabled(true);
 		}
+		
 		
 		tegelsPanel.tekenOpnieuw();
 
