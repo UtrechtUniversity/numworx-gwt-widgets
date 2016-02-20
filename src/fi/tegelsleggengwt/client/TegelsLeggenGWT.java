@@ -502,8 +502,10 @@ logger.info("TegelsLeggenGWT init");
 		}
 
 		dlp.forceLayout();
+		canvasPanel.forceLayout();
 		
-logger.info("canvas width = " + canvasPanel.getOffsetWidth());
+logger.info("canvasPanel width = " + canvasPanel.getOffsetWidth());
+logger.info("tegelsCanvasPanel width = " + tegelsPanel.tegelsCanvas.getOffsetWidth());
 		
 		tegelsPanel.aantalSs = schuifStukkenList.size();
 
