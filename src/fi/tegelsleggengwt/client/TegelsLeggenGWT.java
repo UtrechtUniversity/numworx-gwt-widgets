@@ -495,6 +495,7 @@ logger.info("TegelsLeggenGWT init");
 		if (!demoVersion)
 		{
 			cp.initialize();
+			cp.forceLayout();
 		}
 		else
 		{
