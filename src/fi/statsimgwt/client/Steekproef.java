@@ -12,6 +12,7 @@ import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSe
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -38,6 +39,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	Button wisResultaten;
 	ScrollPanel scrollPanel;
 	ScrollPanel scrollPanel1;
+	HTML html;
+	HTML html2;
 	
 	int experiment=0;
 	private Image gaussianImage;
@@ -196,8 +199,10 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	        return object.experimentNumber;
 	      }
 	    };
-	    table.addColumn(expColumn, "no.");
-
+	    //table.addColumn(expColumn, "no.");
+	    table.addColumn(expColumn);
+	    table.setColumnWidth(expColumn, 40.0, Unit.PX);
+	    
 	    // Add a text column to show the address.
 	    TextColumn<Experiment> valueColumn = new TextColumn<Experiment>() {
 	      @Override
@@ -205,11 +210,13 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	        return object.value;
 	      }
 	    };
-	    table.addColumn(valueColumn, "Waarde");
-   
+	    //table.addColumn(valueColumn, "Waarde");
+	    table.addColumn(valueColumn);
+	    table.setColumnWidth(valueColumn, 120.0, Unit.PX);
+	    
 	    scrollPanel = new ScrollPanel(table);
-	    scrollPanel.setSize("230px", "240px");
-	    scrollPanel.getElement().getStyle().setMarginTop(10, Unit.PX);
+	    scrollPanel.setSize("180px", "240px");
+	    //scrollPanel.getElement().getStyle().setMarginTop(10, Unit.PX);
 	    scrollPanel.getElement().getStyle().setMarginBottom(10, Unit.PX);
 
 	    // Create a CellTable.
@@ -229,7 +236,9 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	        return object.experimentNumber;
 	      }
 	    };
-	    table1.addColumn(expColumn1, "no.");
+	    //table1.addColumn(expColumn1, "no.");
+	    table1.addColumn(expColumn1);
+	    
 
 	    // Add a text column to show the address.
 	    TextColumn<Experiment1> muColumn = new TextColumn<Experiment1>() {
@@ -238,7 +247,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	        return object.mu;
 	      }
 	    };
-	    table1.addColumn(muColumn, "\u03BC");
+	    //table1.addColumn(muColumn, "\u03BC");
+	    table1.addColumn(muColumn);
 	
 	    // Add a text column to show the address.
 	    TextColumn<Experiment1> sigmaColumn = new TextColumn<Experiment1>() {
@@ -247,16 +257,37 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	        return object.sigma;
 	      }
 	    };
-	    table1.addColumn(sigmaColumn, "\u03C3");
-   
+	    //table1.addColumn(sigmaColumn, "\u03C3");
+	    table1.addColumn(sigmaColumn);
+	    
 	    scrollPanel1 = new ScrollPanel(table1);
 	    scrollPanel1.setSize("230px", "240px");
-	    scrollPanel1.getElement().getStyle().setMarginTop(10, Unit.PX);
+	    //scrollPanel1.getElement().getStyle().setMarginTop(10, Unit.PX);
 	    scrollPanel1.getElement().getStyle().setMarginBottom(10, Unit.PX);
 
+	    VerticalPanel panel10=new VerticalPanel();
+	    VerticalPanel panel11=new VerticalPanel();
 	    
-	    panel9.add(scrollPanel);
-	    panel9.add(scrollPanel1);
+	    html = new HTML("<table width=145><tr><td><font face=arial size=2><b>no.</b></font></td><td><font face=arial size=2><b>Waarde</b></font></td></tr></table>");
+	    html.getElement().getStyle().setMarginTop(10, Unit.PX);
+	    
+	    panel10.add(html);
+
+	    html2 = new HTML("<table width=195><tr><td width=55><font face=arial size=2><b>no.</b></font></td><td width=75><font face=arial size=2><b>&mu;</b></font></td><td width=65><font face=arial size=2><b>&sigma;</b></font></td></tr></table>");
+	    html2.getElement().getStyle().setMarginTop(10, Unit.PX);
+	    
+	    
+	    panel10.add(scrollPanel);
+	    
+	    panel11.add(html2);
+	    panel11.add(scrollPanel1);
+	    
+	    
+	    
+	    //panel9.add(scrollPanel);
+	    //panel9.add(scrollPanel1);
+	    panel9.add(panel10);
+	    panel9.add(panel11);
 	    
 	    wisResultaten=new Button("Wis resultaten",this);
 	    wisResultaten.setEnabled(false);
@@ -265,6 +296,13 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	    add(panel0);
 	    
 	    steekproefResultaat = new double[1000];
+	}
+	
+	public void setGrootte(int breedte, int hoogte) {
+		//if (breedte-550>0) {
+		//	scrollPanel.setSize("230px", Integer.toString(breedte-550)+"px");
+		//	scrollPanel1.setSize("230px", Integer.toString(breedte-550)+"px");
+		//}
 	}
 	
 	public void getSample() {

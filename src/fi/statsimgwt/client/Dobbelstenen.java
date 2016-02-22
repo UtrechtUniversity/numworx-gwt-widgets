@@ -1322,20 +1322,31 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	}
 	
 	public void setGrootte(int breedte, int hoogte) {
-		kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
-		kladjeHWTCanvas.setHeight(Integer.toString(hoogte-120)+"px");
-		kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
-		kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-120);
-		dobbelstenenGrafiek.setGrootte(breedte-230,hoogte-120);
-	    scrollPanel.setSize("230px", Integer.toString(hoogte-120)+"px");
-	    scrollPanel2.setSize("230px", Integer.toString(hoogte-120)+"px");
-	    scrollPanel3.setSize("230px", Integer.toString(hoogte-120)+"px");
-	    scrollPanel4.setSize(Integer.toString(breedte-450)+"px", "100px");
-	    scrollPanel5.setSize(Integer.toString(breedte-450)+"px", "100px");
-	    scrollPanel6.setSize(Integer.toString(breedte-450)+"px", "100px");
+		if (breedte>230)
+			kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
+		if (hoogte>120)
+			kladjeHWTCanvas.setHeight(Integer.toString(hoogte-120)+"px");
+		if (breedte>230)
+			kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
+		if (hoogte>120) {
+			kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-120);
+			dobbelstenenGrafiek.setGrootte(breedte-230,hoogte-120);
+		}
+	    if (hoogte>120) {
+	    	scrollPanel.setSize("230px", Integer.toString(hoogte-120)+"px");	    
+	    	scrollPanel2.setSize("230px", Integer.toString(hoogte-120)+"px");
+	    	scrollPanel3.setSize("230px", Integer.toString(hoogte-120)+"px");
+	    }
+	    if (breedte>450) {
+	    	scrollPanel4.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    	scrollPanel5.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    	scrollPanel6.setSize(Integer.toString(breedte-450)+"px", "100px");
+	    }
 	    //panel.setWidgetLeftRight(panel9,360,Unit.PX,0,Unit.PX);
-	    panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
-	    panel.setWidgetLeftRight(panel6, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
+	    if (breedte>230)
+	    	panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
+	    if (breedte>350)
+	    	panel.setWidgetLeftRight(panel6, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
 	    
 	    
 	}

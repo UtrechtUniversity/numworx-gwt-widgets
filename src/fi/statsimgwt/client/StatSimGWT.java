@@ -754,6 +754,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 		}
 		if (binomTrekkingSelected) {
 			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
+			binomTrekking.setGrootte(breedte,hoogte);
 			String binomKans="";
 			if (l.containsKey("kans"))
 				binomKans = l.getString("kans");
@@ -771,6 +772,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 		}
 		if (steekproefSelected) {
 			steekproef = new Steekproef();
+			steekproef.setGrootte(breedte, hoogte);
 			String steekproefMu="";
 			if (l.containsKey("mu"))
 				steekproefMu = l.getString("mu");

@@ -8,16 +8,25 @@ public class BinomRooster {
 	
 	BinomTrekking ssg;
 	
+	int breedte=200;
+	int hoogte=340;
+	
 	public BinomRooster (BinomTrekking binomTrekking) {
 		this.ssg = binomTrekking;
+	}
+	
+	public void setGrootte(int breedte, int hoogte) {
+		this.breedte=breedte;
+		this.hoogte=hoogte;
+		paint();
 	}
 
 	public void paint() {
 		
 		ssg.gIm.beginPath();
 		
-		int height=340;
-		int width=200;
+		int height=hoogte;
+		int width=breedte;
 
 		ssg.gIm.setLineWidth(1);
 		ssg.gIm.setFillStyle(ssg.agKleur);

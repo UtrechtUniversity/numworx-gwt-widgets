@@ -107,6 +107,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 	VerticalPanel results4;
 	VerticalPanel results5;
 	VerticalPanel radios;
+	HTML html;
+	HTML html2;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -421,6 +423,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    table = new CellTable<Experiment>();
 		    table.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 		    table.setPageSize(1000);
+		    table.setWidth("230px", true);
 		    
 		    dataProvider = new ListDataProvider<Experiment>();
 			// 	Add the table to the dataProvider.
@@ -434,7 +437,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.experimentNumber;
 		      }
 		    };
-		    table.addColumn(expColumn, "Exp.");
+		    //table.addColumn(expColumn, "Exp.");
+		    table.addColumn(expColumn);
+		    table.setColumnWidth(expColumn, 35.0, Unit.PX);
 
 		    // Add a text column to show the address.
 		    TextColumn<Experiment> kopValueColumn = new TextColumn<Experiment>() {
@@ -443,8 +448,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.kopValue;
 		      }
 		    };
-		    table.addColumn(kopValueColumn, "Aantal kop");
-
+		    //table.addColumn(kopValueColumn, "Aantal kop");
+		    table.addColumn(kopValueColumn);
+		    table.setColumnWidth(kopValueColumn, 80.0, Unit.PX);
+		    
 		    // Add a text column to show the address.
 		    TextColumn<Experiment> muntValueColumn = new TextColumn<Experiment>() {
 		      @Override
@@ -452,13 +459,15 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.muntValue;
 		      }
 		    };
-		    table.addColumn(muntValueColumn, "Aantal munt");
-
+		    //table.addColumn(muntValueColumn, "Aantal munt");
+		    table.addColumn(muntValueColumn);
+		    table.setColumnWidth(muntValueColumn, 95.0, Unit.PX);
+		    
 		    // Create a CellTable.
 		    table2 = new CellTable<Experiment2>();
 		    table2.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
 		    table2.setPageSize(1000);
-		    
+		    table2.setWidth("230px", true); 
 
 		    dataProvider1 = new ListDataProvider<Experiment2>();
 			// 	Add the table to the dataProvider.
@@ -472,7 +481,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.experimentNumber;
 		      }
 		    };
-		    table2.addColumn(expColumn2, "Exp.");
+		    //table2.addColumn(expColumn2, "Exp.");
+		    table2.addColumn(expColumn2);
+		    table2.setColumnWidth(expColumn2, 35.0, Unit.PX);
 
 		    // Add a text column to show the address.
 		    TextColumn<Experiment2> geenKopValueColumn = new TextColumn<Experiment2>() {
@@ -481,8 +492,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.geenKop;
 		      }
 		    };
-		    table2.addColumn(geenKopValueColumn, "0 kop");
-
+		    //table2.addColumn(geenKopValueColumn, "0 kop");
+		    table2.addColumn(geenKopValueColumn);
+		    table2.setColumnWidth(geenKopValueColumn, 60.0, Unit.PX);
+		    
 		    // Add a text column to show the address.
 		    TextColumn<Experiment2> eenKopValueColumn = new TextColumn<Experiment2>() {
 		      @Override
@@ -490,8 +503,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.eenKop;
 		      }
 		    };
-		    table2.addColumn(eenKopValueColumn, "1 kop");
-		 
+		    //table2.addColumn(eenKopValueColumn, "1 kop");
+		    table2.addColumn(eenKopValueColumn);
+		    table2.setColumnWidth(eenKopValueColumn, 55.0, Unit.PX);
+		    
 		    // Add a text column to show the address.
 		    TextColumn<Experiment2> tweeKopValueColumn = new TextColumn<Experiment2>() {
 		      @Override
@@ -499,7 +514,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 		        return object.tweeKop;
 		      }
 		    };
-		    table2.addColumn(tweeKopValueColumn, "2 kop");
+		    //table2.addColumn(tweeKopValueColumn, "2 kop");
+		    table2.addColumn(tweeKopValueColumn);
+		    table2.setColumnWidth(tweeKopValueColumn, 75.0, Unit.PX);
 		    
 		    scrollPanel = new ScrollPanel(table);
 		    scrollPanel.setSize("230px", "240px");
@@ -520,7 +537,15 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    	frequentieCanvas.setVisible(false);
 		    
 		    panel6.add(frequentieCanvas);
+		    
+		    html = new HTML("<table width=213><tr><td><font face=arial size=2><b>Exp.</b></font></td><td><font face=arial size=2><b>Aantal kop</b></font></td><td><font face=arial size=2><b>Aantal munt</b></font></td></tr></table>");
+		    panel6.add(html);
+		    
 		    panel6.add(scrollPanel);
+		    
+		    html2 = new HTML("<table width=213><tr><td><font face=arial size=2><b>Exp.</b></font></td><td><font face=arial size=2><b>0 kop</b></font></td><td><font face=arial size=2><b>1 kop</b></font></td><td><font face=arial size=2><b>2 kop</b></font></td></tr></table>");
+		    panel6.add(html2);
+		    
 		    panel6.add(scrollPanel2);
 		    
 		    maxCount=100;
@@ -549,23 +574,38 @@ public class Munten extends FlowPanel implements ClickHandler{
 	
 	public void setGrootte(int breedte,int hoogte)
 	{
-		scrollPanel.setSize("230px", Integer.toString(hoogte-210)+"px");
-		scrollPanel2.setSize("230px", Integer.toString(hoogte-110)+"px");
+		if (hoogte>210)
+			scrollPanel.setSize("230px", Integer.toString(hoogte-210)+"px");
+		if (hoogte>110)
+			scrollPanel2.setSize("230px", Integer.toString(hoogte-110)+"px");
 		panel.setSize(Integer.toString(breedte)+"px","110px");
-		panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
-		panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
-		panel.setWidgetLeftRight(results,570,Unit.PX,breedte-690,Unit.PX);
-		panel.setWidgetLeftRight(results1,720,Unit.PX,breedte-780,Unit.PX);
-		panel.setWidgetLeftRight(radios,370,Unit.PX,breedte-690,Unit.PX);
-		panel.setWidgetLeftRight(results2,400,Unit.PX,breedte-590,Unit.PX);
-		panel.setWidgetLeftRight(results3,500,Unit.PX,breedte-690,Unit.PX);
-		panel.setWidgetLeftRight(results4,570,Unit.PX,breedte-690,Unit.PX);
-		panel.setWidgetLeftRight(results5,640,Unit.PX,breedte-690,Unit.PX);
-		kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
-		kladjeHWTCanvas.setHeight(Integer.toString(hoogte-110)+"px");
-		kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
-		kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-110);
-		grafiek.setGrootte(breedte-230, hoogte-110);
+		if (breedte>230)
+			panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
+		if (breedte>350)
+			panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-350, Unit.PX);     // Center panel
+		if (breedte>690)
+			panel.setWidgetLeftRight(results,570,Unit.PX,breedte-690,Unit.PX);
+		if (breedte>780)
+			panel.setWidgetLeftRight(results1,720,Unit.PX,breedte-780,Unit.PX);
+		if (breedte>690)
+			panel.setWidgetLeftRight(radios,370,Unit.PX,breedte-690,Unit.PX);
+		if (breedte>590)
+			panel.setWidgetLeftRight(results2,400,Unit.PX,breedte-590,Unit.PX);
+		if (breedte>690) {
+			panel.setWidgetLeftRight(results3,500,Unit.PX,breedte-690,Unit.PX);
+			panel.setWidgetLeftRight(results4,570,Unit.PX,breedte-690,Unit.PX);
+			panel.setWidgetLeftRight(results5,640,Unit.PX,breedte-690,Unit.PX);
+		}
+		if (breedte>230)
+			kladjeHWTCanvas.setWidth(Integer.toString(breedte-230)+"px");
+		if (hoogte>110)
+			kladjeHWTCanvas.setHeight(Integer.toString(hoogte-110)+"px");
+		if (breedte>230)
+			kladjeHWTCanvas.setCoordinateSpaceWidth(breedte-230);
+		if (hoogte>110)
+			kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-110);
+		if (breedte>230 && hoogte>110)
+			grafiek.setGrootte(breedte-230, hoogte-110);
 	}
 	
 	public void setEenMuntTweeMunten() {
@@ -575,6 +615,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 			if (muntenTabel1==true)
 				scrollPanel.setVisible(true);
 			scrollPanel2.setVisible(false);
+			html.setVisible(true);
+			html2.setVisible(false);
 			grafiek.paint();
 			aantalKopRadio.setVisible(true);
 			percentageKopRadio.setVisible(true);
@@ -604,6 +646,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 			scrollPanel.setVisible(false);
 			if (muntenTabel1==true)
 				scrollPanel2.setVisible(true);
+			html2.setVisible(true);
+			html.setVisible(false);
 			grafiek.paint();
 			aantalKopRadio.setVisible(false);
 			percentageKopRadio.setVisible(false);

@@ -11,13 +11,22 @@ public class BinomGrafiek {
 	CssColor red = CssColor.make(255, 0, 0);
 	CssColor black = CssColor.make(0, 0, 0);
 	
+	int breedte=360;
+	int hoogte=340;
+	
 	public BinomGrafiek (BinomTrekking binomTrekking) {
 		this.ssg = binomTrekking;
 	}
 	
+	public void setGrootte (int breedte, int hoogte) {
+		this.breedte=breedte;
+		this.hoogte=hoogte;
+		paint();
+	}
+	
 	public void paint() {
-		int width=360;
-		int height=340;
+		int width=breedte;
+		int height=hoogte;
 		
 		ssg.gIm2.setFillStyle(ssg.agKleur);
 		ssg.gIm2.fillRect(0,0,width,height);

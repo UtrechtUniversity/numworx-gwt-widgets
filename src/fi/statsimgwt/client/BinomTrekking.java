@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -66,6 +67,10 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	Boolean showKans=true;
 	Boolean showPopulatieProportie=false;
 	Label kansLabel;
+	LayoutPanel panel;
+	FlowPanel panel2;
+	VerticalPanel panel1;
+	HTML html;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -117,10 +122,10 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 		
 		
 		
-		LayoutPanel panel = new LayoutPanel();
+		panel = new LayoutPanel();
 	    panel.setSize("790px", "110px");
 
-	    FlowPanel panel2=new FlowPanel();
+	    panel2=new FlowPanel();
 	    panel.add(panel2);
 	    
 	    panel.setWidgetLeftRight(panel2,10,Unit.PX,560,Unit.PX);
@@ -163,7 +168,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    keer = new Button("keer uit",this);
 	    wis = new Button("Wis resultaten",this);
 	    
-	    VerticalPanel panel1=new VerticalPanel();
+	    panel1=new VerticalPanel();
 	    HorizontalPanel panel5=new HorizontalPanel();
 	    panel5.getElement().getStyle().setMarginBottom(5, Unit.PX);
 	    panel1.add(panel5);
@@ -209,7 +214,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	        return object.experimentNumber;
 	      }
 	    };
-	    table.addColumn(expColumn, "Exp.");
+	    //table.addColumn(expColumn, "Exp.");
+	    table.addColumn(expColumn);
+	    table.setColumnWidth(expColumn, 55.0, Unit.PX);
 
 	    // Add a text column to show the address.
 	    TextColumn<Experiment> outcomeColumn = new TextColumn<Experiment>() {
@@ -218,15 +225,21 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	        return object.outcome;
 	      }
 	    };
-	    table.addColumn(outcomeColumn, "Uitkomst");
-   
+	    //table.addColumn(outcomeColumn, "Uitkomst");
+	    table.addColumn(outcomeColumn);
+	    table.setColumnWidth(outcomeColumn, 90.0, Unit.PX);
+	    
 	    scrollPanel = new ScrollPanel(table);
-	    scrollPanel.setSize("230px", "240px");
+	    scrollPanel.setSize("180px", "240px");
 	    
 	    HorizontalPanel panel7=new HorizontalPanel();
 	    // Add it to the root panel.
 	    VerticalPanel panel8 = new VerticalPanel();
 	    panel7.add(panel8);
+	    
+	    html = new HTML("<table width=145><tr><td><font face=arial size=2><b>Exp.</b></font></td><td><font face=arial size=2><b>Uitkomst</b></font></td></tr></table>");
+	    panel8.add(html);
+	    
 	    
 	    panel8.add(scrollPanel);
 	    if (binomTrekkingTabel==false)
@@ -266,6 +279,34 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	     
 	     binomGrafiek=new BinomGrafiek(this);
 	     binomGrafiek.paint();
+	}
+	
+	public void setGrootte(int breedte, int hoogte) {
+		int dummy=(breedte-170)/2;
+		if (dummy>0){
+			kladjeHWTCanvas.setWidth(Integer.toString(dummy)+"px");
+			kladjeHWTCanvas.setCoordinateSpaceWidth(dummy);
+			binomGrafiekCanvas.setWidth(Integer.toString(dummy)+"px");
+			binomGrafiekCanvas.setCoordinateSpaceWidth(dummy);			
+		}
+		if (hoogte-110>0) {
+			kladjeHWTCanvas.setHeight(Integer.toString(hoogte-110)+"px");
+			kladjeHWTCanvas.setCoordinateSpaceHeight(hoogte-110);
+			binomGrafiekCanvas.setHeight(Integer.toString(hoogte-110)+"px");
+			binomGrafiekCanvas.setCoordinateSpaceHeight(hoogte-110);
+		}
+		if (hoogte>210)
+			scrollPanel.setSize("180px", Integer.toString(hoogte-210)+"px");
+		
+		if (dummy>0 && hoogte>210) {
+			binomRooster.setGrootte(dummy,hoogte-210);
+			binomGrafiek.setGrootte(dummy,hoogte-210);
+		}
+		panel.setSize(Integer.toString(breedte)+"px", "110px");
+		if (breedte>230)
+			panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
+		if (breedte>450)
+			panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-450, Unit.PX);     // Center panel
 	}
 	
 	public void setZichtbaar() {
