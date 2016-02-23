@@ -904,6 +904,7 @@ logger.info("AlgebraPijlenGWT init");
 
 		}
 			
+		canvasPanel.forceLayout();
 			
 		asv.paint();
 		
