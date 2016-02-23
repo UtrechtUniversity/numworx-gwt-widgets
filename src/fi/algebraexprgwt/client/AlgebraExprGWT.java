@@ -830,6 +830,8 @@ logger.info("AlgebraExprGWT init");
 
 		}
 		
+		dlp.forceLayout();
+		canvasPanel.forceLayout();
 		
 		asv.paint();
 
