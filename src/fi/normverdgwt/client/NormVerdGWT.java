@@ -712,6 +712,9 @@ logger.info("NormVerdGWT init");
 		
 		normaalPanel.setInitState();
 		
+		dlp.forceLayout();
+		normaalPanel.forceLayout();
+		
 		normaalPanel.paint();
 		
 		ingevuld = false;
