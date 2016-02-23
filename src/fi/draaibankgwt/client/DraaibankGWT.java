@@ -318,6 +318,9 @@ logger.info("DraaibankGWT init");
 		makeBottom();
 		tekenPanel.setState(map);
 
+		dlp.forceLayout();
+		canvasPanel.forceLayout();
+		
 		tekenPanel.tekenOpnieuw();
 
 	}	
