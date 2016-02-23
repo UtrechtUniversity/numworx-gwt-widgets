@@ -810,6 +810,54 @@ logger.info("TekenVeelvlakGWT init");
 				}
 			}
 			
+	// layout button panel:
+	// [BOUWEN][SLOPEN] gap [vol/leeg] gap [aantal] gap [kijkna]
+	//  70       70      10    90      30    70      ?    90     |
+			int slopenX = 70;
+			int gap1 = 10;
+			int span = 0;
+			if(!keuzeBouwenSlopen) {
+				slopenX = 0;
+				gap1 = 150;
+			} else
+				span = slopenX * 2;;
+			int volleegX = 150;
+			int volleegW = 90;
+			int gap2 = 30;
+			if (!volLeegOptie) {
+				volleegW = 0;
+				gap2 = 120;
+			} else 
+				span = volleegX + volleegW;
+			int aantalX  = 270;
+			int aantalW  = 70;
+			if(!aantalBlokjes) {
+				aantalW = 0;
+			} else
+				span = aantalX + aantalW;
+			int kijknaW = kijkNaActief ? 90 : 0;
+			if (breedte - kijknaW < span) {
+	// we have a problem, Huub!			
+				int space = span - (breedte-kijknaW);
+				if(space <= gap1 + gap2) {					
+					// reduce gap, done
+					int p1 = space * gap1 / (gap1 + gap2);
+					gap1 -= p1;
+					gap2 -= (space-p1);
+					space = 0;
+				} else {
+					// take gaps, 
+					space -= gap1 + gap2;
+					gap1 = gap2 = 0;
+				}
+				if ( space > 0) {
+					// take space from buttons/labels
+				}
+// recalculate positions.				
+				volleegX = slopenX * 2 + gap1;
+				aantalX  = volleegX + volleegW + gap2;
+			}
+			
 			
 			if (keuzeBouwenSlopen)
 			{
@@ -819,9 +867,9 @@ logger.info("TekenVeelvlakGWT init");
 				slopenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
 				panel.add(bouwenButton);
 				panel.add(slopenButton);
-				panel.setWidgetLeftWidth(bouwenButton, 0, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetLeftWidth(bouwenButton, 0, Style.Unit.PX, slopenX, Style.Unit.PX);
 				panel.setWidgetTopHeight(bouwenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
-				panel.setWidgetLeftWidth(slopenButton, 70, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetLeftWidth(slopenButton, slopenX, Style.Unit.PX, 70, Style.Unit.PX);
 				panel.setWidgetTopHeight(slopenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				bouwenButton.setValue(true);
 				
@@ -833,9 +881,9 @@ logger.info("TekenVeelvlakGWT init");
 				volButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				panel.add(leegButton);
 				leegButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
-				panel.setWidgetLeftWidth(volButton, 150, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetLeftWidth(volButton, volleegX, Style.Unit.PX, volleegW, Style.Unit.PX);
 				panel.setWidgetTopHeight(volButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
-				panel.setWidgetLeftWidth(leegButton, 150, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetLeftWidth(leegButton, volleegX, Style.Unit.PX, volleegW, Style.Unit.PX);
 				panel.setWidgetTopHeight(leegButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				panel.setWidgetVisible(leegButton, false);
 				volButton.addClickHandler(new PushClickHandler());
@@ -849,7 +897,7 @@ logger.info("TekenVeelvlakGWT init");
 				Msgs msgs = GWT.create(Msgs.class);
 				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
 				panel.add(blokjesLabel);
-				panel.setWidgetLeftWidth(blokjesLabel, 270, Style.Unit.PX, 70, Style.Unit.PX);
+				panel.setWidgetLeftWidth(blokjesLabel, aantalX, Style.Unit.PX, aantalW, Style.Unit.PX);
 				panel.setWidgetTopHeight(blokjesLabel, hoogte - 20, Style.Unit.PX, 25, Style.Unit.PX);
 			}	
 			
