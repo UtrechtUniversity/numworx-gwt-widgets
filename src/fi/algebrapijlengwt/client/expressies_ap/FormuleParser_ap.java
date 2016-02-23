@@ -131,7 +131,7 @@ public class FormuleParser_ap
 			index = s.indexOf(")/(",start);
 		}
 		for(int i=0 ; i<s.length()-1 ; i++)
-		{	if((Character.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)) || s.charAt(i)==')') && (Character.isLetter(s.charAt(i+1)) || s.charAt(i+1)=='('))
+		{	if((Letter.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)) || s.charAt(i)==')') && (Letter.isLetter(s.charAt(i+1)) || s.charAt(i+1)=='('))
 			{	s = s.substring(0,i+1) + '*' +  s.substring(i+1);
 			}
 		}
@@ -197,7 +197,7 @@ public class FormuleParser_ap
 		}
 		
 		//is het een letter?		
-		if(s.length()==1 && Character.isLetter(s.charAt(0)))
+		if(s.length()==1 && Letter.isLetter(s.charAt(0)))
 		{	exp = new BasisExpressie(s);
 			return exp;
 		}

@@ -10,12 +10,12 @@ import com.google.gwt.canvas.dom.client.TextMetrics;
 //import com.google.gwt.dom.client.Style;
 
 import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.Window;
 //import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -337,6 +337,9 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
         {
         	beginExpString = "$f" + beginExpString + "@";
         	Expressie beginExp = FormuleParser_ap.geefExpressie(beginExpString);
+        	if(beginExp == null) {
+        		//Window.alert("null in beginExp " + beginExpString);
+        	} else 
         	zetExpressie(beginExp);
         }
 
@@ -1028,7 +1031,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		
 			catch(NumberFormatException ex)
 			{	for (int i = 0; i < tf.getText().length(); i++)
-				{	if (!Character.isLetter(tf.getText().charAt(i)))
+				{	if (!Letter.isLetter(tf.getText().charAt(i)))
 					{	isGeldigeInvoer = false;
 						break;
 					}
