@@ -37,10 +37,14 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import fi.mozarchgwt.client.text.Text;
+
 import java.util.logging.Logger;
 
 public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	public static Text rb;
+	
 	private static Logger logger = Logger.getLogger("MozarchGWT");
 	
     static final String holderId = "dockholder";
@@ -83,6 +87,8 @@ public class MozarchGWT implements EntryPoint, InteractionStub, InteractionView
 	public void getImages() 
 	{
 
+		rb = GWT.create(Text.class);
+		
 		mozarchGWTClientBundle = GWT.create(MozarchGWTClientBundle.class);
 		mozarchGWTCssResource = mozarchGWTClientBundle.getMozarchGWTCssResource();
 		mozarchGWTCssResource.ensureInjected();
@@ -228,7 +234,8 @@ logger.info("MozarchGWT init");
 			
 			tekenPanel.initialiseer();
 			
-			wisKnop = new PushButton("wis");
+			//wisKnop = new PushButton("wis");
+			wisKnop = new PushButton(rb.wisKnopLabel());
 			wisKnop.addStyleName(mozarchGWTCssResource.pushbutton());
 			canvasPanel.add(wisKnop);
 			canvasPanel.setWidgetLeftWidth(wisKnop, 10, Style.Unit.PX, 50, Style.Unit.PX);
@@ -239,7 +246,9 @@ logger.info("MozarchGWT init");
 			if (map != null)
 				setState((HashMap) map);
 
-
+			dlp.forceLayout();
+			canvasPanel.forceLayout();
+			
 			tekenPanel.tekenOpnieuw();
 
 	}
