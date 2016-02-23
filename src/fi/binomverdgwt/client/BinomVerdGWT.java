@@ -645,6 +645,9 @@ logger.info("BinomVerdGWT post setState");
 		
 //System.out.println("init binomVerdPanel.paint()");
 
+		dlp.forceLayout();
+		binomVerdPanel.forceLayout();
+		
 		binomVerdPanel.paint();
 		
 		ingevuld = false;
