@@ -516,7 +516,9 @@ System.out.println("contains docentKleuren");
 			{
 				v3d.setWidgetVisible(v3d.kijkNaPanel, true);
 			}
-			
+		
+			dlp.forceLayout();
+			v3d.forceLayout();
 			v3d.paint();
 			
 		}
@@ -544,6 +546,9 @@ System.out.println("contains docentKleuren");
 			{
 				vaktek.setWidgetVisible(vaktek.kijkNaPanel, true);
 			}
+
+			dlp.forceLayout();
+			vaktek.forceLayout();
 			
 			vaktek.paint();
 		}
@@ -563,9 +568,14 @@ System.out.println("contains docentKleuren");
 	    	{	Veelvlak tvPijl = maakPijl();
 	    		tvv.toonVoorkantPijl(tvPijl);
 	    	}
-		
+
+			dlp.forceLayout();
+			tvv.forceLayout();
+			tvv.rg.forceLayout();
+
 			tvv.tekenOpnieuw();
 		}	
+		
 		
 		ingevuld = false;
 		
