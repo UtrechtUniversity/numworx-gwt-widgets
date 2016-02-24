@@ -56,10 +56,11 @@ import fi.geomalggwt.client.expressies.Algebra;
 import fi.geomalggwt.client.expressies.Expressie;
 import fi.geomalggwt.client.formuleobjects.FormuleParser;
 
-
+import fi.geomalggwt.client.text.Text;
 
 public class GeomAlgGWT implements EntryPoint, InteractionStub
 {
+	public static Text rb;
 	public static String language = "nl";
 	
     static final String holderId = "dockholder";
@@ -87,7 +88,7 @@ public class GeomAlgGWT implements EntryPoint, InteractionStub
 	int leftOffset = 15;
 	int topOffset = 5;
 	
-	int buttonWidth1 = 40;
+	int buttonWidth1 = 55;
 	int buttonWidth2 = 22;
 	int buttonHeight = 22;
 	int checkBoxWidth = 180;
@@ -137,6 +138,9 @@ boolean touchStart = false;
 
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		language = rb.taalString();
+		
 		geomAlgGWTClientBundle = GWT.create(GeomAlgGWTClientBundle.class);
 		geomAlgGWTCss = geomAlgGWTClientBundle.getGeomAlgGWTCSS();
 		geomAlgGWTCss.ensureInjected();
@@ -178,7 +182,8 @@ boolean touchStart = false;
 		int currentX = leftOffset;
 		int currentY = topOffset;
 		
-		wisButton = new PushButton("wis");
+		//wisButton = new PushButton("wis");
+		wisButton = new PushButton(rb.wisKnopLabel());
 		wisButton.addStyleName(geomAlgGWTCss.pushbutton());
 		bottomPanel.add(wisButton);
 		bottomPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth1, Style.Unit.PX);
@@ -191,7 +196,8 @@ boolean touchStart = false;
 		
 		currentX += buttonWidth1 + leftOffset;
 		
-		terugButton = new PushButton("terug");
+		//terugButton = new PushButton("terug");
+		terugButton = new PushButton(rb.terugKnopLabel());
 		terugButton.addStyleName(geomAlgGWTCss.pushbutton());
 		bottomPanel.add(terugButton);
 		bottomPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth1, Style.Unit.PX);
@@ -205,7 +211,8 @@ boolean touchStart = false;
 		currentX += buttonWidth1 + leftOffset;
 		
 		directBox = new CheckBox();
-		directBox.setText("direct samenvoegen");
+		//directBox.setText("direct samenvoegen");
+		directBox.setText(rb.samenvoegenLabel());
 		directBox.addStyleName(geomAlgGWTCss.pushbutton());
 		bottomPanel.add(directBox);
 				bottomPanel.setWidgetLeftWidth(directBox, currentX, Style.Unit.PX, checkBoxWidth, Style.Unit.PX);
@@ -991,7 +998,8 @@ logger.info("GeomAlgGWT init");
 		{
 			kijkNaPanel = new LayoutPanel();
 			canvasPanel.add(kijkNaPanel);
-			kijkNaButton = new PushButton("Kijk Na");
+			//kijkNaButton = new PushButton("Kijk Na");
+			kijkNaButton = new PushButton(rb.kijkNaKnopLabel());
 			kijkNaButton.addStyleName(geomAlgGWTCss.pushbutton());
 			kijkNaPanel.add(kijkNaButton);
 			kijkNaPanel.add(goedKrulImage);
@@ -999,17 +1007,17 @@ logger.info("GeomAlgGWT init");
 			kijkNaPanel.add(foutKruisImage);
 			kijkNaButton.addClickHandler(new PushClickHandler());
 			
-			canvasPanel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 120, Style.Unit.PX);
+			canvasPanel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 130, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(kijkNaPanel, canvasHoogte - 60, Style.Unit.PX, 25, Style.Unit.PX);
 			
-			kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 70, Style.Unit.PX);
 			kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 20, Style.Unit.PX);
 			
-			kijkNaPanel.setWidgetLeftWidth(goedKrulImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(goedKrulImage, 70, Style.Unit.PX, 30, Style.Unit.PX);
 			kijkNaPanel.setWidgetTopHeight(goedKrulImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
-			kijkNaPanel.setWidgetLeftWidth(goedKrulHalfImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(goedKrulHalfImage, 70, Style.Unit.PX, 30, Style.Unit.PX);
 			kijkNaPanel.setWidgetTopHeight(goedKrulHalfImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
-			kijkNaPanel.setWidgetLeftWidth(foutKruisImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
+			kijkNaPanel.setWidgetLeftWidth(foutKruisImage, 70, Style.Unit.PX, 30, Style.Unit.PX);
 			kijkNaPanel.setWidgetTopHeight(foutKruisImage, -5, Style.Unit.PX, 25, Style.Unit.PX);
 		
 			kijkNaPanel.setWidgetVisible(goedKrulImage, false);
@@ -1072,6 +1080,10 @@ logger.info("GeomAlgGWT init");
 	  	geomAlgGWTCanvas.addTouchEndHandler(touchHandler);
 		
 		makeBottom();
+		
+		dlp.forceLayout();
+		canvasPanel.forceLayout();
+		bottomPanel.forceLayout();
 		
 		paint();
 

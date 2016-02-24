@@ -21,6 +21,10 @@
   <!--  <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
 
+  <extend-property name="locale" values="en"/>
+  <extend-property name="locale" values="de"/>
+  <extend-property name="locale" values="fr"/>
+    
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
 

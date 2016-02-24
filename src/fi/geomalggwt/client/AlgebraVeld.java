@@ -150,15 +150,15 @@ String[] testStrings = new String[30];
 	
 		
 		menuBar = new MenuBar(true);
-		menuBar.addItem("Draai", new MenuCommand("draai"));
-		menuBar.addItem("Kopieer", new MenuCommand("kopieer"));
+		menuBar.addItem(GeomAlgGWT.rb.menuDraaiLabel(), new MenuCommand("draai"));
+		menuBar.addItem(GeomAlgGWT.rb.menuKopieerLabel(), new MenuCommand("kopieer"));
 		menuBar.addSeparator();
-		menuBar.addItem("Splits", new MenuCommand("splits"));
-		menuBar.addItem("Splits volledig", new MenuCommand("splitsvolledig"));
-		menuBar.addItem("Voeg samen", new MenuCommand("voegsamen"));
+		menuBar.addItem(GeomAlgGWT.rb.menuSplitsLabel(), new MenuCommand("splits"));
+		menuBar.addItem(GeomAlgGWT.rb.menuSplitsVolledigLabel(), new MenuCommand("splitsvolledig"));
+		menuBar.addItem(GeomAlgGWT.rb.menuVoegSamenLabel(), new MenuCommand("voegsamen"));
 		menuBar.addSeparator();
-		menuBar.addItem("Maak los", new MenuCommand("maaklos"));
-		menuBar.addItem("Maak alles los", new MenuCommand("maakalleslos"));
+		menuBar.addItem(GeomAlgGWT.rb.menuMaakLosLabel(), new MenuCommand("maaklos"));
+		menuBar.addItem(GeomAlgGWT.rb.menuMaakAllesLosLabel(), new MenuCommand("maakalleslos"));
 
 /* GWT
   		
@@ -439,7 +439,8 @@ gIm.setFillStyle(CssColor.make(255, 0, 0));
 				oppString = UF.format(oppervlakte, 2);
 			else
 				oppString = UF.format(oppervlakte, 0);
-			gIm.fillText("opp = " + oppString, breedte - 120, 20);
+			//gIm.fillText("opp = " + oppString, breedte - 120, 20);
+			gIm.fillText(GeomAlgGWT.rb.oppervlakteLabel()+ " = " + oppString, breedte - 120, 20);
 			
 		}
 		if (varWaardeZichtbaar)
@@ -498,7 +499,8 @@ gIm.setFillStyle(CssColor.make(255, 0, 0));
 		if (maakLos)
 		{	//gIm.drawString(GeomAlgebra.rb.getString("menuMLLabel"), cursorx, cursory + 30);
 //GWT geen cursorx			
-			gIm.fillText("Maak los", 50, 50);
+			//gIm.fillText("Maak los", 50, 50);
+			gIm.fillText(GeomAlgGWT.rb.menuMaakLosLabel(), 50, 50);
 		}
 	}
 	
