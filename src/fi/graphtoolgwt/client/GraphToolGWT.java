@@ -957,8 +957,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return points;
 	}
 	
-	public int addInsert(RealPoint newRP)//, boolean docent)
-	{	int pIndex = -1;
+	public int addInsert(RealPoint newRP)  { //, boolean docent) 	
+		if (!grafiekGWTVeld.valuePointWithinBounds(newRP.getX(), newRP.getY())) {
+			return (-1);
+		}
+
+		int pIndex = -1;
 		boolean firstFound = false;
 		
 		for(int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
