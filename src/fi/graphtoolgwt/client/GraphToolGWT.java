@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -36,6 +37,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -86,6 +88,7 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
 
 import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.Letter;
 import fi.wiskopdr.expressies.Algebra;
 import fi.wiskopdr.expressies.Expressie;
 import fi.wiskopdr.expressies.repr.ContentMathML;
@@ -815,7 +818,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	public void updateXAsNaam(String text)
 	{	String[] forbiddenStrings = {"sin","cos","tan","ln","log"};
-		if(text.length()>0 && !Character.isLetter(text.charAt(0)))
+		if(text.length()>0 && !Letter.isLetter(text.charAt(0)))
 		{	//JOptionPane.showMessageDialog(WiskOpdr.applet, WiskOpdr.rb.getString("xVarMessage1"));
 			DialogBox box = new DialogBox();
 			box.setText(rb.getString("xVarMessage1"));
