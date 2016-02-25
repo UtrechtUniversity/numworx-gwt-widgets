@@ -296,11 +296,11 @@ public class GrafiekGWTVeld {
 		int bx = (int)Math.round(interactiePanel.beginx);			
 		int by = (int)Math.round(interactiePanel.beginy);
 		
-		if (by < drawYmin + cFontHeight + 2 * cExtraAxisMarge) {
+		if (interactiePanel.schaalX && (by < drawYmin + cFontHeight + 2 * cExtraAxisMarge) ) {
 			drawYmax =  drawYmax - cFontHeight - 2 * cExtraAxisMarge; 
 			drawXAxis = false;
 		}
-		if (by > hoogte) {
+		if (interactiePanel.schaalX && (by > hoogte) ) {
 			drawYmin = drawYmin + cFontHeight + 2 * cExtraAxisMarge;
 			drawXAxis = false;
 		}
@@ -376,16 +376,12 @@ public class GrafiekGWTVeld {
 				}
 				
 			}
-			if (bx < drawXmin + maxWoordBreedteY + 2 * cExtraAxisMarge) {
+			if (interactiePanel.schaalY && (bx < drawXmin + maxWoordBreedteY + 2 * cExtraAxisMarge) ){
 				drawXmin = drawXmin + maxWoordBreedteY + 2 * cExtraAxisMarge;
 				drawYAxis = false;
 			}
 			
-//			if (bx > drawXmax - maxWoordBreedteY - cExtraAxisMarge) {
-//				drawYAxis = (bx <= breedte );
-//				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMarge; 
-//			}
-			if (bx > breedte) {
+			if (interactiePanel.schaalY && (bx > breedte) ) {
 				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMarge; 
 				drawYAxis = false;
 			}
