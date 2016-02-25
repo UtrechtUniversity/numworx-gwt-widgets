@@ -792,8 +792,7 @@ public class GrafiekGWTVeld {
 						
 						for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
 							expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
-						}
-						
+						}						
 						
 						gIm.setStrokeStyle(grijs);
 						gIm.setFillStyle(grijs);
