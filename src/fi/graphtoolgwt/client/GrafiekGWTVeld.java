@@ -587,7 +587,7 @@ public class GrafiekGWTVeld {
 		}
 
 		if (interactiePanel.piLijnenZichtbaar) {
-			double rangeX = pixelsXtoValue(drawXmax)-pixelsXtoValue(drawXmin);
+			double rangeX = pixelsXtoValue(breedte)-pixelsXtoValue(0);
 			long piMultiplier = 1;
 			if ( rangeX/(Math.PI*piMultiplier)>(double) cMaxPiLinesOnScreen) {
 				piMultiplier = (long) Math.ceil(rangeX/((cMaxPiLinesOnScreen)*Math.PI));
@@ -1136,24 +1136,8 @@ public class GrafiekGWTVeld {
 			
 			}
 
-//			if(index == interactiePanel.getActiveIndex() && !docent && pix != null)// && tekenComponent.getCursorMode() != tekenComponent.NOCUR)
-//			{	g.beginPath();
-//				g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD + 1, 0, 2* Math.PI);
-//				g.closePath();
-//				g.fill();
-//				//g.stroke();
-//			}
-//			else if (pix != null)
-//			{	g.beginPath();
-//				g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD, 0, 2* Math.PI);
-//				g.closePath();
-//				g.fill();
-//				//g.stroke();
-//			}
 		}
 		// verbinden met lijnen
-		//if ((tekenComponentAan && tekenComponent.getConnectMode() == tekenComponent.LINES) &&
-		  //  (indexPoints.size() > 1))
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.LINES 
 				&& indexPoints.size() > 1)
 		{	RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
@@ -1169,22 +1153,14 @@ public class GrafiekGWTVeld {
 			}
 		}
 		
-		//if ((tekenComponentAan && tekenComponent.getConnectMode() == tekenComponent.CURVE) &&
-		//    (indexPoints.size() == 2))
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE 
 				&& indexPoints.size() == 2)
 		{	RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
 			RealPoint rp1 = (RealPoint) indexPoints.elementAt(1);
 			Point pix0 = interactiePanel.realPointToPixels(rp0);
 			Point pix1 = interactiePanel.realPointToPixels(rp1);
-//			g.beginPath();
-//			g.moveTo(pix0.getX(), pix0.getY());
-//			g.lineTo(pix1.getX(), pix1.getY());
-//			g.stroke();
 			drawLineWithinVisibleBounds(g, pix0.getX(), pix0.getY(), pix1.getX(), pix1.getY());
 		}    
-		//if ((tekenComponentAan && tekenComponent.getConnectMode() == tekenComponent.CURVE) &&
-		//	    (indexPoints.size() > 2))
 			
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE 
 				&& indexPoints.size() > 2) {	
@@ -1216,7 +1192,6 @@ public class GrafiekGWTVeld {
 			Point eindPuntPix = interactiePanel.realPointToPixels(eindPunt);
 			eindPuntPix = new Point( Math.min(eindPuntPix.getX(), drawXmax), eindPuntPix.getY());
 			
-//			for(int i= (int) Math.max(0, beginPuntPix.getX()); i < Math.min(breedte, eindPuntPix.getX()) ; i++) {
 			if(beginPuntPix != null && eindPuntPix != null) {	
 				for(int i=(int) beginPuntPix.getX(); i < eindPuntPix.getX(); i++) {	
 					double ii = i;
@@ -1253,17 +1228,11 @@ public class GrafiekGWTVeld {
 							g.lineTo((float)x1, (float)dy1);						
 						}
 					}
-					
-//						g.moveTo((float)x0, (float)dy0);
-//					
-//						if(!interactiePanel.yPositief || d1>0) {	
-//							g.lineTo((float)x1, (float)dy1);						
-//						}
 				}
 			}
 			g.stroke();
 //			}
-//			else
+//			else :: OLD Code :: Drawing the curve using cubic curves (not possible anymore because not the whole screen is used anymore)
 //			{	
 //				// het punt voor het startpunt p0, if any
 //				RealPoint p00 = null;
@@ -1396,83 +1365,8 @@ public class GrafiekGWTVeld {
 			double y1Pix = valueYtoPixels(rp1.getY()) + helling * (x1Pix - valueXtoPixels(rp1.getX()));
 			
 			drawLineWithinVisibleBounds(g, (int) x0Pix, (int) y0Pix, (int) x1Pix, (int) y1Pix);		
-
-			
-//			double helling = ((interactiePanel.yAsLog?Math.log10(rp1.getY()):rp1.getY()) - (interactiePanel.yAsLog?Math.log10(rp0.getY()):rp0.getY()))/
-//					((interactiePanel.xAsLog?Math.log10(rp1.getX()):rp1.getX()) - (interactiePanel.xAsLog?Math.log10(rp0.getX()):rp0.getX()));
-////			double linkerGrens = interactiePanel.xPositief?0:(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-//			double linkerGrens;
-//			if (interactiePanel.manualScalingX) {
-//				linkerGrens = interactiePanel.xPositief?0:(interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-//			}	
-//			else {
-//				linkerGrens = interactiePanel.xPositief?0:(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-//			}
-//
-//			double xLinks = interactiePanel.xAsLog?Math.pow(10, linkerGrens):linkerGrens;
-//			double yLinks = interactiePanel.yAsLog?Math.pow(10, helling * (linkerGrens - (interactiePanel.xAsLog?Math.log10(rp0.getX()):rp0.getX())) + (interactiePanel.yAsLog?Math.log10(rp0.getY()):rp0.getY())):
-//				(helling * (linkerGrens - (interactiePanel.xAsLog?Math.log10(rp0.getX()):rp0.getX())) + (interactiePanel.yAsLog?Math.log10(rp0.getY()):rp0.getY()));
-//			
-//			double ii2 = breedte;
-////			double rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
-//			double rechterGrens;
-//			if (interactiePanel.manualScalingX) {
-//				rechterGrens = interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.eenheidxValue*ii2/interactiePanel.eenheidxD;
-//			} else {
-//				rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
-//			}
-//			double xRechts = interactiePanel.xAsLog?Math.pow(10,rechterGrens):rechterGrens;
-//			double yRechts = interactiePanel.yAsLog?Math.pow(10, helling * (rechterGrens - (interactiePanel.xAsLog?Math.log10(rp0.getX()):rp0.getX())) + (interactiePanel.yAsLog?Math.log10(rp0.getY()):rp0.getY())):
-//				(helling * (rechterGrens - (interactiePanel.xAsLog?Math.log10(rp0.getX()):rp0.getX())) + (interactiePanel.yAsLog?Math.log10(rp0.getY()):rp0.getY())); 
-//			
-//			RealPoint linkerPunt = new RealPoint(xLinks, yLinks);
-//			RealPoint rechterPunt = new RealPoint(xRechts, yRechts);
-//			
-//			Point pix0 = interactiePanel.realPointToPixels(linkerPunt);
-//			Point pix1 = interactiePanel.realPointToPixels(rechterPunt);
-////			g.beginPath();
-////			g.moveTo(pix0.getX(), pix0.getY());
-////			g.lineTo(pix1.getX(), pix1.getY());
-////			g.stroke();
-//			drawLineWithinVisibleBounds(g, pix0.getX(), pix0.getY(), pix1.getX(), pix1.getY());
-
-			
-			/*
-			Graphics2D g2D = (Graphics2D) g;
-			g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-			
-			
-			
-			
-			GeneralPath curve = new GeneralPath();
-			double[] weights = berekenGewichten(indexPoints);
-			for(int i=Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0) ; i<breedte ; i++)
-			{	double ii = i;
-				double d0 = berekenLagrangeY(indexPoints, interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii
-					/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii/interactiePanel.eenheidxD, weights);
-				double d1 = berekenLagrangeY(indexPoints, interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)
-						/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)/interactiePanel.eenheidxD, weights);
-				int x0 = i;
-				int x1 = i+1;
-				double dy0 = hoogte -(interactiePanel.beginy+interactiePanel.eenheidyD*(interactiePanel.yAsLog?Math.log10(d0):d0)/interactiePanel.schaalFactorY);
-				double dy1 = hoogte -(interactiePanel.beginy+interactiePanel.eenheidyD*(interactiePanel.yAsLog?Math.log10(d1):d1)/interactiePanel.schaalFactorY);
-				if(dy0>1000)dy0 = 1000;
-				if(dy0<-1000)dy0 = -1000;
-				if(dy1>1000)dy1 = 1000;
-				if(dy1<-1000)dy1 = -1000;
-				
-				if(curve.getCurrentPoint()==null)
-				{	curve.moveTo((float)x0, (float)dy0);
-				}
-				if(!interactiePanel.yPositief || d1>0) 
-				{	curve.lineTo((float)x1, (float)dy1);						
-				}
-			}
-			g2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_PURE);
-			g2D.setStroke(new BasicStroke(1.2f));
-			g2D.draw(curve);
-			*/
 		}
+		
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE_EXTRA 
 				&& indexPoints.size() > 2) {	//Graphics2D g2D = (Graphics2D) g;
 			//g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -1494,7 +1388,6 @@ public class GrafiekGWTVeld {
 			
 			g.beginPath();
 			double[] weights = berekenGewichten(indexPoints);
-//			for(int i=Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0) ; i<breedte ; i++) {	
 			for(int i=drawXmin ; i<drawXmax ; i++) {	
 				double ii = i;
 				double d0 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii), weights);
@@ -1530,17 +1423,10 @@ public class GrafiekGWTVeld {
 						g.lineTo((float)x1, (float)dy1);						
 					}
 				}
-
-					
-//				g.moveTo((float)x0, (float)dy0);
-//				
-//				if(!interactiePanel.yPositief || d1>0) {	
-//					g.lineTo((float)x1, (float)dy1);						
-//				}
 			}
 			g.stroke();
 //			}
-//			else
+//			else :: OLD Code :: Drawing the curve using cubic curves (not possible anymore because not the whole screen is used anymore)
 //			{	
 //				// het punt voor het startpunt p0, if any
 //				RealPoint p00 = null; 

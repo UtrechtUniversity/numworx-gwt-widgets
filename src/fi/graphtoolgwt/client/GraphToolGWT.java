@@ -2401,15 +2401,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		
 		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
 		
-		if (!tekenComponentAan) {
-			// Omdat de tekencomponent altijd geactiveerd is (ook als deze niet wordt gebruikt) moeten we ::
-			// In het geval dat de default cursor-mode van de tekencomponent niet de standaard-default is ::
-			// de gezette cursor verwijderen wanneer de tekenComponent niet wordt gebruikt
-			String styleString = grafiekGWTVeld.grafiekGWTCanvas.getStyleName();
-			if (!styleString.isEmpty()) {
-				grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(styleString);
-			}
-		}
+//		if (!tekenComponentAan) {
+//			// Omdat de tekencomponent altijd geactiveerd is (ook als deze niet wordt gebruikt) moeten we ::
+//			// In het geval dat de default cursor-mode van de tekencomponent niet de standaard-default is ::
+//			// de gezette cursor verwijderen wanneer de tekenComponent niet wordt gebruikt
+//			String styleString = grafiekGWTVeld.grafiekGWTCanvas.getStyleName();
+//			if (!styleString.isEmpty()) {
+//				grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(styleString);
+//			}
+//		}
 		
 	}
 
