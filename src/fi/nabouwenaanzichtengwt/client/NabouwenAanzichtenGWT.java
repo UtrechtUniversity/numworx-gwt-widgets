@@ -506,7 +506,10 @@ System.out.println("rood");
 	{
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
-
+		CssColor background = comRoot.getBackground();
+		panel.getElement().getStyle().setBackgroundColor(background.value());
+		vWerk.zetAchtergrond(background);
+		vWerk.tekenOpnieuw();
 	}
 	
 	public void zetMode(int mode)
@@ -993,7 +996,10 @@ logger.info("TekenVeelvlakGWT init");
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		this.breedte = breedte;
+		if(this.breedte != breedte) {
+			this.breedte = breedte;
+			// relayout!
+		}
 		
 	}
 
