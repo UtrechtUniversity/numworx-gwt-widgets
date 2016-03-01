@@ -26,7 +26,10 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Image;
 
+import java.util.logging.Logger;
+
 public class TekenComponentGWT extends LayoutPanel {
+//	private static Logger logger = Logger.getLogger("TekenComponentGWT");
 
 	// cursor
 	public static int NOCUR = 0; 
@@ -603,22 +606,32 @@ public class TekenComponentGWT extends LayoutPanel {
 	public void setState(Map<String, Object> launchState) {	
 		int connectMode = cDefault_connectMode;
 		int cursorMode =  cDefault_cursorMode;
-		boolean tekenComponentAan = true;
-		if(launchState != null)
-		{	if(launchState.containsKey("connectMode"))
+		boolean tekenComponentAan = GraphToolGWT.cDefault_tekenComponentAan;
+		
+		if(launchState != null) {	
+			if(launchState.containsKey("connectMode")) {
 				connectMode = ((Number)launchState.get("connectMode")).intValue();
-			if(launchState.containsKey("cursorMode"))
+			}
+			if(launchState.containsKey("cursorMode")) {
 				cursorMode = ((Number)launchState.get("cursorMode")).intValue();
-			if(launchState.containsKey("tekenComponentAan"))
+			}
+			if(launchState.containsKey("tekenComponentAan")) {
 				tekenComponentAan = Boolean.TRUE.equals(launchState.get("tekenComponentAan"));
+			} else { // if not in State then take the already existing value of the parent
+				tekenComponentAan = interactiePanel.tekenComponentAan;
+			}
 			
 			this.connectMode = connectMode;
 			this.cursorMode = cursorMode;
 			
 		}
-		if(tekenComponentAan)
-		{ 	setConnectMode(this.connectMode);
+		if(tekenComponentAan) { 	
+			setConnectMode(this.connectMode);
 			setCursorMode(this.cursorMode);
+		}
+		else {
+			setConnectMode(-1);
+			setCursorMode(-1);
 		}
 	}
 	

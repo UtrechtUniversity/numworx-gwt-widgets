@@ -102,8 +102,9 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-//	private static Logger logger = Logger.getLogger("GraphTool");
+//	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	final static int cSelectMarge = 5;
+	final static boolean cDefault_tekenComponentAan = false;
 
 	public static Text_nl rb = new Text_nl();
 
@@ -254,7 +255,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean parametrisatieToegestaan = false;
 	
 	boolean formuleComponentAan = true;
-	boolean tekenComponentAan = true;
+	boolean tekenComponentAan = cDefault_tekenComponentAan;
 	//voor testen tabelcomponent: 
 	//boolean tabelComponentAan = true;
 	//standaard:
@@ -2388,6 +2389,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     	//zetXAsNaam(xAsNaam, true);
     	//zetYAsNaam(yAsNaam, true);
 		tabelComponent.setState(h);
+
 		tekenComponent.setState(h);
 		formuleComponent.setState(h, null, null);
 		setActiveIndex(activeIndex, true);
@@ -2400,16 +2402,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		fromuser = true;
 		
 		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
-		
-//		if (!tekenComponentAan) {
-//			// Omdat de tekencomponent altijd geactiveerd is (ook als deze niet wordt gebruikt) moeten we ::
-//			// In het geval dat de default cursor-mode van de tekencomponent niet de standaard-default is ::
-//			// de gezette cursor verwijderen wanneer de tekenComponent niet wordt gebruikt
-//			String styleString = grafiekGWTVeld.grafiekGWTCanvas.getStyleName();
-//			if (!styleString.isEmpty()) {
-//				grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(styleString);
-//			}
-//		}
 		
 	}
 
