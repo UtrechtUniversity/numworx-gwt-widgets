@@ -50,6 +50,9 @@ import fi.statistiekgwt.client.types.ColumnType;
  */
 public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditColumnEventHandler, ViewSelectionChangeEventHandler
 {
+	private static final int WILDCARD = -2;
+	private static final int OUTLIER = -3;
+
 	private boolean isHTML5Ready = false;
 	private int rowCount;
 	private int columnCount;
@@ -531,9 +534,16 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		else
 		{
-			return this.classifyObject(
-				(String) this.getValueAt(rowIndex, columnIndex), columnIndex,
-				binBoundaries);
+			if (this.isOutlier(rowIndex, columnIndex))
+			{
+				return StatTableModel.OUTLIER;
+			}
+			else
+			{
+				return this.classifyObject(
+					(String) this.getValueAt(rowIndex, columnIndex), columnIndex,
+					binBoundaries);
+			}
 		}
 	}
 
@@ -557,7 +567,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		if (ColumnType.WILDCARD.equals(value))
 		{
-			return -2;
+			return StatTableModel.WILDCARD;
 		}
 
 		ColumnType cType = this.getColumnTypes().get(columnIndex);
@@ -943,7 +953,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	{
 		boolean b = false;
 		
-		if (this.cellOutlierList.size() > 0)
+		if ((this.cellOutlierList.size() > 0) && (this.cellOutlierList.get(0).size() > 0))
 			b = this.cellOutlierList.get(columnIndex).get(rowIndex);
 		
 		return b;
@@ -1703,7 +1713,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			for (int i = 0; i < this.rowCount; i++)
 			{
 				Object o = this.getValueAt(i, columnIndex);
-				if (!o.equals(ColumnType.WILDCARD))
+				if (!o.equals(ColumnType.WILDCARD)
+					&& !this.isOutlier(i, columnIndex))
 				{
 					Double d = Double.parseDouble((String) o);
 					if (d < min)
@@ -1755,7 +1766,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (this.selectionList.get(i))
 				{
 					Object o = this.getValueAt(i, columnIndex);
-					if (!o.equals(ColumnType.WILDCARD))
+					if (!o.equals(ColumnType.WILDCARD)
+						&& !this.isOutlier(i, columnIndex))
 					{
 						Double d = Double.parseDouble((String) o);
 						if (d < min)
@@ -1800,7 +1812,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			for (int i = 0; i < this.rowCount; i++)
 			{
 				Object o = this.getValueAt(i, columnIndex);
-				if (!o.equals(ColumnType.WILDCARD))
+				if (!o.equals(ColumnType.WILDCARD)
+					&& !this.isOutlier(i, columnIndex))
 				{
 					Double d = Double.parseDouble((String) o);
 					if (d > max)
@@ -1853,7 +1866,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (this.selectionList.get(i)) // only process the selected items
 				{
 					Object o = this.getValueAt(i, columnIndex);
-					if (!o.equals(ColumnType.WILDCARD))
+					if (!o.equals(ColumnType.WILDCARD)
+						&& !this.isOutlier(i, columnIndex))
 					{
 						Double d = Double.parseDouble((String) o);
 						if (d > max)
@@ -1898,7 +1912,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		for (int i = 0; i < this.rowCount; i++)
 		{
 			Object o = this.getValueAt(i, columnIndex);
-			if (!o.equals(ColumnType.WILDCARD))
+			if (!o.equals(ColumnType.WILDCARD)
+				&& !this.isOutlier(i, columnIndex))
 			{
 				Double d = Double.parseDouble((String) o);
 				sum += d;
@@ -1944,7 +1959,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (this.selectionList.get(i))
 				{
 					Object o = this.getValueAt(i, columnIndex);
-					if (!o.equals(ColumnType.WILDCARD))
+					if (!o.equals(ColumnType.WILDCARD)
+						&& !this.isOutlier(i, columnIndex))
 					{
 						Double d = Double.parseDouble((String) o);
 						sum += d;
@@ -1994,7 +2010,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (this.selectionList.get(i))
 				{
 					Object o = this.getValueAt(i, columnIndex);
-					if (!o.equals(ColumnType.WILDCARD))
+					if (!o.equals(ColumnType.WILDCARD)
+						&& !this.isOutlier(i, columnIndex))
 					{
 						Double d = Double.parseDouble((String) o);
 						sum += d;
@@ -2038,7 +2055,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		for (int i = 0; i < this.rowCount; i++)
 		{
 			Object o = this.getValueAt(i, columnIndex);
-			if (!o.equals(ColumnType.WILDCARD))
+			if (!o.equals(ColumnType.WILDCARD)
+				&& !this.isOutlier(i, columnIndex))
 			{
 				Double d = Double.parseDouble((String) o);
 				sum += Math.pow(d - mean, 2);
@@ -2081,7 +2099,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			if (this.selectionList.get(i))
 			{
 				Object o = this.getValueAt(i, columnIndex);
-				if (!o.equals(ColumnType.WILDCARD))
+				if (!o.equals(ColumnType.WILDCARD)
+					&& !this.isOutlier(i, columnIndex))
 				{
 					Double d = Double.parseDouble((String) o);
 					sum += Math.pow(d - mean, 2);
@@ -2123,7 +2142,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		for (int i = 0; i < this.getRowCount(); i++)
 		{
 			String valueString = (String) this.getValueAt(i, columnIndex);
-			if (!valueString.equals(ColumnType.WILDCARD))
+			if (!valueString.equals(ColumnType.WILDCARD)
+				&& !this.isOutlier(i, columnIndex))
 			{
 				// get the value
 				Double d = Double.parseDouble(valueString);
@@ -2188,7 +2208,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			if (this.selectionList.get(i))
 			{
 				String valueString = (String) this.getValueAt(i, columnIndex);
-				if (!valueString.equals(ColumnType.WILDCARD))
+				if (!valueString.equals(ColumnType.WILDCARD)
+					&& !this.isOutlier(i, columnIndex))
 				{
 					// get the value
 					Double d = Double.parseDouble(valueString);
@@ -2247,7 +2268,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			for (int i = 0; i < this.rowCount; i++)
 			{
 				String valueString = (String) this.getValueAt(i, columnIndex);
-				if (!valueString.equals(ColumnType.WILDCARD))
+				if (!valueString.equals(ColumnType.WILDCARD)
+					&& !this.isOutlier(i, columnIndex))
 				{
 					// get the value
 					Double d = Double.parseDouble(valueString);
@@ -2351,7 +2373,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				if (this.selectionList.get(i))
 				{
 					String valueString = (String) this.getValueAt(i, columnIndex);
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&& !this.isOutlier(i, columnIndex))
 					{
 						// get the value
 						Double d = Double.parseDouble(valueString);
@@ -2662,7 +2685,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			for (int i = 0; i < this.getRowCount(); i++)
 			{
 				Object o = this.getValueAt(i, columnIndex);
-				if (!ColumnType.WILDCARD.equals(o))
+				if (!ColumnType.WILDCARD.equals(o)
+					&& !isOutlier(i, columnIndex)) // check for outliers
 				{
 					Double d = Double.parseDouble((String) o);
 					int bin = -1;
@@ -3229,7 +3253,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		for (int i = 0; i < this.rowCount; i++)
 		{
 			Object o = this.getValueAt(i, columnIndex);
-			if (!o.equals(ColumnType.WILDCARD))
+			if (o!=null && !o.equals(ColumnType.WILDCARD)
+				&& !this.isOutlier(i, columnIndex))
 			{
 				count++;
 			}
