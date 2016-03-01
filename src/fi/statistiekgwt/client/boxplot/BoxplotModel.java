@@ -354,7 +354,8 @@ public class BoxplotModel
 			{
 				String valueString = (String) this.statTableModel.getValueAt(i,
 					columnIndex);
-				if (!valueString.equals(ColumnType.WILDCARD))
+				if (!valueString.equals(ColumnType.WILDCARD)
+					&& !this.getStatTableModel().isOutlier(i, columnIndex))
 				{
 					// get the value
 					Double d = Double.parseDouble(valueString);
@@ -419,7 +420,9 @@ public class BoxplotModel
 				String valueSplitString = (String) this.statTableModel.getValueAt(
 					i, this.splitOptions.getColumnSplitIndex());
 				if (!valueSplitString.equals(ColumnType.WILDCARD)
-					&& !valueString.equals(ColumnType.WILDCARD))
+					&& !valueString.equals(ColumnType.WILDCARD)
+					&& !this.getStatTableModel().isOutlier(i, columnIndex)
+					&& !this.getStatTableModel().isOutlier(i, this.splitOptions.getColumnSplitIndex()))
 				{
 					// get the value
 					Double d = Double.parseDouble(valueString);

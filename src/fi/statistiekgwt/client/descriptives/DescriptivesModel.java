@@ -314,7 +314,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 		
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&& !this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						
@@ -456,7 +457,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 	
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&&!this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						
@@ -505,7 +507,7 @@ public class DescriptivesModel
 	 */
 	public String getColumnMax(int columnIndex, int splitClass, boolean forSelection)
 	{
-		double max;
+//		double max;
 		String maxString = null;
 
 		AllowedTypes type = this.statTableModel.getColumnTypes().get(columnIndex).getType();
@@ -545,7 +547,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 	
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&& !this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						
@@ -596,7 +599,7 @@ public class DescriptivesModel
 	 */
 	public String getColumnMean(int columnIndex, int splitClass, boolean forSelection)
 	{
-		double mean;
+//		double mean;
 		String meanString = null;
 
 		AllowedTypes type = this.statTableModel.getColumnTypes().get(columnIndex).getType();
@@ -637,7 +640,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 	
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&&!this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						
@@ -727,7 +731,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 	
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&&!this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						
@@ -777,7 +782,7 @@ public class DescriptivesModel
 		String sdString = null;
 		String notAvailable = StatistiekGWT.rb.getString("notAvailable");
 
-		double sd;
+//		double sd;
 		AllowedTypes type = this.statTableModel.getColumnTypes().get(columnIndex).getType();
 		int splitColumnIndex = this.splitOptions.getColumnSplitIndex();
 		
@@ -827,7 +832,8 @@ public class DescriptivesModel
 						valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 						splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 		
-						if (!valueString.equals(ColumnType.WILDCARD))
+						if (!valueString.equals(ColumnType.WILDCARD)
+							&& !this.getStatTableModel().isOutlier(i, columnIndex))
 						{
 							valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 							
@@ -914,7 +920,8 @@ public class DescriptivesModel
 					valueString = (String) this.statTableModel.getValueAt(i, columnIndex);
 					splitValueString = (String) this.statTableModel.getValueAt(i, splitColumnIndex);
 		
-					if (!valueString.equals(ColumnType.WILDCARD))
+					if (!valueString.equals(ColumnType.WILDCARD)
+						&& !this.getStatTableModel().isOutlier(i, columnIndex))
 					{
 						valueInSplit = this.isValueInSplit(splitValueString, splitType, splitClass);
 						

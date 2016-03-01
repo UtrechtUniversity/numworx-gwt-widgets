@@ -44,6 +44,8 @@ import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.CustomScrollPanel;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -64,7 +66,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author borku102
  *
  */
-public class HistogramView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+public class HistogramView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, 
+	OutlierChangeEventHandler, HasHandlers
 {
 	private HistogramModel model;
 	private HistogramController controller;
@@ -123,6 +126,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	/**
 	 * The number of the highlighted bar, or for frequency polygons the
@@ -162,6 +170,9 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 		// bind histogramview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		
+		// bind histogramview to stattablemodel: to handle outlier changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 		
 		// create GUI
 		this.mainPanel = new HistogramBarPanel(); // histogrambarpanel heeft een canvas met mousemovehandler
@@ -4361,6 +4372,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 	
 	/**
@@ -4374,6 +4386,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		int number = binBoundaries.size() - 1;
 
 		return number;
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 
 //	@Override

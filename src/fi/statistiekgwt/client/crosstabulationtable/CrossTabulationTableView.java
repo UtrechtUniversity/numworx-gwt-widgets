@@ -34,6 +34,8 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -50,7 +52,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Sylvia van Borkulo
  * 
  */
-public class CrossTabulationTableView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+public class CrossTabulationTableView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, 
+	OutlierChangeEventHandler, HasHandlers
 {
 	private CrossTabulationTableModel model;
 	private CrossTabulationTableController controller;
@@ -145,6 +148,11 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -174,11 +182,14 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
 		this.eventBus = StatistiekUtils.EVENT_BUS;
 		
-		// bind frequencytableview to stattablemodel: to handle table changes in stattablemodel
+		// bind crosstabulationtableview to stattablemodel: to handle table changes in stattablemodel
 		this.tableChangeEventHandlerRegistration = this.model.getStatTableModel().addTableChangeEventHandler(this);
 
-		// bind frequencytableview to stattablemodel: to handle selection changes in stattablemodel
+		// bind crosstabulationtableview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		
+		// bind crosstabulationtableview to stattablemodel: to handle outlier changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 		
 		// create GUI
 		this.mainPanel = new FlowPanel();
@@ -1314,6 +1325,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 
 	/**
@@ -1388,6 +1400,12 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 				this.setModel(this.model);
 			}
 		}
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 
 }

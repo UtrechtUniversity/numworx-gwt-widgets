@@ -28,6 +28,8 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -44,7 +46,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Sylvia van Borkulo
  * 
  */
-public class DescriptivesView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+public class DescriptivesView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, 
+	OutlierChangeEventHandler, HasHandlers
 {
 	private DescriptivesModel model;
 	private DescriptivesController controller;
@@ -174,6 +177,11 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -209,6 +217,9 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 		// bind descriptivesview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+
+		// bind descriptivesview to stattablemodel: to handle selection changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 
 		// create GUI
 		this.mainPanel = new FlowPanel();
@@ -479,7 +490,8 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	}
 
 	/**
-	 * Get the number of cases for the given splitClass. 
+	 * Get the number of cases for the given splitClass,
+	 * excluding wildcards and outliers. 
 	 * 
 	 * @param selection
 	 * 		If selection is 0, the number of cases for the splitClass is returned.
@@ -744,14 +756,17 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		int integerPlaces, decimalPlaces;
 		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
 		{
-			numberString = String.valueOf(this.model.getStatTableModel().getValueAt(i, columnIndex));
-			integerPlaces = numberString.indexOf('.');
-			if (integerPlaces > -1)
+			if (!this.model.getStatTableModel().isOutlier(i, columnIndex))
 			{
-				decimalPlaces = numberString.length() - integerPlaces - 1;
-				if (decimalPlaces > max)
+				numberString = String.valueOf(this.model.getStatTableModel().getValueAt(i, columnIndex));
+				integerPlaces = numberString.indexOf('.');
+				if (integerPlaces > -1)
 				{
-					max = decimalPlaces;
+					decimalPlaces = numberString.length() - integerPlaces - 1;
+					if (decimalPlaces > max)
+					{
+						max = decimalPlaces;
+					}
 				}
 			}
 		}
@@ -1159,6 +1174,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 	
 	/**
@@ -1167,5 +1183,11 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	public DescriptivesUserOptionsPanel getUserOptionsPanel()
 	{
 		return userOptionsPanel;
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 }

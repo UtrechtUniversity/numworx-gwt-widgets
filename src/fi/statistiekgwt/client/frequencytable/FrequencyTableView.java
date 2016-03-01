@@ -33,6 +33,8 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -49,7 +51,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class FrequencyTableView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+public class FrequencyTableView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, 
+	OutlierChangeEventHandler, HasHandlers
 {
 	private FrequencyTableModel model;
 	private FrequencyTableController controller;
@@ -108,6 +111,11 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -142,6 +150,9 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 
 		// bind frequencytableview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		
+		// bind frequencytableview to stattablemodel: to handle outlier changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 		
 		this.mainPanel = new FlowPanel();
 		
@@ -1151,6 +1162,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 	
 	/**
@@ -1159,6 +1171,12 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	public FrequencyTableUserOptionsPanel getUserOptionsPanel()
 	{
 		return userOptionsPanel;
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 
 	

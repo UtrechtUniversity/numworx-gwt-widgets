@@ -31,6 +31,7 @@ import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
+
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.ColorLegend;
 import fi.statistiekgwt.client.ColorPreviewer;
@@ -44,6 +45,8 @@ import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.StatistiekUtils.CustomScrollPanel;
 import fi.statistiekgwt.client.event.ColorChangeEvent;
 import fi.statistiekgwt.client.event.ColorChangeEventHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -60,7 +63,8 @@ import fi.statistiekgwt.client.types.ColumnType;
  * 
  */
 public class DotplotView extends LayoutPanel implements 
-	TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers, ColorChangeEventHandler
+	TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers, ColorChangeEventHandler,
+	OutlierChangeEventHandler
 {
 	private DotplotModel model;
 	private DotplotController controller;
@@ -196,6 +200,11 @@ public class DotplotView extends LayoutPanel implements
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -229,6 +238,9 @@ public class DotplotView extends LayoutPanel implements
 
 		// bind dotplotview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+		
+		// bind dotplotview to stattablemodel: to handle outlier changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 		
 		// create GUI
 		this.mainPanel = new DotPanel();
@@ -929,7 +941,9 @@ public class DotplotView extends LayoutPanel implements
 	{
 		String valueString = (String) this.model.getStatTableModel().getValueAt(
 			pointIndex, this.model.getColumnXIndex());
-		if (valueString.equals(ColumnType.WILDCARD))
+		if (valueString==null 
+			|| valueString.equals(ColumnType.WILDCARD)
+			|| this.model.getStatTableModel().isOutlier(pointIndex, this.model.getColumnXIndex()))
 		{
 			return -1;
 		}
@@ -1092,7 +1106,9 @@ public class DotplotView extends LayoutPanel implements
 		String valueString = (String) this.model.getStatTableModel().getValueAt(
 			pointIndex, this.model.getColumnYIndex());
 
-		if (valueString.equals(ColumnType.WILDCARD))
+		if (valueString == null 
+			|| valueString.equals(ColumnType.WILDCARD)
+			|| this.model.getStatTableModel().isOutlier(pointIndex, this.model.getColumnYIndex()))
 		{
 			return -1;
 		}
@@ -2243,10 +2259,13 @@ public class DotplotView extends LayoutPanel implements
 		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
 		{
 			if (this.model.getStatTableModel()
+				.getValueAt(i, this.model.getColumnXIndex()) == null
+			|| this.model.getStatTableModel()
 				.getValueAt(i, this.model.getColumnXIndex())
-				.equals(ColumnType.WILDCARD))
+				.equals(ColumnType.WILDCARD)
+			|| this.model.getStatTableModel().isOutlier(i, this.model.getColumnXIndex()))
 			{
-				// skip wildcard objects
+				// skip wildcards and outliers
 				splitClasses[i] = -1;
 				continue;
 			}
@@ -2424,10 +2443,13 @@ public class DotplotView extends LayoutPanel implements
 		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
 		{
 			if (this.model.getStatTableModel()
+				.getValueAt(i, this.model.getColumnYIndex()) == null
+			|| this.model.getStatTableModel()
 				.getValueAt(i, this.model.getColumnYIndex())
-				.equals(ColumnType.WILDCARD))
+				.equals(ColumnType.WILDCARD)
+			|| this.model.getStatTableModel().isOutlier(i, this.model.getColumnYIndex()))
 			{
-				// skip wildcard cases
+				// skip wildcards and outliers
 				splitClasses[i] = -1;
 				continue;
 			}
@@ -2447,12 +2469,15 @@ public class DotplotView extends LayoutPanel implements
 
 			for (int j = 0; j < i; j++)
 			{
-				if (!this.model.getStatTableModel()
-					.getValueAt(j, this.model.getColumnYIndex())
-					.equals(ColumnType.WILDCARD)
+				if (this.model.getStatTableModel()
+						.getValueAt(j, this.model.getColumnYIndex()) != null
+					&& !this.model.getStatTableModel()
+						.getValueAt(j, this.model.getColumnYIndex())
+						.equals(ColumnType.WILDCARD)
+					&& !this.model.getStatTableModel().isOutlier(j, this.model.getColumnYIndex())
 					&& splitClasses[i] == splitClasses[j]
 					&& (Math.pow(coords[j][0] - x, 2) + Math.pow(coords[j][1]
-						- coords[i][1], 2)) < dotSizeSquared)
+							- coords[i][1], 2)) < dotSizeSquared)
 				{
 					// some other object is too close, so start over with
 					// smaller y
@@ -3013,10 +3038,19 @@ public class DotplotView extends LayoutPanel implements
 						// use the ordered indices so that selected dots will be drawn at last
 						int index = indexSortedOnSelected[i];
 	
-						if (!DotplotView.this.model
+//						if (!DotplotView.this.model
+//							.getStatTableModel()
+//							.getValueAt(index, DotplotView.this.model.getColumnXIndex())
+//							.equals(ColumnType.WILDCARD))
+						if (DotplotView.this.model
+							.getStatTableModel()
+							.getValueAt(index, DotplotView.this.model.getColumnXIndex()) != null
+						&& !DotplotView.this.model
 							.getStatTableModel()
 							.getValueAt(index, DotplotView.this.model.getColumnXIndex())
-							.equals(ColumnType.WILDCARD))
+							.equals(ColumnType.WILDCARD)
+						&& !DotplotView.this.model
+							.getStatTableModel().isOutlier(index, DotplotView.this.model.getColumnXIndex()))
 						{
 							int splitClass = DotplotView.this.getSplitClass(index);
 							if (DotplotView.this.model.splitInSingleView())
@@ -3140,10 +3174,19 @@ public class DotplotView extends LayoutPanel implements
 						// use the ordered indices so that selected dots will be drawn at last
 						int index = indexSortedOnSelected[i];
 	
-						if (!DotplotView.this.model
+//						if (!DotplotView.this.model
+//							.getStatTableModel()
+//							.getValueAt(index, DotplotView.this.model.getColumnYIndex())
+//							.equals(ColumnType.WILDCARD))
+						if (DotplotView.this.model
+							.getStatTableModel()
+							.getValueAt(index, DotplotView.this.model.getColumnYIndex()) != null
+						&& !DotplotView.this.model
 							.getStatTableModel()
 							.getValueAt(index, DotplotView.this.model.getColumnYIndex())
-							.equals(ColumnType.WILDCARD))
+							.equals(ColumnType.WILDCARD)
+						&& !DotplotView.this.model
+							.getStatTableModel().isOutlier(index, DotplotView.this.model.getColumnYIndex()))
 						{
 							int splitClass = DotplotView.this.getSplitClass(index);
 							if (DotplotView.this.model.splitInSingleView())
@@ -3345,6 +3388,7 @@ public class DotplotView extends LayoutPanel implements
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
 	}
 
 	/**
@@ -3367,5 +3411,11 @@ public class DotplotView extends LayoutPanel implements
 	public DotplotUserOptionsPanel getUserOptionsPanel()
 	{
 		return userOptionsPanel;
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 }

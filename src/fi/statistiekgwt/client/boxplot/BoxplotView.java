@@ -23,6 +23,8 @@ import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
 import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
+import fi.statistiekgwt.client.event.OutlierChangeEvent;
+import fi.statistiekgwt.client.event.OutlierChangeEventHandler;
 import fi.statistiekgwt.client.event.SelectionChangeEvent;
 import fi.statistiekgwt.client.event.SelectionChangeEventHandler;
 import fi.statistiekgwt.client.event.TableChangeEvent;
@@ -37,7 +39,8 @@ import fi.statistiekgwt.client.types.AllowedTypes;
  * @author ManuDrijvers, Sylvia van Borkulo
  * 
  */
-public class BoxplotView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, HasHandlers
+public class BoxplotView extends LayoutPanel implements TableChangeEventHandler, SelectionChangeEventHandler, 
+	HasHandlers, OutlierChangeEventHandler
 {
 	private BoxplotModel model;
 	private BoxplotController controller;
@@ -80,6 +83,11 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 	 * selection change event handler occurrence.
 	 */
 	HandlerRegistration selectionChangeEventHandlerRegistration;
+	/**
+	 * The handler registration used to remove the view's
+	 * outlier change event handler occurrence.
+	 */
+	HandlerRegistration outlierChangeEventHandlerRegistration;
 	
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
 	StatistiekCssResource statistiekCss;
@@ -113,6 +121,9 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 
 		// bind boxplotview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
+
+		// bind boxplotview to stattablemodel: to handle outlier changes in stattablemodel
+		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 
 		// create GUI
 		userOptionsPanel = new BoxplotUserOptionsPanel(this, controller, model);
@@ -524,5 +535,12 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 	{
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
+		this.outlierChangeEventHandlerRegistration.removeHandler();
+	}
+
+	@Override
+	public void onOutlierChange(OutlierChangeEvent event)
+	{
+		this.update();
 	}
 }
