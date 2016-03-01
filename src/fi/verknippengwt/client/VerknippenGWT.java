@@ -326,6 +326,8 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 		
 		dp2.rectangles.removeAllElements();
 		
+		dp2.removeGridOnEdge();
+		
 		KnipPolygon2 kp = new KnipPolygon2(dp2, rodeFiguurCoordinaten, KnipPolygon2.CENTER);
 										 
 		if (taakNummer == 4)
@@ -390,7 +392,7 @@ logger.info("VerknippenGWT init");
 			int maxScore = 10;
 			
 			if ((launchState != null) && launchState.containsKey("taakNummer"))
-					taakNummer = launchState.getInt("taakNummer");
+				taakNummer = launchState.getInt("taakNummer");
 			if ((launchState != null) && launchState.containsKey("groteBalletjes"))
 				groteBalletjes = launchState.getBoolean("groteBalletjes");
 			if ((launchState != null) && launchState.containsKey("roosterZichtbaar"))
@@ -430,6 +432,7 @@ logger.info("VerknippenGWT init");
 			dp2.showSizes = afmetingenZichtbaar;			
 			dp2.figuurTransparant = figuurTransparant;
 			dp2.gridSize = gridSize;
+			dp2.clickDis = gridSize / 2;
 			
 			rodeFiguurCoordinaten = processFiguurString(rodeFiguurString);
 
@@ -491,6 +494,8 @@ logger.info("VerknippenGWT init");
 				setState((HashMap) map);
 
 			//makeBottom();
+			dlp.forceLayout();
+			dp2.forceLayout();
 			
 			dp2.paint();
 
