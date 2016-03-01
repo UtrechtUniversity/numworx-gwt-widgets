@@ -2414,8 +2414,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		FormuleHolder.installKeyboard(kb);
 		this.comRoot = comRoot;
 
-		zetMode(comRoot.getMode());
-		
+		zetMode(comRoot.getMode());		
 	}
 
 	@Override
