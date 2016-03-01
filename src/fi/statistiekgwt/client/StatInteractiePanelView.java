@@ -1140,13 +1140,20 @@ public class StatInteractiePanelView extends LayoutPanel
 		{
 			setSelected();
 			
-			if (event.isControlKeyDown())
+			try
 			{
-				int x = event.getNativeEvent().getClientX();
-			    int y = event.getNativeEvent().getClientY();
-				showTabPopupMenu(x, y);
-			    
-				event.preventDefault(); 
+				if (event.isControlKeyDown())
+				{
+					int x = event.getNativeEvent().getClientX();
+				    int y = event.getNativeEvent().getClientY();
+					showTabPopupMenu(x, y);
+				    
+					event.preventDefault(); 
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
 			}
 		}
 
