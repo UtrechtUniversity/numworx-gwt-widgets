@@ -177,11 +177,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private static final int HEIGHT_PASTE_DIALOG = 230;
 	public static final String CELL_STYLE_FONT_SIZE = "font-size: 13px";//0.875em";
 	public static final String TABLE_HEADER_FONT = "bold 13px sans-serif";//"bold Arial Unicode MS, Arial, sans-serif small";
-	private static final int HEADER_PADDING = 25;
+	private static final int HEADER_PADDING = 15;
 	/**
 	 * Some extra padding used for comboboxes.
 	 */
-	private static final int ENUM_PADDING = 10;
+	private static final int ENUM_PADDING = 22;
 	private static final int MINIMUM_CELL_WIDTH = 30;
 
 	private StatTableModel statTableModel;
@@ -1262,6 +1262,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			//System.out.println("StatTable.clearStatTableModel(): remove column " + i);
 			this.statTableModel.removeColumnWithoutEvent(i);
 		}
+		
+		// clear the selected set
+		this.selectionModel.clear();
 	}
 
 	/*
@@ -1287,14 +1290,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		// process the first file: getStringResult() is only available onLoadEnd()!!
 		this.csvText = this.reader.getStringResult();
-		//Charset.forName(CharEncoding.ISO_8859_1).newEncoder().canEncode("string"); werkt niet in gwt
-//		boolean isText = this.csvText.matches("\\w+|\\s+|[.]+|[,]+|[;]+"); // niet correct
 		
 		if (!(this.csvText == null) 
 			&& !this.csvText.equals("") 
 			&& !this.csvText.equals("Error"))
 		{
-			String[] lines = csvText.split("\\r?\\n");
+			String[] lines = csvText.split("\\r?\\n"); 
+			
+			// check de situatie waarin csvText alleen \r als regelscheiding bevat
+			if ((lines.length == 1) && csvText.contains("\r") && !csvText.contains("\r\n"))
+			{
+				// csvText has only \r as separator
+				lines = csvText.split("\\r");
+			}
 			
 			// check for an incorrect data file
 			if (!this.isCorrectFormat(lines))
@@ -2153,7 +2161,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		public void onBrowserEvent(Event event)
 		{
 			super.onBrowserEvent(event);
-			System.out.println("StatTable.ExtendedTextArea.onBrowserEvent()");
 			
 			switch (DOM.eventGetType(event))
 			{
@@ -2228,7 +2235,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				String colorString = "color: black";// default
 				
 				if (statTable.getStatTableModel().isOutlier(context.getIndex(), context.getColumn() - 2))
-					colorString = "color: red";
+				{
+					String rgbString = ColorUtils.getOutlierColor().value();
+					colorString = "color: " + rgbString;
+				}
 				
 				String styleString = "width: " + this.columnWidth
 					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE + ";" + colorString;
@@ -2244,8 +2254,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    @Override
         public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> valueUpdater) 
         {
-	    	System.out.println("StatTable.StatTableInputCell.onBrowserEvent()");
-	    	
             if (!this.editable)
             {
                 event.preventDefault();
@@ -2271,6 +2279,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    private static Template template;
 	    private ColumnType type;
 		private int columnWidth;
+		private StatTable statTable;
 
 	    interface Template extends SafeHtmlTemplates
 	    {   
@@ -2279,11 +2288,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        SafeHtml cell(String value, String style);
 	    }
 
-	    public StatTableTextCell(ColumnType type, int columnWidth)
+	    public StatTableTextCell(ColumnType type, int columnWidth, StatTable statTable)
 	    {
 	        template = GWT.create(Template.class);
 	        this.type = type;
 	        this.columnWidth = columnWidth;
+	        this.statTable = statTable;
 	    }
 
 	    @Override
@@ -2296,9 +2306,21 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					// Get the string value with language dependent separator
 					value = StatistiekGWT.getStringValue(value);
 				}
+
+				String colorString = "color: black";// default
+				
+				if (statTable.getStatTableModel().isOutlier(context.getIndex(), context.getColumn() - 2))
+				{
+					String rgbString = ColorUtils.getOutlierColor().value();
+					colorString = "color: " + rgbString;
+				}
+				
+				String styleString = "width: " + this.columnWidth
+					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE + ";" + colorString;
 				// set value, style
-				sb.append(template.cell(value, "width: " + this.columnWidth
-					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE));
+//				sb.append(template.cell(value, "width: " + this.columnWidth
+//					+ "px; " + StatTable.CELL_STYLE_FONT_SIZE));
+				sb.append(template.cell(value, styleString));
 			}
 	        else
 	        {
@@ -2322,6 +2344,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		private static Template template;
 		private HashMap<String, Integer> indexForOption = new HashMap<String, Integer>();
 		private final List<String> options;
+		private StatTable statTable;
 
 		interface Template extends SafeHtmlTemplates
 		{
@@ -2343,7 +2366,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			SafeHtml endSelect();
 		}
 
-		public StatTableSelectionCell(List<String> options)
+		public StatTableSelectionCell(List<String> options, StatTable statTable)
 		{
 			super(options);
 			template = GWT.create(Template.class);
@@ -2354,14 +2377,25 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				indexForOption.put(option, index++);
 			}
+			this.statTable = statTable;
 		}
 
 		@Override
 		public void render(Context context, String value, SafeHtmlBuilder sb)
 		{
+			String colorString = "color: black";// default
+			
+			if (statTable.getStatTableModel().isOutlier(context.getIndex(), context.getColumn() - 2))
+			{
+				String rgbString = ColorUtils.getOutlierColor().value();
+				colorString = "color: " + rgbString;
+			}
+			
+			String styleString = StatTable.CELL_STYLE_FONT_SIZE + ";" + colorString;
+			
 			// set style
-			sb.append(template.beginSelect(StatTable.CELL_STYLE_FONT_SIZE));
-//			sb.append(template.beginSelect());//StatTable.CELL_STYLE_FONT_SIZE));
+//			sb.append(template.beginSelect(StatTable.CELL_STYLE_FONT_SIZE));
+			sb.append(template.beginSelect(styleString));
 
 			for (int i = 0; i < options.size(); i++)
 			{
@@ -2932,7 +2966,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableTextCell textCell = new StatTableTextCell(
 					type, 
-					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]));
+					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]), 
+					this);
 				Column<List<String>, String> column = new StatTableColumn(textCell, type);
 
 				column.setSortable(true);
@@ -2950,7 +2985,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				String[] enumOptions = StatTable.this.statTableModel
 					.getColumnTypes().get(i).getEnumOptions();
 
-				SelectionCell enumCell = new StatTableSelectionCell(Arrays.asList(enumOptions));
+				SelectionCell enumCell = new StatTableSelectionCell(Arrays.asList(enumOptions), this);
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				Column<List<String>, String> enumColumn = new StatTableColumn(enumCell, type);
 
@@ -2960,7 +2995,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				enumColumn.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(enumColumn, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING + StatTable.ENUM_PADDING;
+				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
+				if (this.maxCellWidth[i] > this.maxColumnWidth[i] - StatTable.ENUM_PADDING)
+				{
+					width = width + StatTable.ENUM_PADDING;
+				}
 				this.table.setColumnWidth(enumColumn, width, Unit.PX);
 				// add the column's width to total width
 				totalWidth = totalWidth + width;
@@ -3003,7 +3042,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				{
 		            outlierPopupRowIndex = rowIndex;
 		            outlierPopupColumnIndex = columnIndex - 2;
-		            System.out.println("StatTable.onCellPreview(): rowIndex = " + rowIndex + ", columnIndex = " + columnIndex);
+//		            System.out.println("StatTable.onCellPreview(): rowIndex = " + rowIndex + ", columnIndex = " + columnIndex 
+//		            	+ ", outlierPopupColumnIndex = " + outlierPopupColumnIndex);
 				}
 				
 		        int button = event.getNativeEvent().getButton();
@@ -3013,7 +3053,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		            if (event.getNativeEvent().getCtrlKey()) 
 		            {
 		                // CTRL button was pressed during the click
-		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
+//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");
+		        		
+			        	showOutlierPopup(event);
 		            }
 		        }
 //		        if (button == NativeEvent.BUTTON_LEFT)
@@ -3023,31 +3065,35 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //		        }
 		        else if (button == NativeEvent.BUTTON_RIGHT) 
 		        {
-		        	event.getNativeEvent().stopPropagation();
-		        	event.getNativeEvent().preventDefault();
-		        	
-		        	int clientX = event.getNativeEvent().getClientX();
-		        	int clientY = event.getNativeEvent().getClientY();
-		        	
-		        	if (outlierPopupColumnIndex < 0) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
-		        	{
-						updateRowOutlierPopup(outlierPopupRowIndex);
-
-						rowOutlierPopupMenu.setVisible(true);
-						rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
-						rowOutlierPopupMenu.show();
-		        	}
-		        	else
-		        	{
-						updateOutlierPopup(outlierPopupRowIndex, outlierPopupColumnIndex);
-
-						outlierPopupMenu.setVisible(true);
-			        	outlierPopupMenu.setPopupPosition(clientX, clientY);
-						outlierPopupMenu.show();
-		            }
+		        	showOutlierPopup(event);
 		        }
 			}
 			
+			private void showOutlierPopup(CellPreviewEvent<List<String>> event)
+			{
+	        	event.getNativeEvent().stopPropagation();
+	        	event.getNativeEvent().preventDefault();
+	        	
+	        	int clientX = event.getNativeEvent().getClientX();
+	        	int clientY = event.getNativeEvent().getClientY();
+	        	
+	        	if (outlierPopupColumnIndex < 0) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
+	        	{
+					updateRowOutlierPopup(outlierPopupRowIndex);
+
+					rowOutlierPopupMenu.setVisible(true);
+					rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
+					rowOutlierPopupMenu.show();
+	        	}
+	        	else
+	        	{
+					updateOutlierPopup(outlierPopupRowIndex, outlierPopupColumnIndex);
+
+					outlierPopupMenu.setVisible(true);
+		        	outlierPopupMenu.setPopupPosition(clientX, clientY);
+					outlierPopupMenu.show();
+	            }
+			}
 		});
 		
 		this.table.addDomHandler(this.mouseHandler, ContextMenuEvent.getType());
@@ -3407,17 +3453,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setOutlierPopupRowIndex(int i)
 	{
 		this.outlierPopupRowIndex = i;
-	}
-
-	/**
-	 * Set the outlier popup column index.
-	 * Used to be able to mark the clicked cell.
-	 * 
-	 * @param i
-	 */
-	private void setOutlierPopupColumnIndex(int i)
-	{
-		this.outlierPopupColumnIndex = i;
 	}
 
 	/**
