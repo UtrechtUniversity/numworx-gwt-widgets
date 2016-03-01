@@ -24,6 +24,8 @@ import fi.statistiekgwt.client.text.Text_nl;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
@@ -94,6 +96,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public void onModuleLoad()
 	{
+		// prevent the browser's default context menu
+		Element body = Document.get().getBody();
+		body.setAttribute("oncontextmenu", "return false;");
+		
 		GWT.setUncaughtExceptionHandler(
 			new GWT.UncaughtExceptionHandler() {
 		        public void onUncaughtException(Throwable e) 
@@ -118,6 +124,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		Stub.publish(this);
 	}
 	
+//	/**
+//	 * Returns the document element.
+//	 */
+//	public static native com.google.gwt.user.client.Element getDocElement() /*-{
+//		return $doc;
+//	}-*/;
+
 	/**
 	 * Deze methode wordt aangeroepen na init()
 	 */
