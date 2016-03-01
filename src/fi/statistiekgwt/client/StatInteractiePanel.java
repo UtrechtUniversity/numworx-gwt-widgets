@@ -122,6 +122,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		h.put("tableModel", this.model.getStatTableModel().getState());
 
 		h.put("selectionList", this.model.getStatTableModel().getSelectionList());
+		h.put("rowOutlierList", this.model.getStatTableModel().getRowOutlierList());
+		h.put("cellOutlierList", this.model.getStatTableModel().getCellOutlierList());
 
 		// statistiekViewTypes and statistiekViewStates should always be added to the state
 		int noViews = this.model.getViews().size();
