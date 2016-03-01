@@ -39,6 +39,7 @@ public class ColorUtils
 	public static final CssColor SELECTION_COLOR = CssColor.make(192,192,192); // darker light grey
 	public static final RGBColor SELECTION_COLOR_RGB = new RGBColor(192,192,192); // darker light grey
 	public static final CssColor BUTTON_TEXT_GREY = CssColor.make(82, 82, 82); // dark grey
+	public static final CssColor OUTLIER_COLOR = CssColor.make(255, 0, 0); // red
 
 	
 	private static List<String> colorList = 
@@ -146,6 +147,16 @@ public class ColorUtils
 	public static CssColor getDefaultViewElementColor()
 	{
 		return DEFAULT_VIEW_ELEMENT_COLOR;
+	}
+	
+	/**
+	 * Get the outlier color
+	 * 
+	 * @return the outlier color
+	 */
+	public static CssColor getOutlierColor()
+	{
+		return OUTLIER_COLOR;
 	}
 	
 	/**
