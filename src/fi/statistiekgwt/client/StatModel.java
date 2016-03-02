@@ -321,4 +321,10 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	{
 		return eventBus.addHandler(AddViewEvent.TYPE, handler);
 	}
+
+	public void removeData()
+	{
+		statTableModel.removeAllRows();
+	}
+
 }
