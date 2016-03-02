@@ -1173,6 +1173,23 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 	}
 
+	/**
+	 * Remove all rows in the table.
+	 */
+	public synchronized void removeAllRows()
+	{
+		int count = this.rowCount;
+		
+		for (int i = count - 1 ; i > -1; i--)
+		{
+			removeRowWithoutEvent(i);
+		}
+		
+		// send an event
+		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROWS, -1);
+		this.fireEvent(event);
+	}
+
 	private void decreaseKeyHashMap(String key, int columnIndex)
 	{
 		//System.out.println("decreasing: " + key + ". Column: " + columnIndex);
