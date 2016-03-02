@@ -757,7 +757,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		if ((importPopup != null) && importPopup.isVisible())
 			importPopup.setVisible(false);
 
-		exportPopup = new ExportPopup(220, 520, this);
+		exportPopup = new ExportPopup(220, 560, this);
 		exportPopup.export(contents);
 		exportPopup.setPopupPosition(popupX, popupY);
 		exportPopup.show();
@@ -817,9 +817,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	void importeer(String s)
 	{
 		
-System.out.println("importeer");
+//System.out.println("importeer");
 
-System.out.println("code = " + s);
+//System.out.println("code = " + s);
 		clearProgram();
 		paint();
 		ProgrammaImporter pi = new ProgrammaImporter(this);
@@ -846,7 +846,7 @@ System.out.println("code = " + s);
 		if ((exportPopup != null) && exportPopup.isVisible())
 			exportPopup.setVisible(false);
 
-		importPopup = new ImportPopup(300, 520, this);
+		importPopup = new ImportPopup(300, 560, this);
 		importPopup.setPopupPosition(popupX, popupY);
 		importPopup.show();
 		//paramEditor.textBox.setFocus(true);
@@ -973,6 +973,7 @@ System.out.println("code = " + s);
 	}
 */	
 	
+	
 	public CommandComponent findCComponentAt(int x, int y)
 	{
 		CommandComponent result = null;
@@ -1044,7 +1045,9 @@ System.out.println("code = " + s);
 						result = tResult;
 				}	
 			} 
-// keuze
+			// stop bij de bovenste CCContainer
+			if (result != null)
+				break;
 	
 			
 		}

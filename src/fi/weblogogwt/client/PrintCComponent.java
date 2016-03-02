@@ -18,7 +18,11 @@ public class PrintCComponent extends ParameterCommandComponent
 	
 	public boolean execute(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
 	{	
-		if ( !parameters[0].isCorrect(varSet) ) return false; 
+		if ( !parameters[0].isCorrect(varSet) ) 
+		{
+//System.out.println("!correct");			
+			return false;
+		}	
 		ub.print( ((TextParameter)parameters[0]).getValueText());
 		traceKleur = trb.commandExecuted(varSet.getLevel());
 		if ( traceKleur ) trb.setCommandInfo(getActualCall(), varSet);

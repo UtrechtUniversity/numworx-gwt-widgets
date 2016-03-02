@@ -27,10 +27,12 @@ public class TextParameter extends NumericParameter
 			isConstantString = true;
 			parameterText = s;
 			isCorrect = true;
+//System.out.println("setParam isConstantString");			
 		} else
 		{
 			isConstantString = false;
 			super.setParameter(s);
+//System.out.println("setParam !isConstantString");			
 		}
 	}
 
@@ -43,6 +45,8 @@ public class TextParameter extends NumericParameter
 	@Override
 	public String getParameterText()
 	{
+//if (!parameterText.equals(""))		
+//System.out.println("getParamText=" + parameterText);		
 		return parameterText;
 	}
 
@@ -51,9 +55,11 @@ public class TextParameter extends NumericParameter
 	{
 		if ( isConstantString )
 		{
+//System.out.println("isCorrect isConstantString");			
 			return true;
 		} else
 		{
+//System.out.println("isCorrect !isConstantString");			
 			return super.isCorrect(varSet);
 		}
 	}

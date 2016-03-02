@@ -359,6 +359,15 @@ public abstract class CommandComponent //extends JPanel
 				
 					doubletap.clear();
 				}
+				else if (isLongClick() && !dragging)	
+				{ 	
+//System.out.println("longClick on PEL");					
+					ParameterEditorListener pel = (ParameterEditorListener) this; 
+					pel.parameterComponentClicked(x-getAbsoluteLocation().x, y-getAbsoluteLocation().y);
+				
+					doubletap.clear();
+				}
+				
 				else
 				{
 					if (doubletap.size() >= 2)

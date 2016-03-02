@@ -163,8 +163,8 @@ logger.info("WebLogoGWT onModuleLoad");
 		RootPanel.get(holderId).addStyleName(webLogoGWTCssResource.root());
 		
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 
 			
@@ -279,11 +279,12 @@ logger.info("ubb = " + ubb);
 			}
 			
 			// stand-alone
-			if (launchState != null && !launchState.containsKey("breedte"))
+			if (launchState != null && !launchState.containsKey("state"))
 			{
 				breedte = breedtePaul;
 				// hoogte is al gezet
 				ubb = ubbPaul;
+System.out.println("paul");				
 			}
 			
 			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");

@@ -332,34 +332,34 @@ public class ProgrammaImporter
 		//System.out.println("simpel: >"+codeline+"<");
 		CommandComponent cc = null;
 		// 1: commandComponents for simple commands
-		if ( codeline.startsWith("vooruit"))
+		if ( codeline.startsWith("vooruit("))
 		{	cc = new VooruitCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("rechts"))
+		else if ( codeline.startsWith("rechts("))
 		{	cc = new RechtsCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("links"))
+		else if ( codeline.startsWith("links("))
 		{	cc = new LinksCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("stap"))
+		else if ( codeline.startsWith("stap("))
 		{	cc = new StapCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("penAan"))
+		else if ( codeline.startsWith("penAan("))
 		{	cc = new PenAanCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("penUit"))
+		else if ( codeline.startsWith("penUit("))
 		{	cc = new PenUitCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("vulAan"))
+		else if ( codeline.startsWith("vulAan("))
 		{	cc = new VulAanCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("vulUit"))
+		else if ( codeline.startsWith("vulUit("))
 		{	cc = new VulUitCComponent(-100,-100,25,25, veld);
 		} 
-		else if ( codeline.startsWith("print"))
+		else if ( codeline.startsWith("print("))
 		{	cc = new PrintCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("printl"))
+		else if ( codeline.startsWith("println("))
 		{	cc = new PrintlCComponent(-100,-100,25,25, veld);
 		}
 		// cc has been initialized if and only if the line contains one of the simple commands.
@@ -369,10 +369,13 @@ public class ProgrammaImporter
 			//System.out.println("     +++  was command");
 			cc.clearStapel();
 			String parameter = getParamText(codeline);
+			parameter = parameter.trim();
 			// ToDo: setParam1 is hier fout, create setParameterText in cc-klasse die alles afhandelt
 			if ( parameter != null && cc instanceof ParameterCommandComponent )
 			{
 				((ParameterCommandComponent)cc).setParameter(parameter);
+//if (cc instanceof PrintCComponent)				
+//System.out.println("PI=(" + parameter);				
 			}
 			return cc;
 		}
