@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -13,6 +15,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
@@ -22,7 +25,7 @@ import com.google.gwt.user.client.ui.LayoutPanel;
  * @author Manu Drijvers, Sylvia van Borkulo
  * 
  */
-public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
+public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, CBookEventListener
 {
 	private StatModel model;
 	private StatInteractiePanelView view;
@@ -748,5 +751,78 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler
 		super.remove(this.view);
 		Label message = new Label(StatistiekGWT.rb.getString("notHTML5ReadyMessage"));
 		super.add(message);
+	}
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event)
+	{
+		String command = event.getCommand();
+		
+		if (command.startsWith("text.csv"))
+		{
+			Map map = (Map) event.getParameters();
+			
+			if (map != null)
+			{
+				HashMap<String, Object> h = this.getState();
+				h.remove("selectionList");
+				h.remove("rowOutlierList");
+				h.remove("cellOutlierList");
+				
+				HashMap tableModel = (HashMap) h.get("tableModel");
+				int columnCount = ((Integer) tableModel.get("columnCount")).intValue();
+				boolean dataFitting = true;
+				String dataString = (String) map.get("content");
+
+				if ("".equals(dataString))
+				{
+					model.removeData();
+					return;
+				}
+
+				model.getStatTableModel().clearOutlierLists();
+				
+				String[] regels = dataString.split("\n");
+				
+				ArrayList<ArrayList<Object>> values = new ArrayList<ArrayList<Object>>();
+				
+				for (int i = 0; i < regels.length && !"".equals(dataString); i++)
+				{
+					String[] waarden = regels[i].split(";");
+					
+					System.out.println("Waardenlengte = " + waarden.length);
+					if ((waarden.length != columnCount) 
+						&& !"".equals(dataString))
+					{
+						Window.alert("Data not fitting in number of columns");
+						dataFitting = false;
+						break;
+					}
+					
+					values.add(new ArrayList<Object>());
+					for (int j = 0; j < waarden.length; j++)
+					{ 
+						System.out.println("Waarden[" + j + "] = " + waarden[j]);
+						
+						if (!"".equals(waarden[j].trim()))
+						{
+							values.get(i).add(waarden[j]);
+						}
+					}
+				}
+				if (dataFitting)
+				{
+					tableModel.put("rowCount", new Integer(regels.length));
+					
+					if (regels.length > 0)
+					{
+						tableModel.put("values", values);
+					}
+					
+					h.put("tableModel", tableModel);
+					this.setState(h);
+				}
+			}
+		}
 	}
 }
