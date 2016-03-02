@@ -40,7 +40,11 @@ import com.google.gwt.user.client.ui.Widget;
 public class StatistiekGWT implements EntryPoint, InteractionStub
 {
 	private static final Logger logger = Logger.getLogger(ClassName.class.getName());
-	
+
+	OpdrNavIF comRoot;
+
+	public static final String TEXT_CSV = "text.csv";
+
 	public static Text_nl rb = new Text_nl();
 	static final String holderId = "dockholder";
 	static final String upgradeMessage = 
@@ -218,8 +222,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// TODO Auto-generated method stub
+		this.comRoot = comRoot;
 		
+		comRoot.addCBookEventListener(TEXT_CSV, this.basisPanel);
 	}
 
 	@Override
