@@ -39,12 +39,9 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.ContextMenuEvent;
-import com.google.gwt.event.dom.client.ContextMenuHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -91,7 +88,6 @@ import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
-
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
@@ -301,7 +297,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //	private FormPanel formPanel;
 	
 	private StatTableClickHandler clickHandler;
-	private StatTableMouseHandler mouseHandler;
+//	private StatTableMouseHandler mouseHandler;
 	private DummyTouchHandler dummyTouchHandler;
 	private ImportMessageDialogBox importBox;
 	private MessageDialogBox messageBox;
@@ -323,6 +319,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * Temporary index used when handling edit column events.
 	 */
 	private int editColumnIndex;
+	
+	/**
+	 * The duration of the touch tap, to be able to detect a long tap
+	 * for showing the outlier menu.
+	 */
+	protected long taptime;
 
 	/**
 	 * Constructor without viewname, the initial table view.
@@ -418,7 +420,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setUp()
 	{
 		this.clickHandler = new StatTableClickHandler();
-		this.mouseHandler = new StatTableMouseHandler();
+//		this.mouseHandler = new StatTableMouseHandler();
 		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
 		
 		if (this.statInteractiePanel != null)
@@ -1749,232 +1751,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	} // class StatTableClickHandler
 	
-	class StatTableMouseHandler implements MouseDownHandler, ContextMenuHandler//TouchStartHandler, TouchMoveHandler, TouchEndHandler
-	{
-		private int rowIndex;
-		private int columnIndex;
-		
-		public StatTableMouseHandler()
-		{
-			super();
-		}
-		
-		public StatTableMouseHandler(int rowIndex, int columnIndex)
-		{
-			super();
-			this.rowIndex = rowIndex;
-			this.columnIndex = columnIndex;
-		}
-
-		@Override
-		public void onMouseDown(MouseDownEvent event)
-		{
-		} // onMouseDown()
-		
-		@Override
-		public void onContextMenu(ContextMenuEvent event)
-		{
-            event.preventDefault();
-			event.stopPropagation();
-			
-			System.out.println("StatTable.StatTableMouseHandler.onContextMenu()");
-			
-//			if (table.getRowCount() != 0)
-//			{
-//				StatTableDataGrid<List<String>> selectedcell = (StatTableDataGrid<List<String>>)  event.getSource();
-//	            System.out.println("---- StatTable.StatTableMouseHandler.onContextMenu():  Current Selected Row = " + selectedcell.getKeyboardSelectedRow());
-//	            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  Current Selected Column = " + selectedcell.getKeyboardSelectedColumn());
-//	
-//	            outlierPopupRowIndex = selectedcell.getKeyboardSelectedRow();
-//	            outlierPopupColumnIndex = selectedcell.getKeyboardSelectedColumn();
-//	
-//		        int button = event.getNativeEvent().getButton();
-//		        
-//		        if (button == NativeEvent.BUTTON_LEFT) 
-//		        {
-//		        }
-//		        else if (button == NativeEvent.BUTTON_RIGHT) 
-//		        {
-//		        	int clientX = event.getNativeEvent().getClientX();
-//		        	int clientY = event.getNativeEvent().getClientY();
-//		        	
-//		        	// TODO hoe detecteer ik click op header? y-coordinaat?
-//		            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  clientX = " + clientX);
-//		            System.out.println("StatTable.StatTableMouseHandler.onContextMenu():  clientY = " + clientY);
-//
-//		            if (clientY < 70)
-//		            	// outlierPopupColumnIndex loopt af en toe achter...
-//		            	//&& (outlierPopupColumnIndex > 1)) // voor eerste twee headerkolommen geen header popup menu, alleen voor de 'echte' datakolommen
-//		            {
-//		            	if (clientX > 70)
-//		            	{
-//			            	popupColumnIndex = selectedcell.getKeyboardSelectedColumn() - 2;
-//			            	
-//			            	// open header popup
-//							headerPopupMenu.setVisible(true);
-//							headerPopupMenu.setPopupPosition(clientX, clientY);
-//							headerPopupMenu.show();
-//		            	}
-//		            }
-//		            else
-//		            {
-//		            	// no click on header row
-//		            	
-//			        	if (outlierPopupColumnIndex < 2) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
-//			        	{
-//							rowOutlierPopupMenu.setVisible(true);
-//							rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
-//							rowOutlierPopupMenu.show();
-//			        	}
-//			        	else
-//			        	{
-//							outlierPopupMenu.setVisible(true);
-//				        	outlierPopupMenu.setPopupPosition(clientX, clientY);
-//							outlierPopupMenu.show();
-//			        	}
-//		            }
-//		        }
-//			}
-		} // onContextMenu()
-		
-	} // StatTableMouseHandler
-	
-//	class StatTableTouchHandler implements TouchStartHandler
-//	{
-//		@Override
-//		public void onTouchStart(TouchStartEvent e)
-//		{
-//			e.stopPropagation();
-//			
-////			if (e.getSource() == StatTable.this.addRowButton)
-////			{
-////				StatTable.this.statTableModel.addRow();
-////				// show the row added
-////				StatTable.this.pager.lastPage();
-////			}
-////			else if (e.getSource() == StatTable.this.addColumnButton)
-////			{
-////				ColumnDialogModel dialogModel = new ColumnDialogModel(
-////					StatTable.this.statTableModel);
-////				HandlerRegistration handlerRegistration = dialogModel.addAddColumnEventHandler(StatTable.this.statTableModel);
-////				
-////				ColumnDialogView dialogView;
-////
-////				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.getString("addacolumn"));
-////				
-////				ColumnDialogController dialogController = new ColumnDialogController(
-////					dialogModel, dialogView);
-////				dialogController.setHandlerRegistration(handlerRegistration);
-////
-////				dialogView.center();
-////				dialogView.show();
-////			}
-////			else if (e.getSource() == StatTable.this.deleteRowsButton)
-////			{
-////				int[] toRemove = StatTable.this.getSelectedRows();
-////				if (toRemove.length > 0)
-////				{
-////					for (int i = toRemove.length - 1; i >= 0; i--)
-////					{
-////						StatTable.this.statTableModel.removeRowWithoutEvent(toRemove[i]);
-////					}
-////					
-////					// send an event
-////					TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROWS, -1);
-////					StatTable.this.statTableModel.fireEvent(event);
-////				}
-////				
-////				// reset selection
-////				StatTable.this.clearSelectionModel();
-////			}
-////			else if (e.getSource() == StatTable.this.pasteButton)
-////			{
-////				StatTable.this.pasteDataDialog.show();
-////			}
-////			else if (e.getSource() == StatTable.this.importPasteDataButton)
-////			{
-////				StatTable.this.importPasteData();
-////			}
-////			else if (e.getSource() == StatTable.this.cancelPasteDataButton)
-////			{
-////				StatTable.this.pasteDataDialog.hide();
-////			}
-////			else if (e.getSource() == StatTable.this.resetButton)
-////			{
-////				if (StatTable.this.statInteractiePanel != null)
-////				{
-////	    			HashMap resetHashMap = StatTable.this.statInteractiePanel.getModel()
-////	    				.getResetHashMap();
-////	    
-////	    			// clear stringFrequencies
-////	    			StatTable.this.statTableModel.clearStringFrequencies();
-////
-////	    			// clear selectionList and listeners
-////	    			StatTable.this.statTableModel.clearSelectionList();
-////	    			
-////	    			// remove views (and their occurrences as handler)
-////	    			statInteractiePanel.getStatModel().removeViewsWithoutEvent();
-////	    
-////	    			// Complete reset met zetOpdracht()
-////	    			StatTable.this.statInteractiePanel.getView().getController()
-////	    				.zetOpdracht(resetHashMap, null, null);
-////	    			
-////	    			int selectedView = statInteractiePanel.getSelectedView();
-////	    			statInteractiePanel.getView().updateView(selectedView);
-////				} // else the button is clicked in edit-mode: do nothing
-////			}
-////			else if (e.getSource() == StatTable.this.importButton)
-////			{
-////				if (StatTable.this.statTableModel.getRowCount() > 0)
-////				{
-////					StatTable.this.importBox.center();
-////		            importBox.show();
-////				}
-////				else
-////				{
-////					openFileChooserDialog();
-////				}
-////			}
-////			else if (e.getSource() == StatTable.this.importBox.okButton)
-////			{
-////				importBox.hide();
-////				openFileChooserDialog();
-////			}
-////			else if (e.getSource() == StatTable.this.importBox.cancelButton)
-////			{
-////				importBox.hide();
-////			}
-////			else if (e.getSource() == StatTable.this.fileUploadSelectButton)
-////			{
-////				FileList fileList = StatTable.this.fileUpload.getFiles();
-////
-////				StatTable.this.popupFileUploadPanel.hide();
-////				
-////				// test syl: call startLoading to clear the table
-////				StatTable.this.pager.startLoading();
-////				
-////				// Remove old views
-////				StatTable.this.removeViews();
-////				
-////				if (StatTable.this.statInteractiePanel != null)
-////				{
-////					StatTable.this.statInteractiePanel.getView().removeViewTabs();
-////				}
-////				
-////				StatTable.this.processCSVDataFile(fileList);
-////				
-////				StatTable.this.table.setVisible(true);
-////				
-////				RootPanel.getBodyElement().getStyle().setProperty("cursor", "default");
-////			}
-////			else if (e.getSource() == StatTable.this.fileUploadCancelButton)
-////			{
-////				StatTable.this.popupFileUploadPanel.hide();				
-////			}
-//		}
-//		
-//	} // class StatTableTouchHandler
-
 	class StatTableColumn extends Column 
 		implements Comparator
 	{
@@ -2045,7 +1821,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		public void onBrowserEvent(Context context, final Element elem,
 			final NativeEvent event)
 		{
-			System.out.println("StatTable.StatTableTextHeader.onBrowserEvent()");
+			//System.out.println("StatTable.StatTableTextHeader.onBrowserEvent()");
 			
 			// maybe hijack click event
 			if (handler != null)
@@ -2260,6 +2036,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             }
             else
             {
+            	//Window.alert("StatTableInputCell.onBrowserEvent()");
                 super.onBrowserEvent(context, parent, value, event, valueUpdater);
             }
         } // onBrowserEvent()
@@ -2870,6 +2647,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
 		} // add checkColumn
 
+		// add the handler for handling the outlier menu
+		addOutlierHandler();
+		
 		// put the data of statTableModel into this.table
 		this.headers = this.statTableModel.getColumnNames();
 		
@@ -3025,16 +2805,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 		} // for-loop over columns
 		
-		// add handler for right mouse click
-		//this.table.addHandler(this.mouseHandler, MouseDownEvent.getType());
+	}
+	
+	/**
+	 * Add a cell preview handler to handle the right mouse click
+	 * of long tap for showing the outlier menu.
+	 */
+	private void addOutlierHandler()
+	{
 		this.table.addCellPreviewHandler(new Handler<List<String>>(){
 
 			@Override
 			public void onCellPreview(CellPreviewEvent<List<String>> event)
 			{
-//	            event.getNativeEvent().preventDefault();
-//				event.getNativeEvent().stopPropagation();
-
 				int rowIndex = event.getIndex();				
 				int columnIndex = event.getColumn();
 				
@@ -3048,57 +2831,110 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 		        int button = event.getNativeEvent().getButton();
 		        
-		        if ("click".equals(event.getNativeEvent().getType())) 
+		        NativeEvent nativeEvent = event.getNativeEvent();
+		        
+		        if (nativeEvent.getTouches() != null)
 		        {
-		            if (event.getNativeEvent().getCtrlKey()) 
-		            {
-		                // CTRL button was pressed during the click
-//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");
-		        		
-			        	showOutlierPopup(event);
-		            }
+		        	// a touch event happened
+		        	processTouch(nativeEvent);
 		        }
-//		        if (button == NativeEvent.BUTTON_LEFT)
-//		        {
-//		        	if (event.getNativeEvent().getCharCode() == KeyCodes.KEY_CTRL)// check + control
-//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
-//		        }
-		        else if (button == NativeEvent.BUTTON_RIGHT) 
+		        else
 		        {
-		        	showOutlierPopup(event);
+		        	// a click even happened
+		        	int x = event.getNativeEvent().getClientX();
+		        	int y = event.getNativeEvent().getClientY();
+		        	
+					if ("click".equals(nativeEvent.getType())) 
+			        {
+			            if (nativeEvent.getCtrlKey()) 
+			            {
+			                // CTRL button was pressed during the click
+	//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");
+			        		
+				        	showOutlierPopup(nativeEvent, x, y);
+			            }
+			        }
+	//		        if (button == NativeEvent.BUTTON_LEFT)
+	//		        {
+	//		        	if (event.getNativeEvent().getCharCode() == KeyCodes.KEY_CTRL)// check + control
+	//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
+	//		        }
+			        else if (button == NativeEvent.BUTTON_RIGHT) 
+			        {
+			        	showOutlierPopup(nativeEvent, x, y);
+			        }
 		        }
 			}
-			
-			private void showOutlierPopup(CellPreviewEvent<List<String>> event)
-			{
-	        	event.getNativeEvent().stopPropagation();
-	        	event.getNativeEvent().preventDefault();
-	        	
-	        	int clientX = event.getNativeEvent().getClientX();
-	        	int clientY = event.getNativeEvent().getClientY();
-	        	
-	        	if (outlierPopupColumnIndex < 0) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
-	        	{
-					updateRowOutlierPopup(outlierPopupRowIndex);
 
-					rowOutlierPopupMenu.setVisible(true);
-					rowOutlierPopupMenu.setPopupPosition(clientX, clientY);
-					rowOutlierPopupMenu.show();
-	        	}
-	        	else
-	        	{
-					updateOutlierPopup(outlierPopupRowIndex, outlierPopupColumnIndex);
-
-					outlierPopupMenu.setVisible(true);
-		        	outlierPopupMenu.setPopupPosition(clientX, clientY);
-					outlierPopupMenu.show();
-	            }
-			}
 		});
-		
-		this.table.addDomHandler(this.mouseHandler, ContextMenuEvent.getType());
 	}
 	
+	/**
+	 * Process the touch event, set the taptime and for
+	 * a long tap show the outlier menu.
+	 * 
+	 * @param nativeEvent
+	 */
+	private void processTouch(NativeEvent nativeEvent)
+	{
+		if ("touchstart".equals(nativeEvent.getType()))
+		{
+			taptime = System.currentTimeMillis();
+		}
+		else if ("touchend".equals(nativeEvent.getType()) && isLongClick())
+		{
+			Touch touch = null;
+			
+			int x = 0;
+			int y = 0;
+			
+			if (nativeEvent.getTouches().length() > 0)
+			{
+				touch = nativeEvent.getTouches().get(0);
+			}
+			else if ((nativeEvent.getChangedTouches() != null) 
+				&& (nativeEvent.getChangedTouches().length() > 0)) 
+			{
+				touch = nativeEvent.getChangedTouches().get(0);
+			}
+
+			try
+			{
+				x = touch.getClientX();
+				y = touch.getClientY();
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+			
+			showOutlierPopup(nativeEvent, x, y);
+		}
+	}
+	
+	private void showOutlierPopup(NativeEvent nativeEvent, int x, int y)
+	{
+    	nativeEvent.stopPropagation();
+    	nativeEvent.preventDefault();
+    	
+    	if (outlierPopupColumnIndex < 0) // when clicking the first two columns, open the popup with only one option for marking the row as outlier
+    	{
+			updateRowOutlierPopup(outlierPopupRowIndex);
+
+			rowOutlierPopupMenu.setVisible(true);
+			rowOutlierPopupMenu.setPopupPosition(x, y);
+			rowOutlierPopupMenu.show();
+    	}
+    	else
+    	{
+			updateOutlierPopup(outlierPopupRowIndex, outlierPopupColumnIndex);
+
+			outlierPopupMenu.setVisible(true);
+        	outlierPopupMenu.setPopupPosition(x, y);
+			outlierPopupMenu.show();
+        }
+	}
+
 	/**
 	 * Update the outlier popup.
 	 */
@@ -3531,6 +3367,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	public void onOutlierChange(OutlierChangeEvent event)
 	{
 		this.update();
+	}
+	
+	/**
+	 * Detect whether there has been a loong click or 'tap & hold'.
+	 * 
+	 * @return
+	 */
+    protected boolean isLongClick() 
+    {
+    	return System.currentTimeMillis() - taptime > 300;
 	}
 }
 
