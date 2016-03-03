@@ -3297,6 +3297,25 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			this.rowOutlierList.set(rowIndex, false);
 		}
+		else
+		{
+			// check if all cell in the row are now marked as outlier
+			// if so, mark the row as outlier
+			boolean allCellsInRowMarkedAsOutlier = true;
+			
+			for (int i = 0; i < getColumnCount(); i++)
+			{
+				if (!this.cellOutlierList.get(i).get(rowIndex))
+				{
+					allCellsInRowMarkedAsOutlier = false;
+				}
+			}
+			
+			if (allCellsInRowMarkedAsOutlier)
+			{
+				this.rowOutlierList.set(rowIndex, true);
+			}
+		}
 		
 		// send an event
 		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
