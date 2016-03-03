@@ -359,16 +359,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		this.userOptionsPanel.setMinBoundary(d);
 	}
 
-//	public JTextField getNoBinsField()
-//	{
-//		return this.noBinsField;
-//	}
-//
-//	public String getNoBinsFieldText()
-//	{
-//		return this.noBinsField.getText();
-//	}
-//
 	public boolean isShowPercBoxSelected()
 	{
 		return this.userOptionsPanel.isShowPercBoxSelected();
