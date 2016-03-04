@@ -155,9 +155,15 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	
 	ExportPopup exportPopup;
 	ImportPopup importPopup;
+	
+String[] messages = new String[10];	
+int messageCnt = 0;
 		
 	public JavaLogoSchuifVeld(int x, int y, int b, int h, Uitvoerblad tb)
 	{	
+		
+for (int i = 0; i < messages.length; i++)
+	messages[i] = "message " + i; 
 		//setLayout(null);
 		//setBounds(x,y,b,h);
 		xPos = x; yPos = y; breedte = b; hoogte = h;
@@ -185,6 +191,15 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 		jlsvCanvas.addTouchMoveHandler(touchHandler);
 		jlsvCanvas.addTouchEndHandler(touchHandler);
 
+	}
+	
+	public void setMessage(String s)
+	{
+		messages[messageCnt] = s;
+		messageCnt++;
+		if (messageCnt == messages.length)
+			messageCnt = 0;
+		paint();
 	}
 	
 	public Canvas getCanvas()
@@ -548,6 +563,14 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 //			((CompositeCommandComponent) pps.elementAt(pCnt)).paintComponent(g);
 //		}
 
+//		g.setFillStyle(CssColor.make(0,0,0));
+//		int yMess = 300;
+//		for (int i = 0; i < messages.length; i++)
+//		{	g.fillText(messages[i],programmaComponent.xPos + 5, yMess);
+//			yMess += 20;
+//		}
+			
+		
 	}
 	
 // zoek meteen de CommandContainer, maar wel de diepste, dus recursief	
@@ -1212,6 +1235,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 				int eventX = touch.getPageX() - jlsvCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - jlsvCanvas.getAbsoluteTop();				
 				
+				lastMoveX = eventX;
+				lastMoveY = eventY;
+
 				//mouseDownTouchStartAction(eventX, eventY);
 				mousePressed(eventX, eventY,0);
 				

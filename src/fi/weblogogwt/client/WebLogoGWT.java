@@ -384,6 +384,12 @@ System.out.println("paul");
 logger.info("state != null");			
 			}
 			
+			dlp.forceLayout();
+			webLogoPanel.forceLayout();
+			bottomPanel.forceLayout();
+			jlsVeld.forceLayout();
+			uitvoerblad.forceLayout();
+			
 			jlsVeld.paint();			
 			
 			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;

@@ -358,6 +358,9 @@ public abstract class CommandComponent //extends JPanel
 					pel.parameterComponentClicked(x-getAbsoluteLocation().x, y-getAbsoluteLocation().y);
 				
 					doubletap.clear();
+					
+//					schuifveld.setMessage("double " + commandName + " x = " + (x-getAbsoluteLocation().x) +
+//										  " y = " + (y-getAbsoluteLocation().y));
 				}
 				else if (isLongClick() && !dragging)	
 				{ 	
@@ -366,6 +369,9 @@ public abstract class CommandComponent //extends JPanel
 					pel.parameterComponentClicked(x-getAbsoluteLocation().x, y-getAbsoluteLocation().y);
 				
 					doubletap.clear();
+					
+//					schuifveld.setMessage("long " + commandName + " x = " + (x-getAbsoluteLocation().x) +
+//							  " y = " + (y-getAbsoluteLocation().y));
 				}
 				
 				else

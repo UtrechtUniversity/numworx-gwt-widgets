@@ -21,7 +21,7 @@
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='fi.weblogogwt.client.WebLogoGWT'/>
+  <!-- <entry-point class='fi.weblogogwt.client.WebLogoGWT'/> -->
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
