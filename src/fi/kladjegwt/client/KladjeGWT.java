@@ -97,6 +97,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	
 	boolean lijnen = false;
 	boolean ruitjes = true;
+	int ruitjesSize = 20;
 	boolean lijnTekenen = true;
 	boolean rechthoekTekenen = true;
 	boolean cirkelTekenen = true;
@@ -1014,6 +1015,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 			lijnen = launchState.getBoolean("lijnen");
 		if (launchState.containsKey("ruitjes"))
 			ruitjes = launchState.getBoolean("ruitjes");
+		if (launchState.containsKey("ruitjessize"))
+			ruitjesSize = launchState.getInt("ruitjessize");
+
 		
 		if (launchState.containsKey("lijnTekenen"))
 			lijnTekenen = launchState.getBoolean("lijnTekenen");
@@ -1052,6 +1056,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 
 		kladjeGWTVeld.lijnen = lijnen;
 		kladjeGWTVeld.ruitjes = ruitjes;
+		kladjeGWTVeld.lineDistance = ruitjesSize;
 		KladjeGWTVeld.roteren = roteren;
 		KladjeGWTVeld.schalen = schalen;
 		
@@ -1059,6 +1064,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		kladjeGWTVeld.setState(map);
 
 		makeBottom();
+		
+		dlp.forceLayout();
+		bottomPanel.forceLayout();
 		
 		kladjeGWTVeld.paint();
 	}
