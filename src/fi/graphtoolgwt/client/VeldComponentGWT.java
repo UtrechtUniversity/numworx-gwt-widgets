@@ -27,6 +27,21 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
+import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
+
+import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
 //import fi.beans.stringutils.StringUtils;
@@ -38,6 +53,14 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 
 
 
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
+
+import fi.graphtoolgwt.client.FormuleComponentGWT.CheckBoxClickHandler;
+import fi.graphtoolgwt.client.FormuleComponentGWT.EnOfKnopClickHandler;
+import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.expressies.Expressie;
 
@@ -48,11 +71,12 @@ public class VeldComponentGWT extends LayoutPanel {
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
 	
 	/* component defaults & contstants */
-	public final static int cVeldComponentMaxAantalStelsels = 1;
 	public static ArrayList<String> cVeldGrafiekTypeStrings = new ArrayList<String>();
 	public static ArrayList<String> cVeldGrafiekPijlGrootteModusStrings = new ArrayList<String>();	
 
 	public final static int cDefault_VeldComponentHoogte = 150;
+	public final static int cDefault_VeldComponentBreedte = 300;
+	
 	public final static double cDefault_PijlSchaalFactor = 0.2;
 	public final static int cDefault_PijlGroottePixels = 12;
 	
@@ -61,23 +85,44 @@ public class VeldComponentGWT extends LayoutPanel {
 	public final static boolean cDefault_VeldLargerGridStartPoints = false;
 	public final static int cAccoladeXPositie = 25;
 	public final static int cAantalFormulesPerStelsel = 2;
+	public final static String cDefault_diffVarNaam = "t";
+	
+	public final static int cVeldComponentGWT_maxAantalStelsels = 1;
+	public final static int cDefault_VeldComponentGWT_aantalStelsels = 1;
+	public final static FormuleFont cDefault_VeldgrafiekGWT_formulefont = FormuleFont.getDefault(); 
+	
+//	private VergelijkingVak[] formuleVakken; 
 
-	private VergelijkingVak[] formuleVakken; 
-	private JCheckBox[] checkboxen;
 	private GrafiekGWTVeld grafiekGWTVeld;
+	
+	FieldGraphType veldGrafiekType = cDefault_VeldGrafiekType;
+	FieldGraphArrowSizeMode veldPijlGrootteModus = cDefault_VeldPijlGrootteModus;
+	int veldPijlGroottePixels = cDefault_PijlGroottePixels;
+	double veldPijlSchaalfactor = cDefault_PijlSchaalFactor;
+	boolean veldLargerGridStartPoints = cDefault_VeldLargerGridStartPoints;
+	
+	private int maxAantalStelsels = cVeldComponentGWT_maxAantalStelsels;
+	private int aantalStelsels = cDefault_VeldComponentGWT_aantalStelsels;
+	
+	private int veldComponentBreedte = cDefault_VeldComponentBreedte;
+	private int veldComponentHoogte = cDefault_VeldComponentHoogte;
+	
+	GraphtFormuleEditor[] editors = new GraphtFormuleEditor[maxAantalStelsels];
+	private TouchPanel[] editorPanels = new TouchPanel[maxAantalStelsels];
+	private Widget[][] functieBeginViewers = new Widget[maxAantalStelsels][cAantalFormulesPerStelsel];
+	private CheckBox[] checkboxen = new CheckBox[maxAantalStelsels];
+
 	
 	private final GraphToolGWT interactiePanel;
 	
-	private int maxAantalStelsels = cVeldComponentMaxAantalStelsels;
-	private int aantalStelsels=1;
+	private String[][] functieBegin = new String[maxAantalStelsels][cAantalFormulesPerStelsel];
 	
 	private int actiefNummer;
-	
 	private String xAsNaam = "x";
 	private String yAsNaam = "y";
-	private String diffVarNaam = "t";
+	private String diffVarNaam = cDefault_diffVarNaam;
 	
-	String[] namen = {"f","g","h","i","j","k","l","m","n"};
+	String[] namen = { "f", "g", "h", "i", "j", "k", "l", "m", "n"};
 	private boolean functieBeginZichtbaar = true;
 	private boolean formeleFuncties = false;
 	private boolean domeinInstelbaar = false;
@@ -111,63 +156,426 @@ public class VeldComponentGWT extends LayoutPanel {
 	static DecimalFormatSymbols dfs;
 	public static DecimalFormat df;
 	
-	
-	public VeldComponent(boolean b, GraphToolInteractiePanel gc)
-	{	super(b);
-	
-		zetGrafiekComponent(gc);
-		docent = false;
-		
-		if (cVeldGrafiekTypeStrings.size()<1) {
-			cVeldGrafiekTypeStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiekType_Quiver"));
-//			cVeldGrafiekTypeStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiekType_Streamline"));
-		}
-		
-		if (cVeldGrafiekPijlGrootteModusStrings.size()<1) {
-			cVeldGrafiekPijlGrootteModusStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_RealValue"));
-			cVeldGrafiekPijlGrootteModusStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_FixedSize"));
-			cVeldGrafiekPijlGrootteModusStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_ScaledSize"));
-		}
-	
-		dfs = new DecimalFormatSymbols();
-		if(WiskOpdr.language.toString().equals("nl")) dfs.setDecimalSeparator(',');
-		else dfs.setDecimalSeparator('.');
-		if(WiskOpdr.language.toString().equals("nl")) dfs.setGroupingSeparator(' ');
-		else dfs.setGroupingSeparator(' ');
-		df = new DecimalFormat("0.##########", dfs);
-		
-		zetGrafiekOfEdit(true);
-		setFocusable(true);
-		addFocusListener(this);
-		
-		remove(formuleVak);
-		formuleVak.removeActionListener(this);
-		formuleVak.removeFocusListener(this);
-		setScrollHorizontal(false);
-		
-		// Voorlopig maar 1 stelsel, daarom verwijderen we de nieuweRegelknop & verwijderRegelknop
-		headerPanel.remove(nieuweRegelKnop);
-		nieuweRegelKnop.removeActionListener(this);
-		headerPanel.remove(verwijderRegelKnop);
-		verwijderRegelKnop.removeActionListener(this);
-		
-		ndewortelKnop = new FormuleButton("ndewortel");
-		ndewortelKnop.setBounds(112,2,20,20);
-		ndewortelKnop.addActionListener(this);
-		
-		ndelogKnop = new FormuleButton("ndelog");
-		ndelogKnop.setBounds(156,2,25,20);
-		ndelogKnop.addActionListener(this);
-		
-		absKnop = new FormuleButton("abs");
-		absKnop.setBounds(134,2,20,20);
-		absKnop.addActionListener(this);
-		
+//		
+//		
+//		for(int i = 0; i < functieBegin.length; i++)
+//		{	if(formeleFuncties)
+//				functieBegin[i] = namen[i] + "(" + xAsNaam + ")=";
+//			else
+//				functieBegin[i] = yAsNaam + "=";
+//		}
+//		//prefix = "$ff(x)=@";
+//		//hasPrefix = true;
+//		/*
+//		if(h == null)
+//			return;
+//		
+//		this.h = h;
+//		if (h.get("breedte") != null)
+//			breedte = (Integer) h.get("breedte");
+//		if (h.get("hoogte") != null)
+//			hoogte = (Integer) h.get("hoogte");
+//		*/
+//		
+//		//Image regelMinderImg = new Image("images/resources/pijlterug.gif");
+//		//regelMinderImg.getElement().getStyle().setMargin(2, Unit.PX);
+//		verwijderRegelKnop = new PushButton(regelMinderButtonImage);
+//		verwijderRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
+//		//verwijderRegelKnop.add();
+//		//verwijderRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
+//		//regelMinderButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
+//		//addButtonHandler(verwijderRegelKnop);
+//		verwijderRegelKnop.addClickHandler(new ClickHandler(){
+//
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				verwijderRegel();
+//			}
+//			
+//		});
+//		
+//		//Image regelMeerImg = new Image("images/resources/pijlterug.gif");
+//		//regelMeerImg.getElement().getStyle().setMargin(2, Unit.PX);
+//		nieuweRegelKnop = new PushButton(regelMeerButtonImage);
+//		nieuweRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
+//		nieuweRegelKnop.addClickHandler(new ClickHandler(){
+//			
+//			@Override
+//			public void onClick(ClickEvent event) {
+//				voegRegelToe();
+//			}
+//		});
+//		//nieuweRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
+//		//regelMeerButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
+//		//addButtonHandler(nieuweRegelKnop);
+//		
+//		for(int i = 0; i < functieBeginViewers.length; i++)
+//		{	FormuleViewer f = new FormuleViewer(functieBegin[i]);
+//			f.setColor(interactiePanel.getFormuleColor(i));
+//			f.setFont(defaultfont);
+//			functieBeginViewers[i] = f.getAsPanel();
+//			functieBeginViewers[i].getElement().getStyle().setProperty("display", "inline-block");
+//			functieBeginViewers[i].getElement().getStyle().setProperty("clear", "both");
+//			//functieBeginViewers[i].getElement().getStyle().setColor(interactiePanel.getFormuleColor(i).toString());
+//			//breedte functieBeginViewers instellen aan de hand van de lengte van de string functieBegin[i]. 
+//			//De breedte wordt nu mbv setWidgetLeftWidth op 50 gezet. Als er geen formule-functie-notatie is, dan is dat wat breed.
+//			//functieBeginViewers[i].setWidth((formeleFuncties?50:30) + "px");
+//			
+//			//functieBeginViewers[i].getElement().getStyle().setMarginLeft(5, Unit.PX);
+//		}
+//		
+//		for(int i = 0; i < checkboxen.length; i++)
+//		{	checkboxen[i] = new CheckBox();
+//			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
+//			if(i==0)
+//				geselecteerd[i] = true;
+//			else
+//				geselecteerd[i] = false;
+//			checkboxen[i].setValue(geselecteerd[i]);
+//		}
+//		
+//		for(int i = 0 ; i < enOfKnoppen.length; i++)
+//		{	enOfKnoppen[i] = new PushButton(GraphToolGWT.rb.getString("enOfButton_En"));
+//			//enOfKnoppen[i].setMargin(new Insets(0,0,0,0));
+//			enOfKnoppen[i].setSize("24px", "19px");
+//			enOfKnoppen[i].getElement().getStyle().setPadding(1, Unit.PX);
+//			//enOfKnoppen[i].setOpaque(false);
+//			enOfKnoppen[i].addClickHandler(new EnOfKnopClickHandler(i));
+//		}
+//		
+//		for(int i = 0; i < domeinButtons.length; i++)
+//		{
+//			domeinButtons[i] = new DomeinButtonGWT();
+//		}
+//		
+//	
+//		//sp = new ScrollPanel();
+//		
+//		//sp.getElement().getStyle().setWidth(breedte - 5, Unit.PX);
+//		//sp.getElement().getStyle().setHeight(hoogte - 5, Unit.PX);
+//		//sp.getElement().getStyle().setOverflow(Overflow.AUTO);
+//		//sp.getElement().getStyle().setFloat(Style.Float.LEFT);
+//		
+//		LayoutPanel mainPanel = new LayoutPanel();
+//		final IsWidget wrap = wrap(mainPanel);
+//		this.add(wrap);
+//		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+//		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX); 
+//		FlowPanel rechthoekPanel = new FlowPanel();
+//		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
+//		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+//		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+//		mainPanel.add(rechthoekPanel);
+//		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+//		mainPanel.setWidgetTopHeight(rechthoekPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+//		
+//		
+//		mainPanel.add(verwijderRegelKnop);
+//		mainPanel.add(nieuweRegelKnop);
+//		mainPanel.setWidgetLeftWidth(verwijderRegelKnop, breedte - 90, Style.Unit.PX, 40, Style.Unit.PX);
+//		mainPanel.setWidgetTopHeight(verwijderRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
+//		mainPanel.setWidgetLeftWidth(nieuweRegelKnop, breedte - 45, Style.Unit.PX, 40, Style.Unit.PX);
+//		mainPanel.setWidgetTopHeight(nieuweRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
+//		
+//		
+//		regelsPanel = new LayoutPanel();
+//		//contentPanel.addStyleName(graphToolCss.backgroundred());
+//		//contentPanel.getElement().getStyle().setPadding(5, Unit.PX);
+//		//contentPanel.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+//		//contentPanel.getElement().getStyle().setProperty("display", "block");
+//		sp = new ScrollPanel(regelsPanel);
+//		sp.setWidget(regelsPanel);
+//		mainPanel.add(sp);
+//		mainPanel.setWidgetLeftWidth(sp, 1, Style.Unit.PX, breedte - 1, Style.Unit.PX);
+//		mainPanel.setWidgetTopHeight(sp, 30, Style.Unit.PX, hoogte - 31, Style.Unit.PX);
+//		
+//		//final IsWidget wrap = wrap(contentPanel);
+//		//this.add(wrap);
+//		//this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+//		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+//		
+//		
+//		for(int i = 0; i < regelPanels.length; i++)
+//		{	/*regelPanels[i] = new FlowPanel();
+//			layoutRegelPanel(regelPanels[i]);
+//			highLight(regelPanels[i], true);
+//			regelPanels[i].add(checkboxen[i]);
+//			if (!functieBeginAanpasbaar)
+//				regelPanels[i].add(functieBeginViewers[i]);
+//		
+//			editors[i] = addNewEditor(regelPanels[i], i);//hoeft niet voor elke regel?
+//			if(functieBeginAanpasbaar && functieBeginZichtbaar)
+//				editors[i].insert(functieBegin[i]);
+//			if(domeinInstelbaar)
+//				regelPanels[i].add(domeinButtons[i]);
+//				*/
+//			regelPanels[i] = new LayoutPanel();
+//			layoutRegelPanel(regelPanels[i]);
+//			highLight(regelPanels[i], true);
+//			regelPanels[i].add(checkboxen[i]);
+//			//hier
+//			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
+//			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
+//			
+//			if(!functieBeginAanpasbaar)
+//			{	regelPanels[i].add(functieBeginViewers[i]);
+//				regelPanels[i].setWidgetLeftWidth(functieBeginViewers[i], 20, Style.Unit.PX, formeleFuncties?43:30, Style.Unit.PX);
+//				regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
+//			}
+//			editors[i] = factor.build(i);
+//			if (functieBeginAanpasbaar)
+//				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
+//			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
+//			editors[i].setFont(defaultfont);
+//			editors[i].setColor(interactiePanel.getFormuleColor(i));
+//			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
+//			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
+//			editors[i].setCurrent(0, 0);
+//			//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
+//			//editor.installKeyboard(kb);
+//			//editors[i].requestFocus();
+//			//if (!functieBeginAanpasbaar)
+//			//	regelPanels[i].add(functieBeginViewers[i]);
+//			regelPanels[i].add(editorPanels[i]);
+//			addFormulePanelListeners(editorPanels[i], editors[i]);
+//			
+//			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
+//					domeinInstelbaar?20:0, Style.Unit.PX);
+//			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
+//			if(functieBeginAanpasbaar && functieBeginZichtbaar)
+//				editors[i].insert(functieBegin[i]);
+//			if(domeinInstelbaar)
+//			{	regelPanels[i].add(domeinButtons[i]);
+//				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
+//				regelPanels[i].setWidgetTopHeight(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
+//			}
+//			editors[i].setCurrentElementRepaint();
+//		}
+//		
+//		regelsPanel.add(regelPanels[0]);
+//		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
+//		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
+//		resize();
+//		//checkboxen[0].setValue(true);
+//		
 //		domeinStrings = new String[maxAantalFormules][2];
 //		for(int i = 0; i < maxAantalFormules; i++)
 //		{	domeinStrings[i][0] = "$f" + Double.NEGATIVE_INFINITY + "@";
 //			domeinStrings[i][1] = "$f" + Double.POSITIVE_INFINITY + "@";
 //		}
+//		
+//		DEFAULTDOMEIN = new double[2];
+//		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;
+//		DEFAULTDOMEIN[1] = Double.POSITIVE_INFINITY;
+//		
+//		domeinen = new double[maxAantalFormules][2];
+//		for(int i = 0; i < maxAantalFormules; i++)
+//		{	domeinen[i][0] = DEFAULTDOMEIN[0];
+//			domeinen[i][1] = DEFAULTDOMEIN[1];
+//		}
+//		
+//		isOngelijkheid = new boolean[maxAantalFormules];
+//		for(int i = 0; i < maxAantalFormules; i++)
+//		{	isOngelijkheid[i] = false;
+//		
+//		}
+//		
+//		isEn = new boolean[maxAantalFormules];
+//		for(int i = 0; i<isEn.length; i++)
+//		{	isEn[i] = true;
+//		
+//		}
+//		fromuser = true;
+//		//contentPanel.getElement().addClassName("insert_formule_steps");
+//	}
+	
+	public void processLaunchData(Map<String, Object> launchData) {
+	
+		if(launchData != null) {
+			
+			if(launchData.containsKey("veldGrafiekType"))
+				veldGrafiekType = FieldGraphType.values()[ ((Integer)launchData.get("veldGrafiekType")).intValue() ];
+			
+			if(launchData.containsKey("veldPijlGrootteModus"))
+				veldPijlGrootteModus = FieldGraphArrowSizeMode.values()[ ((Integer)launchData.get("veldPijlGrootteModus")).intValue() ];
+			
+			if(launchData.containsKey("veldPijlGroottePixels"))
+				veldPijlGroottePixels = ((Integer)launchData.get("veldPijlGroottePixels")).intValue();
+			
+			if(launchData.containsKey("veldPijlSchaalfactor"))
+				veldPijlSchaalfactor = ((Double)launchData.get("veldPijlSchaalfactor")).doubleValue();
+			
+			if(launchData.containsKey("veldLargerGridStartPoints"))
+				veldLargerGridStartPoints = ((Boolean)launchData.get("veldLargerGridStartPoints")).booleanValue();
+		
+			if(launchData.containsKey("veldComponentHoogte"))
+				veldComponentHoogte = ((Number)launchData.get("veldComponentHoogte")).intValue();
+//			if(launchData.containsKey("xAsNaam"))
+//				xAsNaam = (String)launchData.get("xAsNaam");
+//			if(launchData.containsKey("yAsNaam"))
+//				yAsNaam = (String)launchData.get("yAsNaam");			
+		}
+	}
+	
+	public void initializeFunctieBegin() {
+		for (int i = 0; i < functieBegin.length; i++) {
+			functieBegin[i][0] = "$f$bd" + xAsNaam + "$nd" + diffVarNaam + "@@=@";
+			functieBegin[i][1] = "$f$bd" + yAsNaam + "$nd" + diffVarNaam + "@@=@";
+		}
+	}
+	
+	private IsWidget wrap (IsWidget widget) {
+		//FocusOnTouch.installKeyboard(interactiePanel.kb);
+		FocusPanel focus = FocusOnTouch.wrap (widget.asWidget(), false);
+		//focus.addKeyDownHandler(interactiePanel.keyHandler);
+		//focus.addKeyPressHandler(interactiePanel.keyHandler);
+		//focus.add(widget);
+		//focus.addMouseUpHandler(new FocusOnTouch(focus));
+		return focus;
+	}
+	
+	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte ) {
+//		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
+//		graphToolCss = graphToolGWTClientBundle.getGraphToolGWTCSS();
+//		graphToolCss.ensureInjected();
+		
+		this.interactiePanel = interactiePanel;
+		this.veldComponentBreedte = breedte;
+		processLaunchData(launchData);
+		
+		// PROGRESS LINE
+		
+		docent = false;
+		
+		if (cVeldGrafiekTypeStrings.size()<1) {
+			cVeldGrafiekTypeStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiekType_Quiver"));
+//			cVeldGrafiekTypeStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiekType_Streamline"));
+		}
+		
+		if (cVeldGrafiekPijlGrootteModusStrings.size()<1) {
+			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_RealValue"));
+			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_FixedSize"));
+			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_ScaledSize"));
+		}
+		
+		initializeFunctieBegin();
+		
+		for (int i = 0; i < functieBeginViewers.length; i++) {	
+			for (int j = 0; j < cAantalFormulesPerStelsel; j++) {  
+				FormuleViewer f = new FormuleViewer(functieBegin[i][j]);
+				f.setColor(interactiePanel.getFormuleColor(i));
+				f.setFont(cDefault_VeldgrafiekGWT_formulefont);
+				functieBeginViewers[i][j] = f.getAsPanel();
+				functieBeginViewers[i][j].getElement().getStyle().setProperty("display", "inline-block");
+				functieBeginViewers[i][j].getElement().getStyle().setProperty("clear", "both");
+			}
+		}
+		
+		for(int i = 0; i < checkboxen.length; i++) {	
+			checkboxen[i] = new CheckBox();
+			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
+			checkboxen[i].setValue(i==0);
+		}
+		
+		
+		LayoutPanel mainPanel = new LayoutPanel();
+		final IsWidget wrap = wrap(mainPanel);
+		this.add(wrap);
+		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
+		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX); 
+		FlowPanel rechthoekPanel = new FlowPanel();
+		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
+		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+		mainPanel.add(rechthoekPanel);
+		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(rechthoekPanel, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX);
+		
+		regelsPanel = new LayoutPanel();
+		//contentPanel.addStyleName(graphToolCss.backgroundred());
+		//contentPanel.getElement().getStyle().setPadding(5, Unit.PX);
+		//contentPanel.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+		//contentPanel.getElement().getStyle().setProperty("display", "block");
+		sp = new ScrollPanel(regelsPanel);
+		sp.setWidget(regelsPanel);
+		mainPanel.add(sp);
+		mainPanel.setWidgetLeftWidth(sp, 1, Style.Unit.PX, breedte - 1, Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(sp, 30, Style.Unit.PX, hoogte - 31, Style.Unit.PX);
+		
+		//final IsWidget wrap = wrap(contentPanel);
+		//this.add(wrap);
+		//this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		
+		
+		for(int i = 0; i < regelPanels.length; i++) {	
+			/*regelPanels[i] = new FlowPanel();
+			layoutRegelPanel(regelPanels[i]);
+			highLight(regelPanels[i], true);
+			regelPanels[i].add(checkboxen[i]);
+			if (!functieBeginAanpasbaar)
+				regelPanels[i].add(functieBeginViewers[i]);
+		
+			editors[i] = addNewEditor(regelPanels[i], i);//hoeft niet voor elke regel?
+			if(functieBeginAanpasbaar && functieBeginZichtbaar)
+				editors[i].insert(functieBegin[i]);
+			if(domeinInstelbaar)
+				regelPanels[i].add(domeinButtons[i]);
+				*/
+			regelPanels[i] = new LayoutPanel();
+			layoutRegelPanel(regelPanels[i]);
+			highLight(regelPanels[i], true);
+			regelPanels[i].add(checkboxen[i]);
+			//hier
+			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
+			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
+			
+			if(!functieBeginAanpasbaar)
+			{	regelPanels[i].add(functieBeginViewers[i]);
+				regelPanels[i].setWidgetLeftWidth(functieBeginViewers[i], 20, Style.Unit.PX, formeleFuncties?43:30, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
+			}
+			editors[i] = factor.build(i);
+			if (functieBeginAanpasbaar)
+				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
+			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
+			editors[i].setFont(defaultfont);
+			editors[i].setColor(interactiePanel.getFormuleColor(i));
+			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
+			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
+			editors[i].setCurrent(0, 0);
+			//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
+			//editor.installKeyboard(kb);
+			//editors[i].requestFocus();
+			//if (!functieBeginAanpasbaar)
+			//	regelPanels[i].add(functieBeginViewers[i]);
+			regelPanels[i].add(editorPanels[i]);
+			addFormulePanelListeners(editorPanels[i], editors[i]);
+			
+			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
+					domeinInstelbaar?20:0, Style.Unit.PX);
+			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
+			if(functieBeginAanpasbaar && functieBeginZichtbaar)
+				editors[i].insert(functieBegin[i]);
+			if(domeinInstelbaar)
+			{	regelPanels[i].add(domeinButtons[i]);
+				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
+			}
+			editors[i].setCurrentElementRepaint();
+		}
+		
+		regelsPanel.add(regelPanels[0]);
+		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
+		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
+		resize();
+		//checkboxen[0].setValue(true);
+		
+		DEFAULTDOMEIN = new double[2];
+		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;
+		DEFAULTDOMEIN[1] = Double.POSITIVE_INFINITY;
+		
+		fromuser = true;
 		
 		DEFAULTDOMEIN = new double[2];
 		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;

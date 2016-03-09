@@ -243,8 +243,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 			if(launchData.containsKey("xAsNaam"))
 				xAsNaam = (String)launchData.get("xAsNaam");
 			if(launchData.containsKey("yAsNaam"))
-				yAsNaam = (String)launchData.get("yAsNaam");
-			
+				yAsNaam = (String)launchData.get("yAsNaam");			
 		}
 		
 		
@@ -385,8 +384,8 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		
 		
-		for(int i = 0; i < regelPanels.length; i++)
-		{	/*regelPanels[i] = new FlowPanel();
+		for(int i = 0; i < regelPanels.length; i++) {	
+			/*regelPanels[i] = new FlowPanel();
 			layoutRegelPanel(regelPanels[i]);
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);

@@ -115,7 +115,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	final double asDefaultXMin=-8, asDefaultXMax=10, asDefaultXStap=2;
 	final double asDefaultYMin=-7, asDefaultYMax=2, asDefaultYStap=2;
-
 	
 	//UI
 	FlowPanel basisPanel = new FlowPanel();
