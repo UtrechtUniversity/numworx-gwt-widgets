@@ -445,7 +445,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
 			editors[i].setFont(defaultfont);
 			editors[i].setDefaultFont(defaultfont);
-			logger.info("Editor["+i+"].fontSize = "+editors[i].getFont().getFontSize());
 
 			editors[i].setColor(interactiePanel.getFormuleColor(i));
 			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
