@@ -27,6 +27,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
@@ -89,7 +90,13 @@ public class VeldComponentGWT extends LayoutPanel {
 	
 	public final static int cVeldComponentGWT_maxAantalStelsels = 1;
 	public final static int cDefault_VeldComponentGWT_aantalStelsels = 1;
-	public final static FormuleFont cDefault_VeldgrafiekGWT_formulefont = FormuleFont.getDefault(); 
+	public final static FormuleFont cDefault_VeldgrafiekGWT_formulefont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+	
+	public final static CssColor cVeldComponentGWT_borderColor = CssColor.make(211, 211, 211);
+	public final static 
+	rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+	rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+
 	
 //	private VergelijkingVak[] formuleVakken; 
 
@@ -484,7 +491,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
 		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX); 
 		FlowPanel rechthoekPanel = new FlowPanel();
-		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
+		rechthoekPanel.getElement().getStyle().setBorderColor( CssColor.make(211, 211, 211).toString() );
 		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
 		mainPanel.add(rechthoekPanel);
