@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
@@ -109,6 +110,30 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 			fc.grafiekGWTVeld.paint();
 		}
 		
+
+		@Override
+		public void setFont(FormuleFont fm) {
+			super.setFont(fm);
+		}
+
+		@Override
+		public void diff_partial() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void stelsel() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public FormuleFont getDefaultFont() {
+			// TODO Auto-generated method stub
+			return super.getDefaultFont();
+		}
+
 		public void resize()
 		{
 			fc.resize();
@@ -201,8 +226,9 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	boolean fromuser;
 	
 	
-	public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte) {	
-		defaultfont = FormuleFont.getDefault();
+public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte) {
+		defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+		
 		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
 		graphToolCss = graphToolGWTClientBundle.getGraphToolGWTCSS();
 		graphToolCss.ensureInjected();
@@ -299,9 +325,10 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		//addButtonHandler(nieuweRegelKnop);
 		
 		for(int i = 0; i < functieBeginViewers.length; i++) {	
-			FormuleViewer f = new FormuleViewer(functieBegin[i]);
+			FormuleViewer f = new FormuleViewer(functieBegin[i]); // font is instellingen.font
 			f.setColor(interactiePanel.getFormuleColor(i));
-			f.setFont(defaultfont);
+			f.setFont(defaultfont); // dit is het standaard font.
+			f.setDefaultFont(defaultfont); // dit ook!
 			f.setDefaultFont(defaultfont);
 			functieBeginViewers[i] = f.getAsPanel();
 			functieBeginViewers[i].getElement().getStyle().setProperty("display", "inline-block");
@@ -419,6 +446,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 			editors[i].setFont(defaultfont);
 			editors[i].setDefaultFont(defaultfont);
 			logger.info("Editor["+i+"].fontSize = "+editors[i].getFont().getFontSize());
+
 			editors[i].setColor(interactiePanel.getFormuleColor(i));
 			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
 			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
