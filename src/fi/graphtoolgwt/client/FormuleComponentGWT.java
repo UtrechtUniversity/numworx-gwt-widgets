@@ -226,8 +226,9 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	boolean fromuser;
 	
 	
-	public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte)
-	{	defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte) {
+		defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+		
 		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
 		graphToolCss = graphToolGWTClientBundle.getGraphToolGWTCSS();
 		graphToolCss.ensureInjected();
@@ -237,8 +238,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		
 		this.breedte = breedte;
 		this.hoogte = hoogte;
-		if(launchData != null)
-		{
+		if(launchData != null) {
 			//if(launchData.containsKey("grafiekKleuren"))
 			//	grafiekKleuren = ((Boolean)launchData.get("grafiekKleuren")).booleanValue();
 			//if(launchData.containsKey("kleurInstelbaar"))
@@ -324,11 +324,12 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		//regelMeerButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		//addButtonHandler(nieuweRegelKnop);
 		
-		for(int i = 0; i < functieBeginViewers.length; i++)
-		{	FormuleViewer f = new FormuleViewer(functieBegin[i]); // font is instellingen.font
+		for(int i = 0; i < functieBeginViewers.length; i++) {	
+			FormuleViewer f = new FormuleViewer(functieBegin[i]); // font is instellingen.font
 			f.setColor(interactiePanel.getFormuleColor(i));
 			f.setFont(defaultfont); // dit is het standaard font.
 			f.setDefaultFont(defaultfont); // dit ook!
+			f.setDefaultFont(defaultfont);
 			functieBeginViewers[i] = f.getAsPanel();
 			functieBeginViewers[i].getElement().getStyle().setProperty("display", "inline-block");
 			functieBeginViewers[i].getElement().getStyle().setProperty("clear", "both");
@@ -444,6 +445,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
 			editors[i].setFont(defaultfont);
 			editors[i].setDefaultFont(defaultfont);
+
 			editors[i].setColor(interactiePanel.getFormuleColor(i));
 			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
 			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
