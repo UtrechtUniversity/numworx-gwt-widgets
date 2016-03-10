@@ -69,7 +69,7 @@
   	<dependency>
   		<groupId>gwt.geom</groupId>
   		<artifactId>gwt-geom</artifactId>
-  		<version>0.0.0</version>
+  		<version>0.0.1</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
