@@ -1366,6 +1366,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			this.columnNames.remove(columnIndex);
 			this.columnClass.remove(columnIndex);
+			this.stringOptions.remove(columnIndex);
 			this.stringFrequencies.remove(columnIndex);
 			
 			for (ArrayList<Object> row : this.values)
@@ -1405,38 +1406,6 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			
 			this.cellOutlierList.remove(column);			
 		}
-	}
-
-	/**
-	 * Update the column index for the views.
-	 */
-	private void updateColumnIndexInViews(int removedIndex)
-	{
-//		System.out.println("StatTableModel.updateColumnIndexInViews(" 
-//			+ removedIndex + ")");
-		
-		// TODO test syl: RemoveColumnEvent maken met in elke view/model onRemoveColumn() {updateColumnIndex()}
-
-//		for (ChangeHandler t : this.handlers)
-//		{
-//			if (t.getClass() == BoxplotModel.class)
-//			{
-//				((BoxplotModel) t).updateColumnIndex(removedIndex);
-//			}
-//			else if (t.getClass() == HistogramModel.class)
-//			{
-//				((HistogramModel) t).updateColumnIndex(removedIndex);
-//			}
-//			else if (t.getClass() == DotplotModel.class)
-//			{
-//				((DotplotModel) t).updateColumnIndex(removedIndex);
-//			}
-//			else if (t.getClass() == FrequencyTableModel.class)
-//			{
-//				((FrequencyTableModel) t).updateColumnIndex(removedIndex);
-//			}
-			// andere views...
-//		}
 	}
 
 	/**
