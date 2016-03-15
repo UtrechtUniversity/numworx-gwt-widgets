@@ -128,6 +128,7 @@ public class BoxplotController implements StatistiekView
 		h.put("columnSplitIndex", this.model.getColumnSplitIndex());
 		h.put("name", this.model.getViewName());
 		h.put("splitBoundaries", this.model.getSplitBinBoundaries());
+		h.put("tukeyBox", this.model.isTukeyBox());
 		h.put("verticalBoxplots", this.model.isVerticalBoxplots());
 
 		return h;
@@ -169,6 +170,14 @@ public class BoxplotController implements StatistiekView
 			}
 
 			this.model.setSplitBoundaries(splitBoundaries);
+		}
+		if (map.containsKey("tukeyBox"))
+		{
+			this.model.setIsTukeyBox(map.getBoolean("tukeyBox"));
+		}
+		else
+		{
+			this.model.setIsTukeyBox(false); // oude boxplots default geen Tukey
 		}
 		if (map.containsKey("verticalBoxplots"))
 		{
