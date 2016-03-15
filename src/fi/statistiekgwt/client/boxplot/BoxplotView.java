@@ -281,6 +281,11 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 		return (String) this.userOptionsPanel.getColumnBoxSelectedString();
 	}
 
+	public boolean isTukeyBoxSelected()
+	{
+		return this.userOptionsPanel.isTukeyBoxSelected();
+	}
+
 	public boolean isVerticalBoxesButtonSelected()
 	{
 		return this.userOptionsPanel.isVerticalBoxesButtonSelected();
@@ -355,7 +360,7 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 		model.setPercentileValues();
 		
 		// check for empty data set
-		if (this.model.getDataMinValue() != null)
+		if (!this.model.isEmptyBoxplot())
 		{
 			this.dialogButton.setVisible(this.model.getStatTableModel()
 				.isViewsEditable());
@@ -365,44 +370,27 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 			if (this.model.getStatTableModel().isColumnIndexValid(
 				this.model.getColumnIndex()))
 			{
+				this.mainPanel.setDrawable(true);
+				
 				if (!this.model.getStatTableModel().isColumnIndexValid(
 					this.model.getColumnSplitIndex()))
 				{
+					// no split
+					this.mainPanel.set(
+						this.model.getStatTableModel().getColumnName(this.model.getColumnIndex()),
+						this.model.getOutlierMinValue(0),
+						this.model.getMinValue(0),
+						this.model.getLowerQuartile(0),
+						this.model.getMedian(0),
+						this.model.getUpperQuartile(0),
+						this.model.getMaxValue(0),
+						this.model.getOutlierMaxValue(0),
+						this.model.getDataMinValue(),
+						this.model.getDataMaxValue(),
+						this.model.isVerticalBoxplots(),
+						this.getWidth(),
+						this.getHeight());
 
-					if (this.model.isVerticalBoxplots())
-					{
-						this.mainPanel.set(
-							this.model.getStatTableModel().getColumnName(this.model.getColumnIndex()),
-							this.model.getMinValue(0),
-							this.model.getLowerQuartile(0),
-							this.model.getMedian(0),
-							this.model.getUpperQuartile(0),
-							this.model.getMaxValue(0),
-							this.model.getDataMinValue(),
-							this.model.getDataMaxValue(),
-							this.model.isVerticalBoxplots(),
-							this.getWidth(),
-							this.getHeight());
-						
-					} // vertical boxplots
-					else
-					{
-						// horizontal boxplots
-						
-						this.mainPanel.set(
-							this.model.getStatTableModel().getColumnName(this.model.getColumnIndex()),
-							this.model.getMinValue(0),
-							this.model.getLowerQuartile(0),
-							this.model.getMedian(0),
-							this.model.getUpperQuartile(0),
-							this.model.getMaxValue(0),
-							this.model.getDataMinValue(),
-							this.model.getDataMaxValue(),
-							this.model.isVerticalBoxplots(),
-							this.getWidth(),
-							this.getHeight());
-						
-					} // horizontal boxplots
 				} // no split
 				else
 				{
@@ -411,11 +399,13 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 					// set with arrays of values for each split class
 					this.mainPanel.set(
 						this.model.getStatTableModel().getColumnName(this.model.getColumnIndex()),
+						this.model.getOutlierMinValues(),
 						this.model.getMinValues(),
 						this.model.getLowerQuartiles(),
 						this.model.getMedians(),
 						this.model.getUpperQuartiles(),
 						this.model.getMaxValues(),
+						this.model.getOutlierMaxValues(),
 						this.model.getDataMinValue(),
 						this.model.getDataMaxValue(),
 						this.model.isVerticalBoxplots(),
@@ -423,10 +413,18 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 						this.getHeight());
 						
 				}
+
+			} // columnIndex valid
+			else
+			{
+				this.mainPanel.setDrawable(false);
 			}
+			
 		} // non empty dataset
 		else
 		{
+			this.mainPanel.setDrawable(false);
+			
 			// empty dataset
 			userOptionsPanel.update();			
 		}
@@ -434,6 +432,11 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 		this.setMainPanelSize();
 
 		this.mainPanel.initializeHighlightValues();
+		
+		if (this.model.isTukeyBox() && !this.getModel().isEmptyBoxplot())
+		{
+			this.mainPanel.initializeOutlierHighlightValues();
+		}
 		
 		this.mainPanel.paint();
 	}
@@ -487,6 +490,11 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 				else if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
 				{
 					this.model.updateColumnIndex(event.getColumnIndex());
+					if (this.model.getColumnSplitIndex() == -1)
+					{
+						getUserOptionsPanel().setVisibleSplitOptions(false);
+						getUserOptionsPanel().clearGUISplitComponents();
+					}
 				}
 				
 				// update both view and user options panel
