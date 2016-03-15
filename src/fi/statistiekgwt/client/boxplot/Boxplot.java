@@ -30,6 +30,7 @@ import fi.statistiekgwt.client.types.ColumnType;
  */
 public class Boxplot
 {
+	private static final int COMPENSATION_POSITION_ASTERIX = 10;
 	private boolean drawable;
 	private Canvas canvas;
 	private BoxplotMouseMoveHandler mouseMoveHandler;
@@ -40,6 +41,11 @@ public class Boxplot
 	private BoxplotView boxplotView;
 	private String columnName;
 
+	/**
+	 * An arraylist with an array of outlier values on the
+	 * lower side of the Tukey boxplot for each split class.
+	 */
+	private ArrayList<ArrayList<Double>> outlierMinValues;
 	/**
 	 * An array of the minimum values for the data of the boxplot
 	 * for each split class.
@@ -65,6 +71,11 @@ public class Boxplot
 	 * for each split class.
 	 */
 	private ArrayList<Double> maxValues;
+	/**
+	 * An arraylist with an array of outlier values on the
+	 * upper side of the Tukey boxplot for each split class.
+	 */
+	private ArrayList<ArrayList<Double>> outlierMaxValues;
 
 	/**
 	 * The minimum value in the data set.
@@ -90,6 +101,10 @@ public class Boxplot
 	private boolean verticalBoxplots;
 	
 	/**
+	 * For each split class an array of booleans 'is highlighted y/n' for the lower outlier values.
+	 */
+	private ArrayList<ArrayList<Boolean>> highlightOutlierMinValues;
+	/**
 	 * Array of booleans 'is highlighted y/n' for the minimum value of each split class.
 	 */
 	private ArrayList<Boolean> highlightMinValues;
@@ -109,13 +124,20 @@ public class Boxplot
 	 * Array of booleans 'is highlighted y/n' for the maximum value of each split class.
 	 */
 	private ArrayList<Boolean> highlightMaxValues;
+	/**
+	 * For each split class an array of booleans 'is highlighted y/n' for the upper outlier values.
+	 */
+	private ArrayList<ArrayList<Boolean>> highlightOutlierMaxValues;
 	
 	private int independentAxisWidth = 50;
 	private int independentAxisHeight = 50;
 	private int dependentAxisWidth = 50;
 	private int dependentAxisHeight = 50;
 
-	private static final double FONT_HEIGHT = 20;
+	private static final double FONT_HEIGHT = 8;
+	private static final String OUTLIER_FONT_STRING = "bold 18px sans-serif";
+	private static final String SELECTED_OUTLIER_FONT_STRING = "bold 22px sans-serif";
+	private static final int SELECTED_LINE_WIDTH = 3;
 
 	public static double WIDTH_FILL_FRACTION = 0.8;
 	public static double FILL_FRACTION = 0.8;
@@ -152,26 +174,30 @@ public class Boxplot
 	 */
 	public void initializeHighlightValues()
 	{
-		int numberOfSplits = this.boxplotView.getModel().getSplitClasses();
+		int numberOfSplits = this.boxplotView.getModel().getNumberOfSplitClasses();
 		
 		if (numberOfSplits == 1)
 		{
 			this.independentAxisWidth = 0;
 		}
 		
+		this.highlightOutlierMinValues = new ArrayList<ArrayList<Boolean>>();
 		this.highlightMinValues = new ArrayList<Boolean>();
 		this.highlightLowerQuartiles = new ArrayList<Boolean>();
 		this.highlightMedians = new ArrayList<Boolean>();
 		this.highlightUpperQuartiles = new ArrayList<Boolean>();
 		this.highlightMaxValues = new ArrayList<Boolean>();
+		this.highlightOutlierMaxValues = new ArrayList<ArrayList<Boolean>>();
 
 		for (int i = 0; i < numberOfSplits; i++)
 		{
+			this.highlightOutlierMinValues.add(i, new ArrayList<Boolean>());
 			this.highlightMinValues.add(i, false);
 			this.highlightLowerQuartiles.add(i, false);
 			this.highlightMedians.add(i, false);
 			this.highlightUpperQuartiles.add(i, false);
 			this.highlightMaxValues.add(i, false);
+			this.highlightOutlierMaxValues.add(i, new ArrayList<Boolean>());
 		}
 	}
 
@@ -179,19 +205,25 @@ public class Boxplot
 	 * Set boxplot values without split.
 	 * 
 	 * @param columnName
+	 * @param outlierMinValues
+	 * 			The values of the lower outliers.
 	 * @param minValue
+	 * 			The value of the lower whisker.
 	 * @param lowerQuartile
 	 * @param median
 	 * @param upperQuartile
 	 * @param maxValue
+	 * 			The value of the upper whisker.
+	 * @param outlierMaxValues
+	 * 			The values of the upper outliers.
 	 * @param dataMinValue
 	 * @param dataMaxValue
 	 * @param verticalBoxplots
 	 * @param width
 	 * @param height
 	 */
-	public void set(String columnName, Double minValue, Double lowerQuartile,
-		Double median, Double upperQuartile, Double maxValue,
+	public void set(String columnName, ArrayList<Double> outlierMinValues, Double minValue, Double lowerQuartile,
+		Double median, Double upperQuartile, Double maxValue, ArrayList<Double> outlierMaxValues,
 		Double dataMinValue, Double dataMaxValue, boolean verticalBoxplots,
 		int width, int height)
 	{
@@ -212,6 +244,8 @@ public class Boxplot
 			drawable = true;
 		}
 
+		this.outlierMinValues = new ArrayList<ArrayList<Double>>();
+		this.outlierMinValues.add(outlierMinValues);
 		this.minValues = new ArrayList<Double>();
 		this.minValues.add(minValue);
 		this.lowerQuartiles = new ArrayList<Double>();
@@ -222,6 +256,8 @@ public class Boxplot
 		this.upperQuartiles.add(upperQuartile);
 		this.maxValues = new ArrayList<Double>();
 		this.maxValues.add(maxValue);
+		this.outlierMaxValues = new ArrayList<ArrayList<Double>>();
+		this.outlierMaxValues.add(outlierMaxValues);
 
 		this.dataMinValue = dataMinValue;
 		this.dataMaxValue = dataMaxValue;
@@ -234,19 +270,25 @@ public class Boxplot
 	 * Set boxplot values with a split.
 	 * 
 	 * @param columnName
+	 * @param outlierMinValues
+	 * 			An array of values of the lower outliers.
 	 * @param minValues
+	 * 			An array of values of the lower whisker.
 	 * @param lowerQuartiles
 	 * @param medians
 	 * @param upperQuartiles
 	 * @param maxValues
+	 * 			An array of values of the upper whisker.
+	 * @param outlierMaxValues
+	 * 			An array of values of the upper outliers.
 	 * @param dataMinValue
 	 * @param dataMaxValue
 	 * @param verticalBoxplots
 	 * @param width
 	 * @param height
 	 */
-	public void set(String columnName, ArrayList<Double> minValues, ArrayList<Double> lowerQuartiles,
-		ArrayList<Double> medians, ArrayList<Double> upperQuartiles, ArrayList<Double> maxValues,
+	public void set(String columnName, ArrayList<ArrayList<Double>> outlierMinValues, ArrayList<Double> minValues, ArrayList<Double> lowerQuartiles,
+		ArrayList<Double> medians, ArrayList<Double> upperQuartiles, ArrayList<Double> maxValues, ArrayList<ArrayList<Double>> outlierMaxValues,
 		Double dataMinValue, Double dataMaxValue, boolean verticalBoxplots,
 		int width, int height)
 	{
@@ -267,11 +309,13 @@ public class Boxplot
 			drawable = true;
 		}
 
+		this.outlierMinValues = outlierMinValues;
 		this.minValues = minValues;
 		this.lowerQuartiles = lowerQuartiles;
 		this.medians = medians;
 		this.upperQuartiles = upperQuartiles;
 		this.maxValues = maxValues;
+		this.outlierMaxValues = outlierMaxValues;
 
 		this.dataMinValue = dataMinValue;
 		this.dataMaxValue = dataMaxValue;
@@ -327,11 +371,11 @@ public class Boxplot
 	}
 
 	/**
-	 * Determines for each split class the y coordinate (vertical boxplot) or the
-	 * x coordinate (horizontal boxplot) on the screen in the boxplot of value d.
+	 * Determines for an array of values the y coordinate (vertical boxplot) or the
+	 * x coordinate (horizontal boxplot) on the screen in the boxplot.
 	 * 
-	 * @return an array of coordinates on the screen in the boxplot of value d
-	 * 		for each split class
+	 * @return an array of coordinates on the screen in the boxplot of 
+	 * 		the array of values
 	 */
 	private int[] valueToScreenLocation(ArrayList<Double> values)
 	{
@@ -427,15 +471,15 @@ public class Boxplot
 	 */
 	public void paint()
 	{
+		// clear panel
+		Context2d context = canvas.getContext2d();
+		context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+		
 		if (!this.drawable)
 		{
 			return;
 		}
 
-		// clear panel
-		Context2d context = canvas.getContext2d();
-		context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
-		
 		this.setSingleBoxAreaWidth();
 
 		if (boxplotView.hasSplit())
@@ -458,7 +502,7 @@ public class Boxplot
 	 */
 	private void paintBoxplotArea(Context2d context)
 	{
-		int numberOfSplitClasses = boxplotView.getModel().getSplitClasses();
+		int numberOfSplitClasses = boxplotView.getModel().getNumberOfSplitClasses();
 
 		for (int splitClass = 0; splitClass < numberOfSplitClasses; splitClass++)
 		{
@@ -526,6 +570,17 @@ public class Boxplot
 		int[] locationMedians = valueToScreenLocation(medians);
 		int[] locationUpperQuartiles = valueToScreenLocation(upperQuartiles);
 		int[] locationMaxValues = valueToScreenLocation(maxValues);
+		int[] locationOutlierMinValues = null;
+		int[] locationOutlierMaxValues = null;
+
+		if (this.boxplotView.getModel().isTukeyBox() && !this.boxplotView.getModel().isEmptyBoxplot())
+		{
+			locationOutlierMinValues = valueToScreenLocation(outlierMinValues.get(splitClass));
+			locationOutlierMaxValues = valueToScreenLocation(outlierMaxValues.get(splitClass));
+		}
+		
+		// the radius for the outlier dots
+		double dotRadius = 3;
 
 		if (this.verticalBoxplots)
 		{
@@ -534,6 +589,15 @@ public class Boxplot
 
 			int x = (int) Math.round((double) (splitClass + 0.5) * singleBoxAreaWidth)
 				+ this.dependentAxisWidth - (int) (0.5 * width);
+
+			// paint lower outliers for Tukey boxplot
+			if (this.boxplotView.getModel().isTukeyBox())
+			{
+				// paint the lower outliers
+				this.paintLowerOutliers(context, x + (int) (0.5 * width), dotRadius, locationOutlierMinValues, splitClass);
+				// paint the upper outliers
+				this.paintUpperOutliers(context, x + (int) (0.5 * width), dotRadius, locationOutlierMaxValues, splitClass);
+			}
 
 			// paint min value
 			if (highlightMinValues.get(splitClass))
@@ -669,6 +733,14 @@ public class Boxplot
 				- (this.dependentAxisHeight + (int) Math.round((splitClass + 0.5) * this.singleBoxAreaWidth))
 				+ (int) (0.5 * height);
 			
+			if (this.boxplotView.getModel().isTukeyBox() && !this.boxplotView.getModel().isEmptyBoxplot())
+			{
+				// paint the lower outliers
+				this.paintLowerOutliers(context, y - (int) (0.5 * height), dotRadius, locationOutlierMinValues, splitClass);
+				// paint the upper outliers
+				this.paintUpperOutliers(context, y - (int) (0.5 * height), dotRadius, locationOutlierMaxValues, splitClass);
+			}
+
 			// paint min value
 			if (highlightMinValues.get(splitClass))
 			{
@@ -792,6 +864,203 @@ public class Boxplot
 		}
 	}
 	
+	/**
+	 * Paint the lower outliers of the boxplot with the given fixed coordinate.
+	 * 
+	 * @param context
+	 * @param fixedCoordinate
+	 * @param dotRadius
+	 * @param locationLowerOutliers
+	 * @param splitClass
+	 */
+	private void paintLowerOutliers(Context2d context, int fixedCoordinate, double dotRadius, int[] locationLowerOutliers, int splitClass)
+	{
+		String asterix = "*";
+		TextMetrics metrics;
+		String originalFontString = context.getFont();
+		
+		for (int i = 0; i < locationLowerOutliers.length; i++)
+		{
+			if (verticalBoxplots)
+			{
+				if (outlierMinValues.get(splitClass).get(i) < boxplotView.getModel().getOutlierStrongMinValue(splitClass))
+				{
+					// draw asterix
+
+					if (highlightOutlierMinValues.get(splitClass).get(i))
+					{
+						context.setFont(SELECTED_OUTLIER_FONT_STRING);
+					}
+					else
+					{
+						context.setFont(OUTLIER_FONT_STRING);
+					}
+					metrics = context.measureText(asterix);
+					context.fillText(asterix,
+						fixedCoordinate - metrics.getWidth()/2,
+						locationLowerOutliers[i] + COMPENSATION_POSITION_ASTERIX);
+					// reset to original font
+					context.setFont(originalFontString);
+				}
+				else
+				{
+					// draw circle
+					
+					context.beginPath();
+
+					if (highlightOutlierMinValues.get(splitClass).get(i))
+					{
+						context.setLineWidth(SELECTED_LINE_WIDTH);
+					}
+
+					context.arc(fixedCoordinate, locationLowerOutliers[i], dotRadius, 0, Math.PI * 2.0, true);
+					context.closePath();
+					context.stroke();
+					context.setLineWidth(1);
+				}
+			} // vertical box
+			else
+			{
+				// horizontal box
+				
+				if (outlierMinValues.get(splitClass).get(i) < boxplotView.getModel().getOutlierStrongMinValue(splitClass))
+				{
+					// draw asterix
+
+					if (highlightOutlierMinValues.get(splitClass).get(i))
+					{
+						context.setFont(SELECTED_OUTLIER_FONT_STRING);
+					}
+					else
+					{
+						context.setFont(OUTLIER_FONT_STRING);
+					}
+					
+					metrics = context.measureText(asterix);
+					context.fillText(asterix,
+						locationLowerOutliers[i] - metrics.getWidth()/2,
+						fixedCoordinate + COMPENSATION_POSITION_ASTERIX);
+					// reset to original font
+					context.setFont(originalFontString);
+
+				}
+				else
+				{
+					// draw circle
+					context.beginPath();
+
+					if (highlightOutlierMinValues.get(splitClass).get(i))
+					{
+						context.setLineWidth(SELECTED_LINE_WIDTH);
+					}
+
+					context.arc(locationLowerOutliers[i], fixedCoordinate, dotRadius, 0, Math.PI * 2.0, true);				
+					context.closePath();
+					context.stroke();
+					context.setLineWidth(1);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Paint the upper outliers of the boxplot with the given fixed coordinate.
+	 * 
+	 * @param context
+	 * @param fixedCoordinate
+	 * @param dotRadius
+	 * @param locationUpperOutliers
+	 * @param splitClass
+	 */
+	private void paintUpperOutliers(Context2d context, int fixedCoordinate, double dotRadius, int[] locationUpperOutliers, int splitClass)
+	{
+		String asterix = "*";
+		TextMetrics metrics;
+		String originalFontString = context.getFont();
+		
+		for (int i = 0; i < locationUpperOutliers.length; i++)
+		{
+			if (verticalBoxplots)
+			{
+				if (outlierMaxValues.get(splitClass).get(i) > boxplotView.getModel().getOutlierStrongMaxValue(splitClass))
+				{
+					// draw asterix
+
+					if (highlightOutlierMaxValues.get(splitClass).get(i))
+					{
+						context.setFont(SELECTED_OUTLIER_FONT_STRING);
+					}
+					else
+					{
+						context.setFont(OUTLIER_FONT_STRING);
+					}
+					
+					metrics = context.measureText(asterix);
+					context.fillText(asterix,
+						fixedCoordinate - metrics.getWidth()/2,
+						locationUpperOutliers[i] + COMPENSATION_POSITION_ASTERIX);
+					// reset to original font
+					context.setFont(originalFontString);
+				}
+				else
+				{
+					// draw circle
+					context.beginPath();
+
+					if (highlightOutlierMaxValues.get(splitClass).get(i))
+					{
+						context.setLineWidth(SELECTED_LINE_WIDTH);
+					}
+
+					context.arc(fixedCoordinate, locationUpperOutliers[i], dotRadius, 0, Math.PI * 2.0, true);
+					context.closePath();
+					context.stroke();
+					context.setLineWidth(1);
+				}
+			} // vertical box
+			else
+			{
+				// horizontal box
+				
+				if (outlierMaxValues.get(splitClass).get(i) > boxplotView.getModel().getOutlierStrongMaxValue(splitClass))
+				{
+					// draw asterix
+
+					if (highlightOutlierMaxValues.get(splitClass).get(i))
+					{
+						context.setFont(SELECTED_OUTLIER_FONT_STRING);
+					}
+					else
+					{
+						context.setFont(OUTLIER_FONT_STRING);
+					}
+					
+					metrics = context.measureText(asterix);
+					context.fillText(asterix,
+						locationUpperOutliers[i] - metrics.getWidth()/2,
+						fixedCoordinate + COMPENSATION_POSITION_ASTERIX);
+					// reset to original font
+					context.setFont(originalFontString);
+				}
+				else
+				{
+					// draw circle
+					context.beginPath();
+
+					if (highlightOutlierMaxValues != null && highlightOutlierMaxValues.get(splitClass).get(i))
+					{
+						context.setLineWidth(SELECTED_LINE_WIDTH);
+					}
+
+					context.arc(locationUpperOutliers[i], fixedCoordinate, dotRadius, 0, Math.PI * 2.0, true);				
+					context.closePath();
+					context.stroke();
+					context.setLineWidth(1);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Paint the boxplot's dependent axis.
 	 */
@@ -940,7 +1209,7 @@ public class Boxplot
 			String s;
 			if (type.isNumber())
 			{
-				for (int i = 0; i <= model.getSplitClasses(); i++)
+				for (int i = 0; i <= model.getNumberOfSplitClasses(); i++)
 				{
 					int x = (int) Math.round((double) i * singleBoxAreaWidth)
 						+ this.dependentAxisWidth;
@@ -980,7 +1249,7 @@ public class Boxplot
 			{
 				// text
 				
-				for (int splitClass = 0; splitClass < model.getSplitClasses(); splitClass++)
+				for (int splitClass = 0; splitClass < model.getNumberOfSplitClasses(); splitClass++)
 				{
 					int x1 = (int) Math.round((splitClass + 0.5) * singleBoxAreaWidth) + this.dependentAxisWidth;
 
@@ -1040,7 +1309,7 @@ public class Boxplot
 
 			if (this.type.isNumber())
 			{
-				for (int i = 0; i <= model.getSplitClasses(); i++)
+				for (int i = 0; i <= model.getNumberOfSplitClasses(); i++)
 				{
 					String s = StatistiekGWT.getStringValue(model.getSplitOptions()
 						.getBinBoundaries().get(i));
@@ -1062,7 +1331,7 @@ public class Boxplot
 			else
 			{ // non number
 				String s;
-				for (int i = 0; i < model.getSplitClasses(); i++)
+				for (int i = 0; i < model.getNumberOfSplitClasses(); i++)
 				{
 					if (type.equals(AllowedTypes.ENUM))
 					{
@@ -1156,8 +1425,8 @@ public class Boxplot
 		if (this.verticalBoxplots)
 		{
 			singleBoxAreaWidth = (double) (this.boxplotView.getWidth()
-				- this.dependentAxisWidth - BoxplotView.KEEP_CLEAR_WIDTH)
-				/ (double) model.getSplitClasses();
+				- this.dependentAxisWidth 
+				- BoxplotView.KEEP_CLEAR_WIDTH) / (double) model.getNumberOfSplitClasses();
 			normalFit = maxStringLength <= singleBoxAreaWidth;
 
 			if (normalFit)
@@ -1181,8 +1450,7 @@ public class Boxplot
 			
 			this.singleBoxAreaWidth = (double) (this.canvas.getCoordinateSpaceHeight() 
 				- BoxplotView.KEEP_CLEAR_WIDTH 
-				- this.dependentAxisHeight) 
-				/ (double) model.getSplitClasses();
+				- this.dependentAxisHeight) / (double) model.getNumberOfSplitClasses();
 
 			if ((this.independentAxisWidth != maxStringLength + Boxplot.FONT_HEIGHT + 5))
 			{
@@ -1199,15 +1467,14 @@ public class Boxplot
 		if (this.verticalBoxplots)
 		{
 			singleBoxAreaWidth = (double) (this.boxplotView.getWidth()
-				- this.dependentAxisWidth - BoxplotView.KEEP_CLEAR_WIDTH)
-				/ (double) model.getSplitClasses();
+				- this.dependentAxisWidth 
+				- BoxplotView.KEEP_CLEAR_WIDTH) / (double) model.getNumberOfSplitClasses();
 		}
 		else
 		{
 			this.singleBoxAreaWidth = (double) (this.canvas.getCoordinateSpaceHeight() 
 				- BoxplotView.KEEP_CLEAR_WIDTH 
-				- this.dependentAxisHeight) 
-				/ (double) model.getSplitClasses();
+				- this.dependentAxisHeight) / (double) model.getNumberOfSplitClasses();
 		}
 	}
 	
@@ -1281,6 +1548,16 @@ public class Boxplot
 		return sb.toString();
 	}
 
+	/**
+	 * Set booleans for highlighting markers in the boxplot.
+	 * 
+	 * @param minValue
+	 * @param lowerQuartile
+	 * @param median
+	 * @param upperQuartile
+	 * @param maxValue
+	 * @param splitClass
+	 */
 	private void setHighlightValues(boolean minValue,
 		boolean lowerQuartile, boolean median, boolean upperQuartile, 
 		boolean maxValue, int splitClass)
@@ -1293,7 +1570,29 @@ public class Boxplot
 	}
 
 	/**
-	 * Set value at the given index or add the value at the given index if the index
+	 * Initialize booleans for highlighting outliers in a Tukey boxplot.
+	 * 
+	 */
+	void initializeOutlierHighlightValues()
+	{
+		int numberOfSplitClasses = boxplotView.getModel().getNumberOfSplitClasses();
+		
+		for (int splitClass = 0; splitClass < numberOfSplitClasses; splitClass++)
+		{
+			for (int i = 0; i < outlierMinValues.get(splitClass).size(); i++)
+			{
+				this.setArrayListValue(this.highlightOutlierMinValues.get(splitClass), i, false);		
+			}
+			
+			for (int i = 0; i < outlierMaxValues.get(splitClass).size(); i++)
+			{
+				this.setArrayListValue(this.highlightOutlierMaxValues.get(splitClass), i, false);
+			}
+		}
+	}
+
+	/**
+	 * Set the boolean value at the given index or add the boolean value at the given index if the index
 	 * exceeds the size of the list.
 	 *  
 	 * @param valueList
@@ -1370,6 +1669,8 @@ public class Boxplot
 		 */
 		private int clientY = 0;
 		
+		private boolean showPopup = false;
+		
 		@Override
 		public void onMouseMove(MouseMoveEvent event)
 		{
@@ -1405,9 +1706,9 @@ public class Boxplot
 			int widthBoxplot = Math.min(Boxplot.MAX_BOX_HEIGHT,
 				(int) Math.round(WIDTH_FILL_FRACTION * getHeight()));
 
-			int numberOfSplitClasses = boxplotView.getModel().getSplitClasses();
+			int numberOfSplitClasses = boxplotView.getModel().getNumberOfSplitClasses();
 
-			boolean showPopup = false;
+			showPopup = false;
 			
 			for (int splitClass = 0; splitClass < numberOfSplitClasses; splitClass++)
 			{
@@ -1416,58 +1717,94 @@ public class Boxplot
 					int width = Math.min(Boxplot.MAX_BOX_HEIGHT,
 						(int) Math.round(WIDTH_FILL_FRACTION * getWidth()));
 
+					// lower x and upper x define the box width
 					int lower_x = (int) Math.round((double) (splitClass + 0.5) * singleBoxAreaWidth + dependentAxisWidth) - (int) (0.5 * width);
 					int upper_x = lower_x + widthBoxplot;
 					
-		    		if (x > lower_x && x < upper_x
-		    			&& (y > (locationMedians[splitClass] - 5)) && y < (locationMedians[splitClass] + 5))
+		    		if (x > lower_x && x < upper_x) // x in the box area
 		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
-		    			setHighlightValues(false, false, true, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (x > lower_x && x < upper_x
-		    			&& (y > (locationMinValues[splitClass] - 5)) && y < (locationMinValues[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("minimumIs") + StatistiekGWT.getStringValue(minValues.get(splitClass))));
-		    			setHighlightValues(true, false, false, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		// TODO: when e.g. minValue and lowerQuartile are close together or the same
-		    		// show multiple tooltips
-		    		else if (x > lower_x && x < upper_x
-		    			&& (y > (locationLowerQuartiles[splitClass] - 5)) && y < (locationLowerQuartiles[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
-		    			setHighlightValues(false, true, false, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (x > lower_x && x < upper_x
-		    			&& (y > (locationUpperQuartiles[splitClass] - 5)) && y < (locationUpperQuartiles[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
-		    			setHighlightValues(false, false, false, true, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (x > lower_x && x < upper_x
-		    			&& (y > (locationMaxValues[splitClass] - 5)) && y < (locationMaxValues[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("maximumIs") + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
-		    			setHighlightValues(false, false, false, false, true, splitClass);
-		    			showPopup = true;
+		    			if (y > (locationMedians[splitClass] - 5) && y < (locationMedians[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
+			    			setHighlightValues(false, false, true, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (y > (locationMinValues[splitClass] - 5) && y < (locationMinValues[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							String text;
+							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasLowerOutliers(splitClass))
+							{
+								text = StatistiekGWT.rb.getString("tukeyMinimumIs");
+							}
+							else
+							{
+								text = StatistiekGWT.rb.getString("minimumIs");
+							}
+							this.popup.add(new Label(text + StatistiekGWT.getStringValue(minValues.get(splitClass))));
+			    			setHighlightValues(true, false, false, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		// TODO: when e.g. minValue and lowerQuartile are close together or the same
+			    		// show multiple tooltips
+			    		else if (y > (locationLowerQuartiles[splitClass] - 5) && y < (locationLowerQuartiles[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
+			    			setHighlightValues(false, true, false, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (y > (locationUpperQuartiles[splitClass] - 5) && y < (locationUpperQuartiles[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
+			    			setHighlightValues(false, false, false, true, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (y > (locationMaxValues[splitClass] - 5) && y < (locationMaxValues[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							String text;
+							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasUpperOutliers(splitClass))
+							{
+								text = StatistiekGWT.rb.getString("tukeyMaximumIs");
+							}
+							else
+							{
+								text = StatistiekGWT.rb.getString("maximumIs");
+							}
+							this.popup.add(new Label(text + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
+			    			setHighlightValues(false, false, false, false, true, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if ((x > lower_x + (upper_x - lower_x)/2 - 3 && x < upper_x - (upper_x - lower_x)/2 + 3) // x in a more restricted middle part of box width 
+			    			&& boxplotView.getModel().isTukeyBox())
+			    		{
+			    			processOutliers(splitClass, y, positionCallBack);
+			    		}
+			    		else
+			    		{
+			    			if (boxplotView.getModel().isTukeyBox())
+			    			{
+			    				resetOutlierHighlightValues(splitClass);
+			    			}
+			    			
+			    			setHighlightValues(false, false, false, false, false, splitClass);
+			    		}
 		    		}
 		    		else
 		    		{
+		    			if (boxplotView.getModel().isTukeyBox())
+		    			{
+		    				resetOutlierHighlightValues(splitClass);
+		    			}
+		    			
 		    			setHighlightValues(false, false, false, false, false, splitClass);
 		    		}
 		    		
@@ -1484,58 +1821,94 @@ public class Boxplot
 					int height = Math.min(Boxplot.MAX_BOX_HEIGHT,
 						(int) Math.round(WIDTH_FILL_FRACTION * getHeight()));
 
+					// lower y and upper y define the box width
 					int upper_y = canvas.getCoordinateSpaceHeight()
 						- (dependentAxisHeight + (int) Math.round((splitClass + 0.5) * singleBoxAreaWidth))
 						+ (int) (0.5 * height);
 					int lower_y = upper_y - widthBoxplot;
 					
-		    		if (y > lower_y && y < upper_y
-		    			&& (x > (locationMedians[splitClass] - 5)) && x < (locationMedians[splitClass] + 5))
+		    		if (y > lower_y && y < upper_y) // y in the box area
 		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
-		    			setHighlightValues(false, false, true, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (y > lower_y && y < upper_y
-		    			&& (x > (locationMinValues[splitClass] - 5)) && x < (locationMinValues[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("minimumIs") + StatistiekGWT.getStringValue(minValues.get(splitClass))));
-		    			setHighlightValues(true, false, false, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (y > lower_y && y < upper_y
-		    			&& (x > (locationLowerQuartiles[splitClass] - 5)) && x < (locationLowerQuartiles[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
-		    			setHighlightValues(false, true, false, false, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (y > lower_y && y < upper_y
-		    			&& (x > (locationUpperQuartiles[splitClass] - 5)) && x < (locationUpperQuartiles[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
-		    			setHighlightValues(false, false, false, true, false, splitClass);
-		    			showPopup = true;
-		    		}
-		    		else if (y > lower_y && y < upper_y
-		    			&& (x > (locationMaxValues[splitClass] - 5)) && x < (locationMaxValues[splitClass] + 5))
-		    		{
-						this.popup.setPopupPositionAndShow(positionCallBack);
-						this.popup.clear();
-						this.popup.add(new Label(StatistiekGWT.rb.getString("maximumIs") + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
-		    			setHighlightValues(false, false, false, false, true, splitClass);
-		    			showPopup = true;
+		    			if (x > (locationMedians[splitClass] - 5) && x < (locationMedians[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
+			    			setHighlightValues(false, false, true, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (x > (locationMinValues[splitClass] - 5) && x < (locationMinValues[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							String text;
+							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasLowerOutliers(splitClass))
+							{
+								text = StatistiekGWT.rb.getString("tukeyMinimumIs");
+							}
+							else
+							{
+								text = StatistiekGWT.rb.getString("minimumIs");
+							}
+							this.popup.add(new Label(text + StatistiekGWT.getStringValue(minValues.get(splitClass))));
+			    			setHighlightValues(true, false, false, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (x > (locationLowerQuartiles[splitClass] - 5) && x < (locationLowerQuartiles[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
+			    			setHighlightValues(false, true, false, false, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (x > (locationUpperQuartiles[splitClass] - 5) && x < (locationUpperQuartiles[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
+			    			setHighlightValues(false, false, false, true, false, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if (x > (locationMaxValues[splitClass] - 5) && x < (locationMaxValues[splitClass] + 5))
+			    		{
+							this.popup.setPopupPositionAndShow(positionCallBack);
+							this.popup.clear();
+							String text;
+							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasUpperOutliers(splitClass))
+							{
+								text = StatistiekGWT.rb.getString("tukeyMaximumIs");
+							}
+							else
+							{
+								text = StatistiekGWT.rb.getString("maximumIs");
+							}
+							this.popup.add(new Label(text + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
+			    			setHighlightValues(false, false, false, false, true, splitClass);
+			    			showPopup = true;
+			    		}
+			    		else if ((y > lower_y + (upper_y - lower_y)/2 - 3 && y < upper_y - (upper_y - lower_y)/2 + 3) // y in a more restricted middle part of box width 
+			    			&& boxplotView.getModel().isTukeyBox())
+			    		{
+			    			processOutliers(splitClass, x, positionCallBack);
+			    		}
+			    		else
+			    		{
+			    			if (boxplotView.getModel().isTukeyBox())
+			    			{
+			    				resetOutlierHighlightValues(splitClass);
+			    			}
+			    			
+			    			setHighlightValues(false, false, false, false, false, splitClass);
+			    		}
 		    		}
 		    		else
 		    		{
+		    			if (boxplotView.getModel().isTukeyBox())
+		    			{
+		    				resetOutlierHighlightValues(splitClass);
+		    			}
+		    			
 						setHighlightValues(false, false, false, false, false, splitClass);
 		    		}
 		    		
@@ -1556,6 +1929,91 @@ public class Boxplot
 			
 			paint();
 		}
+		
+		/**
+		 * Show popup for outliers and set highlight values.
+		 * 
+		 * @param splitClass
+		 * @param coordinate
+		 * @param positionCallBack
+		 */
+		private void processOutliers(int splitClass, int coordinate, PositionCallback positionCallBack)
+		{
+			int[] locationOutlierMinValues = valueToScreenLocation(outlierMinValues.get(splitClass));
+			int[] locationOutlierMaxValues = valueToScreenLocation(outlierMaxValues.get(splitClass));
+			
+			// process lower outliers
+			for (int i = 0; i < locationOutlierMinValues.length; i++)
+			{
+				if (coordinate > locationOutlierMinValues[i] - 2 && coordinate < locationOutlierMinValues[i] + 2)
+				{
+					// set popup
+					this.popup.setPopupPositionAndShow(positionCallBack);
+					this.popup.clear();
+					Label text = new Label(StatistiekGWT.rb.getString("valueIs") 
+						+ StatistiekGWT.getStringValue(outlierMinValues.get(splitClass).get(i)));
+					this.popup.add(text);
+	    			setArrayListValue(highlightOutlierMinValues.get(splitClass), i, true);
+	    			showPopup = true;
+	    			
+					// if found, still continue to set the rest of the highlight values
+				}
+				else
+				{
+					setArrayListValue(highlightOutlierMinValues.get(splitClass), i, false);
+				}
+			}
+			
+			// process upper outliers
+			for (int i = 0; i < locationOutlierMaxValues.length; i++)
+			{
+				if (coordinate > locationOutlierMaxValues[i] - 2 && coordinate < locationOutlierMaxValues[i] + 2)
+				{
+					// set popup
+					this.popup.setPopupPositionAndShow(positionCallBack);
+					this.popup.clear();
+					Label text = new Label(StatistiekGWT.rb.getString("valueIs") 
+						+ StatistiekGWT.getStringValue(outlierMaxValues.get(splitClass).get(i)));
+					this.popup.add(text);
+	    			setArrayListValue(highlightOutlierMaxValues.get(splitClass), i, true);
+	    			showPopup = true;
+					
+					// if found, still continue to set the rest of the highlight values
+				}
+				else
+				{
+					setArrayListValue(highlightOutlierMaxValues.get(splitClass), i, false);
+				}
+			}				
+			
+			// process upper outliers
+		}
 	} // class BoxplotMouseMoveHandler
+
+
+	/**
+	 * Reset the outlier highlight values to false for the given splitclass.
+	 * 
+	 * @param splitClass
+	 */
+	public void resetOutlierHighlightValues(int splitClass)
+	{
+		for (int i = 0; i < outlierMinValues.size(); i++)
+		{
+			this.setArrayListValue(this.highlightOutlierMinValues.get(splitClass), i, false);		
+		}
+		
+		for (int i = 0; i < outlierMaxValues.size(); i++)
+		{
+			this.setArrayListValue(this.highlightOutlierMaxValues.get(splitClass), i, false);
+		}
+	}
+
+	public void setDrawable(boolean b)
+	{
+		this.drawable = b;
+	}
+
+
 
 }
