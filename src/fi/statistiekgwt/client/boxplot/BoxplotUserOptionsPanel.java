@@ -17,6 +17,7 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -60,6 +61,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 	// display settings
 	private Label absRelLabel;
+	private CheckBox tukeyBox;
 	private RadioButton verticalBoxesRadioItem;
 	private RadioButton horizontalBoxesRadioItem;
 
@@ -135,6 +137,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 	private void addHandlers()
 	{
 		// click handlers
+		this.tukeyBox.addClickHandler(this.clickHandler);
 		this.horizontalBoxesRadioItem.addClickHandler(this.clickHandler);
 		this.verticalBoxesRadioItem.addClickHandler(this.clickHandler);
 		this.splitButton.addClickHandler(this.clickHandler);
@@ -173,6 +176,10 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		// display settings
 		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
+
+		this.tukeyBox = new CheckBox(
+			StatistiekGWT.rb.getString("tukeyCheckbox"), true);
+		this.tukeyBox.addStyleName(statistiekCss.checkBox());
 
 		this.verticalBoxesRadioItem = new RadioButton("verticalHorizontalGroup",
 			StatistiekGWT.rb.getString("verticalboxplotsRadio"));
@@ -265,6 +272,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		displaySettingsPanel.add(this.absRelLabel);
+		displaySettingsPanel.add(this.tukeyBox);
 		displaySettingsPanel.add(horizontalBoxesRadioItem);
 		displaySettingsPanel.add(verticalBoxesRadioItem);
 
@@ -322,6 +330,11 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		int selectedIndex = this.columnIndexBox.getSelectedIndex();
 		
 		return this.columnIndexBox.getItemText(selectedIndex);
+	}
+
+	public boolean isTukeyBoxSelected()
+	{
+		return (this.tukeyBox != null && this.tukeyBox.getValue());
 	}
 
 	public boolean isVerticalBoxesButtonSelected()
@@ -503,6 +516,8 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 			}
 		}
 
+		this.tukeyBox.setValue(this.model.isTukeyBox());
+
 		if (this.model.isVerticalBoxplots())
 		{
 			verticalBoxesRadioItem.setValue(true);
@@ -627,7 +642,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 	 * split variable, bin settings and labels with information 
 	 * about number of objects and minimum and maximum values.
 	 */
-	private void clearGUISplitComponents()
+	void clearGUISplitComponents()
 	{
 		this.splitVarBox.setSelectedIndex(0);
 		this.splitBinWidthField.setText("");
@@ -650,7 +665,12 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 			BoxplotModel model = BoxplotUserOptionsPanel.this.model;
 			BoxplotView view = BoxplotUserOptionsPanel.this.view;
 			
-			if ((e.getSource() == horizontalBoxesRadioItem) || (e.getSource() == verticalBoxesRadioItem))
+			if (e.getSource() == tukeyBox)
+			{
+				model.setIsTukeyBox(view.isTukeyBoxSelected());
+				this.update();
+			}
+			else if ((e.getSource() == horizontalBoxesRadioItem) || (e.getSource() == verticalBoxesRadioItem))
 			{
 				model.setVerticalBoxplots(view.isVerticalBoxesButtonSelected());
 				this.update();
@@ -750,8 +770,6 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == columnIndexBox)
 			{
-				model.setColumnIndex(BoxplotUserOptionsPanel.this.getColumnIndexBoxSelectedIndex());
-				
 				String selectedString = view.getColumnBoxSelectedString();
 				if (selectedString != null)
 				{
