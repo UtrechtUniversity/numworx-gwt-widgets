@@ -646,8 +646,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("content", arg1);
 		Window.alert(arg1);	
-		//comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
-		comRoot.fireEvent(new CBookEvent(this, "text",map));
+		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
 	}
 
 	@Override
