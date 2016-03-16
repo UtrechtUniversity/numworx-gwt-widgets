@@ -1727,7 +1727,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.medianIs() + StatistiekGWT.getStringValue(medians.get(splitClass))));
 			    			setHighlightValues(false, false, true, false, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1738,11 +1738,11 @@ public class Boxplot
 							String text;
 							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasLowerOutliers(splitClass))
 							{
-								text = StatistiekGWT.rb.getString("tukeyMinimumIs");
+								text = StatistiekGWT.rb.tukeyMinimumIs();
 							}
 							else
 							{
-								text = StatistiekGWT.rb.getString("minimumIs");
+								text = StatistiekGWT.rb.minimumIs();
 							}
 							this.popup.add(new Label(text + StatistiekGWT.getStringValue(minValues.get(splitClass))));
 			    			setHighlightValues(true, false, false, false, false, splitClass);
@@ -1754,7 +1754,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.firstQuartileIs() + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
 			    			setHighlightValues(false, true, false, false, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1762,7 +1762,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.thirdQuartileIs() + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
 			    			setHighlightValues(false, false, false, true, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1773,11 +1773,11 @@ public class Boxplot
 							String text;
 							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasUpperOutliers(splitClass))
 							{
-								text = StatistiekGWT.rb.getString("tukeyMaximumIs");
+								text = StatistiekGWT.rb.tukeyMaximumIs();
 							}
 							else
 							{
-								text = StatistiekGWT.rb.getString("maximumIs");
+								text = StatistiekGWT.rb.maximumIs();
 							}
 							this.popup.add(new Label(text + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
 			    			setHighlightValues(false, false, false, false, true, splitClass);
@@ -1833,7 +1833,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("medianIs") + StatistiekGWT.getStringValue(medians.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.medianIs() + StatistiekGWT.getStringValue(medians.get(splitClass))));
 			    			setHighlightValues(false, false, true, false, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1844,11 +1844,11 @@ public class Boxplot
 							String text;
 							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasLowerOutliers(splitClass))
 							{
-								text = StatistiekGWT.rb.getString("tukeyMinimumIs");
+								text = StatistiekGWT.rb.tukeyMinimumIs();
 							}
 							else
 							{
-								text = StatistiekGWT.rb.getString("minimumIs");
+								text = StatistiekGWT.rb.minimumIs();
 							}
 							this.popup.add(new Label(text + StatistiekGWT.getStringValue(minValues.get(splitClass))));
 			    			setHighlightValues(true, false, false, false, false, splitClass);
@@ -1858,7 +1858,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("firstQuartileIs") + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.firstQuartileIs() + StatistiekGWT.getStringValue(lowerQuartiles.get(splitClass))));
 			    			setHighlightValues(false, true, false, false, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1866,7 +1866,7 @@ public class Boxplot
 			    		{
 							this.popup.setPopupPositionAndShow(positionCallBack);
 							this.popup.clear();
-							this.popup.add(new Label(StatistiekGWT.rb.getString("thirdQuartileIs") + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
+							this.popup.add(new Label(StatistiekGWT.rb.thirdQuartileIs() + StatistiekGWT.getStringValue(upperQuartiles.get(splitClass))));
 			    			setHighlightValues(false, false, false, true, false, splitClass);
 			    			showPopup = true;
 			    		}
@@ -1877,11 +1877,11 @@ public class Boxplot
 							String text;
 							if (boxplotView.getModel().isTukeyBox() && boxplotView.getModel().hasUpperOutliers(splitClass))
 							{
-								text = StatistiekGWT.rb.getString("tukeyMaximumIs");
+								text = StatistiekGWT.rb.tukeyMaximumIs();
 							}
 							else
 							{
-								text = StatistiekGWT.rb.getString("maximumIs");
+								text = StatistiekGWT.rb.maximumIs();
 							}
 							this.popup.add(new Label(text + StatistiekGWT.getStringValue(maxValues.get(splitClass))));
 			    			setHighlightValues(false, false, false, false, true, splitClass);
@@ -1950,7 +1950,7 @@ public class Boxplot
 					// set popup
 					this.popup.setPopupPositionAndShow(positionCallBack);
 					this.popup.clear();
-					Label text = new Label(StatistiekGWT.rb.getString("valueIs") 
+					Label text = new Label(StatistiekGWT.rb.valueIs() 
 						+ StatistiekGWT.getStringValue(outlierMinValues.get(splitClass).get(i)));
 					this.popup.add(text);
 	    			setArrayListValue(highlightOutlierMinValues.get(splitClass), i, true);
@@ -1972,7 +1972,7 @@ public class Boxplot
 					// set popup
 					this.popup.setPopupPositionAndShow(positionCallBack);
 					this.popup.clear();
-					Label text = new Label(StatistiekGWT.rb.getString("valueIs") 
+					Label text = new Label(StatistiekGWT.rb.valueIs() 
 						+ StatistiekGWT.getStringValue(outlierMaxValues.get(splitClass).get(i)));
 					this.popup.add(text);
 	    			setArrayListValue(highlightOutlierMaxValues.get(splitClass), i, true);
