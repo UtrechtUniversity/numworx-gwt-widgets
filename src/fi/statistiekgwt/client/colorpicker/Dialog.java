@@ -81,9 +81,9 @@ public abstract class Dialog extends DialogBox
 
 	protected List<? extends Widget> createButtonsForButtonBar()
 	{
-		okButton = createButton(StatistiekGWT.rb.getString("OKButtonText"));
+		okButton = createButton(StatistiekGWT.rb.oKButtonText());
 		okButton.addStyleName(statistiekCss.margin());
-		cancelButton = createButton(StatistiekGWT.rb.getString("cancelButtonText"));
+		cancelButton = createButton(StatistiekGWT.rb.cancelButtonText());
 		cancelButton.addStyleName(statistiekCss.margin());
 		
 		return Arrays.asList(okButton, cancelButton);
