@@ -295,7 +295,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnModeSplit0NoSelection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMode(
 			1, 0, false); // columnIndex = 1 (gewicht), split 0 (m), no selection
 
@@ -313,7 +313,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnModeSplit0Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMode(
 			1, 0, true); // columnIndex = 1 (gewicht), split 0 (m), selection
 		
@@ -322,7 +322,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnModeSplit1Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMode(
 			1, 1, true); // columnIndex = 1 (gewicht), split 1 (v), selection
 		
@@ -349,7 +349,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnMaxSplit0Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMax(
 			1, 0, true); // columnIndex = 1 (gewicht), split 0 (m), selection
 		
@@ -385,7 +385,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnMinSplit0Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMin(
 			1, 0, true); // columnIndex = 1 (gewicht), split 0 (m), selection
 		
@@ -421,7 +421,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnMeanSplit0Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnMean(
 			1, 0, true); // columnIndex = 1 (gewicht), split 0 (m), selection
 		
@@ -457,7 +457,7 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnSDSplit0Selection()
 	{
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.model.getColumnSD(1, 0, true); // columnIndex = 1 (gewicht), split 0, selection
 		
 		assertEquals("", expected, actual);
