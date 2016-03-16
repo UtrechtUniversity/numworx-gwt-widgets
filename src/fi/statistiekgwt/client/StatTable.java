@@ -449,7 +449,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	     */
 	    this.table.setAutoHeaderRefreshDisabled(true);
 	    // Set the message to display when the table is empty
-	    tableMessageLabel = new Label(StatistiekGWT.rb.getString("emptyTableMessage"));
+	    tableMessageLabel = new Label(StatistiekGWT.rb.emptyTableMessage());
 	    // set large width for horizontal scrollbar, because an empty table (e.g., with many columns) won't show a horizontal scrollbar
 	    tableMessageLabel.setWidth("20000px");
 	    this.table.setEmptyTableWidget(tableMessageLabel);
@@ -523,10 +523,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             }
         };
         this.createInfoCommand();
-		sortItem = new MenuItem(StatistiekGWT.rb.getString("sortItem"), true, sortCommand);
-		editItem = new MenuItem(StatistiekGWT.rb.getString("editcolumnItem"), true, editCommand);
-		deleteItem = new MenuItem(StatistiekGWT.rb.getString("deletecolumnItem"), true, deleteCommand);
-		infoItem = new MenuItem(StatistiekGWT.rb.getString("infocolumnItem"), true, infoCommand);
+		sortItem = new MenuItem(StatistiekGWT.rb.sortItem(), true, sortCommand);
+		editItem = new MenuItem(StatistiekGWT.rb.editcolumnItem(), true, editCommand);
+		deleteItem = new MenuItem(StatistiekGWT.rb.deletecolumnItem(), true, deleteCommand);
+		infoItem = new MenuItem(StatistiekGWT.rb.infocolumnItem(), true, infoCommand);
 		this.headerMenuBar.addItem(sortItem);
 		if (this.statTableModel.isDataEditable())
 		{
@@ -548,8 +548,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		createOutlierCommands();
 		
-		this.outlierCellItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierCell"), true, markOutlierCellCommand);
-		this.outlierRowItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierRow"), true, markOutlierRowCommand);
+		this.outlierCellItem = new MenuItem(StatistiekGWT.rb.markOutlierCell(), true, markOutlierCellCommand);
+		this.outlierRowItem = new MenuItem(StatistiekGWT.rb.markOutlierRow(), true, markOutlierRowCommand);
 		
 		this.outlierMenuBar.addItem(outlierCellItem);
 		this.outlierMenuBar.addItem(outlierRowItem);
@@ -562,7 +562,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.outlierPopupMenu.setVisible(false);
 		this.outlierPopupMenu.hide();
 		
-		this.rowOutlierRowItem = new MenuItem(StatistiekGWT.rb.getString("markOutlierRow"), true, markOutlierRowCommand);
+		this.rowOutlierRowItem = new MenuItem(StatistiekGWT.rb.markOutlierRow(), true, markOutlierRowCommand);
 
 		this.rowOutlierMenuBar.addItem(rowOutlierRowItem);
 
@@ -575,19 +575,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.editDataPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
 		this.editDataPanel.addStyleName(statistiekCss.backgroundblue());
 		
-		this.importButton = new Button(StatistiekGWT.rb.getString("importButton"));
+		this.importButton = new Button(StatistiekGWT.rb.importButton());
 		this.editDataPanel.add(this.importButton);
 
-		this.addRowButton = new Button(StatistiekGWT.rb.getString("addrowButton"));
+		this.addRowButton = new Button(StatistiekGWT.rb.addrowButton());
 		this.editDataPanel.add(this.addRowButton);
 		
-		this.addColumnButton = new Button(StatistiekGWT.rb.getString("addcolumnButton"));
+		this.addColumnButton = new Button(StatistiekGWT.rb.addcolumnButton());
 		this.editDataPanel.add(this.addColumnButton);
 		
-		this.deleteRowsButton = new Button(StatistiekGWT.rb.getString("deleteselectedrowsButton"));
+		this.deleteRowsButton = new Button(StatistiekGWT.rb.deleteselectedrowsButton());
 		this.editDataPanel.add(this.deleteRowsButton);
 		
-		this.pasteButton = new Button(StatistiekGWT.rb.getString("pasteclipboardButton"));
+		this.pasteButton = new Button(StatistiekGWT.rb.pasteclipboardButton());
 		this.editDataPanel.add(this.pasteButton);
 		
 		this.resetButton = new PushButton(new Image(statistiekGWTClientBundle.resetResource().getSafeUri()));
@@ -616,7 +616,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		resizePanel.add(tablePanel);
 		super.add(resizePanel);
 		
-		Label label = new Label(StatistiekGWT.rb.getString("importDialogLabel"));
+		Label label = new Label(StatistiekGWT.rb.importDialogLabel());
 	    importBox = new ImportMessageDialogBox(label);
 	    
 	    this.addHandlers();
@@ -738,14 +738,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setUpPasteDataDialog()
 	{
 		this.pasteDataDialog = new DialogBox(false, true);
-		this.pasteDataDialog.setText(StatistiekGWT.rb.getString("pasteclipboardDialog"));
+		this.pasteDataDialog.setText(StatistiekGWT.rb.pasteclipboardDialog());
 		
 		FlowPanel panel = new FlowPanel();
 		
 		// messages
-		String messageString = StatistiekGWT.rb.getString("pasteclipboardMessage")
-			+ StatistiekGWT.rb.getString("importPastedDataButton")
-			+ ".\n" + StatistiekGWT.rb.getString("pasteclipboardMessage2");
+		String messageString = StatistiekGWT.rb.pasteclipboardMessage()
+			+ StatistiekGWT.rb.importPastedDataButton()
+			+ ".\n" + StatistiekGWT.rb.pasteclipboardMessage2();
 		Label pasteMessage = new Label(messageString);
 		this.importPasteDataMessage = new Label(); // used for fail message
 		this.importPasteDataMessage.addStyleName(statistiekCss.failMessage());
@@ -769,10 +769,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		HorizontalPanel buttonPanel = new HorizontalPanel();
 		buttonPanel.addStyleName(statistiekCss.horizontalPanelWithoutBorder());
 		buttonPanel.getElement().getStyle().setTextAlign(TextAlign.CENTER);
-		String importPasteButtonText = StatistiekGWT.rb.getString("importPastedDataButton");
+		String importPasteButtonText = StatistiekGWT.rb.importPastedDataButton();
 		this.importPasteDataButton = new Button(importPasteButtonText, this.clickHandler);
 		this.importPasteDataButton.addStyleName(statistiekCss.margin());
-		String cancelButtonText = StatistiekGWT.rb.getString("cancelButtonText");
+		String cancelButtonText = StatistiekGWT.rb.cancelButtonText();
 		this.cancelPasteDataButton = new Button(cancelButtonText, this.clickHandler);
 		this.cancelPasteDataButton.addStyleName(statistiekCss.margin());
 		buttonPanel.add(this.importPasteDataButton);
@@ -867,7 +867,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 				ColumnDialogView dialogView;
 
-				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.getString("columninfo"));
+				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.columninfo());
 				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
@@ -903,7 +903,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 				ColumnDialogView dialogView;
 
-				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.getString("editacolumn"));
+				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.editacolumn());
 				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
@@ -921,14 +921,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.fileUpload = new FileUploadExt(false);
 		this.fileUpload.addStyleName(statistiekCss.margin());
 		
-		Label selectLabel = new Label(StatistiekGWT.rb.getString("selectCSVFile"));
+		Label selectLabel = new Label(StatistiekGWT.rb.selectCSVFile());
 		selectLabel.addStyleName(statistiekCss.margin());
 		
-	    this.fileUploadImportButton = new Button(StatistiekGWT.rb.getString("importFile"));
+	    this.fileUploadImportButton = new Button(StatistiekGWT.rb.importFile());
 		this.fileUploadImportButton.addStyleName(statistiekCss.margin());
 	    this.fileUploadImportButton.addClickHandler(this.clickHandler);
 
-	    this.fileUploadCancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
+	    this.fileUploadCancelButton = new Button(StatistiekGWT.rb.cancelButtonText());
 		this.fileUploadCancelButton.addStyleName(statistiekCss.margin());
 	    this.fileUploadCancelButton.addClickHandler(this.clickHandler);
 
@@ -1133,7 +1133,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				// row has incorrect amount of cells
 				// set message
-				this.importPasteDataMessage.setText(StatistiekGWT.rb.getString("importPastedDataFailMessage"));
+				this.importPasteDataMessage.setText(StatistiekGWT.rb.importPastedDataFailMessage());
 				return;
 			}
 		}
@@ -1310,7 +1310,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			if (!this.isCorrectFormat(lines))
 			{
 				this.csvText = "";
-				this.tableMessageLabel.setText(StatistiekGWT.rb.getString("errorLoadingTable"));
+				this.tableMessageLabel.setText(StatistiekGWT.rb.errorLoadingTable());
 				this.table.setEmptyTableWidget(tableMessageLabel);
 				
 				return;
@@ -1586,7 +1586,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 				ColumnDialogView dialogView;
 
-				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.getString("addacolumn"));
+				dialogView = new ColumnDialogView(dialogModel, StatistiekGWT.rb.addacolumn());
 				
 				ColumnDialogController dialogController = new ColumnDialogController(
 					dialogModel, dialogView);
@@ -1697,7 +1697,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 							{
 								clearStatTableModel();
 								
-								table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
+								table.setEmptyTableWidget(new Label(StatistiekGWT.rb.loadingTable()));
 								
 								// Remove old views except table
 								StatTable.this.removeViews();
@@ -1730,7 +1730,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					{
 						// TODO clear fileUpload selected file
 						
-						messageBox.setMessage(StatistiekGWT.rb.getString("noCSVMessage"));
+						messageBox.setMessage(StatistiekGWT.rb.noCSVMessage());
 						messageBox.center();
 						messageBox.show();
 					}
@@ -1738,7 +1738,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				else
 				{
 					// no file selected
-					messageBox.setMessage(StatistiekGWT.rb.getString("noFileMessage"));
+					messageBox.setMessage(StatistiekGWT.rb.noFileMessage());
 					messageBox.center();
 					messageBox.show();
 				}
@@ -1859,15 +1859,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		private Label message = new Label();
 		private Button okButton = new Button(
-			StatistiekGWT.rb.getString("OKButtonText"));
+			StatistiekGWT.rb.oKButtonText());
 		private Button cancelButton = new Button(
-			StatistiekGWT.rb.getString("cancelButtonText"));
+			StatistiekGWT.rb.cancelButtonText());
 
 		public ImportMessageDialogBox(Label label)
 		{
 			super();
 			setTitle(label.getText());
-			message.setText(StatistiekGWT.rb.getString("importWarning"));
+			message.setText(StatistiekGWT.rb.importWarning());
 			okButton.addClickHandler(StatTable.this.clickHandler);
 			okButton.addStyleName(statistiekCss.margin());
 			cancelButton.addClickHandler(StatTable.this.clickHandler);
@@ -1890,7 +1890,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		private Label message = new Label();
 		private Button closeButton = new Button(
-			StatistiekGWT.rb.getString("closeButtonText"));
+			StatistiekGWT.rb.closeButtonText());
 
 		public MessageDialogBox(Label title)
 		{
@@ -2455,7 +2455,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statInteractiePanel.getView().selectLastTab();
 		this.statInteractiePanel.getView().clearAddViewTab();
 		
-		((StatTable) statistiekView).table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("loadingTable")));
+		((StatTable) statistiekView).table.setEmptyTableWidget(new Label(StatistiekGWT.rb.loadingTable()));
 	}
 
 	public int[] getMaxColumnWidth()
@@ -2513,7 +2513,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		if (rows.size() == 0)
 		{
-			table.setEmptyTableWidget(new Label(StatistiekGWT.rb.getString("emptyTableMessage")));
+			table.setEmptyTableWidget(new Label(StatistiekGWT.rb.emptyTableMessage()));
 		}
 		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
@@ -2942,23 +2942,23 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		if (this.statTableModel.isOutlier(rowIndex, columnIndex))
 		{
-			this.outlierCellItem.setText(StatistiekGWT.rb.getString("demarkOutlierCell"));
+			this.outlierCellItem.setText(StatistiekGWT.rb.demarkOutlierCell());
 			this.outlierCellItem.setScheduledCommand(demarkOutlierCellCommand);
 		}
 		else
 		{
-			this.outlierCellItem.setText(StatistiekGWT.rb.getString("markOutlierCell"));
+			this.outlierCellItem.setText(StatistiekGWT.rb.markOutlierCell());
 			this.outlierCellItem.setScheduledCommand(markOutlierCellCommand);
 		}
 		
 		if (this.statTableModel.isOutlier(rowIndex))
 		{
-			this.outlierRowItem.setText(StatistiekGWT.rb.getString("demarkOutlierRow"));
+			this.outlierRowItem.setText(StatistiekGWT.rb.demarkOutlierRow());
 			this.outlierRowItem.setScheduledCommand(demarkOutlierRowCommand);
 		}
 		else
 		{
-			this.outlierRowItem.setText(StatistiekGWT.rb.getString("markOutlierRow"));
+			this.outlierRowItem.setText(StatistiekGWT.rb.markOutlierRow());
 			this.outlierRowItem.setScheduledCommand(markOutlierRowCommand);
 		}
 	}
@@ -2970,12 +2970,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	{
 		if (this.statTableModel.isOutlier(rowIndex))
 		{
-			this.rowOutlierRowItem.setText(StatistiekGWT.rb.getString("demarkOutlierRow"));
+			this.rowOutlierRowItem.setText(StatistiekGWT.rb.demarkOutlierRow());
 			this.rowOutlierRowItem.setScheduledCommand(demarkOutlierRowCommand);
 		}
 		else
 		{
-			this.rowOutlierRowItem.setText(StatistiekGWT.rb.getString("markOutlierRow"));
+			this.rowOutlierRowItem.setText(StatistiekGWT.rb.markOutlierRow());
 			this.rowOutlierRowItem.setScheduledCommand(markOutlierRowCommand);
 		}
 	}
