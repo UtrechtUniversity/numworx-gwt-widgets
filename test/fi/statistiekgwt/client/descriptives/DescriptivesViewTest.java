@@ -102,7 +102,7 @@ public class DescriptivesViewTest extends GWTTestCase
 		Label[][][] expected = new Label[7][2][2];
 		
 		Label label;
-		String notAvailable = StatistiekGWT.rb.getString("notAvailable");
+		String notAvailable = StatistiekGWT.rb.notAvailable();
 		
 		String[][][] expectedStrings = new String[][][]{
 			// m, all cases
