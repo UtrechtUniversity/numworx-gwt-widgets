@@ -632,13 +632,13 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				
 				meanString = this.model.getColumnMean(columnIndex, splitClass, false); 
 				
-				if (!meanString.equals(StatistiekGWT.rb.getString("notAvailable")))
+				if (!meanString.equals(StatistiekGWT.rb.notAvailable()))
 				{
 					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, false);
-				if (!sdString.equals(StatistiekGWT.rb.getString("notAvailable")))
+				if (!sdString.equals(StatistiekGWT.rb.notAvailable()))
 				{
 					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
 				}
@@ -650,13 +650,13 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				maximumString = this.getMaximumValue(columnIndex, splitClass, true);
 				
 				meanString = this.model.getColumnMean(columnIndex, splitClass, true);
-				if (!meanString.equals(StatistiekGWT.rb.getString("notAvailable")))
+				if (!meanString.equals(StatistiekGWT.rb.notAvailable()))
 				{
 					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, true);
-				if (!sdString.equals(StatistiekGWT.rb.getString("notAvailable")))
+				if (!sdString.equals(StatistiekGWT.rb.notAvailable()))
 				{
 					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
 				}
@@ -665,11 +665,11 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		} // type is number
 		else
 		{ // type is enum or string
-			minimumString = StatistiekGWT.rb.getString("notAvailable");
-			maximumString = StatistiekGWT.rb.getString("notAvailable");
-			meanString = StatistiekGWT.rb.getString("notAvailable");
-			sdString = StatistiekGWT.rb.getString("notAvailable");
-			medianString = StatistiekGWT.rb.getString("notAvailable");
+			minimumString = StatistiekGWT.rb.notAvailable();
+			maximumString = StatistiekGWT.rb.notAvailable();
+			meanString = StatistiekGWT.rb.notAvailable();
+			sdString = StatistiekGWT.rb.notAvailable();
+			medianString = StatistiekGWT.rb.notAvailable();
 		}
 
 		// number of cases
@@ -844,37 +844,37 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 	    cellFormatter.setColSpan(0, 0, 2);
 
 		// add row 'Number'
-		Label aantalLabel = new Label(StatistiekGWT.rb.getString("amountLabel"));
+		Label aantalLabel = new Label(StatistiekGWT.rb.amountLabel());
 	    flexTable.setWidget(1, 0, aantalLabel);
 	    flexTable.setWidget(1, 1, dataLabels[0][0][splitClass]);
 
 		// add row 'Minimum'
-		Label minLabel = new Label(StatistiekGWT.rb.getString("minimum"));
+		Label minLabel = new Label(StatistiekGWT.rb.minimum());
 	    flexTable.setWidget(2, 0, minLabel);
 	    flexTable.setWidget(2, 1, dataLabels[1][0][splitClass]);
 		
 		// add row 'Maximum'
-		Label maxLabel = new Label(StatistiekGWT.rb.getString("maximum"));
+		Label maxLabel = new Label(StatistiekGWT.rb.maximum());
 	    flexTable.setWidget(3, 0, maxLabel);
 	    flexTable.setWidget(3, 1, dataLabels[2][0][splitClass]);
 		
 		// add row 'Mean'
-		Label meanLabel = new Label(StatistiekGWT.rb.getString("mean"));
+		Label meanLabel = new Label(StatistiekGWT.rb.mean());
 	    flexTable.setWidget(4, 0, meanLabel);
 	    flexTable.setWidget(4, 1, dataLabels[3][0][splitClass]);
 		
 		// add row 'Standard Deviation'
-		Label sdLabel = new Label(StatistiekGWT.rb.getString("standardDeviation"));
+		Label sdLabel = new Label(StatistiekGWT.rb.standardDeviation());
 	    flexTable.setWidget(5, 0, sdLabel);
 	    flexTable.setWidget(5, 1, dataLabels[4][0][splitClass]);
 		
 		// add row 'Median'
-		Label medianLabel = new Label(StatistiekGWT.rb.getString("median"));
+		Label medianLabel = new Label(StatistiekGWT.rb.median());
 	    flexTable.setWidget(6, 0, medianLabel);
 	    flexTable.setWidget(6, 1, dataLabels[5][0][splitClass]);
 		
 		// add row 'Modus'
-		Label modusLabel = new Label(StatistiekGWT.rb.getString("mode"));
+		Label modusLabel = new Label(StatistiekGWT.rb.mode());
 	    flexTable.setWidget(7, 0, modusLabel);
 	    flexTable.setWidget(7, 1, dataLabels[6][0][splitClass]);
 		
@@ -887,7 +887,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		    FlexCellFormatter cellFormatterSelection = selectionFlexTable.getFlexCellFormatter();
 
 			// add the selected variable name to the first column
-			label = StatistiekGWT.rb.getString("selection");
+			label = StatistiekGWT.rb.selection();
 			Label selectionLabel = new Label(label);
 
 		    cellFormatterSelection.setHorizontalAlignment(
