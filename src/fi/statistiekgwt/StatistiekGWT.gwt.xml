@@ -27,6 +27,9 @@
   <inherits name='org.vectomatic.libgwtfile' />
   <!--  <inherits name='com.alkacon.geranium.Geranium' />	-->
   
+  <extend-property name="locale" values="en"/>
+  <set-property-fallback name='locale' value='en' />
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.statistiekgwt.client.StatistiekGWT'/>
 
