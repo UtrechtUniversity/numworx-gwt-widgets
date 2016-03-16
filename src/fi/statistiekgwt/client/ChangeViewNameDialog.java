@@ -67,7 +67,7 @@ public class ChangeViewNameDialog extends DialogBox // implements ActionListener
 		StatInteractiePanelView view)
 	{
 		super(true, true);
-		super.setText(StatistiekGWT.rb.getString("changeviewnameDialog"));
+		super.setText(StatistiekGWT.rb.changeviewnameDialog());
 		this.viewName = viewName;
 		this.model = model;
 		this.view = view;
@@ -92,7 +92,7 @@ public class ChangeViewNameDialog extends DialogBox // implements ActionListener
 	 */
 	private void setUp()
 	{
-		this.nameLabel = new Label(StatistiekGWT.rb.getString("enternameLabel"));
+		this.nameLabel = new Label(StatistiekGWT.rb.enternameLabel());
 		this.nameLabel.addStyleName(statistiekCss.spaceBottomLabel());
 		this.nameField = new TextBox();
 		this.nameField.setText(this.viewName);
@@ -103,9 +103,9 @@ public class ChangeViewNameDialog extends DialogBox // implements ActionListener
 		this.namePanel.add(this.nameLabel);
 		this.namePanel.add(this.nameField);
 		
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 		this.okButton.addStyleName(statistiekCss.margin());
-		this.cancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
+		this.cancelButton = new Button(StatistiekGWT.rb.cancelButtonText());
 		this.cancelButton.addStyleName(statistiekCss.margin());
 		
 		this.okCancelPanel = new HorizontalPanel();//LayoutPanel();
