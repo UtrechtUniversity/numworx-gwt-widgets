@@ -356,7 +356,7 @@ public class DescriptivesModel
 			
 			if (multipleModes || mode.equals(""))
 			{
-				mode = StatistiekGWT.rb.getString("notAvailable");
+				mode = StatistiekGWT.rb.notAvailable();
 			}
 		} // there is a split
 		
@@ -427,7 +427,7 @@ public class DescriptivesModel
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
 			// type is not numerical
-			minString = StatistiekGWT.rb.getString("notAvailable");
+			minString = StatistiekGWT.rb.notAvailable();
 		}
 		else if (splitColumnIndex == -1)
 		{
@@ -477,7 +477,7 @@ public class DescriptivesModel
 			if (minDouble.equals(Double.MAX_VALUE))
 			{
 				// no minimum found
-				minString = StatistiekGWT.rb.getString("notAvailable");
+				minString = StatistiekGWT.rb.notAvailable();
 			}
 			else
 			{
@@ -517,7 +517,7 @@ public class DescriptivesModel
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
 			// type is not numerical
-			maxString = StatistiekGWT.rb.getString("notAvailable");
+			maxString = StatistiekGWT.rb.notAvailable();
 		}
 		else if (splitColumnIndex == -1)
 		{
@@ -567,7 +567,7 @@ public class DescriptivesModel
 			if (maxDouble.equals(Double.MIN_VALUE))
 			{
 				// no maximum found
-				maxString = StatistiekGWT.rb.getString("notAvailable");
+				maxString = StatistiekGWT.rb.notAvailable();
 			}
 			else
 			{
@@ -609,7 +609,7 @@ public class DescriptivesModel
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
 			// type is not numerical
-			meanString = StatistiekGWT.rb.getString("notAvailable");
+			meanString = StatistiekGWT.rb.notAvailable();
 		}
 		else if (splitColumnIndex == -1)
 		{
@@ -661,7 +661,7 @@ public class DescriptivesModel
 			}
 			else
 			{
-				meanString = StatistiekGWT.rb.getString("notAvailable");
+				meanString = StatistiekGWT.rb.notAvailable();
 			}
 		} // there is a split
 		
@@ -700,7 +700,7 @@ public class DescriptivesModel
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
 			// type is not numerical
-			meanString = StatistiekGWT.rb.getString("notAvailable");
+			meanString = StatistiekGWT.rb.notAvailable();
 		}
 		else if (splitColumnIndex == -1)
 		{
@@ -752,7 +752,7 @@ public class DescriptivesModel
 			}
 			else
 			{
-				meanString = StatistiekGWT.rb.getString("notAvailable");
+				meanString = StatistiekGWT.rb.notAvailable();
 			}
 		} // there is a split
 		
@@ -780,7 +780,7 @@ public class DescriptivesModel
 	public String getColumnSD(int columnIndex, int splitClass, boolean forSelection)
 	{
 		String sdString = null;
-		String notAvailable = StatistiekGWT.rb.getString("notAvailable");
+		String notAvailable = StatistiekGWT.rb.notAvailable();
 
 //		double sd;
 		AllowedTypes type = this.statTableModel.getColumnTypes().get(columnIndex).getType();
@@ -853,7 +853,7 @@ public class DescriptivesModel
 				}
 				else
 				{
-					sdString = StatistiekGWT.rb.getString("notAvailable");
+					sdString = StatistiekGWT.rb.notAvailable();
 				}
 			}
 		} // there is a split
