@@ -267,7 +267,7 @@ public class StatTableModelTest extends GWTTestCase
 	public void testGetColumnModeGewicht()
 	{
 		//StatistiekGWT statistiek = new StatistiekGWT(); 
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnMode(1);
 		assertEquals("", expected, actual);
 	}
@@ -332,7 +332,7 @@ public class StatTableModelTest extends GWTTestCase
 		this.setSelectionListThreeSelected();
 		
 		//StatistiekGWT statistiek = new StatistiekGWT(); 
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnModeOfSelection(1);
 		assertEquals("", expected, actual);
 		
@@ -638,7 +638,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnMinOfSelection(4);
 		assertEquals("", expected, actual);
 		
@@ -649,7 +649,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnMaxOfSelection(4);
 		assertEquals("", expected, actual);
 		
@@ -660,7 +660,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnMeanOfSelection(4);
 		assertEquals("", expected, actual);
 		
@@ -695,7 +695,7 @@ public class StatTableModelTest extends GWTTestCase
 		this.setSelectionListThreeSelected();
 		
 		//StatistiekGWT statistiek = new StatistiekGWT(); 
-		String expected = StatistiekGWT.rb.getString("notAvailable");
+		String expected = StatistiekGWT.rb.notAvailable();
 		String actual = this.statTableModel.getColumnModeOfSelection(4);
 		assertEquals("", expected, actual);
 		
