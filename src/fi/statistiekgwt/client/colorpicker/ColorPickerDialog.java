@@ -51,7 +51,7 @@ public class ColorPickerDialog extends Dialog implements HasHandlers
 	@Override
 	protected Widget createDialogArea()
 	{
-		setText(StatistiekGWT.rb.getString("selectColors"));
+		setText(StatistiekGWT.rb.selectColors());
 
 		HorizontalPanel panel = new HorizontalPanel();
 
