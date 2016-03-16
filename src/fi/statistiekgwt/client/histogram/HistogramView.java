@@ -1126,14 +1126,14 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		TextMetrics metrics;
 
-		String s1 = this.model.hasVerticalBars() ? (this.model.getPercentage() ? StatistiekGWT.rb
-			.getString("percentageLabel") : StatistiekGWT.rb
-			.getString("frequentieLabel"))
+		String s1 = this.model.hasVerticalBars() ? 
+			(this.model.getPercentage() ? StatistiekGWT.rb.percentageLabel() : 
+				StatistiekGWT.rb.frequentieLabel())
 			: this.model.getStatTableModel().getColumnName(
 				this.model.getColumnIndex());
-		String s2 = !this.model.hasVerticalBars() ? (this.model.getPercentage() ? StatistiekGWT.rb
-			.getString("percentageLabel") : StatistiekGWT.rb
-			.getString("frequentieLabel"))
+		String s2 = !this.model.hasVerticalBars() ? 
+			(this.model.getPercentage() ? StatistiekGWT.rb.percentageLabel() : 
+				StatistiekGWT.rb.frequentieLabel())
 			: this.model.getStatTableModel().getColumnName(
 				this.model.getColumnIndex());
 		
@@ -3903,7 +3903,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							}
 							else
 							{
-								valueString = "aantal = " + valueString;
+								valueString = StatistiekGWT.rb.amountIs() + valueString;
 								this.popup.setPopupPositionAndShow(
 									new PopupPanel.PositionCallback()
 									{
@@ -4393,14 +4393,4 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		this.update();
 	}
-
-//	@Override
-//	public void onUpdateView(UpdateViewEvent event)
-//	{
-//		GWT.log("HistogramView.onUpdateView()");
-//		if (event.getName().equals(StatistiekGWT.rb.getString("histogramOption")))
-//		{
-//			this.update();
-//		}
-//	}
 }
