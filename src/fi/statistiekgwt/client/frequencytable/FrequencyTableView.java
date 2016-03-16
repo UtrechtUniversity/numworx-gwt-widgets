@@ -448,8 +448,8 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 				
 				if (this.frequencyTableRows > this.maxRows)
 				{
-					String s = StatistiekGWT.rb.getString("messageNrRowsMoreThan") + this.maxRows
-						+ ". " + StatistiekGWT.rb.getString("messageChooseOtherVar");
+					String s = StatistiekGWT.rb.messageNrRowsMoreThan() + this.maxRows
+						+ ". " + StatistiekGWT.rb.messageChooseOtherVar();
 					Label message = new Label(s);
 					this.mainPanel.add(message);
 					userOptionsPanel.update();
@@ -772,7 +772,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		
 		
 		// ********************* makeTotalRow ********************* 
-		Label totalLabel = new Label(StatistiekGWT.rb.getString("totalLabel"));
+		Label totalLabel = new Label(StatistiekGWT.rb.totalLabel());
 		flexTable.setWidget(this.frequencyTableRows - 1, 0, totalLabel);
 //		// administer the maximum column width
 //		this.updateMaxColumnWidth(0, totalLabel);
