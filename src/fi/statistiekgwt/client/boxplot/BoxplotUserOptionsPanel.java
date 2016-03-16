@@ -126,7 +126,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		addHandlers();
 
 		dialogButton = new DialogButton(
-			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
+			StatistiekGWT.rb.settingsButton(), this.basisPanel);
 
 		this.eventBus = StatistiekUtils.EVENT_BUS;
 	}
@@ -167,44 +167,44 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		this.basisPanel = new FlowPanel();
 
 		// var settings
-		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
+		this.varLabel = new Label(StatistiekGWT.rb.variableLabel());
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.columnIndexBox = new ListBox();
 		this.columnIndexBox.setWidth("100px");
 
 		// display settings
-		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
+		this.absRelLabel = new Label(StatistiekGWT.rb.absRelLabel());
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.tukeyBox = new CheckBox(
-			StatistiekGWT.rb.getString("tukeyCheckbox"), true);
+			StatistiekGWT.rb.tukeyCheckbox(), true);
 		this.tukeyBox.addStyleName(statistiekCss.checkBox());
 
 		this.verticalBoxesRadioItem = new RadioButton("verticalHorizontalGroup",
-			StatistiekGWT.rb.getString("verticalboxplotsRadio"));
+			StatistiekGWT.rb.verticalboxplotsRadio());
 		this.verticalBoxesRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.horizontalBoxesRadioItem = new RadioButton("verticalHorizontalGroup",
-			StatistiekGWT.rb.getString("horizontalboxplotsRadio"));
+			StatistiekGWT.rb.horizontalboxplotsRadio());
 		this.horizontalBoxesRadioItem.addStyleName(statistiekCss.radioButton());
 
 		// split settings
-		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
+		this.splitSettingsLabel = new Label(StatistiekGWT.rb.splitsLabel());
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.splitButton = new Button(
-			StatistiekGWT.rb.getString("splitoptionsButton"));
+			StatistiekGWT.rb.splitoptionsButton());
 		this.splitButton.addStyleName(statistiekCss.button());
 
 		this.splitVarLabel = new Label(
-			StatistiekGWT.rb.getString("splitvariableLabel"));
+			StatistiekGWT.rb.splitvariableLabel());
 		this.splitVarLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitVarBox = new ListBox();
 
 		this.splitBinsLabel = new Label(
-			StatistiekGWT.rb.getString("noClassesLabel"));
+			StatistiekGWT.rb.noClassesLabel());
 		this.splitBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		Integer[] options1 = new Integer[20];
@@ -219,25 +219,25 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		}
 
 		this.splitChooseBoundariesButton = new Button(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 
 		this.separatorSplitBoundaries = new HTML(BoxplotUserOptionsPanel.hrString);
 		this.separatorSplitBoundaries.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
-			StatistiekGWT.rb.getString("startvalueLabel"));
+			StatistiekGWT.rb.startvalueLabel());
 		this.splitMinBoundaryLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitMinBoundaryField = new TextBox();
 
 		this.splitBinWidthLabel = new Label(
-			StatistiekGWT.rb.getString("classwidthLabel"));
+			StatistiekGWT.rb.classwidthLabel());
 		this.splitBinWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinWidthField = new TextBox();
 
 		this.splitBoundariesLabel = new Label(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 		this.splitBoundariesLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBoundariesArea = new TextArea();
@@ -250,7 +250,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 		this.splitMaxValueLabel = new Label("");
 
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 	}
 
 	private void layoutGuiComponents()
@@ -260,7 +260,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 		// Variable settings
 		variableSettingsPanel = new FlowPanel();//new LayoutPanel();
-		variableSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
+		variableSettingsPanel.setTitle(StatistiekGWT.rb.variableLabel()); // tooltip boven panel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableSettingsPanel.add(varLabel);
@@ -268,7 +268,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 		// Display settings
 		displaySettingsPanel = new FlowPanel();
-		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
+		displaySettingsPanel.setTitle(StatistiekGWT.rb.absRelLabel()); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		displaySettingsPanel.add(this.absRelLabel);
@@ -278,7 +278,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 		// splitOptions
 		splitSettingsPanel = new FlowPanel();
-		splitSettingsPanel.setTitle(StatistiekGWT.rb.getString("splitsLabel")); // tooltip boven panel
+		splitSettingsPanel.setTitle(StatistiekGWT.rb.splitsLabel()); // tooltip boven panel
 		splitSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		splitSettingsPanel.add(this.splitSettingsLabel);
@@ -419,7 +419,7 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		}
 		
 		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
-		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
+		this.splitVarBox.addItem(StatistiekGWT.rb.chooseItem());
 		for (int column = 0; column < this.model.getStatTableModel()
 			.getColumnCount(); column++)
 		{
@@ -466,15 +466,14 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 					}
 					
 					this.splitBoundariesArea.setText(sb.toString());
-					this.splitNoObjectsLabel.setText(StatistiekGWT.rb
-						.getString("numberLabel")
+					this.splitNoObjectsLabel.setText(StatistiekGWT.rb.numberLabel()
 						+ this.model.getStatTableModel().getRowCount());
 					String splitMinValue = StatistiekGWT.getStringValue(
 						this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()));
-					this.splitMinValueLabel.setText(StatistiekGWT.rb.getString("minLabel") + splitMinValue);
+					this.splitMinValueLabel.setText(StatistiekGWT.rb.minLabel() + splitMinValue);
 					String splitMaxValue = StatistiekGWT.getStringValue(
 						this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
-					this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel") + splitMaxValue);
+					this.splitMaxValueLabel.setText(StatistiekGWT.rb.maxLabel() + splitMaxValue);
 					this.separatorSplitBoundaries.setVisible(true);
 					this.splitBinsBox.setVisible(true);
 					this.splitBinsLabel.setVisible(true);
@@ -582,13 +581,13 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setVisible(b && !this.splitEnumClasses);
 		if (!b)
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("binsButton"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.binsButton());
 		}
 		else
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("hideButtonLabel"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.hideButtonLabel());
 		}
 	}
 
@@ -620,13 +619,12 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		
 		if (!b)
 		{
-			this.splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
+			this.splitButton.setText(StatistiekGWT.rb.splitoptionsButton());
 			this.setVisibleSplitBoundaryOptions(false);
 		}
 		else
 		{
-			this.splitButton.setText(StatistiekGWT.rb
-				.getString("removeSplitoptionsButton"));
+			this.splitButton.setText(StatistiekGWT.rb.removeSplitoptionsButton());
 		}
 	}
 
