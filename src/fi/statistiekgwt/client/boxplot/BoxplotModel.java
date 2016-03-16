@@ -95,7 +95,7 @@ public class BoxplotModel
 
 		// set initial values
 		this.columnIndex = -1;
-		this.isTukeyBox = true;
+		this.isTukeyBox = false;
 		this.verticalBoxplots = false;
 	}
 
