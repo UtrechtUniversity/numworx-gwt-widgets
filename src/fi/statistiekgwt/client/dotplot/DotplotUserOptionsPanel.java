@@ -150,7 +150,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		addHandlers();
 
 		dialogButton = new DialogButton(
-			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
+			StatistiekGWT.rb.settingsButton(), this.basisPanel);
 
 		this.eventBus = StatistiekUtils.EVENT_BUS;
 	}
@@ -204,36 +204,36 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		this.basisPanel = new FlowPanel();
 
 		// var settings
-		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
+		this.varLabel = new Label(StatistiekGWT.rb.variableLabel());
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
-		this.varXLabel = new Label(StatistiekGWT.rb.getString("variableXLabel"));
+		this.varXLabel = new Label(StatistiekGWT.rb.variableXLabel());
 
 		this.varXBox = new ListBox();
 		this.varXBox.setWidth("100px");
 		
-		this.varYLabel = new Label(StatistiekGWT.rb.getString("variableYLabel"));
+		this.varYLabel = new Label(StatistiekGWT.rb.variableYLabel());
 		this.varYLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.varYBox = new ListBox();
 		this.varYBox.setWidth("100px");
 
 		// display settings
-		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
+		this.absRelLabel = new Label(StatistiekGWT.rb.absRelLabel());
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
 
 		// fields for setting the scale of the X variable
 		this.optimizeScaleXBox = new CheckBox(
-			StatistiekGWT.rb.getString("optimizeScaleBox"), true);
+			StatistiekGWT.rb.optimizeScaleBox(), true);
 		this.optimizeScaleXBox.addStyleName(statistiekCss.checkBox());
 		
 		this.minXOnScaleLabel = new Label(
-			StatistiekGWT.rb.getString("minValueLabel"));
+			StatistiekGWT.rb.minValueLabel());
 
 		this.minXOnScaleField = new TextBox();
 
 		this.maxXOnScaleLabel = new Label(
-			StatistiekGWT.rb.getString("maxValueLabel"));
+			StatistiekGWT.rb.maxValueLabel());
 
 		this.maxXOnScaleField = new TextBox();
 
@@ -242,11 +242,11 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		this.maxValueXLabel = new Label("");
 
 		this.useColorScaleBox = new CheckBox(
-			StatistiekGWT.rb.getString("usecolorscaleCheckbox"), false);
+			StatistiekGWT.rb.usecolorscaleCheckbox(), false);
 		this.useColorScaleBox.addStyleName(statistiekCss.checkBox());
 
 		this.varColorLabel = new Label(
-			StatistiekGWT.rb.getString("variablecolorscaleLabel"));
+			StatistiekGWT.rb.variablecolorscaleLabel());
 		this.varColorLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.varColorBox = new ListBox();
@@ -289,36 +289,36 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		this.separatorColorScale_splitOptions.addStyleName(statistiekCss.horizontalrule());
 
 		this.showCorrelationBox = new CheckBox(
-			StatistiekGWT.rb.getString("showcorrelationCheckbox"), false);
+			StatistiekGWT.rb.showcorrelationCheckbox(), false);
 		this.showCorrelationBox.addStyleName(statistiekCss.checkBox());
 
 		this.singleViewRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("splitsingleviewCheckBox"));
+			StatistiekGWT.rb.splitsingleviewCheckBox());
 		this.singleViewRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.separateRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("separateFromEachOtherRadioItem"));
+			StatistiekGWT.rb.separateFromEachOtherRadioItem());
 		this.separateRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.separatorSplitOptions_correlation = new HTML(DotplotUserOptionsPanel.hrString);
 		this.separatorSplitOptions_correlation.addStyleName(statistiekCss.horizontalrule());
 
 		// split settings
-		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
+		this.splitSettingsLabel = new Label(StatistiekGWT.rb.splitsLabel());
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.splitButton = new Button(
-			StatistiekGWT.rb.getString("splitoptionsButton"));
+			StatistiekGWT.rb.splitoptionsButton());
 		this.splitButton.addStyleName(statistiekCss.button());
 
 		this.splitVarLabel = new Label(
-			StatistiekGWT.rb.getString("splitvariableLabel"));
+			StatistiekGWT.rb.splitvariableLabel());
 		this.splitVarLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitVarBox = new ListBox();
 
 		this.splitBinsLabel = new Label(
-			StatistiekGWT.rb.getString("noClassesLabel"));
+			StatistiekGWT.rb.noClassesLabel());
 		this.splitBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		Integer[] options1 = new Integer[20];
@@ -333,25 +333,25 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		}
 
 		this.splitChooseBoundariesButton = new Button(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 
 		this.separatorSplitBoundaries = new HTML(DotplotUserOptionsPanel.hrString);
 		this.separatorSplitBoundaries.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
-			StatistiekGWT.rb.getString("startvalueLabel"));
+			StatistiekGWT.rb.startvalueLabel());
 		this.splitMinBoundaryLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitMinBoundaryField = new TextBox();
 
 		this.splitBinWidthLabel = new Label(
-			StatistiekGWT.rb.getString("classwidthLabel"));
+			StatistiekGWT.rb.classwidthLabel());
 		this.splitBinWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinWidthField = new TextBox();
 
 		this.splitBoundariesLabel = new Label(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 		this.splitBoundariesLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBoundariesArea = new TextArea();
@@ -364,7 +364,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 
 		this.splitMaxValueLabel = new Label("");
 
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 	}
 
 	private void layoutGuiComponents()
@@ -374,7 +374,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		
 		// Variable settings
 		variableSettingsPanel = new FlowPanel();
-		variableSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
+		variableSettingsPanel.setTitle(StatistiekGWT.rb.variableLabel()); // tooltip boven panel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableSettingsPanel.add(this.varLabel);
@@ -389,7 +389,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 
 		// Display settings
 		displaySettingsPanel = new FlowPanel();
-		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
+		displaySettingsPanel.setTitle(StatistiekGWT.rb.absRelLabel()); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		displaySettingsPanel.add(this.absRelLabel);
@@ -412,7 +412,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 
 		// splitOptions settings
 		splitSettingsPanel = new FlowPanel();
-		splitSettingsPanel.setTitle(StatistiekGWT.rb.getString("splitsLabel")); // tooltip boven panel
+		splitSettingsPanel.setTitle(StatistiekGWT.rb.splitsLabel()); // tooltip boven panel
 		splitSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		splitSettingsPanel.add(this.splitSettingsLabel);
@@ -653,11 +653,11 @@ public class DotplotUserOptionsPanel extends FlowPanel
 				this.maxXOnScaleField.setText(StatistiekGWT.getStringValue(this.model.getMaxXOnScale()));
 				String minValueXString = StatistiekGWT.getStringValue(this.model.getStatTableModel().getColumnMin(
 					this.model.getColumnXIndex()));
-				this.minValueXLabel.setText(StatistiekGWT.rb.getString("minLabel")
+				this.minValueXLabel.setText(StatistiekGWT.rb.minLabel()
 					+ minValueXString);
 				String maxValueXString = StatistiekGWT.getStringValue(this.model.getStatTableModel().getColumnMax(
 					this.model.getColumnXIndex()));
-				this.maxValueXLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+				this.maxValueXLabel.setText(StatistiekGWT.rb.maxLabel()
 					+ maxValueXString);
 			}
 		}
@@ -743,15 +743,15 @@ public class DotplotUserOptionsPanel extends FlowPanel
 				}
 				
 				this.splitBoundariesArea.setText(sb.toString());
-				this.splitNoObjectsLabel.setText(StatistiekGWT.rb.getString("numberLabel")
+				this.splitNoObjectsLabel.setText(StatistiekGWT.rb.numberLabel()
 					+ this.model.getStatTableModel().getRowCount());
 				String splitMinValue = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()));
-				this.splitMinValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
+				this.splitMinValueLabel.setText(StatistiekGWT.rb.minLabel()
 					+ splitMinValue);
 				String splitMaxValue = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
-				this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+				this.splitMaxValueLabel.setText(StatistiekGWT.rb.maxLabel()
 					+ splitMaxValue);
 				this.splitBinsBox.setVisible(true);
 				this.splitBinsLabel.setVisible(true);
@@ -803,7 +803,7 @@ public class DotplotUserOptionsPanel extends FlowPanel
 	private void updateSplitVarBox()
 	{
 		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
-		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
+		this.splitVarBox.addItem(StatistiekGWT.rb.chooseItem());
 		for (int column = 0; column < this.model.getStatTableModel()
 			.getColumnCount(); column++)
 		{
@@ -947,13 +947,13 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setVisible(b && !this.splitEnumClasses);
 		if (!b)
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("binsButton"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.binsButton());
 		}
 		else
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("hideButtonLabel"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.hideButtonLabel());
 		}
 	}
 
@@ -988,13 +988,13 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		
 		if (!b)
 		{
-			this.splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
+			this.splitButton.setText(StatistiekGWT.rb.splitoptionsButton());
 			setVisibleSplitBoundaryOptions(false);
 		}
 		else
 		{
-			this.splitButton.setText(StatistiekGWT.rb
-				.getString("removeSplitoptionsButton"));
+			this.splitButton.setText(
+				StatistiekGWT.rb.removeSplitoptionsButton());
 		}
 	}
 
