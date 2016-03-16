@@ -2054,7 +2054,7 @@ public class DotplotView extends LayoutPanel implements
 				else if (p == -1)
 				{
 					correlationInfoString = "r=" + Double.toString(r) 
-						+ ", " + StatistiekGWT.rb.getString("significanceNoShow");
+						+ ", " + StatistiekGWT.rb.significanceNoShow();
 				}
 				else
 				{
@@ -2067,7 +2067,7 @@ public class DotplotView extends LayoutPanel implements
 			catch (Exception e)
 			{
 				System.out.println("degrees of freedom is 0; er is te weinig data om significantie te berekenen");
-				correlationInfoString = StatistiekGWT.rb.getString("correlationNoShow");
+				correlationInfoString = StatistiekGWT.rb.correlationNoShow();
 			}
 			
 			context.fillText(correlationInfoString,
