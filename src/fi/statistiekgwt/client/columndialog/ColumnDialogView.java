@@ -111,7 +111,7 @@ public class ColumnDialogView extends DialogBox
 		super(false, true);
 		super.setText(text);
 		
-		if (text.equals(StatistiekGWT.rb.getString("columninfo")))
+		if (text.equals(StatistiekGWT.rb.columninfo()))
 		{
 			this.isViewOnly = true;
 		}
@@ -132,18 +132,18 @@ public class ColumnDialogView extends DialogBox
 	{
 		this.font = StatistiekGWT.fontString;
 
-		this.kiesNaam = new Label(StatistiekGWT.rb.getString("columnname"));
+		this.kiesNaam = new Label(StatistiekGWT.rb.columnname());
 		this.nameField = new TextBox();
 		this.nameField.addStyleName(statistiekCss.textbox());
-		this.kiesType = new Label(StatistiekGWT.rb.getString("choosetype"));
+		this.kiesType = new Label(StatistiekGWT.rb.choosetype());
 		this.kiesType.addStyleName(statistiekCss.spaceTopLabel());
 
 		// Use strings from text file to create listbox
 		String[] types = {
-			StatistiekGWT.rb.getString("integer"),
-			StatistiekGWT.rb.getString("double"),
-			StatistiekGWT.rb.getString("string"),
-			StatistiekGWT.rb.getString("enum")
+			StatistiekGWT.rb.integer(),
+			StatistiekGWT.rb.decimalNumber(),
+			StatistiekGWT.rb.string(),
+			StatistiekGWT.rb.enumValue()
 		};
 		this.typeBox = new ListBox();
 		for (int i = 0; i < types.length; i++)
@@ -159,7 +159,7 @@ public class ColumnDialogView extends DialogBox
 		this.setTypePanel.add(this.typeBox);
 
 		this.addEnumElementLabel = new Label(
-			StatistiekGWT.rb.getString("addenumeration"));
+			StatistiekGWT.rb.addenumeration());
 		this.addEnumElementLabel.addStyleName(statistiekCss.spaceTopLabel());
 		this.addEnumElementField = new TextBox();
 		this.addEnumElementField.addStyleName(statistiekCss.textbox());
@@ -180,11 +180,11 @@ public class ColumnDialogView extends DialogBox
 		this.enumListPanel.add(this.enumElementsList);
 		
 		this.removeSelectedElement = new Button(
-			StatistiekGWT.rb.getString("removeselectedelement"));
+			StatistiekGWT.rb.removeselectedelement());
 		this.removeSelectedElement.addStyleName(statistiekCss.margin());
 
 		this.removeAllElements = new Button(
-			StatistiekGWT.rb.getString("removeAllElements"));
+			StatistiekGWT.rb.removeAllElements());
 		this.removeAllElements.addStyleName(statistiekCss.margin());
 		
 		this.enumSouthPanel = new HorizontalPanel();
@@ -192,16 +192,16 @@ public class ColumnDialogView extends DialogBox
 		this.enumSouthPanel.add(this.removeAllElements);
 		
 		this.moveElementUp = new PushButton(new Image(statistiekGWTClientBundle.arrowUpResource().getSafeUri()));
-		this.moveElementUp.setTitle(StatistiekGWT.rb.getString("moveElementUpTooltip"));
+		this.moveElementUp.setTitle(StatistiekGWT.rb.moveElementUpTooltip());
 		this.moveElementUp.addStyleName(statistiekCss.margin());
 
 		this.moveElementDown = new PushButton(new Image(statistiekGWTClientBundle.arrowDownResource().getSafeUri()));
-		this.moveElementDown.setTitle(StatistiekGWT.rb.getString("moveElementDownTooltip"));
+		this.moveElementDown.setTitle(StatistiekGWT.rb.moveElementDownTooltip());
 		this.moveElementDown.addStyleName(statistiekCss.margin());
 
 		this.sortElements = new Button(
-			StatistiekGWT.rb.getString("sortElements"));
-		this.sortElements.setTitle(StatistiekGWT.rb.getString("sortElementsTooltip"));// tooltip
+			StatistiekGWT.rb.sortElements());
+		this.sortElements.setTitle(StatistiekGWT.rb.sortElementsTooltip());// tooltip
 		this.sortElements.addStyleName(statistiekCss.margin());
 
 		this.enumEastPanel = new FlowPanel();
@@ -225,7 +225,7 @@ public class ColumnDialogView extends DialogBox
 		this.typePanel.add(this.setTypePanel);
 		this.typePanel.add(this.createEnumPanel);
 		
-		this.uitlegLabel = new Label(StatistiekGWT.rb.getString("uitlegbijkolom"));
+		this.uitlegLabel = new Label(StatistiekGWT.rb.uitlegbijkolom());
 		this.uitlegArea = new TextArea();
 		this.uitlegArea.addStyleName(statistiekCss.textarea());
 		this.uitlegArea.addStyleName(statistiekCss.boxsizingborder());
@@ -235,9 +235,9 @@ public class ColumnDialogView extends DialogBox
 		this.uitlegPanel.add(this.uitlegArea);
 
 		this.okCancelPanel = new FlowPanel();
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 		this.okButton.addStyleName(statistiekCss.margin());
-		this.cancelButton = new Button(StatistiekGWT.rb.getString("cancelButtonText"));
+		this.cancelButton = new Button(StatistiekGWT.rb.cancelButtonText());
 		this.cancelButton.addStyleName(statistiekCss.margin());
 		this.okCancelPanel.add(this.okButton);
 		this.okCancelPanel.add(this.cancelButton);
@@ -339,19 +339,19 @@ public class ColumnDialogView extends DialogBox
 		String typeString = (String) this.typeBox.getItemText(selectedIndex);
 		AllowedTypes type = null;
 		
-		if (typeString.equals(StatistiekGWT.rb.getString("integer")))
+		if (typeString.equals(StatistiekGWT.rb.integer()))
 		{
 			type = AllowedTypes.INTEGER;
 		}
-		else if (typeString.equals(StatistiekGWT.rb.getString("double")))
+		else if (typeString.equals(StatistiekGWT.rb.decimalNumber()))
 		{
 			type = AllowedTypes.DOUBLE;
 		}
-		else if (typeString.equals(StatistiekGWT.rb.getString("string")))
+		else if (typeString.equals(StatistiekGWT.rb.string()))
 		{
 			type = AllowedTypes.STRING;
 		}
-		else if (typeString.equals(StatistiekGWT.rb.getString("enum")))
+		else if (typeString.equals(StatistiekGWT.rb.enumValue()))
 		{
 			type = AllowedTypes.ENUM;
 		}
@@ -517,19 +517,19 @@ public class ColumnDialogView extends DialogBox
 		String typeString = "";
 		if (type.equals(AllowedTypes.INTEGER))
 		{
-			typeString = StatistiekGWT.rb.getString("integer");
+			typeString = StatistiekGWT.rb.integer();
 		}
 		else if (type.equals(AllowedTypes.DOUBLE))
 		{
-			typeString = StatistiekGWT.rb.getString("double");
+			typeString = StatistiekGWT.rb.decimalNumber();
 		}
 		else if (type.equals(AllowedTypes.STRING))
 		{
-			typeString = StatistiekGWT.rb.getString("string");
+			typeString = StatistiekGWT.rb.string();
 		}
 		else if (type.equals(AllowedTypes.ENUM))
 		{
-			typeString = StatistiekGWT.rb.getString("enum");
+			typeString = StatistiekGWT.rb.enumValue();
 		}
 
 		// find the index of type
