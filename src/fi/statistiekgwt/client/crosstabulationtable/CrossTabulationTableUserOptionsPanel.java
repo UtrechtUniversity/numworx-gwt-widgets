@@ -168,7 +168,7 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		addHandlers();
 
 		dialogButton = new DialogButton(
-			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
+			StatistiekGWT.rb.settingsButton(), this.basisPanel);
 		
 		this.eventBus = StatistiekUtils.EVENT_BUS;
 	}
@@ -212,19 +212,19 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		this.basisPanel = new FlowPanel();
 
 		// ROWS variable settings
-		this.varRowsLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
+		this.varRowsLabel = new Label(StatistiekGWT.rb.variableLabel());
 		this.varRowsLabel.addStyleName(statistiekCss.titlelabel());
-		this.rowsLabel = new Label(StatistiekGWT.rb.getString("rowsLabel"));
+		this.rowsLabel = new Label(StatistiekGWT.rb.rowsLabel());
 		this.rowIndexBox = new ListBox();
 		this.rowIndexBox.setWidth("100px");
 
 		// rows bin settings
-		this.minBoundaryRowsLabel = new Label(StatistiekGWT.rb.getString("startvalueLabel"));
+		this.minBoundaryRowsLabel = new Label(StatistiekGWT.rb.startvalueLabel());
 		this.minBoundaryRowsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.minBoundaryRowsField = new TextBox();
 
-		this.binWidthRowsLabel = new Label(StatistiekGWT.rb.getString("classwidthLabel"));
+		this.binWidthRowsLabel = new Label(StatistiekGWT.rb.classwidthLabel());
 		this.binWidthRowsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.binWidthRowsField = new TextBox();
@@ -237,25 +237,25 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		this.maxValueRowsLabel = new Label("maxValueLabel");
 		
 		// SWAP elements
-		this.swapLabel = new Label(StatistiekGWT.rb.getString("swapLabel"));
+		this.swapLabel = new Label(StatistiekGWT.rb.swapLabel());
 		this.swapLabel.addStyleName(statistiekCss.titlelabel());
 		// button to swap row and column variable
 		this.swapButton = new PushButton(new Image(statistiekGWTClientBundle.swapResource().getSafeUri()));
 		this.swapButton.addStyleName(statistiekCss.pushbutton());
 
 		// COLUMNS variable settings
-		this.varColumnsLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
+		this.varColumnsLabel = new Label(StatistiekGWT.rb.variableLabel());
 		this.varColumnsLabel.addStyleName(statistiekCss.titlelabel());
-		this.columnsLabel = new Label(StatistiekGWT.rb.getString("columnsLabel"));
+		this.columnsLabel = new Label(StatistiekGWT.rb.columnsLabel());
 		this.columnIndexBox = new ListBox();
 
 		// columns bin settings
-		this.minBoundaryColumnsLabel = new Label(StatistiekGWT.rb.getString("startvalueLabel"));
+		this.minBoundaryColumnsLabel = new Label(StatistiekGWT.rb.startvalueLabel());
 		this.minBoundaryColumnsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.minBoundaryColumnsField = new TextBox();
 
-		this.binWidthColumnsLabel = new Label(StatistiekGWT.rb.getString("classwidthLabel"));
+		this.binWidthColumnsLabel = new Label(StatistiekGWT.rb.classwidthLabel());
 		this.binWidthColumnsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.binWidthColumnsField = new TextBox();
@@ -268,37 +268,37 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		this.maxValueColumnsLabel = new Label("maxValueLabel");
 
 		// display settings
-		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
+		this.absRelLabel = new Label(StatistiekGWT.rb.absRelLabel());
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
 		this.amountRadioItem = new RadioButton("percAmountGroup", 
-			StatistiekGWT.rb.getString("amountLabel"));
+			StatistiekGWT.rb.amountLabel());
 		this.amountRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.percentageRadioItem = new RadioButton("percAmountGroup",
-			StatistiekGWT.rb.getString("percentageRadio"));
+			StatistiekGWT.rb.percentageRadio());
 		this.percentageRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.separatorPercentageSettings = new HTML(this.hrString);
 		this.separatorPercentageSettings.addStyleName(statistiekCss.horizontalrule());
 
 		this.percentage_endTotal = new RadioButton("percentageTotal",
-			StatistiekGWT.rb.getString("percentage_endTotal"));
+			StatistiekGWT.rb.percentage_endTotal());
 		this.percentage_endTotal.setValue(true);// by default true
 		this.percentage_endTotal.addStyleName(statistiekCss.radioButton());
 
 		this.percentage_rowTotal = new RadioButton("percentageTotal",
-			StatistiekGWT.rb.getString("percentage_rowTotal"));
+			StatistiekGWT.rb.percentage_rowTotal());
 		this.percentage_rowTotal.addStyleName(statistiekCss.radioButton());
 
 		this.percentage_columnTotal = new RadioButton("percentageTotal",
-			StatistiekGWT.rb.getString("percentage_columnTotal"));
+			StatistiekGWT.rb.percentage_columnTotal());
 		this.percentage_columnTotal.addStyleName(statistiekCss.radioButton());
 
 		// set tooltip
-		this.swapButton.setTitle(StatistiekGWT.rb.getString("swapTooltip"));
+		this.swapButton.setTitle(StatistiekGWT.rb.swapTooltip());
 
 		// ok-cancel
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 	}
 
 	private void layoutGuiComponents()
@@ -308,7 +308,7 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 		// ROWS variable settings
 		variableRowsSettingsPanel = new FlowPanel();
-		variableRowsSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
+		variableRowsSettingsPanel.setTitle(StatistiekGWT.rb.variableLabel()); // tooltip boven panel
 		variableRowsSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableRowsSettingsPanel.add(this.varRowsLabel); // the title
@@ -326,7 +326,7 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 		// Swap button
 		swapPanel = new FlowPanel();
-		swapPanel.setTitle(StatistiekGWT.rb.getString("swapLabel"));
+		swapPanel.setTitle(StatistiekGWT.rb.swapLabel());
 		swapPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		swapPanel.add(this.swapLabel); // the title
@@ -334,7 +334,7 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 		// COLUMNS variable settings
 		variableColumnsSettingsPanel = new FlowPanel();
-		variableColumnsSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
+		variableColumnsSettingsPanel.setTitle(StatistiekGWT.rb.variableLabel()); // tooltip boven panel
 		variableColumnsSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableColumnsSettingsPanel.add(this.varColumnsLabel); // the title
@@ -351,7 +351,7 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 		// Display
 		displaySettingsPanel = new FlowPanel();
-		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
+		displaySettingsPanel.setTitle(StatistiekGWT.rb.absRelLabel()); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		displaySettingsPanel.add(this.absRelLabel); // the title
@@ -452,16 +452,15 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 					StatistiekGWT.getStringValue(this.model.getBinBoundaries().get(0)));
 				// set the row bin width based on the row's bin boundaries
 				this.binWidthRowsField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getBinBoundaries()));
-				this.noObjectsRowsLabel.setText(StatistiekGWT.rb
-					.getString("numberLabel")
+				this.noObjectsRowsLabel.setText(StatistiekGWT.rb.numberLabel()
 					+ this.model.getStatTableModel().getRowCount());
 				String minValueRows = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()));
-				this.minValueRowsLabel.setText(StatistiekGWT.rb.getString("minLabel")
+				this.minValueRowsLabel.setText(StatistiekGWT.rb.minLabel()
 					+ minValueRows);
 				String maxValueRows = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
-				this.maxValueRowsLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+				this.maxValueRowsLabel.setText(StatistiekGWT.rb.maxLabel()
 					+ maxValueRows);
 				setEnumClassesRows(false);
 			}
@@ -489,16 +488,15 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 					StatistiekGWT.getStringValue(this.model.getSplitOptions().getBinBoundaries().get(0)));
 				// set the column bin width based on the column's bin boundaries
 				this.binWidthColumnsField.setText(StatistiekGWT.getFormattedBinWidth(this.model.getSplitOptions().getBinBoundaries()));
-				this.noObjectsColumnsLabel.setText(StatistiekGWT.rb
-					.getString("numberLabel")
+				this.noObjectsColumnsLabel.setText(StatistiekGWT.rb.numberLabel()
 					+ this.model.getStatTableModel().getRowCount());
 				String minValueColumns = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()));
-				this.minValueColumnsLabel.setText(StatistiekGWT.rb.getString("minLabel")
+				this.minValueColumnsLabel.setText(StatistiekGWT.rb.minLabel()
 					+ minValueColumns);
 				String maxValueColumns = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
-				this.maxValueColumnsLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+				this.maxValueColumnsLabel.setText(StatistiekGWT.rb.maxLabel()
 					+ maxValueColumns);
 				setEnumClassesColumns(false);
 			}
