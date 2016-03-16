@@ -10,4 +10,8 @@ public interface Text extends Constants {
 	String maakVol();
 	String maakLeeg();
 	String kijkNa();
+	String bouwen();
+	String slopen();
+	String bouwOpdracht();
+	String sloopOpdracht();
 }

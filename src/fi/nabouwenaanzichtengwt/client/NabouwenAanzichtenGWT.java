@@ -1,5 +1,6 @@
 package fi.nabouwenaanzichtengwt.client;
 
+import java.awt.Cursor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,9 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -37,17 +41,14 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 //import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 
-
-
-
-
 import fi.nabouwenaanzichtengwt.client.text.Msgs;
 import fi.nabouwenaanzichtengwt.client.text.Text;
 
 import java.util.logging.Logger;
 
-public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView
+public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
 {
+	public static final String TEXT_CSV = "text.csv";
 	
     // logger
     static Logger logger = Logger.getLogger("NabouwenaanzichtenGWT");
@@ -105,6 +106,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	boolean kijkNaActief = false;
 
 	private KubusRooster startKr;
+	int maxAantal = 4;
+	boolean[][][] b;
 
 	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
 			vinkjeGrijsImage, buttonBgImage;
@@ -510,6 +513,8 @@ System.out.println("rood");
 		panel.getElement().getStyle().setBackgroundColor(background.value());
 		vWerk.zetAchtergrond(background);
 		vWerk.tekenOpnieuw();
+System.out.println("setComRoot");		
+		comRoot.addCBookEventListener("text.buildingProgram", this);
 	}
 	
 	public void zetMode(int mode)
@@ -532,7 +537,7 @@ System.out.println("rood");
 		breedte = width;
 		hoogte  = height;
 
-logger.info("TekenVeelvlakGWT init");
+logger.info("NabouwenAanzichtenGWT init");
 //System.out.println("breedte = " + breedte);
 //System.out.println("hoogte = " + hoogte);
 
@@ -546,7 +551,7 @@ logger.info("TekenVeelvlakGWT init");
 		//panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
 		//panel.getElement().getStyle().setProperty("textAlign", "right");
 
-		int maxAantal = 4;
+		//int maxAantal = 4;
 		Object stateNew = null;
 
 		if (launchState.containsKey("stateNew"))
@@ -570,7 +575,7 @@ logger.info("TekenVeelvlakGWT init");
 		if (launchState.containsKey("maxAantal"))
 			maxAantal = ((Number) launchState.get("maxAantal")).intValue();
 
-		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
+		b = new boolean[maxAantal][maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
 		{
 			for (int j = 0; j < maxAantal; j++)
@@ -864,8 +869,8 @@ logger.info("TekenVeelvlakGWT init");
 			
 			if (keuzeBouwenSlopen)
 			{
-				bouwenButton = new RadioButton(bouwenSlopenGroup, "Bouwen");
-				slopenButton = new RadioButton(bouwenSlopenGroup, "Slopen");
+				bouwenButton = new RadioButton(bouwenSlopenGroup, rb.bouwen());
+				slopenButton = new RadioButton(bouwenSlopenGroup, rb.slopen());
 				bouwenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
 				slopenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
 				panel.add(bouwenButton);
@@ -1033,7 +1038,61 @@ logger.info("TekenVeelvlakGWT init");
 
 	
 	//@Override
-	public int[][] getScoreObjectives() {
-		return null;
+	public int[][] getScoreObjectives() 
+	{
+		return null; 
 	}
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event) 
+	{
+		String command = event.getCommand();
+		
+/*		
+		if(command.startsWith("blockBuilding"))
+		{
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	boolean[][][] booleanKR = (boolean[][][])map.get("booleanKR");
+				startKr = new KubusRooster(booleanKR, 1);
+				if (vWerk != null)
+					vWerk.zetKubusRooster(startKr);
+				if (vaktekPanel != null)
+					vaktekPanel.zetKubusRooster(startKr);
+				//na.setValue(kr.maxAantal);
+				//setKPanelText();
+				Msgs msgs = GWT.create(Msgs.class);
+				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
+			}
+			
+		}
+*/		
+		
+//System.out.println("acceptCBookEvent");
+//System.out.println("command = " + command);
+
+		if(command.startsWith("text.buildingProgram"))
+		{
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{
+				
+//System.out.println("map != null");				
+				String programText = (String)map.get("content");
+//System.out.println("" + programText);				
+				//setCursor(new Cursor(Cursor.WAIT_CURSOR));
+				vWerk.kr.maakLeeg();
+				Interpreter interpreter = new Interpreter(vWerk.kr);
+				interpreter.execute(programText);
+				//setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				//zetVeranderd();
+//System.out.println("" + vWerk.kr.geefAantalK());
+				vWerk.tekenOpnieuw();
+				Msgs msgs = GWT.create(Msgs.class);
+				if (blokjesLabel != null)
+					blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
+			}
+		}
+	}
+
 }
