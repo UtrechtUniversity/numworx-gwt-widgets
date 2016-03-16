@@ -342,7 +342,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		HashMap<String, Integer> hashMap)
 	{
 		ArrayList<String> list = new ArrayList<String>(hashMap.keySet());
-		// Use collator to sort for example 'é' correctly
+		// Use collator to sort for example 'ï¿½' correctly
 		//Collator collator = Collator.getInstance(Locale.getDefault());
 		//Collections.sort(list, collator);
 		Collections.sort(list);
@@ -1736,13 +1736,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public String getColumnMinOfSelection(int columnIndex)
 	{
-		String minString = StatistiekGWT.rb.getString("notAvailable");
+		String minString = StatistiekGWT.rb.notAvailable();
 		
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
 		if (!(type.equals(AllowedTypes.DOUBLE) 
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
-			minString = StatistiekGWT.rb.getString("notAvailable");
+			minString = StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -1765,7 +1765,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			if (min.equals(Double.MAX_VALUE))
 			{
-				minString = StatistiekGWT.rb.getString("notAvailable");
+				minString = StatistiekGWT.rb.notAvailable();
 			}
 			else
 			{
@@ -1836,13 +1836,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public String getColumnMaxOfSelection(int columnIndex)
 	{
-		String maxString = StatistiekGWT.rb.getString("notAvailable");
+		String maxString = StatistiekGWT.rb.notAvailable();
 		
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
 		if (!(type.equals(AllowedTypes.DOUBLE) 
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
-			maxString = StatistiekGWT.rb.getString("notAvailable");
+			maxString = StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -1865,7 +1865,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			if (max.equals(Double.MIN_VALUE))
 			{
-				maxString = StatistiekGWT.rb.getString("notAvailable");
+				maxString = StatistiekGWT.rb.notAvailable();
 			}
 			else
 			{
@@ -1927,13 +1927,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public String getColumnMeanOfSelection(int columnIndex)
 	{
-		String meanString = StatistiekGWT.rb.getString("notAvailable");
+		String meanString = StatistiekGWT.rb.notAvailable();
 		
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
 		if (!(type.equals(AllowedTypes.DOUBLE) 
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
-			meanString = StatistiekGWT.rb.getString("notAvailable");
+			meanString = StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -1960,7 +1960,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			else
 			{
-				meanString = StatistiekGWT.rb.getString("notAvailable");
+				meanString = StatistiekGWT.rb.notAvailable();
 			}
 		}
 		
@@ -1978,13 +1978,13 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	public String getColumnMeanOfSelectionDoubleValue(int columnIndex)
 	{
-		String meanString = StatistiekGWT.rb.getString("notAvailable");
+		String meanString = StatistiekGWT.rb.notAvailable();
 		
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
 		if (!(type.equals(AllowedTypes.DOUBLE) 
 			|| type.equals(AllowedTypes.INTEGER)))
 		{
-			meanString = StatistiekGWT.rb.getString("notAvailable");
+			meanString = StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -2011,7 +2011,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			}
 			else
 			{
-				meanString = StatistiekGWT.rb.getString("notAvailable");
+				meanString = StatistiekGWT.rb.notAvailable();
 			}
 		}
 		
@@ -2242,7 +2242,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public String getColumnMode(int columnIndex)
 	{
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
-		String mode = StatistiekGWT.rb.getString("notAvailable");
+		String mode = StatistiekGWT.rb.notAvailable();
 		int maxFreq = 0;
 		boolean multipleModes = false;
 		
@@ -2327,7 +2327,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		
 		if (multipleModes)
 		{
-			return StatistiekGWT.rb.getString("notAvailable");
+			return StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -2345,7 +2345,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	public String getColumnModeOfSelection(int columnIndex)
 	{
 		AllowedTypes type = this.getColumnTypes().get(columnIndex).getType();
-		String mode = StatistiekGWT.rb.getString("notAvailable");
+		String mode = StatistiekGWT.rb.notAvailable();
 		int maxFreq = 0;
 		boolean multipleModes = false;
 		
@@ -2434,7 +2434,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		
 		if (multipleModes)
 		{
-			return StatistiekGWT.rb.getString("notAvailable");
+			return StatistiekGWT.rb.notAvailable();
 		}
 		else
 		{
@@ -2818,7 +2818,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 					}
 					List<String> keyList = Arrays.asList(keySet.toArray(new String[0]));
 
-					// Use collator to sort for example 'é' correctly -> not available in gwt
+					// Use collator to sort for example 'ï¿½' correctly -> not available in gwt
 					//Collator collator = Collator.getInstance(Locale.getDefault());
 					//Collections.sort(keyList, collator);
 					Collections.sort(keyList);
@@ -2960,7 +2960,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 					}
 					List<String> keyList = Arrays.asList(keySet.toArray(new String[0]));
 
-					// Use collator to sort for example 'é' correctly
+					// Use collator to sort for example 'ï¿½' correctly
 					//Collator collator = Collator.getInstance(Locale.getDefault());
 					//Collections.sort(keyList, collator);
 					Collections.sort(keyList);
