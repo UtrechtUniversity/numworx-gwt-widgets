@@ -989,7 +989,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		flexTable.setWidget(0, 2, variableColumnsName);
 		cellFormatter.setColSpan(0, 2, numberOfColumnBins);
 		
-		Label totaalLabel = new Label(StatistiekGWT.rb.getString("totalLabel"));
+		Label totaalLabel = new Label(StatistiekGWT.rb.totalLabel());
 		flexTable.setWidget(0, 3, totaalLabel);//numberOfColumnBins + 2, totaalLabel); // mind the colspan...
 		
 		// SECOND ROW with column bin labels
@@ -1033,7 +1033,7 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		}
 
 		// add the total label
-		Label totalLabel = new Label(StatistiekGWT.rb.getString("totalLabel"));
+		Label totalLabel = new Label(StatistiekGWT.rb.totalLabel());
 		if (percentageItemSelected() && percentage_endTotalSelected())
 		{
 			totalLabel.getElement().getStyle().setFontWeight(FontWeight.BOLD);
