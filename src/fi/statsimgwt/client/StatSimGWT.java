@@ -11,6 +11,7 @@ import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -23,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import fi.statsimgwt.client.Munten.Experiment;
 
-public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub {
+public class StatSimGWT implements EntryPoint,  InteractionStub {
 	
 	int breedte;
 	int hoogte;
@@ -112,6 +113,7 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		if (steekproefRadio) {
 			return steekproef;
 		}
+		
 		return null;
 	}
 
@@ -638,9 +640,19 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 		
 	}
 
+	private OpdrNavIF comRoot;
+	public void fireCBookMunten(String arg1) {
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", arg1);
+		Window.alert(arg1);	
+		//comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
+		comRoot.fireEvent(new CBookEvent(this, "text",map));
+	}
+
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
-		// TODO Auto-generated method stub
+		this.comRoot = comRoot;
 		
 	}
 
@@ -653,6 +665,8 @@ public class StatSimGWT implements EntryPoint, InteractionView, InteractionStub 
 	@Override
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
+		breedte = width;
+		hoogte = height;
 		// TODO Auto-generated method stub
 		
 ObjectMap l=JSONUtilities.wrapMap(launchData);
@@ -707,7 +721,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			binomTrekkingRooster = l.getBoolean("binomTrekkingRooster");
 	
 		if (muntenSelected) {
-			munten=new Munten(muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
+			munten=new Munten(this, muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
 			munten.setGrootte(breedte,hoogte);
 			Boolean eenMuntTweeMunt=false;
 			if (l.containsKey("eenMuntTweeMunt"))

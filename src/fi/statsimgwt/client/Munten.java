@@ -1,5 +1,6 @@
 package fi.statsimgwt.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -110,6 +111,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 	HTML html;
 	HTML html2;
 	
+	StatSimGWT ssgwt;
+	
 	public static class Experiment {
 		private final String experimentNumber;
 	    private final String kopValue;
@@ -178,7 +181,9 @@ public class Munten extends FlowPanel implements ClickHandler{
 	CssColor agKleur = CssColor.make(255, 255, 255);
 
 	
-	public Munten (boolean muntenInstellingen, boolean muntenResultaten, boolean muntenGrafiek, boolean muntenTabel, boolean muntenFrequentie) {
+	public Munten (StatSimGWT ssgwt, boolean muntenInstellingen, boolean muntenResultaten, boolean muntenGrafiek, boolean muntenTabel, boolean muntenFrequentie) {
+		this.ssgwt=ssgwt;
+		
 		muntenTabel1=muntenTabel;
 		
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
@@ -393,9 +398,10 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    panel4.add(kansOpKopText);
 	    panel2.add(panel4);
 	    
-	    if (muntenInstellingen==false)
+	    if (muntenInstellingen==false) {
 	    	panel2.setVisible(false);
-	    
+	    	Window.alert("false");
+	    }
 	    		// Add it to the root panel.
 	    panel1=new VerticalPanel();
 	    
@@ -570,6 +576,19 @@ public class Munten extends FlowPanel implements ClickHandler{
 			percentageMunt=new double[10001];
 			
 			
+	}
+
+	public void fireCBook() {
+		
+		List<Munten.Experiment> list = (List<Munten.Experiment>) dataProvider.getList();
+		
+		String string1="";
+		
+		for (int i=0;i<list.size();i++) {
+			string1=string1+list.get(i).getExpNumber()+";"+list.get(i).getKopValue()+";"+list.get(i).getMuntValue()+"\n";			
+		}
+		
+		ssgwt.fireCBookMunten(string1);
 	}
 	
 	public void setGrootte(int breedte,int hoogte)
@@ -920,7 +939,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 				   }
 			   }
 			   setResults();
-			   
+			   fireCBook();
 			   experiment++;
 		   }
 
