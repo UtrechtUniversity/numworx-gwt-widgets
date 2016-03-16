@@ -455,7 +455,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 			String s = this.view.getViewsBoxString();
 			String t = null;
 			if (Arrays.asList(StatistiekGWT.VIEWS_translated).contains(s)
-				&& (s.equals(StatistiekGWT.rb.getString("tableOption"))))
+				&& (s.equals(StatistiekGWT.rb.tableOption())))
 			{
 				// tabel gekozen, er is geen variabelekeuze nodig
 				t = StatistiekGWT.VIEWS[0];
@@ -467,27 +467,27 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 				this.view.clearAddViewTab();
 			}
 			else if (Arrays.asList(StatistiekGWT.VIEWS_translated).contains(s)
-				&& (s.equals(StatistiekGWT.rb.getString("crosstabOption"))))
+				&& (s.equals(StatistiekGWT.rb.crosstabOption())))
 			{
 				// update label "Kies variabele rijen:"
-				this.view.setStartVarLabel(StatistiekGWT.rb.getString("chooseStartVarRowLabel"));
+				this.view.setStartVarLabel(StatistiekGWT.rb.chooseStartVarRowLabel());
 				this.view.setStartVarBox(true);
 				this.view.setStartVar2Box(true);
 			}
 			else if (Arrays.asList(StatistiekGWT.VIEWS_translated).contains(s)
-				&& (s.equals(StatistiekGWT.rb.getString("scatterplotOption"))))
+				&& (s.equals(StatistiekGWT.rb.scatterplotOption())))
 			{
 				// update label "Kies variabele x-as:"
-				this.view.setStartVarLabel(StatistiekGWT.rb.getString("chooseStartVarXLabel"));
+				this.view.setStartVarLabel(StatistiekGWT.rb.chooseStartVarXLabel());
 				// update label "Kies variabele y-as:"
-				this.view.setStartVar2Label(StatistiekGWT.rb.getString("chooseStartVarYLabel"));
+				this.view.setStartVar2Label(StatistiekGWT.rb.chooseStartVarYLabel());
 				this.view.setStartVarBox(true);
 				this.view.setStartVar2Box(true);
 			}
 			else
 			{
 				// bied variabelekeuze aan
-				this.view.setStartVarLabel(StatistiekGWT.rb.getString("chooseStartVarLabel"));
+				this.view.setStartVarLabel(StatistiekGWT.rb.chooseStartVarLabel());
 				this.view.setStartVarBox(true);
 				this.view.setStartVar2Box(false);
 			}
@@ -503,39 +503,39 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 			String t = null;
 			if (Arrays.asList(StatistiekGWT.VIEWS_translated).contains(s))
 			{
-				if (s.equals(StatistiekGWT.rb.getString("tableOption")))
+				if (s.equals(StatistiekGWT.rb.tableOption()))
 				{
 					t = StatistiekGWT.VIEWS[0];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("histogramOption")))
+				else if (s.equals(StatistiekGWT.rb.histogramOption()))
 				{
 					t = StatistiekGWT.VIEWS[1];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("dotplotOption")))
+				else if (s.equals(StatistiekGWT.rb.dotplotOption()))
 				{
 					t = StatistiekGWT.VIEWS[2];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("frequencytableOption")))
+				else if (s.equals(StatistiekGWT.rb.frequencytableOption()))
 				{
 					t = StatistiekGWT.VIEWS[3];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("frequencypolygonOption")))
+				else if (s.equals(StatistiekGWT.rb.frequencypolygonOption()))
 				{
 					t = StatistiekGWT.VIEWS[4];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("boxplotOption")))
+				else if (s.equals(StatistiekGWT.rb.boxplotOption()))
 				{
 					t = StatistiekGWT.VIEWS[5];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("crosstabOption")))
+				else if (s.equals(StatistiekGWT.rb.crosstabOption()))
 				{
 					t = StatistiekGWT.VIEWS[6];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("scatterplotOption")))
+				else if (s.equals(StatistiekGWT.rb.scatterplotOption()))
 				{
 					t = StatistiekGWT.VIEWS[7];
 				}
-				else if (s.equals(StatistiekGWT.rb.getString("descriptivesOption")))
+				else if (s.equals(StatistiekGWT.rb.descriptivesOption()))
 				{
 					t = StatistiekGWT.VIEWS[8];
 				}
@@ -749,7 +749,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 	public void setHTML5Message()
 	{
 		super.remove(this.view);
-		Label message = new Label(StatistiekGWT.rb.getString("notHTML5ReadyMessage"));
+		Label message = new Label(StatistiekGWT.rb.notHTML5ReadyMessage());
 		super.add(message);
 	}
 
