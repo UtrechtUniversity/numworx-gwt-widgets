@@ -159,19 +159,19 @@ public class StatInteractiePanelView extends LayoutPanel
 
 		this.addViewTab = new FlowPanel();
 
-		this.addViewLabel = new Label(StatistiekGWT.rb.getString("addaviewKnopTekst"));
+		this.addViewLabel = new Label(StatistiekGWT.rb.addaviewKnopTekst());
 		this.addViewLabel.addStyleName(statistiekCss.spaceTopLabel());
 
-		this.chooseStartVarLabel = new Label(StatistiekGWT.rb.getString("chooseStartVarLabel"));
+		this.chooseStartVarLabel = new Label(StatistiekGWT.rb.chooseStartVarLabel());
 		this.chooseStartVarLabel.setVisible(false);
 		this.chooseStartVarLabel.addStyleName(statistiekCss.spaceTopLabel());
 
-		this.chooseStartVar2Label = new Label(StatistiekGWT.rb.getString("chooseStartVarColumnLabel"));
+		this.chooseStartVar2Label = new Label(StatistiekGWT.rb.chooseStartVarColumnLabel());
 		this.chooseStartVar2Label.setVisible(false);
 		this.chooseStartVar2Label.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.viewsBox = new ListBox();
-		this.viewsBox.addItem(StatistiekGWT.rb.getString("chooseaviewOption"));
+		this.viewsBox.addItem(StatistiekGWT.rb.chooseaviewOption());
 		for (int i = 0; i < StatistiekGWT.VIEWS_translated.length; i++)
 		{
 			this.viewsBox.addItem(StatistiekGWT.VIEWS_translated[i]);
@@ -218,10 +218,10 @@ public class StatInteractiePanelView extends LayoutPanel
 		this.changeViewNamePopupMenu.hide();
 		
 		this.createChangeNameCommand();
-		this.changeNameItem = new MenuItem(StatistiekGWT.rb.getString("changeViewName"), true, changeNameCommand);
+		this.changeNameItem = new MenuItem(StatistiekGWT.rb.changeViewName(), true, changeNameCommand);
 		
 //		this.createShowInDialogCommand();
-//		this.showInDialogItem = new MenuItem(StatistiekGWT.rb.getString("showInDialog"), true, showInDialogCommand);
+//		this.showInDialogItem = new MenuItem(StatistiekGWT.rb.showInDialog(), true, showInDialogCommand);
 
 		// add the items
 		this.menuBar.addItem(changeNameItem);
@@ -825,7 +825,7 @@ public class StatInteractiePanelView extends LayoutPanel
 		// GWT.log("NA setViewSeparateWindow..... tabPane.getSelectedIndex()="
 		// + tabPane.getSelectedIndex());
 
-		// Als er een view wordt teruggezet vòòr de oude selectedTab,
+		// Als er een view wordt teruggezet vï¿½ï¿½r de oude selectedTab,
 		// dan wordt de nieuwe selectedTab 1 hoger
 		// test syl: let op: als je een tab selecteert en daarna een extern view sluit, dan is selectedView niet de te sluiten externe view maar de selectedTab!
 		// hier moet: de index van statistiekView
@@ -1067,7 +1067,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			}
 			
 			// add first item
-			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+			String firstItem = StatistiekGWT.rb.chooseAVariableOption();
 			this.startVarBox.addItem(firstItem);
 			
 			// add column names
@@ -1102,7 +1102,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			}
 			
 			// add first item
-			String firstItem = StatistiekGWT.rb.getString("chooseAVariableOption");
+			String firstItem = StatistiekGWT.rb.chooseAVariableOption();
 			this.startVar2Box.addItem(firstItem);
 			
 			// add column names
@@ -1991,16 +1991,16 @@ public class StatInteractiePanelView extends LayoutPanel
 	{
 		private Label message = new Label();
 		private Button okButton = new Button(
-			StatistiekGWT.rb.getString("yesRemove"));
+			StatistiekGWT.rb.yesRemove());
 		private Button cancelButton = new Button(
-			StatistiekGWT.rb.getString("noCancel"));
+			StatistiekGWT.rb.noCancel());
 		private Widget widget;
 
 		public RemoveViewDialogBox(Label label)
 		{
 			super();
 			setTitle(label.getText());
-			message.setText(StatistiekGWT.rb.getString("removeViewWarning"));
+			message.setText(StatistiekGWT.rb.removeViewWarning());
 			okButton.addClickHandler(clickHandler);
 			okButton.addStyleName(statistiekCss.margin());
 			cancelButton.addClickHandler(StatInteractiePanelView.this.clickHandler);
