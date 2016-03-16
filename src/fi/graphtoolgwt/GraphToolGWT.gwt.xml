@@ -21,7 +21,7 @@
   <inherits name="com.googlecode.mgwt.MGWT"/>
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.ideas.Ideas' />
-  <inherits name="fi.wiskopdr"/>
+  <inherits name="fi.wiskopdr.WiskOpdr"/>
   <inherits name="nl.uu.fi.dwo.formule.Formule" />
   <inherits name='gwt.Geom' />
 
