@@ -209,7 +209,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		addHandlers();
 
 		dialogButton = new DialogButton(
-			StatistiekGWT.rb.getString("settingsButton"), this.basisPanel);
+			StatistiekGWT.rb.settingsButton(), this.basisPanel);
 		
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 	}
@@ -271,13 +271,13 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.basisPanel = new FlowPanel();
 
 		// VARIABLE SETTINGS
-		this.varLabel = new Label(StatistiekGWT.rb.getString("variableLabel"));
+		this.varLabel = new Label(StatistiekGWT.rb.variableLabel());
 		this.varLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.columnIndexBox = new ListBox();
 		this.columnIndexBox.setWidth("100px");
 
-		this.axisLabel = new Label(StatistiekGWT.rb.getString("axisLabel"));
+		this.axisLabel = new Label(StatistiekGWT.rb.axisLabel());
 		this.axisLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		String[] options2 = new String[2];
@@ -292,10 +292,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// BIN SETTINGS
 		this.optimizeScaleBox = new CheckBox(
-			StatistiekGWT.rb.getString("optimizeScaleBox"), true);
-		this.binSettingsLabel = new Label(StatistiekGWT.rb.getString("classDivisionLabel"));
+			StatistiekGWT.rb.optimizeScaleBox(), true);
+		this.binSettingsLabel = new Label(StatistiekGWT.rb.classDivisionLabel());
 		this.binSettingsLabel.addStyleName(statistiekCss.titlelabel());
-		this.binsLabel = new Label(StatistiekGWT.rb.getString("noClassesLabel"));
+		this.binsLabel = new Label(StatistiekGWT.rb.noClassesLabel());
 
 		Integer[] options1 = new Integer[50];
 		for (int i = 0; i < 50; i++)
@@ -312,16 +312,16 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		separatorBinSettings.addStyleName(statistiekCss.horizontalrule());
 
 		this.minBoundaryLabel = new Label(
-			StatistiekGWT.rb.getString("startvalueLabel"));
+			StatistiekGWT.rb.startvalueLabel());
 
 		this.minBoundaryField = new TextBox();
 
 		this.maxOnScaleLabel = new Label(
-			StatistiekGWT.rb.getString("maxValueLabel"));
+			StatistiekGWT.rb.maxValueLabel());
 		this.maxOnScaleField = new TextBox();
 		
 		this.binWidthLabel = new Label(
-			StatistiekGWT.rb.getString("classwidthLabel"));
+			StatistiekGWT.rb.classwidthLabel());
 		this.binWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.binWidthField = new TextBox();
@@ -334,79 +334,79 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.maxValueLabel = new Label("");
 
 		// DISPLAY SETTINGS
-		this.absRelLabel = new Label(StatistiekGWT.rb.getString("absRelLabel"));
+		this.absRelLabel = new Label(StatistiekGWT.rb.absRelLabel());
 		this.absRelLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.amountRadioItem = new RadioButton("percAmountGroup",
-			StatistiekGWT.rb.getString("amountLabel"));
+			StatistiekGWT.rb.amountLabel());
 		this.amountRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.percentageRadioItem = new RadioButton("percAmountGroup",
-			StatistiekGWT.rb.getString("percentageRadio"));
+			StatistiekGWT.rb.percentageRadio());
 		this.percentageRadioItem.addStyleName(statistiekCss.radioButton());
 		this.percentageRadioItem.addStyleName(statistiekCss.spaceBottomLabel());
 
 		this.cumulativeBox = new CheckBox(
-			StatistiekGWT.rb.getString("cumulativeCheckbox"), false);
+			StatistiekGWT.rb.cumulativeCheckbox(), false);
 
 		amountLabelHR = new HTML(HistogramUserOptionsPanel.hrString);
 		amountLabelHR.addStyleName(statistiekCss.horizontalrule());
 
 		// radiobuttons for position labels
 		this.labelBetweenBinsRadioItem = new RadioButton("labelPositionGroup",
-			StatistiekGWT.rb.getString("labelBetweenBinsRadio"));
+			StatistiekGWT.rb.labelBetweenBinsRadio());
 		this.labelBetweenBinsRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.labelUnderBinRadioItem = new RadioButton("labelPositionGroup",
-			StatistiekGWT.rb.getString("labelUnderBinRadio"));
+			StatistiekGWT.rb.labelUnderBinRadio());
 		this.labelUnderBinRadioItem.addStyleName(statistiekCss.radioButton());
 
 		labelSplitHR = new HTML(HistogramUserOptionsPanel.hrString);
 		labelSplitHR.addStyleName(statistiekCss.horizontalrule());
 
 		this.nextToEachOtherRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("nextToEachOtherRadioItem"));
+			StatistiekGWT.rb.nextToEachOtherRadioItem());
 		this.nextToEachOtherRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.aboveEachOtherRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("aboveEachOtherRadioItem"));
+			StatistiekGWT.rb.aboveEachOtherRadioItem());
 		this.aboveEachOtherRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.separateRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("separateFromEachOtherRadioItem"));
+			StatistiekGWT.rb.separateFromEachOtherRadioItem());
 		this.separateRadioItem.addStyleName(statistiekCss.radioButton());
 
 		this.singleViewRadioItem = new RadioButton("splitViewGroup",
-			StatistiekGWT.rb.getString("splitsingleviewCheckBox"));
+			StatistiekGWT.rb.splitsingleviewCheckBox());
 		this.singleViewRadioItem.addStyleName(statistiekCss.radioButton());
 		
 		splitViewPercentageHR = new HTML(HistogramUserOptionsPanel.hrString);
 		splitViewPercentageHR.addStyleName(statistiekCss.horizontalrule());
 		
 		this.percentage_splitTotal = new RadioButton("percentageSplitTotalGroup",
-			StatistiekGWT.rb.getString("percentage_splitTotal"));
+			StatistiekGWT.rb.percentage_splitTotal());
 		this.percentage_splitTotal.addStyleName(statistiekCss.radioButton());
 		
 		this.percentage_endTotal = new RadioButton("percentageSplitTotalGroup",
-			StatistiekGWT.rb.getString("percentage_endTotal"));
+			StatistiekGWT.rb.percentage_endTotal());
 		this.percentage_endTotal.addStyleName(statistiekCss.radioButton());
 
 		// SPLIT SETTINGS
-		this.splitSettingsLabel = new Label(StatistiekGWT.rb.getString("splitsLabel"));
+		this.splitSettingsLabel = new Label(StatistiekGWT.rb.splitsLabel());
 		this.splitSettingsLabel.addStyleName(statistiekCss.titlelabel());
 
 		this.splitButton = new Button(
-			StatistiekGWT.rb.getString("splitoptionsButton"));
+			StatistiekGWT.rb.splitoptionsButton());
 		this.splitButton.addStyleName(statistiekCss.button());
 
 		this.splitVarLabel = new Label(
-			StatistiekGWT.rb.getString("splitvariableLabel"));
+			StatistiekGWT.rb.splitvariableLabel());
 		this.splitVarLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitVarBox = new ListBox();
 
 		this.splitBinsLabel = new Label(
-			StatistiekGWT.rb.getString("noClassesLabel"));
+			StatistiekGWT.rb.noClassesLabel());
 		this.splitBinsLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinsBox = new ListBox();
@@ -416,25 +416,25 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		}
 
 		this.splitChooseBoundariesButton = new Button(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 
 		this.separatorSplitBoundaries = new HTML(HistogramUserOptionsPanel.hrString);
 		this.separatorSplitBoundaries.addStyleName(statistiekCss.horizontalrule());
 
 		this.splitMinBoundaryLabel = new Label(
-			StatistiekGWT.rb.getString("startvalueLabel"));
+			StatistiekGWT.rb.startvalueLabel());
 		this.splitMinBoundaryLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitMinBoundaryField = new TextBox();
 
 		this.splitBinWidthLabel = new Label(
-			StatistiekGWT.rb.getString("classwidthLabel"));
+			StatistiekGWT.rb.classwidthLabel());
 		this.splitBinWidthLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBinWidthField = new TextBox();
 
 		this.splitBoundariesLabel = new Label(
-			StatistiekGWT.rb.getString("binsButton"));
+			StatistiekGWT.rb.binsButton());
 		this.splitBoundariesLabel.addStyleName(statistiekCss.spaceTopLabel());
 
 		this.splitBoundariesArea = new TextArea();
@@ -448,10 +448,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel = new Label("");
 
 		this.stackModeBox = new CheckBox(
-			StatistiekGWT.rb.getString("stackfrequencypolygonsCheckbox"), true);
+			StatistiekGWT.rb.stackfrequencypolygonsCheckbox(), true);
 		this.stackModeBox.setVisible(this.model.isFrequencyPolygonMode());
 
-		this.okButton = new Button(StatistiekGWT.rb.getString("OKButtonText"));
+		this.okButton = new Button(StatistiekGWT.rb.oKButtonText());
 	}
 
 	private void layoutGuiComponents()
@@ -463,7 +463,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// VARIABLE SETTINGS
 		variableSettingsPanel = new FlowPanel();//new LayoutPanel();
-		variableSettingsPanel.setTitle(StatistiekGWT.rb.getString("variableLabel")); // tooltip boven panel
+		variableSettingsPanel.setTitle(StatistiekGWT.rb.variableLabel()); // tooltip boven panel
 		variableSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		variableSettingsPanel.add(this.varLabel);
@@ -473,7 +473,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// BIN SETTINGS
 		binsSettingsPanel = new FlowPanel();
-		binsSettingsPanel.setTitle(StatistiekGWT.rb.getString("classDivisionLabel")); // tooltip boven panel
+		binsSettingsPanel.setTitle(StatistiekGWT.rb.classDivisionLabel()); // tooltip boven panel
 		binsSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		binsSettingsPanel.add(this.binSettingsLabel);
@@ -496,7 +496,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// DISPLAY
 		displaySettingsPanel = new FlowPanel();
-		displaySettingsPanel.setTitle(StatistiekGWT.rb.getString("absRelLabel")); // tooltip boven panel
+		displaySettingsPanel.setTitle(StatistiekGWT.rb.absRelLabel()); // tooltip boven panel
 		displaySettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		displaySettingsPanel.add(this.absRelLabel);
@@ -526,7 +526,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 		// SPLIT OPTIONS
 		splitSettingsPanel = new FlowPanel();
-		splitSettingsPanel.setTitle(StatistiekGWT.rb.getString("splitsLabel")); // tooltip boven panel
+		splitSettingsPanel.setTitle(StatistiekGWT.rb.splitsLabel()); // tooltip boven panel
 		splitSettingsPanel.addStyleName(this.statistiekCss.settingspanel());
 		// add components
 		splitSettingsPanel.add(this.splitSettingsLabel);
@@ -863,16 +863,16 @@ public class HistogramUserOptionsPanel extends FlowPanel
     				}
 
     				this.splitBoundariesArea.setText(sb.toString());
-    				this.splitNoObjectsLabel.setText(StatistiekGWT.rb
-    					.getString("numberLabel")
+    				this.splitNoObjectsLabel.setText(
+    					StatistiekGWT.rb.numberLabel()
     					+ this.model.getStatTableModel().getRowCount());
     				String splitMinValue = StatistiekGWT.getStringValue(
     					this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()));
-    				this.splitMinValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
+    				this.splitMinValueLabel.setText(StatistiekGWT.rb.minLabel()
     					+ splitMinValue);
     				String splitMaxValue = StatistiekGWT.getStringValue(
     					this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()));
-    				this.splitMaxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+    				this.splitMaxValueLabel.setText(StatistiekGWT.rb.maxLabel()
     					+ splitMaxValue);
     				this.splitBinsLabel.setVisible(true);
     				this.splitBinsBox.setVisible(true);
@@ -937,16 +937,16 @@ public class HistogramUserOptionsPanel extends FlowPanel
 					binWidth = StatistiekGWT.getStringValue(this.model.getBinWidth());
 				}				
 				this.binWidthField.setText(binWidth);
-				this.noObjectsLabel.setText(StatistiekGWT.rb
-					.getString("numberLabel")
+				this.noObjectsLabel.setText(
+					StatistiekGWT.rb.numberLabel()
 					+ this.model.getStatTableModel().getNumberOfValidDataRows(this.model.getColumnIndex()));
 				String minValue = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()));
-				this.minValueLabel.setText(StatistiekGWT.rb.getString("minLabel")
+				this.minValueLabel.setText(StatistiekGWT.rb.minLabel()
 					+ minValue);
 				String maxValue = StatistiekGWT.getStringValue(
 					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()));
-				this.maxValueLabel.setText(StatistiekGWT.rb.getString("maxLabel")
+				this.maxValueLabel.setText(StatistiekGWT.rb.maxLabel()
 					+ maxValue);
 				this.separatorBinSettings.setVisible(true);
 				this.separatorSplitBoundaries.setVisible(true);
@@ -976,7 +976,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 	private void updateSplitVarBox()
 	{
 		StatistiekUtils.removeAllItemsFromListBox(this.splitVarBox);
-		this.splitVarBox.addItem(StatistiekGWT.rb.getString("chooseItem"));
+		this.splitVarBox.addItem(StatistiekGWT.rb.chooseItem());
 		for (int column = 0; column < this.model.getStatTableModel()
 			.getColumnCount(); column++)
 		{
@@ -1124,13 +1124,13 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setVisible(b && !this.splitEnumClasses);
 		if (!b)
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("binsButton"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.binsButton());
 		}
 		else
 		{
-			this.splitChooseBoundariesButton.setText(StatistiekGWT.rb
-				.getString("hideButtonLabel"));
+			this.splitChooseBoundariesButton.setText(
+				StatistiekGWT.rb.hideButtonLabel());
 		}
 	}
 
@@ -1176,13 +1176,13 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		
 		if (!b)
 		{
-			this.splitButton.setText(StatistiekGWT.rb.getString("splitoptionsButton"));
+			this.splitButton.setText(StatistiekGWT.rb.splitoptionsButton());
 			this.setVisibleSplitBoundaryOptions(false);
 		}
 		else
 		{
-			this.splitButton.setText(StatistiekGWT.rb
-				.getString("removeSplitoptionsButton"));
+			this.splitButton.setText(
+				StatistiekGWT.rb.removeSplitoptionsButton());
 		}
 	}
 
