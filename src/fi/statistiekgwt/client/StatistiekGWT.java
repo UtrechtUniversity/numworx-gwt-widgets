@@ -19,8 +19,7 @@ import fi.statistiekgwt.client.descriptives.DescriptivesController;
 import fi.statistiekgwt.client.dotplot.DotplotController;
 import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
 import fi.statistiekgwt.client.histogram.HistogramController;
-import fi.statistiekgwt.client.text.Text_nl;
-
+import fi.statistiekgwt.client.text.Text;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -44,15 +43,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	OpdrNavIF comRoot;
 
 	public static final String TEXT_CSV = "text.csv";
+	public static final String NL = "nl";
 
-	public static Text_nl rb = new Text_nl();
+	public static Text rb;
 	static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 			"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
 	private Map<String, Object> launchState; 
 	
-//	LayoutPanel basisPanel;
 	StatInteractiePanel basisPanel;
 
 	public static NumberFormat nf = NumberFormat.getDecimalFormat(); // number format for the default locale
@@ -86,7 +85,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 	private static String language;
 
-
 	/**
 	 * The message displayed to the user when the server cannot be reached or
 	 * returns an error.
@@ -113,7 +111,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		        }
 		    });
 		
-		StatistiekGWT.language = "nl";
+		rb = GWT.create(Text.class);
+		StatistiekGWT.language = rb.language();
 		
 		initViews();
 		basisPanel = new StatInteractiePanel();
@@ -128,13 +127,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		Stub.publish(this);
 	}
 	
-//	/**
-//	 * Returns the document element.
-//	 */
-//	public static native com.google.gwt.user.client.Element getDocElement() /*-{
-//		return $doc;
-//	}-*/;
-
 	/**
 	 * Deze methode wordt aangeroepen na init()
 	 */
@@ -156,15 +148,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	static void initViews()
 	{
 		VIEWS_translated = new String[9];
-		VIEWS_translated[0] = StatistiekGWT.rb.getString("tableOption");
-		VIEWS_translated[1] = StatistiekGWT.rb.getString("histogramOption");
-		VIEWS_translated[2] = StatistiekGWT.rb.getString("dotplotOption");
-		VIEWS_translated[3] = StatistiekGWT.rb.getString("frequencytableOption");
-		VIEWS_translated[4] = StatistiekGWT.rb.getString("frequencypolygonOption");
-		VIEWS_translated[5] = StatistiekGWT.rb.getString("boxplotOption");
-		VIEWS_translated[6] = StatistiekGWT.rb.getString("crosstabOption");
-		VIEWS_translated[7] = StatistiekGWT.rb.getString("scatterplotOption");
-		VIEWS_translated[8] = StatistiekGWT.rb.getString("descriptivesOption");
+		VIEWS_translated[0] = StatistiekGWT.rb.tableOption();
+		VIEWS_translated[1] = StatistiekGWT.rb.histogramOption();
+		VIEWS_translated[2] = StatistiekGWT.rb.dotplotOption();
+		VIEWS_translated[3] = StatistiekGWT.rb.frequencytableOption();
+		VIEWS_translated[4] = StatistiekGWT.rb.frequencypolygonOption();
+		VIEWS_translated[5] = StatistiekGWT.rb.boxplotOption();
+		VIEWS_translated[6] = StatistiekGWT.rb.crosstabOption();
+		VIEWS_translated[7] = StatistiekGWT.rb.scatterplotOption();
+		VIEWS_translated[8] = StatistiekGWT.rb.descriptivesOption();
 
 		VIEWS = new String[9];
 		VIEWS[0] = "Table";
@@ -276,13 +268,15 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	public StatistiekGWT()
 	{
-		StatistiekGWT.language = "nl";
+		rb = GWT.create(Text.class);
+		StatistiekGWT.language = rb.language();
 		initViews();
 	}
 	
 	public StatistiekGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden, int volleBreedte)
 	{	
-		StatistiekGWT.language = "nl";
+		rb = GWT.create(Text.class);
+		StatistiekGWT.language = rb.language();
 		initViews();
 		basisPanel = new StatInteractiePanel();
 
@@ -846,7 +840,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			
 			// gebruik van locale door numberformat wordt (nog) niet ondersteund
 			// zie: http://stackoverflow.com/questions/9805941/how-to-specify-the-thousands-and-decimal-separator-used-by-gwts-numberformat
-			if (language.equals("nl"))
+			if (language.equals(NL))
 			{
 				s = s.replace('.', ',');
 			}
@@ -865,7 +859,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		// gebruik van locale door numberformat wordt (nog) niet ondersteund
 		// zie: http://stackoverflow.com/questions/9805941/how-to-specify-the-thousands-and-decimal-separator-used-by-gwts-numberformat
-		if (language.equals("nl"))
+		if (language.equals(NL))
 		{
 			s = s.replace('.', ',');
 		}
@@ -1064,7 +1058,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private static String getDecimalSeparator()
 	{
 		String separator = ".";
-		if (StatistiekGWT.language.equals("nl"))
+		if (StatistiekGWT.language.equals(NL))
 		{
 			separator = ",";
 		}
@@ -1075,7 +1069,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private static char getDecimalSeparatorChar()
 	{
 		char separator = '.';
-		if (StatistiekGWT.language.equals("nl"))
+		if (StatistiekGWT.language.equals(NL))
 		{
 			separator = ',';
 		}
