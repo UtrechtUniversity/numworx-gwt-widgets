@@ -37,6 +37,7 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionView 
@@ -164,7 +165,7 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 	
 	public VerknippenGWT()
 	{
-		this(null, null, null);
+		//this(null, null, null);
 	}
 	
 	public VerknippenGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
@@ -370,7 +371,7 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			Map<String, Number> values) 
 	{		
 		
-logger.info("VerknippenGWT init");
+			logger.log(Level.INFO, "VerknippenGWT init" /*, new RuntimeException()*/);
 
 			this.breedte = width;
 			this.hoogte = height;
@@ -608,7 +609,8 @@ System.out.println("polyMaps " + polygonMaps.size());
 	public void setState(HashMap<String, Object> h)
 	{
 		
-System.out.println("setState");
+		logger.info("setState " + h);
+		if(h == null || h.isEmpty()) return;
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		
