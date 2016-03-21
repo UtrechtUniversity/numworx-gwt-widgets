@@ -580,12 +580,20 @@ public class Munten extends FlowPanel implements ClickHandler{
 
 	public void fireCBook() {
 		
+		
 		List<Munten.Experiment> list = (List<Munten.Experiment>) dataProvider.getList();
+		List<Munten.Experiment2> list1 = (List<Munten.Experiment2>) dataProvider1.getList();
 		
 		String string1="";
 		
-		for (int i=0;i<list.size();i++) {
-			string1=string1+list.get(i).getExpNumber()+";"+list.get(i).getKopValue()+";"+list.get(i).getMuntValue()+"\n";			
+		if (eenMunt.getValue()==true) {
+			for (int i=0;i<list.size();i++) {
+				string1=string1+list.get(i).getKopValue()+";"+list.get(i).getMuntValue()+"\n";			
+			}
+		} else {
+			for (int i=0;i<list1.size();i++) {
+				string1=string1+list1.get(i).getGeenKop()+";"+list1.get(i).getEenKop()+";"+list1.get(i).getTweeKop()+"\n";
+			}
 		}
 		
 		ssgwt.fireCBookMunten(string1);

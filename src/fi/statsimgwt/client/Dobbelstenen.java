@@ -69,6 +69,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	CssColor lijnenKleur = CssColor.make(0, 0, 0);
 	CssColor agKleur = CssColor.make(255, 255, 255);
 
+	StatSimGWT ssgwt;
+	
 	public static class Experiment {
 		private final String experimentNumber;
 	    private final String een;
@@ -487,7 +489,10 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	protected ListDataProvider<Experiment4> dataProvider4;
 	protected ListDataProvider<Experiment5> dataProvider5;
 	
-	public Dobbelstenen(boolean dobbelstenenInstellingen, boolean dobbelstenenResultaten, boolean dobbelstenenGrafiek1, boolean dobbelstenenTabel) {
+	public Dobbelstenen(StatSimGWT ssgwt, boolean dobbelstenenInstellingen, boolean dobbelstenenResultaten, boolean dobbelstenenGrafiek1, boolean dobbelstenenTabel) {
+	
+		this.ssgwt=ssgwt;
+		
 		dobbelstenenResultaten1=dobbelstenenResultaten;
 		dobbelstenenTabel1=dobbelstenenTabel;
 		
@@ -1351,6 +1356,33 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 	    
 	}
 	
+	public void fireCBook () {
+
+		List<Dobbelstenen.Experiment> list = (List<Dobbelstenen.Experiment>) dataProvider.getList();
+		List<Dobbelstenen.Experiment1> list1 = (List<Dobbelstenen.Experiment1>) dataProvider1.getList();
+		List<Dobbelstenen.Experiment2> list2 = (List<Dobbelstenen.Experiment2>) dataProvider2.getList();
+		
+		String string1="";
+		
+		if (eenDobbelsteen.getValue()==true) {
+			for (int i=0;i<list.size();i++) {
+				string1=string1+list.get(i).getEen()+";"+list.get(i).getTwee()+";"+list.get(i).getDrie()+";"+list.get(i).getVier()+";"+list.get(i).getVijf()+";"+list.get(i).getZes()+"\n";			
+			}
+		}
+		if (tweeDobbelstenen.getValue()==true) {
+			for (int i=0;i<list1.size();i++) {
+				string1=string1+list1.get(i).getTwee()+";"+list1.get(i).getDrie()+";"+list1.get(i).getVier()+";"+list1.get(i).getVijf()+";"+list1.get(i).getZes()+";"+list1.get(i).getZeven()+";"+list1.get(i).getAcht()+";"+list1.get(i).getNegen()+";"+list1.get(i).getTien()+";"+list1.get(i).getElf()+";"+list1.get(i).getTwaalf()+"\n";			
+			}
+		}
+		if (drieDobbelstenen.getValue()==true) {
+			for (int i=0;i<list1.size();i++) {
+				string1=string1+list2.get(i).getDrie()+";"+list2.get(i).getVier()+";"+list2.get(i).getVijf()+";"+list2.get(i).getZes()+";"+list2.get(i).getZeven()+";"+list2.get(i).getAcht()+";"+list2.get(i).getNegen()+";"+list2.get(i).getTien()+";"+list2.get(i).getElf()+";"+list2.get(i).getTwaalf()+";"+list2.get(i).getDertien()+";"+list2.get(i).getVeertien()+";"+list2.get(i).getVijftien()+";"+list2.get(i).getZestien()+";"+list2.get(i).getZeventien()+";"+list2.get(i).getAchttien()+"\n";			
+			}
+		}
+		
+		ssgwt.fireCBookDobbelstenen(string1);
+	}
+	
 	public void doEenTweeDrieDobbelstenen() {
 		if (eenDobbelsteen.getValue()==true) {
 			if (dobbelstenenTabel1==true)
@@ -1673,6 +1705,7 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 				//	table5.setValueAt(Double.toString(dummy/100), 0,i+1);
 				//}
 			}
+			fireCBook();
 			experiment++;
 			voeruit.setEnabled(true);
 			dobbelstenenGrafiek.paint();

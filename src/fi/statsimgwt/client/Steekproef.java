@@ -47,6 +47,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	StatSimGWTClientBundle clientBundle = GWT.create(StatSimGWTClientBundle.class);
 	double[] steekproefResultaat;
 	
+	StatSimGWT ssgwt;
+	
 	public static class Experiment {
 		private final String experimentNumber;
 	    private final String value;
@@ -95,7 +97,9 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	protected ListDataProvider<Experiment1> dataProvider1;
 		
 	
-	public Steekproef() {
+	public Steekproef(StatSimGWT ssgwt) {
+		this.ssgwt=ssgwt;
+		
 		gaussianImage = new Image(clientBundle.gaussian());
 		
 		VerticalPanel panel0=new VerticalPanel();
@@ -305,6 +309,25 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 		//}
 	}
 	
+	public void fireCBook() {
+		
+		
+		List<Steekproef.Experiment> list = (List<Steekproef.Experiment>) dataProvider.getList();
+		List<Steekproef.Experiment1> list1 = (List<Steekproef.Experiment1>) dataProvider1.getList();
+		
+		String string1="";
+		String string2="";
+		
+		for (int i=0;i<list.size();i++) {
+			string1=string1+list.get(i).getValue()+"\n";			
+		}
+		for (int i=0;i<list1.size();i++) {
+			string2=string2+list1.get(i).getMu()+";"+list1.get(i).getSigma()+"\n";			
+		}
+		
+		ssgwt.fireCBookSteekproef(string1, string2);
+	}
+	
 	public void getSample() {
 		List dataList=dataProvider.getList();
 		dataList.clear();
@@ -361,6 +384,7 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 		else
 			dataList2.set(experiment, ADDEXP1);
 
+		fireCBook();
 		experiment++;
 	}
 	

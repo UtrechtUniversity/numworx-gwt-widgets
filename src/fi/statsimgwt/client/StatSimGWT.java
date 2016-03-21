@@ -645,10 +645,30 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 		
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("content", arg1);
-		Window.alert(arg1);	
 		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
 	}
-
+	public void fireCBookDobbelstenen(String arg1) {
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", arg1);
+		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
+	}
+	public void fireCBookBinomTrekking(String arg1) {
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", arg1);
+		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
+	}
+	public void fireCBookSteekproef(String arg1, String arg2) {
+		
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", arg1);
+		Map<String,Object> map1 = new HashMap<String,Object>();
+		map1.put("content", arg2);
+		
+		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
+		comRoot.fireEvent(new CBookEvent(this, "text.sampleCollection",map1));
+	}
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
@@ -739,7 +759,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		if (dobbelstenenSelected) {
-			dobbelstenen=new Dobbelstenen(dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
+			dobbelstenen=new Dobbelstenen(this, dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
 			dobbelstenen.setGrootte(breedte,hoogte);
 			Boolean eenDobbelsteenRadio=false;
 			if (l.containsKey("eenDobbelsteenRadio"))
@@ -766,7 +786,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		if (binomTrekkingSelected) {
-			binomTrekking = new BinomTrekking(binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
+			binomTrekking = new BinomTrekking(this, binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
 			binomTrekking.setGrootte(breedte,hoogte);
 			String binomKans="";
 			if (l.containsKey("kans"))
@@ -784,7 +804,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
 		}
 		if (steekproefSelected) {
-			steekproef = new Steekproef();
+			steekproef = new Steekproef(this);
 			steekproef.setGrootte(breedte, hoogte);
 			String steekproefMu="";
 			if (l.containsKey("mu"))

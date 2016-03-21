@@ -71,6 +71,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	FlowPanel panel2;
 	VerticalPanel panel1;
 	HTML html;
+	StatSimGWT ssgwt;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -95,7 +96,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	
 	CssColor agKleur = CssColor.make(255, 255, 255);
 	
-	public BinomTrekking(boolean binomTrekkingInstellingen, boolean binomTrekkingGrafiek, boolean binomTrekkingTabel, boolean binomTrekkingRooster) {
+	public BinomTrekking(StatSimGWT ssgwt, boolean binomTrekkingInstellingen, boolean binomTrekkingGrafiek, boolean binomTrekkingTabel, boolean binomTrekkingRooster) {
+		this.ssgwt=ssgwt;
+		
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
 		kladjeHWTCanvas.setWidth("200px");
@@ -309,6 +312,20 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-450, Unit.PX);     // Center panel
 	}
 	
+	public void fireCBook() {
+		
+		
+		List<BinomTrekking.Experiment> list = (List<BinomTrekking.Experiment>) dataProvider.getList();
+		
+		String string1="";
+		
+		for (int i=0;i<list.size();i++) {
+			string1=string1+list.get(i).getOutcome()+"\n";			
+		}
+		
+		ssgwt.fireCBookBinomTrekking(string1);
+	}
+	
 	public void setZichtbaar() {
 		if (showKans)
 			kansLabel.setText("Kans");
@@ -426,6 +443,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			trekkingen[experiment]=totaal;
 			experiment++;
 			if (multipleTimes==false) {
+				fireCBook();
 				stopCounting=true;
 				elapsedTimer.cancel();
 				keer.setEnabled(true);
@@ -434,6 +452,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			} else {
 				numberOfTimes--;
 				if (numberOfTimes==0) {
+					fireCBook();
 					stopCounting=true;
 					elapsedTimer.cancel();
 					multipleTimes=false;
