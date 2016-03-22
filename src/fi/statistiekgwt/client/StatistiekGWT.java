@@ -183,6 +183,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if(h == null || h.isEmpty()) return;
 		this.basisPanel.setState(h);
 	}
 
