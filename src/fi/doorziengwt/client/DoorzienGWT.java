@@ -1750,6 +1750,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if(h == null || h.isEmpty()) return;
 		//boolean popupVisible = false;
 		if (h.containsKey("popupVisible"))
 			popupVisible = ((Boolean) h.get("popupVisible")).booleanValue();
