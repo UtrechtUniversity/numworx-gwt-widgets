@@ -267,6 +267,7 @@ if (k > 0)
 	
 	public void setState(Map map)
 	{	
+		if(map == null || map.isEmpty()) return;
 		ObjectMap h = JSONUtilities.wrapMap(map);
 //System.out.println("tv setState");
 
