@@ -836,6 +836,13 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
 		
 	}
 
+
+	@Override
+	public int[][] getScoreObjectives() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 	
 }
