@@ -538,7 +538,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		
+	
+		if(h == null || h.isEmpty()) return;
 logger.info("AP setState");
 
 		asvSetState = true;
