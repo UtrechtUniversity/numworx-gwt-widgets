@@ -477,7 +477,7 @@ public class GrafiekGWTVeld {
 						gIm.beginPath();
 						if ( (drawYmin < yLabel - cFontHeight) ) { 
 							gIm.moveTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), drawYmin);
-							gIm.lineTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), Math.min(yLabel - cFontHeight, drawYmax));
+							gIm.lineTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), Math.min(yLabel - cFontHeight-cExtraAxisMargeY, drawYmax));
 						}
 						if ( (drawYmax > yLabel + cExtraAxisMargeY)  ) {	
 							gIm.moveTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), yLabel + cExtraAxisMargeY );
