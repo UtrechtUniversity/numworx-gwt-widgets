@@ -18,7 +18,8 @@
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
         	<warSourceDirectory>war</warSourceDirectory>
-        	<attachClasses>true</attachClasses>  
+        	<attachClasses>true</attachClasses>
+        	<packagingIncludes>*.css,*gwt/**,${project.artifactId}.html</packagingIncludes>
         </configuration>
       </plugin>
       <plugin>
@@ -69,7 +70,7 @@
   	<dependency>
   		<groupId>gwt.geom</groupId>
   		<artifactId>gwt-geom</artifactId>
-  		<version>0.0.0</version>
+  		<version>0.0.1</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
