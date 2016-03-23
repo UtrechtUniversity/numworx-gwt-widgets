@@ -472,7 +472,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		
+		if(h == null || h.isEmpty()) return;
 		asvSetState = true;
 		asv.setState(h);
 		asvSetState = false;
