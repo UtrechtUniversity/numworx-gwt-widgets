@@ -28,7 +28,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -295,7 +295,11 @@ public class GrafiekGWTVeld {
 		
 		int bx = (int)Math.round(interactiePanel.beginx);			
 		int by = (int)Math.round(interactiePanel.beginy);
-		
+
+		logger.info("Voor Bepalingen Y :: by = " + by);
+		logger.info("Voor Bepalingen Y :: Grens < = " + drawYmin + cFontHeight + 2 * cExtraAxisMarge);
+		logger.info("Voor Bepalingen Y :: Grens > = " + hoogte);
+
 		if (interactiePanel.schaalX && (by < drawYmin + cFontHeight + 2 * cExtraAxisMarge) ) {
 			drawYmax =  drawYmax - cFontHeight - 2 * cExtraAxisMarge; 
 			drawXAxis = false;
@@ -307,6 +311,9 @@ public class GrafiekGWTVeld {
 		if (interactiePanel.yPositief) {
 			drawYmax =  Math.max(drawYmin, Math.min(drawYmax, hoogte-by));
 		}
+		logger.info("Na   Bepalingen Y :: by = " + by);
+		logger.info("Na   Bepalingen Y :: drawYmin = " + drawYmin);
+		logger.info("Na   Bepalingen Y :: drawYmax = " + drawYmax);
 		
 //		if (by > drawYmax - cFontHeight - 2 * cExtraAxisMarge) {
 //			if (interactiePanel.traceOptie) {
