@@ -288,7 +288,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 
 	@Override
 	public void setState(HashMap<String, Object> map) {
-		// TODO Auto-generated method stub
+		if(map == null||map.isEmpty()) return;
 	
 		
 		ObjectMap h = JSONUtilities.wrapMap(map);
