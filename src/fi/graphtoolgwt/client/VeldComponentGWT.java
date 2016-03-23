@@ -93,6 +93,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	public final static FormuleFont cDefault_VeldgrafiekGWT_formulefont = FormuleHolder.getDefaultActiviteitFont().createCopy();
 	
 	public final static CssColor cVeldComponentGWT_borderColor = CssColor.make(211, 211, 211);
+
 	public final static 
 	rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 	rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
