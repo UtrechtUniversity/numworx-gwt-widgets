@@ -1198,10 +1198,10 @@ public class Grafiek3DGWT implements EntryPoint, InteractionView
 	}
 
 	@Override
-	public boolean isCorrect()
+	public Boolean isCorrect()
 	{
 		// TODO Auto-generated method stub
-		return false;
+		return Boolean.TRUE;
 	}
 	
 
@@ -1210,6 +1210,52 @@ public class Grafiek3DGWT implements EntryPoint, InteractionView
 	{
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public int getAsHoogte() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		return hoogte;
+	}
+
+	@Override
+	public int getWidth() {
+		return breedte;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int[][] getScoreObjectives() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void kijkNa() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetNagekeken(boolean b) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		// TODO Auto-generated method stub
+		
 	}
 }
 
