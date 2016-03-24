@@ -28,6 +28,8 @@ public interface StatistiekCssResource extends CssResource
 
 	String dataGrid();
 
+	String noSelect();
+
 	String failMessage();
 
 	String radioButton();
