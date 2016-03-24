@@ -42,6 +42,8 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -88,6 +90,7 @@ import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.MultiSelectionModel;
 import com.google.gwt.view.client.ProvidesKey;
+
 import fi.statistiekgwt.client.StatistiekUtils.DummyTouchHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController;
 import fi.statistiekgwt.client.columndialog.ColumnDialogModel;
@@ -297,7 +300,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 //	private FormPanel formPanel;
 	
 	private StatTableClickHandler clickHandler;
-//	private StatTableMouseHandler mouseHandler;
+	/**
+	 * Mouse up handler for resetting isMouseDown.
+	 */
+	private StatTableMouseUpHandler mouseUpHandler;
+	/**
+	 * Index of the last row clicked.
+	 */
+	private int clickedRowIndex = -1;
+	private Handler<List<String>> cellPreviewHandler;
 	private DummyTouchHandler dummyTouchHandler;
 	private ImportMessageDialogBox importBox;
 	private MessageDialogBox messageBox;
@@ -325,6 +336,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * for showing the outlier menu.
 	 */
 	protected long taptime;
+	
+	private boolean isMouseDown = false;
 
 	/**
 	 * Constructor without viewname, the initial table view.
@@ -419,9 +432,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void setUp()
 	{
-		this.clickHandler = new StatTableClickHandler();
-//		this.mouseHandler = new StatTableMouseHandler();
-		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
+		setUpHandlers();
 		
 		if (this.statInteractiePanel != null)
 		{
@@ -456,6 +467,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    // set style
 	    this.table.addStyleName(statistiekCss.dataGrid());
 	    this.table.addStyleName(statistiekCss.backgroundblue());
+	    this.table.addStyleName(statistiekCss.noSelect());
 	    this.table.setWidth("100%");
 
 	    this.dataProvider = new ListDataProvider<List<String>>();
@@ -627,6 +639,156 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
+	 * Set up the handlers. 
+	 */
+	private void setUpHandlers()
+	{
+		this.clickHandler = new StatTableClickHandler();
+		this.mouseUpHandler = new StatTableMouseUpHandler();
+		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
+		this.cellPreviewHandler = new Handler<List<String>>(){
+
+			@Override
+			public void onCellPreview(CellPreviewEvent<List<String>> event)
+			{
+				int rowIndex = event.getIndex();				
+				int columnIndex = event.getColumn();
+				
+		        int button = event.getNativeEvent().getButton();
+		        NativeEvent nativeEvent = event.getNativeEvent();
+		        
+				if ("click".equals(nativeEvent.getType())
+					&& columnIndex == 0 // klik op rijnummer doet selectie
+					&& button != NativeEvent.BUTTON_RIGHT)
+		        {
+					List<List<String>> list = (List<List<String>>) dataProvider.getList();
+	    			List<String> rowObject = list.get(rowIndex);
+
+					if (nativeEvent.getCtrlKey())
+					{
+						// add to selection
+						StatTable.this.statTableModel.setSelected(rowIndex, true, SelectionChangeEvent.STAT_TABLE);
+						selectionModel.setSelected(rowObject, true);
+					}
+					else
+					{
+						if (nativeEvent.getShiftKey() && clickedRowIndex > -1) // for shift click select a block
+						{
+							// select rows between clicked and current row index
+							selectAllRowsBetweenIndices(rowIndex);
+						}
+						else
+						{
+							// clear previous selection
+							StatTable.this.statTableModel.resetSelectionList();
+							
+							// no controlkey, no shiftkey: simply select
+							clickedRowIndex = rowIndex;
+
+							StatTable.this.statTableModel.setSelected(rowIndex, true, SelectionChangeEvent.STAT_TABLE);
+							selectionModel.setSelected(rowObject, true);
+						}
+					}
+		        }
+				else if (("mousedown".equals(nativeEvent.getType()) || "touchstart".equals(nativeEvent.getType())) 
+					&& button != NativeEvent.BUTTON_RIGHT
+					&& !nativeEvent.getShiftKey()) // when shift-clicking the old clickedRowIndex needs to be remained
+				{
+					isMouseDown = true;
+					clickedRowIndex = rowIndex; // nodig voor klik-sleep
+				}
+				else if (isMouseDown && "mouseover".equals(nativeEvent.getType())
+					&& button != NativeEvent.BUTTON_RIGHT)
+				{
+					// add the row that is left by the mouse to the selection
+		    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
+	    			List<String> rowObject = list.get(rowIndex);
+	    								
+					// clear previous selection
+					StatTable.this.statTableModel.resetSelectionList();					
+					// select rows between clicked and current row index
+	    			selectAllRowsBetweenIndices(rowIndex);
+				}
+				else if ("touchend".equals(nativeEvent.getType()))
+				{
+//					Window.alert("rowIndex = " + rowIndex + ", columnIndex = " + columnIndex);
+					
+					// add the row that is left by the mouse to the selection
+		    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
+	    								
+					// clear previous selection
+					StatTable.this.statTableModel.resetSelectionList();					
+					// select rows between clicked and current row index
+	    			selectAllRowsBetweenIndices(rowIndex);
+				}
+				
+				if (!rowOutlierPopupMenu.isShowing() && !outlierPopupMenu.isShowing())
+				{
+		            outlierPopupRowIndex = rowIndex;
+		            outlierPopupColumnIndex = columnIndex - 2;
+				}
+				
+		        
+		        if (nativeEvent.getTouches() != null)
+		        {
+		        	// a touch event happened
+		        	processTouch(nativeEvent);
+		        }
+		        else
+		        {
+		        	// a click even happened
+		        	int x = event.getNativeEvent().getClientX();
+		        	int y = event.getNativeEvent().getClientY();
+		        	
+					if ("click".equals(nativeEvent.getType())) 
+			        {
+			            if (nativeEvent.getCtrlKey()) 
+			            {
+				        	showOutlierPopup(nativeEvent, x, y);
+			            }
+			        }
+			        else if (button == NativeEvent.BUTTON_RIGHT) 
+			        {
+			        	showOutlierPopup(nativeEvent, x, y);
+			        }
+		        }
+			}
+
+			/**
+			 * Select the rows between clickedRowIndex and current row index.
+			 * 
+			 * @param currentRowIndex
+			 * @param list
+			 */
+			private void selectAllRowsBetweenIndices(int currentRowIndex)
+			{
+	    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
+				List<String> rowObject;
+				// select the rows from clickedRowIndex to the current rowIndex
+				if (clickedRowIndex >= currentRowIndex)
+				{
+					for (int i = currentRowIndex; i <= clickedRowIndex; i++)
+					{
+						rowObject = list.get(i);
+						StatTable.this.statTableModel.setSelected(i, true, SelectionChangeEvent.STAT_TABLE);
+						selectionModel.setSelected(rowObject, true);
+					}
+				}
+				else
+				{
+					for (int i = clickedRowIndex; i <= currentRowIndex; i++)
+					{
+						rowObject = list.get(i);
+						StatTable.this.statTableModel.setSelected(i, true, SelectionChangeEvent.STAT_TABLE);
+						selectionModel.setSelected(rowObject, true);
+					}
+				}
+			}
+
+		};
+	}
+
+	/**
 	 * Create the commands for the outlier popup menu.
 	 */
 	private void createOutlierCommands()
@@ -705,6 +867,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    this.table.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
 	    this.table.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
 //	    this.table.addDomHandler(this.dummyTouchHandler, ContextMenuEvent.getType());
+
+	    // add the handler for handling the outlier menu and for selecting rows
+		addOutlierAndSelectionHandler();
+
 
 	    // click handlers
 		this.importButton.addClickHandler(this.clickHandler);
@@ -1567,6 +1733,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statInteractiePanel = statInteractiePanel;
 	}
 
+	class StatTableMouseUpHandler implements MouseUpHandler
+	{
+
+		@Override
+		public void onMouseUp(MouseUpEvent event)
+		{
+			isMouseDown = false;
+		}
+		
+	} // class StatTableMouseUpHandler
+	
 	class StatTableClickHandler implements ClickHandler//TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		private FileList fileList;
@@ -2647,9 +2824,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
 		} // add checkColumn
 
-		// add the handler for handling the outlier menu
-		addOutlierHandler();
-		
 		// put the data of statTableModel into this.table
 		this.headers = this.statTableModel.getColumnNames();
 		
@@ -2809,64 +2983,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	
 	/**
 	 * Add a cell preview handler to handle the right mouse click
-	 * of long tap for showing the outlier menu.
+	 * of long tap for showing the outlier menu and for handling row selection.
+	 * Add a mousup handler for resetting isMouseDown.
 	 */
-	private void addOutlierHandler()
+	private void addOutlierAndSelectionHandler()
 	{
-		this.table.addCellPreviewHandler(new Handler<List<String>>(){
-
-			@Override
-			public void onCellPreview(CellPreviewEvent<List<String>> event)
-			{
-				int rowIndex = event.getIndex();				
-				int columnIndex = event.getColumn();
-				
-				if (!rowOutlierPopupMenu.isShowing() && !outlierPopupMenu.isShowing())
-				{
-		            outlierPopupRowIndex = rowIndex;
-		            outlierPopupColumnIndex = columnIndex - 2;
-//		            System.out.println("StatTable.onCellPreview(): rowIndex = " + rowIndex + ", columnIndex = " + columnIndex 
-//		            	+ ", outlierPopupColumnIndex = " + outlierPopupColumnIndex);
-				}
-				
-		        int button = event.getNativeEvent().getButton();
-		        
-		        NativeEvent nativeEvent = event.getNativeEvent();
-		        
-		        if (nativeEvent.getTouches() != null)
-		        {
-		        	// a touch event happened
-		        	processTouch(nativeEvent);
-		        }
-		        else
-		        {
-		        	// a click even happened
-		        	int x = event.getNativeEvent().getClientX();
-		        	int y = event.getNativeEvent().getClientY();
-		        	
-					if ("click".equals(nativeEvent.getType())) 
-			        {
-			            if (nativeEvent.getCtrlKey()) 
-			            {
-			                // CTRL button was pressed during the click
-	//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");
-			        		
-				        	showOutlierPopup(nativeEvent, x, y);
-			            }
-			        }
-	//		        if (button == NativeEvent.BUTTON_LEFT)
-	//		        {
-	//		        	if (event.getNativeEvent().getCharCode() == KeyCodes.KEY_CTRL)// check + control
-	//		        		System.out.println("StatTable.onCellPreview(): CLICK + CONTROL!");		        
-	//		        }
-			        else if (button == NativeEvent.BUTTON_RIGHT) 
-			        {
-			        	showOutlierPopup(nativeEvent, x, y);
-			        }
-		        }
-			}
-
-		});
+		// add a mouse up handler for resetting isMouseDown
+		this.table.addDomHandler(this.mouseUpHandler, MouseUpEvent.getType());
+		
+		// add a cell preview handler for the outlier menu and for row selection
+		this.table.addCellPreviewHandler(this.cellPreviewHandler);
 	}
 	
 	/**
