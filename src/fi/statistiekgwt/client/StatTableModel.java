@@ -21,6 +21,7 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
+
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.AddColumnEventHandler;
 import fi.statistiekgwt.client.event.EditColumnEvent;
@@ -2597,11 +2598,25 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	}
 
 	/**
-	 * Clear selectionList.
+	 * Clear selectionList with a new empty arraylist.
 	 */
 	public void clearSelectionList()
 	{
 		this.selectionList = new ArrayList<Boolean>();
+	}
+	
+	/**
+	 * Reset the current selection list to none selected.
+	 */
+	public void resetSelectionList()
+	{
+		ArrayList<Boolean> selectionList = new ArrayList<Boolean>();
+		for (int row = 0; row < getRowCount(); row++)
+		{
+			selectionList.add(false);
+		}
+		
+		setSelectionList(selectionList);
 	}
 
 	/**
