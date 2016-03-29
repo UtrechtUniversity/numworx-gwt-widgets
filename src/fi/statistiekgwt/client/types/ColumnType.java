@@ -189,7 +189,7 @@ public class ColumnType implements Serializable
 			}
 			else if (this.type.equals(AllowedTypes.STRING))
 			{
-				// Use collator to sort for example 'é' correctly
+				// Use collator to sort for example 'ÃŸ' correctly
 //				Collator collator = Collator.getInstance(Locale.getDefault());
 //				CollationKey key1 = collator.getCollationKey(s1);
 //				CollationKey key2 = collator.getCollationKey(s2);
