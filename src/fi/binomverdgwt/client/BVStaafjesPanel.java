@@ -350,9 +350,13 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 		
 		this.successenDoubleSlider.zetLengte(lengte);
 		this.successenDoubleSlider.setLocation(x, y);
+		this.successenDoubleSlider.globalX = interactiePanel.BVStaafjesPanelX + x;
+		this.successenDoubleSlider.globalY = interactiePanel.BVStaafjesPanelY + y;
 		this.successenDoubleSlider.zetStandRechts((int)((this.grensRechts)*this.staafBreedte) - this.successenDoubleSlider.getMinimumLinks());
 		this.successenSlider.zetLengte(lengte);
 		this.successenSlider.setLocation(x, y);
+		this.successenSlider.globalX = interactiePanel.BVStaafjesPanelX + x;
+		this.successenSlider.globalY = interactiePanel.BVStaafjesPanelY + y;
 		
 	}
 	
@@ -890,18 +894,24 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				//Widget sender = (Widget) e.getSource();
-			    //Element elem = sender.getElement();
-				//int eventX = touch.getRelativeX(elem);
-				//int eventY = touch.getRelativeY(elem);
-				
-				int eventX = touch.getPageX() - interactiePanel.getAbsoluteLeft();
-				int eventY = touch.getPageY() - interactiePanel.getAbsoluteTop();				
-				
+				//int eventX = touch.getPageX() - interactiePanel.getAbsoluteLeft();
+				//int eventY = touch.getPageY() - interactiePanel.getAbsoluteTop();				
+
+				int eventX = touch.getPageX() - binomVerdGWTCanvas.getAbsoluteLeft();
+				int eventY = touch.getPageY() - binomVerdGWTCanvas.getAbsoluteTop();				
+
 				if (tweeGrenzen)
+				{	//eventX -= successenDoubleSlider.globalX; 
+					//eventY -= successenDoubleSlider.globalY;
 					successenDoubleSlider.mouseDownTouchStartAction(eventX, eventY);
+				
+				}
 				else
+				{	//eventX -= successenSlider.globalX; 
+					//eventY -= successenSlider.globalY;
 					successenSlider.mouseDownTouchStartAction(eventX, eventY);
+				
+				}
 
 				
 		    }
@@ -918,13 +928,27 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				int eventX = touch.getPageX() - interactiePanel.getAbsoluteLeft();
-				int eventY = touch.getPageY() - interactiePanel.getAbsoluteTop();				
+				//int eventX = touch.getPageX() - interactiePanel.getAbsoluteLeft();
+				//int eventY = touch.getPageY() - interactiePanel.getAbsoluteTop();
+				
+				int eventX = touch.getPageX() - binomVerdGWTCanvas.getAbsoluteLeft();
+				int eventY = touch.getPageY() - binomVerdGWTCanvas.getAbsoluteTop();				
+
 			    
 				if (tweeGrenzen)
+				{	
+					//eventX -= successenDoubleSlider.globalX; 
+					//eventY -= successenDoubleSlider.globalY;
 					successenDoubleSlider.mouseMoveTouchMoveAction(eventX, eventY);
+				
+				}
 				else 
+				{	
+					//eventX -= successenSlider.globalX; 
+					//eventY -= successenSlider.globalY;
 					successenSlider.mouseMoveTouchMoveAction(eventX, eventY);
+				
+				}
 
 				
 		    }
@@ -934,11 +958,21 @@ public class BVStaafjesPanel //extends JPanel implements ActionListener
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			e.preventDefault();
+			e.stopPropagation();
+			
 			if (tweeGrenzen)
-				successenDoubleSlider.mouseUpTouchEndAction();
+			{	successenDoubleSlider.mouseUpTouchEndAction();
+			
+			}
 			else
-				successenSlider.mouseUpTouchEndAction();
+			{	successenSlider.mouseUpTouchEndAction();
+			
+			}
 
+			e.preventDefault();
+			e.stopPropagation();
+			
 		}
 
 	}

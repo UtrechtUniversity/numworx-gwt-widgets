@@ -61,6 +61,9 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 	
 	boolean mouseDown;
 	
+	int globalX = 0;
+	int globalY = 0;
+	
 	public Slider(BinomVerdPanel o, int aantalPix, int beginst, int x, int y, Context2d c2d, String p) 
 	{
 		owner = o;
@@ -432,8 +435,8 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 				//int eventX = touch.getRelativeX(elem);
 				//int eventY = touch.getRelativeY(elem);
 				
-				int eventX = touch.getPageX() - owner.getAbsoluteLeft();
-				int eventY = touch.getPageY() - owner.getAbsoluteTop();				
+				int eventX = touch.getPageX() - owner.getAbsoluteLeft() - globalX;
+				int eventY = touch.getPageY() - owner.getAbsoluteTop() - globalY;				
 				
 				mouseDownTouchStartAction(eventX, eventY);
 				
@@ -451,8 +454,8 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				int eventX = touch.getPageX() - owner.getAbsoluteLeft();
-				int eventY = touch.getPageY() - owner.getAbsoluteTop();				
+				int eventX = touch.getPageX() - owner.getAbsoluteLeft() - globalX;
+				int eventY = touch.getPageY() - owner.getAbsoluteTop() - globalY;				
 			    
 				mouseMoveTouchMoveAction(eventX, eventY);
 				
@@ -463,7 +466,18 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			e.preventDefault();
+			// prevent scrolling
+			e.stopPropagation();
+
 			mouseUpTouchEndAction();
+
+			e.preventDefault();
+			
+			// prevent scrolling
+			e.stopPropagation();
+
+
 		}
 
 	}

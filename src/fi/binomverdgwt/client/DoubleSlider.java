@@ -49,6 +49,9 @@ public class DoubleSlider //extends JComponent implements MouseListener, MouseMo
 	
 	BinomVerdPanel owner;
 	
+	int globalX = 0;
+	int globalY = 0;
+	
 	public DoubleSlider(BinomVerdPanel o, int aantalPix, int beginLinks, int beginRechts,
 						int x, int y, Context2d c2d)
 	{	

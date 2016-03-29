@@ -80,6 +80,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	private boolean hypergeometrisch; //true: Hypergeometrisch, false: Binomiaal
 	
 	BVStaafjesPanel staafjesPanel;
+	int BVStaafjesPanelX = 0;
+	int BVStaafjesPanelY = 0;
 	private TextBox nText;
 	private Label nLabel;
 	private TextBox pText;
@@ -160,9 +162,18 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 
 	
 	private LayoutPanel noordLinks;
+	int noordLinksX = 0; 
+	int noordLinksY = 0;
 	private LayoutPanel noordMidden;
+	int noordMiddenX = 0; 
+	int noordMiddenY = 0;
 	private LayoutPanel noordRechtsBV;
+	int noordRechtsBVX = 0; 
+	int noordRechtsBVY = 0;
 	private LayoutPanel noordRechtsHyp;
+	int noordRechtsHypX = 0; 
+	int noordRechtsHypY = 0;
+	
 	
 	public final int HOFFSET = 10;
 	
@@ -570,6 +581,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 			setWidgetLeftWidth(staafjesPanel.binomVerdGWTCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 			setWidgetTopHeight(staafjesPanel.binomVerdGWTCanvas, noordHoogte, 
 					           Style.Unit.PX, hoogte - zuidHoogte - noordHoogte, Style.Unit.PX);
+			BVStaafjesPanelX = 0;
+			BVStaafjesPanelY = noordHoogte;
 			
 		}	
 		
@@ -591,12 +604,20 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 			{
 				add(noordLinks);
 				noordLinks.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
+				noordLinksX = 0;
+				noordLinksY = yPos;
 				add(noordMidden);
 				noordMidden.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
+				noordMiddenX = breedte / 3 + NOORDBALKGAP;
+				noordMiddenY = yPos;
 				add(noordRechtsBV);
 				noordRechtsBV.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
+				noordRechtsBVX = 2 * breedte / 3;
+				noordRechtsBVY = yPos;
 				add(noordRechtsHyp);
 				noordRechtsHyp.addStyleName(BinomVerdGWT.binomVerdGWTCss.noordpanel());
+				noordRechtsHypX = 2 * breedte / 3;
+				noordRechtsHypY = yPos;
 				
 				noordLinks.add(nLabel);
 				noordLinks.add(nText);
@@ -611,8 +632,10 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				nText.addKeyDownHandler(new TextBoxKeyDownHandler(nText));
 				nText.addBlurHandler(new TextBoxBlurHandler(nText));
 				
-				nSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "n");
 				ynPos += TEXTBOXHEIGHT + 4;
+				nSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "n");
+				nSlider.globalX = noordLinksX;
+				nSlider.globalY = noordLinksY + ynPos;
 				noordLinks.add(nSlider.sliderCanvas);
 				noordLinks.setWidgetLeftWidth(nSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
 				noordLinks.setWidgetTopHeight(nSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
@@ -633,8 +656,10 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				pText.addKeyDownHandler(new TextBoxKeyDownHandler(pText));
 				pText.addBlurHandler(new TextBoxBlurHandler(pText));
 				
-				pSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "p");
 				ynPos += TEXTBOXHEIGHT + 4;
+				pSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "p");
+				pSlider.globalX = noordRechtsBVX;
+				pSlider.globalY = noordRechtsBVY+ynPos;
 				noordRechtsBV.add(pSlider.sliderCanvas);
 				noordRechtsBV.setWidgetLeftWidth(pSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
 				noordRechtsBV.setWidgetTopHeight(pSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
@@ -655,8 +680,10 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				MText.addKeyDownHandler(new TextBoxKeyDownHandler(MText));
 				MText.addBlurHandler(new TextBoxBlurHandler(MText));
 				
-				MSlider = new Slider(this, breedte / 3 - 10 - 2 * NOORDBALKGAP, 50, 0, 0, null, "M");
 				ynPos += TEXTBOXHEIGHT + 4;
+				MSlider = new Slider(this, breedte / 3 - 10 - 2 * NOORDBALKGAP, 50, 0, 0, null, "M");
+				MSlider.globalX = noordMiddenX;
+				MSlider.globalY = noordMiddenY+ynPos;
 				noordMidden.add(MSlider.sliderCanvas);
 				noordMidden.setWidgetLeftWidth(MSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3 - 2 * NOORDBALKGAP, Style.Unit.PX);
 				noordMidden.setWidgetTopHeight(MSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
@@ -677,8 +704,10 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				populatieText.addKeyDownHandler(new TextBoxKeyDownHandler(populatieText));
 				populatieText.addBlurHandler(new TextBoxBlurHandler(populatieText));
 				
-				populatieSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "populatie");
 				ynPos += TEXTBOXHEIGHT + 4;
+				populatieSlider = new Slider(this, breedte / 3 - 10, 50, 0, 0, null, "populatie");
+				populatieSlider.globalX = noordRechtsHypX;
+				populatieSlider.globalY = noordRechtsHypY+ynPos;
 				noordRechtsHyp.add(populatieSlider.sliderCanvas);
 				noordRechtsHyp.setWidgetLeftWidth(populatieSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
 				noordRechtsHyp.setWidgetTopHeight(populatieSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
