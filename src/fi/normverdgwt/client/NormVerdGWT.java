@@ -15,22 +15,17 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Label;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -72,7 +67,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
-	HashMap<String, Object> randomVarWaarden = null;
+	Map<String, Number> randomVarWaarden = null;
 	
 	// images
 	NormVerdGWTClientBundle normVerdGWTClientBundle;
@@ -208,6 +203,7 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if(h == null || h.isEmpty()) return; // setStateNull()
 //System.out.println("nvgwt setState");
 
 		// let even op: als kanskeuze == TWEEGRENZEN actualMu/SigmaBerekenbaar = false;
@@ -231,7 +227,6 @@ public class NormVerdGWT implements EntryPoint, InteractionStub, InteractionView
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
 		return normaalPanel.score;
 	}
 
@@ -350,6 +345,8 @@ logger.info("pre setChanged " + correct.toString());
 	{
 		getImages();
 		
+		randomVarWaarden = values;
+		randomVarNamen = values.keySet().toArray(new String[values.size()]);
 //System.out.println("normverd init");		
 logger.info("NormVerdGWT init");		
 		
@@ -722,7 +719,7 @@ logger.info("NormVerdGWT init");
 
 	}
 	
-	public static double substitueerRandom(double def, String s, String[] randomVarNamen, HashMap randomVarWaarden) 
+	public static double substitueerRandom(double def, String s, String[] randomVarNamen, Map<String,Number> randomVarWaarden) 
 	{	double d = Double.NaN;
 		s = s.substring(1, s.length() - 1);
 		String[] delen = StringUtils.split(s, "/");
@@ -732,7 +729,7 @@ logger.info("NormVerdGWT init");
 		{	
 //System.out.println("rava " + j + " " + randomVars[j]);			
 			if (randomVarNamen[j].equals(delen[0])) 
-				d = ((Integer) randomVarWaarden.get(randomVarNamen[j])).intValue();
+				d = randomVarWaarden.get(randomVarNamen[j]).doubleValue();
 		}
 		if (delen.length > 1)
 		{	decFactor = Integer.parseInt(delen[1]);
