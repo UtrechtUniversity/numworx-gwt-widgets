@@ -3,7 +3,6 @@ package fi.binomverdgwt.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -14,22 +13,17 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Label;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -69,8 +63,8 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 //	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
 	
 	private Map<String, Object> launchState;
-	String[] randomVarNamen = null;
-	HashMap<String, Object> randomVarWaarden = null;
+	String[] randomVarNamen = new String[0];
+	Map<String, Number> randomVarWaarden = new HashMap<String, Number>();
 	
 	private int mode;
 	private OpdrNavIF comRoot;
@@ -207,6 +201,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if(h == null || h.isEmpty()) return; // setStateNull();
 		bvSetState = true;
 		binomVerdPanel.setState(h);
 		bvSetState = false;
@@ -229,7 +224,6 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	@Override
 	public int getScore()
 	{
-		// TODO Auto-generated method stub
 		return binomVerdPanel.score;
 	}
 
@@ -239,7 +233,7 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 		if (binomVerdPanel.kijkOpdrachtNa)
 			return correct;
 		else
-			return new Boolean(true);
+			return Boolean.TRUE;
 
 	}
 
@@ -290,13 +284,10 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public int getAsHoogte() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -312,8 +303,6 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 
 	@Override
 	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	//@Override
@@ -324,7 +313,6 @@ public class BinomVerdGWT implements EntryPoint, InteractionStub
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
-		
 logger.info("BinomVerdGWT init");
 		
 		this.breedte = width;
@@ -365,7 +353,10 @@ logger.info("BinomVerdGWT componenten geplaatst");
 logger.info("BinomVerdGWT pre setState");
 
 		binomVerdPanel.setState(map);
-
+logger.info("initializeer Random Waarden");
+		randomVarWaarden = values;
+		randomVarNamen = randomVarWaarden.keySet().toArray(new String[randomVarWaarden.size()]);		
+		
 logger.info("BinomVerdGWT post setState");		
 
 		BVInvoer invoer = new BVInvoer("");
@@ -655,18 +646,21 @@ logger.info("BinomVerdGWT post setState");
 
 	}
 
-	public static double substitueerRandom(double def, String s, String[] randomVarNamen, HashMap randomVarWaarden) 
+	public static double substitueerRandom(double def, String s, String[] randomVarNamen, Map<String, Number> randomVarWaarden2) 
 	{	double d = Double.NaN;
 		s = s.substring(1, s.length() - 1);
 		String[] delen = StringUtils.split(s, "/");
 		int decFactor = 1;
 	
-		for (int j = 0 ; j < randomVarNamen.length; j++)
-		{	
-//System.out.println("rava " + j + " " + randomVars[j]);			
-			if (randomVarNamen[j].equals(delen[0])) 
-				d = ((Integer) randomVarWaarden.get(randomVarNamen[j])).intValue();
-		}
+//		for (int j = 0 ; j < randomVarNamen.length; j++)
+//		{	
+////System.out.println("rava " + j + " " + randomVars[j]);			
+//			if (randomVarNamen[j].equals(delen[0])) 
+//				d =  randomVarWaarden2.get(randomVarNamen[j]).doubleValue();
+//		}
+		if(randomVarWaarden2.containsKey(delen[0]))
+			d = randomVarWaarden2.get(delen[0]).doubleValue();
+		
 		if (delen.length > 1)
 		{	decFactor = Integer.parseInt(delen[1]);
 			d = d / decFactor;
