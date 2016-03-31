@@ -523,7 +523,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = "0,03";
+		String expected = "0.03";
 		String actual = this.statTableModel.getColumnMinOfSelection(3);
 		assertEquals("", expected, actual);
 		
@@ -534,7 +534,7 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = "0,04"; // komma voor nl
+		String expected = "0.04";
 		String actual = this.statTableModel.getColumnMaxOfSelection(3);
 		assertEquals("", expected, actual);
 		
@@ -545,8 +545,8 @@ public class StatTableModelTest extends GWTTestCase
 	{
 		this.setSelectionListThreeSelected();
 		
-		String expected = "0,0333";
-		String actual = StatistiekGWT.round(
+		String expected = "0.0333";
+		String actual = StatistiekGWT.getFormatted(
 			this.statTableModel.getColumnMeanOfSelection(3), 4);
 		assertEquals("", expected, actual);
 		
