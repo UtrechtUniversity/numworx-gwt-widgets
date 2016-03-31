@@ -595,6 +595,8 @@ public class BoxplotModel
 				this.outlierMaxValues.add(null);
 				this.outlierWeakMaxValues.add(null);
 				this.outlierStrongMaxValues.add(null);
+				this.dataMinValue = null;
+				this.dataMaxValue = null;
 			}
 			else
 			{
@@ -644,8 +646,11 @@ public class BoxplotModel
 				this.maxValues.add(maxValue);
 			}
 			
-			this.dataMinValue = data.get(0);
-			this.dataMaxValue = data.get(size - 1);
+			if (size > 0)
+			{
+				this.dataMinValue = data.get(0);
+				this.dataMaxValue = data.get(size - 1);
+			}
 			
 		} // no split
 		else
