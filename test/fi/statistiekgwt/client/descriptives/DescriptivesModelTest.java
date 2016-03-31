@@ -412,11 +412,23 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnMeanSplit1NoSelection()
 	{
-		String expected = "51,86";
-		String actual = StatistiekGWT.round(this.model.getColumnMean(
+		String expected = "51.86";
+		String actual = StatistiekGWT.getFormatted(this.model.getColumnMean(
 			1, 1, false), 2); // columnIndex = 1 (gewicht), split 1 (v), no selection
 		
 		assertEquals("", expected, actual);
+	}
+
+	public void testGetColumnMeanSplit1NoSelection_nl()
+	{
+		// De taalinstelling geeft niet dezelfde resultaten als in dwoplayer; doubles worden niet goed geparsed.
+//		StatistiekGWT.setLanguage(StatistiekGWT.NL);
+//		
+//		String expected = "51,86"; // komma voor NL
+//		String actual = StatistiekGWT.getFormatted(this.model.getColumnMean(
+//			1, 1, false), 2); // columnIndex = 1 (gewicht), split 1 (v), no selection
+//		
+//		assertEquals("", expected, actual);
 	}
 
 	public void testGetColumnMeanSplit0Selection()
@@ -439,8 +451,8 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnSDSplit0NoSelection()
 	{
-		String expected = "8,04";
-		String actual = StatistiekGWT.round(
+		String expected = "8.04";
+		String actual = StatistiekGWT.getFormatted(
 			this.model.getColumnSD(1, 0, false), 2); // columnIndex = 1 (gewicht), split 0, no selection
 		
 		assertEquals("", expected, actual);
@@ -448,11 +460,23 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnSDSplit1NoSelection()
 	{
-		String expected = "5,11";
-		String actual = StatistiekGWT.round(
+		String expected = "5.11";
+		String actual = StatistiekGWT.getFormatted(
 			this.model.getColumnSD(1, 1, false), 2); // columnIndex = 1 (gewicht), split 1, no selection
 		
 		assertEquals("", expected, actual);
+	}
+
+	public void testGetColumnSDSplit1NoSelection_nl()
+	{
+		// De taalinstelling geeft niet dezelfde resultaten als in dwoplayer; doubles worden niet goed geparsed.
+//		StatistiekGWT.setLanguage(StatistiekGWT.NL);
+//		
+//		String expected = "5,11"; // komma voor NL
+//		String actual = StatistiekGWT.getFormatted(
+//			this.model.getColumnSD(1, 1, false), 2); // columnIndex = 1 (gewicht), split 1, no selection
+//		
+//		assertEquals("", expected, actual);
 	}
 
 	public void testGetColumnSDSplit0Selection()
@@ -465,8 +489,8 @@ public class DescriptivesModelTest extends GWTTestCase
 
 	public void testGetColumnSDSplit1Selection()
 	{
-		String expected = "6,48";
-		String actual = StatistiekGWT.round(
+		String expected = "6.48";
+		String actual = StatistiekGWT.getFormatted(
 			this.model.getColumnSD(1, 1, true), 2); // columnIndex = 1 (gewicht), split 1, selection
 		
 		assertEquals("", expected, actual);
