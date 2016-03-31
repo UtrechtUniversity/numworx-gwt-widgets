@@ -402,16 +402,18 @@ public class StatistiekGWTTest extends GWTTestCase
 			+ ", actual " + actual.toArray(), actual, expected);
 	}
 
-	public void testAppropriateBoundariesFromBinSettingsBinWidthTooLarge()
+	public void testAppropriateBoundariesFromBinSettings0_10_25_0()
 	{
 		double min = 0;
 		double max = 10;
 		double binWidth = 25;
 		double minBoundary = 0;
 		
-		ArrayList<Double> expected = null;
+		ArrayList<Double> expected = new ArrayList<Double>(Arrays.asList(
+			0.0, 25.0));
 		ArrayList<Double> actual = StatistiekGWT.appropriateBoundariesFromBinSettings(min, max, binWidth, minBoundary);
-		assertEquals(expected, actual);
+		assertEquals("Expected " + expected.toArray()
+			+ ", actual " + actual.toArray(), actual, expected);
 	}
 
 	public void testAppropriateBoundariesFromBinSettingsBinWidthNegative()
@@ -438,16 +440,18 @@ public class StatistiekGWTTest extends GWTTestCase
 		assertEquals(expected, actual);
 	}
 
-	public void testAppropriateBoundariesFromBinSettingsMinBoundaryTooSmall()
+	public void testAppropriateBoundariesFromBinSettings0_10_1_min7()
 	{
 		double min = 0;
 		double max = 10;
 		double binWidth = 1;
 		double minBoundary = -7;
 		
-		ArrayList<Double> expected = null;
+		ArrayList<Double> expected = new ArrayList<Double>(Arrays.asList(
+			-7.0, -6.0, -5.0, -4.0, -3.0, -2.0, -1.0, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0));
 		ArrayList<Double> actual = StatistiekGWT.appropriateBoundariesFromBinSettings(min, max, binWidth, minBoundary);
-		assertEquals(expected, actual);
+			assertEquals("Expected " + expected.toArray()
+				+ ", actual " + actual.toArray(), actual, expected);
 	}
 
 	public void testAppropriateBoundariesFromBinSettingsMinBoundaryTooLarge()
