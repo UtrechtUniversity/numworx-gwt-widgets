@@ -612,6 +612,13 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		return mode;
 	}
 
+	/**
+	 * Set the data labels for minimum, maximum, mean, standard deviation and median,
+	 * for the given splitclass and for all cases or the selected cases.
+	 * 
+	 * @param selection 0 for no selection, all included, 1 for the selected cases.
+	 * @param splitClass
+	 */
 	private void setDataLabels(int selection, int splitClass)
 	{
 		String minimumString;
@@ -634,13 +641,13 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				
 				if (!meanString.equals(StatistiekGWT.rb.notAvailable()))
 				{
-					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
+					meanString = StatistiekGWT.getFormatted(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, false);
 				if (!sdString.equals(StatistiekGWT.rb.notAvailable()))
 				{
-					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
+					sdString = StatistiekGWT.getFormatted(sdString, numberOfDecimals);
 				}
 				medianString = getMedianValue(columnIndex, splitClass, false);
 			}
@@ -652,13 +659,13 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 				meanString = this.model.getColumnMean(columnIndex, splitClass, true);
 				if (!meanString.equals(StatistiekGWT.rb.notAvailable()))
 				{
-					meanString = StatistiekGWT.round(meanString, numberOfDecimals);
+					meanString = StatistiekGWT.getFormatted(meanString, numberOfDecimals);
 				}
 				
 				sdString = this.model.getColumnSD(columnIndex, splitClass, true);
 				if (!sdString.equals(StatistiekGWT.rb.notAvailable()))
 				{
-					sdString = StatistiekGWT.round(sdString, numberOfDecimals);
+					sdString = StatistiekGWT.getFormatted(sdString, numberOfDecimals);
 				}
 				medianString = getMedianValue(columnIndex, splitClass, true);
 			}
