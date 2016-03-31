@@ -106,13 +106,13 @@ public class DescriptivesViewTest extends GWTTestCase
 		
 		String[][][] expectedStrings = new String[][][]{
 			// m, all cases
-			{{"3", "51", "70", "59", "8,04", "56", notAvailable},
+			{{"3", "51", "70", "59.00", "8.04", "56", notAvailable},
 			// m, selected cases
 			{"0", notAvailable, notAvailable, notAvailable, notAvailable, notAvailable, notAvailable}},
 			// v, all cases
-			{{"7", "40", "56", "51,86", "5,11", "54", "55"},
+			{{"7", "40", "56", "51.86", "5.11", "54", "55"},
 			// v, selected cases
-			{"3", "40", "55", "49", "6,48", "52", notAvailable}}};
+			{"3", "40", "55", "49.00", "6.48", "52", notAvailable}}};
 		
 		for (int i = 0; i < 7; i++) // descriptive fields: nr, min, max, mean, sd, median, mode
 		{
