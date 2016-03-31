@@ -876,8 +876,19 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 			Touch touch = event.getTouches().get(0);
 			//Widget sender = (Widget) event.getSource();
 		    //Element elem = sender.getElement();
-			int x = touch.getPageX()- eigenaar.tb.canvas.getAbsoluteLeft();//getRelativeX(elem);
-			int y = touch.getPageY()- eigenaar.tb.canvas.getAbsoluteTop();//getRelativeY(elem);
+			int x = 0;
+			int y = 0;
+			if (eigenaar != null)
+			{	
+				x = touch.getPageX()- eigenaar.tb.canvas.getAbsoluteLeft();//getRelativeX(elem);
+				y = touch.getPageY()- eigenaar.tb.canvas.getAbsoluteTop();//getRelativeY(elem);
+			}
+			else if (eigenaar1 != null)
+			{
+				x = touch.getPageX()- eigenaar1.canvas.getAbsoluteLeft();//getRelativeX(elem);
+				y = touch.getPageY()- eigenaar1.canvas.getAbsoluteTop();//getRelativeY(elem);
+
+			}
 	        dx = x - laatstex;
 			dy = laatstey -y;
 			if (eigenaar != null)
@@ -904,10 +915,20 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 			Touch touch = event.getTouches().get(0);
 			//Widget sender = (Widget) event.getSource();
 		    //Element elem = sender.getElement();
-			eerstex = touch.getPageX() - eigenaar.tb.canvas.getAbsoluteLeft();//getRelativeX(elem);
-			eerstey = touch.getPageY() - eigenaar.tb.canvas.getAbsoluteTop();;//getRelativeY(elem);
-			laatstex = touch.getPageX() - eigenaar.tb.canvas.getAbsoluteLeft();;//getRelativeX(elem);
-			laatstey = touch.getPageY() - eigenaar.tb.canvas.getAbsoluteTop();;//getRelativeY(elem);
+			if (eigenaar != null)
+			{	
+				eerstex = touch.getPageX() - eigenaar.tb.canvas.getAbsoluteLeft();//getRelativeX(elem);
+				eerstey = touch.getPageY() - eigenaar.tb.canvas.getAbsoluteTop();;//getRelativeY(elem);
+				laatstex = touch.getPageX() - eigenaar.tb.canvas.getAbsoluteLeft();;//getRelativeX(elem);
+				laatstey = touch.getPageY() - eigenaar.tb.canvas.getAbsoluteTop();;//getRelativeY(elem);
+			}
+			else if (eigenaar1 != null)
+			{	
+				eerstex = touch.getPageX() - eigenaar1.canvas.getAbsoluteLeft();//getRelativeX(elem);
+				eerstey = touch.getPageY() - eigenaar1.canvas.getAbsoluteTop();;//getRelativeY(elem);
+				laatstex = touch.getPageX() - eigenaar1.canvas.getAbsoluteLeft();;//getRelativeX(elem);
+				laatstey = touch.getPageY() - eigenaar1.canvas.getAbsoluteTop();;//getRelativeY(elem);
+			} 
 			if (eigenaar != null)
 				eigenaar.muisDrukActie();
 		

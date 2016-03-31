@@ -426,7 +426,7 @@ logger.info("TekenVeelvlakGWT init");
 			tvState = launchState.getMap("tvState");
 
         int viewerPosition = 0;
-        int basisFiguur = 1;
+        int basisFiguur = 0;
         int aantalHulppunten = 0;
 
         if (launchState.containsKey("viewerPosition"))
