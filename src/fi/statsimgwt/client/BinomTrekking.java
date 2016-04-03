@@ -389,7 +389,10 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			numberOfTimes=Integer.parseInt(keerText.getText());
 			maxCount=Integer.parseInt(aantalTrekkingenText.getText());
 			multipleTimes=true;
-			elapsedTimer.scheduleRepeating(1);   
+			//elapsedTimer.scheduleRepeating(1);
+			while (stopCounting==false) {
+				doeStap();
+			}
 		}
 		if (event.getSource()==wis) {
 			wis.setEnabled(false);
@@ -437,8 +440,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			dataList.add(ADDEXP);
 		else
 			dataList.set(experiment, ADDEXP);
-
-		
+				
 		if (trekkingCount==maxCount) {
 			trekkingen[experiment]=totaal;
 			experiment++;
@@ -465,8 +467,10 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			}
 		}
 		
-		binomRooster.paint();
-		binomGrafiek.paint();
+		if (multipleTimes==false || numberOfTimes==0) {
+			binomRooster.paint();
+			binomGrafiek.paint();
+		}
 	}
 
 }

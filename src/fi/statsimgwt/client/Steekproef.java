@@ -97,7 +97,7 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	protected ListDataProvider<Experiment1> dataProvider1;
 		
 	
-	public Steekproef(StatSimGWT ssgwt) {
+	public Steekproef(StatSimGWT ssgwt, boolean steekproefLinkerTabel, boolean steekproefRechterTabel) {
 		this.ssgwt=ssgwt;
 		
 		gaussianImage = new Image(clientBundle.gaussian());
@@ -283,10 +283,18 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	    
 	    panel10.add(scrollPanel);
 	    
+	    if (steekproefLinkerTabel==false) {
+	    	html.setVisible(false);
+	    	scrollPanel.setVisible(false);
+	    }
+	    
 	    panel11.add(html2);
 	    panel11.add(scrollPanel1);
 	    
-	    
+	    if (steekproefRechterTabel==false) {
+	    	html2.setVisible(false);
+	    	scrollPanel1.setVisible(false);
+	    }
 	    
 	    //panel9.add(scrollPanel);
 	    //panel9.add(scrollPanel1);
@@ -399,14 +407,30 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 		
 		// TODO Auto-generated method stub
 		if (event.getSource()==doeSteekproef) {
+			doeSteekproef.setEnabled(false);
+			doeSteekproef100Keer.setEnabled(false);
+			muText.setEnabled(false);
+			sigmaText.setEnabled(false);
+			steekproefGrootteText.setEnabled(false);
 			wisResultaten.setEnabled(true);
 			getSample();
+			doeSteekproef.setEnabled(true);
+			doeSteekproef100Keer.setEnabled(true);
+			
 		}
 		if (event.getSource()==doeSteekproef100Keer) {
+			doeSteekproef.setEnabled(false);
+			doeSteekproef100Keer.setEnabled(false);
+			muText.setEnabled(false);
+			sigmaText.setEnabled(false);
+			steekproefGrootteText.setEnabled(false);
 			wisResultaten.setEnabled(true);
 			for (int i=0;i<100;i++) {
 				getSample();
 			}
+			doeSteekproef.setEnabled(true);
+			doeSteekproef100Keer.setEnabled(true);
+			
 		}
 		if (event.getSource()==wisResultaten) {
 			List dataList=dataProvider.getList();
@@ -415,6 +439,9 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 			dataList1.clear();
 			experiment=0;
 			wisResultaten.setEnabled(false);
+			muText.setEnabled(true);
+			sigmaText.setEnabled(true);
+			steekproefGrootteText.setEnabled(true);
 		}
 		if (event.getSource()==muText) {
 			updateGraph();

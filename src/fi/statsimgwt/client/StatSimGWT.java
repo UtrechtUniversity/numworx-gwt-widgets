@@ -50,6 +50,8 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	boolean binomTrekkingRooster=false;
 	boolean binomTrekkingKans=true;
 	boolean binomTrekkingPopulatieProportie=false;
+	boolean steekproefLinkerTabel=true;
+	boolean steekproefRechterTabel=true;
 	
 	boolean muntenSelected=false;
 	boolean dobbelstenenSelected=false;
@@ -738,50 +740,62 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			binomTrekkingFrequentie = l.getBoolean("binomTrekkingFrequentie");
 		if (l.containsKey("binomTrekkingRooster"))
 			binomTrekkingRooster = l.getBoolean("binomTrekkingRooster");
+		if (l.containsKey("steekproefLinkerTabel"))
+			steekproefLinkerTabel = l.getBoolean("steekproefLinkerTabel");
+		if (l.containsKey("steekproefRechterTabel"))
+			steekproefRechterTabel = l.getBoolean("steekproefRechterTabel");
 	
 		if (muntenSelected) {
 			munten=new Munten(this, muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
 			munten.setGrootte(breedte,hoogte);
 			Boolean eenMuntTweeMunt=false;
-			if (l.containsKey("eenMuntTweeMunt"))
+			if (l.containsKey("eenMuntTweeMunt")) {
 				eenMuntTweeMunt = l.getBoolean("eenMuntTweeMunt");
-			munten.eenMunt.setValue(eenMuntTweeMunt);
-			munten.tweeMunten.setValue(!eenMuntTweeMunt);
-			munten.setEenMuntTweeMunten();
+				munten.eenMunt.setValue(eenMuntTweeMunt);
+				munten.tweeMunten.setValue(!eenMuntTweeMunt);
+				munten.setEenMuntTweeMunten();
+			}
 			String aantalWorpen="";
-			if (l.containsKey("aantalWorpen"))
+			if (l.containsKey("aantalWorpen")) {
 				aantalWorpen = l.getString("aantalWorpen");
-			munten.aantalWorpenText.setText(aantalWorpen);
+				munten.aantalWorpenText.setText(aantalWorpen);
+			}
 			String kansOpMunt="";
-			if (l.containsKey("kansOpMunt"))
+			if (l.containsKey("kansOpMunt")) {
 				kansOpMunt = l.getString("kansOpMunt");
-			munten.kansOpKopText.setText(kansOpMunt);
+				munten.kansOpKopText.setText(kansOpMunt);
+			}
 			
 		}
 		if (dobbelstenenSelected) {
 			dobbelstenen=new Dobbelstenen(this, dobbelstenenInstellingen, dobbelstenenResultaten, dobbelstenenGrafiek, dobbelstenenTabel);
 			dobbelstenen.setGrootte(breedte,hoogte);
 			Boolean eenDobbelsteenRadio=false;
-			if (l.containsKey("eenDobbelsteenRadio"))
+			if (l.containsKey("eenDobbelsteenRadio")) {
 				eenDobbelsteenRadio = l.getBoolean("eenDobbelsteenRadio");
-			dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteenRadio);
+				dobbelstenen.eenDobbelsteen.setValue(eenDobbelsteenRadio);
+			}
 			Boolean tweeDobbelstenenRadio=false;
-			if (l.containsKey("tweeDobbelstenenRadio"))
+			if (l.containsKey("tweeDobbelstenenRadio")) {
 				tweeDobbelstenenRadio = l.getBoolean("tweeDobbelstenenRadio");
-			dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenenRadio);
+				dobbelstenen.tweeDobbelstenen.setValue(tweeDobbelstenenRadio);
+			}
 			Boolean drieDobbelstenenRadio=false;
-			if (l.containsKey("drieDobbelstenenRadio"))
+			if (l.containsKey("drieDobbelstenenRadio")) {
 				drieDobbelstenenRadio = l.getBoolean("drieDobbelstenenRadio");
-			dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenenRadio);
+				dobbelstenen.drieDobbelstenen.setValue(drieDobbelstenenRadio);
+			}
 			dobbelstenen.doEenTweeDrieDobbelstenen();
 			String aantalWorpenDobbelsteen="";
-			if (l.containsKey("aantalWorpenDobbelsteen"))
+			if (l.containsKey("aantalWorpenDobbelsteen")) {
 				aantalWorpenDobbelsteen = l.getString("aantalWorpenDobbelsteen");
-			dobbelstenen.aantalWorpenText.setText(aantalWorpenDobbelsteen);
+				dobbelstenen.aantalWorpenText.setText(aantalWorpenDobbelsteen);
+			}
 			Boolean toonSom=false;
-			if (l.containsKey("toonSom"))
+			if (l.containsKey("toonSom")) {
 				toonSom = l.getBoolean("toonSom");
-			dobbelstenen.toonSom.setValue(toonSom);
+				dobbelstenen.toonSom.setValue(toonSom);
+			}
 			dobbelstenen.dobbelstenenGrafiek.paint();
 			
 		}
@@ -789,22 +803,25 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			binomTrekking = new BinomTrekking(this, binomTrekkingInstellingen, binomTrekkingGrafiek, binomTrekkingTabel, binomTrekkingRooster);
 			binomTrekking.setGrootte(breedte,hoogte);
 			String binomKans="";
-			if (l.containsKey("kans"))
+			if (l.containsKey("kans")) {
 				binomKans = l.getString("kans");
-			binomTrekking.kansText.setText(binomKans);
+				binomTrekking.kansText.setText(binomKans);
+			}
 			String aantalTrekkingen="";
-			if (l.containsKey("aantalTrekkingen"))
+			if (l.containsKey("aantalTrekkingen")) {
 				aantalTrekkingen = l.getString("aantalTrekkingen");
-			binomTrekking.aantalTrekkingenText.setText(aantalTrekkingen);
+				binomTrekking.aantalTrekkingenText.setText(aantalTrekkingen);
+			}
 			String aantalKeer="";
-			if (l.containsKey("aantalKeer"))
+			if (l.containsKey("aantalKeer")) {
 				aantalKeer = l.getString("aantalKeer");
-			binomTrekking.keerText.setText(aantalKeer);
+				binomTrekking.keerText.setText(aantalKeer);
+			}
 			binomTrekking.showKans=binomTrekkingKans;
 			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
 		}
 		if (steekproefSelected) {
-			steekproef = new Steekproef(this);
+			steekproef = new Steekproef(this,steekproefLinkerTabel, steekproefRechterTabel);
 			steekproef.setGrootte(breedte, hoogte);
 			String steekproefMu="";
 			if (l.containsKey("mu"))
@@ -817,7 +834,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		RootPanel.get("dockholder").add(asWidget());
+		//RootPanel.get("dockholder").add(asWidget());
 
 	}
 

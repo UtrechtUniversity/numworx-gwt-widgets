@@ -3,6 +3,7 @@ package fi.statsimgwt.client;
 import java.awt.Color;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.user.client.Window;
 
 public class BinomGrafiek {
 	BinomTrekking ssg;
@@ -74,11 +75,14 @@ public class BinomGrafiek {
 		//System.out.println(f);
 		int numMarks1=d/f;
 		
+		ssg.gIm2.setFillStyle(black);
 		for (int i=0;i<=numMarks1;i++) {
 			if (maxHeight>0) {
 				ssg.gIm2.moveTo(45,height-20-(i*f*(height-50)/d));
 				ssg.gIm2.lineTo(50,height-20-(i*f*(height-50)/d));
-				ssg.gIm2.fillText(i*f+"", 25,height-20-(i*f*(height-50)/d));
+				String dummy=i*f+ "";
+				//Window.alert("tekst");
+				ssg.gIm2.fillText(dummy, 25,height-20-(i*f*(height-50)/d));
 			}
 		}
 		

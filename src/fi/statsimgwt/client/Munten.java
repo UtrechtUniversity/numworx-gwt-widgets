@@ -343,7 +343,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    if (muntenResultaten==false)
 	    	radios.setVisible(false);
 	    
-	    panel.setWidgetLeftRight(radios,370,Unit.PX,100,Unit.PX);
+	    panel.setWidgetLeftRight(radios,370,Unit.PX,0,Unit.PX);
 	    panel.setWidgetTopBottom(radios,10,Unit.PX,10,Unit.PX);
 	    
 	    aantalKopRadio = new RadioButton("myRadioGroup1"," Aantal kop");
