@@ -116,6 +116,10 @@ public class AllowedTypes implements Serializable
 		return this.typeClass;
 	}
 
+	/**
+	 * Returns whether the type is a number type, i.e., integer or double.
+	 * @return
+	 */
 	public boolean isNumber()
 	{
 		boolean isNumber = 
