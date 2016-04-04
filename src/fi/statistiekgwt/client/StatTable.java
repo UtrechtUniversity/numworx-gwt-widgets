@@ -182,6 +182,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private static final int ENUM_PADDING = 22;
 	private static final int MINIMUM_CELL_WIDTH = 30;
+	private static final int MAXIMUM_CELL_WIDTH = 60;
 
 	private StatTableModel statTableModel;
 
@@ -196,17 +197,28 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	
 	private Label tableMessageLabel;
 	/**
-	 * Array with the maximum column width for each data column in table
-	 * considering the column header and the table data in the column.
+	 * Array with the column header width for each data column in table.
 	 * The first checkbox column is excluded. 
 	 */
-	private int[] maxColumnWidth;
+	private int[] columnHeaderWidth;
 	
 	/**
 	 * Array with the maximum cell width for each data column in table.
 	 * The first checkbox column is excluded. 
 	 */
 	private int[] maxCellWidth;	
+	
+	/**
+	 * Array with the actual cell width for each data column in table.
+	 * The first checkbox column is excluded. 
+	 */
+	private int[] cellWidth;
+	
+	/**
+	 * Array with the actual column width for each data column in table.
+	 * The first checkbox column is excluded. 
+	 */
+	private int[] columnWidth;
 	
 	/**
 	 * The width of the row number column.
@@ -501,9 +513,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        .<List<String>> createCheckboxManager(0));
 	    // set the row number column width
 	    this.updateRowNumberWidth();
-	    // initialize the maximum column width for each column
-	    this.initializeMaxColumnWidth();
-	    this.initializeMaxCellWidth();
+	    initializeWidth();
 
 	    // create vertical header menubar
 		this.headerMenuBar = new MenuBar(true);
@@ -691,6 +701,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					}
 		        }
 				else if (("mousedown".equals(nativeEvent.getType()) || "touchstart".equals(nativeEvent.getType())) 
+					&& columnIndex == 0
 					&& button != NativeEvent.BUTTON_RIGHT
 					&& !nativeEvent.getShiftKey()) // when shift-clicking the old clickedRowIndex needs to be remained
 				{
@@ -698,6 +709,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					clickedRowIndex = rowIndex; // nodig voor klik-sleep
 				}
 				else if (isMouseDown && "mouseover".equals(nativeEvent.getType())
+					&& columnIndex == 0
 					&& button != NativeEvent.BUTTON_RIGHT)
 				{
 					// add the row that is left by the mouse to the selection
@@ -709,7 +721,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					// select rows between clicked and current row index
 	    			selectAllRowsBetweenIndices(rowIndex);
 				}
-				else if ("touchend".equals(nativeEvent.getType()))
+				else if ("touchend".equals(nativeEvent.getType())
+					&& columnIndex == 0)
 				{
 //					Window.alert("rowIndex = " + rowIndex + ", columnIndex = " + columnIndex);
 					
@@ -1782,13 +1795,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						StatTable.this.statTableModel.removeRowWithoutEvent(toRemove[i]);
 					}
 					
+					// reset selection
+					StatTable.this.clearSelectionModel();
+					
 					// send an event
 					TableChangeEvent event = new TableChangeEvent(TableChangeEvent.REMOVE_ROWS, -1);
 					StatTable.this.statTableModel.fireEvent(event);
 				}
-				
-				// reset selection
-				StatTable.this.clearSelectionModel();
 			}
 			else if (e.getSource() == StatTable.this.pasteButton)
 			{
@@ -2508,12 +2521,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 		else if (event.getInfo().equals(TableChangeEvent.SET_COLUMN_NAME))
 		{
-			this.updateMaxColumnWidth(event.getColumnIndex());
+			this.updateWidth(event.getColumnIndex());
 		}
 		else if (event.getInfo().equals(TableChangeEvent.ADD_COLUMN))
 		{
-			this.addMaxColumnWidth();
-			this.addMaxCellWidth();
+			this.addWidth();
 
 			this.update();
 			
@@ -2524,8 +2536,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 		else if (event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
 		{
-			this.updateMaxColumnWidth(event.getColumnIndex());
-			this.updateMaxCellWidth(event.getColumnIndex());
+			this.updateWidth(event.getColumnIndex());
 
 			this.update();
 
@@ -2540,11 +2551,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				this.updateRowNumberWidth();
 				// all maxColumn/CellWidths must be recalculated
-				this.updateMaxColumnWidth();
-				this.updateMaxCellWidth();
+				updateWidth();
 			}
 			else
 			{
+				this.updateColumnWidth(this.statTableModel.getColumnCount() - 1); // update the last column in case scrollbar appeared
+
 				this.update();
 				
 				// show the row added
@@ -2561,13 +2573,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		else if (event.getInfo().equals(TableChangeEvent.IMPORT_DATA)) // import data from file
 		{
 			this.updateRowNumberWidth();
-			this.initializeMaxColumnWidth();
-			this.initializeMaxCellWidth();
+			initializeWidth();
 		}
 		else if (event.getInfo().equals(TableChangeEvent.SET_VALUE_AT))
 		{
-			this.updateMaxColumnWidth(event.getColumnIndex());
-			this.updateMaxCellWidth(event.getColumnIndex());
+			this.updateWidth(event.getColumnIndex());
 			
 			this.update();
 
@@ -2578,17 +2588,94 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 		else if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
 		{
-			this.removeMaxColumnWidth();
-			this.removeMaxCellWidth();
-			this.updateMaxColumnWidthFromIndex(event.getColumnIndex());
-			this.updateMaxCellWidthFromIndex(event.getColumnIndex());
+			removeWidth();
+			updateWidthFromIndex(event.getColumnIndex());
 		}
 		else if (event.getInfo().equals(TableChangeEvent.REMOVE_ROW) || event.getInfo().equals(TableChangeEvent.REMOVE_ROWS))
 		{
 			this.updateRowNumberWidth();
+			this.updateColumnWidth(this.statTableModel.getColumnCount() - 1); // update the last column in case scrollbar disappeared
 		}
 
 		this.update();
+	}
+
+	/**
+	 * Update the values for column header width, maximum cell width,
+	 * the actual cell width and actual column width 
+	 * for the columns with index the given column index or larger in the table.
+	 *  
+	 * @param fromIndex
+	 */
+	private void updateWidthFromIndex(int fromIndex)
+	{
+		this.updateColumnHeaderWidthFromIndex(fromIndex);
+		this.updateMaxCellWidthFromIndex(fromIndex);
+		this.updateCellWidthFromIndex(fromIndex);
+		this.updateColumnWidthFromIndex(fromIndex);
+	}
+
+	/**
+	 * Remove item from the end of the arrays for column header width, max cell width,
+	 * the actual cell width and the actual column width.
+	 */
+	private void removeWidth()
+	{
+		this.removeColumnHeaderWidth();
+		this.removeMaxCellWidth();
+		this.removeCellWidth();
+		this.removeColumnWidth();
+	}
+
+	/**
+	 * Add an item to the arrays for column header width, max cell width,
+	 * the actual cell width and the actual column width.
+	 */
+	private void addWidth()
+	{
+		this.addColumnHeaderWidth();
+		this.addMaxCellWidth();
+		this.addCellWidth();
+		this.addColumnWidth();
+	}
+
+	/**
+	 * Update the values for column header width and maximum cell width,
+	 * and the actual cell and column width for each column.
+	 */
+	private void updateWidth()
+	{
+		this.updateColumnHeaderWidth();
+		this.updateMaxCellWidth();
+		this.updateCellWidth();
+		this.updateColumnWidth();
+	}
+
+	/**
+	 * Update the values for column header width and maximum cell width,
+	 * and the actual cell and column width for each column.
+	 * 
+	 * @param columnIndex
+	 */
+	private void updateWidth(int columnIndex)
+	{
+		this.updateColumnHeaderWidth(columnIndex);
+		this.updateMaxCellWidth(columnIndex);
+		this.updateCellWidth(columnIndex);
+		this.updateColumnWidth(columnIndex);
+	}
+
+	/**
+	 * Initialize the values for column header width and maximum cell width,
+	 * and the actual cell and column width for each column.
+	 *
+	 */
+	private void initializeWidth()
+	{
+		this.initializeColumnHeaderWidth();
+		this.initializeMaxCellWidth();
+		this.initializeCellWidth();
+		this.initializeColumnWidth();
 	}
 	
 	private void scrollEditColumnIntoView()
@@ -2635,9 +2722,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		((StatTable) statistiekView).table.setEmptyTableWidget(new Label(StatistiekGWT.rb.loadingTable()));
 	}
 
-	public int[] getMaxColumnWidth()
+	/**
+	 * Get the array with column header widths for the data columns (row number column
+	 * and checkbox column excluded).
+	 * 
+	 * @return
+	 */
+	public int[] getColumnHeaderWidth()
 	{
-		return this.maxColumnWidth;
+		return this.columnHeaderWidth;
 	}
 
 	/**
@@ -2920,7 +3013,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableTextCell textCell = new StatTableTextCell(
 					type, 
-					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]), 
+					this.cellWidth[i], 
 					this);
 				Column<List<String>, String> column = new StatTableColumn(textCell, type);
 
@@ -2928,14 +3021,14 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				column.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(column, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
-				this.table.setColumnWidth(column, width, Unit.PX);
+				this.table.setColumnWidth(column, this.columnWidth[i], Unit.PX);
 				// add the column's width to total width
-				totalWidth = totalWidth + width;				
+				totalWidth = totalWidth + this.columnWidth[i];				
 			}
 			else if (this.statTableModel.getColumnTypes().get(i).getType()
 				.equals(AllowedTypes.ENUM))
 			{
+				// ENUM
 				String[] enumOptions = StatTable.this.statTableModel
 					.getColumnTypes().get(i).getEnumOptions();
 
@@ -2949,21 +3042,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				enumColumn.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(enumColumn, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
-				if (this.maxCellWidth[i] > this.maxColumnWidth[i] - StatTable.ENUM_PADDING)
-				{
-					width = width + StatTable.ENUM_PADDING;
-				}
-				this.table.setColumnWidth(enumColumn, width, Unit.PX);
+				this.table.setColumnWidth(enumColumn, this.columnWidth[i], Unit.PX);
 				// add the column's width to total width
-				totalWidth = totalWidth + width;
+				totalWidth = totalWidth + this.columnWidth[i];
 			} // ENUM
 			else
-			{ // STRING OR NUMERIC
+			{ 
+				// STRING OR NUMERIC
 				ColumnType type = this.statTableModel.getColumnTypes().get(i);
 				StatTableInputCell inputCell = new StatTableInputCell(
 					type, 
-					Math.max(this.maxCellWidth[i], this.maxColumnWidth[i]), 
+					this.cellWidth[i], 
 					this.getStatTableModel().isDataEditable(), this);
 				Column<List<String>, String> column = new StatTableColumn(inputCell, type);
 
@@ -2972,10 +3061,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				column.setCellStyleNames(statistiekCss.datagridcell());
 				
 				this.table.addColumn(column, columnHeader);
-				int width = Math.max(this.maxColumnWidth[i], this.maxCellWidth[i]) + StatTable.HEADER_PADDING;
-				this.table.setColumnWidth(column, width, Unit.PX);
+				this.table.setColumnWidth(column, this.columnWidth[i], Unit.PX);
 				// add the column's width to total width
-				totalWidth = totalWidth + width;				
+				totalWidth = totalWidth + this.columnWidth[i];
 			}
 		} // for-loop over columns
 		
@@ -3107,93 +3195,329 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
-	 * Initialize the max column width for each column in table
+	 * Initialize the cell width for each column in table
 	 * considering the column header width and the table data in the column. 
 	 */
-	private void initializeMaxColumnWidth()
+	private void initializeCellWidth()
 	{
-		this.maxColumnWidth = new int[this.statTableModel.getColumnCount()];
+		this.cellWidth = new int[this.statTableModel.getColumnCount()];
 		
-		this.updateMaxColumnWidth();
+		this.updateCellWidth();
 	}
 	
 	/**
-	 * Update the max column width for the given column in table
+	 * Initialize the column width for each column in table
 	 * considering the column header width and the table data in the column. 
 	 */
-	private void updateMaxColumnWidth(int columnIndex)
+	private void initializeColumnWidth()
+	{
+		this.columnWidth = new int[this.statTableModel.getColumnCount()];
+		
+		this.updateColumnWidth();
+	}
+	
+	/**
+	 * Initialize the column headerwidth for each column in table. 
+	 */
+	private void initializeColumnHeaderWidth()
+	{
+		this.columnHeaderWidth = new int[this.statTableModel.getColumnCount()];
+		
+		this.updateColumnHeaderWidth();
+	}
+	
+	/**
+	 * Update the cell width for the given column in table
+	 * based on the max column width and max cell width. 
+	 */
+	private void updateCellWidth(int columnIndex)
+	{
+		cellWidth[columnIndex] = this.determineCellWidth(columnIndex);
+	}
+	
+	/**
+	 * Update the column width for the given column in table
+	 * based on the max column width and max cell width. 
+	 */
+	private void updateColumnWidth(int columnIndex)
+	{
+		columnWidth[columnIndex] = this.determineColumnWidth(columnIndex);
+	}
+	
+	/**
+	 * Determine the cell width based on column header width, max cell width,
+	 * and MAXIMUM_CELL_WIDTH. The column header must always be visible to the full extent,
+	 * in other cases MAXIMUM_CELL_WIDTH is taken into account.
+	 *  
+	 * @param columnIndex
+	 * @return
+	 */
+	private int determineCellWidth(int columnIndex)
+	{
+		int cellWidth;
+		
+//		Math.min(
+////			MAXIMUM_COLUMN_WIDTH, 
+//			MAXIMUM_CELL_WIDTH, 
+//			Math.max(this.maxCellWidth[columnIndex], this.columnHeaderWidth[columnIndex]));
+		
+		if (this.columnHeaderWidth[columnIndex] > MAXIMUM_CELL_WIDTH)
+		{
+			cellWidth = this.columnHeaderWidth[columnIndex];
+		}
+		else if (this.maxCellWidth[columnIndex] > MAXIMUM_CELL_WIDTH)
+		{
+			cellWidth = MAXIMUM_CELL_WIDTH;
+		}
+		else if (this.maxCellWidth[columnIndex] > this.columnHeaderWidth[columnIndex])
+		{
+			cellWidth = this.maxCellWidth[columnIndex];
+		}
+		else
+		{
+			cellWidth = this.columnHeaderWidth[columnIndex];
+		}
+		
+		return cellWidth;
+	}
+
+	/**
+	 * Determine the column width based on cell width.
+	 * For columns containing enumeration listboxes some extra space is required.
+	 *  
+	 * @param columnIndex
+	 * @return
+	 */
+	private int determineColumnWidth(int columnIndex)
+	{
+		int columnWidth = this.determineCellWidth(columnIndex) + HEADER_PADDING;
+		
+		// voor enum kolommen met listboxes (data editable) iets meer ruimte
+		if (this.getStatTableModel().isDataEditable()
+			&& this.statTableModel.getColumnTypes().get(columnIndex).getType()
+				.equals(AllowedTypes.ENUM))
+		{
+			if (this.maxCellWidth[columnIndex] > this.columnHeaderWidth[columnIndex] - StatTable.ENUM_PADDING)
+			{
+				columnWidth = columnWidth + StatTable.ENUM_PADDING;
+			}
+		}
+		
+		int scrollHeight = this.table.getScrollPanel().getElement().getScrollHeight();
+		int clientHeight = this.table.getScrollPanel().getElement().getClientHeight();
+		int bottom = this.table.getScrollPanel().getElement().getAbsoluteBottom();
+		
+		if (this.isLastColumn(columnIndex) 
+			&& (scrollHeight > clientHeight)) // there is a vertical scrollbar; FIXME dit werkt niet! Extra space wordt nu altijd gezet.
+		{
+			columnWidth = columnWidth + 10;
+		}
+		
+		return columnWidth;
+	}
+
+	/**
+	 * Returns whether the column with the given index is the last column in the table.
+	 * 
+	 * @param columnIndex
+	 * @return
+	 */
+	private boolean isLastColumn(int columnIndex)
+	{
+		boolean b = (columnIndex == this.statTableModel.getColumnCount() - 1);
+		
+		return b;
+	}
+
+	/**
+	 * Update the column header width for the given column in table. 
+	 */
+	private void updateColumnHeaderWidth(int columnIndex)
 	{
 		String header;
 		
 		header = this.statTableModel.getColumnNames().get(columnIndex);
-		maxColumnWidth[columnIndex] = this.determineMaxColumnWidth(columnIndex, header);
+		columnHeaderWidth[columnIndex] = this.determineColumnHeaderWidth(columnIndex, header);
 	}
 	
 	/**
-	 * Update the max column width for the columns with index the given column index 
-	 * or larger in table
-	 * considering the column header width and the table data in the column. 
+	 * Update the column header width for the columns with index the given column index 
+	 * or larger in table. 
 	 */
-	private void updateMaxColumnWidthFromIndex(int startColumnIndex)
+	private void updateColumnHeaderWidthFromIndex(int startColumnIndex)
 	{
 		for (int i = startColumnIndex; i < this.statTableModel.getColumnCount(); i++)
 		{
-			this.updateMaxColumnWidth(i);
+			this.updateColumnHeaderWidth(i);
 		}
 	}
 	
 	/**
-	 * Update the max column width for all columns in table
-	 * considering the column header width and the table data in the column. 
+	 * Update the column width for the columns with index the given column index 
+	 * or larger in table considering the column header width and the table data in the column. 
 	 */
-	private void updateMaxColumnWidth()
+	private void updateColumnWidthFromIndex(int startColumnIndex)
+	{
+		for (int i = startColumnIndex; i < this.statTableModel.getColumnCount(); i++)
+		{
+			this.updateColumnWidth(i);
+		}
+	}
+	
+	/**
+	 * Update the cell width for the columns with index the given column index 
+	 * or larger in table considering the table data in the column. 
+	 */
+	private void updateCellWidthFromIndex(int startColumnIndex)
+	{
+		for (int i = startColumnIndex; i < this.statTableModel.getColumnCount(); i++)
+		{
+			this.updateCellWidth(i);
+		}
+	}
+	
+	/**
+	 * Update the cell width for all columns in table
+	 * based on the max column width and max cell width. 
+	 */
+	private void updateCellWidth()
 	{
 		for (int i = 0; i < this.statTableModel.getColumnCount(); i++)
 		{
-			this.updateMaxColumnWidth(i);
+			this.updateCellWidth(i);
 		}
 	}
 	
 	/**
-	 * Add maxColumnWidth to the end of the array for added column.
+	 * Update the column width for all columns in table
+	 * based on the max column width and max cell width. 
+	 */
+	private void updateColumnWidth()
+	{
+		for (int i = 0; i < this.statTableModel.getColumnCount(); i++)
+		{
+			this.updateColumnWidth(i);
+		}
+	}
+	
+	/**
+	 * Update the column header width for all columns in table. 
+	 */
+	private void updateColumnHeaderWidth()
+	{
+		for (int i = 0; i < this.statTableModel.getColumnCount(); i++)
+		{
+			this.updateColumnHeaderWidth(i);
+		}
+	}
+	
+	/**
+	 * Add columnHeaderWidth to the end of the array for added column.
 	 *  
 	 */
-	private void addMaxColumnWidth()
+	private void addColumnHeaderWidth()
 	{
-		int[] oldMaxColumnWidth = this.maxColumnWidth;
-		this.maxColumnWidth = new int[oldMaxColumnWidth.length + 1]; 
+		int[] oldColumnHeaderWidth = this.columnHeaderWidth;
+		this.columnHeaderWidth = new int[oldColumnHeaderWidth.length + 1]; 
 	
-		for (int i = 0; i < this.maxColumnWidth.length - 1; i++)
+		for (int i = 0; i < this.columnHeaderWidth.length - 1; i++)
 		{
-			this.maxColumnWidth[i] = oldMaxColumnWidth[i];
+			this.columnHeaderWidth[i] = oldColumnHeaderWidth[i];
 		}
 	
 		// the last element is the newly added column
-		int indexAddedColumn = this.maxColumnWidth.length - 1;
-		this.updateMaxColumnWidth(indexAddedColumn);
+		int indexAddedColumn = this.columnHeaderWidth.length - 1;
+		this.updateColumnHeaderWidth(indexAddedColumn);
 	}
 	
 	/**
-	 * Remove maxColumnWidth from the end of the array for removed column.
+	 * Remove columnHeaderWidth from the end of the array for removed column.
 	 *  
 	 */
-	private void removeMaxColumnWidth()
+	private void removeColumnHeaderWidth()
 	{
-		int[] oldMaxColumnWidth = this.maxColumnWidth;
-		this.maxColumnWidth = new int[oldMaxColumnWidth.length - 1]; 
+		int[] oldColumnHeaderWidth = this.columnHeaderWidth;
+		this.columnHeaderWidth = new int[oldColumnHeaderWidth.length - 1]; 
 	
-		for (int i = 0; i < this.maxColumnWidth.length; i++)
+		for (int i = 0; i < this.columnHeaderWidth.length; i++)
 		{
-			this.maxColumnWidth[i] = oldMaxColumnWidth[i];
+			this.columnHeaderWidth[i] = oldColumnHeaderWidth[i];
 		}
 	}
 	
 	/**
-	 * Determine the maximum width of the column, considering the column header 
-	 * and the table data in the column.
+	 * Add a columnWidth to the end of the array for added column.
+	 *  
+	 */
+	private void addColumnWidth()
+	{
+		int[] oldColumnWidth = this.columnWidth;
+		this.columnWidth = new int[oldColumnWidth.length + 1]; 
+	
+		for (int i = 0; i < this.columnWidth.length - 1; i++)
+		{
+			this.columnWidth[i] = oldColumnWidth[i];
+		}
+	
+		// the last element is the newly added column
+		int indexAddedColumn = this.columnWidth.length - 1;
+		this.updateColumnWidth(indexAddedColumn);
+	}
+	
+	/**
+	 * Remove columnWidth from the end of the array for removed column.
+	 *  
+	 */
+	private void removeColumnWidth()
+	{
+		int[] oldColumnWidth = this.columnWidth;
+		this.columnWidth = new int[oldColumnWidth.length - 1]; 
+	
+		for (int i = 0; i < this.columnWidth.length; i++)
+		{
+			this.columnWidth[i] = oldColumnWidth[i];
+		}
+	}
+	
+	/**
+	 * Add a cellWidth to the end of the array for added column.
+	 *  
+	 */
+	private void addCellWidth()
+	{
+		int[] oldCellWidth = this.cellWidth;
+		this.cellWidth = new int[oldCellWidth.length + 1]; 
+	
+		for (int i = 0; i < this.cellWidth.length - 1; i++)
+		{
+			this.cellWidth[i] = oldCellWidth[i];
+		}
+	
+		// the last element is the newly added column
+		int indexAddedColumn = this.cellWidth.length - 1;
+		this.updateCellWidth(indexAddedColumn);
+	}
+	
+	/**
+	 * Remove cellWidth from the end of the array for removed column.
+	 *  
+	 */
+	private void removeCellWidth()
+	{
+		int[] oldCellWidth = this.cellWidth;
+		this.cellWidth = new int[oldCellWidth.length - 1]; 
+	
+		for (int i = 0; i < this.cellWidth.length; i++)
+		{
+			this.cellWidth[i] = oldCellWidth[i];
+		}
+	}
+	
+	/**
+	 * Determine the column header width.
 	 * 
 	 */
-	private int determineMaxColumnWidth(int columnIndex, String header)
+	private int determineColumnHeaderWidth(int columnIndex, String header)
 	{
 		TextMetrics metrics;
 		Canvas canvas = Canvas.createIfSupported();
@@ -3203,45 +3527,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		context.setFont(StatTable.TABLE_HEADER_FONT);
 		metrics = context.measureText(header);
 		// initialize maxWidth with the header width
-		int maxWidth = (int) metrics.getWidth();
+		int headerWidth = (int) metrics.getWidth();
 
-		if (this.statTableModel.getColumnTypes().get(columnIndex).getType()
-			.equals(AllowedTypes.ENUM))
-		{
-			String[] enumOptions = StatTable.this.statTableModel
-				.getColumnTypes().get(columnIndex).getEnumOptions();
-			
-			if (enumOptions != null)
-			{
-				// loop over all values in enumOptions.
-				// for large datasets, take a limited number of enumOptions into account
-				for (int i = 0; i < Math.min(enumOptions.length, StatTable.LARGE_DATASET_LIMITED_ROWCOUNT); i++)
-				{
-					String s = enumOptions[i];
-					metrics = context.measureText(s);
-					maxWidth = (int) Math.max(maxWidth, metrics.getWidth());
-				}
-			}
-		}
-		else
-		{
-			ArrayList<ArrayList<Object>> values = this.statTableModel.getValues();
-			
-			if (values != null)
-			{
-				// loop over all values in the column
-				// for large datasets, take a limited number of rows into account
-				for (int i = 0; i < Math.min(values.size(), StatTable.LARGE_DATASET_LIMITED_ROWCOUNT); i++) // i loops over the rows
-				{
-					String s = StatistiekGWT.getStringValue(values.get(i).get(columnIndex).toString());
-					metrics = context.measureText(s);
-					int w = (int) metrics.getWidth(); // for debugging
-					maxWidth = (int) Math.max(maxWidth, w);
-				}
-			}
-		}
-
-		return maxWidth;
+		return headerWidth;
 	}
 
 	/**
@@ -3339,8 +3627,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
-	 * Determine the maximum width of the column, considering the column header 
-	 * and the table data in the column.
+	 * Determine the maximum width of the column's content, considering  
+	 * the table data in the column.
 	 * 
 	 */
 	private int determineMaxCellWidth(int columnIndex)
@@ -3389,6 +3677,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					int w = (int) metrics.getWidth(); // for debugging
 					maxWidth = (int) Math.max(maxWidth, w);
 				}
+			}
+			
+			if (this.getStatTableModel().isDataEditable()
+				&& this.statTableModel.getColumnTypes().get(columnIndex).getType().isNumber())
+			{
+				maxWidth = (int) (maxWidth * 1.1); // somehow a little extra is needed for numbers
 			}
 		}
 
