@@ -4154,7 +4154,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					// verwijderde waarde kan bins veranderen:
 					// bins opnieuw berekenen
-					this.recalculateBinBoundaries(typeHasChanged);
+					if (this.model.columnIndexValid() 
+						&& !this.model.getStatTableModel().isEmptyColumn(this.model.getColumnIndex()))
+					{
+						this.recalculateBinBoundaries(typeHasChanged);
+					}
 
 					if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
 					{
@@ -4169,8 +4173,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				{
 					if (event.getColumnIndex() == this.model.getColumnIndex())
 					{
-						// bins opnieuw berekenen
-						this.recalculateBinBoundaries(typeHasChanged);
+						if (this.model.columnIndexValid() 
+							&& !this.model.getStatTableModel().isEmptyColumn(this.model.getColumnIndex()))
+						{
+							// bins opnieuw berekenen
+							this.recalculateBinBoundaries(typeHasChanged);
+						}
 					}
 					if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
 					{
