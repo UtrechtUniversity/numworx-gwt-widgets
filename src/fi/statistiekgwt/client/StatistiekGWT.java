@@ -20,6 +20,7 @@ import fi.statistiekgwt.client.dotplot.DotplotController;
 import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
 import fi.statistiekgwt.client.histogram.HistogramController;
 import fi.statistiekgwt.client.text.Text;
+
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -753,41 +754,46 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	}
 	
 	/**
-	 * Rounds a number to a certain number of decimals
+	 * Get the formatted value given the decimal count.
 	 * 
-	 * @param number
-	 *            the number to round
-	 * @param numberOfDecimals
-	 *            the number of decimals to round to. If negative, the number
-	 *            will be rounded to zero decimals.
-	 * @return the rounded number
+	 * @param value
+	 * @param decimalCount
+	 * @return
 	 */
-	public static String round(String number, int numberOfDecimals)
+	public static String getFormatted(double value, int decimalCount)
 	{
-		String roundedString;
-		
-		String separator = StatistiekGWT.getDecimalSeparator();
-		int indexSeparator = number.indexOf(separator);
-		
-		NumberFormat numberFormat = StatistiekGWT.getNumberFormat(0.0);
-		String numberWithPeriodSeparator = number.replace(separator.charAt(0), '.');
-		double d = numberFormat.parse(numberWithPeriodSeparator);
-
-		
-		if (indexSeparator > -1)
+		StringBuilder numberPattern = new StringBuilder(
+			(decimalCount <= 0) ? "" : ".");
+		for (int i = 0; i < decimalCount; i++)
 		{
-			// use round(double) for correct half up rounding
-			d = StatistiekGWT.round(d, numberOfDecimals);
-			roundedString = String.valueOf(d);
-			// replace with the correct separator
-			roundedString = roundedString.replace('.', separator.charAt(0));
+			numberPattern.append('0');
 		}
-		else
+		return NumberFormat.getFormat(numberPattern.toString()).format(value);
+	}
+	
+	/**
+	 * Get the formatted value given the decimal count.
+	 * 
+	 * @param value
+	 * @param decimalCount
+	 * @return
+	 */
+	public static String getFormatted(String value, int decimalCount)
+	{
+		StringBuilder numberPattern = new StringBuilder(
+			(decimalCount <= 0) ? "" : "0.");
+		for (int i = 0; i < decimalCount; i++)
 		{
-			roundedString = number;
+			numberPattern.append('0');
 		}
+		NumberFormat numberFormat = NumberFormat.getFormat(numberPattern.toString());
+		if (language.equals(NL))
+		{
+			value = value.replace('.', ',');
+		}
+		double doubleValue = numberFormat.parse(value); // voor nl wordt 59.0 -> 590.0, in unittest: voor nl parse(51,857142857142854) = 5.1857142857142856E16 ipv 51.857142857142854
 		
-		return roundedString;
+		return numberFormat.format(doubleValue);// in unittest wordt 5.1857142857142856E16 51857142857142856.00
 	}
 
 	/**
@@ -927,8 +933,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	}
 	
 	/**
-	 * Parse the double value in doubleString to double 
-	 * using the locale language settings.
+	 * Parse the double value in doubleString to double. 
 	 * 
 	 * @param doubleString
 	 * @return
@@ -938,8 +943,17 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		double d;
 		
 		// let op: deze houdt geen rekening met de nl "," separator!
-		d = nf.parse(doubleString);
-
+		int numberOfDecimals = getNumberOfDecimals(doubleString);
+		
+		//d = nf.parse(doubleString);
+		String formattedString = getFormatted(doubleString, numberOfDecimals);
+		if (language.equals(NL))
+		{
+			formattedString = formattedString.replace(',', '.');
+		}
+		
+		d = Double.parseDouble(formattedString);
+		
 		return d;
 	}
 	
