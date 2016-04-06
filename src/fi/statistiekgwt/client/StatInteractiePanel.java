@@ -150,6 +150,38 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 		return h;
 	}
 
+	public HashMap<String, Object> getStateWithoutRemovingHandlers()
+	{
+		HashMap h = new HashMap();
+
+		h.put("tableModel", this.model.getStatTableModel().getState());
+
+		h.put("selectionList", this.model.getStatTableModel().getSelectionList());
+		h.put("rowOutlierList", this.model.getStatTableModel().getRowOutlierList());
+		h.put("cellOutlierList", this.model.getStatTableModel().getCellOutlierList());
+
+		// statistiekViewTypes and statistiekViewStates should always be added to the state
+		int noViews = this.model.getViews().size();
+		String[] statistiekViewTypes = new String[noViews];
+		Object[] statistiekViewStates = new Object[noViews];
+		for (int i = 0; i < noViews; i++)
+		{
+			statistiekViewTypes[i] = this.model.getViews().get(i).getViewType();
+			statistiekViewStates[i] = this.model.getViews().get(i).getState();
+		}
+
+		h.put("statistiekViewTypes", statistiekViewTypes);
+		h.put("statistiekViewStates", statistiekViewStates);
+
+		int tabInt = this.model.mainWindowIndexToGeneralIndex(this.view
+			.getSelectedView());
+		h.put("selectedView", new Integer(tabInt));
+		System.out.println("StatInteractiePanel.getState(): this.model.mainWindowIndexToGeneralIndex(this.view.getselectedView()="
+			+ this.view.getSelectedView() + ") = " + tabInt);
+
+		return h;
+	}
+
 	public void setState(Map<String, Object> launchState)
 	{
 		this.model.removeViews();
@@ -764,7 +796,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 			
 			if (map != null)
 			{
-				HashMap<String, Object> h = this.getState();
+				HashMap<String, Object> h = this.getStateWithoutRemovingHandlers();
 				h.remove("selectionList");
 				h.remove("rowOutlierList");
 				h.remove("cellOutlierList");
