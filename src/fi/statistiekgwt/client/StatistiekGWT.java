@@ -32,6 +32,7 @@ import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.resources.client.CssResource.ClassName;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -54,6 +55,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private Map<String, Object> launchState; 
 	
 	StatInteractiePanel basisPanel;
+	SimplePanel simpel = new SimplePanel();
 
 	public static NumberFormat nf = NumberFormat.getDecimalFormat(); // number format for the default locale
 
@@ -124,7 +126,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		// voeg statinteractiepanel toe
 		//RootPanel.get(holderId).add(basisPanel);
-		RootLayoutPanel.get().add(basisPanel);
+		
+		RootLayoutPanel.get().add(simpel);
 		Stub.publish(this);
 	}
 	
@@ -328,6 +331,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		// in initialize() wordt de launchState in statInteractiePanel gezet
 		this.initialize();
+		
+		simpel.setWidget(asWidget());
 	}
 	
 	public static StatistiekView createView(String viewType, String viewName,
