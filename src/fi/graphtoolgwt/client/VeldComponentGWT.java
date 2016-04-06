@@ -1,6 +1,5 @@
 package fi.graphtoolgwt.client;
 
-
 import java.awt.AWTEventMulticaster;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,6 +17,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -32,10 +32,13 @@ import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.dom.client.Style.Float;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -59,356 +62,101 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
-import fi.graphtoolgwt.client.FormuleComponentGWT.CheckBoxClickHandler;
-import fi.graphtoolgwt.client.FormuleComponentGWT.EnOfKnopClickHandler;
-import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.expressies.Expressie;
 
-
 public class VeldComponentGWT extends LayoutPanel { 
+	
+	private static Logger logger = Logger.getLogger("VeldComponentGWT");
+
 	
 	public enum FieldGraphType {QUIVER, STREAMLINE};
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
 	
-	/* component defaults & contstants */
-	public static ArrayList<String> cVeldGrafiekTypeStrings = new ArrayList<String>();
-	public static ArrayList<String> cVeldGrafiekPijlGrootteModusStrings = new ArrayList<String>();	
+	/* component defaults */
+//	public static ArrayList<String> cVeldGrafiekTypeStrings = new ArrayList<String>();
+//	public static ArrayList<String> cVeldGrafiekPijlGrootteModusStrings = new ArrayList<String>();	
 
-	public final static int cDefault_VeldComponentHoogte = 150;
-	public final static int cDefault_VeldComponentBreedte = 300;
+	public final static int cDefault_VeldComponentGWT_hoogte = 150;
+	public final static int cDefault_VeldComponentGWT_breedte = 300;
 	
-	public final static double cDefault_PijlSchaalFactor = 0.2;
-	public final static int cDefault_PijlGroottePixels = 12;
+	public final static double cDefault_VeldComponentGWT_pijlSchaalFactor = 0.2;
+	public final static int cDefault_VeldComponentGWT_pijlGroottePixels = 12;
 	
-	public final static FieldGraphType cDefault_VeldGrafiekType = FieldGraphType.QUIVER;
-	public final static FieldGraphArrowSizeMode cDefault_VeldPijlGrootteModus = FieldGraphArrowSizeMode.REALVALUE;
-	public final static boolean cDefault_VeldLargerGridStartPoints = false;
-	public final static int cAccoladeXPositie = 25;
-	public final static int cAantalFormulesPerStelsel = 2;
-	public final static String cDefault_diffVarNaam = "t";
+	public final static FieldGraphType cDefault_VeldComponentGWT_grafiekType = FieldGraphType.QUIVER;
+	public final static FieldGraphArrowSizeMode cDefault_VeldComponentGWT_pijlGrootteModus = FieldGraphArrowSizeMode.REALVALUE;
+	public final static boolean cDefault_VeldComponentGWT_largerGridStartPoints = false;
 	
-	public final static int cVeldComponentGWT_maxAantalStelsels = 1;
 	public final static int cDefault_VeldComponentGWT_aantalStelsels = 1;
-	public final static FormuleFont cDefault_VeldgrafiekGWT_formulefont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+	public final static FormuleFont cDefault_VeldComponentGWT_formulefont = FormuleHolder.getDefaultActiviteitFont().createCopy();
 	
-	public final static CssColor cVeldComponentGWT_borderColor = CssColor.make(211, 211, 211);
-
-	public final static 
-	rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-	rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
-
+	/* component contstants */
+	private final static int cVeldComponentGWT_accoladeXPositie = 25;
+	private final static int cVeldComponentGWT_aantalFormulesPerStelsel = 2;
+	
+	private final static String[] cVeldComponentGWT_diffVarNamen = {"t"};
+	
+	private final static int cVeldComponentGWT_maxAantalStelsels = 1;
+	
+	private final static CssColor cVeldComponentGWT_borderColor = CssColor.make(211, 211, 211);
+	private final static BorderStyle cVeldComponentGWT_borderStyle = BorderStyle.SOLID;
+	private final static int cVeldComponentGWT_borderWidthPix = 1;
+	
+	private final static int cVeldComponentGWT_widgetBorderMargin = 0;
+	private final static int cVeldComponentGWT_widgetScrollMargin = 20;
+	private final static int cVeldComponentGWT_toolbarHeight = 0;
+	
+	private final static CssColor cRegelHighlightColor = CssColor.make(255, 255, 255);
+	private final static CssColor cRegelBackgroundColor = CssColor.make(240, 240, 240);
+	private final static CssColor cVeldComponentGWT_systemColor = CssColor.make(211, 211, 211); // Grey is the basic color
 	
 //	private VergelijkingVak[] formuleVakken; 
 
-	private GrafiekGWTVeld grafiekGWTVeld;
+//	private GrafiekGWTVeld grafiekGWTVeld;
 	
-	FieldGraphType veldGrafiekType = cDefault_VeldGrafiekType;
-	FieldGraphArrowSizeMode veldPijlGrootteModus = cDefault_VeldPijlGrootteModus;
-	int veldPijlGroottePixels = cDefault_PijlGroottePixels;
-	double veldPijlSchaalfactor = cDefault_PijlSchaalFactor;
-	boolean veldLargerGridStartPoints = cDefault_VeldLargerGridStartPoints;
+	FieldGraphType veldGrafiekType = cDefault_VeldComponentGWT_grafiekType;
+	FieldGraphArrowSizeMode veldPijlGrootteModus = cDefault_VeldComponentGWT_pijlGrootteModus;
+	int veldPijlGroottePixels = cDefault_VeldComponentGWT_pijlGroottePixels;
+	double veldPijlSchaalfactor = cDefault_VeldComponentGWT_pijlSchaalFactor;
+	boolean veldLargerGridStartPoints = cDefault_VeldComponentGWT_largerGridStartPoints;
 	
 	private int maxAantalStelsels = cVeldComponentGWT_maxAantalStelsels;
 	private int aantalStelsels = cDefault_VeldComponentGWT_aantalStelsels;
 	
-	private int veldComponentBreedte = cDefault_VeldComponentBreedte;
-	private int veldComponentHoogte = cDefault_VeldComponentHoogte;
+	private int veldComponentBreedte = cDefault_VeldComponentGWT_breedte;
+	private int veldComponentHoogte = cDefault_VeldComponentGWT_hoogte;
 	
-	GraphtFormuleEditor[] editors = new GraphtFormuleEditor[maxAantalStelsels];
-	private TouchPanel[] editorPanels = new TouchPanel[maxAantalStelsels];
-	private Widget[][] functieBeginViewers = new Widget[maxAantalStelsels][cAantalFormulesPerStelsel];
-	private CheckBox[] checkboxen = new CheckBox[maxAantalStelsels];
-
+	LayoutPanel stelselsPanel;
+	
+	SystemDiffEqPanelGWT systemPanels[] = new SystemDiffEqPanelGWT[maxAantalStelsels];
 	
 	private final GraphToolGWT interactiePanel;
 	
-	private String[][] functieBegin = new String[maxAantalStelsels][cAantalFormulesPerStelsel];
-	
-	private int actiefNummer;
+//	private int actiefNummer;
 	private String xAsNaam = "x";
 	private String yAsNaam = "y";
-	private String diffVarNaam = cDefault_diffVarNaam;
 	
-	String[] namen = { "f", "g", "h", "i", "j", "k", "l", "m", "n"};
-	private boolean functieBeginZichtbaar = true;
-	private boolean formeleFuncties = false;
-	private boolean domeinInstelbaar = false;
+//	private boolean functieBeginZichtbaar = true;
+//	private boolean formeleFuncties = false;
+//	private boolean domeinInstelbaar = false;
 	public boolean docent;
 	
 	boolean grafiekKleurInstelbaar = true;
 	boolean functieBeginAanpasbaar = false;
 	
-	private boolean functieToegestaan = true;
-	private boolean ongelijkheidToegestaan = true;
-	private boolean implicieteFunctieToegestaan = false;
-	private boolean verticaleLijnToegestaan = true;
-	private boolean parametrisatieToegestaan = false;
-	
-	private static double[] DEFAULTDOMEIN;
-	
-	private int formuleX = 30;
-	
-	protected static int FUNCTIE = 0;
-	protected static int ONGELIJKHEID = 1;
-	protected static int IMPLICIETEFUNCTIE = 2;
-	protected static int VERTICALELIJN = 3;
-	protected static int PARAMETRISATIEX = 4;
-	protected static int PARAMETRISATIEY = 5;
-	protected static int DIFFERENTIAALX = 6;
-	protected static int DIFFERENTIAALY = 7;
-	
-	private int[] soortVak;
-	//private boolean[] isOngelijkheid;
-	
-	static DecimalFormatSymbols dfs;
-	public static DecimalFormat df;
-	
-//		
-//		
-//		for(int i = 0; i < functieBegin.length; i++)
-//		{	if(formeleFuncties)
-//				functieBegin[i] = namen[i] + "(" + xAsNaam + ")=";
-//			else
-//				functieBegin[i] = yAsNaam + "=";
-//		}
-//		//prefix = "$ff(x)=@";
-//		//hasPrefix = true;
-//		/*
-//		if(h == null)
-//			return;
-//		
-//		this.h = h;
-//		if (h.get("breedte") != null)
-//			breedte = (Integer) h.get("breedte");
-//		if (h.get("hoogte") != null)
-//			hoogte = (Integer) h.get("hoogte");
-//		*/
-//		
-//		//Image regelMinderImg = new Image("images/resources/pijlterug.gif");
-//		//regelMinderImg.getElement().getStyle().setMargin(2, Unit.PX);
-//		verwijderRegelKnop = new PushButton(regelMinderButtonImage);
-//		verwijderRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
-//		//verwijderRegelKnop.add();
-//		//verwijderRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
-//		//regelMinderButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
-//		//addButtonHandler(verwijderRegelKnop);
-//		verwijderRegelKnop.addClickHandler(new ClickHandler(){
-//
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				verwijderRegel();
-//			}
-//			
-//		});
-//		
-//		//Image regelMeerImg = new Image("images/resources/pijlterug.gif");
-//		//regelMeerImg.getElement().getStyle().setMargin(2, Unit.PX);
-//		nieuweRegelKnop = new PushButton(regelMeerButtonImage);
-//		nieuweRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
-//		nieuweRegelKnop.addClickHandler(new ClickHandler(){
-//			
-//			@Override
-//			public void onClick(ClickEvent event) {
-//				voegRegelToe();
-//			}
-//		});
-//		//nieuweRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
-//		//regelMeerButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
-//		//addButtonHandler(nieuweRegelKnop);
-//		
-//		for(int i = 0; i < functieBeginViewers.length; i++)
-//		{	FormuleViewer f = new FormuleViewer(functieBegin[i]);
-//			f.setColor(interactiePanel.getFormuleColor(i));
-//			f.setFont(defaultfont);
-//			functieBeginViewers[i] = f.getAsPanel();
-//			functieBeginViewers[i].getElement().getStyle().setProperty("display", "inline-block");
-//			functieBeginViewers[i].getElement().getStyle().setProperty("clear", "both");
-//			//functieBeginViewers[i].getElement().getStyle().setColor(interactiePanel.getFormuleColor(i).toString());
-//			//breedte functieBeginViewers instellen aan de hand van de lengte van de string functieBegin[i]. 
-//			//De breedte wordt nu mbv setWidgetLeftWidth op 50 gezet. Als er geen formule-functie-notatie is, dan is dat wat breed.
-//			//functieBeginViewers[i].setWidth((formeleFuncties?50:30) + "px");
-//			
-//			//functieBeginViewers[i].getElement().getStyle().setMarginLeft(5, Unit.PX);
-//		}
-//		
-//		for(int i = 0; i < checkboxen.length; i++)
-//		{	checkboxen[i] = new CheckBox();
-//			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
-//			if(i==0)
-//				geselecteerd[i] = true;
-//			else
-//				geselecteerd[i] = false;
-//			checkboxen[i].setValue(geselecteerd[i]);
-//		}
-//		
-//		for(int i = 0 ; i < enOfKnoppen.length; i++)
-//		{	enOfKnoppen[i] = new PushButton(GraphToolGWT.rb.getString("enOfButton_En"));
-//			//enOfKnoppen[i].setMargin(new Insets(0,0,0,0));
-//			enOfKnoppen[i].setSize("24px", "19px");
-//			enOfKnoppen[i].getElement().getStyle().setPadding(1, Unit.PX);
-//			//enOfKnoppen[i].setOpaque(false);
-//			enOfKnoppen[i].addClickHandler(new EnOfKnopClickHandler(i));
-//		}
-//		
-//		for(int i = 0; i < domeinButtons.length; i++)
-//		{
-//			domeinButtons[i] = new DomeinButtonGWT();
-//		}
-//		
-//	
-//		//sp = new ScrollPanel();
-//		
-//		//sp.getElement().getStyle().setWidth(breedte - 5, Unit.PX);
-//		//sp.getElement().getStyle().setHeight(hoogte - 5, Unit.PX);
-//		//sp.getElement().getStyle().setOverflow(Overflow.AUTO);
-//		//sp.getElement().getStyle().setFloat(Style.Float.LEFT);
-//		
-//		LayoutPanel mainPanel = new LayoutPanel();
-//		final IsWidget wrap = wrap(mainPanel);
-//		this.add(wrap);
-//		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-//		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX); 
-//		FlowPanel rechthoekPanel = new FlowPanel();
-//		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
-//		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-//		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
-//		mainPanel.add(rechthoekPanel);
-//		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-//		mainPanel.setWidgetTopHeight(rechthoekPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-//		
-//		
-//		mainPanel.add(verwijderRegelKnop);
-//		mainPanel.add(nieuweRegelKnop);
-//		mainPanel.setWidgetLeftWidth(verwijderRegelKnop, breedte - 90, Style.Unit.PX, 40, Style.Unit.PX);
-//		mainPanel.setWidgetTopHeight(verwijderRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
-//		mainPanel.setWidgetLeftWidth(nieuweRegelKnop, breedte - 45, Style.Unit.PX, 40, Style.Unit.PX);
-//		mainPanel.setWidgetTopHeight(nieuweRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
-//		
-//		
-//		regelsPanel = new LayoutPanel();
-//		//contentPanel.addStyleName(graphToolCss.backgroundred());
-//		//contentPanel.getElement().getStyle().setPadding(5, Unit.PX);
-//		//contentPanel.getElement().getStyle().setOverflow(Overflow.HIDDEN);
-//		//contentPanel.getElement().getStyle().setProperty("display", "block");
-//		sp = new ScrollPanel(regelsPanel);
-//		sp.setWidget(regelsPanel);
-//		mainPanel.add(sp);
-//		mainPanel.setWidgetLeftWidth(sp, 1, Style.Unit.PX, breedte - 1, Style.Unit.PX);
-//		mainPanel.setWidgetTopHeight(sp, 30, Style.Unit.PX, hoogte - 31, Style.Unit.PX);
-//		
-//		//final IsWidget wrap = wrap(contentPanel);
-//		//this.add(wrap);
-//		//this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-//		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-//		
-//		
-//		for(int i = 0; i < regelPanels.length; i++)
-//		{	/*regelPanels[i] = new FlowPanel();
-//			layoutRegelPanel(regelPanels[i]);
-//			highLight(regelPanels[i], true);
-//			regelPanels[i].add(checkboxen[i]);
-//			if (!functieBeginAanpasbaar)
-//				regelPanels[i].add(functieBeginViewers[i]);
-//		
-//			editors[i] = addNewEditor(regelPanels[i], i);//hoeft niet voor elke regel?
-//			if(functieBeginAanpasbaar && functieBeginZichtbaar)
-//				editors[i].insert(functieBegin[i]);
-//			if(domeinInstelbaar)
-//				regelPanels[i].add(domeinButtons[i]);
-//				*/
-//			regelPanels[i] = new LayoutPanel();
-//			layoutRegelPanel(regelPanels[i]);
-//			highLight(regelPanels[i], true);
-//			regelPanels[i].add(checkboxen[i]);
-//			//hier
-//			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
-//			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
-//			
-//			if(!functieBeginAanpasbaar)
-//			{	regelPanels[i].add(functieBeginViewers[i]);
-//				regelPanels[i].setWidgetLeftWidth(functieBeginViewers[i], 20, Style.Unit.PX, formeleFuncties?43:30, Style.Unit.PX);
-//				regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
-//			}
-//			editors[i] = factor.build(i);
-//			if (functieBeginAanpasbaar)
-//				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-//			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
-//			editors[i].setFont(defaultfont);
-//			editors[i].setColor(interactiePanel.getFormuleColor(i));
-//			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
-//			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
-//			editors[i].setCurrent(0, 0);
-//			//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
-//			//editor.installKeyboard(kb);
-//			//editors[i].requestFocus();
-//			//if (!functieBeginAanpasbaar)
-//			//	regelPanels[i].add(functieBeginViewers[i]);
-//			regelPanels[i].add(editorPanels[i]);
-//			addFormulePanelListeners(editorPanels[i], editors[i]);
-//			
-//			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
-//					domeinInstelbaar?20:0, Style.Unit.PX);
-//			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
-//			if(functieBeginAanpasbaar && functieBeginZichtbaar)
-//				editors[i].insert(functieBegin[i]);
-//			if(domeinInstelbaar)
-//			{	regelPanels[i].add(domeinButtons[i]);
-//				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
-//				regelPanels[i].setWidgetTopHeight(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
-//			}
-//			editors[i].setCurrentElementRepaint();
-//		}
-//		
-//		regelsPanel.add(regelPanels[0]);
-//		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
-//		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
-//		resize();
-//		//checkboxen[0].setValue(true);
-//		
-//		domeinStrings = new String[maxAantalFormules][2];
-//		for(int i = 0; i < maxAantalFormules; i++)
-//		{	domeinStrings[i][0] = "$f" + Double.NEGATIVE_INFINITY + "@";
-//			domeinStrings[i][1] = "$f" + Double.POSITIVE_INFINITY + "@";
-//		}
-//		
-//		DEFAULTDOMEIN = new double[2];
-//		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;
-//		DEFAULTDOMEIN[1] = Double.POSITIVE_INFINITY;
-//		
-//		domeinen = new double[maxAantalFormules][2];
-//		for(int i = 0; i < maxAantalFormules; i++)
-//		{	domeinen[i][0] = DEFAULTDOMEIN[0];
-//			domeinen[i][1] = DEFAULTDOMEIN[1];
-//		}
-//		
-//		isOngelijkheid = new boolean[maxAantalFormules];
-//		for(int i = 0; i < maxAantalFormules; i++)
-//		{	isOngelijkheid[i] = false;
-//		
-//		}
-//		
-//		isEn = new boolean[maxAantalFormules];
-//		for(int i = 0; i<isEn.length; i++)
-//		{	isEn[i] = true;
-//		
-//		}
-//		fromuser = true;
-//		//contentPanel.getElement().addClassName("insert_formule_steps");
-//	}
-	
 	public void processLaunchData(Map<String, Object> launchData) {
-	
+
 		if(launchData != null) {
 			
 			if(launchData.containsKey("veldGrafiekType"))
-				veldGrafiekType = FieldGraphType.values()[ ((Integer)launchData.get("veldGrafiekType")).intValue() ];
+				veldGrafiekType = FieldGraphType.values()[ ((Number)launchData.get("veldGrafiekType")).intValue() ];
 			
 			if(launchData.containsKey("veldPijlGrootteModus"))
-				veldPijlGrootteModus = FieldGraphArrowSizeMode.values()[ ((Integer)launchData.get("veldPijlGrootteModus")).intValue() ];
+				veldPijlGrootteModus = FieldGraphArrowSizeMode.values()[ ((Number)launchData.get("veldPijlGrootteModus")).intValue() ];
 			
 			if(launchData.containsKey("veldPijlGroottePixels"))
-				veldPijlGroottePixels = ((Integer)launchData.get("veldPijlGroottePixels")).intValue();
+				veldPijlGroottePixels = ((Number)launchData.get("veldPijlGroottePixels")).intValue();
 			
 			if(launchData.containsKey("veldPijlSchaalfactor"))
 				veldPijlSchaalfactor = ((Double)launchData.get("veldPijlSchaalfactor")).doubleValue();
@@ -418,17 +166,11 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 			if(launchData.containsKey("veldComponentHoogte"))
 				veldComponentHoogte = ((Number)launchData.get("veldComponentHoogte")).intValue();
+
 //			if(launchData.containsKey("xAsNaam"))
 //				xAsNaam = (String)launchData.get("xAsNaam");
 //			if(launchData.containsKey("yAsNaam"))
 //				yAsNaam = (String)launchData.get("yAsNaam");			
-		}
-	}
-	
-	public void initializeFunctieBegin() {
-		for (int i = 0; i < functieBegin.length; i++) {
-			functieBegin[i][0] = "$f$bd" + xAsNaam + "$nd" + diffVarNaam + "@@=@";
-			functieBegin[i][1] = "$f$bd" + yAsNaam + "$nd" + diffVarNaam + "@@=@";
 		}
 	}
 	
@@ -443,6 +185,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	}
 	
 	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte ) {
+		
 //		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
 //		graphToolCss = graphToolGWTClientBundle.getGraphToolGWTCSS();
 //		graphToolCss.ensureInjected();
@@ -451,40 +194,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		this.veldComponentBreedte = breedte;
 		processLaunchData(launchData);
 		
-		// PROGRESS LINE
-		
 		docent = false;
-		
-		if (cVeldGrafiekTypeStrings.size()<1) {
-			cVeldGrafiekTypeStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiekType_Quiver"));
-//			cVeldGrafiekTypeStrings.add(GraphTool.rb.getString("GTIEP_veldGrafiekType_Streamline"));
-		}
-		
-		if (cVeldGrafiekPijlGrootteModusStrings.size()<1) {
-			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_RealValue"));
-			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_FixedSize"));
-			cVeldGrafiekPijlGrootteModusStrings.add(interactiePanel.rb.getString("GTIEP_veldGrafiek_PijlGrootteModus_ScaledSize"));
-		}
-		
-		initializeFunctieBegin();
-		
-		for (int i = 0; i < functieBeginViewers.length; i++) {	
-			for (int j = 0; j < cAantalFormulesPerStelsel; j++) {  
-				FormuleViewer f = new FormuleViewer(functieBegin[i][j]);
-				f.setColor(interactiePanel.getFormuleColor(i));
-				f.setFont(cDefault_VeldgrafiekGWT_formulefont);
-				functieBeginViewers[i][j] = f.getAsPanel();
-				functieBeginViewers[i][j].getElement().getStyle().setProperty("display", "inline-block");
-				functieBeginViewers[i][j].getElement().getStyle().setProperty("clear", "both");
-			}
-		}
-		
-		for(int i = 0; i < checkboxen.length; i++) {	
-			checkboxen[i] = new CheckBox();
-			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
-			checkboxen[i].setValue(i==0);
-		}
-		
 		
 		LayoutPanel mainPanel = new LayoutPanel();
 		final IsWidget wrap = wrap(mainPanel);
@@ -492,102 +202,41 @@ public class VeldComponentGWT extends LayoutPanel {
 		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
 		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX); 
 		FlowPanel rechthoekPanel = new FlowPanel();
-		rechthoekPanel.getElement().getStyle().setBorderColor( CssColor.make(211, 211, 211).toString() );
-		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+		
+		rechthoekPanel.getElement().getStyle().setBorderColor( cVeldComponentGWT_borderColor.toString() );
+		rechthoekPanel.getElement().getStyle().setBorderStyle( cVeldComponentGWT_borderStyle);  
+		rechthoekPanel.getElement().getStyle().setBorderWidth( cVeldComponentGWT_borderWidthPix, Style.Unit.PX);
 		mainPanel.add(rechthoekPanel);
-		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
-		mainPanel.setWidgetTopHeight(rechthoekPanel, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX);
+		mainPanel.setWidgetLeftWidth(rechthoekPanel, cVeldComponentGWT_widgetBorderMargin, Style.Unit.PX, 
+				veldComponentBreedte-cVeldComponentGWT_widgetBorderMargin, Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(rechthoekPanel, cVeldComponentGWT_widgetBorderMargin, Style.Unit.PX, 
+				veldComponentHoogte-cVeldComponentGWT_widgetBorderMargin, Style.Unit.PX);
 		
-		regelsPanel = new LayoutPanel();
-		//contentPanel.addStyleName(graphToolCss.backgroundred());
-		//contentPanel.getElement().getStyle().setPadding(5, Unit.PX);
-		//contentPanel.getElement().getStyle().setOverflow(Overflow.HIDDEN);
-		//contentPanel.getElement().getStyle().setProperty("display", "block");
-		sp = new ScrollPanel(regelsPanel);
-		sp.setWidget(regelsPanel);
-		mainPanel.add(sp);
-		mainPanel.setWidgetLeftWidth(sp, 1, Style.Unit.PX, breedte - 1, Style.Unit.PX);
-		mainPanel.setWidgetTopHeight(sp, 30, Style.Unit.PX, hoogte - 31, Style.Unit.PX);
+		stelselsPanel = new LayoutPanel();
+		ScrollPanel scrollPanel = new ScrollPanel(stelselsPanel);
+		scrollPanel.setWidget(stelselsPanel);
+		mainPanel.add(scrollPanel);
+		mainPanel.setWidgetLeftWidth(scrollPanel, 0, Style.Unit.PX, veldComponentBreedte , Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(scrollPanel, cVeldComponentGWT_toolbarHeight, Style.Unit.PX, veldComponentHoogte - cVeldComponentGWT_toolbarHeight, Style.Unit.PX);
 		
-		//final IsWidget wrap = wrap(contentPanel);
-		//this.add(wrap);
-		//this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-		
-		
-		for(int i = 0; i < regelPanels.length; i++) {	
-			/*regelPanels[i] = new FlowPanel();
-			layoutRegelPanel(regelPanels[i]);
-			highLight(regelPanels[i], true);
-			regelPanels[i].add(checkboxen[i]);
-			if (!functieBeginAanpasbaar)
-				regelPanels[i].add(functieBeginViewers[i]);
-		
-			editors[i] = addNewEditor(regelPanels[i], i);//hoeft niet voor elke regel?
-			if(functieBeginAanpasbaar && functieBeginZichtbaar)
-				editors[i].insert(functieBegin[i]);
-			if(domeinInstelbaar)
-				regelPanels[i].add(domeinButtons[i]);
-				*/
-			regelPanels[i] = new LayoutPanel();
-			layoutRegelPanel(regelPanels[i]);
-			highLight(regelPanels[i], true);
-			regelPanels[i].add(checkboxen[i]);
-			//hier
-			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
-			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
+		String[] asNamen = new String[2];
+		asNamen[0] = xAsNaam;
+		asNamen[1] = yAsNaam;
+		for (int i=0; i < aantalStelsels; i++) {
 			
-			if(!functieBeginAanpasbaar)
-			{	regelPanels[i].add(functieBeginViewers[i]);
-				regelPanels[i].setWidgetLeftWidth(functieBeginViewers[i], 20, Style.Unit.PX, formeleFuncties?43:30, Style.Unit.PX);
-				regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
-			}
-			editors[i] = factor.build(i);
-			if (functieBeginAanpasbaar)
-				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
-			editors[i].setFont(defaultfont);
-			editors[i].setColor(interactiePanel.getFormuleColor(i));
-			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
-			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
-			editors[i].setCurrent(0, 0);
-			//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
-			//editor.installKeyboard(kb);
-			//editors[i].requestFocus();
-			//if (!functieBeginAanpasbaar)
-			//	regelPanels[i].add(functieBeginViewers[i]);
-			regelPanels[i].add(editorPanels[i]);
-			addFormulePanelListeners(editorPanels[i], editors[i]);
-			
-			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
-					domeinInstelbaar?20:0, Style.Unit.PX);
-			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
-			if(functieBeginAanpasbaar && functieBeginZichtbaar)
-				editors[i].insert(functieBegin[i]);
-			if(domeinInstelbaar)
-			{	regelPanels[i].add(domeinButtons[i]);
-				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
-				regelPanels[i].setWidgetTopHeight(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
-			}
-			editors[i].setCurrentElementRepaint();
+			systemPanels[i] = new SystemDiffEqPanelGWT(i,cVeldComponentGWT_aantalFormulesPerStelsel, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin);
+			systemPanels[i].updateFunctionBegin(asNamen, cVeldComponentGWT_diffVarNamen[0]);
+//			stelselsPanel.add(systemPanels[i]);
 		}
 		
-		regelsPanel.add(regelPanels[0]);
-		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
-		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
-		resize();
+		stelselsPanel.add(systemPanels[0]);
+		stelselsPanel.setWidgetLeftWidth(systemPanels[0], 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
+		stelselsPanel.setWidgetTopHeight(systemPanels[0], 0, Style.Unit.PX, 300, Style.Unit.PX);
 		//checkboxen[0].setValue(true);
 		
-		DEFAULTDOMEIN = new double[2];
-		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;
-		DEFAULTDOMEIN[1] = Double.POSITIVE_INFINITY;
 		
-		fromuser = true;
+//		fromuser = true;  // WAAROM??
 		
-		DEFAULTDOMEIN = new double[2];
-		DEFAULTDOMEIN[0] = Double.NEGATIVE_INFINITY;
-		DEFAULTDOMEIN[1] = Double.POSITIVE_INFINITY;
 		
 //		domeinen = new double[maxAantalFormules][2];
 //		for(int i = 0; i < maxAantalFormules; i++)
@@ -595,11 +244,6 @@ public class VeldComponentGWT extends LayoutPanel {
 //			domeinen[i][1] = DEFAULTDOMEIN[1];
 //		}		
 		
-		soortVak = new int[2*maxAantalStelsels]; // ieder stelsel heeft 2 formulevakken
-		for(int i = 0; i < maxAantalStelsels; i++) {
-			soortVak[2*i] 		= 	DIFFERENTIAALX;
-			soortVak[(2*i)+1] 	= 	DIFFERENTIAALY;
-		}	
 		//isOngelijkheid = new boolean[maxAantalFormules];
 		//for(int i = 0; i < maxAantalFormules; i++)
 		//	isOngelijkheid[i] = false;
@@ -607,7 +251,267 @@ public class VeldComponentGWT extends LayoutPanel {
 //		isEn = new boolean[maxAantalFormules];
 //		for(int i = 0; i<isEn.length; i++)
 //			isEn[i] = true;
+		logger.info("uit Veldcomponent");
+		this.resize();
+
 	}
+	
+	public void resize() {
+//		for(int i = 0; i < aantalStelsels; i++)
+//		{
+//			int ashoogte = editors[i].getMainRegel().getAsHoogte();
+//			
+//			if(!functieBeginAanpasbaar)
+//			{	FormuleViewer f = new FormuleViewer(functieBegin[i]);
+//				if(regelPanels[i].getWidgetIndex(functieBeginViewers[i]) > -1)
+//					regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], Math.max(0, ashoogte - f.getMainRegel().getAsHoogte()), Style.Unit.PX, f.getHeight(), Style.Unit.PX);
+//			}
+//			if(regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
+//				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight(), Style.Unit.PX);
+//			if(regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
+//				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 15, Style.Unit.PX);
+//			if(regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
+//				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight()), Style.Unit.PX);
+//			
+//		}
+	}
+	
+	public CssColor getSystemColor(int id) {
+		return cVeldComponentGWT_systemColor;
+	}
+
+	
+	public class SystemDiffEqPanelGWT extends LayoutPanel { 
+		
+		private final int cSystemDiffEqPanelGWT_interObjectMarginX = 5; // horizontal margin between all object-borders
+		private final int cSystemDiffEqPanelGWT_interObjectMarginY = 10; // vertical margin between all object-borders
+		
+		private final int cSystemDiffEqPanelGWT_checkBoxSize = 12;
+		private final int cSystemDiffEqPanelGWT_braceWidth = 20;
+		
+//		private final int ccSystemDiffEqPanelGWT_rowStartX = 35;
+
+		Object parent;
+		private int id;
+		private int nrFunctions;
+		private int systemHeight; // Height of this system of eqations in pixels
+		private int systemWidth; // Width of this system of equations in pixels
+		
+		private boolean functionBeginUserChangable = false; // This is unchangable, for now
+		
+		private FormuleFont defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
+		
+		private String[] functionsBegin;
+		private LayoutPanel[] functionPanels;
+		private TouchPanel[] functionEditorPanels;
+		private FormuleViewer[] functionBeginViewers;
+		private FormuleEditor[] functionEditors;
+		private Canvas braceCanvas;
+		CheckBox cb = new CheckBox();
+		
+		int width = 1;		
+		
+		public void updateFunctionBegin(String[] functionNames, String derivativeName) {
+			if (functionNames.length == nrFunctions) {
+				for (int i = 0; i < nrFunctions; i++) {
+					functionsBegin[i] = "$f$bd" + functionNames[i] + "$nd" + derivativeName + "@@=@";
+					
+					functionPanels[i].remove(functionBeginViewers[i].getAsPanel());
+					functionBeginViewers[i] = new FormuleViewer(functionsBegin[i]);
+					functionBeginViewers[i].setFont(defaultfont);
+					functionBeginViewers[i].setDefaultFont(defaultfont);					
+					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
+				}
+			}
+			adjustSize();
+		}
+		
+		public void layoutRegelPanel(Widget w)
+		{
+			w.getElement().getStyle().setWidth(veldComponentBreedte - 5, Unit.PX);
+			w.getElement().getStyle().setFloat(Float.LEFT);
+			w.getElement().getStyle().setProperty("clear", "both");
+			w.getElement().getStyle().setProperty("display", "block");
+			w.getElement().getStyle().setBackgroundColor(cRegelHighlightColor.toString());
+		}
+		
+		public void highLight(Widget w, boolean b)
+		{
+			w.getElement().getStyle().setBackgroundColor(b ? cRegelHighlightColor.toString() : cRegelBackgroundColor.toString());
+		}
+		
+		private void adjustSize() {
+			int[] rowHeight = new int[2];
+			int systemHalfHeight = 0;
+
+			// Determine RowHeigth & system Height
+			int maxBeginWidth = 0;
+			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY;
+//			this.systemHeight = (nrFunctions+1) * cSystemDiffEqPanelGWT_interObjectMarginY; 
+			for (int i=0; i<nrFunctions; i++) {
+				rowHeight[i]=Math.max(functionBeginViewers[i].getHeight(), functionEditors[i].getHeight());
+				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getHeight());
+				this.systemHeight += rowHeight[i];
+				
+				if ((double) (i+1) <= (double) nrFunctions/2.0) {
+					systemHalfHeight = systemHeight + cSystemDiffEqPanelGWT_interObjectMarginY/2;
+				} 
+				
+				double oddHalfTest =  ((double) (i+1)-((double) nrFunctions/2.0));
+				if ((oddHalfTest > 0) && (oddHalfTest < 1)) {
+					// nrFunctions = odd & we're halfway
+					systemHalfHeight = systemHeight - rowHeight[i]/2;
+				}
+
+				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
+			}
+			
+				
+			// adjust Row Positions
+			int posY = cSystemDiffEqPanelGWT_interObjectMarginY;
+			for (int i=0; i<nrFunctions; i++) {
+
+				// Position Entire Row
+				int rowStartX = 3 * cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize + cSystemDiffEqPanelGWT_braceWidth;
+				this.setWidgetTopHeight(functionPanels[i], posY, Style.Unit.PX, rowHeight[i], Style.Unit.PX);
+				this.setWidgetLeftWidth(functionPanels[i], rowStartX, Style.Unit.PX, systemWidth-rowStartX, Style.Unit.PX);
+				posY += rowHeight[i] + cSystemDiffEqPanelGWT_interObjectMarginY;
+				
+				// Position Begin viewer within Row
+				functionPanels[i].setWidgetTopHeight(functionBeginViewers[i].getAsPanel(), (rowHeight[i]-functionBeginViewers[i].getHeight())/2, Style.Unit.PX, 
+						functionBeginViewers[i].getHeight(), Style.Unit.PX);
+				functionPanels[i].setWidgetLeftWidth(functionBeginViewers[i].getAsPanel(), 0, Style.Unit.PX, 
+						maxBeginWidth, Style.Unit.PX);
+				
+				// Position Function editor within Row
+				functionPanels[i].setWidgetTopHeight(functionEditorPanels[i], (rowHeight[i]-functionEditors[i].getHeight())/2, Style.Unit.PX, 
+						functionEditors[i].getHeight(), Style.Unit.PX);
+				functionPanels[i].setWidgetLeftWidth(functionEditorPanels[i], maxBeginWidth+cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, 
+						systemWidth-rowStartX-cSystemDiffEqPanelGWT_interObjectMarginX-maxBeginWidth, Style.Unit.PX);
+			}				
+			
+			// adjust Checkbox Position
+			this.setWidgetLeftWidth(cb, cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
+			this.setWidgetTopHeight(cb, systemHeight/2-cSystemDiffEqPanelGWT_checkBoxSize/2, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
+				
+			// adjust brace Canvas Position
+			this.setWidgetLeftWidth(braceCanvas, 2* cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize, 
+					Style.Unit.PX, cSystemDiffEqPanelGWT_braceWidth, Style.Unit.PX);
+			this.setWidgetTopHeight(braceCanvas, 0, Style.Unit.PX, systemHeight, Style.Unit.PX);
+			
+			// redraw brace
+			Context2d ctx = braceCanvas.getContext2d();
+			
+			ctx.beginPath();
+			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0, 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 1.5*Math.PI, false);
+			
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0);
+			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0);
+			
+			ctx.arc(0.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0, 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
+			
+			ctx.arc(0.0, systemHeight/2.0+cSystemDiffEqPanelGWT_braceWidth/2.0, 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
+			
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2);
+			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2);
+
+			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0, 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
+			ctx.stroke();
+		}
+		
+		public SystemDiffEqPanelGWT(int id, int nrFunctions, int systemWidth) {
+			super();
+			
+			this.id = id;
+			this.nrFunctions = nrFunctions;
+			this.systemWidth = systemWidth;
+
+			functionsBegin = new String[nrFunctions];
+			functionPanels = new LayoutPanel[nrFunctions];
+			functionEditorPanels = new TouchPanel[nrFunctions];
+			functionBeginViewers = new FormuleViewer[nrFunctions];
+			functionEditors = new FormuleEditor[nrFunctions];
+			braceCanvas = Canvas.createIfSupported();
+			
+			for (int i=0; i < nrFunctions; i++) {
+				functionPanels[i] = new LayoutPanel();
+				layoutRegelPanel(functionPanels[i]);
+				highLight(functionPanels[i], true);
+				
+				if(!functionBeginUserChangable) {
+					functionBeginViewers[i] = new FormuleViewer("$f$bdAs" + (i+1) + "$nd" + "Der" + "@@=@");
+					functionBeginViewers[i].setFont(defaultfont);
+					functionBeginViewers[i].setDefaultFont(defaultfont);					
+					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
+				}
+
+				functionEditors[i] = new FormuleEditor();
+				((VeldComponentGWT) parent).getSystemColor(id);
+				
+				functionEditors[i].setColor(((VeldComponentGWT) parent).getSystemColor(id));
+				functionEditors[i].setFont(defaultfont);
+				functionEditors[i].setDefaultFont(defaultfont);
+//				functionEditors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
+
+				functionEditorPanels[i] = (TouchPanel) functionEditors[i].getAsPanel();
+
+//				functionEditorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
+//				addFormulePanelListeners(functionEditorPanels[i], functionEditors[i]);
+//				functionEditors[i].setCurrentElementRepaint();
+				
+				functionPanels[i].add(functionEditorPanels[i]);				
+				this.add(functionPanels[i]);
+
+				
+//					if (functieBeginAanpasbaar)
+//						editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
+				
+//					editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
+//					editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
+//					editors[i].setCurrent(0, 0);
+					//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
+					//editor.installKeyboard(kb);
+					//editors[i].requestFocus();
+					//if (!functieBeginAanpasbaar)
+					//	regelPanels[i].add(functieBeginViewers[i]);
+				logger.info("in Veldcomponent 2.5");
+				
+			}
+			
+			this.add(cb);		
+			cb.setVisible(true);		
+			
+			this.add(braceCanvas);
+			
+			adjustSize();
+		}
+		
+		public void setWidth(int width) {
+			this.width = width;
+		}
+		
+	}		
+	
+//	class CheckBoxClickHandler implements ClickHandler
+//	{
+//		int regelnummer;
+//		
+//		public CheckBoxClickHandler(int i)
+//		{	super();
+//			regelnummer = i;
+//		}
+//		
+//		@Override
+//		public void onClick(ClickEvent event) {
+//			geselecteerd[regelnummer] = !geselecteerd[regelnummer];
+//			parseFormule(regelnummer, false);
+//			grafiekGWTVeld.paint();
+//		}
+//	}
 	
 //	public void setEditable(boolean b)
 //	{	formuleVakken[0].formuleVak.setEditable(b);	
@@ -658,46 +562,46 @@ public class VeldComponentGWT extends LayoutPanel {
 //		}
 //	}
 	
-	public void zetXAsNaam(String s, boolean setState)
-	{	String oudeXAsNaam = xAsNaam;
-		xAsNaam = s;
-
-		for(int i=0 ; i<formuleVakken.length ; i++)
-		{	String vervangString = formuleVakken[i].formuleVak.toString();
-			String vervangSubString = vervangString.substring(2, vervangString.length() - 1);
-			vervangString = "$f" + vervangSubString.replaceAll(oudeXAsNaam, xAsNaam) + "@";
-			formuleVakken[i].formuleVak.vulVak(vervangString);
-			
-			if(!functieBeginAanpasbaar && functieBeginZichtbaar)
-			{	vervangString = formuleVakken[i].functieBeginVak.toString();
-				vervangSubString = vervangString.substring(2, vervangString.length() - 1);
-				vervangString = "$f" + vervangSubString.replaceAll(oudeXAsNaam, xAsNaam) + "@";
-				formuleVakken[i].functieBeginVak.vulVak(vervangString);
-			}
-			parseFormule(i, setState);
-		}
-	}
+//	public void zetXAsNaam(String s, boolean setState)
+//	{	String oudeXAsNaam = xAsNaam;
+//		xAsNaam = s;
+//
+//		for(int i=0 ; i<formuleVakken.length ; i++)
+//		{	String vervangString = formuleVakken[i].formuleVak.toString();
+//			String vervangSubString = vervangString.substring(2, vervangString.length() - 1);
+//			vervangString = "$f" + vervangSubString.replaceAll(oudeXAsNaam, xAsNaam) + "@";
+//			formuleVakken[i].formuleVak.vulVak(vervangString);
+//			
+//			if(!functieBeginAanpasbaar && functieBeginZichtbaar)
+//			{	vervangString = formuleVakken[i].functieBeginVak.toString();
+//				vervangSubString = vervangString.substring(2, vervangString.length() - 1);
+//				vervangString = "$f" + vervangSubString.replaceAll(oudeXAsNaam, xAsNaam) + "@";
+//				formuleVakken[i].functieBeginVak.vulVak(vervangString);
+//			}
+//			parseFormule(i, setState);
+//		}
+//	}
 	
-	public void zetYAsNaam(String s, boolean setState)
-	{	String oudeYAsNaam = yAsNaam;
-		yAsNaam = s;
-
-		for(int i=0 ; i<formuleVakken.length ; i++)
-		{	String vervangString = formuleVakken[i].formuleVak.toString();
-			String vervangSubString = vervangString.substring(2, vervangString.length() - 1);
-			vervangString = "$f" + vervangSubString.replaceAll(oudeYAsNaam, yAsNaam) + "@";
-			formuleVakken[i].formuleVak.vulVak(vervangString);
-			
-			if(!functieBeginAanpasbaar && functieBeginZichtbaar)
-			{	vervangString = formuleVakken[i].functieBeginVak.toString();
-				vervangSubString = vervangString.substring(2, vervangString.length() - 1);
-				vervangString = "$f" + vervangSubString.replaceAll(oudeYAsNaam, yAsNaam) + "@";
-				formuleVakken[i].functieBeginVak.vulVak(vervangString);
-			}
-
-			parseFormule(i, setState);
-		}
-	}
+//	public void zetYAsNaam(String s, boolean setState)
+//	{	String oudeYAsNaam = yAsNaam;
+//		yAsNaam = s;
+//
+//		for(int i=0 ; i<formuleVakken.length ; i++)
+//		{	String vervangString = formuleVakken[i].formuleVak.toString();
+//			String vervangSubString = vervangString.substring(2, vervangString.length() - 1);
+//			vervangString = "$f" + vervangSubString.replaceAll(oudeYAsNaam, yAsNaam) + "@";
+//			formuleVakken[i].formuleVak.vulVak(vervangString);
+//			
+//			if(!functieBeginAanpasbaar && functieBeginZichtbaar)
+//			{	vervangString = formuleVakken[i].functieBeginVak.toString();
+//				vervangSubString = vervangString.substring(2, vervangString.length() - 1);
+//				vervangString = "$f" + vervangSubString.replaceAll(oudeYAsNaam, yAsNaam) + "@";
+//				formuleVakken[i].functieBeginVak.vulVak(vervangString);
+//			}
+//
+//			parseFormule(i, setState);
+//		}
+//	}
 	
 //	public void zetFormeleFuncties(boolean b, boolean setState)
 //	{	formeleFuncties = b;
@@ -717,91 +621,92 @@ public class VeldComponentGWT extends LayoutPanel {
 //				parseFormule(i, setState);
 //	}
 	
-	public void zetVoorvoegsel(int regelnummer)
-	{	String huidigeTekst = formuleVakken[regelnummer].formuleVak.toString();
-
-		boolean vervangen = huidigeTekst.equals("$f@") || huidigeTekst.endsWith("=@");
-		String differentiaalStr, asNaam="";
-		
-		if (soortVak[regelnummer]==DIFFERENTIAALX) {
-			asNaam = xAsNaam; 
-		} else { // soortVak[regelnummer] must be DIFFERENTIAALY) 
-			asNaam = yAsNaam; 
-		}
-		differentiaalStr = "$f$bd"+asNaam+"$nd"+diffVarNaam+"@@=@";
-		
-		if (functieBeginZichtbaar) {
-			if (functieBeginAanpasbaar) {
-				if (vervangen) {
-					formuleVakken[regelnummer].formuleVak.vulVak(differentiaalStr);
-				}
-			} else {
-				formuleVakken[regelnummer].functieBeginVak.vulVak(differentiaalStr);
-			}
-		}
-		
-	}
+//	public void zetVoorvoegsel(int regelnummer)
+//	{	String huidigeTekst = formuleVakken[regelnummer].formuleVak.toString();
+//
+//		boolean vervangen = huidigeTekst.equals("$f@") || huidigeTekst.endsWith("=@");
+//		String differentiaalStr, asNaam="";
+//		
+//		if (soortVak[regelnummer]==DIFFERENTIAALX) {
+//			asNaam = xAsNaam; 
+//		} else { // soortVak[regelnummer] must be DIFFERENTIAALY) 
+//			asNaam = yAsNaam; 
+//		}
+//		differentiaalStr = "$f$bd"+asNaam+"$nd"+diffVarNaam+"@@=@";
+//		
+//		if (functieBeginZichtbaar) {
+//			if (functieBeginAanpasbaar) {
+//				if (vervangen) {
+//					formuleVakken[regelnummer].formuleVak.vulVak(differentiaalStr);
+//				}
+//			} else {
+//				formuleVakken[regelnummer].functieBeginVak.vulVak(differentiaalStr);
+//			}
+//		}
+//		
+//	}
 	
-	public void layoutVakken(boolean setState)
-	{	int hoogte = 10;
-		for(int i=0 ; i<maxAantalStelsels; i++) {	
-			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
-				if(formuleVakken[(i*cAantalFormulesPerStelsel)+j]!=null) {	
-//					formuleVakken[i].setLocation(formuleX,hoogte);
-//					int breedte = this.getWidth() - 25;
-//					if(getVerticalScrollBarVisible())	
-//						breedte = this.getWidth() - 40;
-					if(soortVak[i * cAantalFormulesPerStelsel] == DIFFERENTIAALX && checkboxen != null && checkboxen[i] != null) {	
-						maakDifferentiaalVak( i * cAantalFormulesPerStelsel);
-					}
-					else if(checkboxen!=null && checkboxen[i]!=null)
-						checkboxen[i].setLocation(4,hoogte+formuleVakken[i].ashoogte-5);
-				
-//					if(domeinButtons!=null && domeinButtons[i]!=null)domeinButtons[i].setLocation(breedte, hoogte+formuleVakken[i].ashoogte-5);
-//					if(i>0 && enOfKnoppen != null && enOfKnoppen[i-1] != null)enOfKnoppen[i-1].setLocation(breedte, hoogte - 15);
-					hoogte = hoogte + formuleVakken[i].getSize().height + 10;
-				}
-			}
-		}
-//		zetDomeinInstelbaar(domeinInstelbaar, setState);
-		repaint();
-	}
+//	public void layoutVakken(boolean setState)
+//	{	int hoogte = 10;
+//		for(int i=0 ; i<maxAantalStelsels; i++) {	
+//			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
+//				if(formuleVakken[(i*cAantalFormulesPerStelsel)+j]!=null) {	
+////					formuleVakken[i].setLocation(formuleX,hoogte);
+////					int breedte = this.getWidth() - 25;
+////					if(getVerticalScrollBarVisible())	
+////						breedte = this.getWidth() - 40;
+//					if(soortVak[i * cAantalFormulesPerStelsel] == DIFFERENTIAALX && checkboxen != null && checkboxen[i] != null) {	
+//						maakDifferentiaalVak( i * cAantalFormulesPerStelsel);
+//					}
+//					else if(checkboxen!=null && checkboxen[i]!=null)
+//						checkboxen[i].setLocation(4,hoogte+formuleVakken[i].ashoogte-5);
+//				
+////					if(domeinButtons!=null && domeinButtons[i]!=null)domeinButtons[i].setLocation(breedte, hoogte+formuleVakken[i].ashoogte-5);
+////					if(i>0 && enOfKnoppen != null && enOfKnoppen[i-1] != null)enOfKnoppen[i-1].setLocation(breedte, hoogte - 15);
+//					hoogte = hoogte + formuleVakken[i].getSize().height + 10;
+//				}
+//			}
+//		}
+////		zetDomeinInstelbaar(domeinInstelbaar, setState);
+//		repaint();
+//	}
 	
-	private void zetGrafiekComponent(GraphToolInteractiePanel gc)
-	{	grafiekComponent = gc;
-		zetGrafiekKleuren();
-	}
+//	private void zetGrafiekComponent(GraphToolInteractiePanel gc)
+//	{	grafiekComponent = gc;
+//		zetGrafiekKleuren();
+//	}
 	
-	public void zetGrafiekKleuren() {	
-		if(formuleVakken != null && grafiekComponent != null) {
-			Color stelselColor = null;
-//			int colorIndex = 0;
-			for(int i=0 ; i<formuleVakken.length ; i++) {
-				if (i % cAantalFormulesPerStelsel == 0) {
-					// stelselColor = grafiekComponent.getFormuleColor(colorIndex++);
-					// For now - all is black
-					stelselColor = Color.black;
-					formuleVakken[i].setFGColor(stelselColor); // First element in stelsel -> New color
-				} else {
-					formuleVakken[i].setFGColor(stelselColor); // Copy color of predecesor
-				}
-			}
-	}
+//	public void zetGrafiekKleuren() {	
+//		if(formuleVakken != null && grafiekComponent != null) {
+//			Color stelselColor = null;
+////			int colorIndex = 0;
+//			for(int i=0 ; i<formuleVakken.length ; i++) {
+//				if (i % cAantalFormulesPerStelsel == 0) {
+//					// stelselColor = grafiekComponent.getFormuleColor(colorIndex++);
+//					// For now - all is black
+//					stelselColor = Color.black;
+//					formuleVakken[i].setFGColor(stelselColor); // First element in stelsel -> New color
+//				} else {
+//					formuleVakken[i].setFGColor(stelselColor); // Copy color of predecesor
+//				}
+//			}
+//	}
+		
 //		if(formuleVakken != null && grafiekComponent != null)
 //			for(int i=0 ; i<formuleVakken.length ; i++)
 //				formuleVakken[i].setFGColor(grafiekComponent.getFormuleColor(i));
-		repaint();
-	}
+//		repaint();
+//	}
 	
-	public void zetGrafiekKleurInstelbaar(boolean b)
-	{	grafiekKleurInstelbaar = b;
-		for(int i = 0; i < checkboxen.length; i++)
-		{	if(b)
-				checkboxen[i].addMouseListener(this);
-			else
-				checkboxen[i].removeMouseListener(this);
-		}
-	}
+//	public void zetGrafiekKleurInstelbaar(boolean b)
+//	{	grafiekKleurInstelbaar = b;
+//		for(int i = 0; i < checkboxen.length; i++)
+//		{	if(b)
+//				checkboxen[i].addMouseListener(this);
+//			else
+//				checkboxen[i].removeMouseListener(this);
+//		}
+//	}
 	
 //	public void zetFunctieBeginZichtbaar(boolean b, boolean setState)
 //	{	functieBeginZichtbaar = b;
@@ -877,98 +782,98 @@ public class VeldComponentGWT extends LayoutPanel {
 //		
 //	}
 	
-	public Hashtable getState() {	
-		String[] veldGrafiekExpressieStrings = null;
-		boolean[] veldGrafiekGeselecteerd = null;
-		
-		veldGrafiekExpressieStrings = new String[maxAantalStelsels * cAantalFormulesPerStelsel];
-		veldGrafiekGeselecteerd = new boolean[maxAantalStelsels];
-		
-		for(int i=0 ; i<maxAantalStelsels ; i++) {	
-			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
-				if(functieBeginAanpasbaar) {
-					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = formuleVakken[i * cAantalFormulesPerStelsel + j].formuleVak.toString();
-				} else {
-//					String s1 = formuleVakken[i * cAantalFormulesPerStelsel + j].functieBeginVak.toString();
-					String s1 = "";
-					String s2 = formuleVakken[i * cAantalFormulesPerStelsel + j].formuleVak.toString();
-					try{
-						s1 = s1.substring(0, s1.length() - 1);
-						s2 = s2.substring(2);
-					}
-					catch(Exception e){}
-					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = s1 + s2;
-				}
-				if(veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j].endsWith("=@"))
-					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = "$f@";
-				veldGrafiekGeselecteerd[i] = checkboxen[i].isSelected();
-			}
-		}
-		Hashtable h = new Hashtable();
-	    h.put("veldGrafiekExpressieStrings", veldGrafiekExpressieStrings);
-		h.put("veldGrafiekGeselecteerd", veldGrafiekGeselecteerd);
-
-	    return h;
-	}
+//	public Hashtable getState() {	
+//		String[] veldGrafiekExpressieStrings = null;
+//		boolean[] veldGrafiekGeselecteerd = null;
+//		
+//		veldGrafiekExpressieStrings = new String[maxAantalStelsels * cAantalFormulesPerStelsel];
+//		veldGrafiekGeselecteerd = new boolean[maxAantalStelsels];
+//		
+//		for(int i=0 ; i<maxAantalStelsels ; i++) {	
+//			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
+//				if(functieBeginAanpasbaar) {
+//					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = formuleVakken[i * cAantalFormulesPerStelsel + j].formuleVak.toString();
+//				} else {
+////					String s1 = formuleVakken[i * cAantalFormulesPerStelsel + j].functieBeginVak.toString();
+//					String s1 = "";
+//					String s2 = formuleVakken[i * cAantalFormulesPerStelsel + j].formuleVak.toString();
+//					try{
+//						s1 = s1.substring(0, s1.length() - 1);
+//						s2 = s2.substring(2);
+//					}
+//					catch(Exception e){}
+//					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = s1 + s2;
+//				}
+//				if(veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j].endsWith("=@"))
+//					veldGrafiekExpressieStrings[i * cAantalFormulesPerStelsel + j] = "$f@";
+//				veldGrafiekGeselecteerd[i] = checkboxen[i].isSelected();
+//			}
+//		}
+//		Hashtable h = new Hashtable();
+//	    h.put("veldGrafiekExpressieStrings", veldGrafiekExpressieStrings);
+//		h.put("veldGrafiekGeselecteerd", veldGrafiekGeselecteerd);
+//
+//	    return h;
+//	}
 	
-	public void setState(Hashtable h, String[] randomVars, Hashtable randomValues, boolean docent)
-    {	String[] veldGrafiekExpressieStrings = null;
-		boolean[] veldGrafiekGeselecteerd = null;
-    	
-    	if(h.containsKey("veldGrafiekExpressieStrings")) 
-    		veldGrafiekExpressieStrings = GraphToolInteractiePanel.toStringArray(h.get("veldGrafiekExpressieStrings"));
-   		if(h.containsKey("veldGrafiekGeselecteerd")) 
-   			veldGrafiekGeselecteerd = GraphToolInteractiePanel.toBooleanArray(h.get("veldGrafiekGeselecteerd"));
-
-    	if (veldGrafiekExpressieStrings==null) {	
-    		return;
-    	}
-    	
-    	
-     	for(int i = 0; i < veldGrafiekExpressieStrings.length; i++)	 {	
-     		if(!veldGrafiekExpressieStrings[i].equals("$f@") && !(i > 0 && veldGrafiekExpressieStrings[i].endsWith("=@") && docent)) {	
-     			if(randomVars != null)
-     			try			
-    			{	veldGrafiekExpressieStrings[i] = FormuleParser.randomizeString(veldGrafiekExpressieStrings[i],randomVars,randomValues);
-    			}
-    			catch(Exception e)
-    			{	veldGrafiekExpressieStrings[i] = "$f???@";
-    				this.zetRandomFout(true);
-    			}
-//				if(functieBeginAanpasbaar)
-				formuleVakken[i].formuleVak.vulVak(veldGrafiekExpressieStrings[i]);
-				parseFormule(i, true);
-			
-//     			if(i>0)
-//					add(formuleVakken[i],0);
-			}
-			formuleVakken[i].setVisible(true);
-
-     	}
-		aantalStelsels = veldGrafiekExpressieStrings.length / cAantalFormulesPerStelsel;
-     	
-    	if(veldGrafiekGeselecteerd==null) 
-    	{	return;
-    	}
-
-     	for(int i = 0; i < veldGrafiekGeselecteerd.length; i++)	 {	
-     	
-				checkboxen[i].setSelected(veldGrafiekGeselecteerd[i]);
-				if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT))) {	
-					//System.out.println("hier visible gezet? " + i);
-					add(checkboxen[i],0);
-					//checkboxen[i].setVisible(true);
-				}
-				if(veldGrafiekGeselecteerd[i]) {
-					for (int j=0; j<cAantalFormulesPerStelsel; j++ ) {
-						parseFormule(i*cAantalFormulesPerStelsel+j, true);
-					}
-				}
-		}
-     	layoutVakken(true);
-//     	grafiekComponent.updateTabelNames(geefExpNamen(), true);
-		
-    }
+//	public void setState(Hashtable h, String[] randomVars, Hashtable randomValues, boolean docent)
+//    {	String[] veldGrafiekExpressieStrings = null;
+//		boolean[] veldGrafiekGeselecteerd = null;
+//    	
+//    	if(h.containsKey("veldGrafiekExpressieStrings")) 
+//    		veldGrafiekExpressieStrings = GraphToolInteractiePanel.toStringArray(h.get("veldGrafiekExpressieStrings"));
+//   		if(h.containsKey("veldGrafiekGeselecteerd")) 
+//   			veldGrafiekGeselecteerd = GraphToolInteractiePanel.toBooleanArray(h.get("veldGrafiekGeselecteerd"));
+//
+//    	if (veldGrafiekExpressieStrings==null) {	
+//    		return;
+//    	}
+//    	
+//    	
+//     	for(int i = 0; i < veldGrafiekExpressieStrings.length; i++)	 {	
+//     		if(!veldGrafiekExpressieStrings[i].equals("$f@") && !(i > 0 && veldGrafiekExpressieStrings[i].endsWith("=@") && docent)) {	
+//     			if(randomVars != null)
+//     			try			
+//    			{	veldGrafiekExpressieStrings[i] = FormuleParser.randomizeString(veldGrafiekExpressieStrings[i],randomVars,randomValues);
+//    			}
+//    			catch(Exception e)
+//    			{	veldGrafiekExpressieStrings[i] = "$f???@";
+//    				this.zetRandomFout(true);
+//    			}
+////				if(functieBeginAanpasbaar)
+//				formuleVakken[i].formuleVak.vulVak(veldGrafiekExpressieStrings[i]);
+//				parseFormule(i, true);
+//			
+////     			if(i>0)
+////					add(formuleVakken[i],0);
+//			}
+//			formuleVakken[i].setVisible(true);
+//
+//     	}
+//		aantalStelsels = veldGrafiekExpressieStrings.length / cAantalFormulesPerStelsel;
+//     	
+//    	if(veldGrafiekGeselecteerd==null) 
+//    	{	return;
+//    	}
+//
+//     	for(int i = 0; i < veldGrafiekGeselecteerd.length; i++)	 {	
+//     	
+//				checkboxen[i].setSelected(veldGrafiekGeselecteerd[i]);
+//				if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT))) {	
+//					//System.out.println("hier visible gezet? " + i);
+//					add(checkboxen[i],0);
+//					//checkboxen[i].setVisible(true);
+//				}
+//				if(veldGrafiekGeselecteerd[i]) {
+//					for (int j=0; j<cAantalFormulesPerStelsel; j++ ) {
+//						parseFormule(i*cAantalFormulesPerStelsel+j, true);
+//					}
+//				}
+//		}
+//     	layoutVakken(true);
+////     	grafiekComponent.updateTabelNames(geefExpNamen(), true);
+//		
+//    }
 	
 //	public double[] getDomein()
 //	{
@@ -1057,119 +962,119 @@ public class VeldComponentGWT extends LayoutPanel {
 //		}
 //	}
 	
-	public void zetDifferentiaalStelsels(int maxAantalStelsels, boolean setState) {
-		// Save relevant existing equation- descriptions
-		String[] exps = new String[cAantalFormulesPerStelsel * maxAantalStelsels];
-		for(int i = 0; i < cAantalFormulesPerStelsel * maxAantalStelsels; i++){
-			exps[i] = "$f@";
-		}	
-		
-		// clear all formulevakken
-		for(int i = 0; formuleVakken != null && i < formuleVakken.length; i++) {
-			if(formuleVakken[i] != null) {
-				if(i < maxAantalStelsels) {
-					if(functieBeginAanpasbaar) {	
-						exps[i] = formuleVakken[i].formuleVak.toString();
-					} else {	
-						String s1 = formuleVakken[i].functieBeginVak.toString();
-						String s2 = formuleVakken[i].formuleVak.toString();
-						try {
-							s1 = s1.substring(0, s1.length() - 1);
-							s2 = s2.substring(2);
-						} catch(Exception e) {
-						}
-						exps[i] = s1 + s2;
-					}
-				}
-				remove(formuleVakken[i]);
-			}
-		}
-		// Save relevant selection info + clear all checkboxes
-		boolean[] geselecteerd = new boolean[maxAantalStelsels];
-		for(int i = 0; checkboxen != null && i < checkboxen.length; i++) {
-			if(checkboxen[i] != null) {	
-				if(i < geselecteerd.length) {
-					geselecteerd[i] = checkboxen[i].isSelected();
-				}
-				remove(checkboxen[i]);
-			}
-		}
-		this.maxAantalStelsels = maxAantalStelsels; 
-		Color stelselColor = null;
-		
-		formuleVakken = new VergelijkingVak[cAantalFormulesPerStelsel * maxAantalStelsels];
-		for(int i=0 ; i<cAantalFormulesPerStelsel * maxAantalStelsels ; i++)
-		{	formuleVakken[i] = new VergelijkingVak(functieBeginAanpasbaar);
-			formuleVakken[i].setFont(WiskOpdr.formuleFont0);
-			if (i==0) {
-				formuleVakken[i].setLocation(formuleX,10);
-			} else {
-				formuleVakken[i].setLocation(formuleX,10+10*i + 41*i);
-			}
-			formuleVakken[i].setOpaque(false);
-//			if(grafiekComponent != null) {
-//				if (i % cAantalFormulesPerStelsel == 0) {
-//					stelselColor = grafiekComponent.getFormuleColor(i);
-//					formuleVakken[i].setFGColor(stelselColor); // First element in stelsel -> New color
-//				} else {
-//					formuleVakken[i].setFGColor(stelselColor); // Copy color of predecesor
+//	public void zetDifferentiaalStelsels(int maxAantalStelsels, boolean setState) {
+//		// Save relevant existing equation- descriptions
+//		String[] exps = new String[cAantalFormulesPerStelsel * maxAantalStelsels];
+//		for(int i = 0; i < cAantalFormulesPerStelsel * maxAantalStelsels; i++){
+//			exps[i] = "$f@";
+//		}	
+//		
+//		// clear all formulevakken
+//		for(int i = 0; formuleVakken != null && i < formuleVakken.length; i++) {
+//			if(formuleVakken[i] != null) {
+//				if(i < maxAantalStelsels) {
+//					if(functieBeginAanpasbaar) {	
+//						exps[i] = formuleVakken[i].formuleVak.toString();
+//					} else {	
+//						String s1 = formuleVakken[i].functieBeginVak.toString();
+//						String s2 = formuleVakken[i].formuleVak.toString();
+//						try {
+//							s1 = s1.substring(0, s1.length() - 1);
+//							s2 = s2.substring(2);
+//						} catch(Exception e) {
+//						}
+//						exps[i] = s1 + s2;
+//					}
 //				}
+//				remove(formuleVakken[i]);
 //			}
-			if(functieBeginAanpasbaar) {
-				formuleVakken[i].formuleVak.vulVak(exps[i]);
-			}
-			formuleVakken[i].formuleVak.addActionListener(this);
-//			formuleVakken[i].formuleVak.addFocusListener(this);
-			formuleVakken[i].formuleVak.geefActieveRegel().addFocusListener(this);
-		}
-		
-		if(maxAantalStelsels > 0)
-		//if(docent || (maxAantalFormules > 1 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
-		{	checkboxen = new JCheckBox[maxAantalStelsels];
-			for(int i=0 ; i<maxAantalStelsels ; i++)
-			{	checkboxen[i] = new JCheckBox();
-				checkboxen[i].setBounds(4,12 + 35*i*cAantalFormulesPerStelsel, 17, 17);
-				checkboxen[i].setOpaque(false);
-				checkboxen[i].addActionListener(this);
-				if(i < geselecteerd.length)
-					checkboxen[i].setSelected(geselecteerd[i]);
-				if(grafiekKleurInstelbaar)
-					checkboxen[i].addMouseListener(this);
-			}
-		}
-
-		for(int i = 0; i < aantalStelsels; i++) {	
-			add(formuleVakken[cAantalFormulesPerStelsel*i],0);
-			add(formuleVakken[cAantalFormulesPerStelsel*i+1],0);
-			if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
-				add(checkboxen[i]);
-		}
-		
-		formuleVakken[0].setVisible(true);
-		for(int i = 0; i < formuleVakken.length; i++) {
-			if(formuleVakken[i].formuleVak.toString().equals("$f@")) {
-				zetVoorvoegsel(i);
-			}
-//			else if(formuleVakken[i].formuleVak.toString().equals("$f"+namen[i]+"(" + xAsNaam + ")=@") ||
-//					formuleVakken[i].formuleVak.toString().equals("$f"+yAsNaam+"$s"+(i+1)+"@=@")||
-//					formuleVakken[i].formuleVak.toString().equals("$f"+yAsNaam+"=@"))
-//				if(!functieBeginZichtbaar)
-//					formuleVakken[i].formuleVak.vulVak("$f@");
-		}
-			
-		formuleVak = formuleVakken[0].formuleVak;
-		formuleVak.requestFocus();
-		actiefNummer = 0;
-		
-		if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
-		{	checkboxen[0].setVisible(true);	
-			checkboxen[0].setSelected(true);
-		}
-		layoutVakken(setState);
-		
-		zetGrafiekKleuren();
-
-	} // end of zetDifferentiaalStelsels
+//		}
+//		// Save relevant selection info + clear all checkboxes
+//		boolean[] geselecteerd = new boolean[maxAantalStelsels];
+//		for(int i = 0; checkboxen != null && i < checkboxen.length; i++) {
+//			if(checkboxen[i] != null) {	
+//				if(i < geselecteerd.length) {
+//					geselecteerd[i] = checkboxen[i].isSelected();
+//				}
+//				remove(checkboxen[i]);
+//			}
+//		}
+//		this.maxAantalStelsels = maxAantalStelsels; 
+//		Color stelselColor = null;
+//		
+//		formuleVakken = new VergelijkingVak[cAantalFormulesPerStelsel * maxAantalStelsels];
+//		for(int i=0 ; i<cAantalFormulesPerStelsel * maxAantalStelsels ; i++)
+//		{	formuleVakken[i] = new VergelijkingVak(functieBeginAanpasbaar);
+//			formuleVakken[i].setFont(WiskOpdr.formuleFont0);
+//			if (i==0) {
+//				formuleVakken[i].setLocation(formuleX,10);
+//			} else {
+//				formuleVakken[i].setLocation(formuleX,10+10*i + 41*i);
+//			}
+//			formuleVakken[i].setOpaque(false);
+////			if(grafiekComponent != null) {
+////				if (i % cAantalFormulesPerStelsel == 0) {
+////					stelselColor = grafiekComponent.getFormuleColor(i);
+////					formuleVakken[i].setFGColor(stelselColor); // First element in stelsel -> New color
+////				} else {
+////					formuleVakken[i].setFGColor(stelselColor); // Copy color of predecesor
+////				}
+////			}
+//			if(functieBeginAanpasbaar) {
+//				formuleVakken[i].formuleVak.vulVak(exps[i]);
+//			}
+//			formuleVakken[i].formuleVak.addActionListener(this);
+////			formuleVakken[i].formuleVak.addFocusListener(this);
+//			formuleVakken[i].formuleVak.geefActieveRegel().addFocusListener(this);
+//		}
+//		
+//		if(maxAantalStelsels > 0)
+//		//if(docent || (maxAantalFormules > 1 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
+//		{	checkboxen = new JCheckBox[maxAantalStelsels];
+//			for(int i=0 ; i<maxAantalStelsels ; i++)
+//			{	checkboxen[i] = new JCheckBox();
+//				checkboxen[i].setBounds(4,12 + 35*i*cAantalFormulesPerStelsel, 17, 17);
+//				checkboxen[i].setOpaque(false);
+//				checkboxen[i].addActionListener(this);
+//				if(i < geselecteerd.length)
+//					checkboxen[i].setSelected(geselecteerd[i]);
+//				if(grafiekKleurInstelbaar)
+//					checkboxen[i].addMouseListener(this);
+//			}
+//		}
+//
+//		for(int i = 0; i < aantalStelsels; i++) {	
+//			add(formuleVakken[cAantalFormulesPerStelsel*i],0);
+//			add(formuleVakken[cAantalFormulesPerStelsel*i+1],0);
+//			if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
+//				add(checkboxen[i]);
+//		}
+//		
+//		formuleVakken[0].setVisible(true);
+//		for(int i = 0; i < formuleVakken.length; i++) {
+//			if(formuleVakken[i].formuleVak.toString().equals("$f@")) {
+//				zetVoorvoegsel(i);
+//			}
+////			else if(formuleVakken[i].formuleVak.toString().equals("$f"+namen[i]+"(" + xAsNaam + ")=@") ||
+////					formuleVakken[i].formuleVak.toString().equals("$f"+yAsNaam+"$s"+(i+1)+"@=@")||
+////					formuleVakken[i].formuleVak.toString().equals("$f"+yAsNaam+"=@"))
+////				if(!functieBeginZichtbaar)
+////					formuleVakken[i].formuleVak.vulVak("$f@");
+//		}
+//			
+//		formuleVak = formuleVakken[0].formuleVak;
+//		formuleVak.requestFocus();
+//		actiefNummer = 0;
+//		
+//		if(docent || (maxAantalStelsels > 0 && (grafiekComponent == null || grafiekComponent.typeOpdracht == GraphToolInteractiePanel.GEENOPDRACHT)))
+//		{	checkboxen[0].setVisible(true);	
+//			checkboxen[0].setSelected(true);
+//		}
+//		layoutVakken(setState);
+//		
+//		zetGrafiekKleuren();
+//
+//	} // end of zetDifferentiaalStelsels
 	
 	
 //	public void zetFormuleRegels(int maxAantalFormules, boolean setState) {	
@@ -1301,14 +1206,14 @@ public class VeldComponentGWT extends LayoutPanel {
 	}
 	*/
 	
-	public FormuleVak geefFormuleVak()
-	{	return formuleVak;
-	}
+//	public FormuleVak geefFormuleVak()
+//	{	return formuleVak;
+//	}
 	
-	public Expressie geefExpressie() {	
-		FormuleParser p = new FormuleParser();
-		return formuleVak.geefExpressie();
-	}
+//	public Expressie geefExpressie() {	
+//		FormuleParser p = new FormuleParser();
+//		return formuleVak.geefExpressie();
+//	}
 	
 //	public String[] geefExpNamen()
 //	{	String[] expNaam = new String[maxAantalStelsels];
@@ -1364,31 +1269,31 @@ public class VeldComponentGWT extends LayoutPanel {
 //		parseFormule("$f@", 0, setState);
 //	}
 
-	public void parseFormule(int regelnummer, boolean setState)
-	{
-		String sExpressie = formuleVakken[regelnummer].formuleVak.toString();
-		int stelselNummer = -1;
-		Expressie expressie = null;
-		String sAs = "";
-		
-		if (soortVak[regelnummer] == DIFFERENTIAALX) {
-			sAs = "X";
-			stelselNummer = regelnummer / cAantalFormulesPerStelsel;
-		}
-		
-		if (soortVak[regelnummer] == DIFFERENTIAALY) {
-			sAs = "Y";
-			stelselNummer = (regelnummer-1) / cAantalFormulesPerStelsel;
-		}
-
-		
-		if (checkboxen[stelselNummer].isSelected()) {
-			expressie = FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString(sExpressie )));
-		}
-	
-		grafiekComponent.zetVectorVeld(stelselNummer, sAs, expressie, setState);
-		
-	}
+//	public void parseFormule(int regelnummer, boolean setState)
+//	{
+//		String sExpressie = formuleVakken[regelnummer].formuleVak.toString();
+//		int stelselNummer = -1;
+//		Expressie expressie = null;
+//		String sAs = "";
+//		
+//		if (soortVak[regelnummer] == DIFFERENTIAALX) {
+//			sAs = "X";
+//			stelselNummer = regelnummer / cAantalFormulesPerStelsel;
+//		}
+//		
+//		if (soortVak[regelnummer] == DIFFERENTIAALY) {
+//			sAs = "Y";
+//			stelselNummer = (regelnummer-1) / cAantalFormulesPerStelsel;
+//		}
+//
+//		
+//		if (checkboxen[stelselNummer].isSelected()) {
+//			expressie = FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString(sExpressie )));
+//		}
+//	
+//		grafiekComponent.zetVectorVeld(stelselNummer, sAs, expressie, setState);
+//		
+//	}
 	
 //	public void parseFormule(int regelnummer, boolean setState)
 //	{	//System.out.println("parseFormule(" + regelnummer + ", " + Boolean.toString(setState));
@@ -1624,20 +1529,20 @@ public class VeldComponentGWT extends LayoutPanel {
 	
 	
 	
-	public void maakDifferentiaalVak(int stelselNummer)
-	{
-		if(stelselNummer > maxAantalStelsels - 1)
-			return;
-		
-		soortVak[stelselNummer*2 + 1] = DIFFERENTIAALY; // alsie dat nog niet was dan issie dat nu
-		int yPositie = formuleVakken[stelselNummer*2].getY();
-
-		checkboxen[stelselNummer].setLocation(4, yPositie + formuleVakken[stelselNummer*2].getSize().height-2);
-		AccoladeLabel accoladeLabel = new AccoladeLabel(formuleVakken[stelselNummer*2].getSize().height + 10  + formuleVakken[stelselNummer*2 + 1].getSize().height);
-		accoladeLabel.setLocation(cAccoladeXPositie, yPositie);
-		add(accoladeLabel);
-
-	}
+//	public void maakDifferentiaalVak(int stelselNummer)
+//	{
+//		if(stelselNummer > maxAantalStelsels - 1)
+//			return;
+//		
+//		soortVak[stelselNummer*2 + 1] = DIFFERENTIAALY; // alsie dat nog niet was dan issie dat nu
+//		int yPositie = formuleVakken[stelselNummer*2].getY();
+//
+//		checkboxen[stelselNummer].setLocation(4, yPositie + formuleVakken[stelselNummer*2].getSize().height-2);
+//		AccoladeLabel accoladeLabel = new AccoladeLabel(formuleVakken[stelselNummer*2].getSize().height + 10  + formuleVakken[stelselNummer*2 + 1].getSize().height);
+//		accoladeLabel.setLocation(cAccoladeXPositie, yPositie);
+//		add(accoladeLabel);
+//
+//	}
 	
 	
 //	public void zetEnOfKnoppen()
@@ -1653,12 +1558,12 @@ public class VeldComponentGWT extends LayoutPanel {
 //		
 //	}
 	
-	public void vulFunctieRegel(String deel1, String deel2, int regelnummer)
-	{	//if(functieBeginAanpasbaar)
-		//	formuleVakken[regelnummer].functieBeginVak.vulVak("$f" + deel1 + vergelijkingsTeken + deel2 + "@");
-		formuleVakken[regelnummer].functieBeginVak.vulVak("$f" + deel1 + "=@");
-		formuleVakken[regelnummer].formuleVak.vulVak("$f" + deel2 + "@");
-	}
+//	public void vulFunctieRegel(String deel1, String deel2, int regelnummer)
+//	{	//if(functieBeginAanpasbaar)
+//		//	formuleVakken[regelnummer].functieBeginVak.vulVak("$f" + deel1 + vergelijkingsTeken + deel2 + "@");
+//		formuleVakken[regelnummer].functieBeginVak.vulVak("$f" + deel1 + "=@");
+//		formuleVakken[regelnummer].formuleVak.vulVak("$f" + deel2 + "@");
+//	}
 	
 //	public void maakNieuweRegel()
 //	{
@@ -1778,7 +1683,7 @@ public class VeldComponentGWT extends LayoutPanel {
 //		return c;
 //	}
 	
-	public void actionPerformed(ActionEvent e) {
+//	public void actionPerformed(ActionEvent e) {
 
 //		if (e.getSource() == nieuweRegelKnop && aantalRegels < maxAantalFormules)
 //		{	maakNieuweRegel();
@@ -1809,37 +1714,37 @@ public class VeldComponentGWT extends LayoutPanel {
 //			return;
 //		}
 		
-		for(int i=0; i<maxAantalStelsels; i++) {
-			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
-				if(e.getSource()==formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak &&  (e.getActionCommand().equals("ingevuld") || 
-						e.getActionCommand().equals("focuslost") || e.getActionCommand().equals("zetmaat"))) {				
-					if(checkboxen[i].isSelected()) {	
-						parseFormule((i*cAantalFormulesPerStelsel)+j, false);
-						layoutVakken(false);
-						produceAction("ingevuld");
-					}
-					break;
-				}
-			}
-			
-		}
-		for(int i=0 ; i<maxAantalStelsels ; i++) {	
-			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
-				if(e.getSource()==formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak && 
-						e.getActionCommand().equals("focus")) {	
-					if(formuleVak != formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak) {	
-						formuleVak.deSelect();
-						parseFormule(actiefNummer, false);
-					}
-
-					actiefNummer = (i*cAantalFormulesPerStelsel)+j;
-					formuleVak = formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak;
-					
-					break;
-				}
-			}
-			
-		}
+//		for(int i=0; i<maxAantalStelsels; i++) {
+//			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
+//				if(e.getSource()==formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak &&  (e.getActionCommand().equals("ingevuld") || 
+//						e.getActionCommand().equals("focuslost") || e.getActionCommand().equals("zetmaat"))) {				
+//					if(checkboxen[i].isSelected()) {	
+//						parseFormule((i*cAantalFormulesPerStelsel)+j, false);
+//						layoutVakken(false);
+//						produceAction("ingevuld");
+//					}
+//					break;
+//				}
+//			}
+//			
+//		}
+//		for(int i=0 ; i<maxAantalStelsels ; i++) {	
+//			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
+//				if(e.getSource()==formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak && 
+//						e.getActionCommand().equals("focus")) {	
+//					if(formuleVak != formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak) {	
+//						formuleVak.deSelect();
+//						parseFormule(actiefNummer, false);
+//					}
+//
+//					actiefNummer = (i*cAantalFormulesPerStelsel)+j;
+//					formuleVak = formuleVakken[(i*cAantalFormulesPerStelsel)+j].formuleVak;
+//					
+//					break;
+//				}
+//			}
+//			
+//		}
 //		for(int i = 0; i<maxAantalFormules; i++)
 //		{	if(e.getSource()==enOfKnoppen[i])
 //			{	isEn[i] = !isEn[i];
@@ -1852,124 +1757,124 @@ public class VeldComponentGWT extends LayoutPanel {
 //			}
 //			
 //		}
-		if (checkboxen != null ) { 
-			for(int i=0 ; i<maxAantalStelsels ; i++) {	
-
-				if(e.getSource()==checkboxen[i]) {	
-					parseFormule(i*cAantalFormulesPerStelsel, false);
-					parseFormule((i*cAantalFormulesPerStelsel)+1, false);
-					if(checkboxen[i].isSelected())
-					{	produceAction("ingevuld");
-					}
-					else 
-					{	produceAction("verwijderd");
-					}
-					if(checkboxen[actiefNummer].isSelected()) 
-					{	parseFormule(actiefNummer, false);
-						produceAction("ingevuld");	
-					}	
-					break;
-				}
-			}
-		}
-//	for(int i=0 ; i<maxAantalFormules ; i++)
-//		{	
-//		
-//		if(e.getSource()==domeinButtons[i] && e.getActionCommand().equals("maak Domein"))
-//			{	domeinStrings[i][0] = domeinButtons[i].getDomeinString()[0];
-//				domeinStrings[i][1] = domeinButtons[i].getDomeinString()[1];
-//				zetDomein(domeinStrings[i], i);
-//				parseFormule(i, false);
-//				
-//				produceAction("ingevuld");
+//		if (checkboxen != null ) { 
+//			for(int i=0 ; i<maxAantalStelsels ; i++) {	
+//
+//				if(e.getSource()==checkboxen[i]) {	
+//					parseFormule(i*cAantalFormulesPerStelsel, false);
+//					parseFormule((i*cAantalFormulesPerStelsel)+1, false);
+//					if(checkboxen[i].isSelected())
+//					{	produceAction("ingevuld");
+//					}
+//					else 
+//					{	produceAction("verwijderd");
+//					}
+//					if(checkboxen[actiefNummer].isSelected()) 
+//					{	parseFormule(actiefNummer, false);
+//						produceAction("ingevuld");	
+//					}	
+//					break;
+//				}
 //			}
 //		}
-		super.actionPerformed(e);
-	}
+////	for(int i=0 ; i<maxAantalFormules ; i++)
+////		{	
+////		
+////		if(e.getSource()==domeinButtons[i] && e.getActionCommand().equals("maak Domein"))
+////			{	domeinStrings[i][0] = domeinButtons[i].getDomeinString()[0];
+////				domeinStrings[i][1] = domeinButtons[i].getDomeinString()[1];
+////				zetDomein(domeinStrings[i], i);
+////				parseFormule(i, false);
+////				
+////				produceAction("ingevuld");
+////			}
+////		}
+//		super.actionPerformed(e);
+//	}
 	
-	public void mousePressed(MouseEvent e) {	
-		
-		if (checkboxen != null) {
-			for(int i = 0; i < aantalStelsels; i++) {
-				if(e.getSource().equals(checkboxen[i]) && (e.getModifiers() & e.BUTTON1_MASK) == 0) {
-					Color kleur = JColorChooser.showDialog(this, GraphTool.rb.getString("kleurKiezer"), grafiekComponent.getFormuleColor(i));//new Color(255,255,180));
-					grafiekComponent.setColor(i,  kleur, false);
-					zetGrafiekKleuren();
-				}
-			}
-		}
-		
-		for(int i = 0; i < aantalStelsels; i++) {	
-			for (int j=0; j < cAantalFormulesPerStelsel; j++) {
-				int yMin = formuleVakken[(i*cAantalFormulesPerStelsel) + j].getLocation().y;
-				int yMax = formuleVakken[(i*cAantalFormulesPerStelsel) + j].getLocation().y + 
-							formuleVakken[(i*cAantalFormulesPerStelsel) + j].getSize().height+10;
-				if(e.getY() > yMin && e.getY() < yMax) {	
-					formuleVak.deSelect();
-					parseFormule(actiefNummer, false);
-					if(checkboxen[((int) actiefNummer/cAantalFormulesPerStelsel)].isSelected()) {	
-						produceAction("ingevuld");		
-					}	
-					actiefNummer = (i*cAantalFormulesPerStelsel) + j;
-					formuleVak = formuleVakken[(i*cAantalFormulesPerStelsel) + j].formuleVak;
-					formuleVak.requestFocus();
-					formuleVak.zetOpEind();
-					break;
-				}
-			}
-		}
-	}
+//	public void mousePressed(MouseEvent e) {	
+//		
+//		if (checkboxen != null) {
+//			for(int i = 0; i < aantalStelsels; i++) {
+//				if(e.getSource().equals(checkboxen[i]) && (e.getModifiers() & e.BUTTON1_MASK) == 0) {
+//					Color kleur = JColorChooser.showDialog(this, GraphTool.rb.getString("kleurKiezer"), grafiekComponent.getFormuleColor(i));//new Color(255,255,180));
+//					grafiekComponent.setColor(i,  kleur, false);
+//					zetGrafiekKleuren();
+//				}
+//			}
+//		}
+//		
+//		for(int i = 0; i < aantalStelsels; i++) {	
+//			for (int j=0; j < cAantalFormulesPerStelsel; j++) {
+//				int yMin = formuleVakken[(i*cAantalFormulesPerStelsel) + j].getLocation().y;
+//				int yMax = formuleVakken[(i*cAantalFormulesPerStelsel) + j].getLocation().y + 
+//							formuleVakken[(i*cAantalFormulesPerStelsel) + j].getSize().height+10;
+//				if(e.getY() > yMin && e.getY() < yMax) {	
+//					formuleVak.deSelect();
+//					parseFormule(actiefNummer, false);
+//					if(checkboxen[((int) actiefNummer/cAantalFormulesPerStelsel)].isSelected()) {	
+//						produceAction("ingevuld");		
+//					}	
+//					actiefNummer = (i*cAantalFormulesPerStelsel) + j;
+//					formuleVak = formuleVakken[(i*cAantalFormulesPerStelsel) + j].formuleVak;
+//					formuleVak.requestFocus();
+//					formuleVak.zetOpEind();
+//					break;
+//				}
+//			}
+//		}
+//	}
 	
-	public void focusGained(FocusEvent e) {
-	}
+//	public void focusGained(FocusEvent e) {
+//	}
 	
-	public void focusLost(FocusEvent e) {   
-		parseFormule(actiefNummer, false);
-		
-		if(checkboxen[(int) actiefNummer / cAantalFormulesPerStelsel].isSelected())
-		{	produceAction("ingevuld");		
-		}
-//		produceAction("focusLost");
-	}
+//	public void focusLost(FocusEvent e) {   
+//		parseFormule(actiefNummer, false);
+//		
+//		if(checkboxen[(int) actiefNummer / cAantalFormulesPerStelsel].isSelected())
+//		{	produceAction("ingevuld");		
+//		}
+////		produceAction("focusLost");
+//	}
 	
-	//ActionProducer
-	private ActionListener actionListener = null;
-	
-	public void addActionListener(ActionListener l) 
- 	{	actionListener = AWTEventMulticaster.add(actionListener,l);
- 	}
- 	
- 	public void removeActionListener(ActionListener l)
- 	{	actionListener = AWTEventMulticaster.remove(actionListener, l);
- 	}	
- 	
- 	public void produceAction(String command)
- 	{	if (actionListener != null)
- 		{	actionListener.actionPerformed( new ActionEvent(this, 0, command) );
- 		}
- 	}
- 	//end ActionProducer
-	
- 	class AccoladeLabel extends JLabel
- 	{
- 		int hoogte;
- 		
- 		public AccoladeLabel(int height)
- 		{
- 			super();
- 			hoogte = height;
- 			setSize(7, hoogte);
- 		}
- 		
- 		public void paintComponent(Graphics g)
- 		{
- 			g.setColor(Color.DARK_GRAY);
- 			g.drawLine(4, 1, 5, 1);
- 			g.drawLine(3, 2, 3, (hoogte - 1)/2 - 1);
- 			g.drawLine(3, (hoogte - 1)/2 - 1, 1, (hoogte - 1)/2 + 1);
- 			g.drawLine(1, (hoogte - 1)/2 + 1, 3, (hoogte - 1)/2 + 3);
- 			g.drawLine(3, (hoogte - 1)/2 + 3, 3, hoogte - 2);
- 			g.drawLine(4, hoogte - 1, 5, hoogte - 1);
- 		}
- 	}
+//	//ActionProducer
+//	private ActionListener actionListener = null;
+//	
+//	public void addActionListener(ActionListener l) 
+// 	{	actionListener = AWTEventMulticaster.add(actionListener,l);
+// 	}
+// 	
+// 	public void removeActionListener(ActionListener l)
+// 	{	actionListener = AWTEventMulticaster.remove(actionListener, l);
+// 	}	
+// 	
+// 	public void produceAction(String command)
+// 	{	if (actionListener != null)
+// 		{	actionListener.actionPerformed( new ActionEvent(this, 0, command) );
+// 		}
+// 	}
+// 	//end ActionProducer
+//	
+// 	class AccoladeLabel extends JLabel
+// 	{
+// 		int hoogte;
+// 		
+// 		public AccoladeLabel(int height)
+// 		{
+// 			super();
+// 			hoogte = height;
+// 			setSize(7, hoogte);
+// 		}
+// 		
+// 		public void paintComponent(Graphics g)
+// 		{
+// 			g.setColor(Color.DARK_GRAY);
+// 			g.drawLine(4, 1, 5, 1);
+// 			g.drawLine(3, 2, 3, (hoogte - 1)/2 - 1);
+// 			g.drawLine(3, (hoogte - 1)/2 - 1, 1, (hoogte - 1)/2 + 1);
+// 			g.drawLine(1, (hoogte - 1)/2 + 1, 3, (hoogte - 1)/2 + 3);
+// 			g.drawLine(3, (hoogte - 1)/2 + 3, 3, hoogte - 2);
+// 			g.drawLine(4, hoogte - 1, 5, hoogte - 1);
+// 		}
+// 	}
 }

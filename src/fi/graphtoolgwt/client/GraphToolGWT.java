@@ -22,6 +22,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 
+
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -37,6 +38,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 
 import com.google.gwt.core.client.EntryPoint;
@@ -127,6 +129,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	TekenComponentGWT tekenComponent;
 	TabelComponentGWT tabelComponent;
 	FormuleComponentGWT formuleComponent;
+	VeldComponentGWT veldComponent;
 	
 	LayoutPanel zoomPanel;
 	int zoomPanelHoogte = 23;
@@ -246,6 +249,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean formeleFuncties = true;
 	boolean domeinInstelbaar = false;
 	int formuleComponentHoogte = 120;
+	int veldComponentHoogte = VeldComponentGWT.cDefault_VeldComponentGWT_hoogte;
 	
 	boolean functieToegestaan = true;
 	boolean ongelijkheidToegestaan = true;
@@ -254,7 +258,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean parametrisatieToegestaan = false;
 	
 	boolean formuleComponentAan = true;
+	boolean veldComponentAan = false;
 	boolean tekenComponentAan = cDefault_tekenComponentAan;
+	
 	//voor testen tabelcomponent: 
 	//boolean tabelComponentAan = true;
 	//standaard:
@@ -417,6 +423,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			grafiekVeldHoogte -= tabelComponentHoogte + offset;
 		if(formuleComponentAan)
 			grafiekVeldHoogte -= formuleComponentHoogte + offset;
+		if(veldComponentAan)
+			grafiekVeldHoogte -= veldComponentHoogte + offset;
 		
 		if((typeOpdracht == 3 || typeOpdracht == 4) && mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS && !checkExternal) 
 		{	grafiekVeldHoogte -= kijkNaPanelHoogte + offset;
@@ -576,14 +584,23 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
 		formuleComponent.setPixelSize( breedte  , (formuleComponentHoogte - 2 - offset) );
 		
+		veldComponent = new VeldComponentGWT(this, launchState, breedte);
+		
 		formuleComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(typeOpdracht == VINDFORMULEBIJGRAFIEK || typeOpdracht == VINDFORMULEBIJPUNTEN)
 			formuleComponent.alsOpdracht = true;
-		if(formuleComponentAan)
-		{	FlowPanel panel = new FlowPanel();
+		if(formuleComponentAan) {	
+			FlowPanel panel = new FlowPanel();
 			panel.setSize(breedte + "px", offset + "px");
 			basisPanel.add(panel);
 			basisPanel.add(formuleComponent);
+		}
+		
+		if (veldComponentAan) {
+			FlowPanel panel = new FlowPanel();
+			panel.setSize(breedte + "px", offset + "px");
+			basisPanel.add(panel);
+			basisPanel.add(veldComponent);
 		}
 		
 		grafiekGWTVeld.initContext2d();
@@ -2604,6 +2621,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				domeinInstelbaar =  launchData.getBoolean("domeinInstelbaar");
 			if(launchData.containsKey("formuleComponentHoogte"))
 				formuleComponentHoogte =  launchData.getInt("formuleComponentHoogte");
+			if(launchData.containsKey("veldComponentHoogte"))
+				veldComponentHoogte =  launchData.getInt("veldComponentHoogte");
 			
 			if(launchData.containsKey("functieToegestaan"))
 				functieToegestaan = launchData.getBoolean("functieToegestaan");
@@ -2618,6 +2637,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			if(launchData.containsKey("formuleComponentAan"))
 				formuleComponentAan =  launchData.getBoolean("formuleComponentAan");
+			if(launchData.containsKey("veldComponentAan"))
+				veldComponentAan =  launchData.getBoolean("veldComponentAan");
+
 			if(launchData.containsKey("tekenComponentAan"))
 				tekenComponentAan =  launchData.getBoolean("tekenComponentAan");
 			if(launchData.containsKey("tabelComponentAan"))
