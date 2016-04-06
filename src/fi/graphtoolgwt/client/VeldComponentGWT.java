@@ -251,7 +251,6 @@ public class VeldComponentGWT extends LayoutPanel {
 //		isEn = new boolean[maxAantalFormules];
 //		for(int i = 0; i<isEn.length; i++)
 //			isEn[i] = true;
-		logger.info("uit Veldcomponent");
 		this.resize();
 
 	}
@@ -341,86 +340,85 @@ public class VeldComponentGWT extends LayoutPanel {
 		}
 		
 		private void adjustSize() {
-			int[] rowHeight = new int[2];
-			int systemHalfHeight = 0;
-
-			// Determine RowHeigth & system Height
-			int maxBeginWidth = 0;
-			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY;
-//			this.systemHeight = (nrFunctions+1) * cSystemDiffEqPanelGWT_interObjectMarginY; 
-			for (int i=0; i<nrFunctions; i++) {
-				rowHeight[i]=Math.max(functionBeginViewers[i].getHeight(), functionEditors[i].getHeight());
-				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getHeight());
-				this.systemHeight += rowHeight[i];
-				
-				if ((double) (i+1) <= (double) nrFunctions/2.0) {
-					systemHalfHeight = systemHeight + cSystemDiffEqPanelGWT_interObjectMarginY/2;
-				} 
-				
-				double oddHalfTest =  ((double) (i+1)-((double) nrFunctions/2.0));
-				if ((oddHalfTest > 0) && (oddHalfTest < 1)) {
-					// nrFunctions = odd & we're halfway
-					systemHalfHeight = systemHeight - rowHeight[i]/2;
-				}
-
-				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
-			}
-			
-				
-			// adjust Row Positions
-			int posY = cSystemDiffEqPanelGWT_interObjectMarginY;
-			for (int i=0; i<nrFunctions; i++) {
-
-				// Position Entire Row
-				int rowStartX = 3 * cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize + cSystemDiffEqPanelGWT_braceWidth;
-				this.setWidgetTopHeight(functionPanels[i], posY, Style.Unit.PX, rowHeight[i], Style.Unit.PX);
-				this.setWidgetLeftWidth(functionPanels[i], rowStartX, Style.Unit.PX, systemWidth-rowStartX, Style.Unit.PX);
-				posY += rowHeight[i] + cSystemDiffEqPanelGWT_interObjectMarginY;
-				
-				// Position Begin viewer within Row
-				functionPanels[i].setWidgetTopHeight(functionBeginViewers[i].getAsPanel(), (rowHeight[i]-functionBeginViewers[i].getHeight())/2, Style.Unit.PX, 
-						functionBeginViewers[i].getHeight(), Style.Unit.PX);
-				functionPanels[i].setWidgetLeftWidth(functionBeginViewers[i].getAsPanel(), 0, Style.Unit.PX, 
-						maxBeginWidth, Style.Unit.PX);
-				
-				// Position Function editor within Row
-				functionPanels[i].setWidgetTopHeight(functionEditorPanels[i], (rowHeight[i]-functionEditors[i].getHeight())/2, Style.Unit.PX, 
-						functionEditors[i].getHeight(), Style.Unit.PX);
-				functionPanels[i].setWidgetLeftWidth(functionEditorPanels[i], maxBeginWidth+cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, 
-						systemWidth-rowStartX-cSystemDiffEqPanelGWT_interObjectMarginX-maxBeginWidth, Style.Unit.PX);
-			}				
-			
-			// adjust Checkbox Position
-			this.setWidgetLeftWidth(cb, cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
-			this.setWidgetTopHeight(cb, systemHeight/2-cSystemDiffEqPanelGWT_checkBoxSize/2, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
-				
-			// adjust brace Canvas Position
-			this.setWidgetLeftWidth(braceCanvas, 2* cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize, 
-					Style.Unit.PX, cSystemDiffEqPanelGWT_braceWidth, Style.Unit.PX);
-			this.setWidgetTopHeight(braceCanvas, 0, Style.Unit.PX, systemHeight, Style.Unit.PX);
-			
-			// redraw brace
-			Context2d ctx = braceCanvas.getContext2d();
-			
-			ctx.beginPath();
-			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0, 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 1.5*Math.PI, false);
-			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0);
-			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0);
-			
-			ctx.arc(0.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0, 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
-			
-			ctx.arc(0.0, systemHeight/2.0+cSystemDiffEqPanelGWT_braceWidth/2.0, 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
-			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2);
-			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2);
-
-			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0, 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
-			ctx.stroke();
+//			int[] rowHeight = new int[2];
+//			int systemHalfHeight = 0;
+//
+//			// Determine RowHeigth & system Height
+//			int maxBeginWidth = 0;
+//			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY;
+//			for (int i=0; i<nrFunctions; i++) {
+//				rowHeight[i]=Math.max(functionBeginViewers[i].getHeight(), functionEditors[i].getHeight());
+//				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getHeight());
+//				this.systemHeight += rowHeight[i];
+//				
+//				if ((double) (i+1) <= (double) nrFunctions/2.0) {
+//					systemHalfHeight = systemHeight + cSystemDiffEqPanelGWT_interObjectMarginY/2;
+//				} 
+//				
+//				double oddHalfTest =  ((double) (i+1)-((double) nrFunctions/2.0));
+//				if ((oddHalfTest > 0) && (oddHalfTest < 1)) {
+//					// nrFunctions = odd & we're halfway
+//					systemHalfHeight = systemHeight - rowHeight[i]/2;
+//				}
+//
+//				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
+//			}
+//			
+//				
+//			// adjust Row Positions
+//			int posY = cSystemDiffEqPanelGWT_interObjectMarginY;
+//			for (int i=0; i<nrFunctions; i++) {
+//
+//				// Position Entire Row
+//				int rowStartX = 3 * cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize + cSystemDiffEqPanelGWT_braceWidth;
+//				this.setWidgetTopHeight(functionPanels[i], posY, Style.Unit.PX, rowHeight[i], Style.Unit.PX);
+//				this.setWidgetLeftWidth(functionPanels[i], rowStartX, Style.Unit.PX, systemWidth-rowStartX, Style.Unit.PX);
+//				posY += rowHeight[i] + cSystemDiffEqPanelGWT_interObjectMarginY;
+//				
+//				// Position Begin viewer within Row
+//				functionPanels[i].setWidgetTopHeight(functionBeginViewers[i].getAsPanel(), (rowHeight[i]-functionBeginViewers[i].getHeight())/2, Style.Unit.PX, 
+//						functionBeginViewers[i].getHeight(), Style.Unit.PX);
+//				functionPanels[i].setWidgetLeftWidth(functionBeginViewers[i].getAsPanel(), 0, Style.Unit.PX, 
+//						maxBeginWidth, Style.Unit.PX);
+//				
+//				// Position Function editor within Row
+//				functionPanels[i].setWidgetTopHeight(functionEditorPanels[i], (rowHeight[i]-functionEditors[i].getHeight())/2, Style.Unit.PX, 
+//						functionEditors[i].getHeight(), Style.Unit.PX);
+//				functionPanels[i].setWidgetLeftWidth(functionEditorPanels[i], maxBeginWidth+cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, 
+//						systemWidth-rowStartX-cSystemDiffEqPanelGWT_interObjectMarginX-maxBeginWidth, Style.Unit.PX);
+//			}				
+//			
+//			// adjust Checkbox Position
+//			this.setWidgetLeftWidth(cb, cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
+//			this.setWidgetTopHeight(cb, systemHeight/2-cSystemDiffEqPanelGWT_checkBoxSize/2, Style.Unit.PX, cSystemDiffEqPanelGWT_checkBoxSize, Style.Unit.PX);
+//				
+//			// adjust brace Canvas Position
+//			this.setWidgetLeftWidth(braceCanvas, 2* cSystemDiffEqPanelGWT_interObjectMarginX + cSystemDiffEqPanelGWT_checkBoxSize, 
+//					Style.Unit.PX, cSystemDiffEqPanelGWT_braceWidth, Style.Unit.PX);
+//			this.setWidgetTopHeight(braceCanvas, 0, Style.Unit.PX, systemHeight, Style.Unit.PX);
+//			
+//			// redraw brace
+//			Context2d ctx = braceCanvas.getContext2d();
+//			
+//			ctx.beginPath();
+//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0, 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 1.5*Math.PI, false);
+//			
+//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0);
+//			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0);
+//			
+//			ctx.arc(0.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0, 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
+//			
+//			ctx.arc(0.0, systemHeight/2.0+cSystemDiffEqPanelGWT_braceWidth/2.0, 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
+//			
+//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2);
+//			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2);
+//
+//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0, 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
+//			ctx.stroke();
 		}
 		
 		public SystemDiffEqPanelGWT(int id, int nrFunctions, int systemWidth) {
@@ -478,7 +476,6 @@ public class VeldComponentGWT extends LayoutPanel {
 					//editors[i].requestFocus();
 					//if (!functieBeginAanpasbaar)
 					//	regelPanels[i].add(functieBeginViewers[i]);
-				logger.info("in Veldcomponent 2.5");
 				
 			}
 			
