@@ -2221,6 +2221,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+		if(h == null || h.isEmpty()) return;
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
 		//System.out.println("setState graphtoolgwt");
