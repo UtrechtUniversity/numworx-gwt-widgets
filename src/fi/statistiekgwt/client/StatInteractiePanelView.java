@@ -606,7 +606,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	public void processSelectedTab(int tab)
 	{
 		if (tab < this.model.getViews().size()
-			&& this.model.getViews().size() > 1)
+			&& this.model.getViews().size() >= 1)
 		{
 			// determine the view related to tab
 			int view = determineView(tab);
