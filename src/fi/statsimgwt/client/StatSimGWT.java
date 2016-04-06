@@ -20,6 +20,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.statsimgwt.client.Munten.Experiment;
@@ -62,6 +63,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	BinomTrekking binomTrekking;
 	Steekproef steekproef;
 	
+	SimplePanel simpel = new SimplePanel();
 	
 	public void onModuleLoad() {
 
@@ -72,6 +74,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 		//Window.alert("test");	
 		
 		//RootPanel.get("dockholder").getElement().setInnerText("textand");
+		RootPanel.get().add(simpel);
 		Stub.publish(this);
 			
 	}
@@ -834,7 +837,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		//RootPanel.get("dockholder").add(asWidget());
+		simpel.setWidget(asWidget());
 
 	}
 
