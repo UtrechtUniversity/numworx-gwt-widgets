@@ -89,11 +89,16 @@ public class DescriptivesController implements StatistiekView
 				noBins);
 			
 			// opnieuw boundaries berekenen met de hierboven berekende binwidth
-			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(this.model.getStatTableModel().getColumnMin(
-					this.model.getSplitOptions().getColumnSplitIndex()),
-				this.model.getStatTableModel().getColumnMax(
-					this.model.getSplitOptions().getColumnSplitIndex()), 
-					boundaries.get(1) - boundaries.get(0), boundaries.get(0));
+			int bin0Decimals = StatistiekGWT.getNumberOfDecimals(boundaries.get(0).toString());
+			int bin1Decimals = StatistiekGWT.getNumberOfDecimals(boundaries.get(1).toString());
+			int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
+			
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex()),
+				this.model.getStatTableModel().getColumnMax(this.model.getSplitOptions().getColumnSplitIndex()), 
+				// door afronding kan de aftreksom heel veel decimalen hebben
+				StatistiekGWT.round(boundaries.get(1) - boundaries.get(0), maxNumberOfDecimals), 
+				boundaries.get(0));
 
 			this.model.setSplitBoundaries(boundaries);
 			this.model.setSplitOptions(this.model.getSplitOptions());
