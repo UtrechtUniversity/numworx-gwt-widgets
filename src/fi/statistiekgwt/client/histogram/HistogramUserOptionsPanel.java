@@ -1456,23 +1456,29 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (e.getSource() == maxOnScaleField)
 			{
+				double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
+
+				// column index bin settings
+				controller.updateBoundariesFromBinSettings();
+
 				if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
 				{
 					// max < min is niet toegestaan
-					if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
+					if (maxOnScale < view.getUserOptionsPanel().getMinBoundary())
 					{
 						// reset to latest value
 						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
 					}
 					else
 					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+						model.setMaxOnScale(maxOnScale);
 					}
 				}
 				else
 				{
 					double maxBinValue = model.getMaxBinBoundaryValue();
-					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+
+					if (maxOnScale < maxBinValue)
 					{
 						if (model.getMaxOnScale() < maxBinValue)
 						{
@@ -1487,10 +1493,10 @@ public class HistogramUserOptionsPanel extends FlowPanel
 					}
 					else
 					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+						model.setMaxOnScale(maxOnScale);
 					}
 				}
-			}
+			} // maxOnScaleField
 			else if (e.getSource() == binWidthField)
 			{
 				model.setBinWidth(view.getBinWidth());
@@ -1703,23 +1709,29 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				}
 				else if (e.getSource() == maxOnScaleField)
 				{
+					double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
+
+					// column index bin settings
+					controller.updateBoundariesFromBinSettings();
+
 					if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
 					{
 						// max < min is niet toegestaan
-						if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
+						if (maxOnScale < view.getUserOptionsPanel().getMinBoundary())
 						{
 							// reset to latest value
 							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
 						}
 						else
 						{
-							model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+							model.setMaxOnScale(maxOnScale);
 						}
 					}
 					else
 					{
 						double maxBinValue = model.getMaxBinBoundaryValue();
-						if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+
+						if (maxOnScale < maxBinValue)
 						{
 							if (model.getMaxOnScale() < maxBinValue)
 							{
@@ -1734,7 +1746,7 @@ public class HistogramUserOptionsPanel extends FlowPanel
 						}
 						else
 						{
-							model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+							model.setMaxOnScale(maxOnScale);
 						}
 					}
 				}
