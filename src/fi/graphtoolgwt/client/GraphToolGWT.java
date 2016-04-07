@@ -21,8 +21,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-
-
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -39,11 +37,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
 
-
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-//import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -67,24 +62,12 @@ import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-//import com.google.gwt.event.dom.client.ClickEvent;
-//import com.google.gwt.event.dom.client.ClickHandler;
-//import com.google.gwt.event.dom.client.KeyCodes;
-//import com.google.gwt.event.dom.client.KeyUpEvent;
-//import com.google.gwt.event.dom.client.KeyUpHandler;
-//import com.google.gwt.user.client.rpc.AsyncCallback;
-//import com.google.gwt.user.client.ui.Button;
-//import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-//import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
-//import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-//import com.google.gwt.user.client.ui.TextBox;
-//import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -104,7 +87,7 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-//	private static Logger logger = Logger.getLogger("GraphToolGWT");
+	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	final static int cSelectMarge = 5;
 	final static boolean cDefault_tekenComponentAan = false;
 
@@ -155,8 +138,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	private int aantalFuncties = 0;
 	
 	Expressie[] functies = new Expressie[maxAantalExpressies];
+	Expressie[][] veldFuncties = new Expressie[VeldComponentGWT.cMaxAantalStelsels][VeldComponentGWT.cAantalFormulesPerStelsel];
+
 	Expressie[] ongelijkheden = new Expressie[maxAantalExpressies];
 	Expressie[] verticaleLijnen = new Expressie[maxAantalExpressies];
+	
 	boolean[] isY = new boolean[maxAantalExpressies];
 	boolean[] isGroterGelijk = new boolean[maxAantalExpressies];
 	boolean[] isEn = new boolean[maxAantalExpressies];
@@ -249,7 +235,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean formeleFuncties = true;
 	boolean domeinInstelbaar = false;
 	int formuleComponentHoogte = 120;
-	int veldComponentHoogte = VeldComponentGWT.cDefault_VeldComponentGWT_hoogte;
+	int veldComponentHoogte = VeldComponentGWT.cDefault_hoogte;
+	VeldComponentGWT.FieldGraphType veldGrafiekType = VeldComponentGWT.cDefault_grafiekType;
+	VeldComponentGWT.FieldGraphArrowSizeMode veldPijlGrootteModus = VeldComponentGWT.cDefault_pijlGrootteModus;
+	int veldPijlGroottePixels = VeldComponentGWT.cDefault_pijlGroottePixels;
+	double veldPijlSchaalfactor = VeldComponentGWT.cDefault_pijlSchaalFactor;
+	boolean veldLargerGridStartPoints = VeldComponentGWT.cDefault_largerGridStartPoints;
+
 	
 	boolean functieToegestaan = true;
 	boolean ongelijkheidToegestaan = true;
@@ -601,6 +593,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			panel.setSize(breedte + "px", offset + "px");
 			basisPanel.add(panel);
 			basisPanel.add(veldComponent);
+			
+			//RPJ
+			zetVectorVeld(0, 0, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fax+y@"))));
+			zetVectorVeld(0, 1, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fay-x@"))));
+		
 		}
 		
 		grafiekGWTVeld.initContext2d();
@@ -2029,6 +2026,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			//grafiekGWTVeld.paint();
 	}
 	
+	public void zetVectorVeld(int stelselNr, int functieNr, Expressie expressie) {
+		veldFuncties[stelselNr][functieNr] = expressie;
+		logger.info("veldFuncties["+stelselNr+"]["+functieNr+"]=" +veldFuncties[stelselNr][functieNr] );
+	}
+
+	
 	public void zetVerticaleLijn(int nr, Expressie e)
 	{
 		verticaleLijnen[nr] = e;
@@ -2237,6 +2240,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+		if(h == null || h.isEmpty()) return;
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
 		//System.out.println("setState graphtoolgwt");
@@ -2408,6 +2412,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 		tekenComponent.setState(h);
 		formuleComponent.setState(h, null, null);
+//		veldComponent.setState(h);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
 		if((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	kijkNa();

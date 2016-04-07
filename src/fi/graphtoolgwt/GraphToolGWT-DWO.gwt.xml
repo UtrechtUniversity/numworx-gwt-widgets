@@ -21,6 +21,7 @@
   <inherits name="com.googlecode.mgwt.MGWT"/>
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='gwt.Geom' />
+  <inherits name='fi.beans.lineairealgebra.LineaireAlgebra'/>
   
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>

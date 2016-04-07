@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="lib/wiskopdrexpressies.jar"/>
 	<classpathentry kind="lib" path="lib/formule.jar"/>
 	<classpathentry kind="lib" path="lib/geom.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/lineairealgebra"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

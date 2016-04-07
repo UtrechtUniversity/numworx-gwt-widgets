@@ -1,8 +1,5 @@
 package fi.graphtoolgwt.client;
 
-
-
-import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Map;
 //import java.util.Map;
@@ -20,6 +17,7 @@ import com.google.gwt.canvas.dom.client.TextMetrics;
 //import fi.graphtool.Slider;
 import com.google.gwt.touch.client.Point;
 
+import fi.beans.lineairealgebra.Vector2d;
 import fi.wiskopdr.expressies.Expressie;
 import gwt.awt.geom.Area;
 import gwt.awt.Rectangle;
@@ -28,13 +26,13 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
 	private final int cExtraAxisMargeX = 2; // Voorzichtig met wijzigen van deze parameters 
 	private final int cExtraAxisMargeY = 3; // (groter maken kan er toe leiden dat bij bestaande oefeningen een x- of y as verdwijnt)
-	private final int cAxesThickness = 1;
+	private final int cAxesThicknessInPixels = 1;
 	private final int cPiFromAxis = 25;
 	private final int cDashStep = 5;
 	private final String cFontString = "10px sans-serif";
@@ -46,6 +44,7 @@ public class GrafiekGWTVeld {
 	private final double cLineWidthLogLines = 0.25d;
 //	private final double cLineWidth = 0.25d;
 	private final double cLineWidthAxes = 1.00d;	
+	private final double cLineWidthVectorFields = 1.2d;
 	
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
 	                        // range is used
@@ -241,6 +240,25 @@ public class GrafiekGWTVeld {
 		} 
 		return valueX;
 	}
+	
+	public double pixelsYtoValue(double pixelsY) { 
+		// This function also needs to perform for values in between pixels, therefore a double is used to represent pixelsY 
+		double scalingMultiplier;		
+		if (interactiePanel.manualScalingY) {
+			scalingMultiplier = interactiePanel.eenheidyValue;
+		}
+		else {
+			scalingMultiplier = interactiePanel.schaalFactorY;			
+		}
+//		double valueY = (pixelsX-gtip.beginx)/gtip.eenheidxD*scalingMultiplier;
+		double valueY = (scalingMultiplier * (-interactiePanel.beginy) / interactiePanel.eenheidyD +
+							scalingMultiplier * (hoogte -pixelsY) / interactiePanel.eenheidyD);
+		if (interactiePanel.yAsLog) {
+			valueY = Math.pow(10, valueY);
+		} 
+		return valueY;
+	}
+
 
 	public double valueXtoPixels(double valueX) {
 		double pixelsX;
@@ -334,11 +352,12 @@ public class GrafiekGWTVeld {
 			scalingMultiplyY *= 2;
 		}
 
+		int imin = -(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX)); 
+		int imax = 1+breedte/(interactiePanel.eenheidx * scalingMultiplyX)-(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX));
+		int jmin = -(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy * scalingMultiplyY)); 
+		int jmax = 1+hoogte/(interactiePanel.eenheidy* scalingMultiplyY)-(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy*scalingMultiplyY));
+		
 		if (interactiePanel.roosterZichtbaar || interactiePanel.schaalZichtbaar) {	
-			int imin = -(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX)); 
-			int imax = 1+breedte/(interactiePanel.eenheidx * scalingMultiplyX)-(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX));
-			int jmin = -(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy * scalingMultiplyY)); 
-			int jmax = 1+hoogte/(interactiePanel.eenheidy* scalingMultiplyY)-(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy*scalingMultiplyY));
 			
 			for(int j=jmin+1 ; j<jmax-1 ; j++) {	
 //				String getal = Double.toString(interactiePanel.schaalFactorY*(j));
@@ -751,7 +770,7 @@ public class GrafiekGWTVeld {
 			xAsNaamRechts = xAsNaamLinks + woordBreedteX;
 			xAsNaamBoven = xAsNaamOnder - cFontHeightItalic;
 
-			yAsNaamLinks = Math.max( drawXmin+ 1 * cExtraAxisMargeX, Math.min(drawXmax - woordBreedteY - 1 * cExtraAxisMargeX, bx+ 1 * cExtraAxisMargeX + cAxesThickness) );
+			yAsNaamLinks = Math.max( drawXmin+ 1 * cExtraAxisMargeX, Math.min(drawXmax - woordBreedteY - 1 * cExtraAxisMargeX, bx+ 1 * cExtraAxisMargeX + cAxesThicknessInPixels) );
 			yAsNaamOnder = drawYmin + cFontHeightItalic +3 * cExtraAxisMargeY;
 			yAsNaamRechts = yAsNaamLinks + woordBreedteY;
 			yAsNaamBoven = yAsNaamOnder - cFontHeightItalic;
@@ -1043,7 +1062,7 @@ public class GrafiekGWTVeld {
 
 		tekenOngelijkheden(gIm);
 		tekenVerticaleLijnen(gIm);
-
+		tekenVeldGrafieken(imin, imax, jmin, jmax, scalingMultiplyX, scalingMultiplyY);
 		
 		//Punten en grafieken uit tekenEditor;
 		if(interactiePanel.docentGraphPoints != null && interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)
@@ -1853,6 +1872,104 @@ public class GrafiekGWTVeld {
 		g.stroke();
 	}
 	
+	public void tekenVeldGrafieken(int gridXmin, int gridXmax, int gridYmin, int gridYmax, int scalingMultiplyX, int scalingMultiplyY) {
+       
+				
+		int loopCounter = 0;
+		// process schuifParameters
+		Expressie xAsExpressie = interactiePanel.veldFuncties[0][0];
+		Expressie yAsExpressie = interactiePanel.veldFuncties[0][1];
+		if ( (xAsExpressie != null) && (yAsExpressie != null) ) {
+			if(interactiePanel.schuifParameters != null) {	
+				for(int i = 0; i < interactiePanel.schuifParameters.length; i++) {	
+					SchuifParameterGWT p = interactiePanel.schuifParameters[i];
+					xAsExpressie = xAsExpressie.substitueer(p.geefWaarde(), p.geefNaam());
+					yAsExpressie = yAsExpressie.substitueer(p.geefWaarde(), p.geefNaam());
+				}
+			}
+
+			// Set visual parameters
+			gIm.setStrokeStyle(grijs);
+			gIm.setLineWidth(cLineWidthVectorFields);
+			/* RPJ start */
+			interactiePanel.veldLargerGridStartPoints = true;
+//			interactiePanel.veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode.SCALEDSIZE;
+			/* RPJ end */
+
+			// roosterpunten aflopen
+			double start = System.currentTimeMillis();
+			for(int i=gridXmin ; i<gridXmax ; i++) { // x-as aflopen
+				for(int j=gridYmin ; j<gridYmax ; j++) { // y-as aflopen
+				
+					// bepaal roosterpositie = begin van vector / stream
+					double vectorStartXScreen =  (interactiePanel.beginx+i*interactiePanel.eenheidxD * scalingMultiplyX);
+					double vectorStartYScreen =  (hoogte-(interactiePanel.beginy+j*interactiePanel.eenheidy* scalingMultiplyY));
+
+					if ((!interactiePanel.veldLargerGridStartPoints) || ((i%2==0) && (j%2==0))) {
+						loopCounter++;
+						tekenVector(gIm, new RealPoint(vectorStartXScreen, vectorStartYScreen), xAsExpressie, yAsExpressie, true);
+
+					}
+				}
+			}
+			double end = System.currentTimeMillis();
+			logger.info(end + ":: Veldgrafiek - Loop finished of :"+loopCounter +"in "+(end-start)/1000+"seconden");
+		}
+	}
+	
+	private RealPoint tekenVector(Context2d g, RealPoint vectorStartScherm, Expressie xAsExpressie, Expressie yAsExpressie,boolean tekenPijlpunt) {
+		double vectorStartXWaarde = pixelsXtoValue(vectorStartScherm.getX()); 
+		double vectorStartYWaarde = pixelsYtoValue(vectorStartScherm.getY());
+		
+		double vectorEindXWaarde = vectorStartXWaarde + xAsExpressie.substitueer(vectorStartXWaarde, interactiePanel.xAsNaam).substitueer(vectorStartYWaarde, interactiePanel.yAsNaam).geefWaarde();
+		double vectorEindYWaarde = vectorStartYWaarde + yAsExpressie.substitueer(vectorStartXWaarde, interactiePanel.xAsNaam).substitueer(vectorStartYWaarde, interactiePanel.yAsNaam).geefWaarde();
+		
+		
+	    Vector2d vectorScherm = new Vector2d(valueXtoPixels(vectorEindXWaarde)-vectorStartScherm.getX(), valueYtoPixels(vectorEindYWaarde)-vectorStartScherm.getY());
+
+	    if (interactiePanel.veldPijlGrootteModus == VeldComponentGWT.FieldGraphArrowSizeMode.FIXEDSIZE) {
+	    	if ( interactiePanel.veldPijlGroottePixels > 0 && vectorScherm.length() > 0) {
+	    		vectorScherm.normalize();
+				vectorScherm.scale(interactiePanel.veldPijlGroottePixels);
+	    	}
+	    } else {
+		    if (interactiePanel.veldPijlGrootteModus == VeldComponentGWT.FieldGraphArrowSizeMode.SCALEDSIZE) {
+		    	if ( interactiePanel.veldPijlSchaalfactor > 0 && vectorScherm.length() > 0) {
+		    		vectorScherm.scale(interactiePanel.veldPijlSchaalfactor);
+		    	}		    	
+		    }
+	    }
+
+	    RealPoint vectorEindScherm = new RealPoint(vectorStartScherm.getX() + vectorScherm.getX(), vectorStartScherm.getY() + vectorScherm.getY());
+		
+		if ( ((int) vectorStartScherm.getX()!= (int) vectorEindScherm.getX()) || ((int) vectorStartScherm.getY()!= (int)vectorEindScherm.getY()) ) { 
+			// alleen tekenen wanneer er lengte is
+			drawLineWithinVisibleBounds(g, (int) vectorStartScherm.getX(), (int) vectorStartScherm.getY(), (int) vectorEindScherm.getX(), (int) vectorEindScherm.getY());
+			
+//			if ((tekenPijlpunt) && pixelsPointWithinBounds(vectorEindScherm.getX(), vectorEindScherm.getY())){
+				tekenPijlpunt(g, vectorStartScherm, vectorEindScherm);
+//			}
+		}
+
+		return (vectorEindScherm);
+	}
+	
+	private void tekenPijlpunt(Context2d g, RealPoint vectorStartScherm, RealPoint vectorEindScherm ) { 
+	    double h = 3*Math.sqrt(3), w = 3;
+	    Vector2d A = new Vector2d();
+	    
+	    Vector2d Vec = new Vector2d(vectorEindScherm.getX()-vectorStartScherm.getX(), vectorEindScherm.getY()-vectorStartScherm.getY());
+	    
+	    Vector2d U = new Vector2d(Vec.getX()/Vec.length(), Vec.getY()/Vec.length());
+	    //U.set(Vec.x/Vec.length(), Vec.y/Vec.length());
+	    
+		Vector2d V = new Vector2d(-U.getY(), U.getX());
+		Vector2d v1 = new Vector2d(vectorEindScherm.getX() -h * U.getX() + w*V.getX(), vectorEindScherm.getY() -h * U.getY() + w*V.getY());
+		Vector2d v2 = new Vector2d(vectorEindScherm.getX() -h * U.getX() - w*V.getX(), vectorEindScherm.getY() -h * U.getY() - w*V.getY());
+		drawLineWithinVisibleBounds(g, v1.getX(), v1.getY(), vectorEindScherm.getX(), vectorEindScherm.getY());
+		drawLineWithinVisibleBounds(g, v2.getX(), v2.getY(), vectorEindScherm.getX(), vectorEindScherm.getY());
+	}
+	
 	public void tekenOngelijkheden(Context2d g)
 	{	//Graphics2D g = (Graphics2D) gr;
 		CssColor[][] ongelijkheidKleuren;
@@ -1871,7 +1988,6 @@ public class GrafiekGWTVeld {
 		
 		// RPJ
 		g.setStrokeStyle("zwart");
-
 
 		for(int j=0 ; j<interactiePanel.ongelijkheden.length ; j++) {	
 			Expressie expressie = interactiePanel.ongelijkheden[j];
