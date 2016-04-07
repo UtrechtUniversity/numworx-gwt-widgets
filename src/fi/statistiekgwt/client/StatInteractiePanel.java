@@ -144,8 +144,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 		int tabInt = this.model.mainWindowIndexToGeneralIndex(this.view
 			.getSelectedView());
 		h.put("selectedView", new Integer(tabInt));
-		System.out.println("StatInteractiePanel.getState(): this.model.mainWindowIndexToGeneralIndex(this.view.getselectedView()="
-			+ this.view.getSelectedView() + ") = " + tabInt);
+//		System.out.println("StatInteractiePanel.getState(): this.model.mainWindowIndexToGeneralIndex(this.view.getselectedView()="
+//			+ this.view.getSelectedView() + ") = " + tabInt);
 
 		return h;
 	}
@@ -176,8 +176,8 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 		int tabInt = this.model.mainWindowIndexToGeneralIndex(this.view
 			.getSelectedView());
 		h.put("selectedView", new Integer(tabInt));
-		System.out.println("StatInteractiePanel.getState(): this.model.mainWindowIndexToGeneralIndex(this.view.getselectedView()="
-			+ this.view.getSelectedView() + ") = " + tabInt);
+//		System.out.println("StatInteractiePanel.getState(): this.model.mainWindowIndexToGeneralIndex(this.view.getselectedView()="
+//			+ this.view.getSelectedView() + ") = " + tabInt);
 
 		return h;
 	}
@@ -822,7 +822,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 				{
 					String[] waarden = regels[i].split(";");
 					
-					System.out.println("Waardenlengte = " + waarden.length);
+					//System.out.println("Waardenlengte = " + waarden.length);
 					if ((waarden.length != columnCount) 
 						&& !"".equals(dataString))
 					{
@@ -834,7 +834,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 					values.add(new ArrayList<Object>());
 					for (int j = 0; j < waarden.length; j++)
 					{ 
-						System.out.println("Waarden[" + j + "] = " + waarden[j]);
+						//System.out.println("Waarden[" + j + "] = " + waarden[j]);
 						
 						if (!"".equals(waarden[j].trim()))
 						{
