@@ -330,6 +330,10 @@ public class HistogramController implements StatistiekView
 		{
 			this.model.setOptimizeScale(map.getBoolean("optimizeScale"));
 		}
+		if (h.containsKey("binWidth")) // bin width nodig voor bepalen maxOnScale
+		{
+			this.model.setBinWidth(map.getDouble("binWidth"));
+		}
 		if (h.containsKey("minOnScale"))
 		{
 			this.model.setMinOnScale(map.getDouble("minOnScale"));
@@ -337,10 +341,6 @@ public class HistogramController implements StatistiekView
 		if (h.containsKey("maxOnScale"))
 		{
 			this.model.setMaxOnScale(map.getDouble("maxOnScale"));
-		}
-		if (h.containsKey("binWidth"))
-		{
-			this.model.setBinWidth(map.getDouble("binWidth"));
 		}
 	}
 
