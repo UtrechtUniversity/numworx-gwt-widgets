@@ -280,10 +280,17 @@ public class HistogramModel
     						this.statTableModel.getColumnMax(this.columnIndex),
     						this.noBins);
     				
+    				int bin0Decimals = StatistiekGWT.getNumberOfDecimals(this.binBoundaries.get(0).toString());
+    				int bin1Decimals = StatistiekGWT.getNumberOfDecimals(this.binBoundaries.get(1).toString());
+    				int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
+
     				// opnieuw berekenen met de berekende bin width, omdat er mogelijk minder bins nodig zijn
-    				this.binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(this.statTableModel.getColumnMin(this.columnIndex),
+    				this.binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+    					this.statTableModel.getColumnMin(this.columnIndex),
     					this.statTableModel.getColumnMax(this.columnIndex), 
-    					this.binBoundaries.get(1) - this.binBoundaries.get(0), this.binBoundaries.get(0));
+    					// door afronding kan de aftreksom heel veel decimalen hebben
+    					StatistiekGWT.round(this.binBoundaries.get(1) - this.binBoundaries.get(0), maxNumberOfDecimals), 
+    					this.binBoundaries.get(0));
     				
     				this.noBins = this.binBoundaries.size() - 1;
 				}
@@ -687,7 +694,7 @@ public class HistogramModel
 			
 			for (int i = 1; max > newMax; i++)
 			{
-				newMax = newMax + getBinWidth();
+				newMax = StatistiekGWT.round(newMax + getBinWidth(), 8);
 			}
 			
 			this.maxOnScale = newMax;
