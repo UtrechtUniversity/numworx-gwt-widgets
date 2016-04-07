@@ -2344,6 +2344,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			for (int i = 0; binValue < maxOnScale; i++)
 			{
 				binValue = minOnScale + i * binWidth;
+				binValue = StatistiekGWT.round(binValue, 8);
 				bins.add(binValue);
 			}
 			
@@ -2374,12 +2375,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			
 			if (maxOnScale <= max)
 			{
-				maxOnScale = max + 1; // bins do not include the upper boundary, so max + 1
+				maxOnScale = max + binWidth; // bins do not include the upper boundary, so max + binWidth
 			}
 			
 			for (int i = 0; binValue < maxOnScale; i++)
 			{
 				binValue = startValue + i * binWidth;
+				binValue = StatistiekGWT.round(binValue, 8);
 				bins.add(binValue);
 			}
 		}
