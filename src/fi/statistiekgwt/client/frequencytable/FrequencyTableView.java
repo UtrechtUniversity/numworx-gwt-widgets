@@ -1098,13 +1098,17 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 
 				// opnieuw berekenen met de berekende binboundaries, omdat er
 				// mogelijk minder bins nodig zijn
+				int bin0Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(0).toString());
+				int bin1Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(1).toString());
+				int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
+
 				binBoundaries = StatistiekGWT
 					.appropriateBoundariesFromBinSettings(
-						this.model.getStatTableModel().getColumnMin(
-							this.model.getColumnIndex()),
-						this.model.getStatTableModel().getColumnMax(
-							this.model.getColumnIndex()), binBoundaries.get(1)
-							- binBoundaries.get(0), binBoundaries.get(0));
+						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
+						this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()),
+    					// door afronding kan de aftreksom heel veel decimalen hebben
+    					StatistiekGWT.round(binBoundaries.get(1) - binBoundaries.get(0), maxNumberOfDecimals), 
+						binBoundaries.get(0));
 				this.model.setBinBoundaries(binBoundaries);
 
 				this.model.setNoBins(binBoundaries.size() - 1);
