@@ -2771,6 +2771,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.dataProvider.getList().addAll(rows);
 		this.dataProvider.refresh();
 		this.dataProvider.flush();
+		this.table.setRowCount(rows.size()); // nodig anders gaat table oude data renderen...
 		
 		if ((rows.size() == 0) || (rows.size() <= TABLE_PAGE_SIZE))
 		{
