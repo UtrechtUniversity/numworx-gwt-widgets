@@ -663,7 +663,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			
 			// The maximum bin boundary should be larger than the maximum value
 			// so (max + 1) to determine the number of bins
-			noBins = (int) Math.ceil(((max + 1) - start)/binWidth);
+			noBins = (int) Math.ceil(((max) - start)/binWidth); // voor decimale getallen geeft dit een bin teveel
 			while (start + noBins * binWidth <= max)
 			{
 				noBins++;
