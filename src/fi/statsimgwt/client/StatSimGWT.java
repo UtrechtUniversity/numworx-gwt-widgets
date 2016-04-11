@@ -34,6 +34,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	boolean dobbelstenenRadio=false;
 	boolean binomTrekkingRadio=false;
 	boolean steekproefRadio=false;
+	boolean steekproefBinomRadio=false;
 	
 	boolean muntenInstellingen=false;
 	boolean muntenResultaten=false;
@@ -53,15 +54,19 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	boolean binomTrekkingPopulatieProportie=false;
 	boolean steekproefLinkerTabel=true;
 	boolean steekproefRechterTabel=true;
+	boolean steekproefBinomLinkerTabel=true;
+	boolean steekproefBinomRechterTabel=true;
 	
 	boolean muntenSelected=false;
 	boolean dobbelstenenSelected=false;
 	boolean binomTrekkingSelected=false;
 	boolean steekproefSelected=false;
+	boolean steekproefBinomSelected=false;
 	Munten munten;
 	Dobbelstenen dobbelstenen;
 	BinomTrekking binomTrekking;
 	Steekproef steekproef;
+	SteekproefBinom steekproefBinom;
 	
 	SimplePanel simpel = new SimplePanel();
 	
@@ -118,7 +123,9 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 		if (steekproefRadio) {
 			return steekproef;
 		}
-		
+		if (steekproefBinomRadio) {
+			return steekproefBinom;
+		}
 		return null;
 	}
 
@@ -285,6 +292,29 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 			
 			h.put("mu", new String(steekproef.muText.getText()));
 			h.put("sigma", new String(steekproef.sigmaText.getText()));
+		}
+		if (steekproefBinomSelected) {
+
+			List<SteekproefBinom.Experiment> list18 = (List<SteekproefBinom.Experiment>) steekproefBinom.dataProvider.getList();	
+			List<List<String>> list19 = new ArrayList<List<String>>();
+			
+			for (int i=0;i<list18.size();i++) {
+				list19.add(Arrays.asList(list18.get(i).getExpNumber(),list18.get(i).getValue()));
+			}
+			
+			h.put("table12", list19);
+			
+			List<SteekproefBinom.Experiment1> list20 = (List<SteekproefBinom.Experiment1>) steekproefBinom.dataProvider1.getList();	
+			List<List<String>> list21 = new ArrayList<List<String>>();
+			
+			for (int i=0;i<list20.size();i++) {
+				list21.add(Arrays.asList(list20.get(i).getExpNumber(),list20.get(i).getMu(),list20.get(i).getSigma()));
+			}
+			
+			h.put("table13", list21);
+			
+			h.put("mu", new String(steekproefBinom.muText.getText()));
+			h.put("sigma", new String(steekproefBinom.sigmaText.getText()));
 		}
 			
 		return h;
