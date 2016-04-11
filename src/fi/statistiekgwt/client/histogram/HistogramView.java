@@ -166,7 +166,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.eventBus = StatistiekUtils.EVENT_BUS;//new SimpleEventBus();
 		
 		// bind histogramview to stattablemodel: to handle table changes in stattablemodel
-		this.tableChangeEventHandlerRegistration = this.model.getStatTableModel().addTableChangeEventHandler(this);//addObserver(this);
+		this.tableChangeEventHandlerRegistration = this.model.getStatTableModel().addTableChangeEventHandler(this);
 
 		// bind histogramview to stattablemodel: to handle selection changes in stattablemodel
 		this.selectionChangeEventHandlerRegistration = this.model.getStatTableModel().addSelectionChangeEventHandler(this);
@@ -1512,6 +1512,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		
 		int[] frequencies = allFrequencies[splitClass];
 		TextMetrics metrics;
+		int height = this.getCurrentFontHeight(context);
 		double theta = Math.PI * 1.75;// 315 graden met de klok mee; 45 graden tegen de klok in
 		int ySplitOffset = splitClass * (this.getHeight() - 5);
 
@@ -1638,7 +1639,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 			else
 			{
-				this.xAxisOffset = (int) (longest + 15);
+				this.xAxisOffset = (int) (longest + 10 + height);
 			}
 		} // vertical bars
 		else // horizontal bars
@@ -2104,8 +2105,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					
 					metrics = context.measureText(s_labelUnderBin);
 					int offset_labelUnderBin = (int) metrics.getWidth();
-					context.fillText(s_labelUnderBin, x - offset_labelUnderBin - 7, y
-						- 2 + ySplitOffset + (int) this.horizontalBarWidth/2);
+					if (isWorkableInterval(i))
+					{
+						context.fillText(s_labelUnderBin, x - offset_labelUnderBin - 7, y
+							- 2 + ySplitOffset + (int) this.horizontalBarWidth/2);
+					}
 				}
 				else
 				{
@@ -2128,7 +2132,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				// put label between bins
 				metrics = context.measureText(s);
 				int offset = (int) metrics.getWidth();
-				context.fillText(s, x - offset - 7, y - 2 + ySplitOffset);
+				if (isWorkableInterval(i))
+				{
+					context.fillText(s, x - offset - 7, y - 2 + ySplitOffset);
+				}
 			}
 		}
 	}
@@ -2192,7 +2199,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						metrics = context.measureText(s_labelUnderBin);
 						String font = context.getFont();
 						int offset_labelUnderBin = (int) (metrics.getWidth() / 2);
-						context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 15 + ySplitOffset);
+						if (isWorkableInterval(i))
+						{
+							context.fillText(s_labelUnderBin, ((x + x2)/2) - offset_labelUnderBin, y + 15 + ySplitOffset);
+						}
 					}
 					else
 					{
@@ -2216,8 +2226,11 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					context.lineTo(x, y + 5 + ySplitOffset);
 					context.closePath();
 					context.stroke();
-					// put label between bins
-					context.fillText(s, x - offset, y + 15 + ySplitOffset);
+					if (isWorkableInterval(i))
+					{
+						// put label between bins
+						context.fillText(s, x - offset, y + 15 + ySplitOffset);
+					}
 				}
 			} // for loop over bins
 		} // normal fit
@@ -2267,9 +2280,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 							(int) (x + 5 + (this.verticalBarWidth/2) - widthRotatedLabel), 
 							y + 7 + heightRotatedLabel + 5 + ySplitOffset); // the desired position of the text
 						context.rotate(theta);
-						context.fillText(s_labelUnderBin, 
-								0, 
-								0);
+						if (isWorkableInterval(i))
+						{
+							context.fillText(s_labelUnderBin, 
+									0, 
+									0);
+						}
 						context.restore();
 					}
 				}
@@ -2283,7 +2299,10 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					// set the drawing position 
 					context.translate(x + 5 - widthRotatedLabel, y + 7 + offset + ySplitOffset);
 					context.rotate(theta);
-					context.fillText(s, 0, 0);
+					if (isWorkableInterval(i))
+					{
+						context.fillText(s, 0, 0);
+					}
 					context.restore();
 				}
 			} // for loop over bins
@@ -4403,4 +4422,23 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	{
 		this.update();
 	}
+	
+	/**
+	 * Retourneert of het waardelabel aan de as van het interval met index i
+	 * getekend moet worden. Hoe smaller de staafbreedte, hoe meer waarden worden weggelaten. 
+	 *   
+	 * @param i
+	 * @return
+	 */
+	private boolean isWorkableInterval(int i)
+	{
+		double width = verticalBarWidth+1;
+		return (width<1 && i%40==0 
+				|| width>=1 && width<2 && i%20==0 
+				|| width>=2 && width<4 && i%10==0 
+				|| width>=4 && width<8 && i%5==0 
+				|| width>=8 && width<16 && i%2==0
+				|| width>=16 );
+	}
+	
 }
