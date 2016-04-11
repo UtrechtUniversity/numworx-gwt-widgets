@@ -433,7 +433,9 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 
 		this.mainPanel.initializeHighlightValues();
 		
-		if (this.model.isTukeyBox() && !this.getModel().isEmptyBoxplot())
+		if (this.model.isTukeyBox() 
+			&& !this.getModel().isEmptyBoxplot()
+			&& this.mainPanel.isDrawable())
 		{
 			this.mainPanel.initializeOutlierHighlightValues();
 		}
