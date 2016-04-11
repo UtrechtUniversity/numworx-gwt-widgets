@@ -2111,54 +2111,61 @@ public class StatInteractiePanelView extends LayoutPanel
 //	    label.addTouchMoveHandler(dragHandler);
 //	    label.addTouchEndHandler(dragHandler);
 	    
-	    ImageAnchor closeBtn = new ImageAnchor();
-	    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
-
-	    closeBtn.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event)
-			{
-				StatInteractiePanelView.this.removeViewBox.setWidgetField(widget);
-				StatInteractiePanelView.this.removeViewBox.center();
-				StatInteractiePanelView.this.removeViewBox.show();
-				
-				// update the clicked view in case of a table, else an empty table will be shown
-				int widgetIndex = tabPanel.getWidgetIndex(widget);
-				int selectedIndex = tabPanel.getSelectedIndex();
-				if (tabPanel.getWidget(widgetIndex) instanceof StatTable && ((StatistiekView) widget).getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-				{
-					((StatistiekView) widget).update();
-				}
-
-				
-				
-//				if (StatInteractiePanelView.this.model.getStatTableModel()
-//						.isViewsAddable()
-//					&& widgetIndex >= 0
-//					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
-//				{
-//					StatInteractiePanelView.this.model
-//						.removeView(StatInteractiePanelView.this.model
-//							.mainWindowIndexToGeneralIndex(widgetIndex));
-//
-//					tabPanel.remove(widgetIndex);
-//					
-//					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
-//					for (int i = 0; i < model.getViews().size(); i++)
-//					{
-//						StatistiekView view = model.getViews().get(i);
-//						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
-//						{
-//							view.update();
-//						}
-//					}
-//				}
-				
-
-			}
-		});
 	    hPanel.add(label);
-	    hPanel.add(new HTML("&nbsp&nbsp&nbsp"));
-	    hPanel.add(closeBtn);
+	    
+	    if (this.model.getStatTableModel().isViewsAddable())
+	    {
+	    	// als views toevoegbaar dan mag je ze ook verwijderen met de close-button
+
+		    ImageAnchor closeBtn = new ImageAnchor();
+		    closeBtn.setResource(statistiekGWTClientBundle.crossResource());
+	
+		    closeBtn.addClickHandler(new ClickHandler() {
+				public void onClick(ClickEvent event)
+				{
+					StatInteractiePanelView.this.removeViewBox.setWidgetField(widget);
+					StatInteractiePanelView.this.removeViewBox.center();
+					StatInteractiePanelView.this.removeViewBox.show();
+					
+					// update the clicked view in case of a table, else an empty table will be shown
+					int widgetIndex = tabPanel.getWidgetIndex(widget);
+					int selectedIndex = tabPanel.getSelectedIndex();
+					if (tabPanel.getWidget(widgetIndex) instanceof StatTable && ((StatistiekView) widget).getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+					{
+						((StatistiekView) widget).update();
+					}
+	
+					
+					
+	//				if (StatInteractiePanelView.this.model.getStatTableModel()
+	//						.isViewsAddable()
+	//					&& widgetIndex >= 0
+	//					&& (widgetIndex < StatInteractiePanelView.this.tabPanel.getWidgetCount() - 1)) // is getWidgetCount getTabCount()?
+	//				{
+	//					StatInteractiePanelView.this.model
+	//						.removeView(StatInteractiePanelView.this.model
+	//							.mainWindowIndexToGeneralIndex(widgetIndex));
+	//
+	//					tabPanel.remove(widgetIndex);
+	//					
+	//					// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+	//					for (int i = 0; i < model.getViews().size(); i++)
+	//					{
+	//						StatistiekView view = model.getViews().get(i);
+	//						if (tabPanel.getWidget(tabPanel.getSelectedIndex()) instanceof StatTable && view.getViewType().equals(StatistiekGWT.VIEWS[0])) // tabel view
+	//						{
+	//							view.update();
+	//						}
+	//					}
+	//				}
+					
+	
+				}
+			});
+
+		    hPanel.add(new HTML("&nbsp&nbsp&nbsp"));
+		    hPanel.add(closeBtn);
+	    }
 	    
 	    return hPanel;
 	}
