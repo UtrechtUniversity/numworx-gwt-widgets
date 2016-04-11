@@ -2014,6 +2014,10 @@ public class Boxplot
 		this.drawable = b;
 	}
 
+	public boolean isDrawable()
+	{
+		return this.drawable;
+	}
 
 
 }
