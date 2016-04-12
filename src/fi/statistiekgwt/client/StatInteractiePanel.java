@@ -19,6 +19,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
+import fi.statistiekgwt.client.event.TableChangeEvent;
+
 /**
  * Statistiek InteractiePanel MVC Controller
  * 
@@ -184,13 +186,13 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 
 	public void setState(Map<String, Object> launchState)
 	{
-		this.model.removeViews();
-		this.view.removeViewTabs();
-		
-		ObjectMap map = JSONUtilities.wrapMap(launchState);
-
 		if (launchState != null)
 		{
+			this.model.removeViews();
+			this.view.removeViewTabs();
+			
+			ObjectMap map = JSONUtilities.wrapMap(launchState);
+
 			this.model.setResetHashtable((HashMap)launchState);
 
 			if (launchState.containsKey("tableModel"))
@@ -313,7 +315,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 				}
 				// if there is only one view and views not addable, no tabs are shown
 			}
-		}
+		} // launchstate != null
 	}
 
 	/**
@@ -853,8 +855,12 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 					
 					h.put("tableModel", tableModel);
 					this.setState(h);
+					
+					// send an event
+					TableChangeEvent tableChangeEvent = new TableChangeEvent(TableChangeEvent.REMOVE_ROWS, -1);
+					this.getStatModel().getStatTableModel().fireEvent(tableChangeEvent);
 				}
-			}
+			} // map != null
 		}
 	}
 }
