@@ -30,6 +30,8 @@ public interface StatistiekCssResource extends CssResource
 
 	String noSelect();
 
+	String noScrollBars();
+
 	String failMessage();
 
 	String radioButton();
