@@ -955,7 +955,17 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		boolean b = false;
 		
 		if ((this.cellOutlierList.size() > 0) && (this.cellOutlierList.get(0).size() > 0))
-			b = this.cellOutlierList.get(columnIndex).get(rowIndex);
+		{
+			try
+			{
+				b = this.cellOutlierList.get(columnIndex).get(rowIndex);
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				// for some reason a non existing index is called
+				b = false;
+			}
+		}
 		
 		return b;
 	}
