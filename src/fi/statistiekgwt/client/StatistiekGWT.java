@@ -126,8 +126,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		// voeg statinteractiepanel toe
 		//RootPanel.get(holderId).add(basisPanel);
-		
 		RootLayoutPanel.get().add(simpel);
+		//simpel.setWidget(asWidget());
 		Stub.publish(this);
 	}
 	
