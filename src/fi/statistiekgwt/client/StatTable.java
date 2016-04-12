@@ -191,7 +191,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	private StatTableDataGrid<List<String>> table; // datagrid provides fixed header and footer section
 	protected ListDataProvider<List<String>> dataProvider;
+	private DockLayoutPanel tablePanel;
 	private SimplePager pager;
+	private HorizontalPanel pagerPanel;
 	private MultiSelectionModel<List<String>> selectionModel;
 	ArrayList<String> headers;
 	
@@ -475,6 +477,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    tableMessageLabel = new Label(StatistiekGWT.rb.emptyTableMessage());
 	    // set large width for horizontal scrollbar, because an empty table (e.g., with many columns) won't show a horizontal scrollbar
 	    tableMessageLabel.setWidth("20000px");
+	    tableMessageLabel.addStyleName(statistiekCss.noScrollBars());
 	    this.table.setEmptyTableWidget(tableMessageLabel);
 	    // set style
 	    this.table.addStyleName(statistiekCss.dataGrid());
@@ -487,19 +490,21 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.dataProvider.addDataDisplay(this.table);
 		
 	    // Create a Pager to control the table.
-	    HorizontalPanel pagerPanel = new HorizontalPanel();
+	    pagerPanel = new HorizontalPanel();
 	    pagerPanel.setSize("100%", "100%");
 	    pagerPanel.addStyleName(statistiekCss.backgroundblue());
 		pagerPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		pagerPanel.addStyleName(statistiekCss.noScrollBars());
 	    SimplePager.Resources pagerResources = GWT.create(SimplePager.Resources.class);
 //	    pager = new SimplePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	    pager = new StatTablePager(TextLocation.CENTER, pagerResources, false, 0, true);
 	    pager.setDisplay(this.table);
 	    pager.setPageSize(StatTable.TABLE_PAGE_SIZE);
 	    pager.setRangeLimited(true);
+	    pager.addStyleName(statistiekCss.noScrollBars());
 	    pagerPanel.add(pager);
 
-	    DockLayoutPanel tablePanel = new DockLayoutPanel(Unit.PX);
+	    tablePanel = new DockLayoutPanel(Unit.PX);
 	    tablePanel.addSouth(pagerPanel, 30);
 	    tablePanel.add(this.table);
 	    tablePanel.setHeight("100%");
@@ -2559,8 +2564,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 				this.update();
 				
-				// show the row added
-				StatTable.this.pager.lastPage();
+				if (StatTable.this.pager.isVisible())
+				{
+					// show the row added
+					StatTable.this.pager.lastPage();
+				}
 				//int lastIndex = StatTable.this.statTableModel.getRowCount() - 1;
 				int lastIndex = StatTable.this.table.getVisibleItemCount() - 1;
 				//StatTable.this.table.getRowElement(lastIndex).scrollIntoView(); // scrolls to the right
@@ -2775,16 +2783,17 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		if ((rows.size() == 0) || (rows.size() <= TABLE_PAGE_SIZE))
 		{
-			this.pager.setVisible(false);
+			this.tablePanel.setWidgetHidden(this.pagerPanel, true);
 		}
 		else
 		{
-			this.pager.setVisible(true);
+			this.tablePanel.setWidgetHidden(this.pagerPanel, false);
 		}
 		
 		if (rows.size() == 0)
 		{
-			table.setEmptyTableWidget(new Label(StatistiekGWT.rb.emptyTableMessage()));
+			tableMessageLabel.setText(StatistiekGWT.rb.emptyTableMessage());
+			table.setEmptyTableWidget(tableMessageLabel);
 		}
 		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
