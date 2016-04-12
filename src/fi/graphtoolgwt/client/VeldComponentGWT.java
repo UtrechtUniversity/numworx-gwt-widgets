@@ -16,6 +16,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -111,7 +112,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	
 	private final static CssColor cRegelHighlightColor = CssColor.make(255, 255, 255);
 	private final static CssColor cRegelBackgroundColor = CssColor.make(240, 240, 240);
-	private final static CssColor cVeldComponentGWT_systemColor = CssColor.make(211, 211, 211); // Grey is the basic color
+	final static CssColor cSystemColor = CssColor.make(150, 150, 150); // Grey is the basic color
 	
 //	private VergelijkingVak[] formuleVakken; 
 
@@ -131,7 +132,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	
 	LayoutPanel stelselsPanel;
 	
-	SystemDiffEqPanelGWT systemPanels[] = new SystemDiffEqPanelGWT[maxAantalStelsels];
+	SystemDiffEqPanelGWT systems[] = new SystemDiffEqPanelGWT[maxAantalStelsels];
 	
 	private final GraphToolGWT interactiePanel;
 	
@@ -186,6 +187,11 @@ public class VeldComponentGWT extends LayoutPanel {
 		return focus;
 	}
 	
+	public void parseFunction(int stelselId, int functionId, String functionStr) {
+		interactiePanel.zetVectorVeld(stelselId, functionId, 
+				FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$f"+functionStr+"@"))));
+	}
+	
 	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte ) {
 		
 //		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
@@ -228,14 +234,14 @@ public class VeldComponentGWT extends LayoutPanel {
 		asNamen[1] = yAsNaam;
 		for (int i=0; i < aantalStelsels; i++) {
 			
-			systemPanels[i] = new SystemDiffEqPanelGWT(i,cAantalFormulesPerStelsel, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin);
-			systemPanels[i].updateFunctionBegin(asNamen, cVeldComponentGWT_diffVarNamen[0]);
+			systems[i] = new SystemDiffEqPanelGWT(i,cAantalFormulesPerStelsel, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin);
+			systems[i].updateFunctionBegin(asNamen, cVeldComponentGWT_diffVarNamen[0]);
 //			stelselsPanel.add(systemPanels[i]);
 		}
 		
-		stelselsPanel.add(systemPanels[0]);
-		stelselsPanel.setWidgetLeftWidth(systemPanels[0], 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
-		stelselsPanel.setWidgetTopHeight(systemPanels[0], 0, Style.Unit.PX, 300, Style.Unit.PX);
+		stelselsPanel.add(systems[0]);
+		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
+		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, 300, Style.Unit.PX);
 		//checkboxen[0].setValue(true);
 		
 		
@@ -280,7 +286,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	}
 	
 	public CssColor getSystemColor(int id) {
-		return cVeldComponentGWT_systemColor;
+		return cSystemColor;
 	}
 
 	
@@ -293,8 +299,9 @@ public class VeldComponentGWT extends LayoutPanel {
 		private final int cSystemDiffEqPanelGWT_braceWidth = 20;
 		
 //		private final int ccSystemDiffEqPanelGWT_rowStartX = 35;
-
-		Object parent;
+		
+		
+		CssColor systemColor = VeldComponentGWT.cSystemColor;
 		private int id;
 		private int nrFunctions;
 		private int systemHeight; // Height of this system of eqations in pixels
@@ -314,6 +321,18 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		int width = 1;		
 		
+		public void setSelected(boolean selected) {
+			cb.setValue(selected);
+		}
+		
+		public void setFunction(int functionId, String functionStr) {
+			if (functionId < nrFunctions) {
+				functionEditors[functionId].clearAll();
+				functionEditors[functionId].insert(functionStr);
+				functionEditors[functionId].setCurrentElementRepaint();
+			}
+		}
+		
 		public void updateFunctionBegin(String[] functionNames, String derivativeName) {
 			if (functionNames.length == nrFunctions) {
 				for (int i = 0; i < nrFunctions; i++) {
@@ -322,7 +341,8 @@ public class VeldComponentGWT extends LayoutPanel {
 					functionPanels[i].remove(functionBeginViewers[i].getAsPanel());
 					functionBeginViewers[i] = new FormuleViewer(functionsBegin[i]);
 					functionBeginViewers[i].setFont(defaultfont);
-					functionBeginViewers[i].setDefaultFont(defaultfont);					
+					functionBeginViewers[i].setDefaultFont(defaultfont);	
+					functionBeginViewers[i].setColor(systemColor);
 					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
 				}
 			}
@@ -331,21 +351,25 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		public void layoutRegelPanel(Widget w)
 		{
-			w.getElement().getStyle().setWidth(veldComponentBreedte - 5, Unit.PX);
+//			w.getElement().getStyle().setWidth(veldComponentBreedte - 5, Unit.PX);
 			w.getElement().getStyle().setFloat(Float.LEFT);
 			w.getElement().getStyle().setProperty("clear", "both");
 			w.getElement().getStyle().setProperty("display", "block");
-			w.getElement().getStyle().setBackgroundColor(cRegelHighlightColor.toString());
+//			w.getElement().getStyle().setBackgroundColor(cRegelHighlightColor.toString());
 		}
 		
 		public void highLight(Widget w, boolean b)
 		{
-			w.getElement().getStyle().setBackgroundColor(b ? cRegelHighlightColor.toString() : cRegelBackgroundColor.toString());
+//			w.getElement().getStyle().setBackgroundColor(b ? cRegelHighlightColor.toString() : cRegelBackgroundColor.toString());
 		}
 		
 		private void adjustSize() {
 			int[] rowHeight = new int[2];
 			int systemHalfHeight = 0;
+
+			// clear old brace canvas
+			Context2d ctx = braceCanvas.getContext2d();
+			ctx.clearRect(0, 0, cSystemDiffEqPanelGWT_braceWidth, this.systemHeight);
 
 			// Determine RowHeigth & system Height
 			int maxBeginWidth = 0;
@@ -403,7 +427,7 @@ public class VeldComponentGWT extends LayoutPanel {
 			this.setWidgetTopHeight(braceCanvas, 0, Style.Unit.PX, systemHeight, Style.Unit.PX);
 			
 			// redraw brace
-			Context2d ctx = braceCanvas.getContext2d();
+			ctx.setStrokeStyle(systemColor.toString());
 			
 			ctx.beginPath();
 			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0, 
@@ -424,6 +448,11 @@ public class VeldComponentGWT extends LayoutPanel {
 			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 			ctx.stroke();
+		}
+		
+		public void setSystemColor(CssColor systemColor){
+			this.systemColor = systemColor;
+			this.adjustSize(); // also repaint			
 		}
 		
 		public SystemDiffEqPanelGWT(int id, int nrFunctions, int systemWidth) {
@@ -447,15 +476,12 @@ public class VeldComponentGWT extends LayoutPanel {
 				
 				if(!functionBeginUserChangable) {
 					functionBeginViewers[i] = new FormuleViewer("$f$bdAs" + (i+1) + "$nd" + "Der" + "@@=@");
-					functionBeginViewers[i].setFont(defaultfont);
-					functionBeginViewers[i].setDefaultFont(defaultfont);					
 					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
 				}
 
 				functionEditors[i] = new FormuleEditor();
-				((VeldComponentGWT) parent).getSystemColor(id);
 				
-				functionEditors[i].setColor(((VeldComponentGWT) parent).getSystemColor(id));
+				functionEditors[i].setColor(systemColor);
 				functionEditors[i].setFont(defaultfont);
 				functionEditors[i].setDefaultFont(defaultfont);
 //				functionEditors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
@@ -818,21 +844,56 @@ public class VeldComponentGWT extends LayoutPanel {
 //	    return h;
 //	}
 	
-//	public void setState(Map<String, Object> h)
-//    {	String[] veldGrafiekExpressieStrings = null;
-//		boolean[] veldGrafiekGeselecteerd = null;
-//    	
-//    	if (h.get("expressieStrings") != null) 
-//    		veldGrafiekExpressieStrings = JSONUtilities.toStringArray(h.get("veldGrafiekExpressieStrings"));
-//    		veldGrafiekExpressieStrings = GraphToolInteractiePanel.toStringArray(h.get("veldGrafiekExpressieStrings"));
-//   		if(h.containsKey("veldGrafiekGeselecteerd")) 
-//   			veldGrafiekGeselecteerd = GraphToolInteractiePanel.toBooleanArray(h.get("veldGrafiekGeselecteerd"));
-//
-//    	if (veldGrafiekExpressieStrings==null) {	
-//    		return;
-//    	}
-//    	
-//    	
+	public void setState(Map<String, Object> h)
+    {	String[] veldGrafiekExpressieStrings = null;
+		boolean[] veldGrafiekGeselecteerd = null;
+		logger.info("SetState !!");
+    	if (h.get("veldGrafiekExpressieStrings") != null) { 
+    		logger.info("found Expressie");
+
+    		veldGrafiekExpressieStrings = JSONUtilities.toStringArray(h.get("veldGrafiekExpressieStrings"));
+    	}
+    	
+	    if (h.get("veldGrafiekGeselecteerd") != null) { 
+    		logger.info("found Selectie");
+    		List<Object> geselecteerdList = JSONUtilities.toArrayList(h.get("veldGrafiekGeselecteerd"));
+    		veldGrafiekGeselecteerd = new boolean[geselecteerdList.size()];
+			for(int i = 0; i < geselecteerdList.size(); i++) {	
+				veldGrafiekGeselecteerd[i] = (Boolean) geselecteerdList.get(i);
+			}
+   		}
+    	if (veldGrafiekExpressieStrings==null) {	
+    		return;
+    	}
+    	
+		aantalStelsels = veldGrafiekExpressieStrings.length / cAantalFormulesPerStelsel;
+		logger.info("SetState :: aantalStelsels = "+ aantalStelsels);
+
+		for (int i=0; i<aantalStelsels; i++) {
+			logger.info("SetState :: veldGrafiekGeselecteerd["+i+"] = "+ veldGrafiekGeselecteerd[i]);
+			systems[i].setSelected(veldGrafiekGeselecteerd[i]);
+			
+			// activeer/deactiveer Stelsel
+			
+			for (int j=0; j< cAantalFormulesPerStelsel; j++) {
+				logger.info("SetState :: Formule["+i+"]["+j+"] = "+ veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+
+				// clear begin and end of formula (if existing)
+ 				if ( veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].startsWith("$f") 
+ 						&& veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].endsWith("@") ) {
+
+ 					veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j] = 
+ 							veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].substring(2, 
+ 									veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].length() - 1);
+ 				}
+				// voeg formule toe aan stelsel (visueel)
+				systems[i].setFunction(j,  veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+				// verwerk formule ook in het interactiePanel
+				parseFunction(i,j,veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+			}
+		}
+    	
+    	
 //     	for(int i = 0; i < veldGrafiekExpressieStrings.length; i++)	 {	
 //     		if(!veldGrafiekExpressieStrings[i].equals("$f@") && !(i > 0 && veldGrafiekExpressieStrings[i].endsWith("=@") && docent)) {	
 //     			if(randomVars != null)
@@ -853,8 +914,7 @@ public class VeldComponentGWT extends LayoutPanel {
 //			formuleVakken[i].setVisible(true);
 //
 //     	}
-//		aantalStelsels = veldGrafiekExpressieStrings.length / cAantalFormulesPerStelsel;
-//     	
+     	
 //    	if(veldGrafiekGeselecteerd==null) 
 //    	{	return;
 //    	}
@@ -874,9 +934,9 @@ public class VeldComponentGWT extends LayoutPanel {
 //				}
 //		}
 //     	layoutVakken(true);
-////     	grafiekComponent.updateTabelNames(geefExpNamen(), true);
-//		
-//    }
+//     	grafiekComponent.updateTabelNames(geefExpNamen(), true);
+		
+    }
 	
 //	public double[] getDomein()
 //	{

@@ -596,8 +596,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			//RPJ
 			zetVectorVeld(0, 0, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fax+y@"))));
-			zetVectorVeld(0, 1, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fay-x@"))));
-		
+			zetVectorVeld(0, 1, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fay-x@"))));		
 		}
 		
 		grafiekGWTVeld.initContext2d();
@@ -605,6 +604,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		grafiekGWTVeld.setState(launchState); //lijkt me niet nodig.
 		tekenComponent.setState(launchState);
 		formuleComponent.setState(launchState, randomVarNamen, randomVarWaarden);
+		veldComponent.setState(launchState);
 		
 		// Initialiseer the schaal parameters in geval van manual scaling 
     	if (manualScalingX || manualScalingY) {
@@ -2412,7 +2412,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 		tekenComponent.setState(h);
 		formuleComponent.setState(h, null, null);
-//		veldComponent.setState(h);
+		veldComponent.setState(h);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
 		if((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	kijkNa();

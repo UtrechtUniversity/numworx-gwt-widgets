@@ -1889,7 +1889,7 @@ public class GrafiekGWTVeld {
 			}
 
 			// Set visual parameters
-			gIm.setStrokeStyle(grijs);
+			gIm.setStrokeStyle(VeldComponentGWT.cSystemColor);
 			gIm.setLineWidth(cLineWidthVectorFields);
 			/* RPJ start */
 			interactiePanel.veldLargerGridStartPoints = true;
@@ -1913,7 +1913,7 @@ public class GrafiekGWTVeld {
 				}
 			}
 			double end = System.currentTimeMillis();
-			logger.info(end + ":: Veldgrafiek - Loop finished of :"+loopCounter +"in "+(end-start)/1000+"seconden");
+//			logger.info(end + ":: Veldgrafiek - Loop finished of :"+loopCounter +"in "+(end-start)/1000+"seconden");
 		}
 	}
 	
