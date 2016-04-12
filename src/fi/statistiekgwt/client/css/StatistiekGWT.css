@@ -169,9 +169,16 @@ label {
 
 /** Used for StatTable.table. */
 .dataGrid {
-    overflow: hidden;
+    overflow: auto; /*hidden;*/
     white-space: nowrap;
     table-layout: fixed;/*auto;*/
+}
+
+/** Used for StatTable.tableMessageLabel. */
+.noScrollBars {
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden
 }
 
 /** Used in StatTable.pasteDataDialog */
