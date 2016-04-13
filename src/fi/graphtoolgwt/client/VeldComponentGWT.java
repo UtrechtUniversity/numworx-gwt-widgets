@@ -240,8 +240,8 @@ public class VeldComponentGWT extends LayoutPanel {
 		}
 		
 		stelselsPanel.add(systems[0]);
-		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
-		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, 300, Style.Unit.PX);
+		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte-10, Style.Unit.PX);
+		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, veldComponentHoogte-30, Style.Unit.PX);
 		//checkboxen[0].setValue(true);
 		
 		
