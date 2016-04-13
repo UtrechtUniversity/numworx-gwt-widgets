@@ -72,6 +72,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	VerticalPanel panel1;
 	HTML html;
 	StatSimGWT ssgwt;
+	boolean binomTrekkingRooster;
 	
 	public static class Experiment {
 		private final String experimentNumber;
@@ -98,6 +99,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	
 	public BinomTrekking(StatSimGWT ssgwt, boolean binomTrekkingInstellingen, boolean binomTrekkingGrafiek, boolean binomTrekkingTabel, boolean binomTrekkingRooster) {
 		this.ssgwt=ssgwt;
+		this.binomTrekkingRooster=binomTrekkingRooster;
 		
 		kladjeHWTCanvas = Canvas.createIfSupported(); 
 
@@ -274,9 +276,9 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			 }
 		 };
 
-		 trekkingen = new int[1000];
+		 trekkingen = new int[10000];
 		    maxCount=Integer.parseInt(aantalTrekkingenText.getText());
-		    trekkingenGeschiedenis = new Boolean[1000];
+		    trekkingenGeschiedenis = new Boolean[10000];
 		 binomRooster=new BinomRooster(this);
 	     binomRooster.paint();
 	     
@@ -363,7 +365,13 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			}
 			stapStarted=true;
 			maxCount=Integer.parseInt(aantalTrekkingenText.getText());
-			elapsedTimer.scheduleRepeating(10);		   
+			if (binomTrekkingRooster==true) {
+				elapsedTimer.scheduleRepeating(10);
+			} else {
+				while(stopCounting==false) {
+					doeStap();
+				}
+			}
 		}
 		if (event.getSource()==stap) {
 			if (!stapStarted1) {

@@ -307,7 +307,7 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	    
 	    add(panel0);
 	    
-	    steekproefResultaat = new double[1000];
+	    steekproefResultaat = new double[10000];
 	}
 	
 	public void setGrootte(int breedte, int hoogte) {

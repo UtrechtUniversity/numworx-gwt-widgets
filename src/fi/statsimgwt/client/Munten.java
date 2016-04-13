@@ -110,6 +110,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	VerticalPanel radios;
 	HTML html;
 	HTML html2;
+	boolean muntenFrequentie;
 	
 	StatSimGWT ssgwt;
 	
@@ -183,6 +184,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 	
 	public Munten (StatSimGWT ssgwt, boolean muntenInstellingen, boolean muntenResultaten, boolean muntenGrafiek, boolean muntenTabel, boolean muntenFrequentie) {
 		this.ssgwt=ssgwt;
+		this.muntenFrequentie=muntenFrequentie;
 		
 		muntenTabel1=muntenTabel;
 		
@@ -400,7 +402,6 @@ public class Munten extends FlowPanel implements ClickHandler{
 	    
 	    if (muntenInstellingen==false) {
 	    	panel2.setVisible(false);
-	    	Window.alert("false");
 	    }
 	    		// Add it to the root panel.
 	    panel1=new VerticalPanel();
@@ -539,10 +540,11 @@ public class Munten extends FlowPanel implements ClickHandler{
 		    VerticalPanel panel6 = new VerticalPanel();
 		    panel5.add(panel6);
 	
-		    if (muntenFrequentie==false)
-		    	frequentieCanvas.setVisible(false);
-		    
 		    panel6.add(frequentieCanvas);
+		    
+		    if (muntenFrequentie==false) {
+		    	frequentieCanvas.setVisible(false);
+		    }
 		    
 		    html = new HTML("<table width=213><tr><td><font face=arial size=2><b>Exp.</b></font></td><td><font face=arial size=2><b>Aantal kop</b></font></td><td><font face=arial size=2><b>Aantal munt</b></font></td></tr></table>");
 		    panel6.add(html);
@@ -637,7 +639,8 @@ public class Munten extends FlowPanel implements ClickHandler{
 	
 	public void setEenMuntTweeMunten() {
 		if (eenMunt.getValue()==true) {
-			frequentieCanvas.setVisible(true);
+			if (muntenFrequentie==true)
+				frequentieCanvas.setVisible(true);
 			frequentie.paint();
 			if (muntenTabel1==true)
 				scrollPanel.setVisible(true);

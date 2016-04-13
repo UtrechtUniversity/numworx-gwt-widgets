@@ -852,6 +852,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			}
 			binomTrekking.showKans=binomTrekkingKans;
 			binomTrekking.showPopulatieProportie=binomTrekkingPopulatieProportie;
+			binomTrekking.setZichtbaar();
 		}
 		if (steekproefSelected) {
 			steekproef = new Steekproef(this,steekproefLinkerTabel, steekproefRechterTabel);
@@ -867,7 +868,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		simpel.setWidget(asWidget());
+		//simpel.setWidget(asWidget());
 
 	}
 
