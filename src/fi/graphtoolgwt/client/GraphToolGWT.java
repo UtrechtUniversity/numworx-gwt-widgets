@@ -2395,7 +2395,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent.setState(h, null, null);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
-		if((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	kijkNa();
+		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+			kijkNa();
+		} else {
+			if (mode == OpdrNavIF.EINDTOETS) {
+				kijkNa(false);
+			}
+		}
 		
 		grafiekGWTVeld.setState(h);
 		grafiekGWTVeld.paint();
