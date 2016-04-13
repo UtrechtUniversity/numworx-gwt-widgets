@@ -958,8 +958,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return points;
 	}
 	
-	public int addInsert(RealPoint newRP)  { //, boolean docent) 	
-		if (!grafiekGWTVeld.valuePointWithinBounds(newRP.getX(), newRP.getY())) {
+	public int addInsert(RealPoint newRP, boolean checkVisibleBounds)  { //, boolean docent) 	
+		if ( checkVisibleBounds && (!grafiekGWTVeld.valuePointWithinBounds(newRP.getX(), newRP.getY()))) {
 			return (-1);
 		}
 
@@ -3301,7 +3301,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							new Point(freePixX, pressedY));
 						newPoint.setIndex(getActiveIndex());
 						newPoint.setTabelIndex(geefEersteVrijeVak(false));
-						addInsert(newPoint);//, false);
+						addInsert(newPoint, true);//, false);
 						if(tabelAlsTekenTool)
 							tabelComponent.vernieuwFirstIndexVisible(newPoint.getTabelIndex(), getActiveIndex());
 						
@@ -3577,7 +3577,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				dragPoint.setxString(Double.toString(dragPoint.getX()));
 				dragPoint.setyString(Double.toString(dragPoint.getY()));
 				removePoint(dragPoint.getTabelIndex(), dragPoint.getIndex());//, false);
-				addInsert(dragPoint);//, false);
+				addInsert(dragPoint, true);//, false);
 				
 				
 				startxv = eventX;
@@ -3607,7 +3607,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				dragPoint.setxString(Double.toString(dragPoint.getX()));
 				dragPoint.setyString(Double.toString(dragPoint.getY()));
 				removePoint(dragPoint.getTabelIndex(), dragPoint.getIndex());//, false);
-				addInsert(dragPoint);//, false);					
+				addInsert(dragPoint, true);//, false);					
 				
 				//repaint();
 				
@@ -3733,7 +3733,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					dragPoint.setY(temp.getY());
 					dragPoint.setxString(Double.toString(dragPoint.getX()));
 					dragPoint.setyString(Double.toString(dragPoint.getY()));
-					addInsert(dragPoint);//, false);
+					addInsert(dragPoint, true);//, false);
 				
 					dragPoint = null;
 					
@@ -3756,7 +3756,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					dragPoint.setY(temp.getY());	
 					dragPoint.setxString(Double.toString(dragPoint.getX()));
 					dragPoint.setyString(Double.toString(dragPoint.getY()));
-					addInsert(dragPoint);//, false);							
+					addInsert(dragPoint, true);//, false);							
 					
 					dragPoint = null;
 					
