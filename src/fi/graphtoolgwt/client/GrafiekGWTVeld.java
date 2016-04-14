@@ -1114,18 +1114,10 @@ public class GrafiekGWTVeld {
 			Point pix = interactiePanel.realPointToPixels(rp);
 			
 			if ( (pix!= null) && pixelsPointWithinBounds(pix.getX(), pix.getY()) ) { 
-				if(index == interactiePanel.getActiveIndex() && !docent) { // && tekenComponent.getCursorMode() != tekenComponent.NOCUR)
-					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius + 1, 0, 2* Math.PI);
-					g.closePath();
-					g.fill();
-				} else { 
-					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
-					g.closePath();
-					g.fill();
-				}
-			
+				g.beginPath();
+				g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
+				g.closePath();
+				g.fill();
 			}
 
 		}
