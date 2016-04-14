@@ -190,8 +190,18 @@ public class GrafiekGWTVeld {
 	private void drawLineWithinVisibleBounds(Context2d g, double x0Pix, double y0Pix, double x1Pix, double y1Pix ) {
 		
 		/* Determine slopes along X and Y */
-		double hellingX = (x1Pix - x0Pix) / (y1Pix - y0Pix);
-		double hellingY = (y1Pix - y0Pix) / (x1Pix - x0Pix);
+		double hellingX;
+		if (y1Pix != y0Pix) {
+			hellingX = ((double) x1Pix - (double) x0Pix) / ((double) y1Pix - (double) y0Pix);
+		} else {
+			hellingX = 0;
+		}
+		double hellingY;
+		if (x1Pix != x0Pix) {
+			hellingY = ((double) y1Pix - (double) y0Pix) / ((double) x1Pix - (double) x0Pix);
+		} else {
+			hellingY = 0;
+		}
 		
 		/* Cut of first point along X-axis */
 		double x0a = Math.max(drawXmin, Math.min(drawXmax, x0Pix));
@@ -863,7 +873,7 @@ public class GrafiekGWTVeld {
 							
 							gIm.beginPath();
 							//gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
-							gIm.arc(x, y, 2, 0, 2* Math.PI);
+							gIm.arc(x, y, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 							gIm.closePath();
 							gIm.fill();
 							gIm.stroke();
@@ -1000,7 +1010,7 @@ public class GrafiekGWTVeld {
 //									}
 									gIm.stroke();
 									gIm.beginPath();
-									gIm.arc(tracex, tracey, 3, 0, 2* Math.PI);
+									gIm.arc(tracex, tracey, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 									gIm.closePath();
 									gIm.fill();
 									gIm.stroke();
@@ -1043,7 +1053,7 @@ public class GrafiekGWTVeld {
 						gIm.setStrokeStyle(grijs);
 						
 						gIm.beginPath();
-						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), 3, 0, 2* Math.PI);
+						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 						gIm.closePath();
 						gIm.fill();
 						gIm.stroke();
@@ -1123,18 +1133,10 @@ public class GrafiekGWTVeld {
 			Point pix = interactiePanel.realPointToPixels(rp);
 			
 			if ( (pix!= null) && pixelsPointWithinBounds(pix.getX(), pix.getY()) ) { 
-				if(index == interactiePanel.getActiveIndex() && !docent) { // && tekenComponent.getCursorMode() != tekenComponent.NOCUR)
-					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD + 1, 0, 2* Math.PI);
-					g.closePath();
-					g.fill();
-				} else { 
-					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD, 0, 2* Math.PI);
-					g.closePath();
-					g.fill();
-				}
-			
+				g.beginPath();
+				g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
+				g.closePath();
+				g.fill();
 			}
 
 		}

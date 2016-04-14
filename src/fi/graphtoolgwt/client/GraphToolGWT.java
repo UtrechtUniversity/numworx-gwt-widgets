@@ -89,6 +89,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	final static int cSelectMarge = 5;
+	final static int cPointRadius = 3;
+
 	final static boolean cDefault_tekenComponentAan = false;
 
 	public static Text_nl rb = new Text_nl();
@@ -268,7 +270,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	double beginy = beginyDocent;
 	
 	CssColor[] colors, opdrachtKleuren, gewoneKleuren;
-	static int PRAD = 2;
 	
 	int tekenGrafiekNauwkeurigheid = 5;
 	
@@ -971,8 +972,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		return points;
 	}
 	
-	public int addInsert(RealPoint newRP)  { //, boolean docent) 	
-		if (!grafiekGWTVeld.valuePointWithinBounds(newRP.getX(), newRP.getY())) {
+	public int addInsert(RealPoint newRP, boolean checkVisibleBounds)  { //, boolean docent) 	
+		if ( checkVisibleBounds && (!grafiekGWTVeld.valuePointWithinBounds(newRP.getX(), newRP.getY()))) {
 			return (-1);
 		}
 
@@ -2415,7 +2416,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		veldComponent.setState(h);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
-		if((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	kijkNa();
+		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+			kijkNa();
+		} else {
+			if (mode == OpdrNavIF.EINDTOETS) {
+				kijkNa(false);
+			}
+		}
 		
 		grafiekGWTVeld.setState(h);
 		grafiekGWTVeld.paint();
@@ -3305,7 +3312,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							int dis = (int) Math.round(
 								Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 										  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-							if (dis <= PRAD + 2)
+							if (dis <= cPointRadius + 1)
 							{	dragPoint = rp;
 							}
 						}
@@ -3326,7 +3333,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							new Point(freePixX, pressedY));
 						newPoint.setIndex(getActiveIndex());
 						newPoint.setTabelIndex(geefEersteVrijeVak(false));
-						addInsert(newPoint);//, false);
+						addInsert(newPoint, true);//, false);
 						if(tabelAlsTekenTool)
 							tabelComponent.vernieuwFirstIndexVisible(newPoint.getTabelIndex(), getActiveIndex());
 						
@@ -3345,7 +3352,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 						int dis = (int) Math.round(
 							Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 									  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-						if (dis <= PRAD + 2)
+						if (dis <= cPointRadius + 1)
 						{	drp = rp;
 						}
 						
@@ -3367,7 +3374,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 						int dis = (int) Math.round(
 							Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 									  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-						if (dis <= PRAD + 2)
+						if (dis <= cPointRadius + 1)
 						{	dragPoint = rp;
 						}
 						
@@ -3384,7 +3391,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 								int dis = (int) Math.round(
 									Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 											  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-								if (dis <= PRAD + 2)
+								if (dis <= cPointRadius + 1)
 								{	otherPoint = rp;
 								}
 						
@@ -3602,7 +3609,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				dragPoint.setxString(Double.toString(dragPoint.getX()));
 				dragPoint.setyString(Double.toString(dragPoint.getY()));
 				removePoint(dragPoint.getTabelIndex(), dragPoint.getIndex());//, false);
-				addInsert(dragPoint);//, false);
+				addInsert(dragPoint, true);//, false);
 				
 				
 				startxv = eventX;
@@ -3632,7 +3639,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				dragPoint.setxString(Double.toString(dragPoint.getX()));
 				dragPoint.setyString(Double.toString(dragPoint.getY()));
 				removePoint(dragPoint.getTabelIndex(), dragPoint.getIndex());//, false);
-				addInsert(dragPoint);//, false);					
+				addInsert(dragPoint, true);//, false);					
 				
 				//repaint();
 				
@@ -3758,7 +3765,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					dragPoint.setY(temp.getY());
 					dragPoint.setxString(Double.toString(dragPoint.getX()));
 					dragPoint.setyString(Double.toString(dragPoint.getY()));
-					addInsert(dragPoint);//, false);
+					addInsert(dragPoint, true);//, false);
 				
 					dragPoint = null;
 					
@@ -3781,7 +3788,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					dragPoint.setY(temp.getY());	
 					dragPoint.setxString(Double.toString(dragPoint.getX()));
 					dragPoint.setyString(Double.toString(dragPoint.getY()));
-					addInsert(dragPoint);//, false);							
+					addInsert(dragPoint, true);//, false);							
 					
 					dragPoint = null;
 					
@@ -3889,7 +3896,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					int dis = (int) Math.round(
 						Math.sqrt((rpPix.getX() - e.getX()) * (rpPix.getX() - e.getX()) +
 								  (rpPix.getY() - e.getY()) * (rpPix.getY() - e.getY())));
-					if (dis <= PRAD + 2)
+					if (dis <= cPointRadius + 1)
 					{	drp = rp;
 					}
 					
