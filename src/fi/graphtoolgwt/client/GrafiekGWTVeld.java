@@ -191,8 +191,18 @@ public class GrafiekGWTVeld {
 	private void drawLineWithinVisibleBounds(Context2d g, double x0Pix, double y0Pix, double x1Pix, double y1Pix ) {
 		
 		/* Determine slopes along X and Y */
-		double hellingX = (x1Pix - x0Pix) / (y1Pix - y0Pix);
-		double hellingY = (y1Pix - y0Pix) / (x1Pix - x0Pix);
+		double hellingX;
+		if (y1Pix != y0Pix) {
+			hellingX = ((double) x1Pix - (double) x0Pix) / ((double) y1Pix - (double) y0Pix);
+		} else {
+			hellingX = 0;
+		}
+		double hellingY;
+		if (x1Pix != x0Pix) {
+			hellingY = ((double) y1Pix - (double) y0Pix) / ((double) x1Pix - (double) x0Pix);
+		} else {
+			hellingY = 0;
+		}
 		
 		/* Cut of first point along X-axis */
 		double x0a = Math.max(drawXmin, Math.min(drawXmax, x0Pix));
