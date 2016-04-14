@@ -271,7 +271,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	double beginy = beginyDocent;
 	
 	CssColor[] colors, opdrachtKleuren, gewoneKleuren;
-	static int PRAD = 2;
+	final static int cPointRadius = 3;
 	
 	int tekenGrafiekNauwkeurigheid = 5;
 	
@@ -3286,7 +3286,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							int dis = (int) Math.round(
 								Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 										  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-							if (dis <= PRAD + 2)
+							if (dis <= cPointRadius + 2)
 							{	dragPoint = rp;
 							}
 						}
@@ -3326,7 +3326,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 						int dis = (int) Math.round(
 							Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 									  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-						if (dis <= PRAD + 2)
+						if (dis <= cPointRadius + 2)
 						{	drp = rp;
 						}
 						
@@ -3348,7 +3348,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 						int dis = (int) Math.round(
 							Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 									  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-						if (dis <= PRAD + 2)
+						if (dis <= cPointRadius + 2)
 						{	dragPoint = rp;
 						}
 						
@@ -3365,7 +3365,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 								int dis = (int) Math.round(
 									Math.sqrt((rpPix.getX() - pressedX) * (rpPix.getX() - pressedX) +
 											  (rpPix.getY() - pressedY) * (rpPix.getY() - pressedY)));
-								if (dis <= PRAD + 2)
+								if (dis <= cPointRadius + 2)
 								{	otherPoint = rp;
 								}
 						
@@ -3870,7 +3870,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					int dis = (int) Math.round(
 						Math.sqrt((rpPix.getX() - e.getX()) * (rpPix.getX() - e.getX()) +
 								  (rpPix.getY() - e.getY()) * (rpPix.getY() - e.getY())));
-					if (dis <= PRAD + 2)
+					if (dis <= cPointRadius + 2)
 					{	drp = rp;
 					}
 					

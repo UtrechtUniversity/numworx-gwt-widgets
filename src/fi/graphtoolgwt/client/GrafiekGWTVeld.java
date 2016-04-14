@@ -844,7 +844,7 @@ public class GrafiekGWTVeld {
 							
 							gIm.beginPath();
 							//gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
-							gIm.arc(x, y, 2, 0, 2* Math.PI);
+							gIm.arc(x, y, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 							gIm.closePath();
 							gIm.fill();
 							gIm.stroke();
@@ -981,7 +981,7 @@ public class GrafiekGWTVeld {
 //									}
 									gIm.stroke();
 									gIm.beginPath();
-									gIm.arc(tracex, tracey, 3, 0, 2* Math.PI);
+									gIm.arc(tracex, tracey, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 									gIm.closePath();
 									gIm.fill();
 									gIm.stroke();
@@ -1024,7 +1024,7 @@ public class GrafiekGWTVeld {
 						gIm.setStrokeStyle(grijs);
 						
 						gIm.beginPath();
-						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), 3, 0, 2* Math.PI);
+						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 						gIm.closePath();
 						gIm.fill();
 						gIm.stroke();
@@ -1106,12 +1106,12 @@ public class GrafiekGWTVeld {
 			if ( (pix!= null) && pixelsPointWithinBounds(pix.getX(), pix.getY()) ) { 
 				if(index == interactiePanel.getActiveIndex() && !docent) { // && tekenComponent.getCursorMode() != tekenComponent.NOCUR)
 					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD + 1, 0, 2* Math.PI);
+					g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius + 1, 0, 2* Math.PI);
 					g.closePath();
 					g.fill();
 				} else { 
 					g.beginPath();
-					g.arc(pix.getX(), pix.getY(), interactiePanel.PRAD, 0, 2* Math.PI);
+					g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 					g.closePath();
 					g.fill();
 				}
