@@ -1312,7 +1312,7 @@ public class TabelComponentGWT extends LayoutPanel{
 				if (tpIndex >= 0)
 				{	interactiePanel.removePoint(vakIndex, interactiePanel.getActiveIndex());//, docent);
 				}
-				interactiePanel.addInsert(rp);//, docent);
+				interactiePanel.addInsert(rp, false);//, docent);
 			}// update interactiePanel
 			
 			//zoeken naar alternatief
@@ -1366,7 +1366,7 @@ public class TabelComponentGWT extends LayoutPanel{
 				if (tpIndex >= 0)
 				{	interactiePanel.removePoint(vakIndex, interactiePanel.getActiveIndex());//, docent);
 				}
-				interactiePanel.addInsert(rp);//, docent);
+				interactiePanel.addInsert(rp, false);//, docent);
 			}
 			grafiekGWTVeld.paint();
 			//produceAction("points changed");

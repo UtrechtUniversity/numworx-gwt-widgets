@@ -109,4 +109,15 @@ public class RealPoint implements Serializable
 		this.yString = yString;
 	}
 	
+	@Override
+	public String toString() {
+		String str = "{ " + x + ", "+ y;
+		str+= ", idx="+ index;
+		str+= ", tabIdx="+ tabelIndex;
+		str+= ", strX="+ xString+", strY="+yString;
+		str+= " }";
+		return str;
+	}
+
+	
 }
