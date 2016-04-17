@@ -308,10 +308,10 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			binomGrafiek.setGrootte(dummy,hoogte-210);
 		}
 		panel.setSize(Integer.toString(breedte)+"px", "110px");
-		if (breedte>230)
-			panel.setWidgetLeftRight(panel2,10,Unit.PX,breedte-230,Unit.PX);
-		if (breedte>450)
-			panel.setWidgetLeftRight(panel1, 240, Unit.PX, breedte-450, Unit.PX);     // Center panel
+		//if (breedte>230)
+			panel.setWidgetLeftRight(panel2,10,Unit.PX,Math.max(0, breedte-230),Unit.PX);
+		//if (breedte>450)
+			panel.setWidgetLeftRight(panel1, 240, Unit.PX, Math.max(0, breedte-450), Unit.PX);     // Center panel
 	}
 	
 	public void fireCBook() {
@@ -325,7 +325,15 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			string1=string1+list.get(i).getOutcome()+"\n";			
 		}
 		
-		ssgwt.fireCBookBinomTrekking(string1);
+		//r=((double)Math.round(r*100))/100;
+		String string2="";
+		for (int i=0;i<experiment;i++) {
+			double proportion = Double.parseDouble(list.get(i).getOutcome())/maxCount;
+			proportion=((double)Math.round(proportion*100))/100;
+			string2=string2+proportion+"\n";
+		}
+		
+		ssgwt.fireCBookBinomTrekking(string1, string2);
 	}
 	
 	public void setZichtbaar() {

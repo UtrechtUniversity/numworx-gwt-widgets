@@ -688,11 +688,17 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 		map.put("content", arg1);
 		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
 	}
-	public void fireCBookBinomTrekking(String arg1) {
+	public void fireCBookBinomTrekking(String arg1, String arg2) {
 		
 		Map<String,Object> map = new HashMap<String,Object>();
 		map.put("content", arg1);
 		comRoot.fireEvent(new CBookEvent(this, "text.sample",map));
+		
+		Map<String,Object> map1 = new HashMap<String,Object>();
+		map1.put("content", arg2);
+		comRoot.fireEvent(new CBookEvent(this, "text.sampleProportion",map1));
+		
+		
 	}
 	public void fireCBookSteekproef(String arg1, String arg2) {
 		
@@ -868,7 +874,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			
 		}
 		
-		//simpel.setWidget(asWidget());
+		simpel.setWidget(asWidget());
 
 	}
 
