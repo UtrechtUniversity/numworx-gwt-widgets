@@ -87,7 +87,7 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-	private static Logger logger = Logger.getLogger("GraphToolGWT");
+//	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	final static int cSelectMarge = 5;
 	final static int cPointRadius = 3;
 
@@ -2029,7 +2029,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	public void zetVectorVeld(int stelselNr, int functieNr, Expressie expressie) {
 		veldFuncties[stelselNr][functieNr] = expressie;
-		logger.info("veldFuncties["+stelselNr+"]["+functieNr+"]=" +veldFuncties[stelselNr][functieNr] );
+//		logger.info("veldFuncties["+stelselNr+"]["+functieNr+"]=" +veldFuncties[stelselNr][functieNr] );
 	}
 
 	
