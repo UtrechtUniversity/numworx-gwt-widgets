@@ -1,33 +1,10 @@
 package fi.graphtoolgwt.client;
 
-import java.awt.AWTEventMulticaster;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-
-
-import javax.swing.JColorChooser;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
@@ -37,36 +14,27 @@ import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Float;
-import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
-//import fi.beans.stringutils.StringUtils;
-//import fi.wiskopdr.GrafiekComponent;
-//import fi.wiskopdr.VergelijkingVak;
-//import fi.wiskopdr.GrafiekComponent;
-//import fi.wiskopdr.ImageComponent;
-//import fi.wiskopdr.expressies.*;
-
-
-
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import fi.wiskopdr.FormuleParser;
-import fi.wiskopdr.expressies.Expressie;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
@@ -233,36 +201,15 @@ public class VeldComponentGWT extends LayoutPanel {
 		asNamen[0] = xAsNaam;
 		asNamen[1] = yAsNaam;
 		for (int i=0; i < aantalStelsels; i++) {
-			
-			systems[i] = new SystemDiffEqPanelGWT(i,cAantalFormulesPerStelsel, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin);
+			systems[i] = new SystemDiffEqPanelGWT(this, i, cAantalFormulesPerStelsel, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin);
 			systems[i].updateFunctionBegin(asNamen, cVeldComponentGWT_diffVarNamen[0]);
-//			stelselsPanel.add(systemPanels[i]);
 		}
 		
 		stelselsPanel.add(systems[0]);
 		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte-10, Style.Unit.PX);
 		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, veldComponentHoogte-30, Style.Unit.PX);
-		//checkboxen[0].setValue(true);
 		
-		
-//		fromuser = true;  // WAAROM??
-		
-		
-//		domeinen = new double[maxAantalFormules][2];
-//		for(int i = 0; i < maxAantalFormules; i++)
-//		{	domeinen[i][0] = DEFAULTDOMEIN[0];
-//			domeinen[i][1] = DEFAULTDOMEIN[1];
-//		}		
-		
-		//isOngelijkheid = new boolean[maxAantalFormules];
-		//for(int i = 0; i < maxAantalFormules; i++)
-		//	isOngelijkheid[i] = false;
-		
-//		isEn = new boolean[maxAantalFormules];
-//		for(int i = 0; i<isEn.length; i++)
-//			isEn[i] = true;
 		this.resize();
-
 	}
 	
 	public void resize() {
@@ -300,13 +247,13 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 //		private final int ccSystemDiffEqPanelGWT_rowStartX = 35;
 		
-		
 		CssColor systemColor = VeldComponentGWT.cSystemColor;
+		private Object parent;
 		private int id;
 		private int nrFunctions;
 		private int systemHeight; // Height of this system of eqations in pixels
 		private int systemWidth; // Width of this system of equations in pixels
-		
+				
 		private boolean functionBeginUserChangable = false; // This is unchangable, for now
 		
 		private FormuleFont defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
@@ -321,8 +268,85 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		int width = 1;		
 		
+		public SystemDiffEqPanelGWT(Object parent, int id, int nrFunctions, int systemWidth) {
+			super();
+			
+			this.parent = parent;
+			this.id = id;
+			this.nrFunctions = nrFunctions;
+			this.systemWidth = systemWidth;
+
+			functionsBegin = new String[nrFunctions];
+			functionPanels = new LayoutPanel[nrFunctions];
+			functionEditorPanels = new TouchPanel[nrFunctions];
+			functionBeginViewers = new FormuleViewer[nrFunctions];
+			functionEditors = new FormuleEditor[nrFunctions];
+			braceCanvas = Canvas.createIfSupported();
+			
+			for (int i=0; i < nrFunctions; i++) {
+				functionPanels[i] = new LayoutPanel();
+				layoutRegelPanel(functionPanels[i]);
+				highLight(functionPanels[i], true);
+				
+				if(!functionBeginUserChangable) {
+					functionBeginViewers[i] = new FormuleViewer("$f$bdAs" + (i+1) + "$nd" + "Der" + "@@=@");
+					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
+				}
+
+				functionEditors[i] = new FormuleEditor();
+				
+				functionEditors[i].setColor(systemColor);
+				functionEditors[i].setFont(defaultfont);
+				functionEditors[i].setDefaultFont(defaultfont);
+
+				functionEditorPanels[i] = (TouchPanel) functionEditors[i].getAsPanel();
+				addFormuleEditorListener(functionEditorPanels[i], functionEditors[i]);
+				functionEditorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
+				
+				functionEditors[i].setCurrentElementRepaint();
+				
+				functionPanels[i].add(functionEditorPanels[i]);				
+				this.add(functionPanels[i]);
+				
+			}
+			
+			this.add(cb);		
+			cb.setVisible(true);
+			cb.addClickHandler(new CheckBoxClickHandler());
+			
+			this.add(braceCanvas);
+			
+			adjustSize();
+		}
+		
+		public void setWidth(int width) {
+			this.width = width;
+		}
+		
 		public void setSelected(boolean selected) {
 			cb.setValue(selected);
+		}
+		
+		private void addFormuleEditorListener(final TouchPanel tp, final FormuleEditor editor)
+		{
+			tp.addDomHandler(new BlurHandler() {
+
+				  @Override 
+				  public void onBlur(BlurEvent event) {
+
+				    logger.info("Blurred");
+				  }
+				}, BlurEvent.getType());
+			tp.addDomHandler(new FocusHandler() {
+
+				  public void onFocus(FocusEvent event) {
+
+				    logger.info("Blurred");
+				  }
+				}, FocusEvent.getType());
+
+			tp.addTouchHandler(new FormuleEditorTouchHandler(editor));
+
 		}
 		
 		public void setFunction(int functionId, String functionStr) {
@@ -455,72 +479,27 @@ public class VeldComponentGWT extends LayoutPanel {
 			this.adjustSize(); // also repaint			
 		}
 		
-		public SystemDiffEqPanelGWT(int id, int nrFunctions, int systemWidth) {
-			super();
+		class CheckBoxClickHandler implements ClickHandler {
 			
-			this.id = id;
-			this.nrFunctions = nrFunctions;
-			this.systemWidth = systemWidth;
-
-			functionsBegin = new String[nrFunctions];
-			functionPanels = new LayoutPanel[nrFunctions];
-			functionEditorPanels = new TouchPanel[nrFunctions];
-			functionBeginViewers = new FormuleViewer[nrFunctions];
-			functionEditors = new FormuleEditor[nrFunctions];
-			braceCanvas = Canvas.createIfSupported();
+//			public CheckBoxClickHandler(int i) {	
+//				super();
+//			}
 			
-			for (int i=0; i < nrFunctions; i++) {
-				functionPanels[i] = new LayoutPanel();
-				layoutRegelPanel(functionPanels[i]);
-				highLight(functionPanels[i], true);
-				
-				if(!functionBeginUserChangable) {
-					functionBeginViewers[i] = new FormuleViewer("$f$bdAs" + (i+1) + "$nd" + "Der" + "@@=@");
-					functionPanels[i].add(functionBeginViewers[i].getAsPanel());
+			@Override
+			public void onClick(ClickEvent event) {
+				if ( cb.getValue() ) {
+					for (int i=0; i<nrFunctions; i++) {
+						((VeldComponentGWT) parent).parseFunction(id,i,functionEditors[i].toString());
+					}
+				} else {
+					for (int i=0; i<nrFunctions; i++) {
+						((VeldComponentGWT) parent).parseFunction(id,i,"");
+					}
 				}
-
-				functionEditors[i] = new FormuleEditor();
-				
-				functionEditors[i].setColor(systemColor);
-				functionEditors[i].setFont(defaultfont);
-				functionEditors[i].setDefaultFont(defaultfont);
-//				functionEditors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
-
-				functionEditorPanels[i] = (TouchPanel) functionEditors[i].getAsPanel();
-
-//				functionEditorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
-//				addFormulePanelListeners(functionEditorPanels[i], functionEditors[i]);
-//				functionEditors[i].setCurrentElementRepaint();
-				
-				functionPanels[i].add(functionEditorPanels[i]);				
-				this.add(functionPanels[i]);
-
-				
-//					if (functieBeginAanpasbaar)
-//						editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-				
-//					editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
-//					editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
-//					editors[i].setCurrent(0, 0);
-					//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
-					//editor.installKeyboard(kb);
-					//editors[i].requestFocus();
-					//if (!functieBeginAanpasbaar)
-					//	regelPanels[i].add(functieBeginViewers[i]);
-				
+				((VeldComponentGWT) parent).interactiePanel.grafiekGWTVeld.paint();
 			}
-			
-			this.add(cb);		
-			cb.setVisible(true);		
-			
-			this.add(braceCanvas);
-			
-			adjustSize();
 		}
-		
-		public void setWidth(int width) {
-			this.width = width;
-		}
+
 		
 	}		
 	

@@ -1445,9 +1445,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			geselecteerd[regelnummer] = !geselecteerd[regelnummer];
 			parseFormule(regelnummer, false);
 			grafiekGWTVeld.paint();
-			
-			
-			
 		}
 	}
 	
