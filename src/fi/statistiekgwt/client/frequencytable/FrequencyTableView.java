@@ -186,7 +186,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 			this.dialogButtonPanel.setHeight("0px");
 		}
 
-		this.alles.setPixelSize(this.getWidth(), this.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 		
 		// add alles to frequencytableview (layoutpanel)
 		this.add(this.alles);
@@ -401,6 +401,8 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	{
 		try
 		{
+			this.setMainPanelSize();
+			
 			this.dialogButton.setVisible(this.model.getStatTableModel()
 				.isViewsEditable());
 			
@@ -829,8 +831,10 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 
 	private void setMainPanelSize()
 	{
-		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight());
+		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		this.scrollPanel.setAlwaysShowScrollBars(false);
+		
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 	}
 	
 	// Override setBound
