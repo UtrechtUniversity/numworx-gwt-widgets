@@ -80,8 +80,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	int hoogte = StatistiekGWT.DEFAULT_HEIGHT;
 	boolean volledigeBreedte = false;
 	private static int WIDTH_OFFSET = 5;
-	private static int HEIGHT_OFFSET; 
-	public static int BUTTON_HEIGHT = 40;
+	private static int heightOffset; 
+	public static int BUTTON_HEIGHT = 30;//40;
+	public static int TABLE_BUTTON_MARGIN = 1;
+	public static int TABLE_BUTTON_PADDING = 3;
 	public static double BIN_WIDTH_DEFAULT = 1;
 	
 	boolean nagekeken = false;
@@ -119,7 +121,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		initViews();
 		basisPanel = new StatInteractiePanel();
-		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
+		StatistiekGWT.heightOffset = (int) this.basisPanel.getBarHeight();
 		this.basisPanel.setWidth(breedte);
 		this.basisPanel.setHeight(hoogte);
 		basisPanel.setPixelSize(breedte, hoogte);
@@ -127,8 +129,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		// voeg statinteractiepanel toe
 		//RootPanel.get(holderId).add(basisPanel);
 		RootLayoutPanel.get().add(simpel);
-		//simpel.setWidget(asWidget());
-		Stub.publish(this);
+		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+		Stub.publish(this); // deze regel uitzetten voor standalone test
 	}
 	
 	/**
@@ -136,7 +138,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	 */
 	private void initialize()
 	{
-		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
+		StatistiekGWT.heightOffset = (int) this.basisPanel.getBarHeight();
 
 		this.basisPanel.setWidth(breedte);
 		this.basisPanel.setHeight(hoogte);
@@ -341,7 +343,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		StatistiekView view = null;
 		int w = statInteractiePanel != null ? statInteractiePanel.getWidth() : 0;
-		int h = statInteractiePanel != null ? Math.max(0, statInteractiePanel.getHeight() - HEIGHT_OFFSET) : 0;
+		int h = statInteractiePanel != null ? Math.max(0, statInteractiePanel.getHeight() - StatistiekGWT.heightOffset) : 0;
 		
 		if (viewType.equals("Table"))
 		{
@@ -387,11 +389,6 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		return view;
 	}
 	
-	private void setHeightOffset()
-	{
-		StatistiekGWT.HEIGHT_OFFSET = (int) this.basisPanel.getBarHeight() + StatistiekGWT.BUTTON_HEIGHT;
-	}
-
 	/**
 	 * get the top level ancestor of a JComponent This implementation differs
 	 * from JComponent.getTopLevelAncestor because this doesn't stop at an
