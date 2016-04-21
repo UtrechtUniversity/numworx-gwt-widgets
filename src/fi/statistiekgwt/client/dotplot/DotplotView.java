@@ -279,7 +279,7 @@ public class DotplotView extends LayoutPanel implements
 
 		this.alles.add(this.scrollPanel);// center
 		
-		this.alles.setPixelSize(this.getWidth(), this.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 		
 		// add alles to dotplotview (layoutpanel)
 		this.add(this.alles);
@@ -313,12 +313,11 @@ public class DotplotView extends LayoutPanel implements
 		
 		if (this.model.getStatTableModel().isViewsEditable())
 		{
-			this.setHeight(this.controller.getHeight());
+			this.setHeight(this.controller.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		}
 		else
 		{
-			// take up the space reserved for the user options button
-			this.setHeight(this.controller.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+			this.setHeight(this.controller.getHeight());
 		}
 	}
 
@@ -427,7 +426,7 @@ public class DotplotView extends LayoutPanel implements
 	 */
 	private int dotAreaHeight()
 	{
-		int h = this.getHeight();
+		int h = this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight();
 
 		if (this.model.columnXIndexValid())
 		{
@@ -456,20 +455,26 @@ public class DotplotView extends LayoutPanel implements
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.getColorLegendWidth();
 		
-		this.scrollPanel.setPixelSize(this.getWidth() - colorLegendWidth, this.getHeight());
+		this.scrollPanel.setPixelSize(
+			this.getWidth() - colorLegendWidth, 
+			this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 
 		if (this.model.isSplitInSingleView())
 		{
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(
+				this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 			
 			this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
+			this.colorLegend.setPixelSize(colorLegendWidth, this.getHeight());
 		}
 		else
 		{
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
-			
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(
+				splitClasses * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight()));
+
 			if (splitClasses > 1)
 			{
 				this.scrollPanel.setAlwaysHideVerticalScrollBar(false);
@@ -517,7 +522,7 @@ public class DotplotView extends LayoutPanel implements
 
 		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
 			this.model.getSplitOptions());
-		if (splitClasses > 1)
+		if (splitClasses > 1 && this.model.isSplitInSingleView())
 		{
 			this.colorLegend.setColumnString(this.model.getStatTableModel()
 				.getColumnName(
@@ -544,6 +549,7 @@ public class DotplotView extends LayoutPanel implements
 		}
 		else
 		{
+			// bij geen split of split in 1 view geen colorlegend tonen
 			if (this.colorLegend.isVisible())
 			{
 				this.colorLegend.setVisible(false);
@@ -821,7 +827,7 @@ public class DotplotView extends LayoutPanel implements
 	 */
 	private void determineDotSize()
 	{
-		double d = (this.getWidth() * this.getHeight())
+		double d = (this.getWidth() * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight()))
 			/ (double) Math.max(10, this.model.getStatTableModel().getRowCount());
 		this.dotRadius = Math.max(2, (int) (0.25 * Math.pow(d, 1.0 / 3.0)));
 	}
@@ -1232,7 +1238,7 @@ public class DotplotView extends LayoutPanel implements
 				}
 				else
 				{
-					y += (splitClass) * (this.getHeight() - 5);
+					y += (splitClass) * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 5);
 				}
 			}
 			drawPointAtLocation(context, x, y, rowIndex);
@@ -1254,7 +1260,7 @@ public class DotplotView extends LayoutPanel implements
 		{
 			if (this.model.columnSplitIndexValid())
 			{
-				y += (splitClass) * (this.getHeight() - 5);
+				y += (splitClass) * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 5);
 			}
 			c = ColorUtils.getColor(splitClass);
 			drawPointAtLocation(context, x, y, rowIndex, c);
@@ -1442,7 +1448,7 @@ public class DotplotView extends LayoutPanel implements
 			// set the painting position
 			context.save();
 			context.translate(DotplotView.FONT_HEIGHT - 2, 
-				this.getHeight() / 2 + metrics.getWidth() / 2 + yOffset); // the desired position of the text
+				(this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight()) / 2 + metrics.getWidth() / 2 + yOffset); // the desired position of the text
 			context.rotate(theta);
 			context.fillText(columnNameY, 0, 0);
 			context.restore();
@@ -1458,7 +1464,7 @@ public class DotplotView extends LayoutPanel implements
 			context.fillText(columnNameX,
 				(this.dotAreaWidth() - this.yAxisOffset - metrics.getWidth()) / 2
 					+ this.yAxisOffset, 
-					this.getHeight() - 2 + yOffset);
+					this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 2 + yOffset);
 		}
 
 		// draw split variable class (e.g., "geslacht: m")
@@ -1473,7 +1479,7 @@ public class DotplotView extends LayoutPanel implements
 			String s = columnNameSplit
 				+ ": " + splitClassLabel;
 			context.fillText(s, 10, 
-				this.getHeight() - 2 + yOffset);
+				this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 2 + yOffset);
 		}
 
 		// draw horizontal axis line
@@ -1501,7 +1507,7 @@ public class DotplotView extends LayoutPanel implements
 		ColumnType columnType = this.model.getStatTableModel().getColumnTypes()
 			.get(this.model.getColumnXIndex());
 
-		int y = this.getHeight() - DotplotView.X_AS_OFFSET;
+		int y = this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - DotplotView.X_AS_OFFSET;
 		
 		// draw x-axis
 		context.beginPath();
@@ -2071,7 +2077,7 @@ public class DotplotView extends LayoutPanel implements
 			}
 			
 			context.fillText(correlationInfoString,
-				3, this.getHeight() - 2);
+				3, this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 2);
 		}
 	}
 
@@ -2992,9 +2998,9 @@ public class DotplotView extends LayoutPanel implements
 					for (int i = 0; i < DotplotView.this.splitClasses; i++)
 					{
 						DotplotView.this.paintXAxis(tempContext, 
-							i * (DotplotView.this.getHeight() - 5));
+							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 						DotplotView.this.paintYAxis(tempContext, 
-							i * (DotplotView.this.getHeight() - 5));
+							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 					}
 	
 					for (int row = 0; row < DotplotView.this.model.getStatTableModel()
@@ -3011,7 +3017,7 @@ public class DotplotView extends LayoutPanel implements
 					for (int i = 0; i < DotplotView.this.splitClasses; i++)
 					{
 						DotplotView.this.paintXAxis(tempContext, 
-							i * (DotplotView.this.getHeight() - 5));
+							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 					}
 					
 					// only the x-column variable is valid, draw a single variable
@@ -3069,7 +3075,7 @@ public class DotplotView extends LayoutPanel implements
 								else
 								{
 									heightOffset = (splitClass)
-										* (DotplotView.this.getHeight() - 5);
+										* (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5);
 								}
 	
 								// startIndexSelected
@@ -3153,7 +3159,7 @@ public class DotplotView extends LayoutPanel implements
 					for (int i = 0; i < DotplotView.this.splitClasses; i++)
 					{
 						DotplotView.this.paintYAxis(tempContext, 
-							i * (DotplotView.this.getHeight() - 5));
+							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 					}
 					
 					// only the y-column variable is valid, draw a single variable
@@ -3202,7 +3208,7 @@ public class DotplotView extends LayoutPanel implements
 								else
 								{
 									heightOffset = (splitClass)
-										* (DotplotView.this.getHeight() - 5);
+										* (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5);
 								}
 	
 								DotplotView.this.drawPointAtLocation(tempContext,
@@ -3218,7 +3224,7 @@ public class DotplotView extends LayoutPanel implements
 					: splitClasses); i++)
 				{
 					int ySplitOffset = i
-						* (DotplotView.this.getHeight() - 5);
+						* (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5);
 					DotplotView.this.paintAxisLabels(tempContext, ySplitOffset, i);
 				}
 				
