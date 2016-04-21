@@ -1499,20 +1499,28 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			} // maxOnScaleField
 			else if (e.getSource() == binWidthField)
 			{
-				model.setBinWidth(view.getBinWidth());
-				
-				// column index bin settings
-				controller.updateBoundariesFromBinSettings();
-
-				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-				double maxBinValue = view.getMaxBinOnScale();
-				if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+				if (view.getBinWidth() == 0)
 				{
-					view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+					// reset to the latest value
+					model.setBinWidth(model.getBinWidth());
 				}
 				else
 				{
-					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					model.setBinWidth(view.getBinWidth());
+					
+					// column index bin settings
+					controller.updateBoundariesFromBinSettings();
+	
+					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+					double maxBinValue = view.getMaxBinOnScale();
+					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+					{
+						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
 				}
 			}
 			else if (e.getSource() == splitMinBoundaryField)
@@ -1639,20 +1647,28 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				model.setBinWidth(view.getBinWidth());
-				
-				// column index bin settings
-				controller.updateBoundariesFromBinSettings();
-
-				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-				double maxBinValue = view.getMaxBinOnScale();
-				if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+				if (view.getBinWidth() == 0)
 				{
-					view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+					// reset to the latest value
+					model.setBinWidth(model.getBinWidth());
 				}
 				else
 				{
-					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					model.setBinWidth(view.getBinWidth());
+					
+					// column index bin settings
+					controller.updateBoundariesFromBinSettings();
+	
+					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+					double maxBinValue = view.getMaxBinOnScale();
+					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+					{
+						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+					}
 				}
 			}
 			else if (e.getSource() == splitMinBoundaryField)
