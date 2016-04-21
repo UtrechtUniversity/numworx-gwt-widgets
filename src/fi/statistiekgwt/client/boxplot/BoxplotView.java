@@ -146,7 +146,7 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 		this.alles.addSouth(this.dialogButtonPanel, StatistiekGWT.BUTTON_HEIGHT);
 		if (!this.model.getStatTableModel().isViewsEditable())
 		{
-			this.dialogButtonPanel.setHeight("0px");
+			this.alles.setWidgetHidden(this.dialogButtonPanel, true);
 		}
 
 		this.mainPanel = new Boxplot(this);
@@ -189,27 +189,24 @@ public class BoxplotView extends LayoutPanel implements TableChangeEventHandler,
 	{
 		this.setWidth(this.controller.getWidth());
 		
+		int correction = 0;
 		if (this.model.getStatTableModel().isViewsEditable())
 		{
-			this.setHeight(this.controller.getHeight());
+			correction = StatistiekGWT.BUTTON_HEIGHT;
 		}
-		else
-		{
-			// take up the space reserved for the user options button
-			this.setHeight(this.controller.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
-		}
+
+		this.setHeight(this.controller.getHeight() - correction);
 	}
 
 	private void setMainPanelSize()
 	{
-		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight());
-		this.scrollPanel.setAlwaysShowScrollBars(false);
-		
-		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight());
+		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		this.scrollPanel.setAlwaysShowScrollBars(false);
 
-		this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8); // correction of 8 for scrollbar
-		this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight() - 8); // correction of 8 for scrollbar
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
+		
+		this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - 8); // -8 for scrollbar
+		this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight() - 8 - this.model.getStatTableModel().getDialogButtonHeight()); // -8 for scrollbar
 	}
 	
 	/**
