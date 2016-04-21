@@ -252,7 +252,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 			this.dialogButtonPanel.setHeight("0px");
 		}
 
-		this.alles.setPixelSize(this.getWidth(), this.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 		
 		// add alles to descriptivesview (layoutpanel)
 		this.add(this.alles);
@@ -410,16 +410,10 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 	private void setMainPanelSize()
 	{
-		int splitClasses = this.model.getStatTableModel().numberOfSplitVarClasses(
-			this.model.getSplitOptions());
-		
-		int scrollWidth = this.scrollPanel.getElement().getScrollWidth();
-		int scrollHeight = this.scrollPanel.getElement().getScrollHeight();
-
-		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight());
+		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		this.scrollPanel.setAlwaysShowScrollBars(false);
 
-		//this.mainPanel.setPixelSize(this.getWidth() - 8, splitClasses * this.getHeight());
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 	}
 
 	/**
