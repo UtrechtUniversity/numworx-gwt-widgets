@@ -47,11 +47,12 @@ public class DotplotController implements StatistiekView
 		model.initializeMinXOnScale();
 		model.initializeMaxXOnScale();
 		
+		this.view = new DotplotView(this.model, this);
+		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
 		
-		this.view = new DotplotView(this.model, this);
 		this.view.update();
 	}
 
@@ -73,11 +74,12 @@ public class DotplotController implements StatistiekView
 		model.initializeMinXOnScale();
 		model.initializeMaxXOnScale();
 
+		this.view = new DotplotView(this.model, this);
+
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
 		
-		this.view = new DotplotView(this.model, this);
 		this.view.update();
 	}
 
@@ -115,7 +117,7 @@ public class DotplotController implements StatistiekView
 	}
 
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	@Override
 	public int getWidth()
@@ -124,7 +126,7 @@ public class DotplotController implements StatistiekView
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	@Override
 	public int getHeight()
@@ -133,21 +135,23 @@ public class DotplotController implements StatistiekView
 	}
 	
 	/**
-	 * Set the views width.
+	 * Set the view's width.
 	 */
 	@Override
 	public void setWidth(int w)
 	{
 		this.width = w;
+		this.view.setWidth(w);
 	}
 	
 	/**
-	 * Set the views height.
+	 * Set the view's height.
 	 */
 	@Override
 	public void setHeight(int h)
 	{
 		this.height = h;
+		this.view.setHeight(h);
 	}
 
 	/**
