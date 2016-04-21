@@ -44,12 +44,11 @@ public class CrossTabulationTableController implements StatistiekView
 		this.model = new CrossTabulationTableModel(tableModel, viewName);
 		this.model.setColumnIndex(startVarRows);
 		
+		this.view = new CrossTabulationTableView(this.model, this);
 		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
-		
-		this.view = new CrossTabulationTableView(this.model, this);
 		
 		// setSplit after the view has been created
 		setSplit(startVarColumns);
@@ -314,7 +313,7 @@ public class CrossTabulationTableController implements StatistiekView
 	}
 
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	public int getWidth()
 	{
@@ -322,7 +321,7 @@ public class CrossTabulationTableController implements StatistiekView
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	public int getHeight()
 	{
@@ -330,19 +329,21 @@ public class CrossTabulationTableController implements StatistiekView
 	}
 	
 	/**
-	 * Set the views width.
+	 * Set the view's width.
 	 */
 	public void setWidth(int w)
 	{
 		this.width = w;
+		this.view.setWidth(w);
 	}
 	
 	/**
-	 * Set the views height.
+	 * Set the view's height.
 	 */
 	public void setHeight(int h)
 	{
 		this.height = h;
+		this.view.setHeight(h);
 	}
 
 	/**
