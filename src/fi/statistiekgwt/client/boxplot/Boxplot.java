@@ -550,7 +550,8 @@ public class Boxplot
 					// Teken hulplijn
 					context.beginPath();
 					context.moveTo(x, 0);
-					context.lineTo(x, this.getHeight() - Boxplot.AXIS_OFFSET);
+					context.lineTo(x, 
+						this.getHeight() - boxplotView.getModel().getStatTableModel().getDialogButtonHeight() - Boxplot.AXIS_OFFSET);
 					context.stroke();
 					context.closePath();
 	
