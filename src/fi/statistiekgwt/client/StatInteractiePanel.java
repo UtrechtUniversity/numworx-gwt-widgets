@@ -299,6 +299,16 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 				
 				if (statistiekViewTypes.length > 0)
 				{
+					if (!this.model.getStatTableModel().isViewsAddable()
+						&& (statistiekViewTypes.length == 1)
+						&& !statistiekViewTypes[0].equals(StatistiekGWT.VIEWS[0])) // Table
+					{
+						// adjust the height of the one view
+						StatistiekView view = this.model.getViews().get(0);
+						view.setHeight((int) (view.getHeight() + getBarHeight()));
+						view.update();
+					}
+					
 					// update statinteractiepanelview for the views added 
 					this.view.update();
 				}
