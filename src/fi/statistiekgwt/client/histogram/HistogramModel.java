@@ -690,14 +690,21 @@ public class HistogramModel
 		if ((this.getStatTableModel().isEmptyColumn(this.getColumnIndex())
 			|| (max >= maxBinValue)) && (max != this.maxOnScale))
 		{
-			double newMax = this.minOnScale;
-			
-			for (int i = 1; max > newMax; i++)
+			if (getBinWidth() == 0)
 			{
-				newMax = StatistiekGWT.round(newMax + getBinWidth(), 8);
+				this.maxOnScale = max;
 			}
-			
-			this.maxOnScale = newMax;
+			else
+			{
+				double newMax = this.minOnScale;
+				
+				for (int i = 1; max > newMax; i++)
+				{
+					newMax = StatistiekGWT.round(newMax + getBinWidth(), 8);
+				}
+				
+				this.maxOnScale = newMax;
+			}
 		}
 	}
 
