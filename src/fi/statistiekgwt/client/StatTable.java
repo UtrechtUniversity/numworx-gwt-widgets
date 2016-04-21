@@ -595,30 +595,55 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 		
 		
-		// maak editDataPanel met 6 buttons
+		// maak editDataPanel met buttons
 		this.editDataPanel = new HorizontalPanel();//new LayoutPanel();
 		this.editDataPanel.setSize("100%", "100%");
-		this.editDataPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_LEFT);
-		this.editDataPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
+		this.editDataPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);//ALIGN_LEFT);
+		this.editDataPanel.setVerticalAlignment(HasVerticalAlignment.ALIGN_BOTTOM);
 		this.editDataPanel.addStyleName(statistiekCss.backgroundblue());
 		
-		this.importButton = new Button(StatistiekGWT.rb.importButton());
+		this.importButton = new Button(getButtonText(StatistiekGWT.rb.importButton()));
+		this.importButton.setTitle(StatistiekGWT.rb.importButton());
+		this.importButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
+		this.importButton.setWidth(getButtonWidth() + "px");
+		this.importButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.importButton);
 
-		this.addRowButton = new Button(StatistiekGWT.rb.addrowButton());
+		this.addRowButton = new Button(getButtonText(StatistiekGWT.rb.addrowButton()));
+		this.addRowButton.setTitle(StatistiekGWT.rb.addrowButton());
+		this.addRowButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
+		this.addRowButton.setWidth(getButtonWidth() + "px");
+		this.addRowButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.addRowButton);
 		
-		this.addColumnButton = new Button(StatistiekGWT.rb.addcolumnButton());
+		this.addColumnButton = new Button(getButtonText(StatistiekGWT.rb.addcolumnButton()));
+		this.addColumnButton.setTitle(StatistiekGWT.rb.addcolumnButton());
+		this.addColumnButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
+		this.addColumnButton.setWidth(getButtonWidth() + "px");
+		this.addColumnButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.addColumnButton);
 		
-		this.deleteRowsButton = new Button(StatistiekGWT.rb.deleteselectedrowsButton());
+		this.deleteRowsButton = new Button(getButtonText(StatistiekGWT.rb.deleteselectedrowsButton()));
+		this.deleteRowsButton.setTitle(StatistiekGWT.rb.deleteselectedrowsButton());
+		this.deleteRowsButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
+		this.deleteRowsButton.setWidth(getButtonWidth() + "px");
+		this.deleteRowsButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.deleteRowsButton);
 		
-		this.pasteButton = new Button(StatistiekGWT.rb.pasteclipboardButton());
+		this.pasteButton = new Button(getButtonText(StatistiekGWT.rb.pasteclipboardButton()));
+		this.pasteButton.setTitle(StatistiekGWT.rb.pasteclipboardButton());
+		this.pasteButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
+		this.pasteButton.setWidth(getButtonWidth() + "px");
+		this.pasteButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.pasteButton);
 		
-		this.resetButton = new PushButton(new Image(statistiekGWTClientBundle.resetResource().getSafeUri()));
+		Image resetImage = new Image(statistiekGWTClientBundle.resetResource().getSafeUri());
+		this.resetButton = new PushButton(resetImage);
+		this.resetButton.setTitle(StatistiekGWT.rb.resetButton());
+		this.resetButton.setHeight((StatistiekGWT.BUTTON_HEIGHT - 1) + "px"); // correct 1 pixel for pushbutton to make buttons and pushbutton of equal height
+		this.resetButton.setWidth(getButtonWidth() + "px");
 		this.resetButton.addStyleName(statistiekCss.pushbutton());
+		//this.resetButton.addStyleName(statistiekCss.tableButton());
 		if (StatTable.this.statInteractiePanel != null)
 		{
     		HashMap resetHashMap = StatTable.this.statInteractiePanel.getModel().getResetHashMap();
@@ -651,6 +676,84 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.update();
 		// set the right selection
 		this.setSelectionFromModelInTable();
+	}
+
+	/**
+	 * Get the (if necessary shortened) text for the table buttons given the button width.
+	 * 
+	 * @param text
+	 * @return
+	 */
+	private String getButtonText(String text)
+	{
+		String buttonText = text;
+		int margin = 5;
+		String periodsString = "...";
+		int marginPeriods = margin + determineStringWidth(periodsString); // margin regarding "..." 
+		
+		int buttonWidth = getButtonWidth();
+		int textWidth = determineStringWidth(text);
+		
+		if (textWidth > buttonWidth - margin)
+		{
+			buttonText = getButtonText(text, buttonWidth - marginPeriods) + periodsString;
+		}
+		
+		return buttonText;
+	}
+
+	/**
+	 * Get the first part of the text of the given width. If the width is larger than the
+	 * text's width, the original text is returned.
+	 * 
+	 * @param text
+	 * @param width
+	 * @return
+	 */
+	private String getButtonText(String text, int width)
+	{
+		String shortenedText = text;
+		
+		while (determineStringWidth(shortenedText) > width)
+		{
+			shortenedText = shortenedText.substring(0, shortenedText.length() - 1);
+		}
+		
+		return shortenedText;
+	}
+
+	/**
+	 * Get the width of the table buttons. The given width of StatInteractiePanel
+	 * is equally distributed over the buttons, taking the button's margin into account.
+	 * 
+	 * @return
+	 */
+	private int getButtonWidth()
+	{
+		int width;
+		
+		width = (int) (getWidth() - getNumberOfButtons() * 2 * StatistiekGWT.TABLE_BUTTON_MARGIN)
+			/getNumberOfButtons();
+		
+		return width;
+	}
+
+	private int getNumberOfButtons()
+	{
+		int number;
+		
+		if (StatTable.this.statInteractiePanel != null)
+		{
+			// including reset button
+			number = 6;
+		}
+		else
+		{
+			// no reset button
+			number = 5;
+		}
+		
+		return number;
 	}
 
 	/**
@@ -3347,7 +3450,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		String header;
 		
 		header = this.statTableModel.getColumnNames().get(columnIndex);
-		columnHeaderWidth[columnIndex] = this.determineColumnHeaderWidth(columnIndex, header);
+		columnHeaderWidth[columnIndex] = this.determineStringWidth(header);
 	}
 	
 	/**
@@ -3524,10 +3627,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
-	 * Determine the column header width.
+	 * Determine the width of the string.
 	 * 
 	 */
-	private int determineColumnHeaderWidth(int columnIndex, String header)
+	private int determineStringWidth(String text)
 	{
 		TextMetrics metrics;
 		Canvas canvas = Canvas.createIfSupported();
@@ -3535,11 +3638,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		// set the table's font
 		context.setFont(StatTable.TABLE_HEADER_FONT);
-		metrics = context.measureText(header);
+		metrics = context.measureText(text);
 		// initialize maxWidth with the header width
-		int headerWidth = (int) metrics.getWidth();
+		int textWidth = (int) metrics.getWidth();
 
-		return headerWidth;
+		return textWidth;
 	}
 
 	/**
@@ -3757,7 +3860,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	public int getWidth()
 	{
@@ -3765,7 +3868,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	public int getHeight()
 	{
@@ -3773,7 +3876,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
-	 * Set the views width.
+	 * Set the view's width.
 	 */
 	public void setWidth(int w)
 	{
@@ -3781,7 +3884,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 	
 	/**
-	 * Set the views height.
+	 * Set the view's height.
 	 */
 	public void setHeight(int h)
 	{
