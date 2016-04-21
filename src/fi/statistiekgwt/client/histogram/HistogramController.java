@@ -49,24 +49,17 @@ public class HistogramController implements StatistiekView
 	public HistogramController(StatTableModel tableModel, String viewName,
 		boolean frequencyPolygonMode, int startVar, int width, int height)
 	{
-//		System.out.println("HistogramController(): maakt nieuw HistogramModel en daarmee HistogramView");
-		
 		this.model = new HistogramModel(tableModel, viewName, frequencyPolygonMode);
 		model.setColumnIndex(startVar);
 		model.setDefaultLabelPositioning();
+		
+		this.view = new HistogramView(this.model, this);
 		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
 		
-		this.view = new HistogramView(this.model, this);
 		this.view.update();
-		
-//		System.out.println("... HistogramController(): this.model.binBoundaries=" + this.model.getBinBoundaries());
-//		System.out.println("... HistogramController(): identityHashCode(this)=" 
-//			+ identityHashCode(this));
-//		System.out.println("... HistogramController(): identityHashCode(this.model.getBinBoundaries())=" 
-//			+ identityHashCode(this.model.getBinBoundaries()));
 	}
 
 	private static int identityHashCode(Object o)
@@ -381,7 +374,7 @@ public class HistogramController implements StatistiekView
 	}
 
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	public int getWidth()
 	{
@@ -389,7 +382,7 @@ public class HistogramController implements StatistiekView
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	public int getHeight()
 	{
@@ -397,19 +390,21 @@ public class HistogramController implements StatistiekView
 	}
 	
 	/**
-	 * Set the views width.
+	 * Set the view's width.
 	 */
 	public void setWidth(int w)
 	{
 		this.width = w;
+		this.view.setWidth(w);
 	}
 	
 	/**
-	 * Set the views height.
+	 * Set the view's height.
 	 */
 	public void setHeight(int h)
 	{
 		this.height = h;
+		this.view.setHeight(h);
 	}
 
 	/**
