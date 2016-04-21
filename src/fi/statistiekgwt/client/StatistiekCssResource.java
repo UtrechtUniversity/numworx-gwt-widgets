@@ -4,6 +4,8 @@ import com.google.gwt.resources.client.CssResource;
 
 public interface StatistiekCssResource extends CssResource
 {
+	String tableButton();
+	
 	String canvas();
 	
 	String pushbutton();
