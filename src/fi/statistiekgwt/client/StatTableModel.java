@@ -3336,4 +3336,22 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		OutlierChangeEvent event = new OutlierChangeEvent("StatTableModel");
 		this.fireEvent(event);
 	}
+	
+	/**
+	 * Get the height reserved for the dialog button of the views
+	 * based on the setting 'views editable' yes/no.
+	 * Returns 0 is no dialog button is shown.
+	 */
+	public int getDialogButtonHeight()
+	{
+		int height = 0;
+		
+		if (this.isViewsEditable())
+		{
+			height = StatistiekGWT.BUTTON_HEIGHT;
+		}
+		
+		return height;
+	}
+
 }
