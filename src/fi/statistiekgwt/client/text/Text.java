@@ -187,10 +187,10 @@ public interface Text extends Constants
 	@DefaultStringValue("Demarkeer rij als uitschieter")
 	String demarkOutlierRow();
 	
-	@DefaultStringValue("Voeg een rij toe")
+	@DefaultStringValue("Voeg rij toe")
 	String addrowButton();
 	
-	@DefaultStringValue("Voeg een kolom toe")
+	@DefaultStringValue("Voeg kolom toe")
 	String addcolumnButton();
 	
 	@DefaultStringValue("Wis geselecteerde rijen")
