@@ -209,7 +209,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 		this.alles.add(this.scrollPanel);// center
 		
-		this.alles.setPixelSize(this.getWidth(), this.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 		
 		// add alles to histogramview (layoutpanel)
 		this.add(this.alles);
@@ -243,12 +243,12 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		
 		if (this.model.getStatTableModel().isViewsEditable())
 		{
-			this.setHeight(this.controller.getHeight());
+			this.setHeight(this.controller.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		}
 		else
 		{
 			// take up the space reserved for the user options button
-			this.setHeight(this.controller.getHeight() + StatistiekGWT.BUTTON_HEIGHT);
+			this.setHeight(this.controller.getHeight());
 		}
 	}
 
@@ -1111,7 +1111,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 	private int barAreaHeight()
 	{
-		int h = this.getHeight() - this.xAxisOffset;
+		int h = this.getHeight() - this.xAxisOffset - this.model.getStatTableModel().getDialogButtonHeight();
 
 		return h;
 	}
@@ -1514,7 +1514,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		TextMetrics metrics;
 		int height = this.getCurrentFontHeight(context);
 		double theta = Math.PI * 1.75;// 315 graden met de klok mee; 45 graden tegen de klok in
-		int ySplitOffset = splitClass * (this.getHeight() - 5);
+		int ySplitOffset = splitClass * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 5);
 
 		availableSpace = HistogramView.MAX_SCREEN_FRACTION_FOR_BARS *
         	(this.model.hasVerticalBars() ? 
@@ -2338,7 +2338,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 		else
 		{
-			bins = this.getBinsfromBinsSettings();
+			bins = this.getBinsFromBinsSettings();
 		}
 		
 		return bins;
@@ -2349,7 +2349,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 * 
 	 * @return
 	 */
-	private ArrayList<Double> getBinsfromBinsSettings()
+	private ArrayList<Double> getBinsFromBinsSettings()
 	{
 		ArrayList<Double> bins = new ArrayList<Double>();
 		double maxOnScale = model.getMaxOnScale();
@@ -2360,19 +2360,23 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			// use the settings without check for valid values
 			double minOnScale = this.getMinBoundary();//model.getMinOnScale(); // voor lege kolom is minOnScale mogelijk op 0 gezet
 			double binValue = minOnScale;
-			for (int i = 0; binValue < maxOnScale; i++)
-			{
-				binValue = minOnScale + i * binWidth;
-				binValue = StatistiekGWT.round(binValue, 8);
-				bins.add(binValue);
-			}
 			
-			if (minOnScale == maxOnScale)
+			if ((minOnScale == maxOnScale) || (binWidth == 0))
 			{
 				bins.add(minOnScale);
 				bins.add(maxOnScale);
 			}
-			else if (bins.isEmpty())
+			else
+			{
+				for (int i = 0; binValue < maxOnScale; i++)
+				{
+					binValue = minOnScale + i * binWidth;
+					binValue = StatistiekGWT.round(binValue, 8);
+					bins.add(binValue);
+				}
+			}
+			
+			if (bins.isEmpty())
 			{
 				bins.add(0.0);
 				bins.add(0.0);
@@ -2397,11 +2401,19 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				maxOnScale = max + binWidth; // bins do not include the upper boundary, so max + binWidth
 			}
 			
-			for (int i = 0; binValue < maxOnScale; i++)
+			if ((startValue == maxOnScale) || (binWidth == 0))
 			{
-				binValue = startValue + i * binWidth;
-				binValue = StatistiekGWT.round(binValue, 8);
-				bins.add(binValue);
+				bins.add(startValue);
+				bins.add(maxOnScale);
+			}
+			else
+			{
+				for (int i = 0; binValue < maxOnScale; i++)
+				{
+					binValue = startValue + i * binWidth;
+					binValue = StatistiekGWT.round(binValue, 8);
+					bins.add(binValue);
+				}
 			}
 		}
 
@@ -2801,7 +2813,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 
 		// get frequencies
 		FrequencyTuple[] frequencies = allFrequencies[splitClass];
-		int ySplitOffset = splitClass * (this.getHeight() - 5);
+		int ySplitOffset = splitClass * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 5);
 
 		availableSpace = HistogramView.MAX_SCREEN_FRACTION_FOR_BARS *
         	(this.model.hasVerticalBars() ? 
@@ -3305,7 +3317,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		return max;
 	}
 	
-	private int getMaxFrequencyofBins(int[][] allFrequencies)
+	private int getMaxFrequencyOfBins(int[][] allFrequencies)
 	{
 		int max = 0;
 		
@@ -3323,19 +3335,25 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			this.model.getSplitOptions());
 		int colorLegendWidth = this.colorLegend.isVisible() ? HistogramView.COLOR_LEGEND_WIDTH : 0;
 
-		this.scrollPanel.setPixelSize(this.getWidth() - colorLegendWidth, this.getHeight());
+		this.scrollPanel.setPixelSize(
+			this.getWidth() - colorLegendWidth, 
+			this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
+		this.alles.setPixelSize(this.getWidth(), this.getHeight());
 
 		if (this.model.isSplitInSingleView())
 		{
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth() - colorLegendWidth);
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(
+				this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 			
 			this.scrollPanel.setAlwaysHideVerticalScrollBar(true);
+			this.colorLegend.setPixelSize(colorLegendWidth, this.getHeight());
 		}
 		else
 		{
 			this.mainPanel.getCanvas().setCoordinateSpaceWidth(this.getWidth());
-			this.mainPanel.getCanvas().setCoordinateSpaceHeight(splitClasses * this.getHeight());
+			this.mainPanel.getCanvas().setCoordinateSpaceHeight(
+				splitClasses * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight()));
 			
 			if (splitClasses > 1)
 			{
@@ -3549,7 +3567,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				: splitClasses); i++)
 			{
 				int ySplitOffset = i
-					* (HistogramView.this.getHeight() - 5);
+					* (HistogramView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5);
 
 				if (HistogramView.this.model.hasVerticalBars())
 				{
@@ -4411,7 +4429,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 	 */
 	private int getNumberOfBinsfromBinsSettings()
 	{
-		ArrayList<Double> binBoundaries = getBinsfromBinsSettings();
+		ArrayList<Double> binBoundaries = getBinsFromBinsSettings();
 		int number = binBoundaries.size() - 1;
 
 		return number;
