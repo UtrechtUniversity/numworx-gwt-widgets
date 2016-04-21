@@ -7,12 +7,22 @@
 
 /** Used for StatTable.resetButton and CrossTabulationTableUserOptionsPanel.swapButton. */
 .pushbutton {
-	background-color: rgb(240, 240, 240);
+	background-color: rgb(240, 240, 240); /* default button grey */
 	background-image: none;
 	display: table-cell;
 	text-align: center;
-	font-size: 0.875em;
+	vertical-align: middle;
+	/*font-size: 0.875em;*/
 	padding: 0px;
+}
+
+/** Used for buttons in StatTable. */
+.tableButton {
+	vertical-align: middle;
+	margin: 1px; /* this margin is the value of StatistiekGWT.MARGIN */
+	padding: 5px;
+	white-space: nowrap;
+	/*background: rgb(220, 229, 245);/*rgb(220, 237, 255); /* DWO blue #DCEDFF */
 }
 
 /** DWO blue. Used for ColorLegend, SeperateViewDialog, 
