@@ -50,12 +50,12 @@ public class BoxplotController implements StatistiekView
 		this.model = new BoxplotModel(tableModel, viewName);
 		this.model.setColumnIndex(startVar);
 		
+		this.view = new BoxplotView(this.model, this);
+		this.view.update();
+		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
-		
-		this.view = new BoxplotView(this.model, this);
-		this.view.update();
 	}
 
 	void setSplitType(AllowedTypes type)
@@ -219,7 +219,7 @@ public class BoxplotController implements StatistiekView
 	}
 
 	/**
-	 * Get the views width.
+	 * Get the view's width.
 	 */
 	public int getWidth()
 	{
@@ -227,7 +227,7 @@ public class BoxplotController implements StatistiekView
 	}
 	
 	/**
-	 * Get the views height.
+	 * Get the view's height.
 	 */
 	public int getHeight()
 	{
@@ -235,19 +235,21 @@ public class BoxplotController implements StatistiekView
 	}
 	
 	/**
-	 * Set the views width.
+	 * Set the view's width.
 	 */
 	public void setWidth(int w)
 	{
 		this.width = w;
+		this.view.setWidth(w);
 	}
 	
 	/**
-	 * Set the views height.
+	 * Set the view's height.
 	 */
 	public void setHeight(int h)
 	{
 		this.height = h;
+		this.view.setHeight(h);
 	}
 
 	/**
