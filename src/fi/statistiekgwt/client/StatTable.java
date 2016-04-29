@@ -3354,7 +3354,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private void updateColumnWidth(int columnIndex)
 	{
-		columnWidth[columnIndex] = this.determineColumnWidth(columnIndex);
+		if (columnIndex > -1)
+		{
+			columnWidth[columnIndex] = this.determineColumnWidth(columnIndex);
+		}
 	}
 	
 	/**
