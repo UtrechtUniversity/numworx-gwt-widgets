@@ -51,11 +51,12 @@ public class BoxplotController implements StatistiekView
 		this.model.setColumnIndex(startVar);
 		
 		this.view = new BoxplotView(this.model, this);
-		this.view.update();
 		
 		// set size
 		this.setWidth(width);
 		this.setHeight(height);
+
+		this.view.update();
 	}
 
 	void setSplitType(AllowedTypes type)
