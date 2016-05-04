@@ -383,8 +383,8 @@ System.out.println("rood");
 
 	void zetVeranderd(boolean state)
 	{
-		if (vWerk == null || !kijkNaActief)
-			return;
+		//if (vWerk == null || !kijkNaActief)
+		//	return;
 		
 		//nakijkKnop.clear();
 		//nakijkKnop.add(vinkjeGrijsImage);
@@ -395,6 +395,10 @@ System.out.println("rood");
 			int aantal = vWerk.kr.geefAantalK();
 			blokjesLabel.setText(msgs.blokjes(aantal));
 		}
+		
+		if (vWerk == null || !kijkNaActief)
+			return;
+
 		
 		ingevuld = true;
 		
@@ -511,8 +515,10 @@ System.out.println("rood");
 		zetMode(comRoot.getMode());
 		CssColor background = comRoot.getBackground();
 		panel.getElement().getStyle().setBackgroundColor(background.value());
-		vWerk.zetAchtergrond(background);
-		vWerk.tekenOpnieuw();
+		if (vWerk != null)
+		{	vWerk.zetAchtergrond(background);
+			vWerk.tekenOpnieuw();
+		}	
 System.out.println("setComRoot");		
 		comRoot.addCBookEventListener("text.buildingProgram", this);
 	}

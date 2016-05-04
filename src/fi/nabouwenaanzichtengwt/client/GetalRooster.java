@@ -47,6 +47,10 @@ public class GetalRooster
 		String fontString4 = "bold 28px arial, sans-serif";
 		String fontString5 = "bold 26px arial, sans-serif";
 		String fontString6 = "bold 24px arial, sans-serif";
+		String fontString7 = "bold 22px arial, sans-serif";
+		String fontString8 = "bold 19px arial, sans-serif";
+		String fontString9 = "bold 16px arial, sans-serif";
+		double corrx = 0;
 		double corry = 0;
 		if (aantal == 4)
 		{	g.setFont(fontString4);
@@ -59,7 +63,21 @@ public class GetalRooster
 		{	g.setFont(fontString6);
 			corry = 0;
 		}
-		
+		else if (aantal == 7)
+		{	g.setFont(fontString7);
+			corry = 0;
+		}
+		else if (aantal == 8)
+		{	g.setFont(fontString8);
+			corry = 0;
+			corrx = 2;
+		}
+		else if (aantal == 9)
+		{	g.setFont(fontString9);
+			corry = 0;
+			corrx = 4;
+		}
+
 		for (int i = 0; i < aantal; i++)
 		{	for (int j = 0; j < aantal; j++)
 			{	if (hoogten[i][j] > 0)
@@ -81,7 +99,18 @@ public class GetalRooster
 					String s = Integer.toString(hoogten[i][j]);
 					TextMetrics tm = g.measureText(s);
 					int woordbreedte = (int) Math.round(tm.getWidth());
-					g.fillText(s, xT - 8, yT + zijde/2 + corry);
+					if (aantal > 9)
+					{
+						if (hoogten[i][j] < 10)
+						{
+							corrx = (aantal % 10)+ Math.abs(aantal-15);
+						}
+						else
+						{
+							corrx = 1;
+						}
+					}
+					g.fillText(s, xT - 8 + corrx, yT + zijde/2 + corry);
 					
 				}
 			}
