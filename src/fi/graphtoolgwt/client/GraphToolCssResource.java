@@ -52,9 +52,9 @@ public interface GraphToolCssResource extends CssResource
 
 	String textmagenta();
 	
-	String gumcursor();
+	String cursor_gum();
+	String cursor_teken();
+	String cursor_drag();
 	
-	String pencursor();
-
 }
 

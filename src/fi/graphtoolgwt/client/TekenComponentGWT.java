@@ -536,24 +536,28 @@ public class TekenComponentGWT extends LayoutPanel {
 			//extrapoleerButton.zetActief(true);
 		}
 	}
-	
+
 	public void setCursorMode(int mode)
 	{
+		final String cursor_drag = graphToolCss.cursor_drag();
+		final String cursor_gum  = graphToolCss.cursor_gum();
+		final String cursor_teken = graphToolCss.cursor_teken();
+		
 		if(mode < 0 || mode > DRAG)
 			cursorMode = NOCUR;
 		else
 			cursorMode = mode;
 		
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag")) {
-			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_drag");
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_drag)) {
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_drag);
 			dragButton.setDown(false);
 		}
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum")) {
-			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_gum");
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_gum)) {
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_gum);
 			deleteButton.setDown(false);
 		}
-		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken")) {
-			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_teken");
+		if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_teken)) {
+			grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_teken);
 			drawButton.setDown(false);
 		}
 		
@@ -565,18 +569,18 @@ public class TekenComponentGWT extends LayoutPanel {
 		else if(cursorMode == DRAW)
 		{
 			drawButton.setDown(true);
-			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_teken");
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_teken);
 		}
 		else if(cursorMode == DELETE)
 		{
 			deleteButton.setDown(true);
-			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_gum");
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_gum);
 
 		}
 		else if(cursorMode == DRAG)
 		{
 			dragButton.setDown(true);
-			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_drag");
+			grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_drag);
 		}
 		
 	}
@@ -696,6 +700,10 @@ public class TekenComponentGWT extends LayoutPanel {
 		//public void onMouseDown(MouseDownEvent e)
    		public void onClick(ClickEvent e)
 		{
+   			final String cursor_drag = graphToolCss.cursor_drag();
+   			final String cursor_gum  = graphToolCss.cursor_gum();
+   			final String cursor_teken = graphToolCss.cursor_teken();
+
 //System.out.println("mouse down");
 			
 			// deze LIJKT niet nodig (mag wel)
@@ -705,29 +713,29 @@ public class TekenComponentGWT extends LayoutPanel {
 			e.stopPropagation();
 			
 			if (e.getSource() == drawButton || e.getSource() == deleteButton || e.getSource() == dragButton) {
-				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_drag"))
-					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_drag");
-				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_gum"))
-					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_gum");
-				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains("cursor_teken"))
-					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName("cursor_teken");
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_drag))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_drag);
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_gum))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_gum);
+				if (grafiekGWTVeld.grafiekGWTCanvas.getStyleName().contains(cursor_teken))
+					grafiekGWTVeld.grafiekGWTCanvas.removeStyleName(cursor_teken);
 			}
 			
 			if (e.getSource() == drawButton && drawButton.isDown())
     		{
     			drawButtonsUp(drawButton);
-    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_teken");
+    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_teken);
     			cursorMode = DRAW;
     		}
     		else if (e.getSource() == deleteButton && deleteButton.isDown())
     		{
     			drawButtonsUp(deleteButton);
-    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_gum");
+    			grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_gum);
     			cursorMode = DELETE;
     		}
     		else if (e.getSource() == dragButton && dragButton.isDown())
     		{	drawButtonsUp(dragButton);
-				grafiekGWTVeld.grafiekGWTCanvas.addStyleName("cursor_drag");
+				grafiekGWTVeld.grafiekGWTCanvas.addStyleName(cursor_drag);
     			cursorMode = DRAG;
     		}
     		else if(!drawButton.isDown() && !deleteButton.isDown() && !dragButton.isDown()) {
