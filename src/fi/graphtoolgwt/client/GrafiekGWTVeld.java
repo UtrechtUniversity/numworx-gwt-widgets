@@ -42,9 +42,9 @@ public class GrafiekGWTVeld {
 	private final int cFontHeight = 10;
 	private final int cFontHeightItalic = 10;
 	private final int cSliderBoxBorderMargin = 2;
-	private final double cLineWidth = 0.5d;
+//	private final double cLineWidth = 0.5d;
 	private final double cLineWidthLogLines = 0.25d;
-//	private final double cLineWidth = 0.25d;
+	private final double cLineWidth = 0.25d;
 	private final double cLineWidthAxes = 1.00d;	
 	
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
