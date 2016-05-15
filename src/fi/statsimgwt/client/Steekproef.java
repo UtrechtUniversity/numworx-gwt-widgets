@@ -312,8 +312,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	
 	public void setGrootte(int breedte, int hoogte) {
 		//if (breedte-550>0) {
-		//	scrollPanel.setSize("230px", Integer.toString(breedte-550)+"px");
-		//	scrollPanel1.setSize("230px", Integer.toString(breedte-550)+"px");
+			scrollPanel.setSize("190px", Integer.toString(Math.max(0,hoogte-230))+"px");
+			scrollPanel1.setSize("230px", Integer.toString(Math.max(0,hoogte-230))+"px");
 		//}
 	}
 	
@@ -392,7 +392,7 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 		else
 			dataList2.set(experiment, ADDEXP1);
 
-		fireCBook();
+		//fireCBook();
 		experiment++;
 	}
 	
@@ -416,6 +416,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 			getSample();
 			doeSteekproef.setEnabled(true);
 			doeSteekproef100Keer.setEnabled(true);
+			fireCBook();
+			
 			
 		}
 		if (event.getSource()==doeSteekproef100Keer) {
@@ -430,6 +432,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 			}
 			doeSteekproef.setEnabled(true);
 			doeSteekproef100Keer.setEnabled(true);
+			fireCBook();
+			
 			
 		}
 		if (event.getSource()==wisResultaten) {
@@ -442,6 +446,7 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 			muText.setEnabled(true);
 			sigmaText.setEnabled(true);
 			steekproefGrootteText.setEnabled(true);
+			fireCBook();
 		}
 		if (event.getSource()==muText) {
 			updateGraph();

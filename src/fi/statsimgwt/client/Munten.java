@@ -793,7 +793,7 @@ public class Munten extends FlowPanel implements ClickHandler{
 			avgResult1.setText("");
 			maxResult1.setText("");
 			minResult1.setText("");
-
+			fireCBook();
 		}
 		if (event.getSource()==stap) {
 			wis.setEnabled(true);

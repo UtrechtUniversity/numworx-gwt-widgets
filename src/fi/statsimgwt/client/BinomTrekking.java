@@ -423,6 +423,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			totaal=0;
 			binomRooster.paint();
 			binomGrafiek.paint();
+			fireCBook();
 		}
 	}
 	

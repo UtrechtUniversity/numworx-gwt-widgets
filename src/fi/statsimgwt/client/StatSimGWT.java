@@ -660,7 +660,7 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	@Override
 	public Boolean isCorrect() {
 		// TODO Auto-generated method stub
-		return null;
+		return true;
 	}
 
 	@Override
@@ -873,8 +873,10 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			steekproef.sigmaText.setText(steekproefSigma);
 			
 		}
-		
+		//RootPanel.get("dockholder").add(asWidget());
+
 		simpel.setWidget(asWidget());
+
 
 	}
 

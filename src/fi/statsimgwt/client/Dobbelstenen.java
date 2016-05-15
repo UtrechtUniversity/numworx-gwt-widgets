@@ -1458,7 +1458,8 @@ public class Dobbelstenen extends FlowPanel implements ClickHandler{
 			dobbelstenenGrafiek.paint();
 			table3.setRowCount(0, true);
 			table4.setRowCount(0, true);
-			table5.setRowCount(0, true);		
+			table5.setRowCount(0, true);
+			fireCBook();
 		}		
 		if (event.getSource()==eenDobbelsteen) {
 			doEenTweeDrieDobbelstenen();
