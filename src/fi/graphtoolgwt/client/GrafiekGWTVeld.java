@@ -228,13 +228,10 @@ public class GrafiekGWTVeld {
 	}
 	
 	private void drawBezierCurveWithinVisibleBounds(Context2d g, double xp0Pix, double yp0Pix, double xc0Pix, double yc0Pix, double xc1Pix, double yc1Pix, double xp1Pix, double yp1Pix ) {
-		final double c = 2.0;
+		final double cSampleFactor = 1.0;
 		
-		if ((xp1Pix-xp0Pix) < c) {
-			drawLineWithinVisibleBounds(g, xp0Pix, yp0Pix,xp1Pix, yp1Pix);	
-		} else {
-
-		double deltat = 1.0/((xp1Pix-xp0Pix)*c);
+		double distBeginEnd = Math.sqrt(Math.pow(xp1Pix - xp0Pix,2)+Math.pow(yp1Pix - yp0Pix,2));	
+		double deltat = 1.0/(distBeginEnd*cSampleFactor);
 		double t=deltat;
 		double bxt; // bezier value of x at t
 		double byt; // bezier value of y at t
@@ -246,7 +243,6 @@ public class GrafiekGWTVeld {
 		g.beginPath();
 		g.moveTo(xp0Pix, yp0Pix);
 		
-//		g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
 		while (t<1.0) {
 			
 			bxt = (1-t)*(1-t)*(1-t)*xp0Pix + 3*t*(1-t)*(1-t)*xc0Pix + 
@@ -278,12 +274,8 @@ public class GrafiekGWTVeld {
 			bytprev = byt;
 			t+= deltat;
 		}
-		
-		
-//		g.lineTo(xp1Pix, yp1Pix);
 		g.stroke();
-
-		}
+		
 	}
 
 	
