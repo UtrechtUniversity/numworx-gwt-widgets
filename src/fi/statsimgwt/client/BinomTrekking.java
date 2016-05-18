@@ -67,6 +67,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	Boolean showKans=true;
 	Boolean showPopulatieProportie=false;
 	Label kansLabel;
+	Label aantalTrekkingenLabel;
 	LayoutPanel panel;
 	FlowPanel panel2;
 	VerticalPanel panel1;
@@ -153,7 +154,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	    
 	    HorizontalPanel panel4=new HorizontalPanel();
 	    panel4.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
-	    Label aantalTrekkingenLabel=new Label("Aantal trekkingen");
+	    aantalTrekkingenLabel=new Label("Aantal trekkingen");
 	    aantalTrekkingenLabel.getElement().getStyle().setMarginRight(10, Unit.PX);
 	    aantalTrekkingenText=new TextBox();
 	    aantalTrekkingenText.setText("20");
@@ -338,9 +339,13 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 	
 	public void setZichtbaar() {
 		if (showKans)
-			kansLabel.setText("Kans");
+		{	kansLabel.setText("Kans");
+			aantalTrekkingenLabel.setText("AantalTrekkingen");
+		}
 		if (showPopulatieProportie)
-			kansLabel.setText("PopulatieProportie");
+		{	kansLabel.setText("PopulatieProportie");
+			aantalTrekkingenLabel.setText("Steekproefgrootte");
+		}
 		
 	}
 	
