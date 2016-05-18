@@ -324,7 +324,7 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 		
 //System.out.println("lCC execute");
 
-		varSet.increaseLevel("-- in loop");
+		varSet.increaseLevel("-- in loop", false);
 		boolean b = executeContent(trb, ub, varSet);
 		varSet.decreaseLevel();
 		return b;

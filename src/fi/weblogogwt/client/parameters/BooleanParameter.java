@@ -24,7 +24,7 @@ public class BooleanParameter extends TAParameter
 
 	public BooleanParameter()
 	{
-		setParameter("0=00");
+		setParameter("0=0");
 	}
 
 	@Override

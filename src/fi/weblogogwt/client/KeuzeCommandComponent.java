@@ -525,7 +525,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		if ( !condition.isCorrect(varSet) ) 
 			return false; 
 		
-		varSet.increaseLevel("-- " + alsString + " " + condition.getValueText());
+		varSet.increaseLevel("-- " + alsString + " " + condition.getValueText(), false);
 		boolean b = executeContent(trb, ub, varSet);
 		varSet.decreaseLevel();
 		return b;

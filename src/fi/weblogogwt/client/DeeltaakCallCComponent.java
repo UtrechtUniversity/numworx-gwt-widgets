@@ -160,7 +160,7 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 			if ( !parameters[i].isCorrect(varSet) ) return false;
 		}
 		//varSet.increaseLevel("Deeltaak: "+getCommandNameTranslated());
-		varSet.increaseLevel("-- "+getActualCall());
+		varSet.increaseLevel("-- "+getActualCall(), true);
 		for ( int i=0; i<noParameters; i++ )
 		{
 			// get parameter name form body and add local var with value of parameter (call by value)

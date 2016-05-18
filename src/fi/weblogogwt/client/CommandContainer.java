@@ -387,7 +387,7 @@ public class CommandContainer // extends JPanel
 	{
 		
 		//g.setColor(new Color(255,255,220));
-		g.setFillStyle(CssColor.make(255,255,220));
+		g.setFillStyle(CssColor.make(238,238,170));
 		g.fillRect(xPos+1,yPos+1,getSize().width-1,getSize().height-1);
 		
 		//g.setColor(Color.black);
