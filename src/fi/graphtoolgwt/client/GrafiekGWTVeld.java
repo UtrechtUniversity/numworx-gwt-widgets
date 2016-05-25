@@ -46,6 +46,7 @@ public class GrafiekGWTVeld {
 	private final double cLineWidthLogLines = 0.25d;
 	private final double cLineWidth = 0.25d;
 	private final double cLineWidthAxes = 1.00d;	
+	private final double cLineWidthCurvesAndFunctions = 1.00d;	
 	
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
 	                        // range is used
@@ -1166,7 +1167,7 @@ public class GrafiekGWTVeld {
 		{	g.setFillStyle(interactiePanel.colors[0]);
 			g.setStrokeStyle(interactiePanel.colors[0]);
 		}
-		g.setLineWidth(1.0);
+		g.setLineWidth(cLineWidthCurvesAndFunctions);
 		for (int pCnt = 0; pCnt < indexPoints.size(); pCnt++)
 		{	RealPoint rp = (RealPoint) indexPoints.elementAt(pCnt);
 			Point pix = interactiePanel.realPointToPixels(rp);
@@ -1376,11 +1377,19 @@ public class GrafiekGWTVeld {
 							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
 						}
 				
-//							g.beginPath();
-//							g.moveTo(p0.getX(), p0.getY());
-//							g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
-//							g.stroke();
-							drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+					    	g.save(); // save original clipping size
+					    	g.beginPath(); 
+					    	g.rect(drawXmin,drawYmin,drawXmax-drawXmin,drawYmax-drawYmin);
+					    	g.clip(); // set temporary clipping window (= previous rectangle)
+					    
+							g.beginPath();
+							g.moveTo(p0.getX(), p0.getY());
+							g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+							g.stroke();
+							
+							g.restore(); // restore original clipping size
+							
+//							drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
 					} // else niet vertikaal
 					p00 = p0;
 					p0 = p1;
@@ -1638,14 +1647,22 @@ public class GrafiekGWTVeld {
 							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
 						}
 				
-						if(index == interactiePanel.getActiveIndex())
-							g.setLineWidth(0.7f);
-//						g.beginPath();
-//						g.moveTo(p0.getX(), p0.getY());
-//						g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
-//						g.stroke();	
+//						if(index == interactiePanel.getActiveIndex())
+//							g.setLineWidth(0.7f);
 						
-						drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+					    g.save(); // save original clipping size
+					    g.beginPath(); 
+					    g.rect(drawXmin,drawYmin,drawXmax-drawXmin,drawYmax-drawYmin);
+					    g.clip(); // set temporary clipping window (= previous rectangle)
+					    
+						g.beginPath();
+						g.moveTo(p0.getX(), p0.getY());
+						g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+						g.stroke();	
+						
+						g.restore(); // restore original clipping window
+						
+//						drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
 						
 					} // else niet vertikaal
 					p00 = p0;
