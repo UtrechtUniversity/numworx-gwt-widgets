@@ -34,6 +34,8 @@ public class GetalRooster
 		}
 		zijde = 1.0*b/aantal;
 
+System.out.println("b = " + breedte);
+System.out.println("h = " + hoogte);
 		
 	}
 	
@@ -44,37 +46,90 @@ public class GetalRooster
 		
 		g.setFillStyle(CssColor.make(0,0,0));
 		
+		String fontString3 = "bold 30px arial, sans-serif";
 		String fontString4 = "bold 28px arial, sans-serif";
+		String fontString4a = "bold 26px arial, sans-serif";
 		String fontString5 = "bold 26px arial, sans-serif";
+		String fontString5a = "bold 23px arial, sans-serif";
 		String fontString6 = "bold 24px arial, sans-serif";
+		String fontString6a = "bold 20px arial, sans-serif";
 		String fontString7 = "bold 22px arial, sans-serif";
+		String fontString7a = "bold 18px arial, sans-serif";
 		String fontString8 = "bold 19px arial, sans-serif";
+		String fontString8a = "bold 16px arial, sans-serif";
 		String fontString9 = "bold 16px arial, sans-serif";
+		String fontString9a = "bold 13px arial, sans-serif";
 		double corrx = 0;
+		double corrx2 = 0;
 		double corry = 0;
-		if (aantal == 4)
-		{	g.setFont(fontString4);
+		if (aantal == 3)
+		{	g.setFont(fontString3);
 			corry = -4;
 		}
+		else if (aantal == 4)
+		{	if (breedte < 50)
+			{	g.setFont(fontString4a);
+				corry = -1;
+			}
+			else
+			{	g.setFont(fontString4a);
+				corry = -4;
+			}
+		}	
 		else if (aantal == 5)
-		{	g.setFont(fontString5);
+		{	if (breedte < 50)
+			{	g.setFont(fontString5a);
+				corry = 2;
+			}
+			else
+			{	g.setFont(fontString5);
+				corry = 0;
+			}
 		}
 		else if (aantal == 6)
-		{	g.setFont(fontString6);
-			corry = 0;
+		{	if (breedte < 50)
+			{	g.setFont(fontString6a);
+				corry = 2;
+				corrx2 = 2;
+			}	
+			else
+			{	g.setFont(fontString6);
+				corry = 0;
+			}
 		}
 		else if (aantal == 7)
-		{	g.setFont(fontString7);
-			corry = 0;
+		{	if (breedte < 50)
+			{	g.setFont(fontString7a);
+				corry = 2;
+				corrx2 = 2;
+			}	
+			else
+			{	g.setFont(fontString7);
+				corry = 0;
+			}	
 		}
 		else if (aantal == 8)
-		{	g.setFont(fontString8);
-			corry = 0;
+		{	if (breedte < 50)
+			{	g.setFont(fontString8a);
+				corry = 2;
+				corrx2 = 2;
+			}	
+			else
+			{	g.setFont(fontString8);
+				corry = 2;
+			}
 			corrx = 2;
+			
 		}
 		else if (aantal == 9)
-		{	g.setFont(fontString9);
-			corry = 0;
+		{	if (breedte < 50)
+			{	g.setFont(fontString9a);
+				corry = 2;
+			}
+			else
+			{	g.setFont(fontString9);
+				corry = 0;
+			}
 			corrx = 4;
 		}
 
@@ -110,7 +165,7 @@ public class GetalRooster
 							corrx = 1;
 						}
 					}
-					g.fillText(s, xT - 8 + corrx, yT + zijde/2 + corry);
+					g.fillText(s, xT - 8 + corrx + corrx2, yT + zijde/2 + corry);
 					
 				}
 			}
