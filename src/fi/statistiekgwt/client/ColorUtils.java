@@ -41,6 +41,7 @@ public class ColorUtils
 	public static final CssColor BUTTON_TEXT_GREY = CssColor.make(82, 82, 82); // dark grey
 	public static final CssColor OUTLIER_COLOR = CssColor.make(255, 0, 0); // red
 
+	public static final String SELECTION_COLOR_TABLE = "#B2C6EB"; // lighter blue than the table's default
 	
 	private static List<String> colorList = 
 		//new ArrayList<CssColor>(Arrays.asList(COLORS));
