@@ -482,6 +482,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	    // set style
 	    this.table.addStyleName(statistiekCss.dataGrid());
 	    this.table.addStyleName(statistiekCss.backgroundblue());
+//	    this.table.addStyleName(statistiekCss.dataGridSelectedRow()); //werkt niet
 	    this.table.addStyleName(statistiekCss.noSelect());
 	    this.table.setWidth("100%");
 
@@ -676,6 +677,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.update();
 		// set the right selection
 		this.setSelectionFromModelInTable();
+		
+		setSelectionBackground();
 	}
 
 	/**
@@ -807,6 +810,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 							selectionModel.setSelected(rowObject, true);
 						}
 					}
+					
+					setSelectionBackground();
 		        }
 				else if (("mousedown".equals(nativeEvent.getType()) || "touchstart".equals(nativeEvent.getType())) 
 					&& columnIndex == 0
@@ -828,6 +833,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					StatTable.this.statTableModel.resetSelectionList();					
 					// select rows between clicked and current row index
 	    			selectAllRowsBetweenIndices(rowIndex);
+	    			
+	    			setSelectionBackground();
 				}
 				else if ("touchend".equals(nativeEvent.getType())
 					&& columnIndex == 0)
@@ -841,6 +848,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					StatTable.this.statTableModel.resetSelectionList();					
 					// select rows between clicked and current row index
 	    			selectAllRowsBetweenIndices(rowIndex);
+	    			
+	    			setSelectionBackground();
 				}
 				
 				if (!rowOutlierPopupMenu.isShowing() && !outlierPopupMenu.isShowing())
@@ -2899,7 +2908,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			table.setEmptyTableWidget(tableMessageLabel);
 		}
 		
+		setSelectionBackground();
+		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
+	}
+
+	/**
+	 * Set the selection background of the table.
+	 */
+	private void setSelectionBackground()
+	{
+		int[] list = this.getSelectedRows();
+		
+		for (int i = 0; i < list.length; i++)
+		{
+			this.table.getRowElement(list[i]).getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+		}
 	}
 
 	/**
@@ -2941,7 +2965,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			
 			rowNumberColumn.setCellStyleNames(statistiekCss.datagridcell());
 			
-			this.table.addColumn(rowNumberColumn);
+			//			this.table.addColumn(rowNumberColumn); // de (lege) header van rijnummerkolom heeft ongewenste border-bottom 2px
+			TextCell emptyCell = new TextCell();
+			Header<String> emptyHeader = new Header<String>(emptyCell) 
+			{
+				@Override
+				public String getValue()
+				{
+					return null;
+				}
+			};
+			
+			emptyHeader.setHeaderStyleNames(statistiekCss.datagridcell());
+			this.table.addColumn(rowNumberColumn, emptyHeader);
 			this.table.setColumnWidth(rowNumberColumn, this.rowNumberWidth, Unit.PX);
 			// add the column's width to total width
 			totalWidth = totalWidth + this.rowNumberWidth;
@@ -2979,6 +3015,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						// setSelectionList van StatTableModel 
 						StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
 						selectionModel.setSelected(s, value);
+						
+						setSelectionBackground();
 					}
 				});
 			
@@ -3016,6 +3054,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						StatTable.this.statTableModel.setSelectedWithoutEvent(row, value);
 						selectionModel.setSelected(rowObject, value);
 					}
+					
+					setSelectionBackground();
 	
 					// send an event
 					SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
@@ -3030,7 +3070,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			totalWidth = totalWidth + StatTable.CHECKBOX_COLUMN_WIDTH;
 		} // add checkColumn
 
-		// put the data of statTableModel into this.table
 		this.headers = this.statTableModel.getColumnNames();
 		
 		for (int i = 0; i < this.statTableModel.getColumnCount(); i++)
