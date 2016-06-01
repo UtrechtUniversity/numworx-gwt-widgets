@@ -68,6 +68,7 @@
 	font-size: 13px;
 	color: gray;
 	padding: 2px 5px !important;
+	border: none !important;
 	width: 100%;
 	box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -320,9 +321,9 @@ label {
 .dataGridSelectedRow {
   /*background: #628cd5;*/
   background: #B2C6EB !important; /* lighter blue */
-  color: white;
+  /*color: white;
   height: auto;
-  overflow: auto;
+  overflow: auto;*/
 }
 
 /** Used for the datagrid table in StatTable. */
