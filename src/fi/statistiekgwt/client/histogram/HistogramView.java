@@ -4037,7 +4037,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				
 				if ((rect != null) && rect.contains(p))
 				{
-					this.barClicked(i);
+					this.barClicked(i, e.isControlKeyDown());
 					break;
 				}
 			}
@@ -4056,7 +4056,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 		}
 
-		private void barClicked(int bar)
+		private void barClicked(int bar, boolean controlClicked)
 		{
 			if (!HistogramView.this.model.columnIndexValid())
 			{
@@ -4072,28 +4072,56 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			ArrayList<ColumnType> list = HistogramView.this.model.getStatTableModel().getColumnTypes();
 			ColumnType cType = list.get(HistogramView.this.model.getColumnIndex());
 			AllowedTypes type = cType.getType();
+
+			ArrayList<Boolean> selectionList;
+
 			if (type.isNumber())
 			{
-				ArrayList<Boolean> selectionList = new ArrayList<Boolean>(
-					HistogramView.this.model.getStatTableModel().getRowCount());
-				for (int i = 0; i < HistogramView.this.model.getStatTableModel()
-					.getRowCount(); i++)
+				if (controlClicked)
 				{
-					Object o = HistogramView.this.model.getStatTableModel()
-						.getValueAt(i,
-							HistogramView.this.model.getColumnIndex());
-
-					selectionList
-						.add(!o.equals(ColumnType.WILDCARD)
-							&& HistogramView.this.model.binOfNumber(Double
-								.parseDouble((String) o)) == bin
-							&& HistogramView.this.model.getStatTableModel()
-								.classifyObject(i,
-									HistogramView.this.model.getSplitOptions()) == splitClass);
+					// get the current selection list
+					selectionList = model.getStatTableModel().getSelectionList();
+					
+					for (int i = 0; i < HistogramView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						Object o = HistogramView.this.model.getStatTableModel()
+							.getValueAt(i,
+								HistogramView.this.model.getColumnIndex());
+	
+						if (!o.equals(ColumnType.WILDCARD)
+								&& HistogramView.this.model.binOfNumber(Double
+									.parseDouble((String) o)) == bin
+								&& HistogramView.this.model.getStatTableModel()
+									.classifyObject(i,
+										HistogramView.this.model.getSplitOptions()) == splitClass) // object in row i in clicked bar
+						{
+							// add selection to current selectionlist
+							selectionList.set(i, true);
+						}
+					}
 				}
-
-				HistogramView.this.model.getStatTableModel().setSelectionList(
-					selectionList);
+				else
+				{
+					// create a new selection list
+					selectionList = new ArrayList<Boolean>(
+						HistogramView.this.model.getStatTableModel().getRowCount());
+					for (int i = 0; i < HistogramView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						Object o = HistogramView.this.model.getStatTableModel()
+							.getValueAt(i,
+								HistogramView.this.model.getColumnIndex());
+	
+						selectionList
+							.add(!o.equals(ColumnType.WILDCARD)
+								&& HistogramView.this.model.binOfNumber(Double
+									.parseDouble((String) o)) == bin
+								&& HistogramView.this.model.getStatTableModel()
+									.classifyObject(i,
+										HistogramView.this.model.getSplitOptions()) == splitClass);
+					}
+				}
 			} // number
 			else
 			{
@@ -4115,26 +4143,54 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					clicked = freqTuple[bin].label;
 				}
 
-				ArrayList<Boolean> selectionList = new ArrayList<Boolean>(
-					HistogramView.this.model.getStatTableModel().getRowCount());
-				for (int i = 0; i < HistogramView.this.model.getStatTableModel()
-					.getRowCount(); i++)
+				if (controlClicked)
 				{
-					Object o = HistogramView.this.model.getStatTableModel()
-						.getValueAt(i,
-							HistogramView.this.model.getColumnIndex());
-					selectionList
-						.add(!o.equals(ColumnType.WILDCARD)
+					// get the current selection list
+					selectionList = model.getStatTableModel().getSelectionList();
+					
+					for (int i = 0; i < HistogramView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						Object o = HistogramView.this.model.getStatTableModel()
+							.getValueAt(i,
+								HistogramView.this.model.getColumnIndex());
+
+						if (!o.equals(ColumnType.WILDCARD)
 							&& ((String) o).equals(clicked)
 							&& HistogramView.this.model.getStatTableModel()
 								.classifyObject(i,
-									HistogramView.this.model.getSplitOptions()) == splitClass);
+									HistogramView.this.model.getSplitOptions()) == splitClass)
+						{
+							// add selection to current selectionlist
+							selectionList.set(i, true);						
+						}
+					}
 				}
-				HistogramView.this.model.getStatTableModel().setSelectionList(
-					selectionList);
+				else
+				{
+					selectionList = new ArrayList<Boolean>(
+						HistogramView.this.model.getStatTableModel().getRowCount());
+					for (int i = 0; i < HistogramView.this.model.getStatTableModel()
+						.getRowCount(); i++)
+					{
+						Object o = HistogramView.this.model.getStatTableModel()
+							.getValueAt(i,
+								HistogramView.this.model.getColumnIndex());
+						selectionList
+							.add(!o.equals(ColumnType.WILDCARD)
+								&& ((String) o).equals(clicked)
+								&& HistogramView.this.model.getStatTableModel()
+									.classifyObject(i,
+										HistogramView.this.model.getSplitOptions()) == splitClass);
+					}
+				}
+				
 			} // enum or string
-			
-			// view statTable moet updaten en de selectie laten zien -> gebeurt al door setSelectionList, die triggert een SelectionChangeEvent
+
+			HistogramView.this.model.getStatTableModel().setSelectionList(
+				selectionList);
+
+			// view statTable moet updaten en de selectie laten zien -> gebeurt door setSelectionList, die triggert een SelectionChangeEvent
 		}
 		
 	} // private class BarClickListener
