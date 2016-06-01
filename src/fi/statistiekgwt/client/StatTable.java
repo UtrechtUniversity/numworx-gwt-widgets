@@ -539,6 +539,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        	StatTable.this.setSelectionFromModelInTable();
 	        	
 	        	StatTable.this.hideHeaderPopupMenu();
+	        	
+	        	// via stattablemodel.sort() wordt een tablechangeevent getriggered die een stattable.update() doet (met setSelectionBackground()),
+	        	// maar kennelijk is default selectiekleur weer gezet, dus:
+	        	setSelectionBackground();
             }
         };
         this.createEditCommand();
