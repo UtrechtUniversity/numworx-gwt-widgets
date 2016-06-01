@@ -2908,9 +2908,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			table.setEmptyTableWidget(tableMessageLabel);
 		}
 		
-		setSelectionBackground();
-		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
+		
+		setSelectionBackground(); // dit moet op het eind anders toont tabel default selectiekleur na tabwissel
 	}
 
 	/**
