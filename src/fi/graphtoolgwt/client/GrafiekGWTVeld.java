@@ -28,7 +28,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -439,8 +439,7 @@ public class GrafiekGWTVeld {
 				}
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
-//				if(j!=0 && j%2==0 && (!interactiePanel.yPositief || j>0))
-				if(j!=0 && (!interactiePanel.yPositief || j>0)) {	
+				if(j!=0 && j%2==0 && (!interactiePanel.yPositief || j>0)) {	
 					maxWoordBreedteY = Math.max(maxWoordBreedteY, woordbreedte);
 				}
 				
@@ -454,6 +453,7 @@ public class GrafiekGWTVeld {
 				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMargeX; 
 				drawYAxis = false;
 			}
+
 			if (interactiePanel.xPositief) {
 				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
 			}
