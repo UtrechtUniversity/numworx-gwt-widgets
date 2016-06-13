@@ -3510,10 +3510,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		else
 		{	
-			if(!dragOptie)
-				return;
 			
-			if (dragPoint == null) { // Move Graph if no point selected
+			if ((dragPoint == null) && (dragOptie)) { // Move Graph if no point selected
 				int dx = eventX - startxv;
 				int dy =  eventY - startyv;					
 				beginx = beginx+dx;
