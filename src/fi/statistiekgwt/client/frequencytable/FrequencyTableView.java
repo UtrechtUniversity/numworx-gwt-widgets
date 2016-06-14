@@ -685,19 +685,21 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 				Label label;
 				
 				ArrayList<Double> binBoundaries = this.model.getBinBoundaries();
+				String text;
 				if (type.equals(AllowedTypes.INTEGER)
-					&& (binBoundaries.get(1) - binBoundaries.get(0) == 1))
+					&& (binBoundaries.get(1) - binBoundaries.get(0)) == 1)
 				{
 					// bin width is 1
-					label = new Label(binBoundaries.get(bin).toString());
+					text = StatistiekGWT.getStringValue(binBoundaries.get(bin)); // getStringValue will give an integer value without decimals
+					
 				}
 				else
 				{
-					label = new Label(
-						StatistiekGWT.getStringValue(binBoundaries.get(bin))
+					text = StatistiekGWT.getStringValue(binBoundaries.get(bin))
 						+ " -< "
-						+ StatistiekGWT.getStringValue(binBoundaries.get(bin + 1)));
+						+ StatistiekGWT.getStringValue(binBoundaries.get(bin + 1));
 				}
+				label = new Label(text);
 				flexTable.setWidget(bin + 1, 0, label);
 				
 		    	// set selection color
@@ -932,7 +934,7 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 			}
 
 			int bins = FrequencyTableView.this.model.getStatTableModel()
-				.numberOfSplitVarClasses(FrequencyTableView.this.model.getColumnIndex(),
+				.numberOfBins(FrequencyTableView.this.model.getColumnIndex(),
 					FrequencyTableView.this.model.getBinBoundaries());
 			int row = rowNumber % bins;
 
