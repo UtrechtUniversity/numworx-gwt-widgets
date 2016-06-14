@@ -458,16 +458,16 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		{
 			return 1;
 		}
-		return this.numberOfSplitVarClasses(splitOptions.getColumnSplitIndex(),
+		return this.numberOfBins(splitOptions.getColumnSplitIndex(),
 			splitOptions.getBinBoundaries());
 	}
 
 	/**
-	 * Determine in how many classes the split variable splits the data
+	 * Determine the number of bins in the given bin boundaries.
 	 * 
-	 * @return the amount of classes in which the split variable splits the data
+	 * @return the number of bins in the given bin boundaries
 	 */
-	public int numberOfSplitVarClasses(int columnIndex, ArrayList<Double> binBoundaries)
+	public int numberOfBins(int columnIndex, ArrayList<Double> binBoundaries)
 	{
 		if (!this.isColumnIndexValid(columnIndex))
 		{
