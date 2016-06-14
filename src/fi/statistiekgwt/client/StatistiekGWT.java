@@ -592,13 +592,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			{
 				return null;
 			}
-			
-			if ((minBoundary > min) 
-				&& (max != min)) // if max = min binwidth is not restricted
-			{
-				return null;
-			}
-			
+
 			// calculate decimal bin boundaries smaller than 1 
 			if (((Math.abs(min) < 1) && (Math.abs(max) < 1))
 				|| (((max - min) < 1) && ((max - min) != 0)))
@@ -644,14 +638,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			double start;
 			int noBins;
 			
-			if (minBoundary <= min)
-			{
-				start = minBoundary;
-			}
-			else
-			{
-				start = min;
-			}
+			start = minBoundary;
 			
 			if (binWidth == 0)
 			{
@@ -1092,5 +1079,182 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		}
 		
 		return separator;
+	}
+
+	/**
+	 * Get the bin boundaries that are from minOnScale to maxOnScale. If minOnScale is
+	 * smaller than the smallest bin in binBoundaries, then bin boundaries are added 
+	 * such that the new smallest bin boundary is equal to or smaller than minOnScale.
+	 * If maxOnScale is larger than the largest bin in binBoundaries, then bin boundaries
+	 * are added such that the new largest bin boundary is equal to or larger than 
+	 * maxOnScale.
+	 * 
+	 * @param binBoundaries
+	 * @param minOnScale
+	 * @param maxOnScale
+	 * @return
+	 */
+	public static ArrayList<Double> getBinBoundariesFromScaleSettings(
+		ArrayList<Double> binBoundaries, double minOnScale, double maxOnScale)
+	{
+		ArrayList<Double> bins = new ArrayList<Double>();
+
+		if (binBoundaries != null && binBoundaries.size() > 1) // valid bin boundaries
+		{
+			Double smallest = determineNewSmallestBinBoundary(binBoundaries, minOnScale);
+			Double largest = determineNewLargestBinBoundary(binBoundaries, maxOnScale);
+			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0);
+			
+			if (binWidth == 0)
+			{
+				binWidth = maxOnScale - minOnScale;
+			}
+			
+			if (smallest.compareTo(largest) == 0)
+			{
+				bins.add(smallest);
+				bins.add(largest);
+			}
+			else
+			{
+				Double binValue = smallest;
+				bins.add(binValue); // add the first value
+
+				while (binValue < largest)
+				{
+					binValue = binValue + binWidth;
+					bins.add(binValue);
+				}
+			}
+		}
+		else
+		{
+			bins = binBoundaries;
+		}
+		
+		return bins;
+	}
+
+	/**
+	 * Determine the 
+	 * 
+	 * @param binBoundaries
+	 * @param minOnScale
+	 * @return
+	 */
+	private static Double determineNewSmallestBinBoundary(
+		ArrayList<Double> binBoundaries, double minOnScale)
+	{
+		Double newSmallest = null;
+		
+		if (binBoundaries != null && binBoundaries.size() > 1) // valid bin boundaries
+		{
+			newSmallest = binBoundaries.get(0);
+			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0); // first bin value
+			
+			if (minOnScale <= binBoundaries.get(0))
+			{
+				// loop until bin value is found smaller than minOnScale
+				while (minOnScale < newSmallest)
+				{
+					newSmallest = newSmallest - binWidth;
+				}
+			}
+			else
+			{
+				// loop until bin value is found larger than minOnScale
+				while (minOnScale >= newSmallest)
+				{
+					newSmallest = newSmallest + binWidth;
+				}
+				
+				newSmallest = newSmallest - binWidth;
+			}
+		}
+		
+		return newSmallest;
+	}
+	
+	/**
+	 * Determine the 
+	 * 
+	 * @param binBoundaries
+	 * @param maxOnScale
+	 * @return
+	 */
+	private static Double determineNewLargestBinBoundary(
+		ArrayList<Double> binBoundaries, double maxOnScale)
+	{
+		Double newLargest = null;
+		
+		if (binBoundaries != null && binBoundaries.size() > 1) // valid bin boundaries
+		{
+			newLargest = binBoundaries.get(binBoundaries.size() - 1); // last bin value
+			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0);
+			
+			if (binWidth == 0)
+			{
+				newLargest = maxOnScale;
+			}
+			else
+			{
+				if (maxOnScale >= binBoundaries.get(binBoundaries.size() - 1))
+				{
+					// loop until bin value is found larger than maxOnScale
+					while (maxOnScale > newLargest)
+					{
+						newLargest = newLargest + binWidth;
+					}
+				}
+				else
+				{
+					// loop until bin value is found smaller than maxOnScale
+					while (maxOnScale < newLargest)
+					{
+						newLargest = newLargest - binWidth;
+					}
+				}
+			}
+		}
+
+		return newLargest;
+	}
+
+	/**
+	 * Get bin boundaries based on the given minimum, maximum and bin width.
+	 * 
+	 * @param minimum
+	 * @param maximum
+	 * @param binWidth
+	 * @return
+	 */
+	public static ArrayList<Double> getBinBoundariesFromScaleSettings(
+		double minimum, double maximum, double binWidth)
+	{
+		ArrayList<Double> bins = new ArrayList<Double>();
+
+		if (binWidth == 0)
+		{
+			binWidth = maximum - minimum;
+		}
+		
+		if (minimum == maximum)
+		{
+			bins.add(minimum);
+			bins.add(maximum);
+		}
+		else
+		{
+			Double binValue = minimum;
+			bins.add(binValue); // add the first value
+
+			while (binValue < maximum)
+			{
+				binValue = binValue + binWidth;
+				bins.add(binValue);
+			}
+		}
+		
+		return bins;
 	}
 }
