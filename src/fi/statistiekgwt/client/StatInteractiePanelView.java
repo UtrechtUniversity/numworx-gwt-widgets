@@ -644,17 +644,6 @@ public class StatInteractiePanelView extends LayoutPanel
 	}
 
 	/**
-	 * Set the field selectedTab to keep track of the visible
- 	 * tab in tabPane in case of views in own window.
-	 * 
-	 * @param index
-	 */
-	public void setSelectedTabIndex(int index)
-	{
-		this.selectedTabIndex = index;
-	}
-
-	/**
 	 * Determine the view number related to tab in tabPane.
 	 * 
 	 * @param tab
@@ -1034,6 +1023,12 @@ public class StatInteractiePanelView extends LayoutPanel
 		// but only if there is a tabbar
 		if ((mainWindowViews.size() != 1) || this.model.getStatTableModel().isViewsAddable())
 		{
+			if (selectedTabIndex >= mainWindowViews.size())
+			{
+				// selectedTabIndex is not valid, reset to first tab
+				selectedTabIndex = 0;
+			}
+			
 			tabPanel.selectTab(selectedTabIndex);
 		}
 		else
