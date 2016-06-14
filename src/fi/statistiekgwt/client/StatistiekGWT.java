@@ -599,14 +599,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			{
 				// use number of decimals of start and binWidth
 				double start;
-				if (minBoundary <= min)
-				{
+//				if (minBoundary <= min)
+//				{
 					start = minBoundary;
-				}
-				else
-				{
-					start = min;
-				}
+//				}
+//				else
+//				{
+//					start = min;
+//				}
 	
 				String startString = String.valueOf(start);
 				int decimalPlacesStart = StatistiekGWT.getNumberOfDecimals(startString);
