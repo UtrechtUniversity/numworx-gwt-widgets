@@ -924,9 +924,19 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			if (type.equals(AllowedTypes.DOUBLE)
 				|| type.equals(AllowedTypes.INTEGER))
 			{
-				this.minBoundaryField.setText(StatistiekGWT.getStringValue(this.view.getBinsOnScale().get(0)));
-				int last = this.view.getBinsOnScale().size() - 1;
-				this.maxOnScaleField.setText(StatistiekGWT.getStringValue(this.view.getBinsOnScale().get(last)));
+				String min;
+				if (this.model.isOptimizeScale())
+				{
+					min = StatistiekGWT.getStringValue(this.view.getBinsOnScale().get(0));
+				}
+				else
+				{
+					min = StatistiekGWT.getStringValue(this.model.getMinOnScale());
+				}				
+				this.minBoundaryField.setText(min);
+				
+				this.maxOnScaleField.setText(StatistiekGWT.getStringValue(this.model.getMaxOnScale()));
+				
 				String binWidth;
 				if (this.model.isOptimizeScale())
 				{
@@ -1271,6 +1281,161 @@ public class HistogramUserOptionsPanel extends FlowPanel
 //	} // class HistogramUOPTouchHandler
 	
 	/**
+	 * Process actions when max on scale has been changed.
+	 */
+	private void processMaxOnScaleChanged()
+	{
+		double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
+
+		// column index bin settings
+		controller.updateBoundariesFromBinSettings();
+
+		// max < min is niet toegestaan
+		if (maxOnScale < view.getUserOptionsPanel().getMinBoundary())
+		{
+			// reset to latest value
+			view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+		}
+		else
+		{
+			double maxBinValue = model.getMaxBinBoundaryValue();
+
+			// alleen check of data binnen grenzen als optimize scale
+			if (model.isOptimizeScale())
+			{
+				if (maxOnScale < maxBinValue) // the new user entered max value is not correct
+				{
+					if (model.getMaxOnScale() < maxBinValue) // the model's max value is not correct
+					{
+						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+						model.setMaxOnScale(maxBinValue);
+					}
+					else
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
+					}
+				}
+				else
+				{
+					// everything is fine, set the value
+					model.setMaxOnScale(maxOnScale);
+				}
+			}
+			else
+			{
+				model.setMaxOnScale(maxOnScale);
+			}
+			
+			if (model.getBinWidth() == 0)
+			{
+				model.setBinWidth(maxOnScale - model.getMinOnScale());
+			}
+		}
+	}
+
+	/**
+	 * Process actions when minimum boundary has been changed.
+	 */
+	private void processMinBoundaryChanged()
+	{
+		double minOnScale = view.getUserOptionsPanel().getMinBoundary();
+		double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
+
+		// max < min is niet toegestaan
+		if (minOnScale > maxOnScale)
+		{
+			// reset to latest value
+			view.getUserOptionsPanel().setMinBoundary(model.getMinOnScale());
+		}
+		else
+		{
+			// update column index bin settings
+			controller.updateBoundariesFromBinSettings();
+			
+			double minBinValue = model.getMinBinBoundaryValue();
+
+			// alleen check of data binnen grenzen als optimize scale
+			if (model.isOptimizeScale())
+			{
+				if (minOnScale > minBinValue) // the new user entered min value is not correct
+				{
+					if (model.getMinOnScale() > minBinValue) // the model's min value is not correct
+					{
+						// the model's min is not correct, data may have been changed and the model's min on scale needs to be reset
+						model.setMinOnScale(minBinValue);
+					}
+					else
+					{
+						// reset to latest value
+						view.getUserOptionsPanel().setMinBoundary(model.getMinOnScale());
+					}
+				}
+				else
+				{
+					// everything is fine, set the value
+					model.setMinOnScale(minOnScale);
+				}
+			}
+			else
+			{
+				model.setMinOnScale(minOnScale);
+			}
+			
+			// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+			double maxBinValue = view.getMaxBinOnScale();
+			if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+			{
+				view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+				model.setMaxOnScale(maxBinValue);
+			}
+			else
+			{
+				// kom je hier ooit...?
+				model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+			}
+
+			if (model.getBinWidth() == 0)
+			{
+				model.setBinWidth(maxOnScale - model.getMinOnScale());
+			}
+		}
+	}
+
+	/**
+	 * Process actions when bin width has been changed.
+	 */
+	private void processBinWidthChanged()
+	{
+		if (view.getBinWidth() <= 0) // zero or negative is not a valid value
+		{
+			// reset to the latest value
+			model.setBinWidth(model.getBinWidth());
+		}
+		else
+		{
+			model.setBinWidth(view.getBinWidth());
+			
+			// column index bin settings
+			controller.updateBoundariesFromBinSettings();
+
+			// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
+			double maxBinValue = view.getMaxBinOnScale();
+			if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
+			{
+				view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
+				model.setMaxOnScale(maxBinValue);
+			}
+			else
+			{
+				// kom je hier ooit...?
+				model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
+			}
+		}
+	}
+
+
+	/**
 	 * A clickhandler for HistogramUserOptionsPanel
 	 */
 	class HistogramUOPClickHandler implements ClickHandler
@@ -1302,8 +1467,20 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			else if (e.getSource() == optimizeScaleBox)
 			{
 				model.setBinWidth(view.getBinWidth());
-				model.setMinOnScale(view.getMinBoundary());
+				Double min = null;
+				double columnMin = model.getStatTableModel().getColumnMin(model.getColumnIndex());
+				if (view.getUserOptionsPanel().isOptimizeScale() && (view.getMinBoundary() > columnMin)) // user zet optimaliseren aan en de oude waarde is te groot
+				{
+					min = columnMin;
+					view.setMinBoundary(min); // update in the view's settings
+				}
+				else
+				{
+					min = view.getMinBoundary();
+				}
+				model.setMinOnScale(min);
 				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
+				view.recalculateBinBoundaries(false);
 				this.update();
 			}
 			else if (e.getSource() == cumulativeBox)
@@ -1345,11 +1522,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			else if (e.getSource() == stackModeBox)
 			{
 				model.setFrequencyPolygonStackMode(view.isStackModeBoxSelected());
-				this.update();
-			}
-			else if (e.getSource() == optimizeScaleBox)
-			{
-				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
 				this.update();
 			}
 			else if (e.getSource() == splitChooseBoundariesButton)
@@ -1429,99 +1601,15 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == minBoundaryField)
 			{
-				// update column index bin settings
-				controller.updateBoundariesFromBinSettings();
-				
-				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-				double maxBinValue = view.getMaxBinOnScale();
-				
-				if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
-					&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
-				{
-					if (model.getMaxOnScale() < maxBinValue)
-					{
-						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-						model.setMaxOnScale(maxBinValue);
-					}
-					else
-					{
-						// reset to latest value
-						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-					}
-				}
-				else
-				{
-					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-				}
+				processMinBoundaryChanged();
 			}
 			else if (e.getSource() == maxOnScaleField)
 			{
-				double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
-
-				// column index bin settings
-				controller.updateBoundariesFromBinSettings();
-
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
-				{
-					// max < min is niet toegestaan
-					if (maxOnScale < view.getUserOptionsPanel().getMinBoundary())
-					{
-						// reset to latest value
-						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-					}
-					else
-					{
-						model.setMaxOnScale(maxOnScale);
-					}
-				}
-				else
-				{
-					double maxBinValue = model.getMaxBinBoundaryValue();
-
-					if (maxOnScale < maxBinValue)
-					{
-						if (model.getMaxOnScale() < maxBinValue)
-						{
-							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-							model.setMaxOnScale(maxBinValue);
-						}
-						else
-						{
-							// reset to latest value
-							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-						}
-					}
-					else
-					{
-						model.setMaxOnScale(maxOnScale);
-					}
-				}
-			} // maxOnScaleField
+				processMaxOnScaleChanged();
+			}
 			else if (e.getSource() == binWidthField)
 			{
-				if (view.getBinWidth() == 0)
-				{
-					// reset to the latest value
-					model.setBinWidth(model.getBinWidth());
-				}
-				else
-				{
-					model.setBinWidth(view.getBinWidth());
-					
-					// column index bin settings
-					controller.updateBoundariesFromBinSettings();
-	
-					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-					double maxBinValue = view.getMaxBinOnScale();
-					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
-					{
-						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
-				}
+				processBinWidthChanged();
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
@@ -1583,93 +1671,15 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == minBoundaryField)
 			{
-				// update column index bin settings
-				controller.updateBoundariesFromBinSettings();
-				
-				// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-				double maxBinValue = view.getMaxBinOnScale();
-				
-				if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
-					&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
-				{
-					if (model.getMaxOnScale() < maxBinValue)
-					{
-						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-						model.setMaxOnScale(maxBinValue);
-					}
-					else
-					{
-						// reset to latest value
-						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-					}
-				}
-				else
-				{
-					model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-				}
+				processMinBoundaryChanged();
 			}
 			else if (e.getSource() == maxOnScaleField)
 			{
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
-				{
-					// max < min is niet toegestaan
-					if (view.getUserOptionsPanel().getMaxOnScale() < view.getUserOptionsPanel().getMinBoundary())
-					{
-						// reset to latest value
-						view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
-				}
-				else
-				{
-					double maxBinValue = model.getMaxBinBoundaryValue();
-					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
-					{
-						if (model.getMaxOnScale() < maxBinValue)
-						{
-							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-							model.setMaxOnScale(maxBinValue);
-						}
-						else
-						{
-							// reset to latest value
-							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-						}
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
-				}
+				processMaxOnScaleChanged();
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				if (view.getBinWidth() == 0)
-				{
-					// reset to the latest value
-					model.setBinWidth(model.getBinWidth());
-				}
-				else
-				{
-					model.setBinWidth(view.getBinWidth());
-					
-					// column index bin settings
-					controller.updateBoundariesFromBinSettings();
-	
-					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-					double maxBinValue = view.getMaxBinOnScale();
-					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
-					{
-						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
-				}
+				processBinWidthChanged();
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
@@ -1698,91 +1708,15 @@ public class HistogramUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == minBoundaryField)
 				{
-					// update column index bin settings
-					controller.updateBoundariesFromBinSettings();
-					
-					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-					double maxBinValue = view.getMaxBinOnScale();
-					
-					if ((view.getUserOptionsPanel().getMaxOnScale() < maxBinValue) 
-						&& !model.getStatTableModel().isEmptyColumn(model.getColumnIndex())) // for empty table or column without any values every maximum is allowed
-					{
-						if (model.getMaxOnScale() < maxBinValue)
-						{
-							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-							model.setMaxOnScale(maxBinValue);
-						}
-						else
-						{
-							// reset to latest value
-							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-						}
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
+					processMinBoundaryChanged();
 				}
 				else if (e.getSource() == maxOnScaleField)
 				{
-					double maxOnScale = view.getUserOptionsPanel().getMaxOnScale();
-
-					// column index bin settings
-					controller.updateBoundariesFromBinSettings();
-
-					if (model.getStatTableModel().isEmptyColumn(model.getColumnIndex()))
-					{
-						// max < min is niet toegestaan
-						if (maxOnScale < view.getUserOptionsPanel().getMinBoundary())
-						{
-							// reset to latest value
-							view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-						}
-						else
-						{
-							model.setMaxOnScale(maxOnScale);
-						}
-					}
-					else
-					{
-						double maxBinValue = model.getMaxBinBoundaryValue();
-
-						if (maxOnScale < maxBinValue)
-						{
-							if (model.getMaxOnScale() < maxBinValue)
-							{
-								// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-								model.setMaxOnScale(maxBinValue);
-							}
-							else
-							{
-								// reset to latest value
-								view.getUserOptionsPanel().setMaxOnScale(model.getMaxOnScale());
-							}
-						}
-						else
-						{
-							model.setMaxOnScale(maxOnScale);
-						}
-					}
+					processMaxOnScaleChanged();
 				}
 				else if (e.getSource() == binWidthField)
 				{
-					model.setBinWidth(view.getBinWidth());
-					
-					// column index bin settings
-					controller.updateBoundariesFromBinSettings();
-
-					// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
-					double maxBinValue = view.getMaxBinOnScale();
-					if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
-					{
-						view.getUserOptionsPanel().setMaxOnScale(maxBinValue);
-					}
-					else
-					{
-						model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
-					}
+					processBinWidthChanged();
 				}
 				else if (e.getSource() == splitMinBoundaryField)
 				{
