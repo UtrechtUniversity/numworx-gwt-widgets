@@ -216,8 +216,10 @@ public class FrequencyTableModel
 					this.tableModel.getColumnMin(this.columnIndex),
 					this.tableModel.getColumnMax(this.columnIndex), 
 					// door afronding kan de aftreksom heel veel decimalen hebben
-					StatistiekGWT.round(this.binBoundaries.get(1) - this.binBoundaries.get(0), 
-						maxNumberOfDecimals), this.binBoundaries.get(0));
+					StatistiekGWT.round(
+						this.binBoundaries.get(1) - this.binBoundaries.get(0), 
+						maxNumberOfDecimals), 
+					this.binBoundaries.get(0));
 				this.noBins = this.binBoundaries.size() - 1;
 			}
 		}
