@@ -98,10 +98,11 @@ public class CrossTabulationTableController implements StatistiekView
 			
 			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(this.model.getStatTableModel().getColumnMin(
 					this.model.getSplitOptions().getColumnSplitIndex()),
-				this.model.getStatTableModel().getColumnMax(
-					this.model.getSplitOptions().getColumnSplitIndex()), 
+					this.model.getStatTableModel().getColumnMax(
+						this.model.getSplitOptions().getColumnSplitIndex()), 
 					// door afronding kan de aftreksom heel veel decimalen hebben
-					StatistiekGWT.round(boundaries.get(1) - boundaries.get(0), maxNumberOfDecimals), boundaries.get(0));
+					StatistiekGWT.round(boundaries.get(1) - boundaries.get(0), maxNumberOfDecimals),
+					boundaries.get(0));
 
 			this.model.setSplitBoundaries(boundaries);
 			this.model.setSplitOptions(this.model.getSplitOptions());
