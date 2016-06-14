@@ -163,8 +163,8 @@ logger.info("WebLogoGWT onModuleLoad");
 		RootPanel.get(holderId).addStyleName(webLogoGWTCssResource.root());
 		
 		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 
 			

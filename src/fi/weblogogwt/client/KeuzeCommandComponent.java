@@ -537,7 +537,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		String tabNieuw = tab + "    ";
 		s = s + ifBlock.getCode(tabNieuw);
 		s = s + tab + "}\n";
-		if ( elseBlock.getComponentCount() > 0 )
+		if (elseBlock != null && elseBlock.getComponentCount() > 0 )
 		{
 			s = s + tab + "Anders\n" + tab +"{\n";
 			s = s + elseBlock.getCode(tabNieuw);

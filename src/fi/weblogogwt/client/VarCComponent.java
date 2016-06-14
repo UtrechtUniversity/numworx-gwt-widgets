@@ -65,6 +65,9 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 //System.out.println("paramEdit name " + editingName + " " + text);
 
 			varnaamParam.setParameter(text);
+			
+			commandName = text + " = " + waarde.getParameterText();
+			
 			editingName = false;
 			
 			schuifveld.jlsvContext2d.setFont(WebLogoGWT.fontString);
@@ -79,6 +82,9 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		{
 //System.out.println("paramEdit value " + editingValue + " " + text);			
 			waarde.setParameter(text);
+			
+			commandName = varnaamParam.getParameterText() + " = " + text;
+			
 			editingValue = false;
 		}
 		// tekstPopup weg
