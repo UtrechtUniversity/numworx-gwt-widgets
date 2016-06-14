@@ -201,10 +201,12 @@ public class CrossTabulationTableModel
 				int bin1Decimals = StatistiekGWT.getNumberOfDecimals(this.binBoundaries.get(1).toString());
 				int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
 				
-				this.binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(this.tableModel.getColumnMin(this.columnIndex),
+				this.binBoundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+					this.tableModel.getColumnMin(this.columnIndex),
 					this.tableModel.getColumnMax(this.columnIndex), 
 					// door afronding kan de aftreksom heel veel decimalen hebben
-					StatistiekGWT.round(this.binBoundaries.get(1) - this.binBoundaries.get(0), maxNumberOfDecimals), this.binBoundaries.get(0));
+					StatistiekGWT.round(this.binBoundaries.get(1) - this.binBoundaries.get(0), maxNumberOfDecimals), 
+					this.binBoundaries.get(0));
 			}
 		}
 	}
