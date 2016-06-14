@@ -408,6 +408,31 @@ public class HistogramModel
 	}
 
 	/**
+	 * Find the frequency of every bin based on min and max on scale, and the amount of selected objects in
+	 * this bin. Only use for columns of type integer or double. This method is used
+	 * when the scale is not optimized and the bins may not include all data.
+	 * 
+	 * @return array of frequencies, with index 2*i the frequency of bin i, and
+	 *         2*i + 1 the amount of selected items in this bin.
+	 */
+	public int[][] numberClassFrequencyFromScaleSettings()
+	{
+		ArrayList<Double> bins;
+		
+		if (this.statTableModel.isEmptyColumn(columnIndex))
+		{
+			bins = StatistiekGWT.getBinBoundariesFromScaleSettings(this.getMinOnScale(), this.getMaxOnScale(), getBinWidth());
+		}
+		else
+		{
+			bins = StatistiekGWT.getBinBoundariesFromScaleSettings(this.binBoundaries, this.getMinOnScale(), this.getMaxOnScale());
+		}
+		
+		// gaat dit goed?
+		return this.statTableModel.numberClassFrequency(bins, this.columnIndex, this.splitOptions);
+	}
+
+	/**
 	 * Find the frequency of every class Only use for columns of type enum of
 	 * string
 	 * 
@@ -648,15 +673,39 @@ public class HistogramModel
 	}
 
 	/**
+	 * Get the minimum bin boundary.
+	 * 
+	 * @return min
+	 */
+	public double getMinBinBoundaryValue()
+	{
+		Double min = null;
+		
+		if (this.getBinBoundaries() != null)
+		{
+			min = this.getBinBoundaries().get(0); 
+		}
+		
+		return min;
+	}
+
+	/**
 	 * Get the maximum bin boundary.
 	 * 
 	 * @return max
 	 */
 	public double getMaxBinBoundaryValue()
 	{
+		Double max = null;
+		
 		int lastBinNumber = this.getNoBins();
 
-		return this.getBinBoundaries().get(lastBinNumber);
+		if (this.getBinBoundaries() != null)
+		{
+			max = this.getBinBoundaries().get(lastBinNumber); 
+		}
+		
+		return max;
 	}
 
 	/**
@@ -667,11 +716,7 @@ public class HistogramModel
 	 */
 	public void setMinOnScale(double min)
 	{
-		double minColumnValue = this.getStatTableModel().getColumnMin(
-			this.getColumnIndex());
-
-		if (this.getStatTableModel().isEmptyColumn(this.getColumnIndex())
-			|| ((min <= minColumnValue) && (min != this.minOnScale)))
+		if (min != this.minOnScale)
 		{
 			this.minOnScale = min;
 		}
@@ -685,10 +730,7 @@ public class HistogramModel
 	 */
 	public void setMaxOnScale(double max)
 	{
-		double maxBinValue = this.getMaxBinBoundaryValue();
-
-		if ((this.getStatTableModel().isEmptyColumn(this.getColumnIndex())
-			|| (max >= maxBinValue)) && (max != this.maxOnScale))
+		if (max != this.maxOnScale)
 		{
 			if (getBinWidth() == 0)
 			{
