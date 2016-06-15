@@ -44,6 +44,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	
 	int experiment=0;
 	private Image gaussianImage;
+	private Image scheveVerdelingImage;
+	private boolean scheveVerdeling;
 	StatSimGWTClientBundle clientBundle = GWT.create(StatSimGWTClientBundle.class);
 	double[] steekproefResultaat;
 	
@@ -97,10 +99,12 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	protected ListDataProvider<Experiment1> dataProvider1;
 		
 	
-	public Steekproef(StatSimGWT ssgwt, boolean steekproefLinkerTabel, boolean steekproefRechterTabel) {
-		this.ssgwt=ssgwt;
+	public Steekproef(StatSimGWT ssgwt, boolean steekproefLinkerTabel, boolean steekproefRechterTabel, boolean steekproefInstellingenZichtbaar, boolean scheveVerdeling) {
+		this.ssgwt = ssgwt;
+		this.scheveVerdeling = scheveVerdeling;
 		
 		gaussianImage = new Image(clientBundle.gaussian());
+		scheveVerdelingImage = new Image(clientBundle.scheveVerdeling());
 		
 		VerticalPanel panel0=new VerticalPanel();
 		HorizontalPanel panel=new HorizontalPanel();
@@ -129,15 +133,24 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	    
 	    panel2.add(panel3);
 	    panel2.add(panel4);
-	    panel.add(panel2);
+	    
 	    
 	    VerticalPanel panel5=new VerticalPanel();
 	    FlowPanel panel6=new FlowPanel();
 	    LayoutPanel panel7=new LayoutPanel();
-	    panel6.add(gaussianImage);
-	    panel.add(panel5);
-	    panel5.add(panel6);
-	    panel5.add(panel7);
+	    
+	    if(scheveVerdeling)
+	    {	panel6.add(scheveVerdelingImage);
+	    	panel.add(panel5);
+	    	panel5.add(panel6);
+	    }
+	    else
+	    {	panel.add(panel2);
+	    	panel6.add(gaussianImage);
+	    	panel.add(panel5);
+	    	panel5.add(panel6);
+	    	panel5.add(panel7);
+	    }
 	    
 	    muLabel1=new Label("0");
 	    sigmaLabel1=new Label("-2");
@@ -160,7 +173,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 	    panel7.setWidgetLeftRight(sigmaLabel2,250,Unit.PX,0,Unit.PX);
 	    panel7.setWidgetTopBottom(sigmaLabel2,0,Unit.PX,0,Unit.PX);
 	    
-	    panel0.add(panel);
+	    if(steekproefInstellingenZichtbaar)
+	    	panel0.add(panel);
 	    
 	    HorizontalPanel panel8=new HorizontalPanel();
 	    panel8.setVerticalAlignment(HorizontalPanel.ALIGN_MIDDLE);
@@ -348,6 +362,8 @@ public class Steekproef extends FlowPanel implements ClickHandler, KeyUpHandler 
 		
 		for (int i=0;i<steekproefGrootte;i++) {
 			double r = generator.nextGaussian();
+			if(scheveVerdeling)
+				r=Math.pow(1.7,r);
 			r=r*Double.parseDouble(sigmaText.getText())+Double.parseDouble(muText.getText());
 			
 			steekproefResultaat[i]=r;

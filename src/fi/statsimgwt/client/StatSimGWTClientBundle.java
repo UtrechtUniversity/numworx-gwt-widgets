@@ -12,4 +12,7 @@ public interface StatSimGWTClientBundle extends ClientBundle {
 	   @Source("fi/statsimgwt/client/resources/pixel.gif")
 	   public ImageResource pixel();
 	   
+	   @Source("fi/statsimgwt/client/resources/scheveVerdeling.png")
+	   public ImageResource scheveVerdeling();
+	   
 }

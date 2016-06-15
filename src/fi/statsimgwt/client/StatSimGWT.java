@@ -56,6 +56,8 @@ public class StatSimGWT implements EntryPoint,  InteractionStub {
 	boolean steekproefRechterTabel=true;
 	boolean steekproefBinomLinkerTabel=true;
 	boolean steekproefBinomRechterTabel=true;
+	boolean steekproefInstellingenZichtbaar=true;
+	boolean scheveVerdeling=false;
 	
 	boolean muntenSelected=false;
 	boolean dobbelstenenSelected=false;
@@ -783,7 +785,11 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			steekproefLinkerTabel = l.getBoolean("steekproefLinkerTabel");
 		if (l.containsKey("steekproefRechterTabel"))
 			steekproefRechterTabel = l.getBoolean("steekproefRechterTabel");
-	
+		if (l.containsKey("steekproefInstellingenZichtbaar"))
+			steekproefInstellingenZichtbaar = l.getBoolean("steekproefInstellingenZichtbaar");
+		if (l.containsKey("scheveVerdeling"))
+			scheveVerdeling = l.getBoolean("scheveVerdeling");
+
 		if (muntenSelected) {
 			munten=new Munten(this, muntenInstellingen, muntenResultaten, muntenGrafiek, muntenTabel, muntenFrequentie);
 			munten.setGrootte(breedte,hoogte);
@@ -861,7 +867,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			binomTrekking.setZichtbaar();
 		}
 		if (steekproefSelected) {
-			steekproef = new Steekproef(this,steekproefLinkerTabel, steekproefRechterTabel);
+			steekproef = new Steekproef(this,steekproefLinkerTabel, steekproefRechterTabel, steekproefInstellingenZichtbaar, scheveVerdeling);
 			steekproef.setGrootte(breedte, hoogte);
 			String steekproefMu="";
 			if (l.containsKey("mu"))
@@ -871,6 +877,7 @@ ObjectMap l=JSONUtilities.wrapMap(launchData);
 			if (l.containsKey("sigma"))
 				steekproefSigma = l.getString("sigma");
 			steekproef.sigmaText.setText(steekproefSigma);
+			
 			
 		}
 		//RootPanel.get("dockholder").add(asWidget());
