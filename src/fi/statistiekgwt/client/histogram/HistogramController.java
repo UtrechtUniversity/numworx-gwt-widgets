@@ -60,6 +60,17 @@ public class HistogramController implements StatistiekView
 		this.setHeight(height);
 		
 		this.view.update();
+		
+		try
+		{
+			this.model.setMinOnScale(this.view.getMinBoundary());
+			this.model.setMaxOnScale(this.view.getMaxBinOnScale());
+		}
+		catch (NumberFormatException e) 
+		{
+			// Bij create view vanuit zet opdracht wordt eerst een histogram-view met columnIndex 0 gemaakt
+			// dan is er nog geen minBoundary en maxBinOnScale
+		}
 	}
 
 	private static int identityHashCode(Object o)
