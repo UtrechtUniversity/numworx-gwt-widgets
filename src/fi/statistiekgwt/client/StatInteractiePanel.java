@@ -623,7 +623,12 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 	    				if (statistiekView != null)
 	    				{
 		    				this.model.addView(statistiekView);
-		    				this.view.selectLastTab();
+		    				try // gaat hier iets mis...? Voor de zekerheid...
+		    				{
+		    					this.view.selectLastTab();
+		    				}
+		    				catch (Exception e){}
+		    				
 		    				this.view.clearAddViewTab();
 	    				}
 					}
