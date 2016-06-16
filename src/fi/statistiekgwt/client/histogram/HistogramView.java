@@ -347,6 +347,16 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		this.userOptionsPanel.setMinBoundary(d);
 	}
 
+	/**
+	 * Set max boundary with value max.
+	 * 
+	 * @param max
+	 */
+	public void setMaxBoundary(Double max)
+	{
+		this.userOptionsPanel.setMaxOnScale(max);
+	}
+	
 	public double getSplitMinBoundary()
 	{
 		return userOptionsPanel.getSplitMinBoundary();
@@ -4349,7 +4359,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
     					this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()), 
     					this.getBinWidth(), this.getMinBoundary()); // met invoervelden
     				
-    				if (binBoundaries == null) // ongeldige waarden in invoervelden
+    				if ((binBoundaries == null) || binBoundaries.size() == 0) // ongeldige waarden in invoervelden
     				{
         				binBoundaries = StatistiekGWT.appropriateBoundaries(
     						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
@@ -4556,5 +4566,5 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 				|| width>=8 && width<16 && i%2==0
 				|| width>=16 );
 	}
-	
+
 }
