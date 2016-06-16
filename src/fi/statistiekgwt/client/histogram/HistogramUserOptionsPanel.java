@@ -1350,9 +1350,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		}
 		else
 		{
-			// update column index bin settings
-			controller.updateBoundariesFromBinSettings();
-			
 			double minBinValue = model.getMinBinBoundaryValue();
 
 			// alleen check of data binnen grenzen als optimize scale
@@ -1382,6 +1379,9 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setMinOnScale(minOnScale);
 			}
 			
+			// update column index bin settings
+			controller.updateBoundariesFromBinSettings();
+
 			// zorg dat maximumwaarde overeenkomt met de hoogste bin waarde op de schaal
 			double maxBinValue = view.getMaxBinOnScale();
 			if (view.getUserOptionsPanel().getMaxOnScale() < maxBinValue)
@@ -1468,19 +1468,37 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			{
 				model.setBinWidth(view.getBinWidth());
 				Double min = null;
+				Double max = null;
 				double columnMin = model.getStatTableModel().getColumnMin(model.getColumnIndex());
-				if (view.getUserOptionsPanel().isOptimizeScale() && (view.getMinBoundary() > columnMin)) // user zet optimaliseren aan en de oude waarde is te groot
+				double columnMax = model.getStatTableModel().getColumnMax(model.getColumnIndex());
+
+				if (view.getUserOptionsPanel().isOptimizeScale()) // optimize wordt aangezet
 				{
-					min = columnMin;
-					view.setMinBoundary(min); // update in the view's settings
+					if (view.getMinBoundary() > columnMin) // user zet optimaliseren aan en de oude min waarde is te groot
+					{
+						min = columnMin;
+						view.setMinBoundary(min); // update in the view's settings
+					}
+					else
+					{
+						min = view.getMinBoundary();
+					}
+					
+					if (view.getMaxBinOnScale() > columnMax) // user zet optimaliseren aan en de oude max waarde is te klein
+					{
+						max = columnMax;
+						view.setMaxBoundary(max); // update in the view's settings
+					}
 				}
 				else
 				{
-					min = view.getMinBoundary();
+					min = Math.min(view.getMinBoundary(), columnMin);
 				}
-				model.setMinOnScale(min);
+				
 				model.setOptimizeScale(view.getUserOptionsPanel().isOptimizeScale());
+				model.setMinOnScale(min);
 				view.recalculateBinBoundaries(false);
+				model.setMaxOnScale(view.getMaxBinOnScale());
 				this.update();
 			}
 			else if (e.getSource() == cumulativeBox)
