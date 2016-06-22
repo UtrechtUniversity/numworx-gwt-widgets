@@ -1145,34 +1145,41 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private static Double determineNewSmallestBinBoundary(
 		ArrayList<Double> binBoundaries, double minOnScale)
 	{
-		Double newSmallest = null;
+		Double newSmallestBin = null;
 		
 		if (binBoundaries != null && binBoundaries.size() > 1) // valid bin boundaries
 		{
-			newSmallest = binBoundaries.get(0);
+			newSmallestBin = binBoundaries.get(0);
 			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0); // first bin value
 			
-			if (minOnScale <= binBoundaries.get(0))
+			if (binWidth == 0)
 			{
-				// loop until bin value is found smaller than minOnScale
-				while (minOnScale < newSmallest)
-				{
-					newSmallest = newSmallest - binWidth;
-				}
+				newSmallestBin = minOnScale;
 			}
 			else
-			{
-				// loop until bin value is found larger than minOnScale
-				while (minOnScale >= newSmallest)
+			{				
+				if (minOnScale <= newSmallestBin)
 				{
-					newSmallest = newSmallest + binWidth;
+					// loop until bin value is found smaller than minOnScale
+					while (minOnScale < newSmallestBin)
+					{
+						newSmallestBin = newSmallestBin - binWidth;
+					}
 				}
-				
-				newSmallest = newSmallest - binWidth;
+				else
+				{
+					// loop until bin value is found larger than minOnScale
+					while (minOnScale >= newSmallestBin)
+					{
+						newSmallestBin = newSmallestBin + binWidth;
+					}
+					
+					newSmallestBin = newSmallestBin - binWidth;
+				}
 			}
 		}
 		
-		return newSmallest;
+		return newSmallestBin;
 	}
 	
 	/**
@@ -1185,39 +1192,39 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	private static Double determineNewLargestBinBoundary(
 		ArrayList<Double> binBoundaries, double maxOnScale)
 	{
-		Double newLargest = null;
+		Double newLargestBin = null;
 		
 		if (binBoundaries != null && binBoundaries.size() > 1) // valid bin boundaries
 		{
-			newLargest = binBoundaries.get(binBoundaries.size() - 1); // last bin value
+			newLargestBin = binBoundaries.get(binBoundaries.size() - 1); // last bin value
 			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0);
 			
 			if (binWidth == 0)
 			{
-				newLargest = maxOnScale;
+				newLargestBin = maxOnScale;
 			}
 			else
 			{
 				if (maxOnScale >= binBoundaries.get(binBoundaries.size() - 1))
 				{
 					// loop until bin value is found larger than maxOnScale
-					while (maxOnScale > newLargest)
+					while (maxOnScale > newLargestBin)
 					{
-						newLargest = newLargest + binWidth;
+						newLargestBin = newLargestBin + binWidth;
 					}
 				}
 				else
 				{
 					// loop until bin value is found smaller than maxOnScale
-					while (maxOnScale < newLargest)
+					while (maxOnScale < newLargestBin)
 					{
-						newLargest = newLargest - binWidth;
+						newLargestBin = newLargestBin - binWidth;
 					}
 				}
 			}
 		}
 
-		return newLargest;
+		return newLargestBin;
 	}
 
 	/**
