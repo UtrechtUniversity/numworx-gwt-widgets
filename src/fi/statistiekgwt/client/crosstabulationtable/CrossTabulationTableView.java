@@ -1415,4 +1415,9 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		this.update();
 	}
 
+	public CrossTabulationTableUserOptionsPanel getUserOptionsPanel()
+	{
+		return userOptionsPanel;
+	}
+
 }
