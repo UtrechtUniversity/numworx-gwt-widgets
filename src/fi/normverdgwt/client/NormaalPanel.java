@@ -1371,7 +1371,9 @@ public class NormaalPanel extends LayoutPanel
 		}
 		
 		if (grensZichtbaarOptie)
-		{	if (kansKeuze == TWEEGRENZEN)
+		{	
+			
+			if (kansKeuze == TWEEGRENZEN)
 			{	
 				//grensLinksLabel.setLocation(offSet, yPos);
 			    setWidgetLeftWidth(grensLinksLabel, offSet, Style.Unit.PX, grensLinksLabelWidth, Style.Unit.PX);
@@ -1428,6 +1430,9 @@ public class NormaalPanel extends LayoutPanel
 		
 			if (kansKeuze == TWEEGRENZEN)
 			{
+				
+//System.out.println("kansKeuze == TWEE");
+
 				setWidgetVisible(grensLinksLabel, true);
 				setWidgetVisible(grensLinksTextField, !(berekenKeuze == BEREKENGRENSLINKS));
 				setWidgetVisible(grensLinksWaardeLabel, (berekenKeuze == BEREKENGRENSLINKS));
@@ -1454,6 +1459,9 @@ public class NormaalPanel extends LayoutPanel
 			}
 			else
 			{
+				
+//System.out.println("kansKeuze != TWEE");
+
 				setWidgetVisible(grensLabel, true);
 				setWidgetVisible(grensTextField, !(berekenKeuze == BEREKENGRENS));
 				setWidgetVisible(grensWaardeLabel, (berekenKeuze == BEREKENGRENS));
@@ -1484,6 +1492,9 @@ public class NormaalPanel extends LayoutPanel
 		}
 		else
 		{
+			
+//System.out.println("!grensZichtbaarOptie");
+
 			setWidgetVisible(grensLabel, false);
 			setWidgetVisible(grensTextField, false);
 			setWidgetVisible(grensWaardeLabel, false);
@@ -1493,6 +1504,32 @@ public class NormaalPanel extends LayoutPanel
 			setWidgetVisible(grensRechtsLabel, false);
 			setWidgetVisible(grensRechtsTextField, false);
 			setWidgetVisible(grensRechtsWaardeLabel, false);
+			
+			if (kansKeuze == TWEEGRENZEN)
+			{	
+				if (grensSliderOptie && (berekenKeuze != BEREKENGRENSLINKS))
+					tweeGrenzenSlider.zetLinksEnabled(true);
+				else 
+					tweeGrenzenSlider.zetLinksEnabled(false);
+				if (grensSliderOptie && (berekenKeuze != BEREKENGRENSRECHTS))
+					tweeGrenzenSlider.zetRechtsEnabled(true);
+				else
+					tweeGrenzenSlider.zetRechtsEnabled(false);
+				
+				grensSlider.zetEnabled(false);
+				
+			}
+			else
+			{
+				if (grensSliderOptie && (berekenKeuze != BEREKENGRENS))
+					grensSlider.zetEnabled(true);
+				else 
+					grensSlider.zetEnabled(false);
+					
+				tweeGrenzenSlider.zetLinksEnabled(false);
+				tweeGrenzenSlider.zetRechtsEnabled(false);
+				
+			}
 		}
 		
 // grenzen zichtbaar is instelling docent
