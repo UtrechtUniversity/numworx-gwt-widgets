@@ -738,6 +738,7 @@ public class HistogramModel
 			}
 			else
 			{
+				// bepaal max on scale adhv min on scale en klassenbreedte
 				double newMax = this.minOnScale;
 				
 				for (int i = 1; max > newMax; i++)
