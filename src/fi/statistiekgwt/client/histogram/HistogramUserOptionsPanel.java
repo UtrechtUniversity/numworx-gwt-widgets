@@ -1391,7 +1391,6 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else
 			{
-				// kom je hier ooit...?
 				model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
 			}
 
@@ -1432,6 +1431,39 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				model.setMaxOnScale(view.getUserOptionsPanel().getMaxOnScale());
 			}
 		}
+	}
+
+	private void processSplitMinBoundaryChanged()
+	{
+		double splitMinBoundary = view.getUserOptionsPanel().getSplitMinBoundary(); // the user entered value
+		double splitMinData = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (splitMinBoundary <= splitMinData)
+		{
+			// update split index bin settings
+			controller.updateSplitBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetSplitMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetSplitMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetSplitMin = splitMinData;
+			}
+			
+			view.getUserOptionsPanel().setSplitMinBoundary(resetSplitMin);
+		}
+	}
+
+	public void processSplitBinWidthChanged()
+	{
+		// update split index bin settings
+		controller.updateSplitBoundariesFromBinSettings();
 	}
 
 
@@ -1631,13 +1663,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -1701,13 +1731,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -1738,13 +1766,11 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				}
 				else if (e.getSource() == splitMinBoundaryField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitMinBoundaryChanged();
 				}
 				else if (e.getSource() == splitBinWidthField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitBinWidthChanged();
 				}
 
 				// update view
@@ -1752,4 +1778,5 @@ public class HistogramUserOptionsPanel extends FlowPanel
 			}
 		}
 	} // class HistogramUOPKeyDownHandler
+
 }
