@@ -570,7 +570,7 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		}
 	}
 
-	public double getSplitminBoundary()
+	public double getSplitMinBoundary()
 	{
 		String s = this.splitMinBoundaryField.getText();
 		s = s.replace(',', '.');
@@ -624,6 +624,39 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		this.splitNoObjectsLabel.setText("");
 		this.splitMinValueLabel.setText("");
 		this.splitMaxValueLabel.setText("");
+	}
+
+	public void processSplitMinBoundaryChanged()
+	{
+		double splitMinBoundary = view.getUserOptionsPanel().getSplitMinBoundary(); // the user entered value
+		double splitMinData = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (splitMinBoundary <= splitMinData)
+		{
+			// update split index bin settings
+			controller.updateSplitBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetSplitMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetSplitMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetSplitMin = splitMinData;
+			}
+			
+			view.getUserOptionsPanel().setSplitMinBoundary(resetSplitMin);
+		}
+	}
+
+	public void processSplitBinWidthChanged()
+	{
+		// update split index bin settings
+		controller.updateSplitBoundariesFromBinSettings();
 	}
 
 
@@ -717,13 +750,11 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -766,13 +797,11 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -791,13 +820,11 @@ public class DescriptivesUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == splitMinBoundaryField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitMinBoundaryChanged();
 				}
 				else if (e.getSource() == splitBinWidthField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitBinWidthChanged();
 				}
 
 				// update view
