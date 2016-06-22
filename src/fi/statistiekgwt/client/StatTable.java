@@ -1778,15 +1778,26 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void addDataRowsWithoutEvent(ArrayList<String> dataRows)
 	{
         Iterator<String> rowIterator = dataRows.iterator();
-        while (rowIterator.hasNext()) 
+        String dataRow = "";
+        int i = 0;
+        
+        try
         {
-        	String dataRow = rowIterator.next();
-
-        	String[] values = dataRow.split(";", -1);
-         	this.replaceMissingValues(values);
-        	ArrayList<Object> valuesList= new ArrayList<Object>(Arrays.asList(values));
-        	
-        	this.statTableModel.addRowWithoutEvent(valuesList);
+	        while (rowIterator.hasNext()) 
+	        {
+	        	i++;
+	        	dataRow = rowIterator.next();
+	
+	        	String[] values = dataRow.split(";", -1);
+	         	this.replaceMissingValues(values);
+	        	ArrayList<Object> valuesList= new ArrayList<Object>(Arrays.asList(values));
+	        	
+	        	this.statTableModel.addRowWithoutEvent(valuesList);
+	        }
+        }
+        catch (Exception e)
+        {
+        	System.out.println("StatTable.addDataRowsWithoutEvent(): datarow = " + dataRow + ", " + e.toString());
         }
 
         // finally sort the string options all at once, for performance reason
