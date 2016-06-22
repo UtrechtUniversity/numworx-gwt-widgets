@@ -1045,7 +1045,142 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		this.splitMaxValueLabel.setText("");
 	}
 
+	/**
+	 * Process actions when minimum value on the scale has been changed.
+	 */
+	private void processMinXOnScaleChanged()
+	{
+		if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
+		{
+			// min > max is niet toegestaan
+			if (getMinXOnScale() > getMaxXOnScale())
+			{
+				// reset to latest value
+				setMinXOnScale(model.getMinXOnScale());
+			}
+			else
+			{
+				model.setMinXOnScale(getMinXOnScale());
+			}
+		} // empty column
+		else
+		{ 
+			// data in column
+			double minColumnXValue = model.getStatTableModel().getColumnMin(model.getColumnXIndex());
+			// alleen check of data binnen grenzen als optimize scale
+			if (model.isOptimizeScaleX())
+			{
+				if (getMinXOnScale() > minColumnXValue)
+				{
+					// invalid input
+					
+					if (model.getMinXOnScale() > minColumnXValue)
+					{
+						// the model's min is not correct, data may have been changed and the model's min on scale needs to be reset
+						model.setMinXOnScale(minColumnXValue);
+					}
+					else
+					{
+						// reset to latest value
+						setMinXOnScale(model.getMinXOnScale());
+					}
+				}
+				else
+				{
+					model.setMinXOnScale(getMinXOnScale());
+				}
+			}
+			else
+			{
+				model.setMinXOnScale(getMinXOnScale());
+			}
+		} // data in column
+	}
 	
+	/**
+	 * Process actions when maximum value on the scale has been changed.
+	 */
+	private void processMaxXOnScaleChanged()
+	{
+		if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
+		{
+			// max < min is niet toegestaan
+			if (getMaxXOnScale() < getMinXOnScale())
+			{
+				// reset to latest value
+				setMaxXOnScale(model.getMaxXOnScale());
+			}
+			else
+			{
+				model.setMaxXOnScale(getMaxXOnScale());
+			}
+		} // empty column
+		else
+		{ // data in column
+			double maxColumnXValue = model.getStatTableModel().getColumnMax(model.getColumnXIndex());
+			
+			// alleen check of data binnen grenzen als optimize scale
+			if (model.isOptimizeScaleX())
+			{
+				if (getMaxXOnScale() < maxColumnXValue)
+				{
+					if (model.getMaxXOnScale() < maxColumnXValue)
+					{
+						// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
+						model.setMaxXOnScale(maxColumnXValue);
+					}
+					else
+					{
+						// reset to latest value
+						setMaxXOnScale(model.getMaxXOnScale());
+					}
+				}
+				else
+				{
+					model.setMaxXOnScale(getMaxXOnScale());
+				}
+			}
+			else
+			{
+				model.setMaxXOnScale(getMaxXOnScale());
+			}
+		} // data in column
+	}
+
+	private void processSplitMinBoundaryChanged()
+	{
+		double splitMinBoundary = view.getUserOptionsPanel().getSplitMinBoundary(); // the user entered value
+		double splitMinData = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (splitMinBoundary <= splitMinData)
+		{
+			// update split index bin settings
+			controller.updateSplitBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetSplitMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetSplitMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetSplitMin = splitMinData;
+			}
+			
+			view.getUserOptionsPanel().setSplitMinBoundary(resetSplitMin);
+		}
+	}
+
+	public void processSplitBinWidthChanged()
+	{
+		// update split index bin settings
+		controller.updateSplitBoundariesFromBinSettings();
+	}
+
+
 	/**
 	 * A clickhandler for DotplotUserOptionsPanel
 	 */
@@ -1172,89 +1307,19 @@ public class DotplotUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 			else if (e.getSource() == minXOnScaleField)
 			{
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-				{
-					// min > max is niet toegestaan
-					if (getMinXOnScale() > getMaxXOnScale())
-					{
-						// reset to latest value
-						setMinXOnScale(model.getMinXOnScale());
-					}
-					else
-					{
-						model.setMinXOnScale(getMinXOnScale());
-					}
-				} // empty column
-				else
-				{ // data in column
-					double minColumnXValue = model.getStatTableModel().getColumnMin(model.getColumnXIndex());
-					if (getMinXOnScale() > minColumnXValue)
-					{
-						// invalid input
-						
-						if (model.getMinXOnScale() > minColumnXValue)
-						{
-							// the model's min is not correct, data may have been changed and the model's min on scale needs to be reset
-							model.setMinXOnScale(minColumnXValue);
-						}
-						else
-						{
-							// reset to latest value
-							setMinXOnScale(model.getMinXOnScale());
-						}
-					}
-					else
-					{
-						model.setMinXOnScale(getMinXOnScale());
-					}
-				} // data in column
+				processMinXOnScaleChanged();
 			}
 			else if (e.getSource() == maxXOnScaleField)
 			{
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-				{
-					// max < min is niet toegestaan
-					if (getMaxXOnScale() < getMinXOnScale())
-					{
-						// reset to latest value
-						setMaxXOnScale(model.getMaxXOnScale());
-					}
-					else
-					{
-						model.setMaxXOnScale(getMaxXOnScale());
-					}
-				} // empty column
-				else
-				{ // data in column
-					double maxColumnXValue = model.getStatTableModel().getColumnMax(model.getColumnXIndex());
-					if (getMaxXOnScale() < maxColumnXValue)
-					{
-						if (model.getMaxXOnScale() < maxColumnXValue)
-						{
-							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-							model.setMaxXOnScale(maxColumnXValue);
-						}
-						else
-						{
-							// reset to latest value
-							setMaxXOnScale(model.getMaxXOnScale());
-						}
-					}
-					else
-					{
-						model.setMaxXOnScale(getMaxXOnScale());
-					}
-				} // data in column
+				processMaxXOnScaleChanged();
 			}
 
 			// update view
@@ -1329,94 +1394,25 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 			else if (e.getSource() == minXOnScaleField)
 			{
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-				{
-					// min > max is niet toegestaan
-					if (getMinXOnScale() > getMaxXOnScale())
-					{
-						// reset to latest value
-						setMinXOnScale(model.getMinXOnScale());
-					}
-					else
-					{
-						model.setMinXOnScale(getMinXOnScale());
-					}
-				} // empty column
-				else
-				{ // data in column
-					double minColumnXValue = model.getStatTableModel().getColumnMin(model.getColumnXIndex());
-					if (getMinXOnScale() > minColumnXValue)
-					{
-						// invalid input
-						
-						if (model.getMinXOnScale() > minColumnXValue)
-						{
-							// the model's min is not correct, data may have been changed and the model's min on scale needs to be reset
-							model.setMinXOnScale(minColumnXValue);
-						}
-						else
-						{
-							// reset to latest value
-							setMinXOnScale(model.getMinXOnScale());
-						}
-					}
-					else
-					{
-						model.setMinXOnScale(getMinXOnScale());
-					}
-				} // data in column
+				processMinXOnScaleChanged();
 			}
 			else if (e.getSource() == maxXOnScaleField)
 			{
-				if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-				{
-					// max < min is niet toegestaan
-					if (getMaxXOnScale() < getMinXOnScale())
-					{
-						// reset to latest value
-						setMaxXOnScale(model.getMaxXOnScale());
-					}
-					else
-					{
-						model.setMaxXOnScale(getMaxXOnScale());
-					}
-				} // empty column
-				else
-				{ // data in column
-					double maxColumnXValue = model.getStatTableModel().getColumnMax(model.getColumnXIndex());
-					if (getMaxXOnScale() < maxColumnXValue)
-					{
-						if (model.getMaxXOnScale() < maxColumnXValue)
-						{
-							// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-							model.setMaxXOnScale(maxColumnXValue);
-						}
-						else
-						{
-							// reset to latest value
-							setMaxXOnScale(model.getMaxXOnScale());
-						}
-					}
-					else
-					{
-						model.setMaxXOnScale(getMaxXOnScale());
-					}
-				} // data in column
+				processMaxXOnScaleChanged();
 			}
 
 			// update view
 			DotplotUserOptionsPanel.this.view.update();
 		}
+
 	} // class DotplotUOPValueChangeHandler
 
 	
@@ -1431,89 +1427,19 @@ public class DotplotUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == splitMinBoundaryField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitMinBoundaryChanged();
 				}
 				else if (e.getSource() == splitBinWidthField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitBinWidthChanged();
 				}
 				else if (e.getSource() == minXOnScaleField)
 				{
-					if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-					{
-						// min > max is niet toegestaan
-						if (getMinXOnScale() > getMaxXOnScale())
-						{
-							// reset to latest value
-							setMinXOnScale(model.getMinXOnScale());
-						}
-						else
-						{
-							model.setMinXOnScale(getMinXOnScale());
-						}
-					} // empty column
-					else
-					{ // data in column
-						double minColumnXValue = model.getStatTableModel().getColumnMin(model.getColumnXIndex());
-						if (getMinXOnScale() > minColumnXValue)
-						{
-							// invalid input
-							
-							if (model.getMinXOnScale() > minColumnXValue)
-							{
-								// the model's min is not correct, data may have been changed and the model's min on scale needs to be reset
-								model.setMinXOnScale(minColumnXValue);
-							}
-							else
-							{
-								// reset to latest value
-								setMinXOnScale(model.getMinXOnScale());
-							}
-						}
-						else
-						{
-							model.setMinXOnScale(getMinXOnScale());
-						}
-					} // data in column
+					processMinXOnScaleChanged();
 				}
 				else if (e.getSource() == maxXOnScaleField)
 				{
-					if (model.getStatTableModel().isEmptyColumn(model.getColumnXIndex()))
-					{
-						// max < min is niet toegestaan
-						if (getMaxXOnScale() < getMinXOnScale())
-						{
-							// reset to latest value
-							setMaxXOnScale(model.getMaxXOnScale());
-						}
-						else
-						{
-							model.setMaxXOnScale(getMaxXOnScale());
-						}
-					} // empty column
-					else
-					{ // data in column
-						double maxColumnXValue = model.getStatTableModel().getColumnMax(model.getColumnXIndex());
-						if (getMaxXOnScale() < maxColumnXValue)
-						{
-							if (model.getMaxXOnScale() < maxColumnXValue)
-							{
-								// the model's max is not correct, data may have been changed and the model's max on scale needs to be reset
-								model.setMaxXOnScale(maxColumnXValue);
-							}
-							else
-							{
-								// reset to latest value
-								setMaxXOnScale(model.getMaxXOnScale());
-							}
-						}
-						else
-						{
-							model.setMaxXOnScale(getMaxXOnScale());
-						}
-					} // data in column
+					processMaxXOnScaleChanged();
 				}
 
 				// update view
@@ -1521,5 +1447,6 @@ public class DotplotUserOptionsPanel extends FlowPanel
 			}
 		}
 	} // class DotplotUOPKeyDownHandler
+
 
 }
