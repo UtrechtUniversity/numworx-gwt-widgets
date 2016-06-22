@@ -179,6 +179,11 @@ public class DotplotView extends LayoutPanel implements
 	
 	private int width;
 	private int height;
+	
+	/**
+	 * Indices of the dots that are within the boundaries of the view.
+	 */
+	int[] indicesDotsInView;
 
 	/**
 	 * Dummy touch handler that stops propagation. Used to avoid that an external view 
@@ -256,6 +261,7 @@ public class DotplotView extends LayoutPanel implements
 		this.userOptionsPanel.update();
 
 		this.initializeSize();
+		this.initializeIndicesDotsInView();
 		
 		this.colorLegend = new ColorLegend("", null, null, DotplotView.COLOR_LEGEND_WIDTH, this.getHeight());
 		this.alles.addEast(this.colorLegend, DotplotView.COLOR_LEGEND_WIDTH);
@@ -285,6 +291,19 @@ public class DotplotView extends LayoutPanel implements
 		this.add(this.alles);
 		
 		this.addHandlers();
+	}
+
+	/**
+	 * Initialize the indices of the dots in the view with all rows.
+	 */
+	private void initializeIndicesDotsInView()
+	{
+		indicesDotsInView = new int[model.getStatTableModel().getRowCount()];
+		
+		for (int i = 0; i < model.getStatTableModel().getRowCount(); i++)
+		{
+			indicesDotsInView[i] = i;
+		}
 	}
 
 	/**
@@ -571,6 +590,7 @@ public class DotplotView extends LayoutPanel implements
 	{
 		this.setTypes();
 		this.setMinMax();
+		this.updateIndicesDotsInView();
 
 		if (this.model.columnSplitIndexValid())
 		{
@@ -596,6 +616,22 @@ public class DotplotView extends LayoutPanel implements
 		this.mainPanel.paint();
 	}
 	
+	private void updateIndicesDotsInView()
+	{
+		this.indicesDotsInView = new int[numberOfDotsInView()];
+		
+		int i = 0;
+		
+		for (int row = 0; row < this.model.getStatTableModel().getRowCount(); row++)
+		{
+			if (rowIsShownInView(row))
+			{
+				this.indicesDotsInView[i] = row;
+				i++;
+			}
+		}
+	}
+
 	/**
 	 * Update the correlation setting in the view.
 	 * 
@@ -827,9 +863,81 @@ public class DotplotView extends LayoutPanel implements
 	 */
 	private void determineDotSize()
 	{
-		double d = (this.getWidth() * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight()))
-			/ (double) Math.max(10, this.model.getStatTableModel().getRowCount());
-		this.dotRadius = Math.max(2, (int) (0.25 * Math.pow(d, 1.0 / 3.0)));
+		int numberOfDotsInView = numberOfDotsInView();
+		
+		// bepaal oppervlak per dot: tekenoppervlak gedeeld door aantal dots
+		double oppervlakPerDot = (this.getWidth() * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight())) // tekenoppervlak
+			/ (double) Math.max(10, numberOfDotsInView); // gedeeld door aantal dots
+		
+		this.dotRadius = Math.max(2, (int) (0.25 * Math.pow(oppervlakPerDot, 1.0 / 3.0)));
+	}
+
+	/**
+	 * 
+	 * @return the number of dots in the view
+	 */
+	private int numberOfDotsInView()
+	{
+		int n = 0;
+		
+		if (this.model.isOptimizeScaleX())
+		{
+			n = this.model.getStatTableModel().getRowCount();
+		}
+		else
+		{
+			for (int row = 0; row < this.model.getStatTableModel().getRowCount(); row++)
+			{
+				if (rowIsShownInView(row))
+				{
+					n++;
+				}
+			}
+		}
+		
+		return n;
+	}
+
+	/**
+	 * Returns whether the given row is shown in the view
+	 * given the settings for minimum on scale and maximum on scale.
+	 * 
+	 * @param row
+	 * @return
+	 */
+	private boolean rowIsShownInView(int row)
+	{
+		boolean b = true;
+		
+		String valueString = (String) this.model.getStatTableModel().getValueAt(row, this.model.getColumnXIndex());
+		
+		if (valueString.equals(ColumnType.WILDCARD) || isOutOfRange(valueString))
+		{
+			b = false;
+		}
+		
+		return b;
+	}
+
+	/**
+	 * Returns whether the double value in the given object is in
+	 * the range determined by the settings of minimum on scale and
+	 * maximum on scale. 
+	 * 
+	 * @param value
+	 * @return
+	 */
+	private boolean isOutOfRange(String value)
+	{
+		boolean b = false;
+		Double d = Double.parseDouble(value);
+		
+		if ((d < model.getMinXOnScale()) || (d > model.getMaxXOnScale()))
+		{
+			b = true;
+		}
+		
+		return b;
 	}
 
 	/**
@@ -1418,7 +1526,11 @@ public class DotplotView extends LayoutPanel implements
 		context.arc(x, y, this.dotRadius, 0, Math.PI * 2.0, true);
 		context.closePath();
 		context.fill();
+		
+		context.setLineWidth(2);
+		context.setStrokeStyle(ColorUtils.BLACK);
 		context.stroke();
+		context.setLineWidth(1);
 
 		this.objectLocations.set(rowIndex, new Point(x, y));
 	}
@@ -2250,32 +2362,32 @@ public class DotplotView extends LayoutPanel implements
 	}
 
 	/**
-	 * Determine the coordinates for all objects Used only in single variable
-	 * cases, with that variable on the x-axis
+	 * Determine the coordinates for all objects.
+	 * Used only in single variable cases, with that variable on the x-axis.
 	 * 
 	 * @return a matrix containing the x and y coordinate for all objects
 	 */
 	private int[][] determineCoordsXSingleVar()
 	{
-		int[][] coords = new int[this.model.getStatTableModel().getRowCount()][2];
-		int[] splitClasses = new int[this.model.getStatTableModel().getRowCount()];
+		int[][] coords = new int[numberOfDotsInView()][2];
+		int[] splitClasses = new int[numberOfDotsInView()];
 		int[][] sortedData = null;
 
 		int drawHeight = this.dotAreaHeight();
-		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
+		for (int i = 0; i < numberOfDotsInView(); i++)
 		{
 			if (this.model.getStatTableModel()
-				.getValueAt(i, this.model.getColumnXIndex()) == null
+				.getValueAt(indicesDotsInView[i], this.model.getColumnXIndex()) == null // hier heb ik indicesDotsInView[] nodig!
 			|| this.model.getStatTableModel()
-				.getValueAt(i, this.model.getColumnXIndex())
+				.getValueAt(indicesDotsInView[i], this.model.getColumnXIndex())
 				.equals(ColumnType.WILDCARD)
-			|| this.model.getStatTableModel().isOutlier(i, this.model.getColumnXIndex()))
+			|| this.model.getStatTableModel().isOutlier(indicesDotsInView[i], this.model.getColumnXIndex()))
 			{
 				// skip wildcards and outliers
 				splitClasses[i] = -1;
 				continue;
 			}
-			splitClasses[i] = this.getSplitClass(i);
+			splitClasses[i] = this.getSplitClass(indicesDotsInView[i]);
 
 			// voor verdeling binnen 1 veld:
 			if (DotplotView.this.model.splitInSingleView())
@@ -2283,12 +2395,12 @@ public class DotplotView extends LayoutPanel implements
 				splitClasses[i] = 0;
 			}
 
-			coords[i][0] = this.determineXCoord(i);
+			coords[i][0] = this.determineXCoord(indicesDotsInView[i]);
 		}
 		
 		// sortedData = [x, y, split, original index]
-		sortedData = new int[this.model.getStatTableModel().getRowCount()][4];
-		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
+		sortedData = new int[numberOfDotsInView()][4];
+		for (int i = 0; i < numberOfDotsInView(); i++)
 		{
 			sortedData[i][0] = coords[i][0];
 			sortedData[i][2] = splitClasses[i];
@@ -2339,9 +2451,9 @@ public class DotplotView extends LayoutPanel implements
 		double y_initial = (1 - DotplotView.KEEP_CLEAR_PART) * drawHeight;
 		double y = y_initial;
 		// use double values to get a precise calculation for large data sets
-		double[] y_doubles = new double[this.model.getStatTableModel().getRowCount()];
+		double[] y_doubles = new double[numberOfDotsInView()];
 		
-		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
+		for (int i = 0; i < numberOfDotsInView(); i++)
 		{
 			if (i > 0)
 			{
@@ -2373,7 +2485,7 @@ public class DotplotView extends LayoutPanel implements
 		} // i-loop
 
 		// round double values to int coordinates
-		for (int i = 0; i < this.model.getStatTableModel().getRowCount(); i++)
+		for (int i = 0; i < numberOfDotsInView(); i++)
 		{
 			sortedData[i][1] = (int) y_doubles[i];
 		}
@@ -2696,19 +2808,19 @@ public class DotplotView extends LayoutPanel implements
 							if (dotIndex == j)
 							{
 								// add selection to current selectionlist
-								selectionList.set(j, true);
+								selectionList.set(indicesDotsInView[j], true);
 							}
 						}
 					}
 					else
 					{
 						// new selection list
-						selectionList = new ArrayList<Boolean>(
-							pointList.size());
+						int rowCount = model.getStatTableModel().getRowCount();
+						selectionList = new ArrayList<Boolean>(rowCount);
 					
-						for (int j = 0; j < pointList.size(); j++)
+						for (int j = 0; j < rowCount; j++)
 						{
-							selectionList.add(dotIndex == j);
+							selectionList.add(indicesDotsInView[dotIndex] == j);
 						}
 					}
 					
@@ -2747,20 +2859,25 @@ public class DotplotView extends LayoutPanel implements
 						Point p = pointList.get(i);
 						if (p != null && r.contains(p))
 						{
-							selectionList.set(i, true);
+							selectionList.set(indicesDotsInView[i], true);
 						}
 					}
 				}
 				else
 				{
 					// new selection list
-					selectionList = new ArrayList<Boolean>(
-						pointList.size());
+					int rowCount = model.getStatTableModel().getRowCount();
+					selectionList = new ArrayList<Boolean>(rowCount);
 	
+					for (int i = 0; i < rowCount; i++)
+					{
+						selectionList.add(false);
+					}
+					// set the points from the point list that are in the drag area
 					for (int i = 0; i < pointList.size(); i++)
 					{
 						Point p = pointList.get(i);
-						selectionList.add(p != null && r.contains(p));
+						selectionList.set(indicesDotsInView[i], p != null && r.contains(p));
 					}
 				}
 	
@@ -2938,7 +3055,7 @@ public class DotplotView extends LayoutPanel implements
 				// sorteer de rij-indices zodat selected rijen op het eind staan
 				// en de bijbehorende dots als laatste worden getekend
 				final StatTableModel tableModel = DotplotView.this.model.getStatTableModel();
-				int nrRows = tableModel.getRowCount();
+				int nrRows = numberOfDotsInView();
 				Integer[] indexSortedOnSelected = new Integer[nrRows];
 				for (int i = 0; i < nrRows; i++)
 				{
@@ -2957,17 +3074,17 @@ public class DotplotView extends LayoutPanel implements
 		            public int compare(Integer i1, Integer i2) 
 		            {
 		            	// if both rows are selected, the order is based on color //doesn't matter
-	            		if (tableModel.isRowSelected(i1) && tableModel.isRowSelected(i2))
+	            		if (tableModel.isRowSelected(indicesDotsInView[i1]) && tableModel.isRowSelected(indicesDotsInView[i2]))
 	            		{
 	            			//return determineColor(i1).value().compareTo(determineColor(i2).value());
 	            			return 0;
 	            		}
 		            	// indices of selected rows are always larger 
-	            		else if (tableModel.isRowSelected(i2))
+	            		else if (tableModel.isRowSelected(indicesDotsInView[i2]))
 	            		{
 		            		return -1;
 	            		}
-		            	else if (tableModel.isRowSelected(i1))
+		            	else if (tableModel.isRowSelected(indicesDotsInView[i1]))
 		            	{
 		            		return 1;
 		            	}
@@ -2985,10 +3102,8 @@ public class DotplotView extends LayoutPanel implements
 				{
 					// all variables are valid, draw a scatterplot
 					DotplotView.this.determineDotSize();
-					DotplotView.this.objectLocations = new ArrayList<Point>(
-						DotplotView.this.model.getStatTableModel().getRowCount());
-					for (int i = 0; i < DotplotView.this.model.getStatTableModel()
-						.getRowCount(); i++)
+					DotplotView.this.objectLocations = new ArrayList<Point>(numberOfDotsInView());
+					for (int i = 0; i < numberOfDotsInView(); i++)
 					{
 						DotplotView.this.objectLocations.add(null);
 					}
@@ -3003,8 +3118,7 @@ public class DotplotView extends LayoutPanel implements
 							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 					}
 	
-					for (int row = 0; row < DotplotView.this.model.getStatTableModel()
-						.getRowCount(); row++)
+					for (int row = 0; row < numberOfDotsInView(); row++)
 					{
 						// use the ordered indices so that selected dots will be drawn at last
 						// test syl TODO: in elke drawPoint() wordt setFillStyle gedaan voor de geselecteerde; dit zorgt voor slechte performance
@@ -3024,10 +3138,8 @@ public class DotplotView extends LayoutPanel implements
 					// dot plot with the variable on the x-axis
 					DotplotView.this.determineDotSize();
 					DotplotView.this.dotRadius = DotplotView.this.dotRadius * 2; // ??
-					DotplotView.this.objectLocations = new ArrayList<Point>(
-						DotplotView.this.model.getStatTableModel().getRowCount());
-					for (int i = 0; i < DotplotView.this.model.getStatTableModel()
-						.getRowCount(); i++)
+					DotplotView.this.objectLocations = new ArrayList<Point>(numberOfDotsInView());
+					for (int i = 0; i < numberOfDotsInView(); i++)
 					{
 						DotplotView.this.objectLocations.add(null);
 					}
@@ -3044,21 +3156,17 @@ public class DotplotView extends LayoutPanel implements
 						// use the ordered indices so that selected dots will be drawn at last
 						int index = indexSortedOnSelected[i];
 	
-//						if (!DotplotView.this.model
-//							.getStatTableModel()
-//							.getValueAt(index, DotplotView.this.model.getColumnXIndex())
-//							.equals(ColumnType.WILDCARD))
 						if (DotplotView.this.model
 							.getStatTableModel()
-							.getValueAt(index, DotplotView.this.model.getColumnXIndex()) != null
+							.getValueAt(indicesDotsInView[index], DotplotView.this.model.getColumnXIndex()) != null
 						&& !DotplotView.this.model
 							.getStatTableModel()
-							.getValueAt(index, DotplotView.this.model.getColumnXIndex())
+							.getValueAt(indicesDotsInView[index], DotplotView.this.model.getColumnXIndex())
 							.equals(ColumnType.WILDCARD)
 						&& !DotplotView.this.model
-							.getStatTableModel().isOutlier(index, DotplotView.this.model.getColumnXIndex()))
+							.getStatTableModel().isOutlier(indicesDotsInView[index], DotplotView.this.model.getColumnXIndex()))
 						{
-							int splitClass = DotplotView.this.getSplitClass(index);
+							int splitClass = DotplotView.this.getSplitClass(indicesDotsInView[index]);
 							if (DotplotView.this.model.splitInSingleView())
 							{
 								splitClass = 0;
@@ -3081,7 +3189,7 @@ public class DotplotView extends LayoutPanel implements
 								// startIndexSelected
 								if (i < startIndexSelected)//(index < startIndexSelected)
 								{
-									currentColor = determineColor(index);
+									currentColor = determineColor(indicesDotsInView[index]);
 									
 									if ((previousColor == null) ||
 										(!currentColor.equals(previousColor)))
@@ -3105,7 +3213,7 @@ public class DotplotView extends LayoutPanel implements
 										
 										previousColor = currentColor;
 									}
-									
+
 									DotplotView.this.drawNonSelectedPointAtLocation(tempContext,
 										coords[index][0], coords[index][1] + heightOffset,
 										index, currentColor);
@@ -3121,8 +3229,8 @@ public class DotplotView extends LayoutPanel implements
 										// reset previousColor
 										previousColor = null;
 									}
-									
-									currentColor = determineColor(index);
+
+									currentColor = determineColor(indicesDotsInView[index]);
 									
 									if ((previousColor == null) ||
 										(!currentColor.equals(previousColor)))
@@ -3217,7 +3325,7 @@ public class DotplotView extends LayoutPanel implements
 							}
 						}
 					}
-				}
+				} // columnYIndexValid
 	
 				// draw the bottom line and labels
 				for (int i = 0; i < (DotplotView.this.isSplitSingleViewSelected() ? 1
@@ -3247,12 +3355,12 @@ public class DotplotView extends LayoutPanel implements
 			int startIndex;
 			
 			final StatTableModel tableModel = DotplotView.this.model.getStatTableModel();
-			int nrRows = tableModel.getRowCount();
+			int nrRows = numberOfDotsInView();
 			startIndex = nrRows;
 			
 			for (int i = 0; i < nrRows; i++)
 			{
-				if (tableModel.isRowSelected(indexSortedOnSelected[i]))
+				if (tableModel.isRowSelected(indicesDotsInView[indexSortedOnSelected[i]]))
 				{
 					startIndex = i;
 					break;
@@ -3340,17 +3448,20 @@ public class DotplotView extends LayoutPanel implements
 	
 	void recalculateScaleXSettings()
 	{
-		// update minOnScale and maxOnScale if necessary
-		double minValueX = this.model.getStatTableModel().getColumnMin(this.model.getColumnXIndex()); 
-		if (this.model.getMinXOnScale() > minValueX)
+		if (model.isOptimizeScaleX())
 		{
-			this.model.setMinXOnScale(minValueX);
-		}
-
-		double maxValueX = this.model.getStatTableModel().getColumnMax(this.model.getColumnXIndex());
-		if (this.model.getMaxXOnScale() <= maxValueX)
-		{
-			this.model.setMaxXOnScale(maxValueX);
+			// update minOnScale and maxOnScale if necessary
+			double minValueX = this.model.getStatTableModel().getColumnMin(this.model.getColumnXIndex()); 
+			if (this.model.getMinXOnScale() > minValueX)
+			{
+				this.model.setMinXOnScale(minValueX);
+			}
+	
+			double maxValueX = this.model.getStatTableModel().getColumnMax(this.model.getColumnXIndex());
+			if (this.model.getMaxXOnScale() <= maxValueX)
+			{
+				this.model.setMaxXOnScale(maxValueX);
+			}
 		}
 	}
 
@@ -3422,6 +3533,29 @@ public class DotplotView extends LayoutPanel implements
 	@Override
 	public void onOutlierChange(OutlierChangeEvent event)
 	{
+		// schaal instellingen opnieuw berekenen
+		this.recalculateScaleXSettings();
+
 		this.update();
+	}
+	
+	/**
+	 * Get the minimum value of columnX on the scale as entered by the user.
+	 * 
+	 * @return
+	 */
+	public double getMinXOnScale()
+	{
+		return this.userOptionsPanel.getMinXOnScale();
+	}
+	
+	/**
+	 * Get the maximum value of columnX on the scale as entered by the user.
+	 * 
+	 * @return
+	 */
+	public double getMaxXOnScale()
+	{
+		return this.userOptionsPanel.getMaxXOnScale();
 	}
 }
