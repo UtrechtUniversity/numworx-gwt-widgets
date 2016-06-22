@@ -864,6 +864,7 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 	}
 
 	
+
 	/**
 	 * A clickhandler for FrequencyTableUserOptionsPanel
 	 */
@@ -962,23 +963,19 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == minBoundaryField)
 			{
-				// update bin settings
-				controller.updateBoundariesFromBinSettings();
+				processMinBoundaryChanged();
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				// update bin settings
-				controller.updateBoundariesFromBinSettings();
+				processBinWidthChanged();
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -1033,23 +1030,19 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == minBoundaryField)
 			{
-				// update bin settings
-				controller.updateBoundariesFromBinSettings();
+				processMinBoundaryChanged();
 			}
 			else if (e.getSource() == binWidthField)
 			{
-				// update bin settings
-				controller.updateBoundariesFromBinSettings();
+				processBinWidthChanged();
 			}
 			else if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -1068,23 +1061,19 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == minBoundaryField)
 				{
-					// update bin settings
-					controller.updateBoundariesFromBinSettings();
+					processMinBoundaryChanged();
 				}
 				else if (e.getSource() == binWidthField)
 				{
-					// update bin settings
-					controller.updateBoundariesFromBinSettings();
+					processBinWidthChanged();
 				}
 				else if (e.getSource() == splitMinBoundaryField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitMinBoundaryChanged();
 				}
 				else if (e.getSource() == splitBinWidthField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitBinWidthChanged();
 				}
 
 				// update view
@@ -1092,5 +1081,71 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 			}
 		}
 	} // class FrequencyTableUOPKeyDownHandler
+
+	private void processMinBoundaryChanged()
+	{
+		double minBoundary = view.getUserOptionsPanel().getMinBoundary(); // the user entered value
+		double minData = this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex());
+		
+		if (minBoundary <= minData)
+		{
+			// update bin settings
+			controller.updateBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetMin;
+			if (model.getBinBoundaries() != null && model.getBinBoundaries().size() > 0)
+			{
+				resetMin = model.getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetMin = minData;
+			}
+			
+			view.getUserOptionsPanel().setMinBoundary(resetMin);
+		}
+	}
+
+	public void processBinWidthChanged()
+	{
+		// update bin settings
+		controller.updateBoundariesFromBinSettings();
+	}
+
+	public void processSplitBinWidthChanged()
+	{
+		// update split index bin settings
+		controller.updateSplitBoundariesFromBinSettings();
+	}
+
+	private void processSplitMinBoundaryChanged()
+	{
+		double splitMinBoundary = view.getUserOptionsPanel().getSplitMinBoundary(); // the user entered value
+		double splitMinData = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (splitMinBoundary <= splitMinData)
+		{
+			// update split index bin settings
+			controller.updateSplitBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetSplitMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetSplitMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetSplitMin = splitMinData;
+			}
+			
+			view.getUserOptionsPanel().setSplitMinBoundary(resetSplitMin);
+		}
+	}
 
 }
