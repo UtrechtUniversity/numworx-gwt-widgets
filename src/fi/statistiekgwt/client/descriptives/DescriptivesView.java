@@ -1018,7 +1018,7 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 	public double getSplitMinBoundary()
 	{
-		return userOptionsPanel.getSplitminBoundary();
+		return userOptionsPanel.getSplitMinBoundary();
 	}
 
 	/**
