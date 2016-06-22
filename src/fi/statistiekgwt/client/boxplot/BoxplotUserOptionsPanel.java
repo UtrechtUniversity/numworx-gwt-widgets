@@ -650,6 +650,41 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		this.splitMinValueLabel.setText("");
 		this.splitMaxValueLabel.setText("");
 	}
+	
+	public void processSplitMinBoundaryChanged()
+	{
+		double splitMinBoundary = view.getUserOptionsPanel().getSplitMinBoundary(); // the user entered value
+		double splitMinData = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (splitMinBoundary <= splitMinData)
+		{
+			// update split index bin settings
+			controller.updateSplitBoundariesFromBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetSplitMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetSplitMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetSplitMin = splitMinData;
+			}
+			
+			view.getUserOptionsPanel().setSplitMinBoundary(resetSplitMin);
+		}
+	}
+
+	public void processSplitBinWidthChanged()
+	{
+		// update split index bin settings
+		controller.updateSplitBoundariesFromBinSettings();
+	}
+
+
 
 	/**
 	 * A clickhandler for BoxplotUserOptionsPanel
@@ -747,13 +782,11 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -807,13 +840,11 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == splitMinBoundaryField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitMinBoundaryChanged();
 			}
 			else if (e.getSource() == splitBinWidthField)
 			{
-				// update split index bin settings
-				controller.updateSplitBoundariesFromBinSettings();
+				processSplitBinWidthChanged();
 			}
 
 			// update view
@@ -832,13 +863,11 @@ public class BoxplotUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == splitMinBoundaryField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitMinBoundaryChanged();
 				}
 				else if (e.getSource() == splitBinWidthField)
 				{
-					// update split index bin settings
-					controller.updateSplitBoundariesFromBinSettings();
+					processSplitBinWidthChanged();
 				}
 
 				// update view
