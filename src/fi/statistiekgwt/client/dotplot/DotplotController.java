@@ -53,6 +53,18 @@ public class DotplotController implements StatistiekView
 		this.setWidth(width);
 		this.setHeight(height);
 		
+		try
+		{
+			// voor standalone
+			this.model.setMinXOnScale(this.view.getMinXOnScale());
+			this.model.setMaxXOnScale(this.view.getMaxXOnScale());
+		}
+		catch (NumberFormatException e) 
+		{
+			// Bij create view vanuit zet opdracht wordt eerst een histogram-view met columnIndex 0 gemaakt
+			// dan is er nog geen minBoundary en maxBinOnScale
+		}
+
 		this.view.update();
 	}
 
