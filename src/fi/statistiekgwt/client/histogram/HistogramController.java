@@ -63,6 +63,7 @@ public class HistogramController implements StatistiekView
 		
 		try
 		{
+			// voor standalone
 			this.model.setMinOnScale(this.view.getMinBoundary());
 			this.model.setMaxOnScale(this.view.getMaxBinOnScale());
 		}
