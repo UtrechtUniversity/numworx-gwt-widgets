@@ -672,6 +672,73 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 	{
 		return this.percentage_columnTotal.getValue();
 	}
+	
+	public void processMinBoundaryRowsChanged()
+	{
+		double minBoundaryRows = view.getUserOptionsPanel().getMinBoundaryRows(); // the user entered value
+		double minDataRows = this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex());
+		
+		if (minBoundaryRows <= minDataRows)
+		{
+			// update the rows' bin settings
+			controller.updateBoundariesFromRowsBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetMin;
+			if (model.getBinBoundaries() != null && model.getBinBoundaries().size() > 0)
+			{
+				resetMin = model.getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetMin = minDataRows;
+			}
+			
+			view.getUserOptionsPanel().setMinBoundaryRows(resetMin);
+		}
+	}
+
+	public void processBinWidthRowsChanged()
+	{
+		controller.updateBoundariesFromRowsBinSettings();
+	}
+
+	public void processMinBoundaryColumnsChanged()
+	{
+		double minBoundaryColumns = view.getUserOptionsPanel().getMinBoundaryColumns(); // the user entered value
+		double minDataColumns = this.model.getStatTableModel().getColumnMin(this.model.getSplitOptions().getColumnSplitIndex());
+		
+		if (minBoundaryColumns <= minDataColumns)
+		{
+			// update the columns' bin settings
+			controller.updateBoundariesFromColumnsBinSettings();
+		}
+		else
+		{
+			// reset to latest value
+			double resetMin;
+			if (model.getSplitOptions().getBinBoundaries() != null && model.getSplitOptions().getBinBoundaries().size() > 0)
+			{
+				resetMin = model.getSplitOptions().getBinBoundaries().get(0);
+			}
+			else
+			{
+				resetMin = minDataColumns;
+			}
+			
+			view.getUserOptionsPanel().setMinBoundaryColumns(resetMin);
+		}
+
+	}
+
+	public void processBinWidthColumnsChanged()
+	{
+		controller.updateBoundariesFromColumnsBinSettings();
+	}
+
+
 
 	
 	/**
@@ -691,14 +758,6 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 			{
 				model.setColumnIndex(view.varRowsBoxSelectedIndex());
 			}
-			else if (e.getSource() == minBoundaryRowsField) // moet dit? Zit al in valueChangeHandler
-			{
-				controller.updateBoundariesFromRowsBinSettings();
-			}
-			else if (e.getSource() == binWidthRowsField) // moet dit? Zit al in valueChangeHandler
-			{
-				controller.updateBoundariesFromRowsBinSettings();
-			}
 			else if (e.getSource() == swapButton)
 			{
 				model.swapVariables();
@@ -706,14 +765,6 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 			else if (e.getSource() == columnIndexBox) // moet dit? Zit al in ChangeHandler
 			{
 				controller.setSplit(view.varColumnsBoxSelectedIndex());
-			}
-			else if (e.getSource() == minBoundaryColumnsField) // moet dit? Zit al in valueChangeHandler
-			{
-				controller.updateBoundariesFromColumnsBinSettings();
-			}
-			else if (e.getSource() == binWidthColumnsField) // moet dit? Zit al in valueChangeHandler
-			{
-				controller.updateBoundariesFromColumnsBinSettings();
 			}
 			else if ((e.getSource() == amountRadioItem) || (e.getSource() == percentageRadioItem))
 			{
@@ -822,19 +873,19 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 			if (e.getSource() == minBoundaryRowsField)
 			{
-				controller.updateBoundariesFromRowsBinSettings();
+				processMinBoundaryRowsChanged();
 			}
 			else if (e.getSource() == binWidthRowsField)
 			{
-				controller.updateBoundariesFromRowsBinSettings();
+				processBinWidthRowsChanged();
 			}
 			else if (e.getSource() == minBoundaryColumnsField)
 			{
-				controller.updateBoundariesFromColumnsBinSettings();
+				processMinBoundaryColumnsChanged();
 			}
 			else if (e.getSource() == binWidthColumnsField)
 			{
-				controller.updateBoundariesFromColumnsBinSettings();
+				processBinWidthColumnsChanged();
 			}
 
 			// update view
@@ -868,19 +919,19 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		{
 			if (e.getSource() == minBoundaryRowsField)
 			{
-				controller.updateBoundariesFromRowsBinSettings();
+				processMinBoundaryRowsChanged();
 			}
 			else if (e.getSource() == binWidthRowsField)
 			{
-				controller.updateBoundariesFromRowsBinSettings();
+				processBinWidthRowsChanged();
 			}
 			else if (e.getSource() == minBoundaryColumnsField)
 			{
-				controller.updateBoundariesFromColumnsBinSettings();
+				processMinBoundaryColumnsChanged();
 			}
 			else if (e.getSource() == binWidthColumnsField)
 			{
-				controller.updateBoundariesFromColumnsBinSettings();
+				processBinWidthColumnsChanged();
 			}
 
 			// update view
@@ -899,19 +950,19 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 
 				if (e.getSource() == minBoundaryRowsField)
 				{
-					controller.updateBoundariesFromRowsBinSettings();
+					processMinBoundaryRowsChanged();
 				}
 				else if (e.getSource() == binWidthRowsField)
 				{
-					controller.updateBoundariesFromRowsBinSettings();
+					processBinWidthRowsChanged();
 				}
 				else if (e.getSource() == minBoundaryColumnsField)
 				{
-					controller.updateBoundariesFromColumnsBinSettings();
+					processMinBoundaryColumnsChanged();
 				}
 				else if (e.getSource() == binWidthColumnsField)
 				{
-					controller.updateBoundariesFromColumnsBinSettings();
+					processBinWidthColumnsChanged();
 				}
 
 				// update view
