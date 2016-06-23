@@ -930,7 +930,16 @@ public class DotplotView extends LayoutPanel implements
 	private boolean isOutOfRange(String value)
 	{
 		boolean b = false;
-		Double d = Double.parseDouble(value);
+		Double d;
+		
+		try
+		{
+			d = Double.parseDouble(value);
+		}
+		catch (NumberFormatException e)
+		{
+			return false;
+		}
 		
 		if ((d < model.getMinXOnScale()) || (d > model.getMaxXOnScale()))
 		{
