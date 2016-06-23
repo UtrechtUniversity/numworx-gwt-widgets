@@ -1055,8 +1055,10 @@ public class DotplotUserOptionsPanel extends FlowPanel
 			// min > max is niet toegestaan
 			if (getMinXOnScale() > getMaxXOnScale())
 			{
-				// reset to latest value
-				setMinXOnScale(model.getMinXOnScale());
+				// set both min and max to the same value
+				model.setMinXOnScale(view.getMinXOnScale());
+				model.setMaxXOnScale(view.getMinXOnScale());
+
 			}
 			else
 			{
@@ -1107,8 +1109,9 @@ public class DotplotUserOptionsPanel extends FlowPanel
 			// max < min is niet toegestaan
 			if (getMaxXOnScale() < getMinXOnScale())
 			{
-				// reset to latest value
-				setMaxXOnScale(model.getMaxXOnScale());
+				// set both min and max to the same value
+				model.setMaxXOnScale(getMaxXOnScale());
+				model.setMinXOnScale(getMaxXOnScale());
 			}
 			else
 			{
