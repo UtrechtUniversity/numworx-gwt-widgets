@@ -1103,8 +1103,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		{
 			Double smallest = determineNewSmallestBinBoundary(binBoundaries, minOnScale);
 			Double largest = determineNewLargestBinBoundary(binBoundaries, maxOnScale);
-			Double binWidth = binBoundaries.get(1) - binBoundaries.get(0);
 			
+			int bin0Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(0).toString());
+			int bin1Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(1).toString());
+			int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
+
+			Double binWidth = StatistiekGWT.round(binBoundaries.get(1) - binBoundaries.get(0), maxNumberOfDecimals);
+
 			if (binWidth == 0)
 			{
 				binWidth = maxOnScale - minOnScale;
@@ -1118,11 +1123,14 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			else
 			{
 				Double binValue = smallest;
+				int binValueDecimals = StatistiekGWT.getNumberOfDecimals(binValue.toString());
+				maxNumberOfDecimals = Math.max(maxNumberOfDecimals, binValueDecimals);
+
 				bins.add(binValue); // add the first value
 
 				while (binValue < largest)
 				{
-					binValue = binValue + binWidth;
+					binValue = StatistiekGWT.round(binValue + binWidth, maxNumberOfDecimals);
 					bins.add(binValue);
 				}
 			}
