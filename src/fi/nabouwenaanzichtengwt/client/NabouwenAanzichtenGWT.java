@@ -1191,7 +1191,8 @@ ObjectMap oMap = JSONUtilities.wrapMap(map);
 					vaktekPanel.tekenOpnieuw();
 				}
 				Msgs msgs = GWT.create(Msgs.class);
-				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
+				if (blokjesLabel != null && vWerk != null)
+					blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
 			}
 			
 		}
