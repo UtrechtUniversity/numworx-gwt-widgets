@@ -14,6 +14,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+//import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -113,6 +114,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			vinkjeGrijsImage, buttonBgImage;
 	
 	NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
+	
+	String buildHistory = "";
 
 	public NabouwenAanzichtenGWT()
 	{
@@ -291,6 +294,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     		{
     			panel.setWidgetVisible(volButton, false);
     			panel.setWidgetVisible(leegButton, true);
+    			buildHistory = "";
     			startKr.maakVol();
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
@@ -300,6 +304,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(volButton, true);
     			panel.setWidgetVisible(leegButton, false);
     			startKr.maakLeeg();
+    			buildHistory = "";
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
     		}
@@ -385,7 +390,8 @@ System.out.println("rood");
 	{
 		//if (vWerk == null || !kijkNaActief)
 		//	return;
-		
+System.out.println("zetVeranderd");
+
 		//nakijkKnop.clear();
 		//nakijkKnop.add(vinkjeGrijsImage);
 		if ((blokjesLabel != null) && (vWerk != null))
@@ -395,7 +401,30 @@ System.out.println("rood");
 			int aantal = vWerk.kr.geefAantalK();
 			blokjesLabel.setText(msgs.blokjes(aantal));
 		}
-		
+
+		if (vWerk != null)
+		{	
+			boolean[][][] booleanKR = vWerk.kr.geefBooleanRooster();
+			int krSize = vWerk.kr.maxAantal;
+			boolean[] booleanArray = boolKRtoBoolArray(booleanKR, krSize);
+			
+			Map<String,Object> map = new HashMap<String,Object>();
+						
+			map.put("krSize", krSize);
+			map.put("booleanArr", booleanArray);
+			
+ 			comRoot.fireEvent(new CBookEvent(this,"blockBuilding",map));
+System.out.println("fire blockBuilding"); 			
+ 			
+			
+			String lastBuildCommand = vWerk.getLastBuildCommand();
+			if(!"".equals(lastBuildCommand))
+				buildHistory = buildHistory + lastBuildCommand + "\n";
+			Map<String,Object> map1 = new HashMap<String,Object>();
+			map1.put("content", buildHistory);
+			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
+		}
+
 		if (vWerk == null || !kijkNaActief)
 			return;
 
@@ -416,6 +445,23 @@ System.out.println("rood");
 		else
 			ingevuld = false;
 		comRoot.setChanged(false);
+
+/*		
+		if (vWerk != null)
+		{	
+			boolean[][][]  booleanKR = vWerk.kr.geefBooleanRooster();
+			Map<String,Object> map = new HashMap<String,Object>();
+			map.put("booleanKR", booleanKR);
+			comRoot.fireEvent(new CBookEvent(this,"blockBuilding",map));
+			
+			String lastBuildCommand = vWerk.getLastBuildCommand();
+			if(!"".equals(lastBuildCommand))
+				buildHistory = buildHistory + lastBuildCommand + "\n";
+			Map<String,Object> map1 = new HashMap<String,Object>();
+			map1.put("content", buildHistory);
+			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
+		}
+*/
 	}
 
 	boolean isBouwen()
@@ -521,6 +567,7 @@ System.out.println("rood");
 		}	
 System.out.println("setComRoot");		
 		comRoot.addCBookEventListener("text.buildingProgram", this);
+		comRoot.addCBookEventListener("blockBuilding", this);
 	}
 	
 	public void zetMode(int mode)
@@ -1049,42 +1096,117 @@ logger.info("NabouwenAanzichtenGWT init");
 		return null; 
 	}
 
+	public String[] getSendCmds() 
+	{
+		
+//System.out.println("getSendCmds");
+
+		String[] commands = {"blockBuilding", "text.buildingProgram"};
+		return commands;
+	}
+
+// restore method
+    
+	public String[] getAcceptedCmds() 
+	{
+//System.out.println("getAcceptedCmds");		
+		String[] commands = {"blockBuilding", "text.buildingProgram"};
+		return commands;
+	}
+
+	public String getLocalizedCmd(String cmd) 
+	{
+		
+//System.out.println("getLocalizedCmd");
+
+		String localizedCmd = null; //NabouwenAanzichten.rb.getString(CBA_PREFIX + cmd);
+		if (localizedCmd == null)
+			return cmd;
+		return localizedCmd;
+	}
+
+	
+	public boolean[] boolKRtoBoolArray(boolean[][][] boolKR, int krSize)
+	{
+		boolean[] boolArray = new boolean[krSize*krSize*krSize];
+		
+		for (int xCnt = 0; xCnt < krSize; xCnt++)
+			for (int yCnt = 0; yCnt < krSize; yCnt++)
+				for (int zCnt = 0; zCnt < krSize; zCnt++)
+				{	int index = xCnt+yCnt*krSize+zCnt*krSize*krSize;
+					if (index < boolArray.length)
+						boolArray[index] = boolKR[xCnt][yCnt][zCnt];
+					else
+System.out.println("KRtoAR IOBE");						
+				}	
+		
+		return boolArray;
+	}
+
+	public boolean[][][] boolArraytoBoolKR(boolean[] boolArray, int krSize)
+	{
+		boolean[][][] boolKR = new boolean[krSize][krSize][krSize];
+		
+		for (int i = 0; i < boolArray.length; i++)
+		{	int x = i % krSize;
+			int z = i / (krSize * krSize);
+			int y = (i - z * krSize * krSize) / krSize;
+			if ((x < krSize) && (y < krSize) && (z < krSize))
+				boolKR[x][y][z] = boolArray[i];
+			else
+System.out.println("ArtoKR IOBE " + x + "," + y + "," + z);				
+		}	
+		
+		return boolKR;
+	}
+
 	@Override
 	public void acceptCBookEvent(CBookEvent event) 
 	{
 		String command = event.getCommand();
 		
-/*		
+		
 		if(command.startsWith("blockBuilding"))
 		{
-			Map map = (Map)event.getParameters();
-			if(map!=null)
-			{	boolean[][][] booleanKR = (boolean[][][])map.get("booleanKR");
+System.out.println("acceptCBookEvent");
+System.out.println("command = " + command);
+
+			Map map = (Map) event.getParameters();
+			
+ObjectMap oMap = JSONUtilities.wrapMap(map);	
+
+			if (oMap != null)
+			{	//boolean[][][] booleanKR = (boolean[][][]) oMap.get("booleanKR");
+				boolean[] booleanArray = oMap.getBooleanArray("booleanArr");
+				int krSize = oMap.getInt("krSize");
+				
+				boolean[][][] booleanKR = boolArraytoBoolKR(booleanArray, krSize);
 				startKr = new KubusRooster(booleanKR, 1);
 				if (vWerk != null)
-					vWerk.zetKubusRooster(startKr);
+				{	vWerk.zetKubusRooster(startKr);
+					vWerk.tekenOpnieuw(); //.draw();
+				}
 				if (vaktekPanel != null)
-					vaktekPanel.zetKubusRooster(startKr);
-				//na.setValue(kr.maxAantal);
-				//setKPanelText();
+				{	vaktekPanel.zetKubusRooster(startKr);
+					vaktekPanel.tekenOpnieuw();
+				}
 				Msgs msgs = GWT.create(Msgs.class);
 				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
 			}
 			
 		}
-*/		
 		
-//System.out.println("acceptCBookEvent");
-//System.out.println("command = " + command);
-
 		if(command.startsWith("text.buildingProgram"))
 		{
+			
+System.out.println("acceptCBookEvent");
+System.out.println("command = " + command);
+			
 			Map map = (Map)event.getParameters();
 			if(map!=null)
 			{
-				
 //System.out.println("map != null");				
-				String programText = (String)map.get("content");
+				String programText = (String) map.get("content");
 //System.out.println("" + programText);				
 				//setCursor(new Cursor(Cursor.WAIT_CURSOR));
 				vWerk.kr.maakLeeg();
