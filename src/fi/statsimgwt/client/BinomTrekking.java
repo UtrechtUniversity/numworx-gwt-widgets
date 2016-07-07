@@ -407,6 +407,7 @@ public class BinomTrekking  extends FlowPanel implements ClickHandler {
 			totaal=0;
 			keer.setEnabled(false);
 			voeruit.setEnabled(false);
+			wis.setEnabled(true);
 			numberOfTimes=Integer.parseInt(keerText.getText());
 			maxCount=Integer.parseInt(aantalTrekkingenText.getText());
 			multipleTimes=true;
