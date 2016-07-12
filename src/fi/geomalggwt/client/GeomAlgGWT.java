@@ -683,6 +683,7 @@ boolean touchStart = false;
 
 	public void setState(HashMap<String, Object> h)
 	{
+		if(h == null||h.isEmpty()) return;
 		settingState = true;
 		State state = NoSer.setStateState(h);
 		av.setState(state);
