@@ -432,7 +432,7 @@ public class KladjeGWTVeld
 	{
 		
 		//System.out.println("kv setState");
-		if(map == null)
+		if(map == null || map.isEmpty())
 			return;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 // accepteer alleen GWTPixels
