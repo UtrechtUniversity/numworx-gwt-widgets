@@ -1398,7 +1398,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if ( !( ( rechteVerbindingen && tekenComponent.getConnectMode() == tekenComponent.LINES) || 
 				( krommeZonderExtrapolatie && tekenComponent.getConnectMode() == tekenComponent.CURVE) ||
 				( krommeMetExtrapolatie && tekenComponent.getConnectMode() == tekenComponent.CURVE_EXTRA)
-			  ) 
+			  ) && (rechteVerbindingen || krommeZonderExtrapolatie || krommeMetExtrapolatie) // er moet wel een grafieklijn gevraagd worden anders zeggen we niets
 		   ) {
 			if ( (score > 0) && (correctLogica) )
 				returnColor = CssColor.make(255, 193, 0);
