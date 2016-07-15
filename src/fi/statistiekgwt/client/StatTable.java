@@ -303,7 +303,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private HorizontalPanel editDataPanel;
 	private Button addRowButton;
 	private Button addColumnButton;
-	private Button pasteButton;
+	private Button pasteButton, copyButton;
 	private Button deleteRowsButton;
 	private PushButton resetButton;
 	private Button importButton;
@@ -634,6 +634,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.deleteRowsButton.setWidth(getButtonWidth() + "px");
 		this.deleteRowsButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.deleteRowsButton);
+
+		this.copyButton = new Button(getButtonText(StatistiekGWT.rb.copyclipboardButton()));
+		this.copyButton.setTitle(StatistiekGWT.rb.copyclipboardButton());
+		this.copyButton.setPixelSize(getButtonWidth(), StatistiekGWT.BUTTON_HEIGHT);
+		this.copyButton.addStyleName(statistiekCss.tableButton());
+		this.editDataPanel.add(this.copyButton);
+		
 		
 		this.pasteButton = new Button(getButtonText(StatistiekGWT.rb.pasteclipboardButton()));
 		this.pasteButton.setTitle(StatistiekGWT.rb.pasteclipboardButton());
@@ -657,6 +664,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
     			this.editDataPanel.add(this.resetButton);
     		}
 		}
+
+		
 		
 		this.editDataPanel.setVisible(this.statTableModel.isDataEditable());
 
@@ -752,12 +761,12 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		if (StatTable.this.statInteractiePanel != null)
 		{
 			// including reset button
-			number = 6;
+			number = 6+1;
 		}
 		else
 		{
 			// no reset button
-			number = 5;
+			number = 5+1;
 		}
 		
 		return number;
@@ -1012,6 +1021,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.addColumnButton.addClickHandler(this.clickHandler);
 		this.deleteRowsButton.addClickHandler(this.clickHandler);
 		this.pasteButton.addClickHandler(this.clickHandler);
+		this.copyButton.addClickHandler(this.clickHandler);
 		this.resetButton.addClickHandler(this.clickHandler);
 
 		// dummy touch handlers to avoid problems when shown in touchondrag dialogbox 
@@ -1021,6 +1031,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.addColumnButton.addTouchStartHandler(this.dummyTouchHandler);
 		this.deleteRowsButton.addTouchStartHandler(this.dummyTouchHandler);
 		this.pasteButton.addTouchStartHandler(this.dummyTouchHandler);
+		this.copyButton.addTouchStartHandler(this.dummyTouchHandler);
 		this.resetButton.addTouchStartHandler(this.dummyTouchHandler);
 		// touch end
 		this.importButton.addTouchEndHandler(this.dummyTouchHandler);
@@ -1028,6 +1039,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.addColumnButton.addTouchEndHandler(this.dummyTouchHandler);
 		this.deleteRowsButton.addTouchEndHandler(this.dummyTouchHandler);
 		this.pasteButton.addTouchEndHandler(this.dummyTouchHandler);
+		this.copyButton.addTouchEndHandler(this.dummyTouchHandler);
 		this.resetButton.addTouchEndHandler(this.dummyTouchHandler);
 	}
 
@@ -1939,6 +1951,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				StatTable.this.pasteDataDialog.show();
 			}
+			else if (e.getSource() == StatTable.this.copyButton)
+			{
+				StatTable.this.copyAction();
+			}
 			else if (e.getSource() == StatTable.this.importPasteDataButton)
 			{
 				StatTable.this.importPasteData();
@@ -2733,6 +2749,26 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 
 		this.update();
+	}
+
+	public void copyAction() {
+		int rows = statTableModel.getRowCount();
+		int cols = statTableModel.getColumnCount();
+		StringBuilder sb = new StringBuilder();
+		final char eol = '\n';
+		final char eod = ';';
+		for(int i = 0; i < rows; i++) {
+			char sep = eol;
+			for(int j = 0; j < cols; j++) {
+				sb.append(sep);
+				sb.append(statTableModel.getValueAt(i, j));
+				sep = eod;
+			}
+		}
+		sb.append(eol);
+		final String data = sb.substring(1);
+System.err.println(sb);
+		statInteractiePanel.statistiekGWT.fire("text.csv", "content", data);
 	}
 
 	/**

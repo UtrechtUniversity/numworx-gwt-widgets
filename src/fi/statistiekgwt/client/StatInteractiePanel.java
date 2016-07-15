@@ -2,10 +2,12 @@ package fi.statistiekgwt.client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
@@ -35,9 +37,12 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 	private double barHeight; 
 	private static final int TAB_HEIGHT_OFFSET = 30;
 	StatistiekGWTClientBundle statistiekGWTClientBundle;
+	OpdrNavIF comRoot;
+
 	
 	private int height;
 	private int width;
+	StatistiekGWT statistiekGWT;
 
 
 	/**
@@ -879,4 +884,5 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 			} // map != null
 		}
 	}
+
 }

@@ -3,6 +3,7 @@ package fi.statistiekgwt.client;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.statistiekgwt.client.StatInteractiePanel;
 import fi.statistiekgwt.client.boxplot.BoxplotController;
@@ -74,7 +76,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 											// "Frequentiepolygoon", "Boxplot", "Crosstab",
 											// "Scatterplot", "Descriptive statistics"};
 
-	public static int DEFAULT_WIDTH = 700;
+	public static int DEFAULT_WIDTH = 1000;
 	public static int DEFAULT_HEIGHT = 400;
 	int breedte = StatistiekGWT.DEFAULT_WIDTH;
 	int hoogte = StatistiekGWT.DEFAULT_HEIGHT;
@@ -105,7 +107,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		// prevent the browser's default context menu
 		Element body = Document.get().getBody();
-		body.setAttribute("oncontextmenu", "return false;");
+		//body.setAttribute("oncontextmenu", "return false;");
 		
 		GWT.setUncaughtExceptionHandler(
 			new GWT.UncaughtExceptionHandler() {
@@ -121,6 +123,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		initViews();
 		basisPanel = new StatInteractiePanel();
+		basisPanel.statistiekGWT = this; // backlink
 		StatistiekGWT.heightOffset = (int) this.basisPanel.getBarHeight();
 		this.basisPanel.setWidth(breedte);
 		this.basisPanel.setHeight(hoogte);
@@ -130,8 +133,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		//RootPanel.get(holderId).add(basisPanel);
 		RootLayoutPanel.get().add(simpel);
 		
-		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
-		Stub.publish(this); // deze regel uitzetten voor standalone test
+		simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+		//Stub.publish(this); // deze regel uitzetten voor standalone test
 	}
 	
 	/**
@@ -287,6 +290,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		StatistiekGWT.language = rb.language();
 		initViews();
 		basisPanel = new StatInteractiePanel();
+		basisPanel.statistiekGWT = this; // backlink
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
 	
@@ -1272,4 +1276,13 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		
 		return bins;
 	}
+	
+	public void fire(String command, String key, Object data) {
+		if(comRoot != null) {
+			Map<String, Object> map = Collections.singletonMap(key, data);
+			CBookEvent event = new CBookEvent(this, command, map);
+			comRoot.fireEvent(event);
+		}
+	}
+
 }
