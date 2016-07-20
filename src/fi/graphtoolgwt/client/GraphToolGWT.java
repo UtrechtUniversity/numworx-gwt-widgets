@@ -2058,7 +2058,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public HashMap<String, Object> getState() {
-		// TODO (aftesten)
+		// TODO (aftesten, wat aftesten?)
+		
+		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+			kijkNa();
+		} else {
+			if (mode == OpdrNavIF.EINDTOETS) {
+				kijkNa(false);
+			}
+		}
 		
 		double beginx = 1;
 		double beginy = 1;
