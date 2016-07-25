@@ -22,6 +22,9 @@ import java.util.Vector;
 import java.util.logging.Logger;
 
 
+
+import org.eclipse.jetty.util.log.Log;
+
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -37,6 +40,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 
 import com.google.gwt.core.client.EntryPoint;
@@ -1485,8 +1489,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					correct = true;
 			}
 		}
-		else if (typeOpdracht == VINDFORMULEBIJPUNTEN)
-		{	Expressie leerlingExp = functies[0];
+		else if (typeOpdracht == VINDFORMULEBIJPUNTEN) {	
+			Expressie leerlingExp = functies[0];
 			if (leerlingExp != null)
 			{	ingevuld = true;
 				CssColor color = CssColor.make(255, 0, 0);
@@ -2058,12 +2062,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public HashMap<String, Object> getState() {
-		// TODO (aftesten, wat aftesten?)
 		
 		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+			formuleComponent.updateFormulas();
 			kijkNa();
 		} else {
+
 			if (mode == OpdrNavIF.EINDTOETS) {
+				formuleComponent.updateFormulas();
 				kijkNa(false);
 			}
 		}
@@ -2403,13 +2409,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent.setState(h, null, null);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
-		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
-			kijkNa();
-		} else {
-			if (mode == OpdrNavIF.EINDTOETS) {
-				kijkNa(false);
-			}
-		}
+//		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+//			kijkNa();
+//		} else {
+//			if (mode == OpdrNavIF.EINDTOETS) {
+//				kijkNa(false);
+//			}
+//		}
 		
 		grafiekGWTVeld.setState(h);
 		grafiekGWTVeld.paint();
