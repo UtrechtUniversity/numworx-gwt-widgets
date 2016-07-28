@@ -21,10 +21,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-
-
-import org.eclipse.jetty.util.log.Log;
-
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
