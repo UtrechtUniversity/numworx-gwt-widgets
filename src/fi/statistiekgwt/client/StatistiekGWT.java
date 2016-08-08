@@ -133,8 +133,8 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		//RootPanel.get(holderId).add(basisPanel);
 		RootLayoutPanel.get().add(simpel);
 		
-		simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
-		//Stub.publish(this); // deze regel uitzetten voor standalone test
+		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+		Stub.publish(this); // deze regel uitzetten voor standalone test
 	}
 	
 	/**
