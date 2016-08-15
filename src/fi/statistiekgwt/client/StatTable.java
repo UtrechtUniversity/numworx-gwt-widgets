@@ -184,6 +184,18 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private static final int MINIMUM_CELL_WIDTH = 30;
 	private static final int MAXIMUM_CELL_WIDTH = 60;
 
+	/**
+	 * The number of all possible buttons, i.e.,
+	 * 		- Open file
+	 * 		- Add row
+	 * 		- Add column
+	 * 		- Delete selected rows
+	 * 		- Copy (to another component with cross widget communication) 
+	 * 		- Paste from clipboard
+	 * 		- Reset 
+	 */
+	private static final int NUMBER_OF_ALL_POSSIBLE_BUTTONS = 7;
+
 	private StatTableModel statTableModel;
 
 	// Include field statInteractiePanel to process the reset actions
@@ -598,8 +610,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 		this.rowOutlierMenuBar.addItem(rowOutlierRowItem);
 
-		
-		
 		// maak editDataPanel met buttons
 		this.editDataPanel = new HorizontalPanel();//new LayoutPanel();
 		this.editDataPanel.setSize("100%", "100%");
@@ -612,7 +622,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.importButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
 		this.importButton.setWidth(getButtonWidth() + "px");
 		this.importButton.addStyleName(statistiekCss.tableButton());
-		this.editDataPanel.add(this.importButton);
+		if (reader != null) // don't add the button if there is no reader available
+		{
+			this.editDataPanel.add(this.importButton);
+		}
 
 		this.addRowButton = new Button(getButtonText(StatistiekGWT.rb.addrowButton()));
 		this.addRowButton.setTitle(StatistiekGWT.rb.addrowButton());
@@ -641,7 +654,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.copyButton.addStyleName(statistiekCss.tableButton());
 		this.editDataPanel.add(this.copyButton);
 		
-		
 		this.pasteButton = new Button(getButtonText(StatistiekGWT.rb.pasteclipboardButton()));
 		this.pasteButton.setTitle(StatistiekGWT.rb.pasteclipboardButton());
 		this.pasteButton.setHeight(StatistiekGWT.BUTTON_HEIGHT + "px");
@@ -664,8 +676,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
     			this.editDataPanel.add(this.resetButton);
     		}
 		}
-
-		
 		
 		this.editDataPanel.setVisible(this.statTableModel.isDataEditable());
 
@@ -756,17 +766,18 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	private int getNumberOfButtons()
 	{
-		int number;
+		int number = NUMBER_OF_ALL_POSSIBLE_BUTTONS;
 		
-		if (StatTable.this.statInteractiePanel != null)
-		{
-			// including reset button
-			number = 6+1;
-		}
-		else
+		if (StatTable.this.statInteractiePanel == null)
 		{
 			// no reset button
-			number = 5+1;
+			number = number - 1;
+		}
+		
+		if (reader == null)
+		{
+			// no import button
+			number = number - 1;
 		}
 		
 		return number;
@@ -1013,7 +1024,6 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 
 	    // add the handler for handling the outlier menu and for selecting rows
 		addOutlierAndSelectionHandler();
-
 
 	    // click handlers
 		this.importButton.addClickHandler(this.clickHandler);
@@ -1262,53 +1272,62 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.fileUploadDialogBox.add(alles);
 		this.fileUploadDialogBox.hide();
 
-		// Create a file reader a and queue of files to read.
-		// UI event handler will populate this queue by calling queueFiles()
-		reader = new FileReader();
-		
-		reader.addLoadEndHandler(new LoadEndHandler()
+		// try to create a file reader; in some browsers FileReader is not available
+		try
 		{
-			/**
-			 * This handler is invoked when FileReader.readAsText(),
-			 * FileReader.readAsBinaryString() or FileReader.readAsArrayBuffer()
-			 * successfully completes
-			 */
-			@Override
-			public void onLoadEnd(LoadEndEvent event)
+			// Create a file reader a and queue of files to read.
+			// UI event handler will populate this queue by calling queueFiles()
+			reader = new FileReader();
+			
+			reader.addLoadEndHandler(new LoadEndHandler()
 			{
-				// when the load has ended the csv text can be read and processed
-				processCSVText();
-				
-				if (reader.getError() == null)
+				/**
+				 * This handler is invoked when FileReader.readAsText(),
+				 * FileReader.readAsBinaryString() or FileReader.readAsArrayBuffer()
+				 * successfully completes
+				 */
+				@Override
+				public void onLoadEnd(LoadEndEvent event)
+				{
+					// when the load has ended the csv text can be read and processed
+					processCSVText();
+					
+					if (reader.getError() == null)
+					{
+						if (readQueue.size() > 0)
+						{
+							readQueue.remove(0);
+							readNextFile();
+						}
+					}
+				}
+			});
+	
+			reader.addErrorHandler(new ErrorHandler()
+			{
+				/**
+				 * This handler is invoked when FileReader.readAsText(),
+				 * FileReader.readAsBinaryString() or FileReader.readAsArrayBuffer()
+				 * fails
+				 */
+				@Override
+				public void onError(ErrorEvent event)
 				{
 					if (readQueue.size() > 0)
 					{
+						File file = readQueue.get(0);
+						handleError(file, event.toDebugString());
 						readQueue.remove(0);
 						readNextFile();
 					}
 				}
-			}
-		});
-
-		reader.addErrorHandler(new ErrorHandler()
+			});
+		}
+		catch (Exception e)
 		{
-			/**
-			 * This handler is invoked when FileReader.readAsText(),
-			 * FileReader.readAsBinaryString() or FileReader.readAsArrayBuffer()
-			 * fails
-			 */
-			@Override
-			public void onError(ErrorEvent event)
-			{
-				if (readQueue.size() > 0)
-				{
-					File file = readQueue.get(0);
-					handleError(file, event.toDebugString());
-					readQueue.remove(0);
-					readNextFile();
-				}
-			}
-		});
+			logger.info("FileReader is not available");
+		}
+		
 		readQueue = new ArrayList<File>();
 
 		// initialize the messagebox for showing error messages
@@ -2751,15 +2770,21 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.update();
 	}
 
-	public void copyAction() {
+	/**
+	 * Copy the table content in CSV format to another widget via cross widget communication.
+	 */
+	public void copyAction()
+	{
 		int rows = statTableModel.getRowCount();
 		int cols = statTableModel.getColumnCount();
 		StringBuilder sb = new StringBuilder();
 		final char eol = '\n';
 		final char eod = ';';
-		for(int i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; i++)
+		{
 			char sep = eol;
-			for(int j = 0; j < cols; j++) {
+			for (int j = 0; j < cols; j++)
+			{
 				sb.append(sep);
 				sb.append(statTableModel.getValueAt(i, j));
 				sep = eod;
@@ -2767,7 +2792,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		}
 		sb.append(eol);
 		final String data = sb.substring(1);
-System.err.println(sb);
+		System.err.println(sb);
 		statInteractiePanel.statistiekGWT.fire("text.csv", "content", data);
 	}
 
