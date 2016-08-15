@@ -198,6 +198,7 @@ public interface Text extends Constants
 	
 	@DefaultStringValue("Plak vanaf klembord")
 	String pasteclipboardButton();
+	
 	@DefaultStringValue("Kopieer")
 	String copyclipboardButton();
 	
