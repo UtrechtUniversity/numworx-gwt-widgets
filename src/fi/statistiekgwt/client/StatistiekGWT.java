@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -42,7 +43,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class StatistiekGWT implements EntryPoint, InteractionStub
 {
-	private static final Logger logger = Logger.getLogger(ClassName.class.getName());
+	private static final Logger logger = Logger.getLogger(StatistiekGWT.class.getName());
 
 	OpdrNavIF comRoot;
 
@@ -113,6 +114,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 			new GWT.UncaughtExceptionHandler() {
 		        public void onUncaughtException(Throwable e) 
 		        {
+		        	logger.log(Level.SEVERE, e.getMessage(), e);
 		        	Window.alert("UncaughtException: message = " + e.getMessage() + ", stackTrace = " + e.getStackTrace().toString()
 		        		+ ", cause = " + e.getCause());
 		        }
