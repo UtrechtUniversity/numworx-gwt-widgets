@@ -284,12 +284,13 @@ public class TopToolBar2 extends LayoutPanel
         	currentX = leftOffset;
         	currentY = topOffset + buttonHeight + 2;
         	owner.helpBar = new Label("help bar");
+        	owner.helpBar.addStyleName(DoorzienGWT.doorzienGWTCss.helpbar());
         	add(owner.helpBar);
         	setWidgetLeftWidth(owner.helpBar, currentX, Style.Unit.PX, breedte - 2 * leftOffset, Style.Unit.PX);
         	setWidgetTopHeight(owner.helpBar, currentY, Style.Unit.PX, helpBarHeight, Style.Unit.PX);
         //}
         
-        closeButton = new PushButton("sluit");
+        closeButton = new PushButton(DoorzienGWT.rb.sluitKnopLabel());
         closeButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		add(closeButton);
 		setWidgetLeftWidth(closeButton, breedte - buttonWidth - leftOffset, Style.Unit.PX, buttonWidth, Style.Unit.PX);

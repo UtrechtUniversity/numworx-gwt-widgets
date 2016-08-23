@@ -593,7 +593,7 @@ public static void showTime(String comment)
         	addToHistory();
         	
 //        	owner.helpBar.setText(owner.tt("rotateText"));
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         }
         //else if ((modelCode == owner.MYFIGURE) && !startUp)
         //	owner.viewer.setScormedObject3D();	
@@ -1286,7 +1286,7 @@ public static void showTime(String comment)
                 
             	setCutPanel(showCut);
                 
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT                
 //                owner.enableOptions(true);
                 
@@ -1384,7 +1384,7 @@ owner.rightToolBar.redoButton.setEnabled(true);
             else
             {	
             	
-            	  owner.helpBar.setText(TextConstants.conDrawSelectText);
+            	  owner.helpBar.setText(DoorzienGWT.rb.bouwplaatVlakTekst());
 //GWT            	
 //                owner.rightToolBar.conDrawButton.setPressed(true);
             	  
@@ -1491,7 +1491,7 @@ System.out.println("aCnt = " + aCnt);
 
             setSlider(true, foldOutInit, 0, 1);
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
 //GWT            
 //          //owner.rightToolBar.conDrawButton.setImage(owner.figureImage);
@@ -1936,7 +1936,7 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 helpPoint = false;
                 panel3D.initializeModel(currentObjectGroup, false);
                 
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT                
 //                owner.enableOptions(true);
                 
@@ -1965,7 +1965,7 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
             clickedPoint = null;
             clickedEdgeWithPoint = null;
             
-            owner.helpBar.setText(TextConstants.linePoint1Text);
+            owner.helpBar.setText(DoorzienGWT.rb.lijnPunt1Tekst());
             
             // now wait for mouse action
         }
@@ -2072,7 +2072,7 @@ System.out.println("clickedPoint");
                 clickedPoint = null;
                 clickedEdgeWithPoint = null;
                 
-                owner.helpBar.setText(TextConstants.linePoint2Text);                            
+                owner.helpBar.setText(DoorzienGWT.rb.lijnPunt2Tekst());                            
             }
             else if (clickedEdgeWithPoint != null)
             {   
@@ -2097,7 +2097,7 @@ System.out.println("clickedEdgeWithPoint");
                 clickedPoint = null;
                 clickedEdgeWithPoint = null;
                 
-                owner.helpBar.setText(TextConstants.linePoint2Text);                            
+                owner.helpBar.setText(DoorzienGWT.rb.lijnPunt2Tekst());                            
             }
             
 
@@ -2340,7 +2340,7 @@ System.out.println("clickedEdgeWithPoint");
             }    
             addToHistory();
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;
             tempObjectGroup2 = null;            
@@ -2413,7 +2413,7 @@ System.out.println("clickedEdgeWithPoint");
             if (!b)
             {   mouseMode = INERT;
             
-            	owner.helpBar.setText(TextConstants.rotateText);
+            	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT            
 //                owner.enableOptions(true);                
                 return;
@@ -2429,7 +2429,7 @@ System.out.println("clickedEdgeWithPoint");
 //System.out.println("co-size = " + construction.length);                        
             if (numLines > 1)
             {   // get the line via the mouse, check with construction
-            	  owner.helpBar.setText(TextConstants.selectDeleteLineText);
+            	  owner.helpBar.setText(DoorzienGWT.rb.verwijderLijnTekst());
 //GWT            	
 //                owner.topToolBar.deleteLineButton.setPressed(true);
                 lineChoosen = null;
@@ -2470,7 +2470,7 @@ System.out.println("clickedEdgeWithPoint");
             // originalObject opnieuw!
             mouseMode = INERT;
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;
             setNumLines(numLines - 1);        
@@ -2542,7 +2542,7 @@ System.out.println("clickedEdgeWithPoint");
         fillPlanes(planesFilled);
         panel3D.initializeModel(currentObjectGroup, false);        
 
-        owner.helpBar.setText(TextConstants.rotateText);
+        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
        if (showCut)
            updateCutPanel();
@@ -2608,7 +2608,7 @@ System.out.println("clickedEdgeWithPoint");
         fillPlanes(planesFilled);
         panel3D.initializeModel(currentObjectGroup, false);        
 
-        owner.helpBar.setText(TextConstants.rotateText);
+        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         if (showCut)
             updateCutPanel();
 //GWT        
@@ -2694,7 +2694,7 @@ System.out.println("clickedEdgeWithPoint");
                 helpPoint = false;
                 panel3D.initializeModel(currentObjectGroup, false);
                
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT                
 //                owner.enableOptions(true);                
                 
@@ -2727,7 +2727,7 @@ System.out.println("clickedEdgeWithPoint");
             clickedPoint = null;
             clickedEdgeWithPoint = null;
             
-            owner.helpBar.setText(TextConstants.planePoint1Text);
+            owner.helpBar.setText(DoorzienGWT.rb.vlakPunt1Tekst());
             // now wait for mouse action
         }
         // one point indicated/choosen, process this
@@ -2844,7 +2844,7 @@ System.out.println("clickedEdgeWithPoint");
                 clickedEdgeWithPoint = null;
             }
             
-            owner.helpBar.setText(TextConstants.planePoint2Text);            
+            owner.helpBar.setText(DoorzienGWT.rb.vlakPunt2Tekst());            
             // now wait again for mouse action
         }    
         // two points choosen, process these
@@ -3135,7 +3135,7 @@ System.out.println("clickedEdgeWithPoint");
 // maak de lijn als je hem nog niet hebt
             }            
             
-            owner.helpBar.setText(TextConstants.planePoint3Text);            
+            owner.helpBar.setText(DoorzienGWT.rb.vlakPunt3Tekst());            
         }
         // third point choosen
         else if (stepNum == 3)
@@ -3425,7 +3425,7 @@ System.out.println("clickedEdgeWithPoint");
             addToHistory();
             // aan het einde
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;            
             tempObjectGroup2 = null;                        
@@ -3506,7 +3506,7 @@ System.out.println("clickedEdgeWithPoint");
             {   
                 mouseMode = INERT;
                 
-                owner.helpBar.setText(TextConstants.rotateText);                
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());                
 //GWT                
 //                owner.enableOptions(true);                
                 return;
@@ -3549,7 +3549,7 @@ System.out.println("clickedEdgeWithPoint");
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     
-                    owner.helpBar.setText(TextConstants.parPlanePointText);                                
+                    owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakPuntTekst());                                
                     // wait for mouse action
                     // choosing the point
 
@@ -3558,7 +3558,7 @@ System.out.println("clickedEdgeWithPoint");
                 {
                     // get the plane via the mouse
               	
-                    owner.helpBar.setText(TextConstants.selectParPlaneText);                                        
+                    owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakTekst());                                        
                     parPlaneChoosen = null;
                     parPointChoosen = null;
                     helpPoint = true;
@@ -3580,7 +3580,7 @@ System.out.println("clickedEdgeWithPoint");
                 clickedPoint = null;
                 clickedEdgeWithPoint = null;
                 
-                owner.helpBar.setText(TextConstants.parPlanePointText);                            
+                owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakPuntTekst());                            
                 // wait for mouse action
                 // choosing the point
 
@@ -3894,7 +3894,7 @@ if (currentObjectGroup.objects.size() > 1)
             // aan het einde 
             
 //            owner.helpBar.setText(Table.lookUp("rotateText"));
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;            
             tempObjectGroup2 = null;                        
@@ -3958,7 +3958,7 @@ if (currentObjectGroup.objects.size() > 1)
             if (!b)
             {   mouseMode = INERT;
             
-            	owner.helpBar.setText(TextConstants.rotateText);
+            	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT            
 //                owner.enableOptions(true);                
                 return;
@@ -3974,7 +3974,7 @@ if (currentObjectGroup.objects.size() > 1)
 //System.out.println("co-size = " + construction.length);                        
             if (numPlanes > 1)
             {   // get the plane via the mouse
-                owner.helpBar.setText(TextConstants.selectDeletePlaneText);            	
+                owner.helpBar.setText(DoorzienGWT.rb.verwijderVlakTekst());            	
 
 //GWT            	
 //                owner.topToolBar.deletePlaneButton.setPressed(true);
@@ -4011,7 +4011,7 @@ if (currentObjectGroup.objects.size() > 1)
             // originalObject opnieuw!
             mouseMode = INERT;
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             setNumPlanes(numPlanes - 1);        
             if (showCut)
@@ -4125,7 +4125,7 @@ if (currentObjectGroup.objects.size() > 1)
             {   mouseMode = INERT;
             
 //                owner.helpBar.setText(owner.tt("rotateText"));     
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 
                 return;
             }
@@ -4225,7 +4225,7 @@ if (currentObjectGroup.objects.size() > 1)
             setSlider(true, 0, minTrans, maxTrans);
                         
 //            owner.helpBar.setText(owner.tt("rotateText"));
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
         // kijk bij rebuild uit dat je niet twee keer hetzelfde
         // vlak snijdt (er kan een parallel vlak zijn)
@@ -4288,7 +4288,7 @@ if (currentObjectGroup.objects.size() > 1)
             {   mouseMode = INERT;
             
 //                owner.helpBar.setText(owner.tt("rotateText"));
-            	owner.helpBar.setText(TextConstants.rotateText);
+            	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
                 
                 return;
             }
@@ -4483,7 +4483,7 @@ else
             setSlider(true, 0, minRot, maxRot);
             
 //            owner.helpBar.setText(owner.tt("rotateText"));
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
        
         
         }
@@ -4545,7 +4545,7 @@ else
                     (mouseMode != ROTATEPLANE))
                     mouseMode = INERT;
                     
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //System.out.println("hiding cut, mouseMode = " + mouseMode);
 //GWT                
 //                owner.helpBar.setText(owner.tt("rotateText"));
@@ -4565,7 +4565,7 @@ else
             if (numPlanes > 1)
             {
                 // help message
-            	owner.helpBar.setText(TextConstants.selectShowCutText);
+            	owner.helpBar.setText(DoorzienGWT.rb.doorsnedeTekst());
 //GWT            	
 //                owner.helpBar.setText(owner.tt("selectShowCutText"));                
 //                owner.topToolBar.showCutButton.setPressed(true);                                
@@ -4616,7 +4616,7 @@ updateCutPanel();
         else
             mouseMode = oldMouseMode;
         
-        owner.helpBar.setText(TextConstants.rotateText);
+        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT        
 //        owner.helpBar.setText(owner.tt("rotateText"));
 //        owner.enableOptions(true);
@@ -4682,7 +4682,7 @@ System.out.println("mm = " + mouseMode);
             if (!figureCut)
             {   mouseMode = INERT;
             
-            	owner.helpBar.setText(TextConstants.rotateText);
+            	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT            
 //                owner.enableOptions(true);
                 setCutPanel(showCut);
@@ -4726,7 +4726,7 @@ System.out.println("mm = " + mouseMode);
             if (numPlanes > 1)
             {
                 // help message
-                owner.helpBar.setText(TextConstants.selectCutPlaneText);
+                owner.helpBar.setText(DoorzienGWT.rb.snijdoorTekst());
             	
             	//GWT            	
 //                owner.topToolBar.cutButton.setPressed(true);                                                            
@@ -4780,7 +4780,7 @@ if (isSide)
             
             panel3D.initializeModel(cutObjectGroup, false);
             
-            owner.helpBar.setText(TextConstants.selectCutFigureText);
+            owner.helpBar.setText(DoorzienGWT.rb.kiesDoorsnedeTekst());
 
             owner.topToolBar.disableLineButtons();            
             owner.topToolBar.disablePlaneButtons2();
@@ -4902,7 +4902,7 @@ panel3D.testString = "";
                 panel3D.initializeModel(currentObjectGroup, false);                                    
                 mouseMode = INERT;
                 
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
                 
                 setNumLines(nLines);
                 setNumPlanes(nPlanes);
@@ -4978,7 +4978,7 @@ panel3D.testString = "";
                 mouseMode = INERT;
                 
 //                owner.helpBar.setText(owner.tt("rotateText"));
-                owner.helpBar.setText(TextConstants.rotateText);
+                owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
                 
                 setNumLines(nLines);
                 setNumPlanes(nPlanes);
@@ -5036,7 +5036,7 @@ panel3D.testString = "";
         mouseMode = INERT;
        
 //        owner.helpBar.setText(owner.tt("rotateText"));
-        owner.helpBar.setText(TextConstants.rotateText);
+        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
         previousObjectGroup();
 //        fillPlanes(planesFilled);
@@ -5107,7 +5107,7 @@ panel3D.testString = "";
         mouseMode = INERT;
         
 //        owner.helpBar.setText(owner.tt("rotateText"));
-        owner.helpBar.setText(TextConstants.rotateText);
+        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
         nextObjectGroup();
 //        fillPlanes(planesFilled);
@@ -5200,7 +5200,7 @@ panel3D.testString = "";
             panel3D.initializeModel(currentObjectGroup, false);                    
             mouseMode = INERT;
             
-            owner.helpBar.setText(TextConstants.rotateText);
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
 //GWT            
 //            owner.helpBar.setText(owner.tt("rotateText"));
 //            owner.enableOptions(true);
@@ -5877,7 +5877,7 @@ panel3D.testString = "";
                             clickedPoint = null;
                             clickedEdgeWithPoint = null;
                                 
-                            owner.helpBar.setText(TextConstants.parPlanePointText);                                                                
+                            owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakPuntTekst());                                                                
                             // wait for mouse action choosing the point
 
                         }

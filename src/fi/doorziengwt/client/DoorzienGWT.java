@@ -35,8 +35,12 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
+import fi.doorziengwt.client.text.Text;
+
 public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionView 
 {
+	public static Text rb;
+	
 	private static Logger logger = Logger.getLogger("DoorzienGWT");
 	
 	MenuBar menuBar;
@@ -188,6 +192,8 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	
 	public void getImages() 
 	{
+		rb = GWT.create(Text.class);
+		
 		doorzienGWTClientBundle = GWT.create(DoorzienGWTClientBundle.class);
 		doorzienGWTCss = doorzienGWTClientBundle.getDoorzienGWTCSS();
 		doorzienGWTCss.ensureInjected();
@@ -367,45 +373,49 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		menuBar = new MenuBar();
 		
 		figurenMenu = new MenuBar(true);
-		figurenMenu.addItem("achtvlak", new MenuCommand("achtvlak"));
-		figurenMenu.addItem("balk", new MenuCommand("balk"));
-		figurenMenu.addItem("cilinder", new MenuCommand("cilinder"));
+		figurenMenu.addItem(rb.achtvlakTekst(), new MenuCommand("achtvlak"));
+		figurenMenu.addItem(rb.balkTekst(), new MenuCommand("balk"));
+		figurenMenu.addItem(rb.cylinderTekst(), new MenuCommand("cilinder"));
+		figurenMenu.addItem(rb.kubusTekst(), new MenuCommand("kubus"));
+		figurenMenu.addItem(rb.twaalfVlakTekst(), new MenuCommand("twaalfvlak"));
+		figurenMenu.addItem(rb.twintigVlakTekst(), new MenuCommand("twintigvlak"));
+		figurenMenu.addItem(rb.vierVlakTekst(), new MenuCommand("viervlak"));
 		huizenMenu = new MenuBar(true);
-		huizenMenu.addItem("huis met piramidedak", new MenuCommand("piramidehuis"));
-		huizenMenu.addItem("huis met schilddak", new MenuCommand("schildhuis"));
-		figurenMenu.addItem("huizen", huizenMenu);
+		huizenMenu.addItem(rb.piramideDakTekst(), new MenuCommand("piramidehuis"));
+		huizenMenu.addItem(rb.schildDakTekst(), new MenuCommand("schildhuis"));
+		figurenMenu.addItem(rb.huizenTekst(), huizenMenu);
 		kegelsMenu = new MenuBar(true);
-		kegelsMenu.addItem("kegel 1", new MenuCommand("kegel1"));
-		kegelsMenu.addItem("kegel 2", new MenuCommand("kegel2"));
-		kegelsMenu.addItem("kegel 3", new MenuCommand("kegel3"));
-		kegelsMenu.addItem("kegel 4", new MenuCommand("kegel4"));
-		figurenMenu.addItem("kegels", kegelsMenu);
-		figurenMenu.addItem("kubus", new MenuCommand("kubus"));
+		kegelsMenu.addItem(rb.kegel1Tekst(), new MenuCommand("kegel1"));
+		kegelsMenu.addItem(rb.kegel2Tekst(), new MenuCommand("kegel2"));
+		kegelsMenu.addItem(rb.kegel3Tekst(), new MenuCommand("kegel3"));
+		kegelsMenu.addItem(rb.kegel4Tekst(), new MenuCommand("kegel4"));
+		figurenMenu.addItem(rb.kegelsTekst(), kegelsMenu);
+		//figurenMenu.addItem(rb.kubusTekst(), new MenuCommand("kubus"));
 		piramidesMenu = new MenuBar(true);
-		piramidesMenu.addItem("driezijdige piramide", new MenuCommand("piramide3"));
-		piramidesMenu.addItem("vierzijdige piramide", new MenuCommand("piramide4"));
-		piramidesMenu.addItem("vijfzijdige piramide", new MenuCommand("piramide5"));
-		piramidesMenu.addItem("zeszijdige piramide", new MenuCommand("piramide6"));
-		piramidesMenu.addItem("zevenzijdige piramide", new MenuCommand("piramide7"));
-		piramidesMenu.addItem("achtzijdige piramide", new MenuCommand("piramide8"));
-		figurenMenu.addItem("piramides", piramidesMenu);
+		piramidesMenu.addItem(rb.piramide3Tekst(), new MenuCommand("piramide3"));
+		piramidesMenu.addItem(rb.piramide4Tekst(), new MenuCommand("piramide4"));
+		piramidesMenu.addItem(rb.piramide5Tekst(), new MenuCommand("piramide5"));
+		piramidesMenu.addItem(rb.piramide6Tekst(), new MenuCommand("piramide6"));
+		piramidesMenu.addItem(rb.piramide7Tekst(), new MenuCommand("piramide7"));
+		piramidesMenu.addItem(rb.piramide8Tekst(), new MenuCommand("piramide8"));
+		figurenMenu.addItem(rb.piramidesTekst(), piramidesMenu);
 		prismasMenu = new MenuBar(true);
-		prismasMenu.addItem("driezijdig prisma", new MenuCommand("prisma3"));
-		prismasMenu.addItem("vierzijdig prisma", new MenuCommand("prisma4"));
-		prismasMenu.addItem("vijfzijdig prisma", new MenuCommand("prisma5"));
-		prismasMenu.addItem("zeszijdig prisma", new MenuCommand("prisma6"));
-		figurenMenu.addItem("prismas", prismasMenu);
-		figurenMenu.addItem("twaalfvlak", new MenuCommand("twaalfvlak"));
-		figurenMenu.addItem("twintigvlak", new MenuCommand("twintigvlak"));
-		figurenMenu.addItem("viervlak", new MenuCommand("viervlak"));
+		prismasMenu.addItem(rb.prisma3Tekst(), new MenuCommand("prisma3"));
+		prismasMenu.addItem(rb.prisma4Tekst(), new MenuCommand("prisma4"));
+		prismasMenu.addItem(rb.prisma5Tekst(), new MenuCommand("prisma5"));
+		prismasMenu.addItem(rb.prisma6Tekst(), new MenuCommand("prisma6"));
+		figurenMenu.addItem(rb.prismasTekst(), prismasMenu);
+		//figurenMenu.addItem(rb.twaalfVlakTekst(), new MenuCommand("twaalfvlak"));
+		//figurenMenu.addItem(rb.twintigVlakTekst(), new MenuCommand("twintigvlak"));
+		//figurenMenu.addItem(rb.vierVlakTekst(), new MenuCommand("viervlak"));
 		
 		optiesMenu = new MenuBar(true);
 		
-		geenHulpPuntenItem = new MenuItem("geen hulppunten",new MenuCommand("hp0"));
-		eenHulpPuntItem = new MenuItem("een hulppunt",new MenuCommand("hp1"));
-		tweeHulpPuntenItem = new MenuItem("twee hulppunten",new MenuCommand("hp2"));
-		drieHulpPuntenItem = new MenuItem("drie hulppunten",new MenuCommand("hp3"));
-		vierHulpPuntenItem = new MenuItem("vier hulppunten",new MenuCommand("hp4"));
+		geenHulpPuntenItem = new MenuItem(rb.geenHulppuntenTekst(),new MenuCommand("hp0"));
+		eenHulpPuntItem = new MenuItem(rb.eenHulppuntTekst(),new MenuCommand("hp1"));
+		tweeHulpPuntenItem = new MenuItem(rb.tweeHulppuntenTekst(),new MenuCommand("hp2"));
+		drieHulpPuntenItem = new MenuItem(rb.drieHulppuntenTekst(),new MenuCommand("hp3"));
+		vierHulpPuntenItem = new MenuItem(rb.vierHulppuntenTekst(),new MenuCommand("hp4"));
 		
 		if (hulpPunten)
 		{	//geenHulpPuntenItem = new MenuItem("geen hulppunten",new MenuCommand("hulppunten"));
@@ -417,12 +427,12 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		}
 
 		if (letters)
-			lettersItem = new MenuItem("geen letters",new MenuCommand("letters"));
+			lettersItem = new MenuItem(rb.geenLettersTekst(),new MenuCommand("letters"));
 		else
-			lettersItem = new MenuItem("toon letters",new MenuCommand("letters"));
+			lettersItem = new MenuItem(rb.toonLettersTekst(),new MenuCommand("letters"));
 		
-		centraleProjectieItem = new MenuItem("centrale projectie",new MenuCommand("cprojectie"));
-		parallelProjectieItem = new MenuItem("parallelprojectie",new MenuCommand("pprojectie"));
+		centraleProjectieItem = new MenuItem(rb.centraleProjTekst(),new MenuCommand("cprojectie"));
+		parallelProjectieItem = new MenuItem(rb.parallelProjTekst(),new MenuCommand("pprojectie"));
 		if (centraleProjectie)
 		{
 //			centraleProjectieItem = new MenuItem("centrale projectie",new MenuCommand("cprojectie"));
@@ -448,8 +458,10 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		optiesMenu.addItem(centraleProjectieItem);
 		optiesMenu.addItem(parallelProjectieItem);
 		
-		menuBar.addItem("figuren", figurenMenu);
-		menuBar.addItem("opties", optiesMenu);
+		menuBar.addItem(rb.figurenTekst(), figurenMenu);
+		menuBar.addItem(rb.optiesTekst(), optiesMenu);
+		
+		menuBar.addStyleName(doorzienGWTCss.menubar());
 		
 		
 	}	
@@ -457,7 +469,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	public void resetLetters()
 	{
 		letters = false; 
-		lettersItem.setText("toon letters");
+		lettersItem.setText(rb.toonLettersTekst());
 	}
 	
 	public void resetProjection()
@@ -619,16 +631,16 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			
 		else if (s.equals("letters"))
 		{
-			if (lettersItem.getText().equals("toon letters"))
+			if (lettersItem.getText().equals(rb.toonLettersTekst()))
 			{
-				lettersItem.setText("geen letters");
+				lettersItem.setText(rb.geenLettersTekst());
 				drawingPanel.setLetters(true);
 				letters = true;
 				
 			}
 			else 
 			{
-				lettersItem.setText("toon letters");
+				lettersItem.setText(rb.toonLettersTekst());
 				drawingPanel.setLetters(false);
 				letters = false;
 				
@@ -1289,12 +1301,12 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
     	if (letters)
 		{
-			lettersItem.setText("geen letters");
+			lettersItem.setText(rb.geenLettersTekst());
 			drawingPanel.setLetters(true);
 		}
 		else 
 		{
-			lettersItem.setText("toon letters");
+			lettersItem.setText(rb.toonLettersTekst());
 			drawingPanel.setLetters(false);
 		}
 
@@ -1770,12 +1782,18 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			dlp.setWidgetVisible(doorzienGWTDock,true);
 			dlp.setWidgetVisible(canvasPanel,false);
 			drawingPanel.paint();
+			
+			//dlp.forceLayout();
+			doorzienGWTDock.forceLayout();
 		}
 		else
 		{	setViewerState(state);
 			dlp.setWidgetVisible(doorzienGWTDock,false);
 			dlp.setWidgetVisible(canvasPanel,true);
 			drawingShell.panel3D.repaint();
+			
+			//dlp.forceLayout();
+			canvasPanel.forceLayout();
 		}
 		 
 	}
@@ -1894,7 +1912,7 @@ logger.info("DoorzienGWT init");
 				                       Style.Unit.PX, Slider2.vertSize, Style.Unit.PX);
 		drawingShell.slider.setVisible(false);
 		
-		drawingShell.flatButton = new PushButton("plat");
+		drawingShell.flatButton = new PushButton(rb.platTekst());
 		drawingShell.flatButton.addStyleName(doorzienGWTCss.pushbutton());
 		canvasPanel.add(drawingShell.flatButton);
 		canvasPanel.setWidgetLeftWidth(drawingShell.flatButton, breedte - 40 - 1, Style.Unit.PX, 40, Style.Unit.PX);
@@ -1922,6 +1940,9 @@ logger.info("DoorzienGWT init");
 		
 		drawingShell.panel3D.repaint();
 
+		dlp.forceLayout();
+		canvasPanel.forceLayout();
+		doorzienGWTDock.forceLayout();
 
 	} //init	
 	

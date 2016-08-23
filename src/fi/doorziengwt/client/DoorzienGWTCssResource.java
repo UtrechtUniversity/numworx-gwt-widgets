@@ -22,4 +22,8 @@ public interface DoorzienGWTCssResource extends CssResource
 	
 	String boldmenuitem();
 	
+	String menubar();
+	
+	String helpbar();
+	
 }
