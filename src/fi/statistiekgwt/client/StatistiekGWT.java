@@ -100,6 +100,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		+ "attempting to contact the server. Please check your network "
 		+ "connection and try again.";
 
+	public static final int ASCENDING = 0;
+	public static final int DESCENDING = 1;
+
 	/**
 	 * This is the entry point method.
 	 */
