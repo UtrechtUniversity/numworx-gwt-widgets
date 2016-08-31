@@ -163,8 +163,11 @@ public interface Text extends Constants
 	@DefaultStringValue("waarde = ")
 	String valueIs();
 	
-	@DefaultStringValue("Sorteer")
-	String sortItem();
+	@DefaultStringValue("Sorteer oplopend")
+	String sortAscendingItem();
+	
+	@DefaultStringValue("Sorteer aflopend")
+	String sortDescendingItem();
 	
 	@DefaultStringValue("Bewerk kolom")
 	String editcolumnItem();
