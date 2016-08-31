@@ -1609,13 +1609,20 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param columnIndex
 	 *            the index of the column to sort by
 	 */
-	public void sort(int columnIndex)
+	public void sort(int columnIndex, int order)
 	{
 		if (columnIndex >= 0)
 		{
-			//this.quickSort(columnIndex, 0, this.rowCount - 1);
-			// lots of same values causes StackOverflowError, so better use:
-			this.threeWayQuickSort(columnIndex, 0, this.rowCount - 1);
+			if (order == StatistiekGWT.ASCENDING)
+			{
+				//this.quickSort(columnIndex, 0, this.rowCount - 1);
+				// lots of same values causes StackOverflowError, so better use:
+				this.threeWayQuickSortAscending(columnIndex, 0, this.rowCount - 1);
+			}
+			else
+			{
+				this.threeWayQuickSortDescending(columnIndex, 0, this.rowCount - 1);
+			}
 	
 			// send an event
 			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
@@ -1687,7 +1694,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * This variant of quicksort is much faster for data with many 
 	 * same values.
 	 * 
-	 * See also: http://www.isical.ac.in/~pdslab/slides/23Quicksort.pdf 
+	 * See also: http://www.isical.ac.in/~pdslab/2014/slides/23Quicksort.pdf
 	 * (see section Duplicate Keys from p. 33, with code on p. 41)
 	 * 
 	 * @param columnIndex
@@ -1697,7 +1704,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * @param r
 	 *            end index of the subarray to sort
 	 */
-	private void threeWayQuickSort(int columnIndex, int p, int r)
+	private void threeWayQuickSortAscending(int columnIndex, int p, int r)
 	{
 		if (r <= p)
 		{
@@ -1728,8 +1735,62 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			else i++;
 		}
 		
-		threeWayQuickSort(columnIndex, p, lt - 1);
-		threeWayQuickSort(columnIndex, gt + 1, r);
+		threeWayQuickSortAscending(columnIndex, p, lt - 1);
+		threeWayQuickSortAscending(columnIndex, gt + 1, r);
+	} 
+
+	/**
+	 * Three way quicksort suited for data with many the same values. 
+	 * Also called Dijkstra's Dutch national flag problem.
+	 * This variant of quicksort is much faster for data with many 
+	 * same values.
+	 * 
+	 * See also: http://www.isical.ac.in/~pdslab/2014/slides/23Quicksort.pdf
+	 * (see section Duplicate Keys from p. 33, with code on p. 41)
+	 * 
+	 * @param columnIndex
+	 *            The column to sort by
+	 * @param p
+	 *            start index of the subarray to sort
+	 * @param r
+	 *            end index of the subarray to sort
+	 */
+	private void threeWayQuickSortDescending(int columnIndex, int p, int r)
+	{
+		// TODO aanpassen op descending...
+		if (r <= p)
+		{
+			return;
+		}
+		
+		ColumnType cType = this.columnClass.get(columnIndex);
+		int lt = p;
+		int gt = r;
+		
+		// get the pivot x
+		ArrayList<Object> dataRow = this.values.get(p);
+
+		int i = p;
+		while (i <= gt)
+		{
+			int cmp = cType.compare(
+				this.values.get(i).get(columnIndex), dataRow.get(columnIndex));
+
+//			if (cmp < 0)
+			if (cmp > 0)
+			{
+				this.switchRows(lt++, i++);
+			}
+//			else if (cmp > 0)
+			else if (cmp < 0)
+			{
+				this.switchRows(i, gt--);
+			}
+			else i++;
+		}
+		
+		threeWayQuickSortDescending(columnIndex, p, lt - 1);
+		threeWayQuickSortDescending(columnIndex, gt + 1, r);
 	} 
 
 	/**
