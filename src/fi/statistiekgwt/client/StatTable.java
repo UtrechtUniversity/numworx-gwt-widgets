@@ -242,11 +242,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private String viewName;
 	private PopupPanel headerPopupMenu;
 	private MenuBar headerMenuBar;
-	private MenuItem sortItem;
+	private MenuItem sortAscendingItem;
+	private MenuItem sortDescendingItem;
 	private MenuItem editItem;
 	private MenuItem deleteItem;
 	private MenuItem infoItem;
-	private Command sortCommand;
+	private Command sortAscendingCommand;
+	private Command sortDescendingCommand;
 	private Command editCommand;
 	private Command deleteCommand;
 	private Command infoCommand;
@@ -541,11 +543,27 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.headerPopupMenu.setVisible(false);
 		this.headerPopupMenu.hide();
 		
-		sortCommand = new Command() {
+		sortAscendingCommand = new Command() {
 	        @Override
             public void execute() 
 	        {
-	        	StatTable.this.statTableModel.sort(StatTable.this.popupColumnIndex);
+	        	StatTable.this.statTableModel.sort(StatTable.this.popupColumnIndex, StatistiekGWT.ASCENDING);
+	        	
+	        	// test syl
+	        	StatTable.this.setSelectionFromModelInTable();
+	        	
+	        	StatTable.this.hideHeaderPopupMenu();
+	        	
+	        	// via stattablemodel.sort() wordt een tablechangeevent getriggered die een stattable.update() doet (met setSelectionBackground()),
+	        	// maar kennelijk is default selectiekleur weer gezet, dus:
+	        	setSelectionBackground();
+            }
+        };
+		sortDescendingCommand = new Command() {
+	        @Override
+            public void execute() 
+	        {
+	        	StatTable.this.statTableModel.sort(StatTable.this.popupColumnIndex, StatistiekGWT.DESCENDING);
 	        	
 	        	// test syl
 	        	StatTable.this.setSelectionFromModelInTable();
@@ -567,11 +585,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             }
         };
         this.createInfoCommand();
-		sortItem = new MenuItem(StatistiekGWT.rb.sortItem(), true, sortCommand);
+		sortAscendingItem = new MenuItem(StatistiekGWT.rb.sortAscendingItem(), true, sortAscendingCommand);
+		sortDescendingItem = new MenuItem(StatistiekGWT.rb.sortDescendingItem(), true, sortDescendingCommand);
 		editItem = new MenuItem(StatistiekGWT.rb.editcolumnItem(), true, editCommand);
 		deleteItem = new MenuItem(StatistiekGWT.rb.deletecolumnItem(), true, deleteCommand);
 		infoItem = new MenuItem(StatistiekGWT.rb.infocolumnItem(), true, infoCommand);
-		this.headerMenuBar.addItem(sortItem);
+		this.headerMenuBar.addItem(sortAscendingItem);
+		this.headerMenuBar.addItem(sortDescendingItem);
 		if (this.statTableModel.isDataEditable())
 		{
 			this.headerMenuBar.addItem(editItem);
@@ -1752,7 +1772,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			
 			try
 			{
-				if (type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2))
+				if (type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || type.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2)
+					|| (type.equals("") && name.endsWith(".csv"))) // voor chromebook
 				{
 					// If the file is larger than 1kb, read only the first 1000
 					// characters to demonstrate file slicing
@@ -2039,10 +2060,13 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			{
 				fileList = StatTable.this.fileUpload.getFiles();
 
+				String fileType = "";
+				
 				if (fileList.getLength() > 0)
 				{
-					String fileType = fileList.getItem(0).getType();
-					if (fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2))
+					fileType = fileList.getItem(0).getType();
+					if (fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE) || fileType.startsWith(StatTable.CSV_FROM_EXCEL_FILE_TYPE2)
+						|| (fileType.equals("") && fileList.getItem(0).getName().endsWith(".csv"))) // voor chromebook
 					{
 						statInteractiePanel.getView().addStyleName(statistiekCss.waitCursor());
 						table.addStyleName(statistiekCss.waitCursor());
