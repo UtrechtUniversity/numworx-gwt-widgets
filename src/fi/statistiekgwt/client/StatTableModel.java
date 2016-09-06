@@ -1607,7 +1607,9 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * Sort by a specified column
 	 * 
 	 * @param columnIndex
-	 *            the index of the column to sort by
+	 *          the index of the column to sort by
+	 * @param order
+	 * 			the order for sorting, ASCENDING or DESCENDING
 	 */
 	public void sort(int columnIndex, int order)
 	{
