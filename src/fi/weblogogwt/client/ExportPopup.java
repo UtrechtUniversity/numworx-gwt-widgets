@@ -42,7 +42,7 @@ public class ExportPopup extends PopupPanel
 		exportPanel = new LayoutPanel();
 		exportPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 			
-		Label codeLabel = new Label("Code van het Algorithme");
+		Label codeLabel = new Label(WebLogoGWT.rb.codeTekst()); //"Code van het Algorithme");
 		codeLabel.addStyleName(WebLogoGWT.webLogoGWTCssResource.codelabel());
 		exportPanel.add(codeLabel);
 		exportPanel.setWidgetLeftWidth(codeLabel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
@@ -57,7 +57,7 @@ public class ExportPopup extends PopupPanel
 		
 		int buttonWidth = 80;
 		int buttonX = (breedte - buttonWidth) / 2;
-		closeButton = new PushButton("sluiten");
+		closeButton = new PushButton(WebLogoGWT.rb.sluitenTekst()); //"sluiten");
 		closeButton.addStyleName(WebLogoGWT.webLogoGWTCssResource.pushbutton());
 		exportPanel.add(closeButton);
 		exportPanel.setWidgetLeftWidth(closeButton, buttonX, Style.Unit.PX, buttonWidth, Style.Unit.PX);

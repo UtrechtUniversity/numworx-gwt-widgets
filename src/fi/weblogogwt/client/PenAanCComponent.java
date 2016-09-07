@@ -17,7 +17,7 @@ public class PenAanCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = "penAan";
+		commandName = WebLogoGWT.rb.penAanTekst(); //"penAan";
 		commandNameTranslated = "penOn"; //JavaLogoWeb.rb.getString(commandName);
 	}
 	

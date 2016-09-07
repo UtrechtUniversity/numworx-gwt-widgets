@@ -409,7 +409,7 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 		boolean b = executeContent(trb, ub, varSet);
 		if ( b ) return b;
 		// When tracing, add 'finished' message AFTER last command
-		trb.setCommandInfo("Klaar!", varSet);
+		trb.setCommandInfo(WebLogoGWT.rb.klaarTekst(), varSet);
 		return false;
 	}
 	

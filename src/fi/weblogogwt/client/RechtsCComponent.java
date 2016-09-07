@@ -11,7 +11,7 @@ public class RechtsCComponent extends ParameterCommandComponent
 		super(x, y, b, h, sv);
 		noParameters = 1;
 		parameters[0] = new NumericParameter();
-		commandName = "rechts";
+		commandName = WebLogoGWT.rb.rechtsTekst(); //"rechts";
 		commandNameTranslated = "right"; //JavaLogoWeb.rb.getString(commandName);
 	}
 

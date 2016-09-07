@@ -8,6 +8,9 @@ public class ProgrammaImporter
 {
 	private JavaLogoSchuifVeld veld;
 	private String[] deeltaaknamen = { "deeltaak1", "deeltaak2", "deeltaak3", "deeltaak4", "deeltaak5"};
+	private String[] deeltaaknamenTrans =	
+		{ WebLogoGWT.rb.deeltaakTekst()+"1", WebLogoGWT.rb.deeltaakTekst()+"2", WebLogoGWT.rb.deeltaakTekst()+"3",
+		  WebLogoGWT.rb.deeltaakTekst()+"4", WebLogoGWT.rb.deeltaakTekst()+"5" };		
 	
 	private String strIf1 = "Keuze: Als";
 	private String strIf2 = "Dan";
@@ -15,6 +18,14 @@ public class ProgrammaImporter
 	private String strFor2 = "keer";
 	private String strWhile1 = "Zolang";
 	private String strWhile2 = "herhaal";
+	
+	private String strIf1Trans = WebLogoGWT.rb.keuzeTekst() + " " + WebLogoGWT.rb.alsTekst();
+	private String strIf2Trans = WebLogoGWT.rb.danTekst();
+	private String strFor1Trans = WebLogoGWT.rb.herhaal1Tekst();
+	private String strFor2Trans = WebLogoGWT.rb.keerTekst();
+	private String strWhile1Trans = WebLogoGWT.rb.zolangTekst();
+	private String strWhile2Trans = WebLogoGWT.rb.herhaal2Tekst();
+	
 	
 	public ProgrammaImporter(JavaLogoSchuifVeld v)
 	{
@@ -35,7 +46,15 @@ public class ProgrammaImporter
 		//System.out.println("+++  Starting import");
 		String programmaTekst = s + "\n";
 		//System.out.println("+++  Deeltaaknamen");
-		String[] codeParts = StringUtils.split(programmaTekst, "Deeltaak:");
+		String[] codeParts1 = StringUtils.split(programmaTekst, "Deeltaak:");
+//System.out.println("codeParts Deeltaak:" + codeParts1.length);
+		String[] codeParts2 = StringUtils.split(programmaTekst, WebLogoGWT.rb.deeltaak1Tekst());
+//System.out.println("codeParts " + WebLogoGWT.rb.deeltaak1Tekst()+ codeParts2.length);
+
+		String[] codeParts = codeParts1;
+		if (codeParts.length == 1)
+			codeParts = codeParts2;
+		
 		for(int i=1 ; i<=JavaLogoSchuifVeld.aantalDeeltaken ; i++)
 		{
 			// wis oude deeltaak
@@ -67,9 +86,15 @@ public class ProgrammaImporter
 			// no brackets, import deeltaak without parameter (so you can import old exports)
 			deeltaaknamen[i] = s;
 			ccont.setDeeltaakHeader(s, "");
-		} else
+		} 
+		else
 		{
-			deeltaaknamen[i] = s.substring(0, bracketpos).trim();
+			String deeltaakNaam = s.substring(0, bracketpos).trim();
+//System.out.println(deeltaakNaam);			
+			if (deeltaakNaam.equals(deeltaaknamen[i]) || deeltaakNaam.equals(deeltaaknamenTrans[i]))
+				deeltaaknamen[i] = deeltaaknamenTrans[i];
+			else
+				deeltaaknamen[i] = s.substring(0, bracketpos).trim();
 			String param = getParamText(s);
 			ccont.setDeeltaakHeader(deeltaaknamen[i], param.trim());
 		}
@@ -168,17 +193,17 @@ public class ProgrammaImporter
 		{
 			ccomp = null;						// will stay null if error in command
 			line = lines.remove(0);
-			if ( line.startsWith("Herhaal"))
+			if (line.startsWith("Herhaal") || line.startsWith(WebLogoGWT.rb.herhaal1Tekst()))
 			{
 				//System.out.println("+++  Start For-loop");
 				ccomp = readForLoopCommand(ccont, line, lines);
 			}
-			if ( line.startsWith("Zolang"))
+			if (line.startsWith("Zolang") || line.startsWith(WebLogoGWT.rb.zolangTekst()))
 			{
 				//System.out.println("+++  Start While-loop");
 				ccomp = readWhileLoopCommand(ccont, line, lines);
 			}
-			else if ( line.startsWith("Keuze:"))
+			else if (line.startsWith("Keuze:") || line.startsWith(WebLogoGWT.rb.keuzeTekst()))
 			{
 				//System.out.println("+++  Start Keuze");
 				ccomp = readKeuzeCommand(ccont, line, lines);
@@ -216,6 +241,13 @@ public class ProgrammaImporter
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
 		}
+		else if ( checkHeader(headerline, strFor1Trans, strFor2Trans) )
+		{
+			String nrrep = stripKeywords(headerline, strFor1Trans, strFor2Trans);
+			//System.out.println("+++  aantal: "+nrrep);
+			cc.setLoopCount(nrrep);
+			ccont.addCComponent(cc);
+		}
 		ArrayList<String> body = getBlock(lines);
 		readBlock(body, cc);
 		//System.out.println("+++  Eind Herhaal");
@@ -240,6 +272,13 @@ public class ProgrammaImporter
 		if ( checkHeader(headerline, strWhile1, strWhile2) )
 		{
 			String nrrep = stripKeywords(headerline, strWhile1, strWhile2);
+			//System.out.println("+++  voorwaarde: "+nrrep);
+			cc.setLoopCount(nrrep);
+			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
+		}
+		else if ( checkHeader(headerline, strWhile1Trans, strWhile2Trans) ) 
+		{
+			String nrrep = stripKeywords(headerline, strWhile1Trans, strWhile2Trans);
 			//System.out.println("+++  voorwaarde: "+nrrep);
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
@@ -274,6 +313,14 @@ public class ProgrammaImporter
 			cc.setBoolExpression( condition );
 			ccont.addCComponent(cc);					// see Herhaal
 		}
+		else if ( checkHeader(headerline, strIf1Trans, strIf2Trans) )
+		{
+			String condition = stripKeywords(headerline, strIf1Trans, strIf2Trans);
+			//System.out.println("+++  voorwaarde: "+condition);
+			cc.setBoolExpression( condition );
+			ccont.addCComponent(cc);					// see Herhaal
+		}
+			
 		ArrayList<String> body_true = getBlock(lines);
 		//System.out.println("+++  Start If");
 		cc.setInIfBlock(true);
@@ -282,7 +329,7 @@ public class ProgrammaImporter
 		if  ( !lines.isEmpty() )
 		{
 			String s2 = lines.get(0);
-			if ( s2.equals("Anders"))
+			if (s2.equals("Anders") || s2.equals(WebLogoGWT.rb.andersTekst()))
 			{
 				cc.setElseVisible(true);
 				//System.out.println("+++  Start Else");
@@ -332,34 +379,37 @@ public class ProgrammaImporter
 		//System.out.println("simpel: >"+codeline+"<");
 		CommandComponent cc = null;
 		// 1: commandComponents for simple commands
-		if ( codeline.startsWith("vooruit("))
+		if (codeline.startsWith("vooruit(") || codeline.startsWith(WebLogoGWT.rb.vooruitTekst() + "("))
 		{	cc = new VooruitCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("rechts("))
+		else if (codeline.startsWith("rechts(") || codeline.startsWith(WebLogoGWT.rb.rechtsTekst() + "("))
 		{	cc = new RechtsCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("links("))
+		else if (codeline.startsWith("links(") || codeline.startsWith(WebLogoGWT.rb.linksTekst() + "("))
 		{	cc = new LinksCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("stap("))
+		else if (codeline.startsWith("stap(") || codeline.startsWith(WebLogoGWT.rb.stapTekst() + "("))
 		{	cc = new StapCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("penAan("))
+		else if (codeline.startsWith("penAan(") || codeline.startsWith(WebLogoGWT.rb.penAanTekst() + "("))
 		{	cc = new PenAanCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("penUit("))
+		else if (codeline.startsWith("penUit(") || codeline.startsWith(WebLogoGWT.rb.penUitTekst() + "("))
 		{	cc = new PenUitCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("vulAan("))
+		else if (codeline.startsWith("vulAan(") || codeline.startsWith(WebLogoGWT.rb.vulAanTekst() + "("))
 		{	cc = new VulAanCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("vulUit("))
+		else if (codeline.startsWith("vulUit(") || codeline.startsWith(WebLogoGWT.rb.vulUitTekst() + "("))
 		{	cc = new VulUitCComponent(-100,-100,25,25, veld);
+		}
+		else if (codeline.startsWith("vulBlad(") || codeline.startsWith(WebLogoGWT.rb.vulBladTekst() + "("))
+		{	cc = new VulBladCComponent(-100,-100,25,25, veld);
 		} 
-		else if ( codeline.startsWith("print("))
+		else if (codeline.startsWith("print(") || codeline.startsWith(WebLogoGWT.rb.printTekst() + "("))
 		{	cc = new PrintCComponent(-100,-100,25,25, veld);
 		}
-		else if ( codeline.startsWith("println("))
+		else if (codeline.startsWith("println(") || codeline.startsWith(WebLogoGWT.rb.printlnTekst() + "("))
 		{	cc = new PrintlCComponent(-100,-100,25,25, veld);
 		}
 		// cc has been initialized if and only if the line contains one of the simple commands.
@@ -370,6 +420,7 @@ public class ProgrammaImporter
 			cc.clearStapel();
 			String parameter = getParamText(codeline);
 			parameter = parameter.trim();
+System.out.println("param = " + parameter);			
 			// ToDo: setParam1 is hier fout, create setParameterText in cc-klasse die alles afhandelt
 			if ( parameter != null && cc instanceof ParameterCommandComponent )
 			{

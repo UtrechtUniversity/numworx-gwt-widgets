@@ -9,7 +9,7 @@ public class PenUitCComponent extends SimpleCommandComponent
 	public PenUitCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
-		commandName = "penUit";
+		commandName = WebLogoGWT.rb.penUitTekst(); //"penUit";
 		commandNameTranslated = "penOff"; //JavaLogoWeb.rb.getString(commandName);
 	}
 		

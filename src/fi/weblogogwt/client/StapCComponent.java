@@ -25,7 +25,7 @@ public class StapCComponent extends ParameterCommandComponent implements Paramet
 	{
 		super(x, y, b, h, sv);
 		
-		commandName = "stap";
+		commandName = WebLogoGWT.rb.stapTekst(); //"stap";
 		commandNameTranslated = "step"; //JavaLogoWeb.rb.getString(commandName);
 		noParameters = 2;
 		parameters[0] = new NumericParameter();

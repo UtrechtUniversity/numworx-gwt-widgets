@@ -35,7 +35,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 	public VarCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
-		commandName = "variabele";				// is virtually irrelevant, parameter holds the real name
+		commandName = WebLogoGWT.rb.variabeleTekst(); //"variabele";				// is virtually irrelevant, parameter holds the real name
 		commandNameTranslated = "variable"; //JavaLogoWeb.rb.getString(commandName);
 		waarde = new NumericParameter();
 		varnaamParam = new Identifier(commandName);

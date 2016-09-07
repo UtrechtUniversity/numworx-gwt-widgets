@@ -34,6 +34,8 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		deeltaaknaamParam = new Identifier(pn);
 		pmParam = new IdentifierList();
 		
+//System.out.println("dbc " + pn);		
+		
 //GWT4		
 		//naamEditor = new ParameterTextField(10, 4, 80, 17, this);
 		//fm = getFontMetrics(JavaLogoWeb.boldfont);
@@ -367,7 +369,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 
 	public String getCode(String tab)
 	{	
-		String s = "\nDeeltaak: " + getProgramName() + "( " + pmParam.getParameterText() + " )" + "\n";
+		String s = "\n" + WebLogoGWT.rb.deeltaak1Tekst() + " " + getProgramName() + "( " + pmParam.getParameterText() + " )" + "\n";
 		return s+ super.getCode(tab)+"\n";
 	}
 

@@ -12,7 +12,7 @@ public class VooruitCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new NumericParameter();
-		commandName = "vooruit";
+		commandName = WebLogoGWT.rb.vooruitTekst(); //"vooruit";
 		commandNameTranslated = "forward";
 	}
 	

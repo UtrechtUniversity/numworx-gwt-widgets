@@ -18,9 +18,9 @@ public class ForLoopCommandComponent extends LoopCommandComponent
 		super(x, y, b, h, sv);
 		
 		loopCondition = new NumericParameter();
-		commandName = "Herhaal";
+		commandName = WebLogoGWT.rb.herhaal1Tekst(); //"Herhaal";
 		commandNameTranslated = "Repeat"; //JavaLogoWeb.rb.getString(commandName);
-		naString = " keer";
+		naString = " " + WebLogoGWT.rb.keerTekst(); //" keer";
 		naStringTranslated = " times"; //JavaLogoWeb.rb.getString(naString);
 		createLoopEditor();
 	}

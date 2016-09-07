@@ -19,9 +19,9 @@ public class WhileLoopCommandComponent extends LoopCommandComponent
 		super(x, y, b, h, sv);
 		
 		loopCondition = new BooleanParameter();
-		commandName = "Zolang";
+		commandName = WebLogoGWT.rb.zolangTekst(); //"Zolang";
 		commandNameTranslated = "While"; //JavaLogoWeb.rb.getString(commandName);
-		naString = " herhaal";
+		naString = " " + WebLogoGWT.rb.herhaal2Tekst(); //" herhaal";
 		naStringTranslated = " repeat"; //JavaLogoWeb.rb.getString(naString);
 		createLoopEditor();
 	}

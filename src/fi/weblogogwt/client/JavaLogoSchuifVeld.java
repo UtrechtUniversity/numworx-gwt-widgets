@@ -264,7 +264,7 @@ for (int i = 0; i < messages.length; i++)
 		//add(programmaPanel,0);
 		
 		programmaComponent = new ProgrammaComponent(ppx, ppy, ProgrammaComponent.pcsw, pph, 
-													"Tekenalgoritme", this);
+													WebLogoGWT.rb.tekenalgorithmeTekst(), this);
 		programmaComponent.zetVast(true);
 		
 		//programmaPanel.add(programmaComponent);
@@ -349,7 +349,7 @@ for (int i = 0; i < messages.length; i++)
 			// create with dummy location and height
 			
 			deeltaakComponenten[i] = new DeeltaakBodyComponent(0,0,ProgrammaComponent.pcsw,ProgrammaComponent.pcclosedh, 
-															   "deeltaak"+(i+1), this);
+															   WebLogoGWT.rb.deeltaakTekst()+(i+1), this);
 			deeltaakComponenten[i].zetVast(false);
 			((DeeltaakCallCComponent)deeltaakCC[i]).setBody(deeltaakComponenten[i]);
 			//programmaPanel.add(deeltaakComponenten[i]);

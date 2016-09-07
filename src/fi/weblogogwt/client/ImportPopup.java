@@ -40,7 +40,7 @@ public class ImportPopup extends PopupPanel
 		importPanel = new LayoutPanel();
 		importPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 			
-		Label codeLabel = new Label("Plak of Type de Code van het Algorithme");
+		Label codeLabel = new Label(WebLogoGWT.rb.pasteCodeTekst()); //"Plak of Type de Code van het Algorithme");
 		codeLabel.addStyleName(WebLogoGWT.webLogoGWTCssResource.codelabel());
 		importPanel.add(codeLabel);
 		importPanel.setWidgetLeftWidth(codeLabel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
@@ -55,14 +55,14 @@ public class ImportPopup extends PopupPanel
 		
 		int buttonWidth = 100;
 		int buttonX = (breedte - 2 * buttonWidth - offSet) / 2;
-		importButton = new PushButton("importeer");
+		importButton = new PushButton(WebLogoGWT.rb.importeerTekst()); //"importeer");
 		importButton.addStyleName(WebLogoGWT.webLogoGWTCssResource.pushbutton());
 		importPanel.add(importButton);
 		importPanel.setWidgetLeftWidth(importButton, buttonX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
 		importPanel.setWidgetTopHeight(importButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
 		importButton.addClickHandler(new PushClickHandler());
 
-		annuleerButton = new PushButton("annuleer");
+		annuleerButton = new PushButton(WebLogoGWT.rb.annuleerTekst()); //"annuleer");
 		annuleerButton.addStyleName(WebLogoGWT.webLogoGWTCssResource.pushbutton());
 		importPanel.add(annuleerButton);
 		importPanel.setWidgetLeftWidth(annuleerButton, buttonX + buttonWidth + offSet, Style.Unit.PX, buttonWidth, Style.Unit.PX);

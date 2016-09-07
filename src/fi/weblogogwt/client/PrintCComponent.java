@@ -12,7 +12,7 @@ public class PrintCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new TextParameter();
-		commandName = "print";
+		commandName = WebLogoGWT.rb.printTekst(); //"print";
 		commandNameTranslated = "print"; //JavaLogoWeb.rb.getString(commandName);
 	}
 	

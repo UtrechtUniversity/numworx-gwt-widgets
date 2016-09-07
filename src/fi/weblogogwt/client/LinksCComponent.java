@@ -11,7 +11,7 @@ public class LinksCComponent  extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new NumericParameter();
-		commandName = "links";
+		commandName = WebLogoGWT.rb.linksTekst(); //"links";
 		commandNameTranslated = "left"; //JavaLogoWeb.rb.getString(commandName);
 	}
 		

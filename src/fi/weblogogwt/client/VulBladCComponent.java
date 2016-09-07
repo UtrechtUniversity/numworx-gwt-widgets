@@ -16,7 +16,7 @@ public class VulBladCComponent extends ParameterCommandComponent
 		super(x, y, b, h, sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = "vulBlad";
+		commandName = WebLogoGWT.rb.vulBladTekst(); //"vulBlad";
 		commandNameTranslated = "fill area"; //JavaLogoWeb.rb.getString(commandName);
 	}
 

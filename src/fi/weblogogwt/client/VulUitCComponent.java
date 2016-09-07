@@ -8,7 +8,7 @@ public class VulUitCComponent extends SimpleCommandComponent
 {
 	public VulUitCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{	super(x,y,b,h,sv);
-		commandName = "vulUit";
+		commandName = WebLogoGWT.rb.vulUitTekst(); //"vulUit";
 		commandNameTranslated = "fillOff"; //JavaLogoWeb.rb.getString(commandName);
 	}
 	

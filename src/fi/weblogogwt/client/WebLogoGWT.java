@@ -54,8 +54,12 @@ import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
 import java.util.logging.Logger;
 
+import fi.weblogogwt.client.text.Text;
+
 public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView 
 {
+	
+	public static Text rb;
 	// logger
     static Logger logger = Logger.getLogger("WebLogoGWT");
 
@@ -140,7 +144,8 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	
 	public void getImages() 
 	{
-
+		rb = GWT.create(Text.class);
+		
 		webLogoGWTClientBundle = GWT.create(WebLogoGWTClientBundle.class);
 		webLogoGWTCssResource = webLogoGWTClientBundle.getWebLogoGWTCssResource();
 		webLogoGWTCssResource.ensureInjected();
@@ -405,7 +410,7 @@ logger.info("state != null");
 
 		if (codeIOZichtbaar)
 		{	
-			importButton = new PushButton("import");
+			importButton = new PushButton(rb.importTekst()); //"import");
 			importButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(importButton);
 			bottomPanel.setWidgetLeftWidth(importButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -414,7 +419,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth + 20;
 		
-			exportButton = new PushButton("export");
+			exportButton = new PushButton(rb.exportTekst()); //"export");
 			exportButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(exportButton);
 			bottomPanel.setWidgetLeftWidth(exportButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -424,7 +429,7 @@ logger.info("state != null");
 			currentX += leftOffset + buttonWidth + 20;
 		}
 
-		runButton = new PushButton("run");
+		runButton = new PushButton(rb.runTekst()); //"run");
 		runButton.addStyleName(webLogoGWTCssResource.pushbutton());
 		bottomPanel.add(runButton);
 		bottomPanel.setWidgetLeftWidth(runButton, currentX, Style.Unit.PX, buttonWidth - 10, Style.Unit.PX);
@@ -435,7 +440,7 @@ logger.info("state != null");
 		
 		if (traceZichtbaar)
 		{
-			traceAanKnop = new PushButton("trace aan");
+			traceAanKnop = new PushButton(rb.traceAanTekst()); //"trace aan");
 			traceAanKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(traceAanKnop);
 			bottomPanel.setWidgetLeftWidth(traceAanKnop, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -444,7 +449,7 @@ logger.info("state != null");
 			
 			currentX = leftOffset;
 		
-			traceUitKnop = new PushButton("trace uit");
+			traceUitKnop = new PushButton(rb.traceUitTekst()); //"trace uit");
 			traceUitKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(traceUitKnop);
 			bottomPanel.setWidgetLeftWidth(traceUitKnop, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -454,7 +459,7 @@ logger.info("state != null");
 	
 			currentX += leftOffset + buttonWidth + 20;
 			
-			beginKnop = new PushButton("begin");
+			beginKnop = new PushButton(rb.beginTekst()); //"begin");
 			beginKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(beginKnop);
 			bottomPanel.setWidgetLeftWidth(beginKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -464,7 +469,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth;
 			
-			stapKnop = new PushButton("stap");
+			stapKnop = new PushButton(rb.stapTekst()); //"stap");
 			stapKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(stapKnop);
 			bottomPanel.setWidgetLeftWidth(stapKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -474,7 +479,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth;
 
-			terugKnop = new PushButton("terug");
+			terugKnop = new PushButton(rb.terugTekst()); //"terug");
 			terugKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(terugKnop);
 			bottomPanel.setWidgetLeftWidth(terugKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -484,7 +489,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth;
 
-			skipKnop = new PushButton("skip");
+			skipKnop = new PushButton(rb.skipTekst()); //"skip");
 			skipKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(skipKnop);
 			bottomPanel.setWidgetLeftWidth(skipKnop, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -494,7 +499,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth;
 			
-			showVariables = new CheckBox("Toon vars");
+			showVariables = new CheckBox(rb.toonVarsTekst()); //"Toon vars");
 			bottomPanel.add(showVariables);
 			bottomPanel.setWidgetLeftWidth(showVariables, currentX, Style.Unit.PX, 2 * buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(showVariables, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);

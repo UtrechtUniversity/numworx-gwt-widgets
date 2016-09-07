@@ -28,8 +28,8 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 {
 	private BooleanParameter condition;
 	
-	private String alsString = "Als"; //JavaLogoWeb.rb.getString("alsLabel");
-	private String andersString = "Anders"; //JavaLogoWeb.rb.getString("andersLabel");
+	private String alsString = WebLogoGWT.rb.alsTekst(); //"Als"; //JavaLogoWeb.rb.getString("alsLabel");
+	private String andersString = WebLogoGWT.rb.andersTekst(); //"Anders"; //JavaLogoWeb.rb.getString("andersLabel");
 	public static final int blockX = 25;
 	// note: elseBlockX is variable, given by a method
 	public static final int ifBlockY = 25;
@@ -533,13 +533,15 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		
 	@Override
 	public String getCode(String tab)
-	{	String s = tab + "Keuze: Als "+condition.getParameterText()+" Dan\n" + tab +"{\n";
+	{	//String s = tab + "Keuze: Als "+condition.getParameterText()+" Dan\n" + tab +"{\n";
+		String s = tab + WebLogoGWT.rb.keuzeTekst() + " " + alsString + " " + condition.getParameterText()+ " " + 
+					WebLogoGWT.rb.danTekst() + "\n" + tab +"{\n";
 		String tabNieuw = tab + "    ";
 		s = s + ifBlock.getCode(tabNieuw);
 		s = s + tab + "}\n";
 		if (elseBlock != null && elseBlock.getComponentCount() > 0 )
 		{
-			s = s + tab + "Anders\n" + tab +"{\n";
+			s = s + tab + andersString + "\n" + tab +"{\n";
 			s = s + elseBlock.getCode(tabNieuw);
 			s = s + tab + "}\n";
 		}

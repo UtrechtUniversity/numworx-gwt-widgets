@@ -17,7 +17,7 @@ public class VulAanCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = "vulAan";
+		commandName = WebLogoGWT.rb.vulAanTekst(); //"vulAan";
 		commandNameTranslated = "fillOn"; //JavaLogoWeb.rb.getString(commandName);
 	}
 	

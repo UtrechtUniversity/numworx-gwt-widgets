@@ -35,7 +35,7 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 	public DeeltaakCallCComponent(int x, int y, int b, int h, int index, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
-		String commandNameBase = "deeltaak";
+		String commandNameBase = WebLogoGWT.rb.deeltaakTekst(); //"deeltaak";
 		commandName = commandNameBase+index;
 		commandNameTranslated = "subroutine" + index; //JavaLogoWeb.rb.getString(commandNameBase)+index;
 		noParameters = 0;
