@@ -103,6 +103,8 @@ import fi.graphtoolgwt.client.text.Text_nl;
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 //	private static Logger logger = Logger.getLogger("GraphToolGWT");
+	
+	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
 	final static int cPointRadius = 3;
 
@@ -1284,8 +1286,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	}
 
 	public void stop() {
-		if(mode != OpdrNavIF.OEFENEN_STRAFPUNTEN)
-			kijkNa();
+		if(mode != OpdrNavIF.OEFENEN_STRAFPUNTEN) {
+			kijkNa(); 
+		}
 	}
 
 	public void start() {
@@ -1430,10 +1433,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 //		}	
 		
 	}
-
 	
-	public void kijkNa(boolean show)
-	{	ingevuld = false;
+	public void kijkNa(boolean show) {
+		
+		ingevuld = false;
 		if(feedbackPanel != null)
 			feedbackPanel.removeFromParent();
 		if(typeOpdracht == VINDFORMULEBIJGRAFIEK)
@@ -2059,15 +2062,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	@Override
 	public HashMap<String, Object> getState() {
 		
-		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+		if ( (!moveActionActivated) && (mode == OpdrNavIF.EINDTOETS) ) {
 			formuleComponent.updateFormulas();
-			kijkNa();
-		} else {
-
-			if (mode == OpdrNavIF.EINDTOETS) {
-				formuleComponent.updateFormulas();
-				kijkNa(false);
-			}
+			kijkNa(false);
 		}
 		
 		double beginx = 1;
@@ -2405,13 +2402,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent.setState(h, null, null);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
-//		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
-//			kijkNa();
-//		} else {
-//			if (mode == OpdrNavIF.EINDTOETS) {
-//				kijkNa(false);
-//			}
-//		}
+		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
+			kijkNa();
+		} else {
+			if (mode == OpdrNavIF.EINDTOETS) {
+				kijkNa(false);
+			}
+		}
 		
 		grafiekGWTVeld.setState(h);
 		grafiekGWTVeld.paint();
@@ -3214,6 +3211,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	}
 	
 	public void mouseDownTouchStartAction(Object source, int eventX, int eventY, int pinchState) {	
+
+
 		//mouseDown = true;
 		//requestFocus(); //nodig?
 		if (pinchState == TWO_FINGERS)
@@ -3246,8 +3245,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		{	startxv = eventX;
 			startyv = eventY;
 		}
-		else if (tekenComponentAan && source == grafiekGWTCanvas)
-		{	if(typeOpdracht > GEENOPDRACHT)
+		else if (tekenComponentAan && source == grafiekGWTCanvas) {	
+			if(typeOpdracht > GEENOPDRACHT)
 			{	setColor(activeIndex - 1, opdrachtKleuren[activeIndex - 1], false);//checken of dit nog +/- 1 moet.
 			}
 			double pressedX = eventX;
@@ -3259,6 +3258,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			}
 			else if (tekenComponent.getCursorMode() == tekenComponent.DRAW)
 			{	
+
 				// geklikt met rechter muisknop, dit is gummen
 				/*
 				if ((e.getModifiers() & e.BUTTON1_MASK) == 0)
@@ -3301,18 +3301,20 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							}
 						}
 					}
+
 					// dragPoint slepen
-					if (dragPoint != null)
-					{	startxv = eventX;
+					if (dragPoint != null) {	
+						startxv = eventX;
 						startyv = eventY;
 					}	
-	       			else // tekenen
-	       			{	if(snapToGridPoints)
+	       			else { // tekenen 
+
+	       				if(snapToGridPoints)
 	       				{	pressedX = closestGridPix(pressedX, true);
 	       					pressedY = closestGridPix(pressedY, false);
 	       				}
 	       				int freePixX = closestFreePixX(pressedX);						
-	
+
 						RealPoint newPoint = pixelsToRealPoint(
 							new Point(freePixX, pressedY));
 						newPoint.setIndex(getActiveIndex());
@@ -3389,8 +3391,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			}
 		}
 	
-	
-	
 		//slider:
 		//misschien aanpassen nu ook schuifparameters erbij komen: raak toch weer in slider zelf laten bijhouden 
 		//zoals ook in de gewone graphtool gebeurt.
@@ -3406,11 +3406,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		startyv = eventY;
 
 		grafiekGWTVeld.paint();
+
 	}
 	
 	public void mouseMoveTouchMoveAction(Object source, int eventX, int eventY, int pinchState, int startDistance, int newDistance, int direction)
 	{	//if (!mouseDown)
 		//return;
+		moveActionActivated = true;
 
 		boolean schuifParameterTouched = false;
 		// Check schuifParameters
@@ -3683,7 +3685,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		*/
 	
 	public void mouseUpTouchEndAction(Object source, int eventX, int eventY) {	
-		
+		moveActionActivated = false;
+
 		boolean schuifParameterTouched = false;
 		// Check schuifParameters
 		if (schuifParameters != null) {	
@@ -3697,7 +3700,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			grafiekGWTVeld.paint();
 			return;
 		}
-
 		
 		if(zooming)
 		{	zooming = false;
