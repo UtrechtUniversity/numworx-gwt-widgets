@@ -11,27 +11,23 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 //import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
-
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import com.google.gwt.canvas.client.Canvas;
-
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -39,11 +35,13 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
+import fi.kladjegwt.client.text.Text;
+
 public class KladjeGWT implements EntryPoint, InteractionStub 
 {
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
-	
+	static final Text rb = GWT.create(Text.class);
 	// UI
 	DockLayoutPanel dlp;
 	LayoutPanel bottomPanel;
@@ -69,6 +67,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
+	
+	
 	
 	// images
 	KladjeGWTClientBundle kladjeGWTClientBundle;
@@ -346,7 +346,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		currentX += toggleSize + 2 * leftOffset;
 	
 		
-		terugButton = new PushButton("terug");
+		terugButton = new PushButton(rb.terugTekst());
 		terugButton.addStyleName("pushbutton");
 		bottomPanel.add(terugButton);
 		bottomPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
@@ -360,7 +360,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		currentX += buttonWidth + 2 * leftOffset;		
 
 
-		wisButton = new PushButton("wis");
+		wisButton = new PushButton(rb.wisTekst());
 		wisButton.addStyleName("pushbutton");
 		bottomPanel.add(wisButton);
 		bottomPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
