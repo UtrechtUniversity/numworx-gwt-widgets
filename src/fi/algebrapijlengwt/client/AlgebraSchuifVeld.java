@@ -1770,7 +1770,7 @@ else // alleenInvullen || isDemo
 			{	verwijder(schuifcomponenten[0]);
 			}
 			maakStapel();
-			if (owner.grafiekBox.getValue())
+			if (owner.grafiekBox != null && owner.grafiekBox.getValue())
 			{	
 				
 				//schuifcomponenten[aantalSc] = grafiekComponent;
