@@ -87,6 +87,9 @@ public class AlgebraSchuifComponent extends SchuifComponent
 		if (!visible)
 			return;
 			
+//if (isStapel)		
+//System.out.println("asc stapel " + xPos);
+
 		if (soort == 1 && open)
 		{	//gIm.setColor(Color.gray);
 			gIm.setFillStyle(CssColor.make(125,125,125));

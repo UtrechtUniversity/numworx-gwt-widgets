@@ -1255,20 +1255,26 @@ System.out.println("after " + this.aantalSc);
 	{
 		if (editmodeState == null)
 		{	
+//System.out.println("ems == null");			
 			int n = aantalSc;
 			for (int i = 0; i < n; i++)
 			{	verwijder(schuifcomponenten[0]);
 			}
 			maakStapel();
-			if (owner.grafiekBox.getValue())
+			if ((owner.grafiekBox != null)&& owner.grafiekBox.getValue())
 			{	
 				toonGrafiekComponent(true);
 				
 			}
-			zoomStateHolder = new ZoomStateHolder(this);				
+			zoomStateHolder = new ZoomStateHolder(this);
+			
 		}
 		else
-			setState(editmodeState);
+		{	setState(editmodeState);
+//System.out.println("ems != null");		
+		}
+		tekenOpnieuw();
+		
 	}
 	
 	public void toonGrafiekComponent(boolean b)

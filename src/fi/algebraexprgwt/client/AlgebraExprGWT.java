@@ -228,7 +228,7 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		currentY += buttonHeight + topOffset;
 		
 		//currentX = (asv.toolsWidth - checkBoxWidth) / 2;
-		currentX = 2 * leftOffset;
+		currentX = leftOffset;
 		
 		expressieBox = new CheckBox();
 		//expressieBox.setText("expressie");
