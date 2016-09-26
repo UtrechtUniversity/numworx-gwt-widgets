@@ -909,11 +909,14 @@ public class DotplotView extends LayoutPanel implements
 	{
 		boolean b = true;
 		
-		String valueString = (String) this.model.getStatTableModel().getValueAt(row, this.model.getColumnXIndex());
-		
-		if (valueString.equals(ColumnType.WILDCARD) || isOutOfRange(valueString))
+		if (getXType().isNumber())
 		{
-			b = false;
+			String valueString = (String) this.model.getStatTableModel().getValueAt(row, this.model.getColumnXIndex());
+			
+			if (valueString.equals(ColumnType.WILDCARD) || isOutOfRange(valueString))
+			{
+				b = false;
+			}
 		}
 		
 		return b;
