@@ -39,6 +39,7 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Style.TextAlign;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -3019,10 +3020,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void setSelectionBackground()
 	{
 		int[] list = this.getSelectedRows();
+		TableRowElement rowElement;
 		
 		for (int i = 0; i < list.length; i++)
 		{
-			this.table.getRowElement(list[i]).getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+			try
+			{
+				rowElement = this.table.getRowElement(list[i]);
+				if (rowElement != null)
+				{
+					rowElement.getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				
+			}
 		}
 	}
 
