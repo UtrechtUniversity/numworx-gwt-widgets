@@ -4,7 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
+
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -682,6 +686,9 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
 
         if (objectType == FUNCTION)
         {	panel3D.zetHoeken(angleXG, angleZG);
+//System.out.println("XG = " + UF.format(panel3D.angleX,2));
+//System.out.println("ZG = " + UF.format(panel3D.angleZ,2));
+
         }
         else if (objectType == SURFACE)
         {	panel3D.zetHoeken(angleXS, angleZS);
@@ -710,10 +717,13 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
     
     public void getHoeken()
     {
-//System.out.println("getH " + objectType);    	
+System.out.println("getH " + objectType);    	
         if (objectType == FUNCTION)
         {	angleXG = panel3D.angleX;
         	angleZG = panel3D.angleZ;
+System.out.println("XG = " + UF.format(panel3D.angleX,2));
+System.out.println("ZG = " + UF.format(panel3D.angleZ,2));
+        	
         }
         else if (objectType == SURFACE)
         {	angleXS = panel3D.angleX;
@@ -2831,6 +2841,7 @@ System.out.println("g3dc zetOpdracht");
 		
 		this.figuurIsDemo = figuurIsDemo;		
 		//zetFiguurIsDemo(figuurIsDemo);
+
 		
 		// state
 		int objectType = FUNCTION;
@@ -3122,10 +3133,12 @@ System.out.println("g3dc zetOpdracht");
 
 	}
 	
-	public void setState(HashMap<String,Object> b)
+	public void setState(Map<String,Object> map, boolean repaint)
 	{
 		
 System.out.println("g3dc setState");		
+		
+		ObjectMap b = JSONUtilities.wrapMap(map);
 		
 		// state
 		int objectType = FUNCTION;
@@ -3177,21 +3190,24 @@ System.out.println("g3dc setState");
 	    CssColor surfaceColor = transYellow;
 		
 		if (b.containsKey("objectType"))
-			objectType = ((Integer) b.get("objectType")).intValue();
+			objectType = b.getInt("objectType");
 		this.objectType = objectType;
 
 		zoomStandaard(false, objectType);
 		
 		// FUNCTION
 		if (b.containsKey("angleXG"))
-			angleXG = ((Double) b.get("angleXG")).doubleValue();
+			angleXG = b.getDouble("angleXG");
 		if (b.containsKey("angleZG"))
-			angleZG = ((Double) b.get("angleZG")).doubleValue();
+			angleZG = b.getDouble("angleZG");
 		this.angleXG = angleXG;
 		this.angleZG = angleZG;
 		
+		boolean zoomGChanged = false;
 		if (b.containsKey("zoomFactorG"))
-			zoomFactorG = ((Integer) b.get("zoomFactorG")).intValue();
+			zoomFactorG = b.getInt("zoomFactorG");
+		if (this.zoomFactorG != zoomFactorG)
+			zoomGChanged = true;
 		if (zoomFactorG < 0)
 		{	for (int zUitCnt = zoomFactorG; zUitCnt < 0; zUitCnt++)
 				zoomUit(false, FUNCTION);
@@ -3201,8 +3217,11 @@ System.out.println("g3dc setState");
 				zoomIn(false, FUNCTION);
 		}
 		
+		boolean transXGChanged = false;
 		if (b.containsKey("translateXFactorG"))
-			translateXFactorG = ((Integer) b.get("translateXFactorG")).intValue();
+			translateXFactorG = b.getInt("translateXFactorG");
+		if (this.translateXFactorG != translateXFactorG)
+			transXGChanged = true;
 		if (translateXFactorG > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateXFactorG; tPlusCnt++)
 				transPlusX(false, FUNCTION);
@@ -3211,8 +3230,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateXFactorG; tMinCnt < 0; tMinCnt++)
 				transMinX(false, FUNCTION);
 		}
+		
+		boolean transYGChanged = false;
 		if (b.containsKey("translateYFactorG"))
-			translateYFactorG = ((Integer) b.get("translateYFactorG")).intValue();
+			translateYFactorG = b.getInt("translateYFactorG");
+		if (this.translateYFactorG != translateYFactorG)
+			transYGChanged = true;
 		if (translateYFactorG > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateYFactorG; tPlusCnt++)
 				transPlusY(false, FUNCTION);
@@ -3221,8 +3244,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateYFactorG; tMinCnt < 0; tMinCnt++)
 				transMinY(false, FUNCTION);
 		}
+		
+		boolean transZGChanged = false;
 		if (b.containsKey("translateZFactorG"))
-			translateZFactorG = ((Integer) b.get("translateZFactorG")).intValue();
+			translateZFactorG = b.getInt("translateZFactorG");
+		if (this.translateZFactorG != translateZFactorG)
+			transZGChanged = true;
 		if (translateZFactorG > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateZFactorG; tPlusCnt++)
 				transPlusZ(false, FUNCTION);
@@ -3232,12 +3259,19 @@ System.out.println("g3dc setState");
 				transMinZ(false, FUNCTION);
 		}
 		
+		boolean wireFrameGChanged = false;
 		if (b.containsKey("wireFrameG"))
-			wireFrameG = ((Boolean) b.get("wireFrameG")).booleanValue();
-		this.wireFrameG = wireFrameG;
-
+			wireFrameG = b.getBoolean("wireFrameG");
+		if (this.wireFrameG != wireFrameG)
+		{	wireFrameGChanged = true;
+			this.wireFrameG = wireFrameG;
+		}
+		
+		boolean finerGChanged = false;
 		if (b.containsKey("finerFactorG"))
-			finerFactorG = ((Integer) b.get("finerFactorG")).intValue();
+			finerFactorG = b.getInt("finerFactorG");
+		if (this.finerFactorG != finerFactorG)
+			finerGChanged = true;
 		if (finerFactorG > 0)
 		{	for (int fPlusCnt = 0; fPlusCnt < finerFactorG; fPlusCnt++)
 				zetFijner(false, FUNCTION);
@@ -3247,36 +3281,55 @@ System.out.println("g3dc setState");
 				zetGrover(false, FUNCTION);
 		}
 		
+		boolean axesGChanged = false;
 		if (b.containsKey("noAxesG"))
-			noAxesG = ((Boolean) b.get("noAxesG")).booleanValue();
+			noAxesG = b.getBoolean("noAxesG");
 		if (b.containsKey("floorTypeG"))
-			floorTypeG = ((Integer) b.get("floorTypeG")).intValue();
-		this.noAxesG = noAxesG;
+			floorTypeG = b.getInt("floorTypeG");
+		if (this.noAxesG != noAxesG)
+		{	axesGChanged = true;
+			this.noAxesG = noAxesG;
+System.out.println("noAxesG " + noAxesG);			
+		}
 		this.floorTypeG = floorTypeG;
 
+		// niet geimplementeerd
 		if (b.containsKey("labelTypeG"))
-			labelTypeG = ((Integer) b.get("labelTypeG")).intValue();
+			labelTypeG = b.getInt("labelTypeG");
 		this.labelTypeG = labelTypeG;
 		
+		boolean projGChanged = false;
 		if (b.containsKey("centraleProjG"))
-			centraleProjG = ((Boolean) b.get("centraleProjG")).booleanValue();
-		this.centraleProjG = centraleProjG;
+			centraleProjG = b.getBoolean("centraleProjG");
+		if (this.centraleProjG != centraleProjG)
+		{	projGChanged = true;
+			this.centraleProjG = centraleProjG;
+			zetCentraleProjectie(centraleProjG, FUNCTION);
+		}
 		
-		if (b.containsKey("graphColor"))
-			graphColor = (CssColor) b.get("graphColor");
-		this.graphColor = graphColor;
+		String graphColorString = ""; 
+		if (b.containsKey("graphColorString"))
+		{	graphColorString = b.getString("graphColorString");
+			graphColor = CssColor.make(graphColorString);
+			this.graphColor = graphColor;
+//System.out.println("gCS = " + graphColorString);
+//System.out.println("gC = " + graphColor.toString());
+		}	
 		
 		
 		// SURFACE
 		if (b.containsKey("angleXS"))
-			angleXS = ((Double) b.get("angleXS")).doubleValue();
+			angleXS = b.getDouble("angleXS");
 		if (b.containsKey("angleZS"))
-			angleZS = ((Double) b.get("angleZS")).doubleValue();
+			angleZS = b.getDouble("angleZS");
 		this.angleXS = angleXS;
 		this.angleZS = angleZS;
 		
+		boolean zoomSChanged = false;
 		if (b.containsKey("zoomFactorS"))
-			zoomFactorS = ((Integer) b.get("zoomFactorS")).intValue();
+			zoomFactorS = b.getInt("zoomFactorS");
+		if (this.zoomFactorS != zoomFactorS)
+			zoomSChanged = true;
 		if (zoomFactorS < 0)
 		{	for (int zUitCnt = zoomFactorS; zUitCnt < 0; zUitCnt++)
 			zoomUit(false, SURFACE);
@@ -3286,8 +3339,11 @@ System.out.println("g3dc setState");
 			zoomIn(false, SURFACE);
 		}
 		
+		boolean transXSChanged = false;
 		if (b.containsKey("translateXFactorS"))
-			translateXFactorS = ((Integer) b.get("translateXFactorS")).intValue();
+			translateXFactorS = b.getInt("translateXFactorS");
+		if (this.translateXFactorS != translateXFactorS)
+			transXSChanged = true;
 		if (translateXFactorS > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateXFactorS; tPlusCnt++)
 				transPlusX(false, SURFACE);
@@ -3296,8 +3352,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateXFactorS; tMinCnt < 0; tMinCnt++)
 				transMinX(false, SURFACE);
 		}
+		
+		boolean transYSChanged = false;
 		if (b.containsKey("translateYFactorS"))
-			translateYFactorS = ((Integer) b.get("translateYFactorS")).intValue();
+			translateYFactorS = b.getInt("translateYFactorS");
+		if (this.translateYFactorS != translateYFactorS)
+			transYSChanged = true;
 		if (translateYFactorS > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateYFactorS; tPlusCnt++)
 				transPlusY(false, SURFACE);
@@ -3306,8 +3366,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateYFactorS; tMinCnt < 0; tMinCnt++)
 				transMinY(false, SURFACE);
 		}
+		
+		boolean transZSChanged = false;
 		if (b.containsKey("translateZFactorS"))
-			translateZFactorS = ((Integer) b.get("translateZFactorS")).intValue();
+			translateZFactorS = b.getInt("translateZFactorS");
+		if (this.translateZFactorS != translateZFactorS)
+			transZSChanged = true;
 		if (translateZFactorS > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateZFactorS; tPlusCnt++)
 				transPlusZ(false, SURFACE);
@@ -3317,39 +3381,59 @@ System.out.println("g3dc setState");
 				transMinZ(false, SURFACE);
 		}
 		
+		boolean wireFrameSChanged = false;
 		if (b.containsKey("wireFrameS"))
-			wireFrameS = ((Boolean) b.get("wireFrameS")).booleanValue();
-		this.wireFrameS = wireFrameS;
+		{	wireFrameS = b.getBoolean("wireFrameS");
+		}
+		if (this.wireFrameS != wireFrameS)
+		{	wireFrameSChanged = true;
+			this.wireFrameS = wireFrameS;
+		}
 
+		boolean axesSChanged = false;
 		if (b.containsKey("noAxesS"))
-			noAxesS = ((Boolean) b.get("noAxesS")).booleanValue();
+			noAxesS = b.getBoolean("noAxesS");
 		if (b.containsKey("floorTypeS"))
-			floorTypeS = ((Integer) b.get("floorTypeS")).intValue();
-		this.noAxesS = noAxesS;
+			floorTypeS = b.getInt("floorTypeS");
+		if (this.noAxesS != noAxesS)
+		{	axesSChanged = true;
+			this.noAxesS = noAxesS;
+		}
 		this.floorTypeS = floorTypeS;
 
 		if (b.containsKey("labelTypeS"))
-			labelTypeS = ((Integer) b.get("labelTypeS")).intValue();
+			labelTypeS = b.getInt("labelTypeS");
 		this.labelTypeS = labelTypeS;
 
+		boolean projSChanged = false;
 		if (b.containsKey("centraleProjS"))
-			centraleProjS = ((Boolean) b.get("centraleProjS")).booleanValue();
-		this.centraleProjS = centraleProjS;
+			centraleProjS = b.getBoolean("centraleProjS");
+		if (this.centraleProjS != centraleProjS)
+		{	projSChanged = true;
+			this.centraleProjS = centraleProjS;
+			zetCentraleProjectie(centraleProjS, SURFACE);
+		}
 		
-		if (b.containsKey("surfaceColor"))
-			surfaceColor = (CssColor) b.get("surfaceColor");
-		this.surfaceColor = surfaceColor;
+		String surfaceColorString = "";
+		if (b.containsKey("surfaceColorString"))
+		{	surfaceColorString = b.getString("surfaceColorString");
+			surfaceColor = CssColor.make(surfaceColorString);
+			this.surfaceColor = surfaceColor;
+		}	
 		
 		// CURVE
 		if (b.containsKey("angleXC"))
-			angleXC = ((Double) b.get("angleXC")).doubleValue();
+			angleXC = b.getDouble("angleXC");
 		if (b.containsKey("angleZC"))
-			angleZC = ((Double) b.get("angleZC")).doubleValue();
+			angleZC = b.getDouble("angleZC");
 		this.angleXC = angleXC;
 		this.angleZC = angleZC;
 		
+		boolean zoomCChanged = false;
 		if (b.containsKey("zoomFactorC"))
-			zoomFactorC = ((Integer) b.get("zoomFactorC")).intValue();
+			zoomFactorC = b.getInt("zoomFactorC");
+		if (this.zoomFactorC != zoomFactorC)
+			zoomCChanged = true;
 		if (zoomFactorC < 0)
 		{	for (int zUitCnt = zoomFactorC; zUitCnt < 0; zUitCnt++)
 				zoomUit(false, CURVE);
@@ -3359,8 +3443,11 @@ System.out.println("g3dc setState");
 			zoomIn(false, CURVE);
 		}
 		
+		boolean transXCChanged = false;
 		if (b.containsKey("translateXFactorC"))
-			translateXFactorC = ((Integer) b.get("translateXFactorC")).intValue();
+			translateXFactorC = b.getInt("translateXFactorC");
+		if (this.translateXFactorC != translateXFactorC)
+			transXSChanged = true;
 		if (translateXFactorC > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateXFactorC; tPlusCnt++)
 				transPlusX(false, CURVE);
@@ -3369,8 +3456,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateXFactorC; tMinCnt < 0; tMinCnt++)
 				transMinX(false, CURVE);
 		}
+		
+		boolean transYCChanged = false;
 		if (b.containsKey("translateYFactorC"))
-			translateYFactorC = ((Integer) b.get("translateYFactorC")).intValue();
+			translateYFactorC = b.getInt("translateYFactorC");
+		if (this.translateYFactorC != translateYFactorC)
+			transYSChanged = true;
 		if (translateYFactorC > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateYFactorC; tPlusCnt++)
 				transPlusY(false, CURVE);
@@ -3379,8 +3470,12 @@ System.out.println("g3dc setState");
 		{	for (int tMinCnt = translateYFactorC; tMinCnt < 0; tMinCnt++)
 				transMinY(false, CURVE);
 		}
+		
+		boolean transZCChanged = false;
 		if (b.containsKey("translateZFactorC"))
-			translateZFactorC = ((Integer) b.get("translateZFactorC")).intValue();
+			translateZFactorC = b.getInt("translateZFactorC");
+		if (this.translateZFactorC != translateZFactorC)
+			transZSChanged = true;
 		if (translateZFactorC > 0)
 		{	for (int tPlusCnt = 0; tPlusCnt < translateZFactorC; tPlusCnt++)
 				transPlusZ(false, CURVE);
@@ -3390,26 +3485,110 @@ System.out.println("g3dc setState");
 				transMinZ(false, CURVE);
 		}
 
+		boolean axesCChanged = false;
 		if (b.containsKey("noAxesC"))
-			noAxesC = ((Boolean) b.get("noAxesC")).booleanValue();
+		{	noAxesC = b.getBoolean("noAxesC");
+//System.out.println("noAxesC = " + noAxesC);		
+		}
 		if (b.containsKey("floorTypeC"))
-			floorTypeC = ((Integer) b.get("floorTypeC")).intValue();
-		this.noAxesC = noAxesC;
+			floorTypeC = b.getInt("floorTypeC");
+		if (this.noAxesC != noAxesC)
+		{	axesCChanged = true;	
+//System.out.println("axesCChanged = " + axesCChanged);		
+			this.noAxesC = noAxesC;
+		}
 		this.floorTypeC = floorTypeC;
 		
+		// niet geimplementeerd
 		if (b.containsKey("labelTypeC"))
-			labelTypeC = ((Integer) b.get("labelTypeC")).intValue();
+			labelTypeC = b.getInt("labelTypeC");
 		this.labelTypeC = labelTypeC;
 
+		boolean projCChanged = false;
 		if (b.containsKey("centraleProjC"))
-			centraleProjC = ((Boolean) b.get("centraleProjC")).booleanValue();
-		this.centraleProjC = centraleProjC;
+			centraleProjC = b.getBoolean("centraleProjC");
+		if (this.centraleProjC != centraleProjC)
+		{	projCChanged = true;
+			this.centraleProjC = centraleProjC;
+			zetCentraleProjectie(centraleProjC, CURVE);
+		}
+		
+		zetHoeken();
+		if (zoomGChanged || zoomSChanged || zoomCChanged || transXGChanged || transYGChanged || transZGChanged ||
+			transXSChanged || transYSChanged || transZSChanged || transXCChanged || transYCChanged || transZCChanged ||
+			finerGChanged || wireFrameGChanged || wireFrameSChanged || axesGChanged || axesSChanged || axesCChanged || 
+			projGChanged || projSChanged || projCChanged || repaint)
+		{
+			// dit veroorzaakt een newModel()
+			if ((axesGChanged && noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged) 
+				zetGeenAssen(true, FUNCTION);
+			else if ((axesGChanged && !noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged)
+				zetxyzAs(true, FUNCTION);
+			if ((axesSChanged && noAxesS) || zoomSChanged || transXSChanged || transYSChanged || transZSChanged) 
+				zetGeenAssen(true, SURFACE);
+			else if ((axesSChanged && !noAxesS) || zoomSChanged || transXSChanged || transYSChanged || transZSChanged)
+				zetxyzAs(true, SURFACE);
+			if ((axesCChanged && noAxesC) || zoomCChanged || transXCChanged || transYCChanged || transZCChanged) 
+				zetGeenAssen(true, CURVE);
+			else if ((axesCChanged && !noAxesC) || zoomCChanged || transXCChanged || transYCChanged || transZCChanged)
+				zetxyzAs(true, CURVE);
+
+			
+			// dit veroorzaakt een paint
+			zetDraadFiguur(objectType);
+		}
+		
+		if ((objectType == FUNCTION) && !centraleProjG)
+			owner.projectieButton.setDown(true);
+		if ((objectType == SURFACE) && !centraleProjS)
+			owner.projectieButton.setDown(true);
+		if ((objectType == CURVE) && !centraleProjC)
+			owner.projectieButton.setDown(true);
+		if ((objectType == FUNCTION) && noAxesG)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,true);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
+		}
+		if ((objectType == SURFACE) && noAxesS)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,true);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
+		
+		}
+		if ((objectType == CURVE) && noAxesC)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,true);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
+
+		}
+		if ((objectType == FUNCTION) && wireFrameG)
+		{	//owner.solidWireButton.setDown(true);
+			if (owner.solidButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.solidButton,true);
+			if (owner.wireButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.wireButton,false);
+		}
+		if ((objectType == SURFACE) && wireFrameS)
+		{	//owner.solidWireButton.setDown(true);
+			if (owner.solidButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.solidButton,true);
+			if (owner.wireButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.wireButton,false);
+		
+		}
 		
 		// hier, objectType nodig
 		//layoutKnoppenPanel();
 		
+		//if (repaint)
+		//	panel3D.paint(grafiek3DContext2d);
 		
-		//functieEditor.setState(b);
 	}
 	
 	public void setEditState(HashMap<String,Object> b)
@@ -3804,8 +3983,8 @@ System.out.println("g3dc setEditState");
 		h.put("centraleProjS", new Boolean(centraleProjS));
 		h.put("centraleProjC", new Boolean(centraleProjC));
 		
-		h.put("graphColor", graphColor);
-		h.put("surfaceColor", surfaceColor);
+		h.put("graphColorString", graphColor.value());
+		h.put("surfaceColorString", surfaceColor.value());
 		
 		return h;
 	}

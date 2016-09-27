@@ -24,4 +24,7 @@ public interface Grafiek3DGWTCssResource extends CssResource
 	
 	String pushbutton();
 	
+	String pushbutton1();
+	
+	String label();
 }

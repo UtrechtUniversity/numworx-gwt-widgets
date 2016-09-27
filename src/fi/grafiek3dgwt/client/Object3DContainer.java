@@ -243,7 +243,7 @@ public static String testString = "";
 		//g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		//g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
     	
-//System.out.println("paint " + paintCnt);    	
+System.out.println("paint " + paintCnt);    	
 
 		if (model == null)
 		{	// outline only
@@ -260,7 +260,7 @@ public static String testString = "";
 	        g.setFillStyle(Grafiek3DComponent.red);
 	        g.fillText("even geduld ... ", breedte / 2, hoogte / 2);
 	        
-System.out.println("geduld");	        
+//System.out.println("geduld");	        
 	        
 			return;
         }

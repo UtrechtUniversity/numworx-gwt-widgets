@@ -22,9 +22,9 @@
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
 
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='fi.grafiek3dgwt.client.Grafiek3DGWT'/>
+  <!-- <entry-point class='fi.grafiek3dgwt.client.Grafiek3DGWT'/> -->
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
-  <add-linker name="xsiframe"/>
+
 </module>
