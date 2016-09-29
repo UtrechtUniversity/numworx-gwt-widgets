@@ -1,100 +1,249 @@
 package fi.sliderwidgetgwt.client;
 
-import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.canvas.dom.client.CssColor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
+
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.MouseMoveEvent;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
-import com.google.gwt.event.dom.client.MouseUpEvent;
-import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 
-public class SliderWidgetGWT implements EntryPoint, MouseDownHandler, MouseMoveHandler, MouseUpHandler {
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
+public class SliderWidgetGWT implements EntryPoint, InteractionStub
+{
+	private static final Logger logger = Logger.getLogger(SliderWidgetGWT.class.getName());
+
+	OpdrNavIF comRoot;
+
+	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
+
+	static final String holderId = "dockholder";
+	SimplePanel simpel = new SimplePanel();
+	SliderWidgetInteractiePanel basisPanel;
 	
+	public static int DEFAULT_WIDTH = 560;
+	public static int DEFAULT_HEIGHT = 340;
+	int breedte = SliderWidgetGWT.DEFAULT_WIDTH;
+	int hoogte = SliderWidgetGWT.DEFAULT_HEIGHT;
+	boolean volledigeBreedte = false;
+	private Map<String, Object> launchState; 
 
-	static final String upgradeMessage = 
-			"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
-	public Canvas sliderGWTCanvas;
-	public Context2d context;
-	
 	int sliderPosition;
-	boolean dragging=false;
+
 	
-	public void onModuleLoad() {
-		sliderGWTCanvas = Canvas.createIfSupported(); 
-
-		sliderGWTCanvas.setWidth("560px");
-		sliderGWTCanvas.setHeight("340px");
-		sliderGWTCanvas.setCoordinateSpaceWidth(560);
-		sliderGWTCanvas.setCoordinateSpaceHeight(340);
-
-		if (sliderGWTCanvas == null) 
+	/*
+	 * Default zero argument constructor is required.
+	 */
+	public SliderWidgetGWT()
+	{
+	}
+	
+	public SliderWidgetGWT(HashMap<String, Object> h, String[] randomVarNamen, HashMap randomVarWaarden, int volleBreedte)
+	{	
+		basisPanel = new SliderWidgetInteractiePanel();
+		basisPanel.geefSchuifParameter().geefSlider().setSliderWidgetGWT(this); // backlink tbv cross widget communicatie
+		
+		ObjectMap map = JSONUtilities.wrapMap(h);
+	
+		if (map != null)
 		{
-	      RootPanel.get().add(new Label(upgradeMessage));
-	      return;
-	    }
+			if (map.containsKey("breedte"))
+			{
+				breedte = map.getInt("breedte");
+			}
+			if (map.containsKey("hoogte"))
+			{
+				hoogte = map.getInt("hoogte");
+			}
+			if (map.containsKey("volledigeBreedte"))
+			{
+				volledigeBreedte = map.getBoolean("volledigeBreedte");
+			}
+		}
+
+		if (volledigeBreedte)
+		{
+			breedte = volleBreedte;
+		}
+	
+		if (h != null && h.get("interactiePanelLaunchState") != null)
+		{
+			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
+		}
+
+		//alle gegevens uit launchState halen: 
+		init(breedte, hoogte, launchState, randomVarWaarden);
+	}
+
+	/**
+	 * Initialize with the values in launch data.
+	 */
+	@Override
+	public void init(int width, int height, Map<String, Object> launchDataMap,
+		Map<String, Number> values)
+	{
+		breedte = width;
+		hoogte = height;
 		
-		context = sliderGWTCanvas.getContext2d();		
-		sliderGWTCanvas.addMouseMoveHandler(this);
-		sliderGWTCanvas.addMouseDownHandler(this);
-		sliderGWTCanvas.addMouseUpHandler(this);
+		launchState = launchDataMap;
 		
-		RootPanel.get().add(sliderGWTCanvas);
+		// in initialize() wordt de launchState in sliderwidget gezet
+		this.initialize();
 		
+		simpel.setWidget(asWidget());
+	}
+	
+	/**
+	 * Deze methode wordt aangeroepen in init()
+	 */
+	private void initialize()
+	{
+		System.out.println("SliderWidgetGWT.initialize(): breedte = " + breedte + ", hoogte = " + hoogte);
 		
-		sliderPosition=0;
+		basisPanel.setSize(breedte, hoogte);
+		basisPanel.setState((HashMap) launchState);
+		
 		paint();
 	}
 
-	public void paint() {
+	public void onModuleLoad()
+	{
+		basisPanel = new SliderWidgetInteractiePanel();
+		basisPanel.geefSchuifParameter().geefSlider().setSliderWidgetGWT(this); // backlink tbv cross widget communicatie
+		basisPanel.setWidth("" + breedte);
+		basisPanel.setHeight("" + hoogte);
+		basisPanel.setPixelSize(breedte, hoogte);
 		
-		context.setFillStyle(CssColor.make(255,255,255));
-		context.fillRect(0,0,560,340);
+		try
+		{
+			RootPanel.get(holderId).add(simpel);
+			RootPanel.get(holderId).setStyleName("root");
+		}
+		catch (Exception e)
+		{
+		}
 		
-		context.beginPath();
-		context.moveTo(20, 50);
-		context.lineTo(220,50);
-		context.stroke();
-		
-		context.setFillStyle(CssColor.make(255,0,0));
-		context.setLineWidth(1);
-		context.setStrokeStyle(CssColor.make(0,0,0));
-		context.beginPath();
-		context.arc(20+sliderPosition, 50, 8, 0, Math.PI * 2.0, true);
-		context.closePath();
-		context.fill();
+		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+		Stub.publish(this); // deze regel uitzetten voor standalone test
 	}
-	@Override
-	public void onMouseDown(MouseDownEvent event) {
-		// TODO Auto-generated method stub
-		
-		if (event.getX()>=20+sliderPosition-4 && event.getX()<=20+sliderPosition+4 && event.getY()>=46 && event.getY()<=54)
-			dragging=true;
-		//Window.alert(Integer.toString(event.getX())+" "+Integer.toString(event.getY()));
+
+	public void paint()
+	{
+		basisPanel.paint();
 	}
 
 	@Override
-	public void onMouseMove(MouseMoveEvent event) {
+	public HashMap<String, Object> getState()
+	{
+		return this.basisPanel.getState();
+	}
+
+	@Override
+	public void setState(HashMap<String, Object> h)
+	{
+		if (h == null || h.isEmpty()) 
+			return;
+		
+		this.basisPanel.setState(h);
+	}
+
+	@Override
+	public int getScore()
+	{
 		// TODO Auto-generated method stub
-		if (dragging==true) {
-			sliderPosition=event.getX()-20;
-			if (sliderPosition<0)
-				sliderPosition=0;
-			if (sliderPosition>200)
-				sliderPosition=200;
-			paint();
+		return 0;
+	}
+
+	@Override
+	public int[][] getScoreObjectives()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Boolean isCorrect()
+	{
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void kijkNa()
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void zetNagekeken(boolean b)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setCommunicationRoot(OpdrNavIF comRoot)
+	{
+		this.comRoot = comRoot;
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public Widget asWidget()
+	{
+		return basisPanel;
+	}
+
+	@Override
+	public int getAsHoogte()
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int getHeight()
+	{
+		return hoogte;
+	}
+
+	@Override
+	public int getWidth()
+	{
+		return breedte;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte)
+	{
+		// TODO Auto-generated method stub
+	}
+	
+	public void fire(String command, String name, Object value)
+	{
+		if (comRoot != null)
+		{
+			Map<String,Object> map = new HashMap<String,Object>();
+			// haal de waarden uit schuifparameter
+			name = basisPanel.geefSchuifParameter().geefNaam();
+			map.put("name", name);
+			value = basisPanel.geefSchuifParameter().geefDoubleStand();
+			map.put("value", value);
+			CBookEvent event = new CBookEvent(this, "double.sliderValue", map);
+			comRoot.fireEvent(event);
 		}
 	}
 
-	@Override
-	public void onMouseUp(MouseUpEvent event) {
-		// TODO Auto-generated method stub
-		dragging=false;
-	}
 }
