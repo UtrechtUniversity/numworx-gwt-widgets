@@ -393,9 +393,13 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			int maxScore = 10;
 			
 			if ((launchState != null) && launchState.containsKey("taakNummer"))
-				taakNummer = launchState.getInt("taakNummer");
+			{	taakNummer = launchState.getInt("taakNummer");
+System.out.println("taakNummer = " + taakNummer);			
+			}
 			if ((launchState != null) && launchState.containsKey("groteBalletjes"))
-				groteBalletjes = launchState.getBoolean("groteBalletjes");
+			{	groteBalletjes = launchState.getBoolean("groteBalletjes");
+System.out.println("groteBalletjes = " + groteBalletjes);			
+			}
 			if ((launchState != null) && launchState.containsKey("roosterZichtbaar"))
 				roosterZichtbaar = launchState.getBoolean("roosterZichtbaar");
 			if ((launchState != null) && launchState.containsKey("schaduwZichtbaar"))
@@ -405,7 +409,9 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			if ((launchState != null) && launchState.containsKey("resetButton"))
 				resetButton = launchState.getBoolean("resetButton");
 			if ((launchState != null) && launchState.containsKey("gridSize"))
-				gridSize = launchState.getInt("gridSize");
+			{	gridSize = launchState.getInt("gridSize");
+System.out.println("gridSize = " + gridSize);			
+			}
 			if ((launchState != null) && launchState.containsKey("rodeFiguurString"))
 				rodeFiguurString = launchState.getString("rodeFiguurString");
 			if ((launchState != null) && launchState.containsKey("grijzeFiguurString"))
@@ -433,7 +439,7 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			dp2.showSizes = afmetingenZichtbaar;			
 			dp2.figuurTransparant = figuurTransparant;
 			dp2.gridSize = gridSize;
-			dp2.clickDis = gridSize / 2;
+			//dp2.clickDis = gridSize / 2;
 			
 			rodeFiguurCoordinaten = processFiguurString(rodeFiguurString);
 

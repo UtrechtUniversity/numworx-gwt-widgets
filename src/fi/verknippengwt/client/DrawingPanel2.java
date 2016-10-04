@@ -2129,7 +2129,9 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 							RealPoint rotPoint = draggPolygon.getRotationPoint();
 							if (realClicked.distance(rotPoint) < clickDis)
 							{	// roteer en stop ermee(?)
+								removeGridOnEdge();
 								handleRotation(draggPolygon, rotPoint);
+								
 								return;
 							}
 							// maak sowieso het rotationPoint zichtbaar
@@ -2146,6 +2148,8 @@ if ((owner.taakNummer == 2) || (owner.taakNummer == 3))
 							knippen = false;
 							startX = eventX;
 							startY = eventY;
+							
+							removeGridOnEdge();
 						} // draggPolygon != null
 						
 						else // kijk of er op een label of op een deel van een labelpunt buiten het polygon geklikt is
