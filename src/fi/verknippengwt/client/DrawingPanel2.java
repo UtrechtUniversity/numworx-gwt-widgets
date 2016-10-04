@@ -184,7 +184,7 @@ public class DrawingPanel2 extends LayoutPanel //extends JPanel
 		dp2Canvas.addTouchEndHandler(touchHandler);
 
 		
-	
+/*	
 		if (owner.groteBalletjes)
 		{	clickDis = 7;
 			ovalSize = 13;
@@ -193,6 +193,7 @@ public class DrawingPanel2 extends LayoutPanel //extends JPanel
 		{	clickDis = 4;
 			ovalSize = 8;
 		}
+*/		
 	
 //GWT		
 		labelWidth = 50; //owner.theBoldFM.stringWidth("XXXXXXX");
