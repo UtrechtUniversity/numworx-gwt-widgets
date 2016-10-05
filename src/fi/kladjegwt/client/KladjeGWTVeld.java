@@ -1464,17 +1464,27 @@ public class KladjeGWTVeld
 		{
 			Object o = (Object) objectsSelected.elementAt(oCnt);
 			if (o instanceof Streep && ((Streep) o).deletable)
-				streepVector.removeElement((Streep) o);
+			{	streepVector.removeElement((Streep) o);
+				gewist = true;
+			}
 			else if (o instanceof Lijn && ((Lijn) o).deletable)
-				lijnVector.removeElement((Lijn) o);
+			{	lijnVector.removeElement((Lijn) o);
+				gewist = true;
+			}
 			else if (o instanceof Rechthoek && ((Rechthoek) o).deletable)
-				rechthoekVector.removeElement((Rechthoek) o);
+			{	rechthoekVector.removeElement((Rechthoek) o);
+				gewist = true;
+			}
 			else if (o instanceof Ellips && ((Ellips) o).deletable)
-				ellipsVector.removeElement((Ellips) o);
+			{	ellipsVector.removeElement((Ellips) o);
+				gewist = true;
+			}
 			else if (o instanceof TekstElement && ((TekstElement) o).deletable)
-				tekstElementVector.removeElement((TekstElement) o);
+			{	tekstElementVector.removeElement((TekstElement) o);
+				gewist = true;
+			}
 			
-			gewist = true;
+			//gewist = true;
 		}
 		
 		sleepSelectie = false;
