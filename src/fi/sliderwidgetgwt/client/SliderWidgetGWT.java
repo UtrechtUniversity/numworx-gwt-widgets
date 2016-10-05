@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -18,13 +18,15 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class SliderWidgetGWT implements EntryPoint, InteractionStub
 {
+	private static final String XWIDGET_DOUBLE_SLIDER_VALUE = "double.sliderValue";
+
 	private static final Logger logger = Logger.getLogger(SliderWidgetGWT.class.getName());
 
 	OpdrNavIF comRoot;
 
-	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
-
-	static final String holderId = "dockholder";
+	/**
+	 * Simple panel om basisPanel te tonen.
+	 */
 	SimplePanel simpel = new SimplePanel();
 	SliderWidgetInteractiePanel basisPanel;
 	
@@ -35,10 +37,6 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 	boolean volledigeBreedte = false;
 	private Map<String, Object> launchState; 
 
-
-	int sliderPosition;
-
-	
 	/*
 	 * Default zero argument constructor is required.
 	 */
@@ -106,8 +104,6 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 	 */
 	private void initialize()
 	{
-		System.out.println("SliderWidgetGWT.initialize(): breedte = " + breedte + ", hoogte = " + hoogte);
-		
 		basisPanel.setSize(breedte, hoogte);
 		basisPanel.setState((HashMap) launchState);
 		
@@ -122,16 +118,10 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 		basisPanel.setHeight("" + hoogte);
 		basisPanel.setPixelSize(breedte, hoogte);
 		
-		try
-		{
-			RootPanel.get(holderId).add(simpel);
-			RootPanel.get(holderId).setStyleName("root");
-		}
-		catch (Exception e)
-		{
-		}
+		RootLayoutPanel.get().add(simpel);
 		
 		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+		//paint(); // deze regel aanzetten voor standalone test
 		Stub.publish(this); // deze regel uitzetten voor standalone test
 	}
 
@@ -153,6 +143,7 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 			return;
 		
 		this.basisPanel.setState(h);
+		paint();
 	}
 
 	@Override
@@ -192,6 +183,7 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
+		this.comRoot.addCBookEventListener(XWIDGET_DOUBLE_SLIDER_VALUE, basisPanel);
 	}
 
 	@Override
@@ -231,17 +223,22 @@ public class SliderWidgetGWT implements EntryPoint, InteractionStub
 		// TODO Auto-generated method stub
 	}
 	
-	public void fire(String command, String name, Object value)
+	/**
+	 * Fire cross widget event with the variable name and current double value.
+	 * 
+	 * @param command
+	 */
+	public void fire(String command)
 	{
 		if (comRoot != null)
 		{
 			Map<String,Object> map = new HashMap<String,Object>();
 			// haal de waarden uit schuifparameter
-			name = basisPanel.geefSchuifParameter().geefNaam();
+			String name = basisPanel.geefSchuifParameter().geefNaam();
 			map.put("name", name);
-			value = basisPanel.geefSchuifParameter().geefDoubleStand();
+			Object value = basisPanel.geefSchuifParameter().geefDoubleStand();
 			map.put("value", value);
-			CBookEvent event = new CBookEvent(this, "double.sliderValue", map);
+			CBookEvent event = new CBookEvent(this, XWIDGET_DOUBLE_SLIDER_VALUE, map);
 			comRoot.fireEvent(event);
 		}
 	}
