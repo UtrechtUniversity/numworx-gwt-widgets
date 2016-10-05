@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.ui.LayoutPanel;
+
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
@@ -18,7 +19,6 @@ public class SliderWidgetInteractiePanel extends LayoutPanel implements CBookEve
 		super();
 
 		schuifParameter = new SchuifParameterGWT(100, "a");
-		// schuifParameter.zetLocatie(0, 0);
 
 		super.add(schuifParameter.geefSlider());
 	}
@@ -67,7 +67,7 @@ public class SliderWidgetInteractiePanel extends LayoutPanel implements CBookEve
 	public HashMap<String, Object> getState()
 	{
 		String paramNaam = schuifParameter.geefNaam();
-		double paramWaarde = schuifParameter.geefWaarde();
+		double paramWaarde = schuifParameter.geefDoubleStand();
 		double paramOnderGrensWaarde = schuifParameter.geefOnderGrens();
 		double paramBovenGrensWaarde = schuifParameter.geefBovenGrens();
 		double paramStapGrootte = schuifParameter.geefStapGrootte();
@@ -122,23 +122,28 @@ public class SliderWidgetInteractiePanel extends LayoutPanel implements CBookEve
 		if (command.startsWith("double"))
 		{
 			Map map = (Map) event.getParameters();
-			if (map != null)
+			if (map != null) // message staat er altijd in dus nooit null...
 			{
 				String name = (String) map.get("name");
-				double waarde = ((Double) map.get("value")).doubleValue();
-				if (name.equals(schuifParameter.geefNaam()))
+				
+				if (name != null)
 				{
+					double waarde = ((Double) map.get("value")).doubleValue();
+					if (name.equals(schuifParameter.geefNaam()))
+					{
+						schuifParameter.zetWaarde(waarde, false);
+						paint();
+					}					
+				}
+				else
+				{
+					String message = event.getMessage();
+					double waarde = Double.parseDouble(message);
 					schuifParameter.zetWaarde(waarde, false);
+					paint();
 				}
 			}
-			else
-			{
-				String message = event.getMessage();
-				double waarde = Double.parseDouble(message);
-				schuifParameter.zetWaarde(waarde, false);
-			}
 		}
-
 	}
 
 	/**
