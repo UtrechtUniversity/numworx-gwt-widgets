@@ -974,7 +974,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		kladjeGWTVeld.setState(h);
+		kladjeGWTVeld.setState(h, false);
 
 	}
 
@@ -1061,7 +1061,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		KladjeGWTVeld.schalen = schalen;
 		
 		
-		kladjeGWTVeld.setState(map);
+		kladjeGWTVeld.setState(map, true);
 
 		makeBottom();
 		

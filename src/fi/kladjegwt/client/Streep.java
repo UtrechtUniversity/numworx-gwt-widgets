@@ -35,6 +35,8 @@ public class Streep
 	Polygon topRightHandle, bottomRightHandle, topLeftHandle, bottomLeftHandle;
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
 	Rectangle rotateEastHandle, rotateWestHandle;
+	
+	boolean deletable = true;
 
 	public Streep(CssColor c, ArrayList<DoublePoint> punten)
 	{	kleur = c;
@@ -959,6 +961,8 @@ class Lijn
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
 	Rectangle rotateEastHandle, rotateWestHandle;
 	
+	boolean deletable = true;
+	
 	public Lijn(CssColor c, int fromX, int fromY, int toX, int toY)
 	{
 		kleur = c;
@@ -1721,6 +1725,7 @@ class Rechthoek
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
 	Rectangle rotateEastHandle, rotateWestHandle;
 
+	boolean deletable = true;
 	
 	public Rechthoek(CssColor c, int x, int y, int w, int h)
 	{
@@ -2388,6 +2393,7 @@ class Ellips
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
 	Rectangle rotateEastHandle, rotateWestHandle;
 	
+	boolean deletable = true;
 	
 	public Ellips(CssColor c, int x, int y, int w, int h)
 	{
@@ -3092,6 +3098,7 @@ class TekstElement
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
 	Rectangle rotateEastHandle, rotateWestHandle;
 
+	boolean deletable = true;
 	
 	public TekstElement(CssColor c, String t, int x, int y)
 	{

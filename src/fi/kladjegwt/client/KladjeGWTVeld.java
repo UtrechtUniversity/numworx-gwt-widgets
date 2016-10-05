@@ -428,7 +428,7 @@ public class KladjeGWTVeld
 	}
 
 	
-	public void setState(Map<String, Object> map)
+	public void setState(Map<String, Object> map, boolean init)
 	{
 		
 		//System.out.println("kv setState");
@@ -447,17 +447,24 @@ public class KladjeGWTVeld
 */
 		
 		// hier de rest
-		streepVector.removeAllElements();
+		if (init)
+			streepVector.removeAllElements();
+		else
+			removeDeletableStrepen();
 		//HashMap<String,Object>[] strepen = new HashMap[0];
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("strepen"))
 			strepen = launchState.getMapList("strepen");
 		for (int sCnt = 0; sCnt < strepen.size(); sCnt++)
 		{	Streep streep = Streep.setState(strepen.get(sCnt));
+			streep.deletable = !init;
 			streepVector.addElement(streep);
 		}
 		
-		lijnVector.removeAllElements();
+		if (init)
+			lijnVector.removeAllElements();
+		else
+			removeDeletableLijnen();
 		//HashMap<String,Object>[] lijnenHash = new HashMap[0];
 		List<Map<String,Object>> lijnenAL = new ArrayList<Map<String,Object>>();
 		// launchdata and setState
@@ -465,36 +472,49 @@ public class KladjeGWTVeld
 			lijnenAL = launchState.getMapList("lijnenhash");
 		for (int lCnt = 0; lCnt < lijnenAL.size(); lCnt++)
 		{	Lijn lijn = Lijn.setState(lijnenAL.get(lCnt));
+			lijn.deletable = !init;
 			lijnVector.addElement(lijn);
 		}
 		
-		rechthoekVector.removeAllElements();
+		if (init)
+			rechthoekVector.removeAllElements();
+		else
+			removeDeletableRechthoeken();
 		//HashMap<String,Object>[] rechthoeken = new HashMap[0];
 		List<Map<String,Object>> rechthoeken = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("rechthoeken"))
 			rechthoeken = launchState.getMapList("rechthoeken");
 		for (int rCnt = 0; rCnt < rechthoeken.size(); rCnt++)
 		{	Rechthoek rechthoek = Rechthoek.setState(rechthoeken.get(rCnt));
+			rechthoek.deletable = !init;
 			rechthoekVector.addElement(rechthoek);
 		}
 
-		ellipsVector.removeAllElements();
+		if (init)
+			ellipsVector.removeAllElements();
+		else
+			removeDeletableEllipsen();
 		//HashMap<String,Object>[] ellipsen = new HashMap[0];
 		List<Map<String,Object>> ellipsen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("ellipsen"))
 			ellipsen = launchState.getMapList("ellipsen");
 		for (int eCnt = 0; eCnt < ellipsen.size(); eCnt++)
 		{	Ellips ellips = Ellips.setState(ellipsen.get(eCnt));
+			ellips.deletable = !init;
 			ellipsVector.addElement(ellips);
 		}
 
-		tekstElementVector.removeAllElements();
+		if (init)
+			tekstElementVector.removeAllElements();
+		else
+			removeDeletableTekstElementen();
 		//HashMap<String,Object>[] tekstElementen = new HashMap[0];
 		List<Map<String,Object>> tekstElementen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("tekstElementen"))
 			tekstElementen = launchState.getMapList("tekstElementen");
 		for (int tCnt = 0; tCnt < tekstElementen.size(); tCnt++)
 		{	TekstElement tekstElement = TekstElement.setState(tekstElementen.get(tCnt));
+			tekstElement.deletable = !init;
 			tekstElementVector.addElement(tekstElement);
 		}
 //System.out.println("kgwtv set " + tekstElementen.size());		
@@ -530,7 +550,7 @@ public class KladjeGWTVeld
 		wis(false);
 		HashMap<String,Object> lastState = getFromHistory();
 		if (lastState != null)
-		{	setState(lastState);
+		{	setState(lastState, false);
 		}
 
 		paint();
@@ -551,16 +571,71 @@ public class KladjeGWTVeld
 		{
 //			pixels.removeAllElements();
 			
-			streepVector.removeAllElements();
-			lijnVector.removeAllElements();
-			rechthoekVector.removeAllElements();
-			ellipsVector.removeAllElements();
-			tekstElementVector.removeAllElements();
+			//streepVector.removeAllElements();
+			//lijnVector.removeAllElements();
+			//rechthoekVector.removeAllElements();
+			//ellipsVector.removeAllElements();
+			//tekstElementVector.removeAllElements();
+			removeDeletableStrepen();
+			removeDeletableLijnen();
+			removeDeletableRechthoeken();
+			removeDeletableEllipsen();
+			removeDeletableTekstElementen();
 			
 			if (complete)
 				numHistories = 0;
 		}			
 		paint();
+	}
+	
+	public void removeDeletableStrepen()
+	{
+		for (int cnt = streepVector.size()-1; cnt >= 0; cnt--)
+		{
+			Streep streep = (Streep) streepVector.elementAt(cnt);
+			if (streep.deletable)
+				streepVector.removeElementAt(cnt);
+		}
+	}
+	
+	public void removeDeletableLijnen()
+	{
+		for (int cnt = lijnVector.size()-1; cnt >= 0; cnt--)
+		{
+			Lijn lijn = (Lijn) lijnVector.elementAt(cnt);
+			if (lijn.deletable)
+				lijnVector.removeElementAt(cnt);
+		}
+	}
+
+	public void removeDeletableRechthoeken()
+	{
+		for (int cnt = rechthoekVector.size()-1; cnt >= 0; cnt--)
+		{
+			Rechthoek rechthoek = (Rechthoek) rechthoekVector.elementAt(cnt);
+			if (rechthoek.deletable)
+				rechthoekVector.removeElementAt(cnt);
+		}
+	}
+
+	public void removeDeletableEllipsen()
+	{
+		for (int cnt = ellipsVector.size()-1; cnt >= 0; cnt--)
+		{
+			Ellips ellips = (Ellips) ellipsVector.elementAt(cnt);
+			if (ellips.deletable)
+				ellipsVector.removeElementAt(cnt);
+		}
+	}
+
+	public void removeDeletableTekstElementen()
+	{
+		for (int cnt = tekstElementVector.size()-1; cnt >= 0; cnt--)
+		{
+			TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(cnt);
+			if (tekstElement.deletable)
+				tekstElementVector.removeElementAt(cnt);
+		}
 	}
 	
 	public ArrayList<DoublePoint> gaussianSmooth(ArrayList<DoublePoint> doublePoints)
@@ -1349,27 +1424,27 @@ public class KladjeGWTVeld
 	public void wisObjectSelected()
 	{ 
 		boolean gewist = false;
-		if (selectedStreep != null)
+		if (selectedStreep != null && selectedStreep.deletable)
 		{	streepVector.removeElement(selectedStreep);
 			selectedStreep = null;
 			gewist = true;
 		}
-		if (selectedLijn != null)  
+		if (selectedLijn != null && selectedLijn.deletable)  
 		{	lijnVector.removeElement(selectedLijn);
 			selectedLijn = null;
 			gewist = true;
 		}
-		if (selectedRechthoek != null)  
+		if (selectedRechthoek != null && selectedRechthoek.deletable)  
 		{	rechthoekVector.removeElement(selectedRechthoek);
 			selectedRechthoek = null;
 			gewist = true;
 		}
-		if (selectedEllips != null) 
+		if (selectedEllips != null && selectedEllips.deletable) 
 		{	ellipsVector.removeElement(selectedEllips);
 			selectedEllips = null;
 			gewist = true;
 		}
-		if (selectedTekstElement != null)
+		if (selectedTekstElement != null && selectedTekstElement.deletable)
 		{	tekstElementVector.removeElement(selectedTekstElement);
 			selectedTekstElement = null;
 			gewist = true;
@@ -1388,15 +1463,15 @@ public class KladjeGWTVeld
 		for (int oCnt = 0; oCnt < objectsSelected.size(); oCnt++)
 		{
 			Object o = (Object) objectsSelected.elementAt(oCnt);
-			if (o instanceof Streep)
+			if (o instanceof Streep && ((Streep) o).deletable)
 				streepVector.removeElement((Streep) o);
-			else if (o instanceof Lijn)
+			else if (o instanceof Lijn && ((Lijn) o).deletable)
 				lijnVector.removeElement((Lijn) o);
-			else if (o instanceof Rechthoek)
+			else if (o instanceof Rechthoek && ((Rechthoek) o).deletable)
 				rechthoekVector.removeElement((Rechthoek) o);
-			else if (o instanceof Ellips)
+			else if (o instanceof Ellips && ((Ellips) o).deletable)
 				ellipsVector.removeElement((Ellips) o);
-			else if (o instanceof TekstElement)
+			else if (o instanceof TekstElement && ((TekstElement) o).deletable)
 				tekstElementVector.removeElement((TekstElement) o);
 			
 			gewist = true;
