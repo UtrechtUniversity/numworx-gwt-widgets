@@ -11,9 +11,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -834,14 +836,26 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 		FlexCellFormatter cellFormatter = flexTable.getFlexCellFormatter();
 	    flexTable.addStyleName(statistiekCss.flexTable());
 
+	    String splitClassString = "";
+		if (this.hasSplit())
+		{
+			String splitColumnName = this.model.getStatTableModel().getColumnName(this.model.getColumnSplitIndex());
+			splitClassString = splitColumnName + ": "
+				+ this.model.getSplitOptions().getSplitClassLabel(splitClass, this.model.getStatTableModel()); // e.g., "geslacht: m"
+		}
+
 		// add the selected variable name to the first column
 		String label = this.model.getStatTableModel().getColumnName(this.model.getColumnIndex());
-		Label columnIndexName = new Label(label);
-		columnIndexName.addStyleName(statistiekCss.noWrap());
+		if (this.hasSplit())
+		{
+			label = label + "\n- " + splitClassString;
+		}
+		// HTML for possible multiple lines
+		HTML htmlLabel = new HTML(new SafeHtmlBuilder().appendEscapedLines(label).toSafeHtml());
 
 	    cellFormatter.setHorizontalAlignment(
 	        0, 0, HasHorizontalAlignment.ALIGN_LEFT);
-	    flexTable.setWidget(0, 0, columnIndexName);
+	    flexTable.setWidget(0, 0, htmlLabel);
 	    cellFormatter.setColSpan(0, 0, 2);
 
 		// add row 'Number'
@@ -889,11 +903,16 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 			// add the selected variable name to the first column
 			label = StatistiekGWT.rb.selection();
-			Label selectionLabel = new Label(label);
+			if (this.hasSplit())
+			{
+				label = label + "\n- " + splitClassString;
+			}
+			// HTML for possible multiple lines
+			HTML htmlLabelSelection = new HTML(new SafeHtmlBuilder().appendEscapedLines(label).toSafeHtml());
 
 		    cellFormatterSelection.setHorizontalAlignment(
 		        0, 0, HasHorizontalAlignment.ALIGN_LEFT);
-		    selectionFlexTable.setWidget(0, 0, selectionLabel);
+		    selectionFlexTable.setWidget(0, 0, htmlLabelSelection);
 		    cellFormatterSelection.setColSpan(0, 0, 2);
 
 			// add row 'Number'
@@ -937,17 +956,6 @@ public class DescriptivesView extends LayoutPanel implements TableChangeEventHan
 
 		flowPanel.add(hPanel);
 		
-		if (this.hasSplit())
-		{
-			String splitColumnName = this.model.getStatTableModel().getColumnName(this.model.getColumnSplitIndex());
-			String splitClassString = splitColumnName + ": "
-				+ this.model.getSplitOptions().getSplitClassLabel(splitClass, this.model.getStatTableModel()); // e.g., "geslacht: m"
-			Label splitClassLabel = new Label(splitClassString);
-			splitClassLabel.addStyleName(statistiekCss.descriptivesSplitClassLabel());
-			
-			flowPanel.add(splitClassLabel);
-		}
-
 		this.mainPanel.add(flowPanel);
 	}
 
