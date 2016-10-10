@@ -1154,7 +1154,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 
