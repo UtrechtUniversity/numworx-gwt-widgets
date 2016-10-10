@@ -1346,6 +1346,12 @@ public class DotplotUserOptionsPanel extends FlowPanel
 					// if not both variables are numerical, no correlation should be shown 
 					model.setShowCorrelation(false);
 				}
+				
+				// set default min and max on scale
+				double minColumnXValue = model.getStatTableModel().getColumnMin(model.getColumnXIndex());
+				model.setMinXOnScale(minColumnXValue);
+				double maxColumnXValue = model.getStatTableModel().getColumnMax(model.getColumnXIndex());
+				model.setMaxXOnScale(maxColumnXValue);
 			}
 			else if (e.getSource() == varYBox)
 			{
