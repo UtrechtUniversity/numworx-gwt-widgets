@@ -19,6 +19,9 @@ public interface Text extends Constants
 	@DefaultStringValue("Kies een view")
 	String chooseaviewOption();
 	
+	@DefaultStringValue("Dataset is te groot voor deze view")
+	String datasetTooLargeForView();
+	
 	@DefaultStringValue("Wijzig viewnaam")
 	String changeviewnameDialog();
 	
