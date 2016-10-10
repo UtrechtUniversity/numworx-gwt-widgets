@@ -77,6 +77,10 @@ public class StatInteractiePanelView extends LayoutPanel
 	private StatInteractiePanel controller;
 	
 	private static Label NO_VIEWS_LABEL = new Label("No views added.");
+	private static final int DOTPLOT_INDEX = 2;
+	private static final int SCATTERPLOT_INDEX = 7;
+	private static final int MAX_ROWS_DOTSCATTERPLOT = 40000;
+	
 	private ScrollableTabLayoutPanel tabPanel;
 	private FlowPanel addViewTab;
 	private ListBox viewsBox, startVarBox, startVar2Box;
@@ -989,6 +993,8 @@ public class StatInteractiePanelView extends LayoutPanel
 			    plusLabel.addClickHandler(new LabelClickHandler(this.addViewTab, "+")); // to handle click to set focus
 			    hPanel.add(plusLabel);
 				this.tabPanel.add(this.addViewTab, hPanel);
+				
+				setEnabledDotScatterplotOptions(model.getStatTableModel().getRowCount() <= MAX_ROWS_DOTSCATTERPLOT);
 			}
 
 			this.tabPanel.addStyleName(statistiekCss.backgroundblue());
@@ -2249,10 +2255,13 @@ public class StatInteractiePanelView extends LayoutPanel
 	public void onTableChange(TableChangeEvent event)
 	{
 		String info = event.getInfo();
-		// test syl: alleen nodig als add/edit/remove column, niet als addRow of dataEditable...
+		// test syl: alleen nodig als add/edit/remove column/row, niet als dataEditable...
 		if (info.equals(TableChangeEvent.ADD_COLUMN)
+			|| info.equals(TableChangeEvent.ADD_ROW)
 			|| info.equals(TableChangeEvent.EDIT_COLUMN)
 			|| info.equals(TableChangeEvent.REMOVE_COLUMN)
+			|| info.equals(TableChangeEvent.REMOVE_ROWS)
+			|| info.equals(TableChangeEvent.REMOVE_ROW)
 			|| info.equals(TableChangeEvent.IMPORT_DATA))
 		{
 			GWT.log("StatInteractiePanelView.onTableChange()");
@@ -2347,5 +2356,40 @@ public class StatInteractiePanelView extends LayoutPanel
 	{
 		StatistiekView view = model.getViews().get(index);
 		view.update();
+	}
+	
+	/**
+	 * Enable or disable the options voor adding a dotplot and scatterplot.
+	 */
+	public void setEnabledDotScatterplotOptions(boolean enabled)
+	{
+		if (enabled)
+		{
+			// enable option
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(DOTPLOT_INDEX + 1).removeAttribute("disabled"); // +1 for the first "Choose view..." option
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(SCATTERPLOT_INDEX + 1).removeAttribute("disabled"); // +1 for the first "Choose view..." option
+
+			// option enabled no tooltip
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(DOTPLOT_INDEX + 1).setTitle("");
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(SCATTERPLOT_INDEX + 1).setTitle("");
+		}
+		else
+		{ 
+			// disable option
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(DOTPLOT_INDEX + 1).setAttribute("disabled",	"disabled"); // +1 for the first "Choose view..." option
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(SCATTERPLOT_INDEX + 1).setAttribute("disabled", "disabled"); // +1 for the first "Choose view..." option
+
+			// show tooltip
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(DOTPLOT_INDEX + 1).setTitle(StatistiekGWT.rb.datasetTooLargeForView());
+			this.viewsBox.getElement().getElementsByTagName("option").
+				getItem(SCATTERPLOT_INDEX + 1).setTitle(StatistiekGWT.rb.datasetTooLargeForView());
+		}
 	}
 }
