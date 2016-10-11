@@ -1,8 +1,5 @@
 package fi.graphtoolgwt.client;
 
-
-
-import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Map;
 //import java.util.Map;
@@ -28,7 +25,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -1751,34 +1748,77 @@ public class GrafiekGWTVeld {
 		return gesorteerd;
 	}
 	
-	public boolean berekenLijn(Vector points, int nauwkeurigheid)
-	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;
-		double nauwkeurigDoubleY = interactiePanel.schaalFactorY * nauwkeurigheid / interactiePanel.eenheidyD;
+//	public boolean berekenLijn(Vector points, int nauwkeurigheid)
+//	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;
+//		double nauwkeurigDoubleY = interactiePanel.schaalFactorY * nauwkeurigheid / interactiePanel.eenheidyD;
+//		
+//		RealPoint rpMin = (RealPoint) points.elementAt(0);
+//		RealPoint rpMax = (RealPoint) points.elementAt(points.size() - 1);
+//		double a = ((interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY()) - (interactiePanel.yAsLog?Math.log10(rpMin.getY()):rpMin.getY()))
+//				/((interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()) - (interactiePanel.xAsLog?Math.log10(rpMin.getX()):rpMin.getX()));
+//		double b = (interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY() - a*(interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()));
+//		boolean lijn = true;
+//		
+//		for(int i = 1; i < points.size() - 1 && lijn; i++)
+//			{	RealPoint rpi = (RealPoint) points.elementAt(i);
+//				double xs = (a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + (interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - a*b)/(a*a + 1);
+//				double ys = (a*a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + a*(interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) + b)/(a*a + 1);
+//
+////				double afstand = ((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs)*((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) + 
+////						((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys)*((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys);
+////				afstand = Math.sqrt(afstand);
+////				if(afstand > nauwkeurigDouble)
+//				boolean afstandxKleinGenoeg = Math.abs((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) <= nauwkeurigDoubleX;
+//				boolean afstandyKleinGenoeg = Math.abs((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys) <= nauwkeurigDoubleY; 
+//				if(!(afstandxKleinGenoeg && afstandyKleinGenoeg))
+//				{	lijn = false;
+//				
+//				}
+//			}
+//		return lijn;
+//	}
+	
+	public boolean berekenLijn(Vector points, int nauwkeurigheid) {
+	//  let op: niet ontworpen voor, noch getest in, Logaritmische schaal! (omdat dat op het moment van schrijven niet aan de orde was) 
+		
+		final double cAxisCompensationFactor = 2.0; // Assen-compensensatie factor is nodig omdat het standaard assenstelsel 
+													// gedefineerd is met een echte waarde van 2
+													// verdeeld over 16 pixels, dit wordt als eenheid betiteld maar in feite 
+		                                            // gaat het over een "tweeheid", zonder compensatiefactor zou de nauwkeurigheid,
+		                                            // welke is gedefineerd in pixels, verkeerd worden geinterpreteerd.
+													// Omdat manualScaling ook gebaseerd is op het grove rooster geldt hiervoor hetzelfde
 		
 		RealPoint rpMin = (RealPoint) points.elementAt(0);
 		RealPoint rpMax = (RealPoint) points.elementAt(points.size() - 1);
-		double a = ((interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY()) - (interactiePanel.yAsLog?Math.log10(rpMin.getY()):rpMin.getY()))
-				/((interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()) - (interactiePanel.xAsLog?Math.log10(rpMin.getX()):rpMin.getX()));
-		double b = (interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY() - a*(interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()));
-		boolean lijn = true;
 		
-		for(int i = 1; i < points.size() - 1 && lijn; i++)
-			{	RealPoint rpi = (RealPoint) points.elementAt(i);
-				double xs = (a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + (interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - a*b)/(a*a + 1);
-				double ys = (a*a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + a*(interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) + b)/(a*a + 1);
-//				double afstand = ((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs)*((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) + 
-//						((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys)*((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys);
-//				afstand = Math.sqrt(afstand);
-//				if(afstand > nauwkeurigDouble)
-				boolean afstandxKleinGenoeg = Math.abs((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) <= nauwkeurigDoubleX;
-				boolean afstandyKleinGenoeg = Math.abs((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys) <= nauwkeurigDoubleY; 
-				if(!(afstandxKleinGenoeg && afstandyKleinGenoeg))
-				{	lijn = false;
-				
-				}
-			}
+		// calculate line: y = ax + b as defined bij first and last point of the pointlist
+		double a = (rpMax.getY() - rpMin.getY()) / (rpMax.getX() - rpMin.getX() );
+		double b = (rpMax.getY() - a * rpMax.getX() );
+		
+		boolean lijn = true;		
+		for(int i = 1; i < points.size() - 1 && lijn; i++) {	
+			RealPoint rpi = (RealPoint) points.elementAt(i);
+			
+			// rn = (real value of) closest point to rpi on line y = ax +b
+			double rnX = (a*(rpi.getY()) + (rpi.getX()) - a*b) / (a*a + 1);
+			double rnY = (a*a*(rpi.getY()) + a*(rpi.getX()) + b) / (a*a + 1);
+			
+			// calulate screen values of rn & rpi
+			double snX = valueXtoPixels(rnX);
+			double snY = valueYtoPixels(rnY);
+			double spiX = valueXtoPixels(rpi.getX());
+			double spiY = valueYtoPixels(rpi.getY());
+			
+			// calculate screen-distance from rpi to line
+			double sDistance = Math.sqrt( Math.pow( (spiX - snX), 2) + Math.pow( spiY - snY, 2) );
+			sDistance /=  cAxisCompensationFactor ; // zie definitie cAxisCompensationFactor
+
+			// compare screen distance to screen 
+			lijn = (sDistance <= nauwkeurigheid);
+
+		}
 		return lijn;
-	}
+	}	
 	
 	public boolean berekenParabool(Vector points, int nauwkeurigheid)
 	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;
