@@ -631,6 +631,11 @@ public class GrafiekGWTVeld {
 					gIm.fillText(getal, xLabel, yLabel);
 				}
 			}
+		} else {
+			// !(roosterZichtbaar || SchaalZichtbaar)
+			if (interactiePanel.xPositief) { // Zet negatieve X-as uit indien nodig
+				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
+			}
 		}
 
 		if (interactiePanel.piLijnenZichtbaar) {
