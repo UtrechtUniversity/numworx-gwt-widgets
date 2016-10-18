@@ -96,6 +96,9 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 	private int mode;
 	private OpdrNavIF comRoot;
 	
+	int maxScore = 10;
+	int score = 0;
+	
 	public void getImages() 
 	{
 
@@ -390,7 +393,7 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			String rodeFiguurString =  "2,0|10,0|8,8|0,8";
 			String grijzeFiguurString =  "0,0|8,0|8,8|0,8";
 			boolean tekenGumOptie = true;
-			int maxScore = 10;
+			//int maxScore = 10;
 			
 			if ((launchState != null) && launchState.containsKey("taakNummer"))
 			{	taakNummer = launchState.getInt("taakNummer");
@@ -694,7 +697,7 @@ System.out.println("polyMaps " + polygonMaps.size());
 	public int getScore()
 	{
 		// TODO Auto-generated method stub
-		return 0;
+		return score;
 	}
 
 	@Override
