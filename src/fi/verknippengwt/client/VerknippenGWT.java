@@ -92,7 +92,7 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 	ToggleButton tekenKnop;
 	PushButton gumKnop;
 	
-	boolean correct = false;
+	boolean correct = true;
 	private int mode;
 	private OpdrNavIF comRoot;
 	
@@ -394,11 +394,11 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 			
 			if ((launchState != null) && launchState.containsKey("taakNummer"))
 			{	taakNummer = launchState.getInt("taakNummer");
-System.out.println("taakNummer = " + taakNummer);			
+//System.out.println("taakNummer = " + taakNummer);			
 			}
 			if ((launchState != null) && launchState.containsKey("groteBalletjes"))
 			{	groteBalletjes = launchState.getBoolean("groteBalletjes");
-System.out.println("groteBalletjes = " + groteBalletjes);			
+//System.out.println("groteBalletjes = " + groteBalletjes);			
 			}
 			if ((launchState != null) && launchState.containsKey("roosterZichtbaar"))
 				roosterZichtbaar = launchState.getBoolean("roosterZichtbaar");
@@ -410,10 +410,12 @@ System.out.println("groteBalletjes = " + groteBalletjes);
 				resetButton = launchState.getBoolean("resetButton");
 			if ((launchState != null) && launchState.containsKey("gridSize"))
 			{	gridSize = launchState.getInt("gridSize");
-System.out.println("gridSize = " + gridSize);			
+//System.out.println("gridSize = " + gridSize);			
 			}
 			if ((launchState != null) && launchState.containsKey("rodeFiguurString"))
-				rodeFiguurString = launchState.getString("rodeFiguurString");
+			{	rodeFiguurString = launchState.getString("rodeFiguurString");
+//System.out.println("rodeFiguurString = " + rodeFiguurString);			
+			}
 			if ((launchState != null) && launchState.containsKey("grijzeFiguurString"))
 				grijzeFiguurString = launchState.getString("grijzeFiguurString");
 			if ((launchState != null) && launchState.containsKey("tekenGumOptie"))
@@ -442,7 +444,6 @@ System.out.println("gridSize = " + gridSize);
 			//dp2.clickDis = gridSize / 2;
 			
 			rodeFiguurCoordinaten = processFiguurString(rodeFiguurString);
-
 			
 			KnipPolygon2 kp = new KnipPolygon2(dp2, rodeFiguurCoordinaten, KnipPolygon2.CENTER);
 			if (taakNummer == 4)
@@ -452,7 +453,6 @@ System.out.println("gridSize = " + gridSize);
 			if ((taakNummer == 2) || (taakNummer == 3))		
 				kp.setLabelPoint();
 
-			
 			zetSchaduwZichtbaar(schaduwZichtbaar, rodeFiguurString);
 			
 			if (taakNummer == 4)
