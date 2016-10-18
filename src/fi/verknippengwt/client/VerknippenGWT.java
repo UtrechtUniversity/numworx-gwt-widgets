@@ -716,9 +716,13 @@ System.out.println("polyMaps " + polygonMaps.size());
 				correct = dp2.figureIsRectangle;
 				comRoot.setChanged(isCorrect().booleanValue());
 				if (correct)
-					dp2.setWidgetVisible(goedKrulImage,true);
+				{	dp2.setWidgetVisible(goedKrulImage,true);
+					score = maxScore;
+				}
 				else
-					dp2.setWidgetVisible(goedKrulImage,false);
+				{	dp2.setWidgetVisible(goedKrulImage,false);
+					score = 0;
+				}
 			}	
      
 //System.out.println("kijkNa() - 2");         
