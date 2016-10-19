@@ -836,8 +836,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
     			if (colorPopup == null)
     			{
     				colorPopup = new ColorPopup(KladjeGWT.this);
-    				//int showX = kleurkeuzeButton.getAbsoluteLeft() + toggleSize/2 - colorPopup.breedte/2;
-    				int showX = kladjeGWTCanvas.getAbsoluteLeft() + breedte - colorPopup.breedte - 20;
+    				int showX = kleurkeuzeButton.getAbsoluteLeft() + toggleSize/2 - colorPopup.breedte/2;
+    				//int showX = kladjeGWTCanvas.getAbsoluteLeft() + breedte - colorPopup.breedte - 20;
     				int showY = hoogte - bottomHeight - colorPopup.hoogte - topOffset;
     				colorPopup.setPopupPosition(showX, showY);
     				colorPopup.show();

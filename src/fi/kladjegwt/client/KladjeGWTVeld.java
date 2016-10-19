@@ -133,7 +133,13 @@ public class KladjeGWTVeld
 	Vector<Rechthoek> rechthoekVector = new Vector<Rechthoek>();
 	Vector<Ellips> ellipsVector = new Vector<Ellips>();
 	Vector<TekstElement> tekstElementVector = new Vector<TekstElement>();
-	
+
+	Vector<Streep> docentStreepVector = new Vector<Streep>();
+	Vector<Lijn> docentLijnVector = new Vector<Lijn>();
+	Vector<Rechthoek> docentRechthoekVector = new Vector<Rechthoek>();
+	Vector<Ellips> docentEllipsVector = new Vector<Ellips>();
+	Vector<TekstElement> docentTekstElementVector = new Vector<TekstElement>();
+
 	int maxHistories = 5;
 	int numHistories = 0;
 	HashMap<String,Object>[] histories = new HashMap[maxHistories + 1];
@@ -448,23 +454,30 @@ public class KladjeGWTVeld
 		
 		// hier de rest
 		if (init)
-			streepVector.removeAllElements();
+		{	streepVector.removeAllElements();
+			docentStreepVector.removeAllElements();
+		}
 		else
-			removeDeletableStrepen();
+			streepVector.removeAllElements();
 		//HashMap<String,Object>[] strepen = new HashMap[0];
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("strepen"))
 			strepen = launchState.getMapList("strepen");
 		for (int sCnt = 0; sCnt < strepen.size(); sCnt++)
 		{	Streep streep = Streep.setState(strepen.get(sCnt));
-			streep.deletable = !init;
-			streepVector.addElement(streep);
+			//streep.deletable = !init;
+			if (init)
+				docentStreepVector.addElement(streep);
+			else
+				streepVector.addElement(streep);
 		}
 		
 		if (init)
-			lijnVector.removeAllElements();
+		{	lijnVector.removeAllElements();
+			docentLijnVector.removeAllElements();
+		}
 		else
-			removeDeletableLijnen();
+			lijnVector.removeAllElements();
 		//HashMap<String,Object>[] lijnenHash = new HashMap[0];
 		List<Map<String,Object>> lijnenAL = new ArrayList<Map<String,Object>>();
 		// launchdata and setState
@@ -472,50 +485,68 @@ public class KladjeGWTVeld
 			lijnenAL = launchState.getMapList("lijnenhash");
 		for (int lCnt = 0; lCnt < lijnenAL.size(); lCnt++)
 		{	Lijn lijn = Lijn.setState(lijnenAL.get(lCnt));
-			lijn.deletable = !init;
-			lijnVector.addElement(lijn);
+			//lijn.deletable = !init;
+			if (init)
+				docentLijnVector.addElement(lijn);
+			else
+				lijnVector.addElement(lijn);
 		}
 		
 		if (init)
-			rechthoekVector.removeAllElements();
+		{	rechthoekVector.removeAllElements();
+			docentRechthoekVector.removeAllElements();
+		}
 		else
-			removeDeletableRechthoeken();
+			rechthoekVector.removeAllElements();
 		//HashMap<String,Object>[] rechthoeken = new HashMap[0];
 		List<Map<String,Object>> rechthoeken = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("rechthoeken"))
 			rechthoeken = launchState.getMapList("rechthoeken");
 		for (int rCnt = 0; rCnt < rechthoeken.size(); rCnt++)
 		{	Rechthoek rechthoek = Rechthoek.setState(rechthoeken.get(rCnt));
-			rechthoek.deletable = !init;
-			rechthoekVector.addElement(rechthoek);
+			//rechthoek.deletable = !init;
+			if (init)
+				docentRechthoekVector.addElement(rechthoek);
+			else
+				rechthoekVector.addElement(rechthoek);
 		}
 
 		if (init)
-			ellipsVector.removeAllElements();
+		{	ellipsVector.removeAllElements();
+			docentEllipsVector.removeAllElements();
+		}
 		else
-			removeDeletableEllipsen();
+			ellipsVector.removeAllElements();
 		//HashMap<String,Object>[] ellipsen = new HashMap[0];
 		List<Map<String,Object>> ellipsen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("ellipsen"))
 			ellipsen = launchState.getMapList("ellipsen");
 		for (int eCnt = 0; eCnt < ellipsen.size(); eCnt++)
 		{	Ellips ellips = Ellips.setState(ellipsen.get(eCnt));
-			ellips.deletable = !init;
-			ellipsVector.addElement(ellips);
+			//ellips.deletable = !init;
+			if (init)
+				docentEllipsVector.addElement(ellips);
+			else
+				ellipsVector.addElement(ellips);
 		}
 
 		if (init)
-			tekstElementVector.removeAllElements();
+		{	tekstElementVector.removeAllElements();
+			docentTekstElementVector.removeAllElements();
+		}
 		else
-			removeDeletableTekstElementen();
+			tekstElementVector.removeAllElements();
 		//HashMap<String,Object>[] tekstElementen = new HashMap[0];
 		List<Map<String,Object>> tekstElementen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("tekstElementen"))
 			tekstElementen = launchState.getMapList("tekstElementen");
 		for (int tCnt = 0; tCnt < tekstElementen.size(); tCnt++)
 		{	TekstElement tekstElement = TekstElement.setState(tekstElementen.get(tCnt));
-			tekstElement.deletable = !init;
-			tekstElementVector.addElement(tekstElement);
+			//tekstElement.deletable = !init;
+			if (init)
+				docentTekstElementVector.addElement(tekstElement);
+			else
+				tekstElementVector.addElement(tekstElement);
 		}
 //System.out.println("kgwtv set " + tekstElementen.size());		
 
@@ -571,16 +602,16 @@ public class KladjeGWTVeld
 		{
 //			pixels.removeAllElements();
 			
-			//streepVector.removeAllElements();
-			//lijnVector.removeAllElements();
-			//rechthoekVector.removeAllElements();
-			//ellipsVector.removeAllElements();
-			//tekstElementVector.removeAllElements();
-			removeDeletableStrepen();
-			removeDeletableLijnen();
-			removeDeletableRechthoeken();
-			removeDeletableEllipsen();
-			removeDeletableTekstElementen();
+			streepVector.removeAllElements();
+			lijnVector.removeAllElements();
+			rechthoekVector.removeAllElements();
+			ellipsVector.removeAllElements();
+			tekstElementVector.removeAllElements();
+			//removeDeletableStrepen();
+			//removeDeletableLijnen();
+			//removeDeletableRechthoeken();
+			//removeDeletableEllipsen();
+			//removeDeletableTekstElementen();
 			
 			if (complete)
 				numHistories = 0;
@@ -813,9 +844,31 @@ public class KladjeGWTVeld
 			{	g.putImageData(pixels, 0, 0);
 			}
 		}
-*/		
+*/
+		// elementen docent
+		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
+		{	Streep streep = (Streep) docentStreepVector.elementAt(sCnt);
+			streep.teken(g);
+		}
+		for (int lCnt = 0; lCnt < docentLijnVector.size(); lCnt++)
+		{	Lijn lijn = (Lijn) docentLijnVector.elementAt(lCnt);
+			lijn.teken(g);
+		}
+		for (int rCnt = 0; rCnt < docentRechthoekVector.size(); rCnt++)
+		{	Rechthoek rechthoek = (Rechthoek) docentRechthoekVector.elementAt(rCnt);
+			rechthoek.teken(g);
+		}
+		for (int eCnt = 0; eCnt < docentEllipsVector.size(); eCnt++)
+		{	Ellips ellips = (Ellips) docentEllipsVector.elementAt(eCnt);
+			ellips.teken(g);
+		}
+		for (int tCnt = 0; tCnt < docentTekstElementVector.size(); tCnt++)
+		{	TekstElement tekstElement = (TekstElement) docentTekstElementVector.elementAt(tCnt);
+			tekstElement.teken(g);
+		}
+
 		
-		// elementen
+		// elementen leerling
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
 			streep.teken(g);
