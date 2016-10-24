@@ -125,7 +125,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 	public HashMap<String, Object> getState()
 	{
 		// remove handlers
-		this.removeHandlers();
+		//this.removeHandlers(); // bij nakijken van een antwoordvak wordt getState() van alle componenten aangeroepen; handlers moeten dan niet verwijderd worden 
 		
 		HashMap h = new HashMap();
 
