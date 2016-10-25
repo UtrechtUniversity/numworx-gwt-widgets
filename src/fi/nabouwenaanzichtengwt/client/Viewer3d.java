@@ -818,6 +818,7 @@ System.out.println("b = " + b);
 
 	}
 
+/*	
 	public void muisKkActie(MouseUpEvent e, boolean remove)
 	//public void muisKkActie(boolean remove)
 	{
@@ -892,7 +893,8 @@ System.out.println("b = " + b);
 			}
 		}
 	}
-
+*/
+/*	
 	public void muisDoubleKlikActie(DoubleClickEvent e)
 	{
 		for (int q = aantalKv - 1; q > -1; q--)
@@ -914,7 +916,7 @@ System.out.println("b = " + b);
 			}
 		}
 	}
-
+*/
 	public void muisKkActie(boolean remove)
 	{
 		for (int q = aantalKv - 1; q > -1; q--)
@@ -926,12 +928,14 @@ System.out.println("b = " + b);
 				if (eigenaar.isBouwen() && !(holdMouse || remove))
 				{
 					changed = kr.voegKubusToe(kv[n].i, kv[n].j, 0);
+					updateLastBuildCommand(changed, true, kv[n].i, kv[n].j, 0);
 					if (gr != null)
 						gr.verhoog(kv[n].i, kv[n].j);
 				}
 				else
 				{
 					changed = kr.verwijderKubus(kv[n].i, kv[n].j, 0);
+					updateLastBuildCommand(changed, false, kv[n].i, kv[n].j, 0);
 					if (gr != null)
 						gr.verlaag(kv[n].i, kv[n].j);
 				}
@@ -949,28 +953,34 @@ System.out.println("b = " + b);
 					if (kv[n].m == 0)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k + 1);
+						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k+1);
 						if (gr != null)
 							gr.verhoog(kv[n].i, kv[n].j);
 					}
 					if (kv[n].m == 1)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j - 1, kv[n].k);
+						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j-1,kv[n].k);
 					}
 					if (kv[n].m == 2)
 					{
 						changed = kr.voegKubusToe(kv[n].i + 1, kv[n].j, kv[n].k);
+						updateLastBuildCommand(changed, true, kv[n].i+1,kv[n].j,kv[n].k);
 					}
 					if (kv[n].m == 3)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j + 1, kv[n].k);
+						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j+1,kv[n].k);
 					}
 					if (kv[n].m == 4)
 					{
 						changed = kr.voegKubusToe(kv[n].i - 1, kv[n].j, kv[n].k);
+						updateLastBuildCommand(changed, true, kv[n].i-1,kv[n].j,kv[n].k);
 					}
 					if (kv[n].m == 5)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k - 1);
+						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k-1);
 					}
 					tekenOpnieuw();
 					if (changed)
@@ -979,6 +989,7 @@ System.out.println("b = " + b);
 				else
 				{
 					changed = kr.verwijderKubus(kv[n].i, kv[n].j, kv[n].k);
+					updateLastBuildCommand(changed, false, kv[n].i,kv[n].j,kv[n].k);
 					if (gr != null)
 						gr.verlaag(kv[n].i, kv[n].j);
 					tekenOpnieuw();
@@ -990,6 +1001,7 @@ System.out.println("b = " + b);
 		}
 	}
 
+/*	
 	public void muisDrukActie(MouseDownEvent e)
 	{
 		if (removing)
@@ -1003,7 +1015,7 @@ System.out.println("b = " + b);
 		//cubeRemoveThread.start();
 
 	}
-
+*/
 	public void muisDrukActie()
 	{
 		if (removing)
@@ -1031,6 +1043,7 @@ System.out.println("b = " + b);
 	{
 	}
 
+/*	
 	public void muisLosActie(MouseUpEvent e)
 	//public void muisLosActie()
 	{
@@ -1043,7 +1056,7 @@ System.out.println("b = " + b);
 		}
 		removed = false;
 	}
-
+*/
 	public void muisLosActie()
 	{
 		holdMouseEndTime = System.currentTimeMillis();

@@ -295,7 +295,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			panel.setWidgetVisible(volButton, false);
     			panel.setWidgetVisible(leegButton, true);
     			buildHistory = "";
-    			startKr.maakVol();
+    			//startKr.maakVol();
+    			vWerk.kr.maakVol();
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
     		}
@@ -303,7 +304,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     		{
     			panel.setWidgetVisible(volButton, true);
     			panel.setWidgetVisible(leegButton, false);
-    			startKr.maakLeeg();
+    			//startKr.maakLeeg();
+    			vWerk.kr.maakLeeg();
     			buildHistory = "";
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
@@ -400,6 +402,9 @@ System.out.println("zetVeranderd");
 			
 			int aantal = vWerk.kr.geefAantalK();
 			blokjesLabel.setText(msgs.blokjes(aantal));
+
+System.out.println("aantal " + aantal);			
+			
 		}
 
 		if (vWerk != null)
@@ -414,15 +419,17 @@ System.out.println("zetVeranderd");
 			map.put("booleanArr", booleanArray);
 			
  			comRoot.fireEvent(new CBookEvent(this,"blockBuilding",map));
-System.out.println("fire blockBuilding"); 			
+//System.out.println("fire blockBuilding"); 			
  			
 			
 			String lastBuildCommand = vWerk.getLastBuildCommand();
+System.out.println("lastBuildCommand " + lastBuildCommand);			
 			if(!"".equals(lastBuildCommand))
 				buildHistory = buildHistory + lastBuildCommand + "\n";
 			Map<String,Object> map1 = new HashMap<String,Object>();
 			map1.put("content", buildHistory);
 			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
+System.out.println("fire text.buildingProgram " + buildHistory);			
 		}
 
 		if (vWerk == null || !kijkNaActief)
@@ -523,6 +530,19 @@ System.out.println("fire blockBuilding");
 				vWerk.zetSchaduw(false);
 				vWerk.kr.zetVulkleur("zwart");
 				vWerk.draw();
+			}
+			
+			if (vWerk.kr.isVol())
+			{
+    			panel.setWidgetVisible(volButton, false);
+    			panel.setWidgetVisible(leegButton, true);
+
+			}
+			if (vWerk.kr.isLeeg())
+			{
+    			panel.setWidgetVisible(volButton, true);
+    			panel.setWidgetVisible(leegButton, false);
+				
 			}
 	
 		}
@@ -871,53 +891,86 @@ logger.info("NabouwenAanzichtenGWT init");
 				}
 			}
 			
+// dit moet je dus niet zo doen. Wim			
 	// layout button panel:
 	// [BOUWEN][SLOPEN] gap [vol/leeg] gap [aantal] gap [kijkna]
 	//  70       70      10    90      30    70      ?    90     |
 			int slopenX = 70;
 			int gap1 = 10;
-			int span = 0;
-			if(!keuzeBouwenSlopen) {
-				slopenX = 0;
-				gap1 = 150;
-			} else
-				span = slopenX * 2;;
-			int volleegX = 150;
+//			int span = 0;
+//			if(!keuzeBouwenSlopen) 
+//			{	slopenX = 0;
+//				gap1 = 150;
+//			} 
+//			else
+//				span = slopenX * 2;;
+//			int volleegX = 150;
 			int volleegW = 90;
-			int gap2 = 30;
-			if (!volLeegOptie) {
-				volleegW = 0;
-				gap2 = 120;
-			} else 
-				span = volleegX + volleegW;
-			int aantalX  = 270;
+//			int gap2 = 30;
+//			if (!volLeegOptie) 
+//			{
+//				volleegW = 0;
+//				gap2 = 120;
+//			} 
+//			else 
+//				span = volleegX + volleegW;
+//			int aantalX  = 270;
 			int aantalW  = 70;
-			if(!aantalBlokjes) {
-				aantalW = 0;
-			} else
-				span = aantalX + aantalW;
+//			if(!aantalBlokjes) 
+//			{
+//				aantalW = 0;
+//			} else
+//				span = aantalX + aantalW;
 			int kijknaW = kijkNaActief ? 90 : 0;
-			if (breedte - kijknaW < span) {
+//			if (breedte - kijknaW < span) 
+//			{
 	// we have a problem, Huub!			
-				int space = span - (breedte-kijknaW);
-				if(space <= gap1 + gap2) {					
+//				int space = span - (breedte-kijknaW);
+//				if (space <= gap1 + gap2) 
+//				{					
 					// reduce gap, done
-					int p1 = space * gap1 / (gap1 + gap2);
-					gap1 -= p1;
-					gap2 -= (space-p1);
-					space = 0;
-				} else {
+//					int p1 = space * gap1 / (gap1 + gap2);
+//					gap1 -= p1;
+//					gap2 -= (space-p1);
+//					space = 0;
+//				} else 
+//				{
 					// take gaps, 
-					space -= gap1 + gap2;
-					gap1 = gap2 = 0;
-				}
-				if ( space > 0) {
+//					space -= gap1 + gap2;
+//					gap1 = gap2 = 0;
+//				}
+//				if ( space > 0) 
+//				{
 					// take space from buttons/labels
-				}
+//				}
 // recalculate positions.				
-				volleegX = slopenX * 2 + gap1;
-				aantalX  = volleegX + volleegW + gap2;
+//				volleegX = slopenX * 2 + gap1;
+//				aantalX  = volleegX + volleegW + gap2;
+//			}
+			
+			int currentX = 0;
+			if (keuzeBouwenSlopen)
+			{
+				currentX += 2*gap1+2*slopenX;
 			}
+			if (volLeegOptie)
+			{
+				currentX += gap1+volleegW;
+			}
+			if (aantalBlokjes)
+			{
+				currentX += gap1+aantalW;
+			}
+			if (kijkNaActief)
+			{
+				currentX += gap1+kijknaW;
+			}
+			int hSpace = (breedte - currentX)/2;
+System.out.println("hSpace " + hSpace);			
+			if (hSpace >= 0)
+				currentX = hSpace;
+			else
+				currentX = 0;
 			
 			
 			if (keuzeBouwenSlopen)
@@ -928,12 +981,13 @@ logger.info("NabouwenAanzichtenGWT init");
 				slopenButton.addStyleName(nabouwenAanzichtenCss.radiobutton());
 				panel.add(bouwenButton);
 				panel.add(slopenButton);
-				panel.setWidgetLeftWidth(bouwenButton, 0, Style.Unit.PX, slopenX, Style.Unit.PX);
+				panel.setWidgetLeftWidth(bouwenButton, currentX+gap1, Style.Unit.PX, slopenX, Style.Unit.PX);
 				panel.setWidgetTopHeight(bouwenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
-				panel.setWidgetLeftWidth(slopenButton, slopenX, Style.Unit.PX, 70, Style.Unit.PX);
+				currentX += gap1+slopenX;
+				panel.setWidgetLeftWidth(slopenButton, currentX, Style.Unit.PX, slopenX+gap1, Style.Unit.PX);
 				panel.setWidgetTopHeight(slopenButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				bouwenButton.setValue(true);
-				
+				currentX += gap1+slopenX;
 			}
 			
 			if (volLeegOptie)
@@ -942,13 +996,15 @@ logger.info("NabouwenAanzichtenGWT init");
 				volButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				panel.add(leegButton);
 				leegButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
-				panel.setWidgetLeftWidth(volButton, volleegX, Style.Unit.PX, volleegW, Style.Unit.PX);
+				panel.setWidgetLeftWidth(volButton, currentX+gap1, Style.Unit.PX, volleegW, Style.Unit.PX);
 				panel.setWidgetTopHeight(volButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
-				panel.setWidgetLeftWidth(leegButton, volleegX, Style.Unit.PX, volleegW, Style.Unit.PX);
+				panel.setWidgetLeftWidth(leegButton, currentX+gap1, Style.Unit.PX, volleegW, Style.Unit.PX);
 				panel.setWidgetTopHeight(leegButton, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 				panel.setWidgetVisible(leegButton, false);
 				volButton.addClickHandler(new PushClickHandler());
 				leegButton.addClickHandler(new PushClickHandler());
+				
+				currentX += gap1+volleegW;
 			}
 			
 			if (aantalBlokjes)
@@ -958,8 +1014,9 @@ logger.info("NabouwenAanzichtenGWT init");
 				Msgs msgs = GWT.create(Msgs.class);
 				blokjesLabel.setText(msgs.blokjes(vWerk.kr.geefAantalK()));
 				panel.add(blokjesLabel);
-				panel.setWidgetLeftWidth(blokjesLabel, aantalX, Style.Unit.PX, aantalW, Style.Unit.PX);
+				panel.setWidgetLeftWidth(blokjesLabel, currentX+gap1, Style.Unit.PX, aantalW, Style.Unit.PX);
 				panel.setWidgetTopHeight(blokjesLabel, hoogte - 20, Style.Unit.PX, 25, Style.Unit.PX);
+				currentX += gap1+aantalW;
 			}	
 			
 			vWerk.initContext2d();
@@ -992,7 +1049,7 @@ logger.info("NabouwenAanzichtenGWT init");
 
 				kijkNaButton.addClickHandler(new PushClickHandler());
 			
-				panel.setWidgetLeftWidth(kijkNaPanel, breedte - 90, Style.Unit.PX, 90, Style.Unit.PX);
+				panel.setWidgetLeftWidth(kijkNaPanel, currentX+gap1, Style.Unit.PX, 90, Style.Unit.PX);
 				panel.setWidgetTopHeight(kijkNaPanel, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 			
 				kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);

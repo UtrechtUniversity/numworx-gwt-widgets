@@ -288,6 +288,16 @@ public class KubusRooster
 		}
 		aantalKubussen = 0;
 	}
+	
+	public boolean isVol()
+	{
+		return aantalKubussen == maxAantal * maxAantal * maxAantal;
+	}
+
+	public boolean isLeeg()
+	{
+		return aantalKubussen == 0;
+	}
 
 	public int geefAantalK()
 	{
