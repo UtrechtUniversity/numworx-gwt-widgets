@@ -311,7 +311,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	@Override
 	public void fireEvent(GwtEvent<?> event)
 	{
-	    eventBus.fireEvent(event);
+	    eventBus.fireEventFromSource(event, this);
 	}
 	
 	/**
@@ -319,7 +319,7 @@ public class StatModel implements HasHandlers//extends Observable// implements T
 	 */
 	public HandlerRegistration addAddViewEventHandler(AddViewEventHandler handler)
 	{
-		return eventBus.addHandler(AddViewEvent.TYPE, handler);
+		return eventBus.addHandlerToSource(AddViewEvent.TYPE, this, handler);
 	}
 
 	public void removeData()
