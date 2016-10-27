@@ -467,10 +467,13 @@ public class Facet3D //implements Serializable
              {   if (numPoints < 3) 
              	 {	//g.drawLine(p.xpoints[0], p.ypoints[0], p.xpoints[1], p.ypoints[1]);
             	 
-            	 	g.beginPath();
-            	 	g.moveTo(p.xpoints[0], p.ypoints[0]);
-            	 	g.lineTo(p.xpoints[1], p.ypoints[1]);
-            	 	g.stroke();
+            	 	if (numPoints > 1)
+            	 	{	
+            	 		g.beginPath();
+            	 		g.moveTo(p.xpoints[0], p.ypoints[0]);
+            	 		g.lineTo(p.xpoints[1], p.ypoints[1]);
+            	 		g.stroke();
+            	 	}	
              	 }
             	 else
             	 {	 //g.drawPolygon(p);

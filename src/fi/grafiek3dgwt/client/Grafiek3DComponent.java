@@ -213,6 +213,7 @@ public class Grafiek3DComponent //extends JPanel implements ActionListener
     //int functieEditorWidth = 350;
     //int functieEditorHeight = 500;
     
+    HashMap<String,Object> resetState = null;
     
 //    JPanel knoppenPanel;
 //    int knoppenPanelWidth = 40; 
@@ -3136,7 +3137,7 @@ System.out.println("g3dc zetOpdracht");
 	public void setState(Map<String,Object> map, boolean repaint)
 	{
 		
-System.out.println("g3dc setState");		
+System.out.println("g3dc setState " + repaint);		
 		
 		ObjectMap b = JSONUtilities.wrapMap(map);
 		
@@ -3283,13 +3284,15 @@ System.out.println("g3dc setState");
 		
 		boolean axesGChanged = false;
 		if (b.containsKey("noAxesG"))
-			noAxesG = b.getBoolean("noAxesG");
+		{	noAxesG = b.getBoolean("noAxesG");
+System.out.println("noAxesG = " + noAxesG);		
+		}
 		if (b.containsKey("floorTypeG"))
 			floorTypeG = b.getInt("floorTypeG");
 		if (this.noAxesG != noAxesG)
 		{	axesGChanged = true;
 			this.noAxesG = noAxesG;
-System.out.println("noAxesG " + noAxesG);			
+System.out.println("axesGChanged = " + axesGChanged);			
 		}
 		this.floorTypeG = floorTypeG;
 
@@ -3392,12 +3395,15 @@ System.out.println("noAxesG " + noAxesG);
 
 		boolean axesSChanged = false;
 		if (b.containsKey("noAxesS"))
-			noAxesS = b.getBoolean("noAxesS");
+		{	noAxesS = b.getBoolean("noAxesS");
+System.out.println("noAxesS = " + noAxesS);
+		}
 		if (b.containsKey("floorTypeS"))
 			floorTypeS = b.getInt("floorTypeS");
 		if (this.noAxesS != noAxesS)
 		{	axesSChanged = true;
 			this.noAxesS = noAxesS;
+System.out.println("axesSChanged = " + axesSChanged);			
 		}
 		this.floorTypeS = floorTypeS;
 
@@ -3488,13 +3494,13 @@ System.out.println("noAxesG " + noAxesG);
 		boolean axesCChanged = false;
 		if (b.containsKey("noAxesC"))
 		{	noAxesC = b.getBoolean("noAxesC");
-//System.out.println("noAxesC = " + noAxesC);		
+System.out.println("noAxesC = " + noAxesC);		
 		}
 		if (b.containsKey("floorTypeC"))
 			floorTypeC = b.getInt("floorTypeC");
 		if (this.noAxesC != noAxesC)
 		{	axesCChanged = true;	
-//System.out.println("axesCChanged = " + axesCChanged);		
+System.out.println("axesCChanged = " + axesCChanged);		
 			this.noAxesC = noAxesC;
 		}
 		this.floorTypeC = floorTypeC;
@@ -3519,31 +3525,50 @@ System.out.println("noAxesG " + noAxesG);
 			finerGChanged || wireFrameGChanged || wireFrameSChanged || axesGChanged || axesSChanged || axesCChanged || 
 			projGChanged || projSChanged || projCChanged || repaint)
 		{
+			
+//System.out.println("XXChanged");
+
 			// dit veroorzaakt een newModel()
-			if ((axesGChanged && noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged) 
-				zetGeenAssen(true, FUNCTION);
-			else if ((axesGChanged && !noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged)
-				zetxyzAs(true, FUNCTION);
-			if ((axesSChanged && noAxesS) || zoomSChanged || transXSChanged || transYSChanged || transZSChanged) 
+			//if ((axesGChanged && noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged)
+			if (noAxesG && (axesGChanged || zoomGChanged || transXGChanged || transYGChanged || transZGChanged))
+			{	zetGeenAssen(true, FUNCTION);
+//System.out.println("axesGChanged && noAxesG");
+			}
+			//else if ((axesGChanged && !noAxesG) || zoomGChanged || transXGChanged || transYGChanged || transZGChanged)
+			else if (!noAxesG &&  (axesGChanged ||  zoomGChanged || transXGChanged || transYGChanged || transZGChanged))
+			{	zetxyzAs(true, FUNCTION);
+//System.out.println("axesGChanged && !noAxesG");			
+			}
+			if (noAxesS && (axesSChanged || zoomSChanged || transXSChanged || transYSChanged || transZSChanged)) 
 				zetGeenAssen(true, SURFACE);
-			else if ((axesSChanged && !noAxesS) || zoomSChanged || transXSChanged || transYSChanged || transZSChanged)
+			else if (!noAxesS && (axesSChanged || zoomSChanged || transXSChanged || transYSChanged || transZSChanged))
 				zetxyzAs(true, SURFACE);
-			if ((axesCChanged && noAxesC) || zoomCChanged || transXCChanged || transYCChanged || transZCChanged) 
+			if (noAxesC && (axesCChanged || zoomCChanged || transXCChanged || transYCChanged || transZCChanged)) 
 				zetGeenAssen(true, CURVE);
-			else if ((axesCChanged && !noAxesC) || zoomCChanged || transXCChanged || transYCChanged || transZCChanged)
+			else if (!noAxesC && (axesCChanged || zoomCChanged || transXCChanged || transYCChanged || transZCChanged))
 				zetxyzAs(true, CURVE);
 
 			
 			// dit veroorzaakt een paint
-			zetDraadFiguur(objectType);
+			//zetDraadFiguur(objectType);
 		}
-		
+
+		// dit veroorzaakt een paint
+		zetDraadFiguur(objectType);
+
 		if ((objectType == FUNCTION) && !centraleProjG)
 			owner.projectieButton.setDown(true);
+		if ((objectType == FUNCTION) && centraleProjG)
+			owner.projectieButton.setDown(false);
 		if ((objectType == SURFACE) && !centraleProjS)
 			owner.projectieButton.setDown(true);
+		if ((objectType == SURFACE) && centraleProjS)
+			owner.projectieButton.setDown(false);
 		if ((objectType == CURVE) && !centraleProjC)
 			owner.projectieButton.setDown(true);
+		if ((objectType == CURVE) && centraleProjC)
+			owner.projectieButton.setDown(false);
+
 		if ((objectType == FUNCTION) && noAxesG)
 		{	//owner.assenButton.setDown(true);
 			if (owner.axesButton.getParent() == owner.rightPanel)
@@ -3551,13 +3576,26 @@ System.out.println("noAxesG " + noAxesG);
 			if (owner.noAxesButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
 		}
+		if ((objectType == FUNCTION) && !noAxesG)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,false);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,true);
+		}
 		if ((objectType == SURFACE) && noAxesS)
 		{	//owner.assenButton.setDown(true);
 			if (owner.axesButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.axesButton,true);
 			if (owner.noAxesButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
-		
+		}
+		if ((objectType == SURFACE) && !noAxesS)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,false);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,true);
 		}
 		if ((objectType == CURVE) && noAxesC)
 		{	//owner.assenButton.setDown(true);
@@ -3565,8 +3603,15 @@ System.out.println("noAxesG " + noAxesG);
 				owner.rightPanel.setWidgetVisible(owner.axesButton,true);
 			if (owner.noAxesButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.noAxesButton,false);
-
 		}
+		if ((objectType == CURVE) && !noAxesC)
+		{	//owner.assenButton.setDown(true);
+			if (owner.axesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.axesButton,false);
+			if (owner.noAxesButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.noAxesButton,true);
+		}
+
 		if ((objectType == FUNCTION) && wireFrameG)
 		{	//owner.solidWireButton.setDown(true);
 			if (owner.solidButton.getParent() == owner.rightPanel)
@@ -3574,13 +3619,26 @@ System.out.println("noAxesG " + noAxesG);
 			if (owner.wireButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.wireButton,false);
 		}
+		if ((objectType == FUNCTION) && !wireFrameG)
+		{	//owner.solidWireButton.setDown(true);
+			if (owner.solidButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.solidButton,false);
+			if (owner.wireButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.wireButton,true);
+		}
 		if ((objectType == SURFACE) && wireFrameS)
 		{	//owner.solidWireButton.setDown(true);
 			if (owner.solidButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.solidButton,true);
 			if (owner.wireButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.wireButton,false);
-		
+		}
+		if ((objectType == SURFACE) && !wireFrameS)
+		{	//owner.solidWireButton.setDown(true);
+			if (owner.solidButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.solidButton,false);
+			if (owner.wireButton.getParent() == owner.rightPanel)
+				owner.rightPanel.setWidgetVisible(owner.wireButton,true);
 		}
 		
 		// hier, objectType nodig

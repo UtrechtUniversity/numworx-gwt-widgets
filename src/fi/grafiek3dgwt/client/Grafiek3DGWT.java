@@ -168,6 +168,8 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 
 	boolean touchStart = false;
 	
+	boolean voorbeeldenUsed = false;
+	
 	public void getImages() 
 	{
 		rb = GWT.create(Text.class);
@@ -769,11 +771,16 @@ logger.info("Grafiek3DGWT init");
 		
 		//processInput(voorbeeldKeuze);
 		
+//logger.info("Grafiek3DGWT init before g3d.setState");		
 		grafiek3DComponent.setState(map, false);
+//logger.info("Grafiek3DGWT init after g3d.setState");
 		
-//System.out.println("g3DC graphColor = " + grafiek3DComponent.graphColor.toString());		
+		grafiek3DComponent.resetState = (HashMap) map;
+		
+		voorbeeldenUsed = false;
 		
 		processLaunchInput();
+logger.info("Grafiek3DGWT init after processLaunch");		
 		
 //System.out.println("g3DC graphColor = " + grafiek3DComponent.graphColor.toString());
 		
@@ -901,6 +908,8 @@ logger.info("Grafiek3DGWT init");
 	
 	public void processInput(int voorbeeldKeuze)
 	{
+		voorbeeldenUsed = true;
+		
 		// knoppen terugzetten
 		solidWireButton.setDown(false);
 		projectieButton.setDown(false);
@@ -1026,19 +1035,25 @@ logger.info("Grafiek3DGWT init");
 		}
 		else if (functieType == CURVE)
 		{	
+			
+logger.info("Grafiek3DGWT processLaunch curve");			
 			Expressie expX = FormuleParser.geefExpressie(curveXString);
 			Expressie expY = FormuleParser.geefExpressie(curveYString);
 			Expressie expZ = FormuleParser.geefExpressie(curveZString);
-			
+logger.info("Grafiek3DGWT processLaunch expressies");			
 			Expressie expTMin = FormuleParser.geefExpressie(tMinString);
 			double tMin = expTMin.geefWaarde();
+logger.info("Grafiek3DGWT processLaunch tMin");			
 			Expressie expTMax = FormuleParser.geefExpressie(tMaxString);
 			double tMax = expTMax.geefWaarde();
+logger.info("Grafiek3DGWT processLaunch tMax");			
 			Expressie expTPointsDouble = FormuleParser.geefExpressie(tPointsString);
 			int tPoints = (int) Math.round(expTPointsDouble.geefWaarde());
+logger.info("Grafiek3DGWT processLaunch tPoints");			
 			
 			grafiek3DComponent.objectType = CURVE;
 			grafiek3DComponent.zetCurve3D(expX, expY, expZ, tMin, tMax, tPoints);
+logger.info("Grafiek3DGWT processLaunch zetCurve");			
 			
 		}
 		
@@ -1148,24 +1163,27 @@ logger.info("Grafiek3DGWT init");
 
 			if (e.getSource() == resetButton)
 			{
+				
 				figuurKeuzeBox.setSelectedIndex(functieType);
 				figuurKeuze = functieType;
 				toonVoorbeeldenBox(functieType);
 				voorbeeldKeuzeBox.setSelectedIndex(0);
 				
-				//solidWireButton.setDown(false);
-				if (solidButton.getParent() == rightPanel)
-					rightPanel.setWidgetVisible(solidButton,false);
-				if (wireButton.getParent() == rightPanel)
-					rightPanel.setWidgetVisible(wireButton,true);
+				if (solidDraadKeuzeOptie)	
+				{	if (solidButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(solidButton,false);
+					if (wireButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(wireButton,true);
+				}	
 				
 				projectieButton.setDown(false);
 				
-				//assenButton.setDown(false);
-				if (axesButton.getParent() == rightPanel)
-					rightPanel.setWidgetVisible(axesButton,false);
-				if (noAxesButton.getParent() == rightPanel)
-					rightPanel.setWidgetVisible(noAxesButton,true);
+				if (asKeuzeOptie)
+				{	if (axesButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(axesButton,false);
+					if (noAxesButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(noAxesButton,true);
+				}	
 
 
 				grafiek3DComponent.zetGrafiek3D(null);
@@ -1305,12 +1323,12 @@ logger.info("Grafiek3DGWT init");
 			{
 				int index = voorbeeldKeuzeBox.getSelectedIndex();
 				
-				if ((index - 1) != voorbeeldKeuze)
-				{
+				//if ((index - 1) != voorbeeldKeuze)
+				//{
 					voorbeeldKeuze = index - 1;
 				 
 					processInput(voorbeeldKeuze);
-				}	
+				//}	
 			}
 		}
 	}
@@ -1465,6 +1483,33 @@ logger.info("Grafiek3DGWT init");
 				grafiek3DComponent.zetGrover(true, figuurKeuze);
 			}
 			
+			else if (e.getSource() == solidButton)
+			{
+				grafiek3DComponent.zetDraadFiguur(false, figuurKeuze);
+				rightPanel.setWidgetVisible(solidButton,false);
+				rightPanel.setWidgetVisible(wireButton,true);
+			}
+			else if (e.getSource() == wireButton)
+			{
+				grafiek3DComponent.zetDraadFiguur(true, figuurKeuze);
+				rightPanel.setWidgetVisible(solidButton,true);
+				rightPanel.setWidgetVisible(wireButton,false);
+			}
+			
+			else if (e.getSource() == axesButton)
+			{
+				grafiek3DComponent.zetxyzAs(true, figuurKeuze);
+				rightPanel.setWidgetVisible(axesButton,false);
+				rightPanel.setWidgetVisible(noAxesButton,true);
+			}
+			else if (e.getSource() == noAxesButton)
+			{
+				grafiek3DComponent.zetGeenAssen(true, figuurKeuze);
+				rightPanel.setWidgetVisible(axesButton,true);
+				rightPanel.setWidgetVisible(noAxesButton,false);
+			}
+
+			
 		}
 	}
 	
@@ -1534,7 +1579,10 @@ logger.info("Grafiek3DGWT init");
 	{
 System.out.println("g3D getState");
 
-		return grafiek3DComponent.getState();
+		if (!voorbeeldenUsed)
+			return grafiek3DComponent.getState();
+		else
+			return grafiek3DComponent.resetState;
 	}
 
 	@Override

@@ -333,10 +333,10 @@ public class FormuleParser
 		{	s = s.substring(0,n) + ")" + s.substring(n+1);
 			n = s.indexOf("@");
 		}
-		n = s.indexOf("Â·");
+		n = s.indexOf("·");
 		while(n>-1)
 		{	s = s.substring(0,n) + "*" + s.substring(n+1);
-			n = s.indexOf("Â·");
+			n = s.indexOf("·");
 		}
 		n = s.indexOf("\u00d7");
 		while(n>-1)
@@ -1663,6 +1663,7 @@ public class FormuleParser
 	{	return parse(schoon(formuleString(codeString),woordformule),woordformule);
 	}
 	
+/*	
 	public static String randomizeString(String s, String[] randomVars, HashMap<String,Object> randomValues) throws Exception
 	{	for(int i=s.length()-1 ; i>-1; i--)
 		{	if(s.charAt(i)=='@')
@@ -1692,7 +1693,8 @@ public class FormuleParser
 		}
 		return s;
 	}
-	
+*/
+/*	
 	public static String randomizeTekstVakString(String tekst, String[] randomVars, HashMap<String,Object> randomValues) throws Exception
 	{	for(int i=tekst.length()-1 ; i>-1; i--)
 		{	if(tekst.charAt(i)=='@')
@@ -1734,7 +1736,7 @@ public class FormuleParser
 		}
 		return tekst;
 	}
-	
+*/	
 	public static String substitueerRandom(String formString, String[] varnamen, HashMap<String,Object> waarden)
 	{	return substitueerRandom(formString,  varnamen,  waarden, true);
 	}
