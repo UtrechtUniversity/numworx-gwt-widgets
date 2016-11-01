@@ -25,7 +25,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -943,7 +943,8 @@ public class GrafiekGWTVeld {
 							g.setStroke(new BasicStroke(1.0f));
 							*/
 							tracexD = interactiePanel.xAsLog?Math.log10(d):d;
-							tracex = x;
+							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
+							tracex = (int) Math.round(tracexD);
 							stand = tracex;
 							//interactiePanel.slider.zetStand(tracex);
 							
@@ -1014,6 +1015,8 @@ public class GrafiekGWTVeld {
 //								+ interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)
 //								/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
 							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
+							tracex = (int) Math.round(tracexD);
+							stand = tracex;
 							double dTraceX = pixelsXtoValue(tracexD);
 
 //							double dTraceY = interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
