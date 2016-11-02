@@ -11,7 +11,9 @@ import java.util.Vector;
 //import fi.grafiek3dtest.Grafiek3DTest;
 //import fi.beans.stringutils.*;
 
-import fi.grafiek3dgwt.client.StringUtils;
+
+
+
 import fi.grafiek3dgwt.client.Grafiek3DGWT;
 import fi.grafiek3dgwt.client.expressies.*;
 
@@ -49,7 +51,8 @@ public class FormuleParser
 		{
 			s = s.substring(2,s.length()-1);
 			if(s.length()==0)return null;
-			String[] vergelijkingStrings = StringUtils.split(s,"of");
+			String[] vergelijkingStrings = s.split("of");
+			//StringUtils.split(s,WiskOpdr.rb.getString("ofLabel"));
 			Vergelijking[] vergelijkingen = new Vergelijking[vergelijkingStrings.length];
 			
 			for(int j=0 ; j<vergelijkingStrings.length; j++) 
@@ -57,7 +60,8 @@ public class FormuleParser
 		    	int index2 = vergelijkingStrings[j].indexOf("]");
 				if(index1>-1 && index2>index1)
 				{	
-					String[] expressieStrings = StringUtils.split(vergelijkingStrings[j].substring(index1+1,index2),":");
+					String[] expressieStrings = vergelijkingStrings[j].substring(index1 + 1, index2).split(":");
+					//String[] expressieStrings = StringUtils.split(vergelijkingStrings[j].substring(index1+1,index2),":");
 					if(expressieStrings.length==3)
 					{	Expressie e1 = parse(schoon(formuleString("$f" + expressieStrings[0] + "@")));
 			    		Expressie e2 = parse(schoon(formuleString("$f" + expressieStrings[1] + "@")));
@@ -98,13 +102,15 @@ public class FormuleParser
 			for(int i=0 ; i<vergelijkingStrings.length; i++)
 		    {	boolean split = false;
 			    for(int j=0 ; j<vergTekens.length && !split  && vergelijkingen[i]==null; j++)
-			    {	String[] expressieStrings  = StringUtils.split(vergelijkingStrings[i],vergTekens[j]);
+			    {	String[] expressieStrings  = vergelijkingStrings[i].split(vergTekens[j]);
+			    	//StringUtils.split(vergelijkingStrings[i],vergTekens[j]);
 			    	if(expressieStrings.length==2)
 			    	{	//if(expressieStrings[1].trim().equals(WiskOpdr.rb.getString("antwoordModelGeen"))) expressieStrings[1] = "0.1234567";
 				    	if(expressieStrings[1].trim().equals("geen") || expressieStrings[1].trim().equals("none")) expressieStrings[1] = "0.1234567";
 			    		Expressie e1 = null;
 			    		Expressie e2 = null;
-			    		String[] eindoplStrings  = StringUtils.split(expressieStrings[1],"::");
+			    		String[] eindoplStrings = expressieStrings[1].split("::"); 
+			    		//StringUtils.split(expressieStrings[1],"::");
 			    		int aantalEO = eindoplStrings.length;
 			    		if(aantalEO>1)
 			    		{ 	Expressie[] eindoplossingen = new Expressie[aantalEO];
@@ -426,7 +432,7 @@ public class FormuleParser
 			}
 			if(index >-1 && tel>index+2) s = s.substring(0,index) + "(" + s.substring(index+1,tel) + ")" + s.substring(tel);
 			
-			else if(index >-1 && index+2<s.length() && Character.isLetter(s.charAt(index+2))) 
+			else if(index >-1 && index+2<s.length() && Letter.isLetter(s.charAt(index+2))) 
 			{	tel = index+3;
 				s = s.substring(0,index) + "(-1)" + s.substring(index+2);
 			}	
@@ -445,7 +451,7 @@ public class FormuleParser
 			
 			if(index >-1 && tel>index+2)s = s.substring(0,index) + "/(" + s.substring(index+1,tel) + ")" + s.substring(tel);
 			
-			else if(index >-1 && index+2<s.length() && Character.isLetter(s.charAt(index+2))) 
+			else if(index >-1 && index+2<s.length() && Letter.isLetter(s.charAt(index+2))) 
 			{	tel = index+3;
 				s = s.substring(0,index) + "(-1)/" + s.substring(index+2);
 			}	
@@ -483,7 +489,7 @@ public class FormuleParser
             {  	char c0 = s.charAt(i);
         		char c1 = s.charAt(i+1);
         		boolean isUpperCasePair = Character.isUpperCase(c0) && Character.isUpperCase(c1);
-        		if(!isUpperCasePair && ((Character.isLetter(c0) || Character.isDigit(c0) || c0==')') && (Character.isLetter(c1) || c1=='(')))
+        		if(!isUpperCasePair && ((Letter.isLetter(c0) || Character.isDigit(c0) || c0==')') && (Letter.isLetter(c1) || c1=='(')))
                 {   s = s.substring(0,i+1) + '*' +  s.substring(i+1);
                 }
                 else if(c0==')' && Character.isDigit(c1))
@@ -493,7 +499,7 @@ public class FormuleParser
         }
 		else if(!(woordformule || FormuleParser.woordFormule))
 		{	for(int i=0 ; i<s.length()-1 ; i++)
-			{	if((Character.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)) || s.charAt(i)==')') && (Character.isLetter(s.charAt(i+1)) || s.charAt(i+1)=='('))
+			{	if((Letter.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)) || s.charAt(i)==')') && (Letter.isLetter(s.charAt(i+1)) || s.charAt(i+1)=='('))
 				{	s = s.substring(0,i+1) + '*' +  s.substring(i+1);
 				}
 				else if(s.charAt(i)==')' && Character.isDigit(s.charAt(i+1)))
@@ -775,10 +781,10 @@ public class FormuleParser
 		
 		if(woordformule || FormuleParser.woordFormule)
 		{	boolean startMetLetter = true;
-			startMetLetter = Character.isLetter(s.charAt(0));
+			startMetLetter = Letter.isLetter(s.charAt(0));
 			boolean basisString = true;
 			for(int i=1 ; i<s.length() ; i++)
-			{	basisString = startMetLetter && (Character.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)));
+			{	basisString = startMetLetter && (Letter.isLetter(s.charAt(i)) || Character.isDigit(s.charAt(i)));
 				if(!basisString) break;
 			}
 			
@@ -793,7 +799,7 @@ public class FormuleParser
 		{
 			boolean upperCasePair = s.length()==2 && Character.isUpperCase(s.charAt(0))&& Character.isUpperCase(s.charAt(1));
 			if(upperCasePair) return new BasisExpressie(s);
-			else if(s.length()==1 && Character.isLetter(s.charAt(0)))
+			else if(s.length()==1 && Letter.isLetter(s.charAt(0)))
 			{	if(s.charAt(0)=='e')exp = new E();
 				else if(s.charAt(0)=='\u03C0')exp = new PI();
 				else exp = new BasisExpressie(s);
@@ -803,10 +809,10 @@ public class FormuleParser
 		else
 		{
 			//is het een letter?		
-			if (s.length() == 1 && Character.isLetter(s.charAt(0)))
+			if (s.length() == 1 && Letter.isLetter(s.charAt(0)))
 			{	if (s.charAt(0) == 'e')
 					exp = new E();
-				else if(s.charAt(0) == '\u03C0')
+				else if (s.charAt(0) == '\u03C0')
 					exp = new PI();
 				else 
 					exp = new BasisExpressie(s);
@@ -827,11 +833,11 @@ public class FormuleParser
 				exp = new BasisExpressie(s);
 			return exp;
 		}
-		if(s.equals("\u03C0"))
-		{
-			exp = new PI();
-			return exp;
-		}
+//		if(s.equals("\u03C0"))
+//		{
+//			exp = new PI();
+//			return exp;
+//		}
 		
 		
 		// is + of - oneidig?
@@ -1474,7 +1480,8 @@ public class FormuleParser
 		}
 		else if(s.length()>3 && s.substring(0,3).equals("rns"))
 		{	String string = s.substring(4,s.length()-1);
-			String[] stringDelen = StringUtils.split(string, "_");
+			String[] stringDelen = string.split("_");
+			//StringUtils.split(string, "_");
 			int lastIndex0 = string.lastIndexOf('_');
 			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
 			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);

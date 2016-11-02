@@ -4,12 +4,10 @@ import java.awt.*;
 //import java.text.DecimalFormat;
 import java.util.*;
 
-//import fi.beans.stringutils.*;
-//import fi.grafiek3dtest.Grafiek3DTest;
-
 import fi.grafiek3dgwt.client.StringUtils;
 import fi.grafiek3dgwt.client.Grafiek3DGWT;
 import fi.grafiek3dgwt.client.UF;
+import fi.grafiek3dgwt.client.formuleobjects.Letter;
 
 public class BasisExpressie extends Expressie  
 {	String 	basisString;
@@ -57,7 +55,7 @@ public class BasisExpressie extends Expressie
 	}
 	
 	public boolean isVar()
-	{	return Character.isLetter(basisString.charAt(0));
+	{	return Letter.isLetter(basisString.charAt(0));
 	}
 	
 	public double geefWaarde()

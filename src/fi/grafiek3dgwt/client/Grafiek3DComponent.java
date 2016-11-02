@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -34,6 +35,7 @@ import fi.grafiek3dgwt.client.expressies.*;
 public class Grafiek3DComponent //extends JPanel implements ActionListener
 {
 
+	//static Logger logger = Logger.getLogger("Grafiek3DComponent");
 	public static final CssColor darkGreen = CssColor.make(41, 156, 57);
     public static final CssColor mediumGreen = CssColor.make(173, 222, 99);
     public static final CssColor brownRed = CssColor.make(214, 0, 0);
@@ -3138,9 +3140,7 @@ System.out.println("g3dc zetOpdracht");
 	{
 		
 System.out.println("g3dc setState " + repaint);		
-		
 		ObjectMap b = JSONUtilities.wrapMap(map);
-		
 		// state
 		int objectType = FUNCTION;
 		
@@ -3189,13 +3189,11 @@ System.out.println("g3dc setState " + repaint);
 	    
 	    CssColor graphColor = transYellow;
 	    CssColor surfaceColor = transYellow;
-		
-		if (b.containsKey("objectType"))
+	    if (b.containsKey("objectType"))
 			objectType = b.getInt("objectType");
 		this.objectType = objectType;
-
-		zoomStandaard(false, objectType);
 		
+		zoomStandaard(false, objectType);
 		// FUNCTION
 		if (b.containsKey("angleXG"))
 			angleXG = b.getDouble("angleXG");
@@ -3217,7 +3215,7 @@ System.out.println("g3dc setState " + repaint);
 		{	for (int zInCnt = 0; zInCnt < zoomFactorG; zInCnt++)
 				zoomIn(false, FUNCTION);
 		}
-		
+
 		boolean transXGChanged = false;
 		if (b.containsKey("translateXFactorG"))
 			translateXFactorG = b.getInt("translateXFactorG");
@@ -3319,7 +3317,6 @@ System.out.println("axesGChanged = " + axesGChanged);
 //System.out.println("gC = " + graphColor.toString());
 		}	
 		
-		
 		// SURFACE
 		if (b.containsKey("angleXS"))
 			angleXS = b.getDouble("angleXS");
@@ -3383,7 +3380,7 @@ System.out.println("axesGChanged = " + axesGChanged);
 		{	for (int tMinCnt = translateZFactorS; tMinCnt < 0; tMinCnt++)
 				transMinZ(false, SURFACE);
 		}
-		
+
 		boolean wireFrameSChanged = false;
 		if (b.containsKey("wireFrameS"))
 		{	wireFrameS = b.getBoolean("wireFrameS");
@@ -3448,7 +3445,7 @@ System.out.println("axesSChanged = " + axesSChanged);
 		{	for (int zInCnt = 0; zInCnt < zoomFactorC; zInCnt++)
 			zoomIn(false, CURVE);
 		}
-		
+
 		boolean transXCChanged = false;
 		if (b.containsKey("translateXFactorC"))
 			translateXFactorC = b.getInt("translateXFactorC");
@@ -3640,7 +3637,7 @@ System.out.println("axesCChanged = " + axesCChanged);
 			if (owner.wireButton.getParent() == owner.rightPanel)
 				owner.rightPanel.setWidgetVisible(owner.wireButton,true);
 		}
-		
+
 		// hier, objectType nodig
 		//layoutKnoppenPanel();
 		

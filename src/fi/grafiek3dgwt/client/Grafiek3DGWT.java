@@ -59,7 +59,7 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 {
 	public static Text rb;
 	
-	static Logger logger = Logger.getLogger("WebLogoGWT");
+	static Logger logger = Logger.getLogger("Grafiek3DGWT");
 	
 	public static final String languageString = "nl";
 	public static String deployVariant = "";
@@ -657,10 +657,10 @@ logger.info("grafiek3dgwt onModuleLoad");
 	{
 		
 logger.info("Grafiek3DGWT init");
-
 		this.breedte = width;
 		this.hoogte = height;
-
+		this.launchState = map;
+				
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 
