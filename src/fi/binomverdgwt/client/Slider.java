@@ -81,12 +81,11 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 		xPos = x;
 		yPos = y;
 		breedte = lengte + 10;
-		hoogte = 13;
+		hoogte = 20;
 		sliderRectangle = new Rectangle(xPos, yPos, breedte, hoogte);
 		
 		if (c2d == null)
 		{
-			
 			
 			sliderCanvas = Canvas.createIfSupported();
 			
@@ -109,7 +108,8 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 
 		}
 		else
-		{	
+		{
+			hoogte = 13;
 			sliderContext2d = c2d;
 			
 		}	
@@ -186,13 +186,17 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 			g.fillRect(xPos, yPos, breedte, hoogte);
 		}
 
+		int deltay = 5;
+		if (!param.equalsIgnoreCase("grens"))
+			deltay = hoogte / 2;
+		
 		if (showLine && enabled)
 		{	//g.setColor(Color.black);
 			g.setStrokeStyle(CssColor.make(0,0,0));
 			//g.drawLine(5, 5, lengte + 5, 5);
 			g.beginPath();
-			g.moveTo(xPos + 5, yPos + 5);
-			g.lineTo(xPos + lengte + 5, yPos + 5);
+			g.moveTo(xPos + 5, yPos + deltay);
+			g.lineTo(xPos + lengte + 5, yPos + deltay);
 			g.stroke();
 		
 		}
@@ -203,7 +207,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 			//g.fillOval(5 + stand - 3, 2, 6, 6);
 			g.setFillStyle(knopColor);
 			g.beginPath();
-            g.arc(xPos + 5 + stand, yPos + 5, 3, 0, 2 * Math.PI);
+            g.arc(xPos + 5 + stand, yPos + deltay, 3, 0, 2 * Math.PI);
        	 	g.fill();
 			
 			
@@ -211,10 +215,10 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 			//g.drawOval(5 + stand - 3, 2, 6, 6);
 			g.setStrokeStyle(CssColor.make(0,0,0));
 			g.beginPath();
-            g.arc(xPos + 5 + stand, yPos + 5, 3, 0, 2 * Math.PI);
+            g.arc(xPos + 5 + stand, yPos + deltay, 3, 0, 2 * Math.PI);
        	 	g.stroke();
        	 	
-//raakRectangle = new Rectangle(xPos + stand - 3, yPos, 16, 13);
+//raakRectangle = new Rectangle(xPos + stand - 3, yPos, 16, hoogte);
 //g.rect(raakRectangle.x, raakRectangle.y, raakRectangle.width, raakRectangle.height);
 //g.stroke();
 		}
@@ -270,7 +274,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 	{
 		if (this.editable) 
 		{
-			raak = enabled && (new Rectangle(xPos + stand - 3, yPos, 16, 13)).contains(eventX, eventY);
+			raak = enabled && (new Rectangle(xPos + stand - 3, yPos, 16, hoogte)).contains(eventX, eventY);
 			muisStartX = eventX;
 			muisStartY = eventY;
 			//if (raak && actionListener != null) 
@@ -284,7 +288,7 @@ public class Slider //extends JComponent implements MouseListener, MouseMotionLi
 	{
 		if (this.editable) 
 		{
-			if (!raak && enabled && (new Rectangle(xPos + stand - 3, yPos, 16, 13).contains(eventX, eventY))) 
+			if (!raak && enabled && (new Rectangle(xPos + stand - 3, yPos, 16, hoogte).contains(eventX, eventY))) 
 			{
 				raak = true;
 				muisStartX = eventX;

@@ -439,6 +439,24 @@ logger.info("BinomVerdGWT post setState");
 //		System.out.println("PInvoer: " + binomVerdPanel.pInvoer.getInput());
 		binomVerdPanel.pInvoer.haalPuntNulWeg();
 		
+		if (binomVerdPanel.MInvoer.isRandomInput()) 
+		{
+			binomVerdPanel.M = (int) substitueerRandom((double) binomVerdPanel.M, binomVerdPanel.MInvoer.getInput(), 
+					                                    randomVarNamen, randomVarWaarden);
+			binomVerdPanel.MInvoer.setInput(Integer.toString(binomVerdPanel.M));
+			
+			
+		}
+
+		if (binomVerdPanel.populatieInvoer.isRandomInput()) 
+		{
+			binomVerdPanel.populatie = (int) substitueerRandom((double) binomVerdPanel.populatie, binomVerdPanel.populatieInvoer.getInput(), 
+					                                           randomVarNamen, randomVarWaarden);
+			binomVerdPanel.populatieInvoer.setInput(Integer.toString(binomVerdPanel.populatie));
+			
+			
+		}
+
 		
 		//zet nakijkopties
 		if (launchState.containsKey("kijkNa")) 

@@ -177,7 +177,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	
 	public final int HOFFSET = 10;
 	
-	public final int NOORDBALKHEIGHT = 43;
+	public final int NOORDBALKHEIGHT = 50; //43;
 	public final int NOORDBALKGAP = 4;
 	public final int COMBOBOXHEIGHT = 22;
 	
@@ -638,7 +638,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				nSlider.globalY = noordLinksY + ynPos;
 				noordLinks.add(nSlider.sliderCanvas);
 				noordLinks.setWidgetLeftWidth(nSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
-				noordLinks.setWidgetTopHeight(nSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
+				noordLinks.setWidgetTopHeight(nSlider.sliderCanvas, ynPos, Style.Unit.PX, 20, Style.Unit.PX);
 				
 				setNSlider();
 				nSlider.zetEnabled(showNSlider && nVeranderbaar);
@@ -662,7 +662,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				pSlider.globalY = noordRechtsBVY+ynPos;
 				noordRechtsBV.add(pSlider.sliderCanvas);
 				noordRechtsBV.setWidgetLeftWidth(pSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
-				noordRechtsBV.setWidgetTopHeight(pSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
+				noordRechtsBV.setWidgetTopHeight(pSlider.sliderCanvas, ynPos, Style.Unit.PX, 20, Style.Unit.PX);
 				
 				setPSlider();
 				pSlider.zetEnabled(showPSlider && pVeranderbaar);
@@ -686,7 +686,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				MSlider.globalY = noordMiddenY+ynPos;
 				noordMidden.add(MSlider.sliderCanvas);
 				noordMidden.setWidgetLeftWidth(MSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3 - 2 * NOORDBALKGAP, Style.Unit.PX);
-				noordMidden.setWidgetTopHeight(MSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
+				noordMidden.setWidgetTopHeight(MSlider.sliderCanvas, ynPos, Style.Unit.PX, 20, Style.Unit.PX);
 				
 				setMSlider();
 				MSlider.zetEnabled(showMSlider && MVeranderbaar);				
@@ -710,7 +710,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 				populatieSlider.globalY = noordRechtsHypY+ynPos;
 				noordRechtsHyp.add(populatieSlider.sliderCanvas);
 				noordRechtsHyp.setWidgetLeftWidth(populatieSlider.sliderCanvas, 0, Style.Unit.PX, breedte / 3, Style.Unit.PX);
-				noordRechtsHyp.setWidgetTopHeight(populatieSlider.sliderCanvas, ynPos, Style.Unit.PX, 13, Style.Unit.PX);
+				noordRechtsHyp.setWidgetTopHeight(populatieSlider.sliderCanvas, ynPos, Style.Unit.PX, 20, Style.Unit.PX);
 				
 				setPopulatieSlider();
 				populatieSlider.zetEnabled(showPopulatieSlider && populatieVeranderbaar);
