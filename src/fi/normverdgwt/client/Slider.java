@@ -51,7 +51,9 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 		xPos = x;
 		yPos = y;
 		breedte = lengte + 10;
-		hoogte = 13;
+		hoogte = 20;
+		if (param.equalsIgnoreCase("grens"))
+			hoogte = 13;
 		sliderRectangle = new Rectangle(xPos, yPos, breedte, hoogte);
 		
 		sliderContext2d = c2d;
@@ -124,6 +126,9 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 			g.fillRect(xPos, yPos, breedte, hoogte);
 		}
 		
+		int deltay = 5;
+		if (!param.equalsIgnoreCase("grens"))
+			deltay = hoogte / 2;
 	
 		if (showLine && enabled)
 		{	
@@ -131,8 +136,8 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 			g.setStrokeStyle(CssColor.make(0,0,0));
 			//g.drawLine(5, 5, lengte + 5, 5);
 			g.beginPath();
-			g.moveTo(xPos + 5, yPos + 5);
-			g.lineTo(xPos + lengte + 5, yPos + 5);
+			g.moveTo(xPos + 5, yPos + deltay);
+			g.lineTo(xPos + lengte + 5, yPos + deltay);
 			g.stroke();
 		
 		}
@@ -143,7 +148,7 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 			//g.fillOval(5 + stand - 3, 2, 6, 6);
             
 			g.beginPath();
-            g.arc(xPos + 5 + stand, yPos + 5, 3, 0, 2 * Math.PI);
+            g.arc(xPos + 5 + stand, yPos + deltay, 3, 0, 2 * Math.PI);
        	 	g.fill();
 
 			
@@ -152,10 +157,10 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 			//g.drawOval(5 + stand - 3, 2, 6, 6);
 			
 			g.beginPath();
-            g.arc(xPos + 5 + stand, yPos + 5, 3, 0, 2 * Math.PI);
+            g.arc(xPos + 5 + stand, yPos + deltay, 3, 0, 2 * Math.PI);
        	 	g.stroke();
        	 	
-//Rectangle pressRect = new Rectangle(xPos + stand - 3, yPos, 16, 13);
+//Rectangle pressRect = new Rectangle(xPos + stand - 3, yPos, 16, hoogte);
 //g.rect(pressRect.x, pressRect.y, pressRect.width, pressRect.height);
 //g.stroke();
 			
@@ -206,7 +211,7 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 	//public void mousePressed(MouseEvent e)
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{	//raak = enabled && (new Rectangle(stand, 0, 10, 20)).contains(e.getX(), e.getY());
-		raak = enabled && (new Rectangle(xPos + stand - 3, yPos, 16, 13)).contains(eventX, eventY);
+		raak = enabled && (new Rectangle(xPos + stand - 3, yPos, 16, hoogte)).contains(eventX, eventY);
 		muisStartX = eventX;
 		muisStartY = eventY;
 		
@@ -219,7 +224,7 @@ public class Slider	//extends JComponent implements MouseListener,MouseMotionLis
 	//public void mouseDragged(MouseEvent e)
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
 	{	if (!raak && enabled && 
-			(new Rectangle(xPos + stand - 3, yPos, 16, 13).contains(eventX, eventY)))
+			(new Rectangle(xPos + stand - 3, yPos, 16, hoogte).contains(eventX, eventY)))
 		{	raak = true;
 			muisStartX = eventX;
 			

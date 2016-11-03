@@ -1251,10 +1251,10 @@ public class NormaalPanel extends LayoutPanel
 				muSlider.zetEnabled(true);
 				//muSlider.setLocation(offSet, yPos);// + (cHeight - muSlider.getSize().height) / 2); 
 				//yPos += muSlider.getSize().height-5;
-				yPos += muSlider.hoogte - 5;
+				yPos += muSlider.hoogte - 1;
 				
 				muRect = new Rectangle(0, yPos - muSlider.hoogte + 5 - cHeight2 - 4, leftWidth, 
-							           cHeight2 + 8 + muSlider.hoogte - 5);
+							           cHeight2 + 8 + muSlider.hoogte - 5); // -5
 			}	
 			else
 				muSlider.zetEnabled(false);
@@ -1318,7 +1318,7 @@ public class NormaalPanel extends LayoutPanel
 				sigmaSlider.setLocation(offSet, yPos + 3);
 				sigmaSlider.zetEnabled(true);
 				//yPos += sigmaSlider.getSize().height-5;
-				yPos += sigmaSlider.hoogte-5;
+				yPos += sigmaSlider.hoogte-1;
 				
 				sigmaRect = new Rectangle(0, yPos - sigmaSlider.hoogte + 5 - cHeight2 - 4, leftWidth, 
 				                          cHeight2 + 8 + sigmaSlider.hoogte - 5);
@@ -1597,7 +1597,7 @@ public class NormaalPanel extends LayoutPanel
 				kansSlider.setLocation(offSet,yPos + 3);// + (cHeight - kansSlider.getSize().height) / 2); 
 				kansSlider.zetEnabled(true);
 				//yPos += kansSlider.getSize().height-5;
-				yPos += kansSlider.hoogte-5;
+				yPos += kansSlider.hoogte-1;
 				
 				kansRect = new Rectangle(0, yPos - kansSlider.hoogte + 5 - cHeight2 - 4, leftWidth, 
                                          cHeight2 + 8 + kansSlider.hoogte - 5);
@@ -5759,12 +5759,12 @@ grensDecimals = findGrensDecimals();
 			muSlider.mouseMoveTouchMoveAction(eventX, eventY);
     	if ((sigmaSlider != null) && sigmaSlider.sliderRectangle.contains(eventX, eventY))
     		sigmaSlider.mouseMoveTouchMoveAction(eventX, eventY);
-    	if ((grensSlider != null) && grensSlider.sliderRectangle.contains(eventX, eventY))
+    	if ((grensSlider != null))// && grensSlider.sliderRectangle.contains(eventX, eventY))
     		grensSlider.mouseMoveTouchMoveAction(eventX, eventY);
     	if ((kansSlider != null) && kansSlider.sliderRectangle.contains(eventX, eventY))
     		kansSlider.mouseMoveTouchMoveAction(eventX, eventY);
 
-    	if ((tweeGrenzenSlider != null) && tweeGrenzenSlider.sliderRectangle.contains(eventX, eventY))
+    	if ((tweeGrenzenSlider != null))// && tweeGrenzenSlider.sliderRectangle.contains(eventX, eventY))
     		tweeGrenzenSlider.mouseMoveTouchMoveAction(eventX, eventY);
     	
 }
@@ -5775,12 +5775,12 @@ grensDecimals = findGrensDecimals();
 			muSlider.mouseUpTouchEndAction();
     	if ((sigmaSlider != null) && sigmaSlider.sliderRectangle.contains(eventX, eventY))
     		sigmaSlider.mouseUpTouchEndAction();
-    	if ((grensSlider != null) && grensSlider.sliderRectangle.contains(eventX, eventY))
+    	if ((grensSlider != null))// && grensSlider.sliderRectangle.contains(eventX, eventY))
     		grensSlider.mouseUpTouchEndAction();
     	if ((kansSlider != null) && kansSlider.sliderRectangle.contains(eventX, eventY))
     		kansSlider.mouseUpTouchEndAction();
 
-    	if ((tweeGrenzenSlider != null) && tweeGrenzenSlider.sliderRectangle.contains(eventX, eventY))
+    	if ((tweeGrenzenSlider != null))// && tweeGrenzenSlider.sliderRectangle.contains(eventX, eventY))
     		tweeGrenzenSlider.mouseUpTouchEndAction();
 
     }	
