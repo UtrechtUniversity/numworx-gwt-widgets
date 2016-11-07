@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -36,6 +37,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 
 
@@ -62,6 +64,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.touch.client.Point;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -102,7 +105,7 @@ import fi.graphtoolgwt.client.text.Text_nl;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
-//	private static Logger logger = Logger.getLogger("GraphToolGWT");
+	// private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
@@ -3492,33 +3495,18 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 //			}
 //		}
 //		logger.info("sliderRaak 2 = " + grafiekGWTVeld.sliderRaak);
-		if(grafiekGWTVeld.sliderRaak )
-		{	int x = eventX;
-			int dx = x - startxv;
-			//stand = stand + dx;
-			grafiekGWTVeld.tracexD = grafiekGWTVeld.tracexD+dx;
-			grafiekGWTVeld.tracex = grafiekGWTVeld.tracex+dx;
-			grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
-//			grafiekGWTVeld.tracexD = eventX;
-//			grafiekGWTVeld.tracex = eventX;
-//			grafiekGWTVeld.zetSliderStand(eventX);
-			/*
-			if(stand>breedte) 
-			{	stand = breedte;
-			}
-			else if(stand<minimum) 
-			{	stand = minimum;
-			}
-			*/
-			if(x<0 || x>breedte)
-			{	grafiekGWTVeld.sliderRaak = false;
-			}
+		if (grafiekGWTVeld.sliderRaak )  { 
+			if (grafiekGWTVeld.pixelsPointWithinBounds(eventX, eventY)) {	
+				int x = eventX;
+				int dx = x - startxv;
+				
+				grafiekGWTVeld.tracexD = grafiekGWTVeld.tracexD+dx;
+				grafiekGWTVeld.tracex = grafiekGWTVeld.tracex+dx;
+				grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
 			
-			//tracex = geefSliderStand();
-			//tracexD = tracex;
-			
-			startxv = x;
-			startyv = eventY;
+				startxv = x;
+				startyv = eventY;
+			}
 		}
 		else
 		{	
@@ -3848,8 +3836,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	{
 		boolean mouseDown = false;
 		
-		public void onMouseDown(MouseDownEvent e)
-		{
+		public void onMouseDown(MouseDownEvent e) {
+			DOM.setCapture(grafiekGWTCanvas.getElement());
+
 			// e.preventDefault();
 			
 			// prevent scrolling 
@@ -3865,8 +3854,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		
 		//public void mouseDragged(MouseEvent e)
-		public void onMouseMove(MouseMoveEvent e)	
-		{
+		public void onMouseMove(MouseMoveEvent e)	{
+			
 			//e.preventDefault();
 			
 			// prevent scrolling
@@ -3899,8 +3888,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		} // onMouseMove
 		
 		//public void mouseReleased(MouseEvent e)
-		public void onMouseUp(MouseUpEvent e)	
-		{
+		public void onMouseUp(MouseUpEvent e) {
+			DOM.releaseCapture(grafiekGWTCanvas.getElement());
+
 			//e.preventDefault();
 			
 			// prevent scrolling
@@ -3908,6 +3898,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			mouseDown = false;
 		
+			
 			mouseUpTouchEndAction(e.getSource(), e.getX(), e.getY());
 
 		}
