@@ -40,11 +40,12 @@ public class GrafiekGWTVeld {
 	private final int cFontHeight = 10;
 	private final int cFontHeightItalic = 10;
 	private final int cSliderBoxBorderMargin = 2;
-	private final double cLineWidth = 0.5d;
+//	private final double cLineWidth = 0.5d;
 	private final double cLineWidthLogLines = 0.25d;
-//	private final double cLineWidth = 0.25d;
+	private final double cLineWidth = 0.25d;
 	private final double cLineWidthAxes = 1.00d;	
 	private final double cLineWidthVectorFields = 1.2d;
+	private final double cLineWidthCurvesAndFunctions = 1.00d;	
 	
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
 	                        // range is used
@@ -226,6 +227,63 @@ public class GrafiekGWTVeld {
 		g.stroke();
 	}
 	
+	private void drawBezierCurveWithinVisibleBounds(Context2d g, double xp0Pix, double yp0Pix, double xc0Pix, double yc0Pix, double xc1Pix, double yc1Pix, double xp1Pix, double yp1Pix ) {
+		final double cSampleFactor = 0.5;
+		
+		// contraints
+		if (xp0Pix >= xp1Pix) {
+			// P1.x needs to be greater than P0.x
+			return;
+		}
+		double distBeginEnd = Math.sqrt(Math.pow(xp1Pix - xp0Pix,2)+Math.pow(yp1Pix - yp0Pix,2));	
+		double deltat = 1.0/(distBeginEnd*cSampleFactor);
+		double t=deltat;
+		double bxt; // bezier value of x at t
+		double byt; // bezier value of y at t
+		double bxtprev; // bezier value of x at previous t
+		double bytprev; // bezier value of y at previous t
+		
+		bxtprev = xp0Pix;
+		bytprev = yp0Pix;
+		g.beginPath();
+		g.moveTo(xp0Pix, yp0Pix);
+		
+		while (t<1.0) {
+			
+			bxt = (1-t)*(1-t)*(1-t)*xp0Pix + 3*t*(1-t)*(1-t)*xc0Pix + 
+				  3*t*t*(1-t)* xc1Pix + t*t*t*xp1Pix;
+			byt = (1-t)*(1-t)*(1-t)*yp0Pix + 3*t*(1-t)*(1-t)*yc0Pix + 
+					  3*t*t*(1-t)* yc1Pix + t*t*t*yp1Pix;			
+			
+			if ( !((bytprev < drawYmin) && (byt < drawYmin)) && !((bytprev > drawYmax) && (byt > drawYmax)) && 
+					!((bxt<drawXmin) || (bxt>drawXmax) || (bxtprev<drawXmin) || (bxtprev>drawXmax)) ) {
+				// at least one of two values are within Ymindraw and drawYmax
+
+				double bytDraw = Math.min(drawYmax, Math.max(drawYmin, byt)); // cap byt at drawMin & max
+				
+				g.moveTo((float)bxtprev, (float)bytprev);
+										
+				if (bytprev<drawYmin) { // move accross empty space, caused by non-visibility
+					g.moveTo((float)bxtprev, (float)drawYmin);
+				}
+			
+				if (bytprev>drawYmax) { // move accross empty space, caused by non-visibility
+					g.moveTo((float)bxtprev, (float)drawYmax);
+				}
+
+				if(!interactiePanel.yPositief || bytDraw>0) {	
+					g.lineTo((float)bxt, (float)bytDraw);						
+				}
+			}
+			bxtprev = bxt;
+			bytprev = byt;
+			t+= deltat;
+		}
+		g.stroke();
+		
+	}
+
+	
 	public boolean valuePointWithinBounds(double x, double y) {
 		return pixelsPointWithinBounds(valueXtoPixels(x), valueYtoPixels(y));
 	}
@@ -400,8 +458,7 @@ public class GrafiekGWTVeld {
 				}
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
-//				if(j!=0 && j%2==0 && (!interactiePanel.yPositief || j>0))
-				if(j!=0 && (!interactiePanel.yPositief || j>0)) {	
+				if(j!=0 && j%2==0 && (!interactiePanel.yPositief || j>0)) {	
 					maxWoordBreedteY = Math.max(maxWoordBreedteY, woordbreedte);
 				}
 				
@@ -415,6 +472,7 @@ public class GrafiekGWTVeld {
 				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMargeX; 
 				drawYAxis = false;
 			}
+
 			if (interactiePanel.xPositief) {
 				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
 			}
@@ -594,6 +652,11 @@ public class GrafiekGWTVeld {
 				if((!interactiePanel.yPositief || j>0) && (schaalTekenen) && (j != 0 || !drawYAxis) ){
 					gIm.fillText(getal, xLabel, yLabel);
 				}
+			}
+		} else {
+			// !(roosterZichtbaar || SchaalZichtbaar)
+			if (interactiePanel.xPositief) { // Zet negatieve X-as uit indien nodig
+				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
 			}
 		}
 
@@ -902,7 +965,8 @@ public class GrafiekGWTVeld {
 							g.setStroke(new BasicStroke(1.0f));
 							*/
 							tracexD = interactiePanel.xAsLog?Math.log10(d):d;
-							tracex = x;
+							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
+							tracex = (int) Math.round(tracexD);
 							stand = tracex;
 							//interactiePanel.slider.zetStand(tracex);
 							
@@ -973,6 +1037,8 @@ public class GrafiekGWTVeld {
 //								+ interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)
 //								/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
 							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
+							tracex = (int) Math.round(tracexD);
+							stand = tracex;
 							double dTraceX = pixelsXtoValue(tracexD);
 
 //							double dTraceY = interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
@@ -1115,6 +1181,7 @@ public class GrafiekGWTVeld {
 
 	public void tekenGraphPoints(int index, Context2d g, boolean docent, boolean witruimteY, int maxWoordBreedteY, int bx, int breedte, int hoogte)
 	{	Vector indexPoints = interactiePanel.getPoints(index, docent);
+
 		if(docent)
 		{	g.setFillStyle(interactiePanel.docentColor);
 			g.setStrokeStyle(interactiePanel.docentColor);
@@ -1127,7 +1194,7 @@ public class GrafiekGWTVeld {
 		{	g.setFillStyle(interactiePanel.colors[0]);
 			g.setStrokeStyle(interactiePanel.colors[0]);
 		}
-		g.setLineWidth(1.0);
+		g.setLineWidth(cLineWidthCurvesAndFunctions);
 		for (int pCnt = 0; pCnt < indexPoints.size(); pCnt++)
 		{	RealPoint rp = (RealPoint) indexPoints.elementAt(pCnt);
 			Point pix = interactiePanel.realPointToPixels(rp);
@@ -1163,16 +1230,20 @@ public class GrafiekGWTVeld {
 			Point pix0 = interactiePanel.realPointToPixels(rp0);
 			Point pix1 = interactiePanel.realPointToPixels(rp1);
 			drawLineWithinVisibleBounds(g, pix0.getX(), pix0.getY(), pix1.getX(), pix1.getY());
-		}    
-			
+		}   
+		
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE 
-				&& indexPoints.size() > 2) {	
+				&& indexPoints.size() > 2)
+		{	//Graphics2D g2D = (Graphics2D) g;
+			//g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
+			boolean puntenVerwijderd = false;
 			if(!interactiePanel.xAsLog && !interactiePanel.yAsLog)
 			{	indexPoints = sorteerNaarX(indexPoints);
 				if(berekenLijn(indexPoints, interactiePanel.tekenGrafiekNauwkeurigheid))
 				{	for(int i = indexPoints.size() - 2; i > 0; i--)
 						indexPoints.removeElementAt(i);
+					puntenVerwijderd = true;
 				}
 				else if(indexPoints.size() > 3 && berekenParabool(indexPoints, interactiePanel.tekenGrafiekNauwkeurigheid))
 				{	int midden = indexPoints.size()/2;
@@ -1181,174 +1252,177 @@ public class GrafiekGWTVeld {
 						{	indexPoints.removeElementAt(i);
 						}
 					}
+					puntenVerwijderd = true;
 				}
 			}
 			
-			g.beginPath();
+			if(puntenVerwijderd) {	
+				g.beginPath();
+				//GeneralPath curve = new GeneralPath();
+				double[] weights = berekenGewichten(indexPoints);
+				RealPoint beginPunt = (RealPoint) indexPoints.elementAt(0);
+				Point beginPuntPix = interactiePanel.realPointToPixels(beginPunt);
+				beginPuntPix = new Point( Math.max(beginPuntPix.getX(), drawXmin), beginPuntPix.getY());
+	
+				RealPoint eindPunt = (RealPoint) indexPoints.elementAt(indexPoints.size() - 1);
+				Point eindPuntPix = interactiePanel.realPointToPixels(eindPunt);
+				eindPuntPix = new Point( Math.min(eindPuntPix.getX(), drawXmax), eindPuntPix.getY());
 				
-			double[] weights = berekenGewichten(indexPoints);
-			RealPoint beginPunt = (RealPoint) indexPoints.elementAt(0);
-			Point beginPuntPix = interactiePanel.realPointToPixels(beginPunt);
-			beginPuntPix = new Point( Math.max(beginPuntPix.getX(), drawXmin), beginPuntPix.getY());
-
-			RealPoint eindPunt = (RealPoint) indexPoints.elementAt(indexPoints.size() - 1);
-			Point eindPuntPix = interactiePanel.realPointToPixels(eindPunt);
-			eindPuntPix = new Point( Math.min(eindPuntPix.getX(), drawXmax), eindPuntPix.getY());
-			
-			if(beginPuntPix != null && eindPuntPix != null) {	
-				for(int i=(int) beginPuntPix.getX(); i < eindPuntPix.getX(); i++) {	
-					double ii = i;
-				
-					double d0 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii), weights);
-					double d1 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii+1), weights);
-					int x0 = i;
-					int x1 = i+1;
-
-					double dy0 = valueYtoPixels(d0);
-					double dy1 = valueYtoPixels(d1);
+				if(beginPuntPix != null && eindPuntPix != null) {	
+					for(int i=(int) beginPuntPix.getX(); i < eindPuntPix.getX(); i++) {	
+						double ii = i;
 					
-					if(dy0>1000)dy0 = 1000;
-					if(dy0<-1000)dy0 = -1000;
-					if(dy1>1000)dy1 = 1000;
-					if(dy1<-1000)dy1 = -1000;
+						double d0 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii), weights);
+						double d1 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii+1), weights);
+						int x0 = i;
+						int x1 = i+1;
+	
+						double dy0 = valueYtoPixels(d0);
+						double dy1 = valueYtoPixels(d1);
 						
-					if ( !((dy0 < drawYmin) && (dy1 < drawYmin)) && !((dy0 > drawYmax) && (dy1 > drawYmax)) ) {
-						// at least one of two values are within Ymindraw and drawYmax
-
-						dy1 = Math.min(drawYmax, Math.max(drawYmin, dy1)); // cap dy1 at drawMin & max
+						if(dy0>1000)dy0 = 1000;
+						if(dy0<-1000)dy0 = -1000;
+						if(dy1>1000)dy1 = 1000;
+						if(dy1<-1000)dy1 = -1000;
 							
-						g.moveTo((float)x0, (float)dy0);
-													
-						if (dy0<drawYmin) { // move accross empty space, caused by non-visibility
-							g.moveTo((float)x0, (float)drawYmin);
-						}
-						
-						if (dy0>drawYmax) { // move accross empty space, caused by non-visibility
-							g.moveTo((float)x0, (float)drawYmax);
-						}
-
-						if(!interactiePanel.yPositief || d1>0) {	
-							g.lineTo((float)x1, (float)dy1);						
+						if ( !((dy0 < drawYmin) && (dy1 < drawYmin)) && !((dy0 > drawYmax) && (dy1 > drawYmax)) ) {
+							// at least one of two values are within Ymindraw and drawYmax
+	
+							dy1 = Math.min(drawYmax, Math.max(drawYmin, dy1)); // cap dy1 at drawMin & max
+								
+							g.moveTo((float)x0, (float)dy0);
+														
+							if (dy0<drawYmin) { // move accross empty space, caused by non-visibility
+								g.moveTo((float)x0, (float)drawYmin);
+							}
+							
+							if (dy0>drawYmax) { // move accross empty space, caused by non-visibility
+								g.moveTo((float)x0, (float)drawYmax);
+							}
+	
+							if(!interactiePanel.yPositief || d1>0) {	
+								g.lineTo((float)x1, (float)dy1);						
+							}
 						}
 					}
 				}
-			}
-			g.stroke();
-//			}
-//			else :: OLD Code :: Drawing the curve using cubic curves (not possible anymore because not the whole screen is used anymore)
-//			{	
-//				// het punt voor het startpunt p0, if any
-//				RealPoint p00 = null;
-//				// startpunt p0
-//				RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
-//				RealPoint p0 = interactiePanel.realPointToRealPixels(rp0);
-//				// eindpunt p1
-//				RealPoint rp1 = null;
-//				RealPoint p1 = null;
-//				// het punt na het eindpunt p1, if any
-//				RealPoint rp11 = null;
-//				RealPoint p11 = null;
-//		
-//				double intervalFrac = 3;				
-//		
-//				for (int pCnt = 1; pCnt < indexPoints.size(); pCnt++)
-//				{	// vind eindpunt
-//					rp1 = (RealPoint) indexPoints.elementAt(pCnt);
-//					p1 = interactiePanel.realPointToRealPixels(rp1);
-//					// kijk of p0-p1 in pixels vertikaal is, teken lijn
-//					if (Math.abs(p0.getX() - p1.getX()) < RealPoint.NZERO)
-//					{	Point pix0 = interactiePanel.realPointToPixels(rp0);
+				g.stroke();
+				}
+			else
+			{	
+				// het punt voor het startpunt p0, if any
+				RealPoint p00 = null;
+				// startpunt p0
+				RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
+				RealPoint p0 = interactiePanel.realPointToRealPixels(rp0);
+				// eindpunt p1
+				RealPoint rp1 = null;
+				RealPoint p1 = null;
+				// het punt na het eindpunt p1, if any
+				RealPoint rp11 = null;
+				RealPoint p11 = null;
+		
+				double intervalFrac = 3;				
+		
+				for (int pCnt = 1; pCnt < indexPoints.size(); pCnt++)
+				{	// vind eindpunt
+					rp1 = (RealPoint) indexPoints.elementAt(pCnt);
+					p1 = interactiePanel.realPointToRealPixels(rp1);
+					// kijk of p0-p1 in pixels vertikaal is, teken lijn
+					if (Math.abs(p0.getX() - p1.getX()) < RealPoint.NZERO) {	
+//						Point pix0 = interactiePanel.realPointToPixels(rp0);
 //						Point pix1 = interactiePanel.realPointToPixels(rp1);
 //						g.beginPath();
 //						g.moveTo(pix0.getX(), pix0.getY());
 //						g.lineTo(pix1.getX(), pix1.getY());
 //						g.stroke();
-//					}
-//					else
-//					{	// vind het punt na p1, if any
-//						if (pCnt < (indexPoints.size() - 1))
-//						{	rp11 = (RealPoint) indexPoints.elementAt(pCnt + 1);
-//							p11 = interactiePanel.realPointToRealPixels(rp11);
-//						}
-//						// vind nu de controle-punten tussen p0 en p1
-//						// controlepunt 0
-//						RealPoint c0 = null;
-//						// p0 is het eerste punt, p1 is het tweede punt
-//						if (p00 == null)
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(
-//								p1.getX() - p0.getX(), p1.getY() - p0.getY());
-//							RealPoint unitSlope0 =	slp0p1.standarize();
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope0.getX();
-//							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
-//								unitSlope0.getY() * newLength);
-//							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
-//						}
-//						else
-//						{	// vector p00 -> p0
-//							RealPoint slp00p0 = new RealPoint(p0.getX() - p00.getX(), p0.getY() - p00.getY());
-//							// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//	//eerst middelen, dan standariseren of omgekeerd?																
-//							RealPoint meanSlope0 = new RealPoint((slp00p0.getX() + slp0p1.getX()) / 2,
-//								(slp00p0.getY() + slp0p1.getY()) / 2);	
-//							RealPoint unitSlope0 =	meanSlope0.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope0.getX();
-//							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
-//								unitSlope0.getY() * newLength);
-//							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
-//						}
-//	
-//						// controlepunt 1
-//						RealPoint c1 = null;
-//						// p1 is het laatste punt
-//						if (p11 == null)
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//							RealPoint unitSlope1 =	slp0p1.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope1.getX();
-//							RealPoint dir1 = new RealPoint(	- unitSlope1.getX() * newLength,
-//								- unitSlope1.getY() * newLength);
-//							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
-//						}
-//						else
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//							// vector p1 -> p11	
-//							RealPoint slp1p11 = new RealPoint(p11.getX() - p1.getX(), p11.getY() - p1.getY());	
-//	//eerst middelen, dan standariseren of omgekeerd?																
-//							RealPoint meanSlope1 = new RealPoint((slp0p1.getX() + slp1p11.getX()) / 2,
-//								(slp0p1.getY() + slp1p11.getY()) / 2);
-//							RealPoint unitSlope1 =	meanSlope1.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope1.getX();
-//							RealPoint dir1 = new RealPoint(- unitSlope1.getX() * newLength,
-//								- unitSlope1.getY() * newLength);
-//							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
-//						}
-//				
-//						//if(index == interactiePanel.getActiveIndex())
-//						//	g.setLineWidth(0.7f);
-//							//g2D.setStroke(new BasicStroke(0.7f));
-//							g.beginPath();
-//							g.moveTo(p0.getX(), p0.getY());
-//							g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
-//							g.stroke();
-//							/*
-//						CubicCurve2D bezier = new CubicCurve2D.Double();
-//						bezier.setCurve(p0.x, p0.y, c0.x, c0.y,
-//									    c1.x, c1.y, p1.x, p1.y);
-//						g2D.draw(bezier);	
-//						*/		    
-//					} // else niet vertikaal
-//					p00 = p0;
-//					p0 = p1;
-//				}
-//			}
-		}
+						drawLineWithinVisibleBounds(g, p0.getX(),  p0.getY(),  p0.getX(),  p0.getY());		
+					}
+					else
+					{	// vind het punt na p1, if any
+						if (pCnt < (indexPoints.size() - 1))
+						{	rp11 = (RealPoint) indexPoints.elementAt(pCnt + 1);
+							p11 = interactiePanel.realPointToRealPixels(rp11);
+						}
+						// vind nu de controle-punten tussen p0 en p1
+						// controlepunt 0
+						RealPoint c0 = null;
+						// p0 is het eerste punt, p1 is het tweede punt
+						if (p00 == null)
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(
+								p1.getX() - p0.getX(), p1.getY() - p0.getY());
+							RealPoint unitSlope0 =	slp0p1.standarize();
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope0.getX();
+							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
+								unitSlope0.getY() * newLength);
+							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
+						}
+						else
+						{	// vector p00 -> p0
+							RealPoint slp00p0 = new RealPoint(p0.getX() - p00.getX(), p0.getY() - p00.getY());
+							// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+	//eerst middelen, dan standariseren of omgekeerd?																
+							RealPoint meanSlope0 = new RealPoint((slp00p0.getX() + slp0p1.getX()) / 2,
+								(slp00p0.getY() + slp0p1.getY()) / 2);	
+							RealPoint unitSlope0 =	meanSlope0.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope0.getX();
+							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
+								unitSlope0.getY() * newLength);
+							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
+						}
+	
+						// controlepunt 1
+						RealPoint c1 = null;
+						// p1 is het laatste punt
+						if (p11 == null)
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+							RealPoint unitSlope1 =	slp0p1.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope1.getX();
+							RealPoint dir1 = new RealPoint(	- unitSlope1.getX() * newLength,
+								- unitSlope1.getY() * newLength);
+							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
+						}
+						else
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+							// vector p1 -> p11	
+							RealPoint slp1p11 = new RealPoint(p11.getX() - p1.getX(), p11.getY() - p1.getY());	
+	//eerst middelen, dan standariseren of omgekeerd?																
+							RealPoint meanSlope1 = new RealPoint((slp0p1.getX() + slp1p11.getX()) / 2,
+								(slp0p1.getY() + slp1p11.getY()) / 2);
+							RealPoint unitSlope1 =	meanSlope1.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope1.getX();
+							RealPoint dir1 = new RealPoint(- unitSlope1.getX() * newLength,
+								- unitSlope1.getY() * newLength);
+							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
+						}
+				
+					    	g.save(); // save original clipping size
+					    	g.beginPath(); 
+					    	g.rect(drawXmin,drawYmin,drawXmax-drawXmin,drawYmax-drawYmin);
+					    	g.clip(); // set temporary clipping window (= previous rectangle)
+					    
+							g.beginPath();
+							g.moveTo(p0.getX(), p0.getY());
+							g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+							g.stroke();
+							
+							g.restore(); // restore original clipping size
+							
+//							drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+					} // else niet vertikaal
+					p00 = p0;
+					p0 = p1;
+				}
+			}
+		}			
 		
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE_EXTRA 
 				&& indexPoints.size() == 2) {	
@@ -1371,14 +1445,17 @@ public class GrafiekGWTVeld {
 		}
 		
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.CURVE_EXTRA 
-				&& indexPoints.size() > 2) {	//Graphics2D g2D = (Graphics2D) g;
+				&& indexPoints.size() > 2)
+		{	//Graphics2D g2D = (Graphics2D) g;
 			//g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			
+			boolean puntenVerwijderd = false;
 			if(!interactiePanel.xAsLog && !interactiePanel.yAsLog)
 			{	indexPoints = sorteerNaarX(indexPoints);
 				if(berekenLijn(indexPoints, interactiePanel.tekenGrafiekNauwkeurigheid))
 				{	for(int i = indexPoints.size() - 2; i > 0; i--)
 						indexPoints.removeElementAt(i);
+					puntenVerwijderd = true;
 				}
 				else if(indexPoints.size() > 3 && berekenParabool(indexPoints, interactiePanel.tekenGrafiekNauwkeurigheid))
 				{	int midden = indexPoints.size()/2;
@@ -1386,233 +1463,241 @@ public class GrafiekGWTVeld {
 						if(i != midden)
 						{	indexPoints.removeElementAt(i);
 						}
+					puntenVerwijderd = true;
 				}
 			}
 			
-			g.beginPath();
-			double[] weights = berekenGewichten(indexPoints);
-			for(int i=drawXmin ; i<drawXmax ; i++) {	
-				double ii = i;
-				double d0 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii), weights);
-				double d1 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii+1), weights);
-
-				int x0 = i;
-				int x1 = i+1;
-
-				double dy0 = valueYtoPixels(d0);
-				double dy1 = valueYtoPixels(d1);
-				
-				if(dy0>1000)dy0 = 1000;
-				if(dy0<-1000)dy0 = -1000;
-				if(dy1>1000)dy1 = 1000;
-				if(dy1<-1000)dy1 = -1000;
-				
-				if ( !((dy0 < drawYmin) && (dy1 < drawYmin)) && !((dy0 > drawYmax) && (dy1 > drawYmax)) ) {
-					// at least one of two values are within Ymindraw and drawYmax
-
-					dy1 = Math.min(drawYmax, Math.max(drawYmin, dy1)); // cap dy1 at drawMin & max
+			if(puntenVerwijderd) {
+				g.beginPath();
+				double[] weights = berekenGewichten(indexPoints);
+				for(int i=drawXmin ; i<drawXmax ; i++) {	
+					double ii = i;
+					double d0 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii), weights);
+					double d1 = berekenLagrangeY(indexPoints, pixelsXtoValue(ii+1), weights);
+	
+					int x0 = i;
+					int x1 = i+1;
+	
+					double dy0 = valueYtoPixels(d0);
+					double dy1 = valueYtoPixels(d1);
 					
-					g.moveTo((float)x0, (float)dy0);
-											
-					if (dy0<drawYmin) { // move accross empty space, caused by non-visibility
-						g.moveTo((float)x0, (float)drawYmin);
-					}
-				
-					if (dy0>drawYmax) { // move accross empty space, caused by non-visibility
-						g.moveTo((float)x0, (float)drawYmax);
-					}
-
-					if(!interactiePanel.yPositief || d1>0) {	
-						g.lineTo((float)x1, (float)dy1);						
+					if(dy0>1000)dy0 = 1000;
+					if(dy0<-1000)dy0 = -1000;
+					if(dy1>1000)dy1 = 1000;
+					if(dy1<-1000)dy1 = -1000;
+					
+					if ( !((dy0 < drawYmin) && (dy1 < drawYmin)) && !((dy0 > drawYmax) && (dy1 > drawYmax)) ) {
+						// at least one of two values are within Ymindraw and drawYmax
+	
+						dy1 = Math.min(drawYmax, Math.max(drawYmin, dy1)); // cap dy1 at drawMin & max
+						
+						g.moveTo((float)x0, (float)dy0);
+												
+						if (dy0<drawYmin) { // move accross empty space, caused by non-visibility
+							g.moveTo((float)x0, (float)drawYmin);
+						}
+					
+						if (dy0>drawYmax) { // move accross empty space, caused by non-visibility
+							g.moveTo((float)x0, (float)drawYmax);
+						}
+	
+						if(!interactiePanel.yPositief || d1>0) {	
+							g.lineTo((float)x1, (float)dy1);						
+						}
 					}
 				}
+				g.stroke();
+				
 			}
-			g.stroke();
-//			}
-//			else :: OLD Code :: Drawing the curve using cubic curves (not possible anymore because not the whole screen is used anymore)
-//			{	
-//				// het punt voor het startpunt p0, if any
-//				RealPoint p00 = null; 
-//				
-//				RealPoint hp0 = (RealPoint) indexPoints.elementAt(0);
-//				RealPoint hp1 = (RealPoint) indexPoints.elementAt(1);
-//				RealPoint hp2 = (RealPoint) indexPoints.elementAt(2);
-//				
-//				//double helling 01 = (hp1.y - hp0.y)/(hp1.x - hp0.x);
-//				//double helling12 = (hp2.y - hp1.y)/(hp2.x - hp1.x);
-//				double helling01 = ((interactiePanel.yAsLog?Math.log10(hp1.getY()):hp1.getY()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/
-//						((interactiePanel.xAsLog?Math.log10(hp1.getX()):hp1.getX()) - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()));
-//				double helling12 = ((interactiePanel.yAsLog?Math.log10(hp2.getY()):hp2.getY()) - (interactiePanel.yAsLog?Math.log10(hp1.getY()):hp1.getY()))/
-//						((interactiePanel.xAsLog?Math.log10(hp2.getX()):hp2.getX()) - (interactiePanel.xAsLog?Math.log10(hp1.getX()):hp1.getX()));
-//				
-//				//hier aanpassen voor andere "extrapolatieregel", en iets verderop.
-//				double helling0 = - helling12/3 + 4 * helling01/3;
-//				
-//				
-//				//double ii = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
-//				//double x0 = interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii
-//				//		/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii/interactiePanel.eenheidxD;
-//				double linkerGrens;
-//				if (interactiePanel.manualScalingX) {
-//					linkerGrens = interactiePanel.xPositief?0:(interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-//				} else {
-//					linkerGrens = interactiePanel.xPositief?0:(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
-//				}
-//				double x0 = interactiePanel.xAsLog?Math.pow(10, linkerGrens):linkerGrens;
-//				double y0 = interactiePanel.yAsLog?Math.pow(10, helling0 * (linkerGrens - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX())) + (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY())):
-//					(helling0 * (linkerGrens - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX())) + (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()));
-//				
-//				if(y0 < 0 && interactiePanel.yPositief)
-//				{
-//					y0 = 0;
-//					x0 = interactiePanel.xAsLog?Math.pow(10, (helling0 * (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/helling0): 
-//						(helling0 * (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/helling0;
-//				}
-//				// startpunt p0
-//				//RealPoint rp0 = new RealPoint(this.graphToolInteractiePanel.beginx, helling0*(this.graphToolInteractiePanel.beginx - hp0.x) + hp0.y);
-//				RealPoint rp0 = new RealPoint(x0, y0);
-//				//RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
-//				RealPoint p0 = interactiePanel.realPointToRealPixels(rp0);
-//				
-//				RealPoint hpLaatst0 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 1);
-//				RealPoint hpLaatst1 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 2);
-//				RealPoint hpLaatst2 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 3);
-//				double helling10 = ((interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY()) - (interactiePanel.yAsLog?Math.log10(hpLaatst1.getY()):hpLaatst1.getY()))/
-//						((interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX()) - (interactiePanel.xAsLog?Math.log10(hpLaatst1.getX()):hpLaatst1.getX())); 
-//				double helling21 = ((interactiePanel.yAsLog?Math.log10(hpLaatst1.getY()):hpLaatst1.getY()) - (interactiePanel.yAsLog?Math.log10(hpLaatst2.getY()):hpLaatst2.getY()))/
-//						((interactiePanel.xAsLog?Math.log10(hpLaatst1.getX()):hpLaatst1.getX()) - (interactiePanel.xAsLog?Math.log10(hpLaatst2.getX()):hpLaatst2.getX()));
-//				
-//				//hier aanpassen voor andere "extrapolatieregel", en een stukje terug.
-//				double hellingLaatst = - helling21/3 + 4 * helling10/3;
-//				
-//				double ii2 = breedte;
-////				double rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
-//				double rechterGrens;
-//				if (interactiePanel.manualScalingX) {
-//					rechterGrens = interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.eenheidxValue*ii2/interactiePanel.eenheidxD;
-//				} else {
-//					rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
-//				}
-//				double xLaatst = interactiePanel.xAsLog?Math.pow(10,rechterGrens):rechterGrens;
-//				double yLaatst = interactiePanel.yAsLog?Math.pow(10, hellingLaatst * (rechterGrens - (interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX())) + (interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY())):
-//					(hellingLaatst * (rechterGrens - (interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX())) + (interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY())); 
-//				RealPoint eindPunt = new RealPoint(xLaatst, yLaatst);
-//				//RealPoint eindPunt = interactiePanel.realPointToRealPixels(realEindPunt);
-//				// eindpunt p1
-//				RealPoint rp1 = null;
-//				RealPoint p1 = null;
-//				// het punt na het eindpunt p1, if any
-//				RealPoint rp11 = null;
-//				RealPoint p11 = null;
-//		
-//				double intervalFrac = 3;				
-//		
-//				for (int pCnt = 0; pCnt < indexPoints.size() + 1; pCnt++) //deze teller al bij 0 laten beginnen. En bij indexPoints.size() + 1 laten eindigen.
-//				{	// vind eindpunt
-//					if(pCnt < indexPoints.size())
-//						rp1 = (RealPoint) indexPoints.elementAt(pCnt);
-//					else
-//						rp1 = eindPunt;
-//					p1 = interactiePanel.realPointToRealPixels(rp1);
-//					// kijk of p0-p1 in pixels vertikaal is, teken lijn
-//					if (Math.abs(p0.getX() - p1.getX()) < RealPoint.NZERO)
-//					{	Point pix0 = interactiePanel.realPointToPixels(rp0);
+			else
+			{	
+				// het punt voor het startpunt p0, if any
+				RealPoint p00 = null; 
+				
+				RealPoint hp0 = (RealPoint) indexPoints.elementAt(0);
+				RealPoint hp1 = (RealPoint) indexPoints.elementAt(1);
+				RealPoint hp2 = (RealPoint) indexPoints.elementAt(2);
+				
+				//double helling 01 = (hp1.y - hp0.y)/(hp1.x - hp0.x);
+				//double helling12 = (hp2.y - hp1.y)/(hp2.x - hp1.x);
+				double helling01 = ((interactiePanel.yAsLog?Math.log10(hp1.getY()):hp1.getY()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/
+						((interactiePanel.xAsLog?Math.log10(hp1.getX()):hp1.getX()) - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()));
+				double helling12 = ((interactiePanel.yAsLog?Math.log10(hp2.getY()):hp2.getY()) - (interactiePanel.yAsLog?Math.log10(hp1.getY()):hp1.getY()))/
+						((interactiePanel.xAsLog?Math.log10(hp2.getX()):hp2.getX()) - (interactiePanel.xAsLog?Math.log10(hp1.getX()):hp1.getX()));
+				
+				//hier aanpassen voor andere "extrapolatieregel", en iets verderop.
+				double helling0 = - helling12/3 + 4 * helling01/3;
+				
+				
+				//double ii = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
+				//double x0 = interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii
+				//		/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii/interactiePanel.eenheidxD;
+				double linkerGrens;
+				if (interactiePanel.manualScalingX) {
+					linkerGrens = interactiePanel.xPositief?0:(interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
+				} else {
+					linkerGrens = interactiePanel.xPositief?0:(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD);
+				}
+				double x0 = interactiePanel.xAsLog?Math.pow(10, linkerGrens):linkerGrens;
+				double y0 = interactiePanel.yAsLog?Math.pow(10, helling0 * (linkerGrens - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX())) + (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY())):
+					(helling0 * (linkerGrens - (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX())) + (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()));
+				
+				if(y0 < 0 && interactiePanel.yPositief)
+				{
+					y0 = 0;
+					x0 = interactiePanel.xAsLog?Math.pow(10, (helling0 * (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/helling0): 
+						(helling0 * (interactiePanel.xAsLog?Math.log10(hp0.getX()):hp0.getX()) - (interactiePanel.yAsLog?Math.log10(hp0.getY()):hp0.getY()))/helling0;
+				}
+				// startpunt p0
+				//RealPoint rp0 = new RealPoint(this.graphToolInteractiePanel.beginx, helling0*(this.graphToolInteractiePanel.beginx - hp0.x) + hp0.y);
+				RealPoint rp0 = new RealPoint(x0, y0);
+				//RealPoint rp0 = (RealPoint) indexPoints.elementAt(0);
+				RealPoint p0 = interactiePanel.realPointToRealPixels(rp0);
+				
+				RealPoint hpLaatst0 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 1);
+				RealPoint hpLaatst1 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 2);
+				RealPoint hpLaatst2 = (RealPoint) indexPoints.elementAt(indexPoints.size() - 3);
+				double helling10 = ((interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY()) - (interactiePanel.yAsLog?Math.log10(hpLaatst1.getY()):hpLaatst1.getY()))/
+						((interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX()) - (interactiePanel.xAsLog?Math.log10(hpLaatst1.getX()):hpLaatst1.getX())); 
+				double helling21 = ((interactiePanel.yAsLog?Math.log10(hpLaatst1.getY()):hpLaatst1.getY()) - (interactiePanel.yAsLog?Math.log10(hpLaatst2.getY()):hpLaatst2.getY()))/
+						((interactiePanel.xAsLog?Math.log10(hpLaatst1.getX()):hpLaatst1.getX()) - (interactiePanel.xAsLog?Math.log10(hpLaatst2.getX()):hpLaatst2.getX()));
+				
+				//hier aanpassen voor andere "extrapolatieregel", en een stukje terug.
+				double hellingLaatst = - helling21/3 + 4 * helling10/3;
+				
+				double ii2 = breedte;
+//				double rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
+				double rechterGrens;
+				if (interactiePanel.manualScalingX) {
+					rechterGrens = interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.eenheidxValue*ii2/interactiePanel.eenheidxD;
+				} else {
+					rechterGrens = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii2/interactiePanel.eenheidxD;
+				}
+				double xLaatst = interactiePanel.xAsLog?Math.pow(10,rechterGrens):rechterGrens;
+				double yLaatst = interactiePanel.yAsLog?Math.pow(10, hellingLaatst * (rechterGrens - (interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX())) + (interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY())):
+					(hellingLaatst * (rechterGrens - (interactiePanel.xAsLog?Math.log10(hpLaatst0.getX()):hpLaatst0.getX())) + (interactiePanel.yAsLog?Math.log10(hpLaatst0.getY()):hpLaatst0.getY())); 
+				RealPoint eindPunt = new RealPoint(xLaatst, yLaatst);
+				//RealPoint eindPunt = interactiePanel.realPointToRealPixels(realEindPunt);
+				// eindpunt p1
+				RealPoint rp1 = null;
+				RealPoint p1 = null;
+				// het punt na het eindpunt p1, if any
+				RealPoint rp11 = null;
+				RealPoint p11 = null;
+		
+				double intervalFrac = 3;				
+		
+				for (int pCnt = 0; pCnt < indexPoints.size() + 1; pCnt++) //deze teller al bij 0 laten beginnen. En bij indexPoints.size() + 1 laten eindigen.
+				{	// vind eindpunt
+					if(pCnt < indexPoints.size())
+						rp1 = (RealPoint) indexPoints.elementAt(pCnt);
+					else
+						rp1 = eindPunt;
+					p1 = interactiePanel.realPointToRealPixels(rp1);
+					// kijk of p0-p1 in pixels vertikaal is, teken lijn
+					if (Math.abs(p0.getX() - p1.getX()) < RealPoint.NZERO) {	
+//						Point pix0 = interactiePanel.realPointToPixels(rp0);
 //						Point pix1 = interactiePanel.realPointToPixels(rp1);
 //						g.beginPath();
 //						g.moveTo(pix0.getX(), pix0.getY());
 //						g.lineTo(pix1.getX(), pix1.getY());
 //						g.stroke();
-//					}
-//					else
-//					{	// vind het punt na p1, if any
-//						if (pCnt < (indexPoints.size() - 1)) //TO DO: aanvullen met punt voor pCnt = indexPoints.size() - 1
-//						{	rp11 = (RealPoint) indexPoints.elementAt(pCnt + 1);
-//							p11 = interactiePanel.realPointToRealPixels(rp11);
-//						}
-//						else if (pCnt == indexPoints.size() - 1)
-//						{	rp11 = eindPunt;
-//							p11 = interactiePanel.realPointToRealPixels(rp11);
-//						}
-//						// vind nu de controle-punten tussen p0 en p1
-//						// controlepunt 0
-//						RealPoint c0 = null;
-//						// p0 is het eerste punt, p1 is het tweede punt
-//						if (p00 == null)
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(
-//								p1.getX() - p0.getX(), p1.getY() - p0.getY());
-//							RealPoint unitSlope0 =	slp0p1.standarize();
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope0.getX();
-//							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
-//								unitSlope0.getY() * newLength);
-//							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
-//						}
-//						else
-//						{	// vector p00 -> p0
-//							RealPoint slp00p0 = new RealPoint(p0.getX() - p00.getX(), p0.getY() - p00.getY());
-//							// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//	//eerst middelen, dan standariseren of omgekeerd?																
-//							RealPoint meanSlope0 = new RealPoint((slp00p0.getX() + slp0p1.getX()) / 2,
-//								(slp00p0.getY() + slp0p1.getY()) / 2);	
-//							RealPoint unitSlope0 =	meanSlope0.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope0.getX();
-//							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
-//								unitSlope0.getY() * newLength);
-//							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
-//						}
-//	
-//						// controlepunt 1
-//						RealPoint c1 = null;
-//						// p1 is het laatste punt
-//						if (p11 == null)
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//							RealPoint unitSlope1 =	slp0p1.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope1.getX();
-//							RealPoint dir1 = new RealPoint(	- unitSlope1.getX() * newLength,
-//								- unitSlope1.getY() * newLength);
-//							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
-//						}
-//						else
-//						{	// vector p0 -> p1
-//							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
-//							// vector p1 -> p11	
-//							RealPoint slp1p11 = new RealPoint(p11.getX() - p1.getX(), p11.getY() - p1.getY());	
-//	//eerst middelen, dan standariseren of omgekeerd?																
-//							RealPoint meanSlope1 = new RealPoint((slp0p1.getX() + slp1p11.getX()) / 2,
-//								(slp0p1.getY() + slp1p11.getY()) / 2);
-//							RealPoint unitSlope1 =	meanSlope1.standarize();	
-//							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
-//							double newLength = xLength / unitSlope1.getX();
-//							RealPoint dir1 = new RealPoint(- unitSlope1.getX() * newLength,
-//								- unitSlope1.getY() * newLength);
-//							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
-//						}
-//				
+						drawLineWithinVisibleBounds(g, p0.getX(),  p0.getY(),  p0.getX(),  p0.getY());		
+					}
+					else
+					{	// vind het punt na p1, if any
+						if (pCnt < (indexPoints.size() - 1)) //TO DO: aanvullen met punt voor pCnt = indexPoints.size() - 1
+						{	rp11 = (RealPoint) indexPoints.elementAt(pCnt + 1);
+							p11 = interactiePanel.realPointToRealPixels(rp11);
+						}
+						else if (pCnt == indexPoints.size() - 1)
+						{	rp11 = eindPunt;
+							p11 = interactiePanel.realPointToRealPixels(rp11);
+						}
+						// vind nu de controle-punten tussen p0 en p1
+						// controlepunt 0
+						RealPoint c0 = null;
+						// p0 is het eerste punt, p1 is het tweede punt
+						if (p00 == null)
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(
+								p1.getX() - p0.getX(), p1.getY() - p0.getY());
+							RealPoint unitSlope0 =	slp0p1.standarize();
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope0.getX();
+							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
+								unitSlope0.getY() * newLength);
+							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
+						}
+						else
+						{	// vector p00 -> p0
+							RealPoint slp00p0 = new RealPoint(p0.getX() - p00.getX(), p0.getY() - p00.getY());
+							// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+	//eerst middelen, dan standariseren of omgekeerd?																
+							RealPoint meanSlope0 = new RealPoint((slp00p0.getX() + slp0p1.getX()) / 2,
+								(slp00p0.getY() + slp0p1.getY()) / 2);	
+							RealPoint unitSlope0 =	meanSlope0.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope0.getX();
+							RealPoint dir0 = new RealPoint(unitSlope0.getX() * newLength,
+								unitSlope0.getY() * newLength);
+							c0 = new RealPoint(p0.getX() + dir0.getX(), p0.getY() + dir0.getY());		
+						}
+	
+						// controlepunt 1
+						RealPoint c1 = null;
+						// p1 is het laatste punt
+						if (p11 == null)
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+							RealPoint unitSlope1 =	slp0p1.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope1.getX();
+							RealPoint dir1 = new RealPoint(	- unitSlope1.getX() * newLength,
+								- unitSlope1.getY() * newLength);
+							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
+						}
+						else
+						{	// vector p0 -> p1
+							RealPoint slp0p1 = new RealPoint(p1.getX() - p0.getX(), p1.getY() - p0.getY());	
+							// vector p1 -> p11	
+							RealPoint slp1p11 = new RealPoint(p11.getX() - p1.getX(), p11.getY() - p1.getY());	
+	//eerst middelen, dan standariseren of omgekeerd?																
+							RealPoint meanSlope1 = new RealPoint((slp0p1.getX() + slp1p11.getX()) / 2,
+								(slp0p1.getY() + slp1p11.getY()) / 2);
+							RealPoint unitSlope1 =	meanSlope1.standarize();	
+							double xLength = (p1.getX() - p0.getX()) / intervalFrac;
+							double newLength = xLength / unitSlope1.getX();
+							RealPoint dir1 = new RealPoint(- unitSlope1.getX() * newLength,
+								- unitSlope1.getY() * newLength);
+							c1 = new RealPoint(p1.getX() + dir1.getX(), p1.getY() + dir1.getY());		
+						}
+				
 //						if(index == interactiePanel.getActiveIndex())
 //							g.setLineWidth(0.7f);
-//							//g2D.setStroke(new BasicStroke(0.7f));
-//						g.beginPath();
-//						g.moveTo(p0.getX(), p0.getY());
-//						g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
-//						g.stroke();	
-//						
-//						/*
-//						CubicCurve2D bezier = new CubicCurve2D.Double();
-//						bezier.setCurve(p0.x, p0.y, c0.x, c0.y,
-//									    c1.x, c1.y, p1.x, p1.y);
-//						g2D.draw(bezier);
-//						*/			    
-//					} // else niet vertikaal
-//					p00 = p0;
-//					p0 = p1;
-//				} 
-//			}
-		}
+						
+					    g.save(); // save original clipping size
+					    g.beginPath(); 
+					    g.rect(drawXmin,drawYmin,drawXmax-drawXmin,drawYmax-drawYmin);
+					    g.clip(); // set temporary clipping window (= previous rectangle)
+					    
+						g.beginPath();
+						g.moveTo(p0.getX(), p0.getY());
+						g.bezierCurveTo(c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+						g.stroke();	
+						
+						g.restore(); // restore original clipping window
+						
+//						drawBezierCurveWithinVisibleBounds(g, p0.getX(), p0.getY(), c0.getX(), c0.getY(), c1.getX(), c1.getY(), p1.getX(), p1.getY());
+						
+					} // else niet vertikaal
+					p00 = p0;
+					p0 = p1;
+				} 
+			}
+		}		
+		
 	}
 	
 	public double[] berekenGewichten(Vector points)
@@ -1693,34 +1778,77 @@ public class GrafiekGWTVeld {
 		return gesorteerd;
 	}
 	
-	public boolean berekenLijn(Vector points, int nauwkeurigheid)
-	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;
-		double nauwkeurigDoubleY = interactiePanel.schaalFactorY * nauwkeurigheid / interactiePanel.eenheidyD;
+//	public boolean berekenLijn(Vector points, int nauwkeurigheid)
+//	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;
+//		double nauwkeurigDoubleY = interactiePanel.schaalFactorY * nauwkeurigheid / interactiePanel.eenheidyD;
+//		
+//		RealPoint rpMin = (RealPoint) points.elementAt(0);
+//		RealPoint rpMax = (RealPoint) points.elementAt(points.size() - 1);
+//		double a = ((interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY()) - (interactiePanel.yAsLog?Math.log10(rpMin.getY()):rpMin.getY()))
+//				/((interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()) - (interactiePanel.xAsLog?Math.log10(rpMin.getX()):rpMin.getX()));
+//		double b = (interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY() - a*(interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()));
+//		boolean lijn = true;
+//		
+//		for(int i = 1; i < points.size() - 1 && lijn; i++)
+//			{	RealPoint rpi = (RealPoint) points.elementAt(i);
+//				double xs = (a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + (interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - a*b)/(a*a + 1);
+//				double ys = (a*a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + a*(interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) + b)/(a*a + 1);
+//
+////				double afstand = ((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs)*((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) + 
+////						((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys)*((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys);
+////				afstand = Math.sqrt(afstand);
+////				if(afstand > nauwkeurigDouble)
+//				boolean afstandxKleinGenoeg = Math.abs((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) <= nauwkeurigDoubleX;
+//				boolean afstandyKleinGenoeg = Math.abs((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys) <= nauwkeurigDoubleY; 
+//				if(!(afstandxKleinGenoeg && afstandyKleinGenoeg))
+//				{	lijn = false;
+//				
+//				}
+//			}
+//		return lijn;
+//	}
+	
+	public boolean berekenLijn(Vector points, int nauwkeurigheid) {
+	//  let op: niet ontworpen voor, noch getest in, Logaritmische schaal! (omdat dat op het moment van schrijven niet aan de orde was) 
+		
+		final double cAxisCompensationFactor = 2.0; // Assen-compensensatie factor is nodig omdat het standaard assenstelsel 
+													// gedefineerd is met een echte waarde van 2
+													// verdeeld over 16 pixels, dit wordt als eenheid betiteld maar in feite 
+		                                            // gaat het over een "tweeheid", zonder compensatiefactor zou de nauwkeurigheid,
+		                                            // welke is gedefineerd in pixels, verkeerd worden geinterpreteerd.
+													// Omdat manualScaling ook gebaseerd is op het grove rooster geldt hiervoor hetzelfde
 		
 		RealPoint rpMin = (RealPoint) points.elementAt(0);
 		RealPoint rpMax = (RealPoint) points.elementAt(points.size() - 1);
-		double a = ((interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY()) - (interactiePanel.yAsLog?Math.log10(rpMin.getY()):rpMin.getY()))
-				/((interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()) - (interactiePanel.xAsLog?Math.log10(rpMin.getX()):rpMin.getX()));
-		double b = (interactiePanel.yAsLog?Math.log10(rpMax.getY()):rpMax.getY() - a*(interactiePanel.xAsLog?Math.log10(rpMax.getX()):rpMax.getX()));
-		boolean lijn = true;
 		
-		for(int i = 1; i < points.size() - 1 && lijn; i++)
-			{	RealPoint rpi = (RealPoint) points.elementAt(i);
-				double xs = (a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + (interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - a*b)/(a*a + 1);
-				double ys = (a*a*(interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) + a*(interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) + b)/(a*a + 1);
-//				double afstand = ((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs)*((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) + 
-//						((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys)*((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys);
-//				afstand = Math.sqrt(afstand);
-//				if(afstand > nauwkeurigDouble)
-				boolean afstandxKleinGenoeg = Math.abs((interactiePanel.xAsLog?Math.log10(rpi.getX()):rpi.getX()) - xs) <= nauwkeurigDoubleX;
-				boolean afstandyKleinGenoeg = Math.abs((interactiePanel.yAsLog?Math.log10(rpi.getY()):rpi.getY()) - ys) <= nauwkeurigDoubleY; 
-				if(!(afstandxKleinGenoeg && afstandyKleinGenoeg))
-				{	lijn = false;
-				
-				}
-			}
+		// calculate line: y = ax + b as defined bij first and last point of the pointlist
+		double a = (rpMax.getY() - rpMin.getY()) / (rpMax.getX() - rpMin.getX() );
+		double b = (rpMax.getY() - a * rpMax.getX() );
+		
+		boolean lijn = true;		
+		for(int i = 1; i < points.size() - 1 && lijn; i++) {	
+			RealPoint rpi = (RealPoint) points.elementAt(i);
+			
+			// rn = (real value of) closest point to rpi on line y = ax +b
+			double rnX = (a*(rpi.getY()) + (rpi.getX()) - a*b) / (a*a + 1);
+			double rnY = (a*a*(rpi.getY()) + a*(rpi.getX()) + b) / (a*a + 1);
+			
+			// calulate screen values of rn & rpi
+			double snX = valueXtoPixels(rnX);
+			double snY = valueYtoPixels(rnY);
+			double spiX = valueXtoPixels(rpi.getX());
+			double spiY = valueYtoPixels(rpi.getY());
+			
+			// calculate screen-distance from rpi to line
+			double sDistance = Math.sqrt( Math.pow( (spiX - snX), 2) + Math.pow( spiY - snY, 2) );
+			sDistance /=  cAxisCompensationFactor ; // zie definitie cAxisCompensationFactor
+
+			// compare screen distance to screen 
+			lijn = (sDistance <= nauwkeurigheid);
+
+		}
 		return lijn;
-	}
+	}	
 	
 	public boolean berekenParabool(Vector points, int nauwkeurigheid)
 	{	double nauwkeurigDoubleX = interactiePanel.schaalFactorX * nauwkeurigheid / interactiePanel.eenheidxD;

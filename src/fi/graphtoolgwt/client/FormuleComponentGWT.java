@@ -802,6 +802,12 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 
 	}
 	
+	public void updateFormulas() {
+		for (int i=0; i<aantalRegels; i++ ) {
+			parseFormule(i, false);
+		}
+	}
+	
 	public void parseFormule(String s, int regelnummer, boolean setState)
     {   
 		//In alle lijstjes met expressies het huidige regelnummer verwijderen. 

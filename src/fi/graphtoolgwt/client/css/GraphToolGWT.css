@@ -1,3 +1,6 @@
+@url tekenUrl tekencursor;
+@url gumUrl gumcursor;
+
 /** dit file staat in graphtoolgwt/client/css */
 
 
@@ -101,13 +104,16 @@
 	color: magenta;
 }
 
-.gumcursor {
-	cursor: url(images/gumcursor.gif), default;
+.cursor_gum {
+	cursor: gumUrl 10 22, auto; 
 }
 
-.pencursor {
-	cursor: url(images/pencursor.gif), default;
+.cursor_teken {
+	cursor: tekenUrl 10 22, auto; 
 }
 
+.cursor_drag {
+	cursor: default; 
+}
 
 

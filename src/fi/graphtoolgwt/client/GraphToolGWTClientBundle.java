@@ -109,6 +109,10 @@ public interface GraphToolGWTClientBundle extends ClientBundle
 	@Source("fi/graphtoolgwt/client/css/GraphToolGWT.css")
 	public  GraphToolCssResource getGraphToolGWTCSS();
 	
+	@Source("fi/graphtoolgwt/client/images/gumcursor.gif")
+	public ImageResource gumcursor();
 	
+	@Source ("fi/graphtoolgwt/client/images/tekencursor.gif")
+	public ImageResource tekencursor();
 
 }
