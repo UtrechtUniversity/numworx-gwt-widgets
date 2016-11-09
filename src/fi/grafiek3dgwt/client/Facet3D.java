@@ -147,6 +147,10 @@ public class Facet3D //implements Serializable
         // get the number of points in the facet as the length
         // of indices
         numPoints = indices.length;
+
+//if (numPoints <= 1)
+//System.out.println("numPoints = " + numPoints);
+
         // note the 2 times new
         points = new Vector3D[numPoints];
         trPoints = new Vector3D[numPoints];
@@ -170,6 +174,7 @@ public class Facet3D //implements Serializable
         for (int i = 0; i < numPoints; i++)
         {   // allPoints[indices[i]] is the Vector3D we need
             points[i] = pts[indices[i]];
+trPoints[i] = points[i];            
         }
         // set fill color
         color = c;
@@ -211,7 +216,7 @@ public class Facet3D //implements Serializable
     // find untransformed normal vector
     public void setNormal()
     {   // point
-        if (numPoints == 1)
+        if (numPoints <= 1)
             normal = new Vector3D(); // zero vector
         // directed segment    
         else if (numPoints == 2)
