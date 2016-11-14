@@ -3538,6 +3538,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		{	
 			
 			if ((dragPoint == null) && (dragOptie)) { // Move Graph if no point selected
+				grafiekGWTVeld.setGrafiekSchuivenActief(true);
 				int dx = eventX - startxv;
 				int dy =  eventY - startyv;					
 				beginx = beginx+dx;
@@ -3645,8 +3646,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				startyv = eventY;
 			}
 			// grafiek slepen als drag==true
-			else if ((dragPoint == null) && (otherPoint == null) && dragOptie)
-			{	int dx = eventX - startxv;
+			else if ((dragPoint == null) && (otherPoint == null) && dragOptie) {
+				grafiekGWTVeld.setGrafiekSchuivenActief(true);
+
+				int dx = eventX - startxv;
 				int dy = eventY - startyv;					
 				beginx = beginx+dx;
 				beginy = beginy-dy;
@@ -3700,6 +3703,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	public void mouseUpTouchEndAction(Object source, int eventX, int eventY) {	
 		moveActionActivated = false;
+		grafiekGWTVeld.setGrafiekSchuivenActief(false);
 
 		boolean schuifParameterTouched = false;
 		// Check schuifParameters

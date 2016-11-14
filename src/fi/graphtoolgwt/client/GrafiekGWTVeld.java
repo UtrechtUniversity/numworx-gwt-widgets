@@ -50,6 +50,8 @@ public class GrafiekGWTVeld {
 	int drawXmin, drawXmax; // minimum & maximum positions of the screens drawing range (when an axis is not visible not the complete
 	                        // range is used
 	int drawYmin, drawYmax;
+	
+	private boolean grafiekSchuivenActief = false;
 
 	public Canvas grafiekGWTCanvas;
 	public Context2d gIm;
@@ -101,6 +103,14 @@ public class GrafiekGWTVeld {
 	//private DecimalFormat df;
 	
 	private final GraphToolGWT interactiePanel;
+	
+	public void setGrafiekSchuivenActief(boolean grafiekSchuivenActief) {
+		this.grafiekSchuivenActief = grafiekSchuivenActief;
+	}
+	
+	public boolean getGrafiekSchuivenActief() {
+		return grafiekSchuivenActief;
+	}
 	
 	private void drawPiLine(int xPos, int by) {
 		
@@ -1138,7 +1148,8 @@ public class GrafiekGWTVeld {
 
 		tekenOngelijkheden(gIm);
 		tekenVerticaleLijnen(gIm);
-		tekenVeldGrafieken(imin, imax, jmin, jmax, scalingMultiplyX, scalingMultiplyY);
+		tekenVeldGrafieken(imin, imax, jmin, jmax, scalingMultiplyX, scalingMultiplyY, 
+				(interactiePanel.veldLargerGridStartPoints || grafiekSchuivenActief) );
 		
 		//Punten en grafieken uit tekenEditor;
 		if(interactiePanel.docentGraphPoints != null && interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)
@@ -2002,7 +2013,7 @@ public class GrafiekGWTVeld {
 		g.stroke();
 	}
 	
-	public void tekenVeldGrafieken(int gridXmin, int gridXmax, int gridYmin, int gridYmax, int scalingMultiplyX, int scalingMultiplyY) {
+	public void tekenVeldGrafieken(int gridXmin, int gridXmax, int gridYmin, int gridYmax, int scalingMultiplyX, int scalingMultiplyY, boolean veldLargerGridStartPoints) {
        
 				
 		int loopCounter = 0;
@@ -2021,13 +2032,9 @@ public class GrafiekGWTVeld {
 			// Set visual parameters
 			gIm.setStrokeStyle(VeldComponentGWT.cSystemColor);
 			gIm.setLineWidth(cLineWidthVectorFields);
-			/* RPJ start */
-			interactiePanel.veldLargerGridStartPoints = true;
-//			interactiePanel.veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode.SCALEDSIZE;
-			/* RPJ end */
 
 			// roosterpunten aflopen
-			double start = System.currentTimeMillis();
+//			double start = System.currentTimeMillis();
 			for(int i=gridXmin ; i<gridXmax ; i++) { // x-as aflopen
 				for(int j=gridYmin ; j<gridYmax ; j++) { // y-as aflopen
 				
@@ -2035,14 +2042,14 @@ public class GrafiekGWTVeld {
 					double vectorStartXScreen =  (interactiePanel.beginx+i*interactiePanel.eenheidxD * scalingMultiplyX);
 					double vectorStartYScreen =  (hoogte-(interactiePanel.beginy+j*interactiePanel.eenheidy* scalingMultiplyY));
 
-					if ((!interactiePanel.veldLargerGridStartPoints) || ((i%2==0) && (j%2==0))) {
+					if ((!veldLargerGridStartPoints) || ((i%2==0) && (j%2==0))) {
 						loopCounter++;
 						tekenVector(gIm, new RealPoint(vectorStartXScreen, vectorStartYScreen), xAsExpressie, yAsExpressie, true);
 
 					}
 				}
 			}
-			double end = System.currentTimeMillis();
+//			double end = System.currentTimeMillis();
 //			logger.info(end + ":: Veldgrafiek - Loop finished of :"+loopCounter +"in "+(end-start)/1000+"seconden");
 		}
 	}
