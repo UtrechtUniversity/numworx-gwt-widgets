@@ -11,10 +11,10 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
-
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 //import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
+
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -42,9 +42,11 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 //import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 
+
 import fi.nabouwenaanzichtengwt.client.text.Msgs;
 import fi.nabouwenaanzichtengwt.client.text.Text;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
@@ -498,8 +500,16 @@ System.out.println("fire text.buildingProgram " + buildHistory);
 		return h;
 	}
 
+	
 	@Override
-	public void setState(HashMap<String, Object> h)
+	public void setState(HashMap<String,Object> h) {
+		try {
+			setState_(h);
+		} catch(Exception e) {
+			logger.log(Level.SEVERE, "setState" , e);
+		}
+	}
+	private void setState_(HashMap<String, Object> h)
 	{
 		if (vWerk == null || h == null)
 			return;
@@ -531,14 +541,14 @@ System.out.println("fire text.buildingProgram " + buildHistory);
 				vWerk.kr.zetVulkleur("zwart");
 				vWerk.draw();
 			}
-			
-			if (vWerk.kr.isVol())
+// Bug: als "volleegoptie" false is, crashed panel.setWidgetVisible met een NPE			
+			if (vWerk.kr.isVol() && volButton.getParent() == panel && leegButton.getParent() == panel)
 			{
-    			panel.setWidgetVisible(volButton, false);
+    			panel.setWidgetVisible(volButton, false); // assert volButton.getParent() == panel anders niet goed!!
     			panel.setWidgetVisible(leegButton, true);
 
 			}
-			if (vWerk.kr.isLeeg())
+			if (vWerk.kr.isLeeg() && volButton.getParent() == panel && leegButton.getParent() == panel)
 			{
     			panel.setWidgetVisible(volButton, true);
     			panel.setWidgetVisible(leegButton, false);
