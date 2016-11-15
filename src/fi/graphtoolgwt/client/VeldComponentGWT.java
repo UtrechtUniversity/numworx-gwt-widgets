@@ -426,8 +426,7 @@ public class VeldComponentGWT extends LayoutPanel {
 				}
 
 				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
-			}
-			
+			}			
 				
 			// adjust Row Positions
 			int posY = cSystemDiffEqPanelGWT_interObjectMarginY;
