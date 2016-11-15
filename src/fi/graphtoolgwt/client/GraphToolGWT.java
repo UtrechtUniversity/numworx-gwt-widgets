@@ -582,7 +582,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
 		formuleComponent.setPixelSize( breedte  , (formuleComponentHoogte - 2 - offset) );
 		
-		veldComponent = new VeldComponentGWT(this, launchState, breedte);
+		veldComponent = new VeldComponentGWT(this, launchState, breedte, veldComponentHoogte);
 		
 		formuleComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(typeOpdracht == VINDFORMULEBIJGRAFIEK || typeOpdracht == VINDFORMULEBIJPUNTEN)

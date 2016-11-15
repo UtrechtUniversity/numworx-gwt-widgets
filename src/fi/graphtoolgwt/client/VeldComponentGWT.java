@@ -47,13 +47,12 @@ import fi.wiskopdr.FormuleParser;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
-//	private static Logger logger = Logger.getLogger("VeldComponentGWT");
+	private static Logger logger = Logger.getLogger("VeldComponentGWT");
 	
 	public enum FieldGraphType {QUIVER, STREAMLINE};
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
 	
 	/* component defaults */
-
 	public final static int cDefault_hoogte = 150;
 	public final static int cDefault_breedte = 300;
 	
@@ -101,6 +100,7 @@ public class VeldComponentGWT extends LayoutPanel {
 	private int veldComponentHoogte = cDefault_hoogte;
 	
 	LayoutPanel stelselsPanel;
+	ScrollPanel scrollPanel;
 	
 	SystemDiffEqPanelGWT systems[] = new SystemDiffEqPanelGWT[maxAantalStelsels];
 	
@@ -148,33 +148,46 @@ public class VeldComponentGWT extends LayoutPanel {
 				FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$f"+functionStr+"@"))));
 	}
 	
-	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte ) {
+	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte , int hoogte) {
 		
 		
 		this.interactiePanel = interactiePanel;
 		this.veldComponentBreedte = breedte;
+		this.veldComponentHoogte = hoogte;
 		processLaunchData(launchData);
 		
 		docent = false;
+		
+//		regelsPanel = new LayoutPanel();
+//		//contentPanel.addStyleName(graphToolCss.backgroundred());
+//		//contentPanel.getElement().getStyle().setPadding(5, Unit.PX);
+//		//contentPanel.getElement().getStyle().setOverflow(Overflow.HIDDEN);
+//		//contentPanel.getElement().getStyle().setProperty("display", "block");
+//		sp = new ScrollPanel(regelsPanel);
+//		sp.setWidget(regelsPanel);
+		
+		logger.info("VeldComponentBreedte = " + veldComponentBreedte);
+		logger.info("veldComponentHoogte = " + veldComponentHoogte);
+
 		
 		LayoutPanel mainPanel = new LayoutPanel();
 		this.add(mainPanel);
 		this.setWidgetLeftWidth(mainPanel, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
 		this.setWidgetTopHeight(mainPanel, 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX); 
 		FlowPanel rechthoekPanel = new FlowPanel();
-		
 		rechthoekPanel.getElement().getStyle().setBorderColor( cVeldComponentGWT_borderColor.toString() );
 		rechthoekPanel.getElement().getStyle().setBorderStyle( cVeldComponentGWT_borderStyle);  
 		rechthoekPanel.getElement().getStyle().setBorderWidth( cVeldComponentGWT_borderWidthPix, Style.Unit.PX);
-		mainPanel.add(rechthoekPanel);
-		mainPanel.setWidgetLeftWidth(rechthoekPanel, cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX, 
-				veldComponentBreedte-cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX);
-		mainPanel.setWidgetTopHeight(rechthoekPanel, cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX, 
-				veldComponentHoogte-cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX);
+//		mainPanel.add(rechthoekPanel);
+//		mainPanel.setWidgetLeftWidth(rechthoekPanel, cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX, 
+//				veldComponentBreedte-cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX);
+//		mainPanel.setWidgetTopHeight(rechthoekPanel, cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX, 
+//				veldComponentHoogte-cVeldComponentGWT_mainWidgetBorderMargin, Style.Unit.PX);
 		
 		stelselsPanel = new LayoutPanel();
-		ScrollPanel scrollPanel = new ScrollPanel(stelselsPanel);
+		scrollPanel = new ScrollPanel(stelselsPanel);
 		scrollPanel.setWidget(stelselsPanel);
+		
 		mainPanel.add(scrollPanel);
 		mainPanel.setWidgetLeftWidth(scrollPanel, cVeldComponentGWT_scrollWidgetBorderMargin, Style.Unit.PX, 
 				veldComponentBreedte-2*cVeldComponentGWT_scrollWidgetBorderMargin , Style.Unit.PX);
@@ -191,12 +204,30 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		stelselsPanel.add(systems[0]);
 		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte-10, Style.Unit.PX);
-		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, veldComponentHoogte-30, Style.Unit.PX);
+		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, veldComponentHoogte, Style.Unit.PX);
+		resize();
 		
-		this.resize();
+//		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
+//		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
+//		resize();
+
 	}
 	
+	public int berekenRegelHoogte(int aantalRegels)
+	{
+		int y = 0;
+		for(int i = 0; i < aantalRegels; i++)
+		{
+//			y += Math.max(30, editors[i].getHeight()) + 5;
+		}
+		return y;
+	}
+
+	
 	public void resize() {
+		for (int i=0; i <aantalStelsels; i++) {
+			systems[i].adjustSize();
+		}
 	}
 	
 	public CssColor getSystemColor(int id) {
@@ -380,7 +411,7 @@ public class VeldComponentGWT extends LayoutPanel {
 			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY;
 			for (int i=0; i<nrFunctions; i++) {
 				rowHeight[i]=Math.max(functionBeginViewers[i].getHeight(), functionEditors[i].getHeight());
-				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getHeight());
+				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getWidth());
 				this.systemHeight += rowHeight[i];
 				
 				if ((double) (i+1) == (double) nrFunctions/2.0) {
