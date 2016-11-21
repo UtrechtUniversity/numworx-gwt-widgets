@@ -56,7 +56,8 @@
   	</dependency>
   </dependencies>
   <build>
-  	<outputDirectory>target/${project.artifactId}-${project.version}/WEB-INF/classes</outputDirectory>
+  	<finalName>${project.artifactId}</finalName>
+  	<outputDirectory>target/${project.build.finalName}/WEB-INF/classes</outputDirectory>
   	<plugins>
               <plugin>
                 <artifactId>maven-war-plugin</artifactId>
