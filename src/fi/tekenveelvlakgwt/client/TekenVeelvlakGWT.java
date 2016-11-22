@@ -256,6 +256,9 @@ System.out.println("tvGWT getState");
 // hier onderscheid maken tussen TVV, Viewer, Profiles?		
 //logger.info("tvGWT setState: " + map);    	
 		
+		if ((map == null) || map.isEmpty())
+			return;
+		
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
 		if (viewerOnly)

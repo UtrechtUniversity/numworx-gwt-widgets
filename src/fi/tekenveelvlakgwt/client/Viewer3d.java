@@ -326,7 +326,13 @@ if (k > 0)
 	{	double drx = geefDraaiX();
 		double dry =  geefDraaiY();
 		double tol = 20;
-	
+
+		gevraagdX = putInRange(gevraagdX);
+		gevraagdY = putInRange(gevraagdY);
+		
+		drx = putInRange(drx);
+		dry = putInRange(dry);
+		
 //System.out.println("docX = " + UF.format(gevraagdX, 0) + " llX = " + UF.format(drx, 0));
 //System.out.println("docY = " + UF.format(gevraagdY, 0) + " llY = " + UF.format(dry, 0));
 		if ((Math.abs(gevraagdX - drx) < tol) && (Math.abs(gevraagdY - dry) < tol))
@@ -334,6 +340,17 @@ if (k > 0)
 		else
 			return false;
 	}
+	
+	public double putInRange(double hoek)
+	{
+		double inRange = hoek;
+		if (hoek < 0)
+			inRange = hoek + 360;
+		else if (hoek > 360)
+			inRange = hoek - 360;
+		return inRange;
+	}
+
 
 	public void setState(Map map)
 	{	
