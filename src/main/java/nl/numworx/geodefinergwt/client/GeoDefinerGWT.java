@@ -9,7 +9,6 @@ import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
-import nl.numworx.geodefinergwt.client.ui.ColorModel;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.ui.TextModel;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
@@ -41,8 +40,8 @@ import fi.euclides.proof.LabelDelegate;
 
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener {
 
-	private int width = 200;
-	private int height = 200;
+	private int width = 500;
+	private int height = 450;
 	private ViewerWidget widget;
 	private OpdrNavIF comRoot;
 	private SimplePanel panel;
@@ -134,7 +133,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		String[] definitions = {
 				"$fp=point(1, 1)@",
 				"$fl=segment(O, p)@",
-				"$ft=text(\"$wText@\", U)@",
+				"$ft=text(\"$wText@\", p)@",
 		};
 
 		PointModel colorP = new PointModel();
@@ -145,7 +144,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		
 		launchData.put("definitions", definitions);
 		launchData.put("configuration", Collections.singletonMap("t", textT.toMap()));
-		launchData.put("axes", Collections.singletonMap("U", colorP.toMap()));
+		launchData.put("axes", Collections.singletonMap("O", colorP.toMap()));
 				
 		Map<String, Number> values = Collections.emptyMap();
 
