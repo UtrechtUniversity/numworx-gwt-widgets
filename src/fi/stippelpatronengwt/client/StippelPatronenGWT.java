@@ -3,6 +3,7 @@ package fi.stippelpatronengwt.client;
 import java.util.HashMap;
 import java.util.Map;
 
+
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -10,21 +11,21 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+//import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
+
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -36,7 +37,7 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
-public class StippelPatronenGWT implements EntryPoint, InteractionStub 
+public class StippelPatronenGWT implements EntryPoint, InteractionStub, CBookEventListener 
 {
 	private static Logger logger = Logger.getLogger("StippelPatronenGWT");
 	
@@ -124,8 +125,8 @@ public class StippelPatronenGWT implements EntryPoint, InteractionStub
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(stippelPatronenGWTCssResource.root());
 		
-		//Stub.publish(this);
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 				
 	}
 	
@@ -354,7 +355,8 @@ logger.info("StippelPatronenGWT init");
 		canvasPanel = new LayoutPanel();
 		dlp.add(canvasPanel);
 
-		drawCon = new DrawingContainer(this, breedte, hoogte - bottomHeight); 
+		//drawCon = new DrawingContainer(this, breedte, hoogte - bottomHeight);
+		drawCon = new DrawingContainer(this, breedte, hoogte);
 
 		Canvas stippelCanvas = drawCon.getCanvas();
 		if (stippelCanvas == null) 
@@ -376,7 +378,8 @@ logger.info("StippelPatronenGWT init");
 
 		canvasPanel.add(stippelCanvas);
 		canvasPanel.setWidgetLeftWidth(stippelCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-		canvasPanel.setWidgetTopHeight(stippelCanvas, 0, Style.Unit.PX, hoogte - bottomHeight, Style.Unit.PX);
+		//canvasPanel.setWidgetTopHeight(stippelCanvas, 0, Style.Unit.PX, hoogte - bottomHeight, Style.Unit.PX);
+		canvasPanel.setWidgetTopHeight(stippelCanvas, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 
 		
 		makeBottom();
@@ -430,5 +433,14 @@ logger.info("StippelPatronenGWT init");
 	public int[][] getScoreObjectives() {
 		return null;
 	}
+	
+	@Override
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+		if(command.startsWith("action.showAllPatterns"))
+		{	drawCon.showAllPatterns();
+		}
+	}
+
 
 }
