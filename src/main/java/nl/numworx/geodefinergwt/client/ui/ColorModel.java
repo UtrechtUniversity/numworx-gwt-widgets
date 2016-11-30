@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import fi.euclides.event.Tracker;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
 import nl.numworx.geodefiner.common.UIModel;
@@ -59,6 +60,11 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	@Override
 	public void setVisible(boolean visible) {
 		this.visible = visible;
+	}
+
+	@Override
+	public UIModel<T, Void> set(Tracker tracker) {
+		return this;
 	}
 
 }
