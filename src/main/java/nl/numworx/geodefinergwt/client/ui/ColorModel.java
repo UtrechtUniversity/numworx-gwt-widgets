@@ -16,13 +16,15 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	protected T item;
 	public int rgba = 0xFF000000;
 	public boolean visible = true;
+	private Tracker tracker;
 	
 	@Override
 	public UIModel<T, Void> init(T item) {
 		this.item = item;
 		return this;
 	}
-
+	
+	
 	@Override
 	public void install() {
 		CssColor css = CssColor.make(colorString());
@@ -64,6 +66,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 	@Override
 	public UIModel<T, Void> set(Tracker tracker) {
+		this.tracker = tracker;
 		return this;
 	}
 
