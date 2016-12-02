@@ -27,8 +27,8 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	
 	@Override
 	public void install() {
-		CssColor css = CssColor.make(colorString());
-		DefaultAdapter.getDefault(item).put(CssColor.class, css);
+		ColorStyle css = new ColorStyle(colorString());
+		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);
 	}
 

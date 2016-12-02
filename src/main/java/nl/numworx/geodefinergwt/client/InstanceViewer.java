@@ -10,6 +10,7 @@ import org.vectomatic.dom.svg.OMSVGTextElement;
 import org.vectomatic.dom.svg.utils.SVGConstants;
 
 import nl.numworx.geodefiner.common.Align;
+import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 
@@ -43,10 +44,10 @@ public class InstanceViewer extends SVGWidget {
 			return;
 		Adapter a = object.getAdapter();
 		stroke = a.adapt(StrokeStyle.class);
-		CssColor c = a.adapt(CssColor.class);
+		ColorStyle c = a.adapt(ColorStyle.class);
 		if (c != null) {
 			// if selected?
-			setCssColor(c);
+			setCssColor(CssColor.make(c.getColor()));
 			return;
 		}
 		super.selectColor(object);
