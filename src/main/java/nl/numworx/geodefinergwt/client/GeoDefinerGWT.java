@@ -9,6 +9,7 @@ import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
+import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.ui.TextModel;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
@@ -42,6 +43,7 @@ import fi.euclides.model.Punt;
 import fi.euclides.model.Track;
 import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.proof.LabelDelegate;
+import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener {
@@ -247,6 +249,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		//widget = new SpeelVeld(width, height);
 		widget = new InstanceViewer(width, height);
 		DoubleFormat.setInstance(new PrettyFormat());
+		Messages.setInstance(new MessagesImpl());
 
 		viewer = widget.getViewer();
 		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap()));

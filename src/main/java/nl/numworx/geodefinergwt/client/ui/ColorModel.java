@@ -34,7 +34,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	
 	@Override
 	public void install() {
-		ColorStyle css = new ColorStyle(colorString());
+		ColorStyle css = new ColorStyle(colorString(rgba));
 		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);
 		if (visibility.getString() != null && tracker != null) {
@@ -55,7 +55,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		}
 	}
 
-	protected String colorString() {
+	protected String colorString(int rgba) {
 		int a = (rgba >> 24) & 0xFF;
 		if( a < 0xFF ) {
 			return

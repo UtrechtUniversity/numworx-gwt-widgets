@@ -75,16 +75,24 @@
                     <warSourceDirectory>war</warSourceDirectory>
                     <extraJvmArgs>-Xms768m -Xmx1024m</extraJvmArgs>
                     <hostedWebapp>${webappDirectory}</hostedWebapp>
-<!--                     <i18nConstantsWithLookupBundles> -->
-<!--                         <i18nConstantsWithLookupBundle>fi.euclides.client.expr.symbols</i18nConstantsWithLookupBundle>                           -->
-<!--                     </i18nConstantsWithLookupBundles> -->
+                    <i18nConstantsWithLookupBundles>
+                        <i18nConstantsWithLookupBundle>nl.numworx.geodefinergwt.client.i18n.messages</i18nConstantsWithLookupBundle>                          
+                    </i18nConstantsWithLookupBundles>
 <!-- generate in generated sources, why not? -->
                 </configuration>
                 <executions>
                     <execution>
+                    	<id>compile</id>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                    	<id>i18n</id>
+                    	<phase>generate-sources</phase>
+                    	<goals>
+                    		<goal>i18n</goal>
+                    	</goals>
                     </execution>
                 </executions>
             </plugin>

@@ -44,6 +44,7 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 
 	@Override
 	public void visitCirkel(Cirkel c) {
+		model = new CircleModel().init(c);
 	}
 
 	@Override
@@ -57,7 +58,8 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 	}
 
 	@Override
-	public void visitTriangle(Triangle t) {		
+	public void visitTriangle(Triangle t) {
+		model = new ColorModel<Triangle>().init(t);
 	}
 
 	@Override
@@ -66,10 +68,12 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 
 	@Override
 	public void visitLocus(Locus l) {
+		model = new LineModel().init(l);
 	}
 
 	@Override
 	public void visitBoog(Boog b) {
+		model = new CircleModel().init(b);
 	}
 
 }

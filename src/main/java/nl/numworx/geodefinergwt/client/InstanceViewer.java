@@ -1,7 +1,5 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.awt.Color;
-
 import org.vectomatic.dom.svg.OMSVGImageElement;
 import org.vectomatic.dom.svg.OMSVGLength;
 import org.vectomatic.dom.svg.OMSVGLineElement;
@@ -13,6 +11,7 @@ import org.vectomatic.dom.svg.utils.SVGConstants;
 
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
+import nl.numworx.geodefinergwt.client.ui.FillStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 
@@ -46,6 +45,11 @@ public class InstanceViewer extends SVGWidget {
 			return;
 		Adapter a = object.getAdapter();
 		stroke = a.adapt(StrokeStyle.class);
+
+		FillStyle f = a.adapt(FillStyle.class);
+		if(f == null) fill = "none";
+		else fill = f.getColor();
+		
 		ColorStyle c = a.adapt(ColorStyle.class);
 		if (c != null) {
 			// if selected?
@@ -113,8 +117,6 @@ public class InstanceViewer extends SVGWidget {
 		short unitType = OMSVGLength.SVG_LENGTHTYPE_NUMBER;
 		OMSVGTextElement text = doc.createSVGTextElement((float)x, (float)y, unitType, string);
 		OMSVGStyle style = text.getStyle();
-		GWT.log("color for" + label + " is " + color);
-		//color = "blue";
 		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
 		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
 		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
