@@ -3,13 +3,11 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.canvas.dom.client.CssColor;
-
+import nl.numworx.geodefiner.common.UIModel;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.euclides.event.Tracker;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
-import nl.numworx.geodefiner.common.UIModel;
-import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
