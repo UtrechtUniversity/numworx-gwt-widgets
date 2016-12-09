@@ -3,10 +3,17 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.numworx.geodefiner.common.Expression;
 import nl.numworx.geodefiner.common.UIModel;
+import nl.tue.win.riaca.openmath.lang.OMApplication;
+import nl.tue.win.riaca.openmath.lang.OMObject;
+import nl.tue.win.riaca.openmath.lang.OMSymbol;
+import nl.tue.win.riaca.openmath.lang.OMVariable;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.euclides.event.Tracker;
+import fi.euclides.formuleobjects.FormuleParser;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.Label;
 import fi.euclides.util.DefaultAdapter;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
@@ -15,6 +22,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	public int rgba = 0xFF000000;
 	public boolean visible = true;
 	private Tracker tracker;
+	private Label visibility = new Label();
 	
 	@Override
 	public UIModel<T, Void> init(T item) {
@@ -22,15 +30,45 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		return this;
 	}
 	
+	private static final OMObject EUCLIDES_VISIBLE = new OMSymbol("euclides", "visible");
 	
 	@Override
 	public void install() {
 		ColorStyle css = new ColorStyle(colorString());
 		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);
+		if (visibility.getString() != null && tracker != null) {
+			try {
+				OMObject o = new FormuleParser(visibility.getString().substring(2)).logic();
+				OMApplication oma = new OMApplication();
+				oma.addElement(EUCLIDES_VISIBLE);
+				oma.addElement(new OMVariable(tracker.getMapper().toString(item)));
+				oma.addElement(o);
+				Expression expr = new Expression(tracker);
+				visibility.destroy();
+				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
+				v.setVisible(false);
+				tracker.getModel().add(v);
+			
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	protected String colorString() {
+		int a = (rgba >> 24) & 0xFF;
+		if( a < 0xFF ) {
+			return
+				"rgba("
+				+ ((rgba >> 16 ) & 0xFF)
+				+ ','
+				+ ((rgba >> 8 ) & 0xFF)
+				+ ','
+				+ ( rgba & 0xFF)
+				+ ','
+				+ ( a / 255.0f)
+				+ ')';
+		}
 		String hex = Integer.toHexString(rgba&0xFFFFFF).toUpperCase();
 		hex = "00000" + hex;
 		int l = hex.length();
@@ -50,7 +88,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	public void fromMap(ObjectMap value) {
 		rgba = value.getInt("color");
 		visible = value.getBoolean("visible", true);
-	}
+		visibility.setString(value.getString("visibility"));	}
 
 	@Override
 	public Void editor() {

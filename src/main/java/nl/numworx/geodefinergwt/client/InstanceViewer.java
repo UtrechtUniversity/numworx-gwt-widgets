@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.awt.Color;
+
 import org.vectomatic.dom.svg.OMSVGImageElement;
 import org.vectomatic.dom.svg.OMSVGLength;
 import org.vectomatic.dom.svg.OMSVGLineElement;
@@ -101,10 +103,10 @@ public class InstanceViewer extends SVGWidget {
 		String v = null;
 		if(align != null) {
 			switch(align) {
-			case LEFT:   h = "start";   v = "central";          break; 
-			case RIGHT:  h = "end";     v = "central";          break;
-			case TOP:    h = "center";  v = "text-before-edge"; break;
-			case BOTTOM: h = "center";  v = "text-after-edge";  break;
+			case LEFT:   h = "end";   	v = "central";          break; 
+			case RIGHT:  h = "start";   v = "central";          break;
+			case TOP:    h = "middle";  v = "text-before-edge"; break;
+			case BOTTOM: h = "middle";  v = "text-after-edge";  break;
 			case BASE: 
 			}
 		}
@@ -119,12 +121,24 @@ public class InstanceViewer extends SVGWidget {
 		getSvgElement().appendChild(text);
 	}
 
+	static final String grayish = "rgba(32,32,32, 0.125)";
+	static final String reddish = "rgba(128,0,0, 0.125)";
+
 	/* (non-Javadoc)
 	 * @see fi.euclides.model.AbstractViewer#visitTriangle(fi.euclides.model.Triangle)
 	 */
 	@Override
 	public void visitTriangle(Triangle t) {
-		selectColor(t);
+		//selectColor(t);
+		ColorStyle c = t.adapt(ColorStyle.class);
+		if (c != null) {
+			setCssColor(CssColor.make(c.getColor()));
+		} else 
+		if (getModel().getSelect().contains(t))
+			setCssColor(CssColor.make(reddish));
+		else
+			setCssColor(CssColor.make(grayish));
+
 		Punt[] depend = (Punt[]) t.getDepend();
 		int length = depend.length;
 		OMSVGPathElement path = doc.createSVGPathElement();
