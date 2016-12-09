@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+
 //import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -14,6 +15,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 //import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
+
 
 
 import com.google.gwt.core.client.EntryPoint;
@@ -245,8 +247,12 @@ public class StippelPatronenGWT implements EntryPoint, InteractionStub, CBookEve
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
+		
+System.out.println("setComRoot");
+
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
+		comRoot.addCBookEventListener("action.showAllPatterns", this);
 	}
 	
 	public void zetMode(int mode)
@@ -434,9 +440,29 @@ logger.info("StippelPatronenGWT init");
 		return null;
 	}
 	
-	@Override
-	public void acceptCBookEvent(CBookEvent event) {
+	public String[] getAcceptedCmds() 
+	{
+System.out.println("getAcceptedCmds");		
+		String[] commands = {"action.showAllPatterns"};
+		return commands;
+	}
+
+	public String getLocalizedCmd(String cmd) 
+	{
+System.out.println("getLocalizedCmd");
+		String localizedCmd = null; //NabouwenAanzichten.rb.getString(CBA_PREFIX + cmd);
+		if (localizedCmd == null)
+			return cmd;
+		return localizedCmd;
+	}
+
+	//@Override
+	public void acceptCBookEvent(CBookEvent event) 
+	{
 		String command = event.getCommand();
+		
+System.out.println("command = " + command);
+
 		if(command.startsWith("action.showAllPatterns"))
 		{	drawCon.showAllPatterns();
 		}
