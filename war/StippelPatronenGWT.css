@@ -104,3 +104,8 @@
 	
 	background-color: rgb(208, 228, 255);
 }	
+
+body {
+	overflow: hidden;
+	margin: 0px !important;
+}
