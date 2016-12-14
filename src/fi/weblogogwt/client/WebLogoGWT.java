@@ -665,7 +665,8 @@ logger.info("getState");
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		
+		if ((h == null) || h.isEmpty())
+			return;
 logger.info("setState");
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
