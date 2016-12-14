@@ -340,7 +340,8 @@ logger.info("MozarchGWT init");
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		
+		if ((h == null) || h.isEmpty())
+			return;
 //System.out.println("setState");
 
 		ObjectMap map = JSONUtilities.wrapMap(h);
