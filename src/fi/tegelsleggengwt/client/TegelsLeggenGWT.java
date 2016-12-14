@@ -294,6 +294,8 @@ public class TegelsLeggenGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if ((h == null) || h.isEmpty())
+			return;
 		ObjectMap state = JSONUtilities.wrapMap(h);
 		
 		if (state.containsKey("schuifStukkenList"))
