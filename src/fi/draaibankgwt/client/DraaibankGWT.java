@@ -248,6 +248,8 @@ public class DraaibankGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
+		if ((h == null) || h.isEmpty())
+			return;
 		tekenPanel.setState(h);
 
 	}
