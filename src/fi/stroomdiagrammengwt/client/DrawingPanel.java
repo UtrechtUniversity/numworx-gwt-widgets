@@ -1,34 +1,10 @@
 package fi.stroomdiagrammengwt.client;
 
-/*
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.util.*;
-
-import javax.swing.JPanel;
-*/
 import java.util.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.TextMetrics;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.ui.LayoutPanel;
 
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
@@ -48,1298 +24,1072 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 
 import com.google.gwt.user.client.ui.PopupPanel;
 
-
+/**
+ * class for drawing the flow diagram on a Canvas using its Context 2d; <br> 
+ * the layout of the flow diagram is handled by class DiagramManager;<br> 
+ * this class also processes the following Mouse/TouchEvents on the Canvas:<br>
+ * clicking on the traceBack and addEdge buttons of a non-root vertex<br>
+ * clicking and dragging a vertex (not on the buttons)<br>
+ * clicking on the addEdge button of a root<br> 
+ * double or long click (not on the button) of a root to open a popup for flow input<br> 
+ * double or long click on the label of any vertex (if there are labels)
+ * to open a popup for label input<br>
+ * double or long click on the capacityField of an edge to open a popup
+ * for capacity input; <br>
+ * long click on an edge to delete it (if allowed, see class Edge)<br> 
+ * this class also takes care of tracing back flows and the user flow diagram
+ * history; the flow diagram history is NOT saved in getState/setState;<br>   
+ * tracing back flows: given a vertex, highlight all edges that contribute
+ * to the flow through this vertex;<br>
+ * displaying edge thickness:<br> 
+ * relative: the sum of the vertical thicknesses of all edges out of a vertex
+ * equals the height of the vertex (excluding label) and the individual  
+ * vertical thicknesses are proportional to the capacities of the edges<br>
+ * absolute: the sum of the vertical thicknesses of all edges out of a root are
+ * displayed as in mode relative, for edges out of other vertices sum of the vertical
+ * thicknesses is proportional to the fraction (flow in vertex divided by maximum
+ * flow in the roots connected to the vertex).     
+ */
 public class DrawingPanel 
-{
+{	
+	/**
+	 * StroomDiagrammenGWT owns this class  
+	 */
 	static StroomDiagrammenGWT owner;
-    // size constants    
-    // grid size in pixels
-    public static int GRIDSIZE = 10;
-    // dimensions for vertices in pixels
-    // this is also layerwidth
+	/**
+	 * constant: width of a vertex in pixels, this is also the 
+	 * width of the vertex layers 
+	 */
     public static int vertexWidth = 62;
+    /**
+     * constant: width of the trace back button on a vertex
+     */
     public static int leftButtonWidth = 10;    
+    /**
+     * constant: width of the add adge button on a vertex 
+     */
     public static int arrowButtonWidth = 15;    
+    /**
+     * constant: height of a vertex
+     */
     public static int vertexHeight = 26;
-    // proposed label height
+    /**
+     * constant: height of the label on a vertex 
+     */
     public static int LABELHEIGHT = 20;
-    // actual label height
+    /**
+     * the actual label height, this is a flagg: equals 0 (no labels) of LABELHEIGHT (labels) 
+     */
     public static int labelHeight = 0;
-    // dimensions for numbers in edges
-    public static int edgeNumberWidth = 50;//38;    
-    public static int edgeNumberHeight = 28;//25;    
-    // maximum width between layers
+    /**
+     * constant: pixel width for displaying capacities in edges
+     */
+    public static int edgeNumberWidth = 50;
+    /**
+     * constant: pixel height for displaying capacities in edges
+     */
+    public static int edgeNumberHeight = 28;    
+    /**
+     * constant: maximum distance between two vertex layers (pixels)
+     */
     public static int maxLayerDistance = 110;
-    // actual width between layers
+    /**
+     * actual distance between two vertex layers
+     */
     public int layerDistance = maxLayerDistance;
-    // roundedness (capacityFields)
-    public static int roundWidth = 26;
-    public static int roundHeight = 14;
-    // left, right, top, bottom insets workSpace (pixels)
-    public static int leftSpace = 10, rightSpace = 10, 
-                      topSpace = 10, bottomSpace = 10; 
-    // minimum vertical distance between two vertices in the same layer
+    /**
+     * constant: offSet for work area
+     */
+    public static int ofSpace = 10;
+    /**
+     * minimum distanve between two vertices in the same layer
+     */
     public static int minSpace = 5;
-    // value not yet defined (empty)
-//    public static double unDefined = -1e9d;    
+    /**
+     * an undefined Rational (but not null)
+     */
     public static Rational unDef = Rational.unDefined();
-    // maximum number of layers
-    public static int maxLayers = 16;
-    // actual number of layers, set in defineSpaces
-    int numLayers = 0; //, oldNumLayers;
-    // modes for showing flows
-    public static int decMode = 0;
-    public static int percMode = 1;
-    public static int fracMode = 2;
-    // actual mode
-    static int flowMode = decMode;
-    // decimals for capacities
-    public static int capDecs = 2;
-    // decimals for vertices
-    int vDecimals = 0;
-    // modes for showing edge thickness
-    public static int relMode = 0;
-    public static int absMode = 1;
-    // actual mode
-    int thickMode = relMode;
-    // work area
-    // effective area after/before resizing
-    Rectangle workSpace, oldWorkSpace;
-    // first root, cannot be deleted 
-//    Vertex root;
-    // roots vector
-    Vector roots = new Vector();
-    // counting sources
-    Vector sources = new Vector();
-    // finding (forward) orbits
-    Vector orbit = new Vector();
-    
-    // the vertices
-    //Vector vertices = new Vector();
-    
-    
-    // vertex being traced back
-    Vertex traceFrom = null;
-    
-    // layout manager
-    static DiagramManager diagramManager;
-    
-//GWT?    
-    // thread for flowing
-    //Thread flowThread;
-    
-    // flagg for showing flow
-    boolean flowOn = false;
-    // other attributes
-    // boolean for deleteMode
-    boolean deleteMode = false;
-    // vertex labels?
-//    boolean vertexLabels = false;
-    
-//GWT    
-    // listener for vertex movements
-    //MLMML listener;
 
+    /**
+     * maximum number of vertex layers
+     */
+    public static int maxLayers = 16;
+    /**
+     * actual number of vertex layers
+     */
+    int numLayers = 0; 
+    /**
+     * constant: show flow as decimal number
+     */
+    public static int decMode = 0;
+    /**
+     * constant: show flow as percentage
+     */
+    public static int percMode = 1;
+    /**
+     * constant: show flow as a fraction
+     */
+    public static int fracMode = 2;
+    /**
+     * global flow mode
+     */
+    static int flowMode = decMode;
+    /**
+     * number of decimals for displaying capacities
+     */
+    public static int capDecs = 2;
+    /**
+     * number of decimals for displaying the flow in a vertex as decimal number
+     */
+    int vDecimals = 0;
+    /**
+     * constant: show Edge thickness (width) relative (see class Edge)
+     */
+    public static int relMode = 0;
+    /**
+     * constant: show Edge thickness (width) absolute (see class Edge)
+     */
+    public static int absMode = 1;
+    /**
+     * actual mode for showing Edge thickness (see class Edge)
+     */
+    int thickMode = relMode;
+    /**
+     * work area (Canvas as Rectangle)
+     */
+    Rectangle workSpace;
+    /** 
+     * Vector containing the roots of the flow diagram
+     */
+    Vector<Vertex> roots = new Vector<Vertex>();
+    /**
+     * Vector for finding recursively the roots connected to a Vertex
+     */
+    Vector<Vertex> sources = new Vector<Vertex>();
+    /**
+     * Vector for finding recursively the forward orbit of a Vertex
+     */
+    Vector<Vertex> orbit = new Vector<Vertex>();
+    /**
+     * Vertex whose flow is being traced back
+     */
+    Vertex traceFrom = null;
+    /**
+     * the DiagramManager for layout
+     */
+    static DiagramManager diagramManager;
+    /**
+     * all vertices created must be assigned a unique code
+     * (otherwise DiagramCopies do not work correctly);
+     * assign and increase this code after creating a new vertex  
+     */
 	public static int vertexCode = 1;
-    static Vector history = new Vector();
+	/**
+	 * the history of the flow diagrams
+	 */
+    static Vector<DiagramCopy> history = new Vector();
+    /**
+     * maximum history size
+     */
     public static int MAXHISTORY = 50;
 
- // for testing
-    String testString = "";
-    // font for testing
-//GWT    
-    //Font fo = new Font("Helvetica", Font.PLAIN, 11);
-
-    //Image offScreen;
-    //Graphics offGraphics;
-    
+    /**
+     * the Canvas for drawing on
+     */
     Canvas sdGWTCanvas;
+    /**
+     * the Context2d of the Canvas for drawing with
+     */
     Context2d sdGWTContext2d;
     
+    /**
+     * width of the Canvas
+     */
     int breedte;
+    /**
+     * height of the Canvas
+     */
     int hoogte;
     	
-//GWT?    
-    //boolean realDWO = false;
-    //SDInteractiePanel sdip = null;
-    
+    /**
+     * flagg for mouse down
+     */
     boolean mouseDown = false;
-    int lastMoveX, lastMoveY;
     
+    /**
+     * isDemo == true: no changing flows and capacities, no Mouse/Touch actions
+     */
     boolean isDemo = false;
 
-    // constructor    
+    /**
+     * constructor
+     * @param o StroomDiagrammenGWT owning this class
+     * @param b required width in pixels
+     * @param h required height in pixels
+     */
     public DrawingPanel(StroomDiagrammenGWT o, int b, int h)
     {   owner = o;
-    
     	breedte = b;
     	hoogte = h;
-        // for Container
-        //setLayout(null);
-     	
+    	// create the Canvas
     	sdGWTCanvas = Canvas.createIfSupported();
     	sdGWTCanvas.setWidth(b + "px");
     	sdGWTCanvas.setHeight(h + "px");
     	sdGWTCanvas.setCoordinateSpaceWidth(b);
     	sdGWTCanvas.setCoordinateSpaceHeight(h);
-    	
+    	// set the Context2d
     	if (sdGWTCanvas != null)
     		initContext2d();
     	else
     		return;
-    	
+    	// add MouseHandlers to the Canvas
 		MouseHandler mouseHandler = new MouseHandler();
 		sdGWTCanvas.addMouseDownHandler(mouseHandler);
 		sdGWTCanvas.addMouseMoveHandler(mouseHandler);
 		sdGWTCanvas.addMouseUpHandler(mouseHandler);
-		
+		// add TouchHandlers to the Canvas
 		TouchHandler touchHandler = new TouchHandler();
 		sdGWTCanvas.addTouchStartHandler(touchHandler);
 		sdGWTCanvas.addTouchMoveHandler(touchHandler);
 		sdGWTCanvas.addTouchEndHandler(touchHandler);
-
-        // init diagramManager
+        // create an instance of DiagramManager
         diagramManager = new DiagramManager(this);
-        
-        // add listener for resizing events
-        //    ComponentListener cl = new CL();
-        //    addComponentListener(cl);
-       
-        //MouseListener ml = new ML();
-        //addMouseListener(ml);
-//GWT        
-        //KeyListener kl = new KL();
-        //    addKeyListener(kl);
-        
-        initialize();
+        defineSpaces();
     } // constructor
 
-/*    
-    public DrawingPanel(Stroomdiagrammen o, boolean realDWO, SDInteractiePanel sdip)
-        {   
-        	this.realDWO = realDWO;
-        	this.sdip = sdip;
-        	
-        	owner = o;
-            // for Container
-            setLayout(null);    
-            // init diagramManager
-            diagramManager = new DiagramManager(this);
-            // add listener for resizing events
-            ComponentListener cl = new CL();
-            addComponentListener(cl);
-            MouseListener ml = new ML();
-            addMouseListener(ml);
-            KeyListener kl = new KL();
-            addKeyListener(kl);
-        } // constructor
-*/        
-        public void zetIsDemo(boolean demo)
-        {
-        	isDemo = demo;
-        	diagramManager.freezeEdges(demo);
-        	diagramManager.freezeVertices(demo);
-        }
+    /**
+     * demo == true: flows, labels and capacities cannot be changed, no dragging of vertices allowed<br>
+     * demo == false: flows, labels and capacities can be changed, dragging of vertices allowed	
+     * @param demo true/false
+     */
+    public void zetIsDemo(boolean demo)
+    {
+      	isDemo = demo;
+       	diagramManager.freezeEdges(demo);
+       	diagramManager.freezeVertices(demo);
+    }
  
-        public Context2d getContext2d()
-        {
-        	return sdGWTContext2d;
-        }
+    /**
+     * get the Context2d of the DrawingPanel's Canvas
+     * @return the Context2d
+     */
+    public Context2d getContext2d()
+    {
+       	return sdGWTContext2d;
+    }
 
-        public Canvas getCanvas()
-        {
-        	return sdGWTCanvas;
-        }
+    /**
+     * get the Canvas of the DrawingPanel
+     * @return the Canvas
+     */
+    public Canvas getCanvas()
+    {
+       	return sdGWTCanvas;
+    }
 
-        public void initContext2d()
-        {
-        	sdGWTContext2d = sdGWTCanvas.getContext2d();
-        }
+    /**
+     * set the Context2d of the DrawingPanel's Canvas 
+     */
+    public void initContext2d()
+    {
+       	sdGWTContext2d = sdGWTCanvas.getContext2d();
+    }
 
-        public Dimension getSize()
-        {
-        	return new Dimension(breedte, hoogte);
+    /**
+     * get the size of the Canvas
+     * @return the Dimension of the Canvas
+     */
+    public Dimension getSize()
+    {
+     	return new Dimension(breedte, hoogte);
+    }
+
+    /**
+     * add the current flow diagram to the history;
+     * keep within the limit on the history size  
+     */
+    public static void addToHistory()
+    {   
+        DiagramCopy dc = diagramManager.copyDiagram();
+        history.addElement(dc);
+        if (history.size() > MAXHISTORY)
+            history.removeElementAt(0);
+        if (history.size() > 1)
+        {	if (owner.terugButton != null)
+        		owner.terugButton.setEnabled(true);
         }
+    }
+
+    /**
+     * get the previous diagram from the history and show it
+     */
+    public void previousDiagram()
+    {   int hisSize = history.size();
+        if (hisSize > 1)
+        {   history.removeElementAt(hisSize - 1);
+            DiagramCopy dc = (DiagramCopy) history.lastElement();
+            diagramManager.recreateDiagram(dc);
+            // recreate diagram add dc to the history, but it was already there
+            // as lastElement, so remove the second copy
+            history.removeElementAt(hisSize - 1);
+            paint();
+        }
+    }    
+    
+    /**
+     * add a new root to the flow diagram and (optionally) add to history
+     * @param toHistory add to history or not
+     */
+    public void addNewRoot(boolean toHistory)
+    {   Vertex newRoot = new Vertex(true, 0);
+        roots.addElement(newRoot);
+        diagramManager.insertVertex(newRoot, null);
+        if (toHistory)
+        	addToHistory();
+    }    
+
+    /**
+     * set work area and layerDistance    
+     */
+    public void defineSpaces()
+    {   
+      	workSpace = new Rectangle(0,0,breedte, hoogte);
+        setLayerDistance();                          
+    } // defineSpaces   
+
+    /**
+     * calculate the layerDistance, using the actual number of vertex layers   
+     */
+    public void setLayerDistance()
+    {   if (numLayers == 0)
+            layerDistance = maxLayerDistance;
+        else
+        {   int newLayerDistance = 
+                (workSpace.width - 2 * ofSpace - 
+                (numLayers + 1) * vertexWidth) /
+                numLayers;
+            layerDistance = Math.min(newLayerDistance, maxLayerDistance); 
+        }
+    }    
         
-        public static void addToHistory()
-        {   //if (diagramManager.vertexLabelsChanged())
-            //{   DiagramCopy dco = diagramManager.copyDiagram();
-            //    history.addElement(dco);
-            //}
-            DiagramCopy dc = diagramManager.copyDiagram();
-            history.addElement(dc);
-            if (history.size() > MAXHISTORY)
-                history.removeElementAt(0);
-            if (history.size() > 1)
-            {	//if (realDWO)
-            	//	sdip.bottomPanel.previousButton.setEnabled(true);
-            	//else
-            		owner.terugButton.setEnabled(true);
-            
+    /**
+     * find out if Vertex v is close to a vertex layer and return the number
+     * of that vertex layer or -1 if v is not close to any vertex layer     
+     * @param v Vertex v
+     * @return vertex layer number or -1
+     */
+    public int isInLayer(Vertex v)
+    {   Rectangle vRect = new Rectangle(v.xPos, v.yPos, v.breedte, v.hoogte);
+    	// v is partly out of work space
+       	if (!rectangleContains(workSpace, vRect))
+            return -1;
+        int index = -1;    
+        for (int i = 0; i < maxLayers; i++)
+        {   int layerStart = workSpace.x + ofSpace + i * (layerDistance + vertexWidth);
+            if (Math.abs(v.xPos - layerStart) <= vertexWidth / 5)
+                index = i;
+        }    
+        return index;
+    }
+        
+    /**
+     * find the x-position of vertex layer lNum 
+     * @param lNum vertex layer lNum
+     * @return x-position
+     */
+    public int getLayerStart(int lNum)
+    {   return workSpace.x + ofSpace +
+               lNum * (layerDistance + vertexWidth);
+    }    
+        
+    /**
+     * check if Rectangle r contains Rectangle s
+     * @param r Rectangle r
+     * @param s Rectangle s
+     * @return true/false
+     */
+    public boolean rectangleContains(Rectangle r, Rectangle s)
+    {   return ((r.x <= s.x) && (r.y <= s.y) &&
+                ((s.x + s.width) <= (r.x + r.width)) &&
+                ((s.y + s.height) <= (r.y + r.height)));
+    } // rectangleContains   
+
+    /**
+     * highlight (recursively) all Edges in the flow diagram that contribute to
+     * the flow in Vertex v     
+     * @param v Vertex v
+     */
+    public void traceBack(Vertex v)
+    {   for (int i = 0; i < v.inEdges.size(); i++)
+        {   Edge ine = (Edge) v.inEdges.elementAt(i);
+            ine.highlighted = true;
+            traceBack(ine.fromVertex);
+        }    
+        paint();
+    }    
+      
+    /**
+     * recursively find all vertices in the diagram that receive
+     * flow from Vertex v (if any); the result is put in the Vector
+     * orbit, which must be empty when calling this method!
+     * avoid adding vertices more than once 
+     * @param v Vertex whose forward orbit must be found
+     */
+    public void forwardOrbit(Vertex v)
+    {   for (int i = 0; i < v.outEdges.size(); i++)
+        {   Edge oute = (Edge) v.outEdges.elementAt(i);
+            Vertex outv = oute.toVertex;
+            if (!orbit.contains(outv))
+                orbit.addElement(outv);
+            forwardOrbit(outv);
+        }    
+    }    
+        
+    /**
+     * find all roots connected to Vertex v and put the result
+     * in the Vector sources; first find at least one such root,
+     * then check if its forward orbit intersects the forward 
+     * orbit of the roots that were not yet found  
+     * @param v the Vertex of which all roots must be found 
+     */
+    public void traceAllSources(Vertex v)
+    {   // reset
+        sources.removeAllElements();
+        // find some root connected to Vertex v
+        traceSomeSources(v);
+        // take the first
+        Vertex someRoot = (Vertex) sources.elementAt(0);
+        // reset orbit
+        orbit.removeAllElements();
+        // put forward orbit of first in 'orbit'
+        forwardOrbit(someRoot);
+        Vector<Vertex> someOrbit = new Vector<Vertex>();
+        // copy
+        for (int j = 0; j < orbit.size(); j++)
+            someOrbit.addElement(orbit.elementAt(j));
+        // check if forward orbit of roots not yet found 
+        // intersects somOrbit, if yes, that root is 
+        // connected to Vertex v
+        for (int i = 0; i < roots.size(); i++)
+        {   Vertex rt = (Vertex) roots.elementAt(i);
+            if (!sources.contains(rt))
+            {   orbit.removeAllElements();
+                forwardOrbit(rt);
+                boolean intersection = false;
+                for (int k = 0; k < orbit.size(); k++)
+                {   if (someOrbit.contains(orbit.elementAt(k)))
+                        intersection = true;
+                }    
+                if (intersection)
+                    sources.addElement(rt);
             }
-        }
-
-        public void updateHistoryLabels()
-        {   // go through list of all vertices present
-        	Vector vertexRefs = diagramManager.getVertexRefs();
-        	for (int vCnt = 0; vCnt < vertexRefs.size(); vCnt++)
-        	{	Vertex v = (Vertex) vertexRefs.elementAt(vCnt);
-    	        // go through list of all diagram copies
-    	        for (int hCnt = 0; hCnt < history.size(); hCnt++)
-        	    {   DiagramCopy dc = (DiagramCopy) history.elementAt(hCnt);
-            	    // go through list of vertexcopies in each diagram copy
-            	    for (int vcCnt = 0; vcCnt < dc.vertexCopies.size(); vcCnt++)
-                	{   VertexCopy vc = (VertexCopy) dc.vertexCopies.elementAt(vcCnt);
-                    	if (v.code == vc.code)
-                    	{	
-//GWT                    		
-                    		//vc.labelText = v.vLabel.getText();
-                    	}
-                    
-                	}    
-            	}
-            }
-        }
+        }    
+    }    
         
-        public void previousDiagram()
-        {   int hisSize = history.size();
-        
-//System.out.println("hisSize = " + hisSize);
-
-            if (hisSize > 1)
-            {   history.removeElementAt(hisSize - 1);
-                DiagramCopy dc = (DiagramCopy) history.lastElement();
-//if (dc == null)
-//System.out.println("dc = null");
-
-                diagramManager.recreateDiagram(dc);
-                
-                paint();
+    /**
+     * recursively find at least one root of the flow diagram that is
+     * connected to Vertex v, the result is put in the Vector
+     * sources, which must be empty when calling this method!
+     * avoid adding vertices more than once; if Vertex v is a root,
+     * this finds v   
+     * @param v the Vertex v of which at least one root must be found
+     */
+    public void traceSomeSources(Vertex v)
+    {   // reset sources first elsewhere!!!!!
+        if (roots.contains(v))
+        {   {   if (!sources.contains(v))
+                        sources.addElement(v);
             }
         }    
-        
-        // initialization of components etc.
-        public void initialize()
-        {   
-        	defineSpaces();
-        	
-        	if (owner.breuken)
-        		flowMode = fracMode;
-        	
-        	if (owner.absoluut)
-        		thickMode = absMode;
-        	
-        	if (owner.labels)
-        		diagramManager.setVertexLabels(true);
-        	else
-        		diagramManager.setVertexLabels(false);
-        	
-        	//dpSize = getSize();
-            // set size of storageHeight
-            // workSpace.height the rest 
-            // takes care of borders
-            //defineSpaces(false);
-            if (owner.diagramCopy == null)
-    		{
-    //System.out.println("dc = null");        	
-    	        // create and add root vertex(vertices)
-            	if (owner.toonOptiesMenu)
-            	{	addNewRoot(true);
-            	}
-            	else
-            	{	for (int rCnt = 1; rCnt <= owner.numRoots; rCnt++)
-            		{	addNewRoot(false);
-            		}
-            		addToHistory();
-            		
-            	}
-    /*        	
-        	    Vertex root = new Vertex(true, 0);
-    	        roots.addElement(root);
-        	    root.addEdgeButton.addMouseListener(new AddEdgeML());
-    	        MLMML lis = new MLMML();
-        	    root.flowField.addMouseListener(lis);
-            	root.flowField.addMouseMotionListener(lis);
-    	        diagramManager.insertVertex(root, null);
-        	    addToHistory();
-    */    	    
-        	}
-        	else
-        	{	
-        		
-    //System.out.println("dc != null");    		
-        		// truckje
-//GWT        		
-        		//owner.setSize(owner.getSize().width, owner.getSize().height + 1);
-        		diagramManager.recreateDiagram(owner.diagramCopy);
-        		addToHistory();
-        	}
-            
-            
-            
-        }  // initialize  
-
-        public void addNewRoot(boolean toHistory)
-        {   Vertex newRoot = new Vertex(true, 0);
-            roots.addElement(newRoot);
-//GWT            
-            //newRoot.addEdgeButton.addMouseListener(new AddEdgeML());
-//GWT            
-            //MLMML lis = new MLMML();
-            //newRoot.flowField.addMouseListener(lis);
-            //newRoot.flowField.addMouseMotionListener(lis);
-            diagramManager.insertVertex(newRoot, null);
-            if (toHistory)
-            	addToHistory();
-        }    
-
-        // sets areas at initialize and after resizing
-        public void defineSpaces()
-        {   
-        	workSpace = new Rectangle(0,0,breedte, hoogte);
-        	oldWorkSpace = workSpace;
-        				
-            setLayerDistance();                          
-        } // defineSpaces   
-        
-        // update workSpace after resizing
-        public void updateWork()
-        {  diagramManager.resizeDiagram(true); 
-        }  // updateWork  
-        
-        public void setLayerDistance()
-        {   if (numLayers == 0)
-                layerDistance = maxLayerDistance;
-            else
-            {   int newLayerDistance = 
-                    (workSpace.width - leftSpace - rightSpace -
-                    (numLayers + 1) * vertexWidth) /
-                    numLayers;
-                layerDistance = Math.min(newLayerDistance, maxLayerDistance); 
-            }
-        }    
-        
-/*
-        // check if r Rectangle r contains lwc    
-        public boolean rectangleContains(Rectangle r, JPanel lwc) //LWContainer lwc)
-        {   return ((r.x <= lwc.getLocation().x) &&
-                    (r.y <= lwc.getLocation().y) &&
-                    ((lwc.getLocation().x + lwc.getSize().width) <=
-                     (r.x + r.width)) &&
-                    ((lwc.getLocation().y + lwc.getSize().height) <=
-                     (r.y + r.height)));
-        }  // rectangleContains  
-*/        
-        public int isInLayer(Vertex v)
-        {   Rectangle vRect = new Rectangle(v.xPos, v.yPos, v.breedte, v.hoogte);
-        	if (!rectangleContains(workSpace, vRect))
-                return -1;
-            int index = -1;    
-            for (int i = 0; i < maxLayers; i++)
-            {   int layerStart = workSpace.x + leftSpace + i * (layerDistance + vertexWidth);
-                if (Math.abs(v.xPos - layerStart) <= vertexWidth / 5)
-                    index = i;
-            }    
-            return index;
-        }    
-        public int getLayerStart(int lNum)
-        {   return workSpace.x + leftSpace +
-                   lNum * (layerDistance + vertexWidth);
-        }    
-        
-
-        // check if Rectangle r contains Rectangle s, overloaded        
-        public boolean rectangleContains(Rectangle r, Rectangle s)
-        {   return ((r.x <= s.x) && (r.y <= s.y) &&
-                    ((s.x + s.width) <= (r.x + r.width)) &&
-                    ((s.y + s.height) <= (r.y + r.height)));
-        } // rectangleContains   
-
-        // tracing flow recursively
-        public void traceBack(Vertex v)
+        else
         {   for (int i = 0; i < v.inEdges.size(); i++)
             {   Edge ine = (Edge) v.inEdges.elementAt(i);
-                ine.highlighted = true;
-                traceBack(ine.fromVertex);
-            }    
-            paint();
-        }    
-      
-        // find forward orbit of vertex v
-        public void forwardOrbit(Vertex v)
-        {   for (int i = 0; i < v.outEdges.size(); i++)
-            {   Edge oute = (Edge) v.outEdges.elementAt(i);
-                Vertex outv = oute.toVertex;
-                if (!orbit.contains(outv))
-                    orbit.addElement(outv);
-                forwardOrbit(outv);
+                // check for source
+                traceSomeSources(ine.fromVertex);
             }    
         }    
+    }    
         
-        // trace all roots connected with v
-        public void traceAllSources(Vertex v)
-        {   // reset
-            sources.removeAllElements();
-            // find some
-            traceSomeSources(v);
-            // take the first
-            Vertex someRoot = (Vertex) sources.elementAt(0);
-            // reset
-            orbit.removeAllElements();
-            // put forward orbit of first in 'orbit'
-            forwardOrbit(someRoot);
-            Vector someOrbit = new Vector();
-            // copy
-            for (int j = 0; j < orbit.size(); j++)
-                someOrbit.addElement(orbit.elementAt(j));
-            //     
-            for (int i = 0; i < roots.size(); i++)
-            {   Vertex rt = (Vertex) roots.elementAt(i);
-                if (!sources.contains(rt))
-                {   orbit.removeAllElements();
-                    forwardOrbit(rt);
-                    boolean intersection = false;
-                    for (int k = 0; k < orbit.size(); k++)
-                    {   if (someOrbit.contains(orbit.elementAt(k)))
-                            intersection = true;
-                    }    
-                    if (intersection)
-                        sources.addElement(rt);
-                }
-            }    
+    /**
+     * get the maximum of the flows in all roots connected to Vertex v
+     * @param v the Vertex whose maximal root flow must be found 
+     * @return the maximal flow or unDefined if there one of
+     * the flows in the root is undefined 
+     */
+    public Rational getSourceFlow(Vertex v)
+    {   traceAllSources(v);
+        Rational sFlow = new Rational(0, 1, 0);
+        for (int s = 0; s < sources.size(); s++)
+        {   Vertex source = (Vertex) sources.elementAt(s);
+            if (source.flow.isUndefined())
+                sFlow.decVal = Rational.unDefined;
+            else    
+                sFlow.decVal = Math.max(source.flow.decVal, sFlow.decVal);
+        }        
+        return sFlow;
+    }    
+
+  	/**
+   	 * paint the DrawingPanel
+   	 */
+    public void paint()
+    {
+       	paintComponent(sdGWTContext2d);
+    }
+
+    /**
+     * paint all items in the DrawingPanel using Contect2d g
+     * @param g the Context2d g
+     */
+    public void paintComponent(Context2d g)
+    {   
+     	// paint background of workspace
+        g.setFillStyle(StroomDiagrammenGWT.workBackground);
+        g.fillRect(workSpace.x, workSpace.y, workSpace.width, workSpace.height);
+        // outline the vertex layers in light gray                       
+        g.setStrokeStyle(CssColor.make(222, 222, 222));
+        for (int k = 0; k < maxLayers; k++)
+        {   g.moveTo(workSpace.x + ofSpace + k * (vertexWidth + layerDistance), workSpace.y);;
+         	g.lineTo(workSpace.x + ofSpace + k * (vertexWidth + layerDistance),
+           			 workSpace.y + workSpace.height - 1);
+           	g.stroke();
+           	g.beginPath();
+           	g.moveTo(workSpace.x + ofSpace + vertexWidth + k * (vertexWidth + layerDistance),
+                     workSpace.y);
+           	g.lineTo(workSpace.x + ofSpace + vertexWidth + k * (vertexWidth + layerDistance),
+           			 workSpace.y + workSpace.height - 1);
+           	g.stroke();
         }    
+        // outline the workspace in black
+        g.setStrokeStyle(CssColor.make(0,0,0));
+        g.strokeRect(workSpace.x, workSpace.y, workSpace.width, workSpace.height - 1);
+        // draw the edges and vertices           
+        diagramManager.drawEdges(g);
+        diagramManager.drawVertices(g);
+    } // paintComponent
         
-        // find at least one source connected to v
-        // tracing flow from sources recursively
-        // avoid counting double!!
-        public void traceSomeSources(Vertex v)
-        {   // reset sources first elsewhere!!!!!
-            if (roots.contains(v))
-            {   {   if (!sources.contains(v))
-                        sources.addElement(v);
-                }
-            }    
-            else
-            {   for (int i = 0; i < v.inEdges.size(); i++)
-                {   Edge ine = (Edge) v.inEdges.elementAt(i);
-                    // check for source
-                    traceSomeSources(ine.fromVertex);
-                }    
-            }    
-        }    
+    /**
+     * handling Mouse Events 
+     */
+   	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
+   	{
+   		public void onMouseDown(MouseDownEvent e)
+   		{
+   			e.preventDefault();
+   			// prevent scrolling 
+   			e.stopPropagation();
+   			mouseDown = true;
+   			int eventX = e.getX();
+   			int eventY = e.getY();
+   			mouseDownTouchStartAction(eventX, eventY);
+   		}
+   		public void onMouseMove(MouseMoveEvent e)	
+   		{
+   			e.preventDefault();
+   			// prevent scrolling
+   			e.stopPropagation();
+   			if (!mouseDown)
+   				return;
+   			int eventX = e.getX();
+   			int eventY = e.getY();
+   			mouseMoveTouchMoveAction(eventX, eventY);
+   		} // onMouseMove
+   		public void onMouseUp(MouseUpEvent e)	
+   		{
+   			e.preventDefault();
+   			// prevent scrolling
+   			e.stopPropagation();
+   			mouseDown = false;
+   			mouseUpTouchEndAction();
+   		}
+
+   	} //MLMML
+
+   	/**
+   	 * handling Touch Events 
+   	 */
+   	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
+   	{
+   		public void onTouchStart(TouchStartEvent e)
+   		{
+   			e.preventDefault();
+   			e.stopPropagation();
+   			if (e.getTouches().length() > 0)
+   			{
+   				Touch touch = e.getTouches().get(0);
+   				int eventX = touch.getPageX() - sdGWTCanvas.getAbsoluteLeft();
+   				int eventY = touch.getPageY() - sdGWTCanvas.getAbsoluteTop();				
+   				mouseDownTouchStartAction(eventX, eventY);
+   		    }
+   			e.preventDefault();
+   			e.stopPropagation();
+   		}
+   		public void onTouchMove(TouchMoveEvent e)
+   		{
+   			e.preventDefault();
+   			e.stopPropagation();
+   			if (e.getTouches().length() > 0)
+   			{
+   				Touch touch = e.getTouches().get(0);
+   			    int eventX = touch.getPageX() - sdGWTCanvas.getAbsoluteLeft();
+   				int eventY = touch.getPageY() - sdGWTCanvas.getAbsoluteTop();				
+   				mouseMoveTouchMoveAction(eventX, eventY);
+   		    }
+   			e.preventDefault();
+   			e.stopPropagation();
+   		}
+   		public void onTouchEnd(TouchEndEvent e)
+   		{
+   			mouseUpTouchEndAction();
+   		}
+   	}
+
+  	/**
+   	 * a PopupPanel for input
+   	 */
+   	PopupPanel aPopupPanel;
+   	/**
+   	 * show a PopupPanel for the input of flow in roots (appears below the root)
+   	 * or the input of a label for any vertex (appears above the label)  
+   	 * @param v vertex for input of flow/label
+   	 * @param isLabel input for label?
+   	 */
+   	public void showVertexPopup(Vertex v, boolean isLabel)
+   	{
+   		int popupX = v.xPos + sdGWTCanvas.getAbsoluteLeft();
+   		int popupY = v.yPos + v.hoogte + sdGWTCanvas.getAbsoluteTop();
+   		if (isLabel)
+   		{
+   			popupY = v.yPos - 50 + sdGWTCanvas.getAbsoluteTop();
+   		}
+   		// check if another popup is open, process its input
+   		if ((aPopupPanel != null) && aPopupPanel.isVisible())
+   		{
+   			if (aPopupPanel instanceof VertexPopup)
+   			{	VertexPopup vpp = (VertexPopup) aPopupPanel;
+   				if ((vpp.owner != v) && !vpp.getText().equals(""))
+   					vpp.owner.processInput(vpp.getText());
+   			}
+   			if (aPopupPanel instanceof EdgePopup)
+   			{	EdgePopup epp = (EdgePopup) aPopupPanel;
+   				if (!epp.getText().equals(""))
+   					epp.owner.processInput(epp.getText());
+   			}
+   		}
+   		aPopupPanel = new VertexPopup(v.breedte, v, sdGWTContext2d, isLabel, this);
+   		aPopupPanel.setPopupPosition(popupX, popupY);
+   		aPopupPanel.show();
+   		if (aPopupPanel instanceof VertexPopup)
+   		{	VertexPopup vpp = (VertexPopup) aPopupPanel;
+   			vpp.textBox.setFocus(true);
+   		}	
+   		paint();
+   	}
+
+   	/**
+   	 * show a PopupPanel for the input of capacity in the capacity panel of an edge
+   	 * @param e edge for input of capacity
+   	 */
+   	public void showEdgePopup(Edge e)
+   	{
+   		int popupX = e.capacityField.xPos + sdGWTCanvas.getAbsoluteLeft();
+   		int popupY = e.capacityField.yPos + e.capacityField.hoogte + sdGWTCanvas.getAbsoluteTop();
+   		// check if another popup is open, process its input
+   		if ((aPopupPanel != null) && aPopupPanel.isVisible())
+   		{
+   			if (aPopupPanel instanceof EdgePopup)
+   			{	EdgePopup epp = (EdgePopup) aPopupPanel;
+   				if ((epp.owner != e) && !epp.getText().equals(""))
+   					epp.owner.processInput(epp.getText());
+   			}
+   			if (aPopupPanel instanceof VertexPopup)
+   			{	VertexPopup vpp = (VertexPopup) aPopupPanel;
+   				if (!vpp.getText().equals(""))
+   					vpp.owner.processInput(vpp.getText());
+   			}
+   		}
+   		aPopupPanel = new EdgePopup(e.capacityField.breedte, e, sdGWTContext2d, this);
+   		aPopupPanel.setPopupPosition(popupX, popupY);
+   		aPopupPanel.show();
+   		if (aPopupPanel instanceof EdgePopup)
+   		{	EdgePopup epp = (EdgePopup) aPopupPanel;
+   			epp.textBox.setFocus(true);
+   		}	
+   		paint();
+   	}
+
+   	/**
+   	 * the time of the last MouseDown/TouchDown Event
+   	 */
+    protected long taptime;
+    /**
+     * List of long to save MouseDown/TouchDown Event times
+     */
+    protected List<Long> doubletap = new ArrayList<Long>();
         
-        public Rational getSourceFlow(Vertex v)
-        {   traceAllSources(v);
-            Rational sFlow = new Rational(0, 1, 0);
-            for (int s = 0; s < sources.size(); s++)
-            {   Vertex source = (Vertex) sources.elementAt(s);
-                if (source.flow.isUndefined())
-                    sFlow.decVal = Rational.unDefined;
-                else    
-                    sFlow.decVal = Math.max(source.flow.decVal, sFlow.decVal);
-            }        
-            return sFlow;
-        }    
-        
-        public Rational getMaxRootFlow()
-        {   Rational sFlow = new Rational(0, 1, 0);
-            for (int s = 0; s < roots.size(); s++)
-            {   Vertex rt = (Vertex) roots.elementAt(s);
-                if (rt.flow.isUndefined())
-                    return DrawingPanel.unDef;
-                else    
-                    sFlow.decVal = Math.max(sFlow.decVal, rt.flow.decVal);
-            }    
-            return sFlow;
-        }    
-  
-//GWT
-/*        
-        // flow thread
-        public void run()
-        {   while (true)
-            {   diagramManager.moveBubbles();
-                try
-                {   flowThread.sleep(150);
-                }
-                catch (InterruptedException ie) {}
-            }
-        }
-*/        
-        
-        // private method to find a darker or a brighter version of color c, using the
-        // HSB color model; factor determines the amount of change, a negative
-        // factor produces darker colors, a positive factor brighter colors
-//GWT
-/*        
-        public static Color hsbChange(Color c, int factor)
-        {   // array for storing hue, saturation, brigtness
-            float[] hsbValues = new float[3];
-            // the resulting variant of Color c
-            Color result;
-            // find hsbValues for Color c
-            hsbValues = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(),
-                        hsbValues);
-            // if a darker color is wanted
-            if (factor < 0)
-            {   // if possible decrease brightness by |factor|*0.1
-                if (hsbValues[2] >= -factor * 1e-1f)
-                    hsbValues[2] -= -factor * 1e-1f;
-                // else try to increase saturation by |factor|*0.1        
-                else    
-                    if (hsbValues[1] <= 1.0f + factor * 1e-1f)
-                        hsbValues[1] += -factor * 1e-1f;
-            }
-            else // a brighter color is wanted
-            {   // if possible increase brightness by factor*0.1
-                if (hsbValues[2] <= 1.0f - factor * 1e-1f)
-                    hsbValues[2] += factor * 1e-1f;
-                // else try to decrease saturation by factor*0.1        
-                else    
-                    if (hsbValues[1] >= factor * 1e-1f)
-                        hsbValues[1] -= factor * 1e-1f;
-            }
-            // get the resulting color in the RGB model            
-            result = Color.getHSBColor(hsbValues[0], hsbValues[1], hsbValues[2]);            
-            return result;
-        }
-*/             
-    /*
-        public void update(Graphics g)
-        {   paint(g);
-        }
+    /**
+     * was the mouse/touch held down longer then 300 milliseconds?
+     * call this method at mouseUp/touchEnd
+     * @return true/false
+     */
+    protected boolean isLongClick() 
+    {
+    	return System.currentTimeMillis() - taptime > 300;
+    }
+    
+    /**
+     * was the last MouseDown/TouchDown Event part of a double click, that is
+     * two MouseDown/TouchDown Events less then 700 milliseconds apart?
+     * @return true/false
+     */
+    protected boolean isDoubleClick() 
+    {
+        return doubletap.size() >= 2 && doubletap.get(1) - doubletap.get(0) < 700;
+    }
 
-    	public void paint(Graphics g)
-    	{	if (offScreen == null)
-                offScreen = createImage(getSize().width, getSize().height);
-            offGraphics = offScreen.getGraphics();
-            offGraphics.setClip(0, 0, getSize().width, getSize().height);
-            paintOpBuffer(offGraphics);
-            //super.paint(og);
-            g.drawImage(offScreen, 0, 0, null);
-    	}
-    */
-        public void paint()
-        {
-        	paintComponent(sdGWTContext2d);
-        }
-        // paint
-        //public void paintComponent(Graphics g)
-        public void paintComponent(Context2d g)
-        {   // paint backgrounds
-            // workspace
-            //g.setColor(Stroomdiagrammen.workBackground);
-            g.setFillStyle(StroomDiagrammenGWT.workBackground);
-            g.fillRect(workSpace.x, workSpace.y, workSpace.width, workSpace.height);
+    /**
+     * x position of MouseDown/TouchDown Event or MouseMove/TouchMove Event when dragging
+     */
+	int startx;
+    /**
+     * y position of MouseDown/TouchDown Event or MouseMove/TouchMove  Event when dragging
+     */
+	int starty;
+    /**
+     * change in x position of MouseMove/TouchMove Event relative to the last MouseMove/TouchMove Event 
+     */
+	int dx;
+    /**
+     * change in y position of MouseMove/TouchMove Event relative to the last MouseMove/TouchMove Event 
+     */
+	int dy;
+	/**
+	 * are we dragging?
+	 */
+    boolean dragging = false;
+    /**
+     * position of the clicked vertex at mouseDown/touchDown; necessary for reset in case dragging is illegal
+     */
+    Point oldPos = null;
+    /**
+     * vertexClicked cannot move further left then this x position
+     */
+    int leftBorder;
+    /**
+     * vertexClicked cannot move furter right then this x position 
+     */
+    int rightBorder;
+    /**
+     * the Vertex clicked (if any) 
+     */
+ 	Vertex vertexClicked = null;
+ 	/**
+ 	 * was a label clicked?
+ 	 */
+  	boolean labelClicked = false;
+  	/**
+  	 * was an addEdgeButton clicked?
+  	 */
+  	boolean addEdgeButtonClicked = false;
+  	/**
+  	 * was a trace back button clicked?
+  	 */
+  	boolean colorButtonClicked = false;
+  	/**
+  	 * the Edge clicked (if any)
+  	 */
+  	Edge edgeClicked = null;
+  	/**
+  	 * the Edge whose capacityPanel was clicked (if any)
+  	 */
+  	Edge edgeCapacityClicked = null;
 
-    /*
-    // (temporary) grids (for checking)
-            // work space
-            int numRows = workSpace.height / GRIDSIZE;
-            int numColumns = workSpace.width / GRIDSIZE;        
-            // horizontal
-            for (int i = 0; i < numRows + 1; i++)
-            {   g.setColor(new Color(222, 222, 222));        
-                g.drawLine(workSpace.x, workSpace.y + i * GRIDSIZE, 
-                           workSpace.x + workSpace.width - 1, workSpace.y + i * GRIDSIZE);
-            }               
-            // vertical               
-            for (int j = 0; j < numColumns + 1; j++)
-                g.drawLine(workSpace.x + j * GRIDSIZE, workSpace.y, 
-                           workSpace.x + j * GRIDSIZE, workSpace.y + workSpace.height - 1);
-    */                       
-                           
-            // outline layers                       
-            //g.setColor(new Color(222, 222, 222));
-            g.setStrokeStyle(CssColor.make(222, 222, 222));
-            for (int k = 0; k < maxLayers; k++)
-            {   //g.drawLine(
-                //   workSpace.x + leftSpace + k * (vertexWidth + layerDistance),
-                //    workSpace.y, 
-                //    workSpace.x + leftSpace + k * (vertexWidth + layerDistance),
-                //    workSpace.y + workSpace.height - 1);
-            	g.beginPath();
-            	g.moveTo(workSpace.x + leftSpace + k * (vertexWidth + layerDistance), workSpace.y);;
-            	g.lineTo(workSpace.x + leftSpace + k * (vertexWidth + layerDistance),
-            			 workSpace.y + workSpace.height - 1);
-            	g.stroke();
-                //g.drawLine(
-                //   workSpace.x + leftSpace + vertexWidth + k * (vertexWidth + layerDistance),
-                //    workSpace.y, 
-                //    workSpace.x + leftSpace + vertexWidth + k * (vertexWidth + layerDistance),
-                //    workSpace.y + workSpace.height - 1);
-            	g.beginPath();
-            	g.moveTo(workSpace.x + leftSpace + vertexWidth + k * (vertexWidth + layerDistance),
-                         workSpace.y);
-            	g.lineTo(workSpace.x + leftSpace + vertexWidth + k * (vertexWidth + layerDistance),
-            			 workSpace.y + workSpace.height - 1);
-            	g.stroke();
-                
-            }    
-            
-
-            // outlines
-            //g.setColor(Color.black);
-            g.setStrokeStyle(CssColor.make(0,0,0));
-            //g.drawRect(workSpace.x, workSpace.y, workSpace.width - 1, workSpace.height - 1);
-            g.strokeRect(workSpace.x, workSpace.y, workSpace.width - 1, workSpace.height - 1);
-                       
-            // draw the edges and vertices           
-            diagramManager.drawEdges(g);
-            diagramManager.drawVertices(g);
-            
-    /*        
-    // testing        
-            g.setFont(fo);        
-            int bx = workSpace.x + 2 * GRIDSIZE;
-            int by = workSpace.y + GRIDSIZE;
-            g.drawString(
-            " " + history.size()
-    // insert test string here        
-    // testString
-            , bx, by);
-    */        
-            
-            
-            
-            // paint vertices and edge capacity fields
-            //super.paint(g);               
-
-            // fill borders to prevent drawing objects
-            // outside predefined areas
-            //g.setColor(Stroomdiagrammen.appletBackground);
-/*            
-            g.setFillStyle(StroomDiagrammenGWT.appletBackground);
-            // bottom
-            g.fillRect(0, workSpace.y + workSpace.height, breedte, 
-                       hoogte - (workSpace.y + workSpace.height));
-            // top                   
-            g.fillRect(0, 0, breedte, workSpace.y);
-            // left           
-            g.fillRect(0, 0, workSpace.x, hoogte);
-            // right                   
-            g.fillRect(workSpace.x + workSpace.width, 0,
-                       breedte - (workSpace.x + workSpace.width), 
-                       hoogte);
-*/                       
-        } // paint
-        
-//GWT?        
-        // handles for use from outside
-        //public TraceML getTraceML()
-        //{   return new TraceML();
-        //}    
-        //public AddEdgeML getAddEdgeML()
-        //{   return new AddEdgeML();
-        //}    
-        //public MLMML getMLMML()
-        //{   return new MLMML();
-        //}
-        
-    	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
-    	{
-    		
-    		//public void mousePressed(MouseEvent e)
-    		public void onMouseDown(MouseDownEvent e)
-    		{
-    			
-    //System.out.println("mouseDown");
-
-    			e.preventDefault();
-    			// prevent scrolling 
-    			e.stopPropagation();
-    			
-    			mouseDown = true;
-    			
-    			int eventX = e.getX();
-    			int eventY = e.getY();
-    			
-    			mouseDownTouchStartAction(eventX, eventY);
-    			
-    		}
-    		
-    		//public void mouseDragged(MouseEvent e)
-    		public void onMouseMove(MouseMoveEvent e)	
-    		{
-    			e.preventDefault();
-    			
-    			// prevent scrolling
-    			e.stopPropagation();
-    			
-    //System.out.println("mouseMov");			
-    			
-    			if (!mouseDown)
-    				return;
-
-    			int eventX = e.getX();
-    			int eventY = e.getY();
-
-    			mouseMoveTouchMoveAction(eventX, eventY);
-    			
-    			
-    			
-    		} // onMouseMove
-    		
-    		//public void mouseReleased(MouseEvent e)
-    		public void onMouseUp(MouseUpEvent e)	
-    		{
-    			e.preventDefault();
-    			// prevent scrolling
-    			e.stopPropagation();
-
-    //System.out.println("mouseUp");
-
-    			mouseDown = false;
-    		
-    			mouseUpTouchEndAction(lastMoveX, lastMoveY);
-
-    		}
-
-    	} //MLMML
-
-
-    	// tablet, dwo 
-    	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
-    	{
-    		
-    		public void onTouchStart(TouchStartEvent e)
-    		{
-    			e.preventDefault();
-    			e.stopPropagation();
-    			
-    			if (e.getTouches().length() > 0)
-    			{
-    				Touch touch = e.getTouches().get(0);
-    				
-    				int eventX = touch.getPageX() - sdGWTCanvas.getAbsoluteLeft();
-    				int eventY = touch.getPageY() - sdGWTCanvas.getAbsoluteTop();				
-    				
-    				mouseDownTouchStartAction(eventX, eventY);
-    				
-    		    }
-    			e.preventDefault();
-    			e.stopPropagation();
-    		}
-    		public void onTouchMove(TouchMoveEvent e)
-    		{
-    			
-    			e.preventDefault();
-    			e.stopPropagation();
-    			
-    			if (e.getTouches().length() > 0)
-    			{
-    				Touch touch = e.getTouches().get(0);
-    				
-    			    int eventX = touch.getPageX() - sdGWTCanvas.getAbsoluteLeft();
-    				int eventY = touch.getPageY() - sdGWTCanvas.getAbsoluteTop();				
-    			    
-    				mouseMoveTouchMoveAction(eventX, eventY);
-    				
-    		    }
-    			e.preventDefault();
-    			e.stopPropagation();
-    			
-    		}
-    		public void onTouchEnd(TouchEndEvent e)
-    		{
-    //GWT check het TouchEndEvent
-    			
-    			mouseUpTouchEndAction(lastMoveX, lastMoveY);
-    		}
-
-    	}
-    	
-    	PopupPanel aPopupPanel;
-    	public void showVertexPopup(Vertex v, boolean isLabel)
-    	{
-    		int popupX = v.xPos + sdGWTCanvas.getAbsoluteLeft();
-    		int popupY = v.yPos + v.hoogte + sdGWTCanvas.getAbsoluteTop();
-    		if (isLabel)
-    		{
-    			popupY = v.yPos - 50 + sdGWTCanvas.getAbsoluteTop();
-    		}
-
-//System.out.println("v.yPos " + v.yPos);
-//System.out.println("v.hoogte " + v.hoogte);
-    		// kijk of er ergens nog een popup open is
-    		if ((aPopupPanel != null) && aPopupPanel.isVisible())
-    		{
-    			if (aPopupPanel instanceof VertexPopup)
-    			{	VertexPopup vpp = (VertexPopup) aPopupPanel;
-    				if (vpp.owner != v)
-    					vpp.owner.processInput(vpp.getText());
-    			}
-    		}
-
-    		aPopupPanel = new VertexPopup(v.breedte, v.hoogte, v, sdGWTContext2d, isLabel, this);
-    		//paramEditor = schuifveld.paramEditor; 
-    		//paramEditor.vulIn(parameters[epi].getParameterText());
-    		aPopupPanel.setPopupPosition(popupX, popupY);
-    		aPopupPanel.show();
-    		if (aPopupPanel instanceof VertexPopup)
-    		{	VertexPopup vpp = (VertexPopup) aPopupPanel;
-    			vpp.textBox.setFocus(true);
-    		}	
-    		
-    		paint();
-    //System.out.println("ParamCC breedte = " + breedte);		
-    //System.out.println("ParamCC popup breedte = " + paramEditor.breedte);		
-
-    	}
-
-        protected long taptime;
-        protected List<Long> doubletap = new ArrayList<Long>();
-        
-    	int startx, starty, dx, dy;
-        boolean dragging = false;
-        Point oldPos = null;
-        int leftBorder, rightBorder;
-    	
-        protected boolean isLongClick() 
-        {
-        	return System.currentTimeMillis() - taptime > 300;
-    	}
-
-    	protected boolean isDoubleClick() 
-    	{
-    	    return doubletap.size() >= 2 && doubletap.get(1) - doubletap.get(0) < 700;
-    	}
-
-    	Vertex vertexClicked = null;
-    	boolean labelClicked = false;
-    	boolean addEdgeButtonClicked = false;
-    	
-		public void mouseDownTouchStartAction(int eventX, int eventY)
-		{	
-			if (isDemo)
-				return;
-			
-	        taptime = System.currentTimeMillis();
-	        doubletap.add(taptime);
-
-			//Vertex vertexClicked = null;
-			for (int vCnt = 0; vCnt < diagramManager.vertices.size(); vCnt++)
-			{
-				Vertex aVertex = (Vertex)diagramManager.vertices.elementAt(vCnt);
-				if (aVertex.vertexClicked(eventX, eventY))
-					vertexClicked = aVertex;
-			}
-			
-			labelClicked = false;
-			
-			if (vertexClicked != null)
-			{
-//System.out.println("vertexClicked");	
-
-				if (vertexClicked.addEdgeButtonClicked(eventX, eventY))
-				{
-//System.out.println("addEdgeButtonClicked");					
-					addEdgeAction(vertexClicked);
-					addEdgeButtonClicked = true;
-					return;
-				}
-				else if (vertexClicked.colorButtonClicked(eventX, eventY))
-				{
-//System.out.println("colorButtonClicked");					
-					diagramManager.lowLightEdges();
-		            Vertex v = vertexClicked;
-		            if (v != traceFrom)
-		            {   traceFrom = v;
-		                traceBack(v);
-		            }
-		            else
-		            {   traceFrom = null;
-		                paint();
-		            }
-		            addToHistory();
-					return;
-				}
-				else if (vertexClicked.labelClicked(eventX, eventY))
-				{
-//System.out.println("labelClicked");					
-					labelClicked = true;
-					return;
-				}
-				startx = eventX;
-				starty = eventY;
-				//dragging = true;
-				leftBorder = getLayerStart(vertexClicked.canMoveLeftTo())- 4;
-				rightBorder = getLayerStart(vertexClicked.canMoveRightTo())+ 4;
-				oldPos = new Point(vertexClicked.getLocation().x, vertexClicked.getLocation().y);
-				
-				
-			}
+  	/**
+  	 * action after MouseDown/TouchStart Event at position (eventX,eventY)
+  	 * @param eventX Event x-position
+  	 * @param eventY Event y-position
+  	 */
+	public void mouseDownTouchStartAction(int eventX, int eventY)
+	{	
+		// no action if flow diagram is demo
+		if (isDemo)
+			return;
+		// remember tapTime and add to tap-list
+        taptime = System.currentTimeMillis();
+        doubletap.add(taptime);
+        // reset
+		vertexClicked = null;
+		// find vertex clicked
+		for (int vCnt = 0; vCnt < diagramManager.vertices.size(); vCnt++)
+		{
+			Vertex aVertex = (Vertex)diagramManager.vertices.elementAt(vCnt);
+			if (aVertex.vertexClicked(eventX, eventY))
+				vertexClicked = aVertex;
 		}
-		
-		public void mouseMoveTouchMoveAction(int eventX, int eventY)
+		// reset
+		labelClicked = false;
+		addEdgeButtonClicked = false;
+		colorButtonClicked = false;
+		// find what part of the vertex was clicked
+		if (vertexClicked != null)
 		{	
-			if (isDemo)
-				return;
-			
-			if (vertexClicked != null)
-			{	
-				dx = eventX - startx;
-				dy = eventY - starty;
-				if ((dx != 0) || (dy != 0))
-					dragging = true;
-				
-				if (dragging == false)
-					return;
-
-				int newx = vertexClicked.xPos + dx;
-				int newy = vertexClicked.yPos + dy;
-                if ((dx < 0) && (newx < leftBorder))
-	                    newx = leftBorder;
-	                else if ((newx > rightBorder))
-	                    newx = rightBorder;
-                // check if v intersects edges    
-                if (!rectangleContains(workSpace, vertexClicked.getBoundingRect()))
-                {   boolean deletable = (vertexClicked.outEdges.size() == 0);
-                    if (deletable)
-                    {   // put in original location
-                        // and save configuration
-                    	vertexClicked.setLocation(oldPos.x, oldPos.y);   
-                        addToHistory();
-                        for (int i = vertexClicked.inEdges.size() - 1; i >= 0; i--)
-                        {   Edge ie = (Edge) vertexClicked.inEdges.elementAt(i);
-                            diagramManager.deleteEdge(ie);
-                        }    
-                    }
-                    else
-                    	vertexClicked.setLocation(oldPos.x, oldPos.y);   
-                    dragging = false;
-                    //anker = null;
-                }    
-                else
-                	vertexClicked.setLocation(newx, newy);   
-                // only update the edges!!!!              
-                diagramManager.updateEdges();
-                paint();                  
-	 
-				startx = eventX;
-				starty = eventY;
-			
-				lastMoveX = eventX;
-				lastMoveY = eventY;
-			}	
-			
-
-		}	
-
-
-		public void mouseUpTouchEndAction(int lastMoveX, int lastMoveY)
-		{	
-			if (isDemo)
-				return;
-			
-			if (vertexClicked != null && isDoubleClick()) 
+			// add an Edge and finished
+			if (vertexClicked.addEdgeButtonClicked(eventX, eventY))
 			{
-				// label en/of root?
-				if (labelClicked)
-				{
-					showVertexPopup(vertexClicked, true);
-				}
-				
-				else if (vertexClicked.root)
-				{	
-					showVertexPopup(vertexClicked, false);
-				}
-	            doubletap.clear();
-	            
-	            paint();
-	        } 
-			else if (!dragging && vertexClicked != null && isLongClick()) 
+				addEdgeAction(vertexClicked);
+				addEdgeButtonClicked = true;
+				return;
+			}
+			// trace back the flow and finished
+			else if (vertexClicked.colorButtonClicked(eventX, eventY))
 			{
-				if (labelClicked)
-				{
-					showVertexPopup(vertexClicked, true);
-				}
-					
-				else if (vertexClicked.root && !addEdgeButtonClicked)
-				{	
-					showVertexPopup(vertexClicked, false);
-				}
-		
-				doubletap.clear();
-				
-				paint();
-	        } 
-			else if ((vertexClicked != null) && dragging)
-	        {   int newLayerNum = isInLayer(vertexClicked);
-	            if (newLayerNum >= 0)
-	            {   if (!diagramManager.intersectsVertex(vertexClicked))
-	                {   boolean remember = (newLayerNum != vertexClicked.layerNum);
-	                    diagramManager.moveVertexTo(vertexClicked, newLayerNum);
-	                    if (remember)
-	                        addToHistory();
-	                }
-                    else  
-	                {   Vertex fv = diagramManager.fuseWith(vertexClicked);
-	                    if (fv != null)
-	                    {   diagramManager.fuseVertices(vertexClicked, fv);     
-	                        addToHistory();
-                        }
-	                    else
-	                    	vertexClicked.setLocation(oldPos.x, oldPos.y);                        
-	                }
-	             }    
-	             else
-	            	 vertexClicked.setLocation(oldPos.x, oldPos.y);
-	             diagramManager.updateEdges();    
-	// do not update vertex layers!!!                
-//	                diagramManager.redrawDiagram();
-	                //anker = null;
-	            dragging = false;	
-
-	            if (doubletap.size() >= 2) 
-	            {	//doubletap.clear();
-	            	doubletap.remove(0);
+				diagramManager.lowLightEdges();
+	            Vertex v = vertexClicked;
+	            if (v != traceFrom)
+	            {   traceFrom = v;
+	                traceBack(v);
 	            }
-	        }
-
-		}	
-
-
-        
-//GWT
-/*        
-        class ML extends MouseAdapter
-        {   public void mousePressed(MouseEvent e)
-            {   requestFocus();
-                Edge edge = diagramManager.getClickedEdge(e.getX(), e.getY());
-                
-                if ((edge != null) && 
-                    (deleteMode || (e.getModifiers() & e.BUTTON3_MASK) != 0)
-                   ) 
-                {   diagramManager.deleteEdge(edge);
-                    deleteMode = false;
+	            else
+	            {   traceFrom = null;
+	                paint();
+	            }
+	            addToHistory();
+	            colorButtonClicked = true;
+				return;
+			}
+			// ste the flagg, action at mouseUp/touchEnd
+			else if (vertexClicked.labelClicked(eventX, eventY))
+			{
+				labelClicked = true;
+				return;
+			}
+			// save down-position
+			startx = eventX;
+			starty = eventY;
+			leftBorder = getLayerStart(vertexClicked.canMoveLeftTo())- 4;
+			rightBorder = getLayerStart(vertexClicked.canMoveRightTo())+ 4;
+			oldPos = new Point(vertexClicked.getLocation().x, vertexClicked.getLocation().y);
+		}
+		// reset
+		edgeClicked = null;
+		edgeCapacityClicked = null;
+		// find Edge and EdgeCapacity clicked
+		edgeClicked = diagramManager.getClickedEdge(eventX, eventY);
+		edgeCapacityClicked = diagramManager.getClickedCapacity(eventX, eventY);
+		// capacity has preference
+		if ((edgeClicked != null) && (edgeCapacityClicked != null))
+		{	edgeClicked = null;
+		}
+	}
+  	/**
+  	 * action after MouseMove/TouchMove Event at position (eventX,eventY)
+  	 * @param eventX Event x-position
+  	 * @param eventY Event y-position
+  	 */
+	public void mouseMoveTouchMoveAction(int eventX, int eventY)
+	{	
+		if (isDemo)
+			return;
+		// dragging a vertex
+		if ((vertexClicked != null) && !addEdgeButtonClicked && !colorButtonClicked && !labelClicked)
+		{	
+			dx = eventX - startx;
+			dy = eventY - starty;
+			// this could be a long click on a root
+			if ((dx != 0) || (dy != 0))
+				dragging = true;
+			if (dragging == false)
+				return;
+			// potential new position
+			int newx = vertexClicked.xPos + dx;
+			int newy = vertexClicked.yPos + dy;
+            if ((dx < 0) && (newx < leftBorder))
+                 newx = leftBorder;
+            else if ((newx > rightBorder))
+                 newx = rightBorder;
+            // check if v intersects edges of workSpace    
+            if (!rectangleContains(workSpace, vertexClicked.getBoundingRect()))
+            {   boolean deletable = (vertexClicked.outEdges.size() == 0);
+                if (deletable)
+                {   // delete all edges ending at vertexClicked
+                    // this also deletes vertexClicked
+                    for (int i = vertexClicked.inEdges.size() - 1; i >= 0; i--)
+                    {   Edge ie = (Edge) vertexClicked.inEdges.elementAt(i);
+                        diagramManager.deleteEdge(ie);
+                    }
                     addToHistory();
-                }
-            }
-        }
-*/
-//GWT
-/*        
-        class KL extends KeyAdapter
-        {   public void keyPressed(KeyEvent e)
-            {   int kc = e.getKeyCode();
-                if (kc == KeyEvent.VK_DELETE)
-                {   deleteMode = true;
-                }    
-            }    
-            public void keyReleased(KeyEvent e)
-            {   int kc = e.getKeyCode();
-                if (kc == KeyEvent.VK_DELETE)
-                {   deleteMode = false;
-                }    
-            }    
-        }    
-*/
-        
-//GWT
-/*        
-        // inner class for vertex color button
-        class TraceML extends MouseAdapter
-        {   public void mousePressed(MouseEvent e)
-            {   requestFocus();
-                diagramManager.lowLightEdges();
-                Vertex v = (Vertex) e.getComponent().getParent();
-                if (v != traceFrom)
-                {   traceFrom = v;
-                    traceBack(v);
-                }
-                else
-                {   traceFrom = null;
-                    repaint();
-                }
-                addToHistory();
-            }    
-        }
-*/
-        
-        // action for vertex add edge button
-        public void addEdgeAction(Vertex v) 
-        {   
-        	// create new vertex to be connected to v            
-            Vertex newVertex = new Vertex(false, v.layerNum + 1);
-            newVertex.decimals = vDecimals;
-            // add listeners
-            //newVertex.addEdgeButton.addMouseListener(new AddEdgeML());            
-            //newVertex.colorButton.addMouseListener(new TraceML());    
-            //MLMML lis = new MLMML();
-            //newVertex.flowField.addMouseListener(lis);
-            //newVertex.flowField.addMouseMotionListener(lis);
-            diagramManager.insertVertex(newVertex, v);
-            // initially 0
-            Rational cap = new Rational(0, 1, 0);
-            // first outedge 1
-            if (v.outEdges.size() == 0)
-            	cap = new Rational(1, 1, 1);
-            // second outedge 0.5 and 0.5     
-            else if (v.outEdges.size() == 1)
-            {   Edge ed = (Edge) v.outEdges.elementAt(0); 
-                ed.setCapacity(new Rational(1, 2, 5e-1d), false);
-                cap = new Rational(1, 2, 5e-1d);
-            }
-            Edge newEdge = new Edge(this, v, newVertex, cap); 
-            // this sorts the outedges of v
-            diagramManager.addEdge(newEdge); 
-            // if v is not a root
-            if (v.layerNum > 0)
-            {   // this edge exists!!
-                Edge preEdge = (Edge) v.inEdges.elementAt(0);
-                Vertex preVertex = preEdge.fromVertex;
-                int preMode = preEdge.mode;
-                // copy capacities
-                if (preVertex.outEdges.size() == v.outEdges.size())
-                {   for (int i = 0; i < v.outEdges.size(); i++)
-                    {   Edge preOe = (Edge) preVertex.outEdges.elementAt(i);
-                        Edge postOe = (Edge) v.outEdges.elementAt(i);
-                        postOe.setCapacity(preOe.capacity, false);
-                    }    
-                }    
-                // copy mode
-                for (int j = 0; j < v.outEdges.size(); j++)
-                {   Edge oe = (Edge) v.outEdges.elementAt(j);
-                    oe.setMode(preMode);
-                }    
+                } 
+                else // not deletable: put back in old position
+                   	vertexClicked.setLocation(oldPos.x, oldPos.y);   
+                dragging = false;
             }    
             else
-                newEdge.setMode(DrawingPanel.decMode);                
-                
-            diagramManager.calculateDiagram();
-                    
-            addToHistory();
-   
-        } // addEdgeAction   
+               	vertexClicked.setLocation(newx, newy);   
+            // only update the edges!!!!              
+            diagramManager.updateEdges();
+            paint();                  
+            startx = eventX;
+			starty = eventY;
+		}	
+	}	
 
-        
-//GWT
-/*        
-        // listening to mouse and mouse motion events on LWContainers
-        class MLMML extends MouseAdapter implements MouseMotionListener
-        {   // dragging with (left) mouse button
-            boolean dragging = false;
-            // anker for dragging
-            Point anker = null;
-            // Vertex where dragg events take place
-            Vertex v;
-            // old position of vertex
-            Point oldPos = null;
-            // shift while dragging
-            int dx, dy;
-            int leftBorder, rightBorder;        
-            
-            // mouse pressed events
-            public void mousePressed(MouseEvent e)
-            {   //requestFocus();
-                // get the vertex
-                v = (Vertex) e.getComponent().getParent();
-                v.flowField.requestFocus();
-                // note: we are dragging the flowField of vertex v
-                leftBorder = getLayerStart(v.canMoveLeftTo()) 
-                             - 4;
-                rightBorder = getLayerStart(v.canMoveRightTo()) 
-                             + 4;
-                
-//                if (!deleteMode)            
-//                {   
-                    // waar was dit voor??
-                    //owner.requestFocus();
-                    dragging = true;
-                    // save old position
-                    oldPos = new Point(v.getLocation().x, v.getLocation().y);
-                    // put on top
-                    // Java 8 resistent!
-                    setComponentZOrder(v,0);
-                    //remove(v);
-                    //add(v, 0);
-                    
-                    // set anker point relative to v!!!
-                    anker = new Point(e.getComponent().getLocation().x + e.getX(), 
-                                      e.getComponent().getLocation().y + e.getY());
-//                }
-//                else // deleteMode on
-//                {   dragging = false;
-                    //if (v != root)
-                    //    diagramManager.deleteVertex(v);
-                    //owner.unDelete();    
-//                }    
-            } // mousePressed
-            
-            public void mouseReleased(MouseEvent e)
-            {   if ((anker != null) && dragging)
-                {   int newLayerNum = isInLayer(v);
-                    if (newLayerNum >= 0)
-                    {   if (!diagramManager.intersectsVertex(v))
-                        {   boolean remember = (newLayerNum != v.layerNum);
-                            diagramManager.moveVertexTo(v, newLayerNum);
-                            if (remember)
-                                addToHistory();
-                        }
-                        else  
-                        {   Vertex fv = diagramManager.fuseWith(v);
-                            if (fv != null)
-                            {   diagramManager.fuseVertices(v, fv);            
-                                addToHistory();
-                            }
-                            else
-                                v.setLocation(oldPos.x, oldPos.y);                        
-                        }
-                    }    
-                    else
-                        v.setLocation(oldPos.x, oldPos.y);
-                    diagramManager.updateEdges();    
-    // do not update vertex layers!!!                
-//                    diagramManager.redrawDiagram();
-                    anker = null;
+  	/**
+  	 * action after MouseUp/TouchEnd Event
+  	 */
+	public void mouseUpTouchEndAction()
+	{	
+		if (isDemo)
+			return;
+		// double click on vertexClicked
+		if (vertexClicked != null && isDoubleClick()) 
+		{
+			// label: edit label
+			if (labelClicked)
+			{
+				showVertexPopup(vertexClicked, true);
+			}
+			// root: edit flow
+			else if (vertexClicked.root && !addEdgeButtonClicked)
+			{	
+				showVertexPopup(vertexClicked, false);
+			}
+			// clear the tap-list
+            doubletap.clear();
+            paint();
+        }
+		// long click on vertexClicked and not dragging
+		else if (!dragging && vertexClicked != null && isLongClick()) 
+		{
+			// label: edit label
+			if (labelClicked)
+			{
+				showVertexPopup(vertexClicked, true);
+			}
+			// root: edit flow
+			else if (vertexClicked.root && !addEdgeButtonClicked)
+			{	
+				showVertexPopup(vertexClicked, false);
+			}
+			// clear the tap-list
+			doubletap.clear();
+			paint();
+        }
+		// double click on edgeCapacityClicked
+		else if (edgeCapacityClicked != null && isDoubleClick()) 
+		{
+			// edit capacity
+			showEdgePopup(edgeCapacityClicked);
+            doubletap.clear();
+            paint();
+        }
+		// double click on edgeCapacityClicked
+		else if (edgeCapacityClicked != null && isLongClick()) 
+		{
+			// edit capacity
+			showEdgePopup(edgeCapacityClicked);
+            doubletap.clear();
+            paint();
+        }
+		// double click on edgeClicked (not on the capacity)
+		else if (edgeClicked != null && isLongClick()) 
+		{
+			// delete the edge if this is allowd
+			boolean deleted = diagramManager.deleteEdge(edgeClicked);
+			if (deleted)
+				addToHistory();
+            doubletap.clear();
+            paint();
+        } 
+		// dragging a vertex 
+		else if ((vertexClicked != null) && dragging)
+        {   // number of vertex layer (if any) where vertex is at mouseUp/touchEnd
+			int newLayerNum = isInLayer(vertexClicked);
+			// a vertex layer
+            if (newLayerNum >= 0)
+            {   // there is no other vertex intersecting vertexClicked 
+            	if (!diagramManager.intersectsVertex(vertexClicked))
+                {   // add to history if vertexClicked changed vertex layer
+            		boolean remember = (newLayerNum != vertexClicked.layerNum);
+            		// move vertexClicked, see class DiagramManager
+                    diagramManager.moveVertexTo(vertexClicked, newLayerNum);
+                    if (remember)
+                        addToHistory();
                 }
-                dragging = false;
-            } // mouseReleased
-            
-            // dragging 
-            public void mouseDragged(MouseEvent e)
-            {   // anker should be set
-                if ((anker != null) && dragging)
-                {   // find relative movement for v!!
-                    dx = e.getComponent().getLocation().x + e.getX() - anker.x;
-                    dy = e.getComponent().getLocation().y + e.getY() - anker.y;
-                    // new position
-                    Point newPos = new Point(
-                                   v.getLocation().x + dx,
-                                   v.getLocation().y + dy);
-                    if ((dx < 0) && (newPos.x < leftBorder))
-                        newPos.x = leftBorder;
-                    else if ((newPos.x > rightBorder))
-                        newPos.x = rightBorder;
-                    // check if v intersects edges    
-                    if (!rectangleContains(workSpace, v))
-                    {   boolean deletable = (v.outEdges.size() == 0);
-                        if (deletable)
-                        {   // put in original location
-                            // and save configuration
-                            v.setLocation(oldPos.x, oldPos.y);   
-                            addToHistory();
-                            for (int i = v.inEdges.size() - 1; i >= 0; i--)
-                            {   Edge ie = (Edge) v.inEdges.elementAt(i);
-                                diagramManager.deleteEdge(ie);
-                            }    
-                        }
-                        else
-                            v.setLocation(oldPos.x, oldPos.y);   
-                        dragging = false;
-                        anker = null;
-                    }    
-                    else
-                        v.setLocation(newPos.x, newPos.y);   
-                    // only update the edges!!!!              
-                    diagramManager.updateEdges();
-                    repaint();                  
-                } // if anker != null   
-            } // mouseDragged       
-            
-            // mouse moved events, not used        
-            public void mouseMoved(MouseEvent e) {}        
-        } // class MLMML
-*/    
+                else // check if vertexClicked is (more or less) on top of another vertex  
+                {   Vertex fv = diagramManager.fuseWith(vertexClicked);
+                	// if so, fuse the two vertices
+                    if (fv != null)
+                    {   diagramManager.fuseVertices(vertexClicked, fv);     
+                        addToHistory();
+                    }
+                    else // vertexclicked not enough on top of another vertex, put back on old position
+                    	vertexClicked.setLocation(oldPos.x, oldPos.y);                        
+               	}
+             }    
+             else // no vertex layer, put back in old position
+            	 vertexClicked.setLocation(oldPos.x, oldPos.y);
+             // find new edge positions
+             diagramManager.updateEdges();    
+             // do not update vertex layers!!!                
+             dragging = false;	
+        }    
+		// remove one tap from the tap-list
+		if (doubletap.size() >= 2) 
+        {	doubletap.remove(0);
+        }
+	}	
+        
+	/**
+	 * action after pressing the addEdgeButton of Vertex v:
+	 * create a new Vertex in the vertex layer to the right of 
+	 * the vertex layer of v and connect the new vertex to v with
+	 * a new Edge; make sure that the sum of the capacities of
+	 * all edges out of Vertex v remains 1
+	 * @param v the Vertex whose addEdgeButton was pressed
+	 */
+    public void addEdgeAction(Vertex v) 
+    {   
+     	// create new vertex to be connected to v            
+        Vertex newVertex = new Vertex(false, v.layerNum + 1);
+        newVertex.decimals = vDecimals;
+        diagramManager.insertVertex(newVertex, v);
+        // initially 0
+        Rational cap = new Rational(0, 1, 0);
+        // the new edge is the first outedge of v: cap = 1
+        if (v.outEdges.size() == 0)
+          	cap = new Rational(1, 1, 1);
+        // the new edge is the second outedge of v: 0.5 and 0.5     
+        else if (v.outEdges.size() == 1)
+        {   Edge ed = (Edge) v.outEdges.elementAt(0); 
+            ed.setCapacity(new Rational(1, 2, 5e-1d), false);
+            cap = new Rational(1, 2, 5e-1d);
+        }
+        Edge newEdge = new Edge(this, v, newVertex, cap); 
+        // this sorts the outedges of v vertically
+        diagramManager.addEdge(newEdge); 
+        // if v is not a root, v has at least 1 incoming edge 
+        if (v.layerNum > 0)
+        {   // this edge exists!!
+            Edge preEdge = (Edge) v.inEdges.elementAt(0);
+            Vertex preVertex = preEdge.fromVertex;
+            int preMode = preEdge.mode;
+            // copy the values of the capacities (possible!)
+            if (preVertex.outEdges.size() == v.outEdges.size())
+            {   for (int i = 0; i < v.outEdges.size(); i++)
+                {   Edge preOe = (Edge) preVertex.outEdges.elementAt(i);
+                    Edge postOe = (Edge) v.outEdges.elementAt(i);
+                    postOe.setCapacity(preOe.capacity, false);
+                }    
+            }    
+            // copy the mode for displaying the capacities
+            for (int j = 0; j < v.outEdges.size(); j++)
+            {   Edge oe = (Edge) v.outEdges.elementAt(j);
+                oe.setMode(preMode);
+            }    
+        }    
+        else // v is a root, so format capacity as global
+            newEdge.setMode(DrawingPanel.flowMode);                
+        diagramManager.calculateDiagram();
+        addToHistory();
+    } // addEdgeAction   
 }

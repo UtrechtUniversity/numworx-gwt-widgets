@@ -2,40 +2,56 @@ package fi.stroomdiagrammengwt.client;
 
 import java.util.Vector;
 
-
-//deze klasse maakt m.b.v. de DiagramManager een kopie
-//van het huidige flowdiagram
-//maak, om status te saven, van de kopie een aparte klasse 
-
+/**
+ * class containing as attributes the attributes of the flow diagram; <br> 
+ * the copy is made when calling the constructor and a DiagramCopy
+ * containing the attributes of the flow diagram can be requested     
+ */
 public class DiagramCopier
-{   DiagramManager owner;
+{   
+	/**
+	 * owner of the DiagramCopier 
+	 */
+	DiagramManager owner;
+	/**
+	 * the horizontal distance between the layers
+	 */
  	int layerDistance;
  	int numLayers;
- 	Dimension size;
+ 	int breedte;
+ 	int hoogte;
  	int flowMode;
  	int thickMode;
  	int labelHeight;
- 	boolean flowOn;
- 	Vector vertexCopies = new Vector();
- 	Vector edgeCopies = new Vector();
+ 	/**
+ 	 * VertexCopies for the vertices in the flow diagram
+ 	 */
+ 	Vector<VertexCopy> vertexCopies = new Vector<VertexCopy>();
+ 	/**
+ 	 * EdgeCopies for the edges in the diagram
+ 	 */
+ 	Vector<EdgeCopy> edgeCopies = new Vector<EdgeCopy>();
+ 	/**
+ 	 * constructor
+ 	 * @param o the DiagramManager owning the DiagramCopier
+ 	 */
  	public DiagramCopier(DiagramManager o)
  	{   owner = o;
      	layerDistance = owner.owner.layerDistance;
      	numLayers = owner.owner.numLayers;
-     	size = owner.owner.getSize(); // DrawingPanel 
-     	flowMode = owner.owner.flowMode;        
+     	breedte = owner.owner.breedte;
+     	hoogte = owner.owner.hoogte;
+     	flowMode = DrawingPanel.flowMode;        
      	thickMode = owner.owner.thickMode;        
-     	labelHeight = owner.owner.labelHeight;
-     	flowOn = owner.owner.flowOn;
+     	labelHeight = DrawingPanel.labelHeight;
      	// vector containing references to all vertices
-     	Vector vertexRefs = owner.getVertexRefs();
+     	Vector<Vertex> vertexRefs = owner.getVertexRefs();
      	// make copies in same order
      	for (int i = 0; i < vertexRefs.size(); i++)
      	{   Vertex v = (Vertex) vertexRefs.elementAt(i);
          	VertexCopy vc = new VertexCopy(v.code,
          						v.layerNum, v.getLocation().y,
          						v.flow, v.decimals, v.root,
-         						//v.vLabel.getText());
          						v.labelText);
          	if (owner.owner.traceFrom != null)
          	{   if (owner.owner.traceFrom == v)
@@ -52,27 +68,6 @@ public class DiagramCopier
          	edgeCopies.addElement(ec);
      	}    
      
-/*        
-     // NOTE: copies and originals are now in same order
-     // now fix the interrelations in the graph
-     for (int i = 0; i < vertexRefs.size(); i++)
-     {   // vertex i
-         Vertex v = (Vertex) vertexRefs.elementAt(i);
-         // copy of vertex i 
-         VertexCopy vc = (VertexCopy) vertexCopies.elementAt(i);
-         for (int m = 0; m < v.inEdges.size(); m++)
-         {   Edge ine = (Edge) v.inEdges.elementAt(m);
-             int inIndex = owner.edges.indexOf(ine);
-             vc.inEdgeCopies.addElement(edgeCopies.elementAt(inIndex));
-         }
-         for (int n = 0; n < v.outEdges.size(); n++)
-         {   Edge oute = (Edge) v.outEdges.elementAt(n);
-             int outIndex = owner.edges.indexOf(oute);            
-             vc.outEdgeCopies.addElement(edgeCopies.elementAt(outIndex));                
-         }
-         
-     }
-*/        
      	for (int j = 0; j < edgeCopies.size(); j++)
      	{   Edge e = (Edge) owner.edges.elementAt(j);
          	EdgeCopy ec = (EdgeCopy) edgeCopies.elementAt(j);
@@ -81,20 +76,24 @@ public class DiagramCopier
          	ec.fromVertexCopy = (VertexCopy) vertexCopies.elementAt(fromIndex);
          	ec.toVertexCopy = (VertexCopy) vertexCopies.elementAt(toIndex);            
      	}    
-     
  	}
- 	
+
+ 	/**
+ 	 * get a DiagramCopy containing the attributes of the flow diagram
+ 	 * @return the DiagramCopy 
+ 	 */
     public DiagramCopy getDiagramCopy()
     {	DiagramCopy dc = new DiagramCopy();
     	dc.layerDistance = layerDistance;
     	dc.numLayers = numLayers;
-    	dc.size = size;
+    	dc.breedte = breedte;
+    	dc.hoogte = hoogte;
     	dc.flowMode = flowMode;        
         dc.thickMode = thickMode;        
         dc.labelHeight = labelHeight;
-        dc.flowOn = flowOn;
 		dc.vertexCopies = vertexCopies;
 		dc.edgeCopies = edgeCopies;        
 		return dc;
     }
+    
 }

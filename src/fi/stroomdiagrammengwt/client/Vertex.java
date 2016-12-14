@@ -1,142 +1,154 @@
 package fi.stroomdiagrammengwt.client;
 
-/*
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-*/
+
 import java.util.Vector;
-//import java.awt.Dimension;
-
-//import javax.swing.JTextField;
-
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.TextMetrics;
 
-import com.google.gwt.user.client.ui.Label;
+/**
+ * class representing a vertex in the flow diagram;<br> 
+ * each vertex has a flow, calculated from the flow entered in the root(s) to which the vertex is connected;<br> 
+ * edges out of the vertex are added by pressing the right arrow button and end in a new vertex; <br>
+ * the flow in a vertex, which is not a root, can be traced back by pressing the left arrow button; <br>
+ * vertices can be moved vertically in the same layer or horizontally when possible; putting two vertices on top
+ * of each other fuses them into one vertex; if a vertex is a terminal vertex (no outgoing edges) it can be deleted
+ * by dragging it onto the border of the work area (this also deletes its incoming edges)<br>
+ * Mouse/Touch action on vertices is handled in class DrawingPanel;<br> 
+ * the initial flow in a root can be entered/changed by a doubleClick or longClick on the root, see also class VertexPopup; <br>
+ * the layout of the flow diagram is controlled by the class DiagramManager; <br>
+ * vertices can have a label: additional text in a rectangle above the vertex; text for the label is entered/changed
+ * by a doubleClick or longClick on the label, see also class VertexPopup.    
+ */
 
 public class Vertex 
 {
-	// attributes
-
+	/**
+	 * left/right arrowbutton enabled?
+	 */
 	boolean frozen = false;
-	
+	/**
+	 * unique vertex code
+	 */
 	int code;
+	/**
+	 * horizontal position of the vertex, that is the number of the vertical layer it is in 
+	 */
     int layerNum;
+    /**
+     * the flow through the vertex
+     */
     Rational flow = DrawingPanel.unDef;
-//GWT
-    //JTextField flowField;
+    /**
+     * String for displaying the flow
+     */
     String flowText = "";
+    /**
+     * font for displaying the flow
+     */
     String fontString = "12px arial, sans-serif";
-
+    /**
+     * does the vertex have a label?
+     */
     boolean hasLabel = false;
+    /**
+     * text of the vertex label
+     */
     String labelText = "";
-    
+    /**
+     * number of decimals if flow displayed as a double
+     */
     int decimals = 2;
-    
+    /**
+     * left arrow button for back tracing the flow
+     */
     LWArrowButton colorButton;
+    /**
+     * right arrow button for adding an edge out of the vertex
+     */
     LWArrowButton addEdgeButton;
+    /**
+     * is the vertex a root?
+     */
     boolean root;  
+    /**
+     * the edges into the vertex
+     */
     Vector inEdges = new Vector();
+    /**
+     * the edges out of the vertex
+     */
     Vector outEdges = new Vector();
     
+    /**
+     * parameters to simulate a component: x position
+     */
     int xPos; 
+    /**
+     * parameters to simulate a component: y position
+     */
     int yPos;
+    /**
+     * parameters to simulate a component: width
+     */
     int breedte;
+    /**
+     * parameters to simulate a component: height
+     */
     int hoogte;
-    
-    // constructor
-    public Vertex(boolean rt, int ln)
+
+    /**
+     * @param root is the vertex a root?
+     * @param layerNum number of layer (horizontal position) to which the vertex should be assigned
+     */
+    public Vertex(boolean root, int layerNum)
     {   
-    	//setLayout(null);
-    	
-    	
+    	// determine the code of the vertex
     	code = DrawingPanel.vertexCode;
     	DrawingPanel.vertexCode++;
-    	root = rt;
-        layerNum = ln;
-        //setSize(DrawingPanel.vertexWidth, 
-        //        DrawingPanel.vertexHeight + DrawingPanel.labelHeight);
+    	this.root = root;
+        this.layerNum = layerNum;
+        // size fixed in DrawingPanel
         breedte = DrawingPanel.vertexWidth;
         hoogte = DrawingPanel.vertexHeight + DrawingPanel.labelHeight;
-        int currentX = 1;
+        // only non-roots have a trace button
         if (!root)
-        {
-//GWT        	
-           	colorButton = new LWArrowButton(3, CssColor.make(192,192,192));
+        {  	colorButton = new LWArrowButton(3, CssColor.make(192,192,192));
             colorButton.setBounds(xPos, yPos + 1 + DrawingPanel.labelHeight, 
                         DrawingPanel.leftButtonWidth, 
                         hoogte - 1 - DrawingPanel.labelHeight);
-            //add(colorButton);
-            //currentX += colorButton.getSize().width;
-
-//GWT            
-            //flowField = new JTextField();
-            //flowField.setEditable(false);
-            //flowField.setHorizontalAlignment(JTextField.CENTER);
-            //flowField.setSize(
-            //      getSize().width - DrawingPanel.leftButtonWidth - DrawingPanel.arrowButtonWidth,
-            //      getSize().height - DrawingPanel.labelHeight - 2);
-            
-            //flowField.setLocation(currentX - 1, DrawingPanel.labelHeight + 1);
-            //flowField.setBackground(new Color(255, 255, 150));
-            //add(flowField);
-            //currentX += flowField.getSize().width;
         }
-        else // root of diagram
-        {   
-
-//GWT        	
-        	//flowField = new JTextField();
-        	//flowField.setSize(
-        	//		getSize().width - DrawingPanel.arrowButtonWidth - 1,
-            //       getSize().height - DrawingPanel.labelHeight - 2);
-        	
-            //flowField.setLocation(currentX, DrawingPanel.labelHeight + 1);
-            //add(flowField);
-            //VertexIAL listener = new VertexIAL();
-            //flowField.addActionListener(listener);
-            //flowField.addFocusListener(listener);
-            //currentX += flowField.getSize().width;
-        }    
-//GWT        
+        // all vertices have a button for adding edges
         addEdgeButton = new LWArrowButton(1, CssColor.make(192,192,192));
         addEdgeButton.setBounds(xPos + breedte - DrawingPanel.arrowButtonWidth,
         						yPos + 1 + DrawingPanel.labelHeight,
         						DrawingPanel.arrowButtonWidth,
         						hoogte - 1 - DrawingPanel.labelHeight);
-        						//currentX - 1, 1 + DrawingPanel.labelHeight, 
-        						//DrawingPanel.arrowButtonWidth, 
-        						//getSize().height - 1 - DrawingPanel.labelHeight);
-        //add(addEdgeButton);
 
-//GWT        
-        //vLabel = new JTextField();
-        //vLabel.setSize(DrawingPanel.vertexWidth - 2,
-        //			   DrawingPanel.LABELHEIGHT - 2);
-        //VertexLabelIAL listener = new VertexLabelIAL();
-        //vLabel.addFocusListener(listener);
-        //vLabel.addActionListener(listener);
-                                 
-        //vLabel.setLocation(1, 1);
-        //vLabel.setVisible(false);
-        //add(vLabel);
+        // the static DrawingPanel.labelHeight determines if vertices have Labela
         if (DrawingPanel.labelHeight > 0)
         {	hasLabel = true;
-
         }
     }    
 
+    /**
+     * does the vertex Rectangle contain the clicked point (x,y)?
+     * note: the vertex Rectangle contains the label (if any) and the buttons 
+     * @param x clicked x
+     * @param y clicked y
+     * @return true/false
+     */
     public boolean vertexClicked(int x, int y)
     {
     	Rectangle vertexRect = new Rectangle(xPos, yPos, breedte, hoogte);
     	return vertexRect.contains(x, y);
     }
     
+    /**
+     * was the addEdgeButton of the vertex clicked?
+     * @param x clicked x
+     * @param y clickec y
+     * @return true/false
+     */
     public boolean addEdgeButtonClicked(int x, int y)
     {
     	if (addEdgeButton == null)
@@ -146,6 +158,12 @@ public class Vertex
     	return addEdgeRect.contains(x, y);
     }
 
+    /**
+     * was the colorButton of the vertex clicked?
+     * @param x clicked x
+     * @param y clickec y
+     * @return true/false
+     */
     public boolean colorButtonClicked(int x, int y)
     {
     	if (colorButton == null)
@@ -155,6 +173,12 @@ public class Vertex
     	return colorRect.contains(x, y);
     }
     
+    /**
+     * was the label of the vertex clicked?
+     * @param x clicked x
+     * @param y clickec y
+     * @return true/false
+     */
     public boolean labelClicked(int x, int y)
     {
     	if (!hasLabel)
@@ -165,7 +189,11 @@ public class Vertex
     	return labelRect.contains(x, y);
     }
     
-
+    /**
+     * set the location of the vertex, do not forget to set the location of the buttons
+     * @param x xPos
+     * @param y yPos
+     */
     public void setLocation(int x, int y)
     {
     	xPos = x; 
@@ -177,88 +205,103 @@ public class Vertex
     		colorButton.setLocation(xPos, yPos + 1 + DrawingPanel.labelHeight);
 
     }
-    
+
+    /**
+     * get the location of the vertex
+     * @return a Point containing xPos and yPos
+     */
     public Point getLocation()
     {
     	return new Point(xPos, yPos);
     }
     
+    /**
+     * get the size of the vertex
+     * @return a Dimension containing breedte and hoogte
+     */
     public Dimension getSize()
     {
     	return new Dimension(breedte, hoogte);
     }
     
+    /**
+     * get the bounding Rectangle of the vertex
+     * @return the vertex Rectangle, label (if any) included 
+     */
     public Rectangle getBoundingRect()
     {
     	return new Rectangle(xPos, yPos, breedte, hoogte);
     }
     
+    /**
+     * freeze/unfreeze the vertex: buttons are disabled/enabled
+     * user input (label text, flow in a root) is disabled/enabled
+     * @param b true/false
+     */
     public void setFrozen(boolean b)
     {
-/*    	
     	frozen = b;
-    	vLabel.setEditable(!frozen);
-    	if (root)
-    		flowField.setEditable(!frozen);
-*/    		
-    	addEdgeButton.setEnabled(!frozen);
+    	if (addEdgeButton != null)
+    		addEdgeButton.setEnabled(!frozen);
     	if (colorButton != null)
     		colorButton.setEnabled(!frozen);
     		
     }
-    
+
+    /**
+     * add a label to/remove the label from the vertex 
+     * @param b true/false
+     */
     public void setLabel(boolean b)
     {   
-
-    	
     	// add label
         if (b)
-        {   hoogte += DrawingPanel.LABELHEIGHT; 
-        	//setSize(DrawingPanel.vertexWidth,
-            //        DrawingPanel.vertexHeight + DrawingPanel.LABELHEIGHT);
+        {   // increase hoogte
+        	hoogte += DrawingPanel.LABELHEIGHT;
+        	// move the arrow buttons down
             if (!root)
                 colorButton.setLocation(colorButton.xPos, colorButton.yPos + DrawingPanel.LABELHEIGHT);
-            //flowField.setLocation(flowField.getLocation().x,
-            //    flowField.getLocation().y + DrawingPanel.LABELHEIGHT);
             addEdgeButton.setLocation(addEdgeButton.xPos, addEdgeButton.yPos + DrawingPanel.LABELHEIGHT);
-            //vLabel.setVisible(true);
             hasLabel = true;
-            
-            //add(vLabel);
         }
         else // remove label
-        {   //remove(vLabel);
-        	//vLabel.setVisible(false);
-        	hasLabel = false;
+        {   hasLabel = false;
+        	// decrease hoogte
         	hoogte = DrawingPanel.vertexHeight;
-            //setSize(DrawingPanel.vertexWidth,
-            //        DrawingPanel.vertexHeight);
+        	// move the arrow buttons up
             if (!root)
                 colorButton.setLocation(colorButton.xPos, colorButton.yPos - DrawingPanel.LABELHEIGHT);
-            //flowField.setLocation(flowField.getLocation().x,
-            //    flowField.getLocation().y - DrawingPanel.LABELHEIGHT);
             addEdgeButton.setLocation(addEdgeButton.xPos,addEdgeButton.yPos - DrawingPanel.LABELHEIGHT);            
         }
         
     }    
+    
+    /**
+     * set the flow of the vertex to Rational f, correctly format the flowText
+     * String as a fraction or a decimal number  
+     * @param f the flow to be set
+     */
     public void setFlow(Rational f)
-    {   
-
-    	
-        flow = f;
+    {   flow = f;
         if (f.isUndefined())
             flowText = "";
         else if (DrawingPanel.flowMode == DrawingPanel.fracMode)
-        {   if (flow.isInteger())
+        {  	if (flow.isInteger())
                 flowText = UF.format(flow.nom, 0);        
             else
                 flowText = UF.format(flow.nom, 0) + "/" + UF.format(flow.denom, 0);  
         }    
         else if (DrawingPanel.flowMode == DrawingPanel.decMode)
-            flowText = UF.format(flow.decVal, decimals);
-
+        {    flowText = UF.format(flow.decVal, decimals);
+        }
     }    
 
+    /**
+     * check if the vertex can move to a layer on the left: determine the maximum layer number
+     * where any fromVertex of an incoming edge of the vertex is located and add 1      
+     * @return the smallest number of a layer where the vertex could move to or the layernumber
+     * of the vertex if it cannot be moved to the left 
+     */
     public int canMoveLeftTo()
     {   if (root)
             return 0;
@@ -268,10 +311,14 @@ public class Vertex
             lNum = Math.max(ie.fromVertex.layerNum + 1, lNum);
         }    
         return lNum;    
-    
-        
-        
     }    
+
+    /**
+     * check if the vertex can move to a layer on the right: determine the minimum layer number
+     * where any toVertex of an outgoing edge of the vertex is located and subtract 1      
+     * @return the largest number of a layer where the vertex could move to or the layernumber
+     * of the vertex if it cannot be moved to the right 
+     */
     public int canMoveRightTo()
     {   if (root)
             return 0;
@@ -281,11 +328,11 @@ public class Vertex
             lNum = Math.min(oe.toVertex.layerNum - 1, lNum);
         }    
         return lNum;    
-        
-        
     }    
 
-    // bubble sort outEdges by y-location of toVertex
+    /**
+     * bubble sort the outEdges of the vertex by the y-location of toVertex
+     */
     public void sortOutEdges()
     {   // bubble sort on y location of toVertex
         Edge tEdge;
@@ -309,29 +356,21 @@ public class Vertex
         } // for
     }
 
-
+    /**
+     * arc tangens of angle between this vertex and vertex v
+     * @param v vertex v
+     * @return arc tangens
+     */
     public double getAngle(Vertex v)
-    {   //DrawingPanel dp = (DrawingPanel) getParent();
-        //double x = v.getLocation().x - getLocation().x + DrawingPanel.vertexWidth;
-        //double y = getLocation().y - v.getLocation().y;
-        double x = v.xPos - xPos + DrawingPanel.vertexWidth;
+    {   double x = v.xPos - xPos + DrawingPanel.vertexWidth;
         double y = yPos - v.yPos;
-        
         return Math.atan(y/x);
     }    
     
-/*
-    public boolean hasFlow()
-    {   double inCap = 0;
-        for (int i = 0; i < inEdges.size(); i++)
-        {   Edge ie = (Edge) inEdges.elementAt(i);
-            inCap += ie.capacity.decVal;
-        }    
-        return inCap > 0;
-    }    
-*/    
-    
-    
+    /**
+     * calculate the flow through the vertex, by adding all flows
+     * coming in through the inEdges   
+     */
     public void calculateFlow()
     {   Rational inFlow = new Rational(0, 1, 0);
         for (int i = 0; i < inEdges.size(); i++)
@@ -341,17 +380,15 @@ public class Vertex
                 return;
             }
             else
-//            else if ( ((DrawingPanel) getParent()).flowMode == DrawingPanel.fracMode)
-//            {   
                 inFlow = inFlow.plus(ie.fromVertex.flow.times(ie.capacity));            
-//            }
-//            else
-//            {   inFlow.decVal += ie.fromVertex.flow.decVal * ie.capacity.decVal;
-//            }
         }
         setFlow(inFlow);
     }    
 
+    /**
+     * find the outEdge which was changed the longest time ago 
+     * @return the "oldest" outEdge or null (case no outEdges)
+     */
     public Edge oldestOutChanged()
     {   if (outEdges.size() == 0)
             return null;
@@ -370,11 +407,23 @@ public class Vertex
             return (Edge) outEdges.elementAt(oldestChange);
         }
     }    
+    
+    /**
+     * make sure that after changing the capacity of the Edge
+     * changedEdge out of this vertex, the sum of the capacities
+     * of all edges out of this vertex equals 1; do this by
+     * changing the capacity of the out edge which remained 
+     * unchanged the longest time 
+     * set all out edges to the display mode that was used
+     * in changing the capacity of changedEdge
+     * @param changedEdge the out Edge changed
+     * @param mode the display mode to be set
+     */
     public void updateOutCapacities(Edge changedEdge, int mode)
     {   Rational total = new Rational(0, 1, 0);
         int oldestChange = 0;
         long changeTime = Long.MAX_VALUE;
-        // find sum of all capacities and
+        // find sum of all capacities and find the 
         // "oldest" edge that was changed 
         for (int i = 0; i < outEdges.size(); i++)
         {   Edge ed = (Edge) outEdges.elementAt(i);
@@ -402,7 +451,6 @@ public class Vertex
                 {    Edge oed = (Edge) outEdges.elementAt(j);
                      if ((oed != led) && (oed != changedEdge))
                          oed.setCapacity(new Rational(0, 0, 0), false);
-                    
                 }    
             }    
         }    
@@ -415,6 +463,10 @@ public class Vertex
         // else total = 1, nothing to do
     }    
 
+    /**
+     * set the display mode of all edges out of this vertex to mode 
+     * @param mode the display mode (see class DrawingPanel)
+     */
     public void setOutModes(int mode)
     {   for (int i = 0; i < outEdges.size(); i++)
         {   Edge oe = (Edge) outEdges.elementAt(i);
@@ -422,6 +474,12 @@ public class Vertex
         }    
     }    
 
+    /**
+     * check if this vertex has an incoming edge
+     * connecting it with Vertex v
+     * @param v the Vertex v
+     * @return the Edge or null
+     */
     public Edge hasInEdgeFrom(Vertex v)
     {   Edge result = null;
         for (int i = 0; i < inEdges.size(); i++)
@@ -431,7 +489,13 @@ public class Vertex
         }
         return result;
     }
-    
+
+    /**
+     * check if this vertex has an outgoing edge
+     * connecting it with Vertex v
+     * @param v the Vertex v
+     * @return the Edge or null
+     */
     public Edge hasOutEdgeTo(Vertex v)
     {   Edge result = null;
         for (int i = 0; i < outEdges.size(); i++)
@@ -442,72 +506,54 @@ public class Vertex
         return result;
     }
     
-    //public void paintComponent(Graphics g)
+    /**
+     * paint the vertex and its button(s) using a Context2d 
+     * @param g the Context2d
+     */
     public void paintComponent(Context2d g)
     {   
+    	//non-roots have a yellowish background
     	if (!root)
-    	{	
-    		g.setFillStyle(CssColor.make(255, 255, 150));
+    	{	g.setFillStyle(CssColor.make(255, 255, 150));
     		g.fillRect(xPos, yPos + DrawingPanel.labelHeight, breedte, hoogte - DrawingPanel.labelHeight);
     	}	
-    	
-    	//g.setColor(Color.black);
+    	// black outline
     	g.setStrokeStyle(CssColor.make(0,0,0));
-        //g.drawRect(0, 0, getSize().width - 1, getSize().height - 1);
     	g.strokeRect(xPos, yPos + DrawingPanel.labelHeight, breedte, hoogte - DrawingPanel.labelHeight);
-    	
+    	// paint the arrow buttons
     	if (addEdgeButton != null)
     		addEdgeButton.paintComponent(g);
-        
     	if (colorButton != null)
     		colorButton.paintComponent(g);
-        
-        
         if (hasLabel)
-        {
-        	//{	g.setColor(Color.red);
+        {  	// label has a red outline
         	g.setStrokeStyle(CssColor.make(255,0,0));        	
-        	//	g.drawRect(0, 0, getSize().width - 1, DrawingPanel.LABELHEIGHT - 1);
         	g.strokeRect(xPos, yPos, breedte, DrawingPanel.LABELHEIGHT);
+        	// black label text
         	g.setFillStyle(CssColor.make(0,0,0));
         	g.fillText(labelText, xPos + 2, yPos + 16, breedte - 4);
         }
-        
+        // paint the flow text in black
         g.setStrokeStyle(CssColor.make(0,0,0));
 		g.setFont(fontString);
-		//int maxTextWidthRoot = breedte - addEdgeButton.breedte - 2;
-		int maxTextWidth = 0; //breedte - addEdgeButton.breedte - colorButton.breedte - 2;
+		int maxTextWidth = 0; 
 		if (root)
 		{	maxTextWidth = breedte - addEdgeButton.breedte - 2;
 			g.fillText(flowText, xPos + 2, yPos + DrawingPanel.labelHeight + 16, maxTextWidth);
-		
 		}
 		else
 		{	maxTextWidth = breedte - addEdgeButton.breedte - colorButton.breedte - 2;
 			g.fillText(flowText, xPos + colorButton.breedte + 2, yPos + DrawingPanel.labelHeight + 16, maxTextWidth);
-		
 		}
-		
-
-        
-        
-        //}
-        
-        //super.paint(g);   
-/*        
-        g.setColor(Color.black);
-        g.drawRoundRect(0, 0, getSize().width - 1, 
-                              getSize().height - 1, 
-                              DrawingPanel.roundWidth, 
-                              DrawingPanel.roundHeight);         
-*/                              
     }    
 
-    
+    /**
+     * process the fraction in String t, if there is
+     * no error, set the flow in this vertex to this fraction 
+     * @param t String containing the fraction 
+     */
     public void processRational(String t)
     {   
-
-    	
     	boolean error = false;
         int nom = 0, denom = 1;
         String nomStr = null, denomStr = null;
@@ -533,6 +579,7 @@ public class Vertex
             }
             if (!error)    
             {   // these lines generate exceptions and activate catch
+            	// this interceps double slash
                 nom = Integer.parseInt(nomStr);
                 denom = Integer.parseInt(denomStr);
             }    
@@ -555,13 +602,15 @@ public class Vertex
                     DrawingPanel.addToHistory();
             }
         }
-
     }    
-  
+
+    /**
+     * process the decimal number in String t, if there is
+     * no error, set the flow in this vertex to this decimal 
+     * @param t String containing the decimal number 
+     */
     public void processDecimal(String t)
     {   
-
-
     	boolean error = false;
         double value = 0;
         // error handling here
@@ -603,22 +652,20 @@ public class Vertex
                 DrawingPanel.diagramManager.calculateDiagram();
                 if (remember)
                     DrawingPanel.addToHistory();                
-                
             }
         }
-            
     }    
   
+    /**
+     * process the String entered in the VertexPopup, find out if it
+     * is empty, if it is a fraction, percentage or decimal number
+     * @param t String entered 
+     */
     public void processInput(String t)
     {   
-
-    	
     	boolean error = false;
         double value = 0;
-        // get current text
-        //String t = flowField.getText();
-        // undo wrapping
-        //flowField.setText(t);
+        // input empty, flow was erased
         if (t.equals(""))
         {   boolean remember = !flow.isUndefined();
             setFlow(DrawingPanel.unDef);
@@ -626,30 +673,32 @@ public class Vertex
             if (remember)
                 DrawingPanel.addToHistory();
         }
-        else
+        else // input some nonempty String
         {   if (StroomDiagrammenGWT.rb.getString("decSep") == ",")
                 t = t.replace(',', '.');
             int mode = DrawingPanel.flowMode;
             int divIndex = t.indexOf('/');
             int decIndex = t.indexOf('.');
+            // no slash and point: t is an integer as String 
             if ((divIndex < 0) && (decIndex < 0))
                 processRational(t);
-            else if (mode == DrawingPanel.fracMode)
-            {   if (decIndex >= 0)
-                    setFlow(flow); // reset
-                else    
-                    processRational(t);
-            }    
-            else if (mode == DrawingPanel.decMode)
-            {   if (divIndex >= 0)
-                    setFlow(flow); // reset
-                else    
-                    processDecimal(t);
-            }    
+            // s;ash and point: error
+            if ((divIndex >= 0) && (decIndex >= 0))
+            	setFlow(flow); // reset
+            // point, no slash: decimal
+            if ((decIndex >= 0) && (divIndex < 0))
+            	processDecimal(t);
+            // slash, no point: fraction
+           	if ((divIndex >= 0) && (decIndex < 0))
+           		processRational(t);	
         }
-            
     }    
 
+    /**
+     * remove all blanks in the String s
+     * @param s String s
+     * @return s with blanks removed
+     */
     public String removeAllBlanks(String s)
     {   int index = s.indexOf(' ');
         while (index >= 0)
@@ -658,7 +707,12 @@ public class Vertex
         }
         return s;
     }
-    
+
+    /**
+     * set the number of decimals for displaying
+     * the flow in this vertex in an ad hoc way
+     * @param value the flow
+     */
     public void setDecimals(double value)
     {   int decs;
         if (value >= 100)
@@ -671,66 +725,6 @@ public class Vertex
             decs = 3;
         // do not forget this one
         decimals = decs;
-//GWT        
-        //((DrawingPanel) getParent()).diagramManager.setDecimals(decs);                            
+        DrawingPanel.diagramManager.setDecimals(decs);                            
     }                
-    
-    // inner class for root numberfield (later all vertices??)
-    // starts calculations on Enter
-//GWT
-/*    
-    class VertexIAL implements FocusListener, ActionListener
-    {      
-        public void focusGained(FocusEvent e)
-        {}
-        public void focusLost(FocusEvent e)
-        {   if (frozen)
-        		return;
-        	processInput();
-        }
-        public void actionPerformed(ActionEvent e)
-        {   if (frozen)
-    			return;
-        	processInput();
-        }
-        
-        
-    } // inner class VertexIAL   
-*/    
-    // inner class vertex labels
-/*    
-    class VertexLabelIAL implements FocusListener, ActionListener
-    {   	
-    	String labelText;
-    	
-        public void focusGained(FocusEvent e)
-        {	if (frozen)
-    			return;
-        	
-        	labelText = vLabel.getText();
-        }
-        public void focusLost(FocusEvent e)
-        {   if (frozen)
-    			return;
-        	
-        	if (!labelText.equals(vLabel.getText()))
-        	{	
-        		((DrawingPanel) getParent()).updateHistoryLabels();
-        		labelText = vLabel.getText();
-        	}
-        }
-        public void actionPerformed(ActionEvent e)
-        {	if (frozen)
-    			return;
-        	
-        	if (!labelText.equals(vLabel.getText()))
-    		{	
-    			((DrawingPanel) getParent()).updateHistoryLabels();
-    			labelText = vLabel.getText();
-    		}
-        }
-        
-    } // inner class VertexIAL
-*/           
-
 }

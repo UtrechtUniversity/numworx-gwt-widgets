@@ -1,27 +1,55 @@
 package fi.stroomdiagrammengwt.client;
 
-//import java.awt.*;
-
-//import javax.swing.*;
-
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.TextMetrics;
 
-
-// a Light Weight Button with an arrow on it
-public class LWArrowButton //extends JButton //LWContainer
-{   // the direction of the arrow 0 = up, 1 = right, 2 = down, 3 = left
+/**
+ * class simulating an up/right/down/left arrow button 
+ */
+public class LWArrowButton 
+{   
+	/**
+	 * direction of the arrow 0 = up, 1 = right, 2 = down, 3 = left
+	 */
     int direction;
-    // polygon for the arrow
+
+    /**
+     * polygon for the arrow
+     */
     Polygon p;
-    // flagg for being enabled
+
+    /**
+     * flagg for being enabled
+     */
     boolean enabled = true;
-    //
+
+    /**
+     * background color of the arrow button
+     */
     CssColor bgColor;
-    
-    int xPos, yPos, breedte, hoogte;
+
+    /**
+     * simulating a component: x-position
+     */
+    int xPos;
+    /**
+     * simulating a component: y-position
+     */
+    int yPos;
+    /**
+     * simulating a component: width
+     */
+    int breedte;
+    /**
+     * simulating a component: height
+     */
+    int hoogte;
     // constructor
+    /**
+     * constructor
+     * @param dir direction of the arrow button
+     * @param bg background color of the arrow button
+     */
     public LWArrowButton(int dir, CssColor bg)
     {   // wrong direction gives up arrow
         if ( (dir >= 0) && (dir <= 3) )
@@ -31,22 +59,35 @@ public class LWArrowButton //extends JButton //LWContainer
         bgColor = bg;    
     }
     
+    /**
+     * simulating a component: setBounds
+     * @param x x-position
+     * @param y y-position
+     * @param b width
+     * @param h height
+     */
     public void setBounds(int x, int y, int b, int h)
     {
     	xPos = x; yPos = y; breedte = b; hoogte = h;
     }
     
+    /**
+     * simulating a component
+     * @param x x-position
+     * @param y y-position
+     */
     public void setLocation(int x, int y)
     {
     	xPos = x; yPos = y;
     }
     
-    // paint
-    //public void paintComponent(Graphics g)
+    /**
+     * paint the arrow button using Context2d g
+     * @param g the Context2d g
+     */
     public void paintComponent(Context2d g)
-    {   //g.setColor(bgColor);
+    {   
     	g.setFillStyle(bgColor);
-        //g.fillRect(0, 0, getSize().width, getSize().height);
     	g.fillRect(xPos, yPos, breedte, hoogte);
         // construct arrow
         int[] xPoints = new int[3];
@@ -54,50 +95,49 @@ public class LWArrowButton //extends JButton //LWContainer
         int nPoints = 3;
         switch (direction)
         {   case 0: // up arrow
-            {   xPoints[0] = xPos + breedte / 2; //getSize().width / 2;
-                xPoints[1] = xPos + breedte / 4; //getSize().width / 4;
-                xPoints[2] = xPos + (breedte / 4) * 3; //(getSize().width / 4) * 3;
-                yPoints[0] = yPos + hoogte / 4; //getSize().height / 4;
-                yPoints[1] = yPos + (hoogte / 4) * 3; //(getSize().height / 4) * 3;
-                yPoints[2] = yPos + (hoogte / 4) * 3; //(getSize().height / 4) * 3;
+            {   xPoints[0] = xPos + breedte / 2; 
+                xPoints[1] = xPos + breedte / 4; 
+                xPoints[2] = xPos + (breedte / 4) * 3; 
+                yPoints[0] = yPos + hoogte / 4; 
+                yPoints[1] = yPos + (hoogte / 4) * 3; 
+                yPoints[2] = yPos + (hoogte / 4) * 3; 
             }
             break;
             case 1: // right arrow
-            {   xPoints[0] = xPos + breedte / 4; //getSize().width / 4;
-                xPoints[1] = xPos + (breedte / 4) * 3; //(getSize().width / 4) * 3;
-                xPoints[2] = xPos + breedte / 4; //getSize().width / 4;
-                yPoints[0] = yPos + hoogte / 4; //getSize().height / 4;
-                yPoints[1] = yPos + hoogte / 2; //getSize().height / 2;
-                yPoints[2] = yPos + (hoogte / 4) * 3; //(getSize().height / 4) * 3;
+            {   xPoints[0] = xPos + breedte / 4; 
+                xPoints[1] = xPos + (breedte / 4) * 3; 
+                xPoints[2] = xPos + breedte / 4; 
+                yPoints[0] = yPos + hoogte / 4; 
+                yPoints[1] = yPos + hoogte / 2; 
+                yPoints[2] = yPos + (hoogte / 4) * 3; 
             }
             break;
             case 2: // down arrow
-            {   xPoints[0] = xPos + breedte / 4; //getSize().width / 4;
-                xPoints[1] = xPos + (breedte / 4) * 3; //(getSize().width / 4) * 3;
-                xPoints[2] = xPos + breedte / 2; //getSize().width / 2;
-                yPoints[0] = yPos + hoogte / 4; //getSize().height / 4;
-                yPoints[1] = yPos + hoogte / 4; //getSize().height / 4;
-                yPoints[2] = yPos + (hoogte / 4) * 3; //(getSize().height / 4) * 3;
+            {   xPoints[0] = xPos + breedte / 4; 
+                xPoints[1] = xPos + (breedte / 4) * 3; 
+                xPoints[2] = xPos + breedte / 2; 
+                yPoints[0] = yPos + hoogte / 4; 
+                yPoints[1] = yPos + hoogte / 4; 
+                yPoints[2] = yPos + (hoogte / 4) * 3; 
             }
             break;
             case 3: // left arrow
-            {   xPoints[0] = xPos + (breedte / 4) * 3; //(getSize().width / 4) * 3;
-                xPoints[1] = xPos + breedte / 4; //getSize().width / 4;
-                xPoints[2] = xPos + (breedte / 4) * 3; //(getSize().width / 4) * 3;
-                yPoints[0] = yPos + hoogte / 4; //getSize().height / 4;
-                yPoints[1] = yPos + hoogte / 2; //getSize().height / 2;
-                yPoints[2] = yPos + (hoogte / 4) * 3; //(getSize().height / 4) * 3;
+            {   xPoints[0] = xPos + (breedte / 4) * 3; 
+                xPoints[1] = xPos + breedte / 4; 
+                xPoints[2] = xPos + (breedte / 4) * 3; 
+                yPoints[0] = yPos + hoogte / 4; 
+                yPoints[1] = yPos + hoogte / 2; 
+                yPoints[2] = yPos + (hoogte / 4) * 3; 
             }
             break;
             default: // nothing, see constructor
         } // switch
         p = new Polygon(xPoints, yPoints, nPoints);
-        // paint arrow
-        //g.setColor(Color.black);
+        // paint arrow: solid if enabled, outline if not enabled
         g.setFillStyle(CssColor.make(0,0,0));
         g.setStrokeStyle(CssColor.make(0,0,0));
         if (enabled)
-        {   //g.fillPolygon(p);
+        {   
         	g.beginPath();
         	g.moveTo(p.doubleX[0], p.doubleY[0]);
         	for (int pCnt = 1; pCnt < p.aantalPunten; pCnt++)
@@ -109,7 +149,7 @@ public class LWArrowButton //extends JButton //LWContainer
         	
         }
         else
-        {   //g.drawPolygon(p);
+        {   
         	g.beginPath();
         	g.moveTo(p.doubleX[0], p.doubleY[0]);
         	for (int pCnt = 1; pCnt < p.aantalPunten; pCnt++)
@@ -121,54 +161,45 @@ public class LWArrowButton //extends JButton //LWContainer
         
         }
         
-        // paint button outline
-        //g.setColor(Color.white);
+        // paint button outline: white lines
         g.setStrokeStyle(CssColor.make(255,255,255));
-        //g.drawLine(0, 0, getSize().width - 1, 0);
         g.beginPath();
         g.moveTo(xPos, yPos);
         g.lineTo(xPos + breedte - 1, yPos);
         g.stroke();
 
-        //g.drawLine(1, 1, getSize().width - 2, 1);
         g.beginPath();
         g.moveTo(xPos + 1, yPos + 1);
         g.lineTo(xPos + breedte - 2, yPos + 1);
         g.stroke();
 
-        //g.drawLine(0, 0, 0, getSize().height - 1);
         g.beginPath();
         g.moveTo(xPos, yPos);
         g.lineTo(xPos, yPos + hoogte - 1);
         g.stroke();
        
-        //g.drawLine(1, 1, 1, getSize().height - 2);
         g.beginPath();
         g.moveTo(xPos + 1, yPos + 1);
         g.lineTo(xPos + 1, yPos + hoogte - 2);
         g.stroke();
         
-        //g.setColor(Color.black);
+        // paint button outline: black lines
         g.setStrokeStyle(CssColor.make(0,0,0));
-        //g.drawLine(0, getSize().height - 1, getSize().width - 1, getSize().height - 1);
         g.beginPath();
         g.moveTo(xPos, yPos + hoogte - 1);
         g.lineTo(xPos + breedte - 1, yPos + hoogte - 1);
         g.stroke();
 
-        //g.drawLine(1, getSize().height - 2, getSize().width - 2, getSize().height - 2);
         g.beginPath();
         g.moveTo(xPos + 1, yPos + hoogte - 2);
         g.lineTo(xPos + breedte - 2, yPos + hoogte - 2);
         g.stroke();
         
-        //g.drawLine(getSize().width - 1, 0, getSize().width - 1, getSize().height - 1);
         g.beginPath();
         g.moveTo(xPos + breedte - 1, yPos);
         g.lineTo(xPos + breedte - 1, yPos + hoogte - 1);
         g.stroke();
         
-        //g.drawLine(getSize().width - 2, 1, getSize().width - 2, getSize().height - 2);
         g.beginPath();
         g.moveTo(xPos + breedte - 2, yPos + 1);
         g.lineTo(xPos + breedte - 2, yPos + hoogte - 2);
@@ -176,14 +207,12 @@ public class LWArrowButton //extends JButton //LWContainer
                    
     } // paint
 
-    // redefined method
+    /**
+     * enable/disable the button
+     * @param b true/false
+     */
     public void setEnabled(boolean b)
     {   enabled = b;
-        //super.setEnabled(b);
-//GWT    
-        //repaint();
     }
-    
-
 } // LWArrowButton
 

@@ -1,15 +1,38 @@
 package fi.stroomdiagrammengwt.client;
 
-
+/**
+ * class containing basic attributes of an edge 
+ */
 public class EdgeCopy 
 {
-	VertexCopy fromVertexCopy, toVertexCopy;
+	/**
+	 * the edge starts at fromVertex
+	 */
+	VertexCopy fromVertexCopy;
+	/**
+	 * the edge ends at toVertex
+	 */
+	VertexCopy toVertexCopy;
+	/**
+	 * the capacity of the edge
+	 */
     Rational capacity;
+    /**
+     * time of last change of the edge
+     */
     long lastTimeChanged;
+    /**
+     * mode of the edge, see class Edge
+     */
     int mode;
-    public EdgeCopy(Rational c, long t, int m)
-    {   capacity = new Rational(c);
-        lastTimeChanged = t;
-        mode = m;
+    /**
+     * @param capacity the capacity of the edge
+     * @param lastTimeChanged time of last change of the edge
+     * @param mode mode of the edge, see class Edge
+     */
+    public EdgeCopy(Rational capacity, long lastTimeChanged, int mode)
+    {   this.capacity = new Rational(capacity);
+        this.lastTimeChanged = lastTimeChanged;
+        this.mode = mode;
     }
 }

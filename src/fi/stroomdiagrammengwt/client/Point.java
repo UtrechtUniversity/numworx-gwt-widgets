@@ -1,5 +1,8 @@
 package fi.stroomdiagrammengwt.client;
 
+/**
+ * there is no class Point in JavaGWT
+ */
 public class Point 
 {
 	int x, y;

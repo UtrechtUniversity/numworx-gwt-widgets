@@ -2,6 +2,9 @@ package fi.stroomdiagrammengwt.client;
 
 import com.google.gwt.resources.client.CssResource;
 
+/**
+ * interface for cascading style sheets 
+ */
 public interface StroomDiagrammenGWTCssResource extends CssResource
 {
 	String root();

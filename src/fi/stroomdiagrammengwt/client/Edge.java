@@ -1,104 +1,176 @@
 package fi.stroomdiagrammengwt.client;
 
-//import java.awt.Point;
-//import java.awt.Color;
-//import java.awt.Graphics;
-//import java.awt.Polygon;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//import java.awt.event.FocusEvent;
-//import java.awt.event.FocusListener;
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
 import java.util.Date;
 import java.util.Vector;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.TextMetrics;
+
+/**
+ * class representing an edge in the flow diagram; <br>
+ * each edge has a capacity, a number between 0 and 1; <br>
+ * the sum of the capacities of the edges out of a vertex equals 1; <br>
+ * the capacity is shown in the capacity field, a box drawn on the edge, see 
+ * class CapacityField, and can be changed by doubleClick or longClick on the capacity field;<br> 
+ * when changing the capacity of an edge, the sum the sum of the capacities from
+ * all edges out of fromVertex of that edge is maintained at 1 by altering the 
+ * capacity of the out edge that was set the longest time ago; <br>
+ * the user can enter the capacity in another format then the global format in which case  
+ * all the capacities of the edges out of fromVertex are displayed in this local 
+ * format, e.g. one can enter a fraction while the global format is a decimal number; <br> 
+ * the edge can be deleted by longClick on the edge polygon outside the capacity field and this is allowed if:<br>
+ * 1) the toVertex of this edge has other incoming edges than this edge<br>
+ * 2) the toVertex of this edge has only this edge as incoming edge and
+ * has no outgoing edges; in this case the toVertex is also deleted;<br> 
+ * see class DrawingPanel for Mouse/Touch action and class EdgePopup for changing the capacity;<br> 
+ * capacities can be entered as decimal fractions, fractions or percentages.  
+ */
 
 public class Edge 
 {
+	/**
+	 * class owning the edge
+	 */
 	DrawingPanel owner;
-    Vertex fromVertex, toVertex;
-    
+	/**
+	 * the edge starts at fromVertex
+	 */
+    Vertex fromVertex;
+    /**
+     * the edge ends at toVertex
+     */
+    Vertex toVertex;
+    /**
+     * can the capacity of the edge be changed?
+     */
     boolean frozen = false;
-
-    
+    /**
+     * a class drawing a box showing the capacity of the edge   
+     */
     CapacityPanel capacityField;
-    
-    Point edgeStart = new Point(), edgeEnd = new Point();
-    // angle (edgeEnd.y - edgeStart.y) / (edgeEnd.x - edgeStart.x)
+    /**
+     * top right point of the fromVertex (not including label)
+     */
+    Point edgeStart = new Point();
+    /**
+     * top left point of the toVertex (not including label)
+     */
+    Point edgeEnd = new Point();
+    /**
+     * arc tangens of (edgeEnd.y-edgeStart.y)/(edgeEnd.x-edgeStart.x)
+     */
     double alpha;
-    // required thickness (perpendicular to flow)
-    // will be corrected later
+    /**
+     * required thickness of the edge (perpendicular to the edge 
+     */
     double thickness;
-    // corrected thickness (pixels) perpendicular to flow
+    /** 
+     * corrected thickness of the edge (pixels)
+     */
     int corrThickness;
-    // offSet from edgeStart.y (pixels)
+    /**
+     * the offset of the Edge from edgeStart.y (pixels)
+     */
     int vOffSet;
-    // vertical thickness (pixels)
+    /**
+     * vertical thickness of the edge (pixels)
+     */
     int vThickness;
-    // edge polygon, click polygon
-    Polygon p, cp;
-    // highlighting
+    /**
+     * the polygon for drawing the edge
+     */
+    Polygon p;
+    /**
+     * the polygon for clicking on the edge, larger than 
+     * the edge polygon when      * the edge polygon is small
+     */
+    Polygon cp;
+    /**
+     * is the edge highlighted for backwards tracing?
+     * see class DrawingPanel
+     */
     boolean highlighted = false;
-    // bubbles
-    int bOffMaxInit = 30;
-    int bOffMax = bOffMaxInit;
-    int bOffStep = 5;
-    
-    // offset for bubbles
-    int bOffSet = randomInteger(1, bOffMaxInit);
+    /**
+     * the number of colors to simulate waves
+     */
     public static int numWaveColors = 4;
+    /**
+     * the index of the color of the first wave
+     */
     int waveStep = randomInteger(0, numWaveColors);
-    
-    // Date instance for fixing time
+    /**
+     * Date instance for fixing time of capacity change
+     */
     Date date;
-    //arrows om LWTextField langs pijl te schuiven??
-    //hoe??
-    //paint
-    //teken pijl
+    /**
+     * the capicty of this edge
+     */
     Rational capacity;
+    /**
+     * the time the capacity of this edge was last changed
+     */
     long lastTimeChanged;
+    /**
+     * the display mode of this edge (decimal number/fraction)
+     * see class DrawingPanel
+     */
     int mode = DrawingPanel.decMode;
+    /**
+     * the mode of displaying the Edge thickness
+     * see class DrawingPanel
+     */
     int thickMode = DrawingPanel.relMode;
+    /**
+     * constructor
+     * @param o DrawingPanle class owning the edge
+     * @param from the fromVertex of the edge
+     * @param to the toVertex of the edge
+     * @param c the capacity of the edge
+     */
     public Edge(DrawingPanel o, Vertex from, Vertex to, Rational c)
     {   owner = o;
         fromVertex = from;
         toVertex = to;
         capacity = new Rational(c);
-
-        
         capacityField = new CapacityPanel(DrawingPanel.edgeNumberWidth, DrawingPanel.edgeNumberHeight);
-        
-        
         capacityField.setText(UF.format(capacity.decVal, DrawingPanel.capDecs));
-
-//GWT        
-        //EdgeIAL listener = new EdgeIAL();
-        //capacityField.capacityTextField.addActionListener(listener);
-        //capacityField.capacityTextField.addFocusListener(listener);
-        //capacityField.addMouseListener(new DelEdgeML());
-        
         from.outEdges.addElement(this);
         to.inEdges.addElement(this);
         thickMode = owner.thickMode;
-//System.out.println("edge thickMode = " + thickMode);        
-
     }
+    
+    /**
+     * set flagg indicating of capacity field can be accessed
+     * @param b true/false
+     */
     public void setFrozen(boolean b)
     {
     	frozen = b;
-
-//GWT    	
-    	//capacityField.capacityTextField.setEditable(!frozen);
     }
+    
+    /**
+     * check if the capacity field contains the point (x,y)
+     * @param x x coordinate in pixels of point clicked
+     * @param y y coordinate in pixels of point clicked
+     * @return true/false
+     */
+	public boolean capacityClicked(int x, int y)
+	{
+		if (frozen)
+			return false;
+		else
+			return capacityField.capacityClicked(x, y);
+	}
+
+	/**
+	 * set the capacity to the Rational c and update lastTimeChanged
+	 * if newTime == true 
+	 * @param c the Rational c
+	 * @param newTime true/false
+	 */
     public void setCapacity(Rational c, boolean newTime)
     {   capacity = new Rational(c);
-    
-
-    
+    	// format capacityField depending on mode
         if (mode == DrawingPanel.decMode)
             capacityField.setText(UF.format(capacity.decVal, DrawingPanel.capDecs));      
         else if (mode == DrawingPanel.percMode)    
@@ -110,23 +182,23 @@ public class Edge
                 capacityField.setText(UF.format(capacity.nom, 0) + "/" +
                                       UF.format(capacity.denom, 0));  
         }
-                                 
+        // update                         
         if (newTime)
         {   date = new Date();
             lastTimeChanged = date.getTime();
         }
-        // thickness 
+        // set thickness 
         setThickness();
-        //thickness = DrawingPanel.vertexHeight * capacity.decVal;        
         owner.paint();
         // no updates here, infinite loop!
     }    
 
+    /**
+     * set the display mode for the capacity of this Edge
+     * @param m the required display mode (see class DrawingPanel)
+     */
     public void setMode(int m)
     {   mode = m;
-    
-//GWT
-/*    
         if (mode == DrawingPanel.decMode)
             capacityField.setText(UF.format(capacity.decVal, DrawingPanel.capDecs));      
         else if (mode == DrawingPanel.percMode)    
@@ -138,47 +210,41 @@ public class Edge
                 capacityField.setText(UF.format(capacity.nom, 0) + "/" +
                                       UF.format(capacity.denom, 0));  
         }
-*/                                  
     }    
     
-    // used when creating, redrawing
+    /**
+     * set parameters of this Edge, used when creating and redrawing
+     */
     public void setEdge()
-    {   //edgeStart.x = fromVertex.getLocation().x + owner.vertexWidth;
-        //edgeStart.y = fromVertex.getLocation().y + owner.labelHeight;
-        //edgeEnd.x = toVertex.getLocation().x;
-        //edgeEnd.y = toVertex.getLocation().y + owner.labelHeight;
-        edgeStart.x = fromVertex.xPos + owner.vertexWidth;
-        edgeStart.y = fromVertex.yPos + owner.labelHeight;
+    {   edgeStart.x = fromVertex.xPos + DrawingPanel.vertexWidth;
+        edgeStart.y = fromVertex.yPos + DrawingPanel.labelHeight;
         edgeEnd.x = toVertex.xPos;
-        edgeEnd.y = toVertex.yPos + owner.labelHeight;
+        edgeEnd.y = toVertex.yPos + DrawingPanel.labelHeight;
         alpha = Math.atan(((double) (edgeEnd.y - edgeStart.y)) / (edgeEnd.x - edgeStart.x));
-        // thickness
         setThickness();
-        //thickness = DrawingPanel.vertexHeight * capacity.decVal;
-        
     }    
     
+    /**
+     * set the thickness mode of this Edge
+     * @param tMode the required thichkness mode (see class DrawingPanel)
+     */
     public void setThicknessMode(int tMode)
     {   thickMode = tMode;
         setThickness();
     }    
     
-    // determine required thickness
+    /**
+     * determine the requires thickness of this edge depending
+     * on the global thickness mode (class DrawingPanel)
+     */
     public void setThickness()
-    {   
-    	
-//System.out.println("edge setThickness " + thickMode);    	
-    	
-    	// relative to capacity
+    {  	// relative thickness is proportional to to capacity
         if (thickMode == DrawingPanel.relMode)
             thickness = DrawingPanel.vertexHeight * capacity.decVal;        
-        else // absolute
-        {   // max of flow in all roots
-            Rational sFlow = owner.getMaxRootFlow();
-            // if not all roots filled in
-            // finds maximum of roots connected to fromVertex
-            if (sFlow.isUndefined())
-                sFlow = owner.getSourceFlow(fromVertex);
+        else // absolute thiskness
+        {   // find flow in all roots connected to fromVertex
+            Rational sFlow = owner.getSourceFlow(fromVertex);
+            // this includes unDefined
             if (sFlow.decVal <= 1e-6d)
                 thickness = 0;
             else    
@@ -188,14 +254,24 @@ public class Edge
         }    
     }
     
-    // generate a random integer between min and max
+    /**
+     * generate a random integer between
+     * @param min min value and
+     * @param max max value
+     * @return random integer
+     */
     public int randomInteger(int min, int max)
     {   double num = min + Math.random() * (max - min);
-        // cast long to int
+        // cast double to int
         return (int) Math.round(num);
     }
     
-    //public void drawEdge(Graphics g)
+    /**
+     * draw the edge using Context2d g
+     * NB the thickness of all edges out of fromVertex MUST have been
+     * set before drawing; drawing the edge sets the click polygon
+     * @param g the Context2d to be used
+     */
     public void drawEdge(Context2d g)
     {   // thickness of all relevant edges MUST have been set
         // before drawing    
@@ -225,7 +301,6 @@ public class Edge
                              (DrawingPanel.vertexHeight - totalThickness) / 2);        
         }                    
         // horizontal offset of center of capacity field
-        
         int hOffSet = Math.max((edgeEnd.x - edgeStart.x) / 4, capacityField.breedte / 2); 
         int lTop = 0, rTop = 0;
         double tan = 0;
@@ -236,8 +311,6 @@ public class Edge
             // endPoint at edgeEnd.y + DrawingPanel.VertexHeight / 2
             rTop = edgeEnd.y + DrawingPanel.vertexHeight / 2;
             tan = ((double) (rTop - lTop)) / (edgeEnd.x - edgeStart.x);           
-            // draw line
-//            g.drawLine(edgeStart.x, lTop, edgeEnd.x, rTop);
             int nPoints = 4;
             int[] xPoints = new int[nPoints];
             int[] yPoints = new int[nPoints];
@@ -254,7 +327,6 @@ public class Edge
             yPoints[2] = edgeEnd.y + (DrawingPanel.vertexHeight - 1) / 2;
             yPoints[3] = edgeEnd.y + (DrawingPanel.vertexHeight + 1) / 2;            
             p = new Polygon(xPoints, yPoints, nPoints);
-            //g.fillPolygon(p);
             g.beginPath();
             g.moveTo(p.geefPuntXD(0), p.geefPuntYD(0));
             for (int i = 1; i < p.aantalPunten; i++)
@@ -263,22 +335,15 @@ public class Edge
             g.lineTo(p.geefPuntXD(0), p.geefPuntYD(0));
             g.closePath();
             g.fill();
-            
+            // create the click polygon
             cyPoints[0] = yPoints[0] + 4;
             cyPoints[1] = yPoints[1] - 4;            
             cyPoints[2] = yPoints[2] - 4;
             cyPoints[3] = yPoints[3] + 4;            
             cp = new Polygon(xPoints, cyPoints, nPoints);            
-            
-//g.drawPolygon(cp);
-            
-
-            
             capacityField.setLocation(edgeStart.x + hOffSet - capacityField.breedte / 2, 
                 lTop + (int) Math.round(hOffSet * tan) - capacityField.hoogte / 2);
-            
             capacityField.paintComponent(g);
-                
         }    
         else // positive capacity/thickness   
         {   if (highlighted)
@@ -312,7 +377,6 @@ public class Edge
             yPoints[2] = edgeEnd.y + (DrawingPanel.vertexHeight - vThickness) / 2;
             yPoints[3] = edgeEnd.y + (DrawingPanel.vertexHeight + vThickness) / 2;            
             p = new Polygon(xPoints, yPoints, nPoints);
-            //g.fillPolygon(p);
             g.beginPath();
             g.moveTo(p.geefPuntXD(0), p.geefPuntYD(0));
             for (int i = 1; i < p.aantalPunten; i++)
@@ -321,7 +385,7 @@ public class Edge
             g.lineTo(p.geefPuntXD(0), p.geefPuntYD(0));
             g.closePath();
             g.fill();
-
+            // create the click polygon
             if (vThickness < 9)
             {   int shift = (9 - vThickness) / 2 + 1;
                 cyPoints[0] = yPoints[0] + shift;
@@ -329,30 +393,12 @@ public class Edge
                 cyPoints[2] = yPoints[2] - shift;
                 cyPoints[3] = yPoints[3] + shift;            
                 cp = new Polygon(xPoints, cyPoints, nPoints);            
-                
             }    
             else
                 cp = new Polygon(xPoints, yPoints, nPoints);            
-
             capacityField.setLocation(edgeStart.x + hOffSet - capacityField.breedte / 2, 
             		lTop + (int) Math.round(hOffSet * tan) + vThickness / 2 - capacityField.hoogte / 2);
-                
-
-/*
-            // simulation
-            // distance between bubbles
-            double frac = ((double) (edgeEnd.x - edgeStart.x)) / owner.maxLayerDistance;
-            bOffMax = (int) Math.round(Math.min(1, frac) * bOffMaxInit);
-            int steps = (int) Math.round(frac * 4);
-            int step = (edgeEnd.x - edgeStart.x) / steps;
-            int numBubbles = (int) Math.round(frac * 5);
-//            for (int i = 0; i < numBubbles; i++)
-//                drawBubbleAt(g, bOffSet + i * (step - 1));
-*/
-
-//GWT            
             drawWavesAt(g, waveStep);           
-                       
             // "smaller" polygon for outline    
             xPoints[0]--;
             xPoints[1]--;
@@ -360,7 +406,6 @@ public class Edge
             yPoints[3]--;
             Polygon q = new Polygon(xPoints, yPoints, nPoints);
             g.setStrokeStyle(CssColor.make(0,0,0));
-            //g.drawPolygon(q);
             g.beginPath();
             g.moveTo(q.geefPuntXD(0), q.geefPuntYD(0));
             for (int i = 1; i < q.aantalPunten; i++)
@@ -369,87 +414,35 @@ public class Edge
             g.lineTo(q.geefPuntXD(0), q.geefPuntYD(0));
             g.closePath();
             g.stroke();
-            
             capacityField.paintComponent(g);
-
         }
     }    
-
     
-//GWT
-/*    
-    public void drawBubbleAt(Context2d g, int step)
-    {   if (highlighted)
-            g.setColor(StroomDiagrammenGWT.highBubbleColor);                
-        else
-            g.setColor(StroomDiagrammenGWT.bubbleColor);            
-        // left top of polygon
-        int lTop = edgeStart.y + vOffSet;
-        // right top of polygon
-        // middle of flow end in middle of right vertex
-        int rTop = edgeEnd.y + (DrawingPanel.vertexHeight - vThickness) / 2;        
-        double tan = ((double) (rTop - lTop)) / (edgeEnd.x - edgeStart.x);           
-        int stepy = (int) Math.round(step * tan);
-        int cx = edgeStart.x + step;            
-        int cy = lTop + stepy + vThickness / 2;
-        if (cx <= edgeEnd.x)
-        {   if (highlighted)
-                g.setColor(DrawingPanel.hsbChange(Stroomdiagrammen.highBubbleColor, 2));        
-            else
-                g.setColor(DrawingPanel.hsbChange(Stroomdiagrammen.bubbleColor, 2));
-            g.fillArc(cx - corrThickness / 2 + 1, 
-                      cy - corrThickness / 2 + 1,
-                      corrThickness - 1, corrThickness - 1,
-                      90, 90); 
-            if (highlighted)
-                g.setColor(DrawingPanel.hsbChange(Stroomdiagrammen.highBubbleColor, - 2));            
-            else
-                g.setColor(DrawingPanel.hsbChange(Stroomdiagrammen.bubbleColor, - 2));
-            g.fillArc(cx - corrThickness / 2 + 1, 
-                      cy - corrThickness / 2 + 1,
-                      corrThickness - 1, corrThickness - 1,
-                      270, 90); 
-            if (highlighted)
-                g.setColor(Stroomdiagrammen.highBubbleColor);                                  
-            else
-                g.setColor(Stroomdiagrammen.bubbleColor);                      
-            g.fillArc(cx - corrThickness / 2 + 1, 
-                      cy - corrThickness / 2 + 1,
-                      corrThickness - 1, corrThickness - 1,
-                      0, 90); 
-            g.fillArc(cx - corrThickness / 2 + 1, 
-                      cy - corrThickness / 2 + 1,
-                      corrThickness - 1, corrThickness - 1,                      
-                      180, 90); 
-            g.fillOval(cx - corrThickness / 4 + 1, 
-                      cy - corrThickness / 4 + 1,
-                      (corrThickness - 1) / 2, (corrThickness - 1) / 2);                      
-                      
-        }               
-    }
-*/
-    //public void drawWavesAt(Graphics g, int step)
+    /**
+     * draw waves in the edge, that is subdivide the edge polygon into
+     * smaller polygons which have different wave colors
+     * @param g Context2d to use for drawing
+     * @param step index of first wave color
+     */
     public void drawWavesAt(Context2d g, int step)
     {   if (vThickness < 1)
             return; // no waves
-
-        // left top of polygon
+        // left top of edge polygon
         int lTop = edgeStart.y + vOffSet;
-        // right top of polygon
+        // right top of edge polygon
         int rTop = edgeEnd.y + (DrawingPanel.vertexHeight - vThickness) / 2;        
         double tan = ((double) (rTop - lTop)) /
                      (edgeEnd.x - edgeStart.x);           
         double atan = Math.atan(tan);             
-        double absAtan = Math.abs(tan);
-        
-        double waveXThickness = 5;
+        double waveXThickness = 5; // pixels
         double waveYThickness = Math.abs(tan) * waveXThickness;
         int numWaves = (int) Math.round( ((double) (edgeEnd.x - edgeStart.x)) / waveXThickness) + 1;
-        Vector waves = new Vector();        
+        Vector<Polygon> waves = new Vector<Polygon>();        
         int nPoints;
         int[] xPoints;
         int[] yPoints;
         Polygon w;
+        // contruct the wave polygons
         for (int cnt = 0; cnt < numWaves; cnt++)
         {   nPoints = 4;
             xPoints = new int[4];
@@ -511,8 +504,6 @@ public class Edge
                              cnt * waveYThickness - 
                              vThickness * Math.cos(atan) * Math.cos(atan)                                                          
                              );
-                             
-
                 yPoints[3] = lTop - (int) Math.round(
                              (cnt - 1) * waveYThickness
                              );
@@ -522,7 +513,6 @@ public class Edge
                              );
                 
             }
-            
             w = new Polygon(xPoints, yPoints, nPoints);
             waves.addElement(w);
         }
@@ -542,9 +532,9 @@ public class Edge
         	colors[2] = StroomDiagrammenGWT.bubbleColor1;
         	colors[3] = StroomDiagrammenGWT.bubbleColor;        
         }
+        // draw the wave polygons
         for (int i = 0; i < waves.size(); i++)
-        {   g.setFillStyle(colors[(i + step) % 4]);
-            
+        {  	g.setFillStyle(colors[(i + step) % 4]);
             Polygon pw = (Polygon) waves.elementAt(i);    
             //g.fillPolygon(pw);
             g.beginPath();
@@ -555,16 +545,18 @@ public class Edge
             g.lineTo(pw.geefPuntXD(0), pw.geefPuntYD(0));
             g.closePath();
             g.fill();
-
         }    
-        
-        
     }
     
+    /**
+     * process String t which might contain a decimal point
+     * and/or a percentage sign % and set the capacity of
+     * this Edge to this value if no error
+     * @param t the String to process
+     * @param percentage percentage or not?
+     */
     public void processDouble(String t, boolean percentage)
     {   
-//GWT
-/*    	
     	boolean error = false;
         double value = 0;
         // error handling here
@@ -575,7 +567,7 @@ public class Edge
                     t = t.substring(0, pc);
             }
             // change decimal separator to "."
-            if (Stroomdiagrammen.rb.getString("decSep") == ",")
+            if (StroomDiagrammenGWT.rb.getString("decSep") == ",")
                 t = t.replace(',', '.');
             // note:  "." is always allowed
             // check for double ..
@@ -603,32 +595,38 @@ public class Edge
         if (!error)
         {   if (percentage)
                 value /= 100;
+        	// value must be between 0 and 1
             if ((value >= 0) && (value <= 1))
-            {   
-                int newMode;
+            {   // determine new local flow format
+            	int newMode = DrawingPanel.flowMode;
                 if (percentage)
-                    newMode = DrawingPanel.percMode;
+                   newMode = DrawingPanel.percMode;
                 else
-                    newMode = DrawingPanel.decMode;
+                   newMode = DrawingPanel.decMode;
+            	// value or format changed, so add to history
                 boolean remember = (value != capacity.decVal) || (mode != newMode);
                 setCapacity(new Rational(value), true);
+                // make sure the capacities of all edges out of fromVertex sum to 1
                 fromVertex.updateOutCapacities(Edge.this, newMode);
-                // includes this one
+                // include this one in new format
                 fromVertex.setOutModes(newMode);
-                ((DrawingPanel) capacityField.getParent()).diagramManager.calculateDiagram();                        
+                DrawingPanel.diagramManager.calculateDiagram();
                 if (remember)
-                    ((DrawingPanel) capacityField.getParent()).addToHistory();
+                {   DrawingPanel.addToHistory();
+                }
             }
             else // reset
                 setCapacity(capacity, false);
         }
-*/            
     }    
     
+    /**
+     * process String t which contains a fraction and set the 
+     * capacity of this Edge to this fraction if no error
+     * @param t the String to be processed
+     */
     public void processRational(String t)
     {   
-//GWT
-/*    	
     	boolean error = false;
         int nom = 0, denom = 1;
         String nomStr = null, denomStr = null;
@@ -637,21 +635,15 @@ public class Edge
         try
         {   t = removeAllBlanks(t);
             int slash = t.indexOf('/');
-//            if (slash >= 0)
-//            {   
-                nomStr = t.substring(0, slash);
-                if (slash == (t.length() - 1))
-                {   error = true;
-                    // reset
-                    setCapacity(capacity, false); 
-                }
-                else
-                    denomStr = t.substring(slash + 1);
-//            }
-//            else
-//            {   nomStr = t; 
-//                denomStr = "1";
-//            }
+            nomStr = t.substring(0, slash);
+            // empty denomStr
+            if (slash == (t.length() - 1))
+            {   error = true;
+                // reset
+                setCapacity(capacity, false); 
+            }
+            else
+                denomStr = t.substring(slash + 1);
             if (!error)    
             {   // these lines generate exceptions and activate catch
                 nom = Integer.parseInt(nomStr);
@@ -665,33 +657,36 @@ public class Edge
         }  // catch
         if (!error)
         {   value = new Rational(nom, denom);
+        	// new local format will be fractions
             int newMode = DrawingPanel.fracMode;
+            // we must have 0 <= value <= 1 
             if (value.isLargerOrEqual(new Rational(0, 1, 0), newMode) && 
                 value.isSmallerOrEqual(new Rational(1, 1, 1), newMode))
-            {   boolean remember = !capacity.equals(value) || (mode != newMode);
+            {   // value or format changed, so add to history
+            	boolean remember = !capacity.equals(value) || (mode != newMode);
                 setCapacity(value, true);
+             // make sure the capacities of all edges out of fromVertex sum to 1
                 fromVertex.updateOutCapacities(Edge.this, newMode);
-                // includes this one
+                // includes this one in the new format
                 fromVertex.setOutModes(newMode);                
-                ((DrawingPanel) capacityField.getParent()).diagramManager.calculateDiagram();                        
+                DrawingPanel.diagramManager.calculateDiagram();
                 if (remember)
-                    ((DrawingPanel) capacityField.getParent()).addToHistory();
+                {   DrawingPanel.addToHistory();
+                }
                 
             }
             else // reset
                 setCapacity(capacity, false);
         }
-*/            
     }    
-    
-    public void processInput()
+
+    /**
+     * process the String entered in the EdgePopup, find out if it
+     * is a fraction, percentage or decimal number
+     * @param t String entered 
+     */
+    public void processInput(String t)
     {   
-//GWT
-/*    	
-    	// get current text
-        String t = capacityField.getText();
-        // undo wrapping
-        capacityField.setText(t);
         int divIndex = t.indexOf('/');
         if (divIndex >= 0)
             processRational(t);
@@ -702,13 +697,13 @@ public class Edge
             else
                 processDouble(t, false);
         }
-*/            
-//        if ((mode == DrawingPanel.decMode) ||
-//            (mode == DrawingPanel.percMode))
-//             processDouble(t);
-//        else // mode == DrawingPanel.fracMode    
-//            processRational(t);
-    }    
+            
+    }
+    /**
+     * remove all blanks in the String s
+     * @param s String s
+     * @return s with blanks removed
+     */
     public String removeAllBlanks(String s)
     {   int index = s.indexOf(' ');
         while (index >= 0)
@@ -717,59 +712,5 @@ public class Edge
         }
         return s;
     }
-
-
-//GWT
-/*    
-    class DelEdgeML extends MouseAdapter
-    {   public void mousePressed(MouseEvent e)
-        {   DrawingPanel dp = (DrawingPanel) e.getComponent().getParent();
-            // put capacity field on top
-//            if (!dp.deleteMode)
-//            { 
-
-//System.out.println("mp capacityField on top");
-
-        		// Java 8 resistent !
-        		dp.setComponentZOrder(capacityField, 0);
-                //dp.remove(capacityField);
-                //dp.add(capacityField, 0);
-        		
-        		dp.repaint();
-                
-//            }  
-//            else // deleteMode on
-//            {   // see if this edge can be deleted
-//                //dp.diagramManager.deleteEdge(Edge.this, true);
-//                //dp.owner.unDelete();
-//            }
-        }    
-    }    
-*/    
-    
-    
- //GWT
-/*     
-  
-    class EdgeIAL implements FocusListener, ActionListener
-    {      
-        public void focusGained(FocusEvent e)
-        {}
-        public void focusLost(FocusEvent e)
-        {   if (frozen)
-    			return;
-        	
-        	processInput();
-        }
-        public void actionPerformed(ActionEvent e)
-        {   if (frozen)
-    			return;
-        	
-        	processInput();
-        }
-        
-        
-    } // inner class EdgeIAL
-*/    
 }
 

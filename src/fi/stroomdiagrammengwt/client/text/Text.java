@@ -10,6 +10,29 @@ public interface Text extends ConstantsWithLookup {
 	String nieuwDiagramKnopLabel();
 	@DefaultStringValue("terug")
 	String terugKnopLabel();
+	
+	@DefaultStringValue("berekeningen")
+	String berekeningenLabel();
+	@DefaultStringValue("decimaal")
+	String decimaalLabel();
+	@DefaultStringValue("breuken")
+	String breukenLabel();
+	
+	@DefaultStringValue("stroombreedte")
+	String stroombreedteLabel();
+	@DefaultStringValue("absoluut")
+	String absoluutLabel();
+	@DefaultStringValue("relatief")
+	String relatiefLabel();
+	
+	@DefaultStringValue("opties")
+	String optiesLabel();
+	@DefaultStringValue("knooppunten met labels")
+	String knooppuntenMetLabelsLabel();
+	@DefaultStringValue("knooppunten zonder labels")
+	String knooppuntenZonderLabelsLabel();
+	@DefaultStringValue("voeg nieuwe bron toe")
+	String voegNieuweBronToeLabel();
 
 
 }

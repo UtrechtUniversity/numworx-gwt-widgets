@@ -1,9 +1,10 @@
 package fi.stroomdiagrammengwt.client;
 
-import com.google.gwt.resources.client.ClientBundle.Source;
 import com.google.gwt.resources.client.ClientBundle;
-import com.google.gwt.resources.client.ImageResource;
 
+/**
+ * interface for the client bundle 
+ */
 public interface StroomDiagrammenGWTClientBundle extends ClientBundle 
 {
 	

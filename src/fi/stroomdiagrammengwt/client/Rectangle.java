@@ -1,5 +1,9 @@
 package fi.stroomdiagrammengwt.client;
 
+/**
+ * there is no class Rectangle in JavaGWT
+ */
+
 public class Rectangle 
 {
 	int x; int y; int width; int height;

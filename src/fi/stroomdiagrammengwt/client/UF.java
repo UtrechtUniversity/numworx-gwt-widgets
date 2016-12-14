@@ -1,13 +1,21 @@
 package fi.stroomdiagrammengwt.client;
 
-// universal formatter
+/**
+ * universal formatter class, containing only static methods
+ */
 class UF
-{   // basic formatting with decs decimals
-    // no error handling (decs < 0)
+{   
+	/**
+	 * format a double with decs decimals
+	 * uses the decimal separator decSep() from StrooomDiagrammenGWT.rb
+	 * @param val double to be formatted
+	 * @param decs number of decimals required
+	 * @return double formatted as required in a String
+	 */
     public static String format(double val, int decs)
     {   String result = "";
         // no decimals required
-        if (decs == 0)
+        if (decs <= 0)
             result = String.valueOf(Math.round(val));
         else //
         {   // factor for decimal part
@@ -15,8 +23,7 @@ class UF
             // integer part: hard cast to int
             int integerPart = (int) val;
             // fractional part
-            int fractionalPart = (int) Math.round(
-                                       Math.abs(val - integerPart) * factor);
+            int fractionalPart = (int) Math.round(Math.abs(val - integerPart) * factor);
             // correct for rounding up
             if (fractionalPart >= factor)
             {   fractionalPart = 0;
@@ -34,21 +41,35 @@ class UF
             if (fractionalString.length() < decs)
                 fractionalString = zeros(decs - fractionalString.length()) +
                                    fractionalString;
-            result = integerString + "," + 
-                     //Stroomdiagrammen.rb.getString("decSep") + 
+            result = integerString +  
+                     StroomDiagrammenGWT.rb.decSep() + 
                      fractionalString;
         }
         return result;
     }
-    // as above but with sign always displayed
+
+    /**
+     * as method format but also displaying the +-sign
+     * @param val double to be formatted 
+     * @param decs number of decimals required
+     * @return double formatted as required in a String
+     */
     public static String sformat(double val, int decs)
     {   String result = format(val, decs);
         if (val >= 0)
             result = "+" + result;
         return result;
     }
-    // as above, but aligned (0=center, 1=left, 2=right) in a field of
-    // width characters (if possible)
+
+    /**
+     * as method format but with the formatted String aligned (0=center, 1=left, 2=right)
+     * within a String of width characters (if possible) 
+     * @param val double to be formatted
+     * @param decs number of decimals required
+     * @param width width of enclosing String
+     * @param al alignment
+     * @return double formatted as required in a String
+     */
     public static String fformat(double val, int decs, int width, int al)
     {   String result = format(val, decs);
         int len = result.length();
@@ -73,18 +94,28 @@ class UF
             }
         return result;
     }
-    // returns a string of c zeros
+
+    /**
+     * return a String of c zerps
+     * @param c number of zeros
+     * @return String of c zeros
+     */
     private static String zeros(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
             result += "0";
         return result;
     }
-    // returns a string of c spaces
+
+    /**
+     * return a String of c spaces
+     * @param c number of spaces
+     * @return String of c spaces
+     */
     private static String spaces(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
             result += " ";
         return result;
     }
-} // class UF
+} 
