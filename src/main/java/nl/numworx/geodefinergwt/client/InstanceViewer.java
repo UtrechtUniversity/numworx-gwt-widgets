@@ -1,10 +1,12 @@
 package nl.numworx.geodefinergwt.client;
 
+import org.vectomatic.dom.svg.OMSVGGElement;
 import org.vectomatic.dom.svg.OMSVGImageElement;
 import org.vectomatic.dom.svg.OMSVGLength;
 import org.vectomatic.dom.svg.OMSVGLineElement;
 import org.vectomatic.dom.svg.OMSVGPathElement;
 import org.vectomatic.dom.svg.OMSVGPathSegList;
+import org.vectomatic.dom.svg.OMSVGRectElement;
 import org.vectomatic.dom.svg.OMSVGStyle;
 import org.vectomatic.dom.svg.OMSVGTextElement;
 import org.vectomatic.dom.svg.utils.SVGConstants;
@@ -27,6 +29,7 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Triangle;
+import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 
 public class InstanceViewer extends SVGWidget {
@@ -65,7 +68,7 @@ public class InstanceViewer extends SVGWidget {
 		OMSVGStyle style = line.getStyle();
 		style.setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, color);
 		if(stroke != null) stroke.toStyle(style);
-		getSvgElement().appendChild(line);
+		getBody().appendChild(line);
 	}
 
 	
@@ -87,12 +90,32 @@ public class InstanceViewer extends SVGWidget {
 		case BOTTOM: x -= w/2.0f; break;
 		}
 		OMSVGImageElement image = doc.createSVGImageElement(x, y, w, h, url);
-		getSvgElement().appendChild(image);
+		getBody().appendChild(image);
 	}
 	
+	private void visitFlipFlop(Label label) {
+		boolean value = label.getState() != Label.FALSE;
+		String off = "none";
+		String on = "gray";
+		float x = (float) label.getXd();
+		float y = (float) label.getYd();
+		OMSVGGElement g = doc.createSVGGElement();
+		OMSVGRectElement rect = doc.createSVGRectElement(x, y, 10, 10, 1, 1);
+		rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, value?on:off);
+		rect.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "black");
+		String string = getMapper().toString(label);
+		OMSVGTextElement text = doc.createSVGTextElement(x+12, y+10, OMSVGLength.SVG_LENGTHTYPE_NUMBER,string);
+		g.appendChild(rect);
+		g.appendChild(text);
+		getBody().appendChild(g);
+	}
 	
 	@Override
 	public void visitLabel(Label label) {
+		if(label.getRegistered() instanceof FlipFlop) {
+			visitFlipFlop(label);
+			return;
+		}
 		if(label.getString().contains("$"))
 		{
 			visitFormule(label);
@@ -120,7 +143,7 @@ public class InstanceViewer extends SVGWidget {
 		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
 		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
 		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
-		getSvgElement().appendChild(text);
+		getBody().appendChild(text);
 	}
 
 	static final String grayish = "rgba(32,32,32, 0.125)";
@@ -158,7 +181,7 @@ public class InstanceViewer extends SVGWidget {
 		OMSVGStyle style = path.getStyle();
 		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
 		style.setSVGProperty(SVGConstants.CSS_FILL_RULE_PROPERTY, SVGConstants.CSS_EVENODD_VALUE);
-		getSvgElement().appendChild(path);
+		getBody().appendChild(path);
 	}
 
 	/* (non-Javadoc)
