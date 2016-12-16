@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client.ui;
 
+import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.UIModel;
 import fi.euclides.event.Tracker;
 import fi.euclides.model.Boog;
@@ -27,7 +28,7 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 	@Override
 	public UIModel<?, ?> build(Destroyable d) {
 		if(d == null) throw new NullPointerException();
-		model = new ColorModel<Destroyable>().init(d);
+		model = null;
 		d.visit(this);
 		return model.set(tracker);
 	}
@@ -54,12 +55,16 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 
 	@Override
 	public void visitLabel(Label label) {
+		if(label.getRegistered() instanceof Interval) {
+			model = new IntervalModel().init(label);
+			return;
+		}
 		model = new TextModel().init(label);
 	}
 
 	@Override
 	public void visitTriangle(Triangle t) {
-		model = new ColorModel<Triangle>().init(t);
+		model = new CircleModel().init(t);
 	}
 
 	@Override

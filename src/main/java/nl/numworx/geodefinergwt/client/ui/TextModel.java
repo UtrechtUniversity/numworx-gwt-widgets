@@ -9,7 +9,7 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.util.DefaultAdapter;
 
-public class TextModel extends ColorModel<Destroyable> {
+public class TextModel extends ColorModel<Label> {
 	public Align align = Align.BASE;
 
 	@Override
@@ -18,11 +18,11 @@ public class TextModel extends ColorModel<Destroyable> {
 		super.install();
 	}
 
-	@Override
-	public UIModel<Destroyable, Void> init(Destroyable item) {
+	public UIModel<Label, Void> init(Label item) {
 		align = item.adapt(Align.class);
 		if(align == null) align= Align.BASE;
-		return super.init(item);
+		super.init(item);
+		return this;
 	}
 
 	@Override

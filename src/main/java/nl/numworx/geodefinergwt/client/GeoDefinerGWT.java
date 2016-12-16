@@ -24,6 +24,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -52,7 +53,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private int height = 450;
 	private ViewerWidget widget;
 	private OpdrNavIF comRoot;
-	private SimplePanel panel;
+	private DockPanel panel;
 	private boolean volledigeBreedte;
 	
 	/**
@@ -134,7 +135,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public GeoDefinerGWT(HashMap<String, Object> h,
 			HashMap<String, Number> randomVarWaarden, int volleBreedte) {
-		panel = new SimplePanel();
+		panel = new DockPanel();
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		
 		if(map != null)
@@ -161,7 +162,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	@Override
 	public void onModuleLoad() {
-		panel = new SimplePanel();
+		panel = new DockPanel();
 		
 		RootPanel.get().add(panel);
 
@@ -214,10 +215,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void zetVolledigeBreedte(int breedte) {
 	}
 
-
-	
 	public Widget asWidget() {
-		return widget.asWidget();
+		return panel;
 	}
 
 	public int getAsHoogte() {
@@ -252,16 +251,16 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Messages.setInstance(new MessagesImpl());
 
 		viewer = widget.getViewer();
-		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap()));
+		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
 		uiModelFactory = new UIModelFactory(viewer);
 
-		SelectHandler h = new SelectHandler();
+		SelectHandler h = selector;
 		h.setTracker(viewer);
 		viewer.setPointerHandler(h);
 		definitions = new Definitions(viewer);
 		
-		asWidget().setPixelSize(width, height);
-		panel.setWidget(asWidget());
+		widget.asWidget().setPixelSize(width, height);
+		panel.add(widget, DockPanel.CENTER);
 		
 // initial model		
 		createModel(viewer.getModel(), width, height);
