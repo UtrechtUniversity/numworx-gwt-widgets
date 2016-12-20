@@ -407,6 +407,8 @@ public class VerknippenGWT implements EntryPoint, InteractionStub, InteractionVi
 				roosterZichtbaar = launchState.getBoolean("roosterZichtbaar");
 			if ((launchState != null) && launchState.containsKey("schaduwZichtbaar"))
 				schaduwZichtbaar = launchState.getBoolean("schaduwZichtbaar");
+			if ((launchState != null) && launchState.containsKey("afmetingenZichtbaar"))
+				afmetingenZichtbaar = launchState.getBoolean("afmetingenZichtbaar");
 			if ((launchState != null) && launchState.containsKey("figuurTransparant"))
 				figuurTransparant = launchState.getBoolean("figuurTransparant");
 			if ((launchState != null) && launchState.containsKey("resetButton"))
