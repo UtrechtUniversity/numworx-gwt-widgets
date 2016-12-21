@@ -6,6 +6,7 @@ import org.vectomatic.dom.svg.OMSVGLength;
 import org.vectomatic.dom.svg.OMSVGLineElement;
 import org.vectomatic.dom.svg.OMSVGPathElement;
 import org.vectomatic.dom.svg.OMSVGPathSegList;
+import org.vectomatic.dom.svg.OMSVGRect;
 import org.vectomatic.dom.svg.OMSVGRectElement;
 import org.vectomatic.dom.svg.OMSVGStyle;
 import org.vectomatic.dom.svg.OMSVGTextElement;
@@ -23,7 +24,9 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.shared.GWT;
 
+import fi.euclides.gwt.Shape;
 import fi.euclides.gwt.canvas.SpeelVeld;
+import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.gwt.svg.SVGWidget;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
@@ -31,6 +34,7 @@ import fi.euclides.model.Punt;
 import fi.euclides.model.Triangle;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
+import fi.euclides.util.DefaultAdapter;
 
 public class InstanceViewer extends SVGWidget {
 
@@ -91,6 +95,9 @@ public class InstanceViewer extends SVGWidget {
 		}
 		OMSVGImageElement image = doc.createSVGImageElement(x, y, w, h, url);
 		getBody().appendChild(image);
+		OMSVGRect bbox = image.getBBox();
+		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
+
 	}
 	
 	private void visitFlipFlop(Label label) {
@@ -108,6 +115,8 @@ public class InstanceViewer extends SVGWidget {
 		g.appendChild(rect);
 		g.appendChild(text);
 		getBody().appendChild(g);
+		OMSVGRect bbox = g.getBBox();
+		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
 	}
 	
 	@Override
@@ -144,6 +153,8 @@ public class InstanceViewer extends SVGWidget {
 		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
 		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
 		getBody().appendChild(text);
+		OMSVGRect bbox = text.getBBox();
+		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
 	}
 
 	static final String grayish = "rgba(32,32,32, 0.125)";
@@ -154,15 +165,7 @@ public class InstanceViewer extends SVGWidget {
 	 */
 	@Override
 	public void visitTriangle(Triangle t) {
-		//selectColor(t);
-		ColorStyle c = t.adapt(ColorStyle.class);
-		if (c != null) {
-			setCssColor(CssColor.make(c.getColor()));
-		} else 
-		if (getModel().getSelect().contains(t))
-			setCssColor(CssColor.make(reddish));
-		else
-			setCssColor(CssColor.make(grayish));
+		selectColor(t);
 
 		Punt[] depend = (Punt[]) t.getDepend();
 		int length = depend.length;
@@ -179,7 +182,8 @@ public class InstanceViewer extends SVGWidget {
 		}
 		points.appendItem(path.createSVGPathSegClosePath());
 		OMSVGStyle style = path.getStyle();
-		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
+		style.setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, color);
+		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, fill);
 		style.setSVGProperty(SVGConstants.CSS_FILL_RULE_PROPERTY, SVGConstants.CSS_EVENODD_VALUE);
 		getBody().appendChild(path);
 	}

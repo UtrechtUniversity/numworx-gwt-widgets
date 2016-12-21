@@ -20,11 +20,13 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.DockPanel.DockLayoutConstant;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -53,7 +55,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private int height = 450;
 	private ViewerWidget widget;
 	private OpdrNavIF comRoot;
-	private DockPanel panel;
+	protected DockPanel panel;
 	private boolean volledigeBreedte;
 	
 	/**
@@ -159,6 +161,16 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	}
 
+	@Override
+	protected void installToolbox() {
+		if( launchData.containsKey("toolbox")) {
+			ObjectList list = launchData.getObjectList("toolbox");
+			if(list.size() > 0) {
+				ToolBoxPanel toolbox = new ToolBoxPanel(list, viewer);
+				panel.add(toolbox, DockPanel.NORTH);
+			}
+		}
+	}
 
 	@Override
 	public void onModuleLoad() {

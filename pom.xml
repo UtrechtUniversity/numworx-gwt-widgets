@@ -85,7 +85,7 @@
 									<version>${euclidesVersion}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
-									<outputDirectory>${project.build.directory}/${project.artifactId}/geodefinergwt/</outputDirectory>
+									<outputDirectory>${project.build.directory}/${project.artifactId}/geodefinergwt${debug}/</outputDirectory>
 									<includes>**/*.png</includes>
 								</artifactItem>
 							</artifactItems>
@@ -100,8 +100,8 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
-					<module>${project.groupId}.${project.artifactId}</module>
-					<runTarget>${project.artifactId}.html</runTarget>
+					<module>${project.groupId}.${project.artifactId}${debug}</module>
+					<runTarget>${project.artifactId}${debug}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
 					<extraJvmArgs>-Xms768m -Xmx1024m</extraJvmArgs>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
@@ -133,5 +133,6 @@
 	<properties>
 		<euclidesVersion>0.0.1-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.2</formuleVersion>
+		<debug>Debug</debug>
 	</properties>
 </project>

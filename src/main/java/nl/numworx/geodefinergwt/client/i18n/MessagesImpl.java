@@ -12,7 +12,7 @@ public class MessagesImpl extends Messages {
 		try {
 			return m.getString(string);
 		} catch(Exception e) {
-			GWT.log("missing key " + string);
+			GWT.log("missing key " + string, e);
 		}
 		return super.getStringImpl(string);
 	}

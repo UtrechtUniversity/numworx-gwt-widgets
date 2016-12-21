@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to='geodefinergwtDebug'>
+  <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name="com.google.gwt.logging.Logging"/>
+  <!-- Inherit the default GWT style sheet.  You can change       -->
+  <!-- the theme of your GWT application by uncommenting          -->
+  <!-- any one of the following lines.                            -->
+  <inherits name='com.google.gwt.user.theme.clean.Clean'/>
+  <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+  <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
+
+  <!-- Other module inherits                                      -->
+   <inherits name="nl.numworx.geodefinergwt.GeoDefinerGWT-DWO" />
+
+  <!-- Specify the app entry point class.                         -->
+  <entry-point class='nl.numworx.geodefinergwt.client.GeoDefinerGWTDebug'/>
+  <add-linker name='xsiframe' />
+<!-- Logging TRUE/FALSE FINEST/.../SEVERE -->   
+    <set-property name="gwt.logging.logLevel" value="FINE"/>
+    <set-property name="gwt.logging.enabled" value="TRUE"/>
+
+  <!-- Specify the paths for translatable code                    -->
+  <source path='client'/>
+</module>
