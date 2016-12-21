@@ -2550,6 +2550,8 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 	 * @param randomVars De namen van de random variabelen
 	 * @param randomValues De waarden van alle random variabelen
 	 */
+	
+/*	
 	public void zetOpdracht(HashMap b, String[] randomVars, HashMap randomValues) {
 		BVInvoer invoer = new BVInvoer("");
 		
@@ -2693,13 +2695,6 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 								}
 							}
 							else {
-								/*
-								if(invoer.isBreuk()) {
-									this.antwoordP = Double.parseDouble(invoer.getTellerString()) / Double.parseDouble(invoer.getNoemerString());
-								}
-								else {
-									this.antwoordP = Double.parseDouble(invoer.getInput());
-								}*/
 								this.antwoordP = new BVInvoer(invoer.getInput());
 							}
 						}
@@ -2770,7 +2765,7 @@ public class BinomVerdPanel extends LayoutPanel //JPanel implements InteractiePa
 		//update
 		this.vernieuw();
 	}
-	
+*/	
     class PushClickHandler implements ClickHandler
     {
     	//public void onMouseDown(MouseDownEvent e)
