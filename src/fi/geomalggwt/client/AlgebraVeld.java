@@ -1734,13 +1734,20 @@ owner.logger.info("aantalFg = " + aantalFg);
 			else pasAanVar(varHuidig,6-ex);
 		}
 		veranderVar = false;
+
 		if (actiefFg!=null)
-			actiefFg.plaatsOpGrid();
+		{	actiefFg.plaatsOpGrid();
+//System.out.println("actiefFg != null");		
+		}
 		
 		
 		if (constructieTools && actiefFg != null && 
-			!new Rectangle(42, 0, breedte-43, hoogte-82).contains(eventX,eventY))
-		{	actiefFg = null;
+			//!new Rectangle(42, 0, breedte-43, hoogte-82).contains(eventX,eventY))
+			((actiefFg.minx < 42) || (actiefFg.miny < 0) || (actiefFg.maxx > breedte-43) || (actiefFg.maxy > hoogte-82)))	
+		{	
+			
+//System.out.println("mouseUp weggooien");			
+			actiefFg = null;
 			fg[0] = null;
 			for(int j=0 ; j<aantalFg-1 ; j++)
 			{	fg[j] = fg[j+1];
@@ -1752,6 +1759,7 @@ owner.logger.info("aantalFg = " + aantalFg);
 			return;
 		}
 		
+
 		//boolean b = true;
 		boolean b = !puzzelen;
 		while(b)
