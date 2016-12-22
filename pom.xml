@@ -108,7 +108,6 @@
 					<i18nConstantsWithLookupBundles>
 						<i18nConstantsWithLookupBundle>nl.numworx.geodefinergwt.client.i18n.messages</i18nConstantsWithLookupBundle>
 					</i18nConstantsWithLookupBundles>
-					<!-- generate in generated sources, why not? -->
 				</configuration>
 				<executions>
 					<execution>
@@ -133,6 +132,6 @@
 	<properties>
 		<euclidesVersion>0.0.1-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.2</formuleVersion>
-		<debug>Debug</debug>
+		<debug></debug>
 	</properties>
 </project>
