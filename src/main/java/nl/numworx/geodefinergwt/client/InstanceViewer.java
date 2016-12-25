@@ -22,10 +22,6 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.core.shared.GWT;
-
-import fi.euclides.gwt.Shape;
-import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.gwt.svg.SVGWidget;
 import fi.euclides.model.Destroyable;
@@ -35,6 +31,7 @@ import fi.euclides.model.Triangle;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
+import gwt.awt.Shape;
 
 public class InstanceViewer extends SVGWidget {
 
