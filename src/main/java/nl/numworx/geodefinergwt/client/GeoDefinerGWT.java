@@ -133,6 +133,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		public HitTester getHitTester() {
 			return viewer.getHitTester();
 		}
+
+		@Override
+		public <T> T adapt(Class<T> cls) {
+			return null;
+		}
 		
 	}
 	
