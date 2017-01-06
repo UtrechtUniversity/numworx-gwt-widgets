@@ -10,6 +10,7 @@ public class MessagesImpl extends Messages {
 	@Override
 	protected String getStringImpl(String string) {
 		try {
+			if(!GWT.isProdMode()) string = string.replace('.', '_'); // FIXME BUG in GWT 2.6?
 			return m.getString(string);
 		} catch(Exception e) {
 			GWT.log("missing key " + string, e);

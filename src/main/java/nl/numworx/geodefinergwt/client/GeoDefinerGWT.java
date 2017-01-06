@@ -27,6 +27,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.DockPanel.DockLayoutConstant;
+import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,6 +59,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private OpdrNavIF comRoot;
 	protected DockPanel panel;
 	private boolean volledigeBreedte;
+	private HasText southPanel;
 	
 	/**
 	 * Decorator pattern. Decorate with a NameMapper.
@@ -88,7 +91,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 		@Override
 		public void setStatus(String string) {
-			GWT.log(string);
+			southPanel.setText(string);
 		}
 
 		@Override
@@ -261,7 +264,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		widget = new InstanceViewer(width, height);
 		DoubleFormat.setInstance(new PrettyFormat());
 		Messages.setInstance(new MessagesImpl());
-
+		Label label = new Label();
+		southPanel = label;
 		viewer = widget.getViewer();
 		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
 		uiModelFactory = new UIModelFactory(viewer);
@@ -273,7 +277,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		
 		widget.asWidget().setPixelSize(width, height);
 		panel.add(widget, DockPanel.CENTER);
-		
+		panel.add(label, DockPanel.SOUTH);
 // initial model		
 		createModel(viewer.getModel(), width, height);
 // configuration

@@ -142,7 +142,7 @@ public class InstanceViewer extends SVGWidget {
 			case BOTTOM: h = "middle";  v = "text-after-edge";  break;
 			case BASE: 
 			}
-		}
+		} else align = Align.BASE;
 		short unitType = OMSVGLength.SVG_LENGTHTYPE_NUMBER;
 		OMSVGTextElement text = doc.createSVGTextElement((float)x, (float)y, unitType, string);
 		OMSVGStyle style = text.getStyle();
@@ -151,6 +151,18 @@ public class InstanceViewer extends SVGWidget {
 		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
 		getBody().appendChild(text);
 		OMSVGRect bbox = text.getBBox();
+		switch(align) {
+		case LEFT:	x += x - bbox.getMaxX(); break; //als maxx > x dan x moet minder worden
+		case BASE:
+		case RIGHT: x += x - bbox.getX(); break;
+		case BOTTOM: 
+		case TOP:	x += x = bbox.getCenterX(); break;
+		}
+// This is how to position after bbox
+		OMSVGLength newX = doc.getRootElement().createSVGLength(unitType, (float) x);
+		text.getX().getBaseVal().replaceItem(newX, 0);
+
+		bbox = text.getBBox();
 		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
 	}
 
@@ -217,6 +229,12 @@ public class InstanceViewer extends SVGWidget {
 
 	private void doPaint() {
 		super.paint();
+	}
+
+	@Override
+	public void drawAxes() {
+		Destroyable grid = getModel().getLijnen().elementAt(2);
+		if(grid.isVisible()) grid.visit(this);
 	}
 
 
