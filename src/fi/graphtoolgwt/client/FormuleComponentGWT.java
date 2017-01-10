@@ -43,10 +43,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	private FormuleEditorFactory factor = GWT.create(FormuleEditorFactory.class);
 	{
 		factor.setFc(this);
-	}
-	
-	
-	
+	}	
 	
 	static class TriforkFormuleEditor extends GraphtFormuleEditor {
 
@@ -70,7 +67,6 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 
 	}
 
-
 	private static Logger logger = Logger.getLogger("FormuleComponentGWT");
 
 	private IsWidget wrap (IsWidget widget) {
@@ -81,8 +77,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		//focus.add(widget);
 		//focus.addMouseUpHandler(new FocusOnTouch(focus));
 		return focus;
-	}
-	
+	}	
 	
 	/*
 	 * class voor de editors die de formules gaan verwerken; vooralsnog komt er in elke regel één.
@@ -124,8 +119,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 
 		@Override
 		public void stelsel() {
-			// TODO Auto-generated method stub
-			
+			// TODO Auto-generated method stub			
 		}
 
 		@Override

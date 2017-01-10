@@ -77,6 +77,11 @@
   		<artifactId>formule</artifactId>
   		<version>0.0.2</version>
   	</dependency>
+  	<dependency>
+  		<groupId>fi.beans</groupId>
+  		<artifactId>lineairealgebra</artifactId>
+  		<version>0.0.1</version>
+  	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
