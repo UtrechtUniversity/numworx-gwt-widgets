@@ -13,6 +13,7 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 //import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 //import fi.graphtool.Slider;
 import com.google.gwt.touch.client.Point;
@@ -2030,6 +2031,9 @@ public class GrafiekGWTVeld {
 			}
 
 			// Set visual parameters
+			FillStrokeStyle previousStyle = gIm.getStrokeStyle();
+			double previousLineWidth = gIm.getLineWidth();
+			
 			gIm.setStrokeStyle(VeldComponentGWT.cSystemColor);
 			gIm.setLineWidth(cLineWidthVectorFields);
 
@@ -2049,6 +2053,10 @@ public class GrafiekGWTVeld {
 					}
 				}
 			}
+			// Restore Previous Values
+			gIm.setStrokeStyle(previousStyle);
+			gIm.setLineWidth(previousLineWidth);
+
 //			double end = System.currentTimeMillis();
 //			logger.info(end + ":: Veldgrafiek - Loop finished of :"+loopCounter +"in "+(end-start)/1000+"seconden");
 		}

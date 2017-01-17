@@ -413,7 +413,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		private void adjustSize() {
 			int[] rowHeight = new int[2];
 			int systemHalfHeight = 0;
-			int cBorderMargin = 5;
+			double cBorderMargin = 5.0;
 
 
 			// clear old brace canvas
@@ -441,9 +441,10 @@ public class VeldComponentGWT extends LayoutPanel {
 
 				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
 			}			
+			this
 				
 			// adjust Row Positions
-			int posY = cSystemDiffEqPanelGWT_interObjectMarginY+cBorderMargin;
+			double posY = cSystemDiffEqPanelGWT_interObjectMarginY+cBorderMargin;
 			for (int i=0; i<nrFunctions; i++) {
 
 				// Position Entire Row
@@ -463,6 +464,12 @@ public class VeldComponentGWT extends LayoutPanel {
 						Style.Unit.PX, functionEditors[i].getHeight(), Style.Unit.PX);
 				functionPanels[i].setWidgetLeftWidth(functionEditorPanels[i], maxBeginWidth+cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, 
 						systemWidth-rowStartX-cSystemDiffEqPanelGWT_interObjectMarginX-maxBeginWidth, Style.Unit.PX);
+				
+				
+				functionEditors[i].setFont(defaultfont);
+				functionEditors[i].setDefaultFont(defaultfont);	
+				functionEditors[i].setColor(systemColor);
+				functionEditorPanels[i].add(functionEditors[i].getAsPanel());
 			}				
 			
 			// adjust Checkbox Position
@@ -475,26 +482,50 @@ public class VeldComponentGWT extends LayoutPanel {
 			this.setWidgetTopHeight(braceCanvas, 0, Style.Unit.PX, systemHeight+2*cSystemDiffEqPanelGWT_braceWidth+2*cBorderMargin, Style.Unit.PX);
 			
 			// redraw brace
-			ctx.setStrokeStyle(systemColor.toString());
-			
+//			ctx.setStrokeStyle(systemColor.toString());
+			ctx.setFillStyle(systemColor);
+//			gIm.setStrokeStyle(VeldComponentGWT.cSystemColor);
+			ctx.setLineWidth(0.25d);
+
 			ctx.beginPath();
-			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 1.5*Math.PI, false);
 			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin);
-			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin);
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
+			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
 			
-			ctx.arc(0.0, systemHalfHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+			ctx.arc(0.0, systemHalfHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
 			
-			ctx.arc(0.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+			ctx.arc(0.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
 			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin);
-			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin);
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
+			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
+			
+			ctx.arc(cSystemDiffEqPanelGWT_braceWidth/2.0,  systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin , 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 0.5*Math.PI, 1.0*Math.PI, false);
+//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth,  systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin , 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 
-			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
+
+//			ctx.arc( cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+//	         cSystemDiffEqPanelGWT_braceWidth/2.0, 0.5*Math.PI, 1.0*Math.PI, false);
+			
+//			ctx.arcTo( cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+//					   cSystemDiffEqPanelGWT_braceWidth/3.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/3.0+cBorderMargin, 
+//					   cSystemDiffEqPanelGWT_braceWidth/2.0);
+
+//			ctx.arcTo(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI);
+//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight+(double) cBorderMargin);
+			
+//			ctx.moveTo((double) cSystemDiffEqPanelGWT_braceWidth, (double) systemHeight+(double) cBorderMargin);
+//			ctx.arc( (double) cSystemDiffEqPanelGWT_braceWidth, (double) systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin-1.0, 
+//			         (double) cSystemDiffEqPanelGWT_braceWidth/2.0, (double) 0.5*Math.PI, (double) 1.0*Math.PI, false);
+			
+//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
+//			cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 			ctx.stroke();
 		}
 		
