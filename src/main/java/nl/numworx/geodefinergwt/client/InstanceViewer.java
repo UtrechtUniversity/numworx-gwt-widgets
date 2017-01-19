@@ -38,6 +38,8 @@ public class InstanceViewer extends SVGWidget {
 	private static final float DEFAULT_POINTSIZE = 5;
 	private AnimationHandle animator;
 
+	public InstanceViewer() {	
+	}
 	public InstanceViewer(int width, int height) {
 		super(width, height);
 	}

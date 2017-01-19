@@ -3,3 +3,25 @@ body {
 	overflow: hidden;
 	margin: 0px !important;
 }
+
+.check {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.check.fout {
+	background-image: url("images/resources/foutkruis.gif");
+}
+
+.check.goed {
+	background-image: url("images/resources/goedkrul.gif");
+}
+
+.check.half {
+	background-image: url("images/resources/goedkrulhalf.gif");
+}
+
+.toolbox .gwt-PushButton {
+	padding: 0px !important;
+}

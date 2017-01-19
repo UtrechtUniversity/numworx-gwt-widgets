@@ -56,9 +56,13 @@ public class ToolBoxPanel extends Composite {
 
 	}
 
-	ToolBoxPanel(ObjectList list, Tracker tracker) {
-		
-		HorizontalPanel p = new HorizontalPanel();
+	HorizontalPanel panel;
+	public ToolBoxPanel() {
+		panel = new HorizontalPanel();
+		initWidget(panel);
+	}
+	
+	void init(ObjectList list, Tracker tracker) {		
 		PushButton btn;
 		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
 		for (int i = 0; i < list.size(); i++ ) {
@@ -123,9 +127,8 @@ public class ToolBoxPanel extends Composite {
 */			
 			
 			}
-			if(btn != null)	p.add(btn);
+			if(btn != null)	panel.add(btn);
 		}
-		initWidget(p);
 	}
 
 	PushButton newBtn(String url, EventHandler handler, Tracker tracker) {

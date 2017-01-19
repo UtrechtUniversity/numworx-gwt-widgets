@@ -5,7 +5,11 @@ import com.google.gwt.core.client.GWT;
 import fi.euclides.util.Messages;
 
 public class MessagesImpl extends Messages {
-	messages m = GWT.create(messages.class);
+	final messages m;
+
+	public MessagesImpl(messages rb) {
+		m = rb;
+	}
 
 	@Override
 	protected String getStringImpl(String string) {

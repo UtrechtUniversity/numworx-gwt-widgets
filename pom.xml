@@ -89,7 +89,7 @@
 									<includes>**/*.png</includes>
 								</artifactItem>
 							</artifactItems>
-							<overWriteReleases>false</overWriteReleases>
+							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
@@ -130,8 +130,8 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.1-SNAPSHOT</euclidesVersion>
+		<euclidesVersion>0.0.1</euclidesVersion>
 		<formuleVersion>0.0.2</formuleVersion>
-		<debug></debug>
+		<debug>Debug</debug>
 	</properties>
 </project>

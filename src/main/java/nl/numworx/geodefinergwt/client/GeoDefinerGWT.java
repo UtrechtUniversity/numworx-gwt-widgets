@@ -5,15 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
-import nl.numworx.geodefinergwt.client.ui.PointModel;
-import nl.numworx.geodefinergwt.client.ui.TextModel;
+import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
-import nl.uu.fi.dwo.interaction.client.FacetHelper;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -25,12 +22,14 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.DockPanel.DockLayoutConstant;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.euclides.event.EventHandler;
@@ -40,26 +39,34 @@ import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.gwt.ViewerWidget;
-import fi.euclides.gwt.canvas.SpeelVeld;
-import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Model;
-import fi.euclides.model.Punt;
 import fi.euclides.model.Track;
 import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.proof.LabelDelegate;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
+import fi.euclides.util.Observer;
 
-public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener {
+public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer {
 
+	private static final String GOED_CSS = "goed";
+	private static final String FOUT_CSS = "fout";
+	private static final String HALF_CSS = "half";
 	private int width = 500;
 	private int height = 450;
-	private ViewerWidget widget;
 	private OpdrNavIF comRoot;
-	protected DockPanel panel;
+	
 	private boolean volledigeBreedte;
-	private HasText southPanel;
+	interface MyUiBinder extends UiBinder<Widget, GeoDefinerGWT> {}
+	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+	@UiField HasText southPanel;
+	Widget  root;
+	@UiField ViewerWidget widget;
+	@UiField FlowPanel check;
+	@UiField ToolBoxPanel toolbox;
+	@UiField messages rb = GWT.create(messages.class);
 	
 	/**
 	 * Decorator pattern. Decorate with a NameMapper.
@@ -145,7 +152,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public GeoDefinerGWT(HashMap<String, Object> h,
 			HashMap<String, Number> randomVarWaarden, int volleBreedte) {
-		panel = new DockPanel();
+
+		root = uiBinder.createAndBindUi(this);
+		
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		
 		if(map != null)
@@ -174,19 +183,16 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				ToolBoxPanel toolbox = new ToolBoxPanel(list, viewer);
-				panel.add(toolbox, DockPanel.NORTH);
+				toolbox.init(list, viewer);
 			}
 		}
 	}
 
 	@Override
 	public void onModuleLoad() {
-		panel = new DockPanel();
 		
-		RootPanel.get().add(panel);
-
-		
+		root = uiBinder.createAndBindUi(this);		
+		RootLayoutPanel.get().add(root);
 		Stub.publish(this);
 	}
 
@@ -214,13 +220,27 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		return getStatus();
 	}
 
-
 	
 	public void kijkNa() {
+		update(null, "changed");
+		feedback();
 	}
 
-
+	@UiHandler("checkBtn") void kijkNa(ClickEvent evt) { kijkNa(); }
 	
+	private void feedback() {
+		Boolean status = getStatus();
+		check.setStyleName(HALF_CSS, status == null);
+		check.setStyleName(FOUT_CSS, Boolean.FALSE.equals(status));
+		check.setStyleName(GOED_CSS, Boolean.TRUE.equals(status));		
+	}
+	
+	private void nofeedback() {
+		check.removeStyleName(HALF_CSS);
+		check.removeStyleName(FOUT_CSS);
+		check.removeStyleName(GOED_CSS);
+	}
+
 	public void zetNagekeken(boolean b) {
 	}
 
@@ -236,7 +256,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 
 	public Widget asWidget() {
-		return panel;
+		return root;
 	}
 
 	public int getAsHoogte() {
@@ -266,11 +286,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			Map<String, Number> values) {
 		//widget = new SVGWidget(width, height);
 		//widget = new SpeelVeld(width, height);
-		widget = new InstanceViewer(width, height);
+		widget.init(width, height);
 		DoubleFormat.setInstance(new PrettyFormat());
-		Messages.setInstance(new MessagesImpl());
-		Label label = new Label();
-		southPanel = label;
+		Messages.setInstance(new MessagesImpl(rb));
 		viewer = widget.getViewer();
 		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
 		uiModelFactory = new UIModelFactory(viewer);
@@ -280,9 +298,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		viewer.setPointerHandler(h);
 		definitions = new Definitions(viewer);
 		
-		widget.asWidget().setPixelSize(width, height);
-		panel.add(widget, DockPanel.CENTER);
-		panel.add(label, DockPanel.SOUTH);
+		root.setPixelSize(width, height);
 // initial model		
 		createModel(viewer.getModel(), width, height);
 // configuration
@@ -303,8 +319,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@Override
 	public void update(Observable observable, Object arg) {
 		super.update(observable, arg);
-		if("changed".equals(arg)) {
+		if("changed".equals(arg) && comRoot != null) {
 			comRoot.setChanged(Boolean.FALSE.equals(getStatus()));
+		}
+		if ( viewer.getModel() == observable) {
+			nofeedback();
 		}
 	}
 
