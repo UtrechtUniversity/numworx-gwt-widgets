@@ -107,6 +107,7 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 	CssColor blauw, oranje, groen, geel, lichtgeel, grijs, donkergrijs, lichtblauw, witblauw;
 	
 	boolean breuk = false;
+	boolean volledigeBreedte = false;
 	
 	int rmMode = 1;
 	boolean gradenInstelbaar = true;
@@ -137,6 +138,8 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 			breedte = h.getInt("breedte");
 		if (h.containsKey("hoogte"))
 			hoogte = h.getInt("hoogte");
+		if(h.containsKey("volledigeBreedte"))
+			volledigeBreedte = h.getBoolean("volledigeBreedte");
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 		basisPanel = new FlowPanel();
@@ -307,7 +310,8 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 		knoppenPanel = new FlowPanel();
 		
 		instellingenPanel = new FlowPanel();
-		instellingenPanel.getElement().getStyle().setMarginTop(10, Style.Unit.PX);
+		instellingenPanel.getElement().getStyle().setPaddingTop(0, Style.Unit.PX);
+		instellingenPanel.getElement().getStyle().setMarginTop(0, Style.Unit.PX);
 		
 		String groep =  "groep";
 		gradenButton = new RadioButton(groep, rb.gradenButton());
@@ -438,6 +442,13 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 				ondersteKnoppen = new Grid(4, 8);
 			else
 				ondersteKnoppen = new Grid(4,6);
+			
+			ondersteKnoppen.setCellSpacing(0);
+			bovensteKnoppen.setCellSpacing(0);
+			ondersteKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+			bovensteKnoppen.getElement().getStyle().setDisplay(Display.INLINE_BLOCK);
+			//ondersteKnoppen.getElement().getStyle().setVerticalAlign(VerticalAlign.TOP);
+			//bovensteKnoppen.getElement().getStyle().setPaddingLeft(5, Style.Unit.PX);
 				
 			bovensteKnoppen.setWidget(0, 0, pijlLinksKnop);
 			bovensteKnoppen.setWidget(0, 1, pijlRechtsKnop);
@@ -637,6 +648,14 @@ public class CalculatorGWT implements EntryPoint, InteractionStub {
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
+		if(volledigeBreedte)
+		{
+			this.breedte = breedte;
+			basisPanel.clear();
+			initialize();
+		}
+		
+		
 	}
 
 	@Override
