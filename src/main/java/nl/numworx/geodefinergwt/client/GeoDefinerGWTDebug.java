@@ -1,13 +1,12 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 
 public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {

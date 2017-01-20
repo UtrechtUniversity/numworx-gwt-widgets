@@ -28,7 +28,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -284,8 +283,6 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
-		//widget = new SVGWidget(width, height);
-		//widget = new SpeelVeld(width, height);
 		widget.init(width, height);
 		DoubleFormat.setInstance(new PrettyFormat());
 		Messages.setInstance(new MessagesImpl(rb));
@@ -296,6 +293,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		SelectHandler h = selector;
 		h.setTracker(viewer);
 		viewer.setPointerHandler(h);
+		viewer.setStatus("");
 		definitions = new Definitions(viewer);
 		
 		root.setPixelSize(width, height);
@@ -321,11 +319,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		super.update(observable, arg);
 		if("changed".equals(arg) && comRoot != null) {
 			comRoot.setChanged(Boolean.FALSE.equals(getStatus()));
+		} else if (observable == viewer.getModel()) {
+			nofeedback();
 		}
 		if ( viewer.getModel() == observable) {
 			nofeedback();
 		}
 	}
-
 
 }
