@@ -61,11 +61,9 @@
   		<artifactId>interaction</artifactId>
   	</dependency>
   	<dependency>
-  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<groupId>com.allen_sauer</groupId>
   		<artifactId>gwt-dnd</artifactId>
   		<version>3.1.2</version>
-  		<scope>system</scope>
-  		<systemPath>${project.basedir}/lib/gwt-dnd-3.1.2.jar</systemPath>
   	</dependency>
   </dependencies>
   <parent>
