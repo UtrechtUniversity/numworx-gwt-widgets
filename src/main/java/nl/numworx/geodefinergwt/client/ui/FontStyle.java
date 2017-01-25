@@ -3,6 +3,7 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.Collections;
 import java.util.Map;
 
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.dom.client.Style;
@@ -13,6 +14,10 @@ public class FontStyle {
 	
 	public void toStyle(Style style) {
 		style.setFontSize(size, Unit.PX);
+	}
+	
+	public FormuleFont getFont() {
+		return FormuleFont.createFromFontSize(Math.round(size));
 	}
 
 	void fromMap(ObjectMap map) {

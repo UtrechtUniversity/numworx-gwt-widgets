@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client.ui;
 
+import nl.numworx.geodefiner.common.Grid;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.UIModel;
@@ -78,6 +79,9 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 
 	@Override
 	public void visitLocus(Locus l) {
+		if (l instanceof Grid) {
+			model = new GridModel().init(l);
+		} else
 		if (l instanceof Integral) {
 			model = new ColorModel<Locus>().init(l);
 		} else

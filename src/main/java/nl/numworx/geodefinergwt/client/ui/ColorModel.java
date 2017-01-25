@@ -21,7 +21,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	protected T item;
 	public int rgba = 0xFF000000;
 	public boolean visible = true;
-	private Tracker tracker;
+	Tracker tracker;
 	private Label visibility = new Label();
 	
 	@Override

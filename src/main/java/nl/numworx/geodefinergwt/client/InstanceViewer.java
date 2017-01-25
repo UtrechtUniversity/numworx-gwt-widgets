@@ -1,5 +1,10 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Rectangle;
+
+import org.vectomatic.dom.svg.OMNode;
 import org.vectomatic.dom.svg.OMSVGEllipseElement;
 import org.vectomatic.dom.svg.OMSVGGElement;
 import org.vectomatic.dom.svg.OMSVGImageElement;
@@ -17,12 +22,17 @@ import org.vectomatic.dom.svg.OMSVGTextElement;
 import org.vectomatic.dom.svg.utils.SVGConstants;
 
 import nl.numworx.geodefiner.common.Align;
+import nl.numworx.geodefiner.common.CELL;
 import nl.numworx.geodefiner.common.Integral;
+import nl.numworx.geodefiner.common.Snapper;
+import nl.numworx.geodefiner.common.Tips;
+import nl.numworx.geodefinergwt.client.ui.AxesModel;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
@@ -33,6 +43,7 @@ import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.gwt.svg.SVGWidget;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
+import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
@@ -51,7 +62,89 @@ public class InstanceViewer extends SVGWidget {
 
 	private static final float DEFAULT_POINTSIZE = 5;
 	private AnimationHandle animator;
+	class SnapperImpl extends Snapper {
+		final int SNAP = 3;
+		boolean isGravity() { return gravity && moved; }
+		private boolean moved;
+		boolean isMoved() {
+			return moved;
+		}
+		void setMoved(boolean moved) {
+			this.moved = moved;
+		}
+	};
+	
+	@Override
+	public void processMouseUp(int x0, int y0) {
+		if(snapper.isGravity()) {
+			int ox = (int) getModel().getO().getXd();
+			int dx = (int) getModel().getU().getXd() - ox;
+			//System.out.print(ev.getX() + " " + ox + " " + dx);
+			int x = (x0-ox) % dx;
+			if ( x < 0 ) x += dx;
+			if ( x*2 > dx) x -= dx;
+			//System.out.println(" " + x);
+			if(x > snapper.SNAP || x < -snapper.SNAP) x = 0;
 
+			int oy = (int) getModel().getO().getYd();
+			int dy = dx;
+			//System.out.print(ev.getX() + " " + ox + " " + dx);
+			int y = (y0-oy) % dy;
+			if ( y < 0 ) y += dy;
+			if ( y*2 > dy) y -= dy;
+			//System.out.println(" " + x);
+			if(y > snapper.SNAP || y < -snapper.SNAP) y = 0;
+
+			x0 = x0+x;
+			y0 = y0+y;
+		}
+		super.processMouseUp(x0, y0);
+	}
+	@Override
+	public void processMouseDrag(int x0, int y0) {
+		snapper.setMoved(true);
+		if(snapper.isGravity()) {
+			int ox = (int) getModel().getO().getXd();
+			int dx = (int) getModel().getU().getXd() - ox;
+			//System.out.print(ev.getX() + " " + ox + " " + dx);
+			int x = (x0-ox) % dx;
+			if ( x < 0 ) x += dx;
+			if ( x*2 > dx) x -= dx;
+			//System.out.println(" " + x);
+			if(x > snapper.SNAP || x < -snapper.SNAP) x = 0;
+
+			int oy = (int) getModel().getO().getYd();
+			int dy = dx;
+			//System.out.print(ev.getX() + " " + ox + " " + dx);
+			int y = (y0-oy) % dy;
+			if ( y < 0 ) y += dy;
+			if ( y*2 > dy) y -= dy;
+			//System.out.println(" " + x);
+			if(y > snapper.SNAP || y < -snapper.SNAP) y = 0;
+
+			x0 = x0+x;
+			y0 = y0+y;
+		}
+		super.processMouseDrag(x0, y0);
+	}
+
+	@Override
+	public void processMouseDown(int x, int y) {
+		snapper.setMoved(false);
+		super.processMouseDown(x, y);
+	}
+
+
+
+
+
+	private SnapperImpl snapper = new SnapperImpl();
+	@Override
+	public <T> T adapt(Class<T> cls) {
+		if(cls == Snapper.class) return (T) snapper;
+		
+		return super.adapt(cls);
+	}
 	public InstanceViewer() {	
 	}
 	public InstanceViewer(int width, int height) {
@@ -91,6 +184,8 @@ public class InstanceViewer extends SVGWidget {
 	
 	public void visitFormule(Label label) {
 		FormuleViewer viewer = new FormuleViewer(label.getString());
+		FontStyle fs = label.adapt(FontStyle.class);
+		if(fs != null) viewer.setFont(fs.getFont());
 		String url = viewer.getCanvas().toDataUrl();
 		float w = viewer.getWidth();
 		float h = viewer.getHeight();
@@ -100,7 +195,7 @@ public class InstanceViewer extends SVGWidget {
 		Align align = label.adapt(Align.class);
 		if(align == null) align = Align.BASE;
 		switch(align) {
-		case BASE: y -= as; break;
+		default: y -= as; break;
 		case LEFT: x -= w;
 		case RIGHT: y -= h/2.0f; break;
 		case TOP: y -= h;
@@ -245,7 +340,54 @@ public class InstanceViewer extends SVGWidget {
 		super.visitPunt(punt);
 	}
 
+	private Segment drawTips(Segment s) {
+		Tips tip = s.adapt(Tips.class);
+		if(tip == null) return s;
+		selectColor(s);
+		float dx = (float) s.getDX();
+		float dy = (float) s.getDY();
+		float len = (float) Math.hypot(dx, dy);
+		Float width = s.adapt(Float.class);
+		float tiplen = 5;
+		if(width != null) tiplen *= width.doubleValue();
+		if(len < tiplen*3) tiplen = len/3;
+		dx *= tiplen/len; 
+		dy *= tiplen/len; 
+		switch(tip) {
+		case ATEND: tip(s.getP2(), -dx, -dy); break;
+		case ATSTARTEND: tip(s.getP2(),-(dx), -(dy));
+		case ATSTART: tip(s.getP1(), dx, dy);
+		case NOTIP: 
+		}
+		return s;
+	}
+
+	private void tip(Punt p1, float dx, float dy) {
+//		Path2D.Double path = new Path2D.Double();
+		float x = (float)p1.getXd();
+		float y = (float)p1.getYd();
+//		path.moveTo(x, y);
+//		path.lineTo(x + dx + dy/2, y + dy -dx/2);
+//		path.lineTo(x + dx - dy/2, y + dy +dx/2);
+//		path.closePath();
+//		g.fill(path);
+		OMSVGPathElement path = doc.createSVGPathElement();
+		OMSVGPathSegList points = path.getPathSegList();
+		points.appendItem(path.createSVGPathSegMovetoAbs(x, y));		
+		points.appendItem(path.createSVGPathSegLinetoAbs(x + dx + dy/2, y + dy -dx/2));
+		points.appendItem(path.createSVGPathSegLinetoAbs(x + dx - dy/2, y + dy +dx/2));
+		points.appendItem(path.createSVGPathSegClosePath());
+		OMSVGStyle style = path.getStyle();
+		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
+		getBody().appendChild(path);
+	}
 	
+	@Override
+	public void visitSegment(Segment s) {
+		s = drawTips(s);
+		super.visitSegment(s);
+		
+	}
 	/** Lazy
 	 * @see fi.euclides.gwt.svg.SVGWidget#paint()
 	 */
@@ -270,8 +412,97 @@ public class InstanceViewer extends SVGWidget {
 	public void drawAxes() {
 		Destroyable grid = getModel().getLijnen().elementAt(2);
 		if(grid.isVisible()) grid.visit(this);
+//draw grid
+		Lijn x = (Lijn) getModel().getLijnen().firstElement();
+		if(grid.isVisible() && !x.isVisible() && x.isDefined()) {
+			// draw x in grid mode
+			ll.setLijn(x);
+			drawLine(ll.getX1(), ll.getY1() , ll.getX2(), ll.getY2());		
+		}
+		Lijn y = (Lijn) getModel().getLijnen().elementAt(1);
+		if(grid.isVisible() && !y.isVisible() && y.isDefined()) {
+			// draw x in grid mode
+			ll.setLijn(y);
+			drawLine(ll.getX1(), ll.getY1() , ll.getX2(), ll.getY2());		
+		}
+		color = "black";
+		CELL item = x.adapt(CELL.class);
+		boolean bx = false, by = false;
+		if (item != null) {
+			AxesModel configX = (AxesModel) item.config;
+			bx = configX != null && configX.numbers && x.isVisible();
+			if(bx) { drawXnumbers(); }
+		}
+		item = y.adapt(CELL.class);
+		if (item != null) {
+			AxesModel configY = (AxesModel) item.config;
+			by = configY != null && configY.numbers && y.isVisible();
+			if(by) { drawYnumbers(); }
+		}
+		if (bx || by) drawO();
+		
+		
+		drawXnumbers();
+		drawYnumbers();
+		drawO();
 	}
 
+	private void drawXnumbers() {
+		double left = clipLeft().doubleValue();
+		double right = clipRight().doubleValue();
+		double x = getModel().getO().getXd();
+		double y = getModel().getO().getYd();
+		double dx = getModel().getU().getXd() - x;
+		if(dx <= 1) return;
+		int i = 0, s = 1;
+		while(dx < 20) { dx += dx; s+=s; if(dx >= 20) break; dx = 2.5*dx; s += s+s/2; if(dx >= 20) break; dx += dx; s += s; }
+		left -= dx;i=s;
+		for(double xr = x+dx ; xr < right; xr += dx, i+=s) {
+			String value = String.valueOf(i);
+			drawString(value, xr, y);
+		}
+		i = -s;
+		for(double xr = x-dx ; xr > left; xr -= dx, i-=s) {
+			String value = String.valueOf(i);
+			drawString(value, xr, y);
+		}
+		
+	}
+	private void drawYnumbers() {
+		double bottom = clipBottom().doubleValue();
+		double top = clipTop().doubleValue();
+		double x = getModel().getO().getXd();
+		double y = getModel().getO().getYd();
+		double dy = getModel().getU().getXd() - x;
+		if (dy <= 1) return;
+		int i = 0, s = 1;
+		while(dy < 20) { dy += dy; s+=s; if(dy >= 20) break; dy = 2.5*dy; s += s+s/2; if(dy >= 20) break; dy += dy; s += s; }
+		i=s;
+		for(double yr = y-dy ; yr > top; yr -= dy, i+=s) {
+			String value = String.valueOf(i);
+			drawString(value, x, yr);
+		}
+		i = -s;
+		bottom += dy;
+		for(double yr = y+dy; yr < bottom; yr += dy, i-=s) {
+			String value = String.valueOf(i);
+			drawString(value, x, yr);
+		}
+	}
+	private void drawO() {
+		double x, y;
+		x = getModel().getO().getXd();
+		y = getModel().getO().getYd();
+		color = "black";
+		drawString("0", x, y);
+		OMNode lastNode = getBody().getLastChild();
+		OMSVGTextElement text = (OMSVGTextElement) lastNode;
+		OMSVGStyle style = text.getStyle();
+		String h,v;
+		h = "end"; v = "text-before-edge";
+		style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
+		style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
+	}
 	private void visitIntegral(Integral l) {
 		selectColor(l);
 		final double y0;

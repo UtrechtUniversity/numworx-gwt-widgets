@@ -26,6 +26,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -64,6 +65,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	Widget  root;
 	@UiField ViewerWidget widget;
 	@UiField FlowPanel check;
+	@UiField Button checkBtn;
 	@UiField ToolBoxPanel toolbox;
 	@UiField messages rb = GWT.create(messages.class);
 	
@@ -142,7 +144,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 		@Override
 		public <T> T adapt(Class<T> cls) {
-			return null;
+			return viewer.adapt(cls);
 		}
 		
 	}
@@ -241,9 +243,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 
 	public void zetNagekeken(boolean b) {
+		this.nagekeken = b;
 	}
-
-
 	
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
@@ -325,6 +326,16 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if ( viewer.getModel() == observable) {
 			nofeedback();
 		}
+	}
+
+	@Override
+	protected boolean installCheckDWO() {
+		if (super.installCheckDWO())
+		{
+			boolean visible = checkDWO.isExtern();
+			checkBtn.setStyleName("extern", visible);
+		}
+		return false;
 	}
 
 }
