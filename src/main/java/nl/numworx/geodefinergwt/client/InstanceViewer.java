@@ -270,11 +270,11 @@ public class InstanceViewer extends SVGWidget {
 		String v = null;
 		if(align != null) {
 			switch(align) {
-			case LEFT:   h = TEXT_END;   	v = TEXT_CENTRAL;          break; 
-			case RIGHT:  h = TEXT_START;   v = TEXT_CENTRAL;          break;
-			case TOP:    h = TEXT_MIDDLE;  v = TEXT_TOP; break;
-			case BOTTOM: h = TEXT_MIDDLE;  v = TEXT_BOTTOM;  break;
-			case BASE: 
+			case LEFT:   h = TEXT_END;   v = TEXT_CENTRAL; break; 
+			case RIGHT:  h = TEXT_START; v = TEXT_CENTRAL; break;
+			case BOTTOM: h = TEXT_MIDDLE;v = TEXT_TOP;     break;
+			case TOP:    h = TEXT_MIDDLE;v = TEXT_BOTTOM;  break;
+			default: 
 			}
 		} else align = Align.BASE;
 		short unitType = OMSVGLength.SVG_LENGTHTYPE_NUMBER;
@@ -290,13 +290,14 @@ public class InstanceViewer extends SVGWidget {
 		switch(align) {
 		case LEFT:	x += x - bbox.getMaxX(); break; //als maxx > x dan x moet minder worden
 		case BASE:
+		case NONE:
 		case RIGHT: x += x - bbox.getX(); break;
 		case BOTTOM: 
 		case TOP:	x += x = bbox.getCenterX(); break;
 		}
-// This is how to position after bbox
-		OMSVGLength newX = doc.getRootElement().createSVGLength(unitType, (float) x);
-		text.getX().getBaseVal().replaceItem(newX, 0);
+// This is how to position after bbox FIXME DOES NOT WORK!
+//		OMSVGLength newX = doc.getRootElement().createSVGLength(unitType, (float) x);
+//		text.getX().getBaseVal().replaceItem(newX, 0);
 
 		bbox = text.getBBox();
 		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
@@ -446,11 +447,6 @@ public class InstanceViewer extends SVGWidget {
 			if(by) { drawYnumbers(); }
 		}
 		if (bx || by) drawO();
-		
-		
-		drawXnumbers();
-		drawYnumbers();
-		drawO();
 	}
 
 	String background = "white";

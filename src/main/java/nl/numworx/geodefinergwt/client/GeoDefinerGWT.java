@@ -335,6 +335,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			boolean visible = checkDWO.isExtern();
 			checkBtn.setStyleName("extern", visible);
 		}
+		check.setVisible(false);
 		return false;
 	}
 
