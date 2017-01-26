@@ -60,6 +60,12 @@ import gwt.awt.geom.PathIterator;
 
 public class InstanceViewer extends SVGWidget {
 
+	private static final String TEXT_BOTTOM = "text-after-edge";
+	private static final String TEXT_TOP = "text-before-edge";
+	private static final String TEXT_CENTRAL = "central";
+	private static final String TEXT_START = "start";
+	private static final String TEXT_MIDDLE = "middle";
+	private static final String TEXT_END = "end";
 	private static final float DEFAULT_POINTSIZE = 5;
 	private AnimationHandle animator;
 	class SnapperImpl extends Snapper {
@@ -264,10 +270,10 @@ public class InstanceViewer extends SVGWidget {
 		String v = null;
 		if(align != null) {
 			switch(align) {
-			case LEFT:   h = "end";   	v = "central";          break; 
-			case RIGHT:  h = "start";   v = "central";          break;
-			case TOP:    h = "middle";  v = "text-before-edge"; break;
-			case BOTTOM: h = "middle";  v = "text-after-edge";  break;
+			case LEFT:   h = TEXT_END;   	v = TEXT_CENTRAL;          break; 
+			case RIGHT:  h = TEXT_START;   v = TEXT_CENTRAL;          break;
+			case TOP:    h = TEXT_MIDDLE;  v = TEXT_TOP; break;
+			case BOTTOM: h = TEXT_MIDDLE;  v = TEXT_BOTTOM;  break;
 			case BASE: 
 			}
 		} else align = Align.BASE;
@@ -447,6 +453,8 @@ public class InstanceViewer extends SVGWidget {
 		drawO();
 	}
 
+	String background = "white";
+	
 	private void drawXnumbers() {
 		double left = clipLeft().doubleValue();
 		double right = clipRight().doubleValue();
@@ -459,15 +467,31 @@ public class InstanceViewer extends SVGWidget {
 		left -= dx;i=s;
 		for(double xr = x+dx ; xr < right; xr += dx, i+=s) {
 			String value = String.valueOf(i);
-			drawString(value, xr, y);
+			drawString(value, xr, y, TEXT_MIDDLE, TEXT_TOP, background);
 		}
 		i = -s;
 		for(double xr = x-dx ; xr > left; xr -= dx, i-=s) {
 			String value = String.valueOf(i);
-			drawString(value, xr, y);
+			drawString(value, xr, y, TEXT_MIDDLE, TEXT_TOP, background);
 		}
 		
 	}
+
+	protected void drawString(String value, double x, double y,
+			String h, String v, String bg) {
+		drawString(value, x, y);
+		OMSVGTextElement text = (OMSVGTextElement) getBody().getLastChild();
+		OMSVGStyle style = text.getStyle();
+		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
+		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
+		if(bg != null) { // TODO randje?
+			OMSVGRect bbox = text.getBBox();
+			OMSVGRectElement rect = doc.createSVGRectElement(bbox);
+			rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, background);
+			getBody().insertBefore(rect, text);
+		}
+	}
+
 	private void drawYnumbers() {
 		double bottom = clipBottom().doubleValue();
 		double top = clipTop().doubleValue();
@@ -480,13 +504,13 @@ public class InstanceViewer extends SVGWidget {
 		i=s;
 		for(double yr = y-dy ; yr > top; yr -= dy, i+=s) {
 			String value = String.valueOf(i);
-			drawString(value, x, yr);
+			drawString(value, x, yr, TEXT_END, TEXT_CENTRAL, background);
 		}
 		i = -s;
 		bottom += dy;
 		for(double yr = y+dy; yr < bottom; yr += dy, i-=s) {
 			String value = String.valueOf(i);
-			drawString(value, x, yr);
+			drawString(value, x, yr, TEXT_END, TEXT_CENTRAL, background);
 		}
 	}
 	private void drawO() {
@@ -494,14 +518,7 @@ public class InstanceViewer extends SVGWidget {
 		x = getModel().getO().getXd();
 		y = getModel().getO().getYd();
 		color = "black";
-		drawString("0", x, y);
-		OMNode lastNode = getBody().getLastChild();
-		OMSVGTextElement text = (OMSVGTextElement) lastNode;
-		OMSVGStyle style = text.getStyle();
-		String h,v;
-		h = "end"; v = "text-before-edge";
-		style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
-		style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
+		drawString("0", x, y, TEXT_END, TEXT_TOP, background);
 	}
 	private void visitIntegral(Integral l) {
 		selectColor(l);
