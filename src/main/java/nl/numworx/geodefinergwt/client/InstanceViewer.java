@@ -145,15 +145,20 @@ public class InstanceViewer extends SVGWidget {
 
 
 	private SnapperImpl snapper = new SnapperImpl();
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T adapt(Class<T> cls) {
-		if(cls == Snapper.class) return (T) snapper;
-		
+		if(cls == Snapper.class) return (T) snapper;		
 		return super.adapt(cls);
 	}
-	public InstanceViewer() {	
+
+	public InstanceViewer() {
+		hitTester = new HitTesterGWT();
 	}
+
 	public InstanceViewer(int width, int height) {
+		this();
 		init(width, height);
 	}
 
@@ -491,7 +496,7 @@ public class InstanceViewer extends SVGWidget {
 	private void drawYnumbers() {
 		double bottom = clipBottom().doubleValue();
 		double top = clipTop().doubleValue();
-		double x = getModel().getO().getXd();
+		double x = getModel().getO().getXd()-2;
 		double y = getModel().getO().getYd();
 		double dy = getModel().getU().getXd() - x;
 		if (dy <= 1) return;
