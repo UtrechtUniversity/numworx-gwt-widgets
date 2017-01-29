@@ -298,12 +298,21 @@ public class InstanceViewer extends SVGWidget {
 		case NONE:
 		case RIGHT: x += x - bbox.getX(); break;
 		case BOTTOM: 
-		case TOP:	x += x = bbox.getCenterX(); break;
+		case TOP:	x += x - bbox.getCenterX(); break;
 		}
-// This is how to position after bbox FIXME DOES NOT WORK!
-//		OMSVGLength newX = doc.getRootElement().createSVGLength(unitType, (float) x);
-//		text.getX().getBaseVal().replaceItem(newX, 0);
-
+		switch(align) {
+		case LEFT:	
+		case RIGHT: y += y - bbox.getCenterY(); 
+			break;
+		case BASE:
+		case NONE: break;
+		case BOTTOM: y += y - bbox.getY(); break;
+		case TOP:	y += y - bbox.getMaxY(); break;
+		}
+// This is how to position after bbox FIXME DOES NOT WORK?
+		text.getX().getBaseVal().getItem(0).setValue((float) x);
+		text.getY().getBaseVal().getItem(0).setValue((float) y);
+		
 		bbox = text.getBBox();
 		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
 	}
