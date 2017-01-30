@@ -27,8 +27,10 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasText;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -58,11 +60,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private OpdrNavIF comRoot;
 	
 	private boolean volledigeBreedte;
-	interface MyUiBinder extends UiBinder<Widget, GeoDefinerGWT> {}
+	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
 	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-	@UiField HasText southPanel;
-	Widget  root;
+	@UiField DockLayoutPanel southPanel;
+	@UiField Label status;
+	DockLayoutPanel  root;
 	@UiField ViewerWidget widget;
 	@UiField FlowPanel check;
 	@UiField Button checkBtn;
@@ -99,7 +102,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 		@Override
 		public void setStatus(String string) {
-			southPanel.setText(string);
+			status.setText(string);
 		}
 
 		@Override
@@ -185,8 +188,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
 				toolbox.init(list, viewer);
+				return;
 			}
 		}
+		root.setWidgetHidden(toolbox, true);
 	}
 
 	@Override
@@ -290,7 +295,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		viewer = widget.getViewer();
 		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
 		uiModelFactory = new UIModelFactory(viewer);
-
+		widget.setMapper(viewer.getMapper());
 		SelectHandler h = selector;
 		h.setTracker(viewer);
 		viewer.setPointerHandler(h);
@@ -334,8 +339,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		{
 			boolean visible = checkDWO.isExtern();
 			checkBtn.setStyleName("extern", visible);
+			return true;
 		}
-		check.setVisible(false);
+		root.setWidgetHidden(southPanel, true);
 		return false;
 	}
 

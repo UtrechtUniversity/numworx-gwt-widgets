@@ -78,10 +78,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 	@Override
 	public Map<String, Object> toMap() {
-		HashMap<String,Object> h = new HashMap<String,Object>();
-		h.put("color", rgba);
-		h.put("visible", visible);
-		return h;
+		return null;
 	}
 
 	@Override

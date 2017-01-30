@@ -39,6 +39,7 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import fi.euclides.event.NameMapper;
 import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.gwt.svg.SVGWidget;
 import fi.euclides.model.Destroyable;
@@ -140,9 +141,9 @@ public class InstanceViewer extends SVGWidget {
 		super.processMouseDown(x, y);
 	}
 
-
-
-
+	private NameMapper mapper = super.getMapper();
+	@Override public NameMapper getMapper() { return mapper; }
+	@Override public void setMapper(NameMapper n) { mapper = n; }
 
 	private SnapperImpl snapper = new SnapperImpl();
 
@@ -194,6 +195,9 @@ public class InstanceViewer extends SVGWidget {
 
 	
 	public void visitFormule(Label label) {
+		Align align = label.adapt(Align.class);
+		if(align == null) align = Align.BASE;
+		else if(align == Align.NONE) return;
 		FormuleViewer viewer = new FormuleViewer(label.getString());
 		FontStyle fs = label.adapt(FontStyle.class);
 		if(fs != null) viewer.setFont(fs.getFont());
@@ -203,8 +207,6 @@ public class InstanceViewer extends SVGWidget {
 		float as = viewer.getAsHoogte();
 		float x = (float) label.getXd();
 		float y = (float) label.getYd();
-		Align align = label.adapt(Align.class);
-		if(align == null) align = Align.BASE;
 		switch(align) {
 		default: y -= as; break;
 		case LEFT: x -= w;
@@ -261,7 +263,7 @@ public class InstanceViewer extends SVGWidget {
 			visitFlipFlop(label);
 			return;
 		}
-		if(label.getString().contains("$"))
+		if(label.getString().contains("$")||true)
 		{
 			visitFormule(label);
 			return;
@@ -581,7 +583,6 @@ public class InstanceViewer extends SVGWidget {
 		OMSVGPathElement path = doc.createSVGPathElement();
 		OMSVGPathSegList points = path.getPathSegList();
 		while(!iter.isDone()) {
-			iter.next();
 			float[] p = new float[6];
 			switch( iter.currentSegment(p)) {
 			case PathIterator.SEG_MOVETO: 
@@ -597,6 +598,7 @@ public class InstanceViewer extends SVGWidget {
 				points.appendItem(close);
 				break;
 			}
+			iter.next();
 		}
 		OMSVGStyle style = path.getStyle();
 		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);

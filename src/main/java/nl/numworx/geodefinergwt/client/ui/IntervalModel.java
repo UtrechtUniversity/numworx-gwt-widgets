@@ -4,6 +4,7 @@ import java.util.Map;
 
 import nl.numworx.geodefiner.common.Animate;
 import nl.numworx.geodefiner.common.Animator;
+import nl.numworx.geodefiner.common.StepValue;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.euclides.model.HorizontalPunt;
@@ -31,9 +32,9 @@ public class IntervalModel extends TextModel {
 			instance.install(item);
 		}
 		if (step == null)
-			adapter.put(Numbers.class, null);
+			adapter.put(StepValue.class, null);
 		else
-			adapter.put(Numbers.class, Numbers.createDouble(step.doubleValue()));
+			adapter.put(StepValue.class, new StepValue(Numbers.createDouble(step.doubleValue())));
 		super.install();
 		ColorStyle css = item.adapt(ColorStyle.class);
 		DefaultAdapter.getDefault(item.getP()).put(css);

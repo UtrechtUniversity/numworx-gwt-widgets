@@ -12,9 +12,9 @@
 			<geo:InstanceViewer ui:field='widget'/>
 		</g:center>
 		<g:south size="30">
-			<g:DockLayoutPanel unit='PX'>
+			<g:DockLayoutPanel ui:field="southPanel" unit='PX'>
 			<g:center>
-				<g:Label ui:field="southPanel "/>
+				<g:Label ui:field="status"/>
 			</g:center>
 			<g:east size="80">
 				<g:FlowPanel ui:field="check" addStyleNames="check">
