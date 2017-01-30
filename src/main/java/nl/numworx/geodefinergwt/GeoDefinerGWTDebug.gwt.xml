@@ -19,6 +19,14 @@
   <entry-point class='nl.numworx.geodefinergwt.client.GeoDefinerGWTDebug'/>
   <add-linker name='xsiframe' />
 <!-- Logging TRUE/FALSE FINEST/.../SEVERE -->   
+	<define-property name="gwt.logging.popupHandler"
+		values="ENABLED, DISABLED" />
+	<set-property name="gwt.logging.popupHandler" value="DISABLED" />
+
+	<set-property name="gwt.logging.popupHandler" value="ENABLED">
+		<when-property-is name="gwt.logging.hasWidgetsHandler"
+			value="ENABLED" />
+	</set-property>
     <set-property name="gwt.logging.logLevel" value="FINE"/>
     <set-property name="gwt.logging.enabled" value="TRUE"/>
 

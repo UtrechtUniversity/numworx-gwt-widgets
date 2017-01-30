@@ -4,6 +4,10 @@
   <inherits name='com.google.gwt.user.User'/>
   <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name="com.google.gwt.logging.Logging"/>
+  <define-property name="gwt.logging.popupHandler"
+		values="ENABLED, DISABLED" />
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
+  
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
   <!-- any one of the following lines.                            -->

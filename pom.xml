@@ -16,6 +16,7 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
+			<version>${gwtVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -55,6 +56,11 @@
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
 			<version>0.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.vectomatic</groupId>
+			<artifactId>lib-gwt-svg</artifactId>
+			<version>0.5.11</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -133,5 +139,6 @@
 		<euclidesVersion>0.0.2-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.2</formuleVersion>
 		<debug></debug>
+		<gwtVersion>2.7.0</gwtVersion>
 	</properties>
 </project>

@@ -209,7 +209,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setState(HashMap<String, Object> h) {
 		Map<String,Object> map = h;
 		setState(map);
-		viewer.paint();
+		start();
 	}
 
 	public int[][] getScoreObjectives() {
