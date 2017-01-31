@@ -71,6 +71,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@UiField Button checkBtn;
 	@UiField ToolBoxPanel toolbox;
 	@UiField messages rb = GWT.create(messages.class);
+	private int mode;
 	
 	/**
 	 * Decorator pattern. Decorate with a NameMapper.
@@ -214,6 +215,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setState(HashMap<String, Object> h) {
 		Map<String,Object> map = h;
 		setState(map);
+		if(nagekeken) {
+			update(null, "changed");
+			if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
+				feedback();
+		}
 		start();
 	}
 
@@ -254,6 +260,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("double", this);
+		this.mode = comRoot.getMode();
 	}
 
 
