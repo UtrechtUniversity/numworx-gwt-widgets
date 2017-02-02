@@ -3,8 +3,8 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.numworx.geodefiner.common.Expression;
 import nl.numworx.geodefiner.common.UIModel;
+import nl.numworx.geodefiner.common.math.Expression;
 import nl.tue.win.riaca.openmath.lang.OMApplication;
 import nl.tue.win.riaca.openmath.lang.OMObject;
 import nl.tue.win.riaca.openmath.lang.OMSymbol;

@@ -31,13 +31,20 @@ public class IntervalModel extends TextModel {
 			adapter.put(instance);
 			instance.install(item);
 		}
+		DefaultAdapter adapterP = DefaultAdapter.getDefault(item.getP());
 		if (step == null)
+		{
 			adapter.put(StepValue.class, null);
+			adapterP.put(Label.class, null);
+		}
 		else
-			adapter.put(StepValue.class, new StepValue(Numbers.createDouble(step.doubleValue())));
+		{	Label min = (Label) item.getDepend()[0];
+			adapter.put(StepValue.class, new StepValue(Numbers.createDouble(step.doubleValue()),min));
+			adapterP.put(Label.class, item);
+		}
 		super.install();
 		ColorStyle css = item.adapt(ColorStyle.class);
-		DefaultAdapter.getDefault(item.getP()).put(css);
+		adapterP.put(css);
 		DefaultAdapter.getDefault(item.getP().getDepend()[0]).put(css);
 		HorizontalPunt hp = (HorizontalPunt) ((Segment) item.getP().getDepend()[0]).getP2();
 		hp.setDistance(Numbers.createDouble(length));
