@@ -93,6 +93,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView
 	int breedtePaul = 950; //maximale breedte stand-alone 
 	int breedte = 784;
 	int hoogte = 575;
+	int hoogtePaul = 575;
 	int bottomHeight = 32;
 	int jlsHoogte = hoogte - bottomHeight - offSet;
 	int ubxKlein = jlsBreedteKlein + 2 * offSet; //programmaVeldZichtbaar ? scheidingX+5 : 5;
@@ -216,7 +217,7 @@ logger.info("WebLogoGWT constructor");
 logger.info("WebLogoGWT uncompiled init");
 
 			//this.breedte = width;
-			//this.hoogte = height;
+			this.hoogte = height;
 			
 			//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 			
@@ -251,15 +252,16 @@ logger.info("WebLogoGWT uncompiled init");
 				{
 					this.breedte = breedteGroot;
 					ubb = ubbGroot;
-logger.info("bg = " + breedte);
-logger.info("ubb = " + ubb);
+//logger.info("bg = " + breedte);
+//logger.info("ubb = " + ubb);
 				}
 				else
 				{
 					this.breedte = breedteKlein;
 					ubb = ubbKlein;
 				}
-				// hoogte is al gezet
+				jlsHoogte = hoogte - bottomHeight - offSet;
+				ubh = jlsHoogte;
 			}
 			else if (!uitvoerVeldZichtbaar && programmaVeldZichtbaar)
 			{
@@ -271,8 +273,8 @@ logger.info("ubb = " + ubb);
 				{
 					this.breedte = jlsBreedteKlein + 2 * offSet;
 				}
-				
-				// hoogte is al gezet
+				jlsHoogte = hoogte - bottomHeight - offSet;
+				ubh = jlsHoogte;
 			}
 			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
 			{
@@ -287,7 +289,7 @@ logger.info("ubb = " + ubb);
 			if (launchState != null && !launchState.containsKey("state"))
 			{
 				breedte = breedtePaul;
-				// hoogte is al gezet
+				hoogte = hoogtePaul;
 				ubb = ubbPaul;
 System.out.println("paul");				
 			}

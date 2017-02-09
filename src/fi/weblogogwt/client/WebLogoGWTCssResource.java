@@ -29,4 +29,6 @@ public interface WebLogoGWTCssResource extends CssResource
 	String varlabel();
 	
 	String vardisplay();
+	
+	String borderless();
 }

@@ -210,7 +210,8 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 	{
 		currentlevel = varset.getLevel();
 //verhuisd		
-		owner.methodeLabel.setText(actualCommand);
+		if (owner.methodeLabel != null)
+			owner.methodeLabel.setText(actualCommand);
 		if ( isVartracing )
 		{
 //verhuisd			

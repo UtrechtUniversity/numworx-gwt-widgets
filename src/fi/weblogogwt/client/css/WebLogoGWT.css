@@ -86,4 +86,8 @@
 	font-family: Helvetica, sans serif;
 	white-space: pre;
 	
-}	
+}
+
+.borderless {
+	border-collapse: collapse;	
+}

@@ -104,7 +104,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	 * ProgrammaPanelHeight
 	 */
 //GWT	
-	public static final int pph = 525;
+	public static int pph = 525;
 	/**
 	 * ProgrammaPanelX
 	 */
@@ -257,6 +257,7 @@ for (int i = 0; i < messages.length; i++)
 		// programmaPanel bevat de 'programma's' waar we componenten op kunnen droppen
 		//programmaPanel = new JPanel();
 		//programmaPanel.setBounds(ppx, ppy, ppw, pph);
+		pph = hoogte - 20;
 		programmaPanel = new Rectangle(ppx, ppy, ppw, pph);
 		
 		//programmaPanel.setBackground(Color.WHITE);
