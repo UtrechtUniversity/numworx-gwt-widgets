@@ -11,6 +11,11 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+//import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
+
+
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -22,22 +27,16 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
-
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
@@ -56,7 +55,7 @@ import java.util.logging.Logger;
 
 import fi.weblogogwt.client.text.Text;
 
-public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView 
+public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener 
 {
 	
 	public static Text rb;
@@ -721,6 +720,12 @@ logger.info("setState");
 logger.info("WebLogoGWT setComRoot");		
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
+		comRoot.addCBookEventListener("text.program", this);
+		comRoot.addCBookEventListener("double.input", this);
+		comRoot.addCBookEventListener("double.input1", this);
+		comRoot.addCBookEventListener("double.input2", this);
+		comRoot.addCBookEventListener("double.input3", this);
+		comRoot.addCBookEventListener("double.input4", this);
 
 
 	}
@@ -768,5 +773,90 @@ logger.info("WebLogoGWT setComRoot");
 		return null;
 	}
 
+
+	//@Override
+	//public void addCBookEventListener(CBookEventListener listener, String command) {
+	//	cbookEventHandler.addCBookEventListener(listener, command);
+	//}
+
+	//@Override
+	//public void removeCBookEventListener(CBookEventListener listener,String command) {
+	//	cbookEventHandler.removeCBookEventListener(listener, command);
+	//}
+
+	//@Override
+	public String[] getSendCmds() {
+		String[] commands = {"text.program"};
+		return commands;
+	}
+
+	//@Override
+	public String[] getAcceptedCmds() {
+		String[] commands = {"text.program", "double.input", "double.input1", "double.input2", "double.input3", "double.input4"};
+		return commands;
+	}
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+		if(command.startsWith("text"))
+		{
+			
+System.out.println("accCBookEv " + command);			
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	String code = (String)map.get("program");
+				HashMap<String,Object> inputVars = (HashMap<String,Object>)map.get("inputVars");
+				jlsVeld.setInputVars(inputVars);
+				jlsVeld.importeer(code);	
+				uitvoerblad.paintDrawing(false);
+			}
+		}
+		if(command.startsWith("double"))
+		{
+			
+System.out.println("accCBookEv " + command);			
+			Map map = (Map)event.getParameters();
+			if(map!=null && command.equals("double.input"))
+			{	String name = (String)map.get("name");
+				double waarde = ((Double)map.get("value")).doubleValue();
+				jlsVeld.setInputVar(name, waarde);
+				uitvoerblad.paintDrawing(false);
+			}
+			else if(map!=null && command.startsWith("double.input"))
+			{	String name = command.substring(command.length()-1);
+				double waarde = ((Double)map.get("value")).doubleValue();
+				jlsVeld.setInputVar(name, waarde);
+				uitvoerblad.paintDrawing(false);
+			}
+			else if(map==null && command.startsWith("double.input"))
+			{	String message = event.getMessage();
+				double waarde = Double.parseDouble(message);
+				String name = command.substring(command.length()-1);
+				jlsVeld.setInputVar(name, waarde);
+				uitvoerblad.paintDrawing(false);
+			}
+			
+			String code = jlsVeld.getCode();
+			HashMap<String, Object> inputVars = jlsVeld.getInputVars();
+			Map<String,Object> map1 = new HashMap<String,Object>();
+			map1.put("program", code);
+			map1.put("inputVars", inputVars);
+			//cbookEventHandler.fire("text.program",map1);
+			comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
+		}
+	}
+
+	
+	//@Override
+	public String getLocalizedCmd(String cmd) {
+		
+		String localizedCmd = null; 
+		if (localizedCmd == null)
+			return cmd;
+		return localizedCmd;
+		
+		//return WebLogoGWT.rb.getString(CBA_PREFIX + cmd);
+	}
 
 }

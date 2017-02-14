@@ -493,6 +493,7 @@ for (int i = 0; i < messages.length; i++)
 		
 		if (vooruitCC.isVisible())
 			yLocation += 150;
+		
 		printCC.setLocation(printCC.getX(), yLocation);
 		printlCC.setLocation(printlCC.getX(), yLocation);
 		
@@ -500,7 +501,6 @@ for (int i = 0; i < messages.length; i++)
 			yLocation += 40;
 		else
 			yLocation += 10;
-
 		
 		varCC.setLocation(varCC.getX(), yLocation);
 		
@@ -952,6 +952,9 @@ for (int i = 0; i < messages.length; i++)
 	public void zetPrintCommandsZichtbaar(boolean b)
 	{	printCC.setVisible(b);
 		printlCC.setVisible(b);
+		
+System.out.println("printCC " + printCC.isVisible());
+System.out.println("printlCC " + printlCC.isVisible());
 		herschikStapel();
 	}
 	

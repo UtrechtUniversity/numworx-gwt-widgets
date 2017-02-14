@@ -87,6 +87,19 @@ public interface Text extends ConstantsWithLookup {
 	@DefaultStringValue("Klaar!")
 	String klaarTekst();
 
+	@DefaultStringValue("programma")
+	String CBA_text_program(); 
+	@DefaultStringValue("invoer-variabele")
+	String CBA_double_input();
+	@DefaultStringValue("invoer 1")
+	String CBA_double_input1();
+	@DefaultStringValue("invoer 2")
+	String CBA_double_input2();
+	@DefaultStringValue("invoer 3")
+	String CBA_double_input3();
+	@DefaultStringValue("invoer 4")
+	String CBA_double_input4();
+
 	
 	
 	

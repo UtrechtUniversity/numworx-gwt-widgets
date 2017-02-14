@@ -108,6 +108,8 @@ public abstract class CommandComponent //extends JPanel
 
 	public boolean contains(int x, int y)
 	{
+		if (!visible)
+			return false;
 		Rectangle rect = new Rectangle(xPos, yPos, breedte, hoogte);
 		return rect.contains(x, y);
 	}
