@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.numworx.geodefiner.common.Snapper;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -27,6 +29,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		launchDebug.put("checkDWO", checkDWO);
 		Map<String, Number> values = new HashMap<String, Number>();
 		init(getWidth(), getHeight(), launchDebug, values);
+		viewer.adapt(Snapper.class).setGravity(true);
 	}
 
 	

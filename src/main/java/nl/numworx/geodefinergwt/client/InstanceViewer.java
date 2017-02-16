@@ -26,6 +26,7 @@ import nl.numworx.geodefiner.common.CELL;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tips;
+import nl.numworx.geodefinergwt.client.SnapperImpl.PH;
 import nl.numworx.geodefinergwt.client.ui.AxesModel;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
@@ -48,91 +49,32 @@ import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
-import fi.euclides.model.SegmentVisitor;
 import fi.euclides.model.Triangle;
-import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
 import gwt.awt.Shape;
 import gwt.awt.geom.Area;
-import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 
-public class InstanceViewer extends SVGWidget {
+public class InstanceViewer extends SVGWidget implements PH {
 
-	private static final String TEXT_BOTTOM = "text-after-edge";
-	private static final String TEXT_TOP = "text-before-edge";
-	private static final String TEXT_CENTRAL = "central";
-	private static final String TEXT_START = "start";
-	private static final String TEXT_MIDDLE = "middle";
-	private static final String TEXT_END = "end";
 	private static final float DEFAULT_POINTSIZE = 5;
 	private AnimationHandle animator;
-	class SnapperImpl extends Snapper {
-		final int SNAP = 3;
-		boolean isGravity() { return gravity && moved; }
-		private boolean moved;
-		boolean isMoved() {
-			return moved;
-		}
-		void setMoved(boolean moved) {
-			this.moved = moved;
-		}
-	};
-	
+
 	@Override
 	public void processMouseUp(int x0, int y0) {
-		if(snapper.isGravity()) {
-			int ox = (int) getModel().getO().getXd();
-			int dx = (int) getModel().getU().getXd() - ox;
-			//System.out.print(ev.getX() + " " + ox + " " + dx);
-			int x = (x0-ox) % dx;
-			if ( x < 0 ) x += dx;
-			if ( x*2 > dx) x -= dx;
-			//System.out.println(" " + x);
-			if(x > snapper.SNAP || x < -snapper.SNAP) x = 0;
-
-			int oy = (int) getModel().getO().getYd();
-			int dy = dx;
-			//System.out.print(ev.getX() + " " + ox + " " + dx);
-			int y = (y0-oy) % dy;
-			if ( y < 0 ) y += dy;
-			if ( y*2 > dy) y -= dy;
-			//System.out.println(" " + x);
-			if(y > snapper.SNAP || y < -snapper.SNAP) y = 0;
-
-			x0 = x0+x;
-			y0 = y0+y;
-		}
-		super.processMouseUp(x0, y0);
+		snapper.pmUp(x0, y0, this);
+	}
+	public void pmUp(int x, int y) {
+		super.processMouseUp(x, y);
 	}
 	@Override
 	public void processMouseDrag(int x0, int y0) {
-		snapper.setMoved(true);
-		if(snapper.isGravity()) {
-			int ox = (int) getModel().getO().getXd();
-			int dx = (int) getModel().getU().getXd() - ox;
-			//System.out.print(ev.getX() + " " + ox + " " + dx);
-			int x = (x0-ox) % dx;
-			if ( x < 0 ) x += dx;
-			if ( x*2 > dx) x -= dx;
-			//System.out.println(" " + x);
-			if(x > snapper.SNAP || x < -snapper.SNAP) x = 0;
-
-			int oy = (int) getModel().getO().getYd();
-			int dy = dx;
-			//System.out.print(ev.getX() + " " + ox + " " + dx);
-			int y = (y0-oy) % dy;
-			if ( y < 0 ) y += dy;
-			if ( y*2 > dy) y -= dy;
-			//System.out.println(" " + x);
-			if(y > snapper.SNAP || y < -snapper.SNAP) y = 0;
-
-			x0 = x0+x;
-			y0 = y0+y;
-		}
-		super.processMouseDrag(x0, y0);
+		snapper.pmDrag(x0, y0, this);
+	}
+	public void pmDrag(int x, int y) {
+		super.processMouseDrag(x, y);
 	}
 
 	@Override
@@ -185,7 +127,7 @@ public class InstanceViewer extends SVGWidget {
 	}
 
 	@Override
-	protected void drawLine(double x1, double y1, double x2, double y2) {
+	public void drawLine(double x1, double y1, double x2, double y2) {
 		OMSVGLineElement line = doc.createSVGLineElement((float)x1, (float)y1, (float)x2, (float)y2);
 		OMSVGStyle style = line.getStyle();
 		style.setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, color);
@@ -489,20 +431,6 @@ public class InstanceViewer extends SVGWidget {
 		
 	}
 
-	protected void drawString(String value, double x, double y,
-			String h, String v, String bg) {
-		drawString(value, x, y);
-		OMSVGTextElement text = (OMSVGTextElement) getBody().getLastChild();
-		OMSVGStyle style = text.getStyle();
-		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
-		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
-		if(bg != null) { // TODO randje?
-			OMSVGRect bbox = text.getBBox();
-			OMSVGRectElement rect = doc.createSVGRectElement(bbox);
-			rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, background);
-			getBody().insertBefore(rect, text);
-		}
-	}
 
 	private void drawYnumbers() {
 		double bottom = clipBottom().doubleValue();
@@ -532,52 +460,11 @@ public class InstanceViewer extends SVGWidget {
 		color = "black";
 		drawString("0", x, y, TEXT_END, TEXT_TOP, background);
 	}
+
 	private void visitIntegral(Integral l) {
 		selectColor(l);
-		final double y0;
-
-		if(l.base > 0) y0 = clipTop().doubleValue();
-		else if( l.base < 0) y0 = clipBottom().doubleValue();
-		else y0 = getModel().getO().getYd();
-
-		final Area shape = new Area();
-		l.visitSegments(new SegmentVisitor() {
-
-			@Override
-			public void visitSegment(Segment s) {
-				double x1 = s.getX1();
-				double x2 = s.getX2();
-				double y1 = s.getY1();
-				double y2 = s.getY2();
-				Path2D.Double path = new Path2D.Double();
-				path.moveTo(x1, y0);
-				path.lineTo(x1, y1);
-				path.lineTo(x2, y2);
-				path.lineTo(x2, y0);
-				path.closePath();
-				Area area = new Area(path);
-				shape.add(area);
-			}
-
-			@Override
-			public Numbers clipTop() {
-				return Numbers.createDouble(Double.NEGATIVE_INFINITY);
-			}
-
-			@Override
-			public Numbers clipBottom() {
-				return Numbers.createDouble(Double.POSITIVE_INFINITY);
-			}
-
-			@Override
-			public Numbers clipLeft() {
-				return InstanceViewer.this.clipLeft();
-			}
-
-			@Override
-			public Numbers clipRight() {
-				return InstanceViewer.this.clipRight();
-			} });
+		Area shape = new Area();
+		l.visitSegments(new IntegralVisitor(l, shape, this));
 //g.fill(shape);
 		PathIterator iter = shape.getPathIterator(null);
 		OMSVGPathElement path = doc.createSVGPathElement();

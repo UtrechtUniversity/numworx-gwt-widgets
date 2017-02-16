@@ -29,7 +29,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,10 +40,12 @@ import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.gwt.ViewerWidget;
+import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Model;
 import fi.euclides.model.Track;
 import fi.euclides.model.math.DoubleFormat;
+import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.LabelDelegate;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
@@ -146,12 +147,21 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			return viewer.getHitTester();
 		}
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T adapt(Class<T> cls) {
+			if(fi.euclides.openmath.Expression.class == cls) 
+				return (T) expression;
 			return viewer.adapt(cls);
 		}
-		
+
+		fi.euclides.openmath.Expression expression;
 	}
+	
+	static {
+		Numbers.setFactory(IntegerFactory.INSTANCE);
+	}
+	
 	
 	public GeoDefinerGWT() {}
 	
@@ -300,7 +310,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		DoubleFormat.setInstance(new PrettyFormat());
 		Messages.setInstance(new MessagesImpl(rb));
 		viewer = widget.getViewer();
-		viewer = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
+		TrackerImpl ti;
+		viewer = ti = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
+		ti.expression = new nl.numworx.geodefiner.common.math.Expression(ti);
 		uiModelFactory = new UIModelFactory(viewer);
 		widget.setMapper(viewer.getMapper());
 		SelectHandler h = selector;
