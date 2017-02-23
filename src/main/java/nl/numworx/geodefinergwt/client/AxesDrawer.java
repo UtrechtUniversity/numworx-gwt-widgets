@@ -26,7 +26,7 @@ class AxesDrawer implements Visitor {
 			super();
 			this.widget = widget;
 			viewer = widget.getViewer();
-			ll.setClip(viewer.clipRight(), viewer.clipTop(), viewer.clipLeft(), viewer.clipBottom());
+			ll.setClip(viewer.clipLeft(), viewer.clipTop(), viewer.clipRight(), viewer.clipBottom());
 		}
 
 		public void visitBoog(Boog b) {
@@ -81,7 +81,7 @@ class AxesDrawer implements Visitor {
 			}
 			Lijn y = (Lijn) getModel().getLijnen().elementAt(1);
 			if(grid.isVisible() && !y.isVisible() && y.isDefined()) {
-				// draw x in grid mode
+				// draw y in grid mode
 				ll.setLijn(y);
 				widget.drawLine(ll.getX1(), ll.getY1() , ll.getX2(), ll.getY2());		
 			}
@@ -140,7 +140,7 @@ class AxesDrawer implements Visitor {
 			double top = viewer.clipTop().doubleValue();
 			double x = getModel().getO().getXd()-2;
 			double y = getModel().getO().getYd();
-			double dy = getModel().getU().getXd() - x;
+			double dy = getModel().getU().getXd() - x -2;
 			if (dy <= 1) return;
 			int i = 0, s = 1;
 			while(dy < 20) { dy += dy; s+=s; if(dy >= 20) break; dy = 2.5*dy; s += s+s/2; if(dy >= 20) break; dy += dy; s += s; }

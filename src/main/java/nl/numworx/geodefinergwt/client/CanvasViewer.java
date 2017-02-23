@@ -1,8 +1,9 @@
 package nl.numworx.geodefinergwt.client;
 
-import org.vectomatic.dom.svg.OMSVGPathElement;
-import org.vectomatic.dom.svg.OMSVGPathSegList;
+import org.vectomatic.dom.svg.OMSVGLength;
+import org.vectomatic.dom.svg.OMSVGRect;
 import org.vectomatic.dom.svg.OMSVGStyle;
+import org.vectomatic.dom.svg.OMSVGTextElement;
 import org.vectomatic.dom.svg.utils.SVGConstants;
 
 import com.google.gwt.animation.client.AnimationScheduler;
@@ -10,22 +11,34 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import fi.euclides.gwt.RectShape;
+import fi.euclides.gwt.canvas.SpeelVeld;
+import fi.euclides.gwt.svg.SVGRectShape;
+import fi.euclides.model.Destroyable;
+import fi.euclides.model.Label;
+import fi.euclides.model.Locus;
+import fi.euclides.model.Punt;
+import fi.euclides.model.Segment;
+import fi.euclides.model.Triangle;
+import fi.euclides.proof.FlipFlop;
+import fi.euclides.util.Adapter;
+import fi.euclides.util.DefaultAdapter;
+import gwt.awt.Shape;
+import gwt.awt.geom.Area;
+import gwt.awt.geom.Path2D;
+import gwt.awt.geom.PathIterator;
+import nl.numworx.geodefiner.common.Align;
+import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
+import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
-import fi.euclides.gwt.canvas.SpeelVeld;
-import fi.euclides.model.Destroyable;
-import fi.euclides.model.Punt;
-import fi.euclides.model.Segment;
-import fi.euclides.model.Triangle;
-import fi.euclides.util.Adapter;
-import fi.euclides.util.DefaultAdapter;
-import gwt.awt.Shape;
-import gwt.awt.geom.Path2D;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 
 public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
+	private static final float DEFAULT_POINTSIZE = 5;
 
 	private AnimationHandle animator;
 
@@ -199,6 +212,161 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		
 	}
 
-	
-	
+	@Override
+	public void visitPunt(Punt punt) {
+		Float ps = punt.adapt(Float.class);
+		if(ps != null) 
+			pointSize = ps.floatValue();
+		else
+			pointSize = DEFAULT_POINTSIZE;
+		super.visitPunt(punt);
+	}
+
+	private void visitIntegral(Integral l) {
+		selectColor(l);
+		Area shape = new Area();
+		l.visitSegments(new IntegralVisitor(l, shape, this));
+		PathIterator iter = shape.getPathIterator(null);
+		context.beginPath();
+		while(!iter.isDone()) {
+			float[] p = new float[6];
+			switch( iter.currentSegment(p)) {
+			case PathIterator.SEG_MOVETO: 
+				context.moveTo(p[0], p[1]);
+				break;
+			case PathIterator.SEG_LINETO:
+				context.lineTo(p[0], p[1]);
+				break;
+			case PathIterator.SEG_CLOSE:
+				context.closePath();
+				break;
+			}
+			iter.next();
+		}
+		context.fill();
+
+		DefaultAdapter.getDefault(l).put(Shape.class, shape);
+	}
+	@Override
+	public void visitLocus(Locus l) {
+		if(l instanceof Integral) {
+			visitIntegral( (Integral) l);
+		} else
+		super.visitLocus(l);
+	}
+
+	public void visitFormule(Label label) {
+		Align align = label.adapt(Align.class);
+		if(align == null) align = Align.BASE;
+		else if(align == Align.NONE) return;
+		FormuleViewer viewer = new FormuleViewer(label.getString());
+		FontStyle fs = label.adapt(FontStyle.class);
+		if(fs != null) viewer.setFont(fs.getFont());
+		float w = viewer.getWidth();
+		float h = viewer.getHeight();
+		float as = viewer.getAsHoogte();
+		float x = (float) label.getXd();
+		float y = (float) label.getYd();
+		switch(align) {
+		default: y -= as; break;
+		case LEFT: x -= w;
+		case RIGHT: y -= h/2.0f; break;
+		case TOP: y -= h;
+		case BOTTOM: x -= w/2.0f; break;
+		}
+		RectShape r = new RectShape(x, y, w, h);
+		context.drawImage(viewer.getCanvas().getCanvasElement(), x, y);
+		DefaultAdapter.getDefault(label).put(Shape.class, r);
+
+	}
+	private void visitFlipFlop(Label label) {
+		boolean value = label.getState() != Label.FALSE;
+		String off = "none";
+		String on = "gray";
+		float x = (float) label.getXd();
+		float y = (float) label.getYd();
+//		OMSVGGElement g = doc.createSVGGElement();
+//		OMSVGRectElement rect = doc.createSVGRectElement(x, y, 10, 10, 1, 1);
+//		rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, value?on:off);
+//		rect.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "black");
+		if(value) {
+			context.setFillStyle("gray");
+			context.fillRect(x, y, 10, 10);
+		}
+		selectColor(label);
+		context.strokeRect(x, y, 10, 10);
+		String string = getMapper().toString(label);
+		drawString(string, x+12, y+10);
+		RectShape r = new RectShape(x, y, 12 + context.measureText(string).getWidth(), 10);
+		
+//		OMSVGTextElement text = doc.createSVGTextElement(x+12, y+10, OMSVGLength.SVG_LENGTHTYPE_NUMBER,string);
+//		g.appendChild(rect);
+//		g.appendChild(text);
+//		getBody().appendChild(g);
+//		OMSVGRect bbox = g.getBBox();
+		DefaultAdapter.getDefault(label).put(Shape.class, r);
+	}
+
+	@Override
+	public void visitLabel(Label label) {
+		if(label.getRegistered() instanceof FlipFlop) {
+			visitFlipFlop(label);
+			return;
+		}
+		if(label.getString().contains("$")||true) // FIXME true = label.adapt(Boolean) ?
+		{
+			visitFormule(label);
+			return;
+		}
+		selectColor(label);
+		String string = label.getString();
+		double x = label.getXd();
+		double y = label.getYd();
+		Align align = label.adapt(Align.class);
+		String h = null;
+		String v = null;
+		if(align != null) {
+			switch(align) {
+			case LEFT:   h = TEXT_END;   v = TEXT_CENTRAL; break; 
+			case RIGHT:  h = TEXT_START; v = TEXT_CENTRAL; break;
+			case BOTTOM: h = TEXT_MIDDLE;v = TEXT_TOP;     break;
+			case TOP:    h = TEXT_MIDDLE;v = TEXT_BOTTOM;  break;
+			default: 
+			}
+		} else align = Align.BASE;
+//		short unitType = OMSVGLength.SVG_LENGTHTYPE_NUMBER;
+//		OMSVGTextElement text = doc.createSVGTextElement((float)x, (float)y, unitType, string);
+//		OMSVGStyle style = text.getStyle();
+//		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
+//		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
+//		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
+		FontStyle fs = label.adapt(FontStyle.class);
+		if(fs != null) fs.toStyle(context);
+//		getBody().appendChild(text);
+//		OMSVGRect bbox = text.getBBox();
+//		switch(align) {
+//		case LEFT:	x += x - bbox.getMaxX(); break; //als maxx > x dan x moet minder worden
+//		case BASE:
+//		case NONE:
+//		case RIGHT: x += x - bbox.getX(); break;
+//		case BOTTOM: 
+//		case TOP:	x += x - bbox.getCenterX(); break;
+//		}
+//		switch(align) {
+//		case LEFT:	
+//		case RIGHT: y += y - bbox.getCenterY(); 
+//			break;
+//		case BASE:
+//		case NONE: break;
+//		case BOTTOM: y += y - bbox.getY(); break;
+//		case TOP:	y += y - bbox.getMaxY(); break;
+//		}
+//// This is how to position after bbox FIXME DOES NOT WORK?
+//		text.getX().getBaseVal().getItem(0).setValue((float) x);
+//		text.getY().getBaseVal().getItem(0).setValue((float) y);
+//		
+//		bbox = text.getBBox();
+//		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
+	}
+
 }

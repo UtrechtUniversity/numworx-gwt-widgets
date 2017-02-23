@@ -6,6 +6,7 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 
@@ -15,6 +16,11 @@ public class FontStyle {
 	public void toStyle(Style style) {
 		style.setFontSize(size, Unit.PX);
 	}
+
+	public void toStyle(Context2d ctx) {
+		ctx.setFont(getFont().toString());
+	}
+	
 	
 	public FormuleFont getFont() {
 		return FormuleFont.createFromFontSize(Math.round(size));
