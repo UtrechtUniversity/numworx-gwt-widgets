@@ -15,7 +15,12 @@ public class LineModel extends ColorModel<Destroyable> {
 			"5, 3" , 
 			"5, 3, 1, 3"
 	};
-	
+	double dash[][] = {
+			null,
+			{ 1, 3 },
+			{ 5, 3 },
+			{ 5, 3, 1, 3 }
+	};
 	
 	/* (non-Javadoc)
 	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#install()
@@ -23,7 +28,7 @@ public class LineModel extends ColorModel<Destroyable> {
 	@Override
 	public void install() {
 		super.install();
-		DefaultAdapter.getDefault(item).put(new StrokeStyle(Float.toString(width), dashes[type.ordinal()]));
+		DefaultAdapter.getDefault(item).put(new StrokeStyle(Float.toString(width), dashes[type.ordinal()], width, dash[type.ordinal()]));
 	}
 
 	/* (non-Javadoc)

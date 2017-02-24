@@ -15,11 +15,13 @@ public class TextModel extends ColorModel<Label> {
 	public Align align = Align.BASE;
 	private FontStyle font = new FontStyle();
 	private float dx, dy;
+	Boolean alwaysF;
 
 	@Override
 	public void install() {
 		DefaultAdapter.getDefault(item).put(align);
 		DefaultAdapter.getDefault(item).put(font);
+		DefaultAdapter.getDefault(item).put(Boolean.class, alwaysF);
 		Punt p = item.getP();
 		if(p instanceof Volgpunt) {
 			((Volgpunt) p).setDxy(Numbers.createDouble(dx), Numbers.createDouble(dy));
@@ -39,6 +41,8 @@ public class TextModel extends ColorModel<Label> {
 		Map<String, Object> map = super.toMap();
 		map.put("align", align.name());
 		map.put("font", font.toMap());
+		if( Boolean.TRUE.equals(alwaysF))
+			map.put("alwaysF", alwaysF);
 		return map;
 	}
 
@@ -58,6 +62,7 @@ public class TextModel extends ColorModel<Label> {
 		if (map.containsKey("font")) {
 			font.fromMap(map.getObjectMap("font"));
 		}
+		alwaysF = map.getBoolean("alwaysF", false);
 		super.fromMap(map);
 	}
 

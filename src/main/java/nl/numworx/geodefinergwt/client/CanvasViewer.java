@@ -29,6 +29,7 @@ import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.Integral;
+import nl.numworx.geodefiner.common.ShortSegment;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
@@ -188,10 +189,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		switch(tip) {
 		case ATEND: tip(s.getP2(), -dx, -dy); break;
 		case ATSTARTEND: tip(s.getP2(),-(dx), -(dy));
-		case ATSTART: tip(s.getP1(), dx, dy);
-		case NOTIP: 
+		case ATSTART: tip(s.getP1(), dx, dy); break;
+		case NOTIP: return s;
 		}
-		return s;
+		return new ShortSegment(s, dx, dy, tip);
 	}
 
 	private void tip(Punt p1, double dx, double dy) {
@@ -313,7 +314,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			visitFlipFlop(label);
 			return;
 		}
-		if(label.getString().contains("$")||true) // FIXME true = label.adapt(Boolean) ?
+		if (label.getString().contains("$")
+		  ||Boolean.TRUE.equals(label.adapt(Boolean.class)))
 		{
 			visitFormule(label);
 			return;
