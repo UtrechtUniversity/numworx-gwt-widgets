@@ -441,7 +441,7 @@ public class VeldComponentGWT extends LayoutPanel {
 
 				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
 			}			
-			this
+		
 				
 			// adjust Row Positions
 			double posY = cSystemDiffEqPanelGWT_interObjectMarginY+cBorderMargin;
