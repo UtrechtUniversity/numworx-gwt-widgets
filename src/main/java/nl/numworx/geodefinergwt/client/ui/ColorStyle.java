@@ -8,4 +8,10 @@ public class ColorStyle {
 	public String getColor() { 
 		return color;
 	}
+
+	@Override
+	public String toString() {
+		return "ColorStyle [color=" + color + "]";
+	}
+	
 }

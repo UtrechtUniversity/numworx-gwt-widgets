@@ -34,6 +34,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	
 	@Override
 	public void install() {
+		//java.util.logging.Logger.getLogger("ColorModel").info("install " + item + " " + rgba);
 		ColorStyle css = new ColorStyle(colorString(rgba));
 		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);

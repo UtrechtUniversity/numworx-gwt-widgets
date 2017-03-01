@@ -21,8 +21,11 @@ public class StrokeStyle implements SVGConstants {
 		this.dash = dash;
 	}
 
-	StrokeStyle(String w, String d) {
-		this(w,d,Double.parseDouble(w), null);
+	StrokeStyle( double lw, double dash[]) {
+		width = null;
+		dasharray = null;
+		lineWidth = lw;
+		this.dash = dash;
 	}
 	
 	

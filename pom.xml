@@ -140,5 +140,7 @@
 		<formuleVersion>0.0.2</formuleVersion>
 		<debug></debug>
 		<gwtVersion>2.7.0</gwtVersion>
+		<gwt.style>PRETTY</gwt.style>
+		<gwt.compiler.force>true</gwt.compiler.force>	
 	</properties>
 </project>

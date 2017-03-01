@@ -28,7 +28,7 @@ public class LineModel extends ColorModel<Destroyable> {
 	@Override
 	public void install() {
 		super.install();
-		DefaultAdapter.getDefault(item).put(new StrokeStyle(Float.toString(width), dashes[type.ordinal()], width, dash[type.ordinal()]));
+		DefaultAdapter.getDefault(item).put(new StrokeStyle(/*Float.toString(width), dashes[type.ordinal()],*/ width, dash[type.ordinal()]));
 	}
 
 	/* (non-Javadoc)

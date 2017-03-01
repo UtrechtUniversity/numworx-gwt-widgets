@@ -140,6 +140,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		if(tracking || trail)
 			return;
 		Adapter a = object.getAdapter();
+		//java.util.logging.Logger.getLogger("CanvasViewer").info(object  + ".adapter=" + a);
 		stroke = a.adapt(StrokeStyle.class);
 		context.setLineWidth(1);
 		//context.setLineDash(null)
@@ -148,6 +149,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		else fill = f.getColor();
 		
 		ColorStyle c = a.adapt(ColorStyle.class);
+		//java.util.logging.Logger.getLogger("CanvasViewer").info("color = " + c);
 		if (c != null) {
 			// if selected?
 			setCssColor(CssColor.make(c.getColor()));
@@ -346,6 +348,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 //		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
 		FontStyle fs = label.adapt(FontStyle.class);
 		if(fs != null) fs.toStyle(context);
+		drawString(string, x, y, h, v, null);
 //		getBody().appendChild(text);
 //		OMSVGRect bbox = text.getBBox();
 //		switch(align) {
