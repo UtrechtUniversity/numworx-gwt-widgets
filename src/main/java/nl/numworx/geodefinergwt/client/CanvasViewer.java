@@ -127,8 +127,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		}
 		context.closePath();
 		path.closePath();
-		context.setFillStyle(fill);
-		context.fill();
+		if(!"none".equals(fill))
+		{	context.setFillStyle(fill);
+			context.fill();
+		}
 		if(stroke != null) stroke.toStyle(context);
 		context.stroke();
 		DefaultAdapter.getDefault(t).put(Shape.class, path);
