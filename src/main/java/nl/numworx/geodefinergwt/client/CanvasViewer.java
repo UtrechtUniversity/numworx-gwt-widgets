@@ -37,8 +37,11 @@ import nl.numworx.geodefinergwt.client.ui.FillStyle;
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
+	private static final FontStyle FONT_STYLE = new FontStyle();
+
 	private static final float DEFAULT_POINTSIZE = 5;
 
 	private AnimationHandle animator;
@@ -267,11 +270,12 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		FormuleViewer viewer = new FormuleViewer(label.getString());
 		FontStyle fs = label.adapt(FontStyle.class);
 		if(fs != null) viewer.setFont(fs.getFont());
+		else viewer.setFont(FONT_STYLE.getFont());
 		float w = viewer.getWidth();
 		float h = viewer.getHeight();
 		float as = viewer.getAsHoogte();
-		float x = (float) label.getXd();
-		float y = (float) label.getYd();
+		double x =  label.getXd();
+		double y =  label.getYd();
 		switch(align) {
 		default: y -= as; break;
 		case LEFT: x -= w;
@@ -295,7 +299,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 //		rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, value?on:off);
 //		rect.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "black");
 		if(value) {
-			context.setFillStyle("gray");
+			context.setFillStyle(on);
 			context.fillRect(x, y, 10, 10);
 		}
 		selectColor(label);
@@ -333,6 +337,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		String v = null;
 		if(align != null) {
 			switch(align) {
+			case NONE: return;
 			case LEFT:   h = TEXT_END;   v = TEXT_CENTRAL; break; 
 			case RIGHT:  h = TEXT_START; v = TEXT_CENTRAL; break;
 			case BOTTOM: h = TEXT_MIDDLE;v = TEXT_TOP;     break;
@@ -340,40 +345,30 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			default: 
 			}
 		} else align = Align.BASE;
-//		short unitType = OMSVGLength.SVG_LENGTHTYPE_NUMBER;
-//		OMSVGTextElement text = doc.createSVGTextElement((float)x, (float)y, unitType, string);
-//		OMSVGStyle style = text.getStyle();
-//		style.setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
-//		if(h != null) style.setSVGProperty(SVGConstants.CSS_TEXT_ANCHOR_PROPERTY, h);
-//		if(v != null) style.setSVGProperty(SVGConstants.CSS_DOMINANT_BASELINE_PROPERTY, v);
 		FontStyle fs = label.adapt(FontStyle.class);
-		if(fs != null) fs.toStyle(context);
+		if (fs == null) fs = FONT_STYLE;
+		
+		fs.toStyle(context);
 		drawString(string, x, y, h, v, null);
-//		getBody().appendChild(text);
-//		OMSVGRect bbox = text.getBBox();
-//		switch(align) {
-//		case LEFT:	x += x - bbox.getMaxX(); break; //als maxx > x dan x moet minder worden
-//		case BASE:
-//		case NONE:
-//		case RIGHT: x += x - bbox.getX(); break;
-//		case BOTTOM: 
-//		case TOP:	x += x - bbox.getCenterX(); break;
-//		}
-//		switch(align) {
-//		case LEFT:	
-//		case RIGHT: y += y - bbox.getCenterY(); 
-//			break;
-//		case BASE:
-//		case NONE: break;
-//		case BOTTOM: y += y - bbox.getY(); break;
-//		case TOP:	y += y - bbox.getMaxY(); break;
-//		}
-//// This is how to position after bbox FIXME DOES NOT WORK?
-//		text.getX().getBaseVal().getItem(0).setValue((float) x);
-//		text.getY().getBaseVal().getItem(0).setValue((float) y);
-//		
-//		bbox = text.getBBox();
-//		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));
+		FormuleFont ff = fs.getFont();
+		double fontHeight = ff.getHeight();
+		double ascent = ff.getAscent();
+		RectShape rect = new RectShape(x, y, context.measureText(string).getWidth(), fontHeight);
+		switch(align) {
+		case LEFT:	rect.x -= rect.width; break; //als maxx > x dan x moet minder worden
+		case BOTTOM: 
+		case TOP:	rect.x -= rect.width/2; break;
+		default:
+		}
+		switch(align) {
+		case LEFT:	
+		case RIGHT: rect.y -= rect.height/2; 
+			break;
+		case BASE:	rect.y -= ascent;break;
+		case TOP:	rect.y -= rect.height; break;
+		default:
+		}
+		DefaultAdapter.getDefault(label).put(Shape.class, rect);
 	}
 
 }

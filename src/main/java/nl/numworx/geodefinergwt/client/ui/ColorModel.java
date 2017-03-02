@@ -12,6 +12,7 @@ import nl.tue.win.riaca.openmath.lang.OMVariable;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.euclides.event.Tracker;
 import fi.euclides.formuleobjects.FormuleParser;
+import fi.euclides.formuleobjects.TokenMgrError;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.util.DefaultAdapter;
@@ -52,6 +53,8 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 				tracker.getModel().add(v);
 			
 			} catch (Exception e) {
+			} catch (TokenMgrError tme) {
+				tme.printStackTrace();
 			}
 		}
 	}
