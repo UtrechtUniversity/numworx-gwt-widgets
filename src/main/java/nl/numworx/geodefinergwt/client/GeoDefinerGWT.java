@@ -4,10 +4,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
+import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
@@ -50,8 +52,9 @@ import fi.euclides.proof.LabelDelegate;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
+import fi.wiskopdr.FormuleParser;
 
-public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer {
+public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer, Randomizer {
 
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
@@ -152,6 +155,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		public <T> T adapt(Class<T> cls) {
 			if(fi.euclides.openmath.Expression.class == cls) 
 				return (T) expression;
+			if(Randomizer.class == cls) 
+				return (T) GeoDefinerGWT.this;
 			return viewer.adapt(cls);
 		}
 
@@ -364,4 +369,22 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		return false;
 	}
 
+	@Override
+	public String randomize(String input) {
+		return randomize(random, input);
+	}
+
+	@Override
+	public String randomize(Map<String, Number> random, String text) {
+		try {
+			HashMap m = new HashMap(random);
+			String[] keys = random.keySet().toArray(new String[random.size()]);
+			return FormuleParser.randomizeString(text, keys, m);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "randomize " + text, e);
+		}
+		return super.randomize(random, text);
+	}
+
+	
 }

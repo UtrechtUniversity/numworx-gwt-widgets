@@ -3,6 +3,7 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.numworx.geodefiner.common.math.Expression;
 import nl.tue.win.riaca.openmath.lang.OMApplication;
@@ -41,12 +42,18 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		item.setVisible(visible);
 		if (visibility.getString() != null && tracker != null) {
 			try {
-				OMObject o = new FormuleParser(visibility.getString().substring(2)).logic();
+				String formula = visibility.getString();
+				Randomizer r = tracker.adapt(Randomizer.class);
+				if(r != null) formula = r.randomize(formula);
+				formula = formula.substring(2);
+				OMObject o = new FormuleParser(formula).logic();
 				OMApplication oma = new OMApplication();
 				oma.addElement(EUCLIDES_VISIBLE);
 				oma.addElement(new OMVariable(tracker.getMapper().toString(item)));
 				oma.addElement(o);
-				Expression expr = new Expression(tracker);
+				fi.euclides.openmath.Expression expr;
+				expr = tracker.adapt(fi.euclides.openmath.Expression.class);
+				if(expr == null) expr = new Expression(tracker);
 				visibility.destroy();
 				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
 				v.setVisible(false);
@@ -54,7 +61,6 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 			
 			} catch (Exception e) {
 			} catch (TokenMgrError tme) {
-				tme.printStackTrace();
 			}
 		}
 	}

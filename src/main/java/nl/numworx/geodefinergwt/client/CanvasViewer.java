@@ -1,19 +1,13 @@
 package nl.numworx.geodefinergwt.client;
 
-import org.vectomatic.dom.svg.OMSVGLength;
-import org.vectomatic.dom.svg.OMSVGRect;
-import org.vectomatic.dom.svg.OMSVGStyle;
-import org.vectomatic.dom.svg.OMSVGTextElement;
-import org.vectomatic.dom.svg.utils.SVGConstants;
-
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+import fi.euclides.event.NameMapper;
 import fi.euclides.gwt.RectShape;
 import fi.euclides.gwt.canvas.SpeelVeld;
-import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Locus;
@@ -45,6 +39,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private static final float DEFAULT_POINTSIZE = 5;
 
 	private AnimationHandle animator;
+
+	private NameMapper mapper = super.getMapper();
+	@Override public NameMapper getMapper() { return mapper; }
+	@Override public void setMapper(NameMapper n) { mapper = n; }
 
 	public CanvasViewer(int width, int height) {
 		super(width, height);
