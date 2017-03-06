@@ -21,7 +21,7 @@ public class StrokeStyle implements SVGConstants {
 		this.dash = dash;
 	}
 
-	StrokeStyle( double lw, double dash[]) {
+	public StrokeStyle( double lw, double dash[]) {
 		width = null;
 		dasharray = null;
 		lineWidth = lw;

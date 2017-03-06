@@ -37,7 +37,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private static final FontStyle FONT_STYLE = new FontStyle();
 
 	private static final float DEFAULT_POINTSIZE = 5;
-
+	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
 	private AnimationHandle animator;
 
 	private NameMapper mapper = super.getMapper();
@@ -143,8 +143,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		Adapter a = object.getAdapter();
 		//java.util.logging.Logger.getLogger("CanvasViewer").info(object  + ".adapter=" + a);
 		stroke = a.adapt(StrokeStyle.class);
-		context.setLineWidth(1);
-		//context.setLineDash(null)
+		DEFAULT_STROKE.toStyle(context);
 		FillStyle f = a.adapt(FillStyle.class);
 		if(f == null) fill = "none";
 		else fill = f.getColor();
@@ -301,6 +300,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			context.fillRect(x, y, 10, 10);
 		}
 		selectColor(label);
+		DEFAULT_STROKE.toStyle(context);
 		context.strokeRect(x, y, 10, 10);
 		String string = getMapper().toString(label);
 		drawString(string, x+12, y+10);
