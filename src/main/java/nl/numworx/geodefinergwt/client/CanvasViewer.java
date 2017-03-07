@@ -8,6 +8,7 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import fi.euclides.event.NameMapper;
 import fi.euclides.gwt.RectShape;
 import fi.euclides.gwt.canvas.SpeelVeld;
+import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Locus;
@@ -98,7 +99,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T adapt(Class<T> cls) {
-		if(cls == Snapper.class) return (T) snapper;		
+		if(cls == Snapper.class) return (T) snapper;
+		if(cls == AbstractViewer.class) return (T) this;
 		return super.adapt(cls);
 	}
 
@@ -268,20 +270,20 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		FontStyle fs = label.adapt(FontStyle.class);
 		if(fs != null) viewer.setFont(fs.getFont());
 		else viewer.setFont(FONT_STYLE.getFont());
-		float w = viewer.getWidth();
-		float h = viewer.getHeight();
-		float as = viewer.getAsHoogte();
+		double w = viewer.getWidth();
+		double h = viewer.getHeight();
+		double as = viewer.getAsHoogte();
 		double x =  label.getXd();
 		double y =  label.getYd();
 		switch(align) {
 		default: y -= as; break;
 		case LEFT: x -= w;
-		case RIGHT: y -= h/2.0f; break;
+		case RIGHT: y -= h/2.0; break;
 		case TOP: y -= h;
-		case BOTTOM: x -= w/2.0f; break;
+		case BOTTOM: x -= w/2.0; break;
 		}
 		RectShape r = new RectShape(x, y, w, h);
-		context.drawImage(viewer.getCanvas().getCanvasElement(), x, y);
+		context.drawImage(viewer.getCanvas().getCanvasElement(), x, y, w, h);
 		DefaultAdapter.getDefault(label).put(Shape.class, r);
 
 	}

@@ -7,6 +7,7 @@ import nl.numworx.geodefiner.common.Animator;
 import nl.numworx.geodefiner.common.StepValue;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import fi.euclides.model.Destroyable;
 import fi.euclides.model.HorizontalPunt;
 import fi.euclides.model.Label;
 import fi.euclides.model.Segment;
@@ -17,7 +18,7 @@ public class IntervalModel extends TextModel {
 	Animate animate = Animate.NONE;
 	double length = 50;
 	int interval = 2000;
-	Double step;
+	Double step, width;
 	
 	@Override
 	public void install() {
@@ -45,8 +46,16 @@ public class IntervalModel extends TextModel {
 		super.install();
 		ColorStyle css = item.adapt(ColorStyle.class);
 		adapterP.put(css);
-		DefaultAdapter.getDefault(item.getP().getDepend()[0]).put(css);
-		HorizontalPunt hp = (HorizontalPunt) ((Segment) item.getP().getDepend()[0]).getP2();
+		Destroyable segment = item.getP().getDepend()[0];
+		DefaultAdapter.getDefault(segment).put(css);
+		if(width != null) {
+			DefaultAdapter.getDefault(segment).put(new StrokeStyle(width.doubleValue(),null));
+			adapterP.put(Float.class, 5.0f * width.floatValue());
+		} else {
+			DefaultAdapter.getDefault(segment).put(StrokeStyle.class, null);
+			adapterP.put(Float.class, null);
+		}
+		HorizontalPunt hp = (HorizontalPunt) ((Segment) segment).getP2();
 		hp.setDistance(Numbers.createDouble(length));
 	}
 
@@ -75,6 +84,7 @@ public class IntervalModel extends TextModel {
 		map.put("interval", interval);
 		map.put("length", length);
 		if(step!=null) map.put("step", step); else map.remove("step"); 
+		if(width!= null) map.put("width", width);else map.remove("width");
 		return map;
 	}
 
@@ -96,6 +106,10 @@ public class IntervalModel extends TextModel {
 			step = map.getDouble("step");
 		else
 			step = null;
+		if (map.containsKey("width"))
+			width = map.getDouble("width");
+		else
+			width = null;
 		super.fromMap(map);
 	}
 
