@@ -291,26 +291,17 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		String on = "gray";
 		float x = (float) label.getXd();
 		float y = (float) label.getYd();
-//		OMSVGGElement g = doc.createSVGGElement();
-//		OMSVGRectElement rect = doc.createSVGRectElement(x, y, 10, 10, 1, 1);
-//		rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, value?on:off);
-//		rect.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "black");
 		if(value) {
 			context.setFillStyle(on);
 			context.fillRect(x, y, 10, 10);
 		}
 		selectColor(label);
+		FONT_STYLE.toStyle(context);
 		DEFAULT_STROKE.toStyle(context);
 		context.strokeRect(x, y, 10, 10);
 		String string = getMapper().toString(label);
 		drawString(string, x+12, y+10);
 		RectShape r = new RectShape(x, y, 12 + context.measureText(string).getWidth(), 10);
-		
-//		OMSVGTextElement text = doc.createSVGTextElement(x+12, y+10, OMSVGLength.SVG_LENGTHTYPE_NUMBER,string);
-//		g.appendChild(rect);
-//		g.appendChild(text);
-//		getBody().appendChild(g);
-//		OMSVGRect bbox = g.getBBox();
 		DefaultAdapter.getDefault(label).put(Shape.class, r);
 	}
 

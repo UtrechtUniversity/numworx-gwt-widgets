@@ -66,6 +66,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private boolean volledigeBreedte;
 	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
 	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+	private static final String CHECK = "check";
 
 	@UiField DockLayoutPanel southPanel;
 	@UiField Label status;
@@ -275,6 +276,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("double", this);
+		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
 	}
 
@@ -316,10 +318,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Messages.setInstance(new MessagesImpl(rb));
 		viewer = widget.getViewer();
 		TrackerImpl ti;
-		viewer = ti = new TrackerImpl(viewer, new NamingModel(viewer, new HashMap<String,Destroyable>()));
+		NamingModel mapper = new NamingModel(viewer, new HashMap<String,Destroyable>());
+		viewer = ti = new TrackerImpl(viewer, mapper);
 		ti.expression = new nl.numworx.geodefiner.common.math.Expression(ti);
 		uiModelFactory = new UIModelFactory(viewer);
-		widget.setMapper(viewer.getMapper());
+		widget.setMapper(mapper);
 		SelectHandler h = selector;
 		h.setTracker(viewer);
 		viewer.setPointerHandler(h);
@@ -337,8 +340,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	@Override
 	public void acceptCBookEvent(CBookEvent event) {
-		// TODO Auto-generated method stub
-		
+		if(CHECK.equals(event.getCommand()) && checkDWO != null)
+		{
+			kijkNa();
+			return;
+		}
 	}
 
 	/* (non-Javadoc)
