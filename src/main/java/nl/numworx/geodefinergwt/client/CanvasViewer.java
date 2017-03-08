@@ -24,6 +24,7 @@ import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.Integral;
+import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.ShortSegment;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tips;
@@ -324,6 +325,16 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		double x = label.getXd();
 		double y = label.getYd();
 		Align align = label.adapt(Align.class);
+		float extra = 0;
+//zet het label correct tov het puntje.
+		if(label.getRegistered() instanceof Interval) {
+			try {
+				if(Align.NONE == align) return;
+				extra = 2;
+				extra = label.getP().adapt(Float.class) / 2.0f; // NPE? 
+			} catch (Exception e) {
+			}
+		}
 		String h = null;
 		String v = null;
 		if(align != null) {
@@ -331,8 +342,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			case NONE: return;
 			case LEFT:   h = TEXT_END;   v = TEXT_CENTRAL; break; 
 			case RIGHT:  h = TEXT_START; v = TEXT_CENTRAL; break;
-			case BOTTOM: h = TEXT_MIDDLE;v = TEXT_TOP;     break;
-			case TOP:    h = TEXT_MIDDLE;v = TEXT_BOTTOM;  break;
+			case BOTTOM: h = TEXT_MIDDLE;v = TEXT_TOP; y+=extra;    break;
+			case TOP:    h = TEXT_MIDDLE;v = TEXT_BOTTOM; y-=extra; break;
 			default: 
 			}
 		} else align = Align.BASE;
