@@ -1,16 +1,7 @@
 package fi.weblogogwt.client;
 
-//import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 //import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
@@ -26,27 +17,18 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.resources.client.ImageResource;
-
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.logotekenap.Tekenblad;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
@@ -545,6 +527,16 @@ logger.info("state != null");
 					jlsVeld.paramEditor.owner.parameterEdited(jlsVeld.paramEditor.getText());	
 				uitvoerblad.paintDrawing(false);
 				jlsVeld.paint();
+				
+				// bij klik op run-knop cross widget event afvuren
+				String code = jlsVeld.getCode();
+				HashMap<String, Object> inputVars = jlsVeld.getInputVars();
+				Map<String,Object> map1 = new HashMap<String,Object>();
+				map1.put("program", code);
+				map1.put("inputVars", inputVars);
+				//cbookEventHandler.fire("text.program",map1);
+				//comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
+				fireCBookEvent("text.program", map1);
 			} 
 			else if (e.getSource() == traceAanKnop)
 			{
@@ -843,10 +835,22 @@ System.out.println("accCBookEv " + command);
 			map1.put("program", code);
 			map1.put("inputVars", inputVars);
 			//cbookEventHandler.fire("text.program",map1);
-			comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
+			//comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
+			fireCBookEvent("text.program", map1);
 		}
 	}
 
+	/**
+	 * Fire cross widget event with the given command and map.
+	 */
+	public void fireCBookEvent(String command, Map<String, Object> map)
+	{
+		if (comRoot != null)
+		{
+			CBookEvent event = new CBookEvent(this, command, map);
+			comRoot.fireEvent(event);
+		}
+	}
 	
 	//@Override
 	public String getLocalizedCmd(String cmd) {
