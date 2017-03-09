@@ -837,6 +837,8 @@ System.out.println("accCBookEv " + command);
 					double waarde;
 					if (map.get("value") != null)
 					{
+						// Slider geeft command "double.input" met de waarde in "value" in map
+						
 						waarde = ((Double) map.get("value")).doubleValue();
 					}
 					else if (map.get("text") != null)
