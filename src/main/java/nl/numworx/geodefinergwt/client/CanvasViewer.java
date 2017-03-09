@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.awt.geom.GeneralPath;
+
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
@@ -12,9 +14,12 @@ import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Locus;
+import fi.euclides.model.MP;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
+import fi.euclides.model.SegmentVisitor;
 import fi.euclides.model.Triangle;
+import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
@@ -229,6 +234,47 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			pointSize = DEFAULT_POINTSIZE;
 		super.visitPunt(punt);
 	}
+	class PathVisitor implements SegmentVisitor {
+		
+		double x = Double.NEGATIVE_INFINITY;
+		double y = Double.NEGATIVE_INFINITY;
+		
+		@Override
+		public void visitSegment(Segment s) {
+			double x1, y1;
+			x1 = s.getX1();
+			y1 = s.getY1();
+			if(x1 != x || y1 != y)
+				context.moveTo(x1, y1);
+			x = s.getX2();
+			y = s.getY2();
+			context.lineTo(x, y);
+		}
+
+		@Override
+		public Numbers clipTop() {
+			return CanvasViewer.this.clipTop();
+		}
+
+		@Override
+		public Numbers clipBottom() {
+			return CanvasViewer.this.clipBottom();
+		}
+
+		@Override
+		public Numbers clipLeft() {
+			return CanvasViewer.this.clipLeft();
+		}
+
+		@Override
+		public Numbers clipRight() {
+			return CanvasViewer.this.clipRight();
+		}
+
+		public void destroy() {
+			context.stroke();
+		}
+	}
 
 	private void visitIntegral(Integral l) {
 		selectColor(l);
@@ -255,6 +301,18 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 
 		DefaultAdapter.getDefault(l).put(Shape.class, shape);
 	}
+
+	public void visitMP(MP l) {
+		selectColor(l);
+		if(stroke != null) stroke.toStyle(context);
+		trail = true;
+		PathVisitor v = new PathVisitor();
+		context.beginPath();
+		l.visitSegments(v);
+		v.destroy();
+		trail = false;
+	}
+
 	@Override
 	public void visitLocus(Locus l) {
 		if(l instanceof Integral) {
