@@ -789,55 +789,116 @@ logger.info("WebLogoGWT setComRoot");
 	}
 
 	@Override
-	public void acceptCBookEvent(CBookEvent event) {
-		String command = event.getCommand();
-		if(command.startsWith("text"))
+	public void acceptCBookEvent(CBookEvent event)
+	{
+		String code = "";
+
+		try
 		{
-			
-System.out.println("accCBookEv " + command);			
-			Map map = (Map)event.getParameters();
-			if(map!=null)
-			{	String code = (String)map.get("program");
-				HashMap<String,Object> inputVars = (HashMap<String,Object>)map.get("inputVars");
-				jlsVeld.setInputVars(inputVars);
-				jlsVeld.importeer(code);	
-				uitvoerblad.paintDrawing(false);
+			String command = event.getCommand();
+			if (command.startsWith("text"))
+			{
+System.out.println("accCBookEv " + command);
+				
+				Map map = (Map) event.getParameters();
+				if (map != null)
+				{
+					if ((String) map.get("program") != null)	
+					{
+						// Logo geeft command "text.program" en de code in "program" in map
+						
+						code = (String) map.get("program");
+						HashMap<String, Object> inputVars = (HashMap<String, Object>) map.get("inputVars");
+						jlsVeld.setInputVars(inputVars);
+						jlsVeld.importeer(code);
+						uitvoerblad.paintDrawing(false);
+					}
+					else if ((String) map.get("content") != null)
+					{
+						// check-tekstantwoordvak geeft command "text.program" en de code in "content" in map (en "logID" 0)
+						// tekst-antwoordvak geeft command "text.program" en de code in "content" in map
+						
+						code = (String) map.get("content");
+						HashMap<String, Object> inputVars = jlsVeld.getInputVars(); // moet dit?
+						jlsVeld.setInputVars(inputVars);
+						jlsVeld.importeer(code);
+						uitvoerblad.paintDrawing(false);
+					}
+				}
 			}
+			if (command.startsWith("double"))
+			{
+System.out.println("accCBookEv " + command);
+				Map map = (Map) event.getParameters();
+				
+				if (map != null && command.equals("double.input"))
+				{
+					String name = (String) map.get("name");
+					double waarde;
+					if (map.get("value") != null)
+					{
+						waarde = ((Double) map.get("value")).doubleValue();
+					}
+					else if (map.get("text") != null)
+					{
+						// FEWA geeft command "double.input" met de waarde in "text" in map
+						
+						waarde = Double.parseDouble((String) map.get("text"));
+						if (name == null)
+						{
+							name = "text";
+						}
+					}
+					else
+					{
+						waarde = 0; // er is iets mis gegaan...
+					}
+					jlsVeld.setInputVar(name, waarde);
+					uitvoerblad.paintDrawing(false);
+				}
+				else if (map != null && command.startsWith("double.input"))
+				{
+					String name = command.substring(command.length() - 1);
+					double waarde = ((Double) map.get("value")).doubleValue();
+					jlsVeld.setInputVar(name, waarde);
+					uitvoerblad.paintDrawing(false);
+				}
+				else if (map == null && command.startsWith("double.input"))
+				{
+					String message = event.getMessage();
+					double waarde = Double.parseDouble(message);
+					String name = command.substring(command.length() - 1);
+					jlsVeld.setInputVar(name, waarde);
+					uitvoerblad.paintDrawing(false);
+				}
+				// kan map leeg zijn met andere commands "input..."?
+			}
+			
+			// geef de gedane wijzigingen door aan mogelijke andere cross widget links
+			fireCBookEventCurrentProgram();
 		}
-		if(command.startsWith("double"))
+		catch (Exception e)
 		{
-			
-System.out.println("accCBookEv " + command);			
-			Map map = (Map)event.getParameters();
-			if(map!=null && command.equals("double.input"))
-			{	String name = (String)map.get("name");
-				double waarde = ((Double)map.get("value")).doubleValue();
-				jlsVeld.setInputVar(name, waarde);
-				uitvoerblad.paintDrawing(false);
-			}
-			else if(map!=null && command.startsWith("double.input"))
-			{	String name = command.substring(command.length()-1);
-				double waarde = ((Double)map.get("value")).doubleValue();
-				jlsVeld.setInputVar(name, waarde);
-				uitvoerblad.paintDrawing(false);
-			}
-			else if(map==null && command.startsWith("double.input"))
-			{	String message = event.getMessage();
-				double waarde = Double.parseDouble(message);
-				String name = command.substring(command.length()-1);
-				jlsVeld.setInputVar(name, waarde);
-				uitvoerblad.paintDrawing(false);
-			}
-			
-			String code = jlsVeld.getCode();
-			HashMap<String, Object> inputVars = jlsVeld.getInputVars();
-			Map<String,Object> map1 = new HashMap<String,Object>();
-			map1.put("program", code);
-			map1.put("inputVars", inputVars);
-			//cbookEventHandler.fire("text.program",map1);
-			//comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
-			fireCBookEvent("text.program", map1);
+			// something went wrong
+			// probably the code was not valid
+			System.out.println("WebLogoGWT.acceptCBookEvent(): error! code = " + code);
 		}
+	}
+	
+	/**
+	 * Fire cbook event with the current program
+	 * code and current input variables.
+	 */
+	private void fireCBookEventCurrentProgram()
+	{
+		String code = jlsVeld.getCode();
+		HashMap<String, Object> inputVars = jlsVeld.getInputVars();
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("program", code);
+		map1.put("inputVars", inputVars);
+		// cbookEventHandler.fire("text.program",map1);
+		// comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
+		fireCBookEvent("text.program", map1);
 	}
 
 	/**
