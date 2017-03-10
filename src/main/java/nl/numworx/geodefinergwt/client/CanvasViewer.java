@@ -41,7 +41,7 @@ import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
-	private static final FontStyle FONT_STYLE = new FontStyle();
+	static final FontStyle FONT_STYLE = new FontStyle();
 
 	private static final float DEFAULT_POINTSIZE = 5;
 	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
@@ -325,24 +325,21 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		Align align = label.adapt(Align.class);
 		if(align == null) align = Align.BASE;
 		else if(align == Align.NONE) return;
-		FormuleViewer viewer = new FormuleViewer(label.getString());
-		FontStyle fs = label.adapt(FontStyle.class);
-		if(fs != null) viewer.setFont(fs.getFont());
-		else viewer.setFont(FONT_STYLE.getFont());
-		double w = viewer.getWidth();
-		double h = viewer.getHeight();
-		double as = viewer.getAsHoogte();
 		double x =  label.getXd();
 		double y =  label.getYd();
+		FormuleCache fc = label.adapt(FormuleCache.class);
+		if(fc == null) fc = new FormuleCache(label);
+		double w = fc.getW();
+		double h = fc.getH();
 		switch(align) {
-		default: y -= as; break;
+		default: y -= fc.getAs(); break;
 		case LEFT: x -= w;
 		case RIGHT: y -= h/2.0; break;
 		case TOP: y -= h;
 		case BOTTOM: x -= w/2.0; break;
 		}
 		RectShape r = new RectShape(x, y, w, h);
-		context.drawImage(viewer.getCanvas().getCanvasElement(), x, y, w, h);
+		context.drawImage(fc.getElement(), x, y, w, h);
 		DefaultAdapter.getDefault(label).put(Shape.class, r);
 
 	}
