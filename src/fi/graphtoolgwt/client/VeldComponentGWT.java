@@ -47,7 +47,7 @@ import fi.wiskopdr.FormuleParser;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
-	private static Logger logger = Logger.getLogger("VeldComponentGWT");
+//	private static Logger logger = Logger.getLogger("VeldComponentGWT");
 	
 	public enum FieldGraphType {QUIVER, STREAMLINE};
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
@@ -170,10 +170,6 @@ public class VeldComponentGWT extends LayoutPanel {
 //		sp = new ScrollPanel(regelsPanel);
 //		sp.setWidget(regelsPanel);
 		
-		logger.info("VeldComponentBreedte = " + veldComponentBreedte);
-		logger.info("veldComponentHoogte = " + veldComponentHoogte);
-
-		
 		LayoutPanel mainPanel = new LayoutPanel();
 		this.add(mainPanel);
 		this.setWidgetLeftWidth(mainPanel, 0, Style.Unit.PX, veldComponentBreedte, Style.Unit.PX);
@@ -211,7 +207,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		stelselsPanel.add(systems[0]);
 		stelselsPanel.setWidgetLeftWidth(systems[0], 0, Style.Unit.PX, veldComponentBreedte-cVeldComponentGWT_widgetScrollMargin, Style.Unit.PX);
 		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, 
-				systems[0].getSystemHeight() + 2* cVeldComponentGWT_scrollWidgetBorderMargin, Style.Unit.PX);
+				systems[0].getSystemHeight()  /* 2* cVeldComponentGWT_scrollWidgetBorderMargin,*/, Style.Unit.PX);
 		resize();
 	}
 	
@@ -422,7 +418,7 @@ public class VeldComponentGWT extends LayoutPanel {
 
 			// Determine RowHeigth & system Height
 			int maxBeginWidth = 0;
-			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY;
+			this.systemHeight = cSystemDiffEqPanelGWT_interObjectMarginY + (int) cBorderMargin;
 			for (int i=0; i<nrFunctions; i++) {
 				rowHeight[i]=Math.max(functionBeginViewers[i].getHeight(), functionEditors[i].getHeight());
 				maxBeginWidth = Math.max(maxBeginWidth,functionBeginViewers[i].getWidth());
@@ -439,7 +435,7 @@ public class VeldComponentGWT extends LayoutPanel {
 					systemHalfHeight = systemHeight - rowHeight[i]/2;
 				}
 
-				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY;
+				this.systemHeight += cSystemDiffEqPanelGWT_interObjectMarginY + (double) cBorderMargin;
 			}			
 		
 				
@@ -464,7 +460,6 @@ public class VeldComponentGWT extends LayoutPanel {
 						Style.Unit.PX, functionEditors[i].getHeight(), Style.Unit.PX);
 				functionPanels[i].setWidgetLeftWidth(functionEditorPanels[i], maxBeginWidth+cSystemDiffEqPanelGWT_interObjectMarginX, Style.Unit.PX, 
 						systemWidth-rowStartX-cSystemDiffEqPanelGWT_interObjectMarginX-maxBeginWidth, Style.Unit.PX);
-				
 				
 				functionEditors[i].setFont(defaultfont);
 				functionEditors[i].setDefaultFont(defaultfont);	
@@ -500,13 +495,11 @@ public class VeldComponentGWT extends LayoutPanel {
 			ctx.arc(0.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
 			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
-			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0);
+			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin);
 			
-			ctx.arc(cSystemDiffEqPanelGWT_braceWidth/2.0,  systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin , 
-					cSystemDiffEqPanelGWT_braceWidth/2.0, 0.5*Math.PI, 1.0*Math.PI, false);
-//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth,  systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin , 
-//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
+			ctx.arc(cSystemDiffEqPanelGWT_braceWidth,  systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin, 
+					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 
 
 //			ctx.arc( cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
