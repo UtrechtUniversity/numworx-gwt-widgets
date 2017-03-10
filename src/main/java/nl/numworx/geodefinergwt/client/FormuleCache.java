@@ -60,7 +60,8 @@ class FormuleCache implements Observer {
 		return element;
 	}
 	
-	
-	
+	String toDataUrl() {
+		return viewer.getCanvas().toDataUrl();
+	}
 	
 }

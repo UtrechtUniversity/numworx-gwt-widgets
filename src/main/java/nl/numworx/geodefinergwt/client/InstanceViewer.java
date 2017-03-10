@@ -1,10 +1,5 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.Rectangle;
-
-import org.vectomatic.dom.svg.OMNode;
 import org.vectomatic.dom.svg.OMSVGEllipseElement;
 import org.vectomatic.dom.svg.OMSVGGElement;
 import org.vectomatic.dom.svg.OMSVGImageElement;
@@ -24,6 +19,7 @@ import org.vectomatic.dom.svg.utils.SVGConstants;
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.CELL;
 import nl.numworx.geodefiner.common.Integral;
+import nl.numworx.geodefiner.common.ShortSegment;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefinergwt.client.SnapperImpl.PH;
@@ -33,7 +29,6 @@ import nl.numworx.geodefinergwt.client.ui.FillStyle;
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
-import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
@@ -205,7 +200,7 @@ public class InstanceViewer extends SVGWidget implements PH {
 			visitFlipFlop(label);
 			return;
 		}
-		if(label.getString().contains("$")||true)
+		if(label.getString().contains("$")||Boolean.TRUE.equals(label.adapt(Boolean.class)))
 		{
 			visitFormule(label);
 			return;
@@ -321,10 +316,10 @@ public class InstanceViewer extends SVGWidget implements PH {
 		switch(tip) {
 		case ATEND: tip(s.getP2(), -dx, -dy); break;
 		case ATSTARTEND: tip(s.getP2(),-(dx), -(dy));
-		case ATSTART: tip(s.getP1(), dx, dy);
-		case NOTIP: 
+		case ATSTART: tip(s.getP1(), dx, dy);break;
+		case NOTIP: return s;
 		}
-		return s;
+		return new ShortSegment(s, dx, dy, tip);
 	}
 
 	private void tip(Punt p1, float dx, float dy) {
