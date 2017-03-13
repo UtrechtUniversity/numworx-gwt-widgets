@@ -169,9 +169,12 @@ public class InstanceViewer extends SVGWidget implements PH {
 		rect.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, value?on:off);
 		rect.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, "black");
 		String string = getMapper().toString(label);
-		OMSVGTextElement text = doc.createSVGTextElement(x+12, y+10, OMSVGLength.SVG_LENGTHTYPE_NUMBER,string);
 		g.appendChild(rect);
-		g.appendChild(text);
+		if(Align.NONE != label.adapt(Align.class))
+		{
+			OMSVGTextElement text = doc.createSVGTextElement(x+12, y+10, OMSVGLength.SVG_LENGTHTYPE_NUMBER,string);
+			g.appendChild(text);
+		}
 		getBody().appendChild(g);
 		OMSVGRect bbox = g.getBBox();
 		DefaultAdapter.getDefault(label).put(Shape.class, new SVGRectShape(bbox));

@@ -358,6 +358,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		DEFAULT_STROKE.toStyle(context);
 		context.strokeRect(x, y, 10, 10);
 		String string = getMapper().toString(label);
+		if(Align.NONE == label.adapt(Align.class)) string = "";
 		drawString(string, x+12, y+10, null, null, null);
 		RectShape r = new RectShape(x, y, 12 + context.measureText(string).getWidth(), 10);
 		DefaultAdapter.getDefault(label).put(Shape.class, r);
