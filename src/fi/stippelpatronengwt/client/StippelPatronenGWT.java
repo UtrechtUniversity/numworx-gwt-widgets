@@ -5,7 +5,7 @@ import java.util.Map;
 
 
 
-//import nl.uu.fi.dwo.interaction.client.InteractionView;
+import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -39,7 +39,7 @@ import com.google.gwt.resources.client.ImageResource;
 
 import java.util.logging.Logger;
 
-public class StippelPatronenGWT implements EntryPoint, InteractionStub, CBookEventListener 
+public class StippelPatronenGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener 
 {
 	private static Logger logger = Logger.getLogger("StippelPatronenGWT");
 	
