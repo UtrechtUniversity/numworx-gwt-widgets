@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client;
 
+import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.dom.client.CanvasElement;
 
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
@@ -17,6 +18,10 @@ class FormuleCache implements Observer {
 	private double w, h, as;
 	private CanvasElement element;
 	
+	boolean isValid() {
+		return string != null;
+	}
+	
 	@Override
 	public void update(Observable observable, Object arg) {
 		if(arg == Label.DESTROY) {
@@ -25,7 +30,11 @@ class FormuleCache implements Observer {
 		if (observable == item) {
 			if(! item.getString().equals(string))	
 				item.deleteObserver(this);
-				DefaultAdapter.getDefault(item).put(FormuleCache.class, null);
+				string = null; // Invalidate.
+				//DefaultAdapter.getDefault(item).put(FormuleCache.class, null);
+				Context2d ctx = viewer.getCanvas().getContext2d();
+				ctx.setStrokeStyle("#CCC");
+				ctx.strokeRect(1, 1, w-2, h-2);
 		}		
 	}
 

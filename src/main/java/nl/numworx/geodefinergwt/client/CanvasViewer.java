@@ -46,7 +46,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private static final float DEFAULT_POINTSIZE = 5;
 	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
 	private AnimationHandle animator;
-
+	private boolean down;
+	
 	private NameMapper mapper = super.getMapper();
 	@Override public NameMapper getMapper() { return mapper; }
 	@Override public void setMapper(NameMapper n) { mapper = n; }
@@ -83,6 +84,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private StrokeStyle stroke;
 	@Override
 	public void processMouseUp(int x0, int y0) {
+		down = false;
 		snapper.pmUp(x0, y0, this);
 	}
 	public void pmUp(int x, int y) {
@@ -100,6 +102,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	public void processMouseDown(int x, int y) {
 		snapper.setMoved(false);
 		super.processMouseDown(x, y);
+		down = true;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -329,6 +332,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		double y =  label.getYd();
 		FormuleCache fc = label.adapt(FormuleCache.class);
 		if(fc == null) fc = new FormuleCache(label);
+		else {
+				if(!down && !fc.isValid()) // als we de mouse down, laten we de cache staan.
+					fc = new FormuleCache(label);
+		}
 		double w = fc.getW();
 		double h = fc.getH();
 		switch(align) {
