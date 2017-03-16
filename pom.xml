@@ -51,8 +51,6 @@
   	<dependency>
   		<groupId>com.google.gwt</groupId>
   		<artifactId>gwt-user</artifactId>
-  		<version>${gwtVersion}</version>
-  		<scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -75,7 +73,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>formule</artifactId>
-  		<version>0.0.2</version>
+  		<version>0.0.3</version>
   	</dependency>
   </dependencies>
   <parent>
