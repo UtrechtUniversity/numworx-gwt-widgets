@@ -331,10 +331,13 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		double x =  label.getXd();
 		double y =  label.getYd();
 		FormuleCache fc = label.adapt(FormuleCache.class);
-		if(fc == null) fc = new FormuleCache(label);
+		if(fc == null) fc = new FormuleCache(label, context.getFillStyle());
 		else {
-				if(!down && !fc.isValid()) // als we de mouse down, laten we de cache staan.
-					fc = new FormuleCache(label);
+				if(!down && !fc.isValid(context.getFillStyle())) // als we de mouse down, laten we de cache staan.
+				{
+					fc.destroy();
+					fc = new FormuleCache(label, context.getFillStyle());
+				}
 		}
 		double w = fc.getW();
 		double h = fc.getH();
@@ -377,13 +380,13 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			visitFlipFlop(label);
 			return;
 		}
+		selectColor(label);
 		if (label.getString().contains("$")
 		  ||Boolean.TRUE.equals(label.adapt(Boolean.class)))
 		{
 			visitFormule(label);
 			return;
 		}
-		selectColor(label);
 		String string = label.getString();
 		double x = label.getXd();
 		double y = label.getYd();
