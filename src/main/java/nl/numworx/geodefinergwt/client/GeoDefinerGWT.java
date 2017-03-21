@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
@@ -62,6 +63,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private int width = 500;
 	private int height = 450;
 	private OpdrNavIF comRoot;
+	private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
+	
+	private void lognagekeken() {
+		LOG.info("nagekeken = " + nagekeken + ", score = " + score + ", feedback = " + getStatus());
+	}
+	
 	
 	private boolean volledigeBreedte;
 	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
@@ -222,7 +229,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	public HashMap<String, Object> getState() {
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
+		LOG.info("voor getState ");
+		lognagekeken();
 		super.getState(hashMap);
+		lognagekeken();
+		LOG.info("getState " + hashMap);
 		return hashMap;
 	}
 
@@ -231,12 +242,14 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setState(HashMap<String, Object> h) {
 		Map<String,Object> map = h;
 		setState(map);
+		lognagekeken();
 		if(nagekeken) {
-			update(null, "changed");
-			if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
+			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
 				feedback();
 		}
+		lognagekeken();
 		start();
+		lognagekeken();
 	}
 
 	public int[][] getScoreObjectives() {
@@ -252,6 +265,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void kijkNa() {
 		update(null, "changed");
 		feedback();
+		nagekeken = true;LOG.info("KijkNA");
+		lognagekeken();
 	}
 
 	@UiHandler("checkBtn") void kijkNa(ClickEvent evt) { kijkNa(); }
@@ -267,6 +282,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
+		nagekeken=false;
 	}
 
 	public void zetNagekeken(boolean b) {
@@ -352,7 +368,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	 */
 	@Override
 	public void update(Observable observable, Object arg) {
+		LOG.info("update " + arg);
 		super.update(observable, arg);
+		lognagekeken();
 		if("changed".equals(arg) && comRoot != null) {
 			comRoot.setChanged(Boolean.FALSE.equals(getStatus()));
 		} else if (observable == viewer.getModel()) {
