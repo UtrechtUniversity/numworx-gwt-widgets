@@ -333,7 +333,9 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		FormuleCache fc = label.adapt(FormuleCache.class);
 		if(fc == null) fc = new FormuleCache(label, context.getFillStyle());
 		else {
-				if(!down && !fc.isValid(context.getFillStyle())) // als we de mouse down, laten we de cache staan.
+				if(
+						!down && 
+						!fc.isValid(context.getFillStyle())) // als we de mouse down, laten we de cache staan.
 				{
 					fc.destroy();
 					fc = new FormuleCache(label, context.getFillStyle());

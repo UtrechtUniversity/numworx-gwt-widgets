@@ -26,7 +26,11 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		checkDWO.put("formule", "$ftrue@");
 		checkDWO.put("score", 10);
 		checkDWO.put("check", Boolean.TRUE);
-		List<String> definitions = Arrays.asList("$fa=9..10@", "$ft=text(\"$w{a}+2$b1$n{a}/2@@$m2@@\",O)@");
+		List<String> definitions = Arrays.asList(
+				"$fa=9..10@", 
+				"$ft=text(\"$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
+				//"$ft=text(\"M$s8@ M$sx@\",O)@"
+				);
 		launchDebug.put("definitions", definitions);
 		launchDebug.put("checkDWO", checkDWO);
 		Map<String, Number> values = new HashMap<String, Number>();
