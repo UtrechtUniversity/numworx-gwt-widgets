@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
-//import nl.uu.fi.dwo.interaction.client.event.CBookEventHandler;
 
 
-import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -33,11 +31,12 @@ import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.logotekenap.Tekenblad;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fi.weblogogwt.client.text.Text;
 
-public class WebLogoGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener 
+public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListener 
 {
 	
 	public static Text rb;
@@ -524,8 +523,15 @@ logger.info("state != null");
 			else if (e.getSource() == runButton)
 			{
 				if ((jlsVeld.paramEditor != null) && jlsVeld.paramEditor.isVisible())
-					jlsVeld.paramEditor.owner.parameterEdited(jlsVeld.paramEditor.getText());	
-				uitvoerblad.paintDrawing(false);
+					jlsVeld.paramEditor.owner.parameterEdited(jlsVeld.paramEditor.getText());
+				try
+				{
+					uitvoerblad.paintDrawing(false);
+				}
+				catch (Exception exc)
+				{
+					logger.log(Level.INFO, "WebLogoGWT.onClick() run button: something went wrong in uitvoerblad.paintDrawing(false), ", e);
+				}
 				jlsVeld.paint();
 				
 				// bij klik op run-knop cross widget event afvuren
@@ -683,7 +689,14 @@ logger.info("setState");
 		//this.scheidingX = scheidingX;
 		//setBounds(getBounds());
 		jlsVeld.paint();
-		uitvoerblad.paintDrawing(false);
+		try
+		{
+			uitvoerblad.paintDrawing(false);
+		}
+		catch (Exception e)
+		{
+			logger.log(Level.INFO, "WebLogoGWT.setState(): error in uitvoerblad.paintDrawing(false)! ", e);
+		}
 	}
 
 	@Override
@@ -798,7 +811,7 @@ logger.info("WebLogoGWT setComRoot");
 			String command = event.getCommand();
 			if (command.startsWith("text"))
 			{
-System.out.println("accCBookEv " + command);
+				logger.info("accCBookEv " + command);
 				
 				Map map = (Map) event.getParameters();
 				if (map != null)
@@ -828,7 +841,8 @@ System.out.println("accCBookEv " + command);
 			}
 			if (command.startsWith("double"))
 			{
-System.out.println("accCBookEv " + command);
+				logger.info("accCBookEv " + command);
+				
 				Map map = (Map) event.getParameters();
 				
 				if (map != null && command.equals("double.input"))
@@ -856,7 +870,18 @@ System.out.println("accCBookEv " + command);
 						waarde = 0; // er is iets mis gegaan...
 					}
 					jlsVeld.setInputVar(name, waarde);
+					// er moet nog iets gebeuren om te zorgen dat veelvlak op Tekenblad punten heeft om te tekenen. Die ontbreken!
 					uitvoerblad.paintDrawing(false);
+					
+					// als in init(); weet niet zeker of deze forceLayout(0)s echt nodig zijn...
+					dlp.forceLayout();
+					webLogoPanel.forceLayout();
+					bottomPanel.forceLayout();
+					jlsVeld.forceLayout();
+					uitvoerblad.forceLayout();
+
+					// ook deze voor het wegwerken van de rode tekst?
+					jlsVeld.paint();
 				}
 				else if (map != null && command.startsWith("double.input"))
 				{
@@ -881,9 +906,11 @@ System.out.println("accCBookEv " + command);
 		}
 		catch (Exception e)
 		{
-			// something went wrong
+			// something went wrong,
 			// probably the code was not valid
-			System.out.println("WebLogoGWT.acceptCBookEvent(): error! code = " + code);
+			// or NPE in uitvoerblad.paintDrawing(false), Tekenblad.tekenPolygon() waar veelvlak.aantalPunten 0 is
+			logger.log(Level.INFO, "WebLogoGWT.acceptCBookEvent(): error! code = " + code + ", " , e);
+			//e.printStackTrace();
 		}
 	}
 	
