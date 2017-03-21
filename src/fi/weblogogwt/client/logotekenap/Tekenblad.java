@@ -16,6 +16,7 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 
 public class Tekenblad extends Uitvoerblad
@@ -241,7 +242,13 @@ public class Tekenblad extends Uitvoerblad
 	}
 	
 	void tekenPolygon()
-	{	//gIm.setColor(vulkleur);
+	{	
+		// als er geen punten zijn, valt er niets te tekenen;
+		// ik heb het even zo gelaten, omdat ik in WebLogoGWT.acceptCBookEvent() wil afbreken als het mis gaat
+		if (veelvlak.geefAantalPunten() == 0)
+			GWT.log("Tekenblad.tekenPolygon(): veelvlak.aantalPunten = 0!");
+		
+		//gIm.setColor(vulkleur);
 		gIm.setFillStyle(vulkleur);
 		//gIm.fillPolygon(veelvlak);
 		
