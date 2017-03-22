@@ -49,7 +49,9 @@ import fi.euclides.model.Model;
 import fi.euclides.model.Track;
 import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.model.math.Numbers;
+import fi.euclides.proof.Const;
 import fi.euclides.proof.LabelDelegate;
+import fi.euclides.proof.LabelValue;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
@@ -249,6 +251,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		}
 		lognagekeken();
 		start();
+		addFireUpdates();
 		lognagekeken();
 	}
 
@@ -288,10 +291,50 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void zetNagekeken(boolean b) {
 		this.nagekeken = b;
 	}
+
+	private void addFireUpdates() {
+		for (Destroyable d: viewer.getModel().getLijnen()) {
+			if(d instanceof fi.euclides.model.Label) {
+				final fi.euclides.model.Label label = (fi.euclides.model.Label) d;
+				final String name = viewer.getMapper().toString(label);
+				final String command = "double." + name;
+				if (label.getRegistered() instanceof LabelValue &&
+						
+					comRoot.hasListeners(command)) {
+					label.addObserver(new Observer() {
+
+						@Override
+						public void update(Observable observable, Object arg) {
+							if(arg == null)
+							{	Map<String,Object> map = new TreeMap<String,Object>();
+								map.put("value", label.value.doubleValue());
+								map.put("name", name);
+								comRoot.fireEvent(new CBookEvent(GeoDefinerGWT.this, command, map));							}
+						}});
+				}
+			
+			
+			}
+		}
+	}
+	
+	
+	
 	
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
-		comRoot.addCBookEventListener("double", this);
+		//comRoot.addCBookEventListener("double", this);
+		for (Destroyable d: viewer.getModel().getLijnen()) {
+			if(d instanceof fi.euclides.model.Label) {
+				fi.euclides.model.Label label = (fi.euclides.model.Label) d;
+				if(label.getSubKey() == Const.TYPE) {
+					String name = viewer.getMapper().toString(label);
+					comRoot.addCBookEventListener("double." + name, this);
+				}
+			}
+		}
+		
+		
 		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
 	}
@@ -361,6 +404,21 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			kijkNa();
 			return;
 		}
+		if(event.getCommand().startsWith("double.")) {
+			int dot = event.getCommand().indexOf('.');
+			String name = event.getCommand().substring(dot+1);
+			Number number = (Number)event.getParameter("value");
+			if(number == null) {
+				number = Double.valueOf(event.getMessage());
+			}
+			fi.euclides.model.Label label = (fi.euclides.model.Label) viewer.getMapper().fromString(name);
+			if(label.getSubKey() == Const.TYPE) { 
+				label.setString(Numbers.toString(label.value));
+				label.setValue(Numbers.createDouble(number.doubleValue()));
+				label.notifyObservers();
+			}
+		}
+
 	}
 
 	/* (non-Javadoc)
