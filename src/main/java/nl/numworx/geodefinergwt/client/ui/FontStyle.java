@@ -23,7 +23,7 @@ public class FontStyle {
 	
 	
 	public FormuleFont getFont() {
-		return FormuleFont.createFromFontSize(Math.round(size));
+		return FormuleFont.createFromFontSize(Math.round(size), true);
 	}
 
 	void fromMap(ObjectMap map) {
