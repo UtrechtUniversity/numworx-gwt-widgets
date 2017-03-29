@@ -530,7 +530,7 @@ logger.info("state != null");
 				}
 				catch (Exception exc)
 				{
-					logger.log(Level.INFO, "WebLogoGWT.onClick() run button: something went wrong in uitvoerblad.paintDrawing(false), ", e);
+//					logger.log(Level.INFO, "WebLogoGWT.onClick() run button: something went wrong in uitvoerblad.paintDrawing(false), ", e);
 				}
 				jlsVeld.paint();
 				
@@ -869,6 +869,8 @@ logger.info("WebLogoGWT setComRoot");
 					{
 						waarde = 0; // er is iets mis gegaan...
 					}
+//System.out.println("name = " + name);
+//System.out.println("waarde = " + UF.format(waarde, 2));
 					jlsVeld.setInputVar(name, waarde);
 					// er moet nog iets gebeuren om te zorgen dat veelvlak op Tekenblad punten heeft om te tekenen. Die ontbreken!
 					uitvoerblad.paintDrawing(false);
@@ -935,6 +937,9 @@ logger.info("WebLogoGWT setComRoot");
 	 */
 	public void fireCBookEvent(String command, Map<String, Object> map)
 	{
+		
+System.out.println("fireCBookEvent");
+
 		if (comRoot != null)
 		{
 			CBookEvent event = new CBookEvent(this, command, map);

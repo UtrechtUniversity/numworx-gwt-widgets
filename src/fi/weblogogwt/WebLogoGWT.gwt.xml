@@ -22,7 +22,7 @@
 
   <extend-property name="locale" values="en"/>
   <extend-property name="locale" values="nl"/>  	
-  <set-property-fallback name="locale" value="en"/>
+  <set-property-fallback name="locale" value="nl"/>
     
   <add-linker name='xsiframe' /> <!-- DEZE LATEN STAAN!!!!! -->
 

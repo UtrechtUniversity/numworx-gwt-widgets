@@ -229,7 +229,7 @@ for (int i = 0; i < messages.length; i++)
 	}
 
 	public void setInputVar(String name, double value)
-	{	inputVars.put("input"+name, new Double(value));
+	{	inputVars.put("input" + name, new Double(value));
 	}
 	
 	public void setInputVars(HashMap<String, Object> inputVars)

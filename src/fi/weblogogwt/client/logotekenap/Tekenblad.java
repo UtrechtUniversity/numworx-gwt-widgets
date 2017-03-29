@@ -243,10 +243,21 @@ public class Tekenblad extends Uitvoerblad
 	
 	void tekenPolygon()
 	{	
-		// als er geen punten zijn, valt er niets te tekenen;
-		// ik heb het even zo gelaten, omdat ik in WebLogoGWT.acceptCBookEvent() wil afbreken als het mis gaat
+		// fout in vulAan
+		if (veelvlak == null)
+		{	
+//System.out.println("veelvlak == null");			
+			return;
+		
+		}
+		else
+//System.out.println("veelvlak != null");
+		
 		if (veelvlak.geefAantalPunten() == 0)
-			GWT.log("Tekenblad.tekenPolygon(): veelvlak.aantalPunten = 0!");
+		{
+//System.out.println("aantalPunten == 0");			
+			return;
+		}
 		
 		//gIm.setColor(vulkleur);
 		gIm.setFillStyle(vulkleur);

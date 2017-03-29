@@ -23,7 +23,11 @@ public class VulAanCComponent extends ParameterCommandComponent
 	
 	public boolean execute(TraceBeheerder trb,Uitvoerblad ub, VarSet varSet)
 	{	 
-		if ( !parameters[0].isCorrect(varSet) ) return false; 
+		if ( !parameters[0].isCorrect(varSet) ) 
+		{
+//System.out.println("vulAan incorrect");			
+			return false;
+		}	
 		CssColor cl = ((ColorParameter)parameters[0]).getColor();
 		
 		String clString = cl.toString().substring(4, cl.toString().length() - 1);

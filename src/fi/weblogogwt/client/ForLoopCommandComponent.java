@@ -31,7 +31,12 @@ public class ForLoopCommandComponent extends LoopCommandComponent
 		
 //System.out.println("flCC executeContent");
 
-		if ( !loopCondition.isCorrect(varSet) ) return false; 
+		if ( !loopCondition.isCorrect(varSet) ) 
+		{	
+System.out.println("for incorrect");			
+			return false;
+		}
+		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
 		if ( traceKleur ) 
 		{
