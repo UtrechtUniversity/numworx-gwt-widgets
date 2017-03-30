@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.2</version>
+		<version>0.0.3</version>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
@@ -138,7 +138,7 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.2-SNAPSHOT</euclidesVersion>
-		<formuleVersion>0.0.4-SNAPSHOT</formuleVersion>
+		<formuleVersion>0.0.4</formuleVersion>
 		<debug></debug>
 		<gwtVersion>2.7.0</gwtVersion>
 		<gwt.style>PRETTY</gwt.style>
