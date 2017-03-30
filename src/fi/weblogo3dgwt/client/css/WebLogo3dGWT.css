@@ -1,0 +1,93 @@
+/** dit file staat in weblogo3dgwt/client/css */
+
+
+.root {
+/**	background-color: yellow;*/ 
+}	
+
+.dock {
+/**	background-color: orange; */
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	background-color: white;	
+}
+
+.upimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.downimage {
+	position: relative;
+	top: -4px;
+	left: -6px;
+}		
+
+.pushimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.togglebutton {
+	
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+	color: red;
+	font-family: Helvetica, sans serif;
+	
+}
+
+.pushbutton {
+
+/**	font-size: 0.875em; */
+
+	font-size: 0.975em;
+	font-weight: bold;
+	font-family: Helvetica, sans serif;
+	text-align: center;
+	/** padding: 0px; */	
+}	
+
+.label {
+	background-color: rgb(255, 255, 255);
+	text-align: left;
+	text-indent: 10px;
+	font-family: Helvetica, sans serif;
+}
+
+.codelabel {
+	background-color: rgb(220, 220, 220);
+	text-align: left;
+	text-indent: 10px;
+	font-family: Helvetica, sans serif;
+	font-weight: bold;
+}
+
+.varlabel {
+	background-color: rgb(161, 255, 161);
+	font-size: 0.975em;
+	font-weight: bold;
+	font-family: Helvetica, sans serif;
+	
+}
+
+.vardisplay {
+	font-size: 0.875em;
+	background-color: rgb(221, 255, 221);
+	text-align: left;
+	font-family: Helvetica, sans serif;
+	white-space: pre;
+	
+}
+
+.borderless {
+	border-collapse: collapse;	
+}
