@@ -73,13 +73,13 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>formule</artifactId>
-  		<version>0.0.3</version>
+  		<version>0.0.4</version>
   	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.2</version>
+  	<version>0.0.3</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
 </project>
