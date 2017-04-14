@@ -2,6 +2,7 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import java.util.Map;
 
+import nl.numworx.geodefiner.common.LineType;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -32,6 +33,8 @@ public class GridModel extends LineModel {
 	}
 	
 	public UIModel<Destroyable, Void> init(Locus item) {
+		rgba=0xFF808080;
+		type = LineType.DOTTED;
 		return super.init(item);
 	}
 
