@@ -10,8 +10,18 @@ public class HitTesterGWT extends HitTester {
 
 	@Override
 	public void visitPunt(Punt p) {
-		// TODO Iets met Point sizes
-		super.visitPunt(p);
+		double old = marge;
+		try {
+			float pointSize;
+			Float ps = p.adapt(Float.class);
+			if(ps != null) {
+				pointSize = ps.floatValue();
+				marge = Math.max(marge, pointSize/2);
+			} 
+			super.visitPunt(p);
+		} finally {
+			marge = old;
+		}
 	}
 
 	@Override

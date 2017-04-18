@@ -13,7 +13,7 @@ class SnapperImpl extends Snapper {
 	
 	
 	final int SNAP = 3;
-	boolean isGravity() { return gravity && moved; }
+	public boolean isGravityM() { return gravity && moved; }
 	private boolean moved;
 	boolean isMoved() {
 		return moved;
@@ -23,7 +23,7 @@ class SnapperImpl extends Snapper {
 	}
 	
 	void pmUp(int x0, int y0, PH ph) {
-		if(isGravity()) {
+		if(isGravityM()) {
 			int ox = (int) ph.getModel().getO().getX().longValue();
 			int dx = (int) ph.getModel().getU().getX().longValue() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
@@ -51,7 +51,7 @@ class SnapperImpl extends Snapper {
 	
 	void pmDrag(int x0, int y0, PH ph) {
 		setMoved(true);
-		if(isGravity()) {
+		if(isGravityM()) {
 			int ox = (int) ph.getModel().getO().getXd();
 			int dx = (int) ph.getModel().getU().getXd() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
