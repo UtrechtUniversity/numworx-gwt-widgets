@@ -41,7 +41,7 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -137,11 +137,14 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.2-SNAPSHOT</euclidesVersion>
+		<euclidesVersion>0.0.2</euclidesVersion>
 		<formuleVersion>0.0.4</formuleVersion>
 		<debug></debug>
 		<gwtVersion>2.7.0</gwtVersion>
 		<gwt.style>PRETTY</gwt.style>
 		<gwt.compiler.force>true</gwt.compiler.force>	
 	</properties>
+	<scm>
+		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/trunk</developerConnection>
+	</scm>
 </project>
