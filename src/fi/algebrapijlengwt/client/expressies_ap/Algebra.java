@@ -40,7 +40,6 @@ public class Algebra
 		{	boolean nan1 = (Double.isInfinite (e1Waarde) || Double.isNaN(e1Waarde));
 			boolean nan2 = (Double.isInfinite (e2Waarde) || Double.isNaN(e2Waarde));
 			boolean ongelijk = Math.abs(e1Waarde - e2Waarde)>absPrecision &&  Math.abs(e1Waarde/e2Waarde-1)>relPrecision;
-			//System.out.println(e1Waarde +"  "+ e1.toString() +"  "+ e2Waarde+"  "+ e2.toString());
 			if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
 			{	return false;
 			}

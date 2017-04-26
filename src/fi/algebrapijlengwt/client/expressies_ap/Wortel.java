@@ -1,6 +1,5 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -17,18 +16,15 @@ public class Wortel extends Expressie
 		isAsym = false;
 	}
 	
-	//public void teken(Graphics g, int x, int y)
 	public void teken(Context2d g, int x, int y)
   	{ 	Wortelteken wt = new Wortelteken(breedte,hoogte-4);
 		wt.paint(g,x,y-8);//+2);
 		kind1.teken(g,x+(hoogte-4)/2 + 2, y+ashoogte-kind1.ashoogte);
 	}
 	
-	//public void zetMaat(FontMetrics fm)
 	public void zetMaat(int fs, Context2d c2d)
-  	{	//this.fm = fm;
+  	{	
 		fontSize = fs;
-		//kind1.zetMaat(fm);
 		kind1.zetMaat(fs, c2d);
 		breedte = kind1.breedte + kind1.hoogte/2 + 2;
 		hoogte =  kind1.hoogte+4;

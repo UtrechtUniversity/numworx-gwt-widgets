@@ -18,7 +18,8 @@ public class WortelSchuifComponent extends AlgebraSchuifComponent
 	//FontMetrics fm;
 	
 	public WortelSchuifComponent(AlgebraSchuifVeld asv,int x, int y, int b, int h)
-	{	super(1,asv,x,y,b,h);
+	{	//super(1,asv,x,y,b,h);
+		super(asv,x,y,b,h);
 		
 		//f = new Font("SansSerrif",Font.PLAIN,14);
 		//fm = getFontMetrics(f);

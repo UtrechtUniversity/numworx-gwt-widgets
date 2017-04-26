@@ -1,13 +1,15 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
-
 import fi.algebrapijlengwt.client.StringUtils;
+import fi.algebrapijlengwt.client.AlgebraPijlenGWT;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
+/**
+ * een basale Expressie bestaande uit een variabele of een getal 
+ */
 public class BasisExpressie extends Expressie  
 {	public String basisString;
 	double w;
@@ -20,29 +22,20 @@ public class BasisExpressie extends Expressie
 		isProdukt = false;
 		isBasis = true;
 		isAsym = false;
-
 		if (!Double.isNaN(geefWaarde().doubleValue()))
 		{	isWaarde = true;
 			w = geefWaarde().doubleValue();
 		}
 	}
-	
-	//public void teken(Graphics g, int x, int y)
+
 	public void teken(Context2d g, int x, int y)
-  	{ 	
-		//g.drawString(basisString, x, y+fm.getAscent()-1);
-		g.setFillStyle(CssColor.make(0,0,0));
+  	{	g.setFillStyle(CssColor.make(0,0,0));
 		g.fillText(basisString, x, y);
-		
 	}
 	
-	//public void zetMaat(FontMetrics fm)
 	public void zetMaat(int fs, Context2d c2d)
-  	{	//this.fm = fm;
-		fontSize = fs;
-		//hoogte = fm.getHeight()-2;
+  	{	fontSize = fs;
 		hoogte = fs - 2;
-		//breedte = fm.stringWidth(basisString);
 		TextMetrics tm = c2d.measureText(basisString);
 		breedte = (int) Math.round(tm.getWidth());
 		ashoogte = hoogte/2;
@@ -77,7 +70,8 @@ public class BasisExpressie extends Expressie
 	{	if (basisString.equals(var))
 		{	return new BasisExpressie("" + subst);
 		}
-		else return new BasisExpressie(basisString);
+		else 
+			return new BasisExpressie(basisString);
 	}
 	
 	public String geefVarNaam()
@@ -90,13 +84,10 @@ public class BasisExpressie extends Expressie
 	{	
 		String basisStringUit = StringUtils.replaceStr(basisString,"?(","$s");
 		basisStringUit = StringUtils.replaceStr(basisStringUit,")","@");
-		
-		if(!Double.isNaN(w) && (!Algebra.withinLongRange((long)w) || basisString.indexOf('E')>-1))basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
-        
-        //if(AlgebraPijlenOpdr.language.toString().equals("nl"))
+		if (!Double.isNaN(w) && (!Algebra.withinLongRange((long) w) || basisString.indexOf('E') > -1))
+			basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
+        if (AlgebraPijlenGWT.rb.decSep().equals(","))
         	basisStringUit = basisStringUit.replace('.',',');
-        
-		 
         return basisStringUit;
 	}
 	
@@ -105,11 +96,10 @@ public class BasisExpressie extends Expressie
 		String basisStringUit = StringUtils.replaceStr(basisString,"?(","$s");
         basisStringUit = StringUtils.replaceStr(basisStringUit,")","@");
         
-        if(!Double.isNaN(w) && (!Algebra.withinLongRange((long)w) || basisString.indexOf('E')>-1))basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
-        
-        //if(AlgebraPijlenOpdr.language.toString().equals("nl"))
+        if (!Double.isNaN(w) && (!Algebra.withinLongRange((long) w) || basisString.indexOf('E') > -1))
+        	basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
+        if (AlgebraPijlenGWT.rb.decSep().equals(","))
         	basisStringUit = basisStringUit.replace('.',',');
         return basisStringUit;
 	}
-	
 }

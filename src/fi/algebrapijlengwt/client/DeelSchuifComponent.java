@@ -42,7 +42,7 @@ public class DeelSchuifComponent extends BewerkingSchuifComponent
 		int w = (int) Math.round(tm.getWidth());
 		
 		int sccrollCorr = 0;
-		if(scrollable)sccrollCorr = 10;
+//		if(scrollable)sccrollCorr = 10;
 		
 //GWT		
 //		if (!tf.isVisible())
@@ -184,11 +184,14 @@ public class DeelSchuifComponent extends BewerkingSchuifComponent
 	
 	public Expressie geefVerborgenUitvoer(int max)
 	{	Expressie uitv = new Expressie();
-		if(pijlIn1==null)return null;
+		if (pijlIn1 == null)
+			return null;
 		Expressie e1 = pijlIn1.zender.geefVerborgenUitvoer(max-1);
 		Expressie e2 = beginw;
-		if(e1==null)return null;
-		if(e2.geefWaarde().doubleValue()==1)uitv = e1;
+		if (e1 == null)
+			return null;
+		if (e2.geefWaarde().doubleValue() == 1)
+			uitv = e1;
 		else uitv = new Deling(e1,e2);
 		return uitv;
 	}

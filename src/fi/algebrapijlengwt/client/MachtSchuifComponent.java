@@ -101,7 +101,7 @@ public class MachtSchuifComponent extends BewerkingSchuifComponent
 		
 		
 		int sccrollCorr = 0;
-		if(scrollable)sccrollCorr = 5;
+//		if(scrollable)sccrollCorr = 5;
 		
 		if(!links)
 		{	

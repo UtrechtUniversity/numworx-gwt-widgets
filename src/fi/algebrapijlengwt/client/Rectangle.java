@@ -1,6 +1,8 @@
 package fi.algebrapijlengwt.client;
 
-
+/**
+ * er is geen klasse Rectangle in JavaGWT 
+ */
 public class Rectangle 
 {
 	int x; int y; int width; int height;

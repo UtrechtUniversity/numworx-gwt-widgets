@@ -1,29 +1,40 @@
 package fi.algebrapijlengwt.client;
 
 import java.util.HashMap;
+import java.util.Map;
 
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
-//import com.google.gwt.dom.client.Style;
 
 import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
-//import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
+
 
 public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements ActionListener, FocusListener
 {	
-	TekstPopup tf, label;
+	/**
+	 * PopupMenu voor invoer van het getal/de variabele in deze UVSC, zie klasse TekstPopup
+	 */
+	TekstPopup tf;
+	/**
+	 * PopupMenu voor invoer van de tekst van het label, zie klasse TekstPopup
+	 */
+	TekstPopup label;
+	/**
+	 * het basis LayoutPanel van AlgebraPijlenGWT, nodig voor de correcte plaatsing van de PopupMenus
+	 */
 	LayoutPanel inputOwner; 
+	/**
+	 * het getal/de variabele in deze UVSC als String
+	 */
 	String tfString = "";
 	
 	private Expressie expressie;
@@ -39,7 +50,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	//private InUitvoerLabel label;
 		
 	boolean tabelZichtbaar;
-	private boolean tabelAan;
+	boolean tabelAan;
 	
 	boolean zoomInTabel;
 	
@@ -88,7 +99,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	boolean isBeginExpressie = false;
 	
 	public UitvoerSchuifComponent(AlgebraSchuifVeld asv,int x, int y, int b, int h)
-	{	super(1,asv,x,y,b,h);
+	{	//super(1,asv,x,y,b,h);
+		super(asv,x,y,b,h);
 		
 //GWT niet bij AlgebraPijlen alleen by AlgebraExpressies	
 		//toonWaarde = !((AlgebraSchuifVeld) schuifveld).ip.isExpr();
@@ -138,7 +150,6 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 */		
 	
 
-		
 		zoomInKnop	= new ZoomKnop("zoomintabel", xPos + 10, yPos + 50, 10, 10, asv.asvContext2d);
 		//zoomInKnop.setBounds(10,50,10,25);
 		//zoomInKnop.addActionListener(this);
@@ -240,7 +251,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	}
 	
 	public HashMap<String,Object> getState()
-	{	String basisExp  = null;
+	{	
+		String basisExp  = null;
 		String defaultVarnaam = null;
 		boolean tabelAan = false;
 		boolean labelZichtbaar = false;
@@ -279,8 +291,11 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	    return h;
 	}
 
-    public void setState(HashMap<String,Object> h)
-    {	String basisExp  = null;
+    public void setState(Map<String,Object> map)
+    {	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    	
+    	String basisExp  = null;
    		String defaultVarnaam = null;
         boolean tabelAan = false;
         boolean labelZichtbaar = false;
@@ -343,7 +358,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
         	zetExpressie(beginExp);
         }
 
-        super.setState(h);
+        super.setState(map);
 		
 		zetMaat();
 		
@@ -669,9 +684,9 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	
 	public void toonTabel(boolean b)
 	{	tabelZichtbaar = b;
-		if(b)
+		if (b)
 		{	
-			
+//System.out.println("tabel gemaakt");			
 			//add(tabel);
 			tabel = new TabelComponent(asv);
 			tabel.setDefaultVarnaam(defaultVarnaam);
@@ -684,6 +699,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			//remove(tabel);
 			tabel = null;
 			zetMaat();
+//System.out.println("tabel = null");			
 		}
 		if (!asv.owner.asvSetState)
 			asv.tekenOpnieuw();
@@ -961,23 +977,25 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 
 	
 	
-	
+	/**
+	 * update de zoomState voor variabele varnaam indien deze de variabele is van expressie of verborgenExpressie 
+	 * @param varnaam nam van de variabele
+	 * @param zoomState de zoomState voor variabele varnaam
+	 */
 	public void setZoomState(String varnaam, ZoomState zoomState)
-	{	if(expressie!=null && expressie.geefVarNaam()!=null && expressie.geefVarNaam().equals(varnaam)
-			|| verborgenExpressie!=null && verborgenExpressie.geefVarNaam()!=null && verborgenExpressie.geefVarNaam().equals(varnaam))
+	{	if (expressie != null && expressie.geefVarNaam() != null && expressie.geefVarNaam().equals(varnaam) ||
+			verborgenExpressie != null && verborgenExpressie.geefVarNaam() != null && verborgenExpressie.geefVarNaam().equals(varnaam))
 		{	this.beginwaarde = zoomState.getBeginwaarde();
 			this.selectnummer = zoomState.getSelectnummer();
 			this.schaalFactorX = zoomState.getSchaalFactorX();
 			this.factorRijNummerX = zoomState.getFactorRijNummerX();
 			this.beginx = zoomState.getBeginx();
-			
+			// update zoomState Tabel
 			if (tabel != null)
 			{	tabel.zetTabel(beginwaarde, selectnummer, varnaam, schaalFactorX, beginx);
-
 			}
 			zetMaat();
 		}
-		
 	}
 	
 	public void zetTabelAan(boolean b)
@@ -996,7 +1014,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		
 		zetMaat();
 		
-		paint();
+		asv.paint();
 	}
 	
 	public void zetInvulWaarde()
@@ -1091,7 +1109,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
     	
     	if (pijlIn1 != null)
     		pijlIn1.zender.zetKettingZichtbaar(b);
-        open = b;
+        //open = b;
         kettingZichtbaar = b;
         
         if (tabel != null)
@@ -1105,8 +1123,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
     {
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;
+//		if (asv.frozen)
+//			return;
 		
 		//if (!e.getActionCommand().equals("knop") || factorRijNummerX > 120)
 		if (factorRijNummerX > 120)
@@ -1147,8 +1165,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
     {
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;
+//		if (asv.frozen)
+//			return;
 		
 		//if (!e.getActionCommand().equals("knop") || factorRijNummerX < 87)
 		if (factorRijNummerX < 87)
@@ -1320,17 +1338,18 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	
 	//public void mousePressed(MouseEvent e)
 	public void mouseDownTouchStartAction(int eventX, int eventY)
-	{	if (asv.fixed)
-			return;
+	{	
+//		if (asv.fixed)
+//			return;
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;		
+//		if (asv.frozen)
+//			return;		
 		
 		//requestFocus();
 		muisrechts = false;
 
-		press = true;
+		//press = true;
 		
 		if (labelZichtbaar && new Rectangle(xPos,yPos,breedte,20).contains(eventX, eventY))
 			labelPressed = true;
@@ -1355,13 +1374,14 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	
 	//public void mouseReleased(MouseEvent e)
 	public void mouseUpTouchEndAction()
-	{	if (asv.fixed)
-			return;
+	{	
+//		if (asv.fixed)
+//			return;
 		if (asv.isDemo)
 			return;
 		
-		if (asv.frozen)
-			return;		
+//		if (asv.frozen)
+//			return;		
 		
 		//super.mouseReleased(e);
 		if (isDoubleClick() && !zoomInPressed && !zoomUitPressed) 
@@ -1409,8 +1429,10 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
             	zoomInTabelAction();
             if (zoomUitPressed)
             	zoomUitTabelAction();
+            
         }
-		super.mouseUpTouchEndAction();
+		if (dragging)
+			super.mouseUpTouchEndAction();
 		labelPressed = false;
 		zoomInPressed = false;
 		zoomUitPressed = false;

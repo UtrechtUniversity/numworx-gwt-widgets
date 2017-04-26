@@ -7,7 +7,6 @@ class PointLong
 	PointLong(long x, long y)
 	{	this.x = x;
 		this.y = y;
-		
 	}
 		
 	PointLong(PointLong p)

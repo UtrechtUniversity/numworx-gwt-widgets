@@ -1,10 +1,5 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
-//import java.awt.event.*;
-//import java.util.Vector;
-import fi.algebrapijlengwt.client.expressies_ap.*;
-
 public class FormuleParser_ap
 {		
 	public FormuleParser_ap()
@@ -97,10 +92,6 @@ public class FormuleParser_ap
 		s = s.replace(',','.');
 		while(index >-1)
 		{	index = s.indexOf(" ");
-			//if(index>0 && index<s.length()-1 && Character.isDigit(s.charAt(index-1)) && Character.isDigit(s.charAt(index+1)))
-			//{	s = s.substring(0,index) + "+" + s.substring(index+1);
-			//}
-			//else 
 			if(index >-1)s = s.substring(0,index) + s.substring(index+1);
 		}
 		//een breuk constructie als "2((1)/(2))" wordt vervangen door 2+1/2
@@ -244,27 +235,11 @@ public class FormuleParser_ap
 		{	Expressie e = parse(s.substring(4,s.length()));
 			return new Wortel(e);
 		}
-		/*
-		//is het een sinus
-		if(s.substring(0,3).equals("sin"))
-		{	Expressie e = parse(s.substring(3,s.length()));
-			return new Sinus(e);
-		}
-		//is het een cosinus
-		if(s.substring(0,3).equals("cos"))
-		{	Expressie e = parse(s.substring(3,s.length()));
-			return new Cosinus(e);
-		}
-		//is het een tangens
-		if(s.substring(0,3).equals("tan"))
-		{	Expressie e = parse(s.substring(3,s.length()));
-			return new Tangens(e);
-		}*/
 		}
 		catch(Exception e)
 		{}
 		return exp;
-		//return s;
+
 	}
 	
 	public static Expressie geefExpressie(String codeString)

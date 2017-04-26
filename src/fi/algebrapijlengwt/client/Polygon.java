@@ -3,6 +3,9 @@ package fi.algebrapijlengwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * er is geen klasse Polygon in JavaGWT 
+ */
 public class Polygon
 {
 	int aantalPunten;

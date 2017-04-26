@@ -1,6 +1,5 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
@@ -17,24 +16,20 @@ public class Functie extends Expressie
 		isAsym = false;
 	}
 	
-	//public void teken(Graphics g, int x, int y)
 	public void teken(Context2d g, int x, int y)
   	{
 		kind1.teken(g, x, y + ashoogte - kind1.ashoogte);
 		
-		//g.drawLine(x + kind1.breedte+5, y + ashoogte, x + kind1.breedte+15, y + ashoogte);
 		g.beginPath();
 		g.moveTo(x + kind1.breedte+5, y + ashoogte -10);
 		g.lineTo(x + kind1.breedte+15, y + ashoogte -10);
 		g.stroke();
 		
-		//g.drawLine(x + kind1.breedte+12, y + ashoogte+3, x + kind1.breedte+15, y + ashoogte);
 		g.beginPath();
 		g.moveTo(x + kind1.breedte+12, y + ashoogte+3 -10);
 		g.lineTo(x + kind1.breedte+15, y + ashoogte -10);
 		g.stroke();
 		
-		//g.drawLine(x + kind1.breedte+12, y + ashoogte-3, x + kind1.breedte+15, y + ashoogte);
 		g.beginPath();
 		g.moveTo(x + kind1.breedte+12, y + ashoogte-3 -10);
 		g.lineTo(x + kind1.breedte+15, y + ashoogte -10);
@@ -43,11 +38,8 @@ public class Functie extends Expressie
 		kind2.teken(g, x+kind1.breedte+20, y + ashoogte-kind2.ashoogte);
 	}	
 	
-	//public void zetMaat(FontMetrics fm)
 	public void zetMaat(int fs, Context2d c2d)
-  	{	//this.fm = fm;
-		//kind1.zetMaat(fm);
-		//kind2.zetMaat(fm);
+  	{	
 		this.fontSize = fs;
 		kind1.zetMaat(fs, c2d);
 		kind2.zetMaat(fs, c2d);

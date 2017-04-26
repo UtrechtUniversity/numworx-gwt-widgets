@@ -31,7 +31,7 @@ public class Letter {
         return (value <= max) & (value >= min);
     }
 
-// Characters in category "COMBINING"
+    // Characters in category "COMBINING"
 	public static boolean isCombined(char ch) {
 		return ch == '\u0302' || ch == '\u0304' || ch == '\u0305';
 	}

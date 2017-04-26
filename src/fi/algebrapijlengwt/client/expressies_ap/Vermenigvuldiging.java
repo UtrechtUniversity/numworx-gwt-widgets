@@ -1,6 +1,6 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
+
 import java.util.Vector;
 
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -21,7 +21,6 @@ public class Vermenigvuldiging extends Expressie
 		isAsym = false;
 	}
 	
-	//public void teken(Graphics g, int x, int y)
 	public void teken(Context2d g, int x, int y)
   	{ 	HaakjeLinks hl1= new HaakjeLinks(kind1.hoogte+2);
 		HaakjeRechts hr1= new HaakjeRechts(kind1.hoogte+2);
@@ -46,9 +45,7 @@ public class Vermenigvuldiging extends Expressie
 			g3 = g2 + HaakjeLinks.geefHBreedte(fontSize);
 		}
 		else g3 = g2;
-		//g.drawString(operatorString, x+g3, y + ashoogte-fm.getHeight()/2 + fm.getAscent());
 		g.fillText(operatorString, x+g3, y + ashoogte-fontSize/2);
-		//int g4 = g3 + fm.stringWidth(operatorString);
 		int g4 = g3 + opBreedte;
 		int g5;
 		if(kind2.isVeelterm)
@@ -63,13 +60,10 @@ public class Vermenigvuldiging extends Expressie
 		}
 	}
 	
-	//public void zetMaat(FontMetrics fm)
 	public void zetMaat(int fs, Context2d c2d)
-  	{	//this.fm = fm;
+  	{	
 		fontSize = fs;
-		//kind1.zetMaat(fm);
   		kind1.zetMaat(fs, c2d);
-		//kind2.zetMaat(fm);
   		kind2.zetMaat(fs, c2d);
   		
 		TextMetrics tm = c2d.measureText(operatorString);
@@ -77,18 +71,16 @@ public class Vermenigvuldiging extends Expressie
   		
 		if((kind1.isVeelterm && !kind2.isVeelterm) || (!kind1.isVeelterm && kind2.isVeelterm))
 		{	int hb = HaakjeLinks.geefHBreedte(fs);
-			//breedte = kind1.breedte + fm.stringWidth(operatorString) + kind2.breedte + 2*hb;
 			breedte = kind1.breedte + opBreedte + kind2.breedte + 2*hb;
 			hoogte = Math.max(kind1.hoogte, kind2.hoogte) + 2;
 		}
 		else if(kind2.isVeelterm && kind1.isVeelterm)
 		{	int hb = HaakjeLinks.geefHBreedte(fs);
-			//breedte = kind1.breedte + fm.stringWidth(operatorString) + kind2.breedte + 4*hb;
 			breedte = kind1.breedte + opBreedte + kind2.breedte + 4*hb;
 			hoogte = Math.max(kind1.hoogte, kind2.hoogte) + 2;
 		}
 		else
-		{	//breedte = kind1.breedte + fm.stringWidth(operatorString) + kind2.breedte;
+		{	
 			breedte = kind1.breedte + opBreedte + kind2.breedte;
 			hoogte = Math.max(kind1.hoogte, kind2.hoogte);
 		}
@@ -114,7 +106,6 @@ public class Vermenigvuldiging extends Expressie
 		}
 		else 
 			return new Double(Double.NaN);
-			//return null;
 	}
 	
 	public double geefW(double subst)

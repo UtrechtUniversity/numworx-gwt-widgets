@@ -1,84 +1,56 @@
 package fi.algebrapijlengwt.client;
 
-//import java.awt.Polygon;
-//import java.awt.*;
-//import java.awt.event.*;
 import fi.algebrapijlengwt.client.expressies_ap.*;
-
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
+/**
+ * een BewerkingSchuifComponent die bij de invoer een getal optelt 
+ */
 
 public class OptelSchuifComponent extends BewerkingSchuifComponent 
 {	
-	
+	/**
+	 * constructor
+	 * @param asv het werkveld
+	 * @param x x-coordinaat
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 */
 	public OptelSchuifComponent(AlgebraSchuifVeld asv,int x, int y, int b, int h)
 	{	super(asv, x, y, b, h);
-		
-//GWT		
-//		tf.setText("3");
 	}
 	
-	//public void paint(Graphics g)
+	/**
+	 * teken de OptelSchuifComponent
+	 */
 	public void paint(Context2d g)
-  	{ 	super.paint(g);
+  	{ 	// doosje
+		super.paint(g);
 		if (!visible)
-  			return; 
-		
-		//g.setColor(Color.black);
+  			return;
+		// waarde
   		g.setFillStyle(CssColor.make(0,0,0));
-		
-		//String s = "+ " + Expressie.df.format(beginw.geefWaarde());
 		String s = "+ " + UF.format0(beginw.geefWaarde(),3);
-		
-//		Font f = new Font("SansSerrif",Font.PLAIN,14);
-//		g.setFont(f);
-//		FontMetrics fm = g.getFontMetrics();
-//		int w = fm.stringWidth(s);
-		
 		String fontString = "14px sans-serif";
 		g.setFont(fontString);
 		TextMetrics tm = g.measureText(s);
 		int w = (int) Math.round(tm.getWidth());
-		
-		int sccrollCorr = 0;
-		if (scrollable)
-			sccrollCorr = 10;
-		
-//GWT		
-//		if (!tf.isVisible())
-//		{	
-			if (!links)
-			{	//g.drawString(s,5+(getSize().width-w-sccrollCorr)/2,getSize().height-4);
-				g.fillText(s,xPos + 5+(breedte-w-sccrollCorr)/2, yPos + hoogte-4);
-			
-			}
-			else 
-			{	//g.drawString(s,-5+(getSize().width-w-sccrollCorr)/2,getSize().height-4);
-				g.fillText(s,xPos -5+(breedte-w-sccrollCorr)/2,yPos + hoogte-4);
-			
-			}
-//		}
-		
-//GWT		
-/*		
-		else
-		{	
-			if (!links)
-			{	//g.drawString("+ ",5+(getSize().width-w-sccrollCorr)/2,getSize().height-4);
-				g.fillText("+ ",5+(breedte-w-sccrollCorr)/2,hoogte-4);
-			}
-			else 
-			{	//g.drawString("+ ",-5+(getSize().width-w-sccrollCorr)/2,getSize().height-4);
-				g.fillText("+ ",-5+(breedte-w-sccrollCorr)/2,hoogte-4);
-			}
+		if (!links)
+		{	g.fillText(s,xPos + 5+(breedte-w)/2, yPos + hoogte-4);
 		}
-*/		
-			
+		else 
+		{	g.fillText(s,xPos -5+(breedte-w)/2,yPos + hoogte-4);
+		}
 	}
 	
-	
+	/**
+	 * bepaal de uitvoerExpressie a.d.h.v. de 
+	 * uitvoerExpressie van de ASC (if any) verbonden via pijlIn
+	 * vereenvoudig de Expressie indien gewenst  
+	 */
 	public Expressie geefUitvoer(int max)
 	{	if (AlgebraPijlenGWT.simplify)
 		{	Expressie uitv = new Expressie();
@@ -88,7 +60,6 @@ public class OptelSchuifComponent extends BewerkingSchuifComponent
 			Expressie e2 = beginw;
 			if (e1 == null)
 				return null;
-			//if(e2.geefWaarde().doubleValue()==0)uitv = e1;
 			double d = 0;
 			if (e1 instanceof Optelling)
 			{	d = e1.kind2.geefWaarde().doubleValue() + e2.geefWaarde().doubleValue();
@@ -97,27 +68,23 @@ public class OptelSchuifComponent extends BewerkingSchuifComponent
 			{	d = -e1.kind2.geefWaarde().doubleValue() + e2.geefWaarde().doubleValue();
 			}
 			else
-			{	
-				d = e2.geefWaarde().doubleValue();
+			{	d = e2.geefWaarde().doubleValue();
 				if (d == 0)
 					uitv = e1;
 				else if (d > 0)
 					uitv = new Optelling(e1, e2);
 				else //d<0
-				{	//e2 = new BasisExpressie(Expressie.df.format(-d));
-					e2 = new BasisExpressie(UF.format0(-d,3));
+				{	e2 = new BasisExpressie(UF.format0(-d,3));
 					uitv = new Aftrekking(e1, e2);
 				}
 				return uitv;
 			}
 			if (d > 0)
-			{	//e2 = new BasisExpressie(Expressie.df.format(d));
-				e2 = new BasisExpressie(UF.format0(d,3));
+			{	e2 = new BasisExpressie(UF.format0(d,3));
 				uitv = new Optelling(e1.kind1, e2);
 			}
 			else if(d < 0)
-			{	//e2 = new BasisExpressie(Expressie.df.format(-d));
-				e2 = new BasisExpressie(UF.format0(-d,3));
+			{	e2 = new BasisExpressie(UF.format0(-d,3));
 				uitv = new Aftrekking(e1.kind1, e2);
 			}
 			else 
@@ -139,7 +106,10 @@ public class OptelSchuifComponent extends BewerkingSchuifComponent
 			return uitv;
 		}
 	}
-	
+	/**
+	 * bepaal de verborgen uitvoerExpressie a.d.h.v. de verborgen
+	 * uitvoerExpressie van de ASC (if any) verbonden via pijlIn  
+	 */
 	public Expressie geefVerborgenUitvoer(int max)
 	{	Expressie uitv = new Expressie();
 		if (pijlIn1 == null)

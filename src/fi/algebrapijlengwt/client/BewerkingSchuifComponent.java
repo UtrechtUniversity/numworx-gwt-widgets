@@ -1,288 +1,173 @@
 package fi.algebrapijlengwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
-
 import fi.algebrapijlengwt.client.expressies_ap.*;
-
-//import javax.swing.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
 import java.util.HashMap;
+import java.util.Map;
 
-public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implements ActionListener, FocusListener
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
+/**
+ * superclass voor alle bewerkingen die veranderbaar zijn, dus optellen (plus een getal),
+ * aftrekken (min een getal), vermeningvuldigen (keer een getal), delen (delen door een getal),
+ * en machtsverheffen (tot de macht een getal);<br>
+ * een doubleClick op de bewerkingSchuifComponent doet een TeksPopup verschijnen (zie klasse TekstPopup),
+ * d.w.z. een PopupMenu met een TextBox erin waarin de nieuwe waarde ingevoerd kan worden (dit moet
+ * een getal zijn).     
+ */
+public class BewerkingSchuifComponent extends AlgebraSchuifComponent
 {	
+	/**
+	 * het getal in de bewerking als Expressie
+	 */
 	BasisExpressie beginw;
-	//JTextField tf;
-	
-	//TextBox tf;
+	/**
+	 * de TekstPopup voor editing (zie klasse TekstPopup)
+	 */
 	TekstPopup tf;
+	/**
+	 * het basisPanel in AlgebraPijlenGWT, nodig om de TekstPopup goed te positioneren
+	 */
 	LayoutPanel inputOwner;
+	/**
+	 * de text uit de TekstPopup
+	 */
 	String tfString = "";
-	
-	//Font f;
-	//FontMetrics fm;
+	/**
+	 * de fontSize voor de BasisExpressie, zie methode zetMaat() in klasse BasisExpressie  
+	 */
 	int fontSize = 14;
-	
-//GWT	
-	//protected PlusMinKnop plusMinKnop;
-	
-	protected boolean scrollable;
-	
-	
+	/**
+	 * constructor
+	 * @param asv het werkveld
+	 * @param x de x-positie van deze BewerkingSchuifComponent
+	 * @param y de y-positie van deze BewerkingSchuifComponent
+	 * @param b de breedte van deze BewerkingSchuifComponent
+	 * @param h de hoogte van deze BewerkingSchuifComponent
+	 */
 	public BewerkingSchuifComponent(AlgebraSchuifVeld asv,int x, int y, int b, int h)
-	{	super(2, asv, x, y, b, h);
-	
-		//f = new Font("SansSerrif",Font.PLAIN,14);
-		//fm = getFontMetrics(f);
-		
+	{	super(asv, x, y, b, h);
 		beginw = new BasisExpressie("3");
-		
-//GWT
-/*		
-		tf = new JTextField();
-		if (!links)
-			tf.setBounds(20,1,19,18);
-		else 
-			tf.setBounds(10,1,19,18);
-		tf.addActionListener(this);
-		tf.addFocusListener(this);
-		tf.setVisible(false);
-		tf.setEnabled(false);
-*/		
-
 		inputOwner = asv.owner.canvasPanel;
-//GWT deze wordt niet gebruikt in AP
-		
-/*		
-		if(!links)
-		{	plusMinKnop = new PlusMinKnop(b-12,2,10,h-4, PlusMinKnop.VERTIKAAL);
-		}
-		else
-		{	plusMinKnop = new PlusMinKnop(b-22,2,10,h-4, PlusMinKnop.VERTIKAAL);
-		}
-		plusMinKnop.addActionListener(this);
-		plusMinKnop.setColor(new Color(255,150,0));
-*/		
 	}
-/*	
-	public void showTextBox()
-	{
-		tf = new TextBox();
-		tf.setText(tfString);
-		
-		inputOwner.add(tf);
-		
-		if (!links)
-		{
-			inputOwner.setWidgetLeftWidth(tf, xPos + 20, Style.Unit.PX, 19, Style.Unit.PX);
-			inputOwner.setWidgetTopHeight(tf, yPos + 1, Style.Unit.PX, 18, Style.Unit.PX);
-		}
-		else
-		{
-			inputOwner.setWidgetLeftWidth(tf, xPos + 10, Style.Unit.PX, 19, Style.Unit.PX);
-			inputOwner.setWidgetTopHeight(tf, yPos + 1, Style.Unit.PX, 18, Style.Unit.PX);
-		}
-		
-		tf.setFocus(true);
-		
-		tf.addKeyDownHandler(new TextBoxKeyDownHandler());
-	}
-*/
+	/**
+	 * toon de TekstPopup ingevuld met de huidige waarde van de bewerking
+	 */
 	public void showTekstPopup()
-	{
+	{	// onder de BewerkingSchuifComponent
 		int popupX = xPos + 10 + inputOwner.getAbsoluteLeft();
 		int popupY = yPos + hoogte + inputOwner.getAbsoluteTop();
-		
+		// als de TekstPopup nog open is, verwerk de inhoud
 		if ((tf != null) && tf.isVisible())
-		{
-			zetInvulWaarde();
+		{	zetInvulWaarde();
 		}
-
+		// maak een nieuwe TekstPopup
 		tf = new TekstPopup(this,false);
 		tf.setText(tfString);
 		tf.setWidth("25px");
 		tf.setHeight("20px");
-		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
 		tf.textBox.setFocus(true);
-
 	}
-	
-	public void setScrollable(boolean b)
-	{	scrollable = b;
-//GWT	
-/*	
-		if(b)
-			add(plusMinKnop,0);
-		else 
-			remove(plusMinKnop);
-*/			
-	}
-	
+	/**
+	 * stop de basisString van de BasisExpressie beginw in een HashMap
+	 */
 	public HashMap<String,Object> getState()
 	{	String basisExp  = null;
-				
 		basisExp = this.beginw.basisString;
-				
 		HashMap<String,Object> h = super.getState();
 	    h.put("basisExp", basisExp);
-	    
 	    return h;
 	}
-
-    public void setState(HashMap<String,Object> h)
-    {	String basisExp = (String)h.get("basisExp");
-    
-				
+	/**
+	 * bepaal de BasisExpressie beginw m.b.v. de String basisExp uit de Map;
+	 * bepaal de afmeting van deze BewerkingSchuifComponent    
+	 */
+    public void setState(Map<String,Object> map)
+    {	
+    	ObjectMap h = JSONUtilities.wrapMap(map);
+    	String basisExp = h.getString("basisExp");
 		beginw = new BasisExpressie(basisExp);
-		//beginw.zetMaat(fm);
 		beginw.zetMaat(fontSize, ascContext2d);
-				
-		super.setState(h);
-		
+		super.setState(map);
 		zetMaat();
-		
     }
     
+    /**
+     * zet de uitgaande pijl(en) van deze BewerkingSchuifComponent naar links (b == true)
+     * of naar rechts (b == false), zie klasse Pijl
+     */
 	public void zetLinks(boolean b)
 	{	links = b;
-	
-//GWT
-/*	
-		if(!links)tf.setBounds(30,1,19,18);
-		else tf.setBounds(20,1,19,18);
-*/		
-		
-		for(int i=0 ; i<aantalPu ; i++)
+		for (int i = 0; i < aantalPu ; i++)
 		{	pijlUit[i].zetLinks(b);
 			if (!links)
-			{	//pijlUit[i].zetPlaats(getLocation().x + getSize().width+9 ,getLocation().y + 10 );
-				pijlUit[i].zetPlaats(xPos + breedte + 9 ,yPos + 10 );
+			{	pijlUit[i].zetPlaats(xPos + breedte + 9,yPos + 10);
 			}
 			else 
-			{	//pijlUit[i].zetPlaats(getLocation().x - 10 ,getLocation().y + 10 );
-				pijlUit[i].zetPlaats(xPos - 10 , yPos + 10 );
+			{	pijlUit[i].zetPlaats(xPos - 10, yPos + 10);
 			
 			}
 		}
-		
-//GWT
-/*		
-		if(!links)
-		{	plusMinKnop.setLocation(getSize().width-12,1);
-		}
-		else
-		{	plusMinKnop.setLocation(getSize().width-22,1);
-		}
-*/		
-		//asv.tekenOpnieuw();
 	}
 	
-	//public void paint(Graphics g)
+	/**
+	 * teken achtergrond and rand van deze BewerkingSchuifComponent
+	 */
 	public void paint(Context2d g)
-  	{ 	
+  	{	
 		if (!visible)
 			return; 
-		
 		if (!links)
-		{	
-			//g.setColor(Color.orange);
+		{	//oranje achtergrond
 			g.setFillStyle(CssColor.make(255, 200, 0));
-			
-			//g.fillRoundRect(10, 0, getSize().width - 11, getSize().height - 1, 8, 8);
 			g.fillRect(xPos + 10, yPos + 0, breedte - 11, hoogte - 1);
-			
-			//g.setColor(Color.black);
+			//zwarte rand
 			g.setStrokeStyle(CssColor.make(0, 0, 0));
-			
-			//g.drawRoundRect(10,0,getSize().width-11,getSize().height-1,8,8);
 			g.strokeRect(xPos + 10,yPos + 0,breedte-11,hoogte-1);
 		}
 		else
-		{	//g.setColor(Color.orange);
+		{	//oranje achtergrond;
 			g.setFillStyle(CssColor.make(255, 200, 0));
-			
-			//g.fillRoundRect(0,0,getSize().width-11,getSize().height-1,8,8);
 			g.fillRect(xPos + 0, yPos + 0, breedte - 11, hoogte - 1);
-			
-			//g.setColor(Color.black);
+			//zwarte rand
 			g.setStrokeStyle(CssColor.make(0, 0, 0));
-			
-			//g.drawRoundRect(0,0,getSize().width-11,getSize().height-1,8,8);
 			g.strokeRect(xPos + 0,yPos + 0,breedte-11,hoogte-1);
 		}	
-		super.paint(g);
+		super.paint(g); // dit is het balletje voor de ingaande pijl
 	}
 	
+	/**
+	 * bepaal de maat van deze BSC
+	 */
 	public void zetMaat()
-	{	int b = AlgebraSchuifVeld.basisB; //50;
-		int h = AlgebraSchuifVeld.basisH; //20;
-		int corr = 0;
+	{	// basisafmeting
+		int b = AlgebraSchuifVeld.basisB; 
+		int h = AlgebraSchuifVeld.basisH;
+		// corrigeer m.b.v. beginw.breedte (bepaald in zetInvulWaarde)
 		if (beginw != null)
 		{	b = beginw.breedte;
 			if (b > 10)
 				b = b+40;
 			else 
-				b = AlgebraSchuifVeld.basisB; //50;
-			
+				b = AlgebraSchuifVeld.basisB; 
 		}
-		
 		// dit wel: past de pijlen aan
 		setSize(b,h);
 		breedte = b;
 		hoogte = h;
-	
-//GWT		
-//		tf.setBounds(20,1,b-31,18);
-				
-		int sccrollCorr = 0;
-		if (scrollable) 
-			sccrollCorr = 10;
-		
-//GWT
-/*		
-		if(!links)
-		{	tf.setBounds(30-sccrollCorr,1,b-31,18);
-			plusMinKnop.setLocation(b-12,2);
-		}
-		else
-		{	tf.setBounds(20-sccrollCorr,1,b-31,18);
-			plusMinKnop.setLocation(b-22,2);
-		}
-*/			
+	}
 
-	}
-	
-//GWT
-/*	
-	//public void mouseClicked(MouseEvent e)
-	{	if (asv.fixed)
-			return;
-		if (asv.isDemo)
-			return;
-		if (asv.frozen)
-			return;
-		
-//System.out.println("clicked");		
-		
-		add(tf);
-		tf.setVisible(true)	;
-		tf.setEnabled(true);
-		tf.selectAll();
-		tf.requestFocus();
-		
-	}
-*/	
+	/**
+	 * kijk of de String in de TekstPopup een bona fide
+	 * invoerwaarde is en verwerk die; update de pijlenketting 
+	 */
 	public void zetInvulWaarde()
 	{	boolean isGeldigeInvoer = true;
 		{	try
@@ -293,128 +178,57 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent //implement
 			}
 			catch(NumberFormatException ex)
 			{	isGeldigeInvoer = false;
-				//tf.setText(Expressie.df.format(beginw.geefWaarde()));
 				tf.setText(UF.format0(beginw.geefWaarde(),3));
 			}
 		}
 		if (isGeldigeInvoer)
-		{	
-			tfString = tf.getText();
+		{ 	tfString = tf.getText();
 			beginw = new BasisExpressie(tf.getText());
-			//beginw.zetMaat(fm);
 			beginw.zetMaat(fontSize, ascContext2d);
 		}
 		else
 		{	beginw = new BasisExpressie("3");
-			//beginw.zetMaat(fm);
 			beginw.zetMaat(fontSize, ascContext2d);
 		}
 		zetMaat();
 		zetVeranderd(20);
-	
-//GWT
-		
-//		tf.setEnabled(false);
-//		remove(tf);
 		tf.setVisible(false);
 		inputOwner.remove(tf);
-		
-		
 		asv.tekenOpnieuw();
 	}
 	
-	//public void mousePressed(MouseEvent e)
+	/**
+	 * extra actie t.o.v. superklasse: initiliseer double en long click 
+	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
-	{	if (asv.fixed)
+	{	if (asv.isDemo)
 			return;
-		if (asv.isDemo)
-			return;
-		if (asv.frozen)
-			return;		
-
-		press = true;
         taptime = System.currentTimeMillis();
         doubletap.add(taptime);
 		super.mouseDownTouchStartAction(eventX, eventY);
 	}	
 	
-	//public void mouseReleased(MouseEvent e)
+	/**
+	 * extra actie t.o.v. superklasse: TekstPopup bij double click
+	 */
 	public void mouseUpTouchEndAction()
-	{	if (asv.fixed)
-			return;
+	{	
 		if (asv.isDemo)
-			return;
-		
-		if (asv.frozen)
-			return;		
-		
-		//super.mouseReleased(e);
+			return; 
 		if (isDoubleClick()) 
-		{
-			if (!isStapel)
+		{	if (!isStapel)
 			{	showTekstPopup();
-				//showTextBox();
-			
 			}
             doubletap.clear();
         } 
 		else if (isLongClick()) 
-		{
-            doubletap.clear();
+		{    doubletap.clear();
         } 
 		else 
-		{
-            if (doubletap.size() >= 2) 
-            {	
-            	//doubletap.clear();
-            	doubletap.remove(0);
+		{   if (doubletap.size() >= 2) 
+            {  	doubletap.remove(0);
             }
         }
 		super.mouseUpTouchEndAction();
-		
-		
 	}
-
-/*	
-	class TextBoxKeyDownHandler implements KeyDownHandler
-	{
-		public void onKeyDown(KeyDownEvent e)
-		{
-			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
-			{
-//System.out.println("enter");
-				zetInvulWaarde();
-
-			}
-		}
-	}
-*/	
-//GWT
-/*	
-	public void actionPerformed(ActionEvent e)
-	{	if(e.getSource()==tf)
-		{	zetInvulWaarde();
-		}
-		else if(e.getSource()==plusMinKnop)
-		{	if(beginw!=null && !Double.isNaN(beginw.geefWaarde().doubleValue()))
-			{	double w = beginw.geefWaarde().doubleValue();
-				if(e.getActionCommand().equals("min"))w -= 1;
-				if(e.getActionCommand().equals("plus"))w += 1;
-				String waardeString = Expressie.df.format(w);
-				beginw = new BasisExpressie(waardeString);
-				tf.setText(waardeString);
-				zetVeranderd(20);
-				beginw.zetMaat(fm);
-				zetMaat();
-				schuifveld.tekenOpnieuw();
-			}
-		}
-		
-	}
-*/	
-//GWT	
-//	public void focusLost(FocusEvent e)
-//	{	zetInvulWaarde();
-//	}
-//	public void focusGained(FocusEvent e){;	}
 }

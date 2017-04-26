@@ -1,6 +1,8 @@
 package fi.algebrapijlengwt.client;
 
-// universal formatter
+/**
+ * Universal Formatter;<br> let op de internationalisatie van de decimale komma 
+ */
 public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)
@@ -36,8 +38,8 @@ public class UF
             if (fractionalString.length() < decs)
                 fractionalString = zeros(decs - fractionalString.length()) +
                                    fractionalString;
-            result = integerString + "," + 
-            			//Grafiek3DTest.rb.getString("decSep") +
+            result = integerString +  
+            			AlgebraPijlenGWT.rb.decSep() +
             			fractionalString;
         }
         return result;
@@ -47,7 +49,8 @@ public class UF
     public static String format0(double val, int decs)
     {	   
     	String result = format(val, decs);
-    	result = trimTrailingZeros(result, ',');
+    	char decSep = AlgebraPijlenGWT.rb.decSep().charAt(0);
+    	result = trimTrailingZeros(result, decSep);
     	return result;
     }
     

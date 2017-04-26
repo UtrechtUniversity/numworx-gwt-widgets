@@ -72,6 +72,12 @@ public class ZoomStateHolder
 		}
     }
     
+    /**
+     * update schaalFactorX voor variable varnaam, als er geen zoomState
+     * is voor variabele varnaam, maar een nieuwe
+     * @param varnaam variabele
+     * @param schaalFactorX nieuwe schaalFactor
+     */
 	public void setSchaalFactorX(String varnaam, double schaalFactorX)
 	{	ZoomState zs = null;
         if (zoomStates.containsKey(varnaam)) 

@@ -1,10 +1,8 @@
 package fi.algebrapijlengwt.client;
 
-//import fi.algebrapijlengwt.client.UitvoerSchuifComponent.MenuCommand;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -19,14 +17,32 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+/**
+ * klasse verantwoordelijk de administratie van de elementen van alle pijlenkettingen op het werkveld en het tekenen
+ * daarvan (op het Canvas uit de klasse AlgebraPijlenGWT); de klasse handelt alle Mouse/Touch Events of dit Canvas af,
+ * door bij een MouseDown/TouchStart Event te bepalen op welk element (if any) dit MouseDown/TouchStart Event plaatsvond
+ * en vervolgens de coordinaten van alle Mouse/Touch Events door te sturen naar dit element.<br>
+ * elementen van een pijlenketting worden met elkaar verbonden (van elkaar losgemaakt) door de uitgaande pijlpunt
+ * te verslepen tot het balletje voor de inkomende pijl (een vastgemaakte pijlpunt "los" the slepen).  
+ */
+
 public class AlgebraSchuifVeld 
 {	
-	//private static Logger logger = Logger.getLogger("ASV");
-	
+	/**
+	 * flagg om te kijken of pijlenkettingen veranderd zijn<br>
+	 * zie AlgebraPijlenGWT answerChanged()
+	 */
 	public boolean changed = false;
 	
+	/**
+	 * het aantal SchuifComponenten op het werkveld
+	 */
 	int aantalSc;	
+	/**
+	 * de AlgebraSchuifComponenten op het werkveld
+	 */
 	AlgebraSchuifComponent[] schuifcomponenten;
+	
 	AlgebraSchuifComponent actieveComponent;
 	Pijl actievePijl;
 	TabelComponent actieveTabel;
@@ -36,7 +52,6 @@ public class AlgebraSchuifVeld
 	
 	GrafiekComponent grafiekComponent;
 	
-	//JButton kijkNaKnop;
 
 // nodig?	
 	private boolean selecterenMogelijk;
@@ -55,8 +70,8 @@ public class AlgebraSchuifVeld
 	Map<String,Object> editmodeState;
 	
 // alleen voor de leraar?	
-	boolean fixed = false;
-	boolean frozen = false;
+	//boolean fixed = false;
+	//boolean frozen = false;
 	
 	public ZoomStateHolder zoomStateHolder;
 	
@@ -190,52 +205,48 @@ public class AlgebraSchuifVeld
 		}	
 	}
 
+	/**
+	 * kijk of UitvoerSchuifComponent uvs aan het einde van een valide pijlenketting zit, d.w.z.:<br>
+	 * uvs ligt niet op de stapel, uvs heeft een waarde, uvs heeft geen uitgaande pijlen, of als er 
+	 * wel uitgaande pijlen zijn, dan zitten die vast aan een component die niet de GrafiekComponent is
+	 * @param uvs de UitvoerSchuifComponent
+	 * @return true/false
+	 */
 	public boolean isEindUVS(UitvoerSchuifComponent uvs)
 	{	if (uvs.isStapel)
 			return false;
 		if ((uvs.geefUitvoer(0) == null) && (uvs.geefVerborgenUitvoer(0) == null))
 			return false;
-		// dit gebeurt niet?
+		// geen uitgaande pijlen
 		if (uvs.pijlUit[0] == null)
 			return true;
 		boolean einde = true;
 		for (int pCnt = 0; pCnt < uvs.pijlUit.length; pCnt++)
-		{	
-			
+		{	// pijl zit vast aan iets anders dan een grafiek		
 			if ((uvs.pijlUit[pCnt] != null) && uvs.pijlUit[pCnt].vast 
 				&& !(uvs.pijlUit[pCnt].ontvanger instanceof GrafiekComponent)
 				)
 				einde = false;
-			
 		}
 		return einde;
 	}
-	
+
+	/**
+	 * vindt alle UitvoerSchuifComponenten op het werkveld die zich aan het einde 
+	 * van een valide pijlenketting bevinden, zie methode isEindUVS 
+	 * @return een vector met UitvoerSchuifComponenten
+	 */
 	public Vector vindExpressieUVS()
 	{	Vector result = new Vector();
-		
 		for (int sCnt = 0; sCnt < aantalSc; sCnt++)
-		{
-			if (schuifcomponenten[sCnt] instanceof UitvoerSchuifComponent)
-			{	
-	
-				UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) schuifcomponenten[sCnt];
-				if (//(uvs.pijlIn1 != null) &&
-					//!uvs.isStapel &&	
-					//((uvs.pijlUit[0] == null) || 
-					 //(!uvs.pijlUit[0].actief && (!uvs.pijlUit[0].vast || 
-					  //(uvs.pijlUit[0].vast && (uvs.pijlUit[0].ontvanger instanceof GrafiekComponent)))))
-					isEindUVS(uvs)	
-				   ) 	
+		{	if (schuifcomponenten[sCnt] instanceof UitvoerSchuifComponent)
+			{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) schuifcomponenten[sCnt];
+				if (isEindUVS(uvs)				   ) 	
 				{
-//System.out.println("pijlen OK");
-
 					result.addElement(uvs);
 				}
-				
 			}
 		}
-	
 		return result;
 	}
 	
@@ -321,24 +332,9 @@ public class AlgebraSchuifVeld
 		}
 	}
 	
-/*	
-	public void zetPlaatjes(Image gk, Image fk, Image kh)
-	{	GOEDKRUL = gk;
-		GOEDKRULHALF = kh;
-		FOUTKRUIS = fk;
-	}
-*/	
-	public void setFixed(boolean b)
-	{	fixed = b;
-/*	
-		hidePanel.setVisible(b);
-		terugKnop.setVisible(!b);
-		heenKnop.setVisible(!b);
-		wisKnop.setVisible(!b);
-		tabelCheckbox.setVisible(!b);
-		grafiekCheckbox.setVisible(!b);
-*/		
-	}
+//	public void setFixed(boolean b)
+//	{	fixed = b;
+//	}
 	
 	public void zetToolkit(boolean b)
 	{
@@ -691,12 +687,12 @@ stapelsCnt++;
 	    return h;
 	}
 
-/*	
+	
 	public void setEditModeState(Map<String,Object> h)
 	{	editmodeState = h;
 		setState(h);
 	}
-*/	
+	
 	
     public void paste()
     {
@@ -1130,34 +1126,27 @@ stapelsCnt++;
 				}
 	    	
 	    }
-//owner.logger.info("componenten gemaakt " + aantalSc);
+
+		// 
 	    for (int i = 0; i < aantalSc; i++)
-	    {	
-	    	
-	    	if (!(schuifcomponenten[i] instanceof GrafiekComponent)) 
-	    	{	//schuifcomponenten[i].setState(scStates[i]);
-//owner.logger.info("componenten " + i + " setState");	    		
-	    		schuifcomponenten[i].setState((HashMap<String,Object>)scStatesList.get(i));
-	    		
+	    {  	if (!(schuifcomponenten[i] instanceof GrafiekComponent)) 
+	    	{	//schuifcomponenten[i].setState((HashMap<String,Object>)scStatesList.get(i));
+	    		schuifcomponenten[i].setState(scStatesList.get(i));
 	    	}
-	    	// bij een GrafiekComponent lukt dit niet omdat die bij setState de parent nodig heeft en die heeft ie nog niet
 	    }
 	    
-//owner.logger.info("state componenten gezet");	    
+	    // maak een uitgaande pijl voor de AlgebraSchuifComponenten die stapel zijn
+	    // en zet al die pijlen de goede kant op (boolean links)
 		int max = aantalSc;
 		for (int i = 0; i < max; i++)
-		{	
-			
-			if (!(schuifcomponenten[i] instanceof GrafiekComponent))
-			{	
-				Pijl p = new Pijl(this);
+		{	if (!(schuifcomponenten[i] instanceof GrafiekComponent))
+			{	Pijl p = new Pijl(this);
 				if (schuifcomponenten[i].isStapel) 
 				{	schuifcomponenten[i].zetLinks(links);
 					p.zetLinks(links);
 				}	
 				schuifcomponenten[i].voegPijlToe(p);
 			}	
-			//add(schuifcomponenten[i]);
 		}
 		
 //owner.logger.info("pijlen gemaakt");
@@ -1228,64 +1217,56 @@ stapelsCnt++;
 				}
 			}
 		}
-	    
-//GWT zoek even lokaties op in maakStapel
-	    
-if (toolkit)	    
-{	    
-//owner.logger.info("toolkit");	
-	    // nodig voor launchdata, bij de Java versie staan de componenten iets hoger
-	    for (int i = 0; i < aantalSc; i++)
-		{	if (schuifcomponenten[i].isStapel)
-			{	if(schuifcomponenten[i] instanceof UitvoerSchuifComponent)schuifcomponenten[i].zetPlaats(20, 35);
-				if(schuifcomponenten[i] instanceof OptelSchuifComponent)schuifcomponenten[i].zetPlaats(20, 90);
-				if(schuifcomponenten[i] instanceof AftrekSchuifComponent)schuifcomponenten[i].zetPlaats(20, 115);
-				if(schuifcomponenten[i] instanceof VermenigvuldigSchuifComponent)schuifcomponenten[i].zetPlaats(20, 140);
-				if(schuifcomponenten[i] instanceof DeelSchuifComponent)schuifcomponenten[i].zetPlaats(20, 165);
-				if(schuifcomponenten[i] instanceof OmkeringSchuifComponent)schuifcomponenten[i].zetPlaats(20, 190);
-				if(schuifcomponenten[i] instanceof WortelSchuifComponent)schuifcomponenten[i].zetPlaats(20, 215);
-				if(schuifcomponenten[i] instanceof MachtSchuifComponent)schuifcomponenten[i].zetPlaats(20, 240);
-			}
-		}
-//owner.logger.info("einde toolkit");	    
-}
-else // alleenInvullen || isDemo
-{
-//owner.logger.info("alleen");	
-//System.out.println("before " + this.aantalSc);	
-	boolean launching = verwijderStapels();
-//System.out.println("after " + this.aantalSc);	
-	if (launching)
-	{	for (int cnt = 0; cnt < this.aantalSc; cnt++)
-		{
-			if (schuifcomponenten[cnt] != null)
-			{	int x = schuifcomponenten[cnt].xPos;
-				int y = schuifcomponenten[cnt].yPos;
-				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
-				for (int pCnt = 0; pCnt < asc.aantalPu; pCnt++)
-					asc.zetPlaats(x - 100,y,asc.pijlUit[pCnt]);
-//System.out.println("aantalPu " + asc.aantalPu);				
-			}
-//			else
-//System.out.println("sc " + cnt + " null");				
-		}
-		for (int cnt = 0; cnt < this.aantalSc; cnt++)
-		{
-			if (schuifcomponenten[cnt] != null)
-			{	//int x = schuifcomponenten[cnt].xPos;
-				//int y = schuifcomponenten[cnt].yPos;
-				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
-				//asc.zetPlaats(x - 100,y);
-				if (asc.pijlIn1 != null)
-					asc.verbind(asc.pijlIn1);
-			
-			}
-		}
-		
-		//paint();
-	
-	}
-}
+
+	    // bij de Java versie staan de stapels iets hoger
+    	// dus de launchdata positie van de stapels is niet correct
+	    if (toolkit)	    
+	    {  	for (int i = 0; i < aantalSc; i++)
+	    	{	if (schuifcomponenten[i].isStapel)
+				{	if (schuifcomponenten[i] instanceof UitvoerSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 35);
+					if (schuifcomponenten[i] instanceof OptelSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 90);
+					if (schuifcomponenten[i] instanceof AftrekSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 115);
+					if (schuifcomponenten[i] instanceof VermenigvuldigSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 140);
+					if (schuifcomponenten[i] instanceof DeelSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 165);
+					if (schuifcomponenten[i] instanceof OmkeringSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 190);
+					if (schuifcomponenten[i] instanceof WortelSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 215);
+					if (schuifcomponenten[i] instanceof MachtSchuifComponent)
+						schuifcomponenten[i].zetPlaats(20, 240);
+				}
+	    	}
+	    }
+	    // geen stapels links, maar de launchdata bevatten wel stapels, die zijn in Java
+	    // buiten beeld geschoven; verwijder dus de stapels en  
+	    // schuif alle componenten op het ASVelsd 100 pixels naar links
+	    else // alleenInvullen || isDemo
+	    {
+	    	boolean launching = verwijderStapels();
+	    	if (launching)
+	    	{	for (int cnt = 0; cnt < this.aantalSc; cnt++)
+	    		{	if (schuifcomponenten[cnt] != null)
+	    			{	int x = schuifcomponenten[cnt].xPos;
+	    				int y = schuifcomponenten[cnt].yPos;
+	    				AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+	    				for (int pCnt = 0; pCnt < asc.aantalPu; pCnt++)
+	    					asc.zetPlaats(x - 100,y,asc.pijlUit[pCnt]);
+	    			}
+	    		}
+	    		for (int cnt = 0; cnt < this.aantalSc; cnt++)
+	    		{	if (schuifcomponenten[cnt] != null)
+	    			{	AlgebraSchuifComponent asc = (AlgebraSchuifComponent) schuifcomponenten[cnt];
+	    				if (asc.pijlIn1 != null)
+	    					asc.verbind(asc.pijlIn1);
+	    			}
+	    		}
+	    	}
+	    }
 	    //Enumeration en = zoomStateHolder.keys();
 	    Set keySet = zoomStateHolder.keySet();
 		Object[] keys = keySet.toArray();
@@ -1381,7 +1362,7 @@ else // alleenInvullen || isDemo
     public void paint(Context2d g)
 	{	
     	
-//logger.info("ASV paint " + aantalSc);
+//System.out.println("ASV paint " + aantalSc);
 
     	tekenAchtergrond(g);
     	
@@ -1425,7 +1406,8 @@ else // alleenInvullen || isDemo
 				{
 					UitvoerSchuifComponent uvsc = (UitvoerSchuifComponent) schuifcomponenten[ascCnt];
 					if (uvsc.tabel != null)
-					{	uvsc.tabel.paint();
+					{	
+						uvsc.tabel.paint();
 						if (uvsc.zoomInTabel)
 						{
 							uvsc.zoomInKnop.paint();
@@ -1520,18 +1502,11 @@ else // alleenInvullen || isDemo
 		g.setFillStyle(CssColor.make(255, 255, 255));
 		
 		g.fillRect(0, 0, breedte, hoogte);
-		if (fixed)
-		{	
-//System.out.println("fixed");			
-			
-//GWT			
-			//g.setColor(getParent().getBackground());//(Color.white);
-			
-			g.fillRect(0, 0, breedte, hoogte);
-//GWT			
-			//hidePanel.setBackground(getParent().getParent().getBackground());
-			return;
-		}
+//		if (fixed)
+//		{	
+//			g.fillRect(0, 0, breedte, hoogte);
+//			return;
+//		}
 		if (toolkit)
 		{	
 			
@@ -1611,7 +1586,8 @@ else // alleenInvullen || isDemo
 		
 		if (asc instanceof UitvoerSchuifComponent)
 		{	schuifcomponenten[aantalSc] = new UitvoerSchuifComponent(this ,x, y, b, h);
-		  	
+			UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) asc; 
+			((UitvoerSchuifComponent) schuifcomponenten[aantalSc]).zetZoomInTabel(uvs.zoomInTabel);
 //GWT		
 		  	//((UitvoerSchuifComponent) schuifcomponenten[aantalSc]).zetTabelAan(tabelCheckbox.isSelected());
 		}
@@ -1649,11 +1625,16 @@ else // alleenInvullen || isDemo
 
 	}
 	
+	/**
+	 * verwijder de ASC sc uit het array schuifcomponenten[] en vul de "lege" plek op
+	 * door alles naar links te schuiven; verwijder de inkomende pijl uit zijn zender,
+	 * en verwijder de uitgaande pijlen uit hun ontvangers  
+	 * @param sc de te verwijderen ASC
+	 */
 	public void verwijder(AlgebraSchuifComponent sc)
 	{	for (int i = 0; i < aantalSc; i++)
 		{	if (schuifcomponenten[i] == sc)
-			{	
-				if (sc instanceof GrafiekComponent)
+			{	if (sc instanceof GrafiekComponent)
 				{	GrafiekComponent gsc = (GrafiekComponent) sc;
 					while (gsc.aantalPijlenIn > 0)
 					{	Pijl p = gsc.pijlenIn[0];
@@ -1662,49 +1643,37 @@ else // alleenInvullen || isDemo
 						p.pijlTerug();
 					}
 				}
-			
 				if (sc.pijlIn1 != null)
 				{	Pijl p = sc.pijlIn1;
 					sc.maakLos(sc.pijlIn1);
 					p.zender.verwijderPijl();
 					p.pijlTerug();
 				}
-				if (sc.pijlIn2 != null)
-				{	Pijl p = sc.pijlIn2;
-					sc.maakLos(sc.pijlIn2);
-					p.zender.verwijderPijl();
-					p.pijlTerug();
-					
-				}	
 				for (int k = 0; k < sc.aantalPu; k++)
 				{	if (sc.pijlUit[k].ontvanger != null)
 					{	AlgebraSchuifComponent as = sc.pijlUit[k].ontvanger;
 						as.maakLos(sc.pijlUit[k]);
 						as.zetVeranderd(20);
 					}	
-//GWT??				
-					//remove(sc.pijlUit[k]);
 				}
-//GWT??				
-				//remove(sc);
 				for (int j = i; j < aantalSc; j++)
 				{	schuifcomponenten[j] = schuifcomponenten[j + 1];
 				}
 				aantalSc--;
-				
+				// geen repaint bij setState 
 				if (!owner.asvSetState)
 					tekenOpnieuw();
-				
-//GWT				
-				//copyItem.setEnabled(!veldIsLeeg());
-				
 				return;
 			}
 		}
 	}
 	
 	public void zetVeranderd()
-	{	for (int i = 0; i < aantalSc; i++)
+	{	
+		
+System.out.println("asv zetVeranderd");
+
+		for (int i = 0; i < aantalSc; i++)
 		{	if (schuifcomponenten[i] instanceof UitvoerSchuifComponent)
 			{	
 				((UitvoerSchuifComponent) schuifcomponenten[i]).zetTabelAan(toonTabellen);
@@ -1720,6 +1689,11 @@ else // alleenInvullen || isDemo
 	{	
 	}
 	
+	/**
+	 * zet de nieuwe zoomState voor elke UitvoerSchuifComponent en de GrafiekComponenet indien deze de variabele varnaam bevatten  
+	 * @param varnaam de variabele naam
+	 * @param zoomState de zoomState voor varnaam
+	 */
 	public void setZoomStates(String varnaam, ZoomState zoomState)
 	{	for (int i = 0; i < aantalSc; i++)
 			{	if (schuifcomponenten[i] instanceof UitvoerSchuifComponent)
@@ -1843,19 +1817,21 @@ else // alleenInvullen || isDemo
 		}
 	}
 */	
-	
+	/**
+	 * vindt de (zichtbare) AlgebraSchuifComponent aasc (als die er is) die het punt met coordinaten (eventX,eventY) bevat
+	 * @param eventX de x-coordinaat
+	 * @param eventY de y-coordinaat
+	 * @return aasc of null
+	 */
 	public AlgebraSchuifComponent vindActieveComponent(int eventX, int eventY)
 	{	AlgebraSchuifComponent aasc = null; 
-		
 		for (int cCnt = 0; cCnt < aantalSc; cCnt++)
-		{
+		{	// zoek alleen onder de zichtbare schuifcomponenten
 			if ((schuifcomponenten[cCnt] != null) && schuifcomponenten[cCnt].visible && 
 				schuifcomponenten[cCnt].contains(eventX, eventY))
-			{
-				return schuifcomponenten[cCnt];
+			{	return schuifcomponenten[cCnt];
 			}
 		}
-	
 		return aasc; 
 	}
 	
@@ -1877,34 +1853,41 @@ else // alleenInvullen || isDemo
 		return tc; 
 	}
 	
-
+	/**
+	 * vindt de (zichtbare) Pijl ap (als die er is) waarvan de pijlpunt het punt met coordinaten (eventX,eventY) bevat
+	 * zie methode contains() in klasse Pijl
+	 * @param eventX x-coordinaat 
+	 * @param eventY y-coordinaat 
+	 * @return de Pijl ap of null
+	 */
 	public Pijl vindActievePijl(int eventX, int eventY)
 	{	Pijl ap = null; 
-		
 		for (int cCnt = 0; cCnt < aantalSc; cCnt++)
-		{
+		{	// het array is niet vol
+			// voor elke schuifcomponent
 			if (schuifcomponenten[cCnt] != null)
-			{
+			{	// check de uitgaande pijlen van de schuifcomponenet
 				for (int pCnt = 0; pCnt < schuifcomponenten[cCnt].pijlUit.length; pCnt++)
-   				{
+   				{	// de uitgaande pijlen moeten er zijn en zichtbaar zijn 
    					if ((schuifcomponenten[cCnt].pijlUit[pCnt] != null) &&
    						schuifcomponenten[cCnt].pijlUit[pCnt].visible &&	
    						schuifcomponenten[cCnt].pijlUit[pCnt].contains(eventX, eventY))	
    					{
    						return schuifcomponenten[cCnt].pijlUit[pCnt];
    					}
-   					
    				}
-   				
+				// check de ingaande pijl van de schuifcomponent
+				// deze moet er zijn en zichtbaar zijn
 				if ((schuifcomponenten[cCnt].pijlIn1 != null) && 
 					schuifcomponenten[cCnt].pijlIn1.visible &&	
 					schuifcomponenten[cCnt].pijlIn1.contains(eventX, eventY))	
 				{
   						return schuifcomponenten[cCnt].pijlIn1;
-   				}				
+   				}
+				//NB de ingaande pijl van een schuifcomponent kan een uitgaande pijl van een andere
+				// schuifcomponent zijn; je neemt de eerste die gevonden wordt
 			}
 		}
-	
 		return ap; 
 	}
 
@@ -1923,7 +1906,11 @@ else // alleenInvullen || isDemo
 		//return (doubletap.size() >= 2) && doubletap.get(doubletap.size() - 1) - doubletap.get(doubletap.size() - 2) < 700;
 	}
 
-	
+	/**
+	 * afhandeling MouseDown/TouchStart Events
+	 * @param eventX de x-coordinaat van het MouseDown/TouchStart Event
+	 * @param eventY de y-coordinaat van het MouseDown/TouchStart Event
+	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{	
 		
@@ -2014,7 +2001,7 @@ else // alleenInvullen || isDemo
 	        } 
 			else if (isLongClick()) 
 			{
-				//showPopupMenu(eventX, eventY);
+				showPopupMenu(eventX, eventY);
 		
 				doubletap.clear();
 	        } 

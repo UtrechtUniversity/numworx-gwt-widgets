@@ -1,6 +1,5 @@
 package fi.algebrapijlengwt.client.expressies_ap;
 
-//import java.awt.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -17,7 +16,6 @@ public class Macht extends Expressie
 		isAsym = false;
 	}
 	
-	//public void teken(Graphics g, int x, int y)
 	public void teken(Context2d g, int x, int y)
   	{ 	HaakjeLinks hl= new HaakjeLinks(kind1.hoogte+2);
 		HaakjeRechts hr= new HaakjeRechts(kind1.hoogte+2);
@@ -40,13 +38,10 @@ public class Macht extends Expressie
 		kind2.teken(g, x+g3, y);
 	}
 	
-	//public void zetMaat(FontMetrics fm)
 	public void zetMaat(int fs, Context2d c2d)
-  	{	//this.fm = fm;
+  	{	
 		fontSize = fs;
-		//kind1.zetMaat(fm);
 		kind1.zetMaat(fs, c2d);
-		//kind2.zetMaat(fm);
 		kind2.zetMaat(fs, c2d);
 		if(!(kind1.isBasis && (Double.isNaN(kind1.geefWaarde().doubleValue()) || 
 				(!Double.isNaN(kind1.geefWaarde().doubleValue()) && kind1.geefWaarde().doubleValue()>0))))

@@ -45,8 +45,6 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 	private int factorRijNummerY;
 	private double schaalFactorX;
 	private int factorRijNummerX;
-//GWT	
-	//private ZoomDraad zoomDraad;
 		 
 	int startxv = 0;
 	int startyv = 0;
@@ -94,7 +92,8 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 
 	
 	public GrafiekComponent(AlgebraSchuifVeld sv,int x, int y, int b, int h)
-	{	super(1,sv,x,y,b,h);
+	{	//super(1,sv,x,y,b,h);
+		super(sv,x,y,b,h);
 		
 		//super.setBounds(x,y,b,h);
 		//setLayout(null);
@@ -137,98 +136,19 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		varNaam = "qq";
 		formuleNaam = "";
 		
-/*		
-		dfs = new DecimalFormatSymbols();
-		dfs.setDecimalSeparator('.');
-		df = new DecimalFormat("0.####", dfs);
-		dfTrace = new DecimalFormat("0.##",dfs);
-*/		
+		// grafiekVeld
 		gv = new GrafiekVeld(xPos+veldx,yPos+veldy,veldb,veldh);
 		
-		//gv.addMouseListener(this);
-		//gv.addMouseMotionListener(this);
-		
-		
-		//add(gv);
-		
-		
+		// zoomknoppen
 		zoomStandaard = new ZoomKnop("standaard",xPos+32,yPos+2,25,25,asv.asvContext2d);
-		//zoomStandaard.setBounds(32,2,25,25);
-		//zoomStandaard.addActionListener(this);
-		//zoomStandaard.setToolTip("Standaard weergave");
-		//add(zoomStandaard);
-		
 		zoomIn	= new ZoomKnop("zoomin",xPos+57,yPos+2,25,25,asv.asvContext2d);
-		//zoomIn.setBounds(57,2,25,25);
-		//zoomIn.addActionListener(this);
-		//zoomIn.setToolTip("Zoom in");
-		//add(zoomIn);
-		
 		zoomUit	= new ZoomKnop("zoomuit",xPos+82,yPos+2,25,25,asv.asvContext2d);
-		//zoomUit.setBounds(82,2,25,25);
-		//zoomUit.addActionListener(this);
-		//zoomUit.setToolTip("Zoom uit");
-		//add(zoomUit);	
-		
 		zoomInX	= new ZoomKnop("zoominx",xPos+107,yPos+2,25,25,asv.asvContext2d);
-		//zoomInX.setBounds(107,2,25,25);
-		//zoomInX.addActionListener(this);
-		//zoomInX.setToolTip("Zoom in horizontaal");
-		//add(zoomInX);
-		
 		zoomUitX= new ZoomKnop("zoomuitx",xPos+132,yPos+2,25,25,asv.asvContext2d);
-		//zoomUitX.setBounds(132,2,25,25);
-		//zoomUitX.addActionListener(this);
-		//zoomUitX.setToolTip("Zoom uit horizontaal");
-		//add(zoomUitX);
-		
 		zoomInY	= new ZoomKnop("zoominy",xPos+157,yPos+2,25,25,asv.asvContext2d);
-		//zoomInY.setBounds(157,2,25,25);
-		//zoomInY.addActionListener(this);
-		//zoomInY.setToolTip("Zoom in vertikaal");
-		//add(zoomInY);
-		
 		zoomUitY= new ZoomKnop("zoomuity",xPos+182,yPos+2,25,25,asv.asvContext2d);
-		//zoomUitY.setBounds(182,2,25,25);
-		//zoomUitY.addActionListener(this);
-		//zoomUitY.setToolTip("Zoom uit vertikaal");
-		//add(zoomUitY);
-		
-	
-//GWT
-/*		
-		slider = new Slider(veldb,0);
-		slider.setLocation(veldx-5,h-13);
-		slider.addActionListener(this);
-		slider.setBackground(new Color(210,210,210));
-		slider.setVisible(trace);
-		add(slider);
-*/
-//GWT
-/*		
-		traceCheckbox = new JCheckBox();
-		traceCheckbox.setBounds(8,getSize().height-13,17,10);
-		traceCheckbox.setBackground(Color.white);
-		traceCheckbox.addActionListener(this);
-		add(traceCheckbox);
-		traceCheckbox.setOpaque(false);
-*/
-		
-//GWT
-/*		
-		popup = new JPopupMenu();
-		
-		JMenuItem mi = new JMenuItem(AlgebraPijlenOpdr.rb.getString("popup1Label5"));
-		mi.addActionListener(this);
-		popup.add(mi);
-		
-		mi = new JMenuItem(AlgebraPijlenOpdr.rb.getString("popup1Label6"));
-		mi.addActionListener(this);
-		popup.add(mi);
-		
-		add(popup);
-*/
-		
+
+		// kleuren
 		colors = new CssColor[10];
 		colors[0] = CssColor.make(0,0,255);
 		colors[1] = CssColor.make(0,200,0);
@@ -530,9 +450,10 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		}
 		//g.drawString("trace",12,hoogte-15);
 //yPos		
-		g.fillText("trace",xPos+12,yPos+hoogte-15);
+		//g.fillText("trace",xPos+12,yPos+hoogte-15);
 		super.paint(g);
 		
+		// teken de zoomknoppen
 		zoomStandaard.paint();
 		zoomIn.paint();
 		zoomUit.paint();
@@ -770,16 +691,16 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;
+//		if (asv.frozen)
+//			return;
 
 //GWT		
 // double of long tap		
 		//if(e.getModifiers()== e.BUTTON3_MASK || e.isControlDown())
 		{	
 			
-			if (asv.fixed)
-				return;
+//			if (asv.fixed)
+//				return;
 			if (asv.alleenInvullen)
 				return;
 //GWT			
@@ -825,8 +746,8 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;
+//		if (asv.frozen)
+//			return;
 		
 		//if (e.getSource() == gv)
 		if (new Rectangle(xPos+veldx,yPos+veldy,veldb,veldh).contains(eventX, eventY))
@@ -911,8 +832,8 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 	{	
 		if (asv.isDemo)
 			return;
-		if (asv.frozen)
-			return;
+//		if (asv.frozen)
+//			return;
 		
 		
 		resize = false;
@@ -1401,199 +1322,6 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 	}	
 */	
 	
-/*	
-	class ZoomDraad extends Thread 
-	{	boolean dood = false;
-		boolean x,y,in;
-		
-		ZoomDraad(boolean x, boolean y, boolean in)
-		{	this.x = x;
-			this.y = y;
-			this.in = in;
-		}
-		
-		public void run()
-		{	if(x) 
-				selectnummer = 999;
-            eenheidxD = eenheid;
-			eenheidyD = eenheid;
-			eenheidx = eenheid;
-			eenheidy = eenheid;
-			double stapx, stapy;
-			double factorx = 1;
-			double factory = 1;
-			
-			double middenx = eenheidx;
-			double middeny = eenheidy;
-			
-			double beginxOud = beginx;
-			
-			if (in && x)
-			{	if (factorRijNummerX % 3 == 2)
-				{	factorx = 0.4;
-				}
-				else if(factorRijNummerX % 3 == 0)
-				{	factorx = 0.5;
-				}
-				else 
-				{	factorx = 0.5;
-				}
-				
-			}
-			
-			else if (!in && x)
-			{	if (factorRijNummerX%3 == 1)
-				{	factorx = 2.5;
-				}
-				else if(factorRijNummerX % 3 == 2)
-				{	factorx = 2;
-				}
-				else 
-				{	factorx = 2;
-				}
-			}
-			
-			if(in && y)
-			{	if(factorRijNummerY%3==2)
-				{	factory =0.4;
-				}
-				else if(factorRijNummerY%3==0)
-				{	factory=0.5;
-				}
-				else 
-				{	factory=0.5;
-				}
-			}
-			
-			else if(!in && y)
-			{	if(factorRijNummerY%3==1)
-				{	factory =2.5;
-				}
-				else if(factorRijNummerY%3==2)
-				{	factory=2;
-				}
-				else 
-				{	factory=2;
-				}
-			}
-			
-			stapx = Math.pow(factorx,0.1);
-			stapy = Math.pow(factory,0.1);
-			
-			
-			for (int i = 0; i < 5; i++)
-			{	int delay = 20;
-				long t = System.currentTimeMillis();
-				try
-				{	t = t+delay;
-					sleep(Math.max(1, t-System.currentTimeMillis()));
-				}
-    			catch(InterruptedException e)    // geen ;
-				{   };
-				eenheidxD = eenheidxD/stapx;
-				eenheidyD = eenheidyD/stapy;
-				eenheidx = (int) Math.round(eenheidxD);
-				eenheidy = (int) Math.round(eenheidyD);
-				double beginxVorig = beginx;
-				beginx =  middenx -(middenx - beginx)/stapx;
-				beginy =  middeny -(middeny - beginy)/stapy;
-				
-				tracexD = middenx -(middenx - tracexD)/stapx;
-				
-				beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-				tracex = (int) Math.round(tracexD);
-//GWT				
-				//slider.zetStand(tracex);
-				
-				gv.tekenOpnieuw();
-				asv.tekenOpnieuw();
-				
-			}
-			
-			
-			
-			schaalFactorX *= factorx;
-			if (in && x)
-				factorRijNummerX--;
-			else if (!in && x)
-				factorRijNummerX++;
-			schaalFactorY *= factory;
-			if (in && y)
-				factorRijNummerY--;
-			if (!in && y)
-				factorRijNummerY++;
-			
-			eenheidxD = eenheidxD * factorx;
-			eenheidyD = eenheidyD * factory;
-			
-			
-			for(int i = 0; i < 5; i++)
-			{	int delay = 20;
-				long t = System.currentTimeMillis();
-				try
-				{	t = t+delay;
-					sleep(Math.max(1, t-System.currentTimeMillis()));
-				}
-    			catch(InterruptedException e)    // geen ;
-				{   };
-				eenheidxD = eenheidxD/stapx;
-				eenheidyD = eenheidyD/stapy;
-				eenheidx = (int) Math.round(eenheidxD);
-				eenheidy = (int) Math.round(eenheidyD);
-				double beginxVorig = beginx;
-				beginx =  middenx -(middenx - beginx)/stapx;
-				beginy =  middeny -(middeny - beginy)/stapy;
-				
-				tracexD = middenx -(middenx - tracexD)/stapx;
-				
-				beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-				tracex = (int) Math.round(tracexD);
-//GWT				
-				//slider.zetStand(tracex);
-				gv.tekenOpnieuw();
-				asv.tekenOpnieuw();
-			}
-			
-			
-			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-			double beginwaardeD = 1.0-(beginx/eenheidx);
-//System.out.println(""+beginx);
-//System.out.println(""+eenheidx);
-//System.out.println(""+beginwaardeD);
-			
-			tracexD = tracexD + eenheid*(beginwaardeD - beginwaarde);
-			tracex = (int) Math.round(tracexD);
-//GWT			
-			//slider.zetStand(tracex);
-			
-			if(x)
-				selectnummer = 999;
-			
-			beginx = eenheidx - eenheidx * beginwaarde;
-			
-            if(aantalPijlenIn>0)
-			{	
-            	asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
-            	asv.zoomStateHolder.setSchaalFactorX(varNaam, schaalFactorX);
-            	asv.zoomStateHolder.setFactorRijNummerX(varNaam, factorRijNummerX);
-            	asv.zoomStateHolder.setSchaalFactorY(varNaam, schaalFactorY);
-            	asv.zoomStateHolder.setFactorRijNummerY(varNaam, factorRijNummerY);
-            	asv.zoomStateHolder.setSelectnummer(varNaam, selectnummer);
-            	asv.zoomStateHolder.setBeginx(varNaam, (beginx-eenheid)*14/eenheid);
-            	asv.zoomStateHolder.setBeginy(varNaam, Math.round(beginy));
-            	asv.zoomStateHolder.setTracexD(varNaam, tracexD);
-            	asv.zoomStateHolder.setZoomStates(varNaam);
-	            
-			}
-            
-			gv.tekenOpnieuw();
-			asv.tekenOpnieuw();
-		}
-		public void maakDood()
-		{	dood = true;
-		}
-	}
-*/	
 	
 	class GrafiekVeld// extends JComponent
 	{

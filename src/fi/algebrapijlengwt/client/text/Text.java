@@ -1,8 +1,12 @@
 package fi.algebrapijlengwt.client.text;
 
 import com.google.gwt.i18n.client.ConstantsWithLookup;
+import com.google.gwt.i18n.client.Constants.DefaultStringValue;
 
 public interface Text extends ConstantsWithLookup {
+	
+	@DefaultStringValue(",")
+	String decSep();
 	
 	@DefaultStringValue("Wis")
 	String wisKnopLabel();
