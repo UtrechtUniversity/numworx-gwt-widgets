@@ -8,7 +8,7 @@
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>GeoDefiner GWT</name>
 	<dependencies>
@@ -144,6 +144,6 @@
 		<gwt.compiler.force>true</gwt.compiler.force>	
 	</properties>
 	<scm>
-		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/tags/GeoDefinerGWT-0.0.1</developerConnection>
+		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/trunk</developerConnection>
 	</scm>
 </project>
