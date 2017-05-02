@@ -408,15 +408,21 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			int dot = event.getCommand().indexOf('.');
 			String name = event.getCommand().substring(dot+1);
 			Number number = (Number)event.getParameter("value");
+			String message = event.getMessage();
+			Numbers value;
 			if(number == null) {
-				number = Double.valueOf(event.getMessage());
+				number = Double.valueOf(message);
+				value = Numbers.createDouble(number.doubleValue());
+			} else {
+				value = Numbers.createDouble(number.doubleValue());
 			}
+			message = Numbers.toString(value);
 			fi.euclides.model.Label label = (fi.euclides.model.Label) viewer.getMapper().fromString(name);
 			if(label.getSubKey() == Const.TYPE) { 
-				label.setString(Numbers.toString(label.value));
-				label.setValue(Numbers.createDouble(number.doubleValue()));
-				label.notifyObservers();
+				label.setString(message);
+				label.setValue(value);
 			}
+			viewer.paint();
 		}
 
 	}
