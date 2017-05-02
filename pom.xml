@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -136,7 +136,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.2</euclidesVersion>
+		<euclidesVersion>0.0.3-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.4</formuleVersion>
 		<debug />
 		<gwtVersion>2.7.0</gwtVersion>
