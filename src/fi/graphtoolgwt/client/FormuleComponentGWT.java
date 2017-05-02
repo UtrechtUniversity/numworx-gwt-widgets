@@ -1257,8 +1257,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		}
 	}
 	
-	public HashMap<String,Object> getState()
-	{
+	public HashMap<String,Object> getState() {
 		/*
 		ArrayList<String> expressieStrings = new ArrayList<String>();
 		ArrayList<Boolean> geselecteerd = new ArrayList<Boolean>();
@@ -1288,9 +1287,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		geselecteerd = new Object[maxAantalFormules];
 		isEn = new Object[maxAantalFormules];
 		domeinStrings = this.domeinStrings;
+		
 		//int teller = 0;
-		for(int i=0 ; i<maxAantalFormules ; i++)
-		{	String hulp; expressieStrings[i] = hulp = editors[i].toString();
+		for(int i=0 ; i<maxAantalFormules ; i++) {	
+			String hulp; expressieStrings[i] = hulp = editors[i].toString();
 			if(!functieBeginAanpasbaar)
 				expressieStrings[i] = functieBegin[i] + expressieStrings[i];
 			if(hulp.endsWith("="))
