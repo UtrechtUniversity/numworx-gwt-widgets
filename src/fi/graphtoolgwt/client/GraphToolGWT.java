@@ -893,8 +893,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if(grafiekXAsNaam.equals(""))
 			grafiekXAsNaam = oldXAsNaam;
 		//grafiekGWTVeld.setXAsNaam(grafiekXAsNaam);
-		grafiekGWTVeld.paint();
+		grafiekGWTVeld.paint();		
 		//xAsNaamTF.requestFocus();
+		veldComponent.updateAxisName(oldXAsNaam, grafiekXAsNaam);
 	}
 	
 	public void updateYAsNaam(String text)
@@ -905,6 +906,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if(grafiekYAsNaam.equals(""))grafiekYAsNaam = oldYAsNaam;
 		//grafiekGWTVeld.setYAsNaam(grafiekYAsNaam);
 		grafiekGWTVeld.paint();
+		veldComponent.updateAxisName(oldYAsNaam, grafiekYAsNaam);
 		//repaint();
 		
 		//yAsNaamTF.requestFocus();
@@ -2202,27 +2204,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		ingevuld = this.ingevuld;
 		nagekeken = this.nagekeken;
 		
-		HashMap<String,Object> h = new HashMap<String,Object>();
+		HashMap<String, Object> h = new HashMap<String,Object>();
 		h = tekenComponent.getState();
-		HashMap<String,Object> h1 = formuleComponent.getState();
+		HashMap<String, Object> h1 = formuleComponent.getState();
 		h.putAll(h1);
-		
-		/*
-		for (Enumeration e = h1.keys(); e.hasMoreElements();)
-		{	Object aKey = e.nextElement();
-			Object aValue = h1.get(aKey);
-			h.put(aKey, aValue);
-		}
-		*/
-		HashMap<String, Object> h2 = tabelComponent.getState();
+		HashMap<String, Object> h2 = veldComponent.getState();
 		h.putAll(h2);
-		/*
-		for(Enumeration e = h2.keys(); e.hasMoreElements();)
-		{	Object aKey = e.nextElement();
-			Object aValue = h2.get(aKey);
-			h.put(aKey, aValue);
-		}
-		*/
+		HashMap<String, Object> h3 = tabelComponent.getState();
+		h.putAll(h3);
 		
 		h.put("beginx", new Double(beginx));
 		h.put("beginy", new Double(beginy));

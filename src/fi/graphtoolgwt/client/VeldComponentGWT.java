@@ -44,10 +44,11 @@ import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.expressies.Expressie;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
-//	private static Logger logger = Logger.getLogger("VeldComponentGWT");
+	private static Logger logger = Logger.getLogger("VeldComponentGWT");
 	
 	public enum FieldGraphType {QUIVER, STREAMLINE};
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
@@ -154,7 +155,6 @@ public class VeldComponentGWT extends LayoutPanel {
 	
 	public VeldComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte , int hoogte) {
 		
-		
 		this.interactiePanel = interactiePanel;
 		this.veldComponentBreedte = breedte;
 		this.veldComponentHoogte = hoogte;
@@ -226,12 +226,13 @@ public class VeldComponentGWT extends LayoutPanel {
 		for (int i=0; i <aantalStelsels; i++) {
 			systems[i].adjustSize();
 		}
+		stelselsPanel.setWidgetTopHeight(systems[0], 0, Style.Unit.PX, 
+				systems[0].getSystemHeight() , Style.Unit.PX);
 	}
 	
 	public CssColor getSystemColor(int id) {
 		return cSystemColor;
 	}
-
 	
 	public class SystemDiffEqPanelGWT extends LayoutPanel { 
 		
@@ -302,8 +303,7 @@ public class VeldComponentGWT extends LayoutPanel {
 				functionEditors[i].setCurrentElementRepaint();
 				
 				functionPanels[i].add(functionEditorPanels[i]);				
-				this.add(functionPanels[i]);
-				
+				this.add(functionPanels[i]);				
 			}
 			
 			this.add(cb);		
@@ -321,6 +321,10 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		public void setSelected(boolean selected) {
 			cb.setValue(selected);
+		}
+		
+		public boolean getSelected() {
+			return cb.getValue();
 		}
 		
 		public int getSystemHeight() {
@@ -362,6 +366,10 @@ public class VeldComponentGWT extends LayoutPanel {
 					veldComponentGWT.interactiePanel.grafiekGWTVeld.paint();
 				}
 			}
+			
+			public String getFunction() {
+				return (this.toString());
+			}
 		}
 		
 		private void addFormuleEditorListener(final TouchPanel tp, final DiffEqFunctionEditor editor ) {
@@ -373,6 +381,14 @@ public class VeldComponentGWT extends LayoutPanel {
 				functionEditors[functionId].clearAll();
 				functionEditors[functionId].insert(functionStr);
 				functionEditors[functionId].setCurrentElementRepaint();
+			}
+		}
+		
+		public String getFunction(int functionId) {
+			if (functionId < nrFunctions) {
+				return functionEditors[functionId].getFunction();
+			} else {
+				return null;
 			}
 		}
 		
@@ -390,6 +406,12 @@ public class VeldComponentGWT extends LayoutPanel {
 				}
 			}
 			adjustSize();
+		}
+		
+		public void updateFunctions(String oldVar, String newVar) {
+			for (int i=0; i < nrFunctions; i++) {
+				setFunction(i,getFunction(i).replaceAll(oldVar, newVar));
+			}
 		}
 		
 		public void layoutRegelPanel(Widget w)
@@ -411,7 +433,7 @@ public class VeldComponentGWT extends LayoutPanel {
 			int systemHalfHeight = 0;
 			double cBorderMargin = 5.0;
 
-
+            logger.info("komt in adjustSize :: "+ this.systemHeight);
 			// clear old brace canvas
 			Context2d ctx = braceCanvas.getContext2d();
 			ctx.clearRect(0, 0, cSystemDiffEqPanelGWT_braceWidth, this.systemHeight);
@@ -488,6 +510,10 @@ public class VeldComponentGWT extends LayoutPanel {
 			
 			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
 			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
+			logger.info("Line 1 :: From " + 
+					(cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin) + " to " + 
+					(systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin)
+					);
 			
 			ctx.arc(0.0, systemHalfHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
@@ -495,37 +521,28 @@ public class VeldComponentGWT extends LayoutPanel {
 			ctx.arc(0.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
 			
-			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0);
+//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0);
+			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
 			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin);
+			logger.info("Line 2 :: From " + 
+					(systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0) + " to " + 
+					(systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin)
+					);
+			logger.info("Line 2 update :: From " + (systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin));
 			
 			ctx.arc(cSystemDiffEqPanelGWT_braceWidth,  systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 
-
-//			ctx.arc( cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
-//	         cSystemDiffEqPanelGWT_braceWidth/2.0, 0.5*Math.PI, 1.0*Math.PI, false);
-			
-//			ctx.arcTo( cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
-//					   cSystemDiffEqPanelGWT_braceWidth/3.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/3.0+cBorderMargin, 
-//					   cSystemDiffEqPanelGWT_braceWidth/2.0);
-
-//			ctx.arcTo(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
-//					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI);
-//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight+(double) cBorderMargin);
-			
-//			ctx.moveTo((double) cSystemDiffEqPanelGWT_braceWidth, (double) systemHeight+(double) cBorderMargin);
-//			ctx.arc( (double) cSystemDiffEqPanelGWT_braceWidth, (double) systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin-1.0, 
-//			         (double) cSystemDiffEqPanelGWT_braceWidth/2.0, (double) 0.5*Math.PI, (double) 1.0*Math.PI, false);
-			
-//			ctx.arc(cSystemDiffEqPanelGWT_braceWidth, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+cBorderMargin, 
-//			cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 			ctx.stroke();
+            logger.info("Uit adjustSize :: "+ this.systemHeight);
+
 		}
 		
 		public void setSystemColor(CssColor systemColor){
 			this.systemColor = systemColor;
 			this.adjustSize(); // also repaint			
 		}
+		
 		
 		class CheckBoxClickHandler implements ClickHandler {
 			
@@ -547,7 +564,6 @@ public class VeldComponentGWT extends LayoutPanel {
 				((VeldComponentGWT) parent).interactiePanel.grafiekGWTVeld.paint();
 			}
 		}
-
 		
 	}		
 	
@@ -585,8 +601,8 @@ public class VeldComponentGWT extends LayoutPanel {
 //	    return h;
 //	}
 	
-	public void setState(Map<String, Object> h)
-    {	String[] veldGrafiekExpressieStrings = null;
+	public void setState(Map<String, Object> h) {	
+		String[] veldGrafiekExpressieStrings = null;
 		boolean[] veldGrafiekGeselecteerd = null;
     	if (h.get("veldGrafiekExpressieStrings") != null) { 
     		veldGrafiekExpressieStrings = JSONUtilities.toStringArray(h.get("veldGrafiekExpressieStrings"));
@@ -608,8 +624,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		for (int i=0; i<aantalStelsels; i++) {
 			systems[i].setSelected(veldGrafiekGeselecteerd[i]);
 			
-			// activeer/deactiveer Stelsel
-			
+			// activeer/deactiveer Stelsel			
 			for (int j=0; j< cAantalFormulesPerStelsel; j++) {
 
 				// clear begin and end of formula (if existing)
@@ -619,13 +634,66 @@ public class VeldComponentGWT extends LayoutPanel {
  					veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j] = 
  							veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].substring(2, 
  									veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j].length() - 1);
+ 					
  				}
+ 				
 				// voeg formule toe aan stelsel (visueel)
 				systems[i].setFunction(j,  veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+				
 				// verwerk formule ook in het interactiePanel
-				parseFunction(i,j,veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+				if (systems[i].getSelected()) {
+					parseFunction(i, j, veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]);
+				} else {
+					parseFunction(i, j, "");
+				}
 			}
 		}
-    	
     }
+	
+	public HashMap<String,Object> getState() {
+			
+		Object[] veldGrafiekExpressieStrings = null;
+		Object[] veldGrafiekGeselecteerd = null;
+		
+		veldGrafiekExpressieStrings = new String[cMaxAantalStelsels*cAantalFormulesPerStelsel];
+		veldGrafiekGeselecteerd = new Object[cMaxAantalStelsels];
+		
+		for (int i=0 ; i<cMaxAantalStelsels ; i++) {	
+			for (int j=0; j<cAantalFormulesPerStelsel; j++) {
+				veldGrafiekExpressieStrings[i*cAantalFormulesPerStelsel+j]=systems[i].getFunction(j);
+			}
+			veldGrafiekGeselecteerd[i] = systems[i].getSelected();
+		}		
+		
+		HashMap<String,Object> h = new HashMap<String,Object>();
+		h.put("veldGrafiekExpressieStrings", veldGrafiekExpressieStrings);
+		h.put("veldGrafiekGeselecteerd", veldGrafiekGeselecteerd);
+		return h;
+	}
+	
+	public void updateAxisName(String oldName, String newName) {
+		boolean change =false;
+		if (xAsNaam.equals(oldName)) {
+			change = true;
+			xAsNaam = newName;
+		} else {
+			if (yAsNaam.equals(oldName)) {
+				change = true;
+			}
+			yAsNaam = newName;
+		}
+		String[] asNamen = new String[2];
+		asNamen[0] = xAsNaam;
+		asNamen[1] = yAsNaam;
+		
+		if (change) {
+			for (int i=0 ; i<cMaxAantalStelsels ; i++) {	
+				systems[i].updateFunctionBegin(asNamen, cVeldComponentGWT_diffVarNamen[0]);
+				systems[i].updateFunctions(oldName, newName);
+			}
+		}
+		
+	}
+
+
 }

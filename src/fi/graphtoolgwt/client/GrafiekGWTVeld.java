@@ -27,7 +27,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -379,8 +379,8 @@ public class GrafiekGWTVeld {
 	}
 	
 	
-	public void paint()
-	{
+	public void paint() {
+		
 		gIm.clearRect(0, 0, breedte, hoogte);
 		String fontString = "10px sans-serif";
 		gIm.setFont(cFontString);
@@ -493,9 +493,6 @@ public class GrafiekGWTVeld {
 			gIm.setStrokeStyle(roosterKleurLicht);
 			gIm.setLineWidth(cLineWidthLogLines);
 			
-			logger.info("1 LineWidth = " + gIm.getLineWidth());
-			logger.info("1 StrokeStyle = " + gIm.getStrokeStyle());
-
 			if(interactiePanel.roosterX)	{	
 				gIm.beginPath();
 				for(int i = imin-1; i < imax+1; i++) {
@@ -532,9 +529,6 @@ public class GrafiekGWTVeld {
 			gIm.setLineWidth(cLineWidthRoosterlijnen);
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
-			logger.info("2 LineWidth = " + gIm.getLineWidth());
-			logger.info("2 StrokeStyle = " + gIm.getStrokeStyle());
-
 
 			for(int i=imin ; i<imax ; i++) {	
 //				String getal = Double.toString(interactiePanel.schaalFactorX*(i));
@@ -678,9 +672,6 @@ public class GrafiekGWTVeld {
 			}
 		}
 		
-		logger.info("3 LineWidth = " + gIm.getLineWidth());
-		logger.info("3 StrokeStyle = " + gIm.getStrokeStyle());
-
 		if (interactiePanel.piLijnenZichtbaar) {
 			double rangeX = pixelsXtoValue(breedte)-pixelsXtoValue(0);
 			long piMultiplier = 1;
@@ -700,8 +691,6 @@ public class GrafiekGWTVeld {
 
 			gIm.setStrokeStyle(grijs);
 			gIm.setFillStyle(zwart);
-			logger.info("4 LineWidth = " + gIm.getLineWidth());
-			logger.info("4 StrokeStyle = " + gIm.getStrokeStyle());
 
 			// 0 is in beeld
 			if ((bx > 0) && (bx < breedte)) {	
@@ -825,7 +814,6 @@ public class GrafiekGWTVeld {
 				}
 			}		
 		}
-		logger.info("Assen zichtbaar = " + interactiePanel.assenZichtbaar);
 		if (interactiePanel.assenZichtbaar) {
 			gIm.setLineWidth(cLineWidthAxes);
 			gIm.setStrokeStyle(zwart);
@@ -835,8 +823,6 @@ public class GrafiekGWTVeld {
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
 		}
-		logger.info("! LineWidth = " + gIm.getLineWidth());
-		logger.info("! StrokeStyle = " + gIm.getStrokeStyle());
 			
 		/* Y-as */
 		if ( (drawYAxis) && (interactiePanel.roosterY) ){	
