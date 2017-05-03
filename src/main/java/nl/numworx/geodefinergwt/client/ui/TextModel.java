@@ -16,7 +16,8 @@ public class TextModel extends ColorModel<Label> {
 	private FontStyle font = new FontStyle();
 	private float dx, dy;
 	Boolean alwaysF;
-
+	Label item;
+	
 	@Override
 	public void install() {
 		DefaultAdapter.getDefault(item).put(align);
@@ -32,6 +33,7 @@ public class TextModel extends ColorModel<Label> {
 	public UIModel<Label, Void> init(Label item) {
 		align = item.adapt(Align.class);
 		if(align == null) align= Align.BASE;
+		this.item = item;
 		super.init(item);
 		return this;
 	}

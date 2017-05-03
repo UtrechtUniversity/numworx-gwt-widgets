@@ -20,7 +20,7 @@ import fi.euclides.util.DefaultAdapter;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
-	protected T item;
+	protected Destroyable item;
 	public int rgba = 0xFF000000;
 	public boolean visible = true;
 	Tracker tracker;
@@ -110,6 +110,12 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	@Override
 	public UIModel<T, Void> set(Tracker tracker) {
 		this.tracker = tracker;
+		return this;
+	}
+
+	@Override
+	public UIModel<T, Void> init2(Destroyable item) {
+		this.item = item;
 		return this;
 	}
 

@@ -213,7 +213,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				toolbox.init(list, viewer);
+				toolbox.init(list, viewer, this);
 				return;
 			}
 		}

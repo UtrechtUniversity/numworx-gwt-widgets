@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
+import nl.numworx.geodefiner.common.ResetHandler;
+import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
 import com.google.gwt.core.client.GWT;
@@ -37,7 +39,7 @@ import fi.euclides.proof.OppHandler;
 import fi.euclides.proof.RatioHandler;
 import fi.euclides.proof.VectorHandler;
 
-public class ToolBoxPanel extends Composite {
+public class ToolBoxPanel extends Composite implements Tools {
 
 	static class Action implements ClickHandler {
 
@@ -57,22 +59,24 @@ public class ToolBoxPanel extends Composite {
 	}
 
 	HorizontalPanel panel;
+	
 	public ToolBoxPanel() {
 		panel = new HorizontalPanel();
 		initWidget(panel);
 	}
 	
-	void init(ObjectList list, Tracker tracker) {		
+	void init(ObjectList list, Tracker tracker, GeoDefinerGWT geoDefinerGWT) {		
 		PushButton btn;
 		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
 			btn = null;
+			ResetHandler resetter;
 			switch(n) {
-			case 0:
+			case SELECTOR:
 				btn = newBtn(url + "/move.png", new SelectHandler(), tracker);break;
 			case 1: 
-				btn = newBtn(url + "/point.png", new AddPuntHandler(), tracker);break;
+				btn = newBtn(url + "/point.png", new AddPuntHandler(), tracker);break;		
 			case 2:
 				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
 			case 3:
@@ -125,7 +129,18 @@ public class ToolBoxPanel extends Composite {
 		item = new MenuItem("CrossRatio", new Action(new CrossRatio("CrossRatio"), tracker ));
 		
 */			
-			
+			case 23: // definitie
+			case 24: // trail
+					break;
+					
+			case 25: // pan
+					EventHandler pan = geoDefinerGWT.widget.getPanHandler();
+					btn = newBtn(url + "/pan.png", pan, tracker);
+					break;
+			case 26: // reset
+				resetter = new ResetHandler("Reset");
+				resetter.instance = geoDefinerGWT;
+				btn = newBtn(url + "/reseticon.gif", resetter, tracker); break;
 			}
 			if(btn != null)	panel.add(btn);
 		}
