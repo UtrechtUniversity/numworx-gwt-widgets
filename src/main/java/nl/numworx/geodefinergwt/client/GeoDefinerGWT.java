@@ -474,5 +474,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		return super.randomize(random, text);
 	}
 
-	
+	public void reset() {
+		toolbox.destroy();
+		createModel(viewer.getModel(), width, height);
+		installLaunchData();
+		start();
+
+	}
 }

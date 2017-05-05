@@ -65,6 +65,13 @@ public class ToolBoxPanel extends Composite implements Tools {
 		initWidget(panel);
 	}
 	
+	void destroy() {
+		int size = panel.getWidgetCount();
+		for(int i = 0; i < size; i++)
+			panel.getWidget(0).removeFromParent();
+	}
+	
+	
 	void init(ObjectList list, Tracker tracker, GeoDefinerGWT geoDefinerGWT) {		
 		PushButton btn;
 		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
@@ -134,8 +141,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 					break;
 					
 			case 25: // pan
-					EventHandler pan = geoDefinerGWT.widget.getPanHandler();
-					btn = newBtn(url + "/pan.png", pan, tracker);
+				btn = newBtn(url + "/pan.png", geoDefinerGWT.widget.getPanHandler(), tracker);
 					break;
 			case 26: // reset
 				resetter = new ResetHandler("Reset");
