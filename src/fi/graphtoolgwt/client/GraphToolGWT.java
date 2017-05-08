@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -40,10 +39,8 @@ import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 
 
 
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-//import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -68,24 +65,12 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
-//import com.google.gwt.event.dom.client.ClickEvent;
-//import com.google.gwt.event.dom.client.ClickHandler;
-//import com.google.gwt.event.dom.client.KeyCodes;
-//import com.google.gwt.event.dom.client.KeyUpEvent;
-//import com.google.gwt.event.dom.client.KeyUpHandler;
-//import com.google.gwt.user.client.rpc.AsyncCallback;
-//import com.google.gwt.user.client.ui.Button;
-//import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-//import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
-//import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
-//import com.google.gwt.user.client.ui.TextBox;
-//import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -134,6 +119,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	TekenComponentGWT tekenComponent;
 	TabelComponentGWT tabelComponent;
 	FormuleComponentGWT formuleComponent;
+	VeldComponentGWT veldComponent;
 	
 	LayoutPanel zoomPanel;
 	int zoomPanelHoogte = 23;
@@ -159,8 +145,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	private int aantalFuncties = 0;
 	
 	Expressie[] functies = new Expressie[maxAantalExpressies];
+	Expressie[][] veldFuncties = new Expressie[VeldComponentGWT.cMaxAantalStelsels][VeldComponentGWT.cAantalFormulesPerStelsel];
+
 	Expressie[] ongelijkheden = new Expressie[maxAantalExpressies];
 	Expressie[] verticaleLijnen = new Expressie[maxAantalExpressies];
+	
 	boolean[] isY = new boolean[maxAantalExpressies];
 	boolean[] isGroterGelijk = new boolean[maxAantalExpressies];
 	boolean[] isEn = new boolean[maxAantalExpressies];
@@ -253,6 +242,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean formeleFuncties = true;
 	boolean domeinInstelbaar = false;
 	int formuleComponentHoogte = 120;
+	int veldComponentHoogte = VeldComponentGWT.cDefault_hoogte;
+	VeldComponentGWT.FieldGraphType veldGrafiekType = VeldComponentGWT.cDefault_grafiekType;
+	VeldComponentGWT.FieldGraphArrowSizeMode veldPijlGrootteModus = VeldComponentGWT.cDefault_pijlGrootteModus;
+	int veldPijlGroottePixels = VeldComponentGWT.cDefault_pijlGroottePixels;
+	double veldPijlSchaalfactor = VeldComponentGWT.cDefault_pijlSchaalFactor;
+	boolean veldLargerGridStartPoints = VeldComponentGWT.cDefault_largerGridStartPoints;
+
 	
 	boolean functieToegestaan = true;
 	boolean ongelijkheidToegestaan = true;
@@ -261,7 +257,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean parametrisatieToegestaan = false;
 	
 	boolean formuleComponentAan = true;
+	boolean veldComponentAan = false;
 	boolean tekenComponentAan = cDefault_tekenComponentAan;
+	
 	//voor testen tabelcomponent: 
 	//boolean tabelComponentAan = true;
 	//standaard:
@@ -423,6 +421,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			grafiekVeldHoogte -= tabelComponentHoogte + offset;
 		if(formuleComponentAan)
 			grafiekVeldHoogte -= formuleComponentHoogte + offset;
+		if(veldComponentAan)
+			grafiekVeldHoogte -= veldComponentHoogte + offset;
 		
 		if((typeOpdracht == 3 || typeOpdracht == 4) && mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS && !checkExternal) 
 		{	grafiekVeldHoogte -= kijkNaPanelHoogte + offset;
@@ -582,14 +582,27 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
 		formuleComponent.setPixelSize( breedte  , (formuleComponentHoogte - 2 - offset) );
 		
+		veldComponent = new VeldComponentGWT(this, launchState, breedte, veldComponentHoogte);
+		
 		formuleComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(typeOpdracht == VINDFORMULEBIJGRAFIEK || typeOpdracht == VINDFORMULEBIJPUNTEN)
 			formuleComponent.alsOpdracht = true;
-		if(formuleComponentAan)
-		{	FlowPanel panel = new FlowPanel();
+		if(formuleComponentAan) {	
+			FlowPanel panel = new FlowPanel();
 			panel.setSize(breedte + "px", offset + "px");
 			basisPanel.add(panel);
 			basisPanel.add(formuleComponent);
+		}
+		
+		if (veldComponentAan) {
+			FlowPanel panel = new FlowPanel();
+			panel.setSize(breedte + "px", offset + "px");
+			basisPanel.add(panel);
+			basisPanel.add(veldComponent);
+			
+			//RPJ
+			zetVectorVeld(0, 0, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fax+y@"))));
+			zetVectorVeld(0, 1, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fay-x@"))));		
 		}
 		
 		grafiekGWTVeld.initContext2d();
@@ -597,6 +610,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		grafiekGWTVeld.setState(launchState); //lijkt me niet nodig.
 		tekenComponent.setState(launchState);
 		formuleComponent.setState(launchState, randomVarNamen, randomVarWaarden);
+		veldComponent.setState(launchState);
 		
 		// Initialiseer the schaal parameters in geval van manual scaling 
     	if (manualScalingX || manualScalingY) {
@@ -879,8 +893,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if(grafiekXAsNaam.equals(""))
 			grafiekXAsNaam = oldXAsNaam;
 		//grafiekGWTVeld.setXAsNaam(grafiekXAsNaam);
-		grafiekGWTVeld.paint();
+		grafiekGWTVeld.paint();		
 		//xAsNaamTF.requestFocus();
+		veldComponent.updateAxisName(oldXAsNaam, grafiekXAsNaam);
 	}
 	
 	public void updateYAsNaam(String text)
@@ -891,6 +906,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if(grafiekYAsNaam.equals(""))grafiekYAsNaam = oldYAsNaam;
 		//grafiekGWTVeld.setYAsNaam(grafiekYAsNaam);
 		grafiekGWTVeld.paint();
+		veldComponent.updateAxisName(oldYAsNaam, grafiekYAsNaam);
 		//repaint();
 		
 		//yAsNaamTF.requestFocus();
@@ -2019,6 +2035,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			//grafiekGWTVeld.paint();
 	}
 	
+	public void zetVectorVeld(int stelselNr, int functieNr, Expressie expressie) {
+		veldFuncties[stelselNr][functieNr] = expressie;
+//		logger.info("veldFuncties["+stelselNr+"]["+functieNr+"]=" +veldFuncties[stelselNr][functieNr] );
+	}
+
+	
 	public void zetVerticaleLijn(int nr, Expressie e)
 	{
 		verticaleLijnen[nr] = e;
@@ -2182,27 +2204,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		ingevuld = this.ingevuld;
 		nagekeken = this.nagekeken;
 		
-		HashMap<String,Object> h = new HashMap<String,Object>();
+		HashMap<String, Object> h = new HashMap<String,Object>();
 		h = tekenComponent.getState();
-		HashMap<String,Object> h1 = formuleComponent.getState();
+		HashMap<String, Object> h1 = formuleComponent.getState();
 		h.putAll(h1);
-		
-		/*
-		for (Enumeration e = h1.keys(); e.hasMoreElements();)
-		{	Object aKey = e.nextElement();
-			Object aValue = h1.get(aKey);
-			h.put(aKey, aValue);
-		}
-		*/
-		HashMap<String, Object> h2 = tabelComponent.getState();
+		HashMap<String, Object> h2 = veldComponent.getState();
 		h.putAll(h2);
-		/*
-		for(Enumeration e = h2.keys(); e.hasMoreElements();)
-		{	Object aKey = e.nextElement();
-			Object aValue = h2.get(aKey);
-			h.put(aKey, aValue);
-		}
-		*/
+		HashMap<String, Object> h3 = tabelComponent.getState();
+		h.putAll(h3);
 		
 		h.put("beginx", new Double(beginx));
 		h.put("beginy", new Double(beginy));
@@ -2403,6 +2412,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 		tekenComponent.setState(h);
 		formuleComponent.setState(h, null, null);
+		veldComponent.setState(h);
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
 		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
@@ -2621,6 +2631,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				domeinInstelbaar =  launchData.getBoolean("domeinInstelbaar");
 			if(launchData.containsKey("formuleComponentHoogte"))
 				formuleComponentHoogte =  launchData.getInt("formuleComponentHoogte");
+			if(launchData.containsKey("veldComponentHoogte"))
+				veldComponentHoogte =  launchData.getInt("veldComponentHoogte");
 			
 			if(launchData.containsKey("functieToegestaan"))
 				functieToegestaan = launchData.getBoolean("functieToegestaan");
@@ -2635,6 +2647,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			
 			if(launchData.containsKey("formuleComponentAan"))
 				formuleComponentAan =  launchData.getBoolean("formuleComponentAan");
+			if(launchData.containsKey("veldComponentAan"))
+				veldComponentAan =  launchData.getBoolean("veldComponentAan");
+
 			if(launchData.containsKey("tekenComponentAan"))
 				tekenComponentAan =  launchData.getBoolean("tekenComponentAan");
 			if(launchData.containsKey("tabelComponentAan"))
@@ -3512,6 +3527,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		{	
 			
 			if ((dragPoint == null) && (dragOptie)) { // Move Graph if no point selected
+				grafiekGWTVeld.setGrafiekSchuivenActief(true);
 				int dx = eventX - startxv;
 				int dy =  eventY - startyv;					
 				beginx = beginx+dx;
@@ -3619,8 +3635,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				startyv = eventY;
 			}
 			// grafiek slepen als drag==true
-			else if ((dragPoint == null) && (otherPoint == null) && dragOptie)
-			{	int dx = eventX - startxv;
+			else if ((dragPoint == null) && (otherPoint == null) && dragOptie) {
+				grafiekGWTVeld.setGrafiekSchuivenActief(true);
+
+				int dx = eventX - startxv;
 				int dy = eventY - startyv;					
 				beginx = beginx+dx;
 				beginy = beginy-dy;
@@ -3674,6 +3692,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	public void mouseUpTouchEndAction(Object source, int eventX, int eventY) {	
 		moveActionActivated = false;
+		grafiekGWTVeld.setGrafiekSchuivenActief(false);
 
 		boolean schuifParameterTouched = false;
 		// Check schuifParameters

@@ -24,6 +24,8 @@
   <inherits name="fi.wiskopdr.WiskOpdr"/>
   <inherits name="nl.uu.fi.dwo.formule.Formule" />
   <inherits name='gwt.Geom' />
+  <inherits name="fi.beans.lineairealgebra.LineaireAlgebra" />
+  
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.graphtoolgwt.client.GraphToolGWT'/>

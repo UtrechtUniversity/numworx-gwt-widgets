@@ -43,10 +43,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	private FormuleEditorFactory factor = GWT.create(FormuleEditorFactory.class);
 	{
 		factor.setFc(this);
-	}
-	
-	
-	
+	}	
 	
 	static class TriforkFormuleEditor extends GraphtFormuleEditor {
 
@@ -70,7 +67,6 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 
 	}
 
-
 	private static Logger logger = Logger.getLogger("FormuleComponentGWT");
 
 	private IsWidget wrap (IsWidget widget) {
@@ -81,8 +77,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		//focus.add(widget);
 		//focus.addMouseUpHandler(new FocusOnTouch(focus));
 		return focus;
-	}
-	
+	}	
 	
 	/*
 	 * class voor de editors die de formules gaan verwerken; vooralsnog komt er in elke regel één.
@@ -124,8 +119,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 
 		@Override
 		public void stelsel() {
-			// TODO Auto-generated method stub
-			
+			// TODO Auto-generated method stub			
 		}
 
 		@Override
@@ -268,8 +262,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			if(launchData.containsKey("xAsNaam"))
 				xAsNaam = (String)launchData.get("xAsNaam");
 			if(launchData.containsKey("yAsNaam"))
-				yAsNaam = (String)launchData.get("yAsNaam");
-			
+				yAsNaam = (String)launchData.get("yAsNaam");			
 		}
 		
 		
@@ -412,8 +405,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		
 		
-		for(int i = 0; i < regelPanels.length; i++)
-		{	/*regelPanels[i] = new FlowPanel();
+		for(int i = 0; i < regelPanels.length; i++) {	
+			/*regelPanels[i] = new FlowPanel();
 			layoutRegelPanel(regelPanels[i]);
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);
@@ -1264,8 +1257,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		}
 	}
 	
-	public HashMap<String,Object> getState()
-	{
+	public HashMap<String,Object> getState() {
 		/*
 		ArrayList<String> expressieStrings = new ArrayList<String>();
 		ArrayList<Boolean> geselecteerd = new ArrayList<Boolean>();
@@ -1295,9 +1287,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		geselecteerd = new Object[maxAantalFormules];
 		isEn = new Object[maxAantalFormules];
 		domeinStrings = this.domeinStrings;
+		
 		//int teller = 0;
-		for(int i=0 ; i<maxAantalFormules ; i++)
-		{	String hulp; expressieStrings[i] = hulp = editors[i].toString();
+		for(int i=0 ; i<maxAantalFormules ; i++) {	
+			String hulp; expressieStrings[i] = hulp = editors[i].toString();
 			if(!functieBeginAanpasbaar)
 				expressieStrings[i] = functieBegin[i] + expressieStrings[i];
 			if(hulp.endsWith("="))
@@ -1363,8 +1356,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 15, Style.Unit.PX);
 			if(regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
 				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight()), Style.Unit.PX);
-			
-			
 		}
 	}
 	
@@ -1452,9 +1443,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			geselecteerd[regelnummer] = !geselecteerd[regelnummer];
 			parseFormule(regelnummer, false);
 			grafiekGWTVeld.paint();
-			
-			
-			
 		}
 	}
 	

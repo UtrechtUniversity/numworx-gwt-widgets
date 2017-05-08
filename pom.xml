@@ -60,6 +60,12 @@
   		<groupId>fi.wiskopdrgwt</groupId>
   		<artifactId>WiskOpdrGWT</artifactId>
   		<version>0.0.2</version>
+  		<exclusions>
+  			<exclusion>
+  				<artifactId>IdeasGWT</artifactId>
+  				<groupId>nl.uu.fi.dwo.ideas</groupId>
+  			</exclusion>
+  		</exclusions>
   	</dependency>
   	<dependency>
   		<groupId>com.googlecode.mgwt</groupId>
@@ -75,6 +81,17 @@
   		<artifactId>formule</artifactId>
   		<version>0.0.4</version>
   	</dependency>
+  	<dependency>
+  		<groupId>fi.beans</groupId>
+  		<artifactId>lineairealgebra</artifactId>
+  		<version>0.0.1</version>
+  	</dependency>
+  		<dependency>
+		<groupId>fi.beans</groupId>
+		<artifactId>lineairealgebra</artifactId>
+		<version>0.0.1</version>
+		<classifier>sources</classifier>			
+	</dependency>  	
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
