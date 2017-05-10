@@ -49,6 +49,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
 	private AnimationHandle animator;
 	private boolean down;
+	private String background = "white";
 	
 	private NameMapper mapper = super.getMapper();
 	@Override public NameMapper getMapper() { return mapper; }
@@ -117,10 +118,15 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 
 	@Override
 	public void drawAxes() {
-		new AxesDrawer(this).drawAxes();
+		new AxesDrawer(this).setBackground(background).drawAxes();
 	}
 
 	
+	@Override
+	public void setBackground(String string) {
+		background = string;
+		super.setBackground(string);
+	}
 	@Override
 	public void visitTriangle(Triangle t) {
 		selectColor(t);

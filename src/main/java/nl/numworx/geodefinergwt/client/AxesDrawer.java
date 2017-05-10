@@ -69,6 +69,15 @@ class AxesDrawer implements Visitor {
 		private String color;
 		private String background = "white";
 		
+		String getBackground() {
+			return background;
+		}
+
+		AxesDrawer setBackground(String background) {
+			this.background = background;
+			return this;
+		}
+
 		void drawAxes() {
 			Destroyable grid = getModel().getLijnen().elementAt(2);
 			if(grid.isVisible()) grid.visit(this);

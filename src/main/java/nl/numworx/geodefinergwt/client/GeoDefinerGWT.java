@@ -323,6 +323,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.comRoot = comRoot;
+		widget.setBackground(comRoot.getBackground().toString());
 		//comRoot.addCBookEventListener("double", this);
 		for (Destroyable d: viewer.getModel().getLijnen()) {
 			if(d instanceof fi.euclides.model.Label) {
