@@ -13,9 +13,11 @@ import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
+import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
 import fi.euclides.model.MP;
 import fi.euclides.model.Punt;
+import fi.euclides.model.Ray;
 import fi.euclides.model.Segment;
 import fi.euclides.model.SegmentVisitor;
 import fi.euclides.model.Triangle;
@@ -439,6 +441,22 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		default:
 		}
 		DefaultAdapter.getDefault(label).put(Shape.class, rect);
+	}
+	/* (non-Javadoc)
+	 * @see fi.euclides.model.AbstractViewer#visitLijn(fi.euclides.model.Lijn)
+	 */
+	@Override
+	public void visitLijn(Lijn l) {
+		if(l instanceof Ray) {
+			visitRay(l);
+		} else {
+			super.visitLijn(l);			
+		}
+	}
+
+	private void visitRay(Lijn l) {
+		rr.setLijn(l);
+		visitSegment(rr);
 	}
 
 }

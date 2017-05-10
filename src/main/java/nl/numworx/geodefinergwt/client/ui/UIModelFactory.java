@@ -13,6 +13,7 @@ import fi.euclides.model.Label;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
 import fi.euclides.model.Punt;
+import fi.euclides.model.Ray;
 import fi.euclides.model.Segment;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.Visitor;
@@ -42,6 +43,10 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 
 	@Override
 	public void visitLijn(Lijn l) {
+		if(l instanceof Ray) {
+			model = new SegmentModel().init(l);
+			return;
+		}
 		String name = tracker.getMapper().toString(l);
 		if("x".equals(name) || "y".equals(name))
 			model = new AxesModel().init(l);
