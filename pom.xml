@@ -56,6 +56,11 @@
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
   	</dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.ideas</groupId>
+			<artifactId>IdeasGWT</artifactId>
+			<version>0.0.2</version>
+		</dependency>
   	<dependency>
   		<groupId>fi.wiskopdrgwt</groupId>
   		<artifactId>WiskOpdrGWT</artifactId>
