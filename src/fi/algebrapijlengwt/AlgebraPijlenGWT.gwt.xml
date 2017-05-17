@@ -19,6 +19,7 @@
 
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+  <inherits name='nl.uu.fi.dwo.formule.Formule' />
 
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
