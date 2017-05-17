@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -33,10 +35,9 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 
@@ -74,7 +75,7 @@ import fi.algebrapijlengwt.client.text.Text;
  * @author Peter Boon
  */
 
-public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //InteractionView 
+public class AlgebraPijlenGWT implements EntryPoint, InteractionStub 
 {
 	/**
 	 * internationalisatie
@@ -99,6 +100,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	/**
 	 * Canvas waarop pijlenkettingen getekenend worden  
 	 */
+	SimplePanel simpel = new SimplePanel();
+	
 	Canvas algebraPijlenGWTCanvas;
 	/**
 	 * teken m.b.v. een Context2d
@@ -282,11 +285,14 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 		getImages();
 		canvasPanel = new LayoutPanel(); 
 		canvasPanel.setSize("" + breedte + "px", "" + hoogte + "px");
-		RootPanel.get(holderId).add(canvasPanel);
+		RootPanel.get(holderId).add(canvasPanel); // deze regel uitzetten voor standalone test
 		RootPanel.get(holderId).addStyleName(algebraPijlenGWTCss.root());
-		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+	
+		//RootLayoutPanel.get().add(simpel); // deze regel aanzetten voor standalone test
+		//simpel.setWidget(asWidget()); // deze regel aanzetten voor standalone test
+
+		Stub.publish(this); // deze regel uitzetten voor standalone test
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>()); // deze regel aanzetten voor standalone test
 	}
 
 	/**
@@ -441,6 +447,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			e.preventDefault();
 			e.stopPropagation();
 		}
+		
 		public void onTouchMove(TouchMoveEvent e)
 		{
 			e.preventDefault();
@@ -457,6 +464,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 			e.preventDefault();
 			e.stopPropagation();
 		}
+		
 		public void onTouchEnd(TouchEndEvent e)
 		{
 			int eventX = 0;
@@ -517,12 +525,38 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	{	return canvasPanel;
 	}
 	
+	/**
+	 * Sluit geopende popup.
+	 * 
+	 * @return
+	 */
+	public void closeOpenedPopups()
+	{
+		asv.closeOpenedPopups();
+	}
+
+
+	/**
+	 * Resize geopende popup.
+	 * 
+	 * @return
+	 */
+	public void resizePopup()
+	{
+		asv.resizePopup();
+	}
+
+
 	@Override
 	public HashMap<String, Object> getState()
 	{
+		// sluit geopende popups
+		closeOpenedPopups();
+		
 		HashMap<String, Object> h = asv.getState();
 		h.put("nagekeken", new Boolean(nagekeken));
 		h.put("ingevuld", new Boolean(ingevuld));
+		
 		return h;
 	}
 
@@ -569,6 +603,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{	this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
+		FormuleKeyboardIF kb = comRoot.getKeyboard();
+		FormuleHolder.installKeyboard(kb);
 	}
 	
 	public void zetMode(int mode)
@@ -779,7 +815,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub //Interacti
 	  	algebraPijlenGWTCanvas.addTouchStartHandler(touchHandler);
 	  	algebraPijlenGWTCanvas.addTouchMoveHandler(touchHandler);
 	  	algebraPijlenGWTCanvas.addTouchEndHandler(touchHandler);
-		
+	  	
 		canvasPanel.add(algebraPijlenGWTCanvas);
 		canvasPanel.setWidgetLeftWidth(algebraPijlenGWTCanvas, 0, Style.Unit.PX, canvasBreedte, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(algebraPijlenGWTCanvas, 0, Style.Unit.PX, canvasHoogte, Style.Unit.PX);
