@@ -1894,6 +1894,8 @@ System.out.println("asv zetVeranderd");
 	protected boolean press;
     protected long taptime;
     protected List<Long> doubletap = new ArrayList<Long>();
+
+	boolean popupOpened = false;
     
     protected boolean isLongClick() 
     {
@@ -1992,18 +1994,25 @@ System.out.println("asv zetVeranderd");
 		else if (actieveComponent != null)
 		{
 			actieveComponent.mouseUpTouchEndAction();
+			if (isDoubleClick())
+			{
+				setPopupOpened(true);
+			}
 		}
 		else
 		{
 			if (isDoubleClick()) 
 			{
 	            doubletap.clear();
+	            setPopupOpened(true);
 	        } 
 			else if (isLongClick()) 
 			{
 				showPopupMenu(eventX, eventY);
 		
 				doubletap.clear();
+				setPopupOpened(false);
+				closeOpenedPopups();
 	        } 
 			else 
 			{
@@ -2011,6 +2020,8 @@ System.out.println("asv zetVeranderd");
 	            {	//doubletap.clear();
 	            	doubletap.remove(0);
 	            }
+	            setPopupOpened(false); // hier kom ik als ik een popup geopend heb en er naast klik
+	            closeOpenedPopups();
 	        }
 
 		}
@@ -2023,6 +2034,26 @@ System.out.println("asv zetVeranderd");
 		}
 	}
 
+	/**
+	 * Set popupOpened en bij de popup van de schuifcomponent.
+	 * 
+	 * @param b
+	 */
+	void setPopupOpened(boolean b)
+	{
+		// nodig voor TekstPopup.onPreviewNativeEvent()
+		for (int i = 0; i < aantalSc; i++)
+		{
+			if (schuifcomponenten[i] instanceof UitvoerSchuifComponent)
+			{
+				if (((UitvoerSchuifComponent) schuifcomponenten[i]).tf != null)
+					((UitvoerSchuifComponent) schuifcomponenten[i]).tf.setPopupOpened(b);
+			}		
+		}
+
+		popupOpened = b;
+	}
+	
 	public void showPopupMenu(int x, int y)
 	{
 		int popupX = x + inputOwner.getAbsoluteLeft();
@@ -2078,6 +2109,51 @@ owner.logger.info("clip = null");
 		{
 			menuAction(cmdString);
 		}
+	}
+
+	/**
+	 * Sluit de geopende popups.
+	 */
+	public void closeOpenedPopups()
+	{
+		for (int i = 0; i < aantalSc; i++)
+		{
+			if (schuifcomponenten[i] instanceof UitvoerSchuifComponent)
+			{
+				// sluit invoer-popup
+				if (((UitvoerSchuifComponent) schuifcomponenten[i]).tf != null)
+					((UitvoerSchuifComponent) schuifcomponenten[i]).tf.hidePopup();
+				
+				// sluit label-popup
+				if (((UitvoerSchuifComponent) schuifcomponenten[i]).label != null)
+					((UitvoerSchuifComponent) schuifcomponenten[i]).label.hidePopup();
+			}		
+			else if (schuifcomponenten[i] instanceof BewerkingSchuifComponent)
+			{
+				// sluit bewerking-popup
+				if (((BewerkingSchuifComponent) schuifcomponenten[i]).tf != null)
+					((BewerkingSchuifComponent) schuifcomponenten[i]).tf.hidePopup();
+			}		
+		}
+		
+		popupOpened = false;
+	}
+
+	/**
+	 * Resize de geopende popup.
+	 */
+	public void resizePopup()
+	{
+		for (int i = 0; i < aantalSc; i++)
+		{
+			if (schuifcomponenten[i] instanceof UitvoerSchuifComponent 
+				&& ((UitvoerSchuifComponent) schuifcomponenten[i]).tf != null) 
+			{
+				((UitvoerSchuifComponent) schuifcomponenten[i]).tf.resize();
+			}		
+		}
+		
+		popupOpened = false;
 	}
 
 }
