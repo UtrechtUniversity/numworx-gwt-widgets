@@ -6,6 +6,8 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.algebrapijlengwt.client.expressies_ap.*;
+import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.RestartException;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -16,6 +18,7 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.i18n.client.NumberFormat;
 
 
 public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements ActionListener, FocusListener
@@ -216,14 +219,26 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		}
 
 		tf = new TekstPopup(this, false);
-		tf.setText(tfString);
-		tf.setWidth("35px");
-		tf.setHeight("20px");
-		//tf.setModal(true);
+		
+		if (!"".equals(tfString))
+			tf.setText(tfString);
+		else if (expressie != null) 
+		{
+			// format voor grote getallen met wetenschappelijke notatie zoals 1234567^2 = 1524155677489...
+			String formatted = NumberFormat.getFormat("0.###").format(expressie.geefWaarde());
+			formatted = formatted.replace(',', '.'); // dit moet, anders gaat BasisExpressie.geefWaarde() met Double.valueOf(basisString) mis
+			tf.setText(formatted);
+		}
+		else
+		{
+			tf.setText("");
+		}
+		tf.resize();
+		
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
-
+		tf.setFocus(true);
+		tf.setSelected();
 	}
 
 	public void showLabelPopup()
@@ -243,15 +258,18 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		label.setText(labelTekst);
 		label.setWidth("35px");
 		label.setHeight("20px");
-		//label.setModal(true);
+		label.resize();
 		label.setPopupPosition(popupX, popupY);
 		label.show();
-		label.textBox.setFocus(true);
-
+		label.setFocus(true);
+		label.setSelected();
 	}
 	
 	public HashMap<String,Object> getState()
 	{	
+		if (tf != null)
+			tf.hide();
+		
 		String basisExp  = null;
 		String defaultVarnaam = null;
 		boolean tabelAan = false;
@@ -260,7 +278,17 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		String labelTekst = null;
 		
 		if (beginw != null)
-			basisExp = this.beginw.basisString;
+		{
+			if ((tf != null) && !tf.isForLabel)
+			{
+				// bij popup, neem de waarde uit popup
+				basisExp = tf.getText();
+			}
+			else
+			{
+				basisExp = this.beginw.basisString;
+			}
+		}
 		else 
 			basisExp = "";
 		defaultVarnaam = this.defaultVarnaam;
@@ -719,9 +747,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 
 	public String geefLabelTekst()
 	{	
-		//return label.geefTekst();
-//GWT
-		return "";
+		return labelTekst;
 	}
 		
 	
@@ -863,7 +889,8 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	}
 	
 	public void zetVeranderd(int max)
-	{	if (pijlIn1 != null)
+	{	
+		if (pijlIn1 != null)
 		{	
 //GWT		
 			//remove(plusMinKnop);
@@ -1019,70 +1046,137 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 	
 	public void zetInvulWaarde()
 	{
-		
+		try
+		{
+			zetInvulWaarde0();
+		}
+		catch (RestartException r)
+		{
+			r.restart(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						zetInvulWaarde0();
+					}
+					catch (RestartException e)
+					{
+						e.restart(this);
+					}
+				}
+			});
+		}
+	}
+	
+	public void zetInvulWaarde0() throws RestartException
+	{
 		ZoomState zs = null;
+		
 		if (expressie != null && expressie.geefVarNaam() != null && asv != null)
-		{	zs = asv.zoomStateHolder.getZoomState(expressie.geefVarNaam());
-
+		{	
+			zs = asv.zoomStateHolder.getZoomState(expressie.geefVarNaam());
 		}
 		else if (verborgenExpressie != null && verborgenExpressie.geefVarNaam() != null && asv != null )
-		{	zs = asv.zoomStateHolder.getZoomState(verborgenExpressie.geefVarNaam());
-
+		{	
+			zs = asv.zoomStateHolder.getZoomState(verborgenExpressie.geefVarNaam());
 		}
 				
 		boolean isGeldigeInvoer = true;
 		{	
-			
 			try
 			{	
-			
 				String s = tf.getText();
 				//String s = "2";
 				
 				s = s.replace(',','.');
 				
-				tf.setText(s);
-				Double w = Double.valueOf(tf.getText());
-
-				toonTabel(false);
+				// formules uit formuleeditor zoals 3$m2@ verwerken
+				fi.wiskopdr.expressies.Expressie exp = FormuleParser.geefExpressie(addFormulaCodes(tf.getText()));
+				
+				if (s.equals(""))
+				{
+					tfString = "";
+					isGeldigeInvoer = false;
+				}
+				else if (exp == null)
+				{
+					isGeldigeInvoer = false;
+				}
+				else
+				{
+					exp = fi.wiskopdr.expressies.Expressie.evalWithCAS(exp); // deze kan een restartexception geven
+					Double d = null;
+					if (exp != null && exp.isWaarde())
+					{
+						d = exp.geefWaarde();
+						// afronden op 3 decimalen; format voor grote getallen met wetenschappelijke notatie zoals 1234567^2 = 1524155677489...
+						String formatted = NumberFormat.getFormat("0.###").format(d);
+						formatted = formatted.replace(',', '.'); // dit moet, anders gaat BasisExpressie.geefWaarde() met Double.valueOf(basisString) mis
+						tf.setText(formatted);
+					}
+					else
+					{
+						// check of variabele letters/variabelenaam bevat
+						for (int i = 0; i < tf.getText().length(); i++)
+						{
+							if (!Letter.isLetter(tf.getText().charAt(i)))
+							{
+								isGeldigeInvoer = false;
+								break;
+							}
+						}
+						if (!isGeldigeInvoer)
+						{
+							tf.setText("");
+							tfString = "";
+						}
+					}
+				}
 			}
-		
-			catch(NumberFormatException ex)
-			{	for (int i = 0; i < tf.getText().length(); i++)
-				{	if (!Letter.isLetter(tf.getText().charAt(i)))
-					{	isGeldigeInvoer = false;
+			catch (NumberFormatException ex)
+			{
+				for (int i = 0; i < tf.getText().length(); i++)
+				{
+					if (!Letter.isLetter(tf.getText().charAt(i)))
+					{
+						isGeldigeInvoer = false;
 						break;
 					}
 				}
 				if (tf.getText().equals(""))
 					isGeldigeInvoer = false;
 				if (!isGeldigeInvoer)
-				{	tf.setText("");
+				{	
+					tf.setText("");
+					tfString = "";
 				}
-			}
-			
+			}			
 		}
+		
 		if (isGeldigeInvoer)
 		{	
-		
-			tfString = tf.getText(); 	
+			tfString = tf.getText();
+			
 			beginw = new BasisExpressie(tf.getText());
 			//beginw = new BasisExpressie("2");
 			
 			//beginw.zetMaat(fm);
 			beginw.zetMaat(fontSize, ascContext2d);
-			
 		}
-		else
-		{	beginw = null;
+		else // ongeldige invoer alles leeg
+		{	
+			tf.setText("");
+			tfString = "";
+			beginw = null;
 		}
+
 		expressie = beginw;
 		
-
 		if (tabel != null)
 		{	
 			if (expressie != null && expressie.geefVarNaam() != null)
-				tabel.zetExpressie(expressie);
+				tabel.zetExpressie(expressie); 
 			else 
 				tabel.zetExpressie(verborgenExpressie);
 		}
@@ -1102,6 +1196,21 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		asv.tekenOpnieuw();
 	}
   
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * Used for fomula editor.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
+	}
+
     public void zetKettingZichtbaarHier(boolean b)
     {   
     	if (isBeginExpressie)
@@ -1508,6 +1617,20 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 			}
 		}
 		menuPopup.setVisible(false);
+	}
+	
+	/**
+	 * Geef de expressie. Dit wordt gebruikt om de 'oude' invoer op te vragen
+	 * bij druk op escape-toets.
+	 * 
+	 */
+	String geefExpressieString()
+	{
+		String text;
+		
+		text = expressie.toString();
+		
+		return text;
 	}
 	
 	class MenuCommand implements Command
