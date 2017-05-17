@@ -28,7 +28,7 @@ public class IntervalModel extends TextModel {
 		if (animate == Animate.NONE) {
 			adapter.put(Animator.class, null);
 		} else {
-			instance = new Animator(animate, interval);
+			instance = new Animator(animate, interval, tracker, align);
 			adapter.put(instance);
 			instance.install(item);
 		}
