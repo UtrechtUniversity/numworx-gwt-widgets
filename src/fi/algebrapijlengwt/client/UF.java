@@ -1,5 +1,7 @@
 package fi.algebrapijlengwt.client;
 
+import com.google.gwt.i18n.client.NumberFormat;
+
 /**
  * Universal Formatter;<br> let op de internationalisatie van de decimale komma 
  */
@@ -7,29 +9,40 @@ public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)
     public static String format(double val, int decs)
-    {   String result = "";
+    {   
+    	String result = "";
         if (val == 0)
             return "0";
         // no decimals required
         if (decs == 0)
             result = String.valueOf(Math.round(val));
-        else //
-        {   // factor for decimal part
+        else
+        {
+        	// factor for decimal part
             double factor = Math.pow(10, decs);
-            // integer part: hard cast to int
-            int integerPart = (int) val;
+            
+
             // fractional part
-            int fractionalPart = (int) Math.round(
-                                       Math.abs(val - integerPart) * factor);
+			double fPart = val % 1;
+			// integer part
+			double integerPart = val - fPart;
+            
+            // integer part: hard cast to int
+//            int integerPart = (int) val; // dit gaat mis voor grote getallen bijv val = 1.2345678901E10
+            // fractional part - the whole number, e.g. 250 for val = 3.25 and decs = 3
+            int fractionalPart = (int) Math.round(Math.abs(val - integerPart) * factor);
             // correct for rounding up
             if (fractionalPart >= factor)
-            {   fractionalPart = 0;
+            {   
+            	fractionalPart = 0;
                 if (val < 0)
                     integerPart -= 1;    
                 else    
                     integerPart += 1;
             }    
-            String integerString = String.valueOf(integerPart);
+//          String integerString = String.valueOf(integerPart); // integerPart may be scientific notation            
+            String integerString = NumberFormat.getFormat("#").format(integerPart);
+            
             // -0 does not exist!!
             if ( (integerPart == 0) && (val < 0) )
                 integerString = "-" + integerString;
