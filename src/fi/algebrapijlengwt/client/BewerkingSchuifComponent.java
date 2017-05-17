@@ -4,6 +4,7 @@ import fi.algebrapijlengwt.client.expressies_ap.*;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.ui.LayoutPanel;
 
 import java.util.HashMap;
@@ -68,18 +69,35 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent
 		}
 		// maak een nieuwe TekstPopup
 		tf = new TekstPopup(this,false);
-		tf.setText(tfString);
+		
+		if (!"".equals(tfString))
+			tf.setText(tfString);
+		else if (beginw != null) 
+		{
+			// format voor grote getallen met wetenschappelijke notatie zoals 1234567^2 = 1524155677489...
+			String formatted = NumberFormat.getFormat("0.###").format(beginw.geefWaarde());
+			formatted = formatted.replace(',', '.'); // dit moet, anders gaat BasisExpressie.geefWaarde() met Double.valueOf(basisString) mis
+			tf.setText(formatted);
+		}
+		else
+		{
+			tf.setText("");
+		}
+		tf.resize();
+		
 		tf.setWidth("25px");
 		tf.setHeight("20px");
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
+		tf.setFocus(true);
+		tf.setSelected();
 	}
 	/**
 	 * stop de basisString van de BasisExpressie beginw in een HashMap
 	 */
 	public HashMap<String,Object> getState()
-	{	String basisExp  = null;
+	{	
+		String basisExp  = null;
 		basisExp = this.beginw.basisString;
 		HashMap<String,Object> h = super.getState();
 	    h.put("basisExp", basisExp);
@@ -230,5 +248,15 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent
             }
         }
 		super.mouseUpTouchEndAction();
+	}
+	
+	/**
+	 * Geef de expressie. Dit wordt gebruikt om de 'oude' waarde op te vragen
+	 * na druk op escape-toets.
+	 * 
+	 */
+	String geefExpressieString()
+	{
+		return beginw.toString();
 	}
 }
