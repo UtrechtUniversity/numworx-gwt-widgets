@@ -38,6 +38,7 @@ import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
 import fi.euclides.proof.RatioHandler;
 import fi.euclides.proof.VectorHandler;
+import fi.euclides.util.Messages;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
@@ -137,7 +138,9 @@ public class ToolBoxPanel extends Composite implements Tools {
 		
 */			
 			case 23: // definitie
+				break;
 			case 24: // trail
+//		actions.add(new TrailAction(Messages.getString("Euclides.44"), viewer)); //$NON-NLS-1$
 					break;
 					
 			case 25: // pan

@@ -20,7 +20,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		RootPanel.get().add(root);
 
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
-		List<Integer> toolbox = Arrays.asList(0,1,2,3, 4,5,6,19,20,21,22,23,24,25,26);
+		List<Integer> toolbox = Arrays.asList(0,1,2,3,5,6,7,19,20,21,22,23,24,25,26);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
