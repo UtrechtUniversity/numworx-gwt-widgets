@@ -1,144 +1,243 @@
 package fi.algebrapijlengwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
 import fi.algebrapijlengwt.client.expressies_ap.*;
 
-//import fi.beans.tooltip.*;
-//import javax.swing.*;
-
-//import java.text.*;
 import java.util.HashMap;
-
+import java.util.Map;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
-
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+/**
+ * Een AlgebraSchuifComponent die grafieken tekent; de GrafiekComponent kan verbonden worden met de uitgaande pijlen van
+ * maximaal 10 verschillende UitvoerSchuifComponenten; de pijl van de UVS naar de GrafiekComponent wordt niet getekend, maar 
+ * de achtergrond van de UVS en de inkomende pijlpunt krijgen dezelfde unieke kleur; de getekende grafiek bestaat uit een of meerdere
+ * punten (UVS zonder/met tabel aan het einde van een ketting met aan het begin alleen een waarde), of een lijngrafiek resp. lijngrafiek
+ * met punten (UVS zonder/met tabel aan het einde van een ketting met aan het begin een variabele); <br>
+ * het is mogelijk in- of uit te zoomen in de hele grafiek (x- en y-as tegelijk) of separaat op de x-as of de y-as; er is een reset
+ * knop voor de zoom-toestand; slepen op de grafiek verandert het zichtbare deel van het xy-vlak; <br>
+ * de afmeting van de GrafiekComponent kan vernaderd worden via resize-gebiedje rechtsonder<br>
+ * de inner class GrafiekVeld tekent de grafieken.        
+ */
 
 public class GrafiekComponent extends AlgebraSchuifComponent 
-//                              implements ActionListener, MouseListener, MouseMotionListener
-{		
+{	
+	/**
+	 * default eenheid	
+	 */
   	private int eenheid = 16;
-	
-//GWT  	
-//	private PlusMinKnop pmKnopY,pmKnopX; 
-	private ZoomKnop zoomInX, zoomUitX, zoomInY, zoomUitY, zoomIn, zoomUit, zoomStandaard;
+  	/**
+  	 * inzoomen op de x-as
+  	 */
+	private ZoomKnop zoomInX;
+  	/**
+  	 * uitzoomen op de x-as
+  	 */
+	private ZoomKnop zoomUitX;
+  	/**
+  	 * inzoomen op de y-as
+  	 */
+	private ZoomKnop zoomInY;
+  	/**
+  	 * uitzoomen op de y-as
+  	 */
+	private ZoomKnop zoomUitY;
+  	/**
+  	 * inzoomen beide assen tegelijk
+  	 */
+	private ZoomKnop zoomIn;
+  	/**
+  	 * uitzoomen beide assen tegelijk
+  	 */
+	private ZoomKnop zoomUit;
+	/**
+	 * zoom reset
+	 */
+	private ZoomKnop zoomStandaard;
   	
+	/**
+	 * de Expressies voor de grafieken
+	 */
   	private Expressie[] expressies;
-	private int aantalExpressies;
+	/**
+	 * het maximale aantal Expressies
+	 */
 	private int maxAantalExpressies;
-	
-	private boolean gevuld;
-	private int beginwaarde;
-	private int selectnummer;
+	/**
+	 * de default variabele-naam
+	 */
 	private String varNaam = "qq";
+	/**
+	 * de formulenaam if any (dit is de tekst uit het label van de UVS)
+	 */
 	private String formuleNaam;
-	private int xmin, xmax, ymin, ymax;
-	private double beginx, beginy;
-	private int veldx, veldy, veldb, veldh;
-	private int eenheidx, eenheidy;
-	private double eenheidxD, eenheidyD;
+	/**
+	 * x-coordinaat grafiekVeld binnen de GrafiekComponent 
+	 */
+	private int veldx;
+	/**
+	 * y-coordinaat grafiekVeld binnen de GrafiekComponent 
+	 */
+	private int veldy;
+	/**
+	 * breedte grafiekVeld 
+	 */
+	private int veldb;
+	/**
+	 * hoogte grafiekVeld 
+	 */
+	private int veldh;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
+	private int beginwaarde;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
+	private int selectnummer;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
+	private double beginx;
+	/**
+	 * t.b.v. zoomen in de y-richting, zie methode zoom(,,)
+	 */
+	private double beginy;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
+	private int eenheidx;
+	/**
+	 * t.b.v. zoomen in de y-richting, zie methode zoom(,,)
+	 */
+	private int eenheidy;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
+	private double eenheidxD;
+	/**
+	 * t.b.v. zoomen in de y-richting, zie methode zoom(,,)
+	 */
+	private double eenheidyD;
+	/**
+	 * t.b.v. zoomen in de y-richting, zie methode zoom(,,)
+	 */
 	private double schaalFactorY;
+	/**
+	 * t.b.v. zoomen in de y-richting, zie methode zoom(,,)
+	 */
 	private int factorRijNummerY;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
 	private double schaalFactorX;
+	/**
+	 * t.b.v. zoomen in de x-richting, zie methode zoom(,,)
+	 */
 	private int factorRijNummerX;
-		 
+	/**
+	 * t.b.v. mouse/touch Action in grafiekVeld	 
+	 */
 	int startxv = 0;
+	/**
+	 * t.b.v. mouse/touch Action in grafiekVeld	 
+	 */
 	int startyv = 0;
+	/**
+	 * t.b.v. mouse/touch Action in de resize-hoek rechtsonder	 
+	 */
 	int startxrs = 0;
+	/**
+	 * t.b.v. mouse/touch Action in de resize-hoek rechtsonder	 
+	 */
 	int startyrs = 0;
-	 
+	/**
+	 * de inner class GrafiekVled
+	 */
 	private GrafiekVeld gv;
-	 
-//	private DecimalFormatSymbols dfs;
-//	private DecimalFormat df, dfTrace;
-	
-	//private FontMetrics fm;
-	
+	/** 
+	 * de inkomnde pijlen
+	 */
 	Pijl[] pijlenIn;
+	/**
+	 * het aantal inkomende pijlen 
+	 */
 	int aantalPijlenIn;
-	
-	private boolean[] isPuntGrafiek;
-	private boolean[] isMeerPuntenGrafiek;
-	private boolean[] isLijnGrafiek;
-	private double[] puntXWaarde;
-	
-	//private Font font = new Font("SansSerif", Font.PLAIN, 10);
-	String fontString = "10px, sans-serif";
-	
-	private boolean resize;
-	private boolean trace=false;
-	private boolean tracing=false;
-	
-//GWT	
-	//private Slider slider;
-	private int tracex=-2;
-	private double tracexD = tracex;
-//GWT
-	//private JCheckBox traceCheckbox;
-	
-//GWT	
-	//private JPopupMenu popup;
-	private boolean kettingZichtbaar = true;
-	private int movex, movey;
-	
-	private CssColor[] colors;
-	private CssColor traceKleur = CssColor.make(255,0,0); //red;
-	
-	//boolean visible = false;
 
-	
+	/**
+	 * zijn de Expressies puntgrafieken?
+	 */
+	private boolean[] isPuntGrafiek;
+	/**
+	 * zijn de Expressies meerpuntengrafieken?
+	 */
+	private boolean[] isMeerPuntenGrafiek;
+	/**
+	 * zijn de Expressies lijngrafieken?
+	 */
+	private boolean[] isLijnGrafiek;
+	/**
+	 * de x-waarde van het punt indien de Expressie een puntgrafiek is
+	 */
+	private double[] puntXWaarde;
+	/**
+	 * font voor labels
+	 */
+	String fontString = "10px, sans-serif";
+	/**
+	 * muis/touch actie op de resize-hoek rechtsonder?
+	 */
+	private boolean resize;
+	/**
+	 * kleuren voor de inkomende pijlen
+	 */
+	private CssColor[] colors;
+
+
+	/**
+	 * constructor
+	 * @param sv werkveld
+	 * @param x x-coordinaat
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 */
 	public GrafiekComponent(AlgebraSchuifVeld sv,int x, int y, int b, int h)
-	{	//super(1,sv,x,y,b,h);
-		super(sv,x,y,b,h);
-		
-		//super.setBounds(x,y,b,h);
-		//setLayout(null);
-		//setBackground(Color.white);
-		
-		maxAantalExpressies = 10;
+	{	super(sv,x,y,b,h);
 		links = false;
 		isStapel = false;
+		maxAantalExpressies = 10;
 		expressies = new Expressie[maxAantalExpressies];
-		aantalExpressies = 0;
-		
 		pijlenIn = new Pijl[maxAantalExpressies];
 		aantalPijlenIn = 0;
-		
 		isPuntGrafiek = new boolean[10];
 		isMeerPuntenGrafiek = new boolean[10];
 		puntXWaarde = new double[10];
 		isLijnGrafiek = new boolean[10];
+		veldx = 40;
+		veldy = 45;
+		veldb = b-60;
+		veldh = h-75;
 				
 		beginwaarde = 0;
 		selectnummer = 999;
-		xmin = 0; 
-		ymin = 0;
-		xmax = 10;
-		ymax = 10;
 		eenheidx = eenheid;
 		eenheidy = eenheid;
 		eenheidxD = eenheid;
 		eenheidyD = eenheid;
 		beginx = eenheidx;
 		beginy = eenheidy;
-		veldx = 40;
-		veldy = 45;
-		veldb = b-60;
-		veldh = h-75;
 		schaalFactorY = 1;
 		factorRijNummerY = 99;
 		schaalFactorX = 1;
 		factorRijNummerX = 99;
+
 		varNaam = "qq";
 		formuleNaam = "";
-		
 		// grafiekVeld
 		gv = new GrafiekVeld(xPos+veldx,yPos+veldy,veldb,veldh);
-		
 		// zoomknoppen
 		zoomStandaard = new ZoomKnop("standaard",xPos+32,yPos+2,25,25,asv.asvContext2d);
 		zoomIn	= new ZoomKnop("zoomin",xPos+57,yPos+2,25,25,asv.asvContext2d);
@@ -147,7 +246,6 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		zoomUitX= new ZoomKnop("zoomuitx",xPos+132,yPos+2,25,25,asv.asvContext2d);
 		zoomInY	= new ZoomKnop("zoominy",xPos+157,yPos+2,25,25,asv.asvContext2d);
 		zoomUitY= new ZoomKnop("zoomuity",xPos+182,yPos+2,25,25,asv.asvContext2d);
-
 		// kleuren
 		colors = new CssColor[10];
 		colors[0] = CssColor.make(0,0,255);
@@ -161,68 +259,49 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		colors[7] = black;
 		colors[8] = black;
 		colors[9] = black;
-        
 	}
-	
+
+	/**
+	 * zet de afmeting van deze GrafiekComponent
+	 */
 	public void setSize(int b, int h)
-	{	
-		super.setSize(b,h);
+	{	super.setSize(b,h);
 		veldb = b-60;
 		veldh = h-75;
 		gv.setSize(veldb,veldh);
-//GWT		
-		//slider.zetLengte(veldb);
-		//slider.setLocation(veldx-5,h-13);
-		//traceCheckbox.setBounds(8,getSize().height-13,17,10);
 	}
 	
-	
+	/**
+	 * get de State van deze GrafiekComponent
+	 */
 	public HashMap getState()
 	{	int sizeB = 0;
 		int sizeH = 0;
-		boolean trace = false;
-		double tracexD = 0;
 		double beginy = 0;
-		boolean kettingZichtbaar = true;
 		double schaalFactorY  = 1;
 		int factorRijNummerY = 99;
-					
-//GWT		
-		//sizeB = getSize().width;
-		//sizeH = getSize().height;
 		sizeB = breedte;
 		sizeH = hoogte;
-		trace = this.trace;
-		tracexD = this.tracexD;
 		beginy = this.beginy;
-		kettingZichtbaar = this.kettingZichtbaar;
 		schaalFactorY = this.schaalFactorY;
 		factorRijNummerY = this.factorRijNummerY;
-		
 		HashMap h = super.getState();
-		
 	    h.put("sizeB", new Integer(sizeB));
 	    h.put("sizeH", new Integer(sizeH));
-	    h.put("trace", new Boolean(trace));
-	    h.put("tracexD", new Double(tracexD));
 	    h.put("beginy", new Double(beginy));
-	    h.put("kettingZichtbaar", new Boolean(kettingZichtbaar));
 	    h.put("schaalFactorY", new Double(schaalFactorY));
 	    h.put("factorRijNummerY", new Integer(factorRijNummerY));
 	    return h;
 	}
-	
-	public void setState(HashMap map)
-    {	
-		
-		ObjectMap h = JSONUtilities.wrapMap(map);
-		
+
+	/**
+	 * zet de State van deze GrafiekComponent
+	 */
+	public void setState(Map<String,Object> map)
+    {	ObjectMap h = JSONUtilities.wrapMap(map);
 		int sizeB = 0;
 		int sizeH = 0;
-		boolean trace = false;
-		double tracexD = 0;
 		double beginy = 0;
-		boolean kettingZichtbaar = true;
 		double schaalFactorY  = 1;
 		int factorRijNummerY = 99;
 		
@@ -230,229 +309,140 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			sizeB = h.getInt("sizeB");
     	if(h.containsKey("sizeH")) 
     		sizeH = h.getInt("sizeH");
-    	if(h.containsKey("trace")) 
-    		trace = h.getBoolean("trace");
-    	if(h.containsKey("tracexD")) 
-    		tracexD = h.getDouble("tracexD");
     	if(h.containsKey("beginy")) 
     		beginy = h.getDouble("beginy");
-    	if(h.containsKey("kettingZichtbaar")) 
-    		kettingZichtbaar = h.getBoolean("kettingZichtbaar");
     	if(h.containsKey("schaalFactorY")) 
     		schaalFactorY = h.getDouble("schaalFactorY");
     	if(h.containsKey("factorRijNummerY")) 
-    		factorRijNummerY = h.getInt("factorRijNummerY");
-    	
-		
+    	{	factorRijNummerY = h.getInt("factorRijNummerY");
+    	}
 		setSize(sizeB,sizeH);
-		this.trace = trace;
-		this.tracexD = tracexD;
 		this.beginy = beginy;
-		tracex = (int)Math.round(tracexD);
-//GWT		
-		//slider.zetStand(tracex);
-		this.kettingZichtbaar = kettingZichtbaar;
-		if(!kettingZichtbaar)zetKettingZichtbaarHier(kettingZichtbaar);
 		this.schaalFactorY = schaalFactorY;
 		this.factorRijNummerY = factorRijNummerY;
-
-//GWT		
-		//traceCheckbox.setSelected(trace);
-		//slider.setVisible(trace);
-		
     }
 	
-	
-	public void drawDottedLine(Context2d g, int x0, int y0, int x1, int y1)
-	{
-		int dx = 3;
-		double length = Math.sqrt((double)((x1-x0)*(x1-x0)) + (double)((y1-y0)*(y1-y0)));
-//System.out.println(""+length);
-		int n = (int)Math.round(length/dx);
-//		System.out.println(""+n);
-		for(int i=0 ; i<n ; i+=2)
-		{
-			int xn0 = x0 + (int)Math.round((double)(x1-x0)*i/n);
-			int yn0 = y0 + (int)Math.round((double)(y1-y0)*i/n);
-			int xn1 = x0 + (int)Math.round((double)(x1-x0)*(i+1)/n);
-			int yn1 = y0 + (int)Math.round((double)(y1-y0)*(i+1)/n);
-			
-			//g.drawLine(xn0,yn0,xn1,yn1);
-			g.beginPath();
-			g.moveTo(xPos+xn0, yPos+yn0);
-			g.lineTo(xPos+xn1, yPos+yn1);
-			g.stroke();
-
-			
-		}
-	}
-     
+	/**
+	 * teken de GrafiekComponent m.b.v. Context2d g
+	 */
 	public void paint(Context2d g)
 	{
-		//if (!visible)
-		//	return;
-		
-		//g.setFont(font);
 		g.setFont(fontString);
-		
-		//int breedte = getSize().width;
-		//int hoogte = getSize().height;
-		
-		//g.setColor(new Color(210,210,210));
+		//NB links is ruimte voor inkomende Pijlen
+		// grijze achtergrond
 		g.setFillStyle(CssColor.make(210,210,210));
 		g.fillRect(xPos+10,yPos+0,breedte-11,hoogte - 1);
-		//g.setColor(Color.black);
+		// zwart uitgelijnd
 		g.setStrokeStyle(CssColor.make(0,0,0));
-		//g.drawRect(10,0,breedte-11,hoogte - 1);
 		g.strokeRect(xPos+10,yPos+0,breedte-11,hoogte - 1);
 		
-		// resize corner
-		//g.setColor(Color.white);
+		// resize corner rechts beneden
+		// witte schuine streepjes
 		g.setStrokeStyle(CssColor.make(255,255,255));
-		//g.drawLine(breedte-10, hoogte-2, breedte-2, hoogte-10);
 		g.beginPath();
 		g.moveTo(xPos+breedte-10, yPos+hoogte-2);
 		g.lineTo(xPos+breedte-2, yPos+hoogte-10);
 		g.stroke();
-		//g.drawLine(breedte-7, hoogte-2, breedte-2, hoogte-7);
 		g.beginPath();
 		g.moveTo(xPos+breedte-7, yPos+hoogte-2);
 		g.lineTo(xPos+breedte-2, yPos+hoogte-7);
 		g.stroke();
-		
-		// resize corner		
-		//g.setColor(Color.gray.darker());
+		// donkergrijze schuine streepjes
 		g.setStrokeStyle(CssColor.make(155,155,155));
-		//g.drawLine(breedte-9, hoogte-2, breedte-2, hoogte-9);
 		g.beginPath();
 		g.moveTo(xPos+breedte-9, yPos+hoogte-2);
 		g.lineTo(xPos+breedte-2, yPos+hoogte-9);
 		g.stroke();
-		//g.drawLine(breedte-6, hoogte-2, breedte-2, hoogte-6);
 		g.beginPath();
 		g.moveTo(xPos+breedte-6, yPos+hoogte-2);
 		g.lineTo(xPos+breedte-2, yPos+hoogte-6);
 		g.stroke();
-
 		
-		//g.setColor(Color.white);
+		// witte achtergrond grafiekveld;
 		g.setFillStyle(CssColor.make(255,255,255));
 		g.fillRect(xPos+veldx-1,yPos+veldy-1,veldb+1,veldh+1);
-
+		// teken de grafieken in het grafiekveld
 		gv.paint(g);
 		
-		//g.setColor(Color.gray.darker());
+		// outline grafiekveld die diepte suggereert
+		// grijs, 4 zijden
 		g.setStrokeStyle(CssColor.make(155,155,155));
-		//g.drawLine(veldx-1,veldy-1,veldx+veldb,veldy-1);
 		g.beginPath();
 		g.moveTo(xPos+veldx-1,yPos+veldy-1);
 		g.lineTo(xPos+veldx+veldb,yPos+veldy-1);
 		g.stroke();
-		//g.drawLine(veldx-1,veldy-1,veldx-1,veldy+veldh);
 		g.beginPath();
 		g.moveTo(xPos+veldx-1,yPos+veldy-1);
 		g.lineTo(xPos+veldx-1,yPos+veldy+veldh);
 		g.stroke();
-		//g.drawLine(veldx-1,veldy-2,veldx+veldb,veldy-2);
 		g.beginPath();
 		g.moveTo(xPos+veldx-1,yPos+veldy-2);
 		g.lineTo(xPos+veldx+veldb,yPos+veldy-2);
 		g.stroke();
-		//g.drawLine(veldx-2,veldy-1,veldx-2,veldy+veldh);
 		g.beginPath();
 		g.moveTo(xPos+veldx-2,yPos+veldy-1);
 		g.lineTo(xPos+veldx-2,yPos+veldy+veldh);
 		g.stroke();
-		//g.setColor(new Color(180,180,180));
+		// donkergrijs, links en boven
 		g.setStrokeStyle(CssColor.make(180,180,180));
-		//g.drawLine(veldx+veldb,veldy-1,veldx+veldb,veldy+veldh);
 		g.beginPath();
 		g.moveTo(xPos+veldx+veldb,yPos+veldy-1);
 		g.lineTo(xPos+veldx+veldb,yPos+veldy+veldh);
 		g.stroke();
-		//g.drawLine(veldx-1,veldy+veldh,veldx+veldb,veldy+veldh);
 		g.beginPath();
 		g.moveTo(xPos+veldx-1,yPos+veldy+veldh);
 		g.lineTo(xPos+veldx+veldb,yPos+veldy+veldh);
 		g.stroke();
-		
-		//g.setColor(Color.white);
+		// wit, rechts en onder 
 		g.setStrokeStyle(CssColor.make(255,255,255));
-		//g.drawLine(veldx+veldb+1,veldy-1,veldx+veldb+1,veldy+veldh);
 		g.beginPath();
 		g.moveTo(xPos+veldx+veldb+1,yPos+veldy-1);
 		g.lineTo(xPos+veldx+veldb+1,yPos+veldy+veldh);
 		g.stroke();
-		//g.drawLine(veldx-1,veldy+veldh+1,veldx+veldb,veldy+veldh+1);
 		g.beginPath();
 		g.moveTo(xPos+veldx-1,yPos+veldy+veldh+1);
 		g.lineTo(xPos+veldx+veldb,yPos+veldy+veldh+1);
 		g.stroke();
-		
-		
-		//g.setColor(Color.black);
+
 		g.setFillStyle(CssColor.make(0,0,0));
-		
-		
-		//FontMetrics fm = g.getFontMetrics();
-		
 		g.setFont(fontString);
-		
 		TextMetrics tm = g.measureText(varNaam);
-		
-		//int woordbreedte = fm.stringWidth(varNaam);
 		int woordbreedte = (int) Math.round(tm.getWidth());
-		
+		// geen verborgen variabele?
 		boolean b = varNaam.equals("qq") || varNaam.length() > 2 && varNaam.substring(0,2).equals("qq");
-		if(!b) 
-		{	//g.drawString(varNaam, veldx+veldb+5,veldy+veldh+5);
-//yPos		
+		if (!b) 
+		{	// variabelenaam rechts bij x-as 
 			g.fillText(varNaam, xPos+veldx+veldb+5,yPos+veldy+veldh+5);
 		}
-		//g.drawString(formuleNaam,veldx,veldy-8);
-//yPos?
+		// formulenaam linksboven grafiek
 		g.fillText(formuleNaam,xPos+veldx,yPos+veldy-8);
-		
+
 		int imin = -(int)Math.round(beginx/eenheidx); 
 		int imax = 1+veldb/eenheidx-(int)Math.round(beginx/eenheidx);
 		int jmin = -(int)Math.round(beginy/eenheidy); 
 		int jmax = 1+veldh/eenheidy-(int)Math.round(beginy/eenheidy);
 		int bx = (int)beginx;
 		int by = (int)beginy;
-		
+		// opschriften x-as
 		for(int i=imin+1 ; i<imax ; i++)
-		{	new Expressie();
-			//String getal = df.format(schaalFactorX*(i));
-			String getal = UF.format0(schaalFactorX*(i),4);
+		{	String getal = UF.format0(schaalFactorX*(i),4);
 			tm = g.measureText(getal);
-			//woordbreedte = fm.stringWidth(getal);
 			woordbreedte = (int) Math.round(tm.getWidth());
 			if(schaalFactorX>0.5 && schaalFactorX<5 && woordbreedte<eenheidx)
-			{	//g.drawString(getal,(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),veldy+veldh+15);
-//yPos?
-				g.fillText(getal,xPos+(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),yPos+veldy+veldh+15);
+			{	g.fillText(getal,xPos+(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),yPos+veldy+veldh+15);
 			}
 			else if(i%2==0)
-			{	//g.drawString(getal,(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),veldy+veldh+15);
-//yPos?			
-				g.fillText(getal,xPos+(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),yPos+veldy+veldh+15);
+			{	g.fillText(getal,xPos+(int)(veldx+beginx+i*eenheidxD-woordbreedte/2),yPos+veldy+veldh+15);
 			}
 		}
+		// opschriften y-as
 		for(int j=jmin+1 ; j<jmax ; j++)
-		{	//String getal = df.format(schaalFactorY*(j));
-			String getal = UF.format0(schaalFactorY*(j),4);
+		{	String getal = UF.format0(schaalFactorY*(j),4);
 			tm = g.measureText(getal);
-			//woordbreedte = fm.stringWidth(getal);
 			woordbreedte = (int) Math.round(tm.getWidth());
-			//g.drawString(getal,veldx-5-woordbreedte,(int)(veldy+veldh+5-(beginy+j*eenheidyD)));
-//yPos			
 			g.fillText(getal,xPos+veldx-5-woordbreedte,yPos+(int)(veldy+veldh+5-(beginy+j*eenheidyD)));
 		}
-		//g.drawString("trace",12,hoogte-15);
-//yPos		
-		//g.fillText("trace",xPos+12,yPos+hoogte-15);
 		super.paint(g);
-		
 		// teken de zoomknoppen
 		zoomStandaard.paint();
 		zoomIn.paint();
@@ -461,25 +451,25 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		zoomUitX.paint();
 		zoomInY.paint();
 		zoomUitY.paint();
-		
 	}	
-		
-	public void zetBegin(int x, int y)
-	{	beginx = eenheidx*x;
-		beginy = eenheidy*y;
-	}
 
+	/**
+	 * zet Expressie nummer nr, bepaal wat voor soort grafiek dit moet worden
+	 * @param nr nummer van de Expressie
+	 * @param e de Expressie
+	 */
 	public void zetExpressie(int nr,Expressie e)
 	{	Expressie exp = null;
+		// reguliere Expressie
 		if(e!=null && e.geefVarNaam()!=null )
 		{	exp = e;
 			if(varNaam.equals("qq")|| aantalPijlenIn==1)
 				varNaam = e.geefVarNaam();
 			isPuntGrafiek[nr] = false;
 		}
+		// Expressie is een getal, bepaal dit
 		else if(e!=null && !Double.isNaN(e.geefWaarde().doubleValue()) && pijlenIn[nr]!=null)
-		{	
-			AlgebraSchuifComponent asc = pijlenIn[nr].zender;
+		{	AlgebraSchuifComponent asc = pijlenIn[nr].zender;
 			int teller = 20;
 			puntXWaarde[nr] = asc.geefUitvoer(teller).geefWaarde().doubleValue();
 			while(asc.pijlIn1 !=null && teller > 0)
@@ -499,63 +489,33 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		gv.tekenOpnieuw();
 	}
 	
-	
+	/**
+	 * zet de zoomState van de variabele van deze GrafiekComponenet
+	 * @param varNaam de naam van de variable
+	 * @param zoomState de nieuwe ZoomState
+	 */
 	public void setZoomState(String varNaam, ZoomState zoomState)
 	{	if(varNaam.equals(this.varNaam) && zoomState!=null)
-		{	double beginxOud = beginx;
-			double factorXOud = schaalFactorX;
-			int factorRijNummerXOud = factorRijNummerX;
-			//System.out.println("beginx3 = "+beginx);
-			//this.beginwaarde = zoomState.getBeginwaarde();
-			//this.selectnummer = zoomState.getSelectnummer();
-			//this.schaalFactorX = zoomState.getSchaalFactorX();
-			//this.schaalFactorY = zoomState.getSchaalFactorY();
-			this.factorRijNummerX = zoomState.getFactorRijNummerX();
-			//this.factorRijNummerY = zoomState.getFactorRijNummerY();
-			//this.beginx = ((double)zoomState.getBeginx()*eenheid)/14+eenheid;
-			//this.beginy = (double)zoomState.getBeginy();
-			//this.tracexD = (double)zoomState.getTracexD();
-			
-			{	this.schaalFactorX = zoomState.getSchaalFactorX();
-				this.beginwaarde = zoomState.getBeginwaarde();
-				this.beginx = ((double)zoomState.getBeginx()*eenheid)/14+eenheid;
-				this.selectnummer = zoomState.getSelectnummer();
-				
-			}
-			
-			double dx  = beginx-beginxOud;
-			double factor = schaalFactorX/factorXOud;
-			
-			if(trace && tracex!=-2) {
-				tracexD = beginx+(tracexD-beginx)/factor+dx;
-				tracex = (int)Math.round(tracexD);
-//GWT				
-				//slider.zetStand(tracex);
-			}
-			
-			if(selectnummer!=999)tracing = false;
-			else
-			{	
-			}
+		{	this.factorRijNummerX = zoomState.getFactorRijNummerX();
+			this.schaalFactorX = zoomState.getSchaalFactorX();
+			this.beginwaarde = zoomState.getBeginwaarde();
+			this.beginx = ((double)zoomState.getBeginx()*eenheid)/14+eenheid;
+			this.selectnummer = zoomState.getSelectnummer();
 			gv.tekenOpnieuw();
 		}
 	}
-	
-	public void zetKettingZichtbaarHier(boolean b)
-    {   for(int i=0 ; i<aantalPijlenIn ; i++)
-		{	if(pijlenIn[i]!=null)pijlenIn[i].zender.zetKettingZichtbaar(b);
-	        kettingZichtbaar = b;
-       
-	        asv.tekenOpnieuw();
-	    }
-    }
-	
+
+	/**
+	 * update deze grafiekComponent
+	 */
 	public void zetVeranderd(int max)
-	{	for(int i=0 ; i<aantalPijlenIn ; i++)
+	{	// loop de inkomende pijlen na
+		for(int i=0 ; i<aantalPijlenIn ; i++)
 		{	Expressie e = pijlenIn[i].zender.geefUitvoer(20);
 			Expressie ev = pijlenIn[i].zender.geefVerborgenUitvoer(20);
 			zetExpressie(i,e);
-			formuleNaam = ((UitvoerSchuifComponent)pijlenIn[i].zender).geefLabelTekst();
+			formuleNaam = ((UitvoerSchuifComponent) pijlenIn[i].zender).geefLabelTekst();
+			// alleen punten
 			if ( (e == null || !Double.isNaN(e.geefWaarde().doubleValue())) && 
 				 !(ev instanceof BasisExpressie) && ((UitvoerSchuifComponent) pijlenIn[i].zender).tabelZichtbaar)
 			{	zetExpressie(i,ev);
@@ -565,7 +525,7 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 				{	AlgebraSchuifComponent asc = pijlenIn[i].zender;
 					int teller = 20;
 					puntXWaarde[i] = asc.geefUitvoer(teller).geefWaarde().doubleValue();
-					while(asc.pijlIn1 != null && teller > 0)
+					while (asc.pijlIn1 != null && teller > 0)
 					{	teller--;
 						asc = asc.pijlIn1.zender;
 						Double d = asc.geefUitvoer(teller).geefWaarde();
@@ -575,38 +535,52 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 					}
 				}
 			}
+			// punten op een grafieklijn  
 			else if(((UitvoerSchuifComponent)pijlenIn[i].zender).tabelZichtbaar)
 			{	isMeerPuntenGrafiek[i] = true;
 				isLijnGrafiek[i] = true;
 			}
-			else 
+			else // alleen een grafieklijn
 			{	isMeerPuntenGrafiek[i] = false;
 				isLijnGrafiek[i] = true;
 			}
 			
 		}
-		
-		//if(getParent()!=null)
-			setZoomState(varNaam,asv.zoomStateHolder.getZoomState(varNaam));
+		// update de zoomState
+		setZoomState(varNaam,asv.zoomStateHolder.getZoomState(varNaam));
         super.zetVeranderd(max);
+        asv.tekenOpnieuw();
 	}
 	
+	/**
+	 * verbindt Pijl p met de GrafiekComponent onder nummer nr;<br>
+	 * t.b.v. setState in het werkveld
+	 * @param p Pijl p
+	 * @param nr het pijlnummer
+	 */
 	public void verbind(Pijl p, int nr)
 	{	pijlenIn[nr] = p;
-		//p.zetEind(getLocation().x , getLocation().y+10+nr*15);
 		p.zetEind(xPos, yPos+10+nr*15);
 		aantalPijlenIn++;
 		pijlenIn[nr].setColor(colors[nr]);
 	}
 
+	/**
+	 * kijk of the punt van pijl p binnen de aansluitrechthoek van de GrafiekComponent
+	 * valt; sluit deze aan als p uit een UVS komt, nog niet angesloten is en de pijlenketting
+	 * van p dezelfde variabele heeft als de GrafiekComponent
+	 */
 	public boolean meldAan(Pijl p, int x, int y)
-	{	if (!(p.zender instanceof UitvoerSchuifComponent))
+	{	// niet uit UVS
+		if (!(p.zender instanceof UitvoerSchuifComponent))
 			return false;
-	
+		// al aangesloten
 		for (int i = 0; i < aantalPijlenIn; i++)
 		{	if (pijlenIn[i].zender == p.zender) 
 				return false;
 		}
+		// vind Expressie aan het begin van de pijlenketting
+		// waarvan p deel uit maakt
 		AlgebraSchuifComponent asc = p.zender;
 		int teller = 20;
 		Expressie e = asc.geefUitvoer(teller);
@@ -615,67 +589,65 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			asc = asc.pijlIn1.zender;
 			e = asc.geefUitvoer(teller);
 		}
-		
+		// verkeerde varnaam in deze Expressie 
 		if (e != null && e.geefVarNaam() != null && varNaam != "qq" && !e.geefVarNaam().equals(varNaam)) 
 			return false;
-					
-		//Rectangle ingang = new Rectangle(-10, 0, getSize().width + 10, getSize().height);
+		// aansluitrechthoek
 		Rectangle ingang = new Rectangle(xPos-10, yPos+0, breedte + 10, hoogte);
-		//if (aantalPijlenIn < 10 && ingang.contains(x - getLocation().x, y - getLocation().y))
+		// in aansluitrechthoek: sluit aaan
 		if (aantalPijlenIn < 10 && ingang.contains(x, y))
-		{	//p.zetEind(getLocation().x , getLocation().y + 10 + aantalPijlenIn * 15);
-			p.zetEind(xPos , yPos + 10 + aantalPijlenIn * 15);
+		{	p.zetEind(xPos , yPos + 10 + aantalPijlenIn * 15);
 			pijlenIn[aantalPijlenIn] = p;
 			aantalPijlenIn++;
 			if (e != null && e.geefVarNaam() != null) 
 				varNaam = e.geefVarNaam();
-			
 			zetVeranderd(20);
 			if (p != null) 
 				p.setColor(colors[aantalPijlenIn - 1]);
-			
 			asv.tekenOpnieuw();
 			return true;
 		}
 		return false;
 	}
 	
+	/**
+	 * maak Pijl p los van de GrafiekComponent; verwijder de Expressie
+	 * uit de pijlenketting van p
+	 */
 	public void maakLos(Pijl p)
 	{	for(int i=0 ; i<aantalPijlenIn ; i++)
-		{	//p.setColor(Color.black);
-			p.setColor(CssColor.make(0,0,0));
+		{	p.setColor(CssColor.make(0,0,0));
 			if(p==pijlenIn[i])
-			{	
-				CssColor colorRes = colors[i];
+			{	CssColor colorRes = colors[i];
 				for(int j=i ; j<aantalPijlenIn-1 ; j++)
 				{	pijlenIn[j] = pijlenIn[j+1];
 					colors[j] = colors[j+1];
-					//pijlenIn[j].zetEind(getLocation().x , getLocation().y+10+j*15);
-					//pijlenIn[j].zetEind(getLocation().x , getLocation().y+10+j*15);
 					pijlenIn[j].zetEind(xPos , yPos +10+j*15);
 					expressies[j] = expressies[j+1];
 				}
 				colors[aantalPijlenIn-1] = colorRes;
-				
 				pijlenIn[aantalPijlenIn-1]=null;
 				aantalPijlenIn--;
 				break;
 			}
 		}
-		
 		selectnummer = 999;
+		// reset
 		if(aantalPijlenIn==0)
-		{	
-			asv.zoomStateHolder.setBeginy(varNaam, eenheidy);
+		{	asv.zoomStateHolder.setBeginy(varNaam, eenheidy);
             varNaam = "qq";
 			formuleNaam = "";
 			beginy = eenheidy;
 		}
 	}
 	
+	/**
+	 * verplaats de zoomknoppen
+	 * @param dx verplaatsing in x-richting
+	 * @param dy verplaatsing in y-richting
+	 */
 	public void verplaatsKnoppen(int dx, int dy)
-	{
-		zoomInX.translate(dx,dy);
+	{	zoomInX.translate(dx,dy);
 		zoomUitX.translate(dx,dy);
 		zoomInY.translate(dx,dy);
 		zoomUitY.translate(dx,dy);
@@ -684,185 +656,99 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		zoomStandaard.translate(dx,dy);	
 	}
 	
-	
-	//public void mousePressed(MouseEvent e)
+	/**
+	 * mouseDown/touchStart op (eventX,eventY)
+	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
-	{	//requestFocus();
-		
-		if (asv.isDemo)
+	{	if (asv.isDemo)
 			return;
-//		if (asv.frozen)
-//			return;
-
-//GWT		
-// double of long tap		
-		//if(e.getModifiers()== e.BUTTON3_MASK || e.isControlDown())
-		{	
-			
-//			if (asv.fixed)
-//				return;
-			if (asv.alleenInvullen)
+		if (asv.alleenInvullen)
 				return;
-//GWT			
-			//popup.show(this,e.getX(),e.getY());
-			//return;
-		}
-		
-		
-		// grafiekveld
-		//if (e.getSource() == gv)
+		// mouseDown/touchStart op grafiekveld
 		if (new Rectangle(xPos + veldx,yPos + veldy,veldb,veldh).contains(eventX, eventY))	
-		{	
-			//startxv = e.getX();
-			//startyv = e.getY();
-			startxv = eventX;
+		{	startxv = eventX;
 			startyv = eventY;
-//GWT			
-			//setCursor(new Cursor(Cursor.MOVE_CURSOR));
 		}
-		// resize corner
-		//else if (e.getX() > getSize().width - 10 && e.getY()> getSize().height - 10)
+		// mouseDown/touchStart op resize-hoek
 		else if (eventX > (xPos + breedte - 10) && eventY > (yPos + hoogte - 10))
 		{	resize = true;
 			startxrs = eventX;
 			startyrs = eventY;
-//GWT			
-			//setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
 		}
-		// een van de zoomknoppen
+		// mouseDown/touchStart op een van de zoomknoppen?
 		else if (zoomAction(eventX, eventY))
-		{
-			
+		{ // actie volgt vanzelf als nodig
 		}
-		else 
-		{	//super.mousePressed(e);
-			super.mouseDownTouchStartAction(eventX, eventY);
+		else // start slepen van deze GrafiekComponent 
+		{	super.mouseDownTouchStartAction(eventX, eventY);
 		}
 	}	
 	
-//	public void mouseDragged(MouseEvent e)
+	/**
+	 * mouseMove/touchMove op (eventX,eventY)
+	 */
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
-	{	
-		
-		if (asv.isDemo)
+	{	if (asv.isDemo)
 			return;
-//		if (asv.frozen)
-//			return;
-		
-		//if (e.getSource() == gv)
+		// mouseMove/touchMove op grafiekveld
+		// grafiek-clip wordt versleept
 		if (new Rectangle(xPos+veldx,yPos+veldy,veldb,veldh).contains(eventX, eventY))
-		{	//int dx = e.getX() - startxv;
-			//int dy = e.getY() - startyv;
-			int dx = eventX - startxv;
+		{	int dx = eventX - startxv;
 			int dy = eventY - startyv;
-		
 			beginx = beginx + dx;
 			beginy = beginy - dy;
-			
-			if(trace && tracex!=-2) 
-			{
-				tracexD = tracexD+dx;
-				tracex = tracex+dx;
-//GWT				
-				//slider.zetStand(tracex);
-			}
-			
 			int b = beginwaarde;
 			if (beginx > 0) 
 				beginwaarde = 1 - (int) Math.round((beginx - eenheidx / 2) / eenheidx);
 			else 
 				beginwaarde = 1 - (int) Math.round((beginx + eenheidx / 2) / eenheidx);
 			selectnummer = selectnummer + b - beginwaarde;
-			
+			// synchronizeer 
 			asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
             asv.zoomStateHolder.setSelectnummer(varNaam, selectnummer);
             asv.zoomStateHolder.setBeginx(varNaam, ((beginx-eenheid)*14)/eenheid);
             asv.zoomStateHolder.setBeginy(varNaam, beginy);
-            asv.zoomStateHolder.setTracexD(varNaam, tracexD);
 			asv.zoomStateHolder.setZoomStates(varNaam);
-            
-			startxv = eventX; //e.getX();
-			startyv = eventY; //e.getY();
-			 
+			startxv = eventX; 
+			startyv = eventY; 
 		}
+		// mouseMove/touchMove op resize-hoek
 		else if(resize)
-		{	//int dx = e.getX() - startx;
-			//int dy = e.getY() - starty;
-			
-			int rsdx = eventX - startxrs;
+		{	int rsdx = eventX - startxrs;
 			int rsdy = eventY - startyrs;
-			
-			//setSize(getSize().width + dx, getSize().height + dy);
-			
-//System.out.println("rsdx = " + rsdx);
-//System.out.println("rsdy = " + rsdy);
-			
 			setSize(breedte + rsdx, hoogte + rsdy);
-		
 			asv.tekenOpnieuw();
-			//startx = e.getX();
-			//starty = e.getY();
-			
 			startxrs = eventX;
 			startyrs = eventY;
-			
-			
 		}
-		else
-		{	//super.mouseDragged(e);
-			super.mouseMoveTouchMoveAction(eventX, eventY);
-			//int dx = e.getX() - startx;
-			//int dy = e.getY() - starty;
-			
-			//int dx = eventX - startx;
-			//int dy = eventY - starty;
-			
+		else // sleep de GrafiekComponent
+		{	super.mouseMoveTouchMoveAction(eventX, eventY);
 			for(int i=0 ; i<aantalPijlenIn ; i++)
 			{	pijlenIn[i].verplaatsEind(dx,dy);
 			}
 			verplaatsKnoppen(dx,dy);
 			gv.verplaats(dx,dy);
-			
 			asv.tekenOpnieuw();
 		}
 	}
 	
-	//public void mouseReleased(MouseEvent e)
+	/**
+	 * mouseUp/touchEnd op (eventX,eventY)
+	 * @param eventX x-coordinaat event
+	 * @param eventY y-coordinaar event
+	 */
 	public void mouseUpTouchEndAction(int eventX, int eventY)
-	{	
-		if (asv.isDemo)
+	{	if (asv.isDemo)
 			return;
-//		if (asv.frozen)
-//			return;
-		
-		
 		resize = false;
-		//trace = false;
-		//if(e.getSource()==gv)
-		
-		
-//GWT: de laatste TouchMove nemen
-		
+		// mouseEnd/touchEnd op grafiekveld
+		// einde sleep grafiek-clip 
 		if (new Rectangle(xPos+veldx,yPos+veldy,veldb,veldh).contains(eventX, eventY))	
-		{	
-			
-//GWT			
-			//setCursor(new Cursor(Cursor.HAND_CURSOR));
-			
-			double beginxR = beginx;
-			beginx = eenheidx*Math.round(beginx/eenheidx);
+		{	beginx = eenheidx*Math.round(beginx/eenheidx);
 			beginy = eenheidy*Math.round(beginy/eenheidy);
-			
-			if(trace && tracex!=-2) 
-			{
-				tracexD += beginx-beginxR;
-				tracex += beginx-beginxR;
-//GWT				
-				//slider.zetStand(tracex);
-			}
+			// synchronizeer
 			if(aantalPijlenIn>0)
-			{					
-				asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
+			{	asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
 				asv.zoomStateHolder.setSchaalFactorX(varNaam, schaalFactorX);
 				asv.zoomStateHolder.setFactorRijNummerX(varNaam, factorRijNummerX);
 				asv.zoomStateHolder.setSchaalFactorY(varNaam, schaalFactorY);
@@ -870,77 +756,32 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 				asv.zoomStateHolder.setSelectnummer(varNaam, selectnummer);
 				asv.zoomStateHolder.setBeginx(varNaam, Math.round(beginx-eenheidx)*14/16);
 				asv.zoomStateHolder.setBeginy(varNaam, Math.round(beginy));
-				asv.zoomStateHolder.setTracexD(varNaam, tracexD);
 				asv.zoomStateHolder.setZoomStates(varNaam);
-	            
 			}
 			gv.tekenOpnieuw();
 			asv.tekenOpnieuw();
 		}
-		else 
-		{	//super.mouseReleased(e);
-			super.mouseUpTouchEndAction();
+		else // einde sleep grafiekComponent
+		{	super.mouseUpTouchEndAction();
 		}
-		
 	}
 	
-//GWT
-/*	
-	public void mouseMoved(MouseEvent e)
-	{	
-		if (asv.isDemo)
-			return;
-		if (asv.frozen)
-			return;
-		
-		
-		movex = e.getX();
-		movey = e.getY();
-		if(e.getX()>getSize().width-10 && e.getY()>getSize().height-10)
-		{	setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
-		}
-		else if(e.getX()>getSize().width-20 && e.getY()>getSize().height-20)
-		{	setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-		}
-		gv.tekenOpnieuw();
-		schuifveld.tekenOpnieuw();
-	}
-*/	
 
-//GWT
-/*	
-	public void mouseExited(MouseEvent e)
-	{	//if(e.getSource()==gv)
-		{	
-			if (asv.isDemo)
-				return;
-			if (asv.frozen)
-				return;
-			
-			setCursor(new Cursor(Cursor.DEFAULT_CURSOR ));
-			gv.tekenOpnieuw();
-		}
-	
-	}
-*/	
-	
-//	public void mouseClicked(MouseEvent e){;}
-	
+	/**
+	 * reset de zoom in de grafiek tot de default
+	 */
 	public void zoomStandaard()
-	{
-		double beginxVorig = beginx;
-		beginx = eenheidx;
+	{	beginx = eenheidx;
 		beginy = eenheidy;
-		tracexD = beginx -(beginxVorig - tracexD)*schaalFactorX;
 		factorRijNummerX = 99;
 		factorRijNummerY = 99;
 		schaalFactorX = 1;
 		schaalFactorY = 1;
 		beginwaarde = 0;
 		selectnummer = 999;
+		// grafiek is niet leeg
 		if(aantalPijlenIn>0)
-		{	
-			asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
+		{	asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
 			asv.zoomStateHolder.setSchaalFactorX(varNaam, schaalFactorX);
 			asv.zoomStateHolder.setFactorRijNummerX(varNaam, factorRijNummerX);
 			asv.zoomStateHolder.setSchaalFactorY(varNaam, schaalFactorY);
@@ -948,23 +789,19 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			asv.zoomStateHolder.setSelectnummer(varNaam, selectnummer);
 			asv.zoomStateHolder.setBeginx(varNaam, (beginx-eenheidx)*14/16);
 			asv.zoomStateHolder.setBeginy(varNaam, Math.round(beginy));
-			asv.zoomStateHolder.setTracexD(varNaam, tracexD);
 			asv.zoomStateHolder.setZoomStates(varNaam);
-            
 		}
-		
-		tracex = (int) Math.round(tracexD);
-//GWT		
-		//slider.zetStand(tracex);
-		
-		//gv.tekenOpnieuw();
 		asv.tekenOpnieuw();
-		
 	}
 	
+	/**
+	 * zoom in deze GrafiekComponent 
+	 * @param x zoom in de x-richting?
+	 * @param y zoom in de y-richting?
+	 * @param in zoom in of zoom uit?
+	 */
 	public void zoom (boolean x, boolean y, boolean in)
-	{
-		if(x) 
+	{	if(x) 
 			selectnummer = 999;
         eenheidxD = eenheid;
 		eenheidyD = eenheid;
@@ -973,12 +810,8 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 		double stapx, stapy;
 		double factorx = 1;
 		double factory = 1;
-		
 		double middenx = eenheidx;
 		double middeny = eenheidy;
-		
-		double beginxOud = beginx;
-		
 		if (in && x)
 		{	if (factorRijNummerX % 3 == 2)
 			{	factorx = 0.4;
@@ -989,9 +822,7 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			else 
 			{	factorx = 0.5;
 			}
-			
 		}
-		
 		else if (!in && x)
 		{	if (factorRijNummerX%3 == 1)
 			{	factorx = 2.5;
@@ -1003,7 +834,6 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			{	factorx = 2;
 			}
 		}
-		
 		if(in && y)
 		{	if(factorRijNummerY%3==2)
 			{	factory =0.4;
@@ -1015,7 +845,6 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			{	factory=0.5;
 			}
 		}
-		
 		else if(!in && y)
 		{	if(factorRijNummerY%3==1)
 			{	factory =2.5;
@@ -1027,44 +856,17 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			{	factory=2;
 			}
 		}
-		
-		
 		stapx = Math.pow(factorx,0.1);
 		stapy = Math.pow(factory,0.1);
-		
-		
 		for (int i = 0; i < 5; i++)
-		{	
-			//int delay = 20;
-			//long t = System.currentTimeMillis();
-			//try
-			//{	t = t+delay;
-			//	sleep(Math.max(1, t-System.currentTimeMillis()));
-			//}
-			//catch(InterruptedException e)    // geen ;
-			//{   };
-			eenheidxD = eenheidxD/stapx;
+		{	eenheidxD = eenheidxD/stapx;
 			eenheidyD = eenheidyD/stapy;
 			eenheidx = (int) Math.round(eenheidxD);
 			eenheidy = (int) Math.round(eenheidyD);
-			double beginxVorig = beginx;
 			beginx =  middenx -(middenx - beginx)/stapx;
 			beginy =  middeny -(middeny - beginy)/stapy;
-			
-			tracexD = middenx -(middenx - tracexD)/stapx;
-			
 			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-			tracex = (int) Math.round(tracexD);
-//GWT				
-			//slider.zetStand(tracex);
-			
-			//gv.tekenOpnieuw();
-			//asv.tekenOpnieuw();
-			
 		}
-		
-		
-		
 		schaalFactorX *= factorx;
 		if (in && x)
 			factorRijNummerX--;
@@ -1075,59 +877,24 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 			factorRijNummerY--;
 		if (!in && y)
 			factorRijNummerY++;
-	
-		
 		eenheidxD = eenheidxD * factorx;
 		eenheidyD = eenheidyD * factory;
-		
-		
 		for(int i = 0; i < 5; i++)
-		{	//int delay = 20;
-			//long t = System.currentTimeMillis();
-			//try
-			//{	t = t+delay;
-			//	sleep(Math.max(1, t-System.currentTimeMillis()));
-			//}
-			//catch(InterruptedException e)    // geen ;
-			//{   };
-			eenheidxD = eenheidxD/stapx;
+		{	eenheidxD = eenheidxD/stapx;
 			eenheidyD = eenheidyD/stapy;
 			eenheidx = (int) Math.round(eenheidxD);
 			eenheidy = (int) Math.round(eenheidyD);
-			double beginxVorig = beginx;
 			beginx =  middenx -(middenx - beginx)/stapx;
 			beginy =  middeny -(middeny - beginy)/stapy;
-			
-			tracexD = middenx -(middenx - tracexD)/stapx;
-			
 			beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-			tracex = (int) Math.round(tracexD);
-//GWT				
-			//slider.zetStand(tracex);
-			//gv.tekenOpnieuw();
-			//asv.tekenOpnieuw();
 		}
-		
-		
 		beginwaarde = 1-(int)Math.round(beginx/eenheidx);
-		double beginwaardeD = 1.0-(beginx/eenheidx);
-//System.out.println(""+beginx);
-//System.out.println(""+eenheidx);
-//System.out.println(""+beginwaardeD);
-		
-		tracexD = tracexD + eenheid*(beginwaardeD - beginwaarde);
-		tracex = (int) Math.round(tracexD);
-//GWT			
-		//slider.zetStand(tracex);
-		
 		if(x)
 			selectnummer = 999;
-		
 		beginx = eenheidx - eenheidx * beginwaarde;
-		
-        if(aantalPijlenIn>0)
-		{	
-        	asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
+		// synchronizeer
+        if (aantalPijlenIn > 0)
+		{	asv.zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
         	asv.zoomStateHolder.setSchaalFactorX(varNaam, schaalFactorX);
         	asv.zoomStateHolder.setFactorRijNummerX(varNaam, factorRijNummerX);
         	asv.zoomStateHolder.setSchaalFactorY(varNaam, schaalFactorY);
@@ -1135,325 +902,201 @@ public class GrafiekComponent extends AlgebraSchuifComponent
         	asv.zoomStateHolder.setSelectnummer(varNaam, selectnummer);
         	asv.zoomStateHolder.setBeginx(varNaam, (beginx-eenheid)*14/eenheid);
         	asv.zoomStateHolder.setBeginy(varNaam, Math.round(beginy));
-        	asv.zoomStateHolder.setTracexD(varNaam, tracexD);
         	asv.zoomStateHolder.setZoomStates(varNaam);
-            
 		}
-        
-		//gv.tekenOpnieuw();
 		asv.tekenOpnieuw();
 	}
 		
 	
-
-	
+	/**
+	 * kijk of een van de zoomKnoppen het punt (eventX,eventY) bevat en voer de corresponderende actie uit  
+	 * @param eventX x-coordinaat punt
+	 * @param eventY y-coordinaat punt
+	 * @return true als een zoomKnop (eventX,eventY), false als niet
+	 */
 	public boolean zoomAction(int eventX, int eventY)
-	{
-		
-		if (new Rectangle(zoomStandaard.xPos,zoomStandaard.yPos,zoomStandaard.breedte,zoomStandaard.hoogte).contains(eventX, eventY))
-		{
-			zoomStandaard();
+	{	if (new Rectangle(zoomStandaard.xPos,zoomStandaard.yPos,zoomStandaard.breedte,zoomStandaard.hoogte).contains(eventX, eventY))
+		{	zoomStandaard();
 			return true;
 		}
 		else if (new Rectangle(zoomIn.xPos,zoomIn.yPos,zoomIn.breedte,zoomIn.hoogte).contains(eventX, eventY))
-		{
+		{	// mag je verder inzoomen?
 			if (factorRijNummerX>87 && factorRijNummerY>87)
 			{	zoom(true,true,true);
 			}
-
 			return true;
 		}
 		else if (new Rectangle(zoomUit.xPos,zoomUit.yPos,zoomUit.breedte,zoomUit.hoogte).contains(eventX, eventY))
-		{
+		{	// mag je verder uitzoomen?
 			if (factorRijNummerX<120 && factorRijNummerY<120)
 			{	zoom(true,true,false);
 			}
 			return true;
 		}
 		else if (new Rectangle(zoomInX.xPos,zoomInX.yPos,zoomInX.breedte,zoomInX.hoogte).contains(eventX, eventY))
-		{
+		{	// mag je verder inzoomen op de x-as?
 			if (factorRijNummerX>87)
 			{	zoom(true,false,true);
 			}
 			return true;
 		}
 		else if (new Rectangle(zoomUitX.xPos,zoomUitX.yPos,zoomUitX.breedte,zoomUitX.hoogte).contains(eventX, eventY))
-		{	
+		{	// mag je verder uitzoomen op de x-as?
 			if (factorRijNummerX<120)
 			{	zoom(true,false,false);
 			}
 			return true;
 		}
 		else if (new Rectangle(zoomInY.xPos,zoomInY.yPos,zoomInY.breedte,zoomInY.hoogte).contains(eventX, eventY))
-		{	
+		{	// mag je verder inzoomen op deyx-as?
 			if (factorRijNummerY>87)
 			{	zoom(false,true,true);
 			}
 			return true;
 		}
 		else if (new Rectangle(zoomUitY.xPos,zoomUitY.yPos,zoomUitY.breedte,zoomUitY.hoogte).contains(eventX, eventY))
-		{
+		{	// mag je verder uitzoomen op de y-as?
 			if (factorRijNummerY < 120)
 			{	zoom(false, true, false);
 			}
 			return true;
 		}
-		
 		return false;
 	}
-//GWT	
-/*	
-	public void actionPerformed(ActionEvent e)
+	
+	/**
+	 * de inner class die de grafieken tekent 
+	 */
+	class GrafiekVeld
 	{	
-		if (asv.isDemo)
-			return;
-		if (asv.frozen)
-			return;
-		
-		
-		if (zoomDraad != null && zoomDraad.isAlive())
-			return;
-		if (e.getActionCommand().equals("focus")) 
-			schuifveld.tekenOpnieuw();
-		else 
-		{	
-			if (e.getSource() instanceof JMenuItem && 
-				((JMenuItem)e.getSource()).getText().equals(AlgebraPijlenOpdr.rb.getString("popup1Label5")))
-			{	zetKettingZichtbaarHier(true);
-			}
-			else if (e.getSource() instanceof JMenuItem && 
-					((JMenuItem)e.getSource()).getText().equals(AlgebraPijlenOpdr.rb.getString("popup1Label6")))
-			{	zetKettingZichtbaarHier(false);
-			}
-			
-			
-			else if (e.getSource() == zoomUitY && factorRijNummerY < 120)
-			{	zoomDraad = new ZoomDraad(false, true, false);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomInY  && factorRijNummerY>87)
-			{	zoomDraad = new ZoomDraad(false,true,true);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomUitX && factorRijNummerX<120)
-			{	zoomDraad = new ZoomDraad(true,false,false);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomInX  && factorRijNummerX>87)
-			{	zoomDraad = new ZoomDraad(true,false,true);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomUit && factorRijNummerX<120 && factorRijNummerY<120)
-			{	zoomDraad = new ZoomDraad(true,true,false);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomIn && factorRijNummerX>87 && factorRijNummerY>87)
-			{	zoomDraad = new ZoomDraad(true,true,true);
-				zoomDraad.start();
-			}
-			else if(e.getSource()==zoomStandaard)
-			{	
-				double beginxVorig = beginx;
-				beginx = eenheidx;
-				beginy = eenheidy;
-				tracexD = beginx -(beginxVorig - tracexD)*schaalFactorX;
-				factorRijNummerX = 99;
-				factorRijNummerY = 99;
-				schaalFactorX = 1;
-				schaalFactorY = 1;
-				beginwaarde = 0;
-				selectnummer = 999;
-				if(aantalPijlenIn>0)
-				{	
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setBeginwaarde(varNaam, beginwaarde);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setSchaalFactorX(varNaam, schaalFactorX);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setFactorRijNummerX(varNaam, factorRijNummerX);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setSchaalFactorY(varNaam, schaalFactorY);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setFactorRijNummerY(varNaam, factorRijNummerY);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setSelectnummer(varNaam, selectnummer);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setBeginx(varNaam, (beginx-eenheidx)*14/16);
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setBeginy(varNaam, Math.round(beginy));
-		            ((AlgebraSchuifVeld)getParent()).zoomStateHolder.setTracexD(varNaam, tracexD);
-					((AlgebraSchuifVeld)getParent()).zoomStateHolder.setZoomStates(varNaam);
-		            
-				}
-				
-				tracex = (int) Math.round(tracexD);
-				slider.zetStand(tracex);
-				
-				gv.tekenOpnieuw();
-				schuifveld.tekenOpnieuw();
-				
-				
-			}
-			
-		}
-		if(e.getSource()==slider)
-		{ 	if(e.getActionCommand().equals("start")) 
-			{	tracing = true;
-				((AlgebraSchuifVeld)getParent()).zetTabellen(beginwaarde, 999, varNaam, schaalFactorX);
-			}
-			tracex = slider.geefStand();
-			tracexD = tracex;
-			gv.tekenOpnieuw();
-			schuifveld.tekenOpnieuw();
-			
-		}
-		if (e.getSource()==traceCheckbox)
-		{	if (((AlgebraSchuifVeld)schuifveld).fixed) return;
-			trace = traceCheckbox.isSelected();
-			slider.setVisible(trace);
-			gv.tekenOpnieuw();
-			schuifveld.tekenOpnieuw();
-		}
-	}
-*/
-
-//GWT
-/*	
-	public void mouseEntered(MouseEvent e)
-	{	requestFocus();
+		/**
+		 * de werkveld-x-coordinaat van het GrafiekVeld	
+		 */
+		int gvX;
+		/**
+		 * de werkveld-y-coordinaat van het GrafiekVeld	
+		 */
+		int gvY;
+		/** 
+		 * de breedte van het GrafiekVled
+		 */
+		int gvBreedte;
+		/** 
+		 * de hoogte van het GrafiekVled
+		 */
+		int gvHoogte;
 	
-		if(e.getSource()==gv)
-		{	setCursor(new Cursor(Cursor.HAND_CURSOR ));
-			schuifveld.tekenOpnieuw();
-			
-		}
-	}	
-*/	
-	
-	
-	class GrafiekVeld// extends JComponent
-	{
-		//private Image im;
-  		//private Graphics gIm;
-		
-		//private boolean veranderd;
-		
-		int gvX, gvY, gvBreedte, gvHoogte;
-	
+		/**
+		 * constructor
+		 * @param x globale x-coordinaat
+		 * @param y globale y-coordinaat
+		 * @param b breedte
+		 * @param h hoogte
+		 */
 		public GrafiekVeld(int x, int y, int b, int h)
-		{	
-			//super.setBounds(x,y,b,h);
-			gvX = x;
+		{	gvX = x;
 			gvY = y;
 			gvBreedte = b;
 			gvHoogte = h;
-			
-			//veranderd = true;
 		}
 		
+		/**
+		 * verplaats het GrafiekVeld over (dx,dy) 
+		 * @param dx verplaatsing x-richting
+		 * @param dy verplaatsing y-richting
+		 */
 		public void verplaats(int dx, int dy)
-		{
-			gvX += dx;
+		{	gvX += dx;
 			gvY += dy;
 		}
 		
 		public void paint()
-		{
-			paint(asv.asvContext2d);
+		{	paint(asv.asvContext2d);
 		}
 		public void paint(Context2d g)
-		{	
-			
-			//if (veranderd)			
-			//{	
-				//if (im == null || resize)
-				//{	im = createImage(breedte, hoogte);
-				//	gIm = im.getGraphics();
-				//}
-				//gIm.setColor(Color.white);
-				g.setFillStyle(CssColor.make(255,255,255));
-				//gIm.fillRect(0,0,breedte,hoogte);
-				g.fillRect(gvX,gvY,gvBreedte,gvHoogte);
-				tekenFunctie(g);
-				//veranderd = false;
-			//}
-			//g.drawImage(im, 0, 0, null);
+		{	// achtergrond wit
+			g.setFillStyle(CssColor.make(255,255,255));
+			g.fillRect(gvX,gvY,gvBreedte,gvHoogte);
+			tekenFunctie(g);
 		}
 		
+		/**
+		 * zet de afmeting van het GrafiekVled
+		 * @param b breedte
+		 * @param h hoogte
+		 */
 		public void setSize(int b, int h)
-		{	
-			gvBreedte = b;
+		{	gvBreedte = b;
 			gvHoogte = h;
 			tekenOpnieuw();
 		}
 		
 		public void tekenOpnieuw()
-		{	//veranderd = true;
-		
-			paint();
+		{	paint();
 		}
-		
+
+		/**
+		 * teken het grafiekrooster, x- and y-as (als nodig) en de grafieken
+		 * @param g de Context2d voor tekenen
+		 */
 		public void	tekenFunctie(Context2d g)
 		{	
-//GWT			
-			//int breedte = getSize().width;
-			//int hoogte = getSize().height;
-			//g.setClip(0, 0, breedte, hoogte);
-			
+			// horizontale roosterlijnen
 			int imin = - (int) Math.round(beginx / eenheidx); 
 			int imax = 1 + gvBreedte / eenheidx - (int) Math.round(beginx / eenheidx);
 			int bx = (int) Math.round(beginx);
 			for (int i = imin; i < imax; i++)
-			{	
-				//g.setColor(Color.lightGray);
-				g.setStrokeStyle(CssColor.make(192,192,192));
-				//g.drawLine((int)(bx + i * eenheidxD), 0, (int)(bx + i * eenheidxD), hoogte);
+			{	g.setStrokeStyle(CssColor.make(192,192,192));
 				g.beginPath();
 				g.moveTo(gvX + bx + i * eenheidxD, gvY + 0);
 				g.lineTo(gvX + bx + i * eenheidxD, gvY + gvHoogte);
 				g.stroke();
 			}
+			// vertikale roosterlijnen
 			int jmin = -(int)Math.round(beginy/eenheidy); 
 			int jmax = 1+ gvHoogte / eenheidy-(int)Math.round(beginy/eenheidy);
 			int by = (int)Math.round(beginy);
 			for(int j=jmin ; j<jmax ; j++)
-			{	//g.setColor(Color.lightGray);
-				g.setStrokeStyle(CssColor.make(192,192,192));
-				//g.drawLine(0,(int)(hoogte-(by+j*eenheidyD)),breedte,(int)(hoogte-(by+j*eenheidyD)));
+			{	g.setStrokeStyle(CssColor.make(192,192,192));
 				g.beginPath();
 				g.moveTo(gvX + 0,gvY + gvHoogte-(by+j*eenheidyD));
 				g.lineTo(gvX + gvBreedte,gvY + gvHoogte-(by+j*eenheidyD));
 				g.stroke();
 			}	
-			//g.setColor(Color.black);
 			g.setStrokeStyle(CssColor.make(0,0,0));
+			// y-as in beeld
 			if(bx>1 && bx<gvBreedte)
-			{	//g.drawLine(bx-1,0,bx-1,hoogte);	
-				g.beginPath();
+			{	g.beginPath();
 				g.moveTo(gvX + bx-1,gvY + 0);
 				g.lineTo(gvX + bx-1,gvY + gvHoogte);
 				g.stroke();
-				//g.drawLine(bx,0,bx,hoogte);
 				g.beginPath();
 				g.moveTo(gvX + bx,gvY + 0);
 				g.lineTo(gvX + bx,gvY + gvHoogte);
 				g.stroke();
-				
 			}
+			// x-as in beeld
 			if(by>0 && by<gvHoogte)
-			{	//g.drawLine(0,hoogte-(by+1),breedte,hoogte-(by+1));
-				g.beginPath();
+			{	g.beginPath();
 				g.moveTo(gvX + 0,gvY + gvHoogte-(by+1));
 				g.lineTo(gvX + gvBreedte,gvY + gvHoogte-(by+1));
 				g.stroke();
-				//g.drawLine(0,hoogte-(by),breedte,hoogte-(by));
 				g.beginPath();
 				g.moveTo(gvX + 0,gvY + gvHoogte-(by));
 				g.lineTo(gvX + gvBreedte,gvY + gvHoogte-(by));
 				g.stroke();
 			}
 			g.setFillStyle(CssColor.make(0,0,0));
-			//g.drawString("O",bx-10,hoogte-by+12);
-// yPos??
-			g.fillText("O",gvX + bx-10,gvY + gvHoogte-by+12);
+			// oorsprong
+			if(bx>1 && bx<gvBreedte && by>0 && by<gvHoogte)
+				g.fillText("O",gvX + bx-10,gvY + gvHoogte-by+12);
 			
+			// teken de grafieken: loop de inkomende pijlen na
 			for (int j = 0; j< aantalPijlenIn; j++)
-			{	if (isLijnGrafiek[j] && expressies[j] != null && expressies[j].geefVarNaam() != null && 
+			{	// lijnGrafiek bij een valide Expressie 
+				if (isLijnGrafiek[j] && expressies[j] != null && expressies[j].geefVarNaam() != null && 
 					varNaam.equals(expressies[j].geefVarNaam()) && !expressies[j].geefVarNaam().equals("qq"))
-				{	//g.setColor(pijlenIn[j].getColor());
-					g.setStrokeStyle(pijlenIn[j].getColor());
+				{	g.setStrokeStyle(pijlenIn[j].getColor());
 					for(int i=0 ; i < gvBreedte ; i++)
 					{	double ii = i;
 						double d0 = expressies[j].geefW(schaalFactorX*(-beginx)/eenheidxD + schaalFactorX*ii/eenheidxD);
@@ -1463,16 +1106,18 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 							int x1 = i+1;
 							double dy0 = Math.round(gvHoogte -(beginy+eenheidyD*d0/schaalFactorY));
 							double dy1 = Math.round(gvHoogte -(beginy+eenheidyD*d1/schaalFactorY));
-							if(dy0>1000)dy0 = 1000;
-							if(dy0<-1000)dy0 = -1000;
-							if(dy1>1000)dy1 = 1000;
-							if(dy1<-1000)dy1 = -1000;
+							if(dy0 > 1000)
+								dy0 = 1000;
+							if(dy0 < -1000)
+								dy0 = -1000;
+							if(dy1 > 1000)
+								dy1 = 1000;
+							if(dy1 < -1000)
+								dy1 = -1000;
 							int y0 = (int)dy0;
 							int y1 = (int)dy1;
-							//g.drawLine(x0,y0,x1,y1);
 							if ((y0 >= 0) && (y0 <= gvHoogte) && (y1 >= 0) && (y1 <= gvHoogte))
-							{	
-								g.beginPath();
+							{	g.beginPath();
 								g.moveTo(gvX + x0,gvY + y0);
 								g.lineTo(gvX + x1,gvY + y1);
 								g.stroke();
@@ -1480,108 +1125,50 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 						}
 					}
 				}
+				// puntgrafiek bij een valide Expressie
 				else if(isPuntGrafiek[j] && expressies[j]!=null && expressies[j].geefVarNaam()==null && !Double.isNaN(puntXWaarde[j]))
 				{	double d = bx+1.0*((puntXWaarde[j])*eenheidx/schaalFactorX);
 					int x = (int)d;
 					double d0 = expressies[j].geefW((puntXWaarde[j])*schaalFactorX);
 					int y = (int)Math.round(gvHoogte -(beginy+eenheidy*d0/schaalFactorY));
-					//g.setColor(pijlenIn[j].getColor());
 					g.setFillStyle(pijlenIn[j].getColor());
-					//g.fillOval(x-2,y-2,5,5);
+					// teken punt
 					if ((y >= 0) && (y <= gvHoogte))
-					{	
-					g.beginPath();
-                    g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
-               	 	g.fill();
+					{	g.beginPath();
+                    	g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
+               	 		g.fill();
 					}
-					
-					//g.setFont(font);
+					// teken waarde
                	 	g.setFont(fontString);
-					//fm = g.getFontMetrics();
-					
-					//String xString = dfTrace.format(puntXWaarde[j]);
-					//String yString = dfTrace.format(d0);
                	 	String xString = UF.format0(puntXWaarde[j], 4);
                	 	String yString = UF.format0(d0, 4);
-					
 					int woordBreedte = 40;
-					//if (fm != null) 
-					//	woordBreedte = fm.stringWidth(xString + yString);
-					
 					TextMetrics tm = g.measureText(xString + yString);
 					woordBreedte = (int) Math.round(tm.getWidth());
-					
 					if ((y >= 0) && (y <= gvHoogte))
-					{
-					//g.setColor(new Color(255,255,225));
-					g.setFillStyle(CssColor.make(255,255,225));
-					g.fillRect(gvX + x+6,gvY + y-7,woordBreedte+20,15);
-					//g.setColor(Color.black);
-					g.setFillStyle(CssColor.make(0,0,0));
-					//g.drawString("(" + xString + " , " + yString + ")", x+8,y+5);
-// yPos??					
-					g.fillText("(" + xString + " , " + yString + ")", gvX + x+8,gvY + y+5);
+					{	g.setFillStyle(CssColor.make(255,255,225));
+						g.fillRect(gvX + x+6,gvY + y-7,woordBreedte+20,15);
+						g.setFillStyle(CssColor.make(0,0,0));
+						g.fillText("(" + xString + " , " + yString + ")", gvX + x+8,gvY + y+5);
 					}
-					
-					
 				}
+				// meerPuntenGrafiek (8 punten)
 				if(isMeerPuntenGrafiek[j] && expressies[j]!=null)
-				{	//g.setColor(pijlenIn[j].getColor());
-					g.setFillStyle(pijlenIn[j].getColor());
+				{	g.setFillStyle(pijlenIn[j].getColor());
 					for (int k = 0; k<8; k++) 
 					{	double d = bx+1.0*((k+beginwaarde)*eenheidx);
 						int x = (int)d;
 						if(expressies[j].isWaarde((k+beginwaarde)*schaalFactorX) && k<8 )
 						{	double d0 = expressies[j].geefW((k+beginwaarde)*schaalFactorX);
 							int y = (int)Math.round(gvHoogte -(beginy+eenheidy*d0/schaalFactorY));
-							//g.fillOval(x-2,y-2,5,5);
 							if ((y >= 0) && (y <= gvHoogte))
-							{
-							g.beginPath();
-		                    g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
-		               	 	g.fill();
-							}
-
-						}
-				    }
-					for (int k = 0; k<8; k++) 
-					{	double d = bx+1.0*((k+beginwaarde)*eenheidx);
-						int x = (int)d;
-						if(expressies[j].isWaarde((k+beginwaarde)*schaalFactorX) && k<8 )
-						{	double d0 = expressies[j].geefW((k+beginwaarde)*schaalFactorX);
-							int y = (int)Math.round(gvHoogte -(beginy+eenheidy*d0/schaalFactorY));
-							
-							if(new Rectangle(x-2,y-2,5,5).contains(movex, movey))
-							{	//g.setFont(font);
-								g.setFont(fontString);
-								//fm = g.getFontMetrics();
-								//String xString = dfTrace.format((k+beginwaarde)*schaalFactorX);
-								//String yString = dfTrace.format(d0);
-								String xString = UF.format0((k+beginwaarde)*schaalFactorX,4);
-								String yString = UF.format0(d0,4);
-								
-								int woordBreedte = 40;
-								//if(fm!=null) woordBreedte = fm.stringWidth(xString+yString);
-								
-								TextMetrics tm = g.measureText(xString + yString);
-								woordBreedte = (int) Math.round(tm.getWidth());
-								
-								if ((y >= 0) && (y <= gvHoogte))
-								{
-								//g.setColor(new Color(255,255,225));
-								g.setFillStyle(CssColor.make(255,255,225));
-								g.fillRect(gvX + x+6,gvY + y-7,woordBreedte+20,15);
-								//g.setColor(Color.black);
-								g.setFillStyle(CssColor.make(0,0,0));
-								//g.drawString("(" + xString + " , " + yString + ")", x+8,y+5);
-// yPos??					
-								g.fillText("(" + xString + " , " + yString + ")", gvX + x+8,gvY + y+5);
-								}
-								
+							{	g.beginPath();
+		                    	g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
+		               	 		g.fill();
 							}
 						}
 				    }
-					
+					//puntgrafiek
 					if (isPuntGrafiek[j] && !Double.isNaN(puntXWaarde[j]))
 					{	double d = bx+1.0*((selectnummer+beginwaarde)*eenheidx);
                         int x = (int)d;
@@ -1589,125 +1176,27 @@ public class GrafiekComponent extends AlgebraSchuifComponent
 						x = (int)d;
 						double d0 = expressies[j].geefW((puntXWaarde[j]));
 						int y = (int)Math.round(gvHoogte -(beginy+eenheidy*d0/schaalFactorY));
-						//g.setColor(Color.black);
 						g.setFillStyle(CssColor.make(0,0,0));
-						//g.fillOval(x-2,y-2,5,5);
 						if ((y >= 0) && (y <= gvHoogte))
-						{
-						g.beginPath();
-	                    g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
-	               	 	g.fill();
+						{	g.beginPath();
+	                    	g.arc(gvX + x,gvY + y,2,0,2 * Math.PI);
+	               	 		g.fill();
 						}
-                        
-                        //g.setFont(font);
 	               	 	g.setFont(fontString);
-                        //fm = g.getFontMetrics();
-                        //String xString = dfTrace.format(puntXWaarde[j]);
-                        //String yString = dfTrace.format(d0);
                         String xString = UF.format0(puntXWaarde[j],4);
                         String yString = UF.format0(d0,4);
-                        
                         int woordBreedte = 40;
-                        //if(fm!=null) woordBreedte = fm.stringWidth(xString+yString);
-                        
     					TextMetrics tm = g.measureText(xString + yString);
     					woordBreedte = (int) Math.round(tm.getWidth());
-                        
     					if ((y >= 0) && (y <= gvHoogte))
-    					{
-                        //g.setColor(new Color(255,255,225));
-                        g.setFillStyle(CssColor.make(255,255,225));
-                        g.fillRect(gvX + x+6,gvY + y-7,woordBreedte+20,15);
-                        //g.setColor(Color.black);
-                        g.setFillStyle(CssColor.make(0,0,0));
-                        //g.drawString("(" + xString + " , " + yString + ")", x+8,y+5);
-//yPos                        
-                        g.fillText("(" + xString + " , " + yString + ")", gvX + x+8,gvY + y+5);
+    					{   g.setFillStyle(CssColor.make(255,255,225));
+                        	g.fillRect(gvX + x+6,gvY + y-7,woordBreedte+20,15);
+                        	g.setFillStyle(CssColor.make(0,0,0));
+                        	g.fillText("(" + xString + " , " + yString + ")", gvX + x+8,gvY + y+5);
     					}
 					}
-							
-				}
-//check dit nog voor tekenen buiten grafiekveld				
-				if(expressies[j]!=null && trace || expressies[j]!=null && selectnummer<8 && selectnummer>-1)
-				{	double d = bx+1.0*((selectnummer+beginwaarde)*eenheidx);
-                    int x = (int)Math.round(d);
-                    if(!tracing && selectnummer<8 && selectnummer>-1)
-                    {   tracexD = d;
-                        tracex = x;
-//GWT                        
-                        //slider.zetStand(tracex);
-                    }
-                    boolean b = varNaam.equals("qq") || varNaam.length()>2 && varNaam.substring(0,2).equals("qq");
-            		
-                    if ((isLijnGrafiek[j])&& trace && !isPuntGrafiek[j] || isMeerPuntenGrafiek[j])
-                    {   
-//GWT                    	
-                    	//slider.zetStand(tracex);
-                        double dTraceX = schaalFactorX*(-beginx)/eenheidxD + schaalFactorX*tracexD/eenheidxD;
-    					double dTraceY = expressies[j].geefW(dTraceX);
-    					if(!b && !Double.isNaN(dTraceY) && tracex<veldb && tracex>-1)
-    					{	int tracey = (int)Math.round(gvHoogte -(beginy+eenheidy*dTraceY/schaalFactorY));
-                            //g.setColor(traceKleur);
-    						g.setFillStyle(traceKleur);
-                            //g.fillOval(tracex-2,tracey-2,5,5);
-                            g.beginPath();
-    	                    g.arc(gvX + tracex,gvY + tracey,2,0,2 * Math.PI);
-    	               	 	g.fill();
-                            
-    						drawDottedLine(g,gvX + tracex,gvY + gvHoogte,gvX + tracex,gvY + tracey);
-    						drawDottedLine(g,gvX + 0,gvY + tracey,gvX + tracex,gvY + tracey);
-    					
-                            if ((isLijnGrafiek[j] || isMeerPuntenGrafiek[j])&& trace && !isPuntGrafiek[j])
-                            {    
-        						//String xWaarde = dfTrace.format(dTraceX);
-        						//String yWaarde = dfTrace.format(dTraceY);
-        						String xWaarde = UF.format0(dTraceX,2);
-        						String yWaarde = UF.format0(dTraceY,2);
-        						
-        						//g.setFont(font);
-        						g.setFont(fontString);
-        						//fm = g.getFontMetrics();
-        						
-        						
-        						//int woordBreedteX = fm.stringWidth(xWaarde);
-        						//int woordHoogteX = fm.getAscent();
-        						
-								TextMetrics tm = g.measureText(xWaarde);
-								int woordBreedteX = (int) Math.round(tm.getWidth());
-//check								
-								int woordHoogteX = 10; 
-
-        						//int woordBreedteY = fm.stringWidth(yWaarde);
-        						//int woordHoogteY = fm.getAscent();
-								tm = g.measureText(yWaarde);
-								int woordBreedteY = (int) Math.round(tm.getWidth());
-//check								
-								int woordHoogteY = 10; 
-        						//g.setColor(new Color(255,255,200));
-        						g.setFillStyle(CssColor.make(255,255,200));
-        						g.fillRect(gvX + tracex-woordBreedteX/2-2, gvY + gvHoogte-woordHoogteX-2, woordBreedteX+4, woordHoogteX+2);
-        						g.fillRect(gvX + 0, gvY + tracey-woordHoogteY/2-2, woordBreedteY+4, woordHoogteY+4);
-        						//g.setColor(Color.black);
-        						g.setStrokeStyle(CssColor.make(0,0,0));
-        						//g.drawRect(tracex-woordBreedteX/2-2, hoogte-woordHoogteX-2, woordBreedteX+4, woordHoogteX+2);
-        						g.strokeRect(gvX + tracex-woordBreedteX/2-2, gvY + gvHoogte-woordHoogteX-2, woordBreedteX+4, woordHoogteX+2);
-        						//g.drawRect(0, tracey-woordHoogteY/2-2, woordBreedteY+4, woordHoogteY+4);
-        						g.strokeRect(gvX + 0, gvY + tracey-woordHoogteY/2-2, woordBreedteY+4, woordHoogteY+4);
-        						
-        						g.setFillStyle(CssColor.make(0,0,0));
-        						//g.drawString(xWaarde, tracex-woordBreedteX/2, gvHoogte-2);
-//yPos?        						
-        						g.fillText(xWaarde, gvX + tracex-woordBreedteX/2, gvY + gvHoogte-2);
-        						
-        						//g.drawString(yWaarde, 2, tracey+woordHoogteY/2);
-//yPos?        						
-        						g.fillText(yWaarde, gvX + 2, gvY + tracey+woordHoogteY/2);
-                            }
-    					}
-                    }
 				}
 			} // for
-			
 		}
 	}
 }
