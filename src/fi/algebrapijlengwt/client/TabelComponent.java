@@ -90,26 +90,29 @@ public class TabelComponent extends SchuifComponent
 	 * t.b.v. slepen in de Tabel, zie aldaar
 	 */
 	private boolean raak = false;
-	 
-	 private String defaultVarnaam;
-	 
-	 //private Color traceKleur = new Color(220,220,220);
-	 private CssColor traceKleur = CssColor.make(220,220,220);
-
-	 AlgebraSchuifVeld asv;
-	 
+	/**
+	 * de variablenaam als de Tabel-Expressie een BasisExpressie is  
+	 */
+	private String defaultVarnaam;
+	/**
+	 * de kleur voor de geselecteerde waarde 
+	 */
+	private CssColor traceKleur = CssColor.make(220,220,220);
+	/**
+	 * het werkveld 
+	 */
+	AlgebraSchuifVeld asv;
+	/**
+	 * is deze TabelComponent zichtbaar? 
+	 */
 	boolean visible = true;
-	 
+
+	/**
+	 * constructor
+	 * @param asv het AlgebraSchuifVeld
+	 */
 	public TabelComponent(AlgebraSchuifVeld asv)
-	{	
-		
-		this.asv = asv;
-		
-		//addMouseListener(this);
-		//addMouseMotionListener(this);
-		//f = new Font("SansSerrif",Font.PLAIN,12);
-		//fm = getFontMetrics(f);
-		
+	{	this.asv = asv;
 		beginwaarde = 0;
 		selectnummer = 999;
 		schaalFactorX = 1;
@@ -120,24 +123,36 @@ public class TabelComponent extends SchuifComponent
 		else 
 			breedteInv = 30;
 		breedteUitv = 33;
-		
-		//setOpaque(false);
-		
 	}
-	
+
+	/**
+	 * zet de afmetingen van deze TabelComponent
+	 * @param x x-positie
+	 * @param y y-positie
+	 * @param b breedte
+	 * @param h hoogte
+	 */
 	public void setBounds(int x, int y, int b, int h)
-	{
-		xPos = x;
+	{	xPos = x;
 		yPos = y;
 		breedte = b;
 		hoogte = h;
 	}
 	
+	/**
+	 * bevat deze TabelCompoment het punt (x,y)
+	 * @param x x-coordinaat punt
+	 * @param y y-coordinaat punt
+	 * @return true/false
+	 */
 	public boolean contains(int x, int y)
-	{
-		return (new Rectangle(xPos,yPos,breedte,hoogte).contains(x, y));
+	{	return (new Rectangle(xPos,yPos,breedte,hoogte).contains(x, y));
 	}
 	
+	/**
+	 * zet de defaultVarnaam (en de Tabel-expressie)
+	 * @param s defailt variable naam
+	 */
 	public void setDefaultVarnaam(String s)
 	{	defaultVarnaam = s;
 		exp = new BasisExpressie(defaultVarnaam);
@@ -152,69 +167,48 @@ public class TabelComponent extends SchuifComponent
 	 * @param g de Context2d
 	 */
 	public void paint(Context2d g)
-	{	
-		if (!visible)
+	{	if (!visible)
 			return;
-		
+		// 2-kolommen
 		if (dubbel)
 		{	breedteUitv = breedte-10-breedteInv;
-			
-			//g.setColor(Color.white);
+			// kolom 2, wit plus zwarte rand
 			g.setFillStyle(CssColor.make(255,255,255));
 			g.fillRect(xPos+breedteInv+6,yPos+15,breedteUitv-10,hoogte - 31);
-			//g.setColor(Color.black);
 			g.setStrokeStyle(CssColor.make(0,0,0));
-			//g.drawRect(breedteInv+6,15,breedteUitv-10,hoogte - 31);
 			g.strokeRect(xPos+breedteInv+6,yPos+15,breedteUitv-10,hoogte - 31);
-
-			//g.setColor(Color.white);
+			// kolom 1, wit plus zwarte rand
 			g.setFillStyle(CssColor.make(255,255,255));
 			g.fillRect(xPos+3,yPos+15,breedteInv,hoogte - 31);
-			//g.setColor(Color.black);
 			g.setStrokeStyle(CssColor.make(0,0,0));
-			//g.drawRect(3,15,breedteInv,hoogte - 31);
 			g.strokeRect(xPos+3,yPos+15,breedteInv,hoogte - 31);
-			
-			//g.setColor(new Color(220,220,220));
+			// grijs doosje variabelenaam boven kolom 1
 			g.setFillStyle(CssColor.make(220,220,220));
 			g.fillRect(xPos+3,yPos,breedteInv,15);
-			//g.setColor(Color.black);
 			g.setStrokeStyle(CssColor.make(0,0,0));
-			//g.drawRect(3,0,breedteInv,15);
 			g.strokeRect(xPos+3,yPos,breedteInv,15);
-			
+			// achtergrond en rand geslecteerde waarde (if any)
 			if(selectMogelijk && selectnummer>-1 && selectnummer<8 && exp!=null && !exp.geefVarNaam().equals(""))
-			{	//g.setColor(traceKleur);
-				g.setFillStyle(traceKleur);
+			{	g.setFillStyle(traceKleur);
 				g.fillRect(xPos+breedteInv+6,yPos+15+selectnummer*15+beginx%eenheidx,breedteUitv-10,16);
 				g.fillRect(xPos+3,yPos+15+selectnummer*15+beginx%eenheidx,breedteInv,16);
-				//g.setColor(Color.black);
 				g.setStrokeStyle(CssColor.make(0,0,0));
-				//g.drawRect(breedteInv+6,15+selectnummer*15+beginx%eenheidx,breedteUitv-10,16);
 				g.strokeRect(xPos+breedteInv+6,yPos+15+selectnummer*15+beginx%eenheidx,breedteUitv-10,16);
-				//g.drawRect(3,15+selectnummer*15+beginx%eenheidx,breedteInv,16);
 				g.strokeRect(xPos+3,yPos+15+selectnummer*15+beginx%eenheidx,breedteInv,16);
 			}
-			
-			int knopPlusX = xPos+38;//15;
+			// scroll-knoppen
+			int knopPlusX = xPos+38;
 			int knopPlusY = yPos+4;
-			int knopMinX = xPos+38;//15;
+			int knopMinX = xPos+38;
 			int knopMinY = yPos+hoogte-5;
-			
-			//pijlPlusContain = new Polygon();
-			//pijlPlusContain.addPoint(knopPlusX-10,knopPlusY+8);
-			//pijlPlusContain.addPoint(knopPlusX+10,knopPlusY+8);
-			//pijlPlusContain.addPoint(knopPlusX,knopPlusY-4);
+			// klikrechthoek omhoog
 			pijlPlusContain = new Rectangle(knopPlusX-10,knopPlusY-4,20,12);
-				
+			// polygon voor omhoog	
 			pijlPlus = new Polygon();
 			pijlPlus.addPoint(knopPlusX-5,knopPlusY+8);
 			pijlPlus.addPoint(knopPlusX+5,knopPlusY+8);
 			pijlPlus.addPoint(knopPlusX,knopPlusY);
-			
 			g.setFillStyle(CssColor.make(0,0,0));
-			
-//			g.fillPolygon(pijlPlus);
 	       	g.moveTo(pijlPlus.doubleX[0], pijlPlus.doubleY[0]);
 			g.beginPath();
 			for (int k = 1; k < pijlPlus.aantalPunten; k++)
@@ -223,22 +217,13 @@ public class TabelComponent extends SchuifComponent
 			g.lineTo(pijlPlus.doubleX[0], pijlPlus.doubleY[0]);
 			g.closePath();
 			g.fill();
-
-//			g.drawPolygon(pijlPlus);
-		
-			//pijlMinContain = new Polygon();
-			//pijlMinContain.addPoint(knopMinX-10,knopMinY-8);
-			//pijlMinContain.addPoint(knopMinX+10,knopMinY-8);
-			//pijlMinContain.addPoint(knopMinX,knopMinY+5);
+			// klikrechthoek omlaag
 			pijlMinContain = new Rectangle(knopMinX-10,knopMinY-8,20,12);
-			
+			// polygon omlaag
 			pijlMin = new Polygon();
 			pijlMin.addPoint(knopMinX-5,knopMinY-8);
 			pijlMin.addPoint(knopMinX+5,knopMinY-8);
 			pijlMin.addPoint(knopMinX,knopMinY);
-			
-
-			//	g.fillPolygon(pijlMin);
 	       	g.moveTo(pijlMin.doubleX[0], pijlMin.doubleY[0]);
 			g.beginPath();
 			for (int k = 1; k < pijlMin.aantalPunten; k++)
@@ -247,48 +232,37 @@ public class TabelComponent extends SchuifComponent
 			g.lineTo(pijlMin.doubleX[0], pijlMin.doubleY[0]);
 			g.closePath();
 			g.fill();
-			
-			
-//			g.drawPolygon(pijlMin);	
-			
+			// 
 			if(exp!=null)
 			{	String s = exp.geefVarNaam();
+				// skip verborgen variabelen
 				boolean b = s.length() >= 2 && s.substring(0,2).equals("qq");
 				if(s!=null && !s.equals(""))
 				{	if (!b)					
-					{	
-						//g.drawString(s,7,12);
-						g.fillText(s,xPos+7,yPos+12);
-					
+					{	g.fillText(s,xPos+7,yPos+12);
 					}
 					for(int i=0 ; i<8 ; i++)
-					{	if(exp.isWaarde(schaalFactorX*(i+beginwaarde)))
+					{	// valide waarde kolom 2
+						if(exp.isWaarde(schaalFactorX*(i+beginwaarde)))
 						{	double d = exp.geefW(schaalFactorX*(i+beginwaarde));
 							if(i<7 && beginx>0 || i>0 && beginx<0 ||beginx%eenheidx==0) 
-							{	
-								//g.drawString(exp.df.format(d),breedteInv+8,28+i*15+beginx%eenheidx);
-								g.fillText(UF.format0(d, 3),xPos+breedteInv+8,yPos+28+i*15+beginx%eenheidx);
+							{	g.fillText(UF.format0(d, 3),xPos+breedteInv+8,yPos+28+i*15+beginx%eenheidx);
 							}
 						}
-						else 
-						{	//g.drawString("-",breedteInv+8,28+i*15+beginx%eenheidx);
-							g.fillText("-",xPos+breedteInv+8,yPos+28+i*15+beginx%eenheidx);
+						else // waarde niet voorhanden 
+						{	g.fillText("-",xPos+breedteInv+8,yPos+28+i*15+beginx%eenheidx);
 						
 						}
-
+						// kolom 1
 						if(i<7 && beginx>0 || i>0 && beginx<0 ||beginx%eenheidx==0)
-						{	
-							
-							//g.drawString(exp.df.format(schaalFactorX*(i+beginwaarde)),5,28+i*15+beginx%eenheidx);
-							g.fillText(UF.format0(schaalFactorX*(i+beginwaarde), 3),xPos+5,yPos+28+i*15+beginx%eenheidx);
+						{	g.fillText(UF.format0(schaalFactorX*(i+beginwaarde), 3),xPos+5,yPos+28+i*15+beginx%eenheidx);
 						}	
 					}
 				}
 			}
 		}
 		else // !dubbel, i.e. een(1) kolom
-		{	
-			breedteUitv = breedte - 10;
+		{	breedteUitv = breedte - 10;
 			// witte tabelrechthoek
 			g.setFillStyle(CssColor.make(255,255,255));
 			g.fillRect(xPos+3, yPos+15, breedte - 17, hoogte - 31);
@@ -362,27 +336,39 @@ public class TabelComponent extends SchuifComponent
 		}
 	}
 	
-	
+	/**
+	 * maak van de TabelCompont een 2-koloms tabel
+	 * @param b 2-koloms/een kolom
+	 */
 	public void zetDubbel(boolean b)
 	{	dubbel = b;
 	}
 	
+	/**
+	 * zet/reset de Expressie van deze TabelComponenet
+	 * @param e de Expressie of null
+	 */
 	public void zetExpressie(Expressie e)
-	{	if (e != null  && e.geefVarNaam() != null)//&& e.geefWaarde()==null
+	{	if (e != null && e.geefVarNaam() != null)
 		{	exp = e;
 			varNaam = e.geefVarNaam();
 		}
-		else //exp = null;
+		else // reset;
 		{	exp = new BasisExpressie(defaultVarnaam); 
 			varNaam = defaultVarnaam;
 		}
 	}
 	
+	/**
+	 * zet de attributen van eze TabelComponent indien de variabelenaam van de Tabel-Expressie gelijk is aan varN
+	 * @param beginwaarde beginwaarde 
+	 * @param selectnummer te selecteren entry (if any)
+	 * @param varN de variabelenaam van de attributen
+	 * @param schaalFactorX schaalfactor
+	 * @param beginx beginwaarde voor slepen
+	 */
 	public void zetTabel(int beginwaarde, int selectnummer, String varN, double schaalFactorX, double beginx)
 	{	varNaam = exp.geefVarNaam();
-		
-//System.out.println("test3"+varNaam +varN);
-	
 		if (varNaam.equals(varN))
 		{	this.beginwaarde = beginwaarde;
 			this.selectnummer = selectnummer;
@@ -391,44 +377,47 @@ public class TabelComponent extends SchuifComponent
 			paint();
 		}
 	}
-	
+
+	/**
+	 * kan in de TabelComponent een waarde geselecteerd worden?
+	 * @param b ja/nee
+	 */
 	public void zetSelectMogelijk(boolean b)
 	{	selectMogelijk = b;
 	}
-	
+
+	/**
+	 * bepaal de gewenste breedte van de TabelCompoment
+	 * @return de breedte
+	 */
 	public int geefBreedte()
-	{	if (dubbel)
+	{	// tabel met twee kolommen
+		if (dubbel)
 		{	breedteInv = 20;
 			breedteUitv = 23;
 			if (exp != null)
 			{	varNaam = exp.geefVarNaam();
 				if (varNaam != null && !varNaam.equals(""))
-				{	boolean b = varNaam.equals("qq") || varNaam.length() > 2 && varNaam.substring(0,2).equals("qq");
+				{	// skip verborgen variabelen
+					boolean b = varNaam.equals("qq") || varNaam.length() > 2 && varNaam.substring(0,2).equals("qq");
+					// breedte naam kolom 1
 					if(!b)
-					{	//breedteInv = Math.max(breedteInv, fm.stringWidth(varNaam) + 4);
-						TextMetrics tm = asv.asvContext2d.measureText(varNaam);
+					{	TextMetrics tm = asv.asvContext2d.measureText(varNaam);
 						int stringWidth = (int) Math.round(tm.getWidth());
 						breedteInv = Math.max(breedteInv, stringWidth + 4);
 					}
-					
+					// maximale breedte alle entires in kolom 1 en kolom 2
 					for (int i = 0; i < 8; i++)
 					{	if (exp.isWaarde(schaalFactorX * (i + beginwaarde)))
 						{	double d = exp.geefW(schaalFactorX * (i + beginwaarde));
-						
-							//String sUitv = exp.df.format(d);
 							String sUitv = UF.format0(d,3);
-							
 							TextMetrics tm = asv.asvContext2d.measureText(sUitv);
 							int stringWidth = (int) Math.round(tm.getWidth());
-							//breedteUitv = Math.max(breedteUitv, fm.stringWidth(sUitv) + 4);
 							breedteUitv = Math.max(breedteUitv, stringWidth + 4);
 						}
-					
-						//String sInv = exp.df.format(schaalFactorX * (i + beginwaarde));
 						String sInv = UF.format0(schaalFactorX * (i + beginwaarde),3);
 						TextMetrics tm = asv.asvContext2d.measureText(sInv);
 						int stringWidth = (int) Math.round(tm.getWidth());
-						//breedteInv = Math.max(breedteInv, fm.stringWidth(sInv) + 4);
 						breedteInv = Math.max(breedteInv, stringWidth + 4);
 					}
 				}
@@ -436,18 +425,19 @@ public class TabelComponent extends SchuifComponent
 			int b = breedteInv + breedteUitv + 20;
 			return b;	
 		}
-		else
+		else // enkelvoudige tabel
 		{	breedteUitv = 30;
 			if (exp != null)
 			{	varNaam = exp.geefVarNaam();
 				if (varNaam != null && !varNaam.equals(""))
-				{				
+				{	// bepaal de maximale breedte van alle zichtbare tabelgetallen				
 					for (int i = 0; i < 8; i++)
 					{	if (exp.isWaarde(schaalFactorX * (i + beginwaarde)))
 						{	double d = exp.geefW(schaalFactorX * (i + beginwaarde));
-//GWT						
-//							String sUitv = exp.df.format(d);
-//							breedteUitv = Math.max(breedteUitv, fm.stringWidth(sUitv) + 4);
+							String sUitv = UF.format0(d,3);
+							TextMetrics tm = asv.asvContext2d.measureText(sUitv);
+							int stringWidth = (int) Math.round(tm.getWidth());
+							breedteUitv = Math.max(breedteUitv, stringWidth + 4);
 						}
 					}
 				}
@@ -455,8 +445,6 @@ public class TabelComponent extends SchuifComponent
 			int b = breedteUitv + 20;
 			return b;	
 		}
-		
-	
 	}
 
 	/**
