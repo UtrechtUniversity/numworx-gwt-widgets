@@ -565,7 +565,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 	{
 		if(map == null || map.isEmpty()) 
 			return;
-//logger.info("AP setState");
+logger.info("AP setState");
 		asvSetState = true;
 		asv.setState(map);
 		asvSetState = false;
@@ -824,6 +824,8 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 
 		asv = new AlgebraSchuifVeld(0, 0, breedte, hoogte, algebraPijlenGWTContext2d, this);
 		
+		makeLeft(); // hier!!
+		
 		// map is altijd != null
 		int aantalSc = 0;
 		if (launchState.containsKey("aantalSc"))
@@ -837,8 +839,6 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 			asv.setEditModeState(map);
 			asvSetState = false;
 		}
-
-		makeLeft();
 		
 		if (kijkNaActief)
 		{	
