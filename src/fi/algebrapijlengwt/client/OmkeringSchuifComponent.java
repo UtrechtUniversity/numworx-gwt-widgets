@@ -23,30 +23,27 @@ public class OmkeringSchuifComponent extends AlgebraSchuifComponent
 	{	super(asv,x,y,b,h);
 	}
 	
-	//public void paint(Graphics g)
+	/**
+	 * teken de OmkeringSchuifComponent
+	 */
 	public void paint(Context2d g)
-  	{ 	
-		if (!visible)
+  	{ 	if (!visible)
   			return; 
 		// dit tekent het balletje voor de ingaande pijl		
 		super.paint(g);
-
 		// oranje achtergrond, zwarte rand
 		if(!links)
-		{	
-			g.setFillStyle(CssColor.make(255, 200, 0));
+		{	g.setFillStyle(CssColor.make(255, 200, 0));
 			g.fillRect(xPos + 10,yPos + 0,breedte-11,hoogte-1);
 			g.setStrokeStyle(CssColor.make(0, 0, 0));
 			g.strokeRect(xPos + 10,yPos + 0,breedte-11,hoogte-1);
 		}
 		else
-		{	
-			g.setFillStyle(CssColor.make(255, 200, 0));
+		{	g.setFillStyle(CssColor.make(255, 200, 0));
 			g.fillRect(xPos + 0,yPos + 0,breedte-11,hoogte-1);
 			g.setStrokeStyle(CssColor.make(0, 0, 0));
 			g.strokeRect(xPos + 0,yPos + 0,breedte-11,hoogte-1);
 		}		
-		
 		// opschrift
 		g.setFillStyle(CssColor.make(0,0,0));
 		String s = "1/...";
@@ -54,7 +51,6 @@ public class OmkeringSchuifComponent extends AlgebraSchuifComponent
 		g.setFont(fontString);
 		TextMetrics tm = g.measureText(s);
 		int w = (int) Math.round(tm.getWidth());
-		
 		if (!links)
 		{	g.fillText(s,xPos + 5+(breedte-w)/2,yPos + hoogte-4);
 		}
@@ -64,7 +60,9 @@ public class OmkeringSchuifComponent extends AlgebraSchuifComponent
 	}
 	
 	/**
-	 * vind
+	 * bepaal de uitvoerExpressie a.d.h.v. de 
+	 * uitvoerExpressie van de ASC (if any) verbonden via pijlIn
+	 * vereenvoudig de Expressie indien gewenst  
 	 */
 	public Expressie geefUitvoer(int max)
 	{	if (AlgebraPijlenGWT.simplify)
@@ -101,7 +99,10 @@ public class OmkeringSchuifComponent extends AlgebraSchuifComponent
 		}
 	}
 	
-	
+	/**
+	 * bepaal de verborgen uitvoerExpressie a.d.h.v. de verborgen
+	 * uitvoerExpressie van de ASC (if any) verbonden via pijlIn  
+	 */
 	public Expressie geefVerborgenUitvoer(int max)
 	{	Expressie uitv = new Expressie();
 		if (pijlIn1 == null || max < 0)

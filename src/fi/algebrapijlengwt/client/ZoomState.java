@@ -6,6 +6,11 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+/**
+ * een klasse die de zoomparameters behorende bij een variabele bevat; <br>
+ * zie klasse ZoomStateHolder en methode zoom(,,) in klasse GrafiekComponent  
+ */
+
 public class ZoomState 
 {
 	private double schaalFactorY = 1;
