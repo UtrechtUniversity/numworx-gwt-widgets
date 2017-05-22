@@ -15,7 +15,7 @@ public class TextModel extends ColorModel<Label> {
 	public Align align = Align.BASE;
 	private FontStyle font = new FontStyle();
 	private float dx, dy;
-	Boolean alwaysF;
+	Boolean alwaysF, herleid;
 	Label item;
 	
 	@Override
@@ -65,7 +65,17 @@ public class TextModel extends ColorModel<Label> {
 			font.fromMap(map.getObjectMap("font"));
 		}
 		alwaysF = map.getBoolean("alwaysF", false);
+		herleid = Boolean.valueOf(map.getBoolean("herleid", false));
+
 		super.fromMap(map);
+	}
+
+	public boolean isAlwaysF() {
+		return Boolean.TRUE.equals(alwaysF);
+	}
+
+	public boolean isHerleid() {
+		return isAlwaysF() && Boolean.TRUE.equals(herleid);
 	}
 
 }

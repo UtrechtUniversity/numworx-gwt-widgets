@@ -83,28 +83,28 @@ public class ToolBoxPanel extends Composite implements Tools {
 			switch(n) {
 			case SELECTOR:
 				btn = newBtn(url + "/move.png", new SelectHandler(), tracker);break;
-			case 1: 
+			case POINT: 
 				btn = newBtn(url + "/point.png", new AddPuntHandler(), tracker);break;		
-			case 2:
+			case LINE:
 				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
-			case 3:
+			case SEGMENT:
 				btn = newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker);break;
-			case 4:
+			case 10:
 				btn = newBtn(url + "/triangle.png", new AddTriangleHandler2(), tracker);break;
-			case 5:
+			case 11:
 				btn = newBtn(url + "/circle.png", new AddCirkelHandler(), tracker);break;
-			case 6:
+			case 7:
 				btn = newBtn(url + "/delete.png", new DestroyHandler(), tracker);break;		
 
-			case 7:
+			case HALFLINE:
 				btn = newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker);break;		
 			case 8:
 				btn = newBtn(url + "/angle.png", new AddBoogHandler("Boog"), tracker);break;		
 			case 9:
 				btn = newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker);break;		
-			case 10:
+			case PERPENDICULAR:
 				btn = newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker);break;		
-			case 11:
+			case PARALLEL:
 				btn = newBtn(url + "/parallel.png", new AddParallelHandler(), tracker);break;		
 			case 12:
 				btn = newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker);break;		

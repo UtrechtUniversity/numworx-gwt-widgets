@@ -13,6 +13,7 @@ import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
+import nl.numworx.geodefinergwt.client.ui.HerleidList;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -381,6 +382,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		NamingModel mapper = new NamingModel(viewer, new HashMap<String,Destroyable>());
 		viewer = ti = new TrackerImpl(viewer, mapper);
 		ti.expression = new nl.numworx.geodefiner.common.math.Expression(ti);
+		LabelDelegate value = new HerleidList(ti);
+		ti.expression.symbolmap.put("list1.list", value);
 		uiModelFactory = new UIModelFactory(viewer);
 		widget.setMapper(mapper);
 		SelectHandler h = selector;
