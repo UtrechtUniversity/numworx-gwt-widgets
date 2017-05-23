@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+
 //import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -36,6 +37,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 //import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
+
 
 
 
@@ -2631,8 +2633,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				domeinInstelbaar =  launchData.getBoolean("domeinInstelbaar");
 			if(launchData.containsKey("formuleComponentHoogte"))
 				formuleComponentHoogte =  launchData.getInt("formuleComponentHoogte");
-			if(launchData.containsKey("veldComponentHoogte"))
-				veldComponentHoogte =  launchData.getInt("veldComponentHoogte");
 			
 			if(launchData.containsKey("functieToegestaan"))
 				functieToegestaan = launchData.getBoolean("functieToegestaan");
@@ -2649,6 +2649,22 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				formuleComponentAan =  launchData.getBoolean("formuleComponentAan");
 			if(launchData.containsKey("veldComponentAan"))
 				veldComponentAan =  launchData.getBoolean("veldComponentAan");
+			
+			/* veldComponent Parameters */
+			if(launchData.containsKey("veldGrafiekType"))
+				veldGrafiekType = VeldComponentGWT.FieldGraphType.values()[ ((Integer)launchData.getInt("veldGrafiekType")) ];
+			if(launchData.containsKey("veldPijlGrootteModus"))
+				veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode.values()[ ((Integer)launchData.getInt("veldPijlGrootteModus")) ];
+			if(launchData.containsKey("veldPijlGroottePixels"))
+				veldPijlGroottePixels = ((Integer)launchData.getInt("veldPijlGroottePixels"));
+			if(launchData.containsKey("veldPijlSchaalfactor"))
+				veldPijlSchaalfactor = ((Double)launchData.getDouble("veldPijlSchaalfactor"));
+			if(launchData.containsKey("veldLargerGridStartPoints"))
+				veldLargerGridStartPoints = ((Boolean)launchData.getBoolean("veldLargerGridStartPoints"));
+			
+			if(launchData.containsKey("veldComponentHoogte"))
+				veldComponentHoogte =  launchData.getInt("veldComponentHoogte");
+			/* veldComponent Parameters */
 
 			if(launchData.containsKey("tekenComponentAan"))
 				tekenComponentAan =  launchData.getBoolean("tekenComponentAan");
