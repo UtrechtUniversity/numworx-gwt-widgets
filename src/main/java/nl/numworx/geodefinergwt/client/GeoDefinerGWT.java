@@ -279,13 +279,17 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Boolean status = getStatus();
 		check.setStyleName(HALF_CSS, status == null);
 		check.setStyleName(FOUT_CSS, Boolean.FALSE.equals(status));
-		check.setStyleName(GOED_CSS, Boolean.TRUE.equals(status));		
+		check.setStyleName(GOED_CSS, Boolean.TRUE.equals(status));
+		if(checkObjects != null)
+			checkObjects.feedback();
 	}
 	
 	private void nofeedback() {
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
+		if(checkObjects != null)
+			checkObjects.removeFeedback();
 		nagekeken=false;
 	}
 
@@ -480,9 +484,17 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	public void reset() {
 		toolbox.destroy();
+		if(checkObjects != null) checkObjects.destroy();
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
 		start();
-
 	}
+
+	@Override
+	public void start() {
+		super.start();
+		if(checkObjects != null)
+			checkObjects.start();
+	}
+	
 }

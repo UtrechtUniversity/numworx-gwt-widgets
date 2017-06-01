@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
 
 import com.google.gwt.animation.client.AnimationScheduler;
@@ -30,6 +31,7 @@ import gwt.awt.geom.Area;
 import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 import nl.numworx.geodefiner.common.Align;
+import nl.numworx.geodefiner.common.CheckObject;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.ShortSegment;
@@ -174,6 +176,13 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 			setCssColor(CssColor.make(c.getColor()));
 			return;
 		}
+// feedback color.
+			CheckObject co = a.adapt(CheckObject.class);
+			if(co != null)
+			{   // extra verificatie?
+				setCssColor(CssColor.make("green"));
+			} else
+
 		super.selectColor(object);
 	}
 
