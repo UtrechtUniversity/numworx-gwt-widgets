@@ -825,7 +825,7 @@ public class GrafiekGWTVeld {
 		}
 			
 		/* Y-as */
-		if ( (drawYAxis) && (interactiePanel.roosterY) ){	
+		if ( (drawYAxis) && (interactiePanel.assenZichtbaar) ){	
 			gIm.beginPath(); 
 			gIm.moveTo(bx, drawYmin);
 			gIm.lineTo(bx, drawYmax);
@@ -833,7 +833,7 @@ public class GrafiekGWTVeld {
 		}
 			
 		/* X-as */
-		if ( (drawXAxis) && (interactiePanel.roosterX) ) {	
+		if ( (drawXAxis) && (interactiePanel.assenZichtbaar) ) {	
 			gIm.beginPath();
 			gIm.moveTo(drawXmin, hoogte-by);
 			gIm.lineTo(drawXmax, hoogte-by);
