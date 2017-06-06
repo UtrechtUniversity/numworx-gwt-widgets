@@ -86,7 +86,6 @@ import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text_nl;
 //import fi.graphtoolgwt.client.ui.KeyHandler;
 
-
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -176,7 +175,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	RealPoint otherPoint = null;
 	
 	private int beginwaarde = 0;
-	private int selectnummer = 999;
+	private int selectnummer = 999; 
 	
 	int eenheidx = eenheid;
 	int eenheidy = eenheid;
