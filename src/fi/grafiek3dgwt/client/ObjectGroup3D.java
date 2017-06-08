@@ -2,50 +2,71 @@ package fi.grafiek3dgwt.client;
 
 import java.util.Vector;
 
-
+/**
+ * A flexible class for grouping 3d-objects: each ObjectGroup3D contains a Vector containing instances of Object3D (each of which can
+ * be an ObjectGroup3D); note that for an ObjectGroup3D (which is also an Object3D), the vertex and facet arrays are NOT 
+ * initialized; to access all vertices of all 3d-objects in the ObjectGroup3D, use method enumerateVertices(); the method
+ * fixFacetArray() initializes the facet array by concatenating recursively the facet arrays of all 3d-objects in the ObjectGroup3D;
+ * in Doorzien this is necessary for drawing the Objectgroup3D, since before drawing, all facets must be sorted at the same time;
+ * in general, in most methods the individual 3d-objects in the ObjectGroup3D are accessed recursively.         
+ * @author huub
+ */
 public class ObjectGroup3D extends Object3D
-{   // the objects in the group
-    Vector objects = new Vector();
-    // flagg for sorting subgroup facet arrays
-    
-// voor Doorzien op true zetten!    
+{   /**
+	 * the 3d-objects in this ObjectGroup3D (each of which can be an ObjectGroup3D)
+	 */
+    Vector<Object3D> objects = new Vector<Object3D>();
+    /**
+     * Doorzien: should the facet arrays of the objects in this ObjectGroup3D be sorted when transforming the 
+     * vertices to view space, see method transformBy  
+     */
     boolean sortSubArrays = true;
-
-    
-    // updating 
-    // redefined
+    /**
+     * update the points of all facets of all objects in this ObjectGroups 3D after changing the vertices of some or all objects; <br>
+     * redefined from class Object3D 
+     */
     public void updatePoints()
     {   for (int oCnt = 0; oCnt < objects.size(); oCnt++)
         {   Object3D ob = (Object3D) objects.elementAt(oCnt);
             ob.updatePoints();
         }
     }
-    // enumerating the vertices, we only need REFERENCE(S) to the actual array
-    // redefine for object groups
-    public Vector enumerateVertices()
-    {   Vector enumer = new Vector();
+    /**
+     * create a Vector containing references to the vertex arrays of all 3d-objects in this 
+     * ObjectGroup3D; redefined from class Object3D   
+     */
+    public Vector<Vector3D[]> enumerateVertices()
+    {   Vector<Vector3D[]> enumer = new Vector<Vector3D[]>();
         for (int oCnt = 0; oCnt < objects.size(); oCnt++)
-        {   Object3D ob = (Object3D) objects.elementAt(oCnt);
-            Vector obEnum = ob.enumerateVertices();
+        {   Object3D ob = objects.elementAt(oCnt);
+            Vector<Vector3D[]> obEnum = ob.enumerateVertices();
             for (int eCnt = 0; eCnt < obEnum.size(); eCnt++)
-            {   Object o = obEnum.elementAt(eCnt);
+            {   Vector3D[] o = obEnum.elementAt(eCnt);
                 enumer.addElement(o);
             }
-        
         }        
         return enumer;
     }
-    
-    // redefined
+    /**
+     * Doorzien: find the Object3D or ObjectGroup3D at index 0;
+     * redefined from class Object3D 
+     */
     public Object3D leftChild()
     {   return (Object3D) objects.elementAt(0);
     }    
-    // redefined
+    /**
+     * Doorzien: find recursively the Object3D at index 0;
+     * redefined from class Object3D 
+     */
     public Object3D leftMostLeaf()
     {   return ((Object3D) objects.elementAt(0)).leftMostLeaf();
     }    
-    
-    // redefined
+    /**
+     * set the attribute diameter of this ObjectGroup3D as the maximum over all object(groups) of 
+     * 2 times distance(center,object.center) plus object.diameter;   
+     * centers of all object(group)s must have been set or calculated;
+     * do nothing if diamSet == true; redefined from superclass Object3D
+     */
     public void findDiameter()
     {   if (diamSet)
             return;
@@ -61,11 +82,14 @@ public class ObjectGroup3D extends Object3D
                 diameter = temp;
         }
     }
-    
-    // redefined
+    /**
+     * calculate the diameter of this ObjectGroup3D as the maximum over all object(groups) of 
+     * 2 times distance(center,object.center) plus object.diameter;   
+     * centers of all object(group)s must have been set or calculated;
+     * do not change the attribute diameter; redefined from superclass Object3D
+     */
     public double getDiameter()
-    {   
-        // assume the whole object tree is centered
+    {   // assume the whole object tree is centered
         Object3D ob;
         double diam = 0;
         double temp;
@@ -78,22 +102,30 @@ public class ObjectGroup3D extends Object3D
         }
         return diam;
     }
-    
-    // default constructor for creating, then adding objects
-    // then calling initObject3D(true, centerObject)
+    /**
+     * default constructor for creating an empty ObjectGroup3D, then 
+     * (repeatedly) use addObject3D() and finally initObject3D() 
+     */
     public ObjectGroup3D()
     {
     }
-    // turning a single object in an object group
+    /**
+     * constructor for turning a single Object3D into an ObjectGroup3D 
+     * @param ob the Object3D to be turned into an ObjectGroup3D
+     * @param centerObject should the ObjectGroup3D be centered?
+     */
     public ObjectGroup3D(Object3D ob, boolean centerObject)
     {   addObject3D(ob);
         filled = ob.filled;
         initObject3D(true, centerObject);
         fixFacetArray();
     }
-    
-    // find the text associated with vertex v
-    // redefined, search the objects in the tree via objectContains
+    /**
+     * find the text associated with vertex v
+     * redefined from class Object3D
+     * @param vertex vertex whose text is required
+     * @return the vertex text or null
+     */
     public String vertexText(Vector3D vertex)
     {   String result = null;
         Object3D ob = objectContains(vertex);
@@ -110,42 +142,34 @@ public class ObjectGroup3D extends Object3D
         for (int i = 0; i < objects.size(); i++)
         {   Object3D ob = (Object3D) objects.elementAt(i);
             copy.addObject3D(ob.deepCopy());
-// dit zorgt voor de goede topParent()!            
+            // dit zorgt voor de goede topParent()!            
         }
         // attributes of the group as top parent object
         copy.outlined = outlined;
         copy.filled = filled;
         copy.visible = visible;
-// dit maar even laten        
-//public Matrix3D oMat;
         copy.centerSet = centerSet;
         copy.diamSet = diamSet;
         copy.diameter = diameter;
         copy.center = new Vector3D(center);
         // attributes of the group as top parent objectgroup        
         copy.sortSubArrays = sortSubArrays;
-        
         copy.numVertexLabels = numVertexLabels;
-// testing the deep copy
-//copy.setFilled(!filled);
-// copy some attributes here    
-    
         copy.fixFacetArray(); 
-//        return copy;
     }    
-    
-    
-    // use something like this in every subclass
-    // note that any deepCopy of an ObjectGroup3D is returned
-    // as an Object, so cast necessary
+    /**
+     * make a deep copy of this ObjectGroup3D, redefined from superclass Object3D; <br>
+     * note that a deep copy of an ObjectGroup3D is returned as an Object3D, so cast if necessary
+     */
     public Object3D deepCopy()
     {   ObjectGroup3D copy = new ObjectGroup3D();
         makeDeepGroupCopy(copy);
         return copy;
     }    
-    
-    // redefined 
-    // centers are found recursively
+    /**
+     * set the attribute center of this ObjectGroup3D to the barycenter of the centers of all its objects(groups);
+     * centers are found recursively; do nothing if centerSet == true; redefined from superclass Object3D 
+     */
     public void findCenter()
     {   if (centerSet)
             return;
@@ -164,12 +188,13 @@ public class ObjectGroup3D extends Object3D
         cz /= objects.size();
         center = new Vector3D(cx, cy, cz);
     }
-    
-    // redefined 
-    // centers are found recursively
+    /**
+     * calculate the center of this ObjectGroup3D as the barycenter of the centers of all its objects(groups);
+     * centers are found recursively; do not change the attribute center; redefined from superclass Object3D
+     * @return the calculated center
+     */
     public Vector3D getCenter()
-    {   
-        double cx = 0;
+    {   double cx = 0;
         double cy = 0;
         double cz = 0;
         for (int i = 0; i < objects.size(); i++)
@@ -184,9 +209,11 @@ public class ObjectGroup3D extends Object3D
         cz /= objects.size();
         return new Vector3D(cx, cy, cz);
     }
-    
-    // redefined
-    // all centers of the tree must have been be calculated
+    /**
+     * translate this ObjectGroup3D in world space over minus center where center is set or must have been calculated;
+     * the new center of the object will be (0,0,0);  
+     * redefined from superclass Object3D 
+     */
     public void center()
     {   for (int i = 0; i < objects.size(); i++)
         {   Object3D ob = (Object3D) objects.elementAt(i);
@@ -194,10 +221,11 @@ public class ObjectGroup3D extends Object3D
         }
         center = new Vector3D(); // (0,0,0)
     }
-    // redefined    
-    // move the objectgroup, its members and its center over (cx, cy, cz)
-    // if the center was (0,0,0) the new center is (cx, cy, cz)
-    // all centers of the tree must have been calculated
+    /**
+     * translate this Object3D and its center in world space over the vector (cx,cy,cz);
+     * if the center was (0,0,0) the new center is (cx, cy, cz); note that center must have been set or calculated 
+     * redefined from superclass Object3D 
+     */
     public void translateBy (double cx, double cy, double cz)
     {   for (int i = 0; i < objects.size(); i++)
         {   Object3D ob = (Object3D) objects.elementAt(i);
@@ -205,8 +233,11 @@ public class ObjectGroup3D extends Object3D
         }        
         Vector3D.translateBy(center, cx, cy, cz);
     }
-    // redefined
-    // all centers of the tree must have been calculated
+    /**
+     * translate this ObjectGroup3D in world space so that (cx,cy,cz) will be its new center,
+     * that is, translate over the vector (cx,cy,cz) minus center; note that center must have been set or calculated
+     * redefined from superclass Object3D 
+     */    
     public void centerAt (double cx, double cy, double cz)
     {   // objects FIRST       
         for (int i = 0; i < objects.size(); i++)
@@ -215,14 +246,18 @@ public class ObjectGroup3D extends Object3D
         }        
         Vector3D.translateBy(center, cx - center.x, cy - center.y, cz - center.z);
     }
-    
-    // add an object to this group
+    /**
+     * add an Object(Group)3D to this group
+     * @param od the Object(Group)3D to be added 
+     */
     public void addObject3D(Object3D od)
     {   objects.addElement(od);
         od.parent = this;
     }
-
-    // search recursively
+    /**
+     * remove Object(Group)3D from this objectgroup
+     * @param od the Object(Group)3D to be removed 
+     */
     public void removeObject3D(Object3D od)
     {   objects.removeElement(od);
         for (int i = 0; i < objects.size(); i++)
@@ -231,9 +266,10 @@ public class ObjectGroup3D extends Object3D
                 ((ObjectGroup3D) ob).removeObject3D(od);
         }    
     }    
-
-    // redefined
-    // concatenate the facet arrays of the whole tree(!) recurse
+    /**
+     * recursively concatenate the facet arrays of all objects in this ObjectGroup3D
+     * redefined from superclass Object3D 
+     */
     public void fixFacetArray()
     {   // determine total facet number
         numFacets = 0;
@@ -248,7 +284,7 @@ public class ObjectGroup3D extends Object3D
             else
                 numFacets += ob.numFacets;
         }    
-        // now all subgroups also have a facet array!
+        // now all subgroups also have a facet array, so concatenate
         facets = new Facet3D[numFacets];
         int fCount = 0;
         for (int j = 0; j < objects.size(); j++)
@@ -259,12 +295,19 @@ public class ObjectGroup3D extends Object3D
             fCount += ob.numFacets;                 
         } 
     }    
-
-    // redefined
+    /**
+     * transform all vertices of all obects in this ObjectGroup3D to view space using the matrix m
+     * leave world space vertices unchanged
+     * if zZort == true, sort the facet array by zValue, note that in this case the facet array of this ObejctGroup3D
+     * must have been initialized by method fixFacetArray()
+     * taking m == null only sorts the facet array if zZort == true 
+     * redefined from superclass Object3D
+     * @param m transformation matrix
+     * @param dis viewing distance in view space
+     * @param zSort should the facet array be sorted (by zValue)? 
+     */
     public void transformBy(Matrix3D m, double dis, boolean zSort)
     {   Object3D ob;
-        // transform vertices and update facets of individual objects    
-        // no sorting necessary at higher levels in the tree!!
         for (int j = 0; j < objects.size(); j++)
         {   ob = (Object3D) objects.elementAt(j);
             if (sortSubArrays)
@@ -275,58 +318,39 @@ public class ObjectGroup3D extends Object3D
         if (zSort)
             zMergeSort();
     }
-
-/*
-// nodig?
-    // redefine oTransform (multiple selection!)
-    // the objectgroup has NO vertexarray!!
-    public void oTransform()
-    {   Object3D ob;
-        // transform vertices and facets of individual objects    
-        for (int j = 0; j < objects.size(); j++)
-        {   ob = (Object3D) objects.elementAt(j);
-            ob.oTransform();
-        }    
-    }
-*/
-
-/*
-// nodig?
-    public void setVisible(Object3D ob, boolean visible)
-    {   ob.setVisible(visible);
-    }
-*/    
-
-
-    // set the fill mode the facets of this objectgroup
-    // avoid disappearance
-    // redefined to set correctly set the object(group) flaggs
+    /**
+     * set all facets of this ObjectGroup3D) filled/not filled and do the same for all
+     * sub-object(group)s
+     * redefined from superclass Object3D
+     */
     public void setFilled(boolean fill)
     {   // this group
         filled = fill;
-        // all object(group)s below
+        // all sub-object(group)s
         for (int i = 0; i < objects.size(); i++) 
         {   Object3D ob = (Object3D) objects.elementAt(i);
             ob.setFilled(fill);
         }
     }
-
-    // set an (objectgroup) to visible/invisible
-    // avoid disappearance
-    // redefined to set correctly set the object(group) flaggs
+    /**
+     * set this ObjectGroup3D) visible/invisible and do the same for all
+     * sub-object(group)s (to avoid disappearance of objects when setting vis = true)
+     * redefined from superclass Object3D
+     */
     public void setVisible(boolean vis)
     {   // this group
         visible = vis;
-        // all object(group)s below        
+        // all sub-object(group)s        
         for (int i = 0; i < objects.size(); i++) 
         {   Object3D ob = (Object3D) objects.elementAt(i);
             ob.setVisible(vis);
         }
     }
-
-    // set an (objectgroup) to outlined/not outlined
-    // avoid disappearance
-    // redefined to set correctly set the object(group) flaggs
+    /**
+     * set all facets of this ObjectGroup3D) outlined/not outlined and do the same for all
+     * sub-object(group)s
+     * redefined from superclass Object3D
+     */
     public void setOutlined(boolean outline)
     {   // this group
         outlined = outline;
@@ -336,17 +360,23 @@ public class ObjectGroup3D extends Object3D
             ob.setOutlined(outline);
         }
     }
-
+    /**
+     * set the sub-object(group) with index i of this ObjectGroup3D) visible/invisible
+     * @param index the index is the sub-object(group) whose visibility is changed  
+     * @param visible true/false
+     */
     public void setVisible(int index, boolean visible)
     {   if ((index >= 0) && (index <= (objects.size() - 1)))
         {   Object3D ob = (Object3D) objects.elementAt(index);
             ob.setVisible(visible);
         }
     }
-    
-    // find the object containing vertex v (if any)
-    // assume object groups have NO vertices
-    // search recursively
+    /**
+     * find (recursively) the Object3D in this ObjectGroupe3D containing vertex v
+     * works only for object groups
+     * @param v the search vertex
+     * @return the Object3D containing vertex v or null 
+     */
     public Object3D objectContains(Vector3D v)
     {   Object3D result = null;
         for (int i = 0; i < objects.size(); i++)
@@ -365,11 +395,12 @@ public class ObjectGroup3D extends Object3D
         }
         return result;
     }
-
-
-    // search recursively
-    // note: this group contains ALL facets, but we
-    // want to find the object(!) containing the facet 
+    /**
+     * find (recursively) the Object3D in this ObjectGroupe3D containing facet f
+     * works only for object groups
+     * @param f the search facet
+     * @return the Object3D containing facet f or null 
+     */
     public Object3D objectContains(Facet3D f)
     {   Object3D result = null;
         for (int i = 0; i < objects.size(); i++)
@@ -388,8 +419,5 @@ public class ObjectGroup3D extends Object3D
         }
         return result;
     }
-
-
-
 } // class Object3DGroup
 

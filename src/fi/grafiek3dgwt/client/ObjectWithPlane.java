@@ -2305,7 +2305,7 @@ return null;
         {   otherIndex = Math.max(otherIndex,
                 getLabelIndex((String) otherVertexLabels.elementAt(oCnt)));
         }    
-        
+ /*       
         if ((start.modelCode == CYLINDER) ||
             (start.modelCode == CONE1) ||
             (start.modelCode == CONE2) ||
@@ -2317,7 +2317,7 @@ return null;
             if (isCylinderType(right))        
                 right.modelCode = start.modelCode;
         }
-        
+*/        
 //        letterObject(left);
 //        letterObject(right);
 //System.out.println("left-vert = " + left.numVertices);

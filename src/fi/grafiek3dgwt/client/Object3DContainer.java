@@ -1,21 +1,27 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-
-import javax.swing.*;
-
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
-// class representing the drawing area (a Canvas), also initializes and
-// manipulates the 3D model
-public class Object3DContainer// extends JPanel
+/**
+ * class taking care of drawing 3d-object(groups) in view space, with a choice of paint algorithms (see class Object3D),
+ * paint modes (shadow, how to color the "inside" of an Object3D), projections (parallel or central; the class also handles
+ * zooming in or out and mouse events on the 3d-object(groups) in view space; <br>
+ * note that the drawing Canvas and its Mouse/Touch handlers are located in class Grafoek3DComponent.  
+ * @author huub
+ */
+public class Object3DContainer
 {       
-    // the 3D object(s) in worldspace
-    ObjectGroup3D model, previewModel;
-    // transforming world space to view space
+	/**
+	 * the 3d-objectgroup in world space
+	 */
+    ObjectGroup3D model;
+    /**
+     * Doorzien: an additional 3d-objectgroup in world space 
+     */
+    ObjectGroup3D previewModel;
+    /** the matrix transforming world space coordinates to view space coordinates
+     */
     Matrix3D mat;
     // types of Painter's algo
     public static final int PUREZ = 0;

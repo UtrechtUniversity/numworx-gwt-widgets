@@ -1,75 +1,88 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
-//import java.io.Serializable;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 
-
-// abstract class, subclasses MUST initialize facets in some way and call
-// initObject3D(true) for initializing the matrix and finding sizes
-// a 3D object
-public abstract class Object3D //implements Serializable
-{   // essential attributes    
-    
-    // number of vertices
+/**
+ * an abstract class representing a 3-dimensional object consisting of vertices (vectors in 3-space) and
+ * facets (polygons in 3-space); to build a specific 3-dimensional object, create a subclass of Object3D, which must
+ * initialize the vertex array and with the help of this vertex array initializes the facet array (see class Facet3D),     
+ * then call one of the methods initObject3D(); showing the Object3D in view space is taken care of by method
+ * paintObject3D().    
+ * @author huub
+ */
+public abstract class Object3D
+{   
+	/**
+	 * the number of vertices
+	 */
     int numVertices;
-    // the vertices
+    /**
+     * the vertex array (in work space)
+     */
     Vector3D[] vertices;
-    // transformed 
+    /**
+     * the transformed vertices (in view space)
+     */
     Vector3D[] trVertices;
-    // some kind of text label for the vertices
+    /**
+     * text labels for the vertices
+     */
     String[] vertexLabels;
-    // number of facets
+    /**
+     * the number of facets
+     */
     int numFacets;
-    // facets
+    /**
+     * the facet array
+     */
     Facet3D[] facets;
-    
-    // look and feel
-    
-    // true of all facets are supposed to be outlined
-    // also used in setting facets empty
+    /**
+     * should all facets be outlined?
+     */
     boolean outlined = true;
-    // true of all facets are supposed to be filled
-    // also used in setting facets empty
+    /**
+     * should all facets be filled?
+     */
     boolean filled = true;
-    // true if visible (as part of a group)
+    /**
+     * is this Oject3D visible?
+     */
     boolean visible = true;
-    
-    // affine transformations world space -> view space
-    // world space -> world space
-    public Matrix3D oMat;
-    
-    // position and size
-    
-    // true if center set externally
+    /**
+     * was the center set externally? if yes, it cannot be recalculated
+     */
     boolean centerSet = false;
-    // true if diameter set externally
+    /**
+     * was the diameter set externally? if yes, it cannot be recalculated
+     */
     boolean diamSet = false;
-    // diameter set or as maximum distance any vertex to center
+    /**
+     * the diameter of this Obkect3D
+     */
     double diameter = -1;
-    // center set or as barycenter
+    /**
+     * the center of this Object3D
+     */
     Vector3D center = null;
-    
-    // location in object tree
-    
-    // the objectgroup's parent in the tree
-    Object3D parent = null;  // could be a group  
-    
-    // constructing the object
-
+    /**
+     * in case this Object3D is an Objectgroup3D: the objectgroup's parent in the tree, could be an Objectgroup3D; <br> 
+     * see class ObjectGroup3D 
+     */
+    Object3D parent = null;  
+    /**
+     * the number of vertex labels, redundant
+     */
     int numVertexLabels;
 
-    
-    // voor EPN
-    int modelCode;
-
-
-    // also works for groups
-    // for numTicks > 0 produces INDIVIDUAL tickmarks
+    /**
+     * if numTicks is positive create numTicks tickmarks on all edges of this Object3D, which can also be an 
+     * ObjectGroup3D, since tickmarks exist on facet level; numTicks == 0 removes the existing tickmarks;
+     * note that in case numTicks is larger then 1, the first two tickmarks determine all others 
+     * @param numTicks the number of tickmarks wanted
+     */
     public void setTickMarks(int numTicks)
     {   fixFacetArray();
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
@@ -106,36 +119,42 @@ public abstract class Object3D //implements Serializable
             }
         }
     }
-
+    /**
+     * show/hide the tickmarks, works also for an ObjectGroup3D
+     * @param b show/hide tickmarks?
+     */
     public void setTickMarksVisible(boolean b)
     {	fixFacetArray();
     	for (int fCnt = 0; fCnt < numFacets; fCnt++)
     	{   facets[fCnt].ticksVisible = b;
-	
     	}
     }	
-
+    /**
+     * should the vertices be drawn thickened? works also for an ObjectGroup3D  
+     * @param b tickened/normal vertices
+     */
     public void setThickenVertices(boolean b)
     {	fixFacetArray();
     	for (int fCnt = 0; fCnt < numFacets; fCnt++)
     	{   facets[fCnt].thickenVertices = b;
-    	
     	}
     }	
-    
+    /**
+     * should the vertex labels be shown? works also for an ObjectGroup3D
+     * @param b show/hide the vertex labels
+     */
     public void setLetters(boolean b)
     {	fixFacetArray();
     	for (int fCnt = 0; fCnt < numFacets; fCnt++)
     	{   facets[fCnt].letters = b;
-    	
     	}
     }	
-    // only for objects!!!
-    // redefine as sum for groups
+    /**
+     * find the volume of this Object3D, works only for 3d-objects, not for objectgroups
+     * @return volume of this Object3D
+     */
     public double getVolume()
-    {   
-//System.out.println("facets = " + numFacets);        
-        double volume = 0;
+    {   double volume = 0;
         // find barycenter
         double bx = 0, by = 0, bz = 0;
         for (int vCnt = 0; vCnt < numVertices; vCnt++)
@@ -163,25 +182,34 @@ public abstract class Object3D //implements Serializable
         }
         return volume;
     }
-    
-    // updating an object
-    // redefine for object groups
+    /**
+     * update the points of all facets of this Object3D after changing the vertices; <br>
+     * redefined for subclass ObjectGroup3D 
+     */
     public void updatePoints()
     {   for (int fCnt = 0; fCnt < numFacets; fCnt++)
             facets[fCnt].updatePoints(vertices);
     }
-    // enumerating the vertices, we only need REFERENCE(S) to the actual array
-    // redefine for object groups
-    public Vector enumerateVertices()
-    {   Vector enumer = new Vector();
+    /**
+     * return a Vector containing a reference to the vertex array of this Object3D;
+     * used in enumerating the vertices of an ObjectGroup3D
+     * redefined for subclass ObjectGroup3D
+     * @return a one-element Vector containing a reference to the vertex array
+     */
+    public Vector<Vector3D[]> enumerateVertices()
+    {   Vector<Vector3D[]> enumer = new Vector<Vector3D[]>();
         enumer.addElement(vertices);
         return enumer;
     }
-    // add a vertex, everything else unchanged
-    // use only for objects, since object groups have no 
-    // vertex arrays
-    // take care of transformed vertices(!) and
-    // vertexLabels
+    /**
+     * add a vertex (with label) to this Object3D, leave everything else unchanged; 
+     * <br>use only for 3d-objects, since object groups have no vertex arrays; 
+     * adjust transformed vertices array and vertexLabel array; 
+     * <br> use this method when creating the vertex array 
+     * of an Object3D, before creating any facets 
+     * @param v vertex to be added
+     * @param label label (if any) of the vertex to be added
+     */
     public void addVertex(Vector3D v, String label)
     {   // no vertices yet
         if (numVertices == 0)
@@ -199,13 +227,16 @@ public abstract class Object3D //implements Serializable
         vertices[numVertices] = v;
         vertexLabels[numVertices] = label;
         numVertices++;
+        numVertexLabels++;
         // only needed for painting
         trVertices = new Vector3D[numVertices];
     }    
-
-    // add a facet, everything else unchanged
-    // use only for objects, since object-group facet arrays are 
-    // constructed from object facet arrays
+    /**
+     * add a facet to this Object3D, leave everything else unchanged; use only for 3d-objects, since object groups (initilally) have no
+     * facet arrays; 
+     * <br> use this method when creating the facet array of an Object3D, after creating the vertex array
+     * @param f facet to be added
+     */
     public void addFacet(Facet3D f)
     {   // no facets yet
         if (numFacets == 0)
@@ -218,14 +249,15 @@ public abstract class Object3D //implements Serializable
         facets[numFacets] = f;
         numFacets++;
     }    
-    
-    // finding special facets
-    
-    // find all VISIBLE facets of this object (group) containing vertex v
-    // works also for object groups
-    public Vector facetsContaining(Vector3D v)
+    /**
+     * find all VISIBLE facets of this object(group) containing vertex v
+     * works also for object groups
+     * @param v the search vertex
+     * @return a Vector with the facets containing vertex v   
+     */
+    public Vector<Facet3D> facetsContaining(Vector3D v)
     {   fixFacetArray();
-        Vector result = new Vector();
+        Vector<Facet3D> result = new Vector<Facet3D>();
         for (int i = 0; i < numFacets; i++)
         {   if (facets[i].visible &&
                 (Facet3D.containsVertex(facets[i], v) >= 0)
@@ -234,9 +266,14 @@ public abstract class Object3D //implements Serializable
         }
         return result;
     }
-    // find a VISIBLE (invisible) facet of this object (group) containing 
-    // the directed edge v1->v2
-    // works also for object groups
+    /**
+     * find a VISIBLE (visible or invisible) facet of this object(group) containing
+     * the directed edge v1v2; works also for object groups
+     * @param v1 start of the directed edge 
+     * @param v2 end of the directed edge
+     * @param includeInvisibles search also among invisible facets
+     * @return the Facet3D containing the directed edge v1v2 or null 
+     */
     public Facet3D facetContaining(Vector3D v1, Vector3D v2,
                                    boolean includeInvisibles)
     {   fixFacetArray();
@@ -249,15 +286,12 @@ public abstract class Object3D //implements Serializable
         }
         return result;
     }
-    
-    
-    
-    
-    
-    // finding vertex properties
-    
-    // find the text associated with vertex v
-    // redefine
+    /**
+     * find the text associated with vertex v
+     * redefined for class ObjectGroup3D
+     * @param vertex vertex whose text is required
+     * @return the vertex text or null
+     */
     public String vertexText(Vector3D vertex)
     {   String result = null;
         int index = containsVertex(vertex);
@@ -265,11 +299,12 @@ public abstract class Object3D //implements Serializable
             return vertexLabels[index];
         return result;
     }
-
-
-    // find index of Vertex v if any
-    // compare absolutely
-    // only for objects!
+    /**
+     * find the index of vertex v in the vertex array of this Object3D
+     * works only for objects, since objectgroups have no vertex array
+     * @param vertex the search vertex
+     * @return the index of vertex v or minus 1
+     */
     public int containsVertex(Vector3D vertex)
     {   int result = -1;
         for (int i = 0; i < numVertices; i++)
@@ -278,10 +313,12 @@ public abstract class Object3D //implements Serializable
         }
         return result;
     }
-
-    // find index of facet f if any
-    // compare by reference
-    // works also for groups
+    /**
+     * find the index of Facet3D f in the facet array of this Object(group)3D
+     * works also for objectgroups 
+     * @param f the search facet
+     * @return the index of facet f or minus 1
+     */
     public int containsFacet(Facet3D f)
     {   fixFacetArray();
         int result = -1;
@@ -291,16 +328,16 @@ public abstract class Object3D //implements Serializable
         }
         return result;
     }
-    
-    // initializing object(groups), still some redundancy here
-    // as to setting center and diameter
-    
-    // works for groups since relevant methods redefined
+    /**
+     * initialize an Object(Group)3D, in case of an Object3D after 
+     * creating vertices and facets; determine center and diameter when not set externally
+     * works also for objectgroups 
+     * @param newObject is this a new Object(Group)3D?
+     * @param centerObject should this Object(Group)3D be centered?
+     */
     public void initObject3D(boolean newObject, boolean centerObject)
     {   if (newObject)
-        {  
-//            oMat = new TMatrix3D();
-            if (numVertices > 0)
+        {	if (numVertices > 0)
             	vertexLabels = new String[numVertices];
         }
         if (center == null)
@@ -311,38 +348,47 @@ public abstract class Object3D //implements Serializable
             findDiameter();
             
     }
-    
-    // (some) parametrized surfaces (tubed helix, sea shell)
-    // center can be set, force recalculation of diameter(s) 
-    // by putting diameter of top object group back to -1
-    // centerSet prevents the center from being recalculated
-    // note: the object(group) is centered at c when
-    // centerObject is true
-    // works for groups since relevant methods redefined    
+    /**
+     * initialize an Object(Group)3D, in case of an Object3D after
+     * creating vertices and facets; set the center to c a and determine the diameter
+     * when not set externally
+     * works also for objectgroups
+     * @param newObject is this a new Object(Group)3D?
+     * @param c the center of the Object(Group)3D (externally set) 
+     * @param centerObject should this Object(Group)3D be centered?
+     */
     public void initObject3D(boolean newObject, Vector3D c, boolean centerObject)
     {   center = c;
+    	// this prevents recalculating the center 
         centerSet = true;
         initObject3D(newObject, centerObject);
     }
-    // (some) parametrized surfaces
-    // centerSet prevents the center from being recalculated    
-    // diamSet prevents the diameter from being recalculated
-    // works for groups since relevant methods redefined    
+    /**
+     * initialize an Object(Group)3D, in case of an Object3D after
+     * creating vertices and facets; set the center to c a and diameter to d
+     * when not set externally
+     * works also for objectgroups
+     * @param newObject is this a new Object(Group)3D?
+     * @param c the center of the Object(Group)3D (externally set)
+     * @param d the diameter of the Object(Group)3D (externally set)
+     * @param centerObject should this Object(Group)3D be centered?
+     */
     public void initObject3D(boolean newObject, Vector3D c, double d,
                              boolean centerObject)
     {   center = c;
+    	// this prevents recalculating the center
         centerSet = true;
         diameter = d;
+        // this prevents recalculating the diameter
         diamSet = true;
         initObject3D(newObject, centerObject);
     }
-    
-    
-    // note: we can (and should not) instanciate Object3D
-    // to make a copy of an object AND maintain its subclass
-    // type (as a subclass of Object3D) instanciate an empty
-    // object of the required subclass type (which is allowed)
-    // and call the following method
+    /**
+     * to make a deep copy of a subclass of Object3D maintaining the
+     * subclass type, instantiate an empty object of that subclass type
+     * and call this method; redefined for class ObjectGroup3D;
+     * @param copy an empty Object3D of the required subclass type
+     */
     public void makeDeepObjectCopy(Object3D copy)
     {   // deep copy of vertices
         copy.numVertices = numVertices;
@@ -373,23 +419,22 @@ public abstract class Object3D //implements Serializable
         copy.outlined = outlined;
         copy.filled = filled;
         copy.visible = visible;
-// dit maar even laten        
-//public Matrix3D oMat;
         copy.centerSet = centerSet;
         copy.diamSet = diamSet;
         copy.diameter = diameter;
         copy.center = new Vector3D(center);
-        
-        copy.modelCode = modelCode;
-        //Object3D parent = null;
-        
-        
     }    
-    // redefine this in the subclasses
+    /**
+     * must be redefined for all subclasses of Object3D
+     * @return the deep copy of this Object3D
+     */
     public abstract Object3D deepCopy();
     
-    // find the maximum distance between any vertex and the objects center
-    // redefine for subclass ObjectGroup3D
+    /**
+     * set the attribute diameter as the maximum distance between any vertex and the center
+     * of the object (which must have been set or calculated);
+     * do nothing if diamSet == true; redefined for subclass ObjectGroup3D
+     */
     public void findDiameter()
     {   if (diamSet)
             return;
@@ -401,8 +446,12 @@ public abstract class Object3D //implements Serializable
                 diameter = temp;
         }
     }
-    
-
+    /**
+     * calculate the diameter this Object3D as the maximum distance between any vertex and the center
+     * of the object (which must have been set or calculated);
+     * do not change the attribute diameter; redefined for subclass ObjectGroup3D
+     * @return the calculated diameter
+     */
     public double getDiameter()
     {   double diam = 0;
         double temp;
@@ -413,9 +462,10 @@ public abstract class Object3D //implements Serializable
         }
         return diam;
     }
-    
-    // find the center of the object as the barycenter of all vertices
-    // redefine for subclass ObjectGroup3D
+    /**
+     * set the attribute center of this Object3D to the barycenter of all vertices;
+     * do nothing if centerSet == true; redefined for subclass ObjectGroup3D 
+     */
     public void findCenter()
     {   if (centerSet)
             return;
@@ -432,10 +482,13 @@ public abstract class Object3D //implements Serializable
         cz /= numVertices;
         center = new Vector3D(cx, cy, cz);
     }
-
+    /**
+     * calculate the center of this Object3D as the barycenter of all vertices;
+     * do not change the attribute center; redefined for subclass ObjectGroup3D
+     * @return the calculated center
+     */
     public Vector3D getCenter()
-    {   
-        double cx = 0;
+    {   double cx = 0;
         double cy = 0;
         double cz = 0;
         for (int i = 0; i < numVertices; i++)
@@ -448,22 +501,21 @@ public abstract class Object3D //implements Serializable
         cz /= numVertices;
         return new Vector3D(cx, cy, cz);
     }
-    
-    // redundant? 
-    // set the object(group)'s center externally
+    /**
+     * set the center of this Object(Group)3D externally
+     * @param cx x-coordinate of center
+     * @param cy y-coordinate of center
+     * @param cz z-coordinate of center
+     */
     public void setCenter(double cx, double cy, double cz)
     {   center = new Vector3D(cx, cy, cz);
         centerSet = true;
     }    
-
-    // basic manipulations in world space
-    // bij het samenstellen van een groep
-    // doen we nog iets met oMat?
-
-    // gebruik dit b.v. bij constructie van objecten    
-    // translate the object over -center where center is set or calculated
-    // the new center of the object will be  (0,0,0)
-    // redefine for subclass ObjectGroup3D
+    /**
+     * translate this Object3D in world space over minus center where center is set or calculated;
+     * the new center of the object will be (0,0,0); use in construction of specific 3d-objects 
+     * redefined for subclass ObjectGroup3D 
+     */
     public void center()
     {   for (int i = 0; i < numVertices; i++)
             Vector3D.translateBy(vertices[i], - center.x, - center.y, - center.z);
@@ -472,9 +524,14 @@ public abstract class Object3D //implements Serializable
             facets[j].updatePoints(vertices);
         
     }
-    // move the object and its center over (cx, cy, cz)
-    // if the center was (0,0,0) the new center is (cx, cy, cz)
-    // redefine for subclass ObjectGroup3D    
+    /**
+     * translate this Object3D and its center in world space over the vector (cx,cy,cz);
+     * if the center was (0,0,0) the new center is (cx, cy, cz) 
+     * redefined for subclass ObjectGroup3D
+     * @param cx x-translation
+     * @param cy y-translation
+     * @param cz x-translation 
+     */
     public void translateBy (double cx, double cy, double cz)
     {   Vector3D.translateBy(center, cx, cy, cz);
         for (int i = 0; i < numVertices; i++)
@@ -483,8 +540,14 @@ public abstract class Object3D //implements Serializable
             facets[j].updatePoints(vertices);
     }
 
-    // put the center of the object at (cx, cy, cz)
-    // redefine for subclass ObjectGroup3D        
+    /**
+     * translate this Object3D in world space so that (cx,cy,cz) will be its new center,
+     * that is, translate over the vector (cx,cy,cz) minus center;
+     * redefined for subclass ObjectGroup3D
+     * @param cx x-coordinate new center 
+     * @param cy y-coordinate new center
+     * @param cz x-coordinate new center 
+     */    
     public void centerAt (double cx, double cy, double cz)
     {   // vertices FIRST!!
         for (int i = 0; i < numVertices; i++)
@@ -492,37 +555,34 @@ public abstract class Object3D //implements Serializable
         Vector3D.translateBy(center, cx - center.x, cy - center.y, cz - center.z);            
         for (int j = 0; j < numFacets; j++)
             facets[j].updatePoints(vertices);
-        
     }
-
-    
-// hier iets met transleren om een versneden object uit elkaar
-// te halen, doe dit door stapsgewijs oMat te veranderen
-// elders centrum en diameter opnieuw uitrekenen
-// of: maak een deep copy in world space en haal die uit elkaar
-// irreversable
-    
-    
-    // redefine for subclass ObjectGroup3D        
+    /**
+     * redefined in the subclass ObjectGroup3D
+     */
     public void fixFacetArray()
-    {
-     // nothing to do, to be redefined   
-    }    
-    // find the topmost objectgroup in the object tree
-    // no need to redefine
+    {}    
+    /**
+     * find the topmost Objectgroup3D in the object tree
+     * no need to redefine in the subclass ObjectGroup3D
+     * @return the topmost Objectgroup3D (always a group)
+     */
     public Object3D topParent()
     {   if (parent == null)
             return this;
         else // recurse
             return parent.topParent();
     }    
-    // redefine!!
-    // could be an object group
+    /**
+     * redefined in the subclass ObjectGroup3D
+     * @return this Object3D
+     */
     public Object3D leftChild()
     {   return this;
     }    
-    // redefine!!
-    // always an object
+    /**
+     * redefined in the subclass ObjectGroup3D
+     * @return this Obejct3D
+     */
     public Object3D leftMostLeaf()
     {   return this;
     }    
@@ -878,18 +938,22 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
         } // EXACT
         
     } // paint
-    
+    /**
+     * check if the transformed Facet3D in view space is "visible": <br>
+     * the transformed Facet3D in view space is "visible" from the vier point (origin.x, origin.y, d) if the point 
+	 * (origin.x, origin.y, d) is at the same side of the transformed Facet3D as the point of the
+	 * transformed normal (thus "visible" means that from the view point one sees the outside of the facet); 
+	 * the transformed Facet3D is of vector form <br> 
+	 * f.trPoints[0] + "some plane through (0,0,0)" and that plane through (0,0,0) has normal vector
+	 * f.unitNormal, so "visible" if the angle between (origin.x, origin.y, d) minus f.trPoints[0] and f.unitNormal
+	 * is smaller then or equals 90 degrees
+     * @param f the Facet3D f
+     * @param dis the viewing distance in view space
+     * @param origin the origin in view space
+     * @return true/false
+     */
     public boolean visFromD(Facet3D f, double dis, Vector3D origin)
-    {
-
-// wat gebeurt hier precies
-// idee is dat de kant van het vlak waar de unit normal
-// heen wijst zichtbaar is vanuit eye, lijkt OK?
-// wat gebeurt hier met segmenten?
-// als segment naar oog toewijst: true?
-// als segment van ook afwijst: false?
-
-        Vector3D eye = new Vector3D(origin.x, origin.y, dis);
+    {   Vector3D eye = new Vector3D(origin.x, origin.y, dis);
         // work with normal support here
         Vector3D support = new Vector3D(f.trPoints[0]);
         eye = Vector3D.minus(eye, support);
@@ -1101,19 +1165,25 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;
     }
 
+    /**
+     * experimental algorithm from Aad Goddijn to determine if in view space the
+     * transformed facet fA with index "index" is "on top of" the transformed facet fB with
+     * index "cnt"; on top: check if the segment from the eye (origin.x,origin.y,dis)
+     * to the barycenter of fA intersects fB  
+     * @param index index of facet fA 
+     * @param cnt index of facet fB
+     * @param dis the viewing distance
+     * @param origin the origin of view space
+     * @return +1 (on top), 0 (undecided) or -1 (not on top)
+     */
     private int isOnTop(int index, int cnt, double dis, Vector3D origin)
     {   int result = 0;
-        // get the facets
+        // get the transformed facets
         Facet3D fA = facets[index];
         Facet3D fB = facets[cnt];
-        // twee vlakjes
+        // two planes
         if ((fA.numPoints > 2) && (fB.numPoints > 2))
-        {   
-            
-//System.out.println("" + index + " is separated from " + cnt + " = " +
-//                   projectionsSeparated(fA, fB, dis, origin)); 
-            
-            // Aad's A na B (i.e. f1 on top of f2)
+        {   // Aad's A after B (i.e. f1 on top of f2)
             Vector3D pointO = new Vector3D(origin.x, origin.y, dis);
             fA.calculateBarycenter();
             Vector3D pointP = fA.barycenter;
@@ -1134,54 +1204,31 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             // line through eye O and barycenter P of fA 
             // intersects the plane through fB in one point Q
             // note that P = Q is impossible since 
-            // P is inwendig en alles versneden
+            // P is an inside point and all is cut up
             else if (isType == 1)
-            {   
-//System.out.println("isType = 1");                
-                Vector3D pointQ = Plane3D.getIntersectionPoint(lineOP, planeB);
+            {   Vector3D pointQ = Plane3D.getIntersectionPoint(lineOP, planeB);
                 Line3D lineOQ = new Line3D(pointO, pointQ);
                 if (lineOQ.segmentContains(pointP))
                     result = 1;
                 else    
                     result = -1;
-                
-//System.out.println("O = " + pointO.toString());
-//System.out.println("P = " + pointP.toString());
-//System.out.println("Q = " + pointQ.toString());
-/*
-if (result)
-System.out.println("" + index + " is on top of " + cnt);                                    
-else
-System.out.println("" + index + " is not on top of " + cnt);                                    
-*/
-                
             }    
             // line through eye and barycenter of fA 
             // is in the the plane through fB
             // but then eye is in the plane through fB
             // thus we are looking at fB from the side
-            // AND (alles versneden) fB is geheel achter
-            // fA of geheel ervoor
+            // AND (all cut up) fB is completely behind
+            // fA or completely before fA
             else if (isType == 2)
             {   if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
             }    
-            
         }
+        // segment and plane
         else if ((fA.numPoints == 2) && (fB.numPoints > 2))
-        {   
-/*            
-if (fA.numPoints == 2)
-{
-    
-System.out.println("comparing segment with plane");    
-System.out.println("index " + index + " point0 = " + fA.points[0].toString());
-System.out.println("index " + index + " point1 = " + fA.points[1].toString());
-}
-*/
-            // Aad's A na B (i.e. f1 on top of f2)
+        {   // Aad's A after B (i.e. f1 on top of f2)
             Vector3D pointO = new Vector3D(origin.x, origin.y, dis);
             fA.calculateBarycenter();
             Vector3D pointP = fA.barycenter;
@@ -1202,83 +1249,57 @@ System.out.println("index " + index + " point1 = " + fA.points[1].toString());
             // line through eye and barycenter of fA 
             // intersects the plane through fB in one point
             else if (isType == 1)
-            {   
-//System.out.println("isType = 1");                
-                Vector3D pointQ = Plane3D.getIntersectionPoint(lineOP, planeB);
+            {   Vector3D pointQ = Plane3D.getIntersectionPoint(lineOP, planeB);
                 Line3D lineOQ = new Line3D(pointO, pointQ);
                 if (lineOQ.segmentContains(pointP))
                     result = 1; 
                 else
                     result = -1;
-                
-//System.out.println("O = " + pointO.toString());
-//System.out.println("P = " + pointP.toString());
-//System.out.println("Q = " + pointQ.toString());
-/*
-if (result)
-System.out.println("" + index + " is on top of " + cnt);                                    
-else
-System.out.println("" + index + " is not on top of " + cnt);                                    
-*/
-                
             }    
             // line through eye and barycenter of fA 
             // is in the the plane through fB
             // but then eye is in the plane through fB
             // thus we are looking at fB from the side
-            // AND (alles versneden) fB is geheel achter
-            // fA of geheel ervoor
+            // AND (all cut up) fB is completely behind
+            // fA of completely before fA
             else if (isType == 2)
             {   if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
             }    
-            
         }
-        
+        // plane and segment
         else if ((fA.numPoints > 2) && (fB.numPoints == 2))
-        {   
-//System.out.println("plane and segment interchanged");            
-            result = - isOnTop(cnt, index, dis, origin);
+        {    result = - isOnTop(cnt, index, dis, origin);
         }
+        // 2 segments
         else if ((fA.numPoints == 2) && (fB.numPoints == 2))
         {   
-            
-//System.out.println("comparing segments");
-
             Vector3D pointO = new Vector3D(origin.x, origin.y, dis);
-            // dit kan eigenlijk niet
+            // not possible?
             if (fA.trPoints[0].equals(fA.trPoints[1]))
             {   if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
-//System.out.println("fA a point");                
                 return result;
             }
             Line3D tLine = new Line3D(fA.trPoints[0], fA.trPoints[1]);
             // we are seeing only a point of fA
             if (tLine.contains(pointO))
-            {    
-//System.out.println("O on fA");                                
-                
-                if (fA.zValue > fB.zValue)
+            {   if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
-//System.out.println("fA a point");                
                 return result;
             }
-            // dit kan eigenlijk niet
+            // not possible
             if (fB.trPoints[0].equals(fB.trPoints[1]))
-            {
-//System.out.println("fB a point");                                
-                if (fA.zValue > fB.zValue)
+            {   if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
-//System.out.println("fA a point");                
                 return result;
             }    
             Line3D lineB = new Line3D(fB.trPoints[0], fB.trPoints[1]);    
@@ -1287,68 +1308,52 @@ System.out.println("" + index + " is not on top of " + cnt);
             // lineB parallel to planeOA
             // sowieso separated            
             if (isType == 0)
-            {   
-//System.out.println("isType = 0");                                
-                // try this
-                // zValue voldoende want de lijnstukken zijn versneden?
+            {   // try this
+                // zValue sufficient, segments are cut up?
                 if (fA.zValue > fB.zValue)
                     result = 1;
                 else
                     result = -1;
-//System.out.println("fA a point");                
                 return result;
             }
             // lineB cuts planeOA in a point
             else if (isType == 1)
-            {   
-//System.out.println("isType = 1");                
-                Vector3D pointQ = Plane3D.getIntersectionPoint(lineB, planeOA);       
+            {    Vector3D pointQ = Plane3D.getIntersectionPoint(lineB, planeOA);       
                 boolean triangleOUVcontainsQ = 
                     Plane3D.triangleContainsPoint(pointO, 
                         fA.trPoints[0], fA.trPoints[1], pointQ);
-                boolean pointQinsidefB = Line3D.segmentContainsPoint(
-                    fB.trPoints[0], fB.trPoints[1], pointQ);
-// dit gebeurt bijna nooit!                    
-                //return !(triangleOUVcontainsQ && pointQinsidefB);    
                 if (!triangleOUVcontainsQ)
                     result = 1;
                 else    
                     result = -1;
-/*                
-                if (triangleOUVcontainsQ)
-                    return false;
-                else 
-                    return (fA.zValue > fB.zValue);
-*/                    
-                
             }
             // lineB is in planeOA
             else if (isType == 2)
-            {   
-//System.out.println("isType = 2");                                                                
-                // randgeval: fA en fB op een lijn
+            {   // fA en fB on the same line
                 if (lineB.contains(fA.trPoints[0]) &&
                     lineB.contains(fA.trPoints[1]))
                     return 0;    
-                else  // anders dit, want fA kan fB niet snijden
-                {   
-                    
-                    if (fA.zValue > fB.zValue)
+                else  // fA cannot intersect fB (all cut up)
+                {   if (fA.zValue > fB.zValue)
                        result = 1;
                     else
                         result = -1;
-//System.out.println("fA a point");                
                     return result;
-                    
                 }    
             }    
-            // mijn eenvoudige oplossing
-            //result = (fA.zValue > fB.zValue);
         }
-        
         return result;
     }    
-    
+    /**
+     * in view space project the transformed facet with index indexA and the transformed facet with
+     * indexB from (origin.x,origin.y,dis) on the plane z = 0 and check if the polygonal projections
+     * are separated (i.e. they do not intersect)
+     * @param indexA first transformed facet
+     * @param indexB second transformed facet
+     * @param dis viewing distance
+     * @param o origin of view space
+     * @return true/false
+     */
     public boolean projectionsSeparated(int indexA, int indexB,
                                         double dis, Vector3D o)
     {   Facet3D fA = facets[indexA];
@@ -1356,11 +1361,17 @@ System.out.println("" + index + " is not on top of " + cnt);
         Polygon2D pA = fA.project2D(dis, o);
         Polygon2D pB = fB.project2D(dis, o);
         return pA.isSeparatedFrom(pB, true);            
-
     }
-    // transform all vertices to view space using the matrix mat
-    // leave world space vertices unchanged
-    // redefine for subclass ObjectGroup3D        
+    /**
+     * transform all vertices to view space using the matrix m
+     * leave world space vertices unchanged
+     * if zZort == true, sort the facet array by zValue
+     * taking m == null only sorts the facets if zZort == true 
+     * redefined for subclass ObjectGroup3D
+     * @param m transformation matrix
+     * @param dis viewing distance in view space
+     * @param zSort should the facet array be sorted (by zValue)? 
+     */
     public void transformBy(Matrix3D m, double dis, boolean zSort)
     {   int lNumVertices = numVertices;
     	Vector3D[] lVertices = vertices;
@@ -1368,20 +1379,14 @@ System.out.println("" + index + " is not on top of " + cnt);
     	int lNumFacets = numFacets;
     	Facet3D[] lFacets = facets;
     	Object3D topParent = topParent();
-    	
-    	// taking m == null only sorts
         if (m != null)
-        {   Vector3D temp;
-            //for (int i = 0; i < lNumVertices; i++)
-        	for (int i = lNumVertices - 1; i >= 0; i--)
-            {   //Object3D topParent = topParent();
-                // center the object(group) here!!
+        {   for (int i = lNumVertices - 1; i >= 0; i--)
+            {   // center the object(group) in world space here!!
                 lTrVertices[i] = m.transform(
                     Vector3D.minus(lVertices[i], topParent.center));
             }
-            //for (int i = 0; i < lNumFacets; i++)
         	for (int i = lNumFacets - 1; i >= 0; i--)
-            {   // notify facet[i] to reference the correct transformed 3-points
+            {   // notify facet[i] to reference the correct transformed 3space-points
                 lFacets[i].updateTrPoints(lTrVertices);
                 lFacets[i].calculateZValue(m.origin, dis);
                 // unit normal stays in  (0, 0, 0)
@@ -1392,28 +1397,19 @@ System.out.println("" + index + " is not on top of " + cnt);
         if (zSort)
             zMergeSort();
     }
-    
-// nodig?    
-/*
-    // transform the object in world space (irreversible)
-    public void oTransform()
-    {   for (int i = 0; i < numVertices; i++)
-            vertices[i] = oMat.oTransform(vertices[i]);
-        for (int i = 0; i < numFacets; i++)
-        {   // notify facet[i] to reference the correct o-transformed 3-points
-            facets[i].updatePoints(vertices);
-            facets[i].normal = oMat.onTransform(facets[i].normal);
-        }
-    }
-*/    
-
-    // merge sort ALL facets by zValue, speed O(n log_2 n)    
+    /**
+     *  merge sort ALL facets by zValue, speed O(n log_2 n)
+     */
     public void zMergeSort()
     {   facets = mergeSort(facets);
     }    
+    /**
+     * standard merge sort algorithm, recursive method 
+     * @param list an array of Facet3D to be sorted
+     * @return an array containing the same Facet3D, now sorted by zValue 
+     */
     public Facet3D[] mergeSort(Facet3D[] list)
-    {   
-    	if (list == null)
+    {   if (list == null)
     		return list;
     	int listLength = list.length;
     	if (listLength == 1)
@@ -1428,12 +1424,16 @@ System.out.println("" + index + " is not on top of " + cnt);
         list1 = mergeSort(list1);
         list2 = mergeSort(list2);
         return merge(list1, list2);
-    }    
+    }  
+    /**
+     * mergesort two arrays of Facet3D by zValue   
+     * @param list1 first array
+     * @param list2 second array
+     * @return the merged array
+     */
     public Facet3D[] merge(Facet3D[] list1, Facet3D[] list2)
-    {   
-    	int list1Length = list1.length;
+    { 	int list1Length = list1.length;
     	int list2Length = list2.length;
-    	
     	Facet3D[] list = new Facet3D[list1Length + list2Length];
         int index1 = 0;
         int index2 = 0;
@@ -1470,16 +1470,20 @@ System.out.println("" + index + " is not on top of " + cnt);
         } // while
         return list;
     }  
-    // end merge sort methods
-    
-    // set facets[i] visible
-    // works also for groups
+    /**
+     * set facets[i] visible, no error check for i between zero and numFacets;
+     * works also for objectgroups after calling fixFacetArray()
+     * @param i index of facet to be set visible/invisible
+     * @param visible true/false
+     */
     public void setVisible(int i, boolean visible)
     {   facets[i].visible = visible;
     }
-    
-    // set this object visible
-    // redefine to set object flaggs correctly
+    /**
+     * set this object visible/invisible by setting its facets visible/invisible
+     * redefined for subclass ObjectGroup3D
+     * @param vis true/false
+     */
     public void setVisible(boolean vis)
     {   visible = vis;
         for (int i = 0; i < numFacets; i++)
@@ -1519,11 +1523,11 @@ System.out.println("" + index + " is not on top of " + cnt);
             }
         }
     }
-    
-    
-    // set this object outlined, skip empty and 2-dim facets
-    // avoid disappearance
-    // REDEFINE
+    /**
+     * set all facets of this Object3D to outlined/not outlined; omit the outline only when the
+     * facet is filled; redefined for subclass ObjectGroup3D
+     * @param outline true/false
+     */
     public void setOutlined(boolean outline)
     {   if (outline)
         {   outlined = true;
@@ -1536,8 +1540,7 @@ System.out.println("" + index + " is not on top of " + cnt);
         {   if (filled)
             {   outlined = false;
                 for (int i = 0; i < numFacets; i++)
-                {   
-                    // 2-dim facets are never filled, correct here
+                {   // 2-dim facets are never filled, correct here
                     if (facets[i].numPoints > 2)
                         facets[i].outlined = false;
                 }
@@ -1559,10 +1562,11 @@ System.out.println("" + index + " is not on top of " + cnt);
     	}
     	
     }
-    
-    // fill the facets of this object
-    // avoid disappearance
-    // MUST be redefined to set correctly set the object(group) flaggs
+    /**
+     * set all facets of this Object3D to filled/not filled; omit filling only when the
+     * facet is outlined; redefined for subclass ObjectGroup3D
+     * @param fill true/false
+     */
     public void setFilled(boolean fill)
     {   if (fill)
         {   filled = true;
@@ -1588,9 +1592,12 @@ System.out.println("" + index + " is not on top of " + cnt);
         {   setEmpty(i, false);
         }
     }
-    // check if this Object3D contains f
-    // redefine for subclass ObjectGroup3D
-    // necesary for ObjectClicked
+    /**
+     * check if this Object3D contains facet f
+     * redefined for subclass ObjectGroup3D
+     * @param f the facet to be checked
+     * @return true/false
+     */
     public Object3D objectContains(Facet3D f)
     {   Object3D result = null;
         if (containsFacet(f) >= 0)
@@ -1958,7 +1965,7 @@ System.out.println("" + index + " is not on top of " + cnt);
         return edgeWithPoint;
     }
 
-// versie 2: aanwijzen van een punt op en edge met mogelijkheid tot tick marks
+// versie 2: aanwijzen van een punt op een edge met mogelijkheid tot tick marks
 // en in de return ook het Factet3D om te kijken of het punt uberhaupt aangeklikt mag
 // worden!
     public FacetWithEdgePoint facetWithEdgePointClicked(
@@ -2247,6 +2254,10 @@ System.out.println("" + index + " is not on top of " + cnt);
     }
 } // class Object3D
 
+/**
+ * a real vector in the x-y-plane 
+ * @author huub
+ */
 class Vector2D
 {   public double x;
     public double y;
@@ -2258,7 +2269,10 @@ class Vector2D
     {   return Math.sqrt((x - v.x) * (x - v.x) + (y - v.y) * (y - v.y));
     }    
 }
-
+/**
+ * a wrapper class containg a Facte3D and one of its vertices
+ * @author huub
+ */
 class FacetWithVertex
 {   public Vector3D vertex;
     public Facet3D facet;
@@ -2267,6 +2281,10 @@ class FacetWithVertex
         facet = f;
     }
 }
+/**
+ * a wrapper class containg a Facet3D and one of its edges with an additional point on that edge, see class EWP  
+ * @author huub
+ */
 class FacetWithEdgePoint
 {   public Vector3D[] edgeWithPoint;
     public Facet3D facet;
@@ -2275,8 +2293,11 @@ class FacetWithEdgePoint
         facet = f;
     }
 }
-    
-// just a wrapper
+/**
+ * a wrapper class containing three 3d-points (in world space):
+ * the start-point of an edge, the end point of an edge and a point on that edge  
+ * @author huub
+ */
 class EWP
 {   public Vector3D[] edgeWithPoint;
     public EWP(Vector3D[] ewp)

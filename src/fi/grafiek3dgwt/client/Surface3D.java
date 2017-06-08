@@ -1,6 +1,5 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.Color;
 import fi.grafiek3dgwt.client.expressies.*;
 
 

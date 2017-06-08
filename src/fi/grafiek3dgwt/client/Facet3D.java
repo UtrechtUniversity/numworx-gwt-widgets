@@ -1,27 +1,27 @@
 package fi.grafiek3dgwt.client;
 
-
-import java.awt.*;
-//import java.io.Serializable;
-
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-
-// a facet of a 3D figure, i.e. a polygon with its points located in some
-// plane of 3-space
-// the facet contains only references to instances of vertices in the
-// object vertices array to which the facet belongs. Thus
-// at construction time the vertices array of the object to which this facet
-// belongs must be have been created and initialized with the objects vertices
-// the transformed vertices of the facet cannot be referenced in the constructor
-// since the objects array of transformed vertices at this stage only contains
-// null pointers so that a method is needed to get the correct references
-// when they are available
-// the objects arrays of (transformed) vertices should NOT be changed
-// otherwise the indices do not make sense anymore
-public class Facet3D //implements Serializable
+/**
+ * a facet of a 3D object, i.e. a polygon with its points located in some plane of 3-space (the world space);
+ * at construction, the points of the facet are specified by giving the indices of the vertices (vectors in 3-space)
+ * in the the vertex array of the 3D object to which the facet belongs (see class Object3D). Thus when calling the
+ * constructor, the vertex array of the 3D object to which this facet belongs must be have been created and filled with vertices; <br>
+ * if the Facet3D belongs to a convex Object3D, make sure the vertices of the Facet3D are listed clockwise when viewing the Object3D 
+ * from the outside, in order to obtain correct fill colors for the Facet3D, when the inside of the Facet3D should be painted in gray; <br>
+ * the vertices of the 3D object and thus of all its facets have transformed coordinated in view space;
+ * the transformed coordinates of the 3D object are not available at construction of the facet, but are calculated when  
+ * needed by calling the method updateTrPoints(); if the 3D object's points in world space are changed, the facet is
+ * updated using method updatePoints(); <br>
+ * for a Facet3D drawing of the edges or the inside can be skipped; if the inside of a Facet3D is drawn, facets which are 
+ * "behind" the Facet3D will not be visible, if only the edges of the Facet3D are drawn, edges and/or the inside of facest 
+ * which are "behind" the Facet3D will be drawn in "hidden colors", derived from their basic colors, see method
+ * paintFacet3D()  
+ * @author huub
+ */
+public class Facet3D 
 {   
 	public static final CssColor darkGreen = CssColor.make(41, 156, 57);
     public static final CssColor mediumGreen = CssColor.make(173, 222, 99);
@@ -34,123 +34,180 @@ public class Facet3D //implements Serializable
     public static final CssColor red = CssColor.make(255,0,0);
     public static final CssColor orange = CssColor.make(255,200,0);
     
-	
-    //public final Color darkGreen = new Color(41, 156, 57); 
-    //public final Color mediumGreen = new Color(173, 222, 99);
-    //public static final Color brownRed = new Color(214, 0, 0);
-    //public static final Color lightRed = new Color(255, 156, 74);
-    //public static final Color mediumBlue = new Color(99, 198, 222);    
-	
-	// public attributes
-    // the number of 3D points in the facet
+    /**
+     * the number of 3D points in the facet
+     */
     public int numPoints;
-    // indices of the points in the real/integer arrays of the object
-    // to which this facet belongs
+    /**
+     * indices of the 3D points in the arrays of (transformed) vertices of the 3D object to which this facet belongs
+     */
     public int[] indices;
-    // the 3D real points of the facet, references only, world space
+    /**
+     * the 3D real points of the facet, world space
+     */
     public Vector3D[] points;
-    // the transformed real points of the facet, references only, view space
+    /**
+     * the transformed 3D real points of the facet, view space
+     */
     public Vector3D[] trPoints;
-    // drawing individual vertices
+    /**
+     * individual vertices can be drawn in a different manner by coding them, see method paintFacet3D 
+     */
     public int[] vertexCodes;        
-    // drawing individual edges
+    /**
+     * individual edges can be drawn in a different manner by coding them, see method drawPolygon 
+     */
     public int[] edgeCodes;   
-    // drawing labels for vertices
+    /**
+     * labels for the vertices; construct for the 3D object to which the facet belongs an array with vertex labels and
+     * copy these labels into the facets in the same way as the points (the indices of the labels in the vertex label array are known); <br>
+     * note that the vertex labels of 3D object can only be drawn by means of drawing the facets. 
+     */
     public String[] vertexLabels;
-    
-    //public static Font vertexFont = new Font("SansSerif", Font.ITALIC, 12);
-        
-// hier vertexLabels, references to Strings
-// regel:
-// maak de vertexlabels van een object in initObject,
-// dus na initObject de vertexlabels "zetten"
-// initialiseer daarna de vertex labels van de facets
-// ze staan op dezelfde plaatsen als de vertices
-// vgl. updatePoints
-// voor het tekenen heb je de vertexLabels HIER nodig
-    
-    // normal vector of the polygon and its unitary transformed
-    public Vector3D normal, unitNormal;
-    // reference to all vertices array
-//    public Vector3D[] allPoints;
-    // true if edges should be drawn
-    public boolean outlined = true;
-    // true if filled
-    // note that this facet in this situation can still be clicked
-    public boolean filled = true;
-    // true if neither outline nor filling
-    // note that this facet in this situation can still be clicked
-    public boolean empty = false;
-    // to be drawn or not, if not drawn not clickable
-    public boolean visible = true;
-    // the color of the facet
+    /**
+     * normal vector of the Fact3D world space
+     */
+    public Vector3D normal;
+    /**
+     * normal vector of length 1 of the transformed Facet3D in view space
+     */
+    public Vector3D unitNormal;
+    /**
+     * the basic color of the inside of the Facet3D (if drawn), see fillColor
+     */
     public CssColor color;
-    // the color of the outline
+    /**
+     * should the edges of the Facet3D be drawn?
+     */
+    public boolean outlined = true;
+    /**
+     * should the inside of the Facet3D be drawn? if not, the Facet3D is still clickable  
+     */
+    public boolean filled = true;
+    /**
+     * true if neither outlined nor filled; an empty Facet3D is still clickable if visible == true(!) 
+     */
+    public boolean empty = false;
+    /**
+     * is the Facet3D visible? if not, the Facet3D is not clickable
+     */
+    public boolean visible = true;
+    /**
+     * the color of the edges of the Facet3D 
+     */
     public CssColor outlineColor = CssColor.make(0,0,0);
     // the actual fill color used (thus adapted for shadow etc)
+    /**
+     * the actual color of the inside of the Facet3D, that is "color" adapted for shadow etc. 
+     */
     public CssColor fillColor;
-
-// changing via rebuild!    
-    // how to draw "hidden" outlines in non-filled mode
-    // voor later 0 = lighter, 1 = dashed 2 = dashed and lighter    
-    public int hiddenOutlineMode = 0; //Grafiek3DComponent.hiddenOutlineMode;
+    /**
+     *  how to draw "hidden" outlines when the facets of an Object3D are  not filled:
+     *  0 = lighter, 1 = dashed 2 = dashed and lighter; to change this mode, rebuild the Object3D 
+     */
+    public int hiddenOutlineMode = 0; 
     
-    // colors for edges, reference sufficient
-    // these are the non-hidden colors
+    /**
+     * Doorzien: basic (non-hidden) color for lines 
+     */
     public CssColor lineColor = blue;
+    /**
+     * Doorzien: basic (non-hidden) color for the edges of a plane 
+     */
     public CssColor planeOutlineColor = brownRed;    
+    /**
+     * Doorzien: basic (non-hidden) color for points 
+     */
     public CssColor pointColor = darkGreen;
-    
-    //public Color[] edgeColors = Grafiek3DComponent.edgeColors;
+    /**
+     * possible edge colors
+     */
     public CssColor[] edgeColors =
 		{outlineColor, lineColor, planeOutlineColor, pointColor};
-
-    // average height above x-y-plane after transforming to
-    // view space, needed for Painter's Algo etc.
+    /**
+     * average height above x-y-plane after transforming to view space; see method paintObject3D() in class Object3D
+     */
     public double zValue;
-    // barycenter in view space
+    /**
+     * the barycenter of the transformed Facet3D in view space
+     */
     public Vector3D barycenter;
-    
-    // voor Doorzien
+    /**
+     * Doorzien: drawing a line on a Feacet3D or cutting an Object3D with a plane subdivides the facets involved;
+     * if a Facet3D is a subdivision, remember the "parent" Facet3D  
+     */
     Facet3D isReplacementOf;
-    
-    // dash length in pixels
+    /**
+     * dash length in pixels
+     */
     public static int DASH = 4;
-    
-    // "highlighting points"
+    /**
+     * thickened vertex size
+     */
     public static int BIGPOINT = 7;
+    /**
+     * normal vertex size
+     */
     public static int SMALLPOINT = 4;
+    /**
+     * should the vertices be thickened? 
+     */
     boolean thickenVertices = false;
-
-    Vector3D[] tickStart;
-    Vector3D[] tickStep;
+    /**
+     * Doorzien: each edge can contain additional points: "ticks";
+     * numTicks is the number of ticks for each edge 
+     */
     int[] numTicks;
+    /**
+     * Doorzien: for each edge, the first tick (if any) in world space
+     */
+    Vector3D[] tickStart;
+    /**
+     * Doorzien: for each edge, if numTicks is larger then 1, the second tick on the edge; subsequent ticks can then be calculated from 
+     * tickStart and tickStep; see method findTransformedTickmarks()
+     */
+    Vector3D[] tickStep;
+    /**
+     * should the ticks on the individual edges be drawn?
+     */
     boolean[] drawTicks; 
+    /**
+     * are ticks visible?
+     */
     boolean ticksVisible = false;
+    /**
+     * color of the ticks when non-hidden
+     */
     public CssColor tickColor = darkGreen;
+    /**
+     * color of the ticks when hidden
+     */
     public CssColor hiddenTickColor = mediumGreen;
-    
-// zorg in edgeClicked dat je ook alleen de ticks 
-// mag aanklikken!!!!!!
-    
+    /**
+     * should the vertex labels be drawn? in Doorzien the vertex labels of the basic 3d-objects are letters, more letters are
+     * added whenever new points are added to the 3d-object; see also class Axes   
+     */
     boolean letters = false;
+    /**
+     * the color of the vertex labels
+     */
     public CssColor letterColor = CssColor.make(0,0,0);
-    
+    /**
+     * is this Facet3D a facet (segment) of a coordinate axis? see class Axes 
+     */
     boolean isOnAxis = false;
     
-    // constructor from vertices and indices
+    /**
+     * constructor
+     * @param pts the array containing all the vertices of the Object3D to which this Facet3D will belong
+     * @param inds the array containing the indices of the vertices in pts which should be part of this Facet3D
+     * @param c the color of this Facet3D when filled
+     */
     public Facet3D(Vector3D[] pts, int[] inds, CssColor c)
-    {   // set reference
-//        allPoints = pts;
-        // init indices
-        indices = inds; // new int[inds.length];
-        // get the number of points in the facet as the length
-        // of indices
+    {   // init indices
+        indices = inds; 
+        // get the number of points in the facet as the length of indices
         numPoints = indices.length;
-
-//if (numPoints <= 1)
-//System.out.println("numPoints = " + numPoints);
-
         // note the 2 times new
         points = new Vector3D[numPoints];
         trPoints = new Vector3D[numPoints];
@@ -160,21 +217,20 @@ public class Facet3D //implements Serializable
         edgeCodes = new int[numPoints];
         // initialized as null
         vertexLabels = new String[numPoints];
-        // coordinate of first tick point
         // initialized as null        
         tickStart = new Vector3D[numPoints];
-        // coordinate of second tick point (if any)
         // initialized as null        
         tickStep = new Vector3D[numPoints];
         // initialized as zero
         numTicks = new int[numPoints];
         // initialized as false
         drawTicks = new boolean[numPoints];
-        
+        // get the vertices of the Facet3D
         for (int i = 0; i < numPoints; i++)
-        {   // allPoints[indices[i]] is the Vector3D we need
+        {   // pts[indices[i]] is the Vector3D we need
             points[i] = pts[indices[i]];
-trPoints[i] = points[i];            
+            // temporary
+            trPoints[i] = points[i];            
         }
         // set fill color
         color = c;
@@ -185,35 +241,48 @@ trPoints[i] = points[i];
         // is calculated after transforming normal
         unitNormal = new Vector3D();
     }
-    
-    // called if vertices have been changed
+    /**
+     * update the points of the Facet3D when the vertices of the object have been changed  
+     * @param pts the vertex array of the object to which the Facet3D belongs
+     */
     public void updatePoints(Vector3D[] pts)
     {   for (int i = 0; i < numPoints; i++)
             points[i] = pts[indices[i]];
         setNormal();    
     }
-    
-    // called if transformed vertices have been changed
+    /**
+     * update the transformed points of the Facet3D when the transformed vertices of the object have been changed  
+     * @param trPts the transformed vertex array of the object to which the Facet3D belongs
+     */
     public void updateTrPoints(Vector3D[] trPts)
     {   for (int i = 0; i < numPoints; i++)
             trPoints[i] = trPts[indices[i]];
     }
-    // assume only consecutive vertices can coincide
+    /**
+     * check if two consecutive points are identical, if yes, delete one of them; <br>
+     * "double points" can occur in the case of parametrized surfaces and cause problems 
+     * when calculating the normal vector   
+     */
     public void checkDoublePoints()
     {   for (int i = 0; i < numPoints; i++)
         {   if (Vector3D.equals(points[i], points[(i + 1) % numPoints]))
                 deletePoint(i);
         }
     }
+    /**
+     * delete the facet-point at points[index] 
+     * @param index index of point to be deleted
+     */
     private void deletePoint(int index)
-    {   // shift for index = 0 to index = numPoints - 2
-        for (int i = index + 1; i < numPoints - 1; i++)
+    {   for (int i = index + 1; i < numPoints-1; i++)
         {   indices[i] = indices[i + 1];
             points[i] = points[i + 1];
         }
         numPoints--;
     }
-    // find untransformed normal vector
+    /**
+     * find the normal vector of the Facet3D in world space
+     */
     public void setNormal()
     {   // point
         if (numPoints <= 1)
@@ -232,25 +301,24 @@ trPoints[i] = points[i];
             {   v2 = Vector3D.minus(points[index], points[0]);
                 index++;
             }
-            normal = Vector3D.crossProduct(v1, v2); // which could be 0-vector
+            normal = Vector3D.crossProduct(v1, v2); // which could be the 0-vector
         }
     }
-    
+    /**
+     * replace the normal vector by its opposite
+     */
     public void reverseNormal()
     {
     	normal = new Vector3D(-normal.x, -normal.y, -normal.z);
     }
-    // average z-coordinate of vertices of trPoints!
-    // used after transforming
+    /**
+     * average z-coordinate of the transformed vertices of this Facet3D corrected for
+     * viewing from (origin.x,origin.y,distance) 
+     * @param origin origin of view space
+     * @param distance distance for viewing in view space (on the positive z-axis)
+     */
     public void calculateZValue(Vector3D origin, double distance)
-    {   
-/*        
-        double zSum = 0;
-        for (int i = 0; i < numPoints; i++)
-            zSum += trPoints[i].z;
-        zValue= zSum / numPoints;
-*/        
-        
+    {   // find barycenter of transformed Facet3D
         double bX = 0;
         double bY = 0;        
         double bZ = 0;                
@@ -259,16 +327,13 @@ trPoints[i] = points[i];
             bY += trPoints[i].y;
             bZ += trPoints[i].z;
         }
-        Vector3D bC = new Vector3D(
-            bX / numPoints, bY / numPoints, bZ / numPoints);
+        Vector3D bC = new Vector3D(bX / numPoints, bY / numPoints, bZ / numPoints);
         Vector3D eye = new Vector3D(origin.x, origin.y, distance);    
         zValue = distance - Vector3D.distance(bC, eye);    
-        
-        
-        
     }
-    
-    
+    /**
+     * calculate the attribute barycenter of the Facet3D
+     */
     public void calculateBarycenter()
     {   double xSum = 0;
         double ySum = 0;
@@ -281,15 +346,16 @@ trPoints[i] = points[i];
         barycenter = new Vector3D(
             xSum / numPoints, ySum / numPoints, zSum / numPoints);
     }
-    
-    // project the transformed facet on the plane z = 0 from
-    // distance = d > 0 in the positive direction of the z-axis,
-    // thus from the view point (o.x, o.y, d)
-    // projecting on another plane can be done analogously
+    /**
+     * view space: project the transformed facet on the plane z = 0 from
+     * distance = d (positive double) in the positive direction of the z-axis,
+     * thus from the view point (o.x, o.y, d)
+     * @param d the distance from o on the positive z-axis
+     * @param o the origin of the view space
+     * @return the projected Facet3D as a Polygon (integer coordinates)
+     */
     public Polygon project(double d, Vector3D o)
-    {   //if (!visible)
-        //    return null;
-        // projected polygon
+    {   // find projection Polygon
         int nPoints = numPoints;
         int[] xPoints = new int[numPoints];
         int[] yPoints = new int[numPoints];
@@ -303,12 +369,16 @@ trPoints[i] = points[i];
         }
         return new Polygon(xPoints, yPoints, nPoints);
     }
-
-    // exact REAL projection
+    /**
+     * view space: project the transformed facet on the plane z = 0 from
+     * distance = d (positive double) in the positive direction of the z-axis,
+     * thus from the view point (o.x, o.y, d)
+     * @param d the distance from o on the positive z-axis
+     * @param o the origin of the view space
+     * @return the projected Facet3D as a Polygon2D (real coordinates)
+     */
     public Polygon2D project2D(double d, Vector3D o)
-    {   //if (!visible)
-        //    return null;
-        // projected polygon
+    {   // find projection Polygon2D
         int nPoints = numPoints;
         double[] xPoints = new double[numPoints];
         double[] yPoints = new double[numPoints];
@@ -322,7 +392,15 @@ trPoints[i] = points[i];
         }
         return new Polygon2D(xPoints, yPoints, nPoints);
     }
-
+   /**
+     * view space: project the points in the array points on the plane z = 0 from
+     * distance = d (positive double) in the positive direction of the z-axis,
+     * thus from the view point (o.x, o.y, d)
+     * @param points the 3D-points in view space to project
+     * @param d the distance from o on the positive z-axis
+     * @param o the origin of the view space
+     * @return the projections 
+     */
     public Point[] projectPoints(Vector3D[] points, double d, Vector3D o)
     {   Point[] result = new Point[points.length];
         for (int i = 0; i < points.length; i++)
@@ -1310,9 +1388,13 @@ if (gray < 0)
                 copy.normal = new Vector3D();
         }    
     }
-    // check if this facet contains v as vertex
-    // cannot be done by reference, v might belong to another object!
-    // return -1 (no) or index of v in this facet
+    /**
+     * check if Facet3D f contains vertex v, this cannot be done by reference, 
+     * since v might belong to another object!
+     * @param f the Facet3D
+     * @param v the vertex v
+     * @return -1 (no) or the index of vertex v in Facet3D
+     */
     public static int containsVertex(Facet3D f, Vector3D v)
     {   int index = -1;
         for (int i = 0; i < f.numPoints; i++)
@@ -1321,9 +1403,13 @@ if (gray < 0)
         }
         return index;
     }
-    // necessary to find adjacent facets
-    // check if this facet contains the directed segment v1->v2 as
-    // a side, return -1 (no) or index of v1 in this facet
+    /**
+     * check if Facet3D f contains the directed edge v1v2, necessary to find adjacent facets
+     * @param f the Facet3D
+     * @param v1 start of directed edge v1v2
+     * @param v2 end of directed edge v1v2
+     * @return return -1 (no) or the index of vertex v1 in Facet3D
+     */
     public static int containsEdge(Facet3D f, Vector3D v1, Vector3D v2)
     {   int index1 = containsVertex(f, v1);
         if (index1 < 0)
@@ -1446,13 +1532,16 @@ if (gray < 0)
         }    
         return false;
     }
-    // check if this facet equals Facet3D f in this sense:
-    // both contain the same set of vertices AND the
-    // directed vertex arrays are equal up to cyclic permutation
-    // thus facets must have the same orientation
-    // return -1 (not equal) or index of vertex in f that corresponds to
-    // points[0] of this vertex
-    // normally we compare by reference
+    /**
+     * check if Facet3d f1 equals Facet3D f2 in this sense:
+     * both facets contain the same set of vertices AND the
+     * directed vertex arrays are equal up to cyclic permutation, that is 
+     * the facets have the same orientation
+     * @param f1 first Facet3D
+     * @param f2 second Facet3D
+     * @return return -1 (not equal) or the index of the vertex in Facet3D f2 that corresponds to
+     * points[0] of Facet3D f1
+     */
     public static int isEqualTo(Facet3D f1, Facet3D f2)
     {   if (f1.numPoints != f2.numPoints)
             return -1;
@@ -1469,9 +1558,13 @@ if (gray < 0)
         // if we get up to here the desired equality is reached
         return f2Index;
     }
-    // check if these facets are each others reverse!!
-    // return -1 (not equal) or index of vertex in f that corresponds to
-    // points[0] of this vertex
+    /**
+     * check if Facet3d f1 is (apart from a cyclic permutation of its vertices) the reverse of Facet3D f2
+     * @param f1 first Facet3D
+     * @param f2 second Facet3D
+     * @return return -1 (not each others reverse) or the index of the vertex in Facet3D f2 that corresponds to
+     * points[0] of Facet3D f1
+     */
     public static int isReverseTo(Facet3D f1, Facet3D f2)
     {   if (f1.numPoints != f2.numPoints)
             return -1;
@@ -1491,14 +1584,12 @@ if (gray < 0)
         // if we get up to here the desired equality is reached
         return f2Index;
     }
-    
-/*
-hier wordt een nieuw facet gemaakt (de vertices blijven dezelfde!)
-beter?: draai alleen de vertices om
-van de referentie naar Facet3D f wordt een lokale kopie gemaakt
-dit is geen probleem zie Vector3D
-*/
-    // reverse the orientation of this facet
+    /**
+     * reverse the orientation of Facet3D f, that is reverse the order 
+     * of the indices of the vertices in the vertex array of the Object3D to which f belongs;
+     * the normal vector of f is not changed!
+     * @param f the Facet3D to be reversed
+     */
     public static void reverse(Facet3D f)
     {   // new index array
         int[] indices = new int[f.numPoints];
@@ -1510,7 +1601,11 @@ dit is geen probleem zie Vector3D
             indices[f.numPoints / 2 + 1] = f.indices[f.numPoints / 2 + 1];
         f.indices = indices;    
     }
-
+    /**
+     * find the surface area of Facet3D f 
+     * @param f the Facet3D
+     * @return the surface area of Facet3D f
+     */
     public static double getSurfaceArea(Facet3D f)
     {   double area = 0;
         // find barycenter
@@ -1534,7 +1629,6 @@ dit is geen probleem zie Vector3D
                 Vector3D barProj = Vector3D.projectOn(bary, eDir);
                 Vector3D startProj = Vector3D.projectOn(eStart, eDir);
                 Vector3D projDif = Vector3D.minus(barProj, startProj);
-                
                 Vector3D proj = Vector3D.plus(projDif, eStart);
                 double base = Vector3D.distance(eStart, eEnd);
                 double height = Vector3D.distance(bary, proj);

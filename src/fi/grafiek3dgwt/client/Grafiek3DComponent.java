@@ -765,7 +765,7 @@ System.out.println("ZG = " + UF.format(panel3D.angleZ,2));
         if (grafiek3DExpressie != null)
         {
         	grafiek3DObject = makeGrafiek3D();
-        	grafiek3DObject.modelCode = code;
+//        	grafiek3DObject.modelCode = code;
         	if (modelGroup == null) // geen assen
         	{	
         		modelGroup = new ObjectGroup3D(grafiek3DObject, false);
@@ -784,7 +784,7 @@ System.out.println("ZG = " + UF.format(panel3D.angleZ,2));
         
         if (surfaceXExpressie != null)
         {	surface3DObject = makeSurface3D();
-        	surface3DObject.modelCode = code;
+//        	surface3DObject.modelCode = code;
         	if (modelGroup == null) // geen assen
         	{	
         		modelGroup = new ObjectGroup3D(surface3DObject, false);
@@ -806,7 +806,7 @@ System.out.println("ZG = " + UF.format(panel3D.angleZ,2));
         if (curveXExpressie != null)
         {
         	curve3DObject = makeCurve3D();
-        	curve3DObject.modelCode = code;
+//        	curve3DObject.modelCode = code;
         	if (modelGroup == null) // geen assen
         	{	
         		modelGroup = new ObjectGroup3D(curve3DObject, false);

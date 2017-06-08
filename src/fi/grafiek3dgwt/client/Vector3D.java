@@ -1,15 +1,10 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.Polygon;
-import java.io.Serializable;
-/*
-    real 3-vector utilities
-    matrix utilities
-    geometric classes and utilities
-*/    
-
-// a (row or column) vector, 3D real point
-public class Vector3D implements Serializable
+/**
+ * class containing real 3-vector utilities
+ * @author huub
+ */
+public class Vector3D // implements Serializable
 {   // constants
     // a small number
     public static final double NZero = 1e-9d;
@@ -148,8 +143,11 @@ public class Vector3D implements Serializable
     
 } // class Vector3D
 
-// class representing an affine transformation
-class Matrix3D implements Serializable
+/**
+ * class containing utilities for affine transformations in 3-space
+ * @author huub
+ */
+class Matrix3D
 {   // public for easy access
     // 3x3 matrix, consisting of 3 row vectors
     public Vector3D row1, row2, row3;
@@ -410,7 +408,7 @@ class Matrix3D implements Serializable
     }
 } // class Matrix3D
 
-class Plane3D implements Serializable
+class Plane3D //implements Serializable
 {   // attributes
     // equation representation
     // all vectors x with (n,x)=(n,p) where n normal vector
@@ -744,7 +742,7 @@ class Plane3D implements Serializable
     
 } // class Plane3D   
 
-class Line3D implements Serializable
+class Line3D //implements Serializable
 {   // attributes
     // segment representation
     Vector3D point1, point2;
@@ -1062,24 +1060,58 @@ class Line3D implements Serializable
     
 }  // class Line3D  
 
-// polygon in real plane
+/**
+ * class representing a plane polygon whose points have real coordinates 
+ * @author huub
+ */
 class Polygon2D
-{   double[] xpoints;
+{   /**
+	 * x-coordinates of the points 	
+	 */
+	double[] xpoints;
+	/**
+	 * y-coordinates of the points
+	 */
     double[] ypoints;
+    /**
+     * number of points
+     */
     int npoints;
-    double baX, baY; // barycenter coordinates
+    /**
+     * x-coordinate of barycenter
+     */
+    double baX; 
+    /**
+     * y-coordinate of barycenter
+     */
+    double baY; 
     
+    /**
+     * constructor
+     * @param xpts x-coordinates of the points
+     * @param ypts y-coordinates of the points
+     * @param npts number of points
+     */
     public Polygon2D(double[] xpts, double[] ypts, int npts) 
     {   xpoints = xpts;
         ypoints = ypts;
         npoints = npts;
     }
-    
+    /**
+     * check id the real points (p1X,p1Y) and (p2X,p2Y) 
+     * @param p1X x-coordinate of first point
+     * @param p1Y y-coordinate of first point
+     * @param p2X x-coordinate of second point
+     * @param p2Y y-coordinate of second point
+     * @return true/false
+     */
     boolean equals(double p1X, double p1Y, double p2X, double p2Y)
     {   return Math.sqrt((p1X - p2X) * (p1X - p2X) +
                          (p1Y - p2Y) * (p1Y - p2Y)) < Vector3D.NZero;
     }
-    
+    /**
+     * set the barycenter coordinates of this Polygon2D
+     */
     void findBarycenter()
     {   baX = 0;
         baY = 0;
@@ -1090,78 +1122,72 @@ class Polygon2D
         baX /= npoints;
         baY /= npoints;
     }    
-    
-    // this MOET een vlakje zijn
+    /**
+     * check if the point (x,y) is inside this Polygon2D which is assumed 
+     * to have 3 different non-collinear points 
+     * @param x x-coordinate of check point
+     * @param y y-coordinate of check point
+     * @return true/false
+     */
     public boolean isInternal(double x, double y) 
-    {
-        
-// later: sneller        
-//        if (getBoundingBox().inside(x, y)) 
-//        {
-            findBarycenter();
-            
-            boolean result = true;
-            
-            // Walk the edges of the polygon
-            for (int n = 0; n < npoints; n++) 
-            {
-                double xStart =  xpoints[n];
-                double yStart = ypoints[n];
-                double xEnd = xpoints[(n + 1) % npoints];
-                double yEnd = ypoints[(n + 1) % npoints];
-                
-                // line through start and end has directional
-                // vector (xEnd-xStart, yEnd-yStart)
-                // thus normal vector 
-                // (yEnd-yStart, -(xEnd-xStart)) when (xEnd-xStart) not 0
-                // (-(yEnd-yStart), xEnd-xStart) when (yEnd-yStart) not 0
-                double dx = xEnd-xStart;
-                double dy = yEnd-yStart;
-                double nX = 0;
-                double nY = 0;
-                if (Math.abs(dx) > Vector3D.NZero)
-                {   nX = dy;
-                    nY = -dx;
-                }
-                else // points supposed different
-                {   nX = -dy;
-                    nY = dx;
-                }
-                // equation of the line is
-                // nX * X + nY * Y = nX * xStart + nY * yStart
-                // the position of the barycenter relative to the
-                // line is given by the double(!)
-                // nX * baX + nY * baY - nX * xStart - nY * yStart
-                // which is either > 0 or < 0
-                double baPos = nX * baX + nY * baY 
-                             - nX * xStart - nY * yStart;
-                
-                double pointPos = 
-                    nX * x + nY * y - nX * xStart - nY * yStart;
-                    
-                result = result && 
-                   (
-                    (
-                     ((baPos > Vector3D.NZero) && (pointPos > Vector3D.NZero)) ||
-                     ((baPos < -Vector3D.NZero) && (pointPos < -Vector3D.NZero))
-                    )
-                   );
-                // exit if (x,y) not on same side of ba for some edge    
-                if (!result)
-                    return false;
+    {   findBarycenter();
+        boolean result = true;
+        // Walk the edges of the polygon
+        for (int n = 0; n < npoints; n++) 
+        {   double xStart =  xpoints[n];
+            double yStart = ypoints[n];
+            double xEnd = xpoints[(n + 1) % npoints];
+            double yEnd = ypoints[(n + 1) % npoints];
+            // line through start and end has directional
+            // vector (xEnd-xStart, yEnd-yStart)
+            // thus normal vector 
+            // (yEnd-yStart, -(xEnd-xStart)) when (xEnd-xStart) not 0
+            // (-(yEnd-yStart), xEnd-xStart) when (yEnd-yStart) not 0
+            double dx = xEnd-xStart;
+            double dy = yEnd-yStart;
+            double nX = 0;
+            double nY = 0;
+            if (Math.abs(dx) > Vector3D.NZero)
+            {   nX = dy;
+                nY = -dx;
+            }
+            else // points supposed different
+            {   nX = -dy;
+                nY = dx;
+            }
+            // equation of the line is
+            // nX * X + nY * Y = nX * xStart + nY * yStart
+            // the position of the barycenter relative to the
+            // line is given by the double(!)
+            // nX * baX + nY * baY - nX * xStart - nY * yStart
+            // which is either > 0 or < 0
+            double baPos = nX * baX + nY * baY - nX * xStart - nY * yStart;
+            double pointPos = nX * x + nY * y - nX * xStart - nY * yStart;
+            result = result && 
+               (
+                (
+                 ((baPos > Vector3D.NZero) && (pointPos > Vector3D.NZero)) ||
+                 ((baPos < -Vector3D.NZero) && (pointPos < -Vector3D.NZero))
+                )
+               );
+            // exit if (x,y) not on same side of ba for some edge    
+            if (!result)
+                return false;
             } // for
-
             return result;
-            
-//        } // if (getBoundingBox().inside(x, y))
     }
-    
+    /**
+     * determine if the line through the edge with index edgeIndex of this Polygon2D does not intersect
+     * Polygon2D pB
+     * @param edgeIndex index of edge
+     * @param pB the Polygon2D
+     * @return true (no intersection)/false (intersection)
+     */
     public boolean isOutside(int edgeIndex, Polygon2D pB)
-    {   double xStart =  xpoints[edgeIndex];
+    {   double xStart = xpoints[edgeIndex];
         double yStart = ypoints[edgeIndex];
         double xEnd = xpoints[(edgeIndex + 1) % npoints];
         double yEnd = ypoints[(edgeIndex + 1) % npoints];
-                
         // line through start and end has directional
         // vector (xEnd-xStart, yEnd-yStart)
         // thus normal vector 
@@ -1187,30 +1213,34 @@ class Polygon2D
         // which is either > 0 or < 0
         double baPos = nX * baX + nY * baY 
                      - nX * xStart - nY * yStart;
-        boolean result = true;             
+        boolean result = true;
+        // true if all points of pB and the barycenter of pB
+        // are on the same side of the line
         for (int i = 0; i < pB.npoints; i++)
-        {
-            double pointPos = nX * pB.xpoints[i] + nY * pB.ypoints[i]
+        {   double pointPos = nX * pB.xpoints[i] + nY * pB.ypoints[i]
                             - nX * xStart - nY * yStart;
-
             result = result &&
-                     ((baPos > Vector3D.NZero) && 
-                      (pointPos <= Vector3D.NZero)) ||
-                     ((baPos < -Vector3D.NZero) && 
-                      (pointPos >= -Vector3D.NZero));
+                     ((baPos > -Vector3D.NZero) && 
+                      (pointPos > -Vector3D.NZero)) ||
+                     ((baPos < Vector3D.NZero) && 
+                      (pointPos < Vector3D.NZero));
             if (!result)
                 return false;    
         }
         return result;
     }
-
-    
+    /**
+     * determine if the all points of Polygon2D lie on the same side of the line
+     * through the edge with index edgeIndex of this Polygon2D
+     * @param edgeIndex index of edge
+     * @param pB the Polygon2D
+     * @return true (same side)/false (not same side)
+     */
     public boolean isOnOneSide(int edgeIndex, Polygon2D pB)
     {   double xStart =  xpoints[edgeIndex];
         double yStart = ypoints[edgeIndex];
         double xEnd = xpoints[(edgeIndex + 1) % npoints];
         double yEnd = ypoints[(edgeIndex + 1) % npoints];
-                
         // line through start and end has directional
         // vector (xEnd-xStart, yEnd-yStart)
         // thus normal vector 
@@ -1237,13 +1267,10 @@ class Polygon2D
         // which is either > 0 or < 0
         double firstPointPos = nX * pB.xpoints[0] + nY * pB.ypoints[0]
                              - nX * xStart - nY * yStart;
-                     
         boolean result = true;             
         for (int i = 1; i < pB.npoints; i++)
-        {
-            double pointPos = nX * pB.xpoints[i] + nY * pB.ypoints[i]
+        {   double pointPos = nX * pB.xpoints[i] + nY * pB.ypoints[i]
                             - nX * xStart - nY * yStart;
-
             result = result &&
                      ((firstPointPos > -Vector3D.NZero) && 
                       (pointPos > -Vector3D.NZero)) ||
@@ -1254,15 +1281,23 @@ class Polygon2D
         }
         return result;
     }
-
+    /**
+     * determine if the points (firstX,firstY) and (nextX,nextY) lie on the same side of the line
+     * through the edge with index edgeIndex of this Polygon2D
+     * @param edgeIndex edgeIndex index of edge
+     * @param firstX x-coordinate first point
+     * @param firstY y-coordinate first point
+     * @param nextX x-coordinate second point
+     * @param nextY y-coordinate second point
+     * @return true (same side)/false (not same side)
+     */
     public boolean areOnOneSide(int edgeIndex, 
             double firstX, double firstY,
             double nextX, double nextY)
-    {   double xStart =  xpoints[edgeIndex];
+    {   double xStart = xpoints[edgeIndex];
         double yStart = ypoints[edgeIndex];
         double xEnd = xpoints[(edgeIndex + 1) % npoints];
         double yEnd = ypoints[(edgeIndex + 1) % npoints];
-                
         // line through start and end has directional
         // vector (xEnd-xStart, yEnd-yStart)
         // thus normal vector 
@@ -1291,34 +1326,37 @@ class Polygon2D
                              - nX * xStart - nY * yStart;
         double nextPointPos = nX * nextX + nY * nextY
                             - nX * xStart - nY * yStart;
-                     
         boolean result = ((firstPointPos > -Vector3D.NZero) && 
                           (nextPointPos > -Vector3D.NZero)) ||
                          ((firstPointPos < Vector3D.NZero) && 
                           (nextPointPos < Vector3D.NZero));
         return result;
     }
-    
-    // 
+    /**
+     * check if Polygon2D pB is separated from this Polygon2D (i.e. no intersections of edges) 
+     * @param pB the Polygon2D
+     * @param firstTry check twice if firstTry == true 
+     * @return true/false
+     */
     public boolean isSeparatedFrom(Polygon2D pB, boolean firstTry)
-    {   // this (pA) een vlakje
-        if (npoints >= 3) // pB vlakje of segment
-        {    findBarycenter();
-            // voldoende met 1 edge
+    {   // this Polygon2D a plane 
+        if (npoints >= 3) // pB plane or segment
+        {   findBarycenter();
+        	boolean outSideE = true;
             for (int eCnt = 0; eCnt < npoints; eCnt++)
-            {   boolean outSideE = isOutside(eCnt, pB);
-                if (outSideE)
-                    return true;
+            {   outSideE = outSideE && isOutside(eCnt, pB);
             } // for
+            if (outSideE)
+                return true;
             // false result here
             if (firstTry)
                 return pB.isSeparatedFrom(this, false);
             else
                 return false;
         } // if (npoints >= 3)
-        // pA een segment
+        // this Polygon2D a segment
         else if (npoints == 2)
-        {   // pB een vlakje, use only one side
+        {   // pB a plane
             if (pB.npoints >= 3)
             {   boolean result = isOnOneSide(0, pB);
                 if (result)
@@ -1330,11 +1368,9 @@ class Polygon2D
                         return false;
                 }    
             }
-            // pB ook een segment
+            // pB also a segment
             else if (pB.npoints == 2)
-            {   
-                
-                // kijk of de segmenten raken
+            {   // segments touch in end points
                 if (equals(xpoints[0], ypoints[0],
                            pB.xpoints[0], pB.ypoints[0]) || 
                     equals(xpoints[0], ypoints[0],
@@ -1345,8 +1381,6 @@ class Polygon2D
                            pB.xpoints[1], pB.ypoints[1])
                    )
                     return false;                
-                    
-                    
                 boolean result = areOnOneSide(0,
                     pB.xpoints[0], pB.ypoints[0],
                     pB.xpoints[1], pB.ypoints[1]);
@@ -1358,12 +1392,9 @@ class Polygon2D
                     else    
                         return false;
                 }    
-                
             }
         }    
         return false;
-        
-        
     }
 } // class Polygon2D  
     
