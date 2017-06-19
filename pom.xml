@@ -10,32 +10,32 @@
     <resources>
     	<resource>
     	   <directory>src</directory>
-    	   <excludes><exclude>**/*.java</exclude></excludes>
+    	   <!-- <excludes><exclude>**/*.java</exclude></excludes> -->
     	</resource>
     </resources>
   	<plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-        	<warSourceDirectory>war</warSourceDirectory>        
+        	<warSourceDirectory>war</warSourceDirectory>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
-         <configuration>
+        <configuration>
               <module>${project.groupId}.${project.artifactId}</module>
               <runTarget>${project.artifactId}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>        
-             </configuration>
+        </configuration>
         <executions>
           <execution>
             <goals>
               <goal>compile</goal>
-             </goals>
+            </goals>
           </execution>
-          </executions>
+        </executions>
       </plugin>
       <plugin>
 <!-- usage: jetty:run-war of jetty:run-exploded -->
@@ -46,24 +46,35 @@
     </plugins>
   </build>
   <dependencies>
-  	<dependency>
-  		<groupId>com.google.gwt</groupId>
-  		<artifactId>gwt-user</artifactId>
-  		<scope>provided</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>interaction</artifactId>
-  	</dependency>
+	  	<dependency>
+	  		<groupId>com.google.gwt</groupId>
+	  		<artifactId>gwt-user</artifactId>
+	  		<scope>provided</scope>
+	  	</dependency>
+	  	<dependency>
+	  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+	  		<artifactId>interaction</artifactId>
+	  	</dependency>
 		<dependency>
-			<groupId>nl.uu.fi.dwo.mobile</groupId>
-			<artifactId>formule</artifactId>
-			<version>0.0.4</version>
+			<groupId>nl.uu.fi.dwo.ideas</groupId>
+			<artifactId>IdeasGWT</artifactId>
+			<version>0.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
 			<version>0.0.3</version>
+	  		<exclusions>
+	  			<exclusion>
+	  				<artifactId>IdeasGWT</artifactId>
+	  				<groupId>nl.uu.fi.dwo.ideas</groupId>
+	  			</exclusion>
+	  		</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.mobile</groupId>
+			<artifactId>formule</artifactId>
+			<version>0.0.4</version>
 		</dependency>
   </dependencies>
   <parent>
