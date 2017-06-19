@@ -921,8 +921,13 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 					isGeldigeInvoer = false;
 				}
 				else
-				{
-					exp = fi.wiskopdr.expressies.Expressie.evalWithCAS(exp); // deze kan een restartexception geven
+				{ 
+					boolean casNodig = false;
+					if (exp!=null) 
+						casNodig = exp.toString().indexOf("$i")>-1 || exp.toString().indexOf("$d")>-1 || exp.toString().indexOf("$T")>-1  || exp.toString().indexOf("$S")>-1  || exp.toString().indexOf("$P")>-1;
+					//logger.fine(antwoord + " needs " + casNodig);
+					if (casNodig)
+						exp = fi.wiskopdr.expressies.Expressie.evalWithCAS(exp); // deze kan een restartexception geven
 					Double d = null;
 					if (exp != null && exp.isWaarde())
 					{
@@ -968,7 +973,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 					tf.setText("");
 					tfString = "";
 				}
-			}			
+			}
 		}
 		
 		if (isGeldigeInvoer)
