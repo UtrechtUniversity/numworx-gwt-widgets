@@ -1364,7 +1364,7 @@ public class AlgebraSchuifVeld
 			if (schuifcomponenten[i] instanceof UitvoerSchuifComponent 
 				&& ((UitvoerSchuifComponent) schuifcomponenten[i]).tf != null) 
 			{
-				((UitvoerSchuifComponent) schuifcomponenten[i]).tf.resize();
+				((UitvoerSchuifComponent) schuifcomponenten[i]).tf.resizePopup();
 			}		
 		}
 		
