@@ -60,6 +60,14 @@ public class TekstPopup extends PopupPanel
 		editor = new FormuleEditor(){
 
 			@Override
+			public void insert(String text)
+			{
+				super.insert(text);
+				
+				resizePopup();
+			}
+
+			@Override
 			public void enter()
 			{
 				super.enter();
@@ -72,7 +80,7 @@ public class TekstPopup extends PopupPanel
 			{
 				// hier kom ik niet helaas; TODO uitzoeken waarom niet...
 				super.setCurrentElementRepaint();
-				// de cursor is weggehaald, focus is weg, dus popup hiden
+				// de cursor is weggehaald, focus is weg, dus popup verbergen
 				if (popupOpened)
 				{
 					if (TekstPopup.this.isForLabel)
@@ -148,6 +156,8 @@ public class TekstPopup extends PopupPanel
 		editor.clearMain();
 		editor.clearAll();
 		editor.insert(text);
+		
+		resizePopup();
 	}
 
 	public void setFocus(boolean b)
@@ -214,7 +224,7 @@ public class TekstPopup extends PopupPanel
 		String type = event.getNativeEvent().getType();
 		String target = event.getNativeEvent().getEventTarget().toString();
 		
-		if (type.equals(BrowserEvents.KEYDOWN))
+		if (type.equals(BrowserEvents.KEYDOWN)) // key en touch events worden door StubView afgevangen en komen hier nooit door 
 		{
 			if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ESCAPE)
 			{
@@ -232,7 +242,7 @@ public class TekstPopup extends PopupPanel
 				hidePopupWithoutSavingInput();
 			}
 		}
-		else if (type.equals(BrowserEvents.CLICK) || type.equals(BrowserEvents.TOUCHEND))
+		else if (type.equals(BrowserEvents.CLICK) || type.equals(BrowserEvents.TOUCHEND)) // deze komen blijkbaar wel door
 		{
 			if (!(target.contains("insert_formule") || target.contains("keyboard-container") || target.contains("gwt-Image key"))
 				&& target.contains("canvas") && target.contains("class") && popupOpened)
@@ -243,7 +253,7 @@ public class TekstPopup extends PopupPanel
 		}
 		
 		// t.b.v. invoegen formule met DWO-keyboard; de maat van editor-inhoud is pas bekend na mouseout
-		resize();
+		resizePopup();
 	}
 
 	/**
@@ -297,7 +307,7 @@ public class TekstPopup extends PopupPanel
 	/**
 	 * Resize the popuppanel according to the size of the editor.
 	 */
-	public void resize()
+	public void resizePopup()
 	{
 		if (editor.getWidth() < 35)
 			setWidth("35px");
