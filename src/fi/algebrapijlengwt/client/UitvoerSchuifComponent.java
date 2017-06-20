@@ -280,7 +280,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		{
 			tf.setText("");
 		}
-		tf.resize();
+		tf.resizePopup();
 		
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
@@ -303,7 +303,7 @@ public class UitvoerSchuifComponent extends AlgebraSchuifComponent //implements 
 		label.setText(labelTekst);
 		label.setWidth("35px");
 		label.setHeight("20px");
-		label.resize();
+		label.resizePopup();
 		label.setPopupPosition(popupX, popupY);
 		label.show();
 		label.setFocus(true);
