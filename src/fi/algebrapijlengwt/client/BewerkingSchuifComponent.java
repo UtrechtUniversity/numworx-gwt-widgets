@@ -83,7 +83,7 @@ public class BewerkingSchuifComponent extends AlgebraSchuifComponent
 		{
 			tf.setText("");
 		}
-		tf.resize();
+		tf.resizePopup();
 		
 		tf.setWidth("25px");
 		tf.setHeight("20px");
