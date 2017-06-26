@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
-			<version>${gwtVersion}</version>
+			<version>${gwtVersion}</version><!--$NO-MVN-MAN-VER$-->
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -122,7 +122,7 @@
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${project.build.directory}/${project.artifactId}/geodefinergwt${debug}/</outputDirectory>
-									<includes>**/*.png</includes>
+									<includes>**/*.png,**/*.gif,**/*.jpg</includes>
 								</artifactItem>
 							</artifactItems>
 							<overWriteReleases>true</overWriteReleases>

@@ -12,15 +12,20 @@ body {
 }
 
 .check.fout {
-	background-image: url("images/resources/foutkruis.gif");
+	background-image: url("images/resources/knop-indicatie-fout.png");
 }
 
 .check.goed {
-	background-image: url("images/resources/goedkrul.gif");
+	background-image: url("images/resources/knop-indicatie-goed.png");
 }
 
 .check.half {
-	background-image: url("images/resources/goedkrulhalf.gif");
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.check .extern {
+	background-color: black;
+	visibility: hidden;
 }
 
 .toolbox .gwt-PushButton {
