@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -89,8 +90,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	
 	Label blokjesLabel;
 	
+	private boolean checkExternal = false;
+
 	PushButton kijkNaButton = new PushButton(rb.kijkNa()); 
 	LayoutPanel kijkNaPanel = new LayoutPanel();
+	
+	private boolean isVeranderdNaNakijken = false;
 	
 	private Viewer3d vWerk = null;
 	private VaktekPanel vaktekPanel = null;
@@ -112,8 +117,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	int maxAantal = 4;
 	boolean[][][] b;
 
-	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
-			vinkjeGrijsImage, buttonBgImage;
+//	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
+//		vinkjeGrijsImage, buttonBgImage;
+	private Image vinkjeGroenImage;
+	private Image vinkjeGeelImage;
+	private Image vinkjeRoodImage;
+	private Image buttonBgImage;
 	
 	NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 	
@@ -148,10 +157,10 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		nabouwenAanzichtenCss = clientBundle.getNabouwenAanzichtenGWTCSS();
 		nabouwenAanzichtenCss.ensureInjected();
 
-		vinkjeGroenImage = new Image(clientBundle.vinkje());
-		vinkjeGeelImage = new Image(clientBundle.vinkjegeel());
-		vinkjeRoodImage = new Image(clientBundle.vinkjerood());
-		vinkjeGrijsImage = new Image(clientBundle.vinkjegrijs());
+		vinkjeGroenImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_groen().getSafeUri());
+		vinkjeGeelImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_geel().getSafeUri());
+		vinkjeRoodImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_kruisje_rood().getSafeUri());
+		
 		buttonBgImage = new Image(clientBundle.footerbgimage());
 	}
 
@@ -301,6 +310,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			vWerk.kr.maakVol();
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
+    			
+    			if (nagekeken)
+    				zetIsVeranderdNaNakijken(true);
     		}
     		else if (e.getSource() == leegButton)
     		{
@@ -311,24 +323,41 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     			buildHistory = "";
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
+    			
+    			if (nagekeken)
+    				zetIsVeranderdNaNakijken(true);
     		}
     		
     		
     	}
     	
     }
-	
+    
+	/**
+	 * Retourneert true als nabouwen aanzichten in de nakijk-modus staat en
+	 * moet nakijken. 
+	 * 
+	 * @return
+	 */
+	private boolean isNakijkModus()
+	{
+		return kijkNaActief || checkExternal;
+	}
+		
 	private void check()
 	{
-		if (vWerk == null || !ingevuld || !kijkNaActief)
+		// reset isVeranderdNaNakijken
+		zetIsVeranderdNaNakijken(false);
+
+		if (vWerk == null || !ingevuld || !isNakijkModus())
 		{	
-System.out.println("ingevuld " + ingevuld);
-System.out.println("kijkNaActief " + kijkNaActief);
+//			System.out.println("ingevuld " + ingevuld);
+//			System.out.println("kijkNaActief " + kijkNaActief);
 
 			return;
 		}
 		
-System.out.println("check");
+		//System.out.println("check");
 
 		KubusRooster useranswer = vWerk.kr;
 		HashMap<String, Object> checkResults = naChecker.checkAnswer(useranswer);
@@ -339,44 +368,44 @@ System.out.println("check");
 		this.goedHalfFout = (Integer) checkResults.get("goedHalfFout");
 
 		//System.out.println("userAnswer: "+useranswer);
-System.out.println("correct: "+ correct);
+		//System.out.println("correct: "+ correct);
 		//System.out.println("score: "+score);
-System.out.println("goedHalfFout: " + goedHalfFout);
+		//System.out.println("goedHalfFout: " + goedHalfFout);
 		//System.out.println(" feedback: "+ feedback);
 
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeGeelImage);
-			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
 			
-System.out.println("geel");			
+			//System.out.println("geel");			
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
 		{
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeGroenImage);
-			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, true);
 			
-System.out.println("groen");			
+			//System.out.println("groen");			
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
 			//nakijkKnop.clear();
 			//nakijkKnop.add(vinkjeRoodImage);
-			kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
+			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
 			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, true);
 			
-System.out.println("rood");			
+			//System.out.println("rood");			
 		}
 		nagekeken = true;
 		ingevuld = true;
@@ -390,11 +419,16 @@ System.out.println("rood");
 		return panel;
 	}
 
+	/**
+	 * Wat doet dit?
+	 * 
+	 * @param state
+	 */
 	void zetVeranderd(boolean state)
 	{
 		//if (vWerk == null || !kijkNaActief)
 		//	return;
-System.out.println("zetVeranderd");
+		//System.out.println("zetVeranderd");
 
 		//nakijkKnop.clear();
 		//nakijkKnop.add(vinkjeGrijsImage);
@@ -405,8 +439,7 @@ System.out.println("zetVeranderd");
 			int aantal = vWerk.kr.geefAantalK();
 			blokjesLabel.setText(msgs.blokjes(aantal));
 
-System.out.println("aantal " + aantal);			
-			
+			//System.out.println("aantal " + aantal);			
 		}
 
 		if (vWerk != null)
@@ -421,31 +454,28 @@ System.out.println("aantal " + aantal);
 			map.put("booleanArr", booleanArray);
 			
  			comRoot.fireEvent(new CBookEvent(this,"blockBuilding",map));
-//System.out.println("fire blockBuilding"); 			
- 			
+ 			//System.out.println("fire blockBuilding");
 			
 			String lastBuildCommand = vWerk.getLastBuildCommand();
-System.out.println("lastBuildCommand " + lastBuildCommand);			
+			//System.out.println("lastBuildCommand " + lastBuildCommand);			
 			if(!"".equals(lastBuildCommand))
 				buildHistory = buildHistory + lastBuildCommand + "\n";
 			Map<String,Object> map1 = new HashMap<String,Object>();
 			map1.put("content", buildHistory);
 			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
-System.out.println("fire text.buildingProgram " + buildHistory);			
+			//System.out.println("fire text.buildingProgram " + buildHistory);			
 		}
 
-		if (vWerk == null || !kijkNaActief)
+		if (vWerk == null || !isNakijkModus())
 			return;
-
 		
 		ingevuld = true;
 		
 		if (state) return;
 		
-		kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, true);
 		kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
 		kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
-		kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
+		kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
 		
 		correct = false;
 		score = 0;
@@ -496,6 +526,7 @@ System.out.println("fire text.buildingProgram " + buildHistory);
 		h.put("stateNew", stateNew);
 		h.put("nagekeken", nagekeken);
 		h.put("ingevuld", ingevuld);
+		h.put("isVeranderdNaNakijken", new Boolean(isVeranderdNaNakijken));
 
 		return h;
 	}
@@ -562,11 +593,39 @@ System.out.println("fire text.buildingProgram " + buildHistory);
 			nagekeken = (Boolean) h.get("nagekeken");
 		if (h.containsKey("ingevuld"))
 			ingevuld = (Boolean) h.get("ingevuld");
+		if (h.containsKey("isVeranderdNaNakijken"))
+			isVeranderdNaNakijken = ((Boolean) h.get("isVeranderdNaNakijken")).booleanValue();
 
 
-		if (ingevuld && (nagekeken || mode == 0))
+		if (nakijkenNodig())
 			check();
+		
 		zetVeranderd(nagekeken);
+	}
+
+	/**
+	 * Retourneert true als er nagekeken moet worden (en vinkje/kruis getoond).
+	 * Retourneert false als er niet nagekeken moet worden.
+	 * 
+	 * @return
+	 */
+	boolean nakijkenNodig()
+	{
+		boolean nodig = false;
+		
+		if (ingevuld)
+		{
+			if (mode == OpdrNavIF.ZELFTOETS && nagekeken && !isVeranderdNaNakijken)
+			{
+				nodig = true;
+			}
+			else if ((checkExternal && mode != OpdrNavIF.ZELFTOETS) || mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN)
+			{
+				nodig = true;
+			}
+		}
+		
+		return nodig;
 	}
 
 	@Override
@@ -578,9 +637,11 @@ System.out.println("fire text.buildingProgram " + buildHistory);
 	@Override
 	public Boolean isCorrect()
 	{
-		if (!kijkNaActief)
+		if (!isNakijkModus())
 			return Boolean.TRUE;
-		if(!nagekeken) return null;
+		if (!nagekeken) 
+			return null;
+		
 		return correct;
 	}
 
@@ -601,9 +662,12 @@ System.out.println("setComRoot");
 	}
 	
 	public void zetMode(int mode)
-	{	this.mode = mode;
-		if (kijkNaActief)    
+	{
+		this.mode = mode;
+		if (isNakijkModus())
+		{
 			kijkNaActief = (mode == 0 || mode == 1);
+		}
 	}
 
 
@@ -620,9 +684,9 @@ System.out.println("setComRoot");
 		breedte = width;
 		hoogte  = height;
 
-logger.info("NabouwenAanzichtenGWT init");
-//System.out.println("breedte = " + breedte);
-//System.out.println("hoogte = " + hoogte);
+		logger.info("NabouwenAanzichtenGWT init");
+		//System.out.println("breedte = " + breedte);
+		//System.out.println("hoogte = " + hoogte);
 
 		launchState = launchData;
 		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
@@ -755,7 +819,10 @@ logger.info("NabouwenAanzichtenGWT init");
 		if (launchState.containsKey("kijkNaActief"))
 			kijkNaActief = ((Boolean) launchState.get("kijkNaActief")).booleanValue();
 		
-//System.out.println("init kijkNaActief = " + kijkNaActief);
+		if (launchMap.containsKey("checkExternal"))
+			checkExternal = launchMap.getBoolean("checkExternal");
+
+		//System.out.println("init kijkNaActief = " + kijkNaActief);
 		
 		this.kijkNaActief = kijkNaActief; 
 
@@ -837,7 +904,7 @@ logger.info("NabouwenAanzichtenGWT init");
 			
 			int vWerkBreedte = breedte;
 			int vWerkHoogte = hoogte;
-			if (kijkNaActief || keuzeBouwenSlopen || volLeegOptie || aantalBlokjes)
+			if (showKijkNaKnop() || keuzeBouwenSlopen || volLeegOptie || aantalBlokjes)
 				vWerkHoogte = hoogte - 25;
 
 			vWerk = new Viewer3d(startKr, 351, -30, vWerkBreedte, vWerkHoogte, this);
@@ -900,6 +967,7 @@ logger.info("NabouwenAanzichtenGWT init");
 					startKr.zetVulkleur("zwart");
 				}
 			}
+
 			
 // dit moet je dus niet zo doen. Wim			
 	// layout button panel:
@@ -931,7 +999,8 @@ logger.info("NabouwenAanzichtenGWT init");
 //				aantalW = 0;
 //			} else
 //				span = aantalX + aantalW;
-			int kijknaW = kijkNaActief ? 90 : 0;
+//			int kijknaW = kijkNaActief ? 90 : 0;
+			int kijknaW = showKijkNaKnop() ? 90 : 0;
 //			if (breedte - kijknaW < span) 
 //			{
 	// we have a problem, Huub!			
@@ -971,7 +1040,7 @@ logger.info("NabouwenAanzichtenGWT init");
 			{
 				currentX += gap1+aantalW;
 			}
-			if (kijkNaActief)
+			if (showKijkNaKnop())
 			{
 				currentX += gap1+kijknaW;
 			}
@@ -1044,26 +1113,29 @@ System.out.println("hSpace " + hSpace);
 			panel.setWidgetLeftWidth(canvas, 0, Style.Unit.PX, vWerkBreedte, Style.Unit.PX);
 			panel.setWidgetTopHeight(canvas, 0, Style.Unit.PX, vWerkHoogte, Style.Unit.PX);
 
-			if (kijkNaActief)
+			if (isNakijkModus())
 			{
 				naChecker = new NabouwenAanzichtenChecker(launchState, randomVarNamen, randomVarWaarden);
 
 				kijkNaButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				
 				panel.add(kijkNaPanel);
-				kijkNaPanel.add(kijkNaButton);
+				if (!checkExternal)
+					kijkNaPanel.add(kijkNaButton);
 				kijkNaPanel.add(vinkjeGroenImage);
 				kijkNaPanel.add(vinkjeGeelImage);
 				kijkNaPanel.add(vinkjeRoodImage);
-				kijkNaPanel.add(vinkjeGrijsImage);
 
 				kijkNaButton.addClickHandler(new PushClickHandler());
 			
 				panel.setWidgetLeftWidth(kijkNaPanel, currentX+gap1, Style.Unit.PX, 90, Style.Unit.PX);
 				panel.setWidgetTopHeight(kijkNaPanel, hoogte - 25, Style.Unit.PX, 25, Style.Unit.PX);
 			
-				kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 25, Style.Unit.PX);
+				if (!checkExternal)
+				{
+					kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
+					kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 25, Style.Unit.PX);
+				}
 			
 				kijkNaPanel.setWidgetLeftWidth(vinkjeGroenImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
 				kijkNaPanel.setWidgetTopHeight(vinkjeGroenImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
@@ -1074,50 +1146,38 @@ System.out.println("hSpace " + hSpace);
 				kijkNaPanel.setWidgetLeftWidth(vinkjeRoodImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
 				kijkNaPanel.setWidgetTopHeight(vinkjeRoodImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
 
-				kijkNaPanel.setWidgetLeftWidth(vinkjeGrijsImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(vinkjeGrijsImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
-
 				kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
 				kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
 				kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
-
-				
-				//Image image = new Image(clientBundle.vinkjegrijs());
-				//nakijkKnop.add(buttonBgImage);
-				
-				//nakijkKnop.add(vinkjeGrijsImage);
-				//addCheckButtonHandler(nakijkKnop);
-				
-				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
-				//nakijkKnop.getElement().getStyle().setProperty("textAlign", "right");
-				
-				//nakijkKnop.getElement().getStyle().setBackgroundImage("url(images/resources/footerbgimage.png)");
-				//nakijkKnop.getElement().getStyle().setBorderColor("gray");
-				//nakijkKnop.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-				//nakijkKnop.getElement().getStyle().setBorderWidth(1, Unit.PX);
-				//nakijkKnop.getElement().getStyle().setProperty("display", "inline-block");
-				//nakijkKnop.getElement().getStyle().setPaddingTop(3, Unit.PX);
-				//nakijkKnop.getElement().getStyle().setPaddingBottom(3, Unit.PX);
-				//nakijkKnop.getElement().getStyle().setPaddingLeft(10, Unit.PX);
-				//nakijkKnop.getElement().getStyle().setPaddingRight(10, Unit.PX);
-				//nakijkKnop.getElement().getStyle().setProperty("borderRadius", "5px");
-				//panel.add(nakijkKnop);
 			}
-
-			//MuisBeheerder mb = new MuisBeheerder(vWerk);
-
-			//touchPanel.addTouchHandler(mb);
 		
 			ingevuld = false;
 		}
 
 	}
 
-	@Override
-	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Retourneert true als de nakijk-knop getoond moet worden,
+	 * anders false.
+	 * 
+	 * @return
+	 */
+	boolean showKijkNaKnop()
+	{
+		return kijkNaActief && !checkExternal;
 	}
+	
+	@Override
+	public void kijkNa() 
+	{
+		check();
+	}
+	
+	void zetIsVeranderdNaNakijken(boolean b)
+	{
+		this.isVeranderdNaNakijken = b;
+	}
+	
 
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
