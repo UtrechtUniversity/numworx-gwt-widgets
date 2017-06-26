@@ -919,6 +919,9 @@ System.out.println("b = " + b);
 */
 	public void muisKkActie(boolean remove)
 	{
+		if (eigenaar.nagekeken)
+			eigenaar.zetIsVeranderdNaNakijken(true);
+		
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
 			int n = sorteerRij[q];
