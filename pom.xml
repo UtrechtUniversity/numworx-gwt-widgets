@@ -54,6 +54,11 @@
   		<groupId>com.googlecode.mgwt</groupId>
   		<artifactId>MGWT</artifactId>
   	</dependency>
+	<dependency>
+		<groupId>nl.uu.fi.dwo.mobile</groupId>
+		<artifactId>formule</artifactId>
+		<version>0.0.4</version>
+	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
