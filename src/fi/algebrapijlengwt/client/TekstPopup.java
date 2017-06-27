@@ -278,21 +278,24 @@ public class TekstPopup extends PopupPanel
 
 	void hidePopup()
 	{
-		// input waarde doorgeven
-		if (isForLabel)
+		if (isShowing())
 		{
-			((UitvoerSchuifComponent) owner).zetLabelTekst();
-		}
-		else
-		{
-			owner.zetInvulWaarde();
-		}
+			// input waarde doorgeven
+			if (isForLabel)
+			{
+				((UitvoerSchuifComponent) owner).zetLabelTekst();
+			}
+			else
+			{
+				owner.zetInvulWaarde();
+			}
 
-		// hide keyboard
-		kb.blur();
-		// hide popup
-		hide();
-		setPopupOpened(false);
+			// hide keyboard
+			kb.blur();
+			// hide popup
+			hide();
+			setPopupOpened(false);
+		}
 	}
 
 	void hidePopupWithoutSavingInput()
