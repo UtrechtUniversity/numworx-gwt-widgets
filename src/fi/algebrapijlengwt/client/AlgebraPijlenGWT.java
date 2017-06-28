@@ -17,6 +17,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 
@@ -45,6 +46,7 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.algebrapijlengwt.client.expressies_ap.*;
@@ -221,10 +223,18 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 	 * parametrisatie: moet er nagekeken worden?
 	 */
 	boolean kijkNaActief = false;
+	/**
+	 * Of er extern moet worden nagekeken door een checkbutton.
+	 * De nakijk-knop wordt dan verborgen.
+	 */
+	private boolean checkExternal = false;
 	/** 
 	 * de kijkNaKnop
 	 */
 	PushButton kijkNaButton;
+	private Image vinkjeGroenImage;
+	private Image vinkjeGeelImage;
+	private Image kruisRoodImage;
 	/**
 	 * parametrisatie: de te maken Expressies als Strings
 	 */
@@ -271,18 +281,22 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 	/**
 	 * creeer internationalisatie en ClientBundle
 	 */
-	public void getImages() 
+	public void makeResources() 
 	{
 		rb = GWT.create(Text.class);
 		algebraPijlenGWTClientBundle = GWT.create(AlgebraPijlenGWTClientBundle.class);
 		algebraPijlenGWTCss = algebraPijlenGWTClientBundle.getAlgebraPijlenGWTCSS();
 		algebraPijlenGWTCss.ensureInjected();
+		
+		vinkjeGroenImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_groen().getSafeUri());
+		vinkjeGeelImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_geel().getSafeUri());
+		kruisRoodImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_kruisje_rood().getSafeUri());
 	}
 	
 	
 	public void onModuleLoad() 
 	{
-		getImages();
+		makeResources();
 		canvasPanel = new LayoutPanel(); 
 		canvasPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 		RootPanel.get(holderId).add(canvasPanel); // deze regel uitzetten voor standalone test
@@ -372,7 +386,7 @@ public class AlgebraPijlenGWT implements EntryPoint, InteractionStub
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 
-		getImages();
+		makeResources();
 		canvasPanel = new LayoutPanel(); 
 		canvasPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 		init(breedte, hoogte, launchState, randomVarWaarden);
@@ -593,7 +607,8 @@ logger.info("AP setState");
 
 	@Override
 	public Boolean isCorrect()
-	{	if (kijkNaActief)
+	{
+		if (isNakijkModus())
 			return correct;
 		else
 			return new Boolean(true);
@@ -601,14 +616,16 @@ logger.info("AP setState");
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
-	{	this.comRoot = comRoot;
+	{
+		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 		FormuleKeyboardIF kb = comRoot.getKeyboard();
 		FormuleHolder.installKeyboard(kb);
 	}
 	
 	public void zetMode(int mode)
-	{	this.mode = mode;
+	{
+		this.mode = mode;
 		if (kijkNaActief)    
 			kijkNaActief = (mode == 0 || mode == 1);
 	}
@@ -617,9 +634,11 @@ logger.info("AP setState");
 	 * verander de docentExpressieStrings in docentExpressies  
 	 */
     public void maakDocentExpressies()
-    {	docentExpressies.clear();
+    {
+    	docentExpressies.clear();
     	for (int i = 0; i < docentExpressieStrings.size(); i++)
-    	{	String text = docentExpressieStrings.get(i);
+    	{
+    		String text = docentExpressieStrings.get(i);
     		String formuleText = "$f" + text + "@";
     		Expressie exp = FormuleParser_ap.geefExpressie(formuleText);
     		docentExpressies.add(exp);
@@ -634,13 +653,15 @@ logger.info("AP setState");
      */
     public void answerChanged()
     {
-    	if ((comRoot != null) && kijkNaActief && !asvSetState)
-		{	// reset alles 	
+    	if ((comRoot != null) && isNakijkModus() && !asvSetState)
+		{
+    		// reset alles 	
     		correct = null;
     		nagekeken = false;
     		score = 0;
     		ingevuld = true;
     		asv.changed = true;
+    		setVisibleFeedbackImages(false, false, false);
     		comRoot.setChanged(true);
 		}	
     }
@@ -652,30 +673,39 @@ logger.info("AP setState");
      */
 	public void kijkNa() 
 	{
-		if (!kijkNaActief)
+		if (!isNakijkModus())
     		return;
+		
 		ingevuld = true;
     	maakDocentExpressies();
+    	
     	// geen opdracht, alles goed
     	if (docentExpressies.size() == 0)
-    	{	score = scoreMax;
+    	{
+    		score = scoreMax;
     		return;
     	}
+    	
     	// vindt de UitvoerSchuifComponeneten aan het einde van alle valide pijlenkettingen
     	// op het werkveld (if any)
     	Vector leerlingExpressieUVS = asv.vindExpressieUVS();
-		// geen valide pijlenketting of niets ingevuld, fout
+		
+    	// geen valide pijlenketting of niets ingevuld, fout
 		if (leerlingExpressieUVS.size() == 0)
-		{	correct = new Boolean(false);
+		{
+			correct = new Boolean(false);
 			comRoot.setChanged(isCorrect().booleanValue());
 			return;
 		}
+		
 		int hits = 0;
+		
 		// hier zijn er docent expressies
 		// voor alle valide pijlenkettingen, vindt de uitvoer-Expressie en vergelijk die met
 		// de docent expressies
 		for (int lCnt = 0; lCnt < leerlingExpressieUVS.size(); lCnt++)
-		{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
+		{
+			UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
 			// vindt de uitvoer Expressie
 			Expressie llgExp = null;
 			if (uvs.geefUitvoer(0) != null)
@@ -690,37 +720,52 @@ logger.info("AP setState");
 			if (llgExp != null)
 			{	
 				for (int dCnt = 0; dCnt < docentExpressies.size(); dCnt++)
-				{	Expressie docExp = docentExpressies.get(dCnt);
+				{
+					Expressie docExp = docentExpressies.get(dCnt);
 					if (Algebra.isGelijkwaardig(docExp, llgExp))
-					{	hits++;
+					{
+						hits++;
 						correct = true;
 					}
 				}
+				
 				// zet een "V" rechts van de UitvoerSchuifComoponent
 				if (correct.equals(Boolean.TRUE))
-				{	if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) 
+				{
+					if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) 
 					{	
 						uvs.pijlUit[0].im = "V";
 						uvs.pijlUit[0].paint();
 					}
 				}
 				else // zet een "X" rechts van de UitvoerSchuifComoponent
-				{	if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) // && (im != null))
+				{
+					if (!uvs.pijlUit[0].isStapel && !uvs.pijlUit[0].vast && !uvs.pijlUit[0].actief) // && (im != null))
 					{	
 						uvs.pijlUit[0].im = "X";
 						uvs.pijlUit[0].paint();
 					}
 				}
 			}
-		}	
+		}
+		
 		// bereken score
 		int scorePerExpressie = scoreMax / docentExpressies.size();
 		if (hits == 0)
+		{
 			score = 0;
+			setVisibleFeedbackImages(false, false, true);
+		}
 		else if (hits == docentExpressies.size())
+		{
 			score = scoreMax;
+			setVisibleFeedbackImages(true, false, false);
+		}
 		else
+		{
 			score = hits * scorePerExpressie;
+			setVisibleFeedbackImages(false, true, false);
+		}
 		
 		asv.tekenOpnieuw();
 		nagekeken = true;
@@ -733,24 +778,27 @@ logger.info("AP setState");
 	}
 
 	@Override
-	public int getAsHoogte() {
+	public int getAsHoogte() 
+	{
 		return 0;
 	}
 
 	@Override
-	public int getHeight() {
+	public int getHeight()
+	{
 		return hoogte;
 	}
 
 	@Override
-	public int getWidth() {
+	public int getWidth()
+	{
 		return breedte;
 	}
 
 	@Override
-	public void setAsHoogte(int ashoogte) {
+	public void setAsHoogte(int ashoogte)
+	{
 	}
-
 	
 	@Override
 	public void init(int width, int height, Map<String, Object> map, Map<String, Number> values) 
@@ -764,7 +812,7 @@ logger.info("AP setState");
 	
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
-		getImages();
+		makeResources();
 
 		// parametrisatie
 		if (launchState.containsKey("toolkit"))
@@ -787,6 +835,8 @@ logger.info("AP setState");
 		}
 		if (launchState.containsKey("kijkNaActief"))
 			kijkNaActief = launchState.getBoolean("kijkNaActief");
+		if (launchState.containsKey("checkExternal"))
+			checkExternal = launchState.getBoolean("checkExternal");
 		if (launchState.containsKey("scoreMax"))
 			scoreMax = launchState.getInt("scoreMax");
 		
@@ -840,14 +890,32 @@ logger.info("AP setState");
 			asvSetState = false;
 		}
 		
-		if (kijkNaActief)
+		if (isNakijkModus())
 		{	
 			kijkNaButton = new PushButton(rb.kijkNa());
 			kijkNaButton.addStyleName(algebraPijlenGWTCss.pushbutton());
-			canvasPanel.add(kijkNaButton);
-			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 70)/2, Style.Unit.PX, 70, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+			if (!checkExternal)
+			{
+				canvasPanel.add(kijkNaButton);
+				canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 70)/2, Style.Unit.PX, 70, Style.Unit.PX);
+				canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+			}
 			kijkNaButton.addClickHandler(new PushClickHandler());
+			
+			// vinkjes toevoegen
+			canvasPanel.add(vinkjeGroenImage);
+			canvasPanel.add(vinkjeGeelImage);
+			canvasPanel.add(kruisRoodImage);
+			canvasPanel.setWidgetLeftWidth(vinkjeGroenImage, (breedte - 70)/2 + 75, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(vinkjeGroenImage, hoogte - 40, Style.Unit.PX, 20, Style.Unit.PX);
+
+			canvasPanel.setWidgetLeftWidth(vinkjeGeelImage, (breedte - 70)/2 + 75, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(vinkjeGeelImage, hoogte - 40, Style.Unit.PX, 20, Style.Unit.PX);
+
+			canvasPanel.setWidgetLeftWidth(kruisRoodImage, (breedte - 70)/2 + 75, Style.Unit.PX, 30, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kruisRoodImage, hoogte - 40, Style.Unit.PX, 20, Style.Unit.PX);
+
+			setVisibleFeedbackImages(false, false, false);
 		}
 			
 		canvasPanel.forceLayout();
@@ -858,25 +926,69 @@ logger.info("AP setState");
 		ingevuld = false;
 	}
 
-
-	//@Override
-	public void zetNagekeken(boolean b) {
+	/**
+	 * Zet de feedback images zichtbaar adhv de meegegeven booleans.
+	 * 
+	 * @param vinkjeGroen
+	 * @param vinkjeGeel
+	 * @param kruisRood
+	 */
+	void setVisibleFeedbackImages(boolean vinkjeGroen, boolean vinkjeGeel, boolean kruisRood)
+	{
+		canvasPanel.setWidgetVisible(vinkjeGroenImage, vinkjeGroen);
+		canvasPanel.setWidgetVisible(vinkjeGeelImage, vinkjeGeel);
+		canvasPanel.setWidgetVisible(kruisRoodImage, kruisRood);
+	}
+	
+	/**
+	 * Retourneert true als nabouwen aanzichten in de nakijk-modus staat en
+	 * moet nakijken. 
+	 * 
+	 * @return
+	 */
+	private boolean isNakijkModus()
+	{
+		return kijkNaActief || checkExternal;
 	}
 
-	//@Override
-	public int[][] getScoreObjectives() {
+	// @Override
+	public void zetNagekeken(boolean b)
+	{
+	}
+
+	// @Override
+	public int[][] getScoreObjectives()
+	{
 		return null;
 	}
 
-}
+	/**
+	 * Het groene vinkje, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getVinkjeGroen()
+	{
+		return ImageElement.as(vinkjeGroenImage.getElement());
+	}
 
-/**
- * er is geen klasse Point in JavaGWT 
- */
-class Point
-{	int x; int y;
-	public Point(int x, int y)
-	{	this.x = x; this.y = y;
+	/**
+	 * Het gele vinkje, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getVinkjeGeel()
+	{
+		return ImageElement.as(vinkjeGeelImage.getElement());
+	}
+
+	/**
+	 * Het rode kruis, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getKruisRood()
+	{
+		return ImageElement.as(kruisRoodImage.getElement());
 	}
 }
-
