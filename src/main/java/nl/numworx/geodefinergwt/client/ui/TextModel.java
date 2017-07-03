@@ -13,7 +13,7 @@ import fi.euclides.util.DefaultAdapter;
 
 public class TextModel extends ColorModel<Label> {
 	public Align align = Align.BASE;
-	private FontStyle font = new FontStyle();
+	FontStyle font = new FontStyle();
 	private float dx, dy;
 	Boolean alwaysF, herleid;
 	Label item;

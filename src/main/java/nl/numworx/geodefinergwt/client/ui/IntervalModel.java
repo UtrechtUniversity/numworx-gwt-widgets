@@ -27,10 +27,10 @@ public class IntervalModel extends TextModel {
 		if (instance != null) instance.install(null);
 		if (animate == Animate.NONE) {
 			adapter.put(Animator.class, null);
+			instance = null;
 		} else {
 			instance = new Animator(animate, interval, tracker, align);
 			adapter.put(instance);
-			instance.install(item);
 		}
 		DefaultAdapter adapterP = DefaultAdapter.getDefault(item.getP());
 		if (step == null)
@@ -57,6 +57,12 @@ public class IntervalModel extends TextModel {
 		}
 		HorizontalPunt hp = (HorizontalPunt) ((Segment) segment).getP2();
 		hp.setDistance(Numbers.createDouble(length));
+		
+		if(instance != null) {
+			Label button = instance.install(item);
+			DefaultAdapter.getDefault(button).put(font);
+		}
+
 	}
 
 	@Override
