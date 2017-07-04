@@ -117,13 +117,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	int maxAantal = 4;
 	boolean[][][] b;
 
-//	private Image vinkjeGroenImage, vinkjeGeelImage, vinkjeRoodImage,
-//		vinkjeGrijsImage, buttonBgImage;
-	private Image vinkjeGroenImage;
-	private Image vinkjeGeelImage;
-	private Image vinkjeRoodImage;
-	private Image buttonBgImage;
-	
 	NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 	
 	String buildHistory = "";
@@ -156,12 +149,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	{
 		nabouwenAanzichtenCss = clientBundle.getNabouwenAanzichtenGWTCSS();
 		nabouwenAanzichtenCss.ensureInjected();
-
-		vinkjeGroenImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_groen().getSafeUri());
-		vinkjeGeelImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_geel().getSafeUri());
-		vinkjeRoodImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_kruisje_rood().getSafeUri());
-		
-		buttonBgImage = new Image(clientBundle.footerbgimage());
 	}
 
 	public void onModuleLoad()
@@ -375,43 +362,28 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
-			//nakijkKnop.clear();
-			//nakijkKnop.add(vinkjeGeelImage);
-			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, true);
-			
-			//System.out.println("geel");			
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), true);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
 		{
-			//nakijkKnop.clear();
-			//nakijkKnop.add(vinkjeGroenImage);
-			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, true);
-			
-			//System.out.println("groen");			
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), true);
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
-			//nakijkKnop.clear();
-			//nakijkKnop.add(vinkjeRoodImage);
-			//kijkNaPanel.setWidgetVisible(vinkjeGrijsImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
-			kijkNaPanel.setWidgetVisible(vinkjeRoodImage, true);
-			
-			//System.out.println("rood");			
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), true);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
+			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
 		}
+		
 		nagekeken = true;
 		ingevuld = true;
 
 		comRoot.setChanged(isCorrect().booleanValue());
-
 	}
 
 	public Panel getAsPanel()
@@ -473,9 +445,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		
 		if (state) return;
 		
-		kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
-		kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
-		kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
+		clearFeedbackImages();
 		
 		correct = false;
 		score = 0;
@@ -501,6 +471,16 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
 		}
 */
+	}
+
+	/**
+	 * Haal vinkje/kruis weg.
+	 */
+	private void clearFeedbackImages()
+	{
+		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
+		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
+		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
 	}
 
 	boolean isBouwen()
@@ -687,7 +667,7 @@ System.out.println("setComRoot");
 		logger.info("NabouwenAanzichtenGWT init");
 		//System.out.println("breedte = " + breedte);
 		//System.out.println("hoogte = " + hoogte);
-
+		
 		launchState = launchData;
 		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
 		randomVarWaarden = values;
@@ -1045,7 +1025,7 @@ System.out.println("setComRoot");
 				currentX += gap1+kijknaW;
 			}
 			int hSpace = (breedte - currentX)/2;
-System.out.println("hSpace " + hSpace);			
+			//System.out.println("hSpace " + hSpace);			
 			if (hSpace >= 0)
 				currentX = hSpace;
 			else
@@ -1120,11 +1100,10 @@ System.out.println("hSpace " + hSpace);
 				kijkNaButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				
 				panel.add(kijkNaPanel);
+				kijkNaPanel.setStylePrimaryName(nabouwenAanzichtenCss.kijknapanel());
+
 				if (!checkExternal)
 					kijkNaPanel.add(kijkNaButton);
-				kijkNaPanel.add(vinkjeGroenImage);
-				kijkNaPanel.add(vinkjeGeelImage);
-				kijkNaPanel.add(vinkjeRoodImage);
 
 				kijkNaButton.addClickHandler(new PushClickHandler());
 			
@@ -1136,24 +1115,10 @@ System.out.println("hSpace " + hSpace);
 					kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
 					kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, 25, Style.Unit.PX);
 				}
-			
-				kijkNaPanel.setWidgetLeftWidth(vinkjeGroenImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(vinkjeGroenImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
-
-				kijkNaPanel.setWidgetLeftWidth(vinkjeGeelImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(vinkjeGeelImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
-
-				kijkNaPanel.setWidgetLeftWidth(vinkjeRoodImage, 60, Style.Unit.PX, 30, Style.Unit.PX);
-				kijkNaPanel.setWidgetTopHeight(vinkjeRoodImage, 0, Style.Unit.PX, 20, Style.Unit.PX);
-
-				kijkNaPanel.setWidgetVisible(vinkjeGroenImage, false);
-				kijkNaPanel.setWidgetVisible(vinkjeGeelImage, false);
-				kijkNaPanel.setWidgetVisible(vinkjeRoodImage, false);
 			}
 		
 			ingevuld = false;
 		}
-
 	}
 
 	/**
