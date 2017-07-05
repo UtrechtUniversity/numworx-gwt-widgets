@@ -665,8 +665,6 @@ System.out.println("setComRoot");
 		hoogte  = height;
 
 		logger.info("NabouwenAanzichtenGWT init");
-		//System.out.println("breedte = " + breedte);
-		//System.out.println("hoogte = " + hoogte);
 		
 		launchState = launchData;
 		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
@@ -1119,6 +1117,9 @@ System.out.println("setComRoot");
 		
 			ingevuld = false;
 		}
+		
+		panel.forceLayout();
+		kijkNaPanel.forceLayout();
 	}
 
 	/**
