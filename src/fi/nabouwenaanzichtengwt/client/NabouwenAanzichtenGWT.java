@@ -362,22 +362,22 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), true);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
+			kijkNaPanel.setStyleName("fout", false);
+			kijkNaPanel.setStyleName("half", true);
+			kijkNaPanel.setStyleName("goed", false);
 		}
 
 		else if (goedHalfFout == NabouwenAanzichtenChecker.GOED)
 		{
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), true);
+			kijkNaPanel.setStyleName("fout", false);
+			kijkNaPanel.setStyleName("half", false);
+			kijkNaPanel.setStyleName("goed", true);
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), true);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
-			kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
+			kijkNaPanel.setStyleName("fout", true);
+			kijkNaPanel.setStyleName("half", false);
+			kijkNaPanel.setStyleName("goed", false);
 		}
 		
 		nagekeken = true;
@@ -478,9 +478,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	 */
 	private void clearFeedbackImages()
 	{
-		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.fout(), false);
-		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.half(), false);
-		kijkNaPanel.setStyleName(nabouwenAanzichtenCss.goed(), false);
+		kijkNaPanel.setStyleName("fout", false);
+		kijkNaPanel.setStyleName("half", false);
+		kijkNaPanel.setStyleName("goed", false);
 	}
 
 	boolean isBouwen()
@@ -1100,7 +1100,7 @@ System.out.println("setComRoot");
 				kijkNaButton.addStyleName(nabouwenAanzichtenCss.pushbutton());
 				
 				panel.add(kijkNaPanel);
-				kijkNaPanel.setStylePrimaryName(nabouwenAanzichtenCss.kijknapanel());
+				kijkNaPanel.setStylePrimaryName("kijknapanel");
 
 				if (!checkExternal)
 					kijkNaPanel.add(kijkNaButton);
