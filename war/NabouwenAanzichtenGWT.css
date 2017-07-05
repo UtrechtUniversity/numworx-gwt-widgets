@@ -22,3 +22,22 @@ h1 {
 #source a {
   text-decoration: none;
 }
+
+.kijknapanel {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.goed {
+	background-image: url("images/resources/knop-indicatie-goed.png");
+}
+
+.half {
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.fout {
+	background-image: url("images/resources/knop-indicatie-fout.png");
+}
+
