@@ -35,7 +35,7 @@ public class UIModelFactory extends nl.numworx.geodefiner.common.UIModelFactory 
 		model = null;
 		if(d instanceof Groep) {
 			Groep g = (Groep)d;
-			build(g.elementAt(0)); // what if 0 elements?
+			build(g.prototype()); // what if 0 elements?
 			return model.init2(d);
 		}
 		d.visit(this);
