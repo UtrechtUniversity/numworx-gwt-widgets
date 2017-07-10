@@ -2,11 +2,11 @@
 
 
 .root {
-	background-color: yellow; 
+	/*background-color: yellow;*/ 
 }	
 
 .dock {
-	background-color: orange; 
+	/*background-color: orange;*/ 
 }
 
 .bottom {
@@ -103,4 +103,4 @@
 .regelaar {
 	
 	background-color: rgb(208, 228, 255);
-}	
+}
