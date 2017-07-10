@@ -382,14 +382,6 @@ class VaktekPanel extends LayoutPanel
 
 	}
 
-	public void zetAchtergrond(CssColor c)
-	{ // setBackground(c);
-		va.zetAchtergrond(c);
-		ra.zetAchtergrond(c);
-		la.zetAchtergrond(c);
-		ba.zetAchtergrond(c);
-	}
-
 	public void zetKlikAan(boolean b)
 	{
 		va.zetKlikAan(b);
