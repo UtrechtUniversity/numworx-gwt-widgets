@@ -33,7 +33,7 @@ public class Viewer3d extends LayoutPanel
 	public Matrix3D mat;
 	private boolean pen, vul, leeg, schaduw;
 	private int lnummer;
-	private CssColor penkleur, vulkleur, achtergrondkleur;
+	private CssColor penkleur, vulkleur;
 	public boolean bezigMetTekenen;
 	public boolean muisAan;
 	public boolean klikAan = false;
@@ -117,7 +117,6 @@ public class Viewer3d extends LayoutPanel
 		canvas.addTouchEndHandler(mb);
 		canvas.addTouchMoveHandler(mb);
 
-		achtergrondkleur = WHITE;
 		leeg = false;
 		schaduw = true;
 		muisAan = true;
@@ -458,13 +457,6 @@ public class Viewer3d extends LayoutPanel
 		{
 			vaktek.synchronizeViewerKleuren(this);
 		}
-
-		// }
-	}
-
-	public void setBackground(CssColor c)
-	{
-		achtergrondkleur = c;
 	}
 
 	public void zetAfstand(double afst)
@@ -685,8 +677,7 @@ public class Viewer3d extends LayoutPanel
 
 		if (wis)
 		{
-			gIm.setFillStyle(achtergrondkleur);
-			gIm.fillRect(0, 0, breedte, hoogte);
+			gIm.clearRect(0, 0, breedte, hoogte);
 		}
 		if (border)
 		{
@@ -952,21 +943,6 @@ public class Viewer3d extends LayoutPanel
 		vul = false;
 		lnummer = 0;
 		leeg = false;
-	}
-
-	void achtergrondkleur(String kl)
-	{
-		achtergrondkleur = maakKleur(kl);
-	}
-
-	void achtergrondkleur(int r, int g, int b)
-	{
-		achtergrondkleur = CssColor.make(r, g, b);
-	}
-
-	void zetAchtergrond(CssColor c)
-	{
-		achtergrondkleur = c;
 	}
 
 	/**
