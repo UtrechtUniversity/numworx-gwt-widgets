@@ -189,8 +189,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	@Override
 	public HashMap<String, Object> getState()
 	{
-// hier onderscheid maken tussen TVV, Viewer, Profiles 		
-System.out.println("tvGWT getState");
+		// hier onderscheid maken tussen TVV, Viewer, Profiles 		
 
 		HashMap<String, Object> h = new HashMap<String, Object>();
 
