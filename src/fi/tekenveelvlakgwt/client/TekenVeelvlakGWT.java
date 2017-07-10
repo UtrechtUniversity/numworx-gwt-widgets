@@ -69,12 +69,9 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
 	
-	// images/css
+	// css
 	TekenVeelvlakGWTClientBundle tekenVeelvlakGWTClientBundle;
 	static TekenVeelvlakGWTCssResource tekenVeelvlakGWTCssResource;
-	ImageResource foutKruisResource, goedKrulResource;
-	Image foutKruisImage, goedKrulImage;
-
 	
 	private int mode;
 	private OpdrNavIF comRoot;
@@ -89,6 +86,11 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	
 	boolean kijkVlakkenNa = false;
 	boolean kijkDraaihoekNa = false;
+	boolean checkExternalVlakken = false;
+	boolean checkExternalDraaihoek = false;
+	/**
+	 * kijkNaActief geeft aan of in nakijkmodus.
+	 */
 	boolean kijkNaActief = false;
 	Boolean correct = null;
 	boolean nagekeken = false;
@@ -119,15 +121,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		tekenVeelvlakGWTClientBundle = GWT.create(TekenVeelvlakGWTClientBundle.class);
 		tekenVeelvlakGWTCssResource = tekenVeelvlakGWTClientBundle.getTekenVeelvlakGWTCssResource();
 		tekenVeelvlakGWTCssResource.ensureInjected();
-		
-		foutKruisResource = tekenVeelvlakGWTClientBundle.foutKruisResource();
-		goedKrulResource = tekenVeelvlakGWTClientBundle.goedKrulResource();
-		foutKruisImage = new Image(foutKruisResource);
-		goedKrulImage = new Image(goedKrulResource);
-
-		
 	} // getImages	
-		
+
 	// stand-alone versie
 	public void onModuleLoad() 
 	{
@@ -374,7 +369,8 @@ System.out.println("tvGWT getState");
 	}
 	
 	public void zetMode(int mode)
-	{	this.mode = mode;
+	{
+		this.mode = mode;
 		if (kijkNaActief)    
 			kijkNaActief = (mode == 0 || mode == 1);
 	}
@@ -399,8 +395,7 @@ System.out.println("tvGWT getState");
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
-		
-logger.info("TekenVeelvlakGWT init");
+		logger.info("TekenVeelvlakGWT init");
 		
 		this.breedte = width;
 		this.hoogte = height;
@@ -408,7 +403,7 @@ logger.info("TekenVeelvlakGWT init");
 		//this.launchState = launchState;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
-// Wim: scoreMax uit launchstate halen.
+		// Wim: scoreMax uit launchstate halen.
 		if(launchState.containsKey("scoreMax"))
 			scoreMax = launchState.getInt("scoreMax");
 		
@@ -463,11 +458,12 @@ logger.info("TekenVeelvlakGWT init");
         List<String> docentKleurenAL = new ArrayList<String>();
 //        String[] docentKleuren = null;
         if (launchState.containsKey("docentKleuren"))
-        { 	 docentKleurenAL = launchState.getStringList("docentKleuren");
-System.out.println("contains docentKleuren");        
+        {
+        	docentKleurenAL = launchState.getStringList("docentKleuren");
         }
     	if (docentKleurenAL != null)
-    	{	docentKleuren = new String[docentKleurenAL.size()];
+    	{
+    		docentKleuren = new String[docentKleurenAL.size()];
     		for (int dk = 0; dk < docentKleurenAL.size(); dk++)
         		docentKleuren[dk] = docentKleurenAL.get(dk);
     	}
@@ -476,25 +472,31 @@ System.out.println("contains docentKleuren");
         	kijkDraaihoekNa = launchState.getBoolean("kijkDraaihoekNa");
         if (launchState.containsKey("kijkVlakkenNa"))
         	kijkVlakkenNa = launchState.getBoolean("kijkVlakkenNa");
+        if (launchState.containsKey("checkExternalDraaihoek"))
+        	checkExternalDraaihoek = launchState.getBoolean("checkExternalDraaihoek");
+        if (launchState.containsKey("checkExternalVlakken"))
+        	checkExternalVlakken = launchState.getBoolean("checkExternalVlakken");
                 
         if (launchState.containsKey("docentDraaihoekX"))
         	docentDraaihoekX = launchState.getDouble("docentDraaihoekX");
         if (launchState.containsKey("docentDraaihoekY"))
         	docentDraaihoekY = launchState.getDouble("docentDraaihoekY");
 
-        this.kijkDraaihoekNa = kijkDraaihoekNa;
-        this.kijkVlakkenNa = kijkVlakkenNa;
-        this.kijkNaActief = kijkDraaihoekNa || kijkVlakkenNa;
-        this.docentDraaihoekX = docentDraaihoekX;
-        this.docentDraaihoekY = docentDraaihoekY;
-	
+        this.kijkNaActief = kijkDraaihoekNa || kijkVlakkenNa || checkExternalDraaihoek || checkExternalVlakken;
     	
 		dlp.setSize(breedte + "px", hoogte + "px");
 		
 		if (viewerOnly)
-		{	v3d = new Viewer3d(0,0,breedte, hoogte,this);
+		{
+			v3d = new Viewer3d(0,0,breedte, hoogte,this);
 			v3d.initContext2d();
 			
+			if (kijkNaActief)
+			{
+				// kijknapanel toevoegen aan south van docklayoutpanel dlp
+				dlp.addSouth(v3d.getKijkNaPanel(), 25);
+			}
+
 			dlp.add(v3d);
 			
 			if (tvState != null)
@@ -515,13 +517,10 @@ System.out.println("contains docentKleuren");
 				v3d.zetVlakkenKleurenOptie(true);
 			}
 			
-			if (kijkNaActief)
-			{
-				v3d.setWidgetVisible(v3d.kijkNaPanel, true);
-			}
-		
 			dlp.forceLayout();
 			v3d.forceLayout();
+			v3d.kijkNaPanel.forceLayout();
+			v3d.alles.forceLayout();
 			v3d.paint();
 			
 		}
@@ -552,6 +551,7 @@ System.out.println("contains docentKleuren");
 
 			dlp.forceLayout();
 			vaktek.forceLayout();
+			vaktek.kijkNaPanel.forceLayout();
 			
 			vaktek.paint();
 		}
@@ -579,18 +579,13 @@ System.out.println("contains docentKleuren");
 			tvv.tekenOpnieuw();
 		}	
 		
-		
 		ingevuld = false;
-		
 	}
 	
 	   public void answerChanged()
 	    {
 	    	if (kijkNaActief)
 	    	{	
-	    		
-	System.out.println("answerChanged");
-
 	    		correct = null;
 	    		score = 0;
 	    		nagekeken = false;
@@ -607,35 +602,24 @@ System.out.println("contains docentKleuren");
     		return;
     	
     	//if (vlakkenKleurenOptie && profielenKleurenOptie && profilesOnly)
-    	if (kijkVlakkenNa && profilesOnly)
+    	if (isVlakkenNakijkModus() && profilesOnly)
     	{
-//System.out.println("kijkNa profiles");    		
-    		
     		correct = vaktek.evalueer(docentKleuren);
     		nagekeken = true;
-    		//vaktek.kijkNaPanel.setWidgetVisible(goedKrulImage, correct);
-    		//vaktek.kijkNaPanel.setWidgetVisible(foutKruisImage, !correct);
-    		
-    		vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelGoed, correct);
-    		vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelFout, !correct);
-    		
+    		vaktek.kijkNaPanel.setStyleName("fout", !correct);
     		
     	}
-    	else if (kijkVlakkenNa && viewerOnly)
+    	else if (isVlakkenNakijkModus() && viewerOnly)
     	{
-    		
-//System.out.println("kijkNa viewer");    		
     		correct = v3d.evalueer(docentKleuren);
     		nagekeken = true;
-    		v3d.kijkNaPanel.setWidgetVisible(goedKrulImage, correct);
-    		v3d.kijkNaPanel.setWidgetVisible(foutKruisImage, !correct);
+    		v3d.kijkNaPanel.setStyleName("goed", correct);
+    		v3d.kijkNaPanel.setStyleName("fout", !correct);
+
     	}
-    	else if (kijkDraaihoekNa)
+    	else if (isDraaihoekNakijkModus())
     	{
-    		
-//System.out.println("kijkNa draaihoek");    		
     		correct = v3d.evalueer(docentDraaihoekX, docentDraaihoekY);
-//System.out.println("correct = " + correct);    		
     		nagekeken = true;
     	}
 
@@ -643,34 +627,60 @@ System.out.println("contains docentKleuren");
 			score = scoreMax;
 		
 		if (correct && viewerOnly)
-		{	//viewer.vinkjeLabel.setVisible(true);
-			v3d.kijkNaPanel.setWidgetVisible(goedKrulImage,true);
-			//vaktek.vinkjeLabel.setVisible(true);
+		{
+    		v3d.kijkNaPanel.setStyleName("goed", true);
+    		v3d.kijkNaPanel.setStyleName("fout", false);
 		}
 		else if (!correct && viewerOnly)
 		{
-			v3d.kijkNaPanel.setWidgetVisible(foutKruisImage,true);
+			v3d.kijkNaPanel.setStyleName("goed", false);
+    		v3d.kijkNaPanel.setStyleName("fout", true);
 		}
 		else if (correct && profilesOnly)
 		{
-			//viewer.kruisjeLabel.setVisible(true);
-			//v3d.kijkNaPanel.setWidgetVisible(tvGWT.goedKrulImage,false);
-			//vaktek.kruisjeLabel.setVisible(true);
-			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelGoed,true);
+			vaktek.kijkNaPanel.setStyleName("goed", true);
+			vaktek.kijkNaPanel.setStyleName("fout", false);
 		}
 		else if (!correct && profilesOnly)
 		{
-			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelFout,true);
+			vaktek.kijkNaPanel.setStyleName("goed", false);
+			vaktek.kijkNaPanel.setStyleName("fout", true);
 		}
 		
 		ingevuld = true;
 
     	comRoot.setChanged(isCorrect().booleanValue());
-
-		
 	}
 
-	public void zetVolledigeBreedte(int breedte) {
+    private boolean isDraaihoekNakijkModus()
+    {
+    	boolean b = false;
+    	
+    	b = kijkDraaihoekNa || checkExternalDraaihoek;
+    	
+    	return b;
+    }
+    
+    private boolean isVlakkenNakijkModus()
+    {
+    	boolean b = false;
+    	
+    	b = kijkVlakkenNa || checkExternalVlakken;
+    	
+    	return b;
+    }
+    
+    boolean isCheckExternalModus()
+    {
+    	boolean b = false;
+    	
+    	b = checkExternalDraaihoek || checkExternalVlakken;
+    	
+    	return b;
+    }
+    
+	public void zetVolledigeBreedte(int breedte) 
+	{
 	}
 
 	public int getAsHoogte() {
@@ -694,7 +704,18 @@ System.out.println("contains docentKleuren");
 	public int[][] getScoreObjectives() {
 		return null;
 	}
-	
-    
 
+	public TekenVeelvlakGWTCssResource getTekenVeelvlakCss()
+	{
+		return tekenVeelvlakGWTCssResource;
+	}
+
+	public boolean isNakijkModus()
+	{
+    	boolean b = false;
+    	
+    	b = kijkNaActief;
+    	
+    	return b;
+	}
 }
