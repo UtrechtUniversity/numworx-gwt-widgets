@@ -2,6 +2,7 @@
 body {
 	overflow: hidden;
 	margin: 0px !important;
+	background-color: transparent !important;
 }
 
 .root {
@@ -17,7 +18,7 @@ body {
 }
 
 .canvas {
-	background-color: white;	
+	background-color: transparent !important;	
 }
 
 .upimage {
@@ -54,3 +55,20 @@ body {
 	padding: 0px;	
 }	
 
+.kijknapanel {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.goed {
+	background-image: url("images/resources/knop-indicatie-goed.png");
+}
+
+.half {
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.fout {
+	background-image: url("images/resources/knop-indicatie-fout.png");
+}
