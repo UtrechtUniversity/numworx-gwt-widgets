@@ -8,9 +8,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.PushButton;
 
 import fi.euclides.event.AddBissectriceHandler;
@@ -32,11 +32,10 @@ import fi.euclides.event.DestroyHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
+import fi.euclides.expr.TrailHandler;
 import fi.euclides.proof.AfstandHandler;
-import fi.euclides.proof.CrossRatio;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
-import fi.euclides.proof.RatioHandler;
 import fi.euclides.proof.VectorHandler;
 import fi.euclides.util.Messages;
 
@@ -59,10 +58,10 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	}
 
-	HorizontalPanel panel;
+	FlowPanel panel;
 	
 	public ToolBoxPanel() {
-		panel = new HorizontalPanel();
+		panel = new FlowPanel();
 		initWidget(panel);
 	}
 	
@@ -72,9 +71,16 @@ public class ToolBoxPanel extends Composite implements Tools {
 			panel.getWidget(0).removeFromParent();
 	}
 	
+	private int height = 38;
+	private int width;
+	int getHeight() {
+		return height;
+	}
 	
 	void init(ObjectList list, Tracker tracker, GeoDefinerGWT geoDefinerGWT) {		
 		PushButton btn;
+		width = geoDefinerGWT.getWidth();
+		height = ((list.size()*38-1)/width+1)*38;
 		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
@@ -89,45 +95,44 @@ public class ToolBoxPanel extends Composite implements Tools {
 				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
 			case SEGMENT:
 				btn = newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker);break;
-			case 10:
+			case TRIANGLE:
 				btn = newBtn(url + "/triangle.png", new AddTriangleHandler2(), tracker);break;
-			case 11:
+			case CIRCLE:
 				btn = newBtn(url + "/circle.png", new AddCirkelHandler(), tracker);break;
-			case 7:
-				btn = newBtn(url + "/delete.png", new DestroyHandler(), tracker);break;		
-
+			case DESTROY:
+				btn = newBtn(url + "/delete.png", new DestroyHandler(), tracker);break;
 			case HALFLINE:
 				btn = newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker);break;		
-			case 8:
+			case ARC:
 				btn = newBtn(url + "/angle.png", new AddBoogHandler("Boog"), tracker);break;		
-			case 9:
+			case MIDPOINT:
 				btn = newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker);break;		
 			case PERPENDICULAR:
 				btn = newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker);break;		
 			case PARALLEL:
 				btn = newBtn(url + "/parallel.png", new AddParallelHandler(), tracker);break;		
-			case 12:
+			case BISECTRICE:
 				btn = newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker);break;		
-			case 13:
+			case MIRROR:
 				btn = newBtn(url + "/mirror.png", new AddSpiegelHandler(), tracker);break;		
-			case 14:
+			case CONIC_SECTION:
 				btn = newBtn(url + "/quadric.png", new AddKegelsnedeHandler("Kegelsnede"), tracker);break;		
-			case 15:
+			case FOCUS:
 				btn = newBtn(url + "/quadric.png", new AddFocusHandler(), tracker);break;		
-			case 16:
+			case LOCUS:
 				btn = newBtn(url + "/objecttracker.png", new AddLocusHandler("Meetkundige plaats"), tracker);break;		
-			case 17:
+			case TANGENT:
 				btn = newBtn(url + "/line.png", new AddRaakLijnHandler(), tracker);break;		
-			case 18:
+			case POLELINE:
 				btn = newBtn(url + "/line.png", new AddPoollijnHandler(), tracker);break;		
 // labels
-			case 19:
+			case DISTANCE:
 				btn = newBtn(url + "/segment.png", new AfstandHandler("lengte"), tracker); break;
-			case 20:
+			case AREA:
 				btn = newBtn(url + "/triangle.png", new OppHandler("oppervlakte"), tracker); break;
-			case 21:
+			case ANGLE:
 				btn = newBtn(url + "/angle.png", new HoekHandler("hoek"), tracker); break;
-			case 22:
+			case VECTOR:
 				btn = newBtn(url + "/ray.png", new VectorHandler("vector"), tracker); break;
 				
 /*			
@@ -137,16 +142,15 @@ public class ToolBoxPanel extends Composite implements Tools {
 		item = new MenuItem("CrossRatio", new Action(new CrossRatio("CrossRatio"), tracker ));
 		
 */			
-			case 23: // definitie
+			case FORMULA: // definitie
 				break;
-			case 24: // trail
-//		actions.add(new TrailAction(Messages.getString("Euclides.44"), viewer)); //$NON-NLS-1$
-					break;
-					
-			case 25: // pan
+			case TRAIL: // trail
+				btn = newBtn(url+"/thickness2.png", new TrailHandler(Messages.getString("Euclides.44")), tracker);
+					break;					
+			case PAN: // pan
 				btn = newBtn(url + "/pan.png", geoDefinerGWT.widget.getPanHandler(), tracker);
 					break;
-			case 26: // reset
+			case RESET: // reset
 				resetter = new ResetHandler("Reset");
 				resetter.instance = geoDefinerGWT;
 				btn = newBtn(url + "/reseticon.gif", resetter, tracker); break;

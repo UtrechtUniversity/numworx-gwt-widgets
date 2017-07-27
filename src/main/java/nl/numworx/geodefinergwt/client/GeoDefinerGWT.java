@@ -215,6 +215,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
 				toolbox.init(list, viewer, this);
+				root.setWidgetSize(toolbox, toolbox.getHeight());
 				return;
 			}
 		}
@@ -379,6 +380,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
 		widget.init(width, height);
+		this.width = width;
+		this.height = height;
 		DoubleFormat.setInstance(new PrettyFormat());
 		Messages.setInstance(new MessagesImpl(rb));
 		viewer = widget.getViewer();
