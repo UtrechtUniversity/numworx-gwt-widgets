@@ -20,6 +20,7 @@
   <!-- Other module inherits                                      -->
   <!--  <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+  <inherits name='nl.uu.fi.dwo.formule.Formule' />
 
   <extend-property name="locale" values="en"/>
   <extend-property name="locale" values="de"/>
