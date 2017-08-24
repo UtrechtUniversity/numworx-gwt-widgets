@@ -22,4 +22,5 @@ public interface GeomAlgGWTCssResource extends CssResource
 	
 	String pushbutton();
 
+	String checkbox();
 }
