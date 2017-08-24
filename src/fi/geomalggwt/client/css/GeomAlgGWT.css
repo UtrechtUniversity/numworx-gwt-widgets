@@ -55,4 +55,7 @@
 	/** padding: 0px; */	
 }	
 
-
+.checkbox input {
+	margin-right: 3px !important;
+	vertical-align: middle;
+}
