@@ -1,28 +1,13 @@
 package fi.graphtoolgwt.client;
 
-//import java.awt.Color;
-//import java.awt.Point;
-//import java.awt.Color;
-//import java.awt.Cursor;
-//import java.awt.Toolkit;
-//import java.awt.event.MouseEvent;
-//import java.awt.image.BufferedImage;
-//import java.io.IOException;
-
-//import java.util.ArrayList;
-
-
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
-//import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-
-//import javax.imageio.ImageIO;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
@@ -36,10 +21,6 @@ import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
-//import nl.uu.fi.dwo.mobile.client.ui.views.ViewModuleViewImpl.KeyHandler;
-
-
-
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -83,8 +64,9 @@ import fi.wiskopdr.expressies.Algebra;
 import fi.wiskopdr.expressies.Expressie;
 import fi.wiskopdr.expressies.repr.ContentMathML;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
+import fi.graphtoolgwt.client.text.Text;
+import fi.graphtoolgwt.client.text.Text_en;
 import fi.graphtoolgwt.client.text.Text_nl;
-//import fi.graphtoolgwt.client.ui.KeyHandler;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -99,7 +81,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	final static boolean cDefault_tekenComponentAan = false;
 
-	public static Text_nl rb = new Text_nl();
+	public static Text rb = GWT.create(Text.class);
 
 	static final String holderId = "dockholder";
 	static final String upgradeMessage = 

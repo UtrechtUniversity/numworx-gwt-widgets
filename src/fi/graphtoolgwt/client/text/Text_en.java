@@ -2,7 +2,7 @@ package fi.graphtoolgwt.client.text;
 
 import java.util.Vector;
 
-public class Text_en {
+public class Text_en extends Text_nl {
 
 	
 	private Vector<String> keys = new Vector<String>();
