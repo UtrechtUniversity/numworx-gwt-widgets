@@ -31,32 +31,20 @@ public class Text_en {
 
 	static final Object[][] contents =
 	{
-	{ 	"ofLabel", "of" },
 	{ 	"ofLabel", "or" },
-	{	"enOfButton_En", "en"},
 	{	"enOfButton_En", "and"},
-	{	"enOfButton_Of", "of"},
 	{	"enOfButton_Of", "or"},
 	
-	{	"kijkNaButton", "Klaar"},
 	{	"kijkNaButton", "Ready"},
 	
-	{	"feedbackTekstPuntenDeels", "Nog niet alle punten zijn (goed) getekend."},
 	{	"feedbackTekstPuntenDeels", "Not all points are drawn (correctly) yet."},
-    {	"feedbackTekstGrafiekenDeels", "Nog niet alle grafieken zijn goed getekend."},
     {	"feedbackTekstGrafiekenDeels", "Not all graphs are drawn (correctly) yet."},
-    {	"feedbackTekstLabelsAssen", "Zet de juiste letters bij de assen"},
-    {	"feedbackTekstLabelsAssen", "Place the correct letters to the axes"},
-    {	"feedbackTekstTekenGrafiek", "Let op: teken ook de grafiek."},
-    {	"feedbackTekstTekenGrafiek", "Be aware: also draw the graph."},
-    {	"feedbackTekstTeWeinigPunten", "Let op: je hebt nog niet voldoende punten getekend."},
-    {	"feedbackTekstTeWeinigPunten", "An insufficient amount of points have been drawn."},
+    {	"feedbackTekstLabelsAssen", "Place the correct letters next to the axes"},
+    {	"feedbackTekstTekenGrafiek", "Also draw the graph."},
+    {	"feedbackTekstTeWeinigPunten", "An insufficient number of points has been drawn."},
     	
-	{	"fc_huidigDomein", "Domein is nu: "},
 	{	"fc_huidigDomein", "Current domain: "},
-    {	"fc_domeinBijFunctie", "Domein bij functie"},
     {	"fc_domeinBijFunctie", "Function domain"},
-    {	"fc_nieuwDomein", "Nieuw domein: "},
     {	"fc_nieuwDomein", "New domain: "},
 	
 	};
