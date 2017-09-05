@@ -344,8 +344,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			checkboxen[i].setValue(geselecteerd[i]);
 		}
 		
-		for(int i = 0 ; i < enOfKnoppen.length; i++)
-		{	enOfKnoppen[i] = new PushButton(GraphToolGWT.rb.getString("enOfButton_En"));
+		for(int i = 0 ; i < enOfKnoppen.length; i++) {	
+			enOfKnoppen[i] = new PushButton(GraphToolGWT.rb.enOfButton_En());
 			//enOfKnoppen[i].setMargin(new Insets(0,0,0,0));
 			enOfKnoppen[i].setSize("24px", "19px");
 			enOfKnoppen[i].getElement().getStyle().setPadding(1, Unit.PX);
@@ -1332,7 +1332,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//deze komt waarschijnlijk nog terug: 
 		regelsPanel.remove(enOfKnoppen[aantalRegels-2]);
 		isEn[aantalRegels - 2] = true;
-		enOfKnoppen[aantalRegels-2].setText(GraphToolGWT.rb.getString("enOfButton_En"));
+		enOfKnoppen[aantalRegels-2].setText(GraphToolGWT.rb.enOfButton_En());
 		//layoutVakken(false);
 		aantalRegels--;
 		
@@ -1459,14 +1459,11 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		public void onClick(ClickEvent event) {
 			isEn[regelnummer] = !isEn[regelnummer];
 			if(isEn[regelnummer])
-				enOfKnoppen[regelnummer].setText(GraphToolGWT.rb.getString("enOfButton_En"));
+				enOfKnoppen[regelnummer].setText(GraphToolGWT.rb.enOfButton_En());
 			else			
-				enOfKnoppen[regelnummer].setText(GraphToolGWT.rb.getString("enOfButton_Of"));
+				enOfKnoppen[regelnummer].setText(GraphToolGWT.rb.enOfButton_Of());
 			parseFormule(regelnummer, false);
 			grafiekGWTVeld.paint();
-			
-			
-			
 			
 		}
 	}
