@@ -1,9 +1,9 @@
 package fi.graphtoolgwt.client.text;
 
-//import com.google.gwt.i18n.client.ConstantsWithLookup;
-import com.google.gwt.i18n.client.Constants;
+import com.google.gwt.i18n.client.ConstantsWithLookup;
+//import com.google.gwt.i18n.client.Constants;
 
-public interface Text extends Constants {
+public interface Text extends ConstantsWithLookup {
 
 	String ofLabel();
 	String enOfButton_En();
