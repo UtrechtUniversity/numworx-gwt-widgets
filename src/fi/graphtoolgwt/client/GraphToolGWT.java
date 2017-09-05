@@ -65,8 +65,6 @@ import fi.wiskopdr.expressies.Expressie;
 import fi.wiskopdr.expressies.repr.ContentMathML;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text;
-import fi.graphtoolgwt.client.text.Text_en;
-import fi.graphtoolgwt.client.text.Text_nl;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
