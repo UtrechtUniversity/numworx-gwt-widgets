@@ -86,8 +86,7 @@ public class DomeinButtonGWT extends Button {
         else
         	xMaxTekst = (String) domeinString[1].subSequence(2, domeinString[1].length() - 1);
        
-        huidigDomeinLabel = new Label(GraphToolGWT.rb.getString("fc_huidigDomein") + " [ " + 
-        //JLabel label = new JLabel(GraphTool.rb.getString("fc_huidigDomein") + " [" + 
+        huidigDomeinLabel = new Label(GraphToolGWT.rb.fc_huidigDomein() + " [ " + 
         		xMinTekst + ";" + xMaxTekst + "]");
         //boxh.add(label);
         frameContents.add(huidigDomeinLabel);
@@ -104,8 +103,7 @@ public class DomeinButtonGWT extends Button {
         frameContents.setWidgetLeftRight(nieuwDomeinPanel, 5, Style.Unit.PX, 5, Style.Unit.PX);
         frameContents.setWidgetTopHeight(nieuwDomeinPanel, 30, Style.Unit.PX, 30, Style.Unit.PX);
         
-        
-        Label nieuwDomein = new Label(GraphToolGWT.rb.getString("fc_nieuwDomein"));
+        Label nieuwDomein = new Label(GraphToolGWT.rb.fc_nieuwDomein());
         nieuwDomeinPanel.add(nieuwDomein);
         //boxh2.add(nieuwDomein);
         Label haakLinks = new Label("[");
@@ -215,7 +213,8 @@ public class DomeinButtonGWT extends Button {
         	xMaxTekst = "" + FormuleParser.geefExpressie(domeinString[1]).geefWaarde();
         else
         	xMaxTekst = (String) domeinString[1].subSequence(2, domeinString[1].length() - 1);
-		huidigDomeinLabel.setText(GraphToolGWT.rb.getString("fc_huidigDomein") + " [ " + 
+        
+		huidigDomeinLabel.setText(GraphToolGWT.rb.fc_huidigDomein() + " [ " + 
         		xMinTekst + ";" + xMaxTekst + "]");
 		
 	}

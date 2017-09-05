@@ -17,6 +17,12 @@ public interface Text extends Constants {
     String feedbackTekstTekenGrafiek();
     String feedbackTekstTeWeinigPunten();
     
+    String xVarMessage1();
+    String xVarMessage2();
+    String xVarMessage3();
+    String xVarMessage4a();
+    String xVarMessage4b();
+    
     String fc_huidigDomein();
     String fc_domeinBijFunctie();
     String fc_nieuwDomein();

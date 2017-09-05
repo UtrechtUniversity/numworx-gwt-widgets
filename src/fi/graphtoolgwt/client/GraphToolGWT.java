@@ -605,7 +605,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		}
 		
 		int nakijkButtonWidth = 75;
-		kijkNaButton = new Button(GraphToolGWT.rb.getString("kijkNaButton"));
+		kijkNaButton = new Button(GraphToolGWT.rb.kijkNaButton());
 		kijkNaButton.getElement().getStyle().setTextAlign(TextAlign.CENTER);
 		kijkNaButton.getElement().getStyle().setFontSize(12, Style.Unit.PX);
 		kijkNaButton.setSize(nakijkButtonWidth + "px", 24 + "px");
@@ -822,21 +822,21 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		if(text.length()>0 && !Letter.isLetter(text.charAt(0)))
 		{	//JOptionPane.showMessageDialog(WiskOpdr.applet, WiskOpdr.rb.getString("xVarMessage1"));
 			DialogBox box = new DialogBox();
-			box.setText(rb.getString("xVarMessage1"));
+			box.setText(rb.xVarMessage1());
 			box.show();
 			updateX(text.substring(1),true);
 		}
 		else if(text.length()>1 && !FormuleParser.isWoordFormule())
 		{	//JOptionPane.showMessageDialog(WiskOpdr.applet, WiskOpdr.rb.getString("xVarMessage2"));
 			DialogBox box = new DialogBox();
-			box.setText(rb.getString("xVarMessage2"));
+			box.setText(rb.xVarMessage2());
 			box.show();
 			updateX(text.substring(0,1),true);
 		}
 		else if(text.length()==1 && text.charAt(0)=='e')
 		{	//JOptionPane.showMessageDialog(WiskOpdr.applet, WiskOpdr.rb.getString("xVarMessage3"));
 			DialogBox box = new DialogBox();
-			box.setText(rb.getString("xVarMessage3"));
+			box.setText(rb.xVarMessage3());
 			box.show();
 			
 			if(FormuleParser.isWoordFormule())
@@ -849,7 +849,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			for(int i=0 ; i<forbiddenStrings.length ; i++)
 			{	if(text.indexOf(forbiddenStrings[i])>-1)
 				{	DialogBox box = new DialogBox();
-					box.setText(rb.getString("xVarMessage4a") + forbiddenStrings[i] + rb.getString("xVarMessage4b"));
+					box.setText(rb.xVarMessage4a() + forbiddenStrings[i] + rb.xVarMessage4b());
 					box.show();
 					//DialogBox.showMessageDialog(WiskOpdr.applet, WiskOpdr.rb.getString("xVarMessage4a") + forbiddenStrings[i] + WiskOpdr.rb.getString("xVarMessage4b"));
 					if(text.length()>0)
@@ -1371,8 +1371,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				correct = false; 
 				goedkrulImage.setVisible(false);
 				goedkrulHalfImage.setVisible(show);
-				if(show)
-					setFeedback(GraphToolGWT.rb.getString("feedbackTekstLabelsAssen"),true);
+				if(show) {
+					setFeedback(GraphToolGWT.rb.feedbackTekstLabelsAssen(),true);
+				}
 			}
 		}
 		return (returnColor);
@@ -1410,8 +1411,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				correct = false;
 				goedkrulImage.setVisible(false);
 				goedkrulHalfImage.setVisible(show);
-				if(show)
-					setFeedback(GraphToolGWT.rb.getString("feedbackTekstTekenGrafiek"),true);
+				if(show) {
+					setFeedback(GraphToolGWT.rb.feedbackTekstTekenGrafiek(),true);
+				}
 			} 
 		}
 		return (returnColor);
@@ -1523,8 +1525,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					comRoot.setChanged(false);
 				if(graphPoints.size() > 0)	
 				{	ingevuld = true;
-					if((checkExternal || mode == OpdrNavIF.ZELFTOETS || mode == OpdrNavIF.EINDTOETS) && show)
-					{	setFeedback(GraphToolGWT.rb.getString("feedbackTekstTeWeinigPunten"),true);
+					if((checkExternal || mode == OpdrNavIF.ZELFTOETS || mode == OpdrNavIF.EINDTOETS) && show){	
+						setFeedback(GraphToolGWT.rb.feedbackTekstTeWeinigPunten(),true);
 					}
 				}
 				return;
@@ -1730,10 +1732,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 							break;
 						}
 					}
-					if(show && minstensEenFunctieCorrect)
-						setFeedback(GraphToolGWT.rb.getString("feedbackTekstGrafiekenDeels"),true);
-					else if(show)
-					{	setFeedback(GraphToolGWT.rb.getString("feedbackTekstPuntenDeels"),true);
+					if(show && minstensEenFunctieCorrect) {
+						setFeedback(GraphToolGWT.rb.feedbackTekstGrafiekenDeels(),true);
+					} else if(show) {
+						setFeedback(GraphToolGWT.rb.feedbackTekstPuntenDeels(),true);
 						puntenCorrect = false;
 					}
 					//if(show)setFeedback(GraphToolGWT.rb.getString("feedbackTekstPuntenDeels"),true);
@@ -1775,8 +1777,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				//produceAction("changed");
 				if(graphPoints.size() > 0)	
 				{	ingevuld = true;
-					if((checkExternal || mode == OpdrNavIF.ZELFTOETS || mode == OpdrNavIF.EINDTOETS) && show)
-					{	setFeedback(GraphToolGWT.rb.getString("feedbackTekstTeWeinigPunten"),true);
+					if((checkExternal || mode == OpdrNavIF.ZELFTOETS || mode == OpdrNavIF.EINDTOETS) && show) {	
+						setFeedback(GraphToolGWT.rb.feedbackTekstTeWeinigPunten(),true);
 					}
 				}
 				return;
