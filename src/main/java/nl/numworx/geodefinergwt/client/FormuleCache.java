@@ -8,7 +8,6 @@ import com.google.gwt.dom.client.CanvasElement;
 
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
-import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.formule.client.formuleobjects.FormuleElement;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import fi.euclides.model.Label;
@@ -93,7 +92,7 @@ class FormuleCache implements Observer {
 		viewer.getMainRegel().validate();
 		w = viewer.getWidth();
 		h = viewer.getHeight();
-		double ratio = 1.0; // getDeviceRatio(ctx);
+		double ratio = CanvasViewer.getDeviceRatio(ctx);
 		canvas.setPixelSize((int)w, (int)h);
 		if(ratio > 1.0) {
 			canvas.setCoordinateSpaceHeight((int) (h*ratio));
