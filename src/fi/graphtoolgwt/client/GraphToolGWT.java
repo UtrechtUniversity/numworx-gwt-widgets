@@ -76,7 +76,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
 	final static int cPointRadius = 3;
-
+	final static CssColor cColorOrange = CssColor.make(255, 193, 0);
+	final static CssColor cColorRed = CssColor.make(255, 0, 0);
+	final static CssColor cColorGreen = CssColor.make(0, 200, 0);
+	
 	final static boolean cDefault_tekenComponentAan = false;
 
 	public static Text rb = GWT.create(Text.class);
@@ -1129,9 +1132,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			return gewoneKleuren[0];
 	}
 	
-	public void setColor(int nr, CssColor c, boolean nakijken)
-	{
+	public void setColor(int nr, CssColor c, boolean nakijken) {
 		//31-8-2015: colors[nr] moet altijd deze kleur worden; bij nakijken wordt rood/groene feedback anders niet getoond.
+		System.out.println("setColor " + nr + "= "+ c + " (" +nakijken +")");
+
 		colors[nr] = c;
 		if(typeOpdracht == GEENOPDRACHT)
 		{	gewoneKleuren[nr] = c;
@@ -1790,6 +1794,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				score = 0;
 				correct = false;
 				fout = false;
+    			System.out.println("color 01 = " + color);
+
 	
 				Vector llgPtsCopy = new Vector();
 				for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
@@ -1805,6 +1811,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				{	ingevuld = false;
 					return;
 				}
+    			System.out.println("color 02 = " + color);
 				for (int dCnt = 0; dCnt < docentGraphPoints.size(); dCnt++)
 				{
 					RealPoint dPt = (RealPoint) docentGraphPoints.elementAt(dCnt);
@@ -1824,10 +1831,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					llgPtsArray[dCnt] = (RealPoint) llgPtsCopy.elementAt(index);
 					llgPtsCopy.removeElementAt(index);
 				}
+    			System.out.println("color 03 = " + color);
+
 			
 				int hits = 0;
-				for (int dCnt = 0; dCnt < docentGraphPoints.size(); dCnt++)
-				{	RealPoint dPoint = (RealPoint) docentGraphPoints.elementAt(dCnt);
+				for (int dCnt = 0; dCnt < docentGraphPoints.size(); dCnt++) {	
+					RealPoint dPoint = (RealPoint) docentGraphPoints.elementAt(dCnt);
 					RealPoint lPoint = llgPtsArray[dCnt];
 					
 					Point lPixel = realPointToPixels(lPoint);
@@ -1839,12 +1848,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					if (dis < nauwkeurigheid[0])
 						hits++;
 				}
+    			System.out.println("color 04 = " + color);
 				
 				int scorePerPunt = scoreMax / Math.max(docentGraphPoints.size(), llgPtsArray.length);
 				if (hits == 0)
 					score = 0;
-				else if (hits == llgPtsArray.length)
-				{
+				else if (hits == llgPtsArray.length) {
 					color = CssColor.make(0, 200, 0);
 					score = scoreMax;
 					correct = true;
@@ -1852,19 +1861,31 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					goedkrulHalfImage.setVisible(false);
 					foutkruisImage.setVisible(false);
 				}
-				else
-				{	score = hits * scorePerPunt;    			
+				else {	
+					score = hits * scorePerPunt;    			
 					fout = true;
+/* oud					
 					goedkrulImage.setVisible(false);
 					goedkrulHalfImage.setVisible(false);
 					foutkruisImage.setVisible(show);
+*/					
+					goedkrulImage.setVisible(false);
+					goedkrulHalfImage.setVisible(show);
+					foutkruisImage.setVisible(false);
+					setFeedback(GraphToolGWT.rb.feedbackTekstPuntenDeels(),true);
+					color = cColorOrange;
+
 				}
+    			System.out.println("color 05 = " + color);
 				
 				color = verwerkTekenModusBijNakijken(show, color, correct);
+    			System.out.println("color 06 = " + color);
 				color = verwerkAsNaamBijNakijken(show, color, correct);
+    			System.out.println("color 07 = " + color);
 
-				if(show)
+				if(show) {
 					setColor(0, color, true);
+				}
 				
 				//grafiekGWTVeld.paint(); // nodig?
 			}
