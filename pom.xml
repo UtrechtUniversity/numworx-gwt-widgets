@@ -140,7 +140,7 @@
 		<formuleVersion>0.0.5-SNAPSHOT</formuleVersion>
 		<debug />
 		<gwtVersion>2.7.0</gwtVersion>
-		<gwt.style>OBFUSCATED</gwt.style> /* -D gwt.style=PRETTY */
+		<gwt.style>OBFUSCATED</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
 	</properties>
 	<scm>
