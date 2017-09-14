@@ -1210,17 +1210,22 @@ public class GrafiekGWTVeld {
 		{	g.setFillStyle(interactiePanel.colors[0]);
 			g.setStrokeStyle(interactiePanel.colors[0]);
 		}
-		for (int pCnt = 0; pCnt < indexPoints.size(); pCnt++)
-		{	RealPoint rp = (RealPoint) indexPoints.elementAt(pCnt);
+		for (int pCnt = 0; pCnt < indexPoints.size(); pCnt++) {	
+			RealPoint rp = (RealPoint) indexPoints.elementAt(pCnt);
 			Point pix = interactiePanel.realPointToPixels(rp);
-			
+			if  ( (interactiePanel.SeparateGraphPointColors) && 
+				  (!interactiePanel.grafiekKleuren) &&
+				  (!docent)
+				) {
+				g.setFillStyle(interactiePanel.graphPointColors.elementAt(pCnt));
+				g.setStrokeStyle(interactiePanel.graphPointColors.elementAt(pCnt));
+			}
 			if ( (pix!= null) && pixelsPointWithinBounds(pix.getX(), pix.getY()) ) { 
 				g.beginPath();
 				g.arc(pix.getX(), pix.getY(), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
 				g.closePath();
 				g.fill();
 			}
-
 		}
 		// verbinden met lijnen
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.LINES 

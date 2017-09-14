@@ -272,6 +272,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	private int numGraphs = maxGraphs;
 	private int activeIndex = 1;
 	Vector<RealPoint> graphPoints = new Vector<RealPoint>();
+	boolean SeparateGraphPointColors = true;
+	Vector<CssColor> graphPointColors = new Vector<CssColor>();
 	SchuifParameterGWT[] schuifParameters = new SchuifParameterGWT[0];
 	
 	Vector<RealPoint> docentGraphPoints = new Vector<RealPoint>();
@@ -978,10 +980,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				firstFound = true;
 			}
 		}
-		if(pIndex == -1)
+		if(pIndex == -1) {
 			graphPoints.addElement(newRP);
-		else
+			graphPointColors.addElement(opdrachtKleuren[activeIndex - 1]);
+		}
+		else {
 			graphPoints.insertElementAt(newRP, pIndex);
+			graphPointColors.insertElementAt(opdrachtKleuren[activeIndex - 1], pIndex);
+		}
 		
 		/*
 		for (int pCnt = 0; pCnt < (docent?docentGraphPoints:graphPoints).size(); pCnt++)
@@ -1007,8 +1013,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	public void removePoints(int index)//, boolean docent)
 	{	for (int pCnt = graphPoints.size() - 1; pCnt > - 1; pCnt--)
 		{	RealPoint rp = graphPoints.elementAt(pCnt);
-			if (rp.getIndex() == index)
+			if (rp.getIndex() == index) {
 				graphPoints.removeElementAt(pCnt);
+				graphPointColors.removeElementAt(pCnt);
+			}
 		}
 
 		/*
@@ -1075,8 +1083,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	public void removePoint(int tabelindex, int index)//, boolean docent)
 	{	for (int pCnt = graphPoints.size() - 1; pCnt > - 1; pCnt--)
 		{	RealPoint rp = (RealPoint) graphPoints.elementAt(pCnt);
-			if (rp.getIndex() == index && rp.getTabelIndex() == tabelindex)
-			{	graphPoints.removeElementAt(pCnt);
+			if (rp.getIndex() == index && rp.getTabelIndex() == tabelindex){	
+				graphPoints.removeElementAt(pCnt);
+				graphPointColors.removeElementAt(pCnt);
 				//produceAction("points changed");
 				pointsChangedAction();
 				break;
@@ -1831,8 +1840,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					llgPtsArray[dCnt] = (RealPoint) llgPtsCopy.elementAt(index);
 					llgPtsCopy.removeElementAt(index);
 				}
-    			System.out.println("color 03 = " + color);
-
 			
 				int hits = 0;
 				for (int dCnt = 0; dCnt < docentGraphPoints.size(); dCnt++) {	
@@ -1845,8 +1852,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					double dis = Math.sqrt((lPixel.getX() - dPixel.getX()) * (lPixel.getX() - dPixel.getX()) +
 								     	   (lPixel.getY() - dPixel.getY()) * (lPixel.getY() - dPixel.getY())); 
 					
-					if (dis < nauwkeurigheid[0])
+					if (dis < nauwkeurigheid[0]) {
 						hits++;
+						graphPointColors.setElementAt(cColorGreen, index);
+					} 
 				}
     			System.out.println("color 04 = " + color);
 				
@@ -1908,8 +1917,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	}
 	
 	
-	public void setFeedback(String tekst, boolean closeable)
-	{	feedbackTekst.setText("");
+	public void setFeedback(String tekst, boolean closeable) {	
+		feedbackTekst.setText("");
 		//feedbackTekst.setCloseable(closeable);
 		//feedbackPanel.setSize((breedte - kijkNaButton.getOffsetWidth() - buttonSize - 5) + "px", "29px");
 		//feedbackTekst.setSize(195,20);
@@ -2133,6 +2142,31 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			for(int i = 0; i < schuifParameters.length; i++)
 				paramWaarden[i] = schuifParameters[i].geefWaarde();
 		}
+
+		int[][] colorRGBsGraphPoints = new int[graphPointColors.size()][3];
+		for(int i = 0; i < graphPointColors.size(); i++)
+		{	int[] kleurLijstje = new int[3];
+			String waarde = graphPointColors.elementAt(i).value();
+			if(waarde.startsWith("rgb"))
+			{	waarde = waarde.substring(4, waarde.length() - 1);
+				try
+				{	String[] waardeLijstje = FormuleComponentGWT.split(waarde, ",");
+					for(int j = 0; j < 3; j++)
+					{	try{kleurLijstje[j] = Integer.parseInt(waardeLijstje[j]);}
+						catch(Exception e){/*kleurLijstje[j] = 0;*/}
+					}
+				}
+				catch(Exception e)
+				{	/*for(int j = 0; j < 3; j++)
+						kleurLijstje[j] = 0;*/
+				}
+			}
+			else
+			{	for(int j = 0; j < 3; j++)
+					kleurLijstje[j] = 0;
+			}
+			colorRGBsGraphPoints[i] = kleurLijstje;
+		}
 		
 		int[][] colorRGBsOpdrachten = new int[opdrachtKleuren.length][3];
 		for(int i = 0; i < opdrachtKleuren.length; i++)
@@ -2158,6 +2192,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			}
 			colorRGBsOpdrachten[i] = kleurLijstje;
 		}
+		
 		int[][] colorRGBsGewoon = new int[gewoneKleuren.length][3];
 		for(int i = 0; i < gewoneKleuren.length; i++)
 		{	int[] kleurLijstje = new int[3];
@@ -2231,6 +2266,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//h.put("colorRGBs", colorRGBs);
 		h.put("colorRGBsGewoon", colorRGBsGewoon);
 		h.put("colorRGBsOpdrachten", colorRGBsOpdrachten);
+		h.put("colorRGBsGraphPoints", colorRGBsGraphPoints);
 		h.put("activeIndex", new Integer(activeIndex));
 		h.put("grafiekXAsNaam", new String(grafiekXAsNaam));
 		h.put("grafiekYAsNaam", new String(grafiekYAsNaam));
@@ -2329,6 +2365,19 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			for (int i = 0; i < colorRGBsGewoon.length; i++) {
 				colorRGBsGewoon[i] = list.getIntArray(i);
 				gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]);
+			}
+		}
+    	
+		int[][] colorRGBsGraphPoints = null;
+		if (map.containsKey("colorRGBsGraphPoints")) {	
+			graphPointColors.clear();
+			ObjectList list = map.getObjectList("colorRGBsGraphPoints");
+			//List<Object> colorRGBsGewoonList = JSONUtilities.toArrayList(h.get("colorRGBsGewoon"));
+			//ArrayList<ArrayList<Integer>> colorRGBsList = (ArrayList<ArrayList<Integer>>) h.get("colorRGBs");
+			colorRGBsGraphPoints = new int[list.size()][];
+			for (int i = 0; i < colorRGBsGraphPoints.length; i++) {
+				colorRGBsGraphPoints[i] = list.getIntArray(i);
+				graphPointColors.add(CssColor.make(colorRGBsGraphPoints[i][0], colorRGBsGraphPoints[i][1], colorRGBsGraphPoints[i][2]));
 			}
 		}
 		
