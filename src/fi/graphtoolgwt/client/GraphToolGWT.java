@@ -76,6 +76,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
 	final static int cPointRadius = 3;
+	final static CssColor cColorOrange = CssColor.make(255, 193, 0);
+	final static CssColor cColorRed = CssColor.make(255, 0, 0);
+	final static CssColor cColorGreen = CssColor.make(0, 200, 0);
 
 	final static boolean cDefault_tekenComponentAan = false;
 
@@ -1745,15 +1748,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				color = verwerkAsNaamBijNakijken(show, color, correctLogica);
 				color = verwerkTekenModusBijNakijken(show, color, correctLogica);
 
-				if(show) 
-				{	//leerlingcolor op juiste kleur zetten.
-					for(int i = 0; i < aantalFuncties; i++)
-					{	if(functieCorrect[koppeling[i]])
+				if(show) {	
+					//leerlingcolor op juiste kleur zetten.
+					for(int i = 0; i < aantalFuncties; i++) {	
+						if(functieCorrect[koppeling[i]]) {
 							setColor(i, cColorGreen, true);
-						//colors[i] = color;
-						else
+							//colors[i] = color;
+						} else {
 							setColor(i, cColorRed, true);
 							//	colors[i] = CssColor.make(255, 0, 0);
+						}
 					}
 					tekenDocentFuncties = new Expressie[aantalFuncties];
 					if(!rechteVerbindingen && !krommeMetExtrapolatie && !krommeZonderExtrapolatie)
