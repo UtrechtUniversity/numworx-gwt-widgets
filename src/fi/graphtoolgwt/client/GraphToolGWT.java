@@ -1749,10 +1749,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				{	//leerlingcolor op juiste kleur zetten.
 					for(int i = 0; i < aantalFuncties; i++)
 					{	if(functieCorrect[koppeling[i]])
-							setColor(i, color, true);
+							setColor(i, cColorGreen, true);
 						//colors[i] = color;
 						else
-							setColor(i, color, true);
+							setColor(i, cColorRed, true);
 							//	colors[i] = CssColor.make(255, 0, 0);
 					}
 					tekenDocentFuncties = new Expressie[aantalFuncties];
