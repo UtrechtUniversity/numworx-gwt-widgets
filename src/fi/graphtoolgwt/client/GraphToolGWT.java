@@ -78,7 +78,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	final static int cPointRadius = 3;
 	final static CssColor cColorOrange = CssColor.make(255, 193, 0);
 	final static CssColor cColorRed = CssColor.make(255, 0, 0);
-	final static CssColor cColorGreen = CssColor.make(0, 200, 0);
+	final static CssColor cColorGreen = CssColor.make(0, 200, 0); 
 
 	final static boolean cDefault_tekenComponentAan = false;
 
