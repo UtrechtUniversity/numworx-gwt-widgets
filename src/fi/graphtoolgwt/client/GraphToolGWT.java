@@ -18,6 +18,8 @@ import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
@@ -63,13 +65,14 @@ import fi.wiskopdr.Letter;
 import fi.wiskopdr.expressies.Algebra;
 import fi.wiskopdr.expressies.Expressie;
 import fi.wiskopdr.expressies.repr.ContentMathML;
+import fi.graphtool.SchuifParameter;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
+public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
 	// private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
@@ -2426,8 +2429,19 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		FormuleClipboardIF clip = comRoot.getFormuleClipboard();
 		FocusOnTouch.installKeyboard(kb, clip);
 		FormuleHolder.installKeyboard(kb);
-		this.comRoot = comRoot;
 
+		this.comRoot = comRoot;
+		comRoot.addCBookEventListener("expression.1", this);
+		comRoot.addCBookEventListener("expression.2", this);
+		comRoot.addCBookEventListener("expression.3", this);
+		comRoot.addCBookEventListener("expression.4", this);
+		comRoot.addCBookEventListener("expression.5", this);
+
+		comRoot.addCBookEventListener("equation.twoGraphs", this);
+		comRoot.addCBookEventListener("double.parameter", this);
+		comRoot.addCBookEventListener("double.trace", this);
+		comRoot.addCBookEventListener("draw_functions", this);
+		
 		zetMode(comRoot.getMode());		
 	}
 
@@ -4420,6 +4434,112 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 			beginyDocent = beginy;			
 		}
+		
+	}
+	
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+		System.out.println("accepted");
+		if(command.equals("input"))
+		{
+	 		String formuleString = (String)event.getMessage();
+			getFormuleComponent().geefFormuleVak().vulVak(formuleString);
+			getFormuleComponent().geefFormuleVak().finish();
+		}
+		if(command.startsWith("expression"))
+		{	String indexString = command.substring(11);
+			int index = Integer.parseInt(indexString)-1;
+			String formuleString = (String)event.getMessage();
+	 		System.out.println("expression:: "+formuleString);
+	 		getFormuleComponent().zetFunctie(index, formuleString);
+		}
+		if(command.equals("equation.twoGraphs"))
+		{
+			String vergelijkingString = (String)event.getMessage();
+			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
+			System.out.println("vergelijkingString: "+vergelijkingString);
+			getFormuleComponent().zetVergelijking(0, vergelijkingString);
+			
+		}
+		if(event.getCommand().equals("draw_functions"))
+		{
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	/*String numberString = (String)map.get("number");
+				int number = 0;
+				try	{	
+					number = Integer.parseInt(numberString);
+				}
+				catch (NumberFormatException nfe) {
+					System.out.println(nfe.toString());
+				}
+				String clear = (String)map.get("clear");
+				String abscissa_name = (String)map.get("abscissa_name");
+				String abscissa_min = (String)map.get("abscissa_min");
+				String abscissa_max = (String)map.get("abscissa_max");
+				String ordinate_name = (String)map.get("ordinate_name");
+				String ordinate_min = (String)map.get("ordinate_min");
+				String ordinate_max = (String)map.get("ordinate_max");
+				
+				Expressie[] functions = new Expressie[number];
+				Color[] colors = null;
+				double[] thicknesses = null;
+				
+				for(int i=0 ; i<number ; i++)
+				{
+					String functionString = (String)map.get("function_"+i);
+					functions[i] = popcornParse(functionString);
+					String colorString = (String)map.get("color_"+i);
+					colors[i] = colorParse(colorString);
+					String thicknessString = (String)map.get("thickness_"+i);
+					try	{	
+						thicknesses[i] = Double.parseDouble(thicknessString);
+					}
+					catch (NumberFormatException nfe) {
+						System.out.println(nfe.toString());
+					}
+					
+				}
+				*/
+				getFormuleComponent().zetFuncties(map);
+			}
+		}
+		
+		if(event.getCommand().equals("double.trace"))
+		{
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	String name = (String)map.get("name");
+				if(grafiekXAsNaam.equals(name)) 
+				{
+					tracing = true;
+					double xWaarde = ((Double)map.get("value")).doubleValue();
+					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
+					tracexD = tracex;
+					slider.zetStand(tracex);
+					
+					repaint();
+				}
+			}
+		}
+		if(event.getCommand().equals("double.parameter"))
+		{	
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	String name = (String)map.get("name");
+				double waarde = ((Double)map.get("value")).doubleValue();
+				SchuifParameter schuifParameter = geefSchuifParameter(name);
+				if(schuifParameter==null)
+				{	
+					schuifParameter = new SchuifParameter(200,name);
+					voegSchuifParameterToe(schuifParameter,false);
+				}
+				schuifParameter.zetWaarde(waarde, false);
+				gv.repaint();
+			}
+			
+		}
+
 		
 	}
 
