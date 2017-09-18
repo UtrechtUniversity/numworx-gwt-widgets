@@ -137,7 +137,7 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.3-SNAPSHOT</euclidesVersion>
-		<formuleVersion>0.0.5-SNAPSHOT</formuleVersion>
+		<formuleVersion>0.0.5</formuleVersion>
 		<debug />
 		<gwtVersion>2.7.0</gwtVersion>
 		<gwt.style>OBFUSCATED</gwt.style> <!--  -D gwt.style=PRETTY -->
