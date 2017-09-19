@@ -420,7 +420,7 @@ public class ProgrammaImporter
 			cc.clearStapel();
 			String parameter = getParamText(codeline);
 			parameter = parameter.trim();
-System.out.println("param = " + parameter);			
+//System.out.println("param = " + parameter);			
 			// ToDo: setParam1 is hier fout, create setParameterText in cc-klasse die alles afhandelt
 			if ( parameter != null && cc instanceof ParameterCommandComponent )
 			{

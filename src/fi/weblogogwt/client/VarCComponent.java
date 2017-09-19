@@ -227,6 +227,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		varSet.setVar(varnaamParam.getParameterText(), waarde.getExpressie());		
 		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
 		{
 			trb.setCommandInfo(varnaamParam.getParameterText()+" = "+waarde.getValueText(), varSet);

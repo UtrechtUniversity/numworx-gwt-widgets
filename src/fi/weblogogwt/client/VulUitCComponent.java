@@ -17,7 +17,8 @@ public class VulUitCComponent extends SimpleCommandComponent
 	{	
 		ub.vulUit();
 		traceKleur = trb.commandExecuted(varSet.getLevel());
-		if ( traceKleur ) trb.setCommandInfo(getCommandName(), varSet);
+		if (traceKleur) traceKleurCnt = 0;
+		if (traceKleur) trb.setCommandInfo(getCommandName(), varSet);
 		return traceKleur;
 	}
 	

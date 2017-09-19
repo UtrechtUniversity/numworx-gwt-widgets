@@ -156,6 +156,9 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	ExportPopup exportPopup;
 	ImportPopup importPopup;
 	
+	CommandComponent traceC;
+	CommandContainer traceCC;
+	
 String[] messages = new String[10];	
 int messageCnt = 0;
 		
@@ -244,7 +247,8 @@ for (int i = 0; i < messages.length; i++)
 	{	
 		VarSet varSet = new VarSet();
 		Iterator iter = (inputVars.keySet()).iterator();
-		while (iter.hasNext()) {
+		while (iter.hasNext()) 
+		{
 			String key = (String)iter.next();
 			double value = ((Double) inputVars.get(key)).doubleValue();
 			varSet.setParameter(key, value);
@@ -670,6 +674,8 @@ for (int i = 0; i < messages.length; i++)
 					kcc.elseBlock.reArrange();
 			}
 			
+			cc.removeCaret();
+			
 			paint();
 		} 
 		else // geen nieuwe parent
@@ -724,41 +730,54 @@ for (int i = 0; i < messages.length; i++)
 		}
 		// find component in programmaPanel, so nothing on the left side nor the dragged CC itself will be found
 		
-//System.out.println("traceCC " + ex + " " + ey);		
+//System.out.println("traceCC " + ex + " " + ey);
 		
+		if (traceC != null)
+			traceC.removeCaret();
+		if (traceCC != null)
+			traceCC.removeCaret();
+		paint();
 		
 		//CommandComponent c = findCComponentAt(ex-ppx,ey-ppy);
-		CommandComponent c = findCComponentAt(ex, ey, sc);
-		CommandContainer cc = findCContainerAt(ex,ey);
+		//CommandComponent c 
+		traceC = findCComponentAt(ex, ey, sc);
+		//CommandContainer cc 
+		traceCC = findCContainerAt(ex,ey);
 		
-		if ((c != null) && c.commandName.equals("Herhaal") && 
-			(cc!= null) && cc.containerName.equals("loop"))
-			c = null;
-		if ((c != null) && c.commandName.equals("Keuze") && 
-				(cc!= null) && cc.containerName.equals("if"))
-				c = null;
-		if ((c != null) && c.commandName.equals("Keuze") && 
-				(cc!= null) && cc.containerName.equals("else"))
-				c = null;
+		// CHECK, ook deeltaak?
+		if ((traceC != null) && traceC.commandName.equals("Herhaal") && 
+			(traceCC!= null) && traceCC.containerName.equals("loop"))
+			traceC = null;
+		if ((traceC != null) && traceC.commandName.equals("Keuze") && 
+			(traceCC!= null) && traceCC.containerName.equals("if"))
+			traceC = null;
+		if ((traceC != null) && traceC.commandName.equals("Keuze") && 
+			(traceCC!= null) && traceCC.containerName.equals("else"))
+			traceC = null;
 				
+if (traceC != null)		
+System.out.println("traceC " + traceC.getCommandName());
+		
+if (traceCC != null)		
+System.out.println("traceCC " + ((CommandContainer) traceCC).containerName);
+
 		// if c is a CommandComponent set Caret on that component
-		if (c != null && c instanceof CommandComponent && c != sc)
+		if (traceC != null && traceC instanceof CommandComponent && traceC != sc)
 		{
-//System.out.println("c traced " + c.getCommandName());			
-			((CommandComponent)c).setCaret(ey);
+System.out.println("c traced " + traceC.getCommandName() + " " + ey);			
+			((CommandComponent) traceC).setCaret(ey);
 //System.out.println("c");			
 		}
-		
 		//CommandContainer cc = findCContainerAt(ex-ppx,ey-ppy);
 		// naar boven
 		//CommandContainer cc = findCContainerAt(ex,ey);
 		// if c is a CommandContainer, then it must be over the empty space, so set caret
 		// to top of the container if it is empty, bottom of last component otherwise
-		else if (cc != null && cc instanceof CommandContainer) 
+		else if (traceCC != null && traceCC instanceof CommandContainer) 
 		{	
-//System.out.println("cc traced " + ((CommandContainer)cc).containerName);			
+System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);			
 			
-			((CommandContainer)cc).setCaret(ey);
+			((CommandContainer) traceCC).setCaret(ey);
 //System.out.println("cc traced");			
 		}
 	}
@@ -953,8 +972,8 @@ for (int i = 0; i < messages.length; i++)
 	{	printCC.setVisible(b);
 		printlCC.setVisible(b);
 		
-System.out.println("printCC " + printCC.isVisible());
-System.out.println("printlCC " + printlCC.isVisible());
+//System.out.println("printCC " + printCC.isVisible());
+//System.out.println("printlCC " + printlCC.isVisible());
 		herschikStapel();
 	}
 	
@@ -1031,6 +1050,7 @@ System.out.println("printlCC " + printlCC.isVisible());
 			CommandComponent tResult = null;
 			if (o instanceof CommandComponent)
 			{	CommandComponent cc = (CommandComponent) o;
+//System.out.println("findCCAt " + cc.commandName);			
 				if ((cc != sc) && cc.contains(x,y))
 				{	result = cc;
 					tResult = cc.findCComponentAt(x, y, sc);
@@ -1041,6 +1061,8 @@ System.out.println("printlCC " + printlCC.isVisible());
 						result = null;	
 				}
 			}
+			if (result != null)
+				break;
 		}
 		return result;
 		
@@ -1069,12 +1091,17 @@ System.out.println("printlCC " + printlCC.isVisible());
 				{	result = pc.commandBlock;
 					tResult = pc.commandBlock.findCContainerAt(x,y);
 					if (tResult != null)
-						result = tResult;
+					{	result = tResult;
+					}
 				}	
 			} 
 			// stop bij de bovenste CCContainer
 			if (result != null)
+			{	
+System.out.println("findCContAt "+result.containerName);				
+				
 				break;
+			}
 	
 			
 		}

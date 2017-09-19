@@ -247,7 +247,16 @@ public class CommandContainer // extends JPanel
 		return rect.contains(x, y);
 	}
 	
-	
+	public void removeCaret()
+	{
+		caretUp = false;
+		for (int cnt = 0; cnt < getComponentCount(); cnt++)
+		{	CommandComponent c = (CommandComponent) components.elementAt(cnt);
+			c.removeCaret();
+		}
+		
+System.out.println("CCont removeCaret " + containerName);		
+	}
 	/**
 	 * Set the caret on the CommandContainer itself.
 	 * This is called by JavaLogoSchuifVeld.traceComponent when the dragged CC is hovering
@@ -412,7 +421,7 @@ public class CommandContainer // extends JPanel
 			g.lineTo(xPos+getSize().width-3,yPos+3);
 			g.stroke();
 			
-			caretUp = false;
+			//caretUp = false;
 		}
 		
 		if (componentsVisible)

@@ -20,11 +20,12 @@ public class PrintCComponent extends ParameterCommandComponent
 	{	
 		if ( !parameters[0].isCorrect(varSet) ) 
 		{
-//System.out.println("!correct");			
+System.out.println("!correct");			
 			return false;
 		}	
 		ub.print( ((TextParameter)parameters[0]).getValueText());
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getActualCall(), varSet);
 		return traceKleur;
 	}	

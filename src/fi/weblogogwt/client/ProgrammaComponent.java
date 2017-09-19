@@ -396,7 +396,7 @@ public class ProgrammaComponent extends CompositeCommandComponent //implements M
 		{	Object c = commandBlock.getComponent(i);
 			if (c instanceof CommandComponent)
 			{	boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
-				if(tracekleur)return true;
+				if (tracekleur) return true;
 			}
 		}
 		return false;

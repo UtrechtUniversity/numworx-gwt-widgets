@@ -248,7 +248,8 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 		{
 			//g.setColor(traceActiveColor);
 			g.setFillStyle(traceActiveColor);
-			traceKleur = false;
+			if (traceKleurCnt >= 2)
+				traceKleur = false;
 		} 
 		else
 		{

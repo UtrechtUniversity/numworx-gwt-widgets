@@ -34,7 +34,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		deeltaaknaamParam = new Identifier(pn);
 		pmParam = new IdentifierList();
 		
-//System.out.println("dbc " + pn);		
+		commandBlock.containerName = pn;		
 		
 //GWT4		
 		//naamEditor = new ParameterTextField(10, 4, 80, 17, this);

@@ -29,10 +29,11 @@ public abstract class SimpleCommandComponent extends CommandComponent
 		//g.setColor(new Color(238,238,238));
 		g.setFillStyle(CssColor.make(238,238,238));
 		if(traceKleur)
-		{
+		{	traceKleurCnt++;
 			//g.setColor(traceActiveColor);
 			g.setFillStyle(traceActiveColor);
-			traceKleur = false;
+			if (traceKleurCnt >= 3)
+				traceKleur = false;
 		}
 		//g.fillRect(0,0,getSize().width-1,getSize().height-1);
 		g.fillRect(xPos,yPos,getSize().width-1,getSize().height-1);

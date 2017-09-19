@@ -28,7 +28,8 @@ public abstract class CommandComponent //extends JPanel
 	protected String commandNameTranslated;
 			
 	public boolean traceKleur;
-	public CssColor traceActiveColor = CssColor.make(255,200,200);
+	int traceKleurCnt = 0;
+	public CssColor traceActiveColor = CssColor.make(255,200,200); // rose
 	
 	// variables for handling mouse events: editting & dragging
 	protected boolean dragging = false;
@@ -161,6 +162,13 @@ public abstract class CommandComponent //extends JPanel
 	
 	public void zetVast(boolean b)
 	{	vast = b;
+	}
+	
+	
+	public void removeCaret()
+	{
+		caretUp = false;
+		caretDown = false;
 	}
 	
 	/**
@@ -395,6 +403,7 @@ public abstract class CommandComponent //extends JPanel
 //System.out.println("mouseReleased !vast && dragging");			
 			dropComponent(x, y);
 		}
+		tekenOpnieuw();
 	}
 		
 	public void tekenOpnieuw()
@@ -441,8 +450,8 @@ public abstract class CommandComponent //extends JPanel
 			g.moveTo(xPos+2,yPos+3);
 			g.lineTo(xPos+getSize().width-3,yPos+3);
 			g.stroke();
-			
-			caretUp = false;
+System.out.println(""+commandName+" paintCaretUp "+yPos);			
+//			caretUp = false;
 		}
 		if(caretDown)
 		{	
@@ -457,10 +466,10 @@ public abstract class CommandComponent //extends JPanel
 			g.moveTo(xPos+2,yPos+getSize().height-4);
 			g.lineTo(xPos+getSize().width-3,yPos+getSize().height-4);
 			g.stroke();
-			
-			
-			caretDown = false;
+System.out.println(""+commandName+" paintCaretDown "+getSize().width+" "+getSize().height);			
+//			caretDown = false;
 		}
+		
 	}
 	
 	public boolean isVisible()
@@ -495,6 +504,8 @@ public abstract class CommandComponent //extends JPanel
 	//public void paint(Graphics g)
 	public void paint(Context2d g)
 	{
+		
+//System.out.println(""+commandName+" paint");		
 		//super.paint(g);
 		paintCaret(g);
 	}

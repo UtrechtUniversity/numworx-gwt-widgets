@@ -2,6 +2,7 @@ package fi.weblogogwt.client;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 
@@ -19,14 +20,17 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
+//import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
+
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.logotekenap.Tekenblad;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
@@ -52,6 +56,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 
 	// UI
 	DockLayoutPanel dlp;
+	//AbsolutePanel dlp;
 	LayoutPanel bottomPanel;
 	LayoutPanel webLogoPanel;
 	JavaLogoSchuifVeld jlsVeld;
@@ -67,7 +72,8 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	int offSet = 4;
 	int leftOffset = 5;
 	int topOffset = 5;
-	
+
+	boolean paul = false;
 	int breedteGroot = 784; //784 is maximale breedte in popupFacade;
 	int breedteKlein = 700;
 	int breedtePaul = 950; //maximale breedte stand-alone 
@@ -142,18 +148,20 @@ logger.info("WebLogoGWT onModuleLoad");
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(webLogoGWTCssResource.dock());
+		
+		// popUpFacade of StubView
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
-
+		
+		// standalone versie Paul
+		//dlp.setSize("" + breedte + "px", "" + Window.getClientHeight() + "px");
 
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(webLogoGWTCssResource.root());
 		
-		
 		Stub.publish(this);
+		// popUpfacade o standalone versie Paul
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
-
-			
 	}
 	
 	public WebLogoGWT()
@@ -183,7 +191,6 @@ logger.info("WebLogoGWT constructor");
 		dlp.addStyleName(webLogoGWTCssResource.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
-
 		init(breedte, hoogte, launchState, randomVarWaarden);
 
 
@@ -198,8 +205,6 @@ logger.info("WebLogoGWT uncompiled init");
 
 			//this.breedte = width;
 			this.hoogte = height;
-			
-			//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 			
 			//this.launchState = launchState;
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
@@ -268,18 +273,30 @@ logger.info("WebLogoGWT uncompiled init");
 			// stand-alone
 			if (launchState != null && !launchState.containsKey("state"))
 			{
-				breedte = breedtePaul;
-				hoogte = hoogtePaul;
-				ubb = ubbPaul;
 System.out.println("paul");				
+				paul = true;
+				breedte = Window.getClientWidth(); //breedtePaul;
+				ubb = breedte - jlsBreedteGroot - 3 * offSet; //ubbPaul;
+				hoogte = Window.getClientHeight(); //hoogtePaul;
+				jlsHoogte = hoogte - bottomHeight - offSet;
+System.out.println("jlsh " + jlsHoogte);				
+				ubh = jlsHoogte;
+				dlp.setWidth("100%");
+				//dlp.setSize("100%","100%");
+				//dlp.setHeight("100%");
+System.out.println("wcW " + Window.getClientWidth());
+System.out.println("wcH " + Window.getClientHeight());
 			}
-			
-			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+			else
+				dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			
 			webLogoPanel = new LayoutPanel();
 			webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
 			
+System.out.println("this b " + this.breedte);			
+System.out.println("this h " + this.hoogte);
+
 			uitvoerblad = new Tekenblad(this,ubb,ubh);
 			Canvas tekenbladCanvas = uitvoerblad.getCanvas();
 			if (tekenbladCanvas == null) 
@@ -290,8 +307,8 @@ System.out.println("paul");
 			
 			uitvoerblad.initContext2d();
 			
-			
 			webLogoPanel.add(uitvoerblad);
+
 			if (!uitvoerVeldZichtbaar)
 				webLogoPanel.setWidgetVisible(uitvoerblad,false);
 			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && deeltakenZichtbaar)
@@ -360,7 +377,6 @@ System.out.println("paul");
 				webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte-bottomHeight, Style.Unit.PX, bottomHeight, Style.Unit.PX);
 			}
 			
-			
 			dlp.add(webLogoPanel);
 			
 			jlsVeld.paint();
@@ -370,6 +386,7 @@ System.out.println("paul");
 			{	setState(state);
 logger.info("state != null");			
 			}
+			
 			
 			dlp.forceLayout();
 			webLogoPanel.forceLayout();
@@ -494,7 +511,7 @@ logger.info("state != null");
 			methodeLabel = new Label("");
 			methodeLabel.addStyleName(webLogoGWTCssResource.label());
 			bottomPanel.add(methodeLabel);
-			bottomPanel.setWidgetLeftWidth(methodeLabel, currentX, Style.Unit.PX, 4 * buttonWidth, Style.Unit.PX);
+			bottomPanel.setWidgetLeftWidth(methodeLabel, currentX, Style.Unit.PX, 8 * buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(methodeLabel, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			bottomPanel.setWidgetVisible(methodeLabel, false);
 			
@@ -722,7 +739,7 @@ logger.info("setState");
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-logger.info("WebLogoGWT setComRoot");		
+//logger.info("WebLogoGWT setComRoot");		
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 		comRoot.addCBookEventListener("text.program", this);
@@ -938,7 +955,7 @@ logger.info("WebLogoGWT setComRoot");
 	public void fireCBookEvent(String command, Map<String, Object> map)
 	{
 		
-System.out.println("fireCBookEvent");
+//System.out.println("fireCBookEvent");
 
 		if (comRoot != null)
 		{

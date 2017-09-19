@@ -490,6 +490,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 
 		boolean value = condition.getValue();
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
 		{
 			trb.setCommandInfo(alsString+" "+condition.getValueText(), varSet);

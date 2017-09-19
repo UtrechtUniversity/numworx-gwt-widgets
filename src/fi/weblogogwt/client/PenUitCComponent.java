@@ -16,6 +16,7 @@ public class PenUitCComponent extends SimpleCommandComponent
 	public boolean execute(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
 	{	ub.penUit();
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getCommandName(), varSet);
 		return traceKleur;
 	}

@@ -169,6 +169,7 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		}
 		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		//if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
 		{	
 			trb.setCommandInfo(getActualCall(), varSet);
@@ -178,6 +179,7 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		//if (traceKleur ) schuifveld.traceVariables(varSet);
 		// execution may also stop at a command in the body. Call will be pink then, too.
 		traceKleur = deeltaakBody.execute(trb, ub, varSet);
+		if (traceKleur) traceKleurCnt = 0;
 		varSet.decreaseLevel();
 		return traceKleur;
 	}
