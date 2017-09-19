@@ -61,6 +61,11 @@
 			<artifactId>lib-gwt-svg</artifactId>
 			<version>0.5.11</version>
 		</dependency>
+		<dependency>
+			<groupId>fi.wiskopdrgwt</groupId>
+			<artifactId>WiskOpdrGWT</artifactId>
+			<version>0.0.4-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>

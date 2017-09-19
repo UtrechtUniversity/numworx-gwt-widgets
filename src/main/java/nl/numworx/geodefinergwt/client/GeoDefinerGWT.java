@@ -57,6 +57,7 @@ import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
 import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.VariableCollection;
 
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer, Randomizer {
 
@@ -402,11 +403,27 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		root.setPixelSize(width, height);
 // initial model		
 		createModel(viewer.getModel(), width, height);
+// random variables
+		String random = (String) launchData.get("random");
+		values = launchRandomVars(random, values);
 // configuration
 		setLaunchData(launchData, values);
 		viewer.paint();
 	}
 
+
+	private Map<String, Number> launchRandomVars(String random,
+			Map<String, Number> values) {
+		if(random == null || random.isEmpty())
+			return values;
+		VariableCollection vc = new VariableCollection();
+		if (vc.setVariables(random)) {
+			Map<String, Number> vars = vc.getRandomValues();
+			vars.putAll(values);
+			values = vars;
+		}
+		return values;
+	}
 
 	@Override
 	public void acceptCBookEvent(CBookEvent event) {
