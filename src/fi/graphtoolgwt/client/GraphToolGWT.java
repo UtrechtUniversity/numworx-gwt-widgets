@@ -65,7 +65,6 @@ import fi.wiskopdr.Letter;
 import fi.wiskopdr.expressies.Algebra;
 import fi.wiskopdr.expressies.Expressie;
 import fi.wiskopdr.expressies.repr.ContentMathML;
-import fi.graphtool.SchuifParameter;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text;
 
@@ -4440,29 +4439,30 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	public void acceptCBookEvent(CBookEvent event) {
 		String command = event.getCommand();
 		System.out.println("accepted");
-		if(command.equals("input"))
-		{
+		if(command.equals("input")) {
 	 		String formuleString = (String)event.getMessage();
-			getFormuleComponent().geefFormuleVak().vulVak(formuleString);
-			getFormuleComponent().geefFormuleVak().finish();
+	 		System.out.println("input:: "+formuleString);
+//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ
+//			getFormuleComponent().geefFormuleVak().finish(); RPJ
 		}
 		if(command.startsWith("expression"))
 		{	String indexString = command.substring(11);
 			int index = Integer.parseInt(indexString)-1;
 			String formuleString = (String)event.getMessage();
 	 		System.out.println("expression:: "+formuleString);
-	 		getFormuleComponent().zetFunctie(index, formuleString);
+//	 		getFormuleComponent().zetFunctie(index, formuleString); RPJ
 		}
 		if(command.equals("equation.twoGraphs"))
 		{
 			String vergelijkingString = (String)event.getMessage();
 			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
 			System.out.println("vergelijkingString: "+vergelijkingString);
-			getFormuleComponent().zetVergelijking(0, vergelijkingString);
+//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ
 			
 		}
-		if(event.getCommand().equals("draw_functions"))
-		{
+		if(event.getCommand().equals("draw_functions")) {
+	 		System.out.println("draw_functions:: "+(String)event.getMessage());
+
 			Map map = (Map)event.getParameters();
 			if(map!=null)
 			{	/*String numberString = (String)map.get("number");
@@ -4501,17 +4501,18 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					
 				}
 				*/
-				getFormuleComponent().zetFuncties(map);
+//				getFormuleComponent().zetFuncties(map); RPJ
 			}
 		}
 		
-		if(event.getCommand().equals("double.trace"))
-		{
+		if(event.getCommand().equals("double.trace")) {
+	 		System.out.println("double.trace:: "+(String)event.getMessage());
+	 		
 			Map map = (Map)event.getParameters();
 			if(map!=null)
 			{	String name = (String)map.get("name");
-				if(grafiekXAsNaam.equals(name)) 
-				{
+				if(grafiekXAsNaam.equals(name)) {
+/* RPJ START					
 					tracing = true;
 					double xWaarde = ((Double)map.get("value")).doubleValue();
 					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
@@ -4519,27 +4520,28 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					slider.zetStand(tracex);
 					
 					repaint();
+RPJ END */
 				}
 			}
 		}
-		if(event.getCommand().equals("double.parameter"))
-		{	
+		if(event.getCommand().equals("double.parameter")) {	
+	 		System.out.println("double.parameter:: "+(String)event.getMessage());
+
 			Map map = (Map)event.getParameters();
-			if(map!=null)
-			{	String name = (String)map.get("name");
+			if(map!=null) {	
+				String name = (String)map.get("name");
 				double waarde = ((Double)map.get("value")).doubleValue();
+/* RPJ START
 				SchuifParameter schuifParameter = geefSchuifParameter(name);
-				if(schuifParameter==null)
-				{	
+				if(schuifParameter==null) {	
 					schuifParameter = new SchuifParameter(200,name);
 					voegSchuifParameterToe(schuifParameter,false);
 				}
 				schuifParameter.zetWaarde(waarde, false);
 				gv.repaint();
+RPJ END */			
 			}
-			
 		}
-
 		
 	}
 
