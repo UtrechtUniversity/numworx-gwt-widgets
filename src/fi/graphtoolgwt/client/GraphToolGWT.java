@@ -4444,12 +4444,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
  		System.out.println("event = "+ event.toString());
  		System.out.println("command = "+ command.toString());
 		System.out.println("accepted");
+/*		
 		if(command.equals("input")) {
 	 		String formuleString = (String)event.getMessage();
 	 		System.out.println("input:: "+formuleString);
 //			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
 //			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
 		}
+*/
 		if ( command.startsWith("expression")) {	
 			String indexString = command.substring(11);
 			int index = Integer.parseInt(indexString)-1;
@@ -4463,10 +4465,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	 		System.out.println("indexString = "+ indexString);
 	 		System.out.println("expression:: index = "+ index +", formule = "+formuleString);
 //*/
-//	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
-//	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
-//	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
+	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
+	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
+	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
 		}
+/*		BIG ONE RPJ START
 				
 		if(command.equals("equation.twoGraphs"))
 		{
@@ -4482,43 +4485,43 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			Map map = (Map)event.getParameters();
 			if(map!=null) {	
 				
-				/* BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
-				String numberString = (String)map.get("number");
-				int number = 0;
-				try	{	
-					number = Integer.parseInt(numberString);
-				}
-				catch (NumberFormatException nfe) {
-					System.out.println(nfe.toString());
-				}
-				String clear = (String)map.get("clear");
-				String abscissa_name = (String)map.get("abscissa_name");
-				String abscissa_min = (String)map.get("abscissa_min");
-				String abscissa_max = (String)map.get("abscissa_max");
-				String ordinate_name = (String)map.get("ordinate_name");
-				String ordinate_min = (String)map.get("ordinate_min");
-				String ordinate_max = (String)map.get("ordinate_max");
-				
-				Expressie[] functions = new Expressie[number];
-				Color[] colors = null;
-				double[] thicknesses = null;
-				
-				for(int i=0 ; i<number ; i++)
-				{
-					String functionString = (String)map.get("function_"+i);
-					functions[i] = popcornParse(functionString);
-					String colorString = (String)map.get("color_"+i);
-					colors[i] = colorParse(colorString);
-					String thicknessString = (String)map.get("thickness_"+i);
-					try	{	
-						thicknesses[i] = Double.parseDouble(thicknessString);
-					}
-					catch (NumberFormatException nfe) {
-						System.out.println(nfe.toString());
-					}
-					
-				}
-				END OLD JAVA ANNOTATION */
+//				 BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
+//				String numberString = (String)map.get("number");
+//				int number = 0;
+//				try	{	
+//					number = Integer.parseInt(numberString);
+//				}
+//				catch (NumberFormatException nfe) {
+//					System.out.println(nfe.toString());
+//				}
+//				String clear = (String)map.get("clear");
+//				String abscissa_name = (String)map.get("abscissa_name");
+//				String abscissa_min = (String)map.get("abscissa_min");
+//				String abscissa_max = (String)map.get("abscissa_max");
+//				String ordinate_name = (String)map.get("ordinate_name");
+//				String ordinate_min = (String)map.get("ordinate_min");
+//				String ordinate_max = (String)map.get("ordinate_max");
+//				
+//				Expressie[] functions = new Expressie[number];
+//				Color[] colors = null;
+//				double[] thicknesses = null;
+//				
+//				for(int i=0 ; i<number ; i++)
+//				{
+//					String functionString = (String)map.get("function_"+i);
+//					functions[i] = popcornParse(functionString);
+//					String colorString = (String)map.get("color_"+i);
+//					colors[i] = colorParse(colorString);
+//					String thicknessString = (String)map.get("thickness_"+i);
+//					try	{	
+//						thicknesses[i] = Double.parseDouble(thicknessString);
+//					}
+//					catch (NumberFormatException nfe) {
+//						System.out.println(nfe.toString());
+//					}
+//					
+//				}
+//				END OLD JAVA ANNOTATION 
 //				getFormuleComponent().zetFuncties(map); RPJ == from active java version
 			}
 		}
@@ -4530,15 +4533,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			if(map!=null)
 			{	String name = (String)map.get("name");
 				if(grafiekXAsNaam.equals(name)) {
-/* RPJ START == from active java version					
-					tracing = true;
-					double xWaarde = ((Double)map.get("value")).doubleValue();
-					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
-					tracexD = tracex;
-					slider.zetStand(tracex);
-					
-					repaint();
-RPJ END */
+// RPJ START == from active java version					
+//					tracing = true;
+//					double xWaarde = ((Double)map.get("value")).doubleValue();
+//					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
+//					tracexD = tracex;
+//					slider.zetStand(tracex);
+//					
+//					repaint();
+//RPJ END 
 				}
 			}
 		}
@@ -4549,17 +4552,18 @@ RPJ END */
 			if(map!=null) {	
 				String name = (String)map.get("name");
 				double waarde = ((Double)map.get("value")).doubleValue();
-/* RPJ START == from active java version
-				SchuifParameter schuifParameter = geefSchuifParameter(name);
-				if(schuifParameter==null) {	
-					schuifParameter = new SchuifParameter(200,name);
-					voegSchuifParameterToe(schuifParameter,false);
-				}
-				schuifParameter.zetWaarde(waarde, false);
-				gv.repaint();
-RPJ END */			
+// RPJ START == from active java version
+//				SchuifParameter schuifParameter = geefSchuifParameter(name);
+//				if(schuifParameter==null) {	
+//					schuifParameter = new SchuifParameter(200,name);
+//					voegSchuifParameterToe(schuifParameter,false);
+//				}
+//				schuifParameter.zetWaarde(waarde, false);
+//				gv.repaint();
+//RPJ END 			
 			}
 		}
+BIG ONE RPJ END */
 		
 	}
 
