@@ -2009,10 +2009,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		//	grafiekGWTVeld.paint();
 	}
 	
-	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent)
-	{	functies[nr] = e;
+	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent) {	
+		functies[nr] = e;
 		domeinen[nr][0] = domein[0];
 		domeinen[nr][1] = domein[1];
+		if (update) {
+			grafiekGWTVeld.paint();
+		}
 		
 		if(!tabelAlsTekenTool)
 		{	
@@ -4438,34 +4441,49 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public void acceptCBookEvent(CBookEvent event) {
 		String command = event.getCommand();
+ 		System.out.println("event = "+ event.toString());
+ 		System.out.println("command = "+ command.toString());
 		System.out.println("accepted");
 		if(command.equals("input")) {
 	 		String formuleString = (String)event.getMessage();
 	 		System.out.println("input:: "+formuleString);
-//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ
-//			getFormuleComponent().geefFormuleVak().finish(); RPJ
+//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
+//			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
 		}
-		if(command.startsWith("expression"))
-		{	String indexString = command.substring(11);
+		if ( command.startsWith("expression")) {	
+			String indexString = command.substring(11);
 			int index = Integer.parseInt(indexString)-1;
+			
 			String formuleString = (String)event.getMessage();
-	 		System.out.println("expression:: "+formuleString);
-//	 		getFormuleComponent().zetFunctie(index, formuleString); RPJ
+			if(!formuleString.substring(0,2).equals("$f")) {
+				formuleString = "$f" + formuleString + "@";
+			}
+//* Testmessages 
+	 		System.out.println("command = "+ command.toString());
+	 		System.out.println("indexString = "+ indexString);
+	 		System.out.println("expression:: index = "+ index +", formule = "+formuleString);
+//*/
+//	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
+//	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
+//	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
 		}
+				
 		if(command.equals("equation.twoGraphs"))
 		{
 			String vergelijkingString = (String)event.getMessage();
 			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
 			System.out.println("vergelijkingString: "+vergelijkingString);
-//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ
+//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ == from active java version
 			
 		}
 		if(event.getCommand().equals("draw_functions")) {
 	 		System.out.println("draw_functions:: "+(String)event.getMessage());
 
 			Map map = (Map)event.getParameters();
-			if(map!=null)
-			{	/*String numberString = (String)map.get("number");
+			if(map!=null) {	
+				
+				/* BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
+				String numberString = (String)map.get("number");
 				int number = 0;
 				try	{	
 					number = Integer.parseInt(numberString);
@@ -4500,8 +4518,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					}
 					
 				}
-				*/
-//				getFormuleComponent().zetFuncties(map); RPJ
+				END OLD JAVA ANNOTATION */
+//				getFormuleComponent().zetFuncties(map); RPJ == from active java version
 			}
 		}
 		
@@ -4512,7 +4530,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			if(map!=null)
 			{	String name = (String)map.get("name");
 				if(grafiekXAsNaam.equals(name)) {
-/* RPJ START					
+/* RPJ START == from active java version					
 					tracing = true;
 					double xWaarde = ((Double)map.get("value")).doubleValue();
 					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
@@ -4531,7 +4549,7 @@ RPJ END */
 			if(map!=null) {	
 				String name = (String)map.get("name");
 				double waarde = ((Double)map.get("value")).doubleValue();
-/* RPJ START
+/* RPJ START == from active java version
 				SchuifParameter schuifParameter = geefSchuifParameter(name);
 				if(schuifParameter==null) {	
 					schuifParameter = new SchuifParameter(200,name);
