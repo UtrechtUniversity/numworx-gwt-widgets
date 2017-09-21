@@ -142,7 +142,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 		item = new MenuItem("CrossRatio", new Action(new CrossRatio("CrossRatio"), tracker ));
 		
 */			
-			case FORMULA: // definitie
+			case FORMULA: // definitie, /formuleknop.gif
 				break;
 			case TRAIL: // trail
 				btn = newBtn(url+"/thickness2.png", new TrailHandler(Messages.getString("Euclides.44")), tracker);
