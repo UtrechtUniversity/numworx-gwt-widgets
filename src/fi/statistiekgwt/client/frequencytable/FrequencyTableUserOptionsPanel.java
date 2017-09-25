@@ -961,21 +961,28 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 		{
 			FrequencyTableController controller = FrequencyTableUserOptionsPanel.this.controller;
 
-			if (e.getSource() == minBoundaryField)
+			try
 			{
-				processMinBoundaryChanged();
+				if (e.getSource() == minBoundaryField)
+				{
+					processMinBoundaryChanged();
+				}
+				else if (e.getSource() == binWidthField)
+				{
+					processBinWidthChanged();
+				}
+				else if (e.getSource() == splitMinBoundaryField)
+				{
+					processSplitMinBoundaryChanged();
+				}
+				else if (e.getSource() == splitBinWidthField)
+				{
+					processSplitBinWidthChanged();
+				}
 			}
-			else if (e.getSource() == binWidthField)
+			catch (NumberFormatException nfe)
 			{
-				processBinWidthChanged();
-			}
-			else if (e.getSource() == splitMinBoundaryField)
-			{
-				processSplitMinBoundaryChanged();
-			}
-			else if (e.getSource() == splitBinWidthField)
-			{
-				processSplitBinWidthChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -1028,37 +1035,8 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 		@Override
 		public void onValueChange(ValueChangeEvent<String> e)
 		{
-			if (e.getSource() == minBoundaryField)
+			try
 			{
-				processMinBoundaryChanged();
-			}
-			else if (e.getSource() == binWidthField)
-			{
-				processBinWidthChanged();
-			}
-			else if (e.getSource() == splitMinBoundaryField)
-			{
-				processSplitMinBoundaryChanged();
-			}
-			else if (e.getSource() == splitBinWidthField)
-			{
-				processSplitBinWidthChanged();
-			}
-
-			// update view
-			FrequencyTableUserOptionsPanel.this.view.update();
-		}
-	} // class FrequencyTableUOPValueChangeHandler
-
-	class FrequencyTableUOPKeyDownHandler implements KeyDownHandler
-	{
-		@Override
-		public void onKeyDown(KeyDownEvent e)
-		{
-			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
-			{
-				FrequencyTableController controller = FrequencyTableUserOptionsPanel.this.controller;
-
 				if (e.getSource() == minBoundaryField)
 				{
 					processMinBoundaryChanged();
@@ -1075,7 +1053,50 @@ public class FrequencyTableUserOptionsPanel extends FlowPanel
 				{
 					processSplitBinWidthChanged();
 				}
+			}
+			catch (NumberFormatException nfe)
+			{
+				// invalid value, do nothing
+			}
 
+			// update view
+			FrequencyTableUserOptionsPanel.this.view.update();
+		}
+	} // class FrequencyTableUOPValueChangeHandler
+
+	class FrequencyTableUOPKeyDownHandler implements KeyDownHandler
+	{
+		@Override
+		public void onKeyDown(KeyDownEvent e)
+		{
+			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			{
+				FrequencyTableController controller = FrequencyTableUserOptionsPanel.this.controller;
+
+				try
+				{
+					if (e.getSource() == minBoundaryField)
+					{
+						processMinBoundaryChanged();
+					}
+					else if (e.getSource() == binWidthField)
+					{
+						processBinWidthChanged();
+					}
+					else if (e.getSource() == splitMinBoundaryField)
+					{
+						processSplitMinBoundaryChanged();
+					}
+					else if (e.getSource() == splitBinWidthField)
+					{
+						processSplitBinWidthChanged();
+					}
+				}
+				catch (NumberFormatException nfe)
+				{
+					// invalid value, do nothing
+				}
+				
 				// update view
 				FrequencyTableUserOptionsPanel.this.view.update();
 			}
