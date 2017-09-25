@@ -91,14 +91,22 @@ public class BoxplotController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getSplitOptions().getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getSplitBinWidth(),
-			view.getSplitminBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getSplitBinWidth(),
+				view.getSplitminBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}		
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBinBoundaries(boundaries);
 		}
@@ -261,4 +269,10 @@ public class BoxplotController implements StatistiekView
 	{
 		this.view.update();
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		view.setEditable(editable);
+//	}
 }
