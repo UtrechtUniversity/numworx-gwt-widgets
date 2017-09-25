@@ -4441,35 +4441,35 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public void acceptCBookEvent(CBookEvent event) {
 		String command = event.getCommand();
- 		System.out.println("event = "+ event.toString());
- 		System.out.println("command = "+ command.toString());
-		System.out.println("accepted");
-/*		
+// 		System.out.println("event = "+ event.toString());
+// 		System.out.println("command = "+ command.toString());
+//		System.out.println("accepted");
+		
 		if(command.equals("input")) {
 	 		String formuleString = (String)event.getMessage();
 	 		System.out.println("input:: "+formuleString);
 //			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
 //			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
 		}
-*/
+
 		if ( command.startsWith("expression")) {	
 			String indexString = command.substring(11);
 			int index = Integer.parseInt(indexString)-1;
 			
 			String formuleString = (String)event.getMessage();
-			if(!formuleString.substring(0,2).equals("$f")) {
+			if ((formuleString.length()<3) || (!formuleString.substring(0,2).equals("$f"))) {
 				formuleString = "$f" + formuleString + "@";
 			}
+			
 //* Testmessages 
 	 		System.out.println("command = "+ command.toString());
 	 		System.out.println("indexString = "+ indexString);
-	 		System.out.println("expression:: index = "+ index +", formule = "+formuleString);
+	 		System.out.println("formuleString = "+formuleString);
 //*/
 	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
 	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
 	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
 		}
-/*		BIG ONE RPJ START
 				
 		if(command.equals("equation.twoGraphs"))
 		{
@@ -4563,7 +4563,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 //RPJ END 			
 			}
 		}
-BIG ONE RPJ END */
 		
 	}
 
