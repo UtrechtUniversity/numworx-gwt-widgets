@@ -105,14 +105,22 @@ public class HistogramController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getColumnIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getBinWidth(),
-			view.getMinBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getBinWidth(),
+				view.getMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setMinOnScale(view.getMinBoundary());
 			this.model.setBinBoundaries(boundaries);
@@ -140,14 +148,22 @@ public class HistogramController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getSplitOptions().getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getSplitBinWidth(),
-			view.getSplitMinBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getSplitBinWidth(),
+				view.getSplitMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBoundaries(boundaries);
 			//this.view.setModel(this.model); // test syl: waarom moet dit hier en niet bij updateBoundariesFromBinSettings()?
@@ -161,33 +177,6 @@ public class HistogramController implements StatistiekView
 		}
 	}
 	
-	/*
-	 * Update the bin boundaries with the set number of bins.
-	 */
-	private void updateBoundaries()
-	{
-		ArrayList<Double> boundaries = new ArrayList<Double>();
-		for (int i = 0; i <= this.model.getNoBins(); i++)
-		{
-			boundaries.add(new Double(view.getMinBoundary() + i
-				* view.getBinWidth()));
-		}
-		
-		this.model.setBinBoundaries(boundaries);
-	}
-
-	private void updateSplitBoundaries()
-	{
-		ArrayList<Double> boundaries = new ArrayList<Double>();
-		for (int i = 0; i <= this.view.getSplitBinsBoxSelectedInt(); i++)
-		{
-			boundaries.add(new Double(view.getSplitMinBoundary() + i
-				* view.getSplitBinWidth()));
-		}
-		this.model.setSplitBoundaries(boundaries);
-		this.view.setModel(this.model);
-	}
-
 	public void setSplitType(AllowedTypes type)
 	{
 		if (type.isNumber())
@@ -427,4 +416,10 @@ public class HistogramController implements StatistiekView
 	{
 		this.view.update();
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		this.view.setEditable(editable);
+//	}
 }
