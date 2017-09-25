@@ -871,21 +871,28 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		{
 			CrossTabulationTableController controller = CrossTabulationTableUserOptionsPanel.this.controller;
 
-			if (e.getSource() == minBoundaryRowsField)
+			try
 			{
-				processMinBoundaryRowsChanged();
+				if (e.getSource() == minBoundaryRowsField)
+				{
+					processMinBoundaryRowsChanged();
+				}
+				else if (e.getSource() == binWidthRowsField)
+				{
+					processBinWidthRowsChanged();
+				}
+				else if (e.getSource() == minBoundaryColumnsField)
+				{
+					processMinBoundaryColumnsChanged();
+				}
+				else if (e.getSource() == binWidthColumnsField)
+				{
+					processBinWidthColumnsChanged();
+				}
 			}
-			else if (e.getSource() == binWidthRowsField)
+			catch (NumberFormatException nfe)
 			{
-				processBinWidthRowsChanged();
-			}
-			else if (e.getSource() == minBoundaryColumnsField)
-			{
-				processMinBoundaryColumnsChanged();
-			}
-			else if (e.getSource() == binWidthColumnsField)
-			{
-				processBinWidthColumnsChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -917,21 +924,28 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 		@Override
 		public void onValueChange(ValueChangeEvent<String> e)
 		{
-			if (e.getSource() == minBoundaryRowsField)
+			try
 			{
-				processMinBoundaryRowsChanged();
+				if (e.getSource() == minBoundaryRowsField)
+				{
+					processMinBoundaryRowsChanged();
+				}
+				else if (e.getSource() == binWidthRowsField)
+				{
+					processBinWidthRowsChanged();
+				}
+				else if (e.getSource() == minBoundaryColumnsField)
+				{
+					processMinBoundaryColumnsChanged();
+				}
+				else if (e.getSource() == binWidthColumnsField)
+				{
+					processBinWidthColumnsChanged();
+				}
 			}
-			else if (e.getSource() == binWidthRowsField)
+			catch (NumberFormatException nfe)
 			{
-				processBinWidthRowsChanged();
-			}
-			else if (e.getSource() == minBoundaryColumnsField)
-			{
-				processMinBoundaryColumnsChanged();
-			}
-			else if (e.getSource() == binWidthColumnsField)
-			{
-				processBinWidthColumnsChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -948,21 +962,28 @@ public class CrossTabulationTableUserOptionsPanel extends FlowPanel
 			{
 				CrossTabulationTableController controller = CrossTabulationTableUserOptionsPanel.this.controller;
 
-				if (e.getSource() == minBoundaryRowsField)
+				try
 				{
-					processMinBoundaryRowsChanged();
+					if (e.getSource() == minBoundaryRowsField)
+					{
+						processMinBoundaryRowsChanged();
+					}
+					else if (e.getSource() == binWidthRowsField)
+					{
+						processBinWidthRowsChanged();
+					}
+					else if (e.getSource() == minBoundaryColumnsField)
+					{
+						processMinBoundaryColumnsChanged();
+					}
+					else if (e.getSource() == binWidthColumnsField)
+					{
+						processBinWidthColumnsChanged();
+					}
 				}
-				else if (e.getSource() == binWidthRowsField)
+				catch (NumberFormatException nfe)
 				{
-					processBinWidthRowsChanged();
-				}
-				else if (e.getSource() == minBoundaryColumnsField)
-				{
-					processMinBoundaryColumnsChanged();
-				}
-				else if (e.getSource() == binWidthColumnsField)
-				{
-					processBinWidthColumnsChanged();
+					// invalid value, do nothing
 				}
 
 				// update view
