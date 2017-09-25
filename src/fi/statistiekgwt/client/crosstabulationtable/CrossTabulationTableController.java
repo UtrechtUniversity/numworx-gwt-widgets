@@ -226,14 +226,22 @@ public class CrossTabulationTableController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getColumnIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getBinWidthRows(),
-			view.getMinBoundaryRows());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getBinWidthRows(),
+				view.getMinBoundaryRows());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setBinBoundaries(boundaries);
 		}
@@ -261,14 +269,22 @@ public class CrossTabulationTableController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			this.view.getBinWidthColumns(),
-			this.view.getMinBoundaryColumns());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				this.view.getBinWidthColumns(),
+				this.view.getMinBoundaryColumns());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBoundaries(boundaries);
 		}
@@ -355,4 +371,10 @@ public class CrossTabulationTableController implements StatistiekView
 	{
 		this.view.update();
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		this.view.setEditable(editable);
+//	}
 }
