@@ -18,6 +18,8 @@ import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
@@ -69,7 +71,7 @@ import fi.graphtoolgwt.client.text.Text;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
+public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
 	// private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
@@ -2007,10 +2009,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//	grafiekGWTVeld.paint();
 	}
 	
-	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent)
-	{	functies[nr] = e;
+	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent) {	
+		functies[nr] = e;
 		domeinen[nr][0] = domein[0];
 		domeinen[nr][1] = domein[1];
+		if (update) {
+			grafiekGWTVeld.paint();
+		}
 		
 		if(!tabelAlsTekenTool)
 		{	
@@ -2426,8 +2431,19 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		FormuleClipboardIF clip = comRoot.getFormuleClipboard();
 		FocusOnTouch.installKeyboard(kb, clip);
 		FormuleHolder.installKeyboard(kb);
-		this.comRoot = comRoot;
 
+		this.comRoot = comRoot;
+		comRoot.addCBookEventListener("expression.1", this);
+		comRoot.addCBookEventListener("expression.2", this);
+		comRoot.addCBookEventListener("expression.3", this);
+		comRoot.addCBookEventListener("expression.4", this);
+		comRoot.addCBookEventListener("expression.5", this);
+
+		comRoot.addCBookEventListener("equation.twoGraphs", this);
+		comRoot.addCBookEventListener("double.parameter", this);
+		comRoot.addCBookEventListener("double.trace", this);
+		comRoot.addCBookEventListener("draw_functions", this);
+		
 		zetMode(comRoot.getMode());		
 	}
 
@@ -4419,6 +4435,133 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			beginy = -Math.round(asDefYMin/eenheidyValue * eenheidyD);			
 	
 			beginyDocent = beginy;			
+		}
+		
+	}
+	
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+// 		System.out.println("event = "+ event.toString());
+// 		System.out.println("command = "+ command.toString());
+//		System.out.println("accepted");
+		
+		if(command.equals("input")) {
+	 		String formuleString = (String)event.getMessage();
+	 		System.out.println("input:: "+formuleString);
+//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
+//			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
+		}
+
+		if ( command.startsWith("expression")) {	
+			String indexString = command.substring(11);
+			int index = Integer.parseInt(indexString)-1;
+			
+			String formuleString = (String)event.getMessage();
+			if ((formuleString.length()<3) || (!formuleString.substring(0,2).equals("$f"))) {
+				formuleString = "$f" + formuleString + "@";
+			}
+			
+//* Testmessages 
+	 		System.out.println("command = "+ command.toString());
+	 		System.out.println("indexString = "+ indexString);
+	 		System.out.println("formuleString = "+formuleString);
+//*/
+	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
+	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
+	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
+		}
+				
+		if(command.equals("equation.twoGraphs"))
+		{
+			String vergelijkingString = (String)event.getMessage();
+			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
+			System.out.println("vergelijkingString: "+vergelijkingString);
+//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ == from active java version
+			
+		}
+		if(event.getCommand().equals("draw_functions")) {
+	 		System.out.println("draw_functions:: "+(String)event.getMessage());
+
+			Map map = (Map)event.getParameters();
+			if(map!=null) {	
+				
+//				 BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
+//				String numberString = (String)map.get("number");
+//				int number = 0;
+//				try	{	
+//					number = Integer.parseInt(numberString);
+//				}
+//				catch (NumberFormatException nfe) {
+//					System.out.println(nfe.toString());
+//				}
+//				String clear = (String)map.get("clear");
+//				String abscissa_name = (String)map.get("abscissa_name");
+//				String abscissa_min = (String)map.get("abscissa_min");
+//				String abscissa_max = (String)map.get("abscissa_max");
+//				String ordinate_name = (String)map.get("ordinate_name");
+//				String ordinate_min = (String)map.get("ordinate_min");
+//				String ordinate_max = (String)map.get("ordinate_max");
+//				
+//				Expressie[] functions = new Expressie[number];
+//				Color[] colors = null;
+//				double[] thicknesses = null;
+//				
+//				for(int i=0 ; i<number ; i++)
+//				{
+//					String functionString = (String)map.get("function_"+i);
+//					functions[i] = popcornParse(functionString);
+//					String colorString = (String)map.get("color_"+i);
+//					colors[i] = colorParse(colorString);
+//					String thicknessString = (String)map.get("thickness_"+i);
+//					try	{	
+//						thicknesses[i] = Double.parseDouble(thicknessString);
+//					}
+//					catch (NumberFormatException nfe) {
+//						System.out.println(nfe.toString());
+//					}
+//					
+//				}
+//				END OLD JAVA ANNOTATION 
+//				getFormuleComponent().zetFuncties(map); RPJ == from active java version
+			}
+		}
+		
+		if(event.getCommand().equals("double.trace")) {
+	 		System.out.println("double.trace:: "+(String)event.getMessage());
+	 		
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	String name = (String)map.get("name");
+				if(grafiekXAsNaam.equals(name)) {
+// RPJ START == from active java version					
+//					tracing = true;
+//					double xWaarde = ((Double)map.get("value")).doubleValue();
+//					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
+//					tracexD = tracex;
+//					slider.zetStand(tracex);
+//					
+//					repaint();
+//RPJ END 
+				}
+			}
+		}
+		if(event.getCommand().equals("double.parameter")) {	
+	 		System.out.println("double.parameter:: "+(String)event.getMessage());
+
+			Map map = (Map)event.getParameters();
+			if(map!=null) {	
+				String name = (String)map.get("name");
+				double waarde = ((Double)map.get("value")).doubleValue();
+// RPJ START == from active java version
+//				SchuifParameter schuifParameter = geefSchuifParameter(name);
+//				if(schuifParameter==null) {	
+//					schuifParameter = new SchuifParameter(200,name);
+//					voegSchuifParameterToe(schuifParameter,false);
+//				}
+//				schuifParameter.zetWaarde(waarde, false);
+//				gv.repaint();
+//RPJ END 			
+			}
 		}
 		
 	}
