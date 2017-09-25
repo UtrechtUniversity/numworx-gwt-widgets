@@ -678,15 +678,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		double d = 1;
 		String s = this.binWidthField.getText();
 		s = s.replace(',', '.');
-		try
-		{
-			d = Double.parseDouble(s); 
-		}
-		catch (NumberFormatException e)
-		{
-			System.out.println("Klassenbreedte heeft niet het goede formaat. Cannot parse bin width " + s);
-			//e.printStackTrace();
-		}
+		d = Double.parseDouble(s); 
+
 		return d;
 	}
 	
@@ -1668,25 +1661,32 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		{
 			HistogramController controller = HistogramUserOptionsPanel.this.controller;
 
-			if (e.getSource() == minBoundaryField)
+			try
 			{
-				processMinBoundaryChanged();
+				if (e.getSource() == minBoundaryField)
+				{
+					processMinBoundaryChanged();
+				}
+				else if (e.getSource() == maxOnScaleField)
+				{
+					processMaxOnScaleChanged();
+				}
+				else if (e.getSource() == binWidthField)
+				{
+					processBinWidthChanged();
+				}
+				else if (e.getSource() == splitMinBoundaryField)
+				{
+					processSplitMinBoundaryChanged();
+				}
+				else if (e.getSource() == splitBinWidthField)
+				{
+					processSplitBinWidthChanged();
+				}
 			}
-			else if (e.getSource() == maxOnScaleField)
+			catch (NumberFormatException nfe)
 			{
-				processMaxOnScaleChanged();
-			}
-			else if (e.getSource() == binWidthField)
-			{
-				processBinWidthChanged();
-			}
-			else if (e.getSource() == splitMinBoundaryField)
-			{
-				processSplitMinBoundaryChanged();
-			}
-			else if (e.getSource() == splitBinWidthField)
-			{
-				processSplitBinWidthChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -1736,41 +1736,8 @@ public class HistogramUserOptionsPanel extends FlowPanel
 		@Override
 		public void onValueChange(ValueChangeEvent<String> e)
 		{
-			if (e.getSource() == minBoundaryField)
+			try
 			{
-				processMinBoundaryChanged();
-			}
-			else if (e.getSource() == maxOnScaleField)
-			{
-				processMaxOnScaleChanged();
-			}
-			else if (e.getSource() == binWidthField)
-			{
-				processBinWidthChanged();
-			}
-			else if (e.getSource() == splitMinBoundaryField)
-			{
-				processSplitMinBoundaryChanged();
-			}
-			else if (e.getSource() == splitBinWidthField)
-			{
-				processSplitBinWidthChanged();
-			}
-
-			// update view
-			HistogramUserOptionsPanel.this.view.update();
-		}
-	} // class HistogramUOPValueChangeHandler
-
-	class HistogramUOPKeyDownHandler implements KeyDownHandler
-	{
-		@Override
-		public void onKeyDown(KeyDownEvent e)
-		{
-			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
-			{
-				HistogramController controller = HistogramUserOptionsPanel.this.controller;
-
 				if (e.getSource() == minBoundaryField)
 				{
 					processMinBoundaryChanged();
@@ -1790,6 +1757,53 @@ public class HistogramUserOptionsPanel extends FlowPanel
 				else if (e.getSource() == splitBinWidthField)
 				{
 					processSplitBinWidthChanged();
+				}
+			}
+			catch (NumberFormatException nfe)
+			{
+				// invalid value, do nothing
+			}
+
+			// update view
+			HistogramUserOptionsPanel.this.view.update();
+		}
+	} // class HistogramUOPValueChangeHandler
+
+	class HistogramUOPKeyDownHandler implements KeyDownHandler
+	{
+		@Override
+		public void onKeyDown(KeyDownEvent e)
+		{
+			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
+			{
+				HistogramController controller = HistogramUserOptionsPanel.this.controller;
+
+				try
+				{
+					if (e.getSource() == minBoundaryField)
+					{
+						processMinBoundaryChanged();
+					}
+					else if (e.getSource() == maxOnScaleField)
+					{
+						processMaxOnScaleChanged();
+					}
+					else if (e.getSource() == binWidthField)
+					{
+						processBinWidthChanged();
+					}
+					else if (e.getSource() == splitMinBoundaryField)
+					{
+						processSplitMinBoundaryChanged();
+					}
+					else if (e.getSource() == splitBinWidthField)
+					{
+						processSplitBinWidthChanged();
+					}
+				}
+				catch (NumberFormatException nfe)
+				{
+					// invalid value, do nothing
 				}
 
 				// update view
