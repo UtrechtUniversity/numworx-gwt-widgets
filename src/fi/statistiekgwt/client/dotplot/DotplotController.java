@@ -333,14 +333,22 @@ public class DotplotController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getSplitOptions().getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getSplitBinWidth(),
-			view.getSplitMinBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getSplitBinWidth(),
+				view.getSplitMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}			
 
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBoundaries(boundaries);
 		}
@@ -372,4 +380,10 @@ public class DotplotController implements StatistiekView
 	public void setUp(DialogBox owner)
 	{
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		this.view.setEditable(editable);
+//	}
 }
