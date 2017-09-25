@@ -78,14 +78,22 @@ public class FrequencyTableController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getSplitOptions().getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getSplitBinWidth(),
-			view.getSplitMinBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getSplitBinWidth(),
+				view.getSplitMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBoundaries(boundaries);
 		}
@@ -204,15 +212,24 @@ public class FrequencyTableController implements StatistiekView
 			this.model.getColumnIndex());
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getColumnIndex());
-		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getBinWidth(),
-			view.getMinBoundary());
+
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getBinWidth(),
+				view.getMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+			System.out.println("FrequencyTableController.updateBoundariesFromBinSettings(): NumberFormatException " + e.toString());
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setBinBoundaries(boundaries);
 		}
@@ -316,4 +333,10 @@ public class FrequencyTableController implements StatistiekView
 	{
 		this.view.update();
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		this.view.setEditable(editable);
+//	}
 }
