@@ -471,6 +471,10 @@ public class Boxplot
 	 */
 	public void paint()
 	{
+//		System.out.println("Boxplot.paint(): canvas.offsetwidth = " + canvas.getOffsetWidth()
+//			+ ", canvas.coordinatespacewidth = " + canvas.getCoordinateSpaceWidth()
+//			+ ", this.getWidth() = " + this.getWidth());
+	
 		// clear panel
 		Context2d context = canvas.getContext2d();
 		context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
@@ -1063,7 +1067,8 @@ public class Boxplot
 	}
 
 	/**
-	 * Paint the boxplot's dependent axis.
+	 * Paint the boxplot's dependent axis. 
+	 * For horizontal box this is the horizontal axis.
 	 */
 	private void paintDependentAxis(Context2d context)
 	{
@@ -1181,6 +1186,7 @@ public class Boxplot
 
 	/**
 	 * Paint the boxplot's independent axis, if applicable.
+	 * For horizontal boxes this is the vertical axis.
 	 * 
 	 * @param context
 	 */
@@ -1301,7 +1307,7 @@ public class Boxplot
 		{
 			// horizontal boxplots
 		
-			// paint the axis line
+			// paint the vertical axis line
 			context.beginPath();
 			context.moveTo(this.independentAxisWidth, 0);
 			context.lineTo(this.independentAxisWidth, this.canvas.getCoordinateSpaceHeight() - Boxplot.AXIS_OFFSET);
