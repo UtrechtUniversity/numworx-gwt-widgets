@@ -120,14 +120,22 @@ public class DescriptivesController implements StatistiekView
 		double max = this.model.getStatTableModel().getColumnMax(
 			this.model.getSplitOptions().getColumnSplitIndex());
 		
-		boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
-			min,
-			max,
-			view.getSplitBinWidth(),
-			view.getSplitMinBoundary());
+		try
+		{
+			boundaries = StatistiekGWT.appropriateBoundariesFromBinSettings(
+				min,
+				max,
+				view.getSplitBinWidth(),
+				view.getSplitMinBoundary());
+		}
+		catch (NumberFormatException e)
+		{
+			// Something went wrong with the entered values.
+			// Do nothing and keep the old ones.
+		}
 		
 		// if result is valid, set boundaries
-		if (boundaries != null)
+		if (boundaries != null && boundaries.size() > 0)
 		{
 			this.model.setSplitBoundaries(boundaries);
 		}
@@ -306,4 +314,9 @@ public class DescriptivesController implements StatistiekView
 	{
 		this.view.update();
 	}
+	
+//	public void setEditable(boolean editable)
+//	{
+//		view.setEditable(editable);
+//	}
 }
