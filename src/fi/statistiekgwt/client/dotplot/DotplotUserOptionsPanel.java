@@ -1308,21 +1308,28 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		{
 			DotplotController controller = DotplotUserOptionsPanel.this.controller;
 
-			if (e.getSource() == splitMinBoundaryField)
+			try
 			{
-				processSplitMinBoundaryChanged();
+				if (e.getSource() == splitMinBoundaryField)
+				{
+					processSplitMinBoundaryChanged();
+				}
+				else if (e.getSource() == splitBinWidthField)
+				{
+					processSplitBinWidthChanged();
+				}
+				else if (e.getSource() == minXOnScaleField)
+				{
+					processMinXOnScaleChanged();
+				}
+				else if (e.getSource() == maxXOnScaleField)
+				{
+					processMaxXOnScaleChanged();
+				}
 			}
-			else if (e.getSource() == splitBinWidthField)
+			catch (NumberFormatException nfe)
 			{
-				processSplitBinWidthChanged();
-			}
-			else if (e.getSource() == minXOnScaleField)
-			{
-				processMinXOnScaleChanged();
-			}
-			else if (e.getSource() == maxXOnScaleField)
-			{
-				processMaxXOnScaleChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -1401,21 +1408,28 @@ public class DotplotUserOptionsPanel extends FlowPanel
 		@Override
 		public void onValueChange(ValueChangeEvent<String> e)
 		{
-			if (e.getSource() == splitMinBoundaryField)
+			try
 			{
-				processSplitMinBoundaryChanged();
+				if (e.getSource() == splitMinBoundaryField)
+				{
+					processSplitMinBoundaryChanged();
+				}
+				else if (e.getSource() == splitBinWidthField)
+				{
+					processSplitBinWidthChanged();
+				}
+				else if (e.getSource() == minXOnScaleField)
+				{
+					processMinXOnScaleChanged();
+				}
+				else if (e.getSource() == maxXOnScaleField)
+				{
+					processMaxXOnScaleChanged();
+				}
 			}
-			else if (e.getSource() == splitBinWidthField)
+			catch (NumberFormatException nfe)
 			{
-				processSplitBinWidthChanged();
-			}
-			else if (e.getSource() == minXOnScaleField)
-			{
-				processMinXOnScaleChanged();
-			}
-			else if (e.getSource() == maxXOnScaleField)
-			{
-				processMaxXOnScaleChanged();
+				// invalid value, do nothing
 			}
 
 			// update view
@@ -1434,21 +1448,28 @@ public class DotplotUserOptionsPanel extends FlowPanel
 			{
 				DotplotController controller = DotplotUserOptionsPanel.this.controller;
 
-				if (e.getSource() == splitMinBoundaryField)
+				try
 				{
-					processSplitMinBoundaryChanged();
+					if (e.getSource() == splitMinBoundaryField)
+					{
+						processSplitMinBoundaryChanged();
+					}
+					else if (e.getSource() == splitBinWidthField)
+					{
+						processSplitBinWidthChanged();
+					}
+					else if (e.getSource() == minXOnScaleField)
+					{
+						processMinXOnScaleChanged();
+					}
+					else if (e.getSource() == maxXOnScaleField)
+					{
+						processMaxXOnScaleChanged();
+					}
 				}
-				else if (e.getSource() == splitBinWidthField)
+				catch (NumberFormatException nfe)
 				{
-					processSplitBinWidthChanged();
-				}
-				else if (e.getSource() == minXOnScaleField)
-				{
-					processMinXOnScaleChanged();
-				}
-				else if (e.getSource() == maxXOnScaleField)
-				{
-					processMaxXOnScaleChanged();
+					// invalid value, do nothing
 				}
 
 				// update view
