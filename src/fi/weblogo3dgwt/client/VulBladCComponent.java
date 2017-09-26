@@ -35,6 +35,7 @@ public class VulBladCComponent extends ParameterCommandComponent
 		
 		ub.vulBlad(clRed, clGreen, clBlue);
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getCommandNameTranslated(), varSet);
 		return traceKleur;	}
 }

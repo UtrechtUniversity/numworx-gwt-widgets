@@ -22,6 +22,7 @@ public class VooruitCComponent extends ParameterCommandComponent
 			return false; 
 		ub.vooruit( ((NumericParameter)parameters[0]).getValue() );
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getActualCall(), varSet);
 		return traceKleur;
 	}

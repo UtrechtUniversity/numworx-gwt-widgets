@@ -29,6 +29,7 @@ public abstract class CommandComponent //extends JPanel
 	protected String commandNameTranslated;
 			
 	public boolean traceKleur;
+	int traceKleurCnt = 0;
 	public CssColor traceActiveColor = CssColor.make(255,200,200);
 	
 	// variables for handling mouse events: editting & dragging
@@ -162,6 +163,12 @@ public abstract class CommandComponent //extends JPanel
 	
 	public void zetVast(boolean b)
 	{	vast = b;
+	}
+	
+	public void removeCaret()
+	{
+		caretUp = false;
+		caretDown = false;
 	}
 	
 	/**
@@ -443,7 +450,7 @@ public abstract class CommandComponent //extends JPanel
 			g.lineTo(xPos+getSize().width-3,yPos+3);
 			g.stroke();
 			
-			caretUp = false;
+			//caretUp = false;
 		}
 		if(caretDown)
 		{	
@@ -460,7 +467,7 @@ public abstract class CommandComponent //extends JPanel
 			g.stroke();
 			
 			
-			caretDown = false;
+			//caretDown = false;
 		}
 	}
 	

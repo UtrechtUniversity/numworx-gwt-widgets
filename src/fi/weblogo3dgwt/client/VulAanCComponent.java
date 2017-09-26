@@ -35,6 +35,7 @@ public class VulAanCComponent extends ParameterCommandComponent
 		
 		ub.vulAan(clRed, clGreen, clBlue);
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getActualCall(), varSet);
 		return traceKleur;
 	}

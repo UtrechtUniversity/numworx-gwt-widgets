@@ -58,6 +58,7 @@ public class Stap3DCComponent extends ParameterCommandComponent implements Param
 		double valueZ = ((NumericParameter)parameters[2]).getValue();
 		ub.stap(valueX, valueY,valueZ);
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if (traceKleur ) 
 			trb.setCommandInfo(getActualCall(), varSet);
 		return traceKleur;

@@ -33,6 +33,7 @@ public class ForLoopCommandComponent extends LoopCommandComponent
 
 		if ( !loopCondition.isCorrect(varSet) ) return false; 
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
 		{
 			trb.setCommandInfo(getCommandName()+" "+loopCondition.getValueText()+" "+naString, varSet);

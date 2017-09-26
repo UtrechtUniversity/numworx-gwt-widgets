@@ -20,6 +20,7 @@ public class LinksCComponent  extends ParameterCommandComponent
 		if ( !parameters[0].isCorrect(varSet) ) return false; 
 		ub.links( ((NumericParameter)parameters[0]).getValue());
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) trb.setCommandInfo(getActualCall(), varSet);
 		return traceKleur;
 	}

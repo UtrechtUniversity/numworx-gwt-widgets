@@ -32,6 +32,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -87,6 +88,7 @@ public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionVie
 	int leftOffset = 5;
 	int topOffset = 5;
 	
+	boolean paul = false;
 	int breedteGroot = 784; //784 is maximale breedte in popupFacade;
 	int breedteKlein = 700;
 	int breedtePaul = 950; //maximale breedte stand-alone 
@@ -195,14 +197,16 @@ logger.info("WebLogo3dGWT onModuleLoad");
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(webLogo3dGWTCssResource.dock());
+		// StubView
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
-
+		// standalone versie Paul
+		//dlp.setSize("" + breedte + "px", "" + (Window.getClientHeight()-20) + "px");
 
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(webLogo3dGWTCssResource.root());
 		
-		
 		Stub.publish(this);
+		// standalone versie Paul
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 
@@ -328,13 +332,18 @@ logger.info("WebLogo3dGWT uncompiled init");
 			// stand-alone
 			if (launchState != null && !launchState.containsKey("state"))
 			{
-				breedte = breedtePaul;
-				hoogte = hoogtePaul;
-				ubb = ubbPaul;
 System.out.println("paul");				
+				paul = true;
+				breedte = Window.getClientWidth(); //breedtePaul;
+				ubb = breedte - jlsBreedteGroot - 3 * offSet; //ubbPaul;
+				hoogte = Window.getClientHeight()-20; //hoogtePaul;
+				jlsHoogte = hoogte - bottomHeight - offSet;
+				ubh = jlsHoogte;
+				dlp.setWidth("100%");
+System.out.println("hoogte = " + hoogte);				
 			}
-			
-			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+			else
+				dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			
 			webLogoPanel = new LayoutPanel();
 			webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
@@ -620,7 +629,7 @@ logger.info("state != null");
 			methodeLabel = new Label("");
 			methodeLabel.addStyleName(webLogo3dGWTCssResource.label());
 			bottomPanel.add(methodeLabel);
-			bottomPanel.setWidgetLeftWidth(methodeLabel, currentX, Style.Unit.PX, 4 * buttonWidth, Style.Unit.PX);
+			bottomPanel.setWidgetLeftWidth(methodeLabel, currentX, Style.Unit.PX, 8 * buttonWidth, Style.Unit.PX);
 			bottomPanel.setWidgetTopHeight(methodeLabel, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
 			bottomPanel.setWidgetVisible(methodeLabel, false);
 			

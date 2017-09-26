@@ -36,6 +36,7 @@ public class WhileLoopCommandComponent extends LoopCommandComponent
 		int loopcount = 0;
 		if ( !loopCondition.isCorrect(varSet) ) return false; 
 		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
 		{
 			trb.setCommandInfo(getCommandNameTranslated()+" "+loopCondition.getValueText(), varSet);

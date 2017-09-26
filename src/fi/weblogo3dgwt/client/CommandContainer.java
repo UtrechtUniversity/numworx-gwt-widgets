@@ -18,6 +18,7 @@ import java.util.*;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
+
 import fi.weblogo3dgwt.client.logotekenap3d.Rectangle;
 
 public class CommandContainer // extends JPanel
@@ -246,6 +247,17 @@ public class CommandContainer // extends JPanel
 	{
 		Rectangle rect = new Rectangle(xPos, yPos, breedte, hoogte);
 		return rect.contains(x, y);
+	}
+	
+	public void removeCaret()
+	{
+		caretUp = false;
+		for (int cnt = 0; cnt < getComponentCount(); cnt++)
+		{	CommandComponent c = (CommandComponent) components.elementAt(cnt);
+			c.removeCaret();
+		}
+		
+//System.out.println("CCont removeCaret " + containerName);		
 	}
 	
 	

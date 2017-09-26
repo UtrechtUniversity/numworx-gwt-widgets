@@ -67,9 +67,12 @@ public class TextParameter extends NumericParameter
 	public String getValueText()
 	{
 		if ( isConstantString )
-		{
-			return getParameterText().substring(1, getParameterText().length()-1);
-		} else
+		{	if (getParameterText().length() >= 1)
+				return getParameterText().substring(1, getParameterText().length()-1);
+			else
+				return "";
+		} 
+		else
 		{
 			return ""+(super.getValue());
 		}

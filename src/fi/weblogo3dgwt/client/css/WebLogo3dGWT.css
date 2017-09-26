@@ -2,11 +2,13 @@
 
 
 .root {
-/**	background-color: yellow;*/ 
+	background-color: yellow;
+	margin: 0 0 0 0; 
 }	
 
 .dock {
-/**	background-color: orange; */
+	background-color: orange; 
+	margin: 0 0 0 0;
 }
 
 .bottom {
