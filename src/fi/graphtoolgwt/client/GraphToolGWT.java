@@ -73,7 +73,7 @@ import fi.graphtoolgwt.client.text.Text;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
-	// private static Logger logger = Logger.getLogger("GraphToolGWT");
+	//private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
@@ -329,7 +329,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	boolean kijkNaButtonZichtbaar = false;
 	//URL imageURL;
-	
 	
 	public static int READY = 0;
     public static int ONE_FINGER = 1;
@@ -1033,8 +1032,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			setColor(0, opdrachtKleuren[0], false);	
 			tabelComponent.zetTabelPunten(docentGraphPoints, false);
 			
-			if(graphPoints.size() >= docentGraphPoints.size())
-			{	kijkNaButton.setEnabled(true);
+			if(graphPoints.size() >= docentGraphPoints.size()) {	
+				kijkNaButton.setEnabled(true);
 			}
 			else
 			{	kijkNaButton.setEnabled(false);
@@ -1049,8 +1048,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 			setChanged(false);
 		}
-		else if (typeOpdracht == TEKENPUNTENBIJFORMULE)
-		{	int kleinsteMinimum = minimumPunten[0];
+		else if (typeOpdracht == TEKENPUNTENBIJFORMULE) {	
+			int kleinsteMinimum = minimumPunten[0];
 	    	for(int i = 1; i < aantalFuncties; i++)
 	    	{	if(minimumPunten[i] < kleinsteMinimum)
 	    		{	kleinsteMinimum = minimumPunten[i];
@@ -1134,9 +1133,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			return gewoneKleuren[0];
 	}
 	
-	public void setColor(int nr, CssColor c, boolean nakijken)
-	{
+	public void setColor(int nr, CssColor c, boolean nakijken) {
 		//31-8-2015: colors[nr] moet altijd deze kleur worden; bij nakijken wordt rood/groene feedback anders niet getoond.
+ 		System.out.println("setColor:: "+nr +", " + c + ", " +nakijken);
 		colors[nr] = c;
 		if(typeOpdracht == GEENOPDRACHT)
 		{	gewoneKleuren[nr] = c;
@@ -1441,8 +1440,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 	}
 	
-	public void kijkNa(boolean show) {
+	public void kijkNa(boolean show, boolean setState) {
 		
+
 		ingevuld = false;
 		if(feedbackPanel != null)
 			feedbackPanel.removeFromParent();
@@ -1876,7 +1876,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 		}
 		
-		if (show)
+		if ( (show) && (!setState))
 			if (ingevuld)
 			{	if(comRoot != null)
 					comRoot.setChanged(fout);
@@ -1889,7 +1889,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 
 	public void kijkNa()
-    {	kijkNa(true);
+    {	kijkNa(true, false /* geen setState */);
 	}
 	
 	
@@ -1984,11 +1984,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
     }
 
     public void kijkNa(int stapNr) {
-		kijkNa(true);
+		kijkNa(true, false /* geen setState */);
 	}
 	
 	public void kijkNa(int stapNr, boolean show) {
-		kijkNa(show);
+		kijkNa(show, false /* geen setState */);
 	}
 	
 	
@@ -2073,15 +2073,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		//initialize();
 		asHoogte = new FormuleHolder().getDefaultFont().getAscent(); 
 	}
-	
-	
 
 	@Override
 	public HashMap<String, Object> getState() {
 		
-		if ( (!moveActionActivated) && (mode == OpdrNavIF.EINDTOETS) ) {
+		if ( (!moveActionActivated) && 
+				( (mode == OpdrNavIF.EINDTOETS) || (mode == OpdrNavIF.ZELFTOETS) ) ) {
 			formuleComponent.updateFormulas();
-			kijkNa(false);
+			kijkNa(false /* no show */, false /* geen setState */);
 		}
 		
 		double beginx = 1;
@@ -2226,12 +2225,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		h.put("beginwaarde", new Integer(beginwaarde));
 		h.put("ingevuld", new Boolean(ingevuld));
 		h.put("nagekeken", new Boolean(nagekeken));
+ 		System.out.println("getState 2 || nagekekenen = " + nagekeken);
+
 		
 		return h;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+
 		if(h == null || h.isEmpty()) return;
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
@@ -2408,10 +2410,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
 		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
-			kijkNa();
+			kijkNa(true /* show */, true /* wel setSate */);
 		} else {
-			if (mode == OpdrNavIF.EINDTOETS) {
-				kijkNa(false);
+			if ( (mode == OpdrNavIF.EINDTOETS) ) {
+				kijkNa(false /* no show */, true /* wel setState */);
 			}
 		}
 		
@@ -2421,7 +2423,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		fromuser = true;
 		
 		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
-		
 	}
 
 		@Override
@@ -3743,8 +3744,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
 			}
 		}
-		else if (source == grafiekGWTCanvas)
-		{	if (tekenComponent.getCursorMode() == tekenComponent.NOCUR)
+		else if (source == grafiekGWTCanvas) {	
+			if (tekenComponent.getCursorMode() == tekenComponent.NOCUR)
 			{	double beginxR = beginx;
 				if (!manualScalingX && !manualScalingY) {
 					beginx = eenheidx*Math.round(beginx/eenheidx);
@@ -4408,7 +4409,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	}
 	
 	void setChanged(boolean b) {
-		if(comRoot != null && fromuser)
+		if(comRoot != null && fromuser && (mode != OpdrNavIF.ZELFTOETS))
 			comRoot.setChanged(b);
 	}
 	
