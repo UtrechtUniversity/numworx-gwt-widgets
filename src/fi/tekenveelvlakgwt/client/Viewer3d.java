@@ -302,11 +302,14 @@ public class Viewer3d extends LayoutPanel
 
 		gevraagdX = putInRange(gevraagdX);
 		gevraagdY = putInRange(gevraagdY);
-
+		
 		drx = putInRange(drx);
 		dry = putInRange(dry);
 
-		if ((Math.abs(gevraagdX - drx) < tol) && (Math.abs(gevraagdY - dry) < tol))
+		double verschilX = Math.min(Math.abs(gevraagdX - drx), gevraagdX - drx > 0 ? Math.abs(gevraagdX - drx - 360) : Math.abs(gevraagdX - drx + 360));
+		double verschilY = Math.min(Math.abs(gevraagdY - dry), gevraagdY - dry > 0 ? Math.abs(gevraagdY - dry - 360) : Math.abs(gevraagdY - dry + 360));
+		
+		if ((Math.abs(verschilX) < tol) && (Math.abs(verschilY) < tol))
 			return true;
 		else
 			return false;
