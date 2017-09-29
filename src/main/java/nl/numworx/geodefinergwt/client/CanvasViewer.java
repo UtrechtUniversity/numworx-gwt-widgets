@@ -60,6 +60,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	public CanvasViewer(int width, int height) {
 		super(width, height);
 		hitTester = new HitTesterGWT();
+		asWidget().addStyleName("canvas");
 	}
 
 	public CanvasViewer() {
