@@ -1135,7 +1135,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public void setColor(int nr, CssColor c, boolean nakijken) {
 		//31-8-2015: colors[nr] moet altijd deze kleur worden; bij nakijken wordt rood/groene feedback anders niet getoond.
- 		System.out.println("setColor:: "+nr +", " + c + ", " +nakijken);
+// 		System.out.println("setColor:: "+nr +", " + c + ", " +nakijken);
 		colors[nr] = c;
 		if(typeOpdracht == GEENOPDRACHT)
 		{	gewoneKleuren[nr] = c;
@@ -2225,8 +2225,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		h.put("beginwaarde", new Integer(beginwaarde));
 		h.put("ingevuld", new Boolean(ingevuld));
 		h.put("nagekeken", new Boolean(nagekeken));
- 		System.out.println("getState 2 || nagekekenen = " + nagekeken);
-
 		
 		return h;
 	}
