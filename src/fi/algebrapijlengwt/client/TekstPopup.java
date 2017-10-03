@@ -9,6 +9,7 @@ import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
 import nl.uu.fi.dwo.formule.client.formuleobjects.FormuleElement;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -112,12 +113,13 @@ public class TekstPopup extends PopupPanel
 		{
 			// TODO set keyboard in abc-mode
 			//kb.goTo("Alpha");//nl.uu.fi.dwo.mobile.client.ui.dwokb.FormuleKeyboard
-			
+			kb.setEnterType(EnterType.ENTER);
 			// werkt dit? nee, geeft geen abc-modus van dwo-toetsenbord
 			editor.setFormuleToolBijFocus(false);
 		}
 		else
 		{
+			kb.setEnterType(EnterType.APPLY);
 			editor.setFormuleToolBijFocus(true);
 		}
 		
