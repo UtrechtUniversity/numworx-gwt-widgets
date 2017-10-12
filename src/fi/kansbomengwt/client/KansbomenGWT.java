@@ -1,5 +1,7 @@
 package fi.kansbomengwt.client;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -767,13 +769,35 @@ public class KansbomenGWT implements EntryPoint, InteractionStub{
     	updateLeerlingAntwoorden();
     	if(Arrays.equals(leerlingAntwoorden,beginStatus))
     	{
-    		ingevuld = false;
-    		return;
+    		//A step has already been made
+    		if(goedKrulImage.isVisible() || foutKruisImage.isVisible())
+    		{
+    			score = 0;
+    			foutKruisImage.setVisible(true);
+    			goedKrulImage.setVisible(false);
+        		ingevuld = true;
+        		//fire actionEvent
+        		comRoot.setChanged(foutKruisImage.isVisible());
+         		return;
+    		}
+    		else //No step has been made yet
+    		{
+    			ingevuld = false;
+        		return;
+    		}
     	}		                                   
     	
     	leerlingAntwoorden[0] = nakijkModel[0];
-    	for(int i = nakijkModel[9]; i < 6; i++)
-    		leerlingAntwoorden[i + 1] = nakijkModel[i + 1];
+    	if(!ballenZichtbaar)
+    	{
+    		for(int i = 0; i < 6; i++)
+        		leerlingAntwoorden[i + 1] = nakijkModel[i + 1];
+    	}
+    	else
+    	{
+    		for(int i = nakijkModel[9]; i < 6; i++)
+        		leerlingAntwoorden[i + 1] = nakijkModel[i + 1];
+    	}
     	if(Arrays.equals(leerlingAntwoorden,nakijkModel))
     	{	score = scoreMax;
     		foutKruisImage.setVisible(false);
