@@ -143,7 +143,9 @@ public class ToolBoxPanel extends Composite implements Tools {
 		
 */			
 			case FORMULA: // definitie, /formuleknop.gif
-				break;
+				btn = newBtn(url + "/formuleknop.gif", new FormuleHandler("Definitie"), tracker);break;
+			case TEXT: 
+				btn = newBtn(url + "/text.png", new TextHandler("Text"), tracker); break;
 			case TRAIL: // trail
 				btn = newBtn(url+"/thickness2.png", new TrailHandler(Messages.getString("Euclides.44")), tracker);
 					break;					
