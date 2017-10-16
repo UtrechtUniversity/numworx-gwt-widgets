@@ -18,6 +18,8 @@ import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
@@ -69,16 +71,16 @@ import fi.graphtoolgwt.client.text.Text;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
+public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
-	// private static Logger logger = Logger.getLogger("GraphToolGWT");
+	//private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
 	final static int cPointRadius = 3;
 	final static CssColor cColorOrange = CssColor.make(255, 193, 0);
 	final static CssColor cColorRed = CssColor.make(255, 0, 0);
-	final static CssColor cColorGreen = CssColor.make(0, 200, 0);
+	final static CssColor cColorGreen = CssColor.make(0, 200, 0); 
 	
 	final static boolean cDefault_tekenComponentAan = false;
 
@@ -329,7 +331,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 	boolean kijkNaButtonZichtbaar = false;
 	//URL imageURL;
-	
 	
 	public static int READY = 0;
     public static int ONE_FINGER = 1;
@@ -1039,8 +1040,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			setColor(0, opdrachtKleuren[0], false);	
 			tabelComponent.zetTabelPunten(docentGraphPoints, false);
 			
-			if(graphPoints.size() >= docentGraphPoints.size())
-			{	kijkNaButton.setEnabled(true);
+			if(graphPoints.size() >= docentGraphPoints.size()) {	
+				kijkNaButton.setEnabled(true);
 			}
 			else
 			{	kijkNaButton.setEnabled(false);
@@ -1055,8 +1056,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			}
 			setChanged(false);
 		}
-		else if (typeOpdracht == TEKENPUNTENBIJFORMULE)
-		{	int kleinsteMinimum = minimumPunten[0];
+		else if (typeOpdracht == TEKENPUNTENBIJFORMULE) {	
+			int kleinsteMinimum = minimumPunten[0];
 	    	for(int i = 1; i < aantalFuncties; i++)
 	    	{	if(minimumPunten[i] < kleinsteMinimum)
 	    		{	kleinsteMinimum = minimumPunten[i];
@@ -1449,8 +1450,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		
 	}
 	
-	public void kijkNa(boolean show) {
+	public void kijkNa(boolean show, boolean setState) {
 		
+
 		ingevuld = false;
 		if(feedbackPanel != null)
 			feedbackPanel.removeFromParent();
@@ -1758,15 +1760,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				color = verwerkAsNaamBijNakijken(show, color, correctLogica);
 				color = verwerkTekenModusBijNakijken(show, color, correctLogica);
 
-				if(show) 
-				{	//leerlingcolor op juiste kleur zetten.
-					for(int i = 0; i < aantalFuncties; i++)
-					{	if(functieCorrect[koppeling[i]])
-							setColor(i, color, true);
-						//colors[i] = color;
-						else
-							setColor(i, color, true);
+				if(show) {	
+					//leerlingcolor op juiste kleur zetten.
+					for(int i = 0; i < aantalFuncties; i++) {	
+						if(functieCorrect[koppeling[i]]) {
+							setColor(i, cColorGreen, true);
+							//colors[i] = color;
+						} else {
+							setColor(i, cColorRed, true);
 							//	colors[i] = CssColor.make(255, 0, 0);
+						}
 					}
 					tekenDocentFuncties = new Expressie[aantalFuncties];
 					if(!rechteVerbindingen && !krommeMetExtrapolatie && !krommeZonderExtrapolatie)
@@ -1854,7 +1857,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 					
 					if (dis < nauwkeurigheid[0]) {
 						hits++;
-						graphPointColors.setElementAt(cColorGreen, index);
+						graphPointColors.setElementAt(cColorGreen, dCnt);
 					} 
 				}
     			System.out.println("color 04 = " + color);
@@ -1900,7 +1903,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			}
 		}
 		
-		if (show)
+		if ( (show) && (!setState))
 			if (ingevuld)
 			{	if(comRoot != null)
 					comRoot.setChanged(fout);
@@ -1913,7 +1916,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	
 
 	public void kijkNa()
-    {	kijkNa(true);
+    {	kijkNa(true, false /* geen setState */);
 	}
 	
 	
@@ -2008,11 +2011,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
     }
 
     public void kijkNa(int stapNr) {
-		kijkNa(true);
+		kijkNa(true, false /* geen setState */);
 	}
 	
 	public void kijkNa(int stapNr, boolean show) {
-		kijkNa(show);
+		kijkNa(show, false /* geen setState */);
 	}
 	
 	
@@ -2033,10 +2036,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//	grafiekGWTVeld.paint();
 	}
 	
-	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent)
-	{	functies[nr] = e;
+	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent) {	
+		functies[nr] = e;
 		domeinen[nr][0] = domein[0];
 		domeinen[nr][1] = domein[1];
+		if (update) {
+			grafiekGWTVeld.paint();
+		}
 		
 		if(!tabelAlsTekenTool)
 		{	
@@ -2094,15 +2100,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		//initialize();
 		asHoogte = new FormuleHolder().getDefaultFont().getAscent(); 
 	}
-	
-	
 
 	@Override
 	public HashMap<String, Object> getState() {
 		
-		if ( (!moveActionActivated) && (mode == OpdrNavIF.EINDTOETS) ) {
+		if ( (!moveActionActivated) && 
+				( (mode == OpdrNavIF.EINDTOETS) || (mode == OpdrNavIF.ZELFTOETS) ) ) {
 			formuleComponent.updateFormulas();
-			kijkNa(false);
+			kijkNa(false /* no show */, false /* geen setState */);
 		}
 		
 		double beginx = 1;
@@ -2280,6 +2285,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+
 		if(h == null || h.isEmpty()) return;
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
@@ -2469,10 +2475,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		setActiveIndex(activeIndex, true);
 		pointsChangedAction();
 		if ((mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS) || nagekeken)	{ 
-			kijkNa();
+			kijkNa(true /* show */, true /* wel setSate */);
 		} else {
-			if (mode == OpdrNavIF.EINDTOETS) {
-				kijkNa(false);
+			if ( (mode == OpdrNavIF.EINDTOETS) ) {
+				kijkNa(false /* no show */, true /* wel setState */);
 			}
 		}
 		
@@ -2482,7 +2488,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		fromuser = true;
 		
 		herlokeerSchuifParameters();  // Indien nodig :: Herpositioneer de schuifParamters
-		
 	}
 
 		@Override
@@ -2492,8 +2497,19 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 		FormuleClipboardIF clip = comRoot.getFormuleClipboard();
 		FocusOnTouch.installKeyboard(kb, clip);
 		FormuleHolder.installKeyboard(kb);
-		this.comRoot = comRoot;
 
+		this.comRoot = comRoot;
+		comRoot.addCBookEventListener("expression.1", this);
+		comRoot.addCBookEventListener("expression.2", this);
+		comRoot.addCBookEventListener("expression.3", this);
+		comRoot.addCBookEventListener("expression.4", this);
+		comRoot.addCBookEventListener("expression.5", this);
+
+		comRoot.addCBookEventListener("equation.twoGraphs", this);
+		comRoot.addCBookEventListener("double.parameter", this);
+		comRoot.addCBookEventListener("double.trace", this);
+		comRoot.addCBookEventListener("draw_functions", this);
+		
 		zetMode(comRoot.getMode());		
 	}
 
@@ -3793,8 +3809,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 				grafiekGWTVeld.zetSliderStand(grafiekGWTVeld.tracex);
 			}
 		}
-		else if (source == grafiekGWTCanvas)
-		{	if (tekenComponent.getCursorMode() == tekenComponent.NOCUR)
+		else if (source == grafiekGWTCanvas) {	
+			if (tekenComponent.getCursorMode() == tekenComponent.NOCUR)
 			{	double beginxR = beginx;
 				if (!manualScalingX && !manualScalingY) {
 					beginx = eenheidx*Math.round(beginx/eenheidx);
@@ -4458,7 +4474,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 	}
 	
 	void setChanged(boolean b) {
-		if(comRoot != null && fromuser)
+		if(comRoot != null && fromuser && (mode != OpdrNavIF.ZELFTOETS))
 			comRoot.setChanged(b);
 	}
 	
@@ -4485,6 +4501,133 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware {
 			beginy = -Math.round(asDefYMin/eenheidyValue * eenheidyD);			
 	
 			beginyDocent = beginy;			
+		}
+		
+	}
+	
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+// 		System.out.println("event = "+ event.toString());
+// 		System.out.println("command = "+ command.toString());
+//		System.out.println("accepted");
+		
+		if(command.equals("input")) {
+	 		String formuleString = (String)event.getMessage();
+	 		System.out.println("input:: "+formuleString);
+//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
+//			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
+		}
+
+		if ( command.startsWith("expression")) {	
+			String indexString = command.substring(11);
+			int index = Integer.parseInt(indexString)-1;
+			
+			String formuleString = (String)event.getMessage();
+			if ((formuleString.length()<3) || (!formuleString.substring(0,2).equals("$f"))) {
+				formuleString = "$f" + formuleString + "@";
+			}
+			
+//* Testmessages 
+	 		System.out.println("command = "+ command.toString());
+	 		System.out.println("indexString = "+ indexString);
+	 		System.out.println("formuleString = "+formuleString);
+//*/
+	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
+	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
+	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
+		}
+				
+		if(command.equals("equation.twoGraphs"))
+		{
+			String vergelijkingString = (String)event.getMessage();
+			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
+			System.out.println("vergelijkingString: "+vergelijkingString);
+//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ == from active java version
+			
+		}
+		if(event.getCommand().equals("draw_functions")) {
+	 		System.out.println("draw_functions:: "+(String)event.getMessage());
+
+			Map map = (Map)event.getParameters();
+			if(map!=null) {	
+				
+//				 BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
+//				String numberString = (String)map.get("number");
+//				int number = 0;
+//				try	{	
+//					number = Integer.parseInt(numberString);
+//				}
+//				catch (NumberFormatException nfe) {
+//					System.out.println(nfe.toString());
+//				}
+//				String clear = (String)map.get("clear");
+//				String abscissa_name = (String)map.get("abscissa_name");
+//				String abscissa_min = (String)map.get("abscissa_min");
+//				String abscissa_max = (String)map.get("abscissa_max");
+//				String ordinate_name = (String)map.get("ordinate_name");
+//				String ordinate_min = (String)map.get("ordinate_min");
+//				String ordinate_max = (String)map.get("ordinate_max");
+//				
+//				Expressie[] functions = new Expressie[number];
+//				Color[] colors = null;
+//				double[] thicknesses = null;
+//				
+//				for(int i=0 ; i<number ; i++)
+//				{
+//					String functionString = (String)map.get("function_"+i);
+//					functions[i] = popcornParse(functionString);
+//					String colorString = (String)map.get("color_"+i);
+//					colors[i] = colorParse(colorString);
+//					String thicknessString = (String)map.get("thickness_"+i);
+//					try	{	
+//						thicknesses[i] = Double.parseDouble(thicknessString);
+//					}
+//					catch (NumberFormatException nfe) {
+//						System.out.println(nfe.toString());
+//					}
+//					
+//				}
+//				END OLD JAVA ANNOTATION 
+//				getFormuleComponent().zetFuncties(map); RPJ == from active java version
+			}
+		}
+		
+		if(event.getCommand().equals("double.trace")) {
+	 		System.out.println("double.trace:: "+(String)event.getMessage());
+	 		
+			Map map = (Map)event.getParameters();
+			if(map!=null)
+			{	String name = (String)map.get("name");
+				if(grafiekXAsNaam.equals(name)) {
+// RPJ START == from active java version					
+//					tracing = true;
+//					double xWaarde = ((Double)map.get("value")).doubleValue();
+//					tracex =(int)(eenheidxD*(xWaarde)/schaalFactorX+beginx);
+//					tracexD = tracex;
+//					slider.zetStand(tracex);
+//					
+//					repaint();
+//RPJ END 
+				}
+			}
+		}
+		if(event.getCommand().equals("double.parameter")) {	
+	 		System.out.println("double.parameter:: "+(String)event.getMessage());
+
+			Map map = (Map)event.getParameters();
+			if(map!=null) {	
+				String name = (String)map.get("name");
+				double waarde = ((Double)map.get("value")).doubleValue();
+// RPJ START == from active java version
+//				SchuifParameter schuifParameter = geefSchuifParameter(name);
+//				if(schuifParameter==null) {	
+//					schuifParameter = new SchuifParameter(200,name);
+//					voegSchuifParameterToe(schuifParameter,false);
+//				}
+//				schuifParameter.zetWaarde(waarde, false);
+//				gv.repaint();
+//RPJ END 			
+			}
 		}
 		
 	}

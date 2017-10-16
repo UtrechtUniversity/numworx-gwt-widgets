@@ -48,7 +48,7 @@ import fi.wiskopdr.expressies.Expressie;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
-	private static Logger logger = Logger.getLogger("VeldComponentGWT");
+//	private static Logger logger = Logger.getLogger("VeldComponentGWT");
 	
 	public enum FieldGraphType {QUIVER, STREAMLINE};
 	public enum FieldGraphArrowSizeMode { REALVALUE, FIXEDSIZE, SCALEDSIZE }	
@@ -433,7 +433,6 @@ public class VeldComponentGWT extends LayoutPanel {
 			int systemHalfHeight = 0;
 			double cBorderMargin = 5.0;
 
-            logger.info("komt in adjustSize :: "+ this.systemHeight);
 			// clear old brace canvas
 			Context2d ctx = braceCanvas.getContext2d();
 			ctx.clearRect(0, 0, cSystemDiffEqPanelGWT_braceWidth, this.systemHeight);
@@ -510,10 +509,6 @@ public class VeldComponentGWT extends LayoutPanel {
 			
 			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
 			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
-			logger.info("Line 1 :: From " + 
-					(cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin) + " to " + 
-					(systemHeight/2.0-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin)
-					);
 			
 			ctx.arc(0.0, systemHalfHeight-cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 0, 0.5*Math.PI, false);
@@ -521,20 +516,13 @@ public class VeldComponentGWT extends LayoutPanel {
 			ctx.arc(0.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.5*Math.PI, 2.0*Math.PI, false);
 			
-//			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0);
 			ctx.moveTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin);
 			ctx.lineTo(cSystemDiffEqPanelGWT_braceWidth/2.0, systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin);
-			logger.info("Line 2 :: From " + 
-					(systemHeight/2+cSystemDiffEqPanelGWT_braceWidth/2.0) + " to " + 
-					(systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin)
-					);
-			logger.info("Line 2 update :: From " + (systemHalfHeight+cSystemDiffEqPanelGWT_braceWidth/2.0+(double) cBorderMargin));
 			
 			ctx.arc(cSystemDiffEqPanelGWT_braceWidth,  systemHeight-cSystemDiffEqPanelGWT_braceWidth/2.0- (double) cBorderMargin, 
 					cSystemDiffEqPanelGWT_braceWidth/2.0, 1.0*Math.PI, 0.5*Math.PI, true);
 
 			ctx.stroke();
-            logger.info("Uit adjustSize :: "+ this.systemHeight);
 
 		}
 		
