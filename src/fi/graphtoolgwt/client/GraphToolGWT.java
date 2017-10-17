@@ -1801,14 +1801,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 			if (graphPoints.size() > 0)
 			{	
+				grafiekKleuren = false; //RPJ
 				ingevuld = true;
 				CssColor color = CssColor.make(255, 0, 0);
 				score = 0;
 				correct = false;
 				fout = false;
-    			System.out.println("color 01 = " + color);
-
-	
+				
 				Vector llgPtsCopy = new Vector();
 				for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
 				{	RealPoint pt = (RealPoint) graphPoints.elementAt(pCnt);
@@ -1823,7 +1822,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				{	ingevuld = false;
 					return;
 				}
-    			System.out.println("color 02 = " + color);
 				for (int dCnt = 0; dCnt < docentGraphPoints.size(); dCnt++)
 				{
 					RealPoint dPt = (RealPoint) docentGraphPoints.elementAt(dCnt);
@@ -1855,12 +1853,48 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					double dis = Math.sqrt((lPixel.getX() - dPixel.getX()) * (lPixel.getX() - dPixel.getX()) +
 								     	   (lPixel.getY() - dPixel.getY()) * (lPixel.getY() - dPixel.getY())); 
 					
+//					if (dis < nauwkeurigheid[0]) {
+//						hits++;
+//						graphPointColors.setElementAt(cColorGreen, dCnt);
+//					} 
 					if (dis < nauwkeurigheid[0]) {
 						hits++;
-						graphPointColors.setElementAt(cColorGreen, dCnt);
-					} 
+						if (show) { // teken het juiste punt groen
+							// findIndex of hitPoint
+//							System.out.println("***--- CHECK HIT ---***");
+//							System.out.println("lPixel = (" + lPoint.getX() + ", " +  lPoint.getY() +")");
+
+							double verglNauwkeurigheid = 0.000001;
+							boolean found = false;
+							for (int i = 0; (i < graphPoints.size() && !found); i++) {
+								RealPoint pt = (RealPoint) graphPoints.elementAt(i); 
+//								System.out.println("pt = (" + pt.getX() + ", " +  pt.getY() +")");
+//								System.out.println("lPoint = (" + lPoint.getX() + ", " +  lPoint.getY() +")");
+//								System.out.println(i + ", XDiff = " + Math.abs(lPoint.getX() - pt.getX()));
+//								System.out.println(i + ", YDiff = " + Math.abs(lPoint.getY() - pt.getY()));
+								
+								if ( (Math.abs(lPoint.getX() - pt.getX()) < verglNauwkeurigheid) && 
+										(Math.abs(lPoint.getY() - pt.getY()) < verglNauwkeurigheid) ) {
+//									System.out.println("Hit found :: i = " + i );
+//									System.out.println("Hit found :: Size = " + graphPointColors.size());
+									found = true;
+									graphPointColors.setElementAt(cColorGreen, i);
+								}
+							}
+						}
+					}
+					
 				}
-    			System.out.println("color 04 = " + color);
+				
+//				for (int i=0; i<graphPointColors.size(); i++) {
+//	    			System.out.println("color " + i +"//" + graphPointColors.size() + " = " + graphPointColors.get(i) );
+//				}
+//				for (int i=0; i<docentGraphPoints.size(); i++) {
+//	    			System.out.println("docent " + i +"//" + docentGraphPoints.size() + " = (" + docentGraphPoints.get(i).getX() +"," + docentGraphPoints.get(i).getY() + ")");
+//				}
+//				for (int i=0; i<graphPoints.size(); i++) {
+//	    			System.out.println("leerling " + i +"//" + graphPoints.size() + " = (" + graphPoints.get(i).getX() +"," + graphPoints.get(i).getY() + ")");
+//				}
 				
 				int scorePerPunt = scoreMax / Math.max(docentGraphPoints.size(), llgPtsArray.length);
 				if (hits == 0)
@@ -1888,12 +1922,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					color = cColorOrange;
 
 				}
-    			System.out.println("color 05 = " + color);
 				
 				color = verwerkTekenModusBijNakijken(show, color, correct);
-    			System.out.println("color 06 = " + color);
 				color = verwerkAsNaamBijNakijken(show, color, correct);
-    			System.out.println("color 07 = " + color);
 
 				if(show) {
 					setColor(0, color, true);
