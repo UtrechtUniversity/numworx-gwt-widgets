@@ -27,7 +27,7 @@ import gwt.awt.geom.PathIterator;
 
 public class GrafiekGWTVeld {
 	
-//	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
+	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
 	/* contstants */
 	private final int cMaxPiLinesOnScreen = 8;
@@ -889,6 +889,7 @@ public class GrafiekGWTVeld {
 		{	for(int j = 0; j < interactiePanel.tekenDocentFuncties.length; j++)
 			{	if(interactiePanel.tekenDocentFuncties[j] != null)
 				{	int xMin = Math.max(witruimteY?maxWoordBreedteY:drawXmin, interactiePanel.xPositief?bx:drawXmin);
+				    logger.info(":: 1 :: ");
 					tekenFunctie(gIm, xMin, interactiePanel.tekenDocentFuncties[j], interactiePanel.docentDomeinen[j], 
 							interactiePanel.docentColor);
 				}
@@ -904,6 +905,8 @@ public class GrafiekGWTVeld {
 				if(interactiePanel.functies[j]!=null && interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam)) {	
 					
 					int xMin = Math.max(witruimteY?maxWoordBreedteY:drawXmin, interactiePanel.xPositief?bx:drawXmin);
+				    logger.info(":: 2 :: ");
+
 					tekenFunctie(gIm, xMin, interactiePanel.functies[j], interactiePanel.domeinen[j],
 							(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN 
 							|| interactiePanel.grafiekKleuren)?interactiePanel.colors[j]:interactiePanel.colors[0]);
@@ -1210,13 +1213,15 @@ public class GrafiekGWTVeld {
 		{	g.setFillStyle(interactiePanel.colors[0]);
 			g.setStrokeStyle(interactiePanel.colors[0]);
 		}
+		
 		for (int pCnt = 0; pCnt < indexPoints.size(); pCnt++) {	
 			RealPoint rp = (RealPoint) indexPoints.elementAt(pCnt);
 			Point pix = interactiePanel.realPointToPixels(rp);
 			if  ( (interactiePanel.SeparateGraphPointColors) && 
-				  (!interactiePanel.grafiekKleuren) &&
+				  (interactiePanel.puntenNagekeken) &&
 				  (!docent)
 				) {
+				// Diferent Color for each point
 				g.setFillStyle(interactiePanel.graphPointColors.elementAt(pCnt));
 				g.setStrokeStyle(interactiePanel.graphPointColors.elementAt(pCnt));
 			}
@@ -1227,6 +1232,23 @@ public class GrafiekGWTVeld {
 				g.fill();
 			}
 		}
+		
+		// Reset colors for lines if nescessary
+		if ((interactiePanel.puntenNagekeken) && (interactiePanel.SeparateGraphPointColors) ) {
+			if(docent) {	
+				g.setFillStyle(interactiePanel.docentColor);
+				g.setStrokeStyle(interactiePanel.docentColor);
+			} else {
+				if(interactiePanel.grafiekKleuren) {	
+					g.setFillStyle(interactiePanel.colors[index - 1]);
+					g.setStrokeStyle(interactiePanel.colors[index - 1]);
+				} else { 
+					g.setFillStyle(interactiePanel.colors[0]);
+					g.setStrokeStyle(interactiePanel.colors[0]);
+				}
+			}
+		}
+		
 		// verbinden met lijnen
 		if (interactiePanel.tekenComponent != null && interactiePanel.tekenComponent.getConnectMode() == interactiePanel.tekenComponent.LINES 
 				&& indexPoints.size() > 1)
@@ -1916,8 +1938,8 @@ public class GrafiekGWTVeld {
 		return parabool;
 	}
 	
-	public void tekenFunctie(Context2d g, int xMin, Expressie expressie, double[] domein, CssColor kleur)
-	{
+	public void tekenFunctie(Context2d g, int xMin, Expressie expressie, double[] domein, CssColor kleur) {
+		logger.info("tekenFunctie :: "+ kleur);
 		Expressie exp = expressie;
 		for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
 			exp = exp.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			

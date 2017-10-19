@@ -73,7 +73,7 @@ import fi.graphtoolgwt.client.text.Text;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
-	//private static Logger logger = Logger.getLogger("GraphToolGWT");
+	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
@@ -222,6 +222,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	boolean dragOptie = true;
 	
 	boolean grafiekKleuren = true;
+	boolean puntenNagekeken = false;
 	boolean kleurInstelbaar = true;
 	boolean functieBeginZichtbaar = true;
 	boolean functieBeginAanpasbaar = true;
@@ -1039,6 +1040,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		{
 			setColor(0, opdrachtKleuren[0], false);	
 			tabelComponent.zetTabelPunten(docentGraphPoints, false);
+			puntenNagekeken = false;
 			
 			if(graphPoints.size() >= docentGraphPoints.size()) {	
 				kijkNaButton.setEnabled(true);
@@ -1546,8 +1548,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				}
 				return;
 			}
-			if (docentFuncties != null)
-			{	boolean[] functieCorrect = new boolean[aantalFuncties];
+			if (docentFuncties != null) {
+				puntenNagekeken = true; // RPJ
+				boolean[] functieCorrect = new boolean[aantalFuncties];
 				boolean puntenCorrect = true;
 				for(int i = 0; i < aantalFuncties; i++)
 				{	functieCorrect[i] = false;
@@ -1799,9 +1802,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				}
 				return;
 			}
-			if (graphPoints.size() > 0)
-			{	
-				grafiekKleuren = false; //RPJ
+			if (graphPoints.size() > 0) {	
+				puntenNagekeken = true;
 				ingevuld = true;
 				CssColor color = CssColor.make(255, 0, 0);
 				score = 0;
@@ -1813,8 +1815,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				{	RealPoint pt = (RealPoint) graphPoints.elementAt(pCnt);
 					//alleen naar punten van actieve tabel (= grafiek met index 0) kijken; 
 					//in andere tabellen kan de docent punten hebben getekend, die moeten niet worden meegenomen.
-					if(pt.getIndex() == 1)
+					if(pt.getIndex() == 1) {
 						llgPtsCopy.addElement(graphPoints.elementAt(pCnt));
+						graphPointColors.setElementAt(cColorRed, pCnt); // default is false
+					}
 				}
 				//RealPoint[] llgPtsArray = new RealPoint[graphPoints.size()];
 				RealPoint[] llgPtsArray = new RealPoint[llgPtsCopy.size()];
@@ -1923,8 +1927,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 				}
 				
+				logger.info("Color 1 = "+ correct+ " "+ color);
 				color = verwerkTekenModusBijNakijken(show, color, correct);
+				logger.info("Color 2 = "+ correct+ " "+ color);
 				color = verwerkAsNaamBijNakijken(show, color, correct);
+				logger.info("Color 3 = "+ correct+ " "+ color);
 
 				if(show) {
 					setColor(0, color, true);
@@ -2263,6 +2270,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		boolean ingevuld = true;
 		boolean nagekeken = false;
+		boolean puntenNagekeken = false;
 		
 		beginx = this.beginx;
 		beginy =  this.beginy;
@@ -2278,6 +2286,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		ingevuld = this.ingevuld;
 		nagekeken = this.nagekeken;
+		puntenNagekeken = this.puntenNagekeken;
 		
 		HashMap<String, Object> h = new HashMap<String,Object>();
 		h = tekenComponent.getState();
@@ -2310,6 +2319,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		h.put("beginwaarde", new Integer(beginwaarde));
 		h.put("ingevuld", new Boolean(ingevuld));
 		h.put("nagekeken", new Boolean(nagekeken));
+		h.put("puntenNagekeken", new Boolean(puntenNagekeken));
 		
 		return h;
 	}
@@ -2445,6 +2455,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		boolean ingevuld = false;
 		boolean nagekeken = false;
+		boolean puntenNagekeken = false;
 		
 		if(map.containsKey("beginx")) 
     		beginx = map.getDouble("beginx");
@@ -2469,6 +2480,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
     		ingevuld = map.getBoolean("ingevuld");
     	if(map.containsKey("nagekeken"))
     		nagekeken = map.getBoolean("nagekeken");
+    	if(map.containsKey("puntenNagekeken"))
+    		puntenNagekeken = map.getBoolean("puntenNagekeken");
     	
     	this.beginx = beginx;
     	this.beginy = beginy;
@@ -2511,6 +2524,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			if ( (mode == OpdrNavIF.EINDTOETS) ) {
 				kijkNa(false /* no show */, true /* wel setState */);
 			}
+		}
+		
+		logger.info("puntenNagekeken = "+ puntenNagekeken);
+		if (!puntenNagekeken) { 
+			// Moet percee na kijkna worden gezet om de juiste visuele situatie te initialiseren.
+  		    // Want bij kijkNa wordt deze boolean gereset voor normaal gebruik.
+			pointsChangedAction();
 		}
 		
 		grafiekGWTVeld.setState(h);
