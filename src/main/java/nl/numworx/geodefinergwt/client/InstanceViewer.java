@@ -103,10 +103,10 @@ public class InstanceViewer extends SVGWidget implements PH {
 	private StrokeStyle stroke;
 	
 	public void selectColor(Destroyable object) {
-		if(tracking || trail)
-			return;
 		Adapter a = object.getAdapter();
 		stroke = a.adapt(StrokeStyle.class);
+		if(tracking || trail)
+			return;
 
 		FillStyle f = a.adapt(FillStyle.class);
 		if(f == null) fill = "none";
