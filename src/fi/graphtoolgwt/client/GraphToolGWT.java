@@ -73,7 +73,7 @@ import fi.graphtoolgwt.client.text.Text;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
-	private static Logger logger = Logger.getLogger("GraphToolGWT");
+//	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
@@ -956,8 +956,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	*/
 
 	
-	public Vector<RealPoint> getPoints(int index, boolean docent)
-	{	Vector<RealPoint> points = new Vector<RealPoint>();
+	public Vector<RealPoint> getPoints(int index, boolean docent) {	
+		Vector<RealPoint> points = new Vector<RealPoint>();
 		Vector<RealPoint> vector = docent?docentGraphPoints:graphPoints;
 		for (int pCnt = 0; pCnt < vector.size(); pCnt++)
 		{	RealPoint rp = vector.elementAt(pCnt);
@@ -965,6 +965,19 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				points.addElement(rp);
 		}
 		return points;
+	}
+	
+	public Vector<CssColor> getColors(int index) {
+		Vector<CssColor> colors = new Vector<CssColor>();
+		
+		for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++) {	
+			RealPoint rp = graphPoints.elementAt(pCnt);
+			if (rp.getIndex() == index) {
+				CssColor color = graphPointColors.elementAt(pCnt);
+				colors.addElement(color);
+			}
+		}
+		return colors;
 	}
 	
 	public int addInsert(RealPoint newRP, boolean checkVisibleBounds)  { //, boolean docent) 	
@@ -1146,7 +1159,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public void setColor(int nr, CssColor c, boolean nakijken) {
 		//31-8-2015: colors[nr] moet altijd deze kleur worden; bij nakijken wordt rood/groene feedback anders niet getoond.
-		System.out.println("setColor " + nr + "= "+ c + " (" +nakijken +")");
 
 		colors[nr] = c;
 		if(typeOpdracht == GEENOPDRACHT)
@@ -1865,22 +1877,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 						hits++;
 						if (show) { // teken het juiste punt groen
 							// findIndex of hitPoint
-//							System.out.println("***--- CHECK HIT ---***");
-//							System.out.println("lPixel = (" + lPoint.getX() + ", " +  lPoint.getY() +")");
 
 							double verglNauwkeurigheid = 0.000001;
 							boolean found = false;
 							for (int i = 0; (i < graphPoints.size() && !found); i++) {
 								RealPoint pt = (RealPoint) graphPoints.elementAt(i); 
-//								System.out.println("pt = (" + pt.getX() + ", " +  pt.getY() +")");
-//								System.out.println("lPoint = (" + lPoint.getX() + ", " +  lPoint.getY() +")");
-//								System.out.println(i + ", XDiff = " + Math.abs(lPoint.getX() - pt.getX()));
-//								System.out.println(i + ", YDiff = " + Math.abs(lPoint.getY() - pt.getY()));
 								
 								if ( (Math.abs(lPoint.getX() - pt.getX()) < verglNauwkeurigheid) && 
 										(Math.abs(lPoint.getY() - pt.getY()) < verglNauwkeurigheid) ) {
-//									System.out.println("Hit found :: i = " + i );
-//									System.out.println("Hit found :: Size = " + graphPointColors.size());
 									found = true;
 									graphPointColors.setElementAt(cColorGreen, i);
 								}
@@ -1889,16 +1893,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					}
 					
 				}
-				
-//				for (int i=0; i<graphPointColors.size(); i++) {
-//	    			System.out.println("color " + i +"//" + graphPointColors.size() + " = " + graphPointColors.get(i) );
-//				}
-//				for (int i=0; i<docentGraphPoints.size(); i++) {
-//	    			System.out.println("docent " + i +"//" + docentGraphPoints.size() + " = (" + docentGraphPoints.get(i).getX() +"," + docentGraphPoints.get(i).getY() + ")");
-//				}
-//				for (int i=0; i<graphPoints.size(); i++) {
-//	    			System.out.println("leerling " + i +"//" + graphPoints.size() + " = (" + graphPoints.get(i).getX() +"," + graphPoints.get(i).getY() + ")");
-//				}
 				
 				int scorePerPunt = scoreMax / Math.max(docentGraphPoints.size(), llgPtsArray.length);
 				if (hits == 0)
@@ -1927,11 +1921,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 				}
 				
-				logger.info("Color 1 = "+ correct+ " "+ color);
 				color = verwerkTekenModusBijNakijken(show, color, correct);
-				logger.info("Color 2 = "+ correct+ " "+ color);
 				color = verwerkAsNaamBijNakijken(show, color, correct);
-				logger.info("Color 3 = "+ correct+ " "+ color);
 
 				if(show) {
 					setColor(0, color, true);
@@ -2153,7 +2144,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		double schaalFactorX  = 1;
 		double schaalFactorY  = 1;
 		
-		//System.out.println("graphToolGWT getState: graphPoints.size() = " + graphPoints.size());
 		double[] graphPointsX = new double[graphPoints.size()];
 		double[] graphPointsY = new double[graphPoints.size()];
 		//ArrayList<Double> graphPointsX = new ArrayList<Double>();
@@ -2330,7 +2320,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if(h == null || h.isEmpty()) return;
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
-		//System.out.println("setState graphtoolgwt");
 		/*
 		List<?> graphPointsX = null;
 		List<?> graphPointsY = null;
@@ -2391,7 +2380,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 			*/
 		}
-		//System.out.println("voorbij graphPoints");
 		
     	double[] paramWaarden = null;
     	if(map.containsKey("paramWaarden"))
@@ -2526,7 +2514,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 		}
 		
-		logger.info("puntenNagekeken = "+ puntenNagekeken);
 		if (!puntenNagekeken) { 
 			// Moet percee na kijkna worden gezet om de juiste visuele situatie te initialiseren.
   		    // Want bij kijkNa wordt deze boolean gereset voor normaal gebruik.
@@ -3041,8 +3028,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				docentGraphPointsYString = launchData.getStringArray("docentGraphPointsYString");
 			
 			/*
-			if(launchData.get("docentGraphPointsX") != null)
-			{	//System.out.println("test: " + test);
+			if(launchData.get("docentGraphPointsX") != null) {	
 				docentGraphPointsX = JSONUtilities.toArrayList(launchData.get("docentGraphPointsX"));
 			}
 	    	if(launchData.get("docentGraphPointsY") != null)
@@ -4564,7 +4550,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		if(command.equals("input")) {
 	 		String formuleString = (String)event.getMessage();
-	 		System.out.println("input:: "+formuleString);
+//	 		System.out.println("input:: "+formuleString);
 //			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
 //			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
 		}
@@ -4579,9 +4565,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 			
 //* Testmessages 
-	 		System.out.println("command = "+ command.toString());
-	 		System.out.println("indexString = "+ indexString);
-	 		System.out.println("formuleString = "+formuleString);
+//	 		System.out.println("command = "+ command.toString());
+//	 		System.out.println("indexString = "+ indexString);
+//	 		System.out.println("formuleString = "+formuleString);
 //*/
 	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
 	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
@@ -4592,12 +4578,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		{
 			String vergelijkingString = (String)event.getMessage();
 			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
-			System.out.println("vergelijkingString: "+vergelijkingString);
+//			System.out.println("vergelijkingString: "+vergelijkingString);
 //			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ == from active java version
 			
 		}
 		if(event.getCommand().equals("draw_functions")) {
-	 		System.out.println("draw_functions:: "+(String)event.getMessage());
+//	 		System.out.println("draw_functions:: "+(String)event.getMessage());
 
 			Map map = (Map)event.getParameters();
 			if(map!=null) {	
@@ -4644,7 +4630,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		}
 		
 		if(event.getCommand().equals("double.trace")) {
-	 		System.out.println("double.trace:: "+(String)event.getMessage());
+//	 		System.out.println("double.trace:: "+(String)event.getMessage());
 	 		
 			Map map = (Map)event.getParameters();
 			if(map!=null)
@@ -4663,7 +4649,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 		}
 		if(event.getCommand().equals("double.parameter")) {	
-	 		System.out.println("double.parameter:: "+(String)event.getMessage());
+//	 		System.out.println("double.parameter:: "+(String)event.getMessage());
 
 			Map map = (Map)event.getParameters();
 			if(map!=null) {	
