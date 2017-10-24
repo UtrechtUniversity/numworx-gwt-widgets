@@ -1561,7 +1561,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				return;
 			}
 			if (docentFuncties != null) {
-				puntenNagekeken = true; // RPJ
+//				puntenNagekeken = true; // RPJ MISSCHIEN LATER AAN Zorgt voor verschillende kleuren per punt
 				boolean[] functieCorrect = new boolean[aantalFuncties];
 				boolean puntenCorrect = true;
 				for(int i = 0; i < aantalFuncties; i++)
