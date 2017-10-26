@@ -92,7 +92,7 @@ class FormuleCache implements Observer {
 		viewer.getMainRegel().validate();
 		w = viewer.getWidth();
 		h = viewer.getHeight();
-		double ratio = CanvasViewer.getDeviceRatio(ctx);
+		double ratio = nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(ctx);
 		canvas.setPixelSize((int)w, (int)h);
 		if(ratio > 1.0) {
 			canvas.setCoordinateSpaceHeight((int) (h*ratio));

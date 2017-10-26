@@ -1,8 +1,5 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.awt.Color;
-import java.awt.geom.GeneralPath;
-
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
@@ -41,7 +38,6 @@ import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
 import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
-import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
