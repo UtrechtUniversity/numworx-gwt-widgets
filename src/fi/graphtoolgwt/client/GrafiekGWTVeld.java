@@ -1197,7 +1197,7 @@ public class GrafiekGWTVeld {
 
 	public void tekenGraphPoints(int index, Context2d g, boolean docent, boolean witruimteY, int maxWoordBreedteY, int bx, int breedte, int hoogte) {	
 		Vector indexPoints = interactiePanel.getPoints(index, docent);
-		Vector<CssColor> indexColors = null;
+		Vector<String> indexColors = null;
 		if ( (interactiePanel.SeparateGraphPointColors) && 
 			 (interactiePanel.puntenNagekeken) &&
 			 (!docent)) {
