@@ -973,7 +973,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++) {	
 			RealPoint rp = graphPoints.elementAt(pCnt);
 			if (rp.getIndex() == index) {
-				CssColor color = graphPointColors.elementAt(pCnt);
+				CssColor color = CssColor.make(graphPointColors.elementAt(pCnt).toString());
 				colors.addElement(color);
 			}
 		}
