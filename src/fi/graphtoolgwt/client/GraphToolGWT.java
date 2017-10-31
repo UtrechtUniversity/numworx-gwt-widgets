@@ -1821,6 +1821,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				score = 0;
 				correct = false;
 				fout = false;
+				// graphPoints aanvullen indien nodig
+//				while (graphPointColors.size() <  graphPoints.size() ) {
+//					graphPointColors.add(cColorRed);
+//				}
 				
 				Vector llgPtsCopy = new Vector();
 				for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
