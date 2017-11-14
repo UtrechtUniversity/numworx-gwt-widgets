@@ -1103,7 +1103,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	    	for(int i=0 ; i<domeinStrings.length; i++)
 			{	
 	     		if(domeinStrings != null && i < domeinStrings.length && i < domeinButtons.length)
-	     		{	if(!domeinStrings[i].equals("$f@"))
+	     		{	if(!domeinStrings[i][0].equals("$f@"))
 	    			{	if(randomValues != null)
 	    				{	try
 							{	domeinStrings[i][0] = FormuleParser.randomizeString(domeinStrings[i][0],randomVars,randomValues);
