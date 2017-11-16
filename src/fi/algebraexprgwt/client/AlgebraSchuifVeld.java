@@ -15,22 +15,14 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 
-import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-public class AlgebraSchuifVeld //extends SchuifVeld 
-							   //implements //ItemListener, 
-							              //MouseListener, MouseMotionListener,ActionListener
-{	
-
-	private static Logger logger = Logger.getLogger("AEGWT");
+public class AlgebraSchuifVeld
+{
+	private static Logger logger = Logger.getLogger("AlgebraExprGWT");
 	
 	public boolean changed = false;
-	//Image GOEDKRUL,FOUTKRUIS, GOEDKRULHALF;	
-	//private JButton wisKnop;
-	//InvulPanel ip;
-	//private JCheckBox grafiekCheckbox;
 	
 	AlgebraSchuifComponent[] schuifcomponenten;
 	AlgebraSchuifComponent actieveComponent;
@@ -1457,6 +1449,10 @@ System.out.println("after " + this.aantalSc);
 			actieveComponent.mouseUpTouchEndAction();
 		}
 
-	}	
+	}
 
+	AlgebraExprGWT getOwner()
+	{
+		return owner;
+	}
 }
