@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-//import nl.uu.fi.dwo.interaction.client.InteractionView;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -15,10 +16,9 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
-import com.google.gwt.dom.client.Style.Unit;
-
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -45,14 +45,10 @@ import com.google.gwt.canvas.dom.client.CssColor;
 
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.resources.client.ImageResource;
-
 import fi.algebraexprgwt.client.expressies_ap.*;
 import fi.algebraexprgwt.client.text.Text;
 
@@ -118,8 +114,27 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
 	//boolean standAlone = false;
 	
+	/**
+	 * parametrisatie: moet er nagekeken worden?
+	 */
 	boolean kijkNaActief = false;
-	PushButton kijkNaButton; 
+	/**
+	 * Of er extern moet worden nagekeken door een checkbutton. De nakijk-knop
+	 * wordt dan verborgen.
+	 */
+	private boolean checkExternal = false;
+	/**
+	 * de kijkNaKnop
+	 */
+	PushButton kijkNaButton;
+	/**
+	 * Het panel waar de nakijkknop op komt en feedback-vinkjes/kruisje.
+	 */
+	LayoutPanel kijkNaPanel = new LayoutPanel();
+	// deze images zijn nodig om te tekenen bij de afzonderlijke pijlenkettingen
+	private Image vinkjeGroenImage;
+	private Image vinkjeGeelImage;
+	private Image kruisRoodImage;
 	List<String> docentExpressieStrings = new ArrayList<String>();
 	List<Expressie> docentExpressies = new ArrayList<Expressie>();
 	int scoreMax = 10;
@@ -133,18 +148,22 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 
 	boolean asvSetState = false;
 	
-	public void getImages() 
+	public void makeResources() 
 	{
 		rb = GWT.create(Text.class);
 		
 		algebraExprGWTClientBundle = GWT.create(AlgebraExprGWTClientBundle.class);
 		algebraExprGWTCss = algebraExprGWTClientBundle.getAlgebraExprGWTCSS();
 		algebraExprGWTCss.ensureInjected();
+		
+		vinkjeGroenImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_groen().getSafeUri());
+		vinkjeGeelImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_vinkje_geel().getSafeUri());
+		kruisRoodImage = new Image(FormuleHolder.FORMULE_BUNDLE.mw_kruisje_rood().getSafeUri());
 	}
 	
 	public void onModuleLoad() 
 	{
-		getImages();
+		makeResources();
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(algebraExprGWTCss.dock());
@@ -157,7 +176,6 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
-	
 	}
 	
 	public AlgebraExprGWT()
@@ -178,14 +196,13 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 
-		getImages();
+		makeResources();
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName("dock");
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		init(breedte, hoogte, launchState, randomVarWaarden);
-
 	}
 
 	public void	makeLeft()
@@ -254,7 +271,6 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		waardeBox.addClickHandler(new PushClickHandler());
 		
 		currentY += buttonHeight + topOffset;
-
 	}
 
     class PushClickHandler implements ClickHandler
@@ -293,11 +309,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 			}
 			else if (e.getSource() == kijkNaButton)
 			{
-//System.out.println("kijkNaButton");
-
 				kijkNa();
 			}
-
     	}
     }
     
@@ -305,12 +318,9 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
     {
     	public void onTouchStart(TouchStartEvent e)
     	{
-			
     		// DIT NIET toevoegen!!
     		//e.preventDefault();
 			e.stopPropagation();
-    		
-    		
     	}
     }
 	
@@ -331,7 +341,6 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 			mouseDown = true;
 			
 			asv.mouseDownTouchStartAction(eventX, eventY);
-			
 		}
 		
 		public void onMouseMove(MouseMoveEvent e)	
@@ -348,7 +357,6 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 			int eventY = e.getY();
 
 			asv.mouseMoveTouchMoveAction(eventX, eventY);
-			
 		} // onMouseMove
 		
 		public void onMouseUp(MouseUpEvent e)	
@@ -364,7 +372,6 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 			int eventY = e.getY();
 			
 			asv.mouseUpTouchEndAction(eventX,eventY);
-
 		}
 
 	} //MouseHandler
@@ -392,14 +399,13 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 				lastMoveY = -1000;
 				
 				asv.mouseDownTouchStartAction(eventX, eventY);
-				
 		    }
 			e.preventDefault();
 			e.stopPropagation();
 		}
+
 		public void onTouchMove(TouchMoveEvent e)
 		{
-			
 			e.preventDefault();
 			e.stopPropagation();
 			
@@ -412,46 +418,42 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 				
 				lastMoveX = eventX; 
 				lastMoveY = eventY;
-
 			    
 				asv.mouseMoveTouchMoveAction(eventX, eventY);
-				
 		    }
 			e.preventDefault();
 			e.stopPropagation();
-			
 		}
+
 		public void onTouchEnd(TouchEndEvent e)
 		{
-			//de Touch die beeindigd werd zit niet in e.getTouches()?? 
-			//if (e.getTouches().length() > 0)
-			//{
-				//Touch touch = e.getTouches().get(0);
-				
-			    //int eventX = touch.getPageX() - algebraExprGWTCanvas.getAbsoluteLeft();
-				//int eventY = touch.getPageY() - algebraExprGWTCanvas.getAbsoluteTop();				
+			// de Touch die beeindigd werd zit niet in e.getTouches()??
+			// if (e.getTouches().length() > 0)
+			// {
+			// Touch touch = e.getTouches().get(0);
 
-				int eventX = 0;
-				int eventY = 0;
-			
-				if (lastMoveX <= -999)
-				{
-					eventX = lastStartX;
-					eventY = lastStartY;
-				}
-				else
-				{
-					eventX = lastMoveX;
-					eventY = lastMoveY;
-					
-				}
-				
-				asv.mouseUpTouchEndAction(eventX,eventY);
-				
-		    //}
+			// int eventX = touch.getPageX() -
+			// algebraExprGWTCanvas.getAbsoluteLeft();
+			// int eventY = touch.getPageY() -
+			// algebraExprGWTCanvas.getAbsoluteTop();
+
+			int eventX = 0;
+			int eventY = 0;
+
+			if (lastMoveX <= -999)
+			{
+				eventX = lastStartX;
+				eventY = lastStartY;
+			}
+			else
+			{
+				eventX = lastMoveX;
+				eventY = lastMoveY;
+			}
+
+			asv.mouseUpTouchEndAction(eventX, eventY);
 		}
-
-	}
+	}// class TouchHandler
 
 	public Widget asWidget()
 	{
@@ -472,7 +474,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setState(HashMap<String, Object> h)
 	{
-		if(h == null || h.isEmpty()) return;
+		if (h == null || h.isEmpty())
+			return;
 		asvSetState = true;
 		asv.setState(h);
 		asvSetState = false;
@@ -480,20 +483,19 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		ingevuld = false;
 		
 		if (h.containsKey("nagekeken"))
-		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		{
+			nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
 		}
 		if (h.containsKey("ingevuld"))
-		{	ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+		{
+			ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
 		}
 
 		if (!ingevuld)
 			asv.changed = false;
 		
 		if (ingevuld && (mode == 0 || nagekeken))
-		//if (nagekeken)
 			kijkNa();
-
-
 	}
 
 	@Override
@@ -505,7 +507,10 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 	@Override
 	public Boolean isCorrect()
 	{
-		return correct;
+		if (kijkNaActief)
+			return correct;
+		else
+			return new Boolean(true);
 	}
 
 	@Override
@@ -514,25 +519,27 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 
+		FormuleKeyboardIF kb = comRoot.getKeyboard();
+		FormuleHolder.installKeyboard(kb);
 	}
 
 	public void zetMode(int mode)
-	{	this.mode = mode;
+	{
+		this.mode = mode;
 		if (kijkNaActief)    
 			kijkNaActief = (mode == 0 || mode == 1);
 	}
 
     public void maakDocentExpressies()
-    {	docentExpressies.clear();
+    {
+    	docentExpressies.clear();
     	for (int i = 0; i < docentExpressieStrings.size(); i++)
-    	{	String text = docentExpressieStrings.get(i);
+    	{
+    		String text = docentExpressieStrings.get(i);
     		String formuleText = "$f" + text + "@";
     		Expressie exp = FormuleParser_ap.geefExpressie(formuleText);
     		docentExpressies.add(exp);
-    		
-//System.out.println("exp = " + exp.toString());    		
     	}
-    	
     }
 
     public void answerChanged()
@@ -543,42 +550,31 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 			score = 0;
 			ingevuld = true;
 			asv.changed = true;
-
+			setVisibleFeedbackImages(false, false, false);
 			comRoot.setChanged(true);
-
 		}	
-    	
     }
     
 	@Override
 	public void kijkNa()
-    {	if (!kijkNaActief)
+    {
+		if (!kijkNaActief)
     		return;
-
-//System.out.println("kijkNa");
 
     	//ingevuld = !asv.veldIsLeeg();
     	ingevuld = true;//asv.changed;
 
-//System.out.println("ingevuld  " + ingevuld);
-
- //   	if (!ingevuld)
- //   		return;
-    	
     	maakDocentExpressies();
     	
     	// geen opdracht, alles goed
     	if (docentExpressies.size() == 0)
-    	{	score = scoreMax;
+    	{
+    		score = scoreMax;
     		//fireChangeEvent();
     		return;
     	}
     	
     	Vector leerlingExpressieUVS = asv.vindExpressieUVS();
-//System.out.println("llgUVS = " + leerlingExpressieUVS.size());    	
-//System.out.println("docS = " + docentExpressieStrings.size());
-//System.out.println("docE = " + docentExpressies.size());    
-
 		int hits = 0;
 		
 		// geen valide expressie
@@ -591,7 +587,8 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 		
 		// hier zijn er docent expressies
 		for (int lCnt = 0; lCnt < leerlingExpressieUVS.size(); lCnt++)
-		{	UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
+		{
+			UitvoerSchuifComponent uvs = (UitvoerSchuifComponent) leerlingExpressieUVS.elementAt(lCnt);
 			Expressie llgExp = null;
 			if (uvs.geefUitvoer(0) != null)
 				llgExp = uvs.geefUitvoer(0);
@@ -599,10 +596,10 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 //				llgExp = uvs.geefVerborgenUitvoer(0);
 
 			if (llgExp == null)
-				return;
-			
+//				return;
+				break;
+				
 			String llgExpStr = llgExp.toString();
-//System.out.println(llgExpStr);
 			Vector varNamen = Algebra.geefVarN(llgExp);
 			String llgExpStrC = new String(llgExpStr);
 			for (int i = 0; i < varNamen.size(); i++)
@@ -611,31 +608,24 @@ public class AlgebraExprGWT implements EntryPoint, InteractionStub
 				llgExpStrC = llgExpStr.replaceAll(varNaam, "x");
 			}
 
-//System.out.println(llgExpStrC);
 			llgExp = FormuleParser_ap.geefExpressie("$f" + llgExpStrC + "@");
 
 			correct = new Boolean(false);
 			if (llgExp != null)
-			{	
-				
+			{
 				for (int dCnt = 0; dCnt < docentExpressies.size(); dCnt++)
-				{	Expressie docExp = (Expressie) docentExpressies.get(dCnt);
-
-				
-System.out.println("docExp = " + docExp.toString());
-
-if (llgExp != null)
-System.out.println("llgExp = " + llgExp.toString());
-//else
-//System.out.println("llgExp = null");
+				{
+					Expressie docExp = (Expressie) docentExpressies.get(dCnt);
 					if (Algebra.isGelijkwaardig(docExp, llgExp))
-					{	hits++;
+					{
+						hits++;
 						correct = new Boolean(true);
 					}
 				}
 				
 				if (correct.equals(Boolean.TRUE))
-				{	uvs.pijlUit[0].im = "V";
+				{
+					uvs.pijlUit[0].im = "V";
 					uvs.pijlUit[0].paint();
 					//asv.paint();
 				}
@@ -644,37 +634,32 @@ System.out.println("llgExp = " + llgExp.toString());
 					uvs.pijlUit[0].im = "X";
 					uvs.pijlUit[0].paint();
 					//asv.paint();
-					
 				}
 			}
 		}	
-//System.out.println("hits = " + hits);
 		
+		// bereken score
 		int scorePerExpressie = scoreMax / docentExpressies.size();
 		if (hits == 0)
+		{
 			score = 0;
+			setVisibleFeedbackImages(false, false, true);
+		}
 		else if (hits == docentExpressies.size())
+		{
 			score = scoreMax;
+			setVisibleFeedbackImages(true, false, false);
+		}
 		else
+		{
 			score = hits * scorePerExpressie;
+			setVisibleFeedbackImages(false, true, false);
+		}
     	
 		asv.tekenOpnieuw();
 		nagekeken = true;
 		
-		//fireChangeEvent();
-/*    	
-    	//fire actionEvent
-		ActionEvent event = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "changed");
-		for (int lCnt = 0; lCnt < listeners.size(); lCnt++)
-		{
-			((ActionListener) listeners.elementAt(lCnt)).actionPerformed(event);
-		}
-*/		
-		
-//System.out.println("corr = " + isCorrect().booleanValue());
-
 		comRoot.setChanged(isCorrect().booleanValue());
-    	
     }
 
 	@Override
@@ -710,12 +695,9 @@ System.out.println("llgExp = " + llgExp.toString());
 	public void init(int width, int height, Map<String, Object> map,//launchState,
 					 Map<String, Number> values) 
 	{
-		
-logger.info("AlgebraExprGWT init");		
-
 		this.breedte = width;
 		this.hoogte = height;
-		
+
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		
 		//this.launchState = launchState;
@@ -740,14 +722,17 @@ logger.info("AlgebraExprGWT init");
 			grafiekOptie = launchState.getBoolean("grafiekOptie");
 
 		if (launchState.containsKey("docentExpressieStrings"))
-		{	docentExpressieStrings = launchState.getStringList("docentExpressieStrings");
-//System.out.println("contains dES " + docentExpressieStrings.size());		
+		{
+			docentExpressieStrings = launchState.getStringList("docentExpressieStrings");
 		}
 		
 		if (launchState.containsKey("kijkNaActief"))
 			kijkNaActief = launchState.getBoolean("kijkNaActief");
-//GWT		
+		//GWT		
 		//zetKijkNaActief(kijkNaActief);
+
+		if (launchState.containsKey("checkExternal"))
+			checkExternal = launchState.getBoolean("checkExternal");
 
 		if (launchState.containsKey("scoreMax"))
 			scoreMax = launchState.getInt("scoreMax");
@@ -765,7 +750,8 @@ logger.info("AlgebraExprGWT init");
 		algebraExprGWTCanvas.addStyleName("canvas");
 		
 		if (algebraExprGWTCanvas == null) 
-		{   RootPanel.get(holderId).add(new Label(upgradeMessage));
+		{  
+			RootPanel.get(holderId).add(new Label(upgradeMessage));
 	        return;
 	    }
 		
@@ -785,8 +771,6 @@ logger.info("AlgebraExprGWT init");
 		canvasPanel.setWidgetLeftWidth(algebraExprGWTCanvas, 0, Style.Unit.PX, canvasBreedte, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(algebraExprGWTCanvas, 0, Style.Unit.PX, canvasHoogte, Style.Unit.PX);
 
-		//makeLeft();
-		
 		algebraExprGWTContext2d = algebraExprGWTCanvas.getContext2d();
 
 		asv = new AlgebraSchuifVeld(0, 0, breedte, hoogte, algebraExprGWTContext2d, this);
@@ -802,43 +786,67 @@ logger.info("AlgebraExprGWT init");
 			aantalSc = launchState.getInt("aantalSc");
  
 		if (aantalSc > 0)	
-		{	asvSetState = true;
+		{
+			asvSetState = true;
 			asv.setState(map);
 			asvSetState = false;
 		}
-
 		
-		if (kijkNaActief)
-		{	
-			//kijkNaButton = new PushButton("kijk na");
+		if (isNakijkModus())
+		{
+			canvasPanel.add(kijkNaPanel);
+			kijkNaPanel.setStylePrimaryName("kijknapanel");
+			
 			kijkNaButton = new PushButton(rb.kijkNa());
 			kijkNaButton.addStyleName(algebraExprGWTCss.pushbutton());
-			canvasPanel.add(kijkNaButton);
-			canvasPanel.setWidgetLeftWidth(kijkNaButton, (breedte - 70)/2, Style.Unit.PX, 70, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(kijkNaButton, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
-			kijkNaButton.addClickHandler(new PushClickHandler());
-/*			
-			canvasPanel.add(goedKrulImage);
-			canvasPanel.setWidgetLeftWidth(goedKrulImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(goedKrulImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
-			canvasPanel.setWidgetVisible(goedKrulImage, false);
-			canvasPanel.add(foutKruisImage);
-			canvasPanel.setWidgetLeftWidth(foutKruisImage, 0, Style.Unit.PX, 30, Style.Unit.PX);
-			canvasPanel.setWidgetTopHeight(foutKruisImage, 0, Style.Unit.PX, 40, Style.Unit.PX);
-			canvasPanel.setWidgetVisible(foutKruisImage, false);
-*/
+			if (!checkExternal)
+			{
+				kijkNaPanel.add(kijkNaButton);
+				kijkNaPanel.setWidgetLeftWidth(kijkNaButton, 0, Style.Unit.PX, 60, Style.Unit.PX);
+				kijkNaPanel.setWidgetTopHeight(kijkNaButton, 0, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+			}
 
+			kijkNaButton.addClickHandler(new PushClickHandler());
+			
+			canvasPanel.setWidgetLeftWidth(kijkNaPanel, (breedte - 70) / 2, Style.Unit.PX, 90, Style.Unit.PX);
+			canvasPanel.setWidgetTopHeight(kijkNaPanel, hoogte - 40, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+
+			setVisibleFeedbackImages(false, false, false);
 		}
 		
 		dlp.forceLayout();
 		canvasPanel.forceLayout();
+		kijkNaPanel.forceLayout();
 		
 		asv.paint();
 
 		asv.changed = false;
-		
 		ingevuld = false;
-		
+	}
+
+	/**
+	 * Zet de feedback images zichtbaar adhv de meegegeven booleans.
+	 * 
+	 * @param vinkjeGroen
+	 * @param vinkjeGeel
+	 * @param kruisRood
+	 */
+	void setVisibleFeedbackImages(boolean vinkjeGroen, boolean vinkjeGeel, boolean kruisRood)
+	{
+		kijkNaPanel.setStyleName("goed", vinkjeGroen);
+		kijkNaPanel.setStyleName("half", vinkjeGeel);
+		kijkNaPanel.setStyleName("fout", kruisRood);
+	}
+
+	/**
+	 * Retourneert true als nabouwen aanzichten in de nakijk-modus staat en moet
+	 * nakijken.
+	 * 
+	 * @return
+	 */
+	boolean isNakijkModus()
+	{
+		return kijkNaActief || checkExternal;
 	}
 
 	//@Override
@@ -852,4 +860,32 @@ logger.info("AlgebraExprGWT init");
 		return null;
 	}
 
-}
+	/**
+	 * Het groene vinkje, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getVinkjeGroen()
+	{
+		return ImageElement.as(vinkjeGroenImage.getElement());
+	}
+
+	/**
+	 * Het gele vinkje, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getVinkjeGeel()
+	{
+		return ImageElement.as(vinkjeGeelImage.getElement());
+	}
+
+	/**
+	 * Het rode kruis, om te tekenen in een context2d.
+	 * 
+	 * @return
+	 */
+	ImageElement getKruisRood()
+	{
+		return ImageElement.as(kruisRoodImage.getElement());
+	}}
