@@ -1,6 +1,9 @@
 package fi.weblogogwt.client;
 
-// universal formatter
+/**
+ * universal formatter
+ * @author huub
+  */
 public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)

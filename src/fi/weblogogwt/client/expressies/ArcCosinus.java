@@ -1,6 +1,5 @@
 package fi.weblogogwt.client.expressies;
 
-import java.awt.*;
 
 public class ArcCosinus extends Expressie  
 {	

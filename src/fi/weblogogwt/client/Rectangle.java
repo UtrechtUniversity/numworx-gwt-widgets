@@ -1,5 +1,9 @@
 package fi.weblogogwt.client;
 
+/**
+ * There is no class Rectangle in GWT 
+ */
+
 public class Rectangle 
 {
 	int x; int y; int width; int height;

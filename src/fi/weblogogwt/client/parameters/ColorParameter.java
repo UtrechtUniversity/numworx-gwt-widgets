@@ -1,8 +1,5 @@
 package fi.weblogogwt.client.parameters;
 
-//import java.awt.Color;
-
-//import fi.beans.stringutils.StringUtils;
 import fi.weblogogwt.client.VarSet;
 import fi.weblogogwt.client.expressies.*;
 import fi.weblogogwt.client.formuleobjects.*;
@@ -11,25 +8,29 @@ import fi.weblogogwt.client.formuleobjects.*;
  * KleurParameter is the class for an input expression representing a Color.
  * Both text ("rood") and RGB-values can be given.
  * Used for parameters in CC's, or the number of repetitions in 'Herhaal'
- * 
+ * the ColorParameter is correct if the color can be calculated, that is: all its variables exist and have valid numerical values, 
+ * no division by zero, etc. When color is indicated by name, it is true if the name is in the list
+ * of standard colors.
+ * NOTE: at this moment this can only determined at execution time.
  * @author berge020
  */
 
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.Context2d;
 
 public class ColorParameter extends TAParameter
 {
-	private boolean isColorByName;		// true if parameter was given as a Color name (rood, groen...)
-	
+	/**
+	 * true if parameter was given as a Color name (rood, groen...)
+	 */
+	private boolean isColorByName;			
 	/**
 	 * Three expressions for the color rgb-components
 	 * Note: this was an Expressie[3] first, but then there were 'ArrayStoreExceptions' when 
 	 * assigning them with a subclass of Expressie! WtF!!
 	 */
-	private Expressie redExpression;			// for each of the color components R, G & B
-	private Expressie greenExpression;			// for each of the color components R, G & B
-	private Expressie blueExpression;			// for each of the color components R, G & B
+	private Expressie redExpression;
+	private Expressie greenExpression;	
+	private Expressie blueExpression;	
 	
 	int[] rgb = new int[3];
 	
@@ -39,14 +40,10 @@ public class ColorParameter extends TAParameter
 	private boolean redExpressionValid;
 	private boolean greenExpressionValid;
 	private boolean blueExpressionValid;
+
 	/**
-	 * true if 'waarde' can be calculated, that is: all its variables exist and have valid numerical values, 
-	 * no division by zero, etc. When color is indicated by name, it is true if the name is in the list
-	 * of standard colors.
-	 * NOTE: at this moment this can only determined at execution time.
+	 * the color 
 	 */
-	// private boolean isCorrect; defined in superclass
-	
 	private CssColor theColor;
 	
 	public ColorParameter()
@@ -65,6 +62,10 @@ public class ColorParameter extends TAParameter
 		isCorrect = true;
 	}
 	
+	/**
+	 * set the validity of the r-g-b-expressiosn
+	 * @param b validity
+	 */
 	private void setAllValid(boolean b)
 	{
 		redExpressionValid = b;
@@ -72,6 +73,10 @@ public class ColorParameter extends TAParameter
 		blueExpressionValid = b;
 	}
 	
+	/**
+	 * check all r-g-b-expressions are valid 
+	 * @return true/false
+	 */
 	private boolean allValid()
 	{
 		return redExpressionValid && greenExpressionValid && blueExpressionValid;
@@ -82,7 +87,6 @@ public class ColorParameter extends TAParameter
 	 * 
 	 * @param text		the input string to be parsed
 	 */
-	@Override
 	public void setParameter(String text)
 	{
 		parameterText = text.trim();
@@ -101,7 +105,11 @@ public class ColorParameter extends TAParameter
 			isCorrect = allValid(); 	// we assume variables in r,g,b-expressions to be ok until the program runs
 		}
 	}
-	
+
+	/**
+	 * find the color its name in a standart color list (NL and EN allowed)
+	 * @param s name of the color
+	 */
 	private void parseColorName(String s)
 	{
 		isColorByName = true;
@@ -136,6 +144,10 @@ public class ColorParameter extends TAParameter
 		else isCorrect = false;		// ... here
 	}
 
+	/**
+	 * find the color from an array containing Expressions for red/green/blue
+	 * @param s expression array
+	 */
 	private void parseRGB(String s[])
 	{
 		isColorByName = false;
@@ -177,7 +189,6 @@ public class ColorParameter extends TAParameter
 	 * 
 	 * @return		text
 	 */
-	@Override
 	public String getParameterText()
 	{
 		if ( !isColorByName )
@@ -192,8 +203,8 @@ public class ColorParameter extends TAParameter
 	
 	/**
 	 * Calculate a single colorcomponent r/g/b with given VarSet
-	 * @param e
-	 * @param varSet
+	 * @param e the color expression
+	 * @param varSet the current varSet
 	 * @return			int, one of r,g,b
 	 */
 	private int calculateColorValue(Expressie e, VarSet varSet)
@@ -221,7 +232,6 @@ public class ColorParameter extends TAParameter
 	 * @param varSet	current VarSet in the running program
 	 * @return			true, if a valid color can be generated from teh VarSet
 	 */
-	@Override
 	public boolean isCorrect(VarSet varSet)
 	{
 		if ( isColorByName )
@@ -259,12 +269,11 @@ public class ColorParameter extends TAParameter
 		return theColor;
 	}
 
-	@Override
 	public boolean isCorrect()
 	{
 		return isCorrect;
 	}
-	@Override
+
 	public String getValueText()
 	{
 		if ( isColorByName )

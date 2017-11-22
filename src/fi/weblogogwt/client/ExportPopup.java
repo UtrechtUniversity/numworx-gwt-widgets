@@ -9,33 +9,51 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 
-import com.google.gwt.canvas.dom.client.TextMetrics;
-
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-
+/**
+ * PopupPanel for exporting code: when opened, the PopupPanel will contain the code of the 
+ * current program (including subroutines); format: see method getCode() in class JavaLogoSchuifVeld; the user
+ * can then select this code in the text area of the PopupPanel and copy the code to the clipboard.
+ * @author huub
+ */
 
 public class ExportPopup extends PopupPanel 
 {
+	/**
+	 * text area
+	 */
 	TextArea textArea;
+	/**
+	 * button for closing the ExportPopup
+	 */
 	PushButton closeButton;
+	/**
+	 * title label
+	 */
 	Label codeLabel;
-	
+	/**
+	 * width and height
+	 */
 	int breedte, hoogte;
-	
+	/**
+	 * JavaLogoSchuifVeld owns the ExportPopup
+	 */
 	JavaLogoSchuifVeld schuifveld;
 	
+	/**
+	 * layouting the ExportPopup
+	 */
 	LayoutPanel exportPanel;
 	
+	/**
+	 * constructor
+	 * @param b width
+	 * @param h height
+	 * @param sv the owner of this PopupPanel
+	 */
 	public ExportPopup(int b, int h, JavaLogoSchuifVeld sv)
 	{	super(true);
 		schuifveld = sv;
-	
-		//breedte wordt meteen bij vulIn aangepast		
 		breedte = b;
 		hoogte = h;
 
@@ -47,8 +65,7 @@ public class ExportPopup extends PopupPanel
 		exportPanel.add(codeLabel);
 		exportPanel.setWidgetLeftWidth(codeLabel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		exportPanel.setWidgetTopHeight(codeLabel, 0, Style.Unit.PX, 20, Style.Unit.PX);
-		
-		
+
 		textArea = new TextArea();
 		exportPanel.add(textArea);
 		exportPanel.setWidgetLeftWidth(textArea, 0, Style.Unit.PX, breedte, Style.Unit.PX);
@@ -64,23 +81,28 @@ public class ExportPopup extends PopupPanel
 		exportPanel.setWidgetTopHeight(closeButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
 		closeButton.addClickHandler(new PushClickHandler());
 	
-		//textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		setWidget(exportPanel);
-	
-		//addCloseHandler(new PopupCloseHandler());
 	}
 	
+	/**
+	 * write String s in the text area 
+	 * @param s text to be written
+	 */
 	public void export(String s)
 	{
 		textArea.setText(s);
 	}
 	
+	/**
+	 * inner class for closeButton; note that ExportPopup also closes
+	 * when clicking somewhere outside the ExportPopup  
+	 * @author huub
+	 */
     class PushClickHandler implements ClickHandler
     {
     	
     	public void onClick(ClickEvent e)
     	{
-			//e.preventDefault();
 			e.stopPropagation();
 			if (e.getSource() == closeButton)
 			{

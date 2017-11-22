@@ -1,5 +1,8 @@
 package fi.weblogogwt.client.logotekenap;
 
+/**
+ * there is no class Point in GWT
+ */
 public class Punt
 {	
 	double x, y;

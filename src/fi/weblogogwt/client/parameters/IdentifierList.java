@@ -7,20 +7,26 @@ import fi.weblogogwt.client.VarSet;
 /**
  * This class represents the list of comma separated identifiers that are the parameters
  * in the header of a deeltaak definition.
- * The number of identifiers is bound to a maximum, for practical reasons. You can't edit >3 parameters.
+ * The number of identifiers is bound to a maximum, for practical reasons. You can't edit more than 3 parameters.
  * 
- * For simplicity, this maximum number of ids is always created at construction, an idCount tells
+ * For simplicity, this maximum number of identifiers is always created at construction, an idCount tells
  * how many are actually in use.
  * 
  * @author berge020
  */
 public class IdentifierList extends TAParameter
 {
+	/**
+	 * number of identifiers in the list that are in use
+	 */
 	private int idCount;
+	/**
+	 * the identifierList
+	 */
 	private Identifier[] ids;
 
 	/**
-	 * Create a new IdentifierList with zero id's in use
+	 * Create a new IdentifierList with zero identifiers in use
 	 */
 	public IdentifierList()
 	{
@@ -38,12 +44,9 @@ public class IdentifierList extends TAParameter
 	 * Set the list from a comma separated string and determine the number and correctness.
 	 * The IdentifierList is correct iff
 	 * - there aren't any parameters (parameterless deeltaak) OR
-	 * - the number of parameters <= JavaLogoSchuifVeld.maxParameterCount AND
+	 * - the number of parameters is less than or equal to JavaLogoSchuifVeld.maxParameterCount AND
 	 * - all parameters are correct identifiers
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#setParameter(java.lang.String)
 	 */
-	@Override
 	public void setParameter(String s)
 	{
 		s = s.trim();
@@ -71,11 +74,8 @@ public class IdentifierList extends TAParameter
 	}
 
 	/**
-	 * Return a comma separated String of all id's in use
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#getParameterText()
+	 * @return  a comma separated String of all id's in use
 	 */
-	@Override
 	public String getParameterText()
 	{
 		if ( idCount == 0 ) return parameterText;			// will be "" or too many params
@@ -90,10 +90,8 @@ public class IdentifierList extends TAParameter
 	/**
 	 * Returns true if all identifiers are correct (varSet irrelevant).
 	 * Note: also returns true if there are no identifiers, a deeltaak without parameters is ok!
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#isCorrect(VarSet varSet)
+	 * @return value of isCorrect
 	 */
-	@Override
 	public boolean isCorrect(VarSet varSet)
 	{
 		return isCorrect;
@@ -102,26 +100,36 @@ public class IdentifierList extends TAParameter
 	/**
 	 * Returns true if all identifiers are correct.
 	 * Note: also returns true if there are no identifiers, a deeltaak without parameters is ok!
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#isCorrect()
+	 * @return value of isCorrect
 	 */
-	@Override
 	public boolean isCorrect()
 	{
 		return isCorrect;
 	}
 	
+	/**
+	 * get the number of identifiers in use 
+	 * @return idCount
+	 */
 	public int getIdCount()
 	{
 		return idCount;
 	}
 	
+	/**
+	 * get the identifier at index index
+	 * @param index the index
+	 * @return the identifier at index index
+	 */
 	public String getIdentifier(int index)
 	{
 		return ids[index].getParameterText();
 	}
 
-	@Override
+	/**
+	 * calls getParameterText()
+	 * @return list of all identifiers in use separated by komma's
+	 */
 	public String getValueText()
 	{
 		return getParameterText();

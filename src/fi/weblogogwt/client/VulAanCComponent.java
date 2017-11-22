@@ -1,6 +1,5 @@
 package fi.weblogogwt.client;
 
-//import java.awt.Color;
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -9,24 +8,44 @@ import fi.weblogogwt.client.formuleobjects.StringUtils;
 import fi.weblogogwt.client.parameters.ColorParameter;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
+/**
+ * class representing the vulAan(color) command: save all points through which the cursor passes
+ * after this command until the command vulUit(), which fills a Polygon constructed from all
+ * these points, see class TekenBlad; <br>
+ * the command has one parameter: a String representing an RGB-color,
+ * or a String representing the name of a color, see class
+ * ColorParameter   
+ */
+
 public class VulAanCComponent extends ParameterCommandComponent
 {
+	/**
+	 * constructor
+	 * @param x x-position
+	 * @param y y-position
+	 * @param b width
+	 * @param h height
+	 * @param sv instance of JavaLogoSchuifVeld sv containing the drawing Canvas; necessary for superclass constructor
+	 */
 	
 	public VulAanCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = WebLogoGWT.rb.vulAanTekst(); //"vulAan";
-		commandNameTranslated = "fillOn"; //JavaLogoWeb.rb.getString(commandName);
+		commandName = WebLogoGWT.rb.vulAanTekst(); 
+		commandNameTranslated = "fillOn"; 
 	}
 	
+	/**
+	 * check the color parameter of this command for correctness; 
+	 * execute this command, if tracing, change its color and display
+	 * the command and parameter; see class TraceBeheerder
+	 */
 	public boolean execute(TraceBeheerder trb,Uitvoerblad ub, VarSet varSet)
 	{	 
 		if ( !parameters[0].isCorrect(varSet) ) 
-		{
-//System.out.println("vulAan incorrect");			
-			return false;
+		{	return false;
 		}	
 		CssColor cl = ((ColorParameter)parameters[0]).getColor();
 		

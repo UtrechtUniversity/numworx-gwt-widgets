@@ -1,11 +1,10 @@
 package fi.weblogogwt.client.parameters;
 
-import java.lang.*;
 import fi.weblogogwt.client.VarSet;
 
 /**
  * Class for any identifier in the TekenApplet. 
- * Identifiers are varaiable names, deeltaak names and parameters
+ * Identifiers are variable names, deeltaak names and parameters
  * 
  * @author berge020
  */
@@ -15,14 +14,13 @@ public class Identifier extends TAParameter
 	 * An indentifier can start with a default name, such as 'variabele' or 'deeltaak2'
 	 * or the empty String (parameter of deeltaak)
 	 * 
-	 * @param the default name of this parameter's owner (VarCC or DeeltaakBodyC), or empty String
+	 * @param s the default name of this parameter's owner (VarCC or DeeltaakBodyC), or empty String
 	 */
 	public Identifier(String s)
 	{
 		setParameter(s);
 	}
 
-	@Override
 	public void setParameter(String s)
 	{
     	if ( s == null ) s = "";
@@ -31,7 +29,7 @@ public class Identifier extends TAParameter
 	}
 	
     /**
-     * Check if string s is an identidier using the standard Unicode rules, supplied in class Character
+     * Check if string s is an identifier using the standard Unicode rules, supplied in class Character
      * 
      * @param s		string to be tested
      * @return		true, if correct
@@ -53,11 +51,22 @@ public class Identifier extends TAParameter
     	return true;
     }
 
+    /**
+     * check if ch is a legal starting charater for an identifier (i.e. a letter)
+     * @param ch input character
+     * @return true/false
+     */
     private boolean isUnicodeIdentifierStart(char ch)
     {
     	return (Character.isLetter(ch) == true); // || (Character.getType(ch) == Character.LETTER_NUMBER); 
     }
 
+    /**
+     * check if ch is a legal starting identifier part (except for the first character), i.e. 
+     * letter, number or underscore (is this enough?)
+     * @param ch input character
+     * @return true/false
+     */
     private boolean isUnicodeIdentifierPart(char ch)
     {
     	return (Character.isLetter(ch) == true) || (Character.isDigit(ch) == true) ||
@@ -68,26 +77,22 @@ public class Identifier extends TAParameter
     		   //(Character.getType(ch) == Character.NON_SPACING_MARK); 
     }
 
-	@Override
 	public String getParameterText()
 	{
 		return parameterText;
 	}
 
-	@Override
 	public boolean isCorrect(VarSet varSet)
 	{
 		// identifier is independent of VarSet
 		return isCorrect;
 	}
 
-	@Override
 	public boolean isCorrect()
 	{
 		return isCorrect;
 	}
 	
-	@Override
 	public String getValueText()
 	{
 		return getParameterText();

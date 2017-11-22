@@ -1,7 +1,5 @@
 package fi.weblogogwt.client.expressies;
 
-import java.awt.*;
-
 public class Macht extends Expressie  
 {		
 	public Macht(Expressie e1, Expressie e2 )

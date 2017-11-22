@@ -1,6 +1,6 @@
 package fi.weblogogwt.client.expressies;
 
-class PointLong
+public class PointLong
 
 {	long x, y;
 		

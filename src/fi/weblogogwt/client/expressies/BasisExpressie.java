@@ -1,6 +1,5 @@
 package fi.weblogogwt.client.expressies;
 
-import java.awt.*;
 import java.util.*;
 
 import fi.weblogogwt.client.UF;

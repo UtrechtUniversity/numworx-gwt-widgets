@@ -2,20 +2,14 @@ package fi.weblogogwt.client.expressies;
 
 import java.util.Vector;
 
-//import fi.wiskopdr.WiskOpdr;
 import fi.weblogogwt.client.expressies.Algebra;
 import fi.weblogogwt.client.expressies.BasisExpressie;
 import fi.weblogogwt.client.expressies.Expressie;
 import fi.weblogogwt.client.expressies.Vergelijking;
-//import fi.javalogoweb.expressies.VergelijkingMeerv;
-
-//import fi.javalogoweb.WiskOpdr;
-
 
 public class VergelijkingMeerv 
 {	
 	Vergelijking[] vergelijkingen;
-	//OngelijkheidObject[] ongelijkheidObjecten;
 	
 	public VergelijkingMeerv(Vergelijking[] v)
 	{	vergelijkingen = v;
@@ -215,16 +209,6 @@ public class VergelijkingMeerv
 		return isOplossing;
 	}
 	
-	/*public boolean bevatFouteOplossing(VergelijkingMeerv antw)
-	{	boolean isOplossing = true;
-		for(int j=0 ; j<vergelijkingen.length ; j++)
-		{	if(vergelijkingen[j].isEindOplossing())
-			{	isOplossing = antw.isOplossing(vergelijkingen[j].geefEindOplossing());
-				if(!isOplossing)return true;
-			}
-		}
-		return false;
-	}*/
 	
 	public boolean bevatFouteOplossing(VergelijkingMeerv antw, String var)
 	{	for(int j=0 ; j<vergelijkingen.length ; j++)
@@ -379,12 +363,6 @@ public class VergelijkingMeerv
 		
 		return s;
 	}
-	/*public boolean isEindOplossing()
-	{	for(int i=0 ; i<vergelijkingen.length ; i++)
-		{	if(!vergelijkingen[i].isEindOplossing())return false;
-		}
-		return true;
-	}*/
 	
 	public boolean isEindOplossing(String var)
 	{	for(int i=0 ; i<vergelijkingen.length ; i++)
@@ -399,19 +377,6 @@ public class VergelijkingMeerv
 		}
 		return true;
 	}
-	
-	
-	
-	/*
-	public double[] geefEindOplossing()
-	{	double[] oplossingen = new double[vergelijkingen.length];
-		if(isEindOplossing())
-		{	for(int i=0 ; i<vergelijkingen.length ; i++)
-			{	oplossingen[i] = vergelijkingen[i].geefEindOplossing();
-			}
-		}
-		return oplossingen;
-	}*/
 	
 	public Expressie[] geefEindOplossing(String var)
 	{	Expressie[] oplossingen = new Expressie[vergelijkingen.length];

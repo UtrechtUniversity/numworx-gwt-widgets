@@ -9,34 +9,59 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.TextArea;
 
-import fi.weblogogwt.client.ExportPopup.PushClickHandler;
+/**
+ * PopupPanel for importing code: when opened, program code can be pasted in the text area of
+ * typed into the text area; format: see class ProgrammaImporter; upon clicking the importButton
+ * the code will be imported and the ImportPopup will be closed 
+ * @author huub
+ */
 
 public class ImportPopup extends PopupPanel 
 {
+	/**
+	 * text area
+	 */
 	TextArea textArea;
+	/**
+	 * import/cancel Button
+	 */
 	PushButton importButton, annuleerButton;
+	/**
+	 * instruction label
+	 */
 	Label codeLabel;
 	
+	/**
+	 * width/height
+	 */
 	int breedte, hoogte;
+	/**
+	 * offset for layout
+	 */
 	int offSet = 10;
 	
+	/**
+	 * JavaLogoSchuifVeld owns the ImportPopup
+	 */
 	JavaLogoSchuifVeld schuifveld;
 	
+	/**
+	 * layouting the ImportPopup
+	 */
 	LayoutPanel importPanel;
 	
+	/**
+	 * constructor
+	 * @param b width
+	 * @param h height
+	 * @param sv the owner of this PopupPanel
+	 */
 	public ImportPopup(int b, int h, JavaLogoSchuifVeld sv)
 	{	super(true);
 		schuifveld = sv;
-	
-		//breedte wordt meteen bij vulIn aangepast		
 		breedte = b;
 		hoogte = h;
-
 		importPanel = new LayoutPanel();
 		importPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 			
@@ -45,7 +70,6 @@ public class ImportPopup extends PopupPanel
 		importPanel.add(codeLabel);
 		importPanel.setWidgetLeftWidth(codeLabel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		importPanel.setWidgetTopHeight(codeLabel, 0, Style.Unit.PX, 20, Style.Unit.PX);
-		
 		
 		textArea = new TextArea();
 		importPanel.add(textArea);
@@ -69,24 +93,28 @@ public class ImportPopup extends PopupPanel
 		importPanel.setWidgetTopHeight(annuleerButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
 		annuleerButton.addClickHandler(new PushClickHandler());
 
-		//textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		setWidget(importPanel);
-	
-		//addCloseHandler(new PopupCloseHandler());
 	}
 	
+	/**
+	 * read the code from the text area and import it
+	 */
 	public void importeer()
 	{
 		String s = textArea.getText();
 		schuifveld.importeer(s);
 	}
 	
+	/**
+	 * inner class for import and cancel Button; note that ImportPopup also closes
+	 * when clicking somewhere outside the ImportPopup  
+	 * @author huub
+	 */
     class PushClickHandler implements ClickHandler
     {
     	
     	public void onClick(ClickEvent e)
     	{
-			//e.preventDefault();
 			e.stopPropagation();
 			if (e.getSource() == importButton)
 			{

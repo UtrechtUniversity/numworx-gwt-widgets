@@ -1,6 +1,5 @@
 package fi.weblogogwt.client.logotekenap;
 
-//import javax.swing.JPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.canvas.client.Canvas;
 
@@ -17,9 +16,6 @@ import com.google.gwt.canvas.client.Canvas;
  */
 public abstract class Uitvoerblad extends LayoutPanel
 {
-	/**
-	 * Tekenopdrachten
-	 */
 	public abstract void links(double dHoek);
 	
   	public abstract void rechts(double dHoek);
@@ -38,18 +34,10 @@ public abstract class Uitvoerblad extends LayoutPanel
 	
 	public abstract void vulBlad(int r, int g, int b);
 	
-	/**
-	 * Opdrachten tekstuitvoer
-	 */
 	public abstract void printl(String s);
 	
 	public abstract void print(String s);
 	
-	/**
-	 * Algemeen
-	 */
- 	public abstract void tekenOpnieuw();
- 	
  	public abstract void initializeDrawing(boolean b);
  	
  	public abstract void paintDrawing(boolean cursor);

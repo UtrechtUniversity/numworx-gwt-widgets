@@ -1,67 +1,50 @@
 package fi.weblogogwt.client;
 
-import fi.weblogogwt.client.formuleobjects.StringUtils;
-
-//import java.awt.*;
-//import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
-
-
-//import javax.swing.ImageIcon;
-//import javax.swing.JPanel;
-//import javax.swing.JLabel;
-//import javax.swing.JButton;
-//import javax.swing.JTextArea;
-
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.canvas.dom.client.TextMetrics;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.LayoutPanel;
-
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
-
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.dom.client.TouchEndHandler;
-
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
-import com.google.gwt.user.client.ui.PopupPanel;
-
-
 /**
- * @author PBgv, changes made
- * 	19/2/2015 changed commandComponents ffrom array to ArrayList, deleted int: aantalCC
- *
+ * class representing the program area: on the left it contains heaps (piles) of the basic program components,
+ * that can be dragged into the actual program or into subroutines (the latter are optional);  
+ * the class also contains a Canvas on which the program components, the program and the subroutines
+ * are drawn, and this Canvas processes any mouse (touch) actions on the components  
+ *  
+ * @author Peter Boon
  */
-public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements  MouseListener, MouseMotionListener
+public class JavaLogoSchuifVeld extends LayoutPanel 
 {
 	/**
-	 * Number of deeltaken
+	 * Number of subroutines
 	 */
 	public static final int aantalDeeltaken = 5;
 	
 	/**
-	 * Maximum number of parameters in a deeltaak
+	 * Maximum number of parameters in a subroutines
 	 */
-	public static final int maxParamCount = 4;		// temp: must go to JavaLogoWeb
+	public static final int maxParamCount = 4;
 
 	/**
 	 * commCompLargeWidth: width of two-column component (in pile)
@@ -103,7 +86,6 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	/**
 	 * ProgrammaPanelHeight
 	 */
-//GWT	
 	public static int pph = 525;
 	/**
 	 * ProgrammaPanelX
@@ -113,18 +95,29 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	 * ProgrammaPanelY
 	 */
 	public static final int ppy = 10;
-		
-	//private JPanel programmaPanel;
+
+	/**
+	 * rectangle containing the ProgrammaComponent and the 
+	 * DeeltaakBodyComponents; used for dragging CC's
+	 */
 	private Rectangle programmaPanel;
+	/**
+	 * the component containing the actual program, see class ProgrammaComponent
+	 */
 	private ProgrammaComponent programmaComponent;
-	
+	/**
+	 * the subroutines, see class DeeltaakBodyComponent
+	 */
 	private DeeltaakBodyComponent[] deeltaakComponenten;
-	private Uitvoerblad uitvoerblad;
-	
-	//private VardisplayPanel vartracer = null;
-	//private boolean isVartracing = false;
+
+	/**
+	 * if true, prevents dragging outside the Canvas 
+	 */
 	private boolean gesloten;
 	
+	/**
+	 * the available CommandComponents
+	 */
 	private CommandComponent vooruitCC;
 	private CommandComponent stapCC;
 	private CommandComponent linksCC;
@@ -142,38 +135,65 @@ public class JavaLogoSchuifVeld extends LayoutPanel //extends JPanel implements 
 	private CommandComponent keuzeCC;
 	private CommandComponent[] deeltaakCC;
 	
-	//private HashMap<String, Double> inputVars = new HashMap<String, Double>();
+	/**
+	 * the variables in the current progam
+	 */
 	private HashMap<String, Object> inputVars = new HashMap<String, Object>();
 	
+	/**
+	 * simulating a Java Component
+	 */
 	int xPos, yPos, breedte, hoogte;
+	/**
+	 * Canvas to be drawn on
+	 */
 	Canvas jlsvCanvas;
+	/**
+	 * Context2d to be drawn with
+	 */
 	Context2d jlsvContext2d;
 	
-	Vector ccs = new Vector();
+	/**
+	 * all CommandComponents contained in this JavaLogoSchuifVeld, necessary for painting and
+	 * event handling
+	 */
+	Vector<CommandComponent> ccs = new Vector<CommandComponent>();
 	
+	/**
+	 * reference to any visible PopupPanel for editing parameters; keep track of open
+	 * PopupPanels here, so that they can be processed and closed when a new one is
+	 * opened elsewhere; see class ParameterCommandComponent
+	 */
 	ParameterTextField paramEditor;
 	
+	/**
+	 * a PopupPanel for exporting code, see class ExportPopup 
+	 */
 	ExportPopup exportPopup;
+	/**
+	 * a PopupPanel for importing code, see class ImportPopup 
+	 */
 	ImportPopup importPopup;
 	
+	/**
+	 * the last CommandComponent with a caret, see method traceComponent 
+	 */
 	CommandComponent traceC;
+	/**
+	 * the last CommandContainer with a caret, see method traceComponent 
+	 */
 	CommandContainer traceCC;
 	
-String[] messages = new String[10];	
-int messageCnt = 0;
-		
-	public JavaLogoSchuifVeld(int x, int y, int b, int h, Uitvoerblad tb)
+	/**
+	 * constructor, create drawing Canvas and add mouse/touch listeners to this Canvas
+	 * @param x x-position
+	 * @param y y-position
+	 * @param b width
+	 * @param h height
+	 */
+	public JavaLogoSchuifVeld(int x, int y, int b, int h)
 	{	
-		
-for (int i = 0; i < messages.length; i++)
-	messages[i] = "message " + i; 
-		//setLayout(null);
-		//setBounds(x,y,b,h);
 		xPos = x; yPos = y; breedte = b; hoogte = h;
-	
-		//addMouseListener(this);
-		//addMouseMotionListener(this);
-		uitvoerblad = tb;
 		
 		jlsvCanvas = Canvas.createIfSupported();
 		jlsvCanvas.setWidth(b + "px");
@@ -193,56 +213,84 @@ for (int i = 0; i < messages.length; i++)
 		jlsvCanvas.addTouchStartHandler(touchHandler);
 		jlsvCanvas.addTouchMoveHandler(touchHandler);
 		jlsvCanvas.addTouchEndHandler(touchHandler);
-
 	}
 	
-	public void setMessage(String s)
-	{
-		messages[messageCnt] = s;
-		messageCnt++;
-		if (messageCnt == messages.length)
-			messageCnt = 0;
-		paint();
-	}
-	
+	/**
+	 * getter for the drawing Canvas
+	 * @return  jlsvCanvas
+	 */
 	public Canvas getCanvas()
 	{
 		return jlsvCanvas;
 	}
 	
+	/**
+	 * initialize the Context2d used for drawing on jlsvCanvas 
+	 */
 	public void initContext2d() 
 	{
 		jlsvContext2d = jlsvCanvas.getContext2d();
 		
 	}
 
+	/**
+	 * simulating a Java Component
+	 * @return dimension of this JavaLogoSchuifVeld
+	 */
 	public Dimension getSize()
 	{
 		return new Dimension(breedte,hoogte);
 	}
 	
+	/**
+	 * simulating a Java Component
+	 * @return height of this JavaLogoSchuifVeld
+	 */
 	public int getHeight()
 	{
 		return hoogte;
 	}
 
+	/**
+	 * simulating a Java Component
+	 * @return width of this JavaLogoSchuifVeld
+	 */
 	public int getWidth()
 	{
 		return breedte;
 	}
 
+	/**
+	 * add a variable to the HashMap inputVars
+	 * @param name name of the vaiable
+	 * @param value value of the variable
+	 */
 	public void setInputVar(String name, double value)
 	{	inputVars.put("input" + name, new Double(value));
 	}
 	
+	/**
+	 * setter for inputVars (setState)
+	 * @param inputVars new HashMap for inputVars
+	 */
 	public void setInputVars(HashMap<String, Object> inputVars)
 	{	this.inputVars = inputVars;
 	}
 	
+	/**
+	 * setter for inputVars (getState)
+	 * @return inputVars
+	 */
 	public HashMap<String, Object> getInputVars()
 	{	return inputVars;
 	}
 	
+	/**
+	 * execute the program: create a varSet with all variable names and their values
+	 * from the HashMap inputVars, then call the main program 
+	 * @param trb the tracing controller
+	 * @param ub drawing area
+	 */
 	public void execute(TraceBeheerder trb,Uitvoerblad ub)
 	{	
 		VarSet varSet = new VarSet();
@@ -256,242 +304,207 @@ for (int i = 0; i < messages.length; i++)
 		programmaComponent.execute(trb,ub, varSet);
 	}
 	
+	/**
+	 * initialize this instance of JavaLogoSchuifVeld: create all CC-piles,
+	 * the main program and the subroutines; depending on the parametrization,
+	 * elements are removed at a later stage 
+	 */
 	public void initialize()
 	{	
-		// programmaPanel bevat de 'programma's' waar we componenten op kunnen droppen
-		//programmaPanel = new JPanel();
-		//programmaPanel.setBounds(ppx, ppy, ppw, pph);
+		zetGesloten(true);
 		pph = hoogte - 20;
 		programmaPanel = new Rectangle(ppx, ppy, ppw, pph);
-		
-		//programmaPanel.setBackground(Color.WHITE);
-		//programmaPanel.setLayout(null);
-		//add(programmaPanel,0);
-		
+		// main program
 		programmaComponent = new ProgrammaComponent(ppx, ppy, ProgrammaComponent.pcsw, pph, 
 													WebLogoGWT.rb.tekenalgorithmeTekst(), this);
+		// not draggeble
 		programmaComponent.zetVast(true);
 		
-		//programmaPanel.add(programmaComponent);
 		ccs.addElement(programmaComponent);
 				
-		
-		//vartracer = new VardisplayPanel(2*ccsw+10, 515);
-		//add(vartracer);
-		//setWidgetLeftWidth(vartracer, ccx, Style.Unit.PX, 2*ccsw+10, Style.Unit.PX);
-		//setWidgetTopHeight(vartracer, ccy, Style.Unit.PX, 515, Style.Unit.PX);
-		//vartracer.setBounds(ccx, ccy, 2*ccsw+10, 515);
-		
 		vooruitCC = new VooruitCComponent(ccx,ccy,ccsw,ccsh, this);
-		//add(vooruitCC,0);
 		ccs.addElement(vooruitCC);
 				
 		stapCC = new StapCComponent(ccx2,ccy,ccsw,ccsh, this);
-		//add(stapCC,0);
 		ccs.addElement(stapCC);
 	
 		linksCC = new LinksCComponent(ccx,ccy+30,ccsw,ccsh, this);
-		//add(linksCC,0);
 		ccs.addElement(linksCC);
 		
 		rechtsCC = new RechtsCComponent(ccx2,ccy+30,ccsw,ccsh, this);
-		//add(rechtsCC,0);
 		ccs.addElement(rechtsCC);
 			
 		penAanCC = new PenAanCComponent(ccx,ccy+60,ccsw,ccsh, this);
-		//add(penAanCC,0);
 		ccs.addElement(penAanCC);
 			
 		penUitCC = new PenUitCComponent(ccx2,ccy+60,ccsw,ccsh, this);
-		//add(penUitCC,0);
 		ccs.addElement(penUitCC);
 			
 		vulAanCC = new VulAanCComponent(ccx,ccy+90,ccsw,ccsh, this);
-		//add(vulAanCC,0);
 		ccs.addElement(vulAanCC);
 			
 		vulUitCC = new VulUitCComponent(ccx2,ccy+90,ccsw,ccsh, this);
-		//add(vulUitCC,0);
 		ccs.addElement(vulUitCC);
 		
 		vulbladCC = new VulBladCComponent(ccx,ccy+120,ccsw,ccsh, this);
-		//add(vulbladCC,0);
 		ccs.addElement(vulbladCC);
 			
 		printCC = new PrintCComponent(ccx,ccy+150,ccsw,ccsh, this);
-		//add(printCC,0);
 		ccs.addElement(printCC);
 			
 		printlCC = new PrintlCComponent(ccx2,ccy+150,ccsw,ccsh, this);
-		//add(printlCC,0);
 		ccs.addElement(printlCC);
 		
 		varCC = new VarCComponent(ccx,ccy+190,cclw,ccsh, this);
-		//add(varCC,0);
 		ccs.addElement(varCC);
 	
 		herhaalCC = new ForLoopCommandComponent(ccx,ccy+230,cclw,ccsh+10, this);
-		//add(herhaalCC,0);
 		ccs.addElement(herhaalCC);
 		
 		whileCC = new WhileLoopCommandComponent(ccx,ccy+270,cclw,ccsh+10, this);
-		//add(whileCC,0);
 		ccs.addElement(whileCC);
 		
 		keuzeCC = new KeuzeCommandComponent(ccx,ccy+310,cclw,ccsh+10, this);
-		//add(keuzeCC,0);
 		ccs.addElement(keuzeCC);
         
-	
 		deeltaakComponenten = new DeeltaakBodyComponent[aantalDeeltaken];
 		deeltaakCC = new DeeltaakCallCComponent[aantalDeeltaken];
 		for(int i=0; i < aantalDeeltaken; i++)
 		{
 			deeltaakCC[i] = new DeeltaakCallCComponent(xPos+ccx,yPos+ccy+360+30*i,cclw,ccsh, i+1, this);
-			//add(deeltaakCC[i],0);
 			ccs.addElement(deeltaakCC[i]);
 
 			// create with dummy location and height
-			
 			deeltaakComponenten[i] = new DeeltaakBodyComponent(0,0,ProgrammaComponent.pcsw,ProgrammaComponent.pcclosedh, 
 															   WebLogoGWT.rb.deeltaakTekst()+(i+1), this);
 			deeltaakComponenten[i].zetVast(false);
 			((DeeltaakCallCComponent)deeltaakCC[i]).setBody(deeltaakComponenten[i]);
-			//programmaPanel.add(deeltaakComponenten[i]);
 			ccs.addElement(deeltaakComponenten[i]);
 		}
 		// set location and height right, one by one...
-
-		
 		deeltaakComponenten[0].setLocation(xPos+ppx+ProgrammaComponent.pcsw+40, yPos+ccy+0);
-		deeltaakComponenten[0].changeHeight();			// was initialialized as closed, so this will open it.
+		// was initialialized as closed, so this will open it
+		deeltaakComponenten[0].changeHeight();
 		deeltaakComponenten[1].setLocation(xPos+ppx+ProgrammaComponent.pcsw+10, yPos+ccy+180);
+		// was initialialized as closed, so this will open it
 		deeltaakComponenten[1].changeHeight();
 		deeltaakComponenten[2].setLocation(xPos+ppx+ProgrammaComponent.pcsw+20, yPos+ccy+400);
 		deeltaakComponenten[3].setLocation(xPos+ppx+ProgrammaComponent.pcsw+30, yPos+ccy+415);
 		deeltaakComponenten[4].setLocation(xPos+ppx+ProgrammaComponent.pcsw+40, yPos+ccy+430);
-		
-		
-//einde GWT		
 	}
 	
-	
+	/**
+	 * add a CC to the Vector of CC's in this JavaLogoSchuifVeld   
+	 * @param c CC to add
+	 */
 	void addToProgrammaPanel(CommandComponent c)
 	{
 		//programmaPanel.add(c, 0);
 		ccs.addElement(c);
 	}
 	
-	
+	/**
+	 * put CommandComponent cc at index 0 in css, so that it will be drawn
+	 * as the last CC (thus on top of all others)
+	 * @param cc CC to be put on top
+	 */
 	public void putOnTop(CommandComponent cc)
-	{
-		ccs.removeElement(cc);
+	{	ccs.removeElement(cc);
 		ccs.insertElementAt(cc,0);
 	}
 	
+	/**
+	 * CommandComponent cc was dragged from a pile (heap); at the start of the dragg
+	 * put cc's isStapel to false and create a new CC of the same type to represent
+	 * the pile (heap); see method mouseDragged in class CommandComponent 
+	 * @param cc CC needing a new pile 
+	 */
 	public void zetStapel(CommandComponent cc)
 	{	int x = cc.getLocation().x;
 		int y = cc.getLocation().y;
 		int b = cc.getSize().width;
 		int h = cc.getSize().height;
 		
-		CommandComponent currentCC;
 		if(cc == printCC)
 		{ 	printCC = new PrintCComponent(x,y,b,h, this);
-			//add(printCC,0);
 			ccs.addElement(printCC);
 		}
 		if(cc == vulbladCC)
 		{ 	vulbladCC = new VulBladCComponent(x,y,b,h, this);
-			//add(vulbladCC,0);
 			ccs.addElement(vulbladCC);
 		}
 		if(cc == printlCC)
 		{ 	printlCC = new PrintlCComponent(x,y,b,h, this);
-			//add(printlCC,0);
 			ccs.addElement(printlCC);
 		}
-		//if(cc instanceof InvoerCComponent)
-		//{ 	currentCC = new InvoerCComponent(x,y,b,h, this);
-		//	add(currentCC,0);
-		//}
 		if(cc == penAanCC)
 		{ 	penAanCC = new PenAanCComponent(x,y,b,h, this);
-			//add(penAanCC,0);
 			ccs.addElement(penAanCC);
 		}
 		if(cc == penUitCC)
 		{ 	penUitCC = new PenUitCComponent(x,y,b,h, this);
-			//add(penUitCC,0);
 			ccs.addElement(penUitCC);
 		}		
 		if(cc == vooruitCC)
 		{ 	vooruitCC = new VooruitCComponent(x,y,b,h, this);
-			//add(vooruitCC,0);
 			ccs.addElement(vooruitCC);
 		}
 		if(cc == linksCC)
 		{ 	linksCC = new LinksCComponent(x,y,b,h, this);
-			//add(linksCC,0);
 			ccs.addElement(linksCC);
 		}
 		if(cc == rechtsCC)
 		{ 	rechtsCC = new RechtsCComponent(x,y,b,h, this);
-			//add(rechtsCC,0);
 			ccs.addElement(rechtsCC);
 		}
 		if(cc == vulAanCC)
 		{ 	vulAanCC = new VulAanCComponent(x,y,b,h, this);
-			//add(vulAanCC,0);
 			ccs.addElement(vulAanCC);
 		}
 		if(cc == vulUitCC)
 		{ 	vulUitCC = new VulUitCComponent(x,y,b,h, this);
-			//add(vulUitCC,0);
 			ccs.addElement(vulUitCC);
 		}
 		if(cc == stapCC)
 		{ 	stapCC = new StapCComponent(x,y,b,h, this);
-			//add(stapCC,0);
 			ccs.addElement(stapCC);
 		}
 		
 		if(cc == herhaalCC)
 		{ 	herhaalCC = new ForLoopCommandComponent(x,y,b,h, this);
-			//	add(herhaalCC,0);
 			ccs.addElement(herhaalCC);
 			cc.setSize(cc.getWidth(), cclh);
 		}
 		
 		if(cc == whileCC)
 		{ 	whileCC = new WhileLoopCommandComponent(x,y,b,h, this);
-			//	add(whileCC,0);
 			ccs.addElement(whileCC);
 			cc.setSize(cc.getWidth(), cclh);
 		}
 	
 		if(cc == keuzeCC)
         {   keuzeCC = new KeuzeCommandComponent(x,y,b,h, this);
-			//	add(keuzeCC,0);
         	ccs.addElement(keuzeCC);
         	cc.setSize(cc.getWidth(), cclh);
         }
 		
 		if(cc == varCC)
 		{ 	varCC = new VarCComponent(x,y,b,h, this);
-			//	add(varCC,0);
 			ccs.addElement(varCC);
 		}
 		
 		for(int i=0; i<aantalDeeltaken; i++)
 		{	if(cc == deeltaakCC[i])
 			{ 	deeltaakCC[i] = new DeeltaakCallCComponent((DeeltaakCallCComponent) cc, this);
-				//add(deeltaakCC[i],0);
 				ccs.addElement(deeltaakCC[i]);
 			}
 		}
 	}
-	
+
+	/**
+	 * reposition the piles after changing the visibility of one or more
+	 * heaps of CommandComponenets 
+	 */
 	private void herschikStapel()
 	{	int yLocation = ccy;
 		
@@ -525,141 +538,90 @@ for (int i = 0; i < messages.length; i++)
 			yLocation += 10;
 			
 		for(int i=0 ; i<5 ; i++)
-		{	//deeltaakCC[i].setLocation(ccx,yLocation);
+		{	
 			deeltaakCC[i].setLocation(deeltaakCC[i].getX(),yLocation);
 			yLocation +=30;
 		}
 	}
 
+	/**
+	 * remove a CC from the Vector of CC's in this JavaLogoSchuifVeld 
+	 * @param cc CC to remove
+	 */
 	public void verwijder(CommandComponent cc)
 	{	
-		//remove(cc);
 		ccs.removeElement(cc);
 		paint();
 	}
 	
 	public void paint()
 	{
-//System.out.println("JLSV paint");		
 		paintComponent(jlsvContext2d);
-//System.out.println("JLSV painted");		
 	}
 	
-	//public void paintComponent(Graphics g)
+	/**
+	 * paint this JavaLogoSchuifVled
+	 * @param g Context2d for drawing
+	 */
 	public void paintComponent(Context2d g)
-	{	//Dimension dd = getSize();
-		//g.setColor(getBackground());
+	{	
+		// white
 		g.setFillStyle(CssColor.make(255,255,255));
 		g.fillRect(xPos,yPos,breedte,hoogte);
-		//g.setColor(new Color(205,230,255));
+		// light blue for pile part on the left 
 		g.setFillStyle(CssColor.make(205,230,255));
 		g.fillRect(xPos+4,yPos+4,172,hoogte-8);
 
-//System.out.println("ccs = " + ccs.size());		
-		
-		//for (int cCnt = 0; cCnt < ccs.size(); cCnt++)
+		// paint all CC's starting from the end of the Vector!!
 		for (int cCnt = ccs.size() - 1; cCnt >= 0; cCnt--)
 		{
 			((CommandComponent) ccs.elementAt(cCnt)).paintComponent(g);
 		}
-
-//		for (int pCnt = 0; pCnt < pps.size(); pCnt++)
-//		{
-//			((CompositeCommandComponent) pps.elementAt(pCnt)).paintComponent(g);
-//		}
-
-//		g.setFillStyle(CssColor.make(0,0,0));
-//		int yMess = 300;
-//		for (int i = 0; i < messages.length; i++)
-//		{	g.fillText(messages[i],programmaComponent.xPos + 5, yMess);
-//			yMess += 20;
-//		}
-			
-		
 	}
 	
-// zoek meteen de CommandContainer, maar wel de diepste, dus recursief	
-	
+	/**
+	 * check if Rectangle programmaPanel contains a  CommandContainer containing the 
+	 * point (x,y), find the "deepest", see method findContainerAt 
+	 * @param x x-coordinate for checking
+	 * @param y y-coordinate for checking
+	 * @return null or the "deepest" CommandContainerAt
+	 */
 	public CommandContainer getCommandContainerAt(int x, int y)
 	{	
 		if (!programmaPanel.contains(x, y))
 		{	
-//System.out.println("outside pP");
-
 			return null;
-		
 		}
-	
 		CommandContainer result = findCContainerAt(x,y);
 		return result;
-		
-
- 
-/*		
-		Object cc = getContainerAt(x,y);
-		if (cc == null)
-			return null;
-		Object tcc = ((CommandContainer) cc).getContainerAt(x,y);;
-		while (tcc != null)
-		{	cc = tcc;
-			tcc = ((CommandContainer) tcc).getContainerAt(x,y);;
-		}
-		
-		return cc;
-		
-		// find the deepest component in programmaPanel
-		Component c = programmaPanel.findComponentAt(x-ppx,y-ppy);
-		// if c is a CommandComponent, move to the CommandContainer that holds this object
-		if ( c instanceof CommandComponent)
-		{
-			c = c.getParent();
-		}
-		if( c instanceof CommandContainer) 
-		{	
-			CommandContainer cc =  (CommandContainer)c;
-			// don't add to the Commands that are in the piles, for pickup of new ones
-			//if ( cc.getOwner().isStapel ) not needed anymore (find in programmaPanel)
-			//{
-			//	return null;
-			//}
-			return cc;
-		}
-*/		
-	}
-	
-	public Object getContainerAt(int x, int y)
-	{
-		Object result = null;
-		for (int cCnt = 0; cCnt < ccs.size(); cCnt++)
-		{
-			Object o = ccs.elementAt(cCnt);
-			if ((o instanceof CommandContainer) &&
-				((CommandContainer) o).contains(x, y))
-				result = o;
-				
-		}
-		return result;
 	}
 
+	/**
+	 * dragging CommandComponent sc was ended position (x,y)
+	 * (by means of mouseReleased); find the CommandContainer at (x,y) (if any)
+	 * and add sc to this CommandContainer; if no CommandContainer was found
+	 * remove sc  
+	 * @param sc CC that was released 
+	 * @param x x-position of release
+	 * @param y y-position of release
+	 */
 	public void losSchuiver(CommandComponent sc, int x, int y)
 	{	
-//System.out.println("losSchuiver " + x + " " + y);		
+		// find potential new parent 
 		CommandContainer cc = getCommandContainerAt(x,y);
-		
-		// nieuwe parent
+		// new parent
 		if (cc != null )
 		{	
-//System.out.println("cc " + cc.containerName);			
-			// schuifveld
+			// remove sc from the schuifveld (only effective if sc originated from a pile)
 			if (sc.parent == null)
 			{	verwijder(sc);
-//System.out.println("sc.parent == null");			
 			}
-// dit is niet nodig, parent wordt "genulld" in mouseDragged			
+			// not necessary, parent of sc was put to null after removing in mouseDragged			
 			else
 			{	sc.parent.remove(sc);
 			}
 			cc.addCComponent(sc);
+			// set sc back to normal height  
 			if (sc instanceof LoopCommandComponent)
 			{	LoopCommandComponent lcc = (LoopCommandComponent) sc;
 				lcc.loopBlock.setMinimumHeight(ccsh);
@@ -668,84 +630,89 @@ for (int i = 0; i < messages.length; i++)
 			if (sc instanceof KeuzeCommandComponent)
 			{	KeuzeCommandComponent kcc = (KeuzeCommandComponent) sc;
 				kcc.ifBlock.setMinimumHeight(ccsh);
-				// elseBlock heeft meteen de goede minimumHeight
+				// elseBlock directly has correct minimum height
 				kcc.ifBlock.reArrange();
 				if (kcc.elseBlock != null)
 					kcc.elseBlock.reArrange();
 			}
-			
 			cc.removeCaret();
-			
 			paint();
 		} 
-		else // geen nieuwe parent
-		{	
-//System.out.println("cc == null");
-			// schuifveld
+		else // no new parent
+		{	// remove sc from schuifveld (only effective if sc originated from a pile)
 			if (sc.parent == null)
 			{	verwijder(sc);
-//System.out.println("sc.par == null");
 			}
-// dit is niet nodig, parent wordt "genulld" in mouseDragged			
+			// not necessary, parent of sc was put to null after removing from parent sc in mouseDragged			
 			else
 			{	sc.parent.remove(sc);
 			}
 			paint();
 		}
-		
-		
 		paint();
 	}
 	
+	/**
+	 * CommandComponent CC will be dragged; remember position at dragg start,
+	 * set the width to dragg width; put on top for drawing and re-arrange the
+	 * CommandContainer CC used to belong to (CC was already removed from this 
+	 * CommandContainer 
+	 * @param sc CC to be dragged
+	 */
 	public void zetSchuiver(CommandComponent sc)
 	{	int newLx = sc.getAbsoluteLocation().x;
 		int newLy = sc.getAbsoluteLocation().y;
 		sc.setBounds(newLx,newLy,sc.getDragWidth(),sc.getSize().height);
-
-		//setComponentZOrder(sc, 0);
 		putOnTop(sc);
 		if(sc instanceof CommandComponent)
-		{
-			CommandContainer cc = getCommandContainerAt(newLx,newLy);
+		{	CommandContainer cc = getCommandContainerAt(newLx,newLy);
 			if (cc != null) 
 				cc.reArrange();
 		}
-		
 	}
 	
+	/**
+	 * CommandComponent sc is being dragged and currently at position (ex,ey); find out if sc is 
+	 * 1. hoovering over another CC in the program and display this CC's relevant caret 
+	 * (so at mouseReleased sc will be inserted before or after this CC in this CC's CommandContainer) or
+	 * 2. CC is hoovering over a CommandContainer and display this CommandContainer's caret 
+	 * (so at mouseReleased sc will be added (at the bottom of) this CommandContainer);
+	 * remove previous carets 
+	 * if sc hoovers over a CC it automatically hoovers over the CCont containing the CC, however
+	 * 1. if sc hoovers over a CCont it can hoover over a CC underneath the CCont, correct for this
+	 * 2. in case CC is a loop or choice and CCont its command block, sc should be added to the
+	 * command block, correct for this  
+	 * @param sc CC being dragged
+	 * @param ex current x-position of sc
+	 * @param ey current x-position of sc
+	 */
 	void traceComponent(CommandComponent sc, int ex, int ey)
 	{	
 		if ( !sc.isTraceable() ) 
-		{	
-//System.out.println("traceCC not traceble");			
+		{			
 			return;
 		}
-		
-		
+		// find CC or CContainer in programmaPanel, so nothing on the left side nor the dragged CC itself will be found
 		if ( !programmaPanel.contains(ex, ey))
 		{	
-//System.out.println("traceCC outside pp " + ex + " " + ey);			
 			return;
-		
 		}
-		// find component in programmaPanel, so nothing on the left side nor the dragged CC itself will be found
-		
-//System.out.println("traceCC " + ex + " " + ey);
-		
+		// remove previous carets
 		if (traceC != null)
 			traceC.removeCaret();
 		if (traceCC != null)
 			traceCC.removeCaret();
 		paint();
 		
-		//CommandComponent c = findCComponentAt(ex-ppx,ey-ppy);
-		//CommandComponent c 
+		// find CommandComponent traceC (if any)
 		traceC = findCComponentAt(ex, ey, sc);
-		//CommandContainer cc 
+		// find CommandContainer traceCC (if any)
 		traceCC = findCContainerAt(ex,ey);
 		
-		// CHECK, ook deeltaak?
-		if ((traceC != null) && traceC.commandName.equals("Herhaal") && 
+		// here traceC is a loop/choice block and traceCC its command block 
+		if ((traceC != null) && 
+			(traceC.commandName.equals(WebLogoGWT.rb.herhaal1Tekst()) || 
+			 traceC.commandName.equals(WebLogoGWT.rb.zolangTekst())) && 
 			(traceCC!= null) && traceCC.containerName.equals("loop"))
 			traceC = null;
 		if ((traceC != null) && traceC.commandName.equals("Keuze") && 
@@ -755,43 +722,52 @@ for (int i = 0; i < messages.length; i++)
 			(traceCC!= null) && traceCC.containerName.equals("else"))
 			traceC = null;
 				
-if (traceC != null)		
-System.out.println("traceC " + traceC.getCommandName());
-		
-if (traceCC != null)		
-System.out.println("traceCC " + ((CommandContainer) traceCC).containerName);
+//if (traceC != null)		
+//System.out.println("traceC " + traceC.getCommandName());
+//if (traceCC != null)		
+//System.out.println("traceCC " + ((CommandContainer) traceCC).containerName);
+
+ 		int topParentCIndex = -1;
+		if (traceC != null)
+			topParentCIndex = findTopParentIndex(traceC);
+//System.out.println("topPCI " + topParentCIndex);
+
+		int topParentCCIndex = -1;
+		if (traceCC != null)
+		{	topParentCCIndex = findTopParentIndex(traceCC.parent);
+		}	
+//System.out.println("topPCCI " + topParentCCIndex);
+
+		// traceC is under traceCC
+		if (topParentCIndex > topParentCCIndex)
+			traceC = null;
 
 		// if c is a CommandComponent set Caret on that component
 		if (traceC != null && traceC instanceof CommandComponent && traceC != sc)
 		{
-System.out.println("c traced " + traceC.getCommandName() + " " + ey);			
+//System.out.println("c traced " + traceC.getCommandName() + " " + ey);			
 			((CommandComponent) traceC).setCaret(ey);
-//System.out.println("c");			
 		}
-		//CommandContainer cc = findCContainerAt(ex-ppx,ey-ppy);
-		// naar boven
-		//CommandContainer cc = findCContainerAt(ex,ey);
 		// if c is a CommandContainer, then it must be over the empty space, so set caret
 		// to top of the container if it is empty, bottom of last component otherwise
 		else if (traceCC != null && traceCC instanceof CommandContainer) 
 		{	
-System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);			
-			
+//System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);			
 			((CommandContainer) traceCC).setCaret(ey);
-//System.out.println("cc traced");			
 		}
 	}
 	
-	
+
+	/**
+	 * open the PopupPanel for exporting code and fill it with the current code
+	 * see class ExportPopup
+	 * @param contents current code as a String
+	 */
 	void exportFrame(String contents) 
 	{
-		
 		int popupX = xPos + getAbsoluteLeft();
-		
 		int popupY = yPos + getAbsoluteTop();
-		
-		
-		// kijk of er ergens nog een popup open is
+		// check if some other Popup is open
 		if ((paramEditor != null) && paramEditor.isVisible())
 		{
 			paramEditor.owner.parameterEdited(paramEditor.getText());
@@ -804,39 +780,16 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 		exportPopup.export(contents);
 		exportPopup.setPopupPosition(popupX, popupY);
 		exportPopup.show();
-		//paramEditor.textBox.setFocus(true);
-		
 		paint();
 
-//GWT
-/*		
-		final TextArea area = new TextArea(contents, 0, 0, TextArea.SCROLLBARS_NONE);
-		Frame f = new Frame("Code van het algoritme");
-		f.setLayout(new BorderLayout());
-		f.add(area,BorderLayout.CENTER);
-		f.addWindowListener(new WindowAdapter() {
-			public void windowOpened(WindowEvent e) {
-				area.requestFocus();
-				area.setCaretPosition(0);
-			}
-			public void windowActivated(WindowEvent e) {
-				area.selectAll();
-			}
-			public void windowClosing(WindowEvent e) {
-					e.getWindow().dispose();
-			} });
-		f.pack();
-		f.setVisible(true);
-		f.toFront();
-*/
-//einde GWT		
 	}
-	
+
+	/**
+	 * reset: remobe all statements from main program and subroutines
+	 */
 	private void clearProgram()
 	{
 		programmaComponent.clearProgram();
-		
-		
 		for ( int i=0; i<aantalDeeltaken; i++ )
 		{
 			deeltaakComponenten[i].clearProgram();
@@ -844,43 +797,48 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 		}
 	}
 	
-	
+	/**
+	 * getter for body of subroutine i 
+	 * @param i index of subroutine 
+	 * @return body of subroutine i CC
+	 */
 	DeeltaakBodyComponent getDeeltaakBody(int i)
 	{
 		return deeltaakComponenten[i];
 	}
-	
+	/**
+	 * getter for the main program
+	 * @return main program CC
+	 */
 	ProgrammaComponent getProgramma()
 	{
 		return programmaComponent;
 	}
 	
-
+	/**
+	 * turn the code in String s into an active program
+	 * se class ProgrammaImporter
+	 * @param s code String
+	 */
 	
 	void importeer(String s)
 	{
-		
-//System.out.println("importeer");
-
-//System.out.println("code = " + s);
 		clearProgram();
 		paint();
 		ProgrammaImporter pi = new ProgrammaImporter(this);
 		pi.importProgramma(s);
-		
 		paint();
 	}
 
-
+	/**
+	 * open the PopupPanel for importing code
+	 * see class ImportPopup
+	 */
 	void importFrame() 
 	{
-		
 		int popupX = xPos + getAbsoluteLeft();
-		
 		int popupY = yPos + getAbsoluteTop();
-		
-		
-		// kijk of er ergens nog een popup open is
+		// check if some other PopupPanel is open
 		if ((paramEditor != null) && paramEditor.isVisible())
 		{
 			paramEditor.owner.parameterEdited(paramEditor.getText());
@@ -892,62 +850,43 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 		importPopup = new ImportPopup(300, 560, this);
 		importPopup.setPopupPosition(popupX, popupY);
 		importPopup.show();
-		//paramEditor.textBox.setFocus(true);
-		
 		paint();
-
-/*	
-		try
-		{
-			ImporterFrame imf = new ImporterFrame("Importeer code", this);
-			imf.pack();
-			imf.setVisible(true);
-			imf.toFront();
-		} 
-		catch ( Exception e )
-		{ 
-			System.out.println("Mis!  "+e.getMessage());
-		}
-*/		
 	}
 
+	/**
+	 * get a String containing all code in ProgrammaComponent followed
+	 * by all code in the deelTaakBodyComponents; used for code export; <br>
+	 * note the specific format used
+	 * @return code String
+	 */
 	public String getCode()
 	{	String s0 = programmaComponent.getCode("");
 		for(int i=0 ; i<aantalDeeltaken ; i++)
-		{
-			
-			s0 = s0 + deeltaakComponenten[i].getCode("");
+		{	s0 = s0 + deeltaakComponenten[i].getCode("");
 		}
 		return s0+"\n";
 	}
 	
-/*	
-	public void setVartracing(boolean vt)
-	{
-		if ( vt )
-		{
-//GWT			
-			//add(vartracer, 0);
-			isVartracing = true;
-		} 
-		else
-		{
-			isVartracing = false;
-//GWT			
-			//this.remove(vartracer);
-			//vartracer.setContent("");
-		}
-		paint();
-	}
-*/	
+	/**
+	 * getter for gesloten
+	 * @return vlaue of gesloten
+	 */
 	public boolean isGesloten()
 	{	return gesloten;
 	}
-	
+
+	/**
+	 * setter for gesloten
+	 * @param b value of gesloten
+	 */
 	public void zetGesloten(boolean b)
 	{	gesloten = b;
 	}
 	
+	/**
+	 * set the visiblity of the subroutines (call and bodies)
+	 * @param b true/false
+	 */
 	public void zetDeeltaken(boolean b)
 	{	
 		for (int i = 0; i <aantalDeeltaken; i++)
@@ -955,28 +894,40 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 			((DeeltaakCallCComponent)deeltaakCC[i]).getBody().setVisible(b);
 		}
 	}
-	
+
+	/**
+	 * set the visiblity of the while command
+	 * @param b true/false
+	 */
 	public void zetWhileLoopZichtbaar(boolean b)
 	{	
 		whileCC.setVisible(b);
 		herschikStapel();
 	}
-	
+
+	/**
+	 * set the visiblity of the keuze command
+	 * @param b true/false
+	 */
 	public void zetKeuzeCommandZichtbaar(boolean b)
-	{
-		keuzeCC.setVisible(b);
+	{	keuzeCC.setVisible(b);
 		herschikStapel();
 	}
 	
+	/**
+	 * set the visibilty of the print commands
+	 * @param b true/false
+	 */
 	public void zetPrintCommandsZichtbaar(boolean b)
 	{	printCC.setVisible(b);
 		printlCC.setVisible(b);
-		
-//System.out.println("printCC " + printCC.isVisible());
-//System.out.println("printlCC " + printlCC.isVisible());
 		herschikStapel();
 	}
-	
+
+	/**
+	 * set the visiblity of the drawing commands
+	 * @param b true/false
+	 */
 	public void zetTekenCommandsZichtbaar(boolean b)
 	{	vooruitCC.setVisible(b);
 		stapCC.setVisible(b);
@@ -991,35 +942,35 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 	}
 	
 	/**
-	 * Reapint this component and update the component holding the trace of the variables.
-	 * This method will be called from the execute-methods in the CC's, when trace is on.
-	 * 
-	 * @param varset	the current set of variables in tracing mode
+	 * given a CC, it must be part of some tree (or form a tree by itself)
+	 * whose root is a CC contained in the Vector css of JavaSchuifVeld;
+	 * find this root CC
+	 * @param c CC whos root must be found
+	 * @return root CC of c
 	 */
-/*	
-	void updateView(VarSet varset)
-	{
-		if ( isVartracing )
-		{
-			vartracer.setContent(varset.toString());
+	public int findTopParentIndex(CommandComponent c)
+	{	CommandComponent topParent = c;
+		while (topParent.parent != null)
+		{	CommandContainer cParent = topParent.parent;
+			topParent = cParent.parent;
 		}
-		paint();
+		return ccs.indexOf(topParent);
 	}
-*/	
-//GWT niet nodig?	
-/*	
-	public void setSize(int b, int h)
-	{	
-		if ((getSize().width == b) && (getSize().height == h))
-			return;
-		programmaPanel.setSize(b-ppx, h);
-		programmaComponent.setSize(programmaComponent.getWidth(), h-20);
-		super.setSize(b, h);
-	
-	}
-*/	
 	
 	
+
+	/**
+	 * check if JavaLogoSchuifveld contains a CC that contains the coordinates (x,y); 
+	 * note that if a CC contains (x,y) it can be a composite containing
+	 * other CC's containing (x,y), so find the "deepest" CC in the tree below a CC satisfying the 
+	 * criteria; <br>
+	 * important: the CC's in JavaLogoSchuifVeld áre painted starting at the CC with the highest index
+	 * in the Vector css; since things can overlap, we start searching at index 0 and quit whenever we find a CC
+	 * satisfying the criteria, so we always find the top CC;  
+	 * @param x x-coordinate for search
+	 * @param y y-coordinate for search
+	 * @return CC sough or null
+	 */
 	public CommandComponent findCComponentAt(int x, int y)
 	{
 		CommandComponent result = null;
@@ -1039,9 +990,21 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 				break;
 		}
 		return result;
-		
 	}	
 
+	/**
+	 * check if JavaLogoSchuifveld contains a CC that is NOT equal to CC sc and that contains 
+	 * the coordinates (x,y); note that if a CC contains (x,y) it can be a composite containing
+	 * other CC's containing (x,y), so find the "deepest" CC in the tree below a CC satisfying the 
+	 * criteria; <br>
+	 * important: the CC's in JavaLogoSchuifVeld áre painted starting at the CC with the highest index
+	 * in the Vector css; since things can overlap, we start searching at index 0 and quit whenever we find a CC
+	 * satisfying the criteria, so we always find the top CC;  
+	 * @param x x-coordinate for search
+	 * @param y y-coordinate for search
+	 * @param sc CC to be excluded
+	 * @return CC sough or null
+	 */
 	public CommandComponent findCComponentAt(int x, int y, CommandComponent sc)
 	{
 		CommandComponent result = null;
@@ -1065,9 +1028,22 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 				break;
 		}
 		return result;
-		
 	}	
 	
+	/**
+	 * check if JavaLogoSchuifVeld contains a CC containing a CContainer that contains 
+	 * the coordinates (x,y); note that such CC must be a ProgrammaComponent (or its subclass
+	 * DeelTaakBodyComponent; 
+	 * KeuzeCC and that the latter can contain two CContainers
+	 * note that if a CC contains (x,y) it can be a composite containing
+	 * another CContainer containing (x,y), so find the "deepest" CContainer in the tree
+	 * important: the CC's in JavaLogoSchuifVeld áre painted starting at the CC with the highest index
+	 * in the Vector css; since things can overlap, we start searching at index 0 and quit whenever we find a CC
+	 * satisfying the criteria, so we always find the top CC;  
+	 * @param x x-coordinate for search
+	 * @param y y-coordinate for search
+	 * @return CContainer sought or null
+	 */
 	public CommandContainer findCContainerAt(int x, int y)
 	{
 		CommandContainer result = null;
@@ -1075,16 +1051,7 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 		{
 			Object o = ccs.elementAt(cCnt);
 			CommandContainer tResult = null;
-// dit kan niet 			
-/*			
-			if ((o instanceof LoopCommandComponent) && ((CommandComponent) o).contains(x, y))
-			{	LoopCommandComponent lcc = (LoopCommandComponent) o;
-				tResult = lcc.loopBlock.findCContainerAt(x,y);
-				if (tResult != null)
-					result = tResult;
-			}
-*/			
-			// dit doet ook de deeltaakBodyComponenten
+			// also takes care of deeltaakBodyComponents
 			if ((o instanceof ProgrammaComponent) && ((CommandComponent) o).contains(x, y))
 			{	ProgrammaComponent pc = (ProgrammaComponent) o;
 				if (pc.commandBlock.contains(x, y))
@@ -1095,264 +1062,150 @@ System.out.println("cc traced " + ((CommandContainer) traceCC).containerName);
 					}
 				}	
 			} 
-			// stop bij de bovenste CCContainer
+			// quit at top CC if this complies
 			if (result != null)
-			{	
-System.out.println("findCContAt "+result.containerName);				
-				
-				break;
+			{	break;
 			}
-	
-			
 		}
 		return result;
-		
 	}
 
 
-	/* PBgv: Fix voor het probleem van het verlies van de MouseListeners in Java8.
-	 * Outline:
-	 * Listeners move to main Panel (this). At mousePressed the CC that's being clicked is locate, 
-	 * and remembered. The event is passed on, just as the ensueing drag and release events. 
-	 * Outline phase 2:
-	 * For scrolling, we want the ProgrammaComponents to implement MouseWheelListener.
-	 * Unfortunately, when you implement this interface, ALL mouseEvents will be passed to the
-	 * ProgrammaComponent. So PC needs to implement MouseListener and MouseMotionListener. 
-	 * But then, these events have wrong x,y: local to the ProgrammaComponent.
-	 * This is solved by having methods like mousePressed(x, y, modifiers) which do the real work.
-	 * The methods from the interfaces will compute the right (x,y) from the event and the CC's
-	 * absolute position and call the 'work-methods'. Pfff, Bloody hell...
-	 * Note: modifiers are as yet unused. Maybe in the future: shift-click to select & drag >1 CC!
+	/**
+	 * the CommandComponent containing the x- and y-coordinates of a MouseDown/TouchStart Event  
 	 */
-	
 	private CommandComponent mouseTargetComponent = null;
-	
+	/**
+	 * find the CommandComponent containing the x- and y-coordinates of a MouseDown/TouchStart Event (if any)
+	 * and pass on the event coordinates
+	 * @param x x-coordinate of a MouseDown/TouchStart Event
+	 * @param y y-coordinate of a MouseDown/TouchStart Event
+	 * @param modifiers not used, maybe in the future
+	 */
 	public void mousePressed(int x, int y, int modifiers) 
 	{
 		CommandComponent c = this.findCComponentAt(x, y);
-		//if ( c instanceof CommandComponent )
-		//{
-		
-			if (c != null)
-			{	
-//System.out.println("jlsv mousePressed " + c.commandName);				
-				mouseTargetComponent = c;
-				mouseTargetComponent.mousePressed(x, y, modifiers);
-			}	
-		//}
-		
-		
-		//else 
-		//{
-//GWT			
-			//requestFocus();		// end possible editing of parameters, see ParameterTextField for details	
-			//if ( c instanceof CommandContainer)
-			//{	
-				//Component c2 = c.getParent();
-				//if ( c2 instanceof CompositeCommandComponent )
-				//{
-				//	mouseTargetComponent = (CommandComponent)c2;
-				//	mouseTargetComponent.mousePressed(x, y, modifiers);
-				//}
-			//}
-		//}
+		if (c != null)
+		{	mouseTargetComponent = c;
+			mouseTargetComponent.mousePressed(x, y, modifiers);
+		}	
 	}
-	
+	/**
+	 * pass on the x- and y-coordinates of a MouseUp/TouchEnd Event (if possible)
+	 * @param x-coordinate of a MouseUp/TouchEnd Event
+	 * @param y-coordinate of a MouseUp/TouchEnd Event
+	 * @param modifiers modifiers not used, maybe in the future
+	 */
 	public void mouseReleased(int x, int y, int modifiers) 
-	{
-		if ( mouseTargetComponent != null )
-		{
-			mouseTargetComponent.mouseReleased(x, y, modifiers);
+	{	if ( mouseTargetComponent != null )
+		{	mouseTargetComponent.mouseReleased(x, y, modifiers);
 			mouseTargetComponent = null;
 		}
 	}
-	
+	/**
+	 * pass on the x- and y-coordinates of a MouseMove/TouchMove Event (if possible)
+	 * @param x-coordinate of a MouseMove/TouchMove Event
+	 * @param y-coordinate of a MouseMove/TouchMove Event
+	 * @param modifiers modifiers not used, maybe in the future
+	 */
 	public void mouseDragged(int x, int y, int modifiers) 
-	{
-		if ( mouseTargetComponent != null )
-		{
-			mouseTargetComponent.mouseDragged(x, y, modifiers);
+	{	if ( mouseTargetComponent != null )
+		{	mouseTargetComponent.mouseDragged(x, y, modifiers);
 		}
 	}
 	
-	/*
-	 * The methods form the mouse(Motion)Listener interfaces
+	/**
+	 * remembering mouseDown
 	 */
-	
 	boolean mouseDown = false;
+	/**
+	 * remember x- and y-coordinates of the last TouchMove Event, since the the coordinates of the
+	 * TouchEnd Event e are not stored in e.touches  
+	 */
 	int lastMoveX, lastMoveY;
-	
+	/**
+	 * inner class for handling mouse Events
+	 * @author huub
+	 */
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
-		
-		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
-			
-//System.out.println("mouseDown");
-
 			e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
-			
 			mouseDown = true;
-			
 			int eventX = e.getX();
 			int eventY = e.getY();
-			
-			//mouseDownTouchStartAction(eventX, eventY);
 			mousePressed(eventX, eventY,0);
-			
 		}
-		
-		//public void mouseDragged(MouseEvent e)
+
 		public void onMouseMove(MouseMoveEvent e)	
 		{
 			e.preventDefault();
-			
 			// prevent scrolling
 			e.stopPropagation();
-			
-//System.out.println("mouseMov");			
-			
 			if (!mouseDown)
 				return;
-
 			int eventX = e.getX();
 			int eventY = e.getY();
-			
-			//mouseMoveTouchMoveAction(eventX, eventY);
 			mouseDragged(eventX, eventY,0);
-			
-			
-			
 		} // onMouseMove
 		
-		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
 			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
-
-//System.out.println("mouseUp");
-
 			mouseDown = false;
-
 			int eventX = e.getX();
 			int eventY = e.getY();
-
-			//mouseUpTouchEndAction(lastMoveX, lastMoveY);
 			mouseReleased(eventX, eventY,0);
-
 		}
+	} 
 
-	} //MLMML
-
-
-	// tablet, dwo 
+	/**
+	 * inner class for handling touch Events 
+	 * @author huub
+	 */
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
-		
 		public void onTouchStart(TouchStartEvent e)
 		{
 			e.preventDefault();
 			e.stopPropagation();
-			
 			if (e.getTouches().length() > 0)
 			{
 				Touch touch = e.getTouches().get(0);
-				
 				int eventX = touch.getPageX() - jlsvCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - jlsvCanvas.getAbsoluteTop();				
-				
 				lastMoveX = eventX;
 				lastMoveY = eventY;
-
-				//mouseDownTouchStartAction(eventX, eventY);
 				mousePressed(eventX, eventY,0);
-				
 		    }
 			e.preventDefault();
 			e.stopPropagation();
 		}
 		public void onTouchMove(TouchMoveEvent e)
 		{
-			
 			e.preventDefault();
 			e.stopPropagation();
-			
 			if (e.getTouches().length() > 0)
 			{
 				Touch touch = e.getTouches().get(0);
-				
 			    int eventX = touch.getPageX() - jlsvCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - jlsvCanvas.getAbsoluteTop();				
-			    
 				lastMoveX = eventX;
 				lastMoveY = eventY;
-				
-				//mouseMoveTouchMoveAction(eventX, eventY);
 				mouseDragged(eventX, eventY,0);
-				
 		    }
 			e.preventDefault();
 			e.stopPropagation();
-			
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
-//GWT check het TouchEndEvent
-			
-			//mouseUpTouchEndAction(lastMoveX, lastMoveY);
 			mouseReleased(lastMoveX, lastMoveY, 0);
 		}
-
 	}
 	
-/*	
-	@Override
-	public void mousePressed(MouseEvent e) 
-	{
-		mousePressed(e.getX(), e.getY(), e.getModifiersEx());
-	}
-*/
-/*	
-	@Override
-	public void mouseReleased(MouseEvent e) 
-	{
-		mouseReleased(e.getX(), e.getY(), e.getModifiersEx());
-	}
-*/
-/*	
-	@Override
-	public void mouseDragged(MouseEvent e) 
-	{
-		mouseDragged(e.getX(), e.getY(), e.getModifiersEx());
-	}
-*/	
-//	@Override
-//	public void mouseMoved(MouseEvent e) 
-//	{
-		// unused		
-//	}
-	
-//	@Override
-//	public void mouseClicked(MouseEvent e) 
-//	{
-		// unused		
-//	}
-	
-//	@Override
-//	public void mouseEntered(MouseEvent e) 
-//	{
-		// unused
-//	}
-	
-//	@Override
-//	public void mouseExited(MouseEvent e) 
-//	{
-		// unused
-//	}
-
 }

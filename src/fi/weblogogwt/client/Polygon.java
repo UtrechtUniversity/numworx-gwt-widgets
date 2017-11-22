@@ -3,6 +3,10 @@ package fi.weblogogwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * There is no class Polygon in GWT 
+ */
+
 public class Polygon
 {
 	int aantalPunten;

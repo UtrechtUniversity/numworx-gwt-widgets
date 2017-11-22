@@ -1,8 +1,5 @@
 package fi.weblogogwt.client;
 
-//import java.awt.Component;
-
-//import java.awt.Component;
 
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
 import fi.weblogogwt.client.CommandComponent;
@@ -10,33 +7,38 @@ import fi.weblogogwt.client.VarSet;
 import fi.weblogogwt.client.parameters.NumericParameter;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
+/**
+ * class implementing the for loop command;  
+ */
 public class ForLoopCommandComponent extends LoopCommandComponent
 {
-
+	/**
+	 * constructor
+	 * @param x x-position
+	 * @param y y-position
+	 * @param b width
+	 * @param h height
+	 * @param sv instance of JavaLogoSchuifVeld for drawing
+	 */
 	public ForLoopCommandComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{
 		super(x, y, b, h, sv);
-		
 		loopCondition = new NumericParameter();
-		commandName = WebLogoGWT.rb.herhaal1Tekst(); //"Herhaal";
-		commandNameTranslated = "Repeat"; //JavaLogoWeb.rb.getString(commandName);
-		naString = " " + WebLogoGWT.rb.keerTekst(); //" keer";
-		naStringTranslated = " times"; //JavaLogoWeb.rb.getString(naString);
-		createLoopEditor();
+		commandName = WebLogoGWT.rb.herhaal1Tekst(); 
+		commandNameTranslated = "Repeat"; 
+		naString = " " + WebLogoGWT.rb.keerTekst(); 
+		naStringTranslated = " times"; 
 	}
 
-	@Override
+	/**
+	 * check correctness of loop condition, inform traceBeheerder that a loop has started 
+	 * and execute the code in loopBlock multiple times as specified in loop condition 
+	 */
 	public boolean executeContent(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
 	{	
-		
-//System.out.println("flCC executeContent");
-
 		if ( !loopCondition.isCorrect(varSet) ) 
-		{	
-System.out.println("for incorrect");			
-			return false;
+		{	return false;
 		}
-		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
 		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
@@ -44,7 +46,7 @@ System.out.println("for incorrect");
 			trb.setCommandInfo(getCommandName()+" "+loopCondition.getValueText()+" "+naString, varSet);
 			return traceKleur;
 		}
-		for(int i=0 ; i<(int) ((NumericParameter)loopCondition).getValue() ; i++)
+		for (int i = 0 ; i < (int) ((NumericParameter)loopCondition).getValue() ; i++)
 		{	
 			for(int j=0 ; j<loopBlock.getComponentCount() ; j++)
 			{	
@@ -57,6 +59,4 @@ System.out.println("for incorrect");
 		}
 		return false;
 	}
-	
-
 }

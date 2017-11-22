@@ -1,5 +1,9 @@
 package fi.weblogogwt.client;
 
+/**
+ * GWT has no class Dimension 
+ * @author huub
+ */
 public class Dimension 
 {
 	int width, height;

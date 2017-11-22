@@ -6,7 +6,6 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 
-
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -26,7 +25,6 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
-//import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,11 +38,26 @@ import java.util.logging.Logger;
 
 import fi.weblogogwt.client.text.Text;
 
+/**
+ * start-up class for WebLogoGWT; the widget contains a program part
+ * (see class JavaLogoSchuifVeld), a drawing part (see class
+ * Uitvoerblad/Tekenblad) and a bottomPanel (see method makeBottom(); 
+ * when used in the DWOPlayer these parts can be added/omitted through  
+ * using JavaLogoWebPaul in the DWO; in this case, CBook-communication
+ * is also possible (e.g. using a large drawing area communicating with 
+ * a separate program part under a button); <br>
+ * in the stand-alone version all available space in the browser is used
+ * (first choose the browser size, then close the browser, then open
+ * the widget in the browser; if the widget is opened, it cannot adapt 
+ * its size). 
+ */
+
 public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListener 
 {
-	
+	/**
+	 * internationalisation
+	 */
 	public static Text rb;
-	// logger
     static Logger logger = Logger.getLogger("WebLogoGWT");
 
     static final String holderId = "dockholder";
@@ -54,91 +67,207 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	WebLogoGWTClientBundle webLogoGWTClientBundle;
 	static WebLogoGWTCssResource webLogoGWTCssResource;
 
-	// UI
+	/**
+	 * DockLayoutPanel added to the Root
+	 */
 	DockLayoutPanel dlp;
-	//AbsolutePanel dlp;
+	/** 
+	 * Panel at the bottom of dlp (if programmaVeldZichtbaar)
+	 */
 	LayoutPanel bottomPanel;
+	/**
+	 * Panel in the centre of  dlp
+	 */
 	LayoutPanel webLogoPanel;
+	/**
+	 * Panel for program part
+	 */
 	JavaLogoSchuifVeld jlsVeld;
-	public TraceBeheerder trb;
+	/**
+	 * Panel for drawing part
+	 */
 	public Uitvoerblad uitvoerblad;
 	
+	/**
+	 * class implementing program tracing  
+	 */
+	public TraceBeheerder trb;
+	
+	/**
+	 * predefined button sizes
+	 */
 	int buttonWidth = 45;
 	int buttonHeight = 22;
 
+	/**
+	 * width program part without subroutines
+	 */
 	static int jlsBreedteKlein = 390;
+	/**
+	 * width program part with subroutines
+	 */
 	static int jlsBreedteGroot = 620;
 	
+	/**
+	 * offsets
+	 */
 	int offSet = 4;
 	int leftOffset = 5;
 	int topOffset = 5;
 
+	/**
+	 * flagg for stand-alone version
+	 */
 	boolean paul = false;
-	int breedteGroot = 784; //784 is maximale breedte in popupFacade;
+	/**
+	 * width with subroutines and with drawing part, 784 is max width in popupFacade;
+	 */
+	int breedteGroot = 784; 
+	/**
+	 * width without subroutines and with drawing part 
+	 */
 	int breedteKlein = 700;
-	int breedtePaul = 950; //maximale breedte stand-alone 
+	/**
+	 * final width
+	 */
 	int breedte = 784;
+	/**
+	 * final height
+	 */
 	int hoogte = 575;
-	int hoogtePaul = 575;
+	/**
+	 * height of bottom panel (if programmaVeldZichtbaar)
+	 */
 	int bottomHeight = 32;
+	/**
+	 * height program part
+	 */
 	int jlsHoogte = hoogte - bottomHeight - offSet;
-	int ubxKlein = jlsBreedteKlein + 2 * offSet; //programmaVeldZichtbaar ? scheidingX+5 : 5;
+	/**
+	 * x-position drawing part, no subroutines in program part
+	 */
+	int ubxKlein = jlsBreedteKlein + 2 * offSet; 
+	/**
+	 * x-position drawing part, subroutines in program part
+	 */
 	int ubxGroot = jlsBreedteGroot + 2 * offSet;
+	/**
+	 * y-position drawing part
+	 */
 	int uby = offSet;
-	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; //getWidth()-(programmaVeldZichtbaar ? scheidingX+10 : 10);
+	/**
+	 * width drawing part, no subroutines in program part
+	 */
+	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; 
+	/**
+	 * width drawing part, depending on subroutines in program part
+	 */
 	int ubbGroot = breedteGroot - jlsBreedteGroot - 3 * offSet;
-	int ubbPaul = breedtePaul - jlsBreedteGroot - 3 * offSet;
 	int ubb = 0;
-	int ubh = jlsHoogte; //programmaVeldZichtbaar ? getHeight()-77 : getHeight()-10;
-	
+	/**
+	 * height drawing part
+	 */
+	int ubh = jlsHoogte; 
+	/**
+	 * fonts
+	 */
 	public static String fontString = "12px sans-serif";
 	public static String boldFontString = "bold 12px sans-serif";
 	
-//	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
-	
+	/**
+	 * launchdata
+	 */
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
+	/**
+	 * initial code (if any) in launchdata
+	 */
+	HashMap<String, Object> state = null;
 	
-	// parametrisatie
+	/**
+	 * parametrisation: drawing part available
+	 */
 	boolean uitvoerVeldZichtbaar = true;
+	/**
+	 * parametrisation: program part available
+	 */
 	boolean programmaVeldZichtbaar = true;
+	/**
+	 * parametrisation: subroutines available
+	 */
 	boolean deeltakenZichtbaar = true;
+	/**
+	 * parametrisation: while command available
+	 */
 	boolean whileLoopZichtbaar = true;
+	/**
+	 * parametrisation: if - else command available  
+	 */
 	boolean keuzeCommandZichtbaar = true;
+	/**
+	 * parametrisation: print commands available
+	 */
 	boolean printCommandsZichtbaar = true;
+	/**
+	 * parametrisation: drawing commands available
+	 */
 	boolean tekenCommandsZichtbaar = true;
+	/**
+	 * parametrisation: tracing available
+	 */
 	boolean traceZichtbaar = true;
+	/**
+	 * parametrisation: import/export code available
+	 */
 	boolean codeIOZichtbaar = true;
 	
-	HashMap state = null;
-
+	/**
+	 * flagg for tracing
+	 */
 	boolean traceAan = false;
 	
-	boolean correct = false;
 	private int mode;
 	private OpdrNavIF comRoot;
-	
-	
+
+	/**
+	 * PushButtons for importing code, exporting code, running code
+	 */
 	PushButton importButton, exportButton, runButton;
+	/**
+	 * PushButtons for tracing
+	 */
 	PushButton traceAanKnop, traceUitKnop, beginKnop, stapKnop, terugKnop, skipKnop;
+	/**
+	 * CheckBox for showing a variable window
+	 */
 	CheckBox showVariables;
+	/**
+	 * label for showing current code line when tracing
+	 */
 	public Label methodeLabel;
 	
+	/**
+	 * Panel showing the variables during tracing
+	 */
 	public VardisplayPanel vartracer = null;
 	
+	/**
+	 * sizes of VardisplayPanel
+	 */
 	public int vartracerWidth, vartracerHeight;
 	
 	public void getImages() 
 	{
 		rb = GWT.create(Text.class);
-		
 		webLogoGWTClientBundle = GWT.create(WebLogoGWTClientBundle.class);
 		webLogoGWTCssResource = webLogoGWTClientBundle.getWebLogoGWTCssResource();
 		webLogoGWTCssResource.ensureInjected();
-		
-
-	}	
+	}
+	
+	/**
+	 * note the separate setSize statement for the stand-alone version
+	 */
 	public void onModuleLoad() 
 	{
 		
@@ -149,17 +278,17 @@ logger.info("WebLogoGWT onModuleLoad");
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(webLogoGWTCssResource.dock());
 		
-		// popUpFacade of StubView
+		// StubView
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		
-		// standalone versie Paul
+		// standalone version Paul
 		//dlp.setSize("" + breedte + "px", "" + Window.getClientHeight() + "px");
 
 		RootPanel.get(holderId).add(dlp);
 		RootPanel.get(holderId).addStyleName(webLogoGWTCssResource.root());
 		
 		Stub.publish(this);
-		// popUpfacade o standalone versie Paul
+		// standalone version Paul
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}
@@ -196,19 +325,22 @@ logger.info("WebLogoGWT constructor");
 
 	}
 
-
-
+	/**
+	 *  init
+	 */
 	public void init(int width, int height, Map<String,Object> map, Map<String,Number> values) 
 	{
 		
 logger.info("WebLogoGWT uncompiled init");
 
-			//this.breedte = width;
-			this.hoogte = height;
+			// StubView shows a vertical scoll bar?
+			this.hoogte = height + 35;
+			// take user width instead of fixed width
+			this.breedte = width;
 			
-			//this.launchState = launchState;
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
-			
+
+			// parametrisation (DWOPlayer version) 
 			if (launchState != null && launchState.containsKey("uitvoerVeldZichtbaar")) 
 				uitvoerVeldZichtbaar = launchState.getBoolean("uitvoerVeldZichtbaar");
 			if (launchState != null && launchState.containsKey("programmaVeldZichtbaar")) 
@@ -227,65 +359,66 @@ logger.info("WebLogoGWT uncompiled init");
 				traceZichtbaar = launchState.getBoolean("traceZichtbaar");
 			if (launchState != null && launchState.containsKey("codeIOZichtbaar")) 
 				codeIOZichtbaar = launchState.getBoolean("codeIOZichtbaar");			
-			
+			// a non-null launchstate from the DWO always contains state
+			// in the stand-alone version the launchstate is empty (but non-null) 
 			if (launchState != null && launchState.containsKey("state")) 
 				state = (HashMap) launchState.getMap("state");
 			
+			// DWOPlayer: program and drawing part
+			// override width and height from DWO
 			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar)
-			{
+			{	// with subroutines
 				if (deeltakenZichtbaar)
-				{
-					this.breedte = breedteGroot;
+				{	//this.breedte = breedteGroot;
 					ubb = ubbGroot;
-//logger.info("bg = " + breedte);
-//logger.info("ubb = " + ubb);
 				}
-				else
-				{
-					this.breedte = breedteKlein;
+				else // without subroutines
+				{	//this.breedte = breedteKlein;
 					ubb = ubbKlein;
 				}
 				jlsHoogte = hoogte - bottomHeight - offSet;
 				ubh = jlsHoogte;
 			}
+			// program part only
+			// override width and height from DWO
 			else if (!uitvoerVeldZichtbaar && programmaVeldZichtbaar)
-			{
+			{	// with subroutines
 				if (deeltakenZichtbaar)
-				{
-					this.breedte = jlsBreedteGroot + 2 * offSet;
+				{	//this.breedte = jlsBreedteGroot + 2 * offSet;
 				}
-				else
-				{
-					this.breedte = jlsBreedteKlein + 2 * offSet;
+				else // without subroutines
+				{	//this.breedte = jlsBreedteKlein + 2 * offSet;
 				}
 				jlsHoogte = hoogte - bottomHeight - offSet;
 				ubh = jlsHoogte;
 			}
+			// drawing part only
+			// use width and height from DWO
 			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
-			{
-				this.breedte = width;
+			{	this.breedte = width;
 				this.hoogte = height;
 				ubb = this.breedte;
 				ubh = this.hoogte;
-				
 			}
 			
-			// stand-alone
+			// override previous settings in case of stand-alone version: 
+			// this has empty launchstate (thus non-null) without state 
 			if (launchState != null && !launchState.containsKey("state"))
 			{
-System.out.println("paul");				
 				paul = true;
-				breedte = Window.getClientWidth(); //breedtePaul;
+				// use full browser width, fix the program width at jlsBreedteGroot (thus including subroutines)
+				// and use the remaining widt for the drawing area
+				breedte = Window.getClientWidth(); 
 				ubb = breedte - jlsBreedteGroot - 3 * offSet; //ubbPaul;
 				hoogte = Window.getClientHeight(); //hoogtePaul;
 				jlsHoogte = hoogte - bottomHeight - offSet;
-System.out.println("jlsh " + jlsHoogte);				
 				ubh = jlsHoogte;
+				// use full browser width
 				dlp.setWidth("100%");
+				// it seems (?) only one 100% statement can be used, so set dlp-height 
+				// to maximum in onModuleLoad()
 				//dlp.setSize("100%","100%");
 				//dlp.setHeight("100%");
-System.out.println("wcW " + Window.getClientWidth());
-System.out.println("wcH " + Window.getClientHeight());
 			}
 			else
 				dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
@@ -294,44 +427,39 @@ System.out.println("wcH " + Window.getClientHeight());
 			webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
 			webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
 			
-System.out.println("this b " + this.breedte);			
-System.out.println("this h " + this.hoogte);
+//System.out.println("this b " + this.breedte);			
+//System.out.println("this h " + this.hoogte);
 
 			uitvoerblad = new Tekenblad(this,ubb,ubh);
 			Canvas tekenbladCanvas = uitvoerblad.getCanvas();
 			if (tekenbladCanvas == null) 
-			{
-		      RootPanel.get().add(new Label(upgradeMessage));
-		      return;
+			{   RootPanel.get().add(new Label(upgradeMessage));
+		      	return;
 		    }
 			
 			uitvoerblad.initContext2d();
-			
 			webLogoPanel.add(uitvoerblad);
 
+			// position drawing part on webLogoPanel
 			if (!uitvoerVeldZichtbaar)
 				webLogoPanel.setWidgetVisible(uitvoerblad,false);
 			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && deeltakenZichtbaar)
-			{	
-				webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxGroot, Style.Unit.PX, ubb, Style.Unit.PX);
+			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxGroot, Style.Unit.PX, ubb, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
 			}
 			else if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && !deeltakenZichtbaar)
-			{
-				webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxKlein, Style.Unit.PX, ubb, Style.Unit.PX);
+			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxKlein, Style.Unit.PX, ubb, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
 			}
 			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
-			{
-				webLogoPanel.setWidgetLeftWidth(uitvoerblad, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(uitvoerblad, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 			}
 			
-			
 			if (deeltakenZichtbaar)
-				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteGroot,jlsHoogte,uitvoerblad);
+				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteGroot,jlsHoogte);
 			else
-				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteKlein,jlsHoogte,uitvoerblad);
+				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteKlein,jlsHoogte);
 			
 			Canvas jlsvCanvas = jlsVeld.getCanvas();
 			if (jlsvCanvas == null) 
@@ -343,9 +471,9 @@ System.out.println("this h " + this.hoogte);
 			jlsVeld.initContext2d();
 			jlsVeld.initialize();
 
+			// position program part on webLogoPanel
 			if (programmaVeldZichtbaar)
-			{	
-				webLogoPanel.add(jlsVeld);
+			{	webLogoPanel.add(jlsVeld);
 				if (deeltakenZichtbaar)
 				{	webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteGroot, Style.Unit.PX);
 					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
@@ -356,6 +484,7 @@ System.out.println("this h " + this.hoogte);
 					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
 				}
 			}
+			// set parametrization
 			jlsVeld.zetDeeltaken(deeltakenZichtbaar);
 			jlsVeld.zetWhileLoopZichtbaar(whileLoopZichtbaar);
 			jlsVeld.zetKeuzeCommandZichtbaar(keuzeCommandZichtbaar);
@@ -370,9 +499,9 @@ System.out.println("this h " + this.hoogte);
 			
 			makeBottom();
 			
+			// bottom Panel only if program part is available
 			if (programmaVeldZichtbaar)
-			{	
-				webLogoPanel.add(bottomPanel);
+			{	webLogoPanel.add(bottomPanel);
 				webLogoPanel.setWidgetLeftWidth(bottomPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 				webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte-bottomHeight, Style.Unit.PX, bottomHeight, Style.Unit.PX);
 			}
@@ -387,7 +516,6 @@ System.out.println("this h " + this.hoogte);
 logger.info("state != null");			
 			}
 			
-			
 			dlp.forceLayout();
 			webLogoPanel.forceLayout();
 			bottomPanel.forceLayout();
@@ -395,13 +523,21 @@ logger.info("state != null");
 			uitvoerblad.forceLayout();
 			
 			jlsVeld.paint();			
-			
+
+			// variable window
 			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;
 			vartracerHeight = 515;
 			vartracer = new VardisplayPanel(vartracerWidth, vartracerHeight);
-			//vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
 	}
 	
+	/**
+	 * create the buttons and other GUI elements in the bottomPanel depending on the parametrization;
+	 * clicking the traceAanKnop makes the other tracing related buttons and other GUI elements visible
+	 * hides the traceAanKnop and sets the traceUitKnop visible; <br>
+	 * clicking the traceuitKnop hides the other tracing related buttons and other GUI elements 
+	 * hides the traceUitKnop and sets the traceAanKnop visible; <br>
+	 * note: changing the text on the traceAanKnop does not work without errors   
+	 */
 	public void	makeBottom()
 	{
 		int currentX = leftOffset;
@@ -409,7 +545,7 @@ logger.info("state != null");
 
 		if (codeIOZichtbaar)
 		{	
-			importButton = new PushButton(rb.importTekst()); //"import");
+			importButton = new PushButton(rb.importTekst()); 
 			importButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(importButton);
 			bottomPanel.setWidgetLeftWidth(importButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -418,7 +554,7 @@ logger.info("state != null");
 		
 			currentX += leftOffset + buttonWidth + 20;
 		
-			exportButton = new PushButton(rb.exportTekst()); //"export");
+			exportButton = new PushButton(rb.exportTekst()); 
 			exportButton.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(exportButton);
 			bottomPanel.setWidgetLeftWidth(exportButton, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -428,7 +564,7 @@ logger.info("state != null");
 			currentX += leftOffset + buttonWidth + 20;
 		}
 
-		runButton = new PushButton(rb.runTekst()); //"run");
+		runButton = new PushButton(rb.runTekst()); 
 		runButton.addStyleName(webLogoGWTCssResource.pushbutton());
 		bottomPanel.add(runButton);
 		bottomPanel.setWidgetLeftWidth(runButton, currentX, Style.Unit.PX, buttonWidth - 10, Style.Unit.PX);
@@ -439,7 +575,7 @@ logger.info("state != null");
 		
 		if (traceZichtbaar)
 		{
-			traceAanKnop = new PushButton(rb.traceAanTekst()); //"trace aan");
+			traceAanKnop = new PushButton(rb.traceAanTekst()); 
 			traceAanKnop.addStyleName(webLogoGWTCssResource.pushbutton());
 			bottomPanel.add(traceAanKnop);
 			bottomPanel.setWidgetLeftWidth(traceAanKnop, currentX, Style.Unit.PX, buttonWidth + 20, Style.Unit.PX);
@@ -507,7 +643,6 @@ logger.info("state != null");
 		
 			currentX += leftOffset + 2 * buttonWidth;
 			
-			// hier nog een label/noneditable TextBox
 			methodeLabel = new Label("");
 			methodeLabel.addStyleName(webLogoGWTCssResource.label());
 			bottomPanel.add(methodeLabel);
@@ -516,11 +651,11 @@ logger.info("state != null");
 			bottomPanel.setWidgetVisible(methodeLabel, false);
 			
 		}
-		
-
-
 	}
 
+	/**
+	 * inner class for handling clicks on buttons  
+	 */
     class PushClickHandler implements ClickHandler
     {
     	
@@ -551,24 +686,22 @@ logger.info("state != null");
 				}
 				jlsVeld.paint();
 				
-				// bij klik op run-knop cross widget event afvuren
+				// at click on runButton fire cross widget event
 				String code = jlsVeld.getCode();
 				HashMap<String, Object> inputVars = jlsVeld.getInputVars();
 				Map<String,Object> map1 = new HashMap<String,Object>();
 				map1.put("program", code);
 				map1.put("inputVars", inputVars);
-				//cbookEventHandler.fire("text.program",map1);
-				//comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
 				fireCBookEvent("text.program", map1);
 			} 
 			else if (e.getSource() == traceAanKnop)
 			{
 //System.out.println("click traceAan");
 
+				// hide/show relevant buttons and other Gui elements
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, false);
 					bottomPanel.setWidgetVisible(exportButton, false);
-					//if ((jlsVeld.exportPopup != null) && jlsVeld.exportPopup.isVisible()) 
 				}
 				
 				bottomPanel.setWidgetVisible(runButton, false);
@@ -585,12 +718,14 @@ logger.info("state != null");
 				bottomPanel.setWidgetVisible(methodeLabel, true);
 				methodeLabel.setText("");
 				
+				// initialize tracing
 				trb.traceAanAction();
 			} 
 			else if (e.getSource() == traceUitKnop)
 			{
 //System.out.println("click traceUit");
 
+				// show/hide relevant buttons and other Gui elements
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, true);
 					bottomPanel.setWidgetVisible(exportButton, true);
@@ -612,6 +747,7 @@ logger.info("state != null");
 				showVariables.setValue(false);
 				trb.setVartracing(false);
 				
+				// close tracing
 				trb.traceUitAction();
 				
 			}
@@ -632,12 +768,12 @@ logger.info("state != null");
 			{
 				trb.skipAction();
 			}
-    		
-			
-    		
     	}
     }
-    
+
+    /**
+     * inner class to handle changes in showVariables CheckBox 
+     */
 	class ShowVariablesVCH implements ValueChangeHandler<Boolean>
 	{	//public void actionPerformed(ActionEvent e)
 		public void onValueChange(ValueChangeEvent<Boolean> e)
@@ -649,62 +785,45 @@ logger.info("state != null");
 	}
 
 	public Widget asWidget()
-	{
-		return dlp;
+	{	return dlp;
 	}
 	
-	@Override
+	/**
+	 * state is a HashMap containing a String with all code of the program and a 
+	 * HashMap containing the (names of  the) variables of the program and their values, see class JavaLogoSchuifVeld
+	 */
 	public HashMap<String, Object> getState()
 	{
-		
-logger.info("getState");
-
+//logger.info("getState");
 		HashMap<String, Object> h = new HashMap<String, Object>();
-		
 		String code = "";
-		//int scheidingX = 615;
-	
 		code = jlsVeld.getCode();
-		
-//logger.info("code = " + code);		
-		//scheidingX = this.scheidingX;
 		HashMap<String,Object> inputVars = jlsVeld.getInputVars();
-		 
 	    h.put("code", code);
-	    //h.put("scheidingX", new Integer(scheidingX));
 	    h.put("inputVars", inputVars);
-    	
 		return h;
-
 	}
 
-	@Override
+	/**
+	 * set the state using a HashMap containing a String with all code of the program and a 
+	 * HashMap containing the (names of  the) variables of the program and their values, see class JavaLogoSchuifVeld 
+	 */
 	public void setState(HashMap<String, Object> h)
 	{
 		if ((h == null) || h.isEmpty())
 			return;
-logger.info("setState");
-
+//logger.info("setState");
 		ObjectMap map = JSONUtilities.wrapMap(h);
-		
 		String code = "";
-		//int scheidingX = 615;
 		HashMap<String, Object> inputVars = null;
-		
 		if (map.containsKey("code")) 
 			code = map.getString("code");
-		
 //logger.info("code = " + code);
-
-		//if(h.containsKey("scheidingX")) scheidingX = ((Integer)h.get("scheidingX")).intValue();
 		if (map.containsKey("inputVars")) 
 			inputVars = (HashMap) map.getMap("inputVars");
-		
 		if (inputVars != null)
 			jlsVeld.setInputVars(inputVars);
 		jlsVeld.importeer(code);
-		//this.scheidingX = scheidingX;
-		//setBounds(getBounds());
 		jlsVeld.paint();
 		try
 		{
@@ -716,27 +835,21 @@ logger.info("setState");
 		}
 	}
 
-	@Override
 	public int getScore()
-	{
-		// TODO Auto-generated method stub
-		return 0;
+	{	return 0;
 	}
 
-	@Override
 	public Boolean isCorrect()
-	{
-		// TODO Auto-generated method stub
-		return correct;
+	{	return Boolean.TRUE;
 	}
 
-	@Override
 	public void kijkNa() 
 	{		 
-
 	}
 	
-	@Override
+	/**
+	 * set the comRoot and make sure it can listen to the available CBookEvents 
+	 */
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 //logger.info("WebLogoGWT setComRoot");		
@@ -748,8 +861,6 @@ logger.info("setState");
 		comRoot.addCBookEventListener("double.input2", this);
 		comRoot.addCBookEventListener("double.input3", this);
 		comRoot.addCBookEventListener("double.input4", this);
-
-
 	}
 	
 	public void zetMode(int mode)
@@ -768,13 +879,11 @@ logger.info("setState");
 		return 0;
 	}
 
-	@Override
 	public int getHeight() 
 	{
 		return hoogte;
 	}
 
-	@Override
 	public int getWidth() 
 	{
 		return breedte;
@@ -795,17 +904,6 @@ logger.info("setState");
 		return null;
 	}
 
-
-	//@Override
-	//public void addCBookEventListener(CBookEventListener listener, String command) {
-	//	cbookEventHandler.addCBookEventListener(listener, command);
-	//}
-
-	//@Override
-	//public void removeCBookEventListener(CBookEventListener listener,String command) {
-	//	cbookEventHandler.removeCBookEventListener(listener, command);
-	//}
-
 	//@Override
 	public String[] getSendCmds() {
 		String[] commands = {"text.program"};
@@ -818,7 +916,9 @@ logger.info("setState");
 		return commands;
 	}
 
-	@Override
+	/**
+	 * 
+	 */
 	public void acceptCBookEvent(CBookEvent event)
 	{
 		String code = "";
@@ -828,15 +928,15 @@ logger.info("setState");
 			String command = event.getCommand();
 			if (command.startsWith("text"))
 			{
-				logger.info("accCBookEv " + command);
+//logger.info("accCBookEv " + command);
 				
 				Map map = (Map) event.getParameters();
 				if (map != null)
 				{
 					if ((String) map.get("program") != null)	
 					{
-						// Logo geeft command "text.program" en de code in "program" in map
-						
+						// Logo gives command "text.program" so get program code and program variables 
+						// from map and import program
 						code = (String) map.get("program");
 						HashMap<String, Object> inputVars = (HashMap<String, Object>) map.get("inputVars");
 						jlsVeld.setInputVars(inputVars);
@@ -845,11 +945,10 @@ logger.info("setState");
 					}
 					else if ((String) map.get("content") != null)
 					{
-						// check-tekstantwoordvak geeft command "text.program" en de code in "content" in map (en "logID" 0)
-						// tekst-antwoordvak geeft command "text.program" en de code in "content" in map
-						
+						// check-tekstantwoordvak gives command "text.program" and code is in String "content" in map 
+						// tekst-antwoordvak gives command "text.program" and code is in String "content" in map
 						code = (String) map.get("content");
-						HashMap<String, Object> inputVars = jlsVeld.getInputVars(); // moet dit?
+						HashMap<String, Object> inputVars = jlsVeld.getInputVars(); 
 						jlsVeld.setInputVars(inputVars);
 						jlsVeld.importeer(code);
 						uitvoerblad.paintDrawing(false);
@@ -858,8 +957,7 @@ logger.info("setState");
 			}
 			if (command.startsWith("double"))
 			{
-				logger.info("accCBookEv " + command);
-				
+// logger.info("accCBookEv " + command);
 				Map map = (Map) event.getParameters();
 				
 				if (map != null && command.equals("double.input"))
@@ -868,40 +966,38 @@ logger.info("setState");
 					double waarde;
 					if (map.get("value") != null)
 					{
-						// Slider geeft command "double.input" met de waarde in "value" in map
-						
+						// Slider generates the command "double.input" with the name and value of the variable
+						// in "name"and "value" in map
 						waarde = ((Double) map.get("value")).doubleValue();
 					}
 					else if (map.get("text") != null)
 					{
-						// FEWA geeft command "double.input" met de waarde in "text" in map
-						
+						// FEWA generates command "double.input" with the the name and value of the variable
+						// in "name"and "text" in map
 						waarde = Double.parseDouble((String) map.get("text"));
 						if (name == null)
-						{
-							name = "text";
+						{	name = "text";
 						}
 					}
 					else
 					{
-						waarde = 0; // er is iets mis gegaan...
+						waarde = 0; // some error
 					}
 //System.out.println("name = " + name);
 //System.out.println("waarde = " + UF.format(waarde, 2));
 					jlsVeld.setInputVar(name, waarde);
-					// er moet nog iets gebeuren om te zorgen dat veelvlak op Tekenblad punten heeft om te tekenen. Die ontbreken!
 					uitvoerblad.paintDrawing(false);
 					
 					// als in init(); weet niet zeker of deze forceLayout(0)s echt nodig zijn...
+					// probably not necessary
 					dlp.forceLayout();
 					webLogoPanel.forceLayout();
 					bottomPanel.forceLayout();
 					jlsVeld.forceLayout();
 					uitvoerblad.forceLayout();
-
-					// ook deze voor het wegwerken van de rode tekst?
 					jlsVeld.paint();
 				}
+				// name of variable in command, value in map
 				else if (map != null && command.startsWith("double.input"))
 				{
 					String name = command.substring(command.length() - 1);
@@ -909,6 +1005,7 @@ logger.info("setState");
 					jlsVeld.setInputVar(name, waarde);
 					uitvoerblad.paintDrawing(false);
 				}
+				// name of variable in command, value in event Message
 				else if (map == null && command.startsWith("double.input"))
 				{
 					String message = event.getMessage();
@@ -920,22 +1017,22 @@ logger.info("setState");
 				// kan map leeg zijn met andere commands "input..."?
 			}
 			
-			// geef de gedane wijzigingen door aan mogelijke andere cross widget links
+			// make sure changes are sent to other cross widget links
 			fireCBookEventCurrentProgram();
 		}
 		catch (Exception e)
 		{
 			// something went wrong,
 			// probably the code was not valid
-			// or NPE in uitvoerblad.paintDrawing(false), Tekenblad.tekenPolygon() waar veelvlak.aantalPunten 0 is
+			// or NPE in uitvoerblad.paintDrawing(false), Tekenblad.tekenPolygon() with veelvlak.aantalPunten 0
+			// this error was corrected
 			logger.log(Level.INFO, "WebLogoGWT.acceptCBookEvent(): error! code = " + code + ", " , e);
-			//e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Fire cbook event with the current program
-	 * code and current input variables.
+	 * Fire CBook event with the current program
+	 * code and current variable names and their values.
 	 */
 	private void fireCBookEventCurrentProgram()
 	{
@@ -944,35 +1041,28 @@ logger.info("setState");
 		Map<String, Object> map1 = new HashMap<String, Object>();
 		map1.put("program", code);
 		map1.put("inputVars", inputVars);
-		// cbookEventHandler.fire("text.program",map1);
-		// comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
 		fireCBookEvent("text.program", map1);
 	}
 
 	/**
 	 * Fire cross widget event with the given command and map.
+	 * @param command the command
+	 * @param map the Map
 	 */
 	public void fireCBookEvent(String command, Map<String, Object> map)
 	{
-		
-//System.out.println("fireCBookEvent");
-
 		if (comRoot != null)
-		{
-			CBookEvent event = new CBookEvent(this, command, map);
+		{	CBookEvent event = new CBookEvent(this, command, map);
 			comRoot.fireEvent(event);
 		}
 	}
 	
 	//@Override
-	public String getLocalizedCmd(String cmd) {
-		
+	public String getLocalizedCmd(String cmd) 
+	{
 		String localizedCmd = null; 
 		if (localizedCmd == null)
 			return cmd;
 		return localizedCmd;
-		
-		//return WebLogoGWT.rb.getString(CBA_PREFIX + cmd);
 	}
-
 }

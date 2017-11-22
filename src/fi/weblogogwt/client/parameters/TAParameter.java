@@ -14,7 +14,13 @@ import fi.weblogogwt.client.VarSet;
  */
 public abstract class TAParameter
 {
+	/**
+	 * text of the parameter
+	 */
 	protected String parameterText;
+	/**
+	 * true if (1, edit-time) expression is well-formed (2, runtime) is computable with the current VarSet
+	 */
 	protected boolean isCorrect;
 	
 	public TAParameter()
@@ -23,9 +29,9 @@ public abstract class TAParameter
 	}
 	
 	/**
-	 * Set the (text of the) parameter and test it for syntactic corretness (if necessary)
+	 * Set the (text of the) parameter and test it for syntactic correctness (if necessary)
 	 * 
-	 * @param s
+	 * @param s text to be set
 	 */
 	public abstract void setParameter(String s);
 	
@@ -33,7 +39,7 @@ public abstract class TAParameter
 	 * Gets the text of the parameter, regardless of if it's correct or not
 	 * Note: users want to edit an incorrect param to fix the problem
 	 * 
-	 * @return
+	 * @return the text
 	 */
 	public abstract String getParameterText();
 	
@@ -43,8 +49,8 @@ public abstract class TAParameter
 	 * At this stage (runtime) we can see if all variables in the expression exist, don't give
 	 * division by zero, etc...
 	 * 
-	 * @param varSet
-	 * @return
+	 * @param varSet the current varSet
+	 * @return is this TAParameter correct?
 	 */
 	public abstract boolean isCorrect(VarSet varSet);
 	

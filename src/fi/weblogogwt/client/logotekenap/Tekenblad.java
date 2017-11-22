@@ -1,14 +1,5 @@
 package fi.weblogogwt.client.logotekenap;
 
-//import javax.swing.JPanel;
-
-//import java.awt.Color;
-//import java.awt.Font;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
-//import java.awt.Image;
-//import java.awt.Polygon;
-
 import fi.weblogogwt.client.Polygon;
 import fi.weblogogwt.client.WebLogoGWT;
 
@@ -16,31 +7,100 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
 
+/**
+ * class implementing all drawing; note that the superclass Uitvoerblad is actually not needed (see there); <br>
+ * all drawing is so-called turtle graphics, that is, there is a virtual turtle (the cursor when tracing),
+ * which at any time is at a certain position and points its node in a certain direction;
+ * the turtle holds a pen, which can be put down on the "paper" or taken off the "paper"; the move-commands voorruit(pixels)
+ * and stap(x-pixels,y-pixels) are relative to the to the turtle (cursor) position; in the same way the turn-commands
+ * links(degrees) and rechts(degrees) are relative to the to the turtle (cursor) direction;        
+ *
+ */
 public class Tekenblad extends Uitvoerblad
 {
+	/**
+	 * width and height of drawing area
+	 */
 	private int breedte,hoogte;
-	private Punt beginpunt,eindpunt,startpunt;
-  	private Polygon veelvlak;
-//GWT?  	
-  	//private Image im ;
-  	//private Graphics gIm ;
-  	private Context2d gIm ;
-	public Matrix2D mat;  
-	//private JavaLogoInteractiePanel eigenaar;
-	private WebLogoGWT eigenaar;
-	private boolean pen, vul;
-  	private CssColor penkleur, vulkleur, achtergrondkleur;
-	public static int consoleStartX = 10;
-	public static int consoleStartY = 16;
-	private int consoleX = consoleStartX;
-	private int consoleY = consoleStartY;
-	private boolean veranderd = true;
 	
+	/**
+	 * current position of turtle (cursor)
+	 */
+	private Punt beginpunt;
+	/**
+	 * new position of turtle (cursor) after move commands
+	 */
+	private Punt eindpunt;
+	/**
+	 * center of drawing area at initialization
+	 */
+	private Punt startpunt;
+	
+	/**
+	 * Polygon use by methods vulAan() and vulUit()
+	 */
+  	private Polygon veelvlak;
+  	/**
+  	 * instance of Context2d for drawing
+  	 */
+  	private Context2d gIm;
+  	/**
+  	 * matrix for turtle graphics, see class Matrix2D
+  	 */
+	public Matrix2D mat;  
+
+	private WebLogoGWT eigenaar;
+	/**
+	 * flagg for drawing/not drawing
+	 */
+	private boolean pen;
+	/**
+	 * flagg for saving points into a Polygon, to be filled in a later stage<br>
+	 * see methods vulAan() and vulUit()
+	 */
+	private boolean vul;
+	/**'
+	 * the pen color
+	 */
+  	private CssColor penkleur;
+  	/**
+  	 * the fill color
+  	 */
+  	private CssColor vulkleur;
+  	/**
+  	 * the background color
+  	 */
+  	private CssColor achtergrondkleur;
+  	/**
+  	 * initial print x-position
+  	 */
+	public static int consoleStartX = 10;
+  	/**
+  	 * initial print y-position
+  	 */
+	public static int consoleStartY = 16;
+	/**
+	 * current print x-position
+	 */
+	private int consoleX = consoleStartX;
+	/**
+	 * current print y-position
+	 */
+	private int consoleY = consoleStartY;
+
+	/**
+	 * Canvas for drawing upon
+	 */
 	Canvas tekenbladCanvas;
 		
+	/**
+	 * constructor
+	 * @param ap instance of WebLogoGWT 
+	 * @param b width
+	 * @param h height
+	 */
 	public Tekenblad(WebLogoGWT ap, int b, int h)
 	{	
 		breedte = b;
@@ -55,95 +115,61 @@ public class Tekenblad extends Uitvoerblad
 		setWidgetLeftWidth(tekenbladCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		setWidgetTopHeight(tekenbladCanvas, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 
-		//achtergrondkleur = Color.white;
+		// white;
 		achtergrondkleur = CssColor.make(255,255,255);
 		veelvlak = new Polygon();
 		eigenaar = ap;
-		mat = new Matrix2D();					// zorgt voor de tekenrichting
-		
+		mat = new Matrix2D();					
 		double startschaal = Math.min((double)breedte/500,(double)hoogte/500);
 		mat.initialiseer(0,startschaal);	
 		startpunt = new Punt(breedte/2,hoogte/2);
 		
 	}
 	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt door het Tekenblad: om de image te initialiseren en
-	//op het scherm te zetten. "paint()" wordt alleen bij de eerste keer tekenen gebruikt, daarna 
-	//zorgt "tekenOpnieuw()" of "tekenErbij()" hiervoor. "TekenOpImage()" zorgt voor het vullen 
-	//van de image, metbehulp van het door de leerlingen geimplementeerde "tekenprogramma()",
-	//en wordt zowel door "paint()" als door "tekenOpImage()" gebruikt
-	//-------------------------------------------------------------------------------------------
-  	//public void paintComponent(Graphics g)
-	public void paintComponent(Context2d g)
-  	{ 	
-		//if ( im==null || veranderd )
-		//{	
-			//breedte = getSize().width;
-			//hoogte = getSize().height;	
-			double startschaal = Math.min((double)breedte/500,(double)hoogte/500);
-			mat.initialiseer(0,startschaal);	
-			startpunt = new Punt(breedte/2,hoogte/2);
- 			//im = createImage(breedte,hoogte);
-  			//gIm = im.getGraphics();
-  			initializeDrawing(eigenaar.trb.isTraceAan());
-			//veranderd = false;
-		//}
-    	//g.drawImage(im, 0, 0, null);
-  	}
-  	
+	/**
+	 * set the Context2d of the drawing Canvas
+	 */
 	public void initContext2d()
 	{
 		gIm = tekenbladCanvas.getContext2d();
 	}
 	
+	/**
+	 * getter for the drawing Canvas
+	 */
 	public Canvas getCanvas()
 	{
 		return tekenbladCanvas;
 	}
 	
- 	public void repaint()
-	{	//veranderd = true;
-		//super.repaint();
- 		paintComponent(gIm);
-	}
- 	
-	//-------------------------------------------------------------------------------------------
-	// PBgv, 2015: deze methoden worden gebruikt door UI-componenten om de tekening te beginnen
- 	// en na executie van het tekenalgoritme op het beeldscherm te zetten
-	//-------------------------------------------------------------------------------------------
-
  	/**
- 	 * Initializes a drawing. To be called before starting the execution of a 'tekenalgoritme'.
+ 	 * initialize the turtle, draw background, and output a finished drawing 
+ 	 * (no tracing) or a partial drawing (tracing)
+	 * @param cursor true when tracing, draw cursor on top of drawing.
  	 */
-	@Override
  	public void initializeDrawing(boolean cursor)
   	{ 	
-  		// wat is de reden van deze voorwaarde???
-  		if ( startpunt==null) return;
+  		// possible?
+  		if (startpunt == null) 
+  		{	return;
+  		}
   		beginpunt = new Punt(startpunt);
     	eindpunt = new Punt(beginpunt);
     	mat.initialiseer();
-    	//achtergrondkleur = Color.WHITE;
+    	// background
     	achtergrondkleur = CssColor.make(255,255,255);
-	  	//gIm.setColor(achtergrondkleur);
     	gIm.setFillStyle(achtergrondkleur);
     	gIm.fillRect(0, 0, breedte, hoogte);
-    	//gIm.setColor(Color.gray);
+    	// border;
     	gIm.setStrokeStyle(CssColor.make(192, 192, 192));
-    	//gIm.drawRect(0, 0, breedte-1, hoogte-1);
     	gIm.strokeRect(0, 0, breedte-1, hoogte-1);
     	consoleX = consoleStartX;
     	consoleY = consoleStartY;
-    	//penAan(0,0,0);
     	pen = true;
-    	//penkleur = Color.black;
     	penkleur = CssColor.make(0,0,0);
-    	//gIm.setColor(penkleur);
     	gIm.setStrokeStyle(penkleur);
     	penAan();
 		vul = false;
-    	//vulkleur = Color.black;
     	vulkleur = CssColor.make(0,0,0);
     	if (cursor)
     	{	eigenaar.trb.traceProgram();
@@ -151,10 +177,12 @@ public class Tekenblad extends Uitvoerblad
     	}
     	else
     		eigenaar.trb.executeProgram();
-    	
-    		
 	}
   	
+	/**
+	 * draw a cursor at the current turtle position pointing in the
+	 * turtle direction
+	 */
 	void tekenCursor()
 	{	Polygon cursor = new Polygon();
 		Punt p;
@@ -164,9 +192,8 @@ public class Tekenblad extends Uitvoerblad
 		cursor.addPoint((int)p.x,(int)p.y);
 		p = mat.geefVolgendPunt(p,-10,10);
 		cursor.addPoint((int)p.x,(int)p.y);
-		//gIm.setColor(new Color(255,255,0));
+		// yellow filling
 		gIm.setFillStyle(CssColor.make(255,255,0));
-		//gIm.fillPolygon(cursor);
 		
 		gIm.beginPath();
 		gIm.moveTo(cursor.geefPuntXD(0), cursor.geefPuntYD(0));
@@ -177,9 +204,8 @@ public class Tekenblad extends Uitvoerblad
 		gIm.lineTo(cursor.geefPuntXD(0), cursor.geefPuntYD(0));
 		gIm.fill();
 		
-		//gIm.setColor(new Color(0,0,255));
+		// outline blue
 		gIm.setStrokeStyle(CssColor.make(0,0,255));
-		//gIm.drawPolygon(cursor);
 		
 		gIm.beginPath();
 		gIm.moveTo(cursor.geefPuntXD(0), cursor.geefPuntYD(0));
@@ -189,232 +215,237 @@ public class Tekenblad extends Uitvoerblad
 		}
 		gIm.lineTo(cursor.geefPuntXD(0), cursor.geefPuntYD(0));
 		gIm.stroke();
-
 	}
 
 	/**
 	 * Outputs a finished drawing to the display, with or without the cursor (tracing)
-	 * 
+	 * redundant, this is just initializeDrawing 
 	 * @param cursor	true when tracing, draw cursor on top of drawing.
 	 */
-	@Override
 	public void paintDrawing(boolean cursor)
 	{	
 		initializeDrawing(cursor);
-//GWT?		
-		//Graphics g = getGraphics();
-		//if(g!=null)
-		//	g.drawImage(im, 0, 0, null);
 	}
 	
  	/**
- 	 * TODO: Deze methode zorgde eerst voor execute and paint. Is nu obsolete. Er staat nog een 
- 	 * dummy om compile errors tijdens conversie te voorkomen. 
- 	 * Peter: de 'most likely candidate' om deze methode te vervangen is Tracebeheerder.executeProgram(),
- 	 * die runt het programma zonder trace. Maar ik ken de widget communictions niet...
+ 	 * move to a new position calculated as new = current + mat * (dx,dy)T; 
+ 	 * note how this works: the direction of the cursor defines the positive y-axis
+ 	 * of a coordinate system; in this coordinater system change the position by (dx,dy) 
+ 	 * if pen == true, connect old and new position by a line in penkleur;
+ 	 * if vul == true, add the old position to the Polygon veelvlak  
+ 	 * @param dx x-change
+ 	 * @param dy y-change
  	 */
- 	public void tekenOpnieuw()
-	{	
-	}
- 	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt door het Tekenblad om de lijnen en vlakken te tekenen
-	//-------------------------------------------------------------------------------------------
- 	
 	public void naarVolgendPunt(double dx,double dy)
 	{	eindpunt = mat.geefVolgendPunt(beginpunt,dx,dy);
-		//gIm.setColor(penkleur);
 		gIm.setStrokeStyle(penkleur);
-		if(pen)
-		{	//gIm.drawLine((int)Math.rint(beginpunt.x),(int)Math.rint(beginpunt.y),
-			//	         (int)Math.rint(eindpunt.x),(int)Math.rint(eindpunt.y));
-			gIm.beginPath();
+		if (pen)
+		{	gIm.beginPath();
 			gIm.moveTo((int)Math.rint(beginpunt.x),(int)Math.rint(beginpunt.y));
 			gIm.lineTo((int)Math.rint(eindpunt.x),(int)Math.rint(eindpunt.y));
 			gIm.stroke();
-			
-		
 		}
-		if(vul) 
+		if (vul) 
 			veelvlak.addPoint((int)Math.rint(beginpunt.x),(int)Math.rint(beginpunt.y));
 		beginpunt.x = eindpunt.x;
 		beginpunt.y = eindpunt.y;
 	}
 	
+	/**
+	 * draw the Polygon veelvlak; <br>
+	 * NOTE: buggfix Huub: if the vulAan(--) statement is incorrect, it is skipped at
+	 * execution; in this case, at the call to vulUit() veelvlak == null or 
+	 * contains zero points
+	 */
 	void tekenPolygon()
-	{	
-		// fout in vulAan
-		if (veelvlak == null)
-		{	
-//System.out.println("veelvlak == null");			
-			return;
-		
+	{	if (veelvlak == null)
+		{	return;
 		}
-		else
-//System.out.println("veelvlak != null");
-		
 		if (veelvlak.geefAantalPunten() == 0)
-		{
-//System.out.println("aantalPunten == 0");			
-			return;
+		{	return;
 		}
-		
-		//gIm.setColor(vulkleur);
+		// fill veelvlak 
 		gIm.setFillStyle(vulkleur);
-		//gIm.fillPolygon(veelvlak);
-		
 		gIm.beginPath();
 		gIm.moveTo(veelvlak.geefPuntXD(0), veelvlak.geefPuntYD(0));
 		for (int pCnt = 1; pCnt < veelvlak.geefAantalPunten(); pCnt++)
-		{
-			gIm.lineTo(veelvlak.geefPuntXD(pCnt), veelvlak.geefPuntYD(pCnt));
+		{	gIm.lineTo(veelvlak.geefPuntXD(pCnt), veelvlak.geefPuntYD(pCnt));
 		}
 		gIm.lineTo(veelvlak.geefPuntXD(0), veelvlak.geefPuntYD(0));
 		gIm.fill();
-		
+		// outline veelvlak in penkleur if pen == true
 		if ( pen ) 
-		{
-			//gIm.setColor(penkleur);
-			gIm.setStrokeStyle(penkleur);
-			//gIm.drawPolygon(veelvlak);
-
+		{	gIm.setStrokeStyle(penkleur);
 			gIm.beginPath();
 			gIm.moveTo(veelvlak.geefPuntXD(0), veelvlak.geefPuntYD(0));
 			for (int pCnt = 1; pCnt < veelvlak.geefAantalPunten(); pCnt++)
-			{
-				gIm.lineTo(veelvlak.geefPuntXD(pCnt), veelvlak.geefPuntYD(pCnt));
+			{	gIm.lineTo(veelvlak.geefPuntXD(pCnt), veelvlak.geefPuntYD(pCnt));
 			}
 			gIm.lineTo(veelvlak.geefPuntXD(0), veelvlak.geefPuntYD(0));
 			gIm.stroke();
-
-			
 		}
 	}
+
+	/**
+	 * fill the drawing area with color c
+	 * @param c the fill color
+	 */
   	void vulBlad(CssColor c)
-  	{
-  		//gIm.setColor(c);
-  		gIm.setFillStyle(c);
+  	{	gIm.setFillStyle(c);
   		gIm.fillRect(1, 1, breedte-2, hoogte-2);
   	}
-	
-	@Override
+
+  	/**
+	 * fill the drawing area with the RGB-color given by the integers (r,g,b) 
+  	 */
+	public void vulBlad(int r, int g, int b)
+	{	vulBlad(CssColor.make(r,g,b));
+	}
+
+  	/**
+  	 * turn the cursor left over angle dHoek (degrees)
+  	 */
 	public void links(double dHoek)
-	{	
-		mat.draai(dHoek);
+	{	mat.draai(dHoek);
 	}
 	
-	@Override
+	/**
+	 * turn the cursor rigth over angle dhoek (degrees)
+	 */
   	public void rechts(double dHoek)
-	{	
-  		mat.draai(-dHoek);		
+	{	mat.draai(-dHoek);		
 	}
   	
-	@Override
+  	/**
+  	 * move forward dy in the direction of the cursor; 
+  	 * see method naarVolgendPunt for pen and vul action
+  	 */
 	public void vooruit(double dy)
-	{	
-		naarVolgendPunt(0,-dy);	
+	{	naarVolgendPunt(0,-dy);	
 	}
 	
-	public void stapy(double dy)
-	{	
-		naarVolgendPunt(0,-dy);		
-	}
-	
-	public void stapx(double dx)
-	{	
-		naarVolgendPunt(dx,0);		
-	}
-	
-	@Override
+	/**
+	 * move (dx,dy) relative to the direction of the cursor
+ 	 * note how this works: the direction of the cursor defines the positive y-axis
+ 	 * of a coordinate system; in this coordinater system change the position by (dx,dy) 
+	 */
 	public void stap(double dx,double dy)
-	{	
-		naarVolgendPunt(dx,-dy);
+	{	naarVolgendPunt(dx,-dy);
 	}
 	
+	/**
+	 * activate the pen
+	 */
 	public void penAan()
-	{	
-		pen = true;							
+	{	pen = true;							
 	}
 	
+	/**
+	 * activate the pen with the color name given by a String
+	 * @param kl name of the color
+	 */
 	public void penAan(String kl)
-	{	
-		pen = true;
+	{	pen = true;
 		penkleur = maakKleur(kl);
-		//gIm.setColor(penkleur);
 		gIm.setStrokeStyle(penkleur);
 	}
-	
-	@Override
+
+	/**
+	 * activate the pern with RGB-color given by the integers (r,g,b)
+	 */
 	public void penAan(int r, int g, int b)
-	{	
-		pen = true;
+	{	pen = true;
 		penkleur = CssColor.make(r,g,b); //new Color(r,g,b);
-		//gIm.setColor(penkleur);
 		gIm.setStrokeStyle(penkleur);
 	}
 	
-	@Override
+	/**
+	 * de-activate the pen
+	 */
 	public void penUit()
-	{	
-		pen = false;							
+	{	pen = false;							
 	}
 	
+	/**
+	 * start vul, that is refresh the Polygon veelvlak and
+	 * save all points passed in veelvlak; vulUit() fills
+	 * the Polygon veelvlak with vulkleur 
+	 */
 	public void vulAan()
-	{	
-		vul = true;
+	{	vul = true;
 		veelvlak = new Polygon();							
 	}
-	
+
+	/**
+	 * start vul, that is refresh the Polygon veelvlak and
+	 * save all points through which the cursor passes in veelvlak; 
+	 * set vulkleur to the color given by the name kl;
+	 * vulUit() fills the Polygon veelvlak with vulkleur 
+	 * @param kl name of vulkleur
+	 */
 	public void vulAan(String kl)
-	{	
-		vul = true;	
+	{	vul = true;	
 		vulkleur = maakKleur(kl);
 		veelvlak = new Polygon();				
 	}
 	
-	@Override
+	/**
+	 * start vul, that is refresh the Polygon veelvlak and
+	 * save all points through which the cursor passes in veelvlak; 
+	 * set vulkleur to the RGB-color given by the integers (r,g,b)l;
+	 * vulUit() fills the Polygon veelvlak with vulkleur 
+	 */
 	public void vulAan(int r, int g, int b)
-	{	
-		vul = true;	
+	{	vul = true;	
 		vulkleur = CssColor.make(r,g,b); //new Color(r,g,b);
 		veelvlak = new Polygon();	
 	}
 	
-	@Override
+	/**
+	 * de-activate vul and fill the Polygon veelvlak 
+	 * with vulkeur
+	 */
 	public void vulUit()
-	{	
-		tekenPolygon();
+	{	tekenPolygon();
 		vul = false;							
 	}
-	
-	@Override
-	public void vulBlad(int r, int g, int b)
-	{
-		//vulBlad(new Color(r,g,b));
-		vulBlad(CssColor.make(r,g,b));
-	}
 
+	/**
+	 * set the background color to kl
+	 * @param kl String with name of color
+	 */
 	void achtergrondkleur(String kl)
 	{	
 		achtergrondkleur = maakKleur(kl);
 	}
 	
+	/**
+	 * set the background color giving RGB-values
+	 * @param r red value
+	 * @param g green value
+	 * @param b blue value
+	 */
 	void achtergrondkleur(int r, int g, int b)
 	{	
-		achtergrondkleur = CssColor.make(r,g,b); //new Color(r,g,b);
+		achtergrondkleur = CssColor.make(r,g,b); 
 	}
 	
+	/**
+	 * print String s at the current console position
+	 * do not update the console position
+	 * @param s String to be printed
+	 */
 	public void printConsole(String s)
 	{	
-		//gIm.setFont(JavaLogoWeb.defaultfont);
 		gIm.setFont(WebLogoGWT.fontString);
-		//gIm.setFillStyle(CssColor.make(0,0,0));
 		gIm.setFillStyle(penkleur);
-		//gIm.drawString(s, consoleX, consoleY);
 		gIm.fillText(s, consoleX, consoleY);
 	}
-	
-	@Override
+
+	/**
+	 * print String s at the current console position
+	 * and start a new line
+	 */
 	public void printl(String s)
 	{
 		printConsole(s);
@@ -422,32 +453,32 @@ public class Tekenblad extends Uitvoerblad
 		consoleY = consoleY+16;
 	}
 
-	@Override
+	/**
+	 * print String s at the current console position
+	 * and update the console position
+	 */
 	public void print(String s)
 	{
 		printConsole(s);
-		//FontMetrics fm = getFontMetrics(JavaLogoWeb.defaultfont);
 		TextMetrics tm = gIm.measureText(s);
 		int width = (int) Math.round(tm.getWidth());
-		consoleX = consoleX + width; //fm.stringWidth(s);
+		consoleX = consoleX + width; 
 	}
 
-	void schrijf(String s, String fString)
-	{	
-		gIm.setFont(fString);
-		gIm.setFillStyle(CssColor.make(0,0,0));
-		//gIm.drawString(s, (int)beginpunt.x, (int)beginpunt.y);
-		gIm.fillText(s, (int)beginpunt.x, (int)beginpunt.y);
-	}
-	
-	Polygon geefVlak()							// geeft de laatst getekende Polygon
+	/**
+	 * get the last filled veelvlak
+	 * @return veelvlak
+	 */
+	Polygon geefVlak()				
 	{	
 		return veelvlak;
 	}
-	
- 	//-------------------------------------------------------------------------------------------
-	//deze methode wordt gebruikt een kleur in de vorm van een string om te zetten in een Color
-	//-------------------------------------------------------------------------------------------
+
+	/**
+	 * given the name (in Dutch or English) of a color, create that color
+	 * @param s color name (in Dutch or English)
+	 * @return corresponding color
+	 */
 	private CssColor maakKleur(String s)
 	{	if (s.equals("rood")) return CssColor.make(255,0,0);
 		else if ( s.equals("groen")) return CssColor.make(0,255,0);

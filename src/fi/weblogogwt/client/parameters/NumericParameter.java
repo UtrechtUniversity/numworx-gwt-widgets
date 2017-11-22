@@ -5,14 +5,20 @@ import fi.weblogogwt.client.expressies.*;
 import fi.weblogogwt.client.formuleobjects.*;
 
 /**
- * InputParameter is the class for any numerical input value that can be calculated (Expressie)
+ * NumericParameter is the class for any numerical input value that can be calculated (Expressie)
  * Used for parameters in CC's, or the number of repetitions in 'Herhaal'
  * 
  * @author berge020
  */
 public class NumericParameter extends TAParameter
 {
+	/**
+	 * expression representing the parameter
+	 */
 	private Expressie waarde;
+	/**
+	 * value of waarde
+	 */
 	private double value;
 	/**
 	 * true if 'waarde' is a syntactically correct expression, given that all variables exist
@@ -38,10 +44,8 @@ public class NumericParameter extends TAParameter
 	
 	/**
 	 * Sets the text and determines if the expression is valid.
-	 * 
 	 * @param text		the input string to be parsed
 	 */
-	@Override
 	public void setParameter(String text)
 	{
 		parameterText = text.trim();
@@ -64,15 +68,17 @@ public class NumericParameter extends TAParameter
 		//System.out.println(parameterText+", "+value+", "+isValid+", "+isCorrect);
 	}
 	
-	@Override
+	/**
+	 * @return parameterText
+	 */
 	public String getParameterText()
 	{
-		// if ( isValid ) { return waarde.toString(); } else
-		// dit doen we maar niet, de toString() levert soms een bruikbare String, soms niet
 		return parameterText;
 	}
 	
-	@Override
+	/**
+	 * @return isCorrect
+	 */
 	public boolean isCorrect(VarSet varSet)
 	{
 		if ( isValid )
@@ -81,7 +87,8 @@ public class NumericParameter extends TAParameter
 			if(Double.isNaN(value))
 				value = varSet.getExpressionValue(waarde);
 			isCorrect = !(Double.isNaN(value));
-		} else
+		} 
+		else
 		{
 			isCorrect = false;
 		}
@@ -92,7 +99,6 @@ public class NumericParameter extends TAParameter
 	/**
 	 * @return true if (1, edit-time) expression is well-formed (2, runtime) is computable with the current VarSet
 	 */
-	@Override
 	public boolean isCorrect()
 	{
 		return isCorrect;
@@ -101,7 +107,6 @@ public class NumericParameter extends TAParameter
 	/**
 	 * Get the value. This is only guaranteed to yield a valid result if the parameter expression
 	 * has been tested for correctness with the current Varset
-	 * 
 	 * @return the numeric value
 	 */
 	public double getValue()
@@ -120,7 +125,9 @@ public class NumericParameter extends TAParameter
 		return waarde;
 	}
 	
-	@Override
+	/**
+	 * @return value as text
+	 */
 	public String getValueText()
 	{
 		return ""+(int)value;

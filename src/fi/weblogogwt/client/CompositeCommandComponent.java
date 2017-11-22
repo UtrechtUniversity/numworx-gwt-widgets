@@ -1,25 +1,27 @@
 package fi.weblogogwt.client;
 
-//import javax.swing.JPanel;
-
 /**
- * abstract superclass for all CommandComponents that have a list of CCs inside.
- * 
+ * abstract superclass for all CommandComponents that have a list of CommandComponents inside.
  * @author Berge020
  */
 public abstract class CompositeCommandComponent extends CommandComponent
-{	
-	
+{
+	/**
+	 * constructor
+	 * @param x x-position
+	 * @param y y-position
+	 * @param b width
+	 * @param h height
+	 * @param sv parent containing the drawing Canvas
+	 */
 	public CompositeCommandComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
-	{
-		super(x, y, b, h, sv);
+	{	super(x, y, b, h, sv);
 	}
 	
 	/**
 	 * Add a CC to this CompositeCommandComponent at the end of this CCC's CommandContainer.
 	 * Note: this is for adding components from a script (ProgrammaImporter). This component's
-	 * CommandContainer will handle drag & drop.
-	 * 
+	 * CommandContainer will handle drag and drop.
 	 * @param cc	CC to be added 
 	 */
 	abstract void addCComponent(CommandComponent cc);
@@ -28,7 +30,6 @@ public abstract class CompositeCommandComponent extends CommandComponent
 	 * Called by the enclosed CommandContainer when its height has changed through
 	 * addition or removal of CommandComponents. This component can than recalculate its
 	 * own height.
-	 * 
 	 * @param h		new height of the CommandContainer
 	 */
 	abstract void containerHeightChanged(int h);

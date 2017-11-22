@@ -1,11 +1,8 @@
 package fi.weblogogwt.client.expressies;
 
-import java.awt.*;
-import java.util.*;
 
 public class Aftrekking extends Expressie  
 {	
-	
 	public Aftrekking(Expressie e1,Expressie e2 )
 	{	kind1 = e1;
 		kind2 = e2;

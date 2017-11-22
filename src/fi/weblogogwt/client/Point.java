@@ -1,5 +1,8 @@
 package fi.weblogogwt.client;
 
+/**
+ * there is no class Point in GWT 
+ */
 public class Point 
 {
 	int x, y;
@@ -23,3 +26,4 @@ public class Point
 		y += dy;
 	}
 }
+

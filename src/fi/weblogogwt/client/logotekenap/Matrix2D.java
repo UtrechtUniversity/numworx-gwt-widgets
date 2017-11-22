@@ -1,12 +1,12 @@
 package fi.weblogogwt.client.logotekenap;
 
+/**
+ * this class remembers and continuously recalculates the drawing direction and
+ * calculates for Tekenblad the next end point of the line being drawn, using dx and dy  
+ * @author Peter Boon
+ */
 public class Matrix2D
 {
-	//-------------------------------------------------------------------------------------------
-	//deze klasse onthoudt, en berekent steeds opnieuw de tekenrichting, en berekent voor het 
-	//Tekenblad aan de hand van een dx en dy het volgende eindpunt van de tekenlijn.
-	//-------------------------------------------------------------------------------------------
-	
 	private double  starthoek, hoek, radHoek, cosHoek, sinHoek, startschaal, schaal;
 	private double a11,a12,a21,a22;
  	private static double pi = Math.PI;

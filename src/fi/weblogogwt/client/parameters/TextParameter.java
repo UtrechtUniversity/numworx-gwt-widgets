@@ -10,6 +10,9 @@ import fi.weblogogwt.client.VarSet;
  */
 public class TextParameter extends NumericParameter
 {
+	/**
+	 * String in quotes or expression 
+	 */
 	private boolean isConstantString;
 
 	public TextParameter()
@@ -19,7 +22,6 @@ public class TextParameter extends NumericParameter
 		isCorrect = true;
 	}
 
-	@Override
 	public void setParameter(String s)
 	{
 		if ( s.startsWith("\"") && s.endsWith("\""))
@@ -39,25 +41,20 @@ public class TextParameter extends NumericParameter
 	/**
 	 * This method returns the String constants WITH the enclosing quotes (for editing, exporting)
 	 * Use getValueText() to get the value without quotes (or the numeric value)
-	 * 
-	 * @see fi.javalogoweb.NumericParameter#getParameterText()
 	 */
-	@Override
 	public String getParameterText()
 	{
-//if (!parameterText.equals(""))		
-//System.out.println("getParamText=" + parameterText);		
 		return parameterText;
 	}
 
-	@Override
 	public boolean isCorrect(VarSet varSet)
 	{
 		if ( isConstantString )
 		{
 //System.out.println("isCorrect isConstantString");			
 			return true;
-		} else
+		} 
+		else
 		{
 //System.out.println("isCorrect !isConstantString");			
 			return super.isCorrect(varSet);
@@ -71,7 +68,8 @@ public class TextParameter extends NumericParameter
 				return getParameterText().substring(1, getParameterText().length()-1);
 			else
 				return "";
-		} else
+		} 
+		else
 		{
 			return ""+(super.getValue());
 		}

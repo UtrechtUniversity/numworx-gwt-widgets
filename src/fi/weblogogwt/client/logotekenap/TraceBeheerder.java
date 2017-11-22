@@ -1,56 +1,68 @@
 package fi.weblogogwt.client.logotekenap;
 
-//import java.awt.*;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//import java.awt.event.ItemEvent;
-//import java.awt.event.ItemListener;
-
-//import javax.swing.JCheckBox;
-//import javax.swing.JPanel;
-//import javax.swing.JButton;
-//import javax.swing.JTextField;
 
 import fi.weblogogwt.client.JavaLogoSchuifVeld;
 import fi.weblogogwt.client.WebLogoGWT;
 import fi.weblogogwt.client.VarSet;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 
-//GWT
-//import fi.weblogogwt.client.VardisplayPanel;
-
-public class TraceBeheerder //extends JPanel implements ActionListener, ItemListener
+/**
+ * class implementing tracing through the current program; tracing is activated by clicking
+ * traceAanKnop in class WebLogoGWT, which also activates the cursor in class TekenBlad;
+ * clicking traceAanKnop activates traceUit-, begin-, start-, terug- and skipbuttons, 
+ * a Label for displaying the current command and a CheckBox for tracing variables
+ */
+public class TraceBeheerder 
 {
-//GWT	
-	//private JButton stapKnop,terugKnop,beginKnop,skipKnop,traceKnop;
-//GWT	
-	//private JCheckBox showVariables;
-//GWT	
-	//private JTextField methodeVeld;
-	
-	private int maxAantalStappen,aantalStappen;
+	/** 
+	 * keeping track of program steps
+	 */
+	private int maxAantalStappen, aantalStappen;
+	/**
+	 * drawing area
+	 */
 	private Uitvoerblad tb;
+	/**
+	 * instance of JavaLogoSchuifVeld
+	 */
 	private JavaLogoSchuifVeld jlsveld;
+	/** 
+	 * flagg for tracing
+	 */
 	private boolean traceAan;
 	
+	/**
+	 * flagg for tracing variables
+	 */
 	private boolean isVartracing = false;
 	
-	//private VardisplayPanel vartracer = null;
-	
+	/**
+	 * the current program level
+	 */
 	private int currentlevel;
+	/** 
+	 * flagg for skipping commands
+	 */
 	private boolean isSkipping;
+	/**
+	 * level at which commands are skipped
+	 */
 	private int skipLevel;
-	
+
+	/**
+	 * class containing all steering buttons for tracing
+	 */
 	WebLogoGWT owner; 
-	
+
+	/**
+	 * 
+	 * @param tb drawing area
+	 * @param v instance of JavaLogoSchuifVeld
+	 * @param o instance of WebLogoGWT
+	 */
 	public TraceBeheerder(Uitvoerblad tb, JavaLogoSchuifVeld v, WebLogoGWT o)
 	{	
 		owner = o;
-		
-		//setLayout(null);
-		//setOpaque(false);
-		makeGUI();
 		aantalStappen = 0;
 		maxAantalStappen = 0;
 		isSkipping = false;
@@ -58,78 +70,8 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 		this.tb = tb;
 		jlsveld = v;
 		traceAan = false;
-		setComponentVisibilty(false);
 	}
 	
-//GWT naar WebLogoGWT	
-	private void makeGUI()
-	{
-/*		
-		beginKnop = new JButton(JavaLogoWeb.rb.getString("beginKnopLabel"));
-		beginKnop.setBounds(0,5,50,23);
-		beginKnop.setFont(JavaLogoWeb.boldfont);
-		beginKnop.setMargin(new Insets(0,0,0,0));
-		beginKnop.addActionListener(this);
-		add(beginKnop);
-		stapKnop = new JButton(JavaLogoWeb.rb.getString("stapKnopLabel"));
-		stapKnop.setBounds(60,5,50,23);
-		stapKnop.setFont(JavaLogoWeb.boldfont);
-		stapKnop.setMargin(new Insets(0,0,0,0));
-		stapKnop.addActionListener(this);
-		add(stapKnop);
-		terugKnop = new JButton(JavaLogoWeb.rb.getString("terugKnopLabel"));
-		terugKnop.setBounds(120,5,50,23);
-		terugKnop.setFont(JavaLogoWeb.boldfont);
-		terugKnop.setMargin(new Insets(0,0,0,0));
-		terugKnop.addActionListener(this);
-		add(terugKnop);
-		skipKnop = new JButton(JavaLogoWeb.rb.getString("skipKnopLabel"));
-		skipKnop.setBounds(180,5,50,23);
-		skipKnop.setFont(JavaLogoWeb.boldfont);
-		skipKnop.setMargin(new Insets(0,0,0,0));
-		skipKnop.addActionListener(this);
-		add(skipKnop);
-		showVariables = new JCheckBox(JavaLogoWeb.rb.getString("showVarLabel"));
-		showVariables.setOpaque(false);
-		showVariables.addItemListener(this);
-		showVariables.setEnabled(true);
-		showVariables.setSelected(false);
-		showVariables.setBounds(240, 5, 160, 23);
-		showVariables.setFont(JavaLogoWeb.boldfont);
-		add(showVariables);
-		
-		traceKnop = new JButton(JavaLogoWeb.rb.getString("traceOnLabel"));
-		traceKnop.setBounds(0,32,170,23);
-		traceKnop.setFont(JavaLogoWeb.boldfont);
-		traceKnop.setMargin(new Insets(0,0,0,0));
-		traceKnop.addActionListener(this);
-		add(traceKnop);
-		methodeVeld = new JTextField("",15);
-		methodeVeld.setBounds(180,32,160,23);
-		methodeVeld.setFont(JavaLogoWeb.defaultfont);
-		methodeVeld.setMargin(new Insets(0,0,0,0));
-		add(methodeVeld);
-
-		
-		// handle vartracer panel here
-		vartracer = new VardisplayPanel();
-		vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
-*/		
-	}
-	
-	private void setComponentVisibilty(boolean b)
-	{	
-//GWT naar WebLogoGWT
-/*		
-		methodeVeld.setVisible(b);
-		beginKnop.setVisible(b);
-		stapKnop.setVisible(b);
-		terugKnop.setVisible(b);
-		skipKnop.setVisible(b);
-		showVariables.setVisible(b);
-*/		
-	}
-
 	//-------------------------------------------------------------------------------------------
 	// Execution and tracing of programs 
 	//-------------------------------------------------------------------------------------------
@@ -142,7 +84,11 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 		traceAan = false;
 		jlsveld.execute(this, tb);
 	}
-	
+
+	/**
+	 * getter for traceAan
+	 * @return traceAan
+	 */
 	public boolean isTraceAan()
 	{
 		return traceAan;
@@ -154,184 +100,147 @@ public class TraceBeheerder //extends JPanel implements ActionListener, ItemList
 	 */
 	public void traceProgram()
 	{
-		// clear oude tracekleur
 		traceAan = true;
 		aantalStappen = 0;
 		if ( maxAantalStappen > 0 )
 		{
+			// this puts last command in methodeLabel in WebLogoGWT
 			jlsveld.execute(this, tb);
-			// zet laatste command in textfield; methodeVeld.setText(...);
 		}
-		jlsveld.paint();				// show the pink trace color!
+		// show traced CC in trace color pink
+		jlsveld.paint();				
 	}
 	
 	/**
 	 * Callback method for execution of a program while tracing. CommandComponents will call
 	 * this method when they have completed (or started: deeltaak, loop, if...)
 	 * TraceBeheerder will signal the end of execution when maxAaantalStappen is reached.
-	 * 
+	 * @param commandLevel level of the command
 	 * @return	true, if execution of the program must stop at this point, false otherwise.
 	 */
 	public boolean commandExecuted(int commandLevel)
 	{
-		if ( !traceAan ) return false;
+		if (!traceAan ) 
+			return false;
 		aantalStappen++;
 		if ( aantalStappen == maxAantalStappen )
 		{
 			if ( isSkipping )
-			{											// check level of this command
+			{	// check level of this command
+				// lower than skipLevel, return to normal tracing
 				if ( commandLevel < skipLevel )
-				{										// lower then skipLevel, return to normal tracing
-					isSkipping = false;
+				{	isSkipping = false;
 					return true;
-				} else
-				{										// in skipped block				
-					maxAantalStappen++;					// new max after skipping this command, increase max here
-					return false;						// ... to make next command satify the first if
+				} 
+				else // in skipped block
+				{	// new max after skipping this command, increase max here to make next command satisfy the first if									
+					maxAantalStappen++;	
+					return false;		
 				}
-			} else
-			{											// not skipping, stop at this command
-				return true;
+			} 
+			else // not skipping, stop at this command
+			{	return true;
 			}
-		} else
-		{
-			return false;
+		} 
+		else
+		{	return false;
 		}
 	}
 
 	/**
-	 * Set text of 'methodeVeld' and (if var tracing is on) the varset in the vartracer.
+	 * Set text of 'methodeVeld' and (if var tracing is on) the current variable set in the vartracer.
 	 * This method will be called from the execute-methods in the CC's, when trace is on
 	 * and execution stops at that command.
-	 * 
+	 * @param actualCommand the actual command
 	 * @param varset	the current set of variables in tracing mode
 	 */
 	public void setCommandInfo(String actualCommand, VarSet varset)
 	{
 		currentlevel = varset.getLevel();
-//verhuisd		
 		if (owner.methodeLabel != null)
 			owner.methodeLabel.setText(actualCommand);
 		if ( isVartracing )
 		{
-//verhuisd			
 			owner.vartracer.setContent(varset.toString());
 		}
 	}
 	
 	//-------------------------------------------------------------------------------------------
-	//afhandeling van de knopacties
+	// button actions, buttons are property of and listened to in class WebLogoGWT 
 	//-------------------------------------------------------------------------------------------
-//GWT naar WebLogoGWT
-/*	
-	@Override
-	public void actionPerformed(ActionEvent e)
-	{	if(e.getSource() == stapKnop)
-		{
-*/
-		public void stapAction()
-		{
-			maxAantalStappen++;
-			tb.paintDrawing(true);
-		}
-/*		
-		if(e.getSource() == terugKnop)
-		{
-*/
-		public void terugAction()
-		{
-			maxAantalStappen--;
-			if(maxAantalStappen<0)maxAantalStappen=0;
-			tb.paintDrawing(true);
-		}
-/*		
-		if(e.getSource() == skipKnop)
-		{	
-*/		
-		public void skipAction()
-		{
-			skipLevel = currentlevel;
-			isSkipping = true;
-			tb.paintDrawing(true);
-		}
-/*		
-		if(e.getSource() == beginKnop)
-		{	
-*/
-		public void beginAction()
-		{
-//GWT			
-			//vartracer.setContent("");
-//verhuisd			
-			//methodeVeld.setText("");
-			isSkipping = false;					// previous trace may have stopped in skip
-			maxAantalStappen = 0;
-			tb.paintDrawing(true);
-		}
-/*		
-		if(e.getSource() == traceKnop)
-		{	
-			if(!traceAan)
-			{
-*/			
-			public void traceAanAction()
-			{
-				traceAan = true;
-				isSkipping = false;
-				maxAantalStappen = 0;
-//verhuisd				
-				//methodeVeld.setText("");
-				tb.paintDrawing(true);
-				//traceKnop.setText(JavaLogoWeb.rb.getString("traceOffLabel"));
-				//setComponentVisibilty(true);
-			}
-			
-/*			
-			else
-			{
-*/			public void traceUitAction()
-			{
-				traceAan = false;
-				tb.paintDrawing(false);
-//verhuisd				
-				//showVariables.setSelected(false);
-				setVartracing(false);
-				//setComponentVisibilty(false);
-				//traceKnop.setText(JavaLogoWeb.rb.getString("traceOnLabel"));
-			}
-/*
-			repaint();
-		}
-	}
-*/	
-	
-//GWT naar WebLogoGWT
-/*	
-	@Override
-	public void itemStateChanged(ItemEvent e)
+	/**
+	 * action at clicking stapKnop in WebLogoGWT
+	 */
+	public void stapAction()
 	{
-		boolean b = ( e.getStateChange() == ItemEvent.SELECTED );
-		setVartracing(b);
+		maxAantalStappen++;
+		tb.paintDrawing(true);
 	}
-*/	
+	/**
+	 * action at clicking terugKnop in WebLogoGWT
+	 */
+	public void terugAction()
+	{
+		maxAantalStappen--;
+		if (maxAantalStappen < 0)
+			maxAantalStappen=0;
+		tb.paintDrawing(true);
+	}
+	/**
+	 * action at clicking skipKnop in WebLogoGWT
+	 */
+	public void skipAction()
+	{
+		skipLevel = currentlevel;
+		isSkipping = true;
+		tb.paintDrawing(true);
+	}
+	/**
+	 * action at clicking beginKnop in WebLogoGWT
+	 */
+	public void beginAction()
+	{	// previous trace may have stopped in skip
+		isSkipping = false;					
+		maxAantalStappen = 0;
+		tb.paintDrawing(true);
+	}
+	/**
+	 * action at clicking traceAanKnop in WebLogoGWT
+	 */
+	public void traceAanAction()
+	{
+		traceAan = true;
+		isSkipping = false;
+		maxAantalStappen = 0;
+		tb.paintDrawing(true);
+	}
+	/**
+	 * action at clicking traceAanKnop in WebLogoGWT
+	 */
+	public void traceUitAction()
+	{
+			traceAan = false;
+			tb.paintDrawing(false);
+			setVartracing(false);
+	}
+	
+	/**
+	 * enable/disable tracing of variables: add/remove the vartracer in JavaLogoSchuifVels  
+	 * @param b enable/disable
+	 */
 	public void setVartracing(boolean b)
 	{
 		if ( b )
-		{
-			isVartracing = true;
-//GWT naar WebLogoGWT			
+		{	isVartracing = true;
 			jlsveld.add(owner.vartracer);
-			//vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
 			jlsveld.setWidgetLeftWidth(owner.vartracer, JavaLogoSchuifVeld.ccx-1, Style.Unit.PX, owner.vartracerWidth, Style.Unit.PX);
 			jlsveld.setWidgetTopHeight(owner.vartracer, JavaLogoSchuifVeld.ccy - 1, Style.Unit.PX, owner.vartracerHeight, Style.Unit.PX);
-			//vartracer.setBounds(ccx, ccy, 2*ccsw+10, 515);
-			
-		} else
+		} 
+		else
 		{
 			isVartracing = false;
-//GWT naar WebLogoGWT 			
 			jlsveld.remove(owner.vartracer);
-			
+			// remove, so that upon starting tracing variables, vartracer is empty
 			owner.vartracer.setContent("");
 		}
 		jlsveld.paint();

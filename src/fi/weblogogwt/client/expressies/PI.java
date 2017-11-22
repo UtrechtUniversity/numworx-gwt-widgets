@@ -1,6 +1,6 @@
 package fi.weblogogwt.client.expressies;
 
-import java.awt.*;
+
 import java.util.Vector;
 
 public class PI extends BasisExpressie  
