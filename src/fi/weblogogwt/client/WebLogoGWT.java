@@ -80,7 +80,8 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	 */
 	LayoutPanel webLogoPanel;
 	/**
-	 * Panel for program part
+	 * Java logo schuifveld.
+	 * Panel for program part.
 	 */
 	JavaLogoSchuifVeld jlsVeld;
 	/**
@@ -116,7 +117,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	int topOffset = 5;
 
 	/**
-	 * flagg for stand-alone version
+	 * Flag for stand-alone version.
 	 */
 	boolean paul = false;
 	/**
@@ -156,11 +157,13 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	 */
 	int uby = offSet;
 	/**
-	 * width drawing part, no subroutines in program part
+	 * Uitvoerbladbreedte klein.
+	 * Width drawing part, no subroutines in program part.
 	 */
 	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; 
 	/**
-	 * width drawing part, depending on subroutines in program part
+	 * Uitvoerbladbreedte groot.
+	 * Width drawing part, depending on subroutines in program part
 	 */
 	int ubbGroot = breedteGroot - jlsBreedteGroot - 3 * offSet;
 	int ubb = 0;
@@ -321,8 +324,6 @@ logger.info("WebLogoGWT constructor");
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		init(breedte, hoogte, launchState, randomVarWaarden);
-
-
 	}
 
 	/**
@@ -330,204 +331,220 @@ logger.info("WebLogoGWT constructor");
 	 */
 	public void init(int width, int height, Map<String,Object> map, Map<String,Number> values) 
 	{
+		logger.info("WebLogoGWT uncompiled init");
+
+		// StubView shows a vertical scoll bar?
+		this.hoogte = height;
+		// take user width instead of fixed width
+		this.breedte = width;
 		
-logger.info("WebLogoGWT uncompiled init");
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
-			// StubView shows a vertical scoll bar?
-			this.hoogte = height + 35;
-			// take user width instead of fixed width
-			this.breedte = width;
-			
-			ObjectMap launchState = JSONUtilities.wrapMap(map);
+		// parametrisation (DWOPlayer version)
+		if (launchState != null && launchState.containsKey("uitvoerVeldZichtbaar"))
+			uitvoerVeldZichtbaar = launchState.getBoolean("uitvoerVeldZichtbaar");
+		if (launchState != null && launchState.containsKey("programmaVeldZichtbaar"))
+			programmaVeldZichtbaar = launchState.getBoolean("programmaVeldZichtbaar");
+		if (launchState != null && launchState.containsKey("deeltakenZichtbaar"))
+			deeltakenZichtbaar = launchState.getBoolean("deeltakenZichtbaar");
+		if (launchState != null && launchState.containsKey("whileLoopZichtbaar"))
+			whileLoopZichtbaar = launchState.getBoolean("whileLoopZichtbaar");
+		if (launchState != null && launchState.containsKey("keuzeCommandZichtbaar"))
+			keuzeCommandZichtbaar = launchState.getBoolean("keuzeCommandZichtbaar");
+		if (launchState != null && launchState.containsKey("printCommandsZichtbaar"))
+			printCommandsZichtbaar = launchState.getBoolean("printCommandsZichtbaar");
+		if (launchState != null && launchState.containsKey("tekenCommandsZichtbaar"))
+			tekenCommandsZichtbaar = launchState.getBoolean("tekenCommandsZichtbaar");
+		if (launchState != null && launchState.containsKey("traceZichtbaar"))
+			traceZichtbaar = launchState.getBoolean("traceZichtbaar");
+		if (launchState != null && launchState.containsKey("codeIOZichtbaar"))
+			codeIOZichtbaar = launchState.getBoolean("codeIOZichtbaar");
+		// a non-null launchstate from the DWO always contains state
+		// in the stand-alone version the launchstate is empty (but non-null)
+		if (launchState != null && launchState.containsKey("state"))
+			state = (HashMap) launchState.getMap("state");
 
-			// parametrisation (DWOPlayer version) 
-			if (launchState != null && launchState.containsKey("uitvoerVeldZichtbaar")) 
-				uitvoerVeldZichtbaar = launchState.getBoolean("uitvoerVeldZichtbaar");
-			if (launchState != null && launchState.containsKey("programmaVeldZichtbaar")) 
-				programmaVeldZichtbaar = launchState.getBoolean("programmaVeldZichtbaar");
-			if (launchState != null && launchState.containsKey("deeltakenZichtbaar"))	
-				deeltakenZichtbaar = launchState.getBoolean("deeltakenZichtbaar");
-			if (launchState != null && launchState.containsKey("whileLoopZichtbaar")) 
-				whileLoopZichtbaar = launchState.getBoolean("whileLoopZichtbaar");
-			if (launchState != null && launchState.containsKey("keuzeCommandZichtbaar")) 
-				keuzeCommandZichtbaar = launchState.getBoolean("keuzeCommandZichtbaar");
-			if (launchState != null && launchState.containsKey("printCommandsZichtbaar")) 
-				printCommandsZichtbaar = launchState.getBoolean("printCommandsZichtbaar");
-			if (launchState != null && launchState.containsKey("tekenCommandsZichtbaar")) 
-				tekenCommandsZichtbaar = launchState.getBoolean("tekenCommandsZichtbaar");
-			if (launchState != null && launchState.containsKey("traceZichtbaar")) 
-				traceZichtbaar = launchState.getBoolean("traceZichtbaar");
-			if (launchState != null && launchState.containsKey("codeIOZichtbaar")) 
-				codeIOZichtbaar = launchState.getBoolean("codeIOZichtbaar");			
-			// a non-null launchstate from the DWO always contains state
-			// in the stand-alone version the launchstate is empty (but non-null) 
-			if (launchState != null && launchState.containsKey("state")) 
-				state = (HashMap) launchState.getMap("state");
-			
-			// DWOPlayer: program and drawing part
-			// override width and height from DWO
-			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar)
-			{	// with subroutines
-				if (deeltakenZichtbaar)
-				{	//this.breedte = breedteGroot;
-					ubb = ubbGroot;
-				}
-				else // without subroutines
-				{	//this.breedte = breedteKlein;
-					ubb = ubbKlein;
-				}
-				jlsHoogte = hoogte - bottomHeight - offSet;
-				ubh = jlsHoogte;
-			}
-			// program part only
-			// override width and height from DWO
-			else if (!uitvoerVeldZichtbaar && programmaVeldZichtbaar)
-			{	// with subroutines
-				if (deeltakenZichtbaar)
-				{	//this.breedte = jlsBreedteGroot + 2 * offSet;
-				}
-				else // without subroutines
-				{	//this.breedte = jlsBreedteKlein + 2 * offSet;
-				}
-				jlsHoogte = hoogte - bottomHeight - offSet;
-				ubh = jlsHoogte;
-			}
-			// drawing part only
-			// use width and height from DWO
-			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
-			{	this.breedte = width;
-				this.hoogte = height;
-				ubb = this.breedte;
-				ubh = this.hoogte;
-			}
-			
-			// override previous settings in case of stand-alone version: 
-			// this has empty launchstate (thus non-null) without state 
-			if (launchState != null && !launchState.containsKey("state"))
-			{
-				paul = true;
-				// use full browser width, fix the program width at jlsBreedteGroot (thus including subroutines)
-				// and use the remaining widt for the drawing area
-				breedte = Window.getClientWidth(); 
-				ubb = breedte - jlsBreedteGroot - 3 * offSet; //ubbPaul;
-				hoogte = Window.getClientHeight(); //hoogtePaul;
-				jlsHoogte = hoogte - bottomHeight - offSet;
-				ubh = jlsHoogte;
-				// use full browser width
-				dlp.setWidth("100%");
-				// it seems (?) only one 100% statement can be used, so set dlp-height 
-				// to maximum in onModuleLoad()
-				//dlp.setSize("100%","100%");
-				//dlp.setHeight("100%");
-			}
-			else
-				dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
-			
-			webLogoPanel = new LayoutPanel();
-			webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
-			webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
-			
-//System.out.println("this b " + this.breedte);			
-//System.out.println("this h " + this.hoogte);
-
-			uitvoerblad = new Tekenblad(this,ubb,ubh);
-			Canvas tekenbladCanvas = uitvoerblad.getCanvas();
-			if (tekenbladCanvas == null) 
-			{   RootPanel.get().add(new Label(upgradeMessage));
-		      	return;
-		    }
-			
-			uitvoerblad.initContext2d();
-			webLogoPanel.add(uitvoerblad);
-
-			// position drawing part on webLogoPanel
-			if (!uitvoerVeldZichtbaar)
-				webLogoPanel.setWidgetVisible(uitvoerblad,false);
-			if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && deeltakenZichtbaar)
-			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxGroot, Style.Unit.PX, ubb, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
-			}
-			else if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && !deeltakenZichtbaar)
-			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxKlein, Style.Unit.PX, ubb, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
-			}
-			else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
-			{	webLogoPanel.setWidgetLeftWidth(uitvoerblad, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(uitvoerblad, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-			}
-			
+		// DWOPlayer: program and drawing part
+		// override width and height from DWO
+		if (uitvoerVeldZichtbaar && programmaVeldZichtbaar)
+		{
+			// with subroutines
 			if (deeltakenZichtbaar)
-				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteGroot,jlsHoogte);
-			else
-				jlsVeld = new JavaLogoSchuifVeld(0,0,jlsBreedteKlein,jlsHoogte);
-			
-			Canvas jlsvCanvas = jlsVeld.getCanvas();
-			if (jlsvCanvas == null) 
 			{
-		      RootPanel.get().add(new Label(upgradeMessage));
-		      return;
-		    }
-			
-			jlsVeld.initContext2d();
-			jlsVeld.initialize();
-
-			// position program part on webLogoPanel
-			if (programmaVeldZichtbaar)
-			{	webLogoPanel.add(jlsVeld);
-				if (deeltakenZichtbaar)
-				{	webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteGroot, Style.Unit.PX);
-					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
-				}	
-				else
-				{
-					webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteKlein, Style.Unit.PX);
-					webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
-				}
+				// this.breedte = breedteGroot;
+				ubb = breedte - jlsBreedteGroot - 3 * offSet;
 			}
-			// set parametrization
-			jlsVeld.zetDeeltaken(deeltakenZichtbaar);
-			jlsVeld.zetWhileLoopZichtbaar(whileLoopZichtbaar);
-			jlsVeld.zetKeuzeCommandZichtbaar(keuzeCommandZichtbaar);
-			jlsVeld.zetPrintCommandsZichtbaar(printCommandsZichtbaar);
-			jlsVeld.zetTekenCommandsZichtbaar(tekenCommandsZichtbaar);
-			
-			trb = new TraceBeheerder(uitvoerblad, jlsVeld, this);
-			
-			bottomPanel = new LayoutPanel();
-			bottomPanel.setSize("" + breedte + "px", "" + bottomHeight + "px");
-			bottomPanel.addStyleName(webLogoGWTCssResource.bottom());
-			
-			makeBottom();
-			
-			// bottom Panel only if program part is available
-			if (programmaVeldZichtbaar)
-			{	webLogoPanel.add(bottomPanel);
-				webLogoPanel.setWidgetLeftWidth(bottomPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-				webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte-bottomHeight, Style.Unit.PX, bottomHeight, Style.Unit.PX);
+			else // without subroutines
+			{
+				// this.breedte = breedteKlein;
+				ubb = breedte - jlsBreedteKlein - 3 * offSet;
 			}
-			
-			dlp.add(webLogoPanel);
-			
-			jlsVeld.paint();
-			uitvoerblad.initializeDrawing(false);
-
-			if (state != null)
-			{	setState(state);
-logger.info("state != null");			
+			jlsHoogte = hoogte - bottomHeight - offSet;
+			ubh = jlsHoogte;
+		}
+		// program part only
+		// override width and height from DWO
+		else if (!uitvoerVeldZichtbaar && programmaVeldZichtbaar)
+		{ // with subroutines
+			if (deeltakenZichtbaar)
+			{
+				// this.breedte = jlsBreedteGroot + 2 * offSet;
 			}
-			
-			dlp.forceLayout();
-			webLogoPanel.forceLayout();
-			bottomPanel.forceLayout();
-			jlsVeld.forceLayout();
-			uitvoerblad.forceLayout();
-			
-			jlsVeld.paint();			
+			else // without subroutines
+			{
+				// this.breedte = jlsBreedteKlein + 2 * offSet;
+			}
+			jlsHoogte = hoogte - bottomHeight - offSet;
+			ubh = jlsHoogte;
+		}
+		// drawing part only
+		// use width and height from DWO
+		else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
+		{
+			this.breedte = width;
+			this.hoogte = height;
+			ubb = this.breedte;
+			ubh = this.hoogte;
+		}
 
-			// variable window
-			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;
-			vartracerHeight = 515;
-			vartracer = new VardisplayPanel(vartracerWidth, vartracerHeight);
+		// override previous settings in case of stand-alone version:
+		// this has empty launchstate (thus non-null) without state
+		if (launchState != null && !launchState.containsKey("state"))
+		{
+			paul = true;
+			// use full browser width, fix the program width at jlsBreedteGroot
+			// (thus including subroutines)
+			// and use the remaining widt for the drawing area
+			breedte = Window.getClientWidth();
+			ubb = breedte - jlsBreedteGroot - 3 * offSet; // ubbPaul;
+			hoogte = Window.getClientHeight(); // hoogtePaul;
+			jlsHoogte = hoogte - bottomHeight - offSet;
+			ubh = jlsHoogte;
+			// use full browser width
+			dlp.setWidth("100%");
+			// it seems (?) only one 100% statement can be used, so set
+			// dlp-height
+			// to maximum in onModuleLoad()
+			// dlp.setSize("100%","100%");
+			// dlp.setHeight("100%");
+		}
+		else
+			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+
+		webLogoPanel = new LayoutPanel();
+		webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+		webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
+
+		// System.out.println("this b " + this.breedte);
+		// System.out.println("this h " + this.hoogte);
+
+		uitvoerblad = new Tekenblad(this, ubb, ubh);
+		Canvas tekenbladCanvas = uitvoerblad.getCanvas();
+		if (tekenbladCanvas == null)
+		{
+			RootPanel.get().add(new Label(upgradeMessage));
+			return;
+		}
+
+		uitvoerblad.initContext2d();
+		webLogoPanel.add(uitvoerblad);
+
+		// position drawing part on webLogoPanel
+		if (!uitvoerVeldZichtbaar)
+			webLogoPanel.setWidgetVisible(uitvoerblad, false);
+		if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && deeltakenZichtbaar)
+		{
+			webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxGroot, Style.Unit.PX, ubb, Style.Unit.PX);
+			webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
+		}
+		else if (uitvoerVeldZichtbaar && programmaVeldZichtbaar && !deeltakenZichtbaar)
+		{
+			webLogoPanel.setWidgetLeftWidth(uitvoerblad, ubxKlein, Style.Unit.PX, ubb, Style.Unit.PX);
+			webLogoPanel.setWidgetTopHeight(uitvoerblad, uby, Style.Unit.PX, ubh, Style.Unit.PX);
+		}
+		else if (uitvoerVeldZichtbaar && !programmaVeldZichtbaar)
+		{
+			webLogoPanel.setWidgetLeftWidth(uitvoerblad, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			webLogoPanel.setWidgetTopHeight(uitvoerblad, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
+		}
+
+		if (deeltakenZichtbaar)
+			jlsVeld = new JavaLogoSchuifVeld(0, 0, jlsBreedteGroot, jlsHoogte);
+		else
+			jlsVeld = new JavaLogoSchuifVeld(0, 0, jlsBreedteKlein, jlsHoogte);
+
+		Canvas jlsvCanvas = jlsVeld.getCanvas();
+		if (jlsvCanvas == null)
+		{
+			RootPanel.get().add(new Label(upgradeMessage));
+			return;
+		}
+
+		jlsVeld.initContext2d();
+		jlsVeld.initialize();
+
+		// position program part on webLogoPanel
+		if (programmaVeldZichtbaar)
+		{
+			webLogoPanel.add(jlsVeld);
+			if (deeltakenZichtbaar)
+			{
+				webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteGroot, Style.Unit.PX);
+				webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
+			}
+			else
+			{
+				webLogoPanel.setWidgetLeftWidth(jlsVeld, offSet, Style.Unit.PX, jlsBreedteKlein, Style.Unit.PX);
+				webLogoPanel.setWidgetTopHeight(jlsVeld, offSet, Style.Unit.PX, jlsHoogte, Style.Unit.PX);
+			}
+		}
+		// set parametrization
+		jlsVeld.zetDeeltaken(deeltakenZichtbaar);
+		jlsVeld.zetWhileLoopZichtbaar(whileLoopZichtbaar);
+		jlsVeld.zetKeuzeCommandZichtbaar(keuzeCommandZichtbaar);
+		jlsVeld.zetPrintCommandsZichtbaar(printCommandsZichtbaar);
+		jlsVeld.zetTekenCommandsZichtbaar(tekenCommandsZichtbaar);
+
+		trb = new TraceBeheerder(uitvoerblad, jlsVeld, this);
+
+		bottomPanel = new LayoutPanel();
+		bottomPanel.setSize("" + breedte + "px", "" + bottomHeight + "px");
+		bottomPanel.addStyleName(webLogoGWTCssResource.bottom());
+
+		makeBottom();
+
+		// bottom Panel only if program part is available
+		if (programmaVeldZichtbaar)
+		{
+			webLogoPanel.add(bottomPanel);
+			webLogoPanel.setWidgetLeftWidth(bottomPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+			webLogoPanel.setWidgetTopHeight(bottomPanel, hoogte - bottomHeight, Style.Unit.PX, bottomHeight,
+				Style.Unit.PX);
+		}
+
+		dlp.add(webLogoPanel);
+
+		jlsVeld.paint();
+		uitvoerblad.initializeDrawing(false);
+
+		if (state != null)
+		{
+			setState(state);
+			logger.info("state != null");
+		}
+
+		dlp.forceLayout();
+		webLogoPanel.forceLayout();
+		bottomPanel.forceLayout();
+		jlsVeld.forceLayout();
+		uitvoerblad.forceLayout();
+
+		jlsVeld.paint();
+
+		// variable window
+		vartracerWidth = 2 * JavaLogoSchuifVeld.ccsw + 12;
+		vartracerHeight = 515;
+		vartracer = new VardisplayPanel(vartracerWidth, vartracerHeight);
 	}
 	
 	/**
@@ -696,8 +713,6 @@ logger.info("state != null");
 			} 
 			else if (e.getSource() == traceAanKnop)
 			{
-//System.out.println("click traceAan");
-
 				// hide/show relevant buttons and other Gui elements
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, false);
@@ -723,8 +738,6 @@ logger.info("state != null");
 			} 
 			else if (e.getSource() == traceUitKnop)
 			{
-//System.out.println("click traceUit");
-
 				// show/hide relevant buttons and other Gui elements
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, true);
@@ -794,7 +807,7 @@ logger.info("state != null");
 	 */
 	public HashMap<String, Object> getState()
 	{
-//logger.info("getState");
+		//logger.info("getState");
 		HashMap<String, Object> h = new HashMap<String, Object>();
 		String code = "";
 		code = jlsVeld.getCode();
@@ -812,13 +825,13 @@ logger.info("state != null");
 	{
 		if ((h == null) || h.isEmpty())
 			return;
-//logger.info("setState");
+		//logger.info("setState");
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		String code = "";
 		HashMap<String, Object> inputVars = null;
 		if (map.containsKey("code")) 
 			code = map.getString("code");
-//logger.info("code = " + code);
+		//logger.info("code = " + code);
 		if (map.containsKey("inputVars")) 
 			inputVars = (HashMap) map.getMap("inputVars");
 		if (inputVars != null)
@@ -852,7 +865,7 @@ logger.info("state != null");
 	 */
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-//logger.info("WebLogoGWT setComRoot");		
+		//logger.info("WebLogoGWT setComRoot");		
 		this.comRoot = comRoot;
 		zetMode(comRoot.getMode());
 		comRoot.addCBookEventListener("text.program", this);
@@ -864,17 +877,19 @@ logger.info("state != null");
 	}
 	
 	public void zetMode(int mode)
-	{	this.mode = mode;
+	{
+		this.mode = mode;
 	}
 	
 	@Override
-	public void zetVolledigeBreedte(int breedte) {
+	public void zetVolledigeBreedte(int breedte)
+	{
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
-	public int getAsHoogte() {
+	public int getAsHoogte()
+	{
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -926,10 +941,11 @@ logger.info("state != null");
 		try
 		{
 			String command = event.getCommand();
+			
+			logger.info("WebLogoGWT.acceptCBookaccCBookEvent(): " + command);
+			
 			if (command.startsWith("text"))
 			{
-//logger.info("accCBookEv " + command);
-				
 				Map map = (Map) event.getParameters();
 				if (map != null)
 				{
@@ -957,7 +973,7 @@ logger.info("state != null");
 			}
 			if (command.startsWith("double"))
 			{
-// logger.info("accCBookEv " + command);
+				// logger.info("accCBookEv " + command);
 				Map map = (Map) event.getParameters();
 				
 				if (map != null && command.equals("double.input"))
@@ -983,8 +999,6 @@ logger.info("state != null");
 					{
 						waarde = 0; // some error
 					}
-//System.out.println("name = " + name);
-//System.out.println("waarde = " + UF.format(waarde, 2));
 					jlsVeld.setInputVar(name, waarde);
 					uitvoerblad.paintDrawing(false);
 					
