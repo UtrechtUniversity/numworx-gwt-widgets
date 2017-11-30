@@ -2658,6 +2658,18 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			HeaderPanel header = (HeaderPanel) getWidget();
 			return (ScrollPanel) header.getContentWidget();
 		}
+		
+//		 /**
+//		  * Method to access the data grid's header widget.
+//		  * 
+//		  * @return
+//		  */
+//		public Widget getHeaderWidget()
+//		{
+//			HeaderPanel header = (HeaderPanel) getWidget();
+//			return (Widget) header.getHeaderWidget();
+//		}
+
 	} // class StatTableDataGrid
 
 	
@@ -4066,5 +4078,22 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
     {
     	return System.currentTimeMillis() - taptime > 300;
 	}
+
+//	@Override
+//	public void setEditable(boolean editable)
+//	{
+//		tablePanel.asWidget().setStyleDependentName("readonly", !editable);
+//
+//		if (!editable)
+//		{
+//			table.getScrollPanel().getWidget().getElement().getStyle().setProperty("pointerEvents", "none");
+//			table.getHeaderWidget().getElement().getStyle().setProperty("pointerEvents", "none");
+//		}
+//		else
+//		{
+//			table.getScrollPanel().getWidget().getElement().getStyle().clearProperty("pointerEvents");
+//			table.getHeaderWidget().getElement().getStyle().clearProperty("pointerEvents");
+//		}
+//	}
 }
 
