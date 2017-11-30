@@ -113,35 +113,60 @@ public class ColorParameter extends TAParameter
 	private void parseColorName(String s)
 	{
 		isColorByName = true;
-		isCorrect = true;			// until proven differently...
+		isCorrect = true; // until proven differently...
 		s = s.trim();
-		if ( s.equals("rood")) theColor = CssColor.make(255,0,0);
-		else if ( s.equals("groen")) theColor = CssColor.make(0,255,0);
-		else if ( s.equals("blauw")) theColor = CssColor.make(0,0,255);
-		else if ( s.equals("geel")) theColor = CssColor.make(255, 255, 0);
-		else if ( s.equals("cyaan")) theColor = CssColor.make(0, 255, 255);
-		else if ( s.equals("roze")) theColor = CssColor.make(255,20,147);
-		else if ( s.equals("zwart")) theColor = CssColor.make(0,0,0);
-		else if ( s.equals("grijs")) theColor = CssColor.make(192, 192, 192);
-		else if ( s.equals("lichtgrijs")) theColor = CssColor.make(220, 220, 220);
-		else if ( s.equals("magenta")) theColor = CssColor.make(255, 0, 255);
-		else if ( s.equals("wit")) theColor = CssColor.make(255,255,255);
-		else if ( s.equals("oranje")) theColor = CssColor.make(255, 127, 0);
-		
-		else if ( s.equals("red")) theColor = CssColor.make(255,0,0);
-		else if ( s.equals("green")) theColor = CssColor.make(0,255,0);
-		else if ( s.equals("blue")) theColor = CssColor.make(0,0,255);
-		else if ( s.equals("yellow")) theColor = CssColor.make(255, 255, 0);
-		else if ( s.equals("cyan")) theColor = CssColor.make(0, 255, 255);
-		else if ( s.equals("pink")) theColor = CssColor.make(255,20,147);
-		else if ( s.equals("black")) theColor = CssColor.make(0,0,0);
-		else if ( s.equals("gray")) theColor = CssColor.make(192, 192, 192);
-		else if ( s.equals("lightGray")) theColor = CssColor.make(220, 220, 220);
-		else if ( s.equals("magenta")) theColor = CssColor.make(255, 0, 255);
-		else if ( s.equals("white")) theColor = CssColor.make(255,255,255);
-		else if ( s.equals("orange")) theColor = CssColor.make(255, 127, 0);
-		
-		else isCorrect = false;		// ... here
+		if (s.equals("rood"))
+			theColor = CssColor.make(255, 0, 0);
+		else if (s.equals("groen"))
+			theColor = CssColor.make(0, 255, 0);
+		else if (s.equals("blauw"))
+			theColor = CssColor.make(0, 0, 255);
+		else if (s.equals("geel"))
+			theColor = CssColor.make(255, 255, 0);
+		else if (s.equals("cyaan"))
+			theColor = CssColor.make(0, 255, 255);
+		else if (s.equals("roze"))
+			theColor = CssColor.make(255, 20, 147);
+		else if (s.equals("zwart"))
+			theColor = CssColor.make(0, 0, 0);
+		else if (s.equals("grijs"))
+			theColor = CssColor.make(192, 192, 192);
+		else if (s.equals("lichtgrijs"))
+			theColor = CssColor.make(220, 220, 220);
+		else if (s.equals("magenta"))
+			theColor = CssColor.make(255, 0, 255);
+		else if (s.equals("wit"))
+			theColor = CssColor.make(255, 255, 255);
+		else if (s.equals("oranje"))
+			theColor = CssColor.make(255, 127, 0);
+
+		else if (s.equals("red"))
+			theColor = CssColor.make(255, 0, 0);
+		else if (s.equals("green"))
+			theColor = CssColor.make(0, 255, 0);
+		else if (s.equals("blue"))
+			theColor = CssColor.make(0, 0, 255);
+		else if (s.equals("yellow"))
+			theColor = CssColor.make(255, 255, 0);
+		else if (s.equals("cyan"))
+			theColor = CssColor.make(0, 255, 255);
+		else if (s.equals("pink"))
+			theColor = CssColor.make(255, 20, 147);
+		else if (s.equals("black"))
+			theColor = CssColor.make(0, 0, 0);
+		else if (s.equals("gray"))
+			theColor = CssColor.make(192, 192, 192);
+		else if (s.equals("lightGray"))
+			theColor = CssColor.make(220, 220, 220);
+		else if (s.equals("magenta"))
+			theColor = CssColor.make(255, 0, 255);
+		else if (s.equals("white"))
+			theColor = CssColor.make(255, 255, 255);
+		else if (s.equals("orange"))
+			theColor = CssColor.make(255, 127, 0);
+
+		else
+			isCorrect = false; // ... here
 	}
 
 	/**
