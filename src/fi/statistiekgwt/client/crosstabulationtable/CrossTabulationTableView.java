@@ -1420,4 +1420,20 @@ public class CrossTabulationTableView extends LayoutPanel implements TableChange
 		return userOptionsPanel;
 	}
 
+//	public void setEditable(boolean editable)
+//	{
+//		this.alles.setStyleDependentName("readonly", !editable);
+//
+//		// als niet-editable, dan mainPanel in scrollpanel niet laten reageren op pointer events
+//		if (!editable)
+//		{
+//			mainPanel.getElement().getStyle().setProperty("pointerEvents", "none");
+//		}
+//		else
+//		{
+//			mainPanel.getElement().getStyle().clearProperty("pointerEvents");
+//		}
+//		
+//		dialogButton.setEnabled(editable);		
+//	}
 }
