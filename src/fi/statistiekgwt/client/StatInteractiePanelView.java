@@ -970,6 +970,10 @@ public class StatInteractiePanelView extends LayoutPanel
 				{
 					StatistiekView view = mainWindowViews.get(i);
 					this.tabPanel.add(view.getWidget(), this.getTabTitle(view.getWidget(), view.getViewName()));
+					
+					// test non editable
+//					view.getWidget().setStyleDependentName("readonly", controller.isEditable());
+//					view.setEditable(controller.isEditable());
 				}
 			}
 			else
@@ -2392,4 +2396,15 @@ public class StatInteractiePanelView extends LayoutPanel
 				getItem(SCATTERPLOT_INDEX + 1).setTitle(StatistiekGWT.rb.datasetTooLargeForView());
 		}
 	}
+
+//	/**
+//	 * Set editable (read-only).
+//	 * 
+//	 * @param editable
+//	 */
+//	public void setEditable(boolean editable)
+//	{
+//		super.setStyleDependentName("readonly", !editable);
+//		this.tabPanel.setStyleDependentName("readonly", !editable);
+//	}
 }
