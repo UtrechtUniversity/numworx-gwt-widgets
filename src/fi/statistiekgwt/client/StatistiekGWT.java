@@ -335,7 +335,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public void init(int width, int height, Map<String, Object> launchDataMap,
 		Map<String, Number> values)
 	{
-		breedte = width - 2 * WIDTH_OFFSET;
+		breedte = width;
 		hoogte = height;
 		
 		launchState = launchDataMap;
