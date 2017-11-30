@@ -10,7 +10,7 @@
 }
 
 .bottom {
-	background-color: rgb(220,220,220);	
+	background-color: rgb(220,220,220);	/* grijs */
 }
 
 .canvas {
@@ -57,14 +57,14 @@
 }	
 
 .label {
-	background-color: rgb(255, 255, 255);
+	background-color: rgb(255, 255, 255); /* wit */
 	text-align: left;
 	text-indent: 10px;
 	font-family: Helvetica, sans serif;
 }
 
 .codelabel {
-	background-color: rgb(220, 220, 220);
+	background-color: rgb(220, 220, 220); /* grijs */
 	text-align: left;
 	text-indent: 10px;
 	font-family: Helvetica, sans serif;
@@ -72,7 +72,7 @@
 }
 
 .varlabel {
-	background-color: rgb(161, 255, 161);
+	background-color: rgb(161, 255, 161); /* groen */
 	font-size: 0.975em;
 	font-weight: bold;
 	font-family: Helvetica, sans serif;
@@ -81,7 +81,7 @@
 
 .vardisplay {
 	font-size: 0.875em;
-	background-color: rgb(221, 255, 221);
+	background-color: rgb(221, 255, 221); /* lichtgroen */
 	text-align: left;
 	font-family: Helvetica, sans serif;
 	white-space: pre;
