@@ -740,7 +740,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 			if (this.model.isShowPercentage())
 			{
 				double d = frequency * 100 / (double) sum;
-				d = Math.round(d * 100) / (double) 100;
 				// round to one decimal
 				int decimals = 1;
 				d = StatistiekGWT.round(d, decimals);
@@ -763,7 +762,6 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 	    	if (this.model.isShowPercentage() && this.model.isShowCumulative())
 	    	{
 				double d = (double) cumulative * 100 / (double) sum;
-				d = Math.round(d * 100) / (double) 100;
 				// round to one decimal
 				int decimals = 1;
 				d = StatistiekGWT.round(d, decimals);
@@ -1179,6 +1177,10 @@ public class FrequencyTableView extends LayoutPanel implements TableChangeEventH
 		this.update();
 	}
 
+//	public void setEditable(boolean editable)
+//	{
+//		this.alles.setStyleDependentName("readonly", !editable);
+//	}
 	
 //	/*
 //	 * RowClickListener is used on mainPanel which may contain several splitClassPanels
