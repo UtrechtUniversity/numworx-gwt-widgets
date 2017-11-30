@@ -33,6 +33,7 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 {
 	private StatModel model;
 	private StatInteractiePanelView view;
+//	private boolean editable = true;
 	public static final boolean DEBUG = false;
 	private double barHeight; 
 	private static final int TAB_HEIGHT_OFFSET = 30;
@@ -68,6 +69,10 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 		}
 		
 		super.add(this.view);
+		
+		// test non editable
+//		editable = false;
+//		view.setEditable(false);
 	}
 
 	public StatInteractiePanel(StatModel model)
@@ -882,7 +887,16 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 					this.getStatModel().getStatTableModel().fireEvent(tableChangeEvent);
 				}
 			} // map != null
-		}
+		} // command text.csv
+//		else if ("action.setNotEditable".equals(command))
+//		{
+//			editable = false;
+//			view.setEditable(false);
+//		}
 	}
 
+//	boolean isEditable()
+//	{
+//		return editable;
+//	}
 }
