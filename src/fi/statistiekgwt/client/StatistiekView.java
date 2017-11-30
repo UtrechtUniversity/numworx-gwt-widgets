@@ -92,4 +92,6 @@ public interface StatistiekView {
 	 * in statinteractiepanel. Views there are only accessible as statistiekViews.
 	 */
 	public void update();
+
+//	public void setEditable(boolean editable);
 }
