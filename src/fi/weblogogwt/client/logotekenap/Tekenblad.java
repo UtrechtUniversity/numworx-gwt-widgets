@@ -156,13 +156,10 @@ public class Tekenblad extends Uitvoerblad
   		beginpunt = new Punt(startpunt);
     	eindpunt = new Punt(beginpunt);
     	mat.initialiseer();
-    	// background
+    	// background white
     	achtergrondkleur = CssColor.make(255,255,255);
     	gIm.setFillStyle(achtergrondkleur);
     	gIm.fillRect(0, 0, breedte, hoogte);
-    	// border;
-    	gIm.setStrokeStyle(CssColor.make(192, 192, 192));
-    	gIm.strokeRect(0, 0, breedte-1, hoogte-1);
     	consoleX = consoleStartX;
     	consoleY = consoleStartY;
     	pen = true;
@@ -480,33 +477,59 @@ public class Tekenblad extends Uitvoerblad
 	 * @return corresponding color
 	 */
 	private CssColor maakKleur(String s)
-	{	if (s.equals("rood")) return CssColor.make(255,0,0);
-		else if ( s.equals("groen")) return CssColor.make(0,255,0);
-		else if ( s.equals("blauw")) return CssColor.make(0,0,255);
-		else if ( s.equals("geel")) return CssColor.make(255, 255, 0);
-		else if ( s.equals("cyaan")) return CssColor.make(0, 255, 255);
-		else if ( s.equals("roze")) return CssColor.make(255,20,147);
-		else if ( s.equals("zwart")) return CssColor.make(0,0,0);
-		else if ( s.equals("grijs")) return CssColor.make(192, 192, 192);
-		else if ( s.equals("lichtgrijs")) return CssColor.make(220, 220, 220);
-		else if ( s.equals("magenta")) return CssColor.make(255, 0, 255);
-		else if ( s.equals("wit")) return CssColor.make(255,255,255);
-		else if ( s.equals("oranje")) return CssColor.make(255, 127, 0);
-	
-		else if ( s.equals("red")) return CssColor.make(255,0,0);
-		else if ( s.equals("green")) return CssColor.make(0,255,0);
-		else if ( s.equals("blue")) return CssColor.make(0,0,255);
-		else if ( s.equals("yellow")) return CssColor.make(255, 255, 0);
-		else if ( s.equals("cyan")) return CssColor.make(0, 255, 255);
-		else if ( s.equals("pink")) return CssColor.make(255,20,147);
-		else if ( s.equals("black")) return CssColor.make(0,0,0);
-		else if ( s.equals("gray")) return CssColor.make(192, 192, 192);
-		else if ( s.equals("lightGray")) return CssColor.make(220, 220, 220);
-		else if ( s.equals("magenta")) return CssColor.make(255, 0, 255);
-		else if ( s.equals("white")) return CssColor.make(255,255,255);
-		else if ( s.equals("orange")) return CssColor.make(255, 127, 0);
-	
-		else return CssColor.make(0,0,0);
+	{
+		if (s.equals("rood"))
+			return CssColor.make(255, 0, 0);
+		else if (s.equals("groen"))
+			return CssColor.make(0, 255, 0);
+		else if (s.equals("blauw"))
+			return CssColor.make(0, 0, 255);
+		else if (s.equals("geel"))
+			return CssColor.make(255, 255, 0);
+		else if (s.equals("cyaan"))
+			return CssColor.make(0, 255, 255);
+		else if (s.equals("roze"))
+			return CssColor.make(255, 20, 147);
+		else if (s.equals("zwart"))
+			return CssColor.make(0, 0, 0);
+		else if (s.equals("grijs"))
+			return CssColor.make(192, 192, 192);
+		else if (s.equals("lichtgrijs"))
+			return CssColor.make(220, 220, 220);
+		else if (s.equals("magenta"))
+			return CssColor.make(255, 0, 255);
+		else if (s.equals("wit"))
+			return CssColor.make(255, 255, 255);
+		else if (s.equals("oranje"))
+			return CssColor.make(255, 127, 0);
+
+		else if (s.equals("red"))
+			return CssColor.make(255, 0, 0);
+		else if (s.equals("green"))
+			return CssColor.make(0, 255, 0);
+		else if (s.equals("blue"))
+			return CssColor.make(0, 0, 255);
+		else if (s.equals("yellow"))
+			return CssColor.make(255, 255, 0);
+		else if (s.equals("cyan"))
+			return CssColor.make(0, 255, 255);
+		else if (s.equals("pink"))
+			return CssColor.make(255, 20, 147);
+		else if (s.equals("black"))
+			return CssColor.make(0, 0, 0);
+		else if (s.equals("gray"))
+			return CssColor.make(192, 192, 192);
+		else if (s.equals("lightGray"))
+			return CssColor.make(220, 220, 220);
+		else if (s.equals("magenta"))
+			return CssColor.make(255, 0, 255);
+		else if (s.equals("white"))
+			return CssColor.make(255, 255, 255);
+		else if (s.equals("orange"))
+			return CssColor.make(255, 127, 0);
+
+		else
+			return CssColor.make(0, 0, 0);
 	}
 
 }
