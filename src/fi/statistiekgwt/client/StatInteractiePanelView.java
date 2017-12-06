@@ -627,10 +627,14 @@ public class StatInteractiePanelView extends LayoutPanel
 
 			setSelectedView(view);
 		}
-		else if (tab == this.model.getViews().size())
+		else if ((tab == this.model.getViews().size()) && this.model.getStatTableModel().isViewsAddable())
 		{
 			// select the add view tab
 			this.tabPanel.selectTab(this.model.getViews().size());
+		}
+		else
+		{
+			// something went wrong...
 		}
 	}
 
@@ -1210,7 +1214,7 @@ public class StatInteractiePanelView extends LayoutPanel
 		private int startY;
 		private int lastMovedX;
 		private int lastMovedY;
-		private boolean hasMoved;
+		//private boolean hasMoved;
 		
 		boolean mouseDown = false;
 
@@ -1265,7 +1269,7 @@ public class StatInteractiePanelView extends LayoutPanel
 				{
 					Touch touch = event.getTouches().get(0);
 					
-					this.hasMoved = true;
+					//this.hasMoved = true;
 					
 				    int movedX = touch.getPageX();
 					int movedY = touch.getPageY();	
