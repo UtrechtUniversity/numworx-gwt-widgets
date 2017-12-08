@@ -261,7 +261,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	double beginx = beginxDocent;
 	double beginy = beginyDocent;
 	
-	CssColor[] colors, opdrachtKleuren, gewoneKleuren;
+	String[] colors, opdrachtKleuren, gewoneKleuren;
 	
 	int tekenGrafiekNauwkeurigheid = 5;
 	
@@ -996,11 +996,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		}
 		if(pIndex == -1) {
 			graphPoints.addElement(newRP);
-			graphPointColors.addElement(opdrachtKleuren[activeIndex - 1].value());
+			graphPointColors.addElement(opdrachtKleuren[activeIndex - 1]);
 		}
 		else {
 			graphPoints.insertElementAt(newRP, pIndex);
-			graphPointColors.insertElementAt(opdrachtKleuren[activeIndex - 1].value(), pIndex);
+			graphPointColors.insertElementAt(opdrachtKleuren[activeIndex - 1], pIndex);
 		}
 		
 		/*
@@ -1050,7 +1050,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	{
 		if(typeOpdracht == TEKENTABELPUNTEN)
 		{
-			setColor(0, opdrachtKleuren[0], false);	
+			setColor(0, CssColor.make(opdrachtKleuren[0]), false);	
 			tabelComponent.zetTabelPunten(docentGraphPoints, false);
 			puntenNagekeken = false;
 			
@@ -1149,22 +1149,22 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	public CssColor getFormuleColor(int index)
 	{
 		if(grafiekKleuren && typeOpdracht != GEENOPDRACHT)
-			return opdrachtKleuren[index];
+			return CssColor.make(opdrachtKleuren[index]);
 		else if(grafiekKleuren)
-			return gewoneKleuren[index];
+			return CssColor.make(gewoneKleuren[index]);
 		else
-			return gewoneKleuren[0];
+			return CssColor.make(gewoneKleuren[0]);
 	}
 	
 	public void setColor(int nr, CssColor c, boolean nakijken) {
 		//31-8-2015: colors[nr] moet altijd deze kleur worden; bij nakijken wordt rood/groene feedback anders niet getoond.
 
-		colors[nr] = c;
+		colors[nr] = c.value();
 		if(typeOpdracht == GEENOPDRACHT)
-		{	gewoneKleuren[nr] = c;
+		{	gewoneKleuren[nr] = c.value();
 		}
 		else if (!nakijken)
-		{	opdrachtKleuren[nr] = c;
+		{	opdrachtKleuren[nr] = c.value();
 		}
 			
 	}
@@ -2207,7 +2207,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		int[][] colorRGBsOpdrachten = new int[opdrachtKleuren.length][3];
 		for(int i = 0; i < opdrachtKleuren.length; i++)
 		{	int[] kleurLijstje = new int[3];
-			String waarde = opdrachtKleuren[i].value();
+			String waarde = opdrachtKleuren[i];
 			if(waarde.startsWith("rgb"))
 			{	waarde = waarde.substring(4, waarde.length() - 1);
 				try
@@ -2232,7 +2232,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		int[][] colorRGBsGewoon = new int[gewoneKleuren.length][3];
 		for(int i = 0; i < gewoneKleuren.length; i++)
 		{	int[] kleurLijstje = new int[3];
-			String waarde = gewoneKleuren[i].value();
+			String waarde = gewoneKleuren[i];
 			if(waarde.startsWith("rgb"))
 			{	waarde = waarde.substring(4, waarde.length() - 1);
 				try
@@ -2402,7 +2402,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			colorRGBsGewoon = new int[list.size()][];
 			for (int i = 0; i < colorRGBsGewoon.length; i++) {
 				colorRGBsGewoon[i] = list.getIntArray(i);
-				gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]);
+				gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]).value();
 			}
 		}
     	
@@ -2427,7 +2427,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			colorRGBsOpdrachten = new int[list.size()][];
 			for (int i = 0; i < colorRGBsOpdrachten.length; i++) {
 				colorRGBsOpdrachten[i] = list.getIntArray(i);
-				opdrachtKleuren[i] = CssColor.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]);
+				opdrachtKleuren[i] = CssColor.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]).value();
 			}
 		}
 		
@@ -2561,15 +2561,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public void maakStandaardKleuren()
 	{
-		opdrachtKleuren = new CssColor[10];
-		gewoneKleuren = new CssColor[10];
-		colors = new CssColor[10];
+		opdrachtKleuren = new String[10];
+		gewoneKleuren = new String[10];
+		colors = new String[10];
 	    
-		CssColor zwart = CssColor.make(0, 0, 0);
-		opdrachtKleuren[0] = CssColor.make(0,0,255);
-		opdrachtKleuren[1] = CssColor.make(00,220,220);
-		opdrachtKleuren[2] = CssColor.make(220,0,220);
-		opdrachtKleuren[3] = CssColor.make(200,200,0);
+		String zwart = CssColor.make(0, 0, 0).value();
+		opdrachtKleuren[0] = CssColor.make(0,0,255).value();
+		opdrachtKleuren[1] = CssColor.make(00,220,220).value();
+		opdrachtKleuren[2] = CssColor.make(220,0,220).value();
+		opdrachtKleuren[3] = CssColor.make(200,200,0).value();
 		opdrachtKleuren[4] = zwart;
 		opdrachtKleuren[5] = zwart;
 		opdrachtKleuren[6] = zwart;
@@ -2577,12 +2577,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		opdrachtKleuren[8] = zwart;
 		opdrachtKleuren[9] = zwart;
 		
-		gewoneKleuren[0] = CssColor.make(0,0,255);
-		gewoneKleuren[1] = CssColor.make(0,200,0);
-		gewoneKleuren[2] = CssColor.make(255,50,50);
-		gewoneKleuren[3] = CssColor.make(00,220,220);
-		gewoneKleuren[4] = CssColor.make(220,0,220);
-		gewoneKleuren[5] = CssColor.make(200,200,0);
+		gewoneKleuren[0] = CssColor.make(0,0,255).value();
+		gewoneKleuren[1] = CssColor.make(0,200,0).value();
+		gewoneKleuren[2] = CssColor.make(255,50,50).value();
+		gewoneKleuren[3] = CssColor.make(00,220,220).value();
+		gewoneKleuren[4] = CssColor.make(220,0,220).value();
+		gewoneKleuren[5] = CssColor.make(200,200,0).value();
 		gewoneKleuren[6] = zwart;
 		gewoneKleuren[7] = zwart;
 		gewoneKleuren[8] = zwart;
@@ -2880,7 +2880,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				int[][] colorRGBsGewoon = new int[list.size()][];
 				for (int i = 0; i < colorRGBsGewoon.length; i++) {
 					colorRGBsGewoon[i] = list.getIntArray(i);
-					gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]);
+					gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]).value();
 				}
 			}
 			
@@ -2890,7 +2890,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				int[][] colorRGBsOpdrachten = new int[list.size()][];
 				for (int i = 0; i < colorRGBsOpdrachten.length; i++) {
 					colorRGBsOpdrachten[i] = list.getIntArray(i);
-					opdrachtKleuren[i] = CssColor.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]);
+					opdrachtKleuren[i] = CssColor.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]).value();
 				}
 			}
 			
@@ -3388,7 +3388,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		}
 		else if (tekenComponentAan && source == grafiekGWTCanvas) {	
 			if(typeOpdracht > GEENOPDRACHT)
-			{	setColor(activeIndex - 1, opdrachtKleuren[activeIndex - 1], false);//checken of dit nog +/- 1 moet.
+			{	setColor(activeIndex - 1, CssColor.make(opdrachtKleuren[activeIndex - 1]), false);//checken of dit nog +/- 1 moet.
 			}
 			double pressedX = eventX;
 			double pressedY = eventY;

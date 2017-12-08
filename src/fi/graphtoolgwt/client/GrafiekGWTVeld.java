@@ -907,7 +907,7 @@ public class GrafiekGWTVeld {
 
 					tekenFunctie(gIm, xMin, interactiePanel.functies[j], interactiePanel.domeinen[j],
 							(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN 
-							|| interactiePanel.grafiekKleuren)?interactiePanel.colors[j]:interactiePanel.colors[0]);
+							|| interactiePanel.grafiekKleuren)?CssColor.make(interactiePanel.colors[j]):CssColor.make(interactiePanel.colors[0]));
 				
 					if(interactiePanel.traceOptie) {
 						Expressie expressie;
@@ -2154,7 +2154,7 @@ public class GrafiekGWTVeld {
 	
 	public void tekenOngelijkheden(Context2d g)
 	{	//Graphics2D g = (Graphics2D) gr;
-		CssColor[][] ongelijkheidKleuren;
+		String[][] ongelijkheidKleuren;
 		if(!interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam))
 			return;
 		//g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -2301,11 +2301,11 @@ public class GrafiekGWTVeld {
 		
 		boolean[][] verwerkEnOf = new boolean[aantalAreaClusters][];
 		Area[][] areaClusters = new Area[aantalAreaClusters][];
-		ongelijkheidKleuren = new CssColor[aantalAreaClusters][];
+		ongelijkheidKleuren = new String[aantalAreaClusters][];
 		for(int i = 0; i < aantalAreaClusters; i++)
 		{	verwerkEnOf[i] = new boolean[clusterLengtes[i]];
 			areaClusters[i] = new Area[clusterLengtes[i]];
-			ongelijkheidKleuren[i] = new CssColor[clusterLengtes[i]];
+			ongelijkheidKleuren[i] = new String[clusterLengtes[i]];
 		}
 		
 		
