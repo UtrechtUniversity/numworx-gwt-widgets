@@ -197,6 +197,11 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 */
 	private static final int NUMBER_OF_ALL_POSSIBLE_BUTTONS = 7;
 
+	/**
+	 * Margin used to determine whether the user moved while touching.
+	 */
+	private static final double MARGIN = 10;
+
 	private StatTableModel statTableModel;
 
 	// Include field statInteractiePanel to process the reset actions
@@ -365,6 +370,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	 * for showing the outlier menu.
 	 */
 	protected long taptime;
+	
+	/**
+	 * The x coordinate of the touch location
+	 */
+	protected double startTouchX;
+	
+	/**
+	 * The y coordinate of the touch location
+	 */
+	protected double startTouchY;
 	
 	private boolean isMouseDown = false;
 
@@ -3371,38 +3386,115 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		if ("touchstart".equals(nativeEvent.getType()))
 		{
 			taptime = System.currentTimeMillis();
+			
+			// bepaal de startpositie
+			startTouchX = getTouchX(nativeEvent);
+			startTouchY = getTouchY(nativeEvent);
 		}
-		else if ("touchend".equals(nativeEvent.getType()) && isLongClick())
+		else if ("touchmove".equals(nativeEvent.getType()))
 		{
-			Touch touch = null;
-			
-			int x = 0;
-			int y = 0;
-			
-			if (nativeEvent.getTouches().length() > 0)
-			{
-				touch = nativeEvent.getTouches().get(0);
-			}
-			else if ((nativeEvent.getChangedTouches() != null) 
-				&& (nativeEvent.getChangedTouches().length() > 0)) 
-			{
-				touch = nativeEvent.getChangedTouches().get(0);
-			}
-
-			try
-			{
-				x = touch.getClientX();
-				y = touch.getClientY();
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-			}
+			// hier komen we nooit...
+		}
+		else if ("touchend".equals(nativeEvent.getType()) && isLongClick() && !hasMoved(nativeEvent))
+		{
+			int x = getTouchX(nativeEvent);
+			int y = getTouchY(nativeEvent);
 			
 			showOutlierPopup(nativeEvent, x, y);
 		}
 	}
-	
+
+	/**
+	 * Return the x coordinate of the given event.
+	 * Used for touch events.
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private int getTouchX(NativeEvent event)
+	{
+		Touch touch = null;
+		
+		int x = 0;
+		
+		if (event.getTouches().length() > 0)
+		{
+			touch = event.getTouches().get(0);
+		}
+		if ((event.getChangedTouches() != null) 
+			&& (event.getChangedTouches().length() > 0)) 
+		{
+			touch = event.getChangedTouches().get(0);
+		}
+
+		try
+		{
+			x = touch.getClientX();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return x;
+	}
+
+	/**
+	 * Return the y coordinate of the given event.
+	 * Used for touch events.
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private int getTouchY(NativeEvent event)
+	{
+		Touch touch = null;
+		
+		int y = 0;
+		
+		if (event.getTouches().length() > 0)
+		{
+			touch = event.getTouches().get(0);
+		}
+		if ((event.getChangedTouches() != null) 
+			&& (event.getChangedTouches().length() > 0)) 
+		{
+			touch = event.getChangedTouches().get(0);
+		}
+
+		try
+		{
+			y = touch.getClientY();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return y;
+	}
+
+	/**
+	 * Determine whether the user moved while touching,
+	 * comparing the administered touch start position to the event's
+	 * current end position. Used for touchend event.
+	 * 
+	 * @param event
+	 * @return
+	 */
+	private boolean hasMoved(NativeEvent event)
+	{
+		boolean moved = false;
+		
+		int endTouchX = getTouchX(event);
+		int endTouchY = getTouchY(event);
+		
+		if (Math.abs(startTouchX - endTouchX) > MARGIN || Math.abs(startTouchY - endTouchY) > MARGIN)
+			moved = true;
+		
+		return moved;
+	}
+
 	private void showOutlierPopup(NativeEvent nativeEvent, int x, int y)
 	{
     	nativeEvent.stopPropagation();
