@@ -1,20 +1,15 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
-import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
-import fi.weblogo3dgwt.client.expressies.BasisExpressie;
-import fi.weblogo3dgwt.client.expressies.Expressie;
-import fi.weblogo3dgwt.client.formuleobjects.FormuleParser;
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
 /**
- * 
- * @author berge020
+ * class representing the stap(dx,dy) command: in the cursor plane move (dx,dy) 
+ * relative to the direction of the cursor or equivalent: 
+ * move the current x-y-z coordinate system over (dx,dy) in the x-y-plane
+ * see class TekenApplet3D; <br>
  */
 public class StapCComponent extends ParameterCommandComponent implements ParameterEditorListener
 {
@@ -25,8 +20,8 @@ public class StapCComponent extends ParameterCommandComponent implements Paramet
 	{
 		super(x, y, b, h, sv);
 		
-		commandName = WebLogo3dGWT.rb.stapTekst(); //"stap";
-		commandNameTranslated = "step"; //JavaLogoWeb.rb.getString(commandName);
+		commandName = WebLogo3dGWT.rb.stapTekst(); 
+		commandNameTranslated = "step"; 
 		noParameters = 2;
 		parameters[0] = new NumericParameter();
 		parameters[1] = new NumericParameter();

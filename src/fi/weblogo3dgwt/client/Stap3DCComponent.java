@@ -1,24 +1,19 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.Graphics;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
-
-
-
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
 /**
- * 
- * @author huub
+ * class representing the stap3d(dx,dy,dz) command: in the cursor plane move (dx,dy) 
+ * and translate the cursor plane parallel to itself over dz 
+ * move the current x-y-z coordinate system over (dx,dy,dz) in 3-space
+ * see class TekenApplet3D; <br>
  */
 public class Stap3DCComponent extends ParameterCommandComponent implements ParameterEditorListener
 {
-	//protected int separatorX;
-	//private boolean editingFirstParam;
 	
 	public Stap3DCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{
@@ -33,22 +28,17 @@ public class Stap3DCComponent extends ParameterCommandComponent implements Param
 	}
 
 	protected void paintCommand(Context2d g)
-	//protected void paintCommand(Graphics g)
 	{
-		//if (getParent() == schuifveld)
 		if (xPos < JavaLogoSchuifVeld.ppx)
 		{	
 			g.setFont(WebLogo3dGWT.fontString);
-			//g.setColor(Color.black);
 			g.setFillStyle(CssColor.make(0,0,0));
-			//g.drawString(getCommandNameTranslated() + strOpen + strClose, 10, 18);
 			g.fillText(getCommandName() + strOpen + strClose, xPos+10, yPos+18);
 		}
 		else 
 			super.paintCommand(g);
 	}
 
-	@Override
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{
 		if (!(parameters[0].isCorrect(varSet) && parameters[1].isCorrect(varSet) && parameters[2].isCorrect(varSet))) 

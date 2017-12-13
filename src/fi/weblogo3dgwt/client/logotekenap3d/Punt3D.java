@@ -1,5 +1,8 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
+/**
+ * a pint in 3-space 
+ */
 public class Punt3D 
 
 {	public double x, y, z;

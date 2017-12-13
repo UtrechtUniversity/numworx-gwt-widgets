@@ -4,6 +4,9 @@ import java.util.*;
 
 import fi.weblogo3dgwt.client.expressies.*;
 
+/**
+ * see also class VarSet in WebLogoGWT
+ */
 public class VarSet 
 {
 	/**
@@ -65,7 +68,6 @@ public class VarSet
 	
 	void decreaseLevel()
 	{
-		//System.out.println(toString());
 		Iterator<TAVariable> it = variabelen.iterator();
 		while ( it.hasNext() )
 		{
@@ -80,10 +82,9 @@ public class VarSet
 	}
 	
 	/**
-	 * Checks if a var is visible, that is level>levelCDT. If we want to get rid of
+	 * Checks if a var is visible, that is level larger than levelCDT. If we want to get rid of
 	 * global vars, we can remove the condition "or level==0".
-	 * Note: Used 3 times: find & substitute
-	 * 
+	 * Note: Used 3 times: find and substitute
 	 * @param tav	The var
 	 * @return		true if visible
 	 */
@@ -131,9 +132,8 @@ public class VarSet
 	/**
 	 * Add a variable to the varset that is a parameter. Parameters are 'call by value',
 	 * so a value is added, not an expression!
-	 * 
-	 * @param varName
-	 * @param value
+	 * @param varName variable name
+	 * @param value variable value
 	 */
 	public void setParameter(String varName, double value)
 	{
@@ -194,12 +194,5 @@ public class VarSet
 		}
 		return s;
 	}
-	private String blaat()
-	{
-		String s = "[";
-		for (int i=0; i<10; i++)
-			s=s+deeltaaklevels[i];
-		s=s+"]";
-		return s;
-	}
+
 }

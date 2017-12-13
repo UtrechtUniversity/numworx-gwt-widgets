@@ -4,6 +4,14 @@ import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * class representing the rechts(ang) command: in the cursor plane, turn
+ * the cursor right over ang degrees relative to the direction to which 
+ * the cursor is pointing or equivalent rotate the current x-y-z coordinate
+ * system ang degrees clockwise around the positive z-axis with; 
+ * see class TekenApplet3D; <br>
+ */
+
 public class RechtsCComponent extends ParameterCommandComponent
 {
 	public RechtsCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)

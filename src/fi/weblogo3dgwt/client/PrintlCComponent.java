@@ -2,8 +2,11 @@ package fi.weblogo3dgwt.client;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
-import fi.weblogo3dgwt.client.expressies.*;
 import fi.weblogo3dgwt.client.parameters.TextParameter;
+
+/**
+ * not implemented as command block, see class PrintlCComponent in WebLogoGWT 
+ */
 
 public class PrintlCComponent extends ParameterCommandComponent
 {
@@ -13,8 +16,8 @@ public class PrintlCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new TextParameter();
-		commandName = WebLogo3dGWT.rb.printlnTekst(); //"println";
-		commandNameTranslated = "println"; //JavaLogoWeb.rb.getString(commandName);
+		commandName = WebLogo3dGWT.rb.printlnTekst(); 
+		commandNameTranslated = "println"; 
 	}
 	
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)

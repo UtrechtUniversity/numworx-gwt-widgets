@@ -1,9 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.*;
-//import java.awt.event.MouseEvent;
-
-//import javax.swing.JPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +12,15 @@ import fi.weblogo3dgwt.client.logotekenap3d.Rectangle;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 
-public abstract class CommandComponent //extends JPanel 
+/**
+ * see class CommandComponent in WebLogoGWT
+ */
+
+public abstract class CommandComponent  
 {
 	JavaLogoSchuifVeld schuifveld;
 	
 	protected boolean vast;
-	// protected String label;				// PBgv: deleted, unused. Also deleted setter, references 'if label != null'
 	protected boolean caretUp, caretDown;
 	protected boolean isStapel = true;
 		
@@ -52,9 +51,8 @@ public abstract class CommandComponent //extends JPanel
     protected List<Long> doubletap = new ArrayList<Long>();
 	
 	public CommandComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
-	{	//setBounds(x,y,b,h);
+	{	
 		xPos = x; yPos = y; breedte = b; hoogte = h;
-		//setLayout(null);
 		schuifveld = sv;
 	}
 	
@@ -174,53 +172,30 @@ public abstract class CommandComponent //extends JPanel
 	/**
 	 * Set caret on this CC
 	 * Note: ProgrammaComponent will override to avoid carets.
-	 * 
 	 * @param y		the absolute ypos of the middle of the CC hovering over this CC
 	 */
 	public void setCaret(int y)
 	{
-//System.out.println("c setCaret " + getCommandName() + " " + y + " " + getAbsoluteLocation().y);		
+		
 		boolean downcaret = (y-getAbsoluteLocation().y > getHeight()/2 );
 		caretUp = !downcaret;
 		caretDown = downcaret;
 		if (parent != null)
 		{	parent.setInsert(this, downcaret);
-//System.out.println("c parent.setInsert " + downcaret);		
+		
 		}
-		//((CommandContainer)getParent()).setInsert(this, downcaret);
+
 	}
 	
-	/* unused
-	public CommandComponent getCommandComponentAt(int x, int y)
-	{	CommandComponent cc = null;
-		Component c = getComponentAt(x,y);
-		if(c!=this && c!=null && c instanceof CommandComponent) 
-		{	cc = (CommandComponent)c;
-			return cc.getCommandComponentAt(x - cc.getLocation().x,y - cc.getLocation().y);
-			
-		}
-		
-		return this;
-	} */
 	
 	/**
 	 * Geeft absolute positie van deze Component in het JavaLogoSchuifVeld
-	 * 
 	 * PBgv: omdat muisevents nu absoluut zijn, hebben we ook de absolute positie van componenten nodig.
-	 * 
 	 * @return absolute positie
 	 */
 	public Point getAbsoluteLocation()
-	{
+	{	//alles is al absoluut in GWT
 		Point p = getLocation();
-		
-//alles is al absoluut in GWT		
-		//Component c = getParent();
-		//while ( c!=null && !( c instanceof JavaLogoSchuifVeld))
-		//{
-		//	p.translate(c.getLocation().x, c.getLocation().y);
-		//	c = c.getParent();
-		//}
 		return p;
 	}
 	
@@ -237,9 +212,6 @@ public abstract class CommandComponent //extends JPanel
 	public void mousePressed(int x, int y, int modifiers)
 	{
 		
-//System.out.println("mousePr " + getCommandName());		
-
-		//requestFocus();
 		if (vast)
 			return;
 		startx = x;								// PBgv: '+getLocation.x of y' removed 4x, ook bij dragged
@@ -249,7 +221,6 @@ public abstract class CommandComponent //extends JPanel
 		startCompy = p.y;
 		dx = 0;
 		dy = 0;
-		//editing = true;
 		dragging = false;
 		
 		if (this instanceof ParameterEditorListener)
@@ -261,7 +232,6 @@ public abstract class CommandComponent //extends JPanel
 	
 	public void moveComponent(int dx, int dy)
 	{	
-//System.out.println("move CC");		
 		int x = startCompx + dx;				// PBgv: new Location = original + mouse displacement
 		int y = startCompy + dy;		
 		if (schuifveld.isGesloten())
@@ -276,14 +246,10 @@ public abstract class CommandComponent //extends JPanel
 			return;
 		dx = x-startx;
 		dy = y-starty;
-		//System.out.println("dx = "+dx);
-		//System.out.println("dy = "+dx);
 		if (dx*dx+dy*dy>=20 || dragging) 
-		{	// System.out.println("MuisDragged: "+e.getX()+", "+e.getY());
+		{	
 			if ( !dragging )		// start dragging a CC
 			{	
-//niet nodig in GWT				
-				//requestFocus();		// end possible editing of parameters, see ParameterTextField for details
 				dragging = true;
 				if (isStapel)
 				{	schuifveld.zetStapel(this);		// get new copy from pile in GUI
@@ -295,7 +261,6 @@ public abstract class CommandComponent //extends JPanel
 					parent.remove(this);
 					parent = null;
 				}
-				//schuifveld.begin();
 				schuifveld.zetSchuiver(this);
 				startCompx = Math.max(x-getDragWidth()+10, startCompx);
 			}
@@ -310,7 +275,6 @@ public abstract class CommandComponent //extends JPanel
 	 * Normally it will b e small, so you can see where you're putting it. This is not needed
 	 * when arranging deeltaken in the ProgrammaPanel, so DeeltaakBodyc will override to retain 
 	 * its original width
-	 * 
 	 * @return	width of this component when dragging it
 	 */
 	int getDragWidth()
@@ -320,7 +284,6 @@ public abstract class CommandComponent //extends JPanel
 	
 	/**
 	 * Standard CC's enable tracing (carets), but DeeltaakBody's won't (will override to return false)
-	 * 
 	 * @return true, if we want to seee carets while dragging
 	 */
 	boolean isTraceable()
@@ -332,56 +295,39 @@ public abstract class CommandComponent //extends JPanel
 	 * Drop this component on the JavaLogoSchuifVeld. Usually this means finding the CommandContainer
 	 * that will receive this component.
 	 * DeeltaakBody's will override to allow the user to move the bodies in the programmaPanel
-	 * 
-	 * @param x
-	 * @param y
+	 * @param x x-position of mouseReleased
+	 * @param y y-position of mouseReleased
 	 */
 	protected void dropComponent(int x, int y)
 	{
 		schuifveld.losSchuiver(this, x, y);
-		// PBgv: quick fix voor zwevende Commands: als ie op JavaLogoSchuifVeld zelf staat (en niet in een of andere
-		//   CommandContainer, dan wordt ie verwijderd
-		//if( getParent()==schuifveld && !isStapel)
 		if (parent == null && !isStapel)
 		{	
-//System.out.println("par == null && !stapel");
-
 			schuifveld.verwijder(this);
 		}
 	}
 	
 	public void mouseReleased(int x, int y, int modifiers)
 	{
-//System.out.println("mouseRel " + getCommandName());		
 		if( !dragging && !isStapel) // PBgv: !isStapel toegevoegd: niet editten van componenten links
 		{
-//System.out.println("mouseReleased !dragging && !isStapel");			
-			
 			// editing of CCs that are 'vast' is allowed: name of 'deeltaak'.
 			if (this instanceof ParameterEditorListener)
 			{	
-				
 				if (isDoubleClick())	
 				{ 	
-//System.out.println("doubleClick on PEL");					
 					ParameterEditorListener pel = (ParameterEditorListener) this; 
 					pel.parameterComponentClicked(x-getAbsoluteLocation().x, y-getAbsoluteLocation().y);
 				
 					doubletap.clear();
 					
-//					schuifveld.setMessage("double " + commandName + " x = " + (x-getAbsoluteLocation().x) +
-//										  " y = " + (y-getAbsoluteLocation().y));
 				}
 				else if (isLongClick() && !dragging)	
 				{ 	
-//System.out.println("longClick on PEL");					
 					ParameterEditorListener pel = (ParameterEditorListener) this; 
 					pel.parameterComponentClicked(x-getAbsoluteLocation().x, y-getAbsoluteLocation().y);
 				
 					doubletap.clear();
-					
-//					schuifveld.setMessage("long " + commandName + " x = " + (x-getAbsoluteLocation().x) +
-//							  " y = " + (y-getAbsoluteLocation().y));
 				}
 				
 				else
@@ -390,17 +336,9 @@ public abstract class CommandComponent //extends JPanel
 						doubletap.remove(0);
 				}
 			}
-/*			 
-			else
-			{
-//niet nodig in GWT				
-				//requestFocus();	// end possible editing of parameters, see ParameterTextField for details
-			}
-*/			
 		}
 		else if (!vast && dragging )
 		{ 	
-//System.out.println("mouseReleased !vast && dragging");			
 			dropComponent(x, y);
 		}
 	}
@@ -411,40 +349,32 @@ public abstract class CommandComponent //extends JPanel
 	
 	/**
 	 * Paint the background of the CommandComponent: rectangles, bgcolor
-	 * 
 	 * @param g the Graphics context
 	 */
-	//protected abstract void paintBackground(Graphics g);
 	protected abstract void paintBackground(Context2d g);
 	
 	/**
 	 * Paint the text of the CommandComponent: command name and parameters that are not being editted
 	 * For the composite components this will be: repetitions for loop / condition / deeltaaknaam / tekenalgoritme
-	 * 
-	 * @param g
+	 * @param g Context2d for drawing
 	 */
-	//protected abstract void paintCommand(Graphics g);
 	protected abstract void paintCommand(Context2d g);
 
 	/**
 	 * Paint caret lines (when dragging a CommandComponent)
 	 * Can be implemented here, since we only draw carets at top or bottom of CComponent.
-	 * 
-	 * @param g
+	 * @param g Context2d for drawing
 	 */
-	//private void paintCaret(Graphics g)
 	private void paintCaret(Context2d g)
 	{
-		//g.setColor(Color.green);
 		g.setStrokeStyle(CssColor.make(0,255,0));
 		if(caretUp)
-		{	//g.drawLine(2,2,getSize().width-3,2);
+		{	
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+2);
 			g.lineTo(xPos+getSize().width-3,yPos+2);
 			g.stroke();
 		
-			//g.drawLine(2,3,getSize().width-3,3);
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+3);
 			g.lineTo(xPos+getSize().width-3,yPos+3);
@@ -454,13 +384,11 @@ public abstract class CommandComponent //extends JPanel
 		}
 		if(caretDown)
 		{	
-			//g.drawLine(2,getSize().height-3,getSize().width-3,getSize().height-3);
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+getSize().height-3);
 			g.lineTo(xPos+getSize().width-3,yPos+getSize().height-3);
 			g.stroke();
 			
-			//g.drawLine(2,getSize().height-4,getSize().width-3,getSize().height-4);
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+getSize().height-4);
 			g.lineTo(xPos+getSize().width-3,yPos+getSize().height-4);
@@ -483,11 +411,8 @@ public abstract class CommandComponent //extends JPanel
 
 	/**
 	 * Painting of the CComponent in three parts, that are implemented at various levels in class hierarchy
-	 * 
-	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+	 * @param g Context2d for drawing
 	 */
-	
-	//public void paintComponent(Graphics g)
 	public void paintComponent(Context2d g)
 	{
 		if (!visible)
@@ -500,10 +425,8 @@ public abstract class CommandComponent //extends JPanel
 	}
 	
 	
-	//public void paint(Graphics g)
 	public void paint(Context2d g)
 	{
-		//super.paint(g);
 		paintCaret(g);
 	}
 	

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 
 import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 
+/**
+ * see class ProgrammaImporter in WebLogoGWT
+ */
+
 public class ProgrammaImporter 
 {
 	private JavaLogoSchuifVeld veld;
@@ -33,19 +37,18 @@ public class ProgrammaImporter
 	}
 	
 	/**
-	 * Main method of the Importer. Imports code in three steps:<br />
-	 * (1) deeltaakheaders<br />
-	 * (2) deeltaakbody's<br />
-	 * (3) hoofdprogramma<br />
-	 * import headers first, deeltaak1 can call deeltaak2 (not yet imported)! step 2 & 3 are interchangeable after this
-	 * 
+	 * Main method of the Importer. Imports code in three steps:
+	 * (1) deeltaakheaders
+	 * (2) deeltaakbody's
+	 * (3) hoofdprogramma
+	 * import headers first, deeltaak1 can call deeltaak2 (not yet imported)! step 2 and 3 are interchangeable after this
 	 * @param s	the full program text from the import frame
 	 */
 	void importProgramma(String s)
 	{
-		//System.out.println("+++  Starting import");
+//System.out.println("+++  Starting import");
 		String programmaTekst = s + "\n";
-		//System.out.println("+++  Deeltaaknamen");
+//System.out.println("+++  Deeltaaknamen");
 		String[] codeParts1 = StringUtils.split(programmaTekst, "Deeltaak:");
 //System.out.println("codeParts Deeltaak:" + codeParts1.length);
 		String[] codeParts2 = StringUtils.split(programmaTekst, WebLogo3dGWT.rb.deeltaak1Tekst());
@@ -63,7 +66,7 @@ public class ProgrammaImporter
 				importDeeltaakHeader(i-1, codeParts[i]);
 			} // else: default names are "deeltaakn" n=0,1,2,3,4. No need to change		
 		}		
-		//System.out.println("+++  Deeltaakbodies");
+//System.out.println("+++  Deeltaakbodies");
 		for(int i=1 ; i<codeParts.length ; i++)
 		{
 			if ( i<codeParts.length )
@@ -71,7 +74,7 @@ public class ProgrammaImporter
 				importDeeltaakBody(i-1, codeParts[i]);				
 			} 
 		}		
-		//System.out.println("+++  Hoofdprogramma");
+//System.out.println("+++  Hoofdprogramma");
 		importHoofdprogramma(codeParts[0]);
 	}
 
@@ -102,9 +105,9 @@ public class ProgrammaImporter
 
 	private void importDeeltaakBody(int i, String code) 
 	{
-		// System.out.println("+++ import deeltaakbody: "+deeltaaknamen[i]);
+// System.out.println("+++ import deeltaakbody: "+deeltaaknamen[i]);
 		ArrayList<String> codeLines = StringUtils.splitLines(code);
-		//System.out.println("+bloklength: "+codeLines.size());
+//System.out.println("+bloklength: "+codeLines.size());
 		codeLines.remove(0);					// first line has deeltaaknaam and parameter
 		DeeltaakBodyComponent ccont = veld.getDeeltaakBody(i);
 		readBlock(codeLines, ccont);
@@ -117,8 +120,7 @@ public class ProgrammaImporter
 	}
 	
 	/**
-	 * Check if a line of code starts & ends with the keywords for a control structure
-	 * 
+	 * Check if a line of code starts and ends with the keywords for a control structure
 	 * @param s			the code line
 	 * @param start		starting keyword
 	 * @param end		closing keyword
@@ -130,8 +132,7 @@ public class ProgrammaImporter
 	}
 	
 	/**
-	 * Strip a line of code of the start & end keywords for a control structure. to obtain condition/loop count
-	 * 
+	 * Strip a line of code of the start and end keywords for a control structure. to obtain condition/loop count
 	 * @param s			the code line
 	 * @param start		starting keyword
 	 * @param end		closing keyword
@@ -146,7 +147,6 @@ public class ProgrammaImporter
 	 * Cuts a block of code from a given list of code lines. The block must start with a line containing "{"
 	 * and will run to the first line containing "}" at the same level (so it will copy subblocks)
 	 * The lines in the block will be removed form the ArrayList 'lines'.
-	 * 
 	 * @param lines		ArrayList with the original code. WILL BE CHANGED!
 	 * @return			list of lines in block, without the enclosing brackets.
 	 */
@@ -181,7 +181,6 @@ public class ProgrammaImporter
 	/**
 	 * Read a block of code, translate to CommandComponents and add them to the specified CommandContainer.
 	 * This method will consume all code in the ArrayList 'lines', this will be empty after the operation.
-	 * 
 	 * @param lines		ArrayList containing lines of code (Strings)
 	 * @param ccont		the target CommandContainer for the code.
 	 */
@@ -195,17 +194,17 @@ public class ProgrammaImporter
 			line = lines.remove(0);
 			if (line.startsWith("Herhaal") || line.startsWith(WebLogo3dGWT.rb.herhaal1Tekst()))
 			{
-				//System.out.println("+++  Start For-loop");
+//System.out.println("+++  Start For-loop");
 				ccomp = readForLoopCommand(ccont, line, lines);
 			}
 			if (line.startsWith("Zolang") || line.startsWith(WebLogo3dGWT.rb.zolangTekst()))
 			{
-				//System.out.println("+++  Start While-loop");
+//System.out.println("+++  Start While-loop");
 				ccomp = readWhileLoopCommand(ccont, line, lines);
 			}
 			else if (line.startsWith("Keuze:") || line.startsWith(WebLogo3dGWT.rb.keuzeTekst()))
 			{
-				//System.out.println("+++  Start Keuze");
+//System.out.println("+++  Start Keuze");
 				ccomp = readKeuzeCommand(ccont, line, lines);
 			}
 			else
@@ -224,7 +223,7 @@ public class ProgrammaImporter
 	 * The number of repetitions in the loop will be read from <em>headerline</em>.
 	 * The method will cut a block of lines (from '{' to the corresponding '}' from the list 'lines'.
 	 * Therefore this list will be changed!
-	 * 
+	 * @param ccont 		the CompositeCommandComponent 
 	 * @param headerline	header line, with number of repetitions
 	 * @param lines			remaining list of code lines. WILL BE CHANGED!
 	 * @return				the ForLoopCommandComponent
@@ -237,20 +236,20 @@ public class ProgrammaImporter
 		if ( checkHeader(headerline, strFor1, strFor2) )
 		{
 			String nrrep = stripKeywords(headerline, strFor1, strFor2);
-			//System.out.println("+++  aantal: "+nrrep);
+//System.out.println("+++  aantal: "+nrrep);
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
 		}
 		else if ( checkHeader(headerline, strFor1Trans, strFor2Trans) )
 		{
 			String nrrep = stripKeywords(headerline, strFor1Trans, strFor2Trans);
-			//System.out.println("+++  aantal: "+nrrep);
+//System.out.println("+++  aantal: "+nrrep);
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);
 		}
 		ArrayList<String> body = getBlock(lines);
 		readBlock(body, cc);
-		//System.out.println("+++  Eind Herhaal");
+//System.out.println("+++  Eind Herhaal");
 		return cc;
 	}
 
@@ -259,7 +258,7 @@ public class ProgrammaImporter
 	 * The condition of the while-loop will be read from <em>headerline</em>.
 	 * The method will cut a block of lines (from '{' to the corresponding '}' from the list 'lines'.
 	 * Therefore this list will be changed!
-	 * 
+	 * @param ccont 		the CompositeCommandComponent 
 	 * @param headerline	header line, with condition
 	 * @param lines			remaining list of code lines. WILL BE CHANGED!
 	 * @return				the WhileLoopCommandComponent
@@ -272,20 +271,20 @@ public class ProgrammaImporter
 		if ( checkHeader(headerline, strWhile1, strWhile2) )
 		{
 			String nrrep = stripKeywords(headerline, strWhile1, strWhile2);
-			//System.out.println("+++  voorwaarde: "+nrrep);
+//System.out.println("+++  voorwaarde: "+nrrep);
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
 		}
 		else if ( checkHeader(headerline, strWhile1Trans, strWhile2Trans) ) 
 		{
 			String nrrep = stripKeywords(headerline, strWhile1Trans, strWhile2Trans);
-			//System.out.println("+++  voorwaarde: "+nrrep);
+//System.out.println("+++  voorwaarde: "+nrrep);
 			cc.setLoopCount(nrrep);
 			ccont.addCComponent(cc);				// need to assign this loop to a Container before adding CC's to this one
 		}
 		ArrayList<String> body = getBlock(lines);
 		readBlock(body, cc);
-		//System.out.println("+++  Eind While");
+//System.out.println("+++  Eind While");
 		return cc;
 	}
 
@@ -295,7 +294,7 @@ public class ProgrammaImporter
 	 * The method will cut a block of lines (from '{' to the corresponding '}' from the list 'lines'.
 	 * if this is followed by "Anders", a second block will be cut from the list 'lines', the else-part.
 	 * Therefore this list will be changed!
-	 * 
+	 * @param ccont 		the CompositeCommandComponent 
 	 * @param headerline	header line, with condition
 	 * @param lines			remaining list of code lines. WILL BE CHANGED!
 	 * @return				the KeuzeCommandComponent
@@ -309,36 +308,36 @@ public class ProgrammaImporter
 		if ( checkHeader(headerline, strIf1, strIf2) )
 		{
 			String condition = stripKeywords(headerline, strIf1, strIf2);
-			//System.out.println("+++  voorwaarde: "+condition);
+//System.out.println("+++  voorwaarde: "+condition);
 			cc.setBoolExpression( condition );
 			ccont.addCComponent(cc);					// see Herhaal
 		}
 		else if ( checkHeader(headerline, strIf1Trans, strIf2Trans) )
 		{
 			String condition = stripKeywords(headerline, strIf1Trans, strIf2Trans);
-			//System.out.println("+++  voorwaarde: "+condition);
+//System.out.println("+++  voorwaarde: "+condition);
 			cc.setBoolExpression( condition );
 			ccont.addCComponent(cc);					// see Herhaal
 		}
 			
 		ArrayList<String> body_true = getBlock(lines);
-		//System.out.println("+++  Start If");
+//System.out.println("+++  Start If");
 		cc.setInIfBlock(true);
 		readBlock(body_true, cc);						// FUTURE: ccont_true
-		//System.out.println("+++  Eind if");
+//System.out.println("+++  Eind if");
 		if  ( !lines.isEmpty() )
 		{
 			String s2 = lines.get(0);
 			if (s2.equals("Anders") || s2.equals(WebLogo3dGWT.rb.andersTekst()))
 			{
 				cc.setElseVisible(true);
-				//System.out.println("+++  Start Else");
+//System.out.println("+++  Start Else");
 				cc.setInIfBlock(false);
 				lines.remove(0);				// line containing "Anders" hasn't been removed yet
 				ArrayList<String> body_false = getBlock(lines);
 				//CommandContainer ccont_false = null;	to be so in the future
 				readBlock(body_false, cc);				// FUTURE: ccont_false
-				//System.out.println("+++  Eind Else");
+//System.out.println("+++  Eind Else");
 			}
 			
 		}
@@ -350,7 +349,6 @@ public class ProgrammaImporter
 	 * Finds the string containing the parameters of a (simple) command.
 	 * It returns the substring between the first '(' and the last ')'.
 	 * If there is no such string, the method returns null.
-	 * 
 	 * @param codeline	The current command
 	 * @return			the String containing parameters, or null if there none
 	 */
@@ -369,14 +367,13 @@ public class ProgrammaImporter
 	
 	/**
 	 * Read a simple command (single-line command). Includes variables and deeltaak-calls.
-	 * 
 	 * @param codeline		line containing the command
 	 * @return				CommandComponent for this line, or null if line is empty or not valid
 	 */
 	private CommandComponent readSimpleCommand(String codeline)
 	{
 		if ( codeline.equals("")) return null;
-		//System.out.println("simpel: >"+codeline+"<");
+//System.out.println("simpel: >"+codeline+"<");
 		CommandComponent cc = null;
 		// 1: commandComponents for simple commands
 		if (codeline.startsWith("vooruit(") || codeline.startsWith(WebLogo3dGWT.rb.vooruitTekst() + "("))
@@ -426,9 +423,10 @@ public class ProgrammaImporter
 		else if (codeline.startsWith("vulUit(") || codeline.startsWith(WebLogo3dGWT.rb.vulUitTekst() + "("))
 		{	cc = new VulUitCComponent(-100,-100,25,25, veld);
 		}
-		else if (codeline.startsWith("vulBlad(") || codeline.startsWith(WebLogo3dGWT.rb.vulBladTekst() + "("))
-		{	cc = new VulBladCComponent(-100,-100,25,25, veld);
-		} 
+		// not implemented
+		//else if (codeline.startsWith("vulBlad(") || codeline.startsWith(WebLogo3dGWT.rb.vulBladTekst() + "("))
+		//{	cc = new VulBladCComponent(-100,-100,25,25, veld);
+		//}
 		//else if (codeline.startsWith("print(") || codeline.startsWith(WebLogo3dGWT.rb.printTekst() + "("))
 		//{	cc = new PrintCComponent(-100,-100,25,25, veld);
 		//}
@@ -439,7 +437,7 @@ public class ProgrammaImporter
 		// If so, read possible parameters
 		if ( cc != null )
 		{
-			//System.out.println("     +++  was command");
+//System.out.println("     +++  was command");
 			cc.clearStapel();
 			String parameter = getParamText(codeline);
 			parameter = parameter.trim();
@@ -448,8 +446,6 @@ public class ProgrammaImporter
 			if ( parameter != null && cc instanceof ParameterCommandComponent )
 			{
 				((ParameterCommandComponent)cc).setParameter(parameter);
-//if (cc instanceof PrintCComponent)				
-//System.out.println("PI=(" + parameter);				
 			}
 			return cc;
 		}
@@ -457,7 +453,7 @@ public class ProgrammaImporter
 		int dtnr = isDeeltaak(codeline);
 		if ( dtnr > 0 )
 		{
-			//System.out.println("     +++  was deeltaak: "+dtnr);
+//System.out.println("     +++  was deeltaak: "+dtnr);
 			DeeltaakBodyComponent ccont = veld.getDeeltaakBody(dtnr-1);
 			cc = new DeeltaakCallCComponent(-100,-100,25,25, dtnr, veld);
 			cc.clearStapel();
@@ -470,7 +466,7 @@ public class ProgrammaImporter
 			return cc;
 		}
 		// 3: variabele-expressie
-		//System.out.println("     +++  was var-expressie");
+//System.out.println("     +++  was var-expressie");
 		String[] params = StringUtils.split(codeline,"=");
 		if ( params.length > 1)
 		{

@@ -4,6 +4,13 @@ import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * class representing the stapz(dz) command: move the cursor dz 
+ * perpendicular to the direction of the cursor or equivalent: 
+ * move the current x-y-z coordinate system dz in the direction of the
+ * positive z-axis; see class TekenApplet3D; <br>
+ */
+
 public class StapZCComponent  extends ParameterCommandComponent
 {
 	public StapZCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)

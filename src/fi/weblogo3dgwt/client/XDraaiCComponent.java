@@ -4,6 +4,12 @@ import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * class representing the xdraai(ang) command: rotate the current 
+ * x-y-z coordinate system ang degrees around the positive x-axis; 
+ * see class TekenApplet3D; <br>
+ */
+
 public class XDraaiCComponent  extends ParameterCommandComponent
 {
 	public XDraaiCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)

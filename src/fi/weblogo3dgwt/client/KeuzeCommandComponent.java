@@ -1,18 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.Component;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
-//import java.awt.Insets;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-
-//import javax.swing.BorderFactory;
-//import javax.swing.ImageIcon;
-//import javax.swing.JToggleButton;
-
-//import java.awt.Component;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.CommandComponent;
@@ -26,12 +13,16 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
+/**
+ * see class KeuzeCommandComponent in WebLogoGWT
+ */
+
 public class KeuzeCommandComponent extends CompositeCommandComponent implements ParameterEditorListener //, ActionListener
 {
 	private BooleanParameter condition;
 	
-	private String alsString = WebLogo3dGWT.rb.alsTekst(); //"Als"; //JavaLogoWeb.rb.getString("alsLabel");
-	private String andersString = WebLogo3dGWT.rb.andersTekst(); //"Anders"; //JavaLogoWeb.rb.getString("andersLabel");
+	private String alsString = WebLogo3dGWT.rb.alsTekst(); 
+	private String andersString = WebLogo3dGWT.rb.andersTekst(); 
 	public static final int blockX = 25;
 	// note: elseBlockX is variable, given by a method
 	public static final int ifBlockY = 25;
@@ -48,8 +39,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	
 	private boolean elseVisible = false;
 	
-	
-	//private JToggleButton elseVisibleButton;
 	Rectangle elseVisibleButton;
 	
 	Polygon arrowDown, arrowUp;
@@ -69,33 +58,13 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 			elseBlock.parent = this;
 			elseBlock.containerName = "else";
 		}
-		//if(elseVisible)
-		//	add(elseBlock);
 		
 		schuifveld.jlsvContext2d.setFont(WebLogo3dGWT.fontString);
 		TextMetrics tm = schuifveld.jlsvContext2d.measureText("Als "); //commandName+" ");
 		int width = (int) Math.round(tm.getWidth()); 
 		
-		//FontMetrics fm = getFontMetrics(JavaLogoWeb.defaultfont);
-		conditionEditorX = 10+width; //fm.stringWidth(commandNameTranslated+" ");
-		
-		
-		//conditionEditor = new ParameterTextField(conditionEditorX, 4, 80, 17, this);
-		//add(conditionEditor);
-		
+		conditionEditorX = 10+width; 
 
-/*		
-		elseVisibleButton = new JToggleButton();
-		elseVisibleButton.setOpaque(false);
-		elseVisibleButton.setIcon(new ImageIcon(JavaLogoWeb.class.getResource("resources/klapuit1.png")));
-		elseVisibleButton.setSelectedIcon(new ImageIcon(JavaLogoWeb.class.getResource("resources/klapuit2.png")));
-		elseVisibleButton.setBounds(5, elseBlockY()-ifBlockY, 15, 15);
-		elseVisibleButton.addActionListener(this);
-		elseVisibleButton.setBackground(Color.orange);
-		elseVisibleButton.setBorder(BorderFactory.createEmptyBorder());
-		elseVisibleButton.setMargin(new Insets(0,0,0,0));
-		add(elseVisibleButton);
-*/		
 		elseVisibleButton = new Rectangle(xPos+5, yPos+ifBlockY + 2, 15, 15);
 		
 		createVArrows();
@@ -127,14 +96,8 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 			elseBlock = null;
 		}
 		
-		//elseVisibleButton.setSelected(b);
 	}
 	
-	/**
-	 * xpos of elseBlock cannot be a constant
-	 * 
-	 * @return	elseBlockX
-	 */
 		
 	public final int elseBlockY()
 	{
@@ -145,12 +108,9 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	{
 		return getWidth()-blockX+1;
 	}
-	
-	
 		
 	/**
 	 * PBgv: set the boolean expression (from programImporter).
-	 * 
 	 * @param expression	the boolean expression as a String
 	 */
 	public void setBoolExpression (String expression)
@@ -160,7 +120,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 
 	/**
 	 * Select a container for future adding of components. Only relevant for scripting (ProgrammaImporter)
-	 * 
 	 * @param inIfBlock		true/false for obvious container selection
 	 */
 	public void setInIfBlock(boolean inIfBlock)
@@ -170,22 +129,17 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 
 	/**
 	 * Add a CommandComponent from source code, for instance by the ProgarammaImporter
-	 * Note: Drag&drop will add a CC directly into one of the CommandContainers
-	 * 
+	 * Note: Drag and drop will add a CC directly into one of the CommandContainers
 	 * @param cc			CommandComponent to be added
-	 * @param inIfBlock		in if- or elseBlock
 	 */
-	@Override
 	void addCComponent(CommandComponent cc)
 	{	
 		if ( inIfBlock )
 		{
-			//ifBlock.addCComponent(cc);
 			ifBlock.addCCompAtBottom(cc);
 		} 
 		else
 		{	
-			//elseBlock.addCComponent(cc);
 			elseBlock.addCCompAtBottom(cc);
 		}
 	}
@@ -194,7 +148,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	{
 		if (ifBlock.contains(x,y))
 		{	
-//System.out.println("ifBlock contains");			
 			return ifBlock.findCComponentAt(x,y,sc);
 		
 		}
@@ -219,9 +172,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 
 	public void moveComponent(int dx, int dy)
 	{	
-		
-//System.out.println("move keuzeCC");
-
 		int x = startCompx + dx;				// PBgv: new Location = original + mouse displacement
 		int y = startCompy + dy;		
 		if (schuifveld.isGesloten())
@@ -235,13 +185,11 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	{
 		if (arrowPressed)
 			return;
-		//super.mouseDragged(x, y, modifiers);
 		super.mouseDragged(x, y, modifiers);
 		if (dragging)
 			ifBlock.setHeight(JavaLogoSchuifVeld.ccsh);
 	}
 
-	@Override
 	public void setSize(int w, int h)
 	{	
 		super.setSize(w,h);
@@ -252,7 +200,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 			elseBlock.setWidth(w-blockX);
 		}	
 		
-		//elseVisibleButton.setBounds(5, elseBlockY()-ifBlockY-18, 15, 15);
 		elseVisibleButton = new Rectangle(xPos+5, yPos + elseBlockY()-ifBlockY -18, 15, 15);
 		createVArrows();
 	}
@@ -263,20 +210,17 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		ifBlock.setWidth(w-blockX);
 		// also move elseBlock to the middle
 		if (elseBlock != null)
-		{	//elseBlock.setLocation(blockX, elseBlockY());
-			elseBlock.setWidth(w-blockX);
+		{	elseBlock.setWidth(w-blockX);
 		}	
 		
-		//elseVisibleButton.setBounds(5, elseBlockY()-ifBlockY-18, 15, 15);
 		elseVisibleButton = new Rectangle(xPos+5, yPos + elseBlockY()-ifBlockY -18, 15, 15);
 		createVArrows();
 	}
 
-	@Override
 	public void setBounds(int x, int y, int w, int h)
 	{	
 		super.setBounds(x,y,w,h);
-		if (ifBlock != null) // && elseBlock != null)		// constructor will call setBounds before containers are made
+		if (ifBlock != null) // constructor will call setBounds before containers are made
 		{
 			ifBlock.setWidth(w-blockX);
 			if (elseBlock != null)
@@ -284,7 +228,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 				elseBlock.setWidth(w-blockX);
 			}	
 			
-			//elseVisibleButton.setBounds(5, elseBlockY()-ifBlockY-18, 15, 15);
 			elseVisibleButton = new Rectangle(xPos+5, yPos + elseBlockY()-ifBlockY -18, 15, 15);
 			createVArrows();
 		}
@@ -303,18 +246,15 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		createVArrows();
 	}
 
-	@Override
 	void containerHeightChanged(int h)
 	{
 		if (elseVisible)
 			super.setSize(getWidth(), 2*ifBlockY + ifBlock.getHeight() + elseBlock.getHeight());
 		else
 			super.setSize(getWidth(), ifBlockY + ifBlock.getHeight());
-		//((CommandContainer)getParent()).reArrange();
 		parent.reArrange();
 	}
 	
-	@Override
 	public void parameterEdited(String text)
 	{
 		condition.setParameter(text);
@@ -328,129 +268,94 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		schuifveld.paint();
 	}
 
-	@Override
 	public void parameterComponentClicked(int x, int y)
 	{
-//		if ( isEditing )
-//		{
-//			
-			//condition.setParameter(conditionEditor.getText());
-			//conditionEditor.setVisible(false);
-			//conditionEditor.setEditable(false);
-			isEditing = false;
-//		} else
-//		{	
-			if ( y < ifBlockY )
-			{
-				isEditing = true;
+		isEditing = false;
+		if ( y < ifBlockY )
+		{
+			isEditing = true;
 				
-				showConditionEditor();
-//				
-				//conditionEditor.vulIn(condition.getParameterText());
-				//conditionEditor.setLocation(conditionEditorX, 4);
-			}
-//		}
+			showConditionEditor();
+		}
 		schuifveld.paint();
 	}
 
 	public void showConditionEditor()
 	{
-		
-//System.out.println("showLoopEditor");
-
 		int popupX = xPos + schuifveld.getAbsoluteLeft();
-		
-//System.out.println("xPos = " + xPos);
-//System.out.println("popupX = " + popupX);
 		
 		int popupY = yPos + ifBlockY + schuifveld.getAbsoluteTop();
 
-//System.out.println("yPos = " + yPos);
-//System.out.println("popupY = " + popupY);
-		
-		//if ((conditionEditor != null) && conditionEditor.isVisible())
 		if ((schuifveld.paramEditor != null) && schuifveld.paramEditor.isVisible())
 		{
 			
 			schuifveld.paramEditor.owner.parameterEdited(schuifveld.paramEditor.getText());
 		}
-//System.out.println("breedte = " + breedte);
-//System.out.println("hoogte = " + hoogte);
 		schuifveld.paramEditor = new ParameterTextField(breedte, hoogte, this, schuifveld);
-		conditionEditor = schuifveld.paramEditor; //new ParameterTextField(breedte, hoogte, this, schuifveld);
+		conditionEditor = schuifveld.paramEditor; 
 		conditionEditor.vulIn(condition.getParameterText());
 		conditionEditor.setPopupPosition(popupX, popupY);
 		conditionEditor.show();
 		conditionEditor.textBox.setFocus(true);
-		
-//System.out.println("loopEditor visible = " + conditionEditor.isVisible());		
 
 	}
 
-	@Override
-	//protected void paintBackground(Graphics g)
 	protected void paintBackground(Context2d g)
 	{
-		//g.setColor(Color.orange);
+		// orange
 		g.setFillStyle(CssColor.make(255, 127, 0));
 		if (traceKleur)
-		{	//g.setColor(traceActiveColor);
+		{	
 			g.setFillStyle(traceActiveColor);
 		}
 		g.fillRect(xPos+0, yPos+0, getSize().width-1, getSize().height-1);
-		//g.setColor(Color.black);
+
 		g.setStrokeStyle(CssColor.make(0,0,0));
-		//g.drawRect(0, 0, getSize().width-1, getSize().height-1);
 		g.strokeRect(xPos+0, yPos+0, getSize().width-1, getSize().height-1);
-		//g.drawRect(1, 1, getSize().width-3, getSize().height-3);
 		g.strokeRect(xPos+1, yPos+1, getSize().width-3, getSize().height-3);
-		//g.drawLine(0, 0, blockWidth(), blockY);
-		//g.drawLine(0, 1, blockWidth(), blockY+1);
-		//g.drawLine(getSize().width, 0, blockWidth(), blockY);
-		//g.drawLine(getSize().width, 1, blockWidth(), blockY+1);
-		//g.setFont(JavaLogoWeb.defaultfont);
 		g.setFont(WebLogo3dGWT.fontString);
 		g.setFillStyle(CssColor.make(0,0,0));
-		//g.drawString(alsString, 10, 18);
 		g.fillText(alsString, xPos+10, yPos+18);
 		if (elseVisible)
 		{	
-			//g.drawString(andersString, 10, ifBlockY+ifBlock.getHeight() +18);
 			g.fillText(andersString, xPos+10, yPos+ifBlockY+ifBlock.getHeight() +18);
 		}
 	}
 
-	@Override
-	//protected void paintCommand(Graphics g)
 	protected void paintCommand(Context2d g)
 	{
 		if ( isEditing ) return;			// nothing to paint, only the TextField
-		//g.setFont(JavaLogoWeb.defaultfont);
 		g.setFont(WebLogo3dGWT.fontString);
 		if ( condition.isCorrect() )
 		{
-			//g.setColor(Color.black);
 			g.setFillStyle(CssColor.make(0,0,0));
 		} 
 		else
 		{
-			//g.setColor(Color.RED);
 			g.setFillStyle(CssColor.make(255,0,0));
 		}
 		
-		TextMetrics tm = g.measureText(condition.getParameterText());
-		int textWidth = (int) Math.round(tm.getWidth());
+		// Als/If is painted in paintBackground, condition starts at xPos+conditionEditorX 
+		String conditionText = condition.getParameterText();
+		TextMetrics tm = g.measureText(conditionText);
+		int textWidth = (int) Math.round(tm.getWidth()) + conditionEditorX;
 		if (textWidth > breedte - 10)
-		{	tm = g.measureText("Als");
-			textWidth = (int) Math.round(tm.getWidth()); 
-			if (textWidth > breedte - 10)
-			{	g.fillText("A",xPos+10,yPos+18);
+		{	
+			// omit characters until fit
+			conditionText = conditionText.substring(0, conditionText.length() - 1);
+			tm = g.measureText(conditionText);
+			textWidth = (int) Math.round(tm.getWidth()) + conditionEditorX;
+			while (textWidth > breedte - 10)
+			{
+				conditionText = conditionText.substring(0, conditionText.length() - 1);
+				tm = g.measureText(conditionText);
+				textWidth = (int) Math.round(tm.getWidth()) + conditionEditorX;
 			}
-			else
-				g.fillText(commandName,xPos+10,yPos+18);
+			g.fillText(conditionText,xPos+conditionEditorX,yPos+18);
+			
 		}
-		else
-			g.fillText(condition.getParameterText(),xPos+conditionEditorX, yPos+18);
+		else // Als/If + condition
+			g.fillText(conditionText,xPos+conditionEditorX, yPos+18);
 
 		
 		if (ifBlock != null)
@@ -488,7 +393,6 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	
 	public boolean executeContent(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
-//System.out.println("kCC executeContent");
 
 		boolean value = condition.getValue();
 		traceKleur = trb.commandExecuted(varSet.getLevel());
@@ -519,12 +423,9 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		return false;
 	}
 	
-	@Override
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
 		
-//System.out.println("kCC execute");
-
 		if ( !condition.isCorrect(varSet) ) 
 			return false; 
 		
@@ -534,9 +435,8 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		return b;
 	}
 		
-	@Override
 	public String getCode(String tab)
-	{	//String s = tab + "Keuze: Als "+condition.getParameterText()+" Dan\n" + tab +"{\n";
+	{	
 		String s = tab + WebLogo3dGWT.rb.keuzeTekst() + " " + alsString + " " + condition.getParameterText()+ " " + 
 					WebLogo3dGWT.rb.danTekst() + "\n" + tab +"{\n";
 		String tabNieuw = tab + "    ";
@@ -555,11 +455,9 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	public void mousePressed(int x, int y, int modifiers) 
 	{	
 		
-//System.out.println("kc mousePressed");		
 		arrowPressed = false;
 		if (elseVisibleButton.contains(x, y))
 		{
-//System.out.println("kc arrowPressed");			
 			setElseVisible(!elseVisible);
 			containerHeightChanged(0);
 			arrowPressed = true;
@@ -575,29 +473,8 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	{	
 		if (arrowPressed)
 			return;
-		//schuifveld.mouseReleased(getAbsoluteLocation().x+e.getX(), getAbsoluteLocation().y+e.getY(), e.getModifiersEx());
 		super.mouseReleased(x, y, modifiers);
 	}
 	
-
-	
-
-/*	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if(e.getSource()==elseVisibleButton)
-		{	elseVisible = elseVisibleButton.isSelected();
-			if(elseVisible)
-				add(elseBlock);
-			else
-			{	remove(elseBlock);
-				elseBlock.removeAll();
-			}
-			containerHeightChanged(0);
-		}
-		
-		
-	}
-*/	
 
 }

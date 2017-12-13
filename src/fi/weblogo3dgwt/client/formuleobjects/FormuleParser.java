@@ -1,14 +1,8 @@
 package fi.weblogo3dgwt.client.formuleobjects;
 
-//import java.awt.*;
-import java.awt.event.*;
-//import java.util.Hashtable;
 import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 import fi.weblogo3dgwt.client.expressies.*;
-//import fi.javalogoweb.WiskOpdr;
 import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 
 public class FormuleParser
@@ -397,19 +391,6 @@ public class FormuleParser
 		{	index = s.indexOf("--");
 			if(index >-1)s = s.substring(0,index) + "+" + s.substring(index+2);
 		}
-		
-		
-		/*index = 0;
-		while(index >-1)
-		{	index = s.indexOf("*-");
-			
-			int tel = index+2;
-			while(tel<s.length() && Character.isDigit(s.charAt(tel)))
-			{	tel++;
-			}
-			
-			if(index >-1 && tel>index+2)s = s.substring(0,index) + "(" + s.substring(index+1,tel) + ")" + s.substring(tel);
-		}*/
 		
 		//vervangt *-6 door *(-6)
 		index = 0;
@@ -830,32 +811,6 @@ public class FormuleParser
 			exp = new BasisExpressie(s);
 		}
 		
-		//is het een optelling, aftrekking, enz?
-		/*char[] operatoren = {'+','-','*','/','^','|'};
-		for(int j=0 ; j<operatoren.length ; j++)
-		{	int niv = 0;
-			for(int i=s.length()-1 ; i>-1 ; i--)
-			{	if(s.charAt(i)==')')
-				{	niv++;
-				}
-				else if(s.charAt(i)=='(')
-				{	niv--;
-				}
-				else if(s.charAt(i)==operatoren[j] && niv==0)
-				{	Expressie e1 = parse(s.substring(0,i));
-					Expressie e2 = parse(s.substring(i+1));
-					if(e1==null || e2==null)return null;
-					if(j==0)return new Optelling(e1,e2);
-					else if(j==1)return new Aftrekking(e1,e2);
-					else if(j==2)return new Vermenigvuldiging(e1,e2);
-					else if(j==3)return new Deling(e1,e2);
-					else if(j==4)return new Macht(e1,e2);
-					else if(j==5)return new NdeWortel(e1,e2);
-					return exp;
-				}
-			}
-		}*/
-		
 		int niv = 0;
 			for(int i=s.length()-1 ; i>-1 ; i--)
 			{	if(s.charAt(i)==')')
@@ -871,7 +826,6 @@ public class FormuleParser
 					return new Optelling(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		
 		niv = 0;
@@ -891,7 +845,6 @@ public class FormuleParser
 					return new Aftrekking(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		niv = 0;
 		if(s.length()>4)
@@ -909,7 +862,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		niv = 0;
@@ -928,7 +880,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		niv = 0;
@@ -947,7 +898,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		
@@ -967,7 +917,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		niv = 0;
@@ -986,7 +935,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		niv = 0;
@@ -1005,7 +953,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		} 
 		 
@@ -1025,7 +972,6 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
 			}
 		}
 		niv = 0;
@@ -1051,8 +997,8 @@ public class FormuleParser
 		
 		
 		niv = 0;
-//GWT nodig?
-/*		
+
+		
 		if(s.length()>4 && s.substring(0,4).equals("sin^"))
 		{	for(int i=4 ; i<s.length() ; i++)
 			{	if(s.charAt(i)=='(')
@@ -1072,7 +1018,7 @@ public class FormuleParser
 			}
 			return null;
 		}
-*/		
+		
 		niv = 0;
 		if(s.length()>4 && s.substring(0,4).equals("cos^"))
 		{	for(int i=4 ; i<s.length() ; i++)
@@ -1243,21 +1189,6 @@ public class FormuleParser
 			}
 		
 		niv = 0;
-			/*for(int i=s.length()-1 ; i>-1 ; i--)
-			{	if(s.charAt(i)==')')
-				{	niv++;
-				}
-				else if(s.charAt(i)=='(')
-				{	niv--;
-				}
-				else if(s.charAt(i)=='^' && niv==0)
-				{	Expressie e1 = parse(s.substring(0,i));
-					Expressie e2 = parse(s.substring(i+1));
-					if(e1==null || e2==null)return null;
-					return new Macht(e1,e2);
-					
-				}
-			}*/
 			for(int i=0 ; i<s.length() ; i++)
 			{	if(s.charAt(i)==')')
 				{	niv++;
@@ -1402,8 +1333,8 @@ public class FormuleParser
 			{	int index = s.substring(0,i).lastIndexOf("$f");
 				String formString = s.substring(index,i+1);
 				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='©')
-					{	int index1 = formString.substring(0,j).lastIndexOf("©");
+				{	if(formString.charAt(j)=='\u00A9')
+					{	int index1 = formString.substring(0,j).lastIndexOf("\u00A9");
 						String parseString = formString.substring(index1+1,j);
 						parseString = substitueerRandom(parseString, randomVars, randomValues, false);
 						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
@@ -1452,8 +1383,8 @@ public class FormuleParser
 					}	
 				}	
 				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='©')
-					{	int index1 = formString.substring(0,j).lastIndexOf("©");
+				{	if(formString.charAt(j)=='\u00A9')
+					{	int index1 = formString.substring(0,j).lastIndexOf("\u00A9");
 						String parseString = formString.substring(index1+1,j);
 						parseString = FormuleParser.substitueerRandom(parseString, randomVars, randomValues,false);
 						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);

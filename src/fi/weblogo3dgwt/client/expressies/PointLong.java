@@ -1,5 +1,6 @@
 package fi.weblogo3dgwt.client.expressies;
 
+
 class PointLong
 
 {	long x, y;

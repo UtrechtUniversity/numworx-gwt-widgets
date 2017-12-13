@@ -9,11 +9,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.TextArea;
 
+/**
+ * see class ImportPopup in WebLogoGWT
+ * @author huub
+ */
 public class ImportPopup extends PopupPanel 
 {
 	TextArea textArea;
@@ -38,7 +38,7 @@ public class ImportPopup extends PopupPanel
 		importPanel = new LayoutPanel();
 		importPanel.setSize("" + breedte + "px", "" + hoogte + "px");
 			
-		Label codeLabel = new Label(WebLogo3dGWT.rb.pasteCodeTekst()); //"Plak of Type de Code van het Algorithme");
+		Label codeLabel = new Label(WebLogo3dGWT.rb.pasteCodeTekst()); 
 		codeLabel.addStyleName(WebLogo3dGWT.webLogo3dGWTCssResource.codelabel());
 		importPanel.add(codeLabel);
 		importPanel.setWidgetLeftWidth(codeLabel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
@@ -67,10 +67,8 @@ public class ImportPopup extends PopupPanel
 		importPanel.setWidgetTopHeight(annuleerButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
 		annuleerButton.addClickHandler(new PushClickHandler());
 
-		//textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		setWidget(importPanel);
 	
-		//addCloseHandler(new PopupCloseHandler());
 	}
 	
 	public void importeer()

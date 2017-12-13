@@ -1,28 +1,66 @@
 package fi.weblogo3dgwt.client.logotekenap3d;					 
 
-//import java.awt.*;
-//import java.awt.event.*;
-//import java.applet.Applet;
-//import javax.swing.JPanel;
-
-//import fi.javalogoweb3d.JavaLogoInteractiePanel;
 import fi.weblogo3dgwt.client.WebLogo3dGWT;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.canvas.client.Canvas;
 
+/**
+ * class handling all drawing: this class contains an instance of class TekenBlad3D, which 
+ * in turn contains a Canvas to be drawn upon and the actual 3D-drawing methods;
+ * note that the drawing commands from the program are forwarded to tekenblad3D; <br>
+ * this class also contains an instance of class MuisBeheerder, for processing mouse and
+ * touch events on the drawing Canvas (currently only mouseMove and TouchMove Events to
+ * rotate the 3D-object); <br>
+ * the class also forwards zoom requests and requests to change the drawing mode 
+ * (solid/transparent/wireframe) to tekenBlad3d; <br>
+ * all drawing is so-called 3d-turtle-graphics: the 3d-turtle (cursor) is actually a flat
+ * turtle (cursor) and the plane determined by the 3d-turtle (cursor) is the current x-y-plane 
+ * with the 3d-turtle always at the origin and pointing in the direction of the positive y-axis; 
+ * the z-axis is of course perpendicular to this x-y-plane,  * with the positive z-axis obtained
+ * by "screwing" the positive y-axis to the positive x-axis over the smallest angle; when using
+ * the cursor (tracing) one obtains the directions of positive x- and y-axis from the shape of
+ * the cursor (see method tekenCursor in class Tekenblad3D); <br>
+ * there are two types of commands to move/rotate the 3d-turtle (cursor):<br>
+ * commands that do not change the plane determined by the 3d-turtle (cursor):<br>
+ * vooruit(dis): see class VooruitCComponent; stap(dx,dy): see class StapCComponent;
+ * links(ang): see class LinksCComponent; rechts(ang): see class RechtsCComponent;<br>      
+ * not available as command block: stapx(dx): see class StapXCommandComponent;  
+ * stapy(dy): see class StapYCommandComponent;<br>
+ * commands that move or rotate the plane determined by the 3d-turtle (cursor):<br>
+ * stapz(dz): see class StapZCommandComponent; xdraai(ang): see class XDraaiCComponent;
+ * ydraai(ang): see class YDraaiCComponent;<br>
+ * not available as command block: zdraai(ang): see class ZDraaiCComponent; <br> 
+ * note that links(ang),rechts(ang) and stap(dx,dy) are equivalent to
+ * stapx(dx),stapy(dy) and zdraai(ang) and that vooruit(dis) is redundant. 
+ */
+
 public class TekenApplet3D extends LayoutPanel 
 {
-//	private Regelaar rg;
+	/**
+	 * class handling all drawing, the class also contains a Canvas to be drawn upon
+	 */
 	public Tekenblad3D tb;
-	//private AnimatieBeheerder ab;
+	/**
+	 * class processing all mouse and touch events on the Canvas of the tekenblad3D
+	 */
 	private MuisBeheerder mb;
-	
-	//JavaLogoInteractiePanel eigenaar;
+	/**
+	 * owner of this instance of TekenAppelt3D
+	 */
 	WebLogo3dGWT eigenaar;
+	/**
+	 * width and height
+	 */
 	int breedte, hoogte;
 			  
+	/**
+	 * constructor
+	 * @param wl3g owner
+	 * @param w width
+	 * @param h height
+	 */
 	public TekenApplet3D(WebLogo3dGWT wl3g, int w, int h)
 	{
 		eigenaar = wl3g;
@@ -31,9 +69,10 @@ public class TekenApplet3D extends LayoutPanel
 		init();
 		
 	}
-	//-----------------------------------------------------------------------------------------
-	// initalisatie
-	//-----------------------------------------------------------------------------------------
+	
+	/**
+	 * create and add instance of TekenBlad3D and Muisbeheerder
+	 */
 	public void init()
 	{	tb = new Tekenblad3D(this, breedte, hoogte);
 		if (tb.tekenbladCanvas != null)
@@ -43,39 +82,30 @@ public class TekenApplet3D extends LayoutPanel
 			setWidgetTopHeight(tb.tekenbladCanvas, 0, Style.Unit.PX, tb.hoogte, Style.Unit.PX);
 
 		}
-//		rg = new Regelaar(this);
-		//this.setLayout(new BorderLayout(0,0));
-//		setLayout(null);
-		initialiseer();
 		maakMuisActieMogelijk();
-		//add(tb); //,"Center");
-//		add(rg,"East");
-		
-		//if (mb != null && ab != null)				
-		//{	mb.meldAnimatieBeheerder(ab);		
-		//}										
 	}	
-	
+
+	/**
+	 * initialize the Context2d of the Canvas in tekenBlad3D
+	 */
 	public void initContext2d()
 	{
 		tb.initContext2d();
 	}
 	
+	/**
+	 * getter for the Canvas in tekenBlad3D
+	 * @return drawing Canvas
+	 */
 	public Canvas getCanvas()
 	{
 		return tb.tekenbladCanvas;
 	}
-	public void stop()
-	{	//if(animatieLopend())onderbreekAnimatie();		
-	}
-	//-------------------------------------------------------------------------------------------
-	//deze methoden kunnen alleen worden gebruikt in  "initialiseer()" van leerling-applet
-	//-------------------------------------------------------------------------------------------
-	public void maakAnimatieMogelijk()
-	{	//ab = new AnimatieBeheerder(this);
-		//add(ab,"North");
-	}
 	
+	/**
+	 * create a Muisbeheerder and use it to listen to Mouse and Touch Events 
+	 * on the Canvas in tekenBlad3D
+	 */
 	public void maakMuisActieMogelijk()
 	{	mb = new MuisBeheerder(this);
 		tb.tekenbladCanvas.addMouseDownHandler(mb);
@@ -84,214 +114,313 @@ public class TekenApplet3D extends LayoutPanel
 		tb.tekenbladCanvas.addTouchStartHandler(mb);
 		tb.tekenbladCanvas.addTouchEndHandler(mb);
 		tb.tekenbladCanvas.addTouchMoveHandler(mb);
-
-		//tb.addMouseListener(mb);
-		//tb.addMouseMotionListener(mb);
 	}
-/*	
-	public void maakZichtbaar(Component c)
-	{	rg.maakZichtbaar(c);
-	} 
-*/	
-	
+
+	/**
+	 * getter for Muisbeheerder instance
+	 * @return mb
+	 */
 	public MuisBeheerder geefMuisBeheerder()
 	{	return mb;
 	}
 	
-	//public AnimatieBeheerder geefAnimatieBeheerder()
-	//{	return ab;
-	//}
-	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt in de muishandler en  doorgegeven aan MuisBeheerder mb
-	//-------------------------------------------------------------------------------------------
+	/**
+	 * get relative x-translation of last MouseMove/TouchMove Event
+	 * @return dx
+	 */
 	public int geefSleepdx()
 	{	return mb.geefSleepdx();
 	}
+	/**
+	 * get relative y-translation of last MouseMove/TouchMove Event
+	 * @return dy
+	 */
 	public int geefSleepdy()
 	{	return mb.geefSleepdy();
 	}
+	/**
+	 * get x-position of last MouseDown/TouchStart Event
+	 * @return last x
+	 */
 	public int geefDrukx()
 	{	return mb.geefDrukx();
 	}
+	/**
+	 * get y-position of last MouseDown/TouchStart Event
+	 * @return last y
+	 */
 	public int geefDruky()
 	{	return mb.geefDruky();
 	}
+	/**
+	 * get x-position of last MouseMove/TouchMove Event 
+	 * @return last x
+	 */
 	public int geefX()
 	{	return mb.geefX();
 	}
+	/**
+	 * get y-position of last MouseMove/TouchMove Event 
+	 * @return last y
+	 */
 	public int geefY()
 	{	return mb.geefY();
 	}
 
-
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt in de animatiehandler en doorgegeven aan AnimatieBeheerder ab
-	//-------------------------------------------------------------------------------------------
-//GWT?	
-	//public void pauze(int millisec){ab.pauze(millisec);}
-	//public boolean animatieLopend(){if (ab!=null)return ab.animatieLopend();else return false;}
-	//public void onderbreekAnimatie(){ab.onderbreekAnimatie();}
-	//public void beginAnimatie(){ab.beginAnimatie();}
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt in de animatiehandler en muishandlers en doogegeven aan 
-	//Tekenblad
-	//-------------------------------------------------------------------------------------------
-	public void tekenOpnieuw()
-	{	tb.tekenOpnieuw();
-	}
-	public void tekenErbij()
-	{	tb.tekenErbij();
-	}
+	/**
+	 * execute the total program (cursor == false) or execute the
+	 * program up to and including the current statement being traced
+	 * (cursor == true); then paint the 3D-object 
+	 * @param cursor true/false
+	 */
 	public void paintDrawing(boolean cursor)
 	{	tb.paintDrawing(cursor);
 	}
-	public void initializeDrawing(boolean cursor)
-	{	tb.initializeDrawing(cursor);
-	}
-	
-	public void zetCursorAan(boolean b)
-	{	tb.zetCursorAan(b);
-	}
 
+	/**
+	 * draw transparant or solid 3D objects
+	 * @param b true/false
+	 */
 	public void zetTransparant(boolean b)
 	{	tb.zetTransparant(b);
 	}
 
+	/**
+	 * draw wireframe or solid 3D objects
+	 * @param b true/false
+	 */
 	public void zetDraadFiguur(boolean b)
 	{	tb.zetDraadFiguur(b);
 	}
 	
+	/**
+	 * draw 3D object larger (button)
+	 */
 	public void zoomIn()
 	{
 		tb.zoomIn();
 	}
+	
+	/**
+	 * draw 3D object smaller (button)
+	 */
 	public void zoomUit()
 	{
 		tb.zoomUit();
 	}
 	
+	/**
+	 * set the zoom factor (setState)
+	 * @param fac zoom factor
+	 */
 	public void zoom(double fac)
 	{
 		tb.zoom(fac);
 	}
 
+	/**
+	 * get current x-rotation of 3D object (getState) 
+	 * @return x-rotation
+	 */
 	public double geefDraaiX()
 	{
 		return tb.geefDraaiX();
 	}
 
+	/**
+	 * get current y-rotation of 3D object (getState) 
+	 * @return y-rotation
+	 */
 	public double geefDraaiY()
 	{
 		return tb.geefDraaiY();
 	}
 
+	/**
+	 * set rotation of 3D object (setState)
+	 * @param hx x-rotation
+	 * @param hy y rotation
+	 */
 	public void zetBeginHoeken(double hx, double hy)
 	{	tb.zetBeginHoeken(hx,hy);
 	}
 
+	/**
+	 * initializes tekenBlad3D
+	 */
 	public void paintTekenblad()
 	{
 		tb.paintTekenblad();
 	}
 
+	/**
+	 * rotate the x-y-z coordinate system angle
+	 * degrees around the positive x-axis
+	 * @param dh angle
+	 */
+	public void xdraai(double dh)
+	{	tb.mat.xdraai(dh);
+	}
+	/**
+	 * rotate the x-y-z coordinate system angle
+	 * degrees around the positive y-axis
+	 * @param dh angle
+	 */
+	public void ydraai(double dh)
+	{	tb.mat.ydraai(dh);
+	}
+	/**
+	 * rotate the x-y-z coordinate system angle
+	 * degrees around the positive z-axis
+	 * @param dh angle
+	 */
+	public void zdraai(double dh)
+	{	tb.mat.zdraai(dh);
+	}
+	/**
+	 * rotate the x-y-z coordinate system angle
+	 * degrees clockwise around the positive z-axis 
+	 * @param dh angle
+	 */
+	public void rechts(double dh)
+	{	tb.mat.zdraai(-dh);
+	}
+	/**
+	 * rotate the x-y-z coordinate system angle
+	 * degrees anti-clockwise around the positive z-axis 
+	 * @param dh angle
+	 */
+	public void links(double dh)
+	{	tb.mat.zdraai(dh);
+	}
+	/**
+	 * move dy in the direction of the positive y-axis
+	 * @param dy y-translate
+	 */
+	public void stapy(double dy)
+	{	tb.naarVolgendPunt(0,-dy,0);
+	}
+	/**
+	 * move dy in the direction of the positive y-axis
+	 * @param dy y-translate
+	 */
+	public void vooruit(double dy)
+	{	tb.naarVolgendPunt(0,-dy,0);	
+	}
+	/**
+	 * move dx in the direction of the positive x-axis
+	 * @param dx x-translate
+	 */
+	public void stapx(double dx)
+	{	tb.naarVolgendPunt(dx,0,0);
+	}
+	/**
+	 * move dz in the direction of the positive z-axis
+	 * @param dz z-translate
+	 */
+	public void stapz(double dz)
+	{	tb.naarVolgendPunt(0,0,-dz);
+	}
+	public void stap(double dx,double dy,double dz)
+	{	tb.naarVolgendPunt(dx,-dy,-dz);
+	}
+	/**
+	 * move (dx,dy) in the x-y-plane
+	 * @param dx x-translate
+	 * @param dy y-translate
+	 */
+	public void stap(double dx,double dy)
+	{	tb.naarVolgendPunt(dx,-dy,0);}
 	
-  	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt in "initialiseer" en doorgegeven aan Tekenblad tb (of 
-	//Matrix2d) 
-	//-------------------------------------------------------------------------------------------
-	public void schaal(double s){tb.mat.schaal(s);}
-	public void achtergrondkleur(String kl){tb.achtergrondkleur(kl);}
-	public void achtergrondkleur(int r, int g, int b){tb.achtergrondkleur(r, g, b);}
-	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt in "tekenprogramma()" en doorgegeven aan Tekenblad tb (of 
-	//Matrix2d) 
-	//-------------------------------------------------------------------------------------------
-	public void xdraai(double dh){tb.mat.xdraai(dh);}
-	public void ydraai(double dh){tb.mat.ydraai(dh);}
-	public void zdraai(double dh){tb.mat.zdraai(dh);}
-	public void rechts(double dh){tb.mat.zdraai(-dh);}
-	public void links(double dh){tb.mat.zdraai(dh);}
-	public void stapy(double dy){tb.naarVolgendPunt(0,-dy,0);}
-	public void vooruit(double dy){tb.naarVolgendPunt(0,-dy,0);}
-	public void stapx(double dx){tb.naarVolgendPunt(dx,0,0);}
-	public void stapz(double dz){tb.naarVolgendPunt(0,0,-dz);}
-	public void stap(double dx,double dy,double dz){tb.naarVolgendPunt(dx,-dy,-dz);}
-	public void stap(double dx,double dy){tb.naarVolgendPunt(dx,-dy,0);}
-	public void penAan(){tb.penAan();}
-	public void penAan(String kl){tb.penAan(kl);}
-	public void penAan(int r, int g, int b){tb.penAan(r, g, b);}
-	public void penUit(){tb.penUit();}
-	public void vulAan(){tb.vulAan();}
-	public void vulAan(String kl){tb.vulAan(kl);}
-	public void vulAan(int r, int g, int b){tb.vulAan(r, g, b);}
-	public void vulUit(){tb.vulUit();}
-	public Polygon geefVlak(){return tb.geefVlak();}
-	public Punt3D geefBeginpunt()
-	{	return tb.geefBeginpunt();
+	/**
+	 * activate the pen
+	 */
+	public void penAan()
+	{	tb.penAan();
+	}
+	/**
+	 * activate the pen in color kl
+	 * @param kl color name
+	 */
+	public void penAan(String kl)
+	{	tb.penAan(kl);
+	}
+	/**
+	 * activate the pen in color (r,g,b)
+	 * @param r red value
+	 * @param g green value
+	 * @param b blue value
+	 */
+	public void penAan(int r, int g, int b)
+	{	tb.penAan(r, g, b);
+	}
+	/**
+	 * de-activate the pen
+	 */
+	public void penUit()
+	{	tb.penUit();
+	}
+	/**
+	 * start polygon to be filled
+	 */
+	public void vulAan()
+	{	tb.vulAan();
+	}
+	/**
+	 * start polygon to be filled with color kl
+	 * @param kl color name
+	 */
+	public void vulAan(String kl)
+	{	tb.vulAan(kl);
+	}
+	/**
+	 * start polygon to be filled with color (r,g,b)
+	 * @param r red value
+	 * @param g green value
+	 * @param b blue value
+	 */
+	public void vulAan(int r, int g, int b)
+	{	tb.vulAan(r, g, b);
+	}
+	/**
+	 * de-activate filling and draw the polygon
+	 */
+	public void vulUit()
+	{	tb.vulUit();
 	}
 	
-// deze zijn niet geimplementeerd
+	/**
+	 * not implemented for lack of space
+	 * @param s String to print
+	 */
 	public void print(String s){}
+	/**
+	 * not implemented for lack of space
+	 * @param s String to println
+	 */
 	public void printl(String s){}
+	/**
+	 * not implemented for lack of space
+	 * @param r background red
+	 * @param g background green
+	 * @param b background blue
+	 */
 	public void vulBlad(int r, int g, int b){}
 	
-	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden geimplemeteerd in het leerlingenprogramma
-	//-------------------------------------------------------------------------------------------
-	public void tekenprogramma(){}
-	public void initialiseer(){}
-	public void animatie(){}
+	/**
+	 * dragg action on drawing Canvas: this rotates the 3D-object
+	 */
 	public void muisSleepActie()
 	{	tb.muisSleepActie();
 	}
+	/**
+	 * not used
+	 */
 	public void muisDrukActie(){}
+	/**
+	 * not used
+	 */
 	public void muisLosActie(){}
-	//public void invoerVarActie(InvoerVariabele iv){}
-	//public void schuifInvoerVarActie(SchuifInvoerVariabele iv){}
 }		
 	
-/*
-class Regelaar extends Panel
-{	
-	private TekenApplet3D eigenaar;
-	private GridBagLayout gridbag;
-	private GridBagConstraints c;
-	private int aantalComponenten;
-	private int maxAantalComponenten;
-	private Component[] componenten;
-	
-	public Regelaar(TekenApplet3D ap)
-	{	setBackground(Color.lightGray);
-		eigenaar = ap;
-		maxAantalComponenten = 10;
-		componenten = new Component[maxAantalComponenten];
-		aantalComponenten = 0;
-		gridbag = new GridBagLayout();
-		c = new GridBagConstraints();
-		setLayout(gridbag);
-		c.insets = new Insets(10, 10, 10, 10); 			
-		c.anchor = GridBagConstraints.NORTHWEST;
-		c.gridwidth = GridBagConstraints.REMAINDER;
-		c.weighty = 0.0;
-		c.weightx = 0.0;
-	}	
-	//-----------------------------------------------------------------------------------------
-	// nieuwe InvoerVariabelen worden hier op het panel geplaatst 
-	//-----------------------------------------------------------------------------------------
-
-	public void maakZichtbaar(Component com)
-	{	if(com instanceof InvoerVar)
-		{	((InvoerVar)com).zetBaas(eigenaar);
-		}
-		componenten[aantalComponenten] = com;
-		aantalComponenten++;
-		gridbag.setConstraints(com, c);
-		add(com);
-	}
-	
-}
-*/
 

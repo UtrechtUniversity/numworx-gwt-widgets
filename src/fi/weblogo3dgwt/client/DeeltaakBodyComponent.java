@@ -1,13 +1,8 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
-//import java.awt.Rectangle;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
-import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 import fi.weblogo3dgwt.client.logotekenap3d.Rectangle;
 import fi.weblogo3dgwt.client.parameters.Identifier;
 import fi.weblogo3dgwt.client.parameters.IdentifierList;
@@ -16,12 +11,13 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-
+/**
+ * see class DeeltaakBodyComponent in WebLogoGWT
+ */
 public class DeeltaakBodyComponent extends ProgrammaComponent implements ParameterEditorListener
 {
 	private ParameterTextField naamEditor;
 	private int separatorX = 0;
-	//private FontMetrics fm;
 	TextMetrics tm;
 	
 	private boolean isEditingName = false;
@@ -34,14 +30,6 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		super(x, y, b, h, pn, sv);
 		deeltaaknaamParam = new Identifier(pn);
 		pmParam = new IdentifierList();
-		
-//System.out.println("dbc " + pn);		
-		
-//GWT4		
-		//naamEditor = new ParameterTextField(10, 4, 80, 17, this);
-		//fm = getFontMetrics(JavaLogoWeb.boldfont);
-		//separatorX = 10+fm.stringWidth(pn+"(");
-		//add(naamEditor);
 		
 		schuifveld.jlsvContext2d.setFont(WebLogo3dGWT.fontString);
 		
@@ -56,8 +44,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	/**
 	 * Check validity of entire deeltaak header.
 	 * This includes testing if name is an identifier, all parameters are identifiers
-	 * and number of parameters <= maximum.
-	 * 
+	 * and number of parameters less than or equel maximum.
 	 * @return true if all checks are ok.
 	 */
 	boolean isHeaderValid()
@@ -65,7 +52,6 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		return deeltaaknaamParam.isCorrect() && pmParam.isCorrect();
 	}
 
-	@Override
 	public void parameterEdited(String text)
 	{
 		if ( isEditingName )
@@ -74,7 +60,6 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 			isEditingName = false;
 			tm = schuifveld.jlsvContext2d.measureText(deeltaaknaamParam.getParameterText()+"(");
 			int tWidth = (int) Math.round(tm.getWidth());
-			//separatorX = 10+fm.stringWidth(deeltaaknaamParam.getParameterText()+"(");
 			separatorX = 10+tWidth;
 		} 
 		else if ( isEditingParamName )
@@ -95,17 +80,10 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	{
 		if ( name )
 		{
-//GWT3			
-			//naamEditor.setLocation(10, 4);
-			//naamEditor.vulIn(deeltaaknaamParam.getParameterText());
-			//separatorX = naamEditor.getX()+naamEditor.getWidth()+1;
 			isEditingName = true;
 		}
 		else
 		{
-//GWT2			
-			//naamEditor.setLocation(separatorX+2, 4);
-			//naamEditor.vulIn(pmParam.getParameterText());
 			isEditingParamName = true;
 		}
 		
@@ -128,7 +106,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		}
 
 		schuifveld.paramEditor = new ParameterTextField(breedte, hoogte, this, schuifveld);
-		naamEditor = schuifveld.paramEditor; //new ParameterTextField(breedte, hoogte, this, schuifveld);
+		naamEditor = schuifveld.paramEditor; 
 		if (name)
 			naamEditor.vulIn(deeltaaknaamParam.getParameterText());
 		else
@@ -143,7 +121,6 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	 * Handle mouse actions tos start and stop editting parameters.
 	 * Note: all resize operations are handled directly by MouseListener in ProgrammaComponent, 
 	 * no need to consider them here.
-	 * @see fi.javalogoweb.ParameterEditorListener#parameterComponentClicked(int, int)
 	 */
 	@Override
 	public void parameterComponentClicked(int x, int y)
@@ -178,15 +155,14 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 			
 			}	
 			
-			//naamEditor.setVisible(false);
-			//naamEditor.setEnabled(false);
 		}
 		schuifveld.paint();
 	}
 	
 	/**
 	 * Set name and parameter directly (ProgrammaImporter)
-	 * @param s
+	 * @param n name of parameter
+	 * @param p parameter text
 	 */
 	void setDeeltaakHeader(String n, String p)
 	{
@@ -200,7 +176,6 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	 * 
 	 * @return	the given name for this deeltaak
 	 */
-	@Override
 	public String getProgramName()
 	{
 		return deeltaaknaamParam.getParameterText();
@@ -219,8 +194,8 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	
 	/**
 	 * Get name of the parameter. Will return empty string if there isn't one.
-	 * 
-	 * @return	parametername or empty string
+	 * @param n number of parameter
+	 * @return	parameter name or empty string
 	 */
 	String getParameterName(int n)
 	{
@@ -229,10 +204,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	
 	/**
 	 * DeeltaakBodyComponents retains its width when being dragged
-	 * 
-	 * @see fi.javalogoweb.CommandComponent#getDragWidth()
 	 */
-	@Override
 	int getDragWidth()
 	{
 		return getWidth();
@@ -240,21 +212,14 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	
 	/**
 	 * Deeltaak will not be traced ( no carets while arranging the DTB's in the ProgrammaPanel)
-	 * 
-	 * @see fi.javalogoweb.CommandComponent#isTraceable()
 	 */
-	@Override
 	boolean isTraceable()
 	{
 		return false;
 	}
 	
-	@Override
 	void containerHeightChanged(int h)
 	{	
-		
-//System.out.println("containerHeightChanged " + commandName);
-
 		if ( !isHeightFixed && isOpen )
 		{	int newh;
 			newh = Math.min(schuifveld.getHeight()-20, Math.max(pcminoh, commandBlock.getContentHeight()+headerHeight+20));
@@ -265,7 +230,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 		int heightSurplus = commandBlock.getHeight()-(getHeight()-headerHeight);
 		if ( heightSurplus > 0 )
 		{	
-			int newY = yPos + headerHeight - heightSurplus;//Math.max(-heightSurplus, Math.min(0, commandBlock.getY()+8));
+			int newY = yPos + headerHeight - heightSurplus;
 			commandBlock.setLocation(commandBlock.getX(), newY);
 		}
 		else
@@ -277,89 +242,89 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	{
 		int newX = previousX;
 		int newY = previousY;
-		//Rectangle r = new Rectangle(JavaLogoSchuifVeld.ppx, JavaLogoSchuifVeld.ppy, 
-		//		                    schuifveld.getWidth(), schuifveld.getHeight());
 		Rectangle r = new Rectangle(JavaLogoSchuifVeld.ppx, JavaLogoSchuifVeld.ppy, 
                 schuifveld.breedte, schuifveld.hoogte);
 
 		if ( r.contains(x, y) )
 		{
-			// Note: the actual mouse position, given by the parameters, is irrelevant, because we want to position
-			// the DBC exactly where it is now. So, just translate the current (absolute-JLSV) coordinates 
-			// to the ProgrammaPanel and apply min/max rules to keep it inside.
-			newX = getX(); //-JavaLogoSchuifVeld.ppx;
+			newX = getX(); 
 			newX = Math.max(80, Math.min(newX, schuifveld.getWidth()-getWidth()));
-			newY = getY(); //-JavaLogoSchuifVeld.ppy;
+			newY = getY(); 
 			newY = Math.max(0, Math.min(newY, schuifveld.getHeight()-getHeight()));
 		}
 		setLocation(newX, newY);
-//GWT? 		
+ 		
 		schuifveld.addToProgrammaPanel(this);
 		schuifveld.paint();
 	}
 	
 	
-	@Override
-	//protected void paintCommand(Graphics g)
 	protected void paintCommand(Context2d g)
 	{
-		//g.setFont(JavaLogoWeb.boldfont);
+
 		g.setFont(WebLogo3dGWT.boldFontString);
-		//g.setColor(Color.BLACK);
 		g.setFillStyle(CssColor.make(0,0,0));
 		
 		if ( isEditingName )
 		{
-			//g.drawString("("+pmParam.getParameterText()+")", separatorX, 18);
 			g.fillText("(" + pmParam.getParameterText() + ")", xPos+ separatorX, yPos+18);
 		}
 		else if ( isEditingParamName )
 		{
-			//g.drawString(deeltaaknaamParam.getParameterText()+"(", 10, 18);
 			g.fillText(deeltaaknaamParam.getParameterText() + "(", xPos+10, yPos+18);
 			
-			//g.drawString(" )", separatorX+naamEditor.getWidth()+3, 18);
 			g.fillText(" )", xPos+separatorX+60+3, yPos+18);
 		} 
 		else
 		{	// paint parts of the declaration in RED if they are incorrect;
 			int xpos = 10;
 			if ( !deeltaaknaamParam.isCorrect() ) 
-			{	//g.setColor(Color.RED);
-				g.setFillStyle(CssColor.make(255,0,0));
+			{	g.setFillStyle(CssColor.make(255,0,0));
 			}
-			//g.drawString(deeltaaknaamParam.getParameterText(), 10, 18);
+			// subroutine name
 			g.fillText(deeltaaknaamParam.getParameterText(), xPos+10, yPos+18);
 			
 			tm = schuifveld.jlsvContext2d.measureText(deeltaaknaamParam.getParameterText());
 			int tWidth = (int) Math.round(tm.getWidth());
-			//xpos = xpos+fm.stringWidth(deeltaaknaamParam.getParameterText());
 			xpos = xpos+tWidth;
-			//g.setColor(Color.BLACK);
 			g.setFillStyle(CssColor.make(0,0,0));
-			//g.drawString("( ", xpos, 18);
 			g.fillText("( ", xPos+xpos, yPos+18);
-			
 			tm = schuifveld.jlsvContext2d.measureText("(");
 			tWidth = (int) Math.round(tm.getWidth());
-			//xpos = xpos + fm.stringWidth("(");
 			xpos = xpos + tWidth;
 			if ( !pmParam.isCorrect() )
-			{	//g.setColor(Color.RED);
-				g.setFillStyle(CssColor.make(255,0,0));
+			{	g.setFillStyle(CssColor.make(255,0,0));
 			}
-			//g.drawString(pmParam.getParameterText(), xpos, 18);
-			g.fillText(pmParam.getParameterText(), xPos+xpos, yPos+18);
 			
+			// parameter list
+			// assume up to here fits
+			String paramString = pmParam.getParameterText();
 			tm = schuifveld.jlsvContext2d.measureText(pmParam.getParameterText());
-			tWidth = (int) Math.round(tm.getWidth());
-			//xpos = xpos + fm.stringWidth(pmParam.getParameterText());
-			xpos = xpos + tWidth;
-			//g.setColor(Color.BLACK);
-			g.setFillStyle(CssColor.make(0,0,0));
-			//g.drawString(")", xpos, 18);
-			g.fillText(")", xPos+xpos, yPos+18);
+			int paramWidth = (int) Math.round(tm.getWidth());
+			int textWidth = xpos+paramWidth;
+			if (textWidth > breedte-50)
+			{	
+				while (textWidth > breedte - 50)
+				{
+					paramString = paramString.substring(0, paramString.length() - 1);
+					tm = g.measureText(paramString);
+					paramWidth = (int) Math.round(tm.getWidth());
+					textWidth = xpos+paramWidth;
+				}
+				g.fillText(paramString,xPos+xpos,yPos+18);
+				
+			}
+			else
+			{	g.fillText(pmParam.getParameterText(), xPos+xpos, yPos+18);
+				xpos = xpos + paramWidth;
+				// black
+				g.setFillStyle(CssColor.make(0,0,0));
+				// closing parenthesis
+				g.fillText(")", xPos+xpos, yPos+18);
+			}
+
 		}
+		
 	}
 	
 	@Override

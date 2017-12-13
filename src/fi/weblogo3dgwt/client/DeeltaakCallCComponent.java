@@ -1,36 +1,31 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Graphics;
+
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
-import com.google.gwt.canvas.dom.client.TextMetrics;
 
 /**
  * CC for a 'deeltaak call' so this is not the deeltaak itself but the little block you
- * can drag around to drop in your algoritm
- * 
+ * can drag around to drop in your algorithm
+ * see also class DeeltaakCallCComponent in WebLogoGWT
  * @author Berge020
  */
 public class DeeltaakCallCComponent extends ParameterCommandComponent
 {
-	
-	
 	private DeeltaakBodyComponent deeltaakBody;
 	
 	/**
 	 * Creates a new DeeltaakCallCComponent witn zero parameters (typically called at startup)
-	 * 
-	 * @param x
-	 * @param y
-	 * @param b
-	 * @param h
-	 * @param index
-	 * @param sv
+	 * @param x x-position
+	 * @param y y-position
+	 * @param b width
+	 * @param h height
+	 * @param index index number
+	 * @param sv instance of JavaLogoSchuifVeld
 	 */
 	public DeeltaakCallCComponent(int x, int y, int b, int h, int index, JavaLogoSchuifVeld sv)
 	{	
@@ -46,9 +41,8 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 	/**
 	 * Creates a DCC from another one, with the right number of parameters
 	 * Typically used when picking up a DDC from the 'pile'
-	 * 
-	 * @param dcc
-	 * @param sv
+	 * @param dcc DeeltaakCallCComponent to be copied
+	 * @param sv instance of JavaLogoSchuifVeld
 	 */
 	public DeeltaakCallCComponent(DeeltaakCallCComponent dcc, JavaLogoSchuifVeld sv)
 	{
@@ -80,10 +74,8 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 	 * can change the name of a Deeltaak.
 	 * Name may not yet created (import). In that case, return the default name 'deeltaaki'.
 	 * Note: also return incorrect name for editing.
-	 * 
 	 * @return		the name of the deeltaak
 	 */
-	@Override
 	public String getCommandName()
 	{
 		
@@ -104,7 +96,6 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		return commandNameTranslated ;		
 	}
 	
-	@Override
 	protected boolean isCorrect()
 	{
 		
@@ -113,21 +104,16 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		return super.isCorrect();
 	}
 	
-	@Override
 	protected String getFullParameterText()
 	{
 		checkParameterList();						// this implies checking for updates at every repaint
 		return super.getFullParameterText();
 	}
 	
-	@Override
-	//protected void paintBackground(Graphics g)
 	protected void paintBackground(Context2d g)
 	{
 		super.paintBackground(g);
-		//g.drawRect(5,1,getSize().width-11,getSize().height-1);
 		g.strokeRect(xPos+5,yPos+1,getSize().width-11,getSize().height-1);
-		//g.drawRect(6,1,getSize().width-13,getSize().height-3);
 		g.strokeRect(xPos+6,yPos+1,getSize().width-13,getSize().height-3);
 	}
 	
@@ -145,12 +131,10 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		noParameters = np;
 	}
 
-	@Override
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
 		
 		// don't run a deeltaak with invalid name
-		
 		if ( !deeltaakBody.isHeaderValid() ) 
 			return false;
 		
@@ -159,12 +143,11 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 		{
 			if ( !parameters[i].isCorrect(varSet) ) return false;
 		}
-		//varSet.increaseLevel("Deeltaak: "+getCommandNameTranslated());
+
 		varSet.increaseLevel("-- "+getActualCall(), true);
 		for ( int i=0; i<noParameters; i++ )
 		{
-			// get parameter name form body and add local var with value of parameter (call by value)
-			
+			// get parameter name from body and add local var with value of parameter (call by value)
 			varSet.setParameter(deeltaakBody.getParameterName(i), ((NumericParameter)parameters[i]).getValue());		
 		}
 		
@@ -174,8 +157,6 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 			trb.setCommandInfo(getActualCall(), varSet);
 			return traceKleur;
 		}
-//dit niet		
-		//if (traceKleur ) schuifveld.traceVariables(varSet);
 		// execution may also stop at a command in the body. Call will be pink then, too.
 		traceKleur = deeltaakBody.execute(trb, ub, varSet);
 		varSet.decreaseLevel();

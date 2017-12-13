@@ -1,22 +1,16 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
 
-//import fi.beans.stringutils.StringUtils;
-import fi.weblogo3dgwt.client.expressies.*;
-import fi.weblogo3dgwt.client.formuleobjects.*;
 import fi.weblogo3dgwt.client.parameters.TAParameter;
-import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-//import com.google.gwt.user.client.ui.LayoutPanel;
-
+/**
+ * see class ParameterCommandComponent in WebLogoGWT
+ */
 
 public abstract class ParameterCommandComponent extends SimpleCommandComponent implements ParameterEditorListener
 {
@@ -30,7 +24,7 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	/**
 	 * array of x-pos of the parameters, positions of TextField when editing param[i]
 	 * The first one holds the position of the first parameter and is not used as separator.
-	 * The others are also used to decide which parameter to edit, separator[i], i>0 is the border
+	 * The others are also used to decide which parameter to edit, separator[i], i larger than 0 is the border
 	 * between param{i-1] and param[i]
 	 * An extra entry is used to put the closing bracket in the right place when editing the last parameter
 	 * Note: values change when editting (or when a deeltaak name is changed by user), so they
@@ -46,7 +40,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	
 	protected ParameterTextField paramEditor;
 
-	//protected FontMetrics fm;
 	protected TextMetrics tm;
 
 	/**
@@ -68,29 +61,21 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	 */
 	protected String strAfterEditor;
 	
-	//LayoutPanel inputOwner;
 
 	public ParameterCommandComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{
 		super(x, y, b, h, sv);
-		
-		//inputOwner = sv;
 		
 		parameters = new TAParameter[JavaLogoSchuifVeld.maxParamCount];
 		parameterPos = new int[JavaLogoSchuifVeld.maxParamCount+1];
 		strBeforeEditor = strOpen;
 		strAfterEditor = strClose;
 		
-		//fm = getFontMetrics(JavaLogoWeb.defaultfont);
-		
-		//paramEditor = new ParameterTextField(10, 4, 60, 17, this);
-		//add(paramEditor);		
 	}
 	
 	/**
 	 * Find the indez of the parameter to be editted
-	 * Pre: noParameters>0
-	 * 
+	 * Pre: noParameters larger than 0
 	 * @param x		x-pos of mouse click
 	 * @return		index of parameter in array parameters
 	 */
@@ -107,7 +92,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	
 	/**
 	 * set the positions for all parameters, taking into account that param[editIndex] will be a TextField
-	 * 
 	 * @param editIndex		the index of the parameter to be edit, or -1 if none is being edited.
 	 */
 	private void setParameterPositions(int editIndex)
@@ -116,29 +100,23 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		
 		tm = schuifveld.jlsvContext2d.measureText(getCommandName()+strOpen);
 		int width = (int) Math.round(tm.getWidth());
-		//int currentX = 10+fm.stringWidth(getCommandNameTranslated()+strOpen);
 		int currentX = 10+width;
 		for ( int i=0; i<noParameters; i++ )
 		{
 			parameterPos[i]=currentX;
 			if ( i == editIndex )
 			{	// add width of TextField
-				
 				currentX = currentX+60;
 			} 
 			else
 			{	tm = schuifveld.jlsvContext2d.measureText(parameters[i].getParameterText());
 				width = (int) Math.round(tm.getWidth());
-	
 				// add width of parameter value printed
-				//currentX = currentX+fm.stringWidth(parameters[i].getParameterText());
 				currentX = currentX+width;
 			}	
 			tm = schuifveld.jlsvContext2d.measureText(", ");
 			width = (int) Math.round(tm.getWidth());
-			
 			// add space for interpunction
-			//currentX = currentX+fm.stringWidth(", ");
 			currentX = currentX+width;
 		}
 		parameterPos[noParameters]=currentX;	// position of closing bracket when editing last parameter
@@ -161,7 +139,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		}
 	}
 	
-	@Override
 	public void parameterEdited(String text)
 	{
 		parameters[epi].setParameter(text);
@@ -175,7 +152,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		schuifveld.paint();
 	}
 
-	@Override
 	public void parameterComponentClicked(int x, int y)
 	{
 		boolean newEdit = false;
@@ -203,15 +179,10 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		if ( newEdit )
 		{
 			isEditing = true;
-			// TODO: to be completely right: calculate width of TextField first...
 			setParameterPositions(epi);			// calculate positions with TextField for current param
 			setBeforeAndAfterStrings(epi);
-			
-// hier de TekstPopup laten verschijnen			
 	
 			showParamEditor();
-			//paramEditor.setLocation(parameterPos[epi], 4);
-			//paramEditor.vulIn(parameters[epi].getParameterText());
 		} 
 		else
 		{
@@ -223,8 +194,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 			
 			}
 			
-			//paramEditor.setVisible(false);
-			//paramEditor.setEnabled(false);
 		}
 		schuifveld.paint();
 	}
@@ -250,20 +219,16 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		paramEditor.textBox.setFocus(true);
 		
 		schuifveld.paint();
-//System.out.println("ParamCC breedte = " + breedte);		
-//System.out.println("ParamCC popup breedte = " + paramEditor.breedte);		
 
 	}
  
 	/**
 	 * Set parameter(s) directly (ProgrammaImporter)
 	 * Will import nothing if the number of parameters does not match the number of comma separated strings.
-	 * <br />
 	 * Note: there's a little bit of mess here. Color parameters may have commas that are NOT separators,
 	 * Strings for print commands may contain commas. So a QUICK FIX is applied. If we have 1 parameter
 	 * we import the lot into that parameter without looking for commas. :-)
-	 * 
-	 * @param s
+	 * @param s String for parameter
 	 */
 	void setParameter(String s)
 	{
@@ -284,7 +249,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	
 	/**
 	 * Get the parameter text. 
-	 * 
 	 * @return 	combined parameter texts
 	 */
 	protected String getFullParameterText()
@@ -300,7 +264,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	
 	/**
 	 * Checks if parameters are ok. Again, before running this is only a syntax check
-	 * 
 	 * @return	boolean
 	 */
 	protected boolean isCorrect()
@@ -312,70 +275,51 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 		return true;
 	}
 	
-	@Override
-	//protected void paintCommand(Graphics g)
 	protected void paintCommand(Context2d g)
 	{
-		//g.setFont(JavaLogoWeb.defaultfont);
 		g.setFont(WebLogo3dGWT.fontString);
-		//g.setColor(Color.black);
 		g.setFillStyle(CssColor.make(0,0,0));
-		
 		if (isEditing)
 		{
-			
-//System.out.println("PCC paintComm isEditing");			
-			//g.drawString(getCommandNameTranslated()+strBeforeEditor, 10, 18);
-			
 			g.fillText(getCommandName()+strBeforeEditor, xPos+10, yPos+18);
-			
-			//g.drawString(strAfterEditor, parameterPos[epi+1], 18);
-		
-			
-//System.out.println("strAfterEditor = " + strAfterEditor);
-//System.out.println("parameterPos[epi+1] = " + parameterPos[epi+1]);
+
 			g.fillText(strAfterEditor, xPos+parameterPos[epi+1], yPos+18);
 		} 
 		else
 		{
-			
-//System.out.println("PCC paintComm !isEditing");
-
 			if (!isCorrect())
-			{	//g.setColor(Color.RED);
+			{	
 				g.setFillStyle(CssColor.make(255,0,0));
 			}
-			
-			//g.drawString(getCommandNameTranslated() + strOpen +  getFullParameterText() + strClose, 10, 18);
-			
-			//g.fillText(getCommandNameTranslated() + strOpen +  getFullParameterText() + strClose, xPos+10, yPos+18);
-			//g.fillText(getCommandName() + strOpen + getFullParameterText() + strClose, xPos+10, yPos+18);
-			
-			TextMetrics tm = g.measureText(getCommandName() + strOpen +  getFullParameterText() + strClose);
+			// display command text or part of it depending on breedte
+			String fullText = getCommandName() + strOpen +  getFullParameterText() + strClose;
+			TextMetrics tm = g.measureText(fullText);
 			int textWidth = (int) Math.round(tm.getWidth());
 			if (textWidth > breedte - 10)
-			{	tm = g.measureText(getCommandName());
-				textWidth = (int) Math.round(tm.getWidth()); 
-				if (textWidth > breedte - 10)
-				{	g.fillText(getCommandName().substring(0,1),xPos+10,yPos+18);
+			{	
+				// omit characters until fit
+				fullText = fullText.substring(0, fullText.length() - 1);
+				tm = g.measureText(fullText);
+				textWidth = (int) Math.round(tm.getWidth());
+				while (textWidth > breedte - 10)
+				{
+					fullText = fullText.substring(0, fullText.length() - 1);
+					tm = g.measureText(fullText);
+					textWidth = (int) Math.round(tm.getWidth());
 				}
-				else
-					g.fillText(getCommandName(),xPos+10,yPos+18);
+				g.fillText(fullText,xPos+10,yPos+18);
 			}
 			else
-				g.fillText(getCommandName() + strOpen +  getFullParameterText() + strClose,xPos+10, yPos+18);
+				g.fillText(fullText,xPos+10, yPos+18);
 
 		}
 	}
 
 	/**
-	 * Get a string value of the command in this componenent. 
+	 * Get a string value of the command in this component. 
 	 * Implemented here for convenience so simple parameter commands don't need to override.
 	 * More complex ones (color?), however, must override
-	 * 
-	 * @see fi.javalogoweb.CommandComponent#getCode(java.lang.String)
 	 */
-	@Override
 	public String getCode(String tab)
 	{	
 		String s = tab + getCommandName() + strOpen +  getFullParameterText() + strClose + "\n";
@@ -384,7 +328,6 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	/**
 	 * Returns the actual command with values of parameters.
 	 * Note: this method MUST only be called after parameters have been checked for correctness
-	 * 
 	 * @return		String, command with calculated values of parameters
 	 */
 	protected String getActualCall()

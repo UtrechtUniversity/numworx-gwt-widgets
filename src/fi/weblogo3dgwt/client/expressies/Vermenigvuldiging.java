@@ -1,6 +1,5 @@
 package fi.weblogo3dgwt.client.expressies;
 
-import java.awt.*;
 import java.util.*;
 
 public class Vermenigvuldiging extends Expressie  
@@ -56,7 +55,7 @@ public class Vermenigvuldiging extends Expressie
 		
 		Vector v1 = Algebra.geefFactorenBeperkt(kind1,new Vector());
 		Vector v2 = Algebra.geefFactorenBeperkt(kind2,new Vector());
-		//Expressie g1 = ((Expressie)v1.elementAt(v1.size()-1));
+
 		Expressie g2 = null;
 		if(v2.size()>0) g2 = ((Expressie)v2.elementAt(0));
 		if(g2 instanceof BasisExpressie && !Double.isNaN(g2.geefWaarde()) && !(g2 instanceof PI) && !(g2 instanceof E)
@@ -64,12 +63,10 @@ public class Vermenigvuldiging extends Expressie
 		{	op = "*";
 		}
 		
-		//if(kind1.geefWaarde()==1)return s2;
 		if(kind1.isVeelterm)s1 = "$h" + s1 + "@";
 		if(kind2.isVeelterm)s2 = "$h" + s2 + "@";
 		
 		return s1 + op + s2;
-		//return s1 + "*" + s2;
 	}
 	
 	public String toStringStrikt()

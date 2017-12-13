@@ -1,21 +1,20 @@
 package fi.weblogo3dgwt.client.parameters;
 
-import java.lang.*;
 import fi.weblogo3dgwt.client.VarSet;
 
 /**
  * Class for any identifier in the TekenApplet. 
  * Identifiers are varaiable names, deeltaak names and parameters
- * 
+ * see also class Identifier in WebLogoGWT 
  * @author berge020
  */
 public class Identifier extends TAParameter
 {
 	/**
-	 * An indentifier can start with a default name, such as 'variabele' or 'deeltaak2'
+	 * An identifier can start with a default name, such as 'variabele' or 'deeltaak2'
 	 * or the empty String (parameter of deeltaak)
 	 * 
-	 * @param the default name of this parameter's owner (VarCC or DeeltaakBodyC), or empty String
+	 * @param s the default name of this parameter's owner (VarCC or DeeltaakBodyC), or empty String
 	 */
 	public Identifier(String s)
 	{
@@ -63,9 +62,6 @@ public class Identifier extends TAParameter
     	return (Character.isLetter(ch) == true) || (Character.isDigit(ch) == true) ||
     		   (ch == '_');
     	
-    		   //(Character.getType(ch) == Character.CONNECTOR_PUNCTUATION) ||
-    		   //(Character.getType(ch) == Character.COMBINING_SPACING_MARK) ||
-    		   //(Character.getType(ch) == Character.NON_SPACING_MARK); 
     }
 
 	@Override

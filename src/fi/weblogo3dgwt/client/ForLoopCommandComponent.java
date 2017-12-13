@@ -1,8 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Component;
-
-//import java.awt.Component;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.CommandComponent;
@@ -10,6 +7,9 @@ import fi.weblogo3dgwt.client.VarSet;
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * see class ForLoopCommandComponent in WebLogoGWT
+ */
 public class ForLoopCommandComponent extends LoopCommandComponent
 {
 
@@ -18,18 +18,14 @@ public class ForLoopCommandComponent extends LoopCommandComponent
 		super(x, y, b, h, sv);
 		
 		loopCondition = new NumericParameter();
-		commandName = WebLogo3dGWT.rb.herhaal1Tekst(); //"Herhaal";
-		commandNameTranslated = "Repeat"; //JavaLogoWeb.rb.getString(commandName);
-		naString = " " + WebLogo3dGWT.rb.keerTekst(); //" keer";
-		naStringTranslated = " times"; //JavaLogoWeb.rb.getString(naString);
-		createLoopEditor();
+		commandName = WebLogo3dGWT.rb.herhaal1Tekst(); 
+		commandNameTranslated = "Repeat"; 
+		naString = " " + WebLogo3dGWT.rb.keerTekst(); 
+		naStringTranslated = " times"; 
 	}
 
-	@Override
 	public boolean executeContent(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
-		
-//System.out.println("flCC executeContent");
 
 		if ( !loopCondition.isCorrect(varSet) ) return false; 
 		traceKleur = trb.commandExecuted(varSet.getLevel());

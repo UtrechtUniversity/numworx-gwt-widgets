@@ -1,5 +1,9 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
+/**
+ * GWT does not have a class Rectangle 
+ */
+
 public class Rectangle 
 {
 	public int x; 

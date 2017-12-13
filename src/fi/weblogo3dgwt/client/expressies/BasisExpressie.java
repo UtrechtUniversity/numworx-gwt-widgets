@@ -1,6 +1,5 @@
 package fi.weblogo3dgwt.client.expressies;
 
-import java.awt.*;
 import java.util.*;
 
 import fi.weblogo3dgwt.client.UF;
@@ -26,7 +25,6 @@ public class BasisExpressie extends Expressie
 	public BasisExpressie(double d)
 	{	super();
 		waarde = d;
-		//basisString = df.format(d);
 		basisString = UF.format0(d,8);
 		isVeelterm = false;
 		isProdukt = false;
@@ -100,12 +98,12 @@ public class BasisExpressie extends Expressie
 	}
 	
 	public String toString()
-	{	//basisString = basisString.replace('.',',');
+	{	
 		return basisString;
 	}
 	
 	public String toStringStrikt()
-	{	//basisString = basisString.replace('.',',');
+	{	
 		return basisString;
 	}
 

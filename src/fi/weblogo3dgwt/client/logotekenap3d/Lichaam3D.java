@@ -1,23 +1,77 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
-//import java.awt.*;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * class representing a 3D configuration consisting of 3d-polygons (see class
+ * Polygon3D); during drawing points in 3d-space are added to arrays of coordinates,
+ * then calling method VoegPolygonToe turns these points into a Polygon3D and
+ * resets the coordinate arrays; for adding lines or a cursor during drawing,
+ * add the line or cursor directly as a Polygon3D, in this way not interrupting
+ * the collection of points in the coordinate arrays.
+ */
 public class Lichaam3D
 {
+	/**
+	 * integer x-coordinates
+	 */
 	public int[] xcoor;
+	/**
+	 * integer y-coordinates
+	 */
 	public int[] ycoor;
+	/**
+	 * integer z-coordinates
+	 */
 	public int[] zcoor;
+	/**
+	 * double x-coordinates
+	 */
 	public double[] xcoord;
+	/**
+	 * double y-coordinates
+	 */
 	public double[] ycoord;
+	/**
+	 * double z-coordinates
+	 */
 	public double[] zcoord;
 
-	public Polygon3D[] vlakken, vlakkenSort;
-	public int aantalPunten, aantalPolygonen;
+	/**
+	 * all 3d-polygons in this Lichaam3D 
+	 */
+	public Polygon3D[] vlakken;
+	/**
+	 * additional Polygon3D array for bubble sort
+	 */
+	Polygon3D[] vlakkenSort;
+	
+	/**
+	 * the current number of points in the coordinate arrays
+	 */
+	public int aantalPunten;
+	/**
+	 * the current number of Polygon3D
+	 */
+	public int aantalPolygonen;
+	
+	/**
+	 * a temporary Polygon3D being constructed
+	 */
 	private Polygon3D huidigePolygon;
+	/**
+	 * the projection factor for projecting from the eye on the z-axis
+	 * (0,0,1000) onto the x-y-plane
+	 */
 	private double pf;
+	/**
+	 * origin of x-y-z coordinate system  
+	 */
 	Punt3D nulpunt;
 
+	/**
+	 * constructor, initialize arrays and nulpunt 
+	 */
 	public Lichaam3D()
 	{	xcoor = new int[1000];
 		ycoor = new int[1000];
@@ -31,12 +85,24 @@ public class Lichaam3D
 		aantalPolygonen = 0;
 		nulpunt = new Punt3D(0,0,0);
 	}
+	
+	/**
+	 * set a new origin
+	 * @param x new x-coordinate
+	 * @param y new y-coordinate
+	 * @param z new z-coordinate
+	 */
 	public void maakNulpunt(double x,double y,double z)
 	{	nulpunt.x = x;
 		nulpunt.y = y;
 		nulpunt.z = z;
 	}
 	
+	/**
+	 * add a 3d-point, as x- and y-coordinate save its 
+	 * projection on the x-y-plane 
+	 * @param p 3d point to add
+	 */
 	public void voegPuntToe(Punt3D p)
 	{	pf = (1000-p.z)/1000;
 		xcoord[aantalPunten] = nulpunt.x + (p.x-nulpunt.x)/pf;
@@ -45,10 +111,16 @@ public class Lichaam3D
 		xcoor[aantalPunten] = (int)xcoord[aantalPunten];
 		ycoor[aantalPunten] = (int)ycoord[aantalPunten];
 		zcoor[aantalPunten] = (int)p.z;
-
 		aantalPunten++;
 	}
-	
+
+	/**
+	 * create and add a Polygon3D representing a line between two 3d-points
+	 * @param p1 line starts at 3d-point p1
+	 * @param p2 line ends at 3d-point p2
+	 * @param lijnkl the line color
+	 * @param vulkl the fill color (ignored)
+	 */
 	public void voegLijnToe(Punt3D p1, Punt3D p2, CssColor lijnkl, CssColor vulkl)
 	{
 //System.out.println("voegLijnToe");
@@ -80,6 +152,12 @@ public class Lichaam3D
 		
 	}
 
+	/**
+	 * create and add a Polygon3D representing a 3d-cursor, see class TekenBlad3D
+	 * @param cursorPunten the 3d-points making up the cursor
+	 * @param lijnkl the outline color of the cursor
+	 * @param vulkl the fill color of the cursor
+	 */
 	public void voegCursorToe(Punt3D[] cursorPunten, CssColor lijnkl, CssColor vulkl)
 	{
 		
@@ -135,7 +213,13 @@ public class Lichaam3D
 		
 	}
 
-	
+	/**
+	 * turns the points saved in the coordinate arrays into a Polygon3D and
+	 * reset the coordinate arrays;
+	 * @param vulkl fill color
+	 * @param lijnkl outline color
+	 * @param isOmlnd should the outline be drawn
+	 */
 	public void voegPolygonToe(CssColor vulkl, CssColor lijnkl, boolean isOmlnd )
 	{	
 //System.out.println("voegPolygonToe");
@@ -176,6 +260,9 @@ public class Lichaam3D
 		aantalPolygonen++;
 	}
 
+	/**
+	 * bubble sort the 3d-polygons on average z-value
+	 */
 	public void sorteer()
 	{	for(int j=0 ; j<aantalPolygonen ;j++)
 		{

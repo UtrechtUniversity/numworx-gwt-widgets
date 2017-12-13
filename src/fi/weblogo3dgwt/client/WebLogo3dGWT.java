@@ -1,18 +1,10 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -24,36 +16,34 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
-import fi.weblogo3dgwt.client.logotekenap3d.Tekenblad3D;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fi.weblogo3dgwt.client.text.Text;
+
+/**
+ * see also class WebLogoGWT 
+ * @author huub
+ */
 
 public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener 
 {
@@ -75,6 +65,9 @@ public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionVie
 	LayoutPanel webLogoPanel;
 	JavaLogoSchuifVeld jlsVeld;
 	public TraceBeheerder trb;
+	/**
+	 * instance of the 3D drawing class
+	 */
 	public TekenApplet3D uitvoerblad;
 	
 	int buttonWidth = 45;
@@ -97,19 +90,17 @@ public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionVie
 	int hoogtePaul = 575;
 	int bottomHeight = 32;
 	int jlsHoogte = hoogte - bottomHeight - offSet;
-	int ubxKlein = jlsBreedteKlein + 2 * offSet; //programmaVeldZichtbaar ? scheidingX+5 : 5;
+	int ubxKlein = jlsBreedteKlein + 2 * offSet; 
 	int ubxGroot = jlsBreedteGroot + 2 * offSet;
 	int uby = offSet;
-	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; //getWidth()-(programmaVeldZichtbaar ? scheidingX+10 : 10);
+	int ubbKlein = breedteKlein - jlsBreedteKlein - 3 * offSet; 
 	int ubbGroot = breedteGroot - jlsBreedteGroot - 3 * offSet;
 	int ubbPaul = breedtePaul - jlsBreedteGroot - 3 * offSet;
 	int ubb = 0;
-	int ubh = jlsHoogte; //programmaVeldZichtbaar ? getHeight()-77 : getHeight()-10;
+	int ubh = jlsHoogte; 
 	
 	public static String fontString = "12px sans-serif";
 	public static String boldFontString = "bold 12px sans-serif";
-	
-//	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
 	
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
@@ -129,8 +120,18 @@ public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionVie
 	boolean traceZichtbaar = true;
 	boolean codeIOZichtbaar = true;
 	
+	/**
+	 * parametrisation 3D: transparent/solid
+	 */
 	boolean transparant = false;
+	/**
+	 * parametrisation 3D: wireframe/solid
+	 */
 	boolean draadFiguur = false;
+	/**
+	 * parametrisation 3D: zoomfactor; keep this attribute here, since it is changed by
+	 * the zoom buttons and used by getState and setState     
+	 */
 	double zoomFactor = 1;
 	
 	HashMap state = null;
@@ -145,13 +146,42 @@ public class WebLogo3dGWT implements EntryPoint, InteractionStub, InteractionVie
 	PushButton traceAanKnop, traceUitKnop, beginKnop, stapKnop, terugKnop, skipKnop;
 	CheckBox showVariables;
 	public Label methodeLabel;
-	PushButton solidButton, draadButton, opaqueButton, transparantButton, zoomInButton, zoomUitButton;
+	/**
+	 * 3D only: make figure solid, visible if figure is a wireframe 
+	 */
+	PushButton solidButton;
+	/**
+	 * 3D only: make figure a wireframe, visible if figure is solid
+	 */
+	PushButton draadButton;
+	/**
+	 * 3D only: make figure non-transparent, visible if figure is transparent
+	 */
+	PushButton opaqueButton;
+	/**
+	 * 3D only: make figure transparent, visible if figure is opaque
+	 */
+	PushButton transparantButton;
+	/**
+	 * 3D only: zooming in
+	 */
+	PushButton zoomInButton;
+	/**
+	 * 3D only: zooming out
+	 */
+	PushButton zoomUitButton;
 	
 	public VardisplayPanel vartracer = null;
 	
 	public int vartracerWidth, vartracerHeight;
-	
+
+	/**
+	 * ImageResources for 3D only buttons
+	 */
 	ImageResource solidResource, draadResource, opaqueResource, transparantResource, zoomInResource, zoomUitResource;
+	/**
+	 * images for 3D only buttons
+	 */
 	Image solidImage, draadImage, opaqueImage, transparantImage, zoomInImage, zoomUitImage;
 	
 	public void getImages() 
@@ -208,8 +238,6 @@ logger.info("WebLogo3dGWT onModuleLoad");
 		Stub.publish(this);
 		// standalone versie Paul
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
-
-
 			
 	}
 	
@@ -253,12 +281,9 @@ logger.info("WebLogo3dGWT constructor");
 		
 logger.info("WebLogo3dGWT uncompiled init");
 
-			//this.breedte = width;
+			this.breedte = width;
 			this.hoogte = height;
 			
-			//dlp.setSize("" + breedte + "px", "" + hoogte + "px");
-			
-			//this.launchState = launchState;
 			ObjectMap launchState = JSONUtilities.wrapMap(map);
 			
 			if (launchState != null && launchState.containsKey("uitvoerVeldZichtbaar")) 
@@ -294,14 +319,12 @@ logger.info("WebLogo3dGWT uncompiled init");
 			{
 				if (deeltakenZichtbaar)
 				{
-					this.breedte = breedteGroot;
+					//this.breedte = breedteGroot;
 					ubb = ubbGroot;
-//logger.info("bg = " + breedte);
-//logger.info("ubb = " + ubb);
 				}
 				else
 				{
-					this.breedte = breedteKlein;
+					//this.breedte = breedteKlein;
 					ubb = ubbKlein;
 				}
 				jlsHoogte = hoogte - bottomHeight - offSet;
@@ -311,11 +334,11 @@ logger.info("WebLogo3dGWT uncompiled init");
 			{
 				if (deeltakenZichtbaar)
 				{
-					this.breedte = jlsBreedteGroot + 2 * offSet;
+					//this.breedte = jlsBreedteGroot + 2 * offSet;
 				}
 				else
 				{
-					this.breedte = jlsBreedteKlein + 2 * offSet;
+					//this.breedte = jlsBreedteKlein + 2 * offSet;
 				}
 				jlsHoogte = hoogte - bottomHeight - offSet;
 				ubh = jlsHoogte;
@@ -332,15 +355,15 @@ logger.info("WebLogo3dGWT uncompiled init");
 			// stand-alone
 			if (launchState != null && !launchState.containsKey("state"))
 			{
-System.out.println("paul");				
+//System.out.println("paul");				
 				paul = true;
-				breedte = Window.getClientWidth(); //breedtePaul;
-				ubb = breedte - jlsBreedteGroot - 3 * offSet; //ubbPaul;
-				hoogte = Window.getClientHeight()-20; //hoogtePaul;
+				breedte = Window.getClientWidth(); 
+				ubb = breedte - jlsBreedteGroot - 3 * offSet; 
+				hoogte = Window.getClientHeight()-20; 
 				jlsHoogte = hoogte - bottomHeight - offSet;
 				ubh = jlsHoogte;
 				dlp.setWidth("100%");
-System.out.println("hoogte = " + hoogte);				
+//System.out.println("hoogte = " + hoogte);				
 			}
 			else
 				dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
@@ -497,7 +520,6 @@ System.out.println("hoogte = " + hoogte);
 			dlp.add(webLogoPanel);
 			
 			jlsVeld.paint();
-			//uitvoerblad.initializeDrawing(false);
 			uitvoerblad.paintTekenblad();
 
 			if (state != null)
@@ -517,7 +539,6 @@ logger.info("state != null");
 			vartracerWidth = 2*JavaLogoSchuifVeld.ccsw+12;
 			vartracerHeight = 515;
 			vartracer = new VardisplayPanel(vartracerWidth, vartracerHeight);
-			//vartracer.setBounds(JavaLogoSchuifVeld.ccx, JavaLogoSchuifVeld.ccy, 2*JavaLogoSchuifVeld.ccsw+10, 515);
 	}
 	
 	public void	makeBottom()
@@ -634,8 +655,6 @@ logger.info("state != null");
 			bottomPanel.setWidgetVisible(methodeLabel, false);
 			
 		}
-		
-
 
 	}
 
@@ -658,7 +677,7 @@ logger.info("state != null");
 			else if (e.getSource() == runButton)
 			{
 				
-System.out.println("runButton");
+//System.out.println("runButton");
 
 				if ((jlsVeld.paramEditor != null) && jlsVeld.paramEditor.isVisible())
 					jlsVeld.paramEditor.owner.parameterEdited(jlsVeld.paramEditor.getText());	
@@ -671,8 +690,6 @@ System.out.println("runButton");
 				Map<String,Object> map1 = new HashMap<String,Object>();
 				map1.put("program", code);
 				map1.put("inputVars", inputVars);
-				//cbookEventHandler.fire("text.program",map1);
-				//comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
 				fireCBookEvent("text.program", map1);
 				
 			} 
@@ -683,7 +700,6 @@ System.out.println("runButton");
 				if (codeIOZichtbaar)
 				{	bottomPanel.setWidgetVisible(importButton, false);
 					bottomPanel.setWidgetVisible(exportButton, false);
-					//if ((jlsVeld.exportPopup != null) && jlsVeld.exportPopup.isVisible()) 
 				}
 				
 				bottomPanel.setWidgetVisible(runButton, false);
@@ -747,7 +763,8 @@ System.out.println("runButton");
 			{
 				trb.skipAction();
 			}
-    		
+
+			// toggle visibility of transparantButton and opaqueButton 
 			else if (e.getSource() == transparantButton)
 			{	transparant = true;
 				uitvoerblad.zetTransparant(true);
@@ -761,6 +778,7 @@ System.out.println("runButton");
 				webLogoPanel.setWidgetVisible(opaqueButton, false);
 			}
 			
+			// toggle visibility of solidButton and draadButton
 			else if (e.getSource() == solidButton)
 			{	draadFiguur = false;
 				uitvoerblad.zetDraadFiguur(false);
@@ -773,7 +791,8 @@ System.out.println("runButton");
 				webLogoPanel.setWidgetVisible(solidButton, true);
 				webLogoPanel.setWidgetVisible(draadButton, false);
 			}
-			
+
+			// adapt zoom factor for getState/setState
 			else if (e.getSource() == zoomInButton)
 			{	uitvoerblad.zoomIn();
 				zoomFactor *= 11e-1d;
@@ -782,39 +801,17 @@ System.out.println("runButton");
 			{	uitvoerblad.zoomUit();
 				zoomFactor *= 91e-2d;
 			}
-
-
     		
     	}
     }
     
 	class ShowVariablesVCH implements ValueChangeHandler<Boolean>
-	{	//public void actionPerformed(ActionEvent e)
+	{	
 		public void onValueChange(ValueChangeEvent<Boolean> e)
 		{
 			if (e.getSource() == showVariables) 
 			{	trb.setVartracing(showVariables.getValue());
 			}
-		}
-	}
-
-	class TransparantVCH implements ValueChangeHandler<Boolean>
-	{	//public void actionPerformed(ActionEvent e)
-		public void onValueChange(ValueChangeEvent<Boolean> e)
-		{
-			//if (e.getSource() == transparantBox) 
-			//{	uitvoerblad.zetTransparant(transparantBox.getValue());
-			//}
-		}
-	}
-
-	class DraadFiguurVCH implements ValueChangeHandler<Boolean>
-	{	//public void actionPerformed(ActionEvent e)
-		public void onValueChange(ValueChangeEvent<Boolean> e)
-		{
-			//if (e.getSource() == draadFiguurBox) 
-			//{	uitvoerblad.zetDraadFiguur(draadFiguurBox.getValue());
-			//}
 		}
 	}
 
@@ -832,21 +829,18 @@ logger.info("getState");
 		HashMap<String, Object> h = new HashMap<String, Object>();
 		
 		String code = "";
-		//int scheidingX = 615;
 	
 		code = jlsVeld.getCode();
-		
-//logger.info("code = " + code);		
-		//scheidingX = this.scheidingX;
 		HashMap<String,Object> inputVars = jlsVeld.getInputVars();
 		 
 	    h.put("code", code);
-	    //h.put("scheidingX", new Integer(scheidingX));
 	    h.put("inputVars", inputVars);
-	    
+
+	    // save rotation
 	    h.put("draaiX", new Double(uitvoerblad.geefDraaiX()));
 	    h.put("draaiY", new Double(uitvoerblad.geefDraaiY()));
 	    
+	    // save 3D settings
 	    h.put("transparant", new Boolean(transparant));
 	    h.put("draadFiguur", new Boolean(draadFiguur));
 	    h.put("zoomFactor", new Double(zoomFactor));
@@ -865,25 +859,19 @@ logger.info("setState");
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		
 		String code = "";
-		//int scheidingX = 615;
 		HashMap<String, Object> inputVars = null;
 		
 		if (map.containsKey("code")) 
 			code = map.getString("code");
-		
-//logger.info("code = " + code);
-
-		//if(h.containsKey("scheidingX")) scheidingX = ((Integer)h.get("scheidingX")).intValue();
 		if (map.containsKey("inputVars")) 
 			inputVars = (HashMap) map.getMap("inputVars");
 		
 		if (inputVars != null)
 			jlsVeld.setInputVars(inputVars);
 		jlsVeld.importeer(code);
-		//this.scheidingX = scheidingX;
-		//setBounds(getBounds());
 		jlsVeld.paint();
 		
+		// get roration
 		double draaiX = 0;
 		double draaiY = 0;
 		if(map.containsKey("draaiX")) 
@@ -891,8 +879,7 @@ logger.info("setState");
 		if(map.containsKey("draaiY")) 
 			draaiY = map.getDouble("draaiY");
 
-		//uitvoerblad.zetBeginHoeken(draaiX,draaiY);
-		
+		// get 3D settings
 		if (map.containsKey("transparant"))
 			transparant = map.getBoolean("transparant");
 		if (map.containsKey("draadFiguur"))
@@ -900,10 +887,12 @@ logger.info("setState");
 		if (map.containsKey("zoomFactor"))
 			zoomFactor = map.getDouble("zoomFactor");
 		
+		// set 3D settings
 		uitvoerblad.zetTransparant(transparant);
 		uitvoerblad.zetDraadFiguur(draadFiguur);
 		uitvoerblad.zoom(zoomFactor);
-		
+
+		// set rotation
 		uitvoerblad.zetBeginHoeken(draaiX,draaiY);		
 		
 		uitvoerblad.paintDrawing(false);
@@ -1122,13 +1111,13 @@ logger.info("WebLogo3dGWT setComRoot");
 		Map<String, Object> map1 = new HashMap<String, Object>();
 		map1.put("program", code);
 		map1.put("inputVars", inputVars);
-		// cbookEventHandler.fire("text.program",map1);
-		// comRoot.fireEvent(new CBookEvent(this,"text.program",map1));
 		fireCBookEvent("text.program", map1);
 	}
 
 	/**
 	 * Fire cross widget event with the given command and map.
+	 * @param command the command
+	 * @param map the Map
 	 */
 	public void fireCBookEvent(String command, Map<String, Object> map)
 	{
@@ -1146,8 +1135,6 @@ logger.info("WebLogo3dGWT setComRoot");
 		if (localizedCmd == null)
 			return cmd;
 		return localizedCmd;
-		
-		//return WebLogoGWT.rb.getString(CBA_PREFIX + cmd);
 	}
 
 }

@@ -9,15 +9,11 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 
-import com.google.gwt.canvas.dom.client.TextMetrics;
-
-import com.google.gwt.event.logical.shared.CloseHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-
+/**
+ * see class ExportPopup in WebLogoGWT
+ * @author huub
+ */
 
 public class ExportPopup extends PopupPanel 
 {
@@ -64,10 +60,7 @@ public class ExportPopup extends PopupPanel
 		exportPanel.setWidgetTopHeight(closeButton, hoogte - 20, Style.Unit.PX, 20, Style.Unit.PX);
 		closeButton.addClickHandler(new PushClickHandler());
 	
-		//textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		setWidget(exportPanel);
-	
-		//addCloseHandler(new PopupCloseHandler());
 	}
 	
 	public void export(String s)
@@ -80,7 +73,6 @@ public class ExportPopup extends PopupPanel
     	
     	public void onClick(ClickEvent e)
     	{
-			//e.preventDefault();
 			e.stopPropagation();
 			if (e.getSource() == closeButton)
 			{

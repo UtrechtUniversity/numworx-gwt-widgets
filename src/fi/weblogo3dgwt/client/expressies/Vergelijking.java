@@ -1,16 +1,14 @@
 package fi.weblogo3dgwt.client.expressies;
 
-//import java.awt.*;
+
 import java.util.Vector;
 
 import fi.weblogo3dgwt.client.expressies.Algebra;
-//import fi.wiskopdr.WiskOpdr;
 import fi.weblogo3dgwt.client.expressies.Aftrekking;
 import fi.weblogo3dgwt.client.expressies.BasisExpressie;
 import fi.weblogo3dgwt.client.expressies.Deling;
 import fi.weblogo3dgwt.client.expressies.Expressie;
 import fi.weblogo3dgwt.client.expressies.Optelling;
-//import fi.javalogoweb.expressies.Vergelijking;
 
 public class Vergelijking 
 {	
@@ -163,8 +161,6 @@ public class Vergelijking
 		Expressie e1 = evalCAS(kind1.substitueer(subst, var));
 		Expressie e2 = evalCAS(kind2.substitueer(subst, var));
 		
-		//Expressie e1 = evalCAS(kind1).substitueer(subst, var);
-		//Expressie e2 = evalCAS(kind2).substitueer(subst, var);
 		if(e1.isWaarde() && e2.isWaarde())
 		{	if (vergelijkingsTeken.equals("=")) return Algebra.isGelijkDouble(e1.geefWaarde(), e2.geefWaarde());
 			else if (vergelijkingsTeken.equals("<")) return e1.geefWaarde()< e2.geefWaarde();
@@ -342,20 +338,6 @@ public class Vergelijking
 		return false;
 	}
 	
-	/*public boolean isEindOplossing()
-	{	return(kind1.isVar() && kind2.isWaarde() || kind2.isVar() && kind1.isWaarde());
-	}
-	
-	public double geefEindOplossing()
-	{	if(isEindOplossing())
-		{	if(kind1.isWaarde())return kind1.geefWaarde();
-			else if(kind2.isWaarde())return kind2.geefWaarde();
-			//else if(kind1.isVar() && kind2.geefVarNaam().equals("D"))return new Optelling(kind1, new BasisExpressie(0.1234567));
-			else return Double.NaN;
-		}
-		else return Double.NaN;
-	}*/
-	
 	public Expressie geefEindOplossing(String var)
 	{	if(isEindOplossing(var))
 		{	if(kind1.isVar() && kind1.geefVarNaam().equals(var))return kind2;
@@ -364,7 +346,6 @@ public class Vergelijking
 			else if(kind1.isVar() && kind1.geefVarNaam().equals("Q"))return new Optelling(kind2, new BasisExpressie(0.2345678));
 			else return null;
 		}
-		//if(kind1.isVar() && kind1.geefVarNaam().equals("D"))return new Optelling(kind2, new BasisExpressie(0.1234567));
 	
 		else return null;
 	}

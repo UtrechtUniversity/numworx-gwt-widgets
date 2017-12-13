@@ -1,5 +1,8 @@
 package fi.weblogo3dgwt.client;
 
+/**
+ * GWT does not have a class Point
+ */
 public class Point 
 {
 	int x, y;

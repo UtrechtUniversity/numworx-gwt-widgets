@@ -1,6 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.parameters.ColorParameter;
@@ -8,6 +7,10 @@ import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+
+/**
+ * see class PenAanCComponent in WebLogoGWT 
+ */
 
 public class PenAanCComponent extends ParameterCommandComponent
 {
@@ -17,8 +20,8 @@ public class PenAanCComponent extends ParameterCommandComponent
 		super(x,y,b,h,sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = WebLogo3dGWT.rb.penAanTekst(); //"penAan";
-		commandNameTranslated = "penOn"; //JavaLogoWeb.rb.getString(commandName);
+		commandName = WebLogo3dGWT.rb.penAanTekst(); 
+		commandNameTranslated = "penOn"; 
 	}
 	
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)

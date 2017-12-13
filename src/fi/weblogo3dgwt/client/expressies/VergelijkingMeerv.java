@@ -2,20 +2,15 @@ package fi.weblogo3dgwt.client.expressies;
 
 import java.util.Vector;
 
-//import fi.wiskopdr.WiskOpdr;
 import fi.weblogo3dgwt.client.expressies.Algebra;
 import fi.weblogo3dgwt.client.expressies.BasisExpressie;
 import fi.weblogo3dgwt.client.expressies.Expressie;
 import fi.weblogo3dgwt.client.expressies.Vergelijking;
-//import fi.javalogoweb.expressies.VergelijkingMeerv;
-
-//import fi.javalogoweb.WiskOpdr;
 
 
 public class VergelijkingMeerv 
 {	
 	Vergelijking[] vergelijkingen;
-	//OngelijkheidObject[] ongelijkheidObjecten;
 	
 	public VergelijkingMeerv(Vergelijking[] v)
 	{	vergelijkingen = v;
@@ -400,18 +395,6 @@ public class VergelijkingMeerv
 		return true;
 	}
 	
-	
-	
-	/*
-	public double[] geefEindOplossing()
-	{	double[] oplossingen = new double[vergelijkingen.length];
-		if(isEindOplossing())
-		{	for(int i=0 ; i<vergelijkingen.length ; i++)
-			{	oplossingen[i] = vergelijkingen[i].geefEindOplossing();
-			}
-		}
-		return oplossingen;
-	}*/
 	
 	public Expressie[] geefEindOplossing(String var)
 	{	Expressie[] oplossingen = new Expressie[vergelijkingen.length];

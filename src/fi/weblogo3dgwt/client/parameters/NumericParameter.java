@@ -7,7 +7,7 @@ import fi.weblogo3dgwt.client.formuleobjects.*;
 /**
  * InputParameter is the class for any numerical input value that can be calculated (Expressie)
  * Used for parameters in CC's, or the number of repetitions in 'Herhaal'
- * 
+ * see also class NumericParameter in WebLogoGWT
  * @author berge020
  */
 public class NumericParameter extends TAParameter
@@ -18,14 +18,6 @@ public class NumericParameter extends TAParameter
 	 * true if 'waarde' is a syntactically correct expression, given that all variables exist
 	 */
 	private boolean isValid;
-	/**
-	 * true if 'waarde' can be calculated, that is: all its variables exist and have valid numerical values, 
-	 * no division by zero, etc.
-	 * NOTE: When editing, this var is equal to isValid, because we don't know about the vars yet.
-	 * At runtime, isCorrect may turn false, because there are missing vars. This will be used in executing (no)
-	 * and painting the CC (it will turn red) 
-	 */
-	// private boolean isCorrect;  defined in superclass
 
 	public NumericParameter()
 	{

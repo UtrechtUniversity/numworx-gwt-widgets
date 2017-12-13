@@ -1,9 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Component;
-
-//import java.awt.Component;
-
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.CommandComponent;
 import fi.weblogo3dgwt.client.WebLogo3dGWT;
@@ -11,6 +7,9 @@ import fi.weblogo3dgwt.client.VarSet;
 import fi.weblogo3dgwt.client.parameters.BooleanParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * see class WhileLoopCommandComponent in WebLogoGWT 
+ */
 public class WhileLoopCommandComponent extends LoopCommandComponent
 {
 
@@ -19,17 +18,14 @@ public class WhileLoopCommandComponent extends LoopCommandComponent
 		super(x, y, b, h, sv);
 		
 		loopCondition = new BooleanParameter();
-		commandName = WebLogo3dGWT.rb.zolangTekst(); //"Zolang";
-		commandNameTranslated = "While"; //JavaLogoWeb.rb.getString(commandName);
-		naString = " " + WebLogo3dGWT.rb.herhaal2Tekst(); //" herhaal";
-		naStringTranslated = " repeat"; //JavaLogoWeb.rb.getString(naString);
-		createLoopEditor();
+		commandName = WebLogo3dGWT.rb.zolangTekst(); 
+		commandNameTranslated = "While"; 
+		naString = " " + WebLogo3dGWT.rb.herhaal2Tekst(); 
+		naStringTranslated = " repeat"; 
 	}
 
-	@Override
 	public boolean executeContent(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
-//System.out.println("wlCC executeContent");		
 		
 		// ToDo: Find a nicer way to get out of a neverending loop. Right now, just maximize the number of
 		// cycles to 100. If we were to leave this out, tekenapplet will 'hang' indefinitely.

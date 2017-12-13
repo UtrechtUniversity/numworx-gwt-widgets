@@ -1,10 +1,6 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
 
-import java.awt.Color;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.parameters.TAParameter;
@@ -13,9 +9,10 @@ import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
-import com.google.gwt.user.client.ui.LayoutPanel;
 
-//import com.google.gwt.user.client.ui.LayoutPanel;
+/**
+ * see class LoopCommandComponent in WebLogoGWT
+ */
 
 public abstract class LoopCommandComponent extends CompositeCommandComponent implements ParameterEditorListener
 {
@@ -31,43 +28,21 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	protected String naString;
 	protected String naStringTranslated;
 	
-	//LayoutPanel inputOwner;
 	
 	public LoopCommandComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
 	{	
 		super(x,y,b,h,sv);
 		
-		//inputOwner = sv;
-		//loopBlock = new CommandContainer(xPos+blockX, yPos+blockY, b-blockX, JavaLogoSchuifVeld.ccsh, this);
 		loopBlock = new CommandContainer(xPos+blockX, yPos+blockY, b-blockX, h-JavaLogoSchuifVeld.ccsh, this);
 		loopBlock.parent = this;
-		//add(loopBlock);
 		loopBlock.containerName = "loop";
 		
-		
 	}
 
-	/**
-	 * Create the textfield for editing loop count or while-condition. Must be called by subclasses
-	 * after the commandName has been set
-	 */
-	protected void createLoopEditor()
-	{	
-// niet nodig in GWT		
-		//FontMetrics fm = getFontMetrics(JavaLogoWeb.defaultfont);
-		//int tfx = 10+fm.stringWidth(commandName+" ");
-		//loopEditor = new ParameterTextField(tfx, 4, 80, 17, this);
-		//add(loopEditor);
-	}
-
-	
 	public CommandComponent findCComponentAt(int x, int y, CommandComponent sc)
 	{
 		if (loopBlock.contains(x,y))
 		{	
-//System.out.println("loopBlock contains");
-//CommandComponent c = loopBlock.findCComponentAt(x,y,sc);
-//if (c == null) System.out.println("c == null");
 			return loopBlock.findCComponentAt(x,y,sc);
 		}
 		else if ((sc != this) && contains(x,y)) // && !loopBlock.contains(x,y))
@@ -86,16 +61,13 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	}
  
 	
-	@Override
 	void addCComponent(CommandComponent cc)
 	{	
-		//loopBlock.addCComponent(cc);
 		loopBlock.addCCompAtBottom(cc);
 	}
 	
 	public void setSize(int w, int h)
 	{	
-	
 		loopBlock.setWidth(w-blockX);
 		super.setSize(w,h);
 	}
@@ -127,14 +99,11 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	{
 		// this is callback from CommandContainer that has been adjusted. Just change height of this component
 		super.setSize(getWidth(), h+blockY);
-		//((CommandContainer)getParent()).reArrange();
 		parent.reArrange();
 	}
 	
 	public void moveComponent(int dx, int dy)
 	{	
-		
-//System.out.println("move loopCC");
 
 		int x = startCompx + dx;				// PBgv: new Location = original + mouse displacement
 		int y = startCompy + dy;		
@@ -155,15 +124,13 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	}
 	/**
 	 * Set loop count directly (programmaImporter)
-	 * 
-	 * @param s
+	 * @param s String version of loop count
 	 */
 	void setLoopCount(String s)
 	{
 		loopCondition.setParameter(s);
 	}
 	
-	@Override
 	public void parameterEdited(String text)
 	{
 		loopCondition.setParameter(text);
@@ -171,146 +138,97 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 		// tekstPopup weg
 		if (loopEditor != null)
 		{	
-//System.out.println("loopEditor weg");			
 			loopEditor.hide();
-		
 		}
 
 		schuifveld.paint();
 	}
 
-	@Override
 	public void parameterComponentClicked(int x, int y)
 	{
-		//if ( isEditing )
-		//{
-
-			//loopCondition.setParameter(loopEditor.getText());
-			//loopEditor.setVisible(false);
-			//loopEditor.setEditable(false);
-			//isEditing = false;
-		//} 
-		//else
-		//{	
-//System.out.println("loopCCClicked " + y);		
-			if (y < blockY )
-			{
-			
-				isEditing = true;
-				//loopEditor.vulIn(loopCondition.getParameterText());
-				showLoopEditor();
-			}
-		//}
+		if (y < blockY )
+		{
+			isEditing = true;
+			showLoopEditor();
+		}
 		schuifveld.paint();
 	}
 	
 	public void showLoopEditor()
 	{
-		
-//System.out.println("showLoopEditor");
 
 		int popupX = xPos + schuifveld.getAbsoluteLeft();
-		
-//System.out.println("xPos = " + xPos);
-//System.out.println("popupX = " + popupX);
-		
 		int popupY = yPos + blockY + schuifveld.getAbsoluteTop();
 
-//System.out.println("yPos = " + yPos);
-//System.out.println("popupY = " + popupY);
-		
-		//if ((loopEditor != null) && loopEditor.isVisible())
 		if ((schuifveld.paramEditor != null) && schuifveld.paramEditor.isVisible())
 		{
-			
 			schuifveld.paramEditor.owner.parameterEdited(schuifveld.paramEditor.getText());
 		}
-
-//System.out.println("breedte = " + breedte);
-//System.out.println("hoogte = " + hoogte);
 		
 		schuifveld.paramEditor = new ParameterTextField(breedte, hoogte, this, schuifveld);
-		loopEditor = schuifveld.paramEditor; //new ParameterTextField(breedte, hoogte, this, schuifveld);
+		loopEditor = schuifveld.paramEditor; 
 		loopEditor.vulIn(loopCondition.getParameterText());
 		loopEditor.setPopupPosition(popupX, popupY);
 		loopEditor.show();
 		loopEditor.textBox.setFocus(true);
-		
-//System.out.println("loopEditor visible = " + loopEditor.isVisible());		
 
 	}
 
-	@Override
-	//protected void paintBackground(Graphics g)
 	protected void paintBackground(Context2d g)
 	{
 		if(traceKleur)
 		{
-			//g.setColor(traceActiveColor);
 			g.setFillStyle(traceActiveColor);
 			traceKleur = false;
 		} 
 		else
 		{
-			//g.setColor(Color.orange);
 			g.setFillStyle(CssColor.make(255, 127, 0));
 		}	
 		
 		
 		
 		g.fillRect(xPos+0,yPos+0,getSize().width-1,getSize().height-1);
-		
-		//g.setColor(Color.black);
 		g.setStrokeStyle(CssColor.make(0,0,0));
-		//g.drawRect(0,0,getSize().width-1,getSize().height-1);
 		g.strokeRect(xPos+0,yPos+0,getSize().width-1,getSize().height-1);
-		
-		//g.drawRect(1,1,getSize().width-3,getSize().height-3);
 		g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
 
 	}
 
-	@Override
-	//protected void paintCommand(Graphics g)
 	protected void paintCommand(Context2d g)
 	{
-//System.out.println("c loop paintComm");		
-		
-		//g.setFont(JavaLogoWeb.defaultfont);
 		g.setFont(WebLogo3dGWT.fontString);
-		//g.setColor(Color.black);
 		g.setFillStyle(CssColor.make(0,0,0));
 		if ( isEditing )
 		{
-			
-			//g.drawString(commandName+" ", 10, 18);
 			g.fillText(commandName+" ",xPos+10, yPos+18);
-			//g.drawString(naStringTranslated, loopEditor.getX()+loopEditor.getWidth()+1, 18);
-			TextMetrics tm = g.measureText(commandName);//+" "+loopCondition.getParameterText());
+			TextMetrics tm = g.measureText(commandName);
 			int textWidth = (int) Math.round(tm.getWidth());
 			g.fillText(naString, xPos+textWidth + 40, yPos+18);
 		} 
 		else
 		{
 			if (!loopCondition.isCorrect())
-				//g.setColor(Color.RED);
 				g.setFillStyle(CssColor.make(255,0,0));
-			//g.drawString(commandNameTranslated+" "+loopCondition.getParameterText()+naStringTranslated, 10, 18);
-//GWT			
-			//g.fillText(commandNameTranslated+" "+loopCondition.getParameterText()+naStringTranslated, xPos+10, yPos+18);
-			TextMetrics tm = g.measureText(commandName+" "+loopCondition.getParameterText()+naString);
+			String fullText = commandName+" "+loopCondition.getParameterText()+naString;
+			TextMetrics tm = g.measureText(fullText);
 			int textWidth = (int) Math.round(tm.getWidth());
 			if (textWidth > breedte - 10)
-			{	tm = g.measureText(commandName);
-				textWidth = (int) Math.round(tm.getWidth()); 
-				if (textWidth > breedte - 10)
-				{	g.fillText(commandName.substring(0,1),xPos+10,yPos+18);
+			{	
+				// omit characters until fit
+				fullText = fullText.substring(0, fullText.length() - 1);
+				tm = g.measureText(fullText);
+				textWidth = (int) Math.round(tm.getWidth());
+				while (textWidth > breedte - 10)
+				{
+					fullText = fullText.substring(0, fullText.length() - 1);
+					tm = g.measureText(fullText);
+					textWidth = (int) Math.round(tm.getWidth());
 				}
-				else
-					g.fillText(commandName,xPos+10,yPos+18);
-			}
+				g.fillText(fullText,xPos+10,yPos+18);
+			}	
 			else
-				g.fillText(commandName+" "+loopCondition.getParameterText()+naString,xPos+10, yPos+18);
+				g.fillText(fullText,xPos+10,yPos+18);
 		}
 		
 		if (loopBlock != null)
@@ -321,16 +239,12 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 	
 	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
 	{	
-		
-//System.out.println("lCC execute");
-
 		varSet.increaseLevel("-- in loop", false);
 		boolean b = executeContent(trb, ub, varSet);
 		varSet.decreaseLevel();
 		return b;
 	}
 		
-	@Override
 	public String getCode(String tab)
 	{	String s = tab + commandName + " " + loopCondition.getParameterText()+naString + "\n" + tab +"{\n";
 		String tabNieuw = tab + "    ";

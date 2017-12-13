@@ -4,6 +4,14 @@ import fi.weblogo3dgwt.client.parameters.NumericParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * class representing the stapy(dy) command: in the cursor plane move dy 
+ * relative to the direction of the cursor or equivalent: 
+ * move the current x-y-z coordinate system dy in the x-y-plane
+ * in the direction of the positive y-axis; see class TekenApplet3D; <br>
+ * Note: not available as command block.
+ */
+
 public class StapYCComponent  extends ParameterCommandComponent
 {
 	public StapYCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)

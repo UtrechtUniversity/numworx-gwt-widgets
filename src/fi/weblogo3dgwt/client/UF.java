@@ -1,6 +1,10 @@
 package fi.weblogo3dgwt.client;
 
-// universal formatter
+/**
+ * universal formatter 
+ * @author huub
+ */
+
 public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)

@@ -4,6 +4,10 @@ import fi.weblogo3dgwt.client.VarSet;
 import fi.weblogo3dgwt.client.expressies.*;
 import fi.weblogo3dgwt.client.formuleobjects.*;
 
+/**
+ * see also class BooleanParameter in WebLogoGWT 
+ */
+
 public class BooleanParameter extends TAParameter
 {
 	private VergelijkingMeerv waarde;
@@ -13,15 +17,7 @@ public class BooleanParameter extends TAParameter
 	 * true if 'waarde' is a syntactically correct expression, given that all variables exist
 	 */
 	private boolean isValid;
-	/**
-	 * true if 'waarde' can be calculated, that is: all its variables exist and have valid numerical values, 
-	 * no division by zero, etc.
-	 * NOTE: When editing, this var is equal to isValid, because we don't know about the vars yet.
-	 * At runtime, isCorrect may turn false, because there are missing vars. This will be used in executing (no)
-	 * and painting the CC (it will turn red) 
-	 */
-	// private boolean isCorrect;  defined in superclass
-
+	
 	public BooleanParameter()
 	{
 		setParameter("0=0");

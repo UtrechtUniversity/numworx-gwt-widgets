@@ -1,6 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -9,6 +8,10 @@ import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
 import fi.weblogo3dgwt.client.parameters.ColorParameter;
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
 
+/**
+ * not implemented as command block, see class VulBladCComponent in WebLogoGWT 
+ */
+
 public class VulBladCComponent extends ParameterCommandComponent
 {
 	public VulBladCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
@@ -16,8 +19,8 @@ public class VulBladCComponent extends ParameterCommandComponent
 		super(x, y, b, h, sv);
 		noParameters = 1;
 		parameters[0] = new ColorParameter();
-		commandName = WebLogo3dGWT.rb.vulBladTekst(); //"vulBlad";
-		commandNameTranslated = "fill area"; //JavaLogoWeb.rb.getString(commandName);
+		commandName = WebLogo3dGWT.rb.vulBladTekst(); 
+		commandNameTranslated = "fill area"; 
 	}
 
 	@Override

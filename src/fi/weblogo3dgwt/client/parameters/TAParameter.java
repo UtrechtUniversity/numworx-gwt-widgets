@@ -9,7 +9,7 @@ import fi.weblogo3dgwt.client.VarSet;
  * 
  * All communication will go through the four methods below, but most subclasses will
  * add one accessible method: getValue(), with return type double/Color/boolean.
- * 
+ * see also class TAParameter in WebLogoGWT
  * @author berge020
  */
 public abstract class TAParameter
@@ -25,7 +25,7 @@ public abstract class TAParameter
 	/**
 	 * Set the (text of the) parameter and test it for syntactic corretness (if necessary)
 	 * 
-	 * @param s
+	 * @param s parameter as String
 	 */
 	public abstract void setParameter(String s);
 	
@@ -33,7 +33,7 @@ public abstract class TAParameter
 	 * Gets the text of the parameter, regardless of if it's correct or not
 	 * Note: users want to edit an incorrect param to fix the problem
 	 * 
-	 * @return
+	 * @return text of the parameter
 	 */
 	public abstract String getParameterText();
 	
@@ -43,8 +43,8 @@ public abstract class TAParameter
 	 * At this stage (runtime) we can see if all variables in the expression exist, don't give
 	 * division by zero, etc...
 	 * 
-	 * @param varSet
-	 * @return
+	 * @param varSet the current variable set
+	 * @return is this TAParameter correct?
 	 */
 	public abstract boolean isCorrect(VarSet varSet);
 	

@@ -1,8 +1,5 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
 
@@ -11,10 +8,12 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
 import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
-import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
-import fi.weblogo3dgwt.client.expressies.*;
 import fi.weblogo3dgwt.client.parameters.Identifier;
 import fi.weblogo3dgwt.client.parameters.NumericParameter;
+
+/**
+ * see class VarCComponent in WebLogoGWT
+ */
 
 public class VarCComponent extends SimpleCommandComponent implements ParameterEditorListener
 {
@@ -29,7 +28,6 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 	private int separatorX;
 	private String equalsString = " = ";
 	private int equalsWidth;
-	//FontMetrics fm;
 	TextMetrics tm;
 	
 	public VarCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
@@ -40,24 +38,18 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		waarde = new NumericParameter();
 		varnaamParam = new Identifier(commandName);
 		
-		//fm = getFontMetrics(JavaLogoWeb.defaultfont);
 		schuifveld.jlsvContext2d.setFont(WebLogo3dGWT.fontString);
 		
 		tm = schuifveld.jlsvContext2d.measureText(commandName+equalsString);
 		int width = (int) Math.round(tm.getWidth());
 				
-		separatorX = 10+width; // fm.stringWidth(commandName+equalsString);
+		separatorX = 10+width; 
 		
 		tm = schuifveld.jlsvContext2d.measureText(equalsString);
 		equalsWidth = (int) Math.round(tm.getWidth()); //fm.stringWidth(equalsString);
 		
-		//paramEditor = new ParameterTextField(10, 4, 60, 17, this);
-		//add(paramEditor);
-		
-//System.out.println("VarCC constr sepX = " + separatorX);		
 	}
 	
-	@Override
 	public void parameterEdited(String text)
 	{
 		if ( editingName )
@@ -99,25 +91,15 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 	{
 		if ( name )
 		{
-			//separatorX = breedte / 2;
-
-// zie showParamEditor(name)			
-			//paramEditor.setLocation(10, 4);
-			//paramEditor.vulIn(varnaamParam.getParameterText());
-			//separatorX = paramEditor.getX()+paramEditor.getWidth()+1;
 			editingName = true;
 		}
 		else
 		{
 			
-// zie showParamEditor(name)		
-			//paramEditor.setLocation(separatorX+2, 4);
-			//paramEditor.vulIn(waarde.getParameterText());
 			editingValue = true;
 		}
 		
 		showParamEditor(name);
-		//schuifveld.tekenOpnieuw();
 	}
 
 	public void showParamEditor(boolean name)
@@ -149,22 +131,16 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 
 	/**
 	 * Determine what to edit given the click on pos x,y
-	 * 
 	 * This method looks a bit messy because the flow is:
 	 * 1. when currently not editing: edit the part nearest to x
 	 * 2. when editing a part and x is near the other part: switch editing to the other part
 	 * 3. when editing a part and x is near the same part: stop editing.
-	 * 
-	 * @see fi.javalogoweb.ParameterEditorListener#parameterComponentClicked(int, int)
 	 */
-	@Override
 	public void parameterComponentClicked(int x, int y)
 	{
 		boolean newEdit;
 		boolean onName = ( x < separatorX );
 		
-//System.out.println("VarCC paramCCClicked " + x + " sepX " + separatorX);
-//System.out.println("VarCC paramCCClicked " + editingName + " -- " + editingValue);
 		if ( editingName )
 		{
 			newEdit = !onName;				// newEdit true: going from name to value
@@ -193,18 +169,14 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 			
 			}
 
-			//paramEditor.setVisible(false);
-			//paramEditor.setEnabled(false);
-			
 		}
 		schuifveld.paint();
 	}
 	
 	/**
-	 * Set varnamee & expression directly (ProgrammaImporter)
-	 * 
-	 * @param name
-	 * @param exp
+	 * Set varname and expression directly (ProgrammaImporter)
+	 * @param name variabe name
+	 * @param exp variable expression
 	 */
 	void setVariable(String name, String exp)
 	{
@@ -215,7 +187,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		tm = schuifveld.jlsvContext2d.measureText(varnaamParam.getParameterText()+equalsString);
 		int width = (int) Math.round(tm.getWidth());
 		
-		separatorX = 10+width; //fm.stringWidth(varnaamParam.getParameterText()+equalsString);
+		separatorX = 10+width; 
 		waarde.setParameter(exp);
 	}
 	
@@ -235,23 +207,17 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		return traceKleur;
 	}
 	
-	@Override
-	//protected void paintCommand(Graphics g)
 	protected void paintCommand(Context2d g)
 	{
-		//g.setFont(JavaLogoWeb.defaultfont);
 		g.setFont(WebLogo3dGWT.fontString);
-		//g.setColor(Color.BLACK);
 		g.setFillStyle(CssColor.make(0,0,0));
 		if ( editingName )
 		{
-			//g.drawString(equalsString+waarde.getParameterText(), separatorX, 18);
 			g.fillText(equalsString+waarde.getParameterText(), xPos+separatorX, yPos+18);
 			
 		}
 		else if ( editingValue )
 		{
-			//g.drawString(varnaamParam.getParameterText()+equalsString, 10, 18);
 			g.fillText(varnaamParam.getParameterText()+equalsString, xPos+10, yPos+18);
 		} 
 		else
@@ -263,34 +229,38 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 			
 			else
 			{	
-			// paint parts of the equation in RED if they are incorrect;
-			if ( !varnaamParam.isCorrect() ) 
-			{	//g.setColor(Color.RED);
-				g.setFillStyle(CssColor.make(255,0,0));
-			}	
-			//g.drawString(varnaamParam.getParameterText(), 10, 18);
-			g.fillText(varnaamParam.getParameterText(), xPos+10, yPos+18);
+				// paint parts of the equation in RED if they are incorrect;
+				if ( !varnaamParam.isCorrect() ) 
+				{	g.setFillStyle(CssColor.make(255,0,0));
+				}	
+				String varPart = varnaamParam.getParameterText()+equalsString;
+				TextMetrics tm = g.measureText(varPart);
+				int varPartWidth = (int) Math.round(tm.getWidth());
+				g.fillText(varPart, xPos+10, yPos+18);
 			
-			//g.setColor(Color.BLACK);
-			g.setFillStyle(CssColor.make(0,0,0));
-			if ( !(varnaamParam.isCorrect()  && waarde.isCorrect()) ) 
-			{	//g.setColor(Color.RED);
-				g.setFillStyle(CssColor.make(255,0,0));
+				g.setFillStyle(CssColor.make(0,0,0));
+				if ( !waarde.isCorrect() )
+				{	g.setFillStyle(CssColor.make(255,0,0));
+				}	
+				String waardePart = waarde.getParameterText();
+				tm = g.measureText(waardePart);
+				int waardePartWidth = (int) Math.round(tm.getWidth());
+				int textWidth = varPartWidth + waardePartWidth;
+				if (textWidth > breedte - 10)
+				{	
+					// omit characters until fit
+					while (textWidth > breedte - 10)
+					{
+						waardePart = waardePart.substring(0, waardePart.length() - 1);
+						tm = g.measureText(waardePart);
+						waardePartWidth = (int) Math.round(tm.getWidth());
+						textWidth = varPartWidth + waardePartWidth;
+					}
+					g.fillText(waardePart, xPos+10+varPartWidth, yPos+18);
+				}	
+				else
+					g.fillText(waardePart, xPos+10+varPartWidth, yPos+18);
 			}	
-
-			//g.drawString(equalsString, separatorX-equalsWidth, 18);
-			g.fillText(equalsString, xPos+separatorX-equalsWidth, yPos+18);
-			
-			//g.setColor(Color.BLACK);
-			g.setFillStyle(CssColor.make(0,0,0));
-			if ( !waarde.isCorrect() )
-			{	//g.setColor(Color.RED);
-				g.setFillStyle(CssColor.make(255,0,0));
-			}	
-
-			//g.drawString(waarde.getParameterText(), separatorX, 18);
-			g.fillText(waarde.getParameterText(), xPos+separatorX, yPos+18);
-			}
 		}
 	}
 	

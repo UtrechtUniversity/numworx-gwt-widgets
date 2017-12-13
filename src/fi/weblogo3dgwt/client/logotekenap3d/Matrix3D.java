@@ -1,11 +1,14 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
+/**
+ * this class saves the direction of the 3d-turtle (that is the direction of drawing) in 3-space,
+ * and recalculates the direction of the 3d-turtle after rotation commands; <br>
+ * given the current position and a translation vector (dx,dy,dz) it also calculates the new
+ * position in 3-space using the current direction of drawing   
+ * @author Peter Boon
+ */
 public class Matrix3D
 {	
-	//-------------------------------------------------------------------------------------------
-	//deze klasse onthoudt, en berekent steeds opnieuw de tekenrichting, en berekent voor het 
-	//Tekenblad aan de hand van een dx,dy en dz het volgende eindpunt van de tekenlijn.
-	//-------------------------------------------------------------------------------------------
 
 	private Rotatie3D[] rotatieRij;
 	private int aantalRotaties;
@@ -73,13 +76,19 @@ public class Matrix3D
 	{	Rotatie3D r = new Rotatie3D(as,rotatieHoek);
 		for(int i = 0; i<aantalRotaties ; i++)
 		{	Rotatie3D rt = rotatieRij[i];
-			if(rt.as == 1)xdraaiAbs(-rt.rotatieHoek);
-			else if(rt.as == 2)ydraaiAbs(-rt.rotatieHoek);
-			else if(rt.as == 3)zdraaiAbs(-rt.rotatieHoek);
+			if(rt.as == 1)
+				xdraaiAbs(-rt.rotatieHoek);
+			else if(rt.as == 2)
+				ydraaiAbs(-rt.rotatieHoek);
+			else if(rt.as == 3)
+				zdraaiAbs(-rt.rotatieHoek);
 		}
-		if(r.as == 1)xdraaiAbs(rotatieHoek);
-		else if(r.as == 2)ydraaiAbs(rotatieHoek);
-		else if(r.as == 3)zdraaiAbs(rotatieHoek);
+		if(r.as == 1)
+			xdraaiAbs(rotatieHoek);
+		else if(r.as == 2)
+			ydraaiAbs(rotatieHoek);
+		else if(r.as == 3)
+			zdraaiAbs(rotatieHoek);
 		for(int i = aantalRotaties ; i>0 ; i--)
 		{	Rotatie3D rt = rotatieRij[i-1];
 			if(rt.as == 1)xdraaiAbs(rt.rotatieHoek);

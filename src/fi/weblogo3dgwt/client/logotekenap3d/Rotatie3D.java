@@ -1,5 +1,9 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
+/**
+ * a rotation in 3-space 
+ */
+
 public class Rotatie3D
 {
 	public int as;

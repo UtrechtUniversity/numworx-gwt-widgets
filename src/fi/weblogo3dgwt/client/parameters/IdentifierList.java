@@ -7,11 +7,11 @@ import fi.weblogo3dgwt.client.VarSet;
 /**
  * This class represents the list of comma separated identifiers that are the parameters
  * in the header of a deeltaak definition.
- * The number of identifiers is bound to a maximum, for practical reasons. You can't edit >3 parameters.
+ * The number of identifiers is bound to a maximum, for practical reasons. You can't edit more than 3 parameters.
  * 
  * For simplicity, this maximum number of ids is always created at construction, an idCount tells
  * how many are actually in use.
- * 
+ * see also class IdentifierList in WebLogoGWT
  * @author berge020
  */
 public class IdentifierList extends TAParameter
@@ -38,10 +38,8 @@ public class IdentifierList extends TAParameter
 	 * Set the list from a comma separated string and determine the number and correctness.
 	 * The IdentifierList is correct iff
 	 * - there aren't any parameters (parameterless deeltaak) OR
-	 * - the number of parameters <= JavaLogoSchuifVeld.maxParameterCount AND
+	 * - the number of parameters less than or equal JavaLogoSchuifVeld.maxParameterCount AND
 	 * - all parameters are correct identifiers
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#setParameter(java.lang.String)
 	 */
 	@Override
 	public void setParameter(String s)
@@ -72,8 +70,6 @@ public class IdentifierList extends TAParameter
 
 	/**
 	 * Return a comma separated String of all id's in use
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#getParameterText()
 	 */
 	@Override
 	public String getParameterText()
@@ -90,8 +86,6 @@ public class IdentifierList extends TAParameter
 	/**
 	 * Returns true if all identifiers are correct (varSet irrelevant).
 	 * Note: also returns true if there are no identifiers, a deeltaak without parameters is ok!
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#isCorrect(VarSet varSet)
 	 */
 	@Override
 	public boolean isCorrect(VarSet varSet)
@@ -102,8 +96,6 @@ public class IdentifierList extends TAParameter
 	/**
 	 * Returns true if all identifiers are correct.
 	 * Note: also returns true if there are no identifiers, a deeltaak without parameters is ok!
-	 * 
-	 * @see fi.javalogoweb.parameters.TAParameter#isCorrect()
 	 */
 	@Override
 	public boolean isCorrect()

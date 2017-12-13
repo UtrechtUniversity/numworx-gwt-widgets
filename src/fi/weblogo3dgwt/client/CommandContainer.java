@@ -1,19 +1,6 @@
 package fi.weblogo3dgwt.client;
 
-//import java.awt.*;
 
-//import javax.swing.JPanel;
-
-/**
- * CommandContainer is a JPanel that will hold a list of CommandComponents, corresponding to a 'block'
- * in programming languages. It is used by HerhaalCC, KeuzeCC, DeeltaakCC, ProgrammaCC...
- * Note: CommandComponent is NOT a CommandComponent, it can not be manipulated apart from its owner.
- * 
- * Height of the container is always (at least) the sum of the heights of its components.
- * Scrolling will be managed by the owner CommandComponent
- * 
- * @author Berge020
- */
 import java.util.*;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -21,7 +8,14 @@ import com.google.gwt.canvas.dom.client.Context2d;
 
 import fi.weblogo3dgwt.client.logotekenap3d.Rectangle;
 
-public class CommandContainer // extends JPanel
+/**
+ * CommandContainer simulates a Panel that will hold a list of CommandComponents, corresponding to a 'block'
+ * in programming languages. It is used by HerhaalCC, KeuzeCC, DeeltaakCC, ProgrammaCC...
+ * Note: CommandComponent is NOT a CommandComponent, it can not be manipulated apart from its owner.
+ * Height of the container is always (at least) the sum of the heights of its components.
+ * see also class CommandContainer in WebKLogoGWT
+ */
+public class CommandContainer 
 {
 	private CompositeCommandComponent owner;
 
@@ -59,9 +53,7 @@ public class CommandContainer // extends JPanel
 		
 	public CommandContainer(int x, int y, int b, int h, CompositeCommandComponent cc)
 	{	
-		//setBounds(x,y,b,h);
 		xPos = x; yPos = y; breedte = b; hoogte = h;
-		//setLayout(null);
 		owner = cc;
 		// we assume we create this object at its minimum height
 		minimumHeight = h;
@@ -76,8 +68,6 @@ public class CommandContainer // extends JPanel
 	
 	public void add(Object o, int insertPos)
 	{
-		
-//System.out.println("add " + insertPos);		
 		components.insertElementAt(o, insertPos);
 	}
 	
@@ -117,9 +107,6 @@ public class CommandContainer // extends JPanel
 
 	public void setBounds(int x, int y, int b, int h)
 	{
-		
-		
-		//xPos = x; yPos = y; breedte = b; hoogte = h;
 		setLocation(x,y);
 		setSize(b,h);
 		
@@ -157,15 +144,8 @@ public class CommandContainer // extends JPanel
 	
 	public void addCComponent(CommandComponent cc)
 	{	
-		
-//System.out.println("CCont addCC " + getComponentCount());
-
 		cc.setBounds(xPos,yPos, getSize().width, cc.getSize().height);
-		//super.add(cc, insertPos);
 		add(cc, insertPos);
-		 
-//WebLogoGWT.logger.info("CCont addCC " + cc.commandName + " at " + insertPos);
-
 		cc.parent = this;
 		reArrange();
 	}
@@ -174,8 +154,6 @@ public class CommandContainer // extends JPanel
 	{
 		cc.setBounds(xPos,yPos, getSize().width, cc.getSize().height);
 		components.addElement(cc);
-		
-//WebLogoGWT.logger.info("CCont addCC " + cc.commandName + " at bottom");		
 		cc.parent = this;
 		reArrange();
 	}
@@ -210,11 +188,9 @@ public class CommandContainer // extends JPanel
 			{	LoopCommandComponent lcc = (LoopCommandComponent) o;
 				if (lcc.loopBlock.contains(x,y))
 				{	result = lcc.loopBlock;
-//System.out.println("in loopblock");				
 					tResult = lcc.loopBlock.findCContainerAt(x,y);
 					if (tResult != null)
 					{	result = tResult;
-//System.out.println("tResult != null");					
 					}
 				}	
 			}	
@@ -256,8 +232,6 @@ public class CommandContainer // extends JPanel
 		{	CommandComponent c = (CommandComponent) components.elementAt(cnt);
 			c.removeCaret();
 		}
-		
-//System.out.println("CCont removeCaret " + containerName);		
 	}
 	
 	
@@ -267,7 +241,6 @@ public class CommandContainer // extends JPanel
 	 * over the empty space of the container. Set Caret at the top of the container if it
 	 * is empty, or at the bottom of the last CC if it is not.
 	 * Note: in the latter case insertPos will be set through call from CommandComponent.setCaret: setInsert
-	 * 
 	 * @param y		y-pos of mouse on hovering CC. x is irrelevant
 	 */
 	public void setCaret(int y)
@@ -276,20 +249,17 @@ public class CommandContainer // extends JPanel
 		{
 			caretUp = true;
 			insertPos = 0;//-1;
-//System.out.println("CC setCaret cnt == 0");			
 		} 
 		else
 		{
-			//Component c = getComponent(getComponentCount()-1);
 			Object c = getComponent(getComponentCount()-1);
 			((CommandComponent) c).setCaret(y);
-//System.out.println("CC setCaret cnt > 0");			
+			
 		}
 	}
 
 	/**
 	 * Set the insertPos for this container when caret is set on a CC inside it
-	 * 
 	 * @param commandComponent		the CC that gets a caret
 	 * @param downcaret				top or bottom, causes a difference of 1 in insertPos
 	 */
@@ -302,26 +272,21 @@ public class CommandContainer // extends JPanel
 				insertPos = i;
 				if (downcaret) 
 					insertPos++;
-				
-//System.out.println("cc " + insertPos);
-
 				return;
 			}
 		}
-		insertPos = 0; //-1;
+		insertPos = 0; 
 	}
 	
 	public void removeAll()
 	{
 		components.removeAllElements();
-		insertPos = 0; //-1;
+		insertPos = 0; 
 		reArrange();
 	}
 	
-	//public void remove(Component c)
 	public void remove(Object c)
 	{	
-//System.out.println("remove " + containerName);		
 		components.remove(c);
 		reArrange();
 		if (c instanceof CommandComponent)
@@ -335,7 +300,6 @@ public class CommandContainer // extends JPanel
 	 * Set the minimum height. This method should not be called on containers for control structures,
 	 * their height should be equal to the sum of heights of the CC's inside (with small minimum)
 	 * Must be called for deeltaakbodies, when resize arrows are used.
-	 * 
 	 * @param h the new minimum height
 	 */
 	public void setMinimumHeight(int h)
@@ -345,11 +309,9 @@ public class CommandContainer // extends JPanel
 	
 	public void setWidth(int b)
 	{	
-		
-//System.out.println("" + containerName + " " + b);		
 		breedte = b; 
 		for (int i = 0; i < getComponentCount(); i++)
-		{	//Component c = getComponent(i);
+		{	
 			Object c = getComponent(i);
 			if(c instanceof CommandComponent)
 			{	CommandComponent cc = (CommandComponent) c;
@@ -357,7 +319,7 @@ public class CommandContainer // extends JPanel
 			
 			}
 		}
-		//setSize(b, hoogte);
+
 	}
 	
 	/**
@@ -366,18 +328,14 @@ public class CommandContainer // extends JPanel
 	 */
 	public void reArrange()
 	{	
-		
 		int hoogte = 0;
 		for (int i = 0; i < getComponentCount(); i++)
-		{	//Component c = getComponent(i);
+		{	
 			Object c = getComponent(i);
 			if (c instanceof CommandComponent)
 			{	CommandComponent cc = (CommandComponent) c;
-				//getComponent(i).setLocation(0,hoogte);
 				cc.setLocation(xPos,yPos+hoogte);
-				//hoogte += getComponent(i).getSize().height-2;
 				hoogte += cc.getSize().height-2;
-				
 			}
 		}
 		contentHeight = hoogte;
@@ -394,38 +352,28 @@ public class CommandContainer // extends JPanel
 		return contentHeight;
 	}
 	
-	
-	//protected void paintComponent(Graphics g)
 	protected void paintComponent(Context2d g)
 	{
-		
-		//g.setColor(new Color(255,255,220));
 		g.setFillStyle(CssColor.make(238,238,170));
 		g.fillRect(xPos+1,yPos+1,getSize().width-1,getSize().height-1);
 		
-		//g.setColor(Color.black);
 		g.setStrokeStyle(CssColor.make(0,0,0));
-		//g.drawRect(0,0,getSize().width-1,getSize().height-1);
 		g.strokeRect(xPos,yPos,getSize().width-1,getSize().height-1);
-		//g.drawRect(1,1,getSize().width-3,getSize().height-3);
 		g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
 		if(caretUp)
 		{	
-			//g.setColor(Color.green);
 			g.setStrokeStyle(CssColor.make(0,255,0));
-			//g.drawLine(2,2,getSize().width-3,2);
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+2);
 			g.lineTo(xPos+getSize().width-3,yPos+2);
 			g.stroke();
 			
-			//g.drawLine(2,3,getSize().width-3,3);
 			g.beginPath();
 			g.moveTo(xPos+2,yPos+3);
 			g.lineTo(xPos+getSize().width-3,yPos+3);
 			g.stroke();
 			
-			caretUp = false;
+			//caretUp = false;
 		}
 		
 		if (componentsVisible)
@@ -442,8 +390,7 @@ public class CommandContainer // extends JPanel
 	{
 		String s = "";
 		for(int i=0 ; i<getComponentCount(); i++)
-		{	//Component c = getComponent(i);
-			Object c = getComponent(i);
+		{	Object c = getComponent(i);
 			if(c instanceof CommandComponent)
 			{	
 				s = s +((CommandComponent)c).getCode(tab);

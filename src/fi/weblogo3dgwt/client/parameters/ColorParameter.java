@@ -1,8 +1,6 @@
 package fi.weblogo3dgwt.client.parameters;
 
-//import java.awt.Color;
 
-//import fi.beans.stringutils.StringUtils;
 import fi.weblogo3dgwt.client.VarSet;
 import fi.weblogo3dgwt.client.expressies.*;
 import fi.weblogo3dgwt.client.formuleobjects.*;
@@ -12,7 +10,7 @@ import fi.weblogo3dgwt.client.logotekenap3d.StringUtils;
  * KleurParameter is the class for an input expression representing a Color.
  * Both text ("rood") and RGB-values can be given.
  * Used for parameters in CC's, or the number of repetitions in 'Herhaal'
- * 
+ * see also class ColorParameter in WebLogoGWT
  * @author berge020
  */
 
@@ -40,13 +38,6 @@ public class ColorParameter extends TAParameter
 	private boolean redExpressionValid;
 	private boolean greenExpressionValid;
 	private boolean blueExpressionValid;
-	/**
-	 * true if 'waarde' can be calculated, that is: all its variables exist and have valid numerical values, 
-	 * no division by zero, etc. When color is indicated by name, it is true if the name is in the list
-	 * of standard colors.
-	 * NOTE: at this moment this can only determined at execution time.
-	 */
-	// private boolean isCorrect; defined in superclass
 	
 	private CssColor theColor;
 	
@@ -193,9 +184,9 @@ public class ColorParameter extends TAParameter
 	
 	/**
 	 * Calculate a single colorcomponent r/g/b with given VarSet
-	 * @param e
-	 * @param varSet
-	 * @return			int, one of r,g,b
+	 * @param e the color expression
+	 * @param varSet the current variable set
+	 * @return	int, one of r,g,b
 	 */
 	private int calculateColorValue(Expressie e, VarSet varSet)
 	{

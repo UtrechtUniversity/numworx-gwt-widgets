@@ -1,5 +1,8 @@
 package fi.weblogo3dgwt.client;
 
+/**
+ * GWT has no class Dimension 
+ */
 public class Dimension 
 {
 	int width, height;

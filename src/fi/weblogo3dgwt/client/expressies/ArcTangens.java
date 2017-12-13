@@ -1,6 +1,5 @@
 package fi.weblogo3dgwt.client.expressies;
 
-import java.awt.*;
 
 public class ArcTangens extends Expressie  
 {	

@@ -3,8 +3,8 @@ package fi.weblogo3dgwt.client;
 /**
  * A simple wrapper class for variables in TekenApplet.
  * A TAVariable just has a name and a value.
- * 
  * @author berge020
+ * see also class TAVariable in WebLogoGWT
  */
 public class TAVariable
 {
@@ -12,7 +12,6 @@ public class TAVariable
 	private double value;
 	
 	private int level;
-	//private boolean isParameter;
 
 	public TAVariable(String n, double v, int l)
 	{

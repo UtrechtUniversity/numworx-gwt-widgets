@@ -1,7 +1,5 @@
 package fi.weblogo3dgwt.client.logotekenap3d;
 
-//import java.awt.*;
-//import java.awt.event.*;
 
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -17,16 +15,53 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 
+/**
+ * class handling mouse and touch events; an instance of this class should be added 
+ * as MouseDown/MouseMove/MouseUp/TouchStart/TouchMove/TouchEnd handler to the 
+ * Canvas on which events take place; the events details are redirected to the class
+ * owning the instance of MuisBeheerder  
+ */
 
 public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler,
 									  TouchStartHandler, TouchMoveHandler, TouchEndHandler
 {
-	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
+	/**
+	 * x-coordinate of last mouseDown/touchStart event
+	 */
+	private int eerstex;
+	/**
+	 * y-coordinate of last mouseDown/touchStart event
+	 */
+	private int eerstey;
+	/**
+	 * x-coordinate of last mouseDown/touchStart/mouseMove/touchMove event
+	 */
+	private int laatstex;
+	/**
+	 * y-coordinate of last mouseDown/touchStart/mouseMove/touchMove event
+	 */
+	private int laatstey;
+	/**
+	 * last mouseMove/touchMove x-translation
+	 */
+	private int dx;
+	/**
+	 * last mouseMove/touchMove y-translation
+	 */
+	private int dy;
+	/**
+	 * class owning this Muisbeheerder (where events are processed)
+	 */
 	private TekenApplet3D eigenaar;
-	//private AnimatieBeheerder ab;
-	private boolean animatieWasAan;
+	/** 
+	 * keeping track of mouseDown events
+	 */
 	boolean mouseDown;
-	
+
+	/**
+	 * constructor
+	 * @param ap owner of this MuisBeheerder
+	 */
 	public MuisBeheerder(TekenApplet3D ap)
 	{	eigenaar = ap;
 		eerstex = 0;
@@ -37,22 +72,11 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		dy = 0;
 	}
 	
-	//-------------------------------------------------------------------------------------------
-	//de AnimatieBeheerder maakt zich met deze methode kenbaar aan de Muisbeheerder  
-	//-------------------------------------------------------------------------------------------
-	//public void meldAnimatieBeheerder(AnimatieBeheerder ab)
-	//{	this.ab = ab;
-	//}
-	
-	//-------------------------------------------------------------------------------------------
-	//afhandeling van de muis gebeurtenissen 
-	//-------------------------------------------------------------------------------------------
+	/**
+	 * handling mouseDown Events
+	 */
 	public void onMouseDown(MouseDownEvent e)
 	{	
-//		if (ab != null && ab.animatieLopend())
-//		{	animatieWasAan = true;
-//			ab.onderbreekAnimatie();
-//		}
 		e.preventDefault();
 		e.stopPropagation();
 		mouseDown = true;
@@ -63,6 +87,9 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		eigenaar.muisDrukActie();
 	}
 	
+	/**
+	 * handling MouseMove Events
+	 */
 	public void onMouseMove(MouseMoveEvent e)
 	{	
 		e.preventDefault();
@@ -77,7 +104,10 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		laatstex = x;
 		laatstey = y;	
 	}
-	
+
+	/**
+	 * handling MouseUp Events
+	 */
 	public void onMouseUp(MouseUpEvent e)
 	{	
 		e.preventDefault();
@@ -86,12 +116,11 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		mouseDown = false;
 	
 		eigenaar.muisLosActie();
-//		if (animatieWasAan)
-//		{	animatieWasAan = false;
-//			ab.beginAnimatie();
-//		}
 	}
 
+	/**
+	 * handling TouchMove Events
+	 */
 	public void onTouchMove(TouchMoveEvent event) 
 	{
 		event.preventDefault();
@@ -99,8 +128,6 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		if (event.getTouches().length() > 0) 
 		{
 			Touch touch = event.getTouches().get(0);
-			//Widget sender = (Widget) event.getSource();
-		    //Element elem = sender.getElement();
 			int x = 0;
 			int y = 0;
 			if (eigenaar != null)
@@ -120,7 +147,9 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		
 	}
 
-	@Override
+	/**
+	 * handling TouchStart Events
+	 */
 	public void onTouchStart(TouchStartEvent event) 
 	{
 		event.preventDefault();
@@ -128,8 +157,6 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		if (event.getTouches().length() > 0) 
 		{
 			Touch touch = event.getTouches().get(0);
-			//Widget sender = (Widget) event.getSource();
-		    //Element elem = sender.getElement();
 			if (eigenaar != null)
 			{	
 				eerstex = touch.getPageX() - eigenaar.tb.tekenbladCanvas.getAbsoluteLeft();//getRelativeX(elem);
@@ -145,7 +172,9 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		
 	}
 
-	@Override
+	/**
+	 * handling TouchEnd Events
+	 */
 	public void onTouchEnd(TouchEndEvent event) 
 	{
 		event.preventDefault();
@@ -157,31 +186,46 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 		event.stopPropagation();
 		
 	}
-	
 
-	//public void mouseExited(MouseEvent e){;}
-	//public void mouseClicked(MouseEvent e){;}
-	//public void mouseEntered(MouseEvent e){;}
-	//public void mouseMoved(MouseEvent e){;}
-	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt door de muishandlers in het leerlingenprogramma
-	//-------------------------------------------------------------------------------------------
+	/**
+	 * getter for last mouseMove/touchMove x-translation
+	 * @return dx
+	 */
 	public int geefSleepdx()
 	{	return dx;
 	}
+	/**
+	 * getter for last mouseMove/touchMove y-translation
+	 * @return dy
+	 */
 	public int geefSleepdy()
 	{	return dy;
 	}
+	/**
+	 * getter for last mouseDown/touchStart x
+	 * @return eerste x 
+	 */
 	public int geefDrukx()
 	{	return eerstex;
 	}
+	/**
+	 * getter for last mouseDown/touchStart y
+	 * @return eerste y 
+	 */
 	public int geefDruky()
 	{	return eerstey;
 	}
+	/**
+	 * getter for last mouseDown/touchStart/mouseMove/touchMove event x
+	 * @return laatste x
+	 */
 	public int geefX()
 	{	return laatstex;
 	}
+	/**
+	 * getter for last mouseDown/touchStart/mouseMove/touchMove event y
+	 * @return laatste y
+	 */
 	public int geefY()
 	{	return laatstey;
 	}
