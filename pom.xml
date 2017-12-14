@@ -55,7 +55,6 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.0.4</version>
   	</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -103,7 +102,7 @@
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
   	<relativePath>../ParentGWT</relativePath>
-  	<version>0.0.4</version>
+  	<version>0.0.5</version>
   </parent>
   <version>2.1.23-SNAPSHOT</version>
   <properties>
