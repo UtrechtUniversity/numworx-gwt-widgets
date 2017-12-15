@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client;
 
+import nl.numworx.geodefiner.common.AddPolygonHandler;
 import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
@@ -96,7 +97,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case SEGMENT:
 				btn = newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker);break;
 			case TRIANGLE:
-				btn = newBtn(url + "/triangle.png", new AddTriangleHandler2(), tracker);break;
+				btn = newBtn(url + "/triangle.png", new AddPolygonHandler("Veelhoek"), tracker);break;
 			case CIRCLE:
 				btn = newBtn(url + "/circle.png", new AddCirkelHandler(), tracker);break;
 			case DESTROY:
@@ -129,7 +130,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case DISTANCE:
 				btn = newBtn(url + "/segment.png", new AfstandHandler("lengte"), tracker); break;
 			case AREA:
-				btn = newBtn(url + "/triangle.png", new OppHandler("oppervlakte"), tracker); break;
+				btn = newBtn(url + "/area.png", new OppHandler("oppervlakte"), tracker); break;
 			case ANGLE:
 				btn = newBtn(url + "/angle.png", new HoekHandler("hoek"), tracker); break;
 			case VECTOR:
@@ -153,8 +154,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 				btn = newBtn(url + "/pan.png", geoDefinerGWT.widget.getPanHandler(), tracker);
 					break;
 			case RESET: // reset
-				resetter = new ResetHandler("Reset");
-				resetter.instance = geoDefinerGWT;
+				resetter = new ResetHandler("Reset",geoDefinerGWT);
 				btn = newBtn(url + "/reseticon.gif", resetter, tracker); break;
 			}
 			if(btn != null)	panel.add(btn);

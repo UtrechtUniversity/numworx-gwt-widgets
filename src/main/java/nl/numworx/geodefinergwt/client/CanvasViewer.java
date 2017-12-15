@@ -4,6 +4,7 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.user.client.ui.Widget;
 
 import fi.euclides.event.NameMapper;
 import fi.euclides.gwt.RectShape;
@@ -112,6 +113,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	public <T> T adapt(Class<T> cls) {
 		if(cls == Snapper.class) return (T) snapper;
 		if(cls == AbstractViewer.class) return (T) this;
+		if(cls == Widget.class) return (T) asWidget();
 		return super.adapt(cls);
 	}
 

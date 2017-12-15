@@ -6,18 +6,183 @@ import java.util.List;
 import java.util.Map;
 
 import nl.numworx.geodefiner.common.Snapper;
+import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
+import nl.uu.fi.dwo.interaction.client.FormuleEditorIF;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Role;
+import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
+import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
+
+	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
+
+		private FormuleEditorIF editor;
+
+		@Override
+		public void setChanged(boolean fout) {
+
+		}
+
+		@Override
+		public FormuleKeyboardIF getKeyboard() {
+			return this;
+		}
+
+		@Override
+		public FormuleClipboardIF getFormuleClipboard() {
+			return this;
+		}
+
+		@Override
+		public int getMode() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public String getLearnerId() {
+			return "0";
+		}
+
+		@Override
+		public String getLearnerName() {
+			return "guest";
+		}
+
+		@Override
+		public CssColor getBackground() {
+			return CssColor.make("white");
+		}
+
+		@Override
+		public String getUUID() {
+			// TODO Auto-generated method stub
+			return "00-00-00";
+		}
+
+		@Override
+		public LessonMode getLessonMode() {
+			return LessonMode.normal;
+		}
+
+		@Override
+		public Role getRole() {
+			return Role.Learner;
+		}
+
+		@Override
+		public HandlerRegistration addCBookEventListener(String command, CBookEventListener listener) {
+			return null;
+		}
+
+		@Override
+		public void fireEvent(CBookEvent event) {
+
+		}
+
+		@Override
+		public boolean hasListeners(String command) {
+			return false;
+		}
+
+		@Override
+		public void pause() {
+
+		}
+
+		@Override
+		public void unpause() {
+
+		}
+
+		@Override
+		public ObjectMap getConfiguration() {
+			return null;
+		}
+
+		@Override
+		public void setEditor(FormuleEditorIF formuleEditor) {
+			this.editor = formuleEditor;
+		}
+
+		@Override
+		public void backspace() {
+			if(editor != null)
+				editor.removeCurrentElement();
+		}
+
+		@Override
+		public void delete() {
+			if(editor != null)
+				editor.removeNextElement();
+			
+		}
+
+		@Override
+		public void enter() {
+			if(editor != null)
+				editor.enter();
+		}
+
+		@Override
+		public void focus() {
+			FocusOnTouch.focus();
+		}
+
+		@Override
+		public FormuleEditorIF getEditor() {
+			return editor;
+		}
+
+		@Override
+		public void softFocus() {
+			FocusOnTouch.focus();
+		}
+
+		@Override
+		public void blur() {
+			editor = null;
+		}
+
+		@Override
+		public void functionKey(int minF) {
+			
+		}
+
+		@Override
+		public void setEnterType(EnterType type) {
+			
+		}
+
+		@Override
+		public String getClipboard() {
+			return "";
+		}
+
+		@Override
+		public void setClipboard(String formule) {
+			
+		}
+
+	}
 
 	@Override
 	public void onModuleLoad() {
 		root = uiBinder.createAndBindUi(this);
 		
-		RootPanel.get().add(root);
+		RootPanel.get().add(FocusOnTouch.wrap(root, true));
 
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(0,1,2,3,5,6,7,8,9,10,11,12,13,19,20,21,22,23,24,25,26);
@@ -39,6 +204,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		launchDebug.put("checkDWO", checkDWO);
 		Map<String, Number> values = new HashMap<String, Number>();
 		init(getWidth(), getHeight(), launchDebug, values);
+		MockOpdrNav opdrnav = new MockOpdrNav();
+		FocusOnTouch.installKeyboard(opdrnav, opdrnav);
+		FocusOnTouch.focus();
+		setCommunicationRoot(opdrnav);
 		viewer.adapt(Snapper.class).setGravity(true);
 	}
 

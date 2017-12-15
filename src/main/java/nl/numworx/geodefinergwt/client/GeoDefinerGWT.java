@@ -15,6 +15,7 @@ import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.ui.HerleidList;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -342,6 +343,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			}
 		}
 		
+		FormuleHolder.installKeyboard(comRoot.getKeyboard());
 		
 		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
