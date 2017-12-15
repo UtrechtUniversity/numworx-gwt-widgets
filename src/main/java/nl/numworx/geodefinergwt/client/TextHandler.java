@@ -60,6 +60,7 @@ class TextHandler extends AbstractTextHandler implements Owner {
 		label.setString(text);
 		Volgpunt v = new Volgpunt(p);
 		v.setDxy(Numbers.createInteger(4), Numbers.ZERO);
+		v.setFree(false);
 		label.setP(v);
 		getModel().add(label);
 		getTracker().paint();
