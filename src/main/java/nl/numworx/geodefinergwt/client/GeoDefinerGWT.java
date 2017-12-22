@@ -15,6 +15,7 @@ import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.ui.HerleidList;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
+import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -247,6 +248,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public void setState(HashMap<String, Object> h) {
 		Map<String,Object> map = h;
+		viewer.getModel().addObserver(UserConfig.INSTANCE);
 		setState(map);
 		lognagekeken();
 		if(nagekeken) {
@@ -517,6 +519,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		super.start();
 		if(checkObjects != null)
 			checkObjects.start();
+		viewer.getModel().addObserver(UserConfig.INSTANCE);
 	}
 	
 }

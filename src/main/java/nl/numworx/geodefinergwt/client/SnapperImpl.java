@@ -12,7 +12,7 @@ class SnapperImpl extends Snapper {
 	}
 	
 	
-	final int SNAP = 3;
+	final int SNAP = 5;
 	public boolean isGravityM() { return gravity && moved; }
 	private boolean moved;
 	boolean isMoved() {

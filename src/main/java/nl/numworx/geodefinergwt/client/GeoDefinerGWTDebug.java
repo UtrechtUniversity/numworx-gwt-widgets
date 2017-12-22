@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import nl.numworx.geodefiner.common.Snapper;
+import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
 import nl.uu.fi.dwo.interaction.client.FormuleEditorIF;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
@@ -185,7 +186,16 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		RootPanel.get().add(FocusOnTouch.wrap(root, true));
 
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
-		List<Integer> toolbox = Arrays.asList(0,1,2,3,5,6,7,8,9,10,11,12,13,19,20,21,22,23,24,25,26);
+		List<Integer> toolbox = Arrays.asList(
+				Tools.SELECTOR,
+				Tools.POINT,
+				Tools.LINE,
+				Tools.HALFLINE,
+				Tools.SEGMENT,
+				Tools.CIRCLE,
+				Tools.ARC,
+				Tools.TRIANGLE,
+				10,11,12,13,19,20,21,22,23,24,25,26);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
@@ -209,6 +219,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		FocusOnTouch.focus();
 		setCommunicationRoot(opdrnav);
 		viewer.adapt(Snapper.class).setGravity(true);
+		start();
 	}
 
 	

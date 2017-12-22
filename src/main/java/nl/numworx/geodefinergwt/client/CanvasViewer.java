@@ -169,20 +169,24 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		else fill = f.getColor();
 		
 		ColorStyle c = a.adapt(ColorStyle.class);
+		CheckObject co = a.adapt(CheckObject.class);
 		//java.util.logging.Logger.getLogger("CanvasViewer").info("color = " + c);
-		if (c != null) {
-			// if selected?
-			setCssColor(CssColor.make(c.getColor()));
+		if (c != null && co == null) {
+			if(getModel().getSelect().contains(object))
+				setColor(RED);
+			else 
+				setCssColor(CssColor.make(c.getColor()));
 			return;
 		}
 // feedback color.
-			CheckObject co = a.adapt(CheckObject.class);
-			if(co != null)
-			{   // extra verificatie?
+		if(co != null)
+		{   // extra verificatie?
+			if(getModel().getSelect().contains(object))
+				setCssColor(CssColor.make("yellow")); // RED + GREEN?
+			else 
 				setCssColor(CssColor.make("green"));
-			} else
-
-		super.selectColor(object);
+		} else
+			super.selectColor(object);
 	}
 
 	@Override
