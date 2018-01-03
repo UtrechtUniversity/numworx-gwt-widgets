@@ -41,7 +41,7 @@ import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
-public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
+public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLighter.GeoDefinerWidget {
 	static final FontStyle FONT_STYLE = new FontStyle();
 
 	private static final float DEFAULT_POINTSIZE = 5;
@@ -49,6 +49,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private AnimationHandle animator;
 	private boolean down;
 	private String background = "white";
+	private HighLighter hiLighter;
 	
 	private NameMapper mapper = super.getMapper();
 	@Override public NameMapper getMapper() { return mapper; }
@@ -58,8 +59,16 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 		super(width, height);
 		hitTester = new HitTesterGWT();
 		asWidget().addStyleName("canvas");
+		
+		enableHighLight();
 	}
 
+	void enableHighLight() {
+		hiLighter = new HighLighter(hitTester.copy(), this);
+		canvas.addMouseMoveHandler(hiLighter);
+	}
+	
+	
 	public CanvasViewer() {
 		this(200, 200);
 	}
@@ -187,6 +196,9 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 				setCssColor(CssColor.make("green"));
 		} else
 			super.selectColor(object);
+
+		if(hiLighter != null)
+			hiLighter.hilight(object);
 	}
 
 	@Override
@@ -475,6 +487,32 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH {
 	private void visitRay(Lijn l) {
 		rr.setLijn(l);
 		visitSegment(rr);
+	}
+
+	@Override
+	public float getPointSize() {
+		return pointSize;
+	}
+	@Override
+	public void setPointSize(float f) {
+		pointSize = f;
+		
+	}
+	@Override
+	public StrokeStyle getStroke() {
+		return stroke ==  null ? DEFAULT_STROKE : stroke;
+	}
+	@Override
+	public void setStroke(StrokeStyle stroke) {
+		this.stroke = stroke;
+	}
+	@Override
+	public int getOffX() {
+		return offX;
+	}
+	@Override
+	public int getOffY() {
+		return offY;
 	}
 
 }

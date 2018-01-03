@@ -12,7 +12,7 @@ public class StrokeStyle implements SVGConstants {
 
 	final String width;
 	final String dasharray;
-	final double lineWidth, dash[];
+	public final double lineWidth, dash[];
 
 	StrokeStyle(String w, String d, double lw, double dash[]) {
 		width = w;
