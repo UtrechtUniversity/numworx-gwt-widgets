@@ -250,6 +250,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
 		setState(map);
+		observeNewItems(UserConfig.INSTANCE);
 		lognagekeken();
 		if(nagekeken) {
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
