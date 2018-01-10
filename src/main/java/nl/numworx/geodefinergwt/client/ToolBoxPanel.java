@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client;
 
+import nl.numworx.geodefiner.common.AddCirkelHandler;
 import nl.numworx.geodefiner.common.AddPolygonHandler;
 import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
@@ -10,13 +11,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 
 import fi.euclides.event.AddBissectriceHandler;
 import fi.euclides.event.AddBoogHandler;
-import fi.euclides.event.AddCirkelHandler;
 import fi.euclides.event.AddFocusHandler;
 import fi.euclides.event.AddKegelsnedeHandler;
 import fi.euclides.event.AddLijnHandler;
@@ -28,7 +27,6 @@ import fi.euclides.event.AddPoollijnHandler;
 import fi.euclides.event.AddPuntHandler;
 import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
-import fi.euclides.event.AddTriangleHandler2;
 import fi.euclides.event.DestroyHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.event.SelectHandler;
