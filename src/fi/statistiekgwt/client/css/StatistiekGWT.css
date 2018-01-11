@@ -321,11 +321,11 @@ label {
 }
 
 .dataGridSelectedRow {
-  /*background: #628cd5;*/
+/*   background: #628cd5; */
   background: #B2C6EB !important; /* lighter blue */
-  /*color: white;
+  color: white;
   height: auto;
-  overflow: auto;*/
+  overflow: auto;
 }
 
 /** Used for the datagrid table in StatTable. */
@@ -345,8 +345,8 @@ label {
 }
 
 .gwt-DataGridSelectedRow {
-  /*background: #628cd5;*/
-  background: #B2C6EB !important; /* lighter blue */
+/*  background: #628cd5; */
+  background: #B2C6EB !important; lighter blue
   color: white;
   height: auto;
   overflow: auto;
