@@ -2796,6 +2796,20 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	}
 
 	/**
+	 * Reset the current selection list to none selected without triggering an event.
+	 */
+	public void resetSelectionListWithoutEvent()
+	{
+		ArrayList<Boolean> selectionList = new ArrayList<Boolean>();
+		for (int row = 0; row < getRowCount(); row++)
+		{
+			selectionList.add(false);
+		}
+		
+		setSelectionListWithoutEvent(selectionList);
+	}
+
+	/**
 	 * Clear outlier lists.
 	 */
 	public void clearOutlierLists()
