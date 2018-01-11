@@ -43,10 +43,10 @@ import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -335,13 +335,26 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	
 	private StatTableClickHandler clickHandler;
 	/**
-	 * Mouse up handler for resetting isMouseDown.
+	 * Mouse handler for resetting isMouseDown.
 	 */
-	private StatTableMouseUpHandler mouseUpHandler;
+	private StatTableMouseHandler mouseHandler;
 	/**
 	 * Index of the last row clicked.
 	 */
 	private int clickedRowIndex = -1;
+	/**
+	 * Boolean die aangeeft of er een sleepactie is gestart.
+	 * Wordt gebruikt om bij de start van een sleep-selecteeractie
+	 * de selectionList op te slaan, om deze als er iets mis gaat
+	 * te kunnen herstellen.
+	 */
+	private boolean dragHasStarted = false;
+	/**
+	 * Backup van de selectionList van StatTableModel.
+	 * Wordt gebruikt om bij een mislukte sleep-selectieactie
+	 * de vorige selectie te kunnen herstellen. 
+	 */
+	private ArrayList<Boolean> selectionListBackup;
 	private Handler<List<String>> cellPreviewHandler;
 	private DummyTouchHandler dummyTouchHandler;
 	private ImportMessageDialogBox importBox;
@@ -572,7 +585,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        	
 	        	// via stattablemodel.sort() wordt een tablechangeevent getriggered die een stattable.update() doet (met setSelectionBackground()),
 	        	// maar kennelijk is default selectiekleur weer gezet, dus:
-	        	setSelectionBackground();
+	        	setSelectionBackgroundFromStatTableModel();
             }
         };
 		sortDescendingCommand = new Command() {
@@ -586,9 +599,9 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	        	
 	        	StatTable.this.hideHeaderPopupMenu();
 	        	
-	        	// via stattablemodel.sort() wordt een tablechangeevent getriggered die een stattable.update() doet (met setSelectionBackground()),
+	        	// via stattablemodel.sort() wordt een tablechangeevent getriggered die een stattable.update() doet (met setSelectionBackgroundFromStatTableModel()),
 	        	// maar kennelijk is default selectiekleur weer gezet, dus:
-	        	setSelectionBackground();
+	        	setSelectionBackgroundFromStatTableModel();
             }
         };
         this.createEditCommand();
@@ -737,7 +750,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		// set the right selection
 		this.setSelectionFromModelInTable();
 		
-		setSelectionBackground();
+		setSelectionBackgroundFromStatTableModel();
 	}
 
 	/**
@@ -819,25 +832,26 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		return number;
 	}
 
+
 	/**
 	 * Set up the handlers. 
 	 */
 	private void setUpHandlers()
 	{
 		this.clickHandler = new StatTableClickHandler();
-		this.mouseUpHandler = new StatTableMouseUpHandler();
+		this.mouseHandler = new StatTableMouseHandler();
 		this.dummyTouchHandler = StatistiekUtils.getDummyTouchHandler();
 		this.cellPreviewHandler = new Handler<List<String>>(){
 
 			@Override
 			public void onCellPreview(CellPreviewEvent<List<String>> event)
 			{
-				int rowIndex = event.getIndex();				
+				int rowIndex = event.getIndex();
 				int columnIndex = event.getColumn();
 				
 		        int button = event.getNativeEvent().getButton();
 		        NativeEvent nativeEvent = event.getNativeEvent();
-		        
+
 				if ("click".equals(nativeEvent.getType())
 					&& columnIndex == 0 // klik op rijnummer doet selectie
 					&& button != NativeEvent.BUTTON_RIGHT)
@@ -856,7 +870,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						if (nativeEvent.getShiftKey() && clickedRowIndex > -1) // for shift click select a block
 						{
 							// select rows between clicked and current row index
-							selectAllRowsBetweenIndices(rowIndex);
+							selectAllRowsBetweenIndices(rowIndex, true);
 						}
 						else
 						{
@@ -871,8 +885,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						}
 					}
 					
-					setSelectionBackground();
-		        }
+					setSelectionBackgroundFromStatTableModel();
+		        } // click
 				else if (("mousedown".equals(nativeEvent.getType()) || "touchstart".equals(nativeEvent.getType())) 
 					&& columnIndex == 0
 					&& button != NativeEvent.BUTTON_RIGHT
@@ -885,31 +899,63 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					&& columnIndex == 0
 					&& button != NativeEvent.BUTTON_RIGHT)
 				{
+					// Klik-sleep
+					
+					if (!dragHasStarted)
+					{
+						// maak een kopie!
+						selectionListBackup = new ArrayList<>(statTableModel.getSelectionList());
+						dragHasStarted = true;
+					}
+					
 					// add the row that is left by the mouse to the selection
 		    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
 	    			List<String> rowObject = list.get(rowIndex);
-	    								
-					// clear previous selection
-					StatTable.this.statTableModel.resetSelectionList();					
-					// select rows between clicked and current row index
-	    			selectAllRowsBetweenIndices(rowIndex);
+
+					if (!nativeEvent.getCtrlKey())
+					{
+						// clear previous selection
+						StatTable.this.statTableModel.resetSelectionListWithoutEvent();
+					}
+					// select rows between clicked and current row index without triggering a selectionchangeevent
+	    			selectAllRowsBetweenIndices(rowIndex, false);
 	    			
-	    			setSelectionBackground();
+	    			// alleen de achtergrond tonen
+	    			setSelectionBackgroundFromSelectionList();
+				}
+				else if ("mouseup".equals(nativeEvent.getType())
+					&& columnIndex == 0)
+				{
+					isMouseDown = false;
+					dragHasStarted = false;
+					
+					if (!nativeEvent.getCtrlKey())
+					{
+						// clear previous selection
+						StatTable.this.statTableModel.resetSelectionList();
+					}
+					
+					// select rows between clicked and current row index
+	    			selectAllRowsBetweenIndices(rowIndex, true);
+				}
+				else if ("mouseup".equals(nativeEvent.getType()))
+				{
+					// reset mouse down and dragging action
+
+					if (isMouseDown && dragHasStarted) // er is iets mis gegaan met sleep-selecteren; de muis bevindt zich niet in kolom 0
+						resetSelectionList();
+
+					isMouseDown = false;
+					dragHasStarted = false;
+					
+					// reset de 'tijdelijke' preview van de selectie
+					//table.redraw(); // geeft dit gekke effecten, scrollen naar eind, verdwijnen events, fieldupdater...
 				}
 				else if ("touchend".equals(nativeEvent.getType())
 					&& columnIndex == 0)
 				{
-//					Window.alert("rowIndex = " + rowIndex + ", columnIndex = " + columnIndex);
-					
 					// add the row that is left by the mouse to the selection
-		    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
-	    								
-					// clear previous selection
-					StatTable.this.statTableModel.resetSelectionList();					
-					// select rows between clicked and current row index
-	    			selectAllRowsBetweenIndices(rowIndex);
-	    			
-	    			setSelectionBackground();
+//		    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
 				}
 				
 				if (!rowOutlierPopupMenu.isShowing() && !outlierPopupMenu.isShowing())
@@ -942,16 +988,19 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			        	showOutlierPopup(nativeEvent, x, y);
 			        }
 		        }
-			}
+			} // onCellPreview
 
 			/**
 			 * Select the rows between clickedRowIndex and current row index.
 			 * 
 			 * @param currentRowIndex
-			 * @param list
+			 * @param triggerEvent
 			 */
-			private void selectAllRowsBetweenIndices(int currentRowIndex)
+			private void selectAllRowsBetweenIndices(int currentRowIndex, boolean triggerEvent)
 			{
+				if (clickedRowIndex == -1)
+					return;
+				
 	    		List<List<String>> list = (List<List<String>>) dataProvider.getList();
 				List<String> rowObject;
 				// select the rows from clickedRowIndex to the current rowIndex
@@ -960,8 +1009,10 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					for (int i = currentRowIndex; i <= clickedRowIndex; i++)
 					{
 						rowObject = list.get(i);
-						StatTable.this.statTableModel.setSelected(i, true, SelectionChangeEvent.STAT_TABLE);
-						selectionModel.setSelected(rowObject, true);
+						// zet alleen de selectionList zonder overbodige change events
+						StatTable.this.statTableModel.setSelectedWithoutEvent(i, true);
+						if (triggerEvent)
+							selectionModel.setSelected(rowObject, true);
 					}
 				}
 				else
@@ -969,14 +1020,25 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					for (int i = clickedRowIndex; i <= currentRowIndex; i++)
 					{
 						rowObject = list.get(i);
-						StatTable.this.statTableModel.setSelected(i, true, SelectionChangeEvent.STAT_TABLE);
-						selectionModel.setSelected(rowObject, true);
+						// zet alleen de selectionList zonder overbodige change events
+						StatTable.this.statTableModel.setSelectedWithoutEvent(i, true);
+						if (triggerEvent)
+							selectionModel.setSelected(rowObject, true);
 					}
 				}
+				
+				if (triggerEvent)
+				{
+					// vuur 1 selectionchangeevent af
+					SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
+					statTableModel.fireEvent(event);
+					
+					// wijzigingen doorvoeren in stattable
+					update();
+				}
 			}
-
 		};
-	}
+	} // setUpHandlers()
 
 	/**
 	 * Create the commands for the outlier popup menu.
@@ -1054,10 +1116,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	private void addHandlers()
 	{
 	    //this.table.addColumnSortHandler(sortHandler);
-	    this.table.addDomHandler(this.dummyTouchHandler, TouchStartEvent.getType());
-	    this.table.addDomHandler(this.dummyTouchHandler, TouchEndEvent.getType());
-//	    this.table.addDomHandler(this.dummyTouchHandler, ContextMenuEvent.getType());
-
+		
 	    // add the handler for handling the outlier menu and for selecting rows
 		addOutlierAndSelectionHandler();
 
@@ -1409,14 +1468,35 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	}
 
 	/**
-	 * Determine which rows are currently selected
+	 * Determine which rows are currently selected,
+	 * based on selectionlist.
 	 * 
 	 * @return an array containing indices of selected rows
 	 */
-	public int[] getSelectedRows()
+	public int[] getSelectedRowsFromSelectionList()
 	{
-		//return this.table.getSelectedRows();
-		//moet dit worden: return this.statTableModel.getSelectedRows()?
+		ArrayList<Integer> intList = new ArrayList<Integer>();
+		intList =  this.statTableModel.getSelectionIndices();
+		
+		// convert Integer list to primitive int array
+		int[] selectedIndices = new int[intList.size()];
+	    Iterator<Integer> iterator = intList.iterator();
+	    for (int j = 0; j < selectedIndices.length; j++)
+	    {
+	        selectedIndices[j] = iterator.next().intValue();
+	    }
+		
+		return selectedIndices;
+	}
+
+	/**
+	 * Determine which rows are currently selected,
+	 * based on the information in stattablemodel.
+	 * 
+	 * @return an array containing indices of selected rows
+	 */
+	public int[] getSelectedRowsFromStatTableModel()
+	{
 		ArrayList<Integer> intList = new ArrayList<Integer>();
 
 		List<List<String>> list = (List<List<String>>) this.dataProvider.getList();
@@ -1865,7 +1945,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
         }
         catch (Exception e)
         {
-        	System.out.println("StatTable.addDataRowsWithoutEvent(): datarow = " + dataRow + ", " + e.toString());
+        	System.out.println("StatTable.addDataRowsWithoutEvent(): exception datarow = " + dataRow + ", " + e.toString());
         }
 
         // finally sort the string options all at once, for performance reason
@@ -1946,13 +2026,27 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		this.statInteractiePanel = statInteractiePanel;
 	}
 
-	class StatTableMouseUpHandler implements MouseUpHandler
+	class StatTableMouseHandler implements MouseOutHandler, MouseUpHandler
 	{
+		@Override
+		public void onMouseOut(MouseOutEvent event)
+		{
+			if (isMouseDown && dragHasStarted) // er is iets mis gegaan bij het verlaten van de muis van de tabel
+			{
+				resetSelectionList();
+				
+				// reset de 'tijdelijke' preview van de selectie
+				table.redraw();
+				setSelectionBackgroundFromSelectionList();
+			}
 
+			isMouseDown = false;
+			dragHasStarted = false;
+		}
+		
 		@Override
 		public void onMouseUp(MouseUpEvent event)
 		{
-			isMouseDown = false;
 		}
 		
 	} // class StatTableMouseUpHandler
@@ -1987,7 +2081,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 			}
 			else if (e.getSource() == StatTable.this.deleteRowsButton)
 			{
-				int[] toRemove = StatTable.this.getSelectedRows();
+				int[] toRemove = StatTable.this.getSelectedRowsFromSelectionList();
 				if (toRemove.length > 0)
 				{
 					for (int i = toRemove.length - 1; i >= 0; i--)
@@ -3038,25 +3132,29 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 		
 		this.table.redraw(); // nodig om te tonen in tabLayoutPanel
 		
-		setSelectionBackground(); // dit moet op het eind anders toont tabel default selectiekleur na tabwissel
+		setSelectionBackgroundFromStatTableModel(); // dit moet op het eind anders toont tabel default selectiekleur na tabwissel
 	}
 
 	/**
 	 * Set the selection background of the table.
+	 * Gebruikt selectionList. Dit is inclusief de selectie die gesleept is, 
+	 * maar nog niet is doorgegeven met een SelectionChangeEvent.
 	 */
-	private void setSelectionBackground()
+	private void setSelectionBackgroundFromSelectionList()
 	{
-		int[] list = this.getSelectedRows();
+		// haal de selectionList op, dit is incl. de selectie die gesleept is, maar nog niet doorgegeven 
+		int[] list = this.getSelectedRowsFromSelectionList();
 		TableRowElement rowElement;
-		
-		for (int i = 0; i < list.length; i++)
+
+		// eerst alle resetten; TODO alleen de zichtbare
+		for (int i = 0; i < table.getRowCount(); i++)
 		{
 			try
 			{
-				rowElement = this.table.getRowElement(list[i]);
+				rowElement = this.table.getRowElement(i);
 				if (rowElement != null)
 				{
-					rowElement.getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+					rowElement.removeClassName(statistiekCss.dataGridSelectedRow());
 				}
 			}
 			catch (IndexOutOfBoundsException e)
@@ -3064,6 +3162,86 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 				
 			}
 		}
+
+		// zet de geselecteerde indices op stijl dataGridSelectedRow
+		for (int i = 0; i < list.length; i++)
+		{
+			try
+			{
+				rowElement = this.table.getRowElement(list[i]);
+				if (rowElement != null)
+				{
+					// met css en de rest niet
+//					rowElement.getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+					rowElement.setClassName(statistiekCss.dataGridSelectedRow());
+				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				
+			}
+		}
+	}
+	
+	/**
+	 * Set the selection background of the table.
+	 * Gebruikt de selectie die is vastgelegd in stattablemodel.
+	 */
+	private void setSelectionBackgroundFromStatTableModel()
+	{
+		// haal de selectionList op, dit is incl. de selectie die gesleept is, maar nog niet doorgegeven 
+		int[] list = this.getSelectedRowsFromStatTableModel();
+		
+		TableRowElement rowElement;
+
+		// eerst alle resetten; TODO alleen de zichtbare
+		for (int i = 0; i < table.getRowCount(); i++)
+		{
+			try
+			{
+				rowElement = this.table.getRowElement(i);
+				if (rowElement != null)
+				{
+					rowElement.removeClassName(statistiekCss.dataGridSelectedRow());
+				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				
+			}
+		}
+
+		// zet de geselecteerde indices op stijl dataGridSelectedRow
+		for (int i = 0; i < list.length; i++)
+		{
+			try
+			{
+				rowElement = this.table.getRowElement(list[i]);
+				if (rowElement != null)
+				{
+					// met css en de rest niet
+//					rowElement.getStyle().setBackgroundColor(ColorUtils.SELECTION_COLOR_TABLE);
+					rowElement.setClassName(statistiekCss.dataGridSelectedRow());
+				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				
+			}
+		}
+	}
+	
+	/**
+	 * Reset de selectionList. Dus, verwijder uit selectionList de 
+	 * geselecteerde rijen die gesleept waren, maar
+	 * nog niet doorgegeven waren met een SelectieChangeEvent.
+	 * De reset gebeurt ook zonder het triggeren van een event.
+	 * Geeft dit problemen bij tabwissel? Even met eventtrigger proberen...
+	 */
+	private void resetSelectionList()
+	{
+		if (selectionListBackup != null)
+			this.statTableModel.setSelectionListWithoutEvent(selectionListBackup);
 	}
 
 	/**
@@ -3143,6 +3321,8 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 					}
 					return selectionModel.isSelected(s);
 				}
+				
+				
 			};
 			
 			checkColumn
@@ -3156,7 +3336,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						StatTable.this.statTableModel.setSelected(rowIndex, value, SelectionChangeEvent.STAT_TABLE);
 						selectionModel.setSelected(s, value);
 						
-						setSelectionBackground();
+						setSelectionBackgroundFromStatTableModel();
 					}
 				});
 			
@@ -3195,7 +3375,7 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 						selectionModel.setSelected(rowObject, value);
 					}
 					
-					setSelectionBackground();
+					setSelectionBackgroundFromStatTableModel();
 	
 					// send an event
 					SelectionChangeEvent event = new SelectionChangeEvent(SelectionChangeEvent.STAT_TABLE);
@@ -3364,12 +3544,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
 	/**
 	 * Add a cell preview handler to handle the right mouse click
 	 * of long tap for showing the outlier menu and for handling row selection.
-	 * Add a mousup handler for resetting isMouseDown.
+	 * Add a mouseout and mouseup handler for resetting isMouseDown.
 	 */
 	private void addOutlierAndSelectionHandler()
 	{
-		// add a mouse up handler for resetting isMouseDown
-		this.table.addDomHandler(this.mouseUpHandler, MouseUpEvent.getType());
+		// add a mouse out handler for resetting drag-select settings
+		this.table.addDomHandler(this.mouseHandler, MouseOutEvent.getType());
+
+		// mouse up om fieldupdates te krijgen
+		this.table.addDomHandler(this.mouseHandler, MouseUpEvent.getType()); 
 		
 		// add a cell preview handler for the outlier menu and for row selection
 		this.table.addCellPreviewHandler(this.cellPreviewHandler);
