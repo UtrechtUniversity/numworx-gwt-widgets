@@ -2204,13 +2204,13 @@ public class StatInteractiePanelView extends LayoutPanel
 	    label.addTouchEndHandler(touchHandler);
 
 	    // make the tab draggable, with mouse and touch
-	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
-	    label.addMouseDownHandler(dragHandler);
-	    label.addMouseMoveHandler(dragHandler);
-	    label.addMouseUpHandler(dragHandler);
-	    label.addTouchStartHandler(dragHandler);
-	    label.addTouchMoveHandler(dragHandler);
-	    label.addTouchEndHandler(dragHandler);
+//	    DragTabHandler dragHandler = new DragTabHandler(widget, title);
+//	    label.addMouseDownHandler(dragHandler);
+//	    label.addMouseMoveHandler(dragHandler);
+//	    label.addMouseUpHandler(dragHandler);
+//	    label.addTouchStartHandler(dragHandler);
+//	    label.addTouchMoveHandler(dragHandler);
+//	    label.addTouchEndHandler(dragHandler);
 	    
 	    hPanel.add(label);
 	    return hPanel;
