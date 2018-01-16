@@ -2528,7 +2528,16 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             else
             {
             	//Window.alert("StatTableInputCell.onBrowserEvent()");
-                super.onBrowserEvent(context, parent, value, event, valueUpdater);
+            	try
+            	{
+            		super.onBrowserEvent(context, parent, value, event, valueUpdater);
+            	}
+            	catch (Exception e)
+            	{
+            		// Er komt een InvocationTargetException uit een blur() aanroep in TextInputCell... 
+            		// Heeft verder geen invloed op de werking van stattable
+            		GWT.log("StatTableInputCell.onBrowserEvent(): " + e.getMessage());
+            	}
             }
         } // onBrowserEvent()
 	    
