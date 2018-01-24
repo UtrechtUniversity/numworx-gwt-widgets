@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
@@ -250,11 +251,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
 		setState(map);
-		observeNewItems(UserConfig.INSTANCE);
+		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
 		if(nagekeken) {
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
-				feedback();
+			fetchScore();
+			feedback();
 		}
 		lognagekeken();
 		start();
@@ -498,7 +500,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@Override
 	public String randomize(Map<String, Number> random, String text) {
 		try {
-			HashMap m = new HashMap(random);
+			HashMap<String, Number> m = new HashMap<String, Number>(random);
 			String[] keys = random.keySet().toArray(new String[random.size()]);
 			return FormuleParser.randomizeString(text, keys, m);
 		} catch (Exception e) {
