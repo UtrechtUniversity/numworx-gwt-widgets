@@ -89,6 +89,18 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	private boolean viewsEditable;
 	private boolean dataEditable;
 	private boolean viewsAddable;
+	
+	/**
+	 * The column index that is sorted. Used to keep track of the 
+	 * previous sorted column.
+	 */
+	private int sortedColumnIndex = -1;
+	/**
+	 * Field indicating whether the sorted
+	 * column was sorted ASCENDING or DESCENDING.
+	 * Used to keep track of the previous sort direction.
+	 */
+	private int sortDirection = -1;
 
 	/**
 	 * Constructor
@@ -1619,17 +1631,31 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			{
 				//this.quickSort(columnIndex, 0, this.rowCount - 1);
 				// lots of same values causes StackOverflowError, so better use:
-				this.threeWayQuickSortAscending(columnIndex, 0, this.rowCount - 1);
+				this.threeWayQuickSortAscendingRemainPreviousSort(columnIndex, 0, this.rowCount - 1);
 			}
 			else
 			{
-				this.threeWayQuickSortDescending(columnIndex, 0, this.rowCount - 1);
+				this.threeWayQuickSortDescendingRemainPreviousSort(columnIndex, 0, this.rowCount - 1);
 			}
 	
+			// save the sorted column and direction
+			setSortedColumnIndex(columnIndex);
+			setSortDirection(order);
+			
 			// send an event
 			TableChangeEvent event = new TableChangeEvent(TableChangeEvent.SORT_COLUMN, -1);
 			this.fireEvent(event);
 		}
+	}
+
+	/**
+	 * Set the direction of the sorted column.
+	 * 
+	 * @param order
+	 */
+	private void setSortDirection(int order)
+	{
+		sortDirection = order;
 	}
 
 	/**
@@ -1689,7 +1715,7 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		this.switchRows(i + 1, r);
 		return i + 1;
 	}
-	
+
 	/**
 	 * Three way quicksort suited for data with many the same values. 
 	 * Also called Dijkstra's Dutch national flag problem.
@@ -1759,7 +1785,6 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 */
 	private void threeWayQuickSortDescending(int columnIndex, int p, int r)
 	{
-		// TODO aanpassen op descending...
 		if (r <= p)
 		{
 			return;
@@ -1778,12 +1803,10 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			int cmp = cType.compare(
 				this.values.get(i).get(columnIndex), dataRow.get(columnIndex));
 
-//			if (cmp < 0)
 			if (cmp > 0)
 			{
 				this.switchRows(lt++, i++);
 			}
-//			else if (cmp > 0)
 			else if (cmp < 0)
 			{
 				this.switchRows(i, gt--);
@@ -1793,6 +1816,180 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		
 		threeWayQuickSortDescending(columnIndex, p, lt - 1);
 		threeWayQuickSortDescending(columnIndex, gt + 1, r);
+	} 
+
+	/**
+	 * Three way quicksort suited for data with many the same values. 
+	 * Also called Dijkstra's Dutch national flag problem.
+	 * This variant of quicksort is much faster for data with many 
+	 * same values.
+	 * 
+	 * See also: http://www.isical.ac.in/~pdslab/2014/slides/23Quicksort.pdf
+	 * (see section Duplicate Keys from p. 33, with code on p. 41)
+	 * 
+	 * For equal values the previous sort is remained.
+	 * 
+	 * @param columnIndex
+	 *            The column to sort by
+	 * @param p
+	 *            start index of the subarray to sort
+	 * @param r
+	 *            end index of the subarray to sort
+	 */
+	private void threeWayQuickSortAscendingRemainPreviousSort(int columnIndex, int p, int r)
+	{
+		if (r <= p)
+		{
+			return;
+		}
+		
+		ColumnType cType = this.columnClass.get(columnIndex);
+		int lt = p;
+		int gt = r;
+		
+		// get the pivot x
+		ArrayList<Object> dataRow = this.values.get(p);
+
+		int i = p;
+		while (i <= gt)
+		{
+			int cmp = cType.compare(
+				this.values.get(i).get(columnIndex), dataRow.get(columnIndex));
+
+			if (cmp < 0)
+			{
+				this.switchRows(lt++, i++);
+			}
+			else if (cmp > 0)
+			{
+				this.switchRows(i, gt--);
+			}
+			else if (cmp == 0 && sortedColumnIndex > -1)
+			{
+				// compare the values of the previously sorted column in the previous sort direction
+				ColumnType cTypePrevious = this.columnClass.get(sortedColumnIndex);
+				int cmp2 = cTypePrevious.compare(
+					this.values.get(i).get(sortedColumnIndex), dataRow.get(sortedColumnIndex));
+				if (sortDirection == StatistiekGWT.ASCENDING)
+				{
+					if (cmp2 < 0)
+					{
+						this.switchRows(lt++, i++);
+					}
+					else if (cmp2 > 0)
+					{
+						this.switchRows(i, gt--);
+					}
+					else
+						i++;
+				}
+				else if (sortDirection == StatistiekGWT.DESCENDING)
+				{
+					if (cmp2 > 0)
+					{
+						this.switchRows(lt++, i++);
+					}
+					else if (cmp2 < 0)
+					{
+						this.switchRows(i, gt--);
+					}
+					else
+						i++;
+				}
+			}
+			else
+				i++;
+		}
+		
+		threeWayQuickSortAscendingRemainPreviousSort(columnIndex, p, lt - 1);
+		threeWayQuickSortAscendingRemainPreviousSort(columnIndex, gt + 1, r);
+	} 
+
+	/**
+	 * Three way quicksort suited for data with many the same values. 
+	 * Also called Dijkstra's Dutch national flag problem.
+	 * This variant of quicksort is much faster for data with many 
+	 * same values.
+	 * 
+	 * See also: http://www.isical.ac.in/~pdslab/2014/slides/23Quicksort.pdf
+	 * (see section Duplicate Keys from p. 33, with code on p. 41)
+	 * 
+	 * For equal values the previous sort is remained.
+	 * 
+	 * @param columnIndex
+	 *            The column to sort by
+	 * @param p
+	 *            start index of the subarray to sort
+	 * @param r
+	 *            end index of the subarray to sort
+	 */
+	private void threeWayQuickSortDescendingRemainPreviousSort(int columnIndex, int p, int r)
+	{
+		if (r <= p)
+		{
+			return;
+		}
+		
+		ColumnType cType = this.columnClass.get(columnIndex);
+		int lt = p;
+		int gt = r;
+		
+		// get the pivot x
+		ArrayList<Object> dataRow = this.values.get(p);
+
+		int i = p;
+		while (i <= gt)
+		{
+			int cmp = cType.compare(
+				this.values.get(i).get(columnIndex), dataRow.get(columnIndex));
+
+			if (cmp > 0)
+			{
+				this.switchRows(lt++, i++);
+			}
+			else if (cmp < 0)
+			{
+				this.switchRows(i, gt--);
+			}
+			else if (cmp == 0 && sortedColumnIndex > -1)
+			{
+				// compare the values of the previously sorted column in the previous sort direction
+				ColumnType cTypePrevious = this.columnClass.get(sortedColumnIndex);
+				int cmp2 = cTypePrevious.compare(
+					this.values.get(i).get(sortedColumnIndex), dataRow.get(sortedColumnIndex));
+				if (sortDirection == StatistiekGWT.DESCENDING)
+				{
+					if (cmp2 > 0)
+					{
+						this.switchRows(lt++, i++);
+					}
+					else if (cmp2 < 0)
+					{
+						this.switchRows(i, gt--);
+					}
+					else
+						i++;
+				}
+				else if (sortDirection == StatistiekGWT.ASCENDING)
+				{
+					if (cmp2 < 0)
+					{
+						this.switchRows(lt++, i++);
+					}
+					else if (cmp2 > 0)
+					{
+						this.switchRows(i, gt--);
+					}
+					else
+						i++;
+				}
+			}
+			else
+				i++;
+		}
+		
+		threeWayQuickSortDescendingRemainPreviousSort(columnIndex, p, lt - 1);
+		threeWayQuickSortDescendingRemainPreviousSort(columnIndex, gt + 1, r);
 	} 
 
 	/**
@@ -3578,5 +3775,15 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		
 		return height;
+	}
+
+	/**
+	 * Set the index of the column that is sorted.
+	 * 
+	 * @param index
+	 */
+	public void setSortedColumnIndex(int index)
+	{
+		this.sortedColumnIndex = index;
 	}
 }
