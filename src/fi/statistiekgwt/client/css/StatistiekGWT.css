@@ -346,7 +346,7 @@ label {
 
 .gwt-DataGridSelectedRow {
 /*  background: #628cd5; */
-  background: #B2C6EB !important; lighter blue
+  background: #B2C6EB !important; /*lighter blue*/
   color: white;
   height: auto;
   overflow: auto;
