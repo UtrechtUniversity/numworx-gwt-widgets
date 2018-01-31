@@ -379,6 +379,9 @@ public interface Text extends Constants
 	@DefaultStringValue("Kengetallen")
 	String descriptivesOption();
 	
+	@DefaultStringValue("Cirkeldiagram")
+	String piechartOption();
+	
 	@DefaultStringValue("Instellingen")
 	String settingsButton();
 	
@@ -504,5 +507,5 @@ public interface Text extends Constants
 	
 	@DefaultStringValue("nl")
 	String language();
-	
+
 }
