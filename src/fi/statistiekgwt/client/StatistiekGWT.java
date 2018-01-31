@@ -22,6 +22,7 @@ import fi.statistiekgwt.client.descriptives.DescriptivesController;
 import fi.statistiekgwt.client.dotplot.DotplotController;
 import fi.statistiekgwt.client.frequencytable.FrequencyTableController;
 import fi.statistiekgwt.client.histogram.HistogramController;
+import fi.statistiekgwt.client.piechart.PieChartController;
 import fi.statistiekgwt.client.text.Text;
 
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -70,11 +71,11 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	public static String[] VIEWS;// = {"Table", "Histogram", "Dotplot",
 								 // "Frequentietabel", "Frequentiepolygoon",
 								 // "Boxplot", "Kruistabel", "Spreidingsdiagram",
-								 // "Kengetallen"};
+								 // "Kengetallen", "Cirkeldiagram"};
 	public static String[] VIEWS_translated;// = {"Table", "Histogram",
-											// "Dotplot", "Frequentietabel",
-											// "Frequentiepolygoon", "Boxplot", "Crosstab",
-											// "Scatterplot", "Descriptive statistics"};
+											// "Dotplot", "Frequency Table",
+											// "Frequency Polygon", "Boxplot", "Crosstab",
+											// "Scatterplot", "Descriptive statistics", "Pie Chart"};
 
 	public static int DEFAULT_WIDTH = 1000;
 	public static int DEFAULT_HEIGHT = 400;
@@ -171,6 +172,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		VIEWS_translated[6] = StatistiekGWT.rb.crosstabOption();
 		VIEWS_translated[7] = StatistiekGWT.rb.scatterplotOption();
 		VIEWS_translated[8] = StatistiekGWT.rb.descriptivesOption();
+//		VIEWS_translated[9] = StatistiekGWT.rb.piechartOption();
 
 		VIEWS = new String[9];
 		VIEWS[0] = "Table";
@@ -182,6 +184,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		VIEWS[6] = "Kruistabel";
 		VIEWS[7] = "Spreidingsdiagram";
 		VIEWS[8] = "Kengetallen";
+//		VIEWS[9] = "Cirkeldiagram";
 		
 		// sort the arrays
 //		Arrays.sort(VIEWS_translated);
@@ -393,6 +396,10 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		else if (viewType.equals("Kengetallen"))
 		{
 			view = new DescriptivesController(model, viewName, startVar, w, h);
+		}
+		else if (viewType.equals("Cirkeldiagram"))
+		{
+			view = new PieChartController(model, viewName, startVar, w, h);
 		}
 		
 		return view;
