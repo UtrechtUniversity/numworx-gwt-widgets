@@ -587,7 +587,29 @@ public abstract class Object3D
     {   return this;
     }    
     
-    // painting
+
+    /**
+     * paint this Object(Group)3D
+     * @param g Context2d for painting
+     * @param shadow use shadow colors
+     * @param inside show the inside of the facets in gray (with or without shadow)
+     * @param dis viewing distance
+     * @param mat matrix transforming world space to view space
+     * @param paintType paintType: <br>
+     * NZMINFIRST<br> use for filled objects with line extensions, in this case inner planes and inner
+     * segments can be skipped (sort is by zvalue)<br>
+     * PUREZ<br> draw all facets (sort is by zvalue)<br>
+     * NONZMIN <br> use for filled objects without line extensions, in this case inner planes, inner 
+     * segments and backwards pointing facets can be skipped (object is convex)(sort is by zvalue)<br>
+     * HYBRID1 <br> use when the object is not filled and planesFilled = false; in this case draw in three passes:
+     * backwards pointing facets, inner segments, forward pointing facets (sort is by zvalue)<br>
+     * HYBRID2 <br> locally corrected HYBBRID1 when planesFilled = true: in this case draw in three passes:
+     * backwards pointing facets, inner planes and inner segments, forward pointing facets (sort is by zvalue)<br>
+     * SEMIEXACT <br> recalculate zValues of inner planes and inner segments using Aad Goddijn's algorithm, 
+     * backwards and foreward pointing facets stay sorted by zValue <br> 
+     * EXACT <br> recalculate all zValues using Aad Goddijn's algorithm, do not use, is very slow<br>
+     * @param retransform transform world object to view space
+     */
     public void paintObject3D(Context2d g, boolean shadow, boolean inside, 
                               double dis, Matrix3D mat, int paintType,
                               boolean retransform)
@@ -599,8 +621,8 @@ public abstract class Object3D
         else
             transformBy(null, dis, true);
             
-        // gebruikt bij een gevulde figuur
-        // NB alle vlakken en inner segments zijn invisible!
+        // use when the object is filled and there are lengthened lines
+        // NB all planes and inner segments are invisible!
         if (paintType == Object3DContainer.NZMINFIRST)
         {   // back facing facets first
             for (int i = 0; i < numFacets; i++)
@@ -620,9 +642,6 @@ public abstract class Object3D
                 } // if (facets[i].visible)
             } // for front facing facets
 
-            // als de objecten convex en gevuld zijn dan is XXXX-clicked 
-            // correct vanwege isCovered en de onzichtbare 
-            // binnenzooi
         }
         else if (paintType == Object3DContainer.PUREZ)
         {
@@ -631,12 +650,10 @@ public abstract class Object3D
                 {   facets[i].paintFacet3D(g, shadow, inside, dis, mat, null);
                 } // if (facets[i].visible)
             } // for facets
-            // nothing to correct here        
-            // dus bij XXXX-clicked geen mergeSort
+            
         }
-        // niet gebruikt?
-        // nee, voor verlengde lijnen MOET je NZMINFIRST
-        // gebruiken
+        // use when the object is filled without lengthened lines
+        // for lengthened lines use  NZMINFIRST
         else if (paintType == Object3DContainer.NONZMIN)
         {
             // only front facing facets
@@ -648,24 +665,11 @@ public abstract class Object3D
                 } // if (facets[i].visible)
             } // for front facing facets
             
-            // als de objecten convex en gevuld zijn dan is XXXX-clicked 
-            // correct vanwege isCovered en de onzichtbare 
-            // binnenzooi
-
         }
         
-        // dit wordt gebruikt als de vlakken niet gevuld zijn en bij 
-        // de doorzichtige fold-out
-        // de vlakken worden dan in het eerste of derde deel getekend
-        // de line extensions en inner segments worden in het tweede 
-        // deel getekend voor XXXX-clicked is dit correct
-        // zolang je niet op het snijpunt van twee getekende
-        // edges klikt
-        // bij de doorzichtige fold-out is dit hetzelfde als
-        // NZMINFIRST
+        // use when the object is not filled
         else if (paintType == Object3DContainer.HYBRID1)
         {   
-//System.out.println("HYBRID1");            
             // first the non-filled back-facing facets which are not segments
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible && !facets[i].filled &&
@@ -692,24 +696,12 @@ public abstract class Object3D
                 {   facets[i].paintFacet3D(g, shadow, inside, dis, mat, null);
                 } // if (facets[i].visible) etc.
             } // for facets
-            // wel corectie bij XXXX-clicked als je CABRI wilt
         }
 
-        // HYBRID2 is HYBRID1 locally corrected                
-        // for planesFilled
-        // in deel twee worden de line extensions,
-        // de inner segments en de gevulde vlakken
-        // getekend
-        // volgorde binnen elk deel: zValue
-        // zie SEMIEXACT
-        // niet correct voor XXXX-clicked
+        // HYBRID2 is HYBRID1 locally corrected for planesFilled
+        // filled facets are now inner planes (filled)
         else if (paintType == Object3DContainer.HYBRID2)
         {   
-            
-            // zie boven, de line extensions zouden meemoeten in het eerste
-            // of in het derde deel
-
-//System.out.println("HYBRID2");            
             // first the non-filled back-facing facets which are not segments
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible && !facets[i].filled &&
@@ -720,7 +712,7 @@ public abstract class Object3D
                 } // if (facets[i].visible) etc.
             } // for facets
             // then the filled facets and INNER segments in ONE GO, will be PUREZ
-            // line extensions zijn hier ook
+            // this includes line extensions 
             // segments are never filled
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible && 
@@ -740,30 +732,19 @@ public abstract class Object3D
                 } // if (facets[i].visible) etc.
             } // for facets
             
-            // wel correctie voor XXXX-clicked nodig           
         } // HYBRID2 locally corrected        
        
-        
-        // vlakdeeltjes en inner segments zitten altijd in deel 2
-        // de line extensions in deel 1 of deel 3, maar soms
-        // verkeerd, check visFromD voor line extensions
+        // recalculate zValues for inner planes, segments and line extension 
         else if (paintType == Object3DContainer.SEMIEXACT)
         {   
-            // hier een deel van de z-waarden verbeteren als volgt:
-            // zorg dat maxBackZ < minFrontZ en dat je daartussinin
-            // nog een range overhoud voor het gecorrigeerde middendeel
-            // opnieuw sorteren i.v.m. rekentijd
-            // check wat sneller is
-//System.out.println("SEMIEXACT");            
 
             int[] tRecalcFacets = new int[numFacets];
             int recalcNum = 0; 
             
-            // first the non-filled back-facing facets which are 
+            // find maximum zValue of non-filled back-facing facets which are 
             // not inner segments, note that any segment is 
             // never filled
             double maxBackZ = - Vector3D.NInf;            
-//int fCnt = 0;            
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible 
                     && 
@@ -776,19 +757,12 @@ public abstract class Object3D
                     &&
                     !visFromD(facets[i], dis, mat.origin)
                    )
-                {   //facets[i].paintFacet3D(g, shadow, inside, dis, mat, null);
-//fCnt++;                
+                {                   
                     maxBackZ = Math.max(maxBackZ, facets[i].zValue);
                 } // if (facets[i].visible) etc.
             } // for back facing facets
 
-//System.out.println("back = " + fCnt);            
-//System.out.println("maxBackZ = " + UF.format(maxBackZ, 2));            
-
-            // then the filled facets and INNER segments in ONE GO, will be PUREZ
-            // line extensions zijn hier ook
-            // segments are never filled
-//fCnt = 0;            
+            // zValues of all filled facets and inner segments, must be recalculated
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible 
                     && 
@@ -798,18 +772,16 @@ public abstract class Object3D
                      )
                     )  
                    )
-                {   //facets[i].paintFacet3D(g, shadow, inside, dis, mat, null);
+                {   
                     tRecalcFacets[recalcNum] = i;
                     recalcNum++;    
-//fCnt++;                
                 } // if (facets[i].visible) etc.
             } // for middle facets
-//System.out.println("middle = " + fCnt);                        
 
-            // then the non-filled front facing facets, which are not segments
+            // find minimum zValue for all non-filled front facing facets, which are not segments
             // and the front facing line extensions
             double minFrontZ = Vector3D.NInf;
-//fCnt = 0;            
+            
             for (int i = 0; i < numFacets; i++)
             {   if (facets[i].visible 
                     && 
@@ -822,23 +794,18 @@ public abstract class Object3D
                     &&
                     visFromD(facets[i], dis, mat.origin)
                    )
-                {   //facets[i].paintFacet3D(g, shadow, inside, dis, mat, null);
-//fCnt++;                
+                {   
                     minFrontZ = Math.min(minFrontZ, facets[i].zValue);
                 } // if (facets[i].visible) etc.
             } // for front facets
             
-//System.out.println("front = " + fCnt);                        
-//System.out.println("minFrontZ = " + UF.format(minFrontZ, 2));                        
-
             double correction = minFrontZ - maxBackZ - 3;
             double minMiddleZ = maxBackZ + 1;
             double maxMiddleZ = minFrontZ - correction - 1;
             
-//double newMinFrontZ = Vector3D.NInf;            
             if (correction < 0)
-            {   // laat back onveranderd
-                // verschuif front over -correction
+            {   // backward unchanged
+                // shift foreward over -correction
                 for (int i = 0; i < numFacets; i++)
                 {   if (facets[i].visible 
                         && 
@@ -852,37 +819,27 @@ public abstract class Object3D
                         visFromD(facets[i], dis, mat.origin)
                        )
                     {   facets[i].zValue -= correction;
-//newMinFrontZ = Math.min(newMinFrontZ, facets[i].zValue);                    
+                    
                     } // if (facets[i].visible) etc.
                 } // for
                 
-                // middendeel krijgt zValues tussen
-                // maxBackZ+1 en minFrontZ-correction-1            
+                // middle part gets zValues between
+                // maxBackZ+1 and minFrontZ-correction-1            
                 minMiddleZ = maxBackZ + 1;
                 maxMiddleZ = minFrontZ - correction - 1;
-
-//System.out.println("new minFrontZ = " + UF.format(newMinFrontZ, 2));                                        
 
             }    
             else
             {
-                // middendeel krijgt zValues tussen
-                // maxBackZ+1 en minFrontZ-1            
+                // middle part gets zValues between
+                // maxBackZ+1 and minFrontZ-1            
                 minMiddleZ = maxBackZ + 1;
                 maxMiddleZ = minFrontZ - 1;
                 
             }    
 
-//System.out.println("minMiddleZ = " + UF.format(minMiddleZ, 2));                        
-//System.out.println("maxMiddleZ = " + UF.format(maxMiddleZ, 2));                        
-            
-//System.out.println("recalcNum = " + recalcNum);                
             int[] recalcFacets = new int[recalcNum];
             System.arraycopy(tRecalcFacets, 0, recalcFacets, 0, recalcNum);
-/*            
-for (int cnt = 0; cnt < recalcFacets.length; cnt++)
-System.out.println("recalcIndex = " + recalcFacets[cnt]);                
-*/
             if (recalcNum > 1)
                 recalcZValues(recalcFacets, dis, mat.origin, 
                     minMiddleZ, maxMiddleZ);
@@ -898,9 +855,9 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
                 
         } // SEMIEXACT        
 
-// "exacte" algorithme volgens Aad voor ALLE facets    
-// dit zal straks te langzaam worden? JA
-// zie semi-exact
+        // experimental algorithm from Aad Goddijn    
+        // recalculate z-values for all visible facets
+        // compare semi-exact
         else if (paintType == Object3DContainer.EXACT)
         {   
             int[] tRecalcFacets = new int[numFacets];
@@ -912,20 +869,16 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
                     recalcNum++;
                 }
             }    
-            
-//System.out.println("recalcNum = " + recalcNum);                
+               
             int[] recalcFacets = new int[recalcNum];
             System.arraycopy(tRecalcFacets, 0, recalcFacets, 0, recalcNum);
-/*            
-for (int cnt = 0; cnt < recalcFacets.length; cnt++)
-System.out.println("recalcIndex = " + recalcFacets[cnt]);                
-*/
             // these are symbolic
             double zMin = 1d;
             double zMax = (double) numFacets;
-        
-            //if (recalcNum > 1)
-            //recalcZValues(facetsUsed, dis, mat.origin, zMin, zMax);
+
+            // this is very slow
+            if (recalcNum > 1)
+            	recalcZValues(recalcFacets, dis, mat.origin, zMin, zMax);
             
             zMergeSort();
             // now paint
@@ -934,13 +887,12 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
                 {   facets[j].paintFacet3D(g, shadow, inside, dis, mat, null);
                 } // if (facets[i].visible) etc.
             } // for facets
-            
         } // EXACT
         
     } // paint
     /**
      * check if the transformed Facet3D in view space is "visible": <br>
-     * the transformed Facet3D in view space is "visible" from the vier point (origin.x, origin.y, d) if the point 
+     * the transformed Facet3D in view space is "visible" from the view point (origin.x, origin.y, d) if the point 
 	 * (origin.x, origin.y, d) is at the same side of the transformed Facet3D as the point of the
 	 * transformed normal (thus "visible" means that from the view point one sees the outside of the facet); 
 	 * the transformed Facet3D is of vector form <br> 
@@ -960,13 +912,20 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
         Vector3D.makeUnitary(eye);
         return Vector3D.dotProduct(eye, f.unitNormal) >= -Vector3D.NZero;
     }
-    
+
+    /**
+     * recalculate the zValues of the facets in recalcFacets
+     * using Aad's algorithm 
+     * @param recalcFacets facets whose zValues should be recalculated
+     * @param dis viewing distance
+     * @param origin origin of drawing plane
+     * @param zMin new zValue should not be smaller than zMin
+     * @param zMax new zValue should not be larger than zMax
+     */
     public void recalcZValues(int[] recalcFacets, double dis,
         Vector3D origin, double zMin, double zMax)
     {   
         int recalcNum = recalcFacets.length;
-//System.out.println("recalcNum = " + recalcNum);
-
         if (recalcNum == 1)
         {   facets[recalcFacets[0]].zValue = zMax;
             return;
@@ -981,16 +940,12 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
                         isOnTop(recalcFacets[row], recalcFacets[col], dis, origin);
                 }    
             }
-            
-//System.out.println("im \n" + im.toString());      
         // any 2 facets with A > B and B < A or A < B and B > A
-        // are separated, so put them to 0
-        // this results in a symmetric matrix??
+        // must be separated, so put them to 0
+        // this results in a symmetric matrix
         im.relax();
-//System.out.println("relaxed im \n" + im.toString());              
-        
         // use additional separation info
-        // assume im is symmetric
+        // note that im is symmetric
         for (int row = 0; row < recalcNum; row++)
             for (int col = row + 1; col < recalcNum; col++)
             {   // find non-zero elements
@@ -998,131 +953,74 @@ System.out.println("recalcIndex = " + recalcFacets[cnt]);
                 {   // check for separation
                     if (projectionsSeparated(recalcFacets[row], recalcFacets[col], dis, origin))
                     {
-//System.out.println("" + recalcFacets[row] + " is sep from " + recalcFacets[col]);                        
                         im.matrix[row][col] = 0;
                         im.matrix[col][row] = 0;
 
                     }    
-//                    else
-//System.out.println("" + recalcFacets[row] + " is not sep from " + recalcFacets[col]);                                            
                 }    
             }
-//System.out.println("separated im \n" + im.toString());                
-  
-  
-/*        
-System.out.println("initial order front/back");
-String s = "";
-for (int i = recalcNum - 1; i >=0 ; i--)
-{   s += " " + recalcFacets[i];
-}
-System.out.println(s);
-*/
-
-
+        // try to find on order on the rows of the incidence matrix
         int[] rowNumsIn = new int[recalcNum];
         for (int i = 0; i < recalcNum; i++)
             rowNumsIn[i] = i;
-            
         int[] newOrder = findOrder(im, rowNumsIn);    
-
+        // order found
         if (newOrder != null)
         {
-/*            
-System.out.println("ordered row numbers back/front");
-String nos = "";
-for (int i = 0; i < recalcNum ; i++)
-    nos += " " + newOrder[i];
-System.out.println(nos);
-*/
-/*
-System.out.println("new order front/back");
-String nos2 = "";
-for (int i = recalcNum - 1; i >=0 ; i--)
-    nos2 += " " + recalcFacets[newOrder[i]];
-System.out.println(nos2);
-*/
-            // hier pas de gecorrigeerde zValues uitdelen
-            double zStep = (zMax - zMin) / (recalcNum - 1); // checked for 0!
+            // now find the new zValues
+            double zStep = (zMax - zMin) / (recalcNum - 1); // was checked for dividing by 0!
             double currentZ = zMax;
             for (int i = recalcNum - 1; i >=0 ; i--)
             {   facets[recalcFacets[newOrder[i]]].zValue = currentZ;
                 currentZ -= zStep;
             }
-
-
         } // newOrder != null
-//        else // dit komt voor als geen enkele order consistent is!
-//            System.out.println("no consistent final order");
-        
-
-
+//      else // this happens if no order is consistent!
+//          System.out.println("no consistent final order");
     }
     
-    
-    
-// recursief
-// we are looking for an order on the row numbers of the
-// matrix, later goedmaken
-// rowNumbers bevat de indices van de rijen die nog mee doen
-
+    /**
+     * recursively find an order on the row numbers of the matrix 
+     * @param im this incidence matrix
+     * @param rowNumbers row numbers still in the game
+     * @return the order or null
+     */
     public int[] findOrder(IncidenceMatrix im, int[] rowNumbers)
-    {   // kijk hoeveel rijen/kolommen nog in het spel
+    {   // find how many rows still in the game
         int numRows = rowNumbers.length;
-        // laatste rij: klaar
+        // last row: finished
         if (numRows == 1)
             return rowNumbers;
-        // find top rows
+        // find rows containing no -1's (top rows)  
         im.findMaximalElements(rowNumbers, 0);
-
-/*        
-if (im.maxCnt > 0)
-System.out.println("" + im.maxCnt + " top rows at rows = " + numRows); 
-*/
-
-        // if no top rows, take max rows
-// dit komt nier meer voor?        
+        // if no top rows, find rows containing a minimum number of -1's (max rows)
         if (im.maxCnt == 0)
         {    im.findMaximalElements(rowNumbers, 1);
-//System.out.println("" + im.maxCnt + " max rows at rows = " + numRows);         
-
         }
-        
         // make hard copies!
         int maxCnt = im.maxCnt;
         int[] maxRows = new int[maxCnt];
         System.arraycopy(im.maxRows, 0, maxRows, 0, maxCnt);
-        
         // maxRows contains a list of positions in rowNumbers
-        // where top or maximal elements are found
-        // the INDEX of the j-th top/maximal row 
+        // where top or max rows are found
+        // the INDEX of the j-th top/max row 
         // is rowNumbers[maxRows[j]]
-        
-//System.out.println("maxCnt = " + maxCnt + " at" + numRows + " rows");                    
-
         // not possible anymore
         if (maxCnt == 0)
         {
-//System.out.println("stuck at " + numRows + " rows");            
             return null;
         }    
         for (int j = 0; j < maxCnt; j++)
         {   
-            
             int[] tRowNumbers = new int[numRows];
             System.arraycopy(rowNumbers, 0, tRowNumbers, 0, numRows);
-            // the row with index in the last position is not
-            // a top or maximal row
-            // so put the top/maximal row as last by swapping
+            // the row with index in the last position is not a top or max row
+            // so put the top/max row as last by swapping
             if (maxRows[j] != (numRows - 1))
             {   int temp = tRowNumbers[maxRows[j]];
                 tRowNumbers[maxRows[j]] = tRowNumbers[numRows - 1];
                 tRowNumbers[numRows - 1] = temp;
-//System.out.println("swapped at " + numRows + " rows");                            
             }    
-//            else
-//System.out.println("trying last at " + numRows + " rows");                                        
-
             // now copy all but last of tRowNumbers
             // and find an order on these
             int[] newRowNumbers = new int[numRows - 1];
@@ -1131,23 +1029,18 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             if (result != null)
             {   // if an order was found, copy it into tRowNumbers
                 System.arraycopy(result, 0, tRowNumbers, 0, numRows - 1);
-                // check for a consistent order here als dit de laatste recursiestap was
-                // of meteen maar overal?
+                // check for a consistent order here 
                 if (numRows == im.size)
                 {   
                     boolean consistent = isConsistent(im, tRowNumbers);
-//System.out.println("consistent = " + consistent);
                     if (!consistent)
                     {   // continue
-//System.out.println("im \n" + im.toString());     
-//System.out.println("consistent = " + consistent);
                     }
                     else
                         return tRowNumbers;
                 }                
                 else
                     return tRowNumbers;
-            
             }
         }    
         return null;
@@ -1167,9 +1060,9 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
 
     /**
      * experimental algorithm from Aad Goddijn to determine if in view space the
-     * transformed facet fA with index "index" is "on top of" the transformed facet fB with
-     * index "cnt"; on top: check if the segment from the eye (origin.x,origin.y,dis)
-     * to the barycenter of fA intersects fB  
+     * transformed facet fA with index "index" is "after" the transformed facet fB with
+     * index "cnt"; "after": check if the segment(!) from the eye (origin.x,origin.y,dis)
+     * to the barycenter of fA intersects fB, that is, fB is "on top" fA    
      * @param index index of facet fA 
      * @param cnt index of facet fB
      * @param dis the viewing distance
@@ -1183,7 +1076,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         Facet3D fB = facets[cnt];
         // two planes
         if ((fA.numPoints > 2) && (fB.numPoints > 2))
-        {   // Aad's A after B (i.e. f1 on top of f2)
+        {   // Aad's A after B (i.e. fB on top of fA)
             Vector3D pointO = new Vector3D(origin.x, origin.y, dis);
             fA.calculateBarycenter();
             Vector3D pointP = fA.barycenter;
@@ -1196,7 +1089,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             // is parallel to the plane through fB
             if (isType == 0)
             {   // try this
-                if (fA.zValue > fB.zValue)
+                if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1220,7 +1113,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             // AND (all cut up) fB is completely behind
             // fA or completely before fA
             else if (isType == 2)
-            {   if (fA.zValue > fB.zValue)
+            {   if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1241,7 +1134,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             // is parallel to the plane through fB
             if (isType == 0)
             {   // try this
-                if (fA.zValue > fB.zValue)
+                if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1263,7 +1156,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             // AND (all cut up) fB is completely behind
             // fA of completely before fA
             else if (isType == 2)
-            {   if (fA.zValue > fB.zValue)
+            {   if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1279,7 +1172,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             Vector3D pointO = new Vector3D(origin.x, origin.y, dis);
             // not possible?
             if (fA.trPoints[0].equals(fA.trPoints[1]))
-            {   if (fA.zValue > fB.zValue)
+            {   if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1288,7 +1181,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             Line3D tLine = new Line3D(fA.trPoints[0], fA.trPoints[1]);
             // we are seeing only a point of fA
             if (tLine.contains(pointO))
-            {   if (fA.zValue > fB.zValue)
+            {   if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1296,7 +1189,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             }
             // not possible
             if (fB.trPoints[0].equals(fB.trPoints[1]))
-            {   if (fA.zValue > fB.zValue)
+            {   if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1310,7 +1203,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             if (isType == 0)
             {   // try this
                 // zValue sufficient, segments are cut up?
-                if (fA.zValue > fB.zValue)
+                if (fA.zValue < fB.zValue)
                     result = 1;
                 else
                     result = -1;
@@ -1334,7 +1227,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                     lineB.contains(fA.trPoints[1]))
                     return 0;    
                 else  // fA cannot intersect fB (all cut up)
-                {   if (fA.zValue > fB.zValue)
+                {   if (fA.zValue < fB.zValue)
                        result = 1;
                     else
                         result = -1;
@@ -1489,10 +1382,13 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         for (int i = 0; i < numFacets; i++)
             setVisible(i, vis);
     }
-    // check if SOME facets of the object are visible
-    // the object itself is visible in this case
-    // but one or more or all of the facets have been hidden
-    // to speed up drawing
+    /**
+     * check if SOME facets of this Object(Group)3D are visible
+     * in this case the Object(Group)3D itself is visible
+     * but one or more or all of the facets have been hidden
+     * to speed up drawing
+     * @return true/false
+     */
     public boolean someFacetsVisible()
     {   boolean result = false;
         for (int i = 0; i < numFacets; i++)
@@ -1501,8 +1397,15 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         }
         return result;
     }    
-    // set facets[i] empty.
-    // if empty = false restore old object(!) state
+    /**
+     * if empty = true, set facets[i] to empty.
+     * if empty = false restore the state of facets[i]
+     * to the state of this Object(Group)3D
+     * note: empty is not visible, but still clickable,
+     * visible == false is not visible and not clickable 
+     * @param i index of facet
+     * @param empty true/false
+     */
     public void setEmpty(int i, boolean empty)
     {   if ((i >= 0) && (i < numFacets))
         {   if (empty)
@@ -1548,6 +1451,11 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         }
     }
     
+    /**
+     * set the outline color of all facets 
+     * also works for groups
+     * @param olc the outline colro
+     */
     public void setOutlineColor(CssColor olc)
     {	for (int i = 0; i < numFacets; i++)
     	{	facets[i].outlineColor = olc;
@@ -1555,7 +1463,12 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
     	}
     	
     }
-    
+
+    /**
+     * set the fill color of all facets,
+     * also works for groups
+     * @param flc fill color
+     */
     public void setFillColor(CssColor flc)
     {	for (int i = 0; i < numFacets; i++)
     	{	facets[i].color = flc;
@@ -1585,8 +1498,10 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         }
     }
     
-    // reset all empty facets
-    // works also for groups
+    /**
+     * reset all empty facets, see method setEmpty
+     * @param o this parameter seems redundant
+     */
     public void reSetEmpty(boolean o)
     {   for (int i = 0; i < numFacets; i++)
         {   setEmpty(i, false);
@@ -1607,18 +1522,33 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;
     }
     
-    // method for user interaction through the mouse
-    
-    // works also for groups
-    // set the clicked facet to empty
+    /**
+     * set the facet, whose projection was clicked in the view plane,
+     * to empty; works also for groups 
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @param dis viewing distance
+     * @param origin origin of drawing plane
+     * @param paintType type of painting used
+     */
     public void setEmpty(int x, int y, double dis, Vector3D origin, int paintType)
     {   int index = facetClicked(x, y, dis, origin, paintType);
         setEmpty(index, true);
     }
     
-    // no need to redefine for subclass ObjectGroup3D
-    // since objectContains was redefined
-    // return type always an Object!!
+    /**
+     * find the Oject3D that, after projection in the view plane,
+     * contains the coordinated (x,y); also works for groups, 
+     * since objectContains was redefined for ObjectGroups3D;'
+     * use only after calling method fixFacetArray (see class ObjectGroup3D),
+     * since this is necessary for correctly using method facetClicked 
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @param dis viewing distance
+     * @param origin origin of drawing plane
+     * @param paintType type of painting used
+     * @return the Object3D or null
+     */
     public Object3D objectClicked(int x, int y, double dis, Vector3D origin, 
                                   int paintType)
     {   Object3D result = null;
@@ -1628,23 +1558,23 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;    
     }
 
-// alleen gebruiken voor het TOP Object
-// wil je de zaak beperken doe dit dan door te checken of 
-// je keuze ook behoort tot een deelobject
-
-    // faster then tracing (x,y) in view plane
-    // back to a facet in word space!!
-    // also works for a group
-    // but use only on top parent facet array since the facet found
-    // might be covered by other facets not in the subgroup array
-    // find index of clicked facet
-    // use objectClicked to find the object
+    /**
+     * find the index of the facet that, after projection in the view plane,
+     * contains the coordinated (x,y); also works for groups, but use only 
+     * after calling method fixFacetArray (see class ObjectGroup3D);
+     * use method objectClicked to find the Object3D the facet belongs to  
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @param dis viewing distance
+     * @param origin origin of drawing plane
+     * @param paintType type of painting used
+     * @return index of facet or -1
+     */
     public int facetClicked(int x, int y, double dis, Vector3D origin, 
                             int paintType)
     {   Polygon p;
         int index = -1;
-        // start on top, facets are already sorted, always by zValue(!)
-// ook hier, netter        
+        // start on top, facets are already sorted by zValue(!)
         if (paintType == Object3DContainer.NONZMIN)
         {   for (int i = numFacets - 1; i >= 0; i--)
             {   // only visible facets that were drawn(!) can be clicked
@@ -1657,8 +1587,8 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                 }    
             }
         }
-// zorg er hier voor dat de facet array gesorteerd is naar
-// de volgorde waarin je ook TEKENT!
+        // start on top, facets are already sorted, 
+        // make sure the facets are sorted in the order they are drawn
         else // all facets were drawn
         {   for (int i = numFacets - 1; i >= 0; i--)
             {   // only visible facets can be clicked
@@ -1671,8 +1601,18 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         }
         return index;
     }
-    // find reference to clicked facet  
-    // see remarks above
+    /**
+     * find the facet that, after projection in the view plane,
+     * contains the coordinated (x,y); also works for groups, but use only 
+     * after calling method fixFacetArray (see class ObjectGroup3D);
+     * use method objectClicked to find the Object3D the facet belongs to  
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @param dis viewing distance
+     * @param origin origin of drawing plane
+     * @param paintType type of painting used
+     * @return the Facet3D or null
+     */
     public Facet3D clickedFacet(int x, int y, double dis, Vector3D origin, 
                                 int paintType)    
     {   Facet3D result = null;
@@ -1681,82 +1621,34 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
             result = facets[index];
         return result;
     }
-/*    
-    // no need to redefine since we are using the facet array
-    // can be called for any object subgroup when the topmost 
-    // objectgroup has sortSubArray = true
-    // but see remarks at facetClicked!!
-    // return actual point in world space!
-    public Vector3D vertexClicked(int x, int y, double dis, 
-                                  //Vector3D origin, boolean includeInvisibles)
-                                  Vector3D origin)
-    {   Vector3D result = null;
-        Polygon p;
-        // point clicked in drawing plane        
-        Point pClicked = new Point(x,y);        
-        // start on top, facets are already sorted, always by zValue
-// zorg er hier voor dat de facet array gesorteerd is naar
-// de volgorde waarin je ook TEKENT!
-        for (int i = numFacets - 1; i >= 0; i--)
-        {   // includeInvisibles determines which vertices can be clicked
-            if (facets[i].visible) // || includeInvisibles)
-            {   p = facets[i].project(dis, origin);
-                for (int cnt = 0; cnt < facets[i].numPoints; cnt++)
-                {   // projected vertex
-                    Point projVertex = 
-                        new Point(p.xpoints[cnt], p.ypoints[cnt]);
-                    if (distance(pClicked, projVertex) <= 
-                        Object3DContainer.SSTT)
-                    {    result = new Vector3D(facets[i].points[cnt]);                            
-                         // this is the topmost vertex which was clicked on
-                         // if the object is filled, check if this
-                         // vertex is covered, if it is, exit since
-                         // nothing more can be found
-                         // asuming the object is convex!
-                        if (filled)
-                        {   if (vertexCovered(dis, origin, i, projVertex))
-                            {    
-                                return null;
-                            }
-                            else // not covered
-                            {    
-                                return result;
-                            }
-                        }
-                        else // not filled
-                            return result;
-                    } // close enough
-                    // else keep looking
-                } // edge loop
-                // else keep looking
-            } // facet loop
-            // else keep looking
-        }
-        return result;
-    }
-*/    
     
-// precieze versie voor vertices heeft geen zin:
-// gebruik de geprojecteerde vertices in the integer plane
-        public FacetWithVertex facetWithVertexClicked(
-            int x, int y, double dis, 
-            //Vector3D origin, boolean includeInvisibles)
+    /**
+     * given a point clicked in the drawing plane, check if this point is 
+     * the projection of some vertex and return the facet to which the vertex
+     * belongs and the vertex in 3-space or null; see class FacetWithVertex;
+     * make sure the facet and its vertex are "topmost" if facets are
+     * filled  
+     * @param x x-coordinate of point clicked in drawing plane
+     * @param y y-coordinate of point clicked in drawing plane
+     * @param dis viewing distance
+     * @param origin origin of view space
+     * @return Facet and vertex clicked or null
+     */
+    public FacetWithVertex facetWithVertexClicked(int x, int y, double dis, 
             Vector3D origin)
     {   FacetWithVertex result = null;
         Polygon p;
         // point clicked in drawing plane        
         Point pClicked = new Point(x,y);        
-        // start on top, facets are already sorted, always by zValue
-// zorg er hier voor dat de facet array gesorteerd is naar
-// de volgorde waarin je ook TEKENT!
+        // start on top, facets are already sorted, 
+        // make sure the facets are sorted in the order they are drawn
         for (int i = numFacets - 1; i >= 0; i--)
-        {   // includeInvisibles determines which vertices can be clicked
-            if (facets[i].visible) // || includeInvisibles)
+        {   
+            if (facets[i].visible) 
             {   p = facets[i].project(dis, origin);
                 for (int cnt = 0; cnt < facets[i].numPoints; cnt++)
                 {   // projected vertex
                     Point projVertex = 
-                        //new Point(p.xpoints[cnt], p.ypoints[cnt]);
                     	new Point(p.puntenX[cnt], p.puntenY[cnt]);
                     if (distance(pClicked, projVertex) <= 
                         Object3DContainer.SSTT)
@@ -1790,21 +1682,35 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;
     }
 
-    
-    // distance between two integer points
+    /**
+     * distance between two integer points
+     * @param p1 first point
+     * @param p2 second point
+     * @return distance
+     */
     public double distance(Point p1, Point p2)
     {   return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) +
                          (p1.y - p2.y) * (p1.y - p2.y));   
     }    
-    // given a vertex belonging to the facet with index i,
-    // check if a projected facet covers its projection
-    // (assuming the facets are filled)
-    // this is a facet with index > i (!)
+    /**
+     * given a vertex belonging to the facet with index fIndex,
+     * check if another projected facet covers the projected
+     * vertex (assuming all facets are filled);
+     * assume facets are sorted in the order they are drawn,
+     * so necessarily, any projected facet covering the
+     * projected vertex has index larger than fIndex  
+     * @param dis viewing distance
+     * @param origin origin of view space
+     * @param fIndex index of facet containing projVertex
+     * @param projVertex vertex to be checked
+     * @return true/false
+     */
     public boolean vertexCovered(double dis, Vector3D origin,
                    int fIndex, Point projVertex)
     {   boolean result = false;
         Polygon p;
-        // start on top, facets are already sorted, always by zValue
+        // start on top, facets are already sorted, 
+        // make sure the facets are sorted in the order they are drawn
         for (int i = numFacets - 1; i > fIndex; i--)
         {   // only visible facets can cover
             if (facets[i].visible)
@@ -1816,34 +1722,33 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;    
     }    
 
-// versie 1, aanwijzen van edges via aangeklikt punt erop
-
-    // no need to redefine since we are using the facet array
-    // can be called for any object subgroup when the topmost 
-    // objectgroup has sortSubArray = true
-    // return edge from, edge to and point as actual points!
-    public Vector3D[] edgeClicked(int x, int y, double dis, 
-                                  //Vector3D origin, boolean includeInvisibles)
-                                  Vector3D origin)
+    /**
+     * given a point clicked in the drawing plane, check if this point is on
+     * a projected edge from some facet and return the edge with clicked point
+     * in 3-space or null; make sure the edge is the "topmost" edge and the 
+     * clicked point is visible if facets are filled   
+     * @param x x-coordinate of point clicked in drawing plane
+     * @param y y-coordinate of point clicked in drawing plane
+     * @param dis viewing distance
+     * @param origin origin of view space
+     * @return starting point of edge clicked, end point of edge clicked and the
+     * actual point on the edge which was clicked (see class EWP) or null
+     */
+    public Vector3D[] edgeClicked(int x, int y, double dis, Vector3D origin)
     {   Vector3D[] edgeWithPoint = null;
         Polygon p;
         // point clicked in drawing plane
         Point pClicked = new Point(x,y);        
-        // start on top, facets are already sorted, always by zValue
-// zorg er hier voor dat de facet array gesorteerd is naar
-// de volgorde waarin je ook TEKENT!
+        // start on top, facets are already sorted but make sure
+        // the facet array is sorted in the order the facets are drawn
         for (int i = numFacets - 1; i >= 0; i--)
         {   // includeInvisibles determines which vertices can be clicked
-            if (facets[i].visible)// || includeInvisibles)
+            if (facets[i].visible)
             {   p = facets[i].project(dis, origin);
                 for (int cnt = 0; cnt < facets[i].numPoints; cnt++)
                 {   // find projected edge
-                    Point projVertexFrom = 
-                        //new Point(p.xpoints[cnt], p.ypoints[cnt]);
-                    	new Point(p.puntenX[cnt], p.puntenY[cnt]);
+                    Point projVertexFrom = new Point(p.puntenX[cnt], p.puntenY[cnt]);
                     Point projVertexTo = 
-                        //new Point(p.xpoints[(cnt + 1) % facets[i].numPoints], 
-                        //          p.ypoints[(cnt + 1) % facets[i].numPoints]);
                         new Point(p.puntenX[(cnt + 1) % facets[i].numPoints], 
                                   p.puntenY[(cnt + 1) % facets[i].numPoints]);
                     	
@@ -1910,8 +1815,6 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                                 new Vector3D(origin.x, origin.y, dis), realClicked);
                             Line3D line2 = new Line3D(facets[i].trPoints[cnt],
                                 facets[i].trPoints[(cnt + 1) % facets[i].numPoints]);
-                            int ist = Line3D.intersectionType(line1, line2);
-//System.out.println("ist = " + ist);                            
                             Vector3D isPoint = Line3D.getIntersectionPoint(line1, line2);
                             double lambda1 = 
                                 Vector3D.distance(isPoint, 
@@ -1920,22 +1823,14 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                                     facets[i].trPoints[(cnt + 1) % facets[i].numPoints]);
                             // in view space y-axis is reversed!        
                             lambda1 = 1 - lambda1;                                    
-                            
-//System.out.println("l = " + lambda);                                    
-//System.out.println("l-1 = " + lambda1);                                                                
-                            
                             // 4)
                             // now find the untransformed version of this point
-                            
-                            
                             // (1-lambda)*"from"+lambda*"to"
                             Vector3D from = new Vector3D(edgeWithPoint[0]); // new!!
                             Vector3D.scaleBy(from, 1 - lambda1);
                             Vector3D to = new Vector3D(edgeWithPoint[1]); // new!! 
                             Vector3D.scaleBy(to, lambda1);
                             edgeWithPoint[2] = Vector3D.plus(from, to);
-                            
-                            
                             // find the integer(!) projection of the new point in
                             // the plane
                             Point projVertex = new Point(
@@ -1965,39 +1860,40 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return edgeWithPoint;
     }
 
-// versie 2: aanwijzen van een punt op een edge met mogelijkheid tot tick marks
-// en in de return ook het Factet3D om te kijken of het punt uberhaupt aangeklikt mag
-// worden!
-    public FacetWithEdgePoint facetWithEdgePointClicked(
-            int x, int y, double dis, 
-            //Vector3D origin, boolean includeInvisibles)
-            Vector3D origin)
+    /**
+     * given a point clicked in the drawing plane, check if this point is on
+     * a projected edge from some facet and return the facet together with the 
+     * clicked point in 3-space or null, see class FacetWithEdgePoint 
+     * make sure the edge is the "topmost" edge and the clicked point is visible 
+     * if facets are filled; if the edge has tick marks, only the projectons of 
+     * the tick marks can be clicked   
+     * @param x x-coordinate of point clicked in drawing plane
+     * @param y y-coordinate of point clicked in drawing plane
+     * @param dis viewing distance
+     * @param origin origin of view space
+     * @return facet and the point of the edge of this facet that was clicked or null
+     */
+    public FacetWithEdgePoint facetWithEdgePointClicked(int x, int y, double dis, Vector3D origin)
     {   FacetWithEdgePoint result = null;
         Polygon p;
         Polygon2D p2;
         // point clicked in drawing plane
         Point pClicked = new Point(x,y);        
         Vector2D p2Clicked = new Vector2D((double) x, (double) y);
-        // start on top, facets are already sorted, always by zValue
-// zorg er hier voor dat de facet array gesorteerd is naar
-// de volgorde waarin je ook TEKENT!
+        // start on top, facets are already sorted but make sure
+        // the facet array is sorted in the order the facets are drawn
         for (int i = numFacets - 1; i >= 0; i--)
-        {   // includeInvisibles determines which vertices can be clicked
-            if (facets[i].visible)// || includeInvisibles)
+        {   
+            if (facets[i].visible)
             {   // get the projected polygon
                 p = facets[i].project(dis, origin);
                 p2 = facets[i].project2D(dis, origin);
                 for (int cnt = 0; cnt < facets[i].numPoints; cnt++)
                 {   
-// moet dit nog preciezer? je zou de reeele versie van de geprojecteerde edge 
-// kunnen gebruiken
                     // find projected edge in integer plane
                     Point projVertexFrom = 
-                        //new Point(p.xpoints[cnt], p.ypoints[cnt]);
                     	new Point(p.puntenX[cnt], p.puntenY[cnt]);
                     Point projVertexTo = 
-                        //new Point(p.xpoints[(cnt + 1) % facets[i].numPoints], 
-                        //          p.ypoints[(cnt + 1) % facets[i].numPoints]);
                         new Point(p.puntenX[(cnt + 1) % facets[i].numPoints], 
                                   p.puntenY[(cnt + 1) % facets[i].numPoints]);
                     	
@@ -2023,19 +1919,13 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                     // if projection is ON the segment as INNER point                                    
                     if ((lambda > 0) && (lambda < 1))
                     {   // real(!) x-coordinate of projection
-                        double projIntersectX = 
-                            (1 - lambda) * projVertexFrom2.x +
-                            lambda * projVertexTo2.x;
+                        double projIntersectX = (1 - lambda) * projVertexFrom2.x + lambda * projVertexTo2.x;
                         // real(!) y-coordinate of projection    
-                        double projIntersectY = 
-                            (1 - lambda) * projVertexFrom2.y +
-                            lambda * projVertexTo2.y;
+                        double projIntersectY = (1 - lambda) * projVertexFrom2.y + lambda * projVertexTo2.y;
                         // distance clicked point - projection of ibidem (in real plane!)   
                         double distance = Math.sqrt(    
-                            (p2Clicked.x - projIntersectX) * 
-                            (p2Clicked.x - projIntersectX) + 
-                            (p2Clicked.y - projIntersectY) * 
-                            (p2Clicked.y - projIntersectY));
+                            (p2Clicked.x - projIntersectX) * (p2Clicked.x - projIntersectX) + 
+                            (p2Clicked.y - projIntersectY) * (p2Clicked.y - projIntersectY));
                         // check if clicked point is close enough to projected edge    
                         if (distance <= Object3DContainer.SSTT)
                         {   
@@ -2048,8 +1938,7 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                             double lambda1 = 0;
                             boolean tickFound = false;
                             // we are looking at edge cnt of facets[i]
-                            // hier: check for tickmarks
-                            // als de edge tickmarks heeft
+                            // check for tickmarks
                             if (facets[i].numTicks[cnt] > 0)
                             {   // find array of ticks in view space
                                 Vector3D[] viewSpaceTicks = facets[i].findTransformedTicks(cnt);
@@ -2071,14 +1960,12 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                                         (p2Clicked.x - xTicks[chCnt]) + 
                                         (p2Clicked.y - yTicks[chCnt]) * 
                                         (p2Clicked.y - yTicks[chCnt]));
-//System.out.println("tDis = " + UF.format(tDis, 2));                                        
                                     if (tDis <= Object3DContainer.SSTT)
                                         tIndex = chCnt;
                                 }
                                 // tickmark found
                                 if (tIndex >= 0)
                                 {   
-//System.out.println("tick found");                                    
                                     // adjust projIntersect for covered check
                                     projIntersectX = xTicks[tIndex];
                                     projIntersectY = yTicks[tIndex];
@@ -2094,30 +1981,10 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                             }
                             if (!tickFound)
                             {
-                                // the exact point we are looking for is obtained as follows
-                                // everything in view space
                                 // 1)
-                                // find the real(!) projection of the edge in the
-                                // plane z = 0, thus embed in view space!
-                                // start
-//                            double temp =  dis / (dis - facets[i].trPoints[cnt].z);
-//                            double startX = (origin.x + (facets[i].trPoints[cnt].x - origin.x) * temp);
-//                            double startY = (origin.y + (facets[i].trPoints[cnt].y - origin.y) * temp);
-//                            Vector3D start = new Vector3D(projVertexFrom2.x, projVertexFrom2.y, 0);
-//                            temp =  dis / (dis - facets[i].trPoints[(cnt + 1) % facets[i].numPoints].z);
-//                            double endX = (origin.x + (facets[i].trPoints[(cnt + 1) % facets[i].numPoints].x - origin.x) * temp);
-//                            double endY = (origin.y + (facets[i].trPoints[(cnt + 1) % facets[i].numPoints].y - origin.y) * temp);
-//                            Vector3D end = new Vector3D(projVertexTo2.x, projVertexTo2.y, 0);
-                                // 2)
-                                // create the real version of the clicked point
-                                // in the z-plane in view space
-                                // (1-lambda)*"start"+lambda*"end"                            
-//                            Vector3D.scaleBy(start, 1 - lambda);
-//                            Vector3D.scaleBy(end, lambda);
-//                            Vector3D realClicked = Vector3D.plus(start, end);
-                                // embed in view space
+                                // embed the real version of the clicked point in the z-plane in view space
                                 Vector3D realClicked = new Vector3D(projIntersectX, projIntersectY, 0);
-                                // 3)
+                                // 2)
                                 // now the line through (origin.x, origin,y, dis) and
                                 // realClicked should intersect the transformed edge
                                 // this corrects for the central projection
@@ -2125,8 +1992,6 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                                     new Vector3D(origin.x, origin.y, dis), realClicked);
                                 Line3D line2 = new Line3D(facets[i].trPoints[cnt],
                                     facets[i].trPoints[(cnt + 1) % facets[i].numPoints]);
-                                int ist = Line3D.intersectionType(line1, line2);
-//System.out.println("ist = " + ist);                            
                                 Vector3D isPoint = Line3D.getIntersectionPoint(line1, line2);
                                 // get the position of isPoint
                                 lambda1 = 
@@ -2134,25 +1999,19 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                                         facets[i].trPoints[(cnt + 1) % facets[i].numPoints]) /
                                     Vector3D.distance(facets[i].trPoints[cnt], 
                                         facets[i].trPoints[(cnt + 1) % facets[i].numPoints]);
-//System.out.println("l = " + lambda);                                    
-//System.out.println("l-1 = " + lambda1);                                                                
                             } // if !tickFound
-                            
-                            // 4)
+                            // 3)
                             // now find the untransformed version of the clicked point
                             // in view space y-axis is reversed!        
                             lambda1 = 1 - lambda1;
-//System.out.println("lambda1 = " + UF.format(lambda1, 5));                            
                             // (1-lambda)*"from"+lambda*"to"
                             Vector3D from = new Vector3D(edgeWithPoint[0]); // new!!
                             Vector3D.scaleBy(from, 1 - lambda1);
                             Vector3D to = new Vector3D(edgeWithPoint[1]); // new!! 
                             Vector3D.scaleBy(to, lambda1);
                             edgeWithPoint[2] = Vector3D.plus(from, to);
-//System.out.println(edgeWithPoint[2].toString());
                             result = new FacetWithEdgePoint(
                                             edgeWithPoint, facets[i]);
-                            
                             // find the projection of the new point in
                             // the plane
                             Point projVertex = new Point(
@@ -2182,12 +2041,16 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return result;
     }
 
-    // give a segment and a point in the plane, find the projection
-    // of the point on the line through the segment of the form
-    // (1-lambda)*from+lambda*to
-    // projection is on the segment if 0<lambda<1
-    // assume from != to
-    // integer version
+    /**
+     * given a segment with integer end points and a point with integer coordinates in the plane, 
+     * find the projection of the point on the line through the segment in the form
+     * (1-lambda)from+(lambda)to; note that the projection is on the segment if lambda between 0 and 1 
+     * assume from != to
+     * @param from starting point of segment
+     * @param to end point of segment
+     * @param pClicked the integer point in the plane
+     * @return lambda
+     */
     public double projectionOnSegment(Point from, Point to, Point pClicked)
     {   // directional vector of segment
         Point dir = new Point(to.x - from.x, to.y - from.y);
@@ -2203,7 +2066,17 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
                          (dir.x*dir.x + dir.y*dir.y);
         return lambda;
     }    
-    // real version
+
+    /**
+     * given a segment with real end points and a point with real coordinates in the plane, 
+     * find the projection of the point on the line through the segment in the form
+     * (1-lambda)from+(lambda)to; note that the projection is on the segment if lambda between 0 and 1
+     * assume from != to
+     * @param from starting point of segment
+     * @param to end point of segment
+     * @param pClicked the real point in the plane
+     * @return lambda
+     */
     public double projectionOnSegment(Vector2D from, Vector2D to, Vector2D pClicked)
     {   // directional vector of segment
         Vector2D dir = new Vector2D(to.x - from.x, to.y - from.y);
@@ -2220,12 +2093,12 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
         return lambda;
     }    
     
-    // make all vertices redundant!
-    // for objects
-// to be redefined for object groups??
-// not if you define additional objects already
-// redundant from the first, i.e. objects cannot 
-// contain references to the same instance of a Vector3D
+    /**
+     * make all vertices redundant, that is, make sure that facets sharing 
+     * a vertex never point to the same instance of this vertex;
+     * do this by adding a copy of this shared vertex to this object3D 
+     * used for fold-outs
+     */
     public void loosenVertices()
     {   // initialized as false
         boolean[] verticesUsed = new boolean[numVertices];
@@ -2254,196 +2127,5 @@ System.out.println("" + im.maxCnt + " top rows at rows = " + numRows);
     }
 } // class Object3D
 
-/**
- * a real vector in the x-y-plane 
- * @author huub
- */
-class Vector2D
-{   public double x;
-    public double y;
-    public Vector2D(double x, double y)
-    {   this.x = x;
-        this.y = y;
-    }    
-    public double distance(Vector2D v)
-    {   return Math.sqrt((x - v.x) * (x - v.x) + (y - v.y) * (y - v.y));
-    }    
-}
-/**
- * a wrapper class containg a Facte3D and one of its vertices
- * @author huub
- */
-class FacetWithVertex
-{   public Vector3D vertex;
-    public Facet3D facet;
-    public FacetWithVertex(Vector3D v, Facet3D f)
-    {   vertex = v;
-        facet = f;
-    }
-}
-/**
- * a wrapper class containg a Facet3D and one of its edges with an additional point on that edge, see class EWP  
- * @author huub
- */
-class FacetWithEdgePoint
-{   public Vector3D[] edgeWithPoint;
-    public Facet3D facet;
-    public FacetWithEdgePoint(Vector3D[] ewp, Facet3D f)
-    {   edgeWithPoint = ewp;
-        facet = f;
-    }
-}
-/**
- * a wrapper class containing three 3d-points (in world space):
- * the start-point of an edge, the end point of an edge and a point on that edge  
- * @author huub
- */
-class EWP
-{   public Vector3D[] edgeWithPoint;
-    public EWP(Vector3D[] ewp)
-    {   edgeWithPoint = ewp;
-    }
-}
 
     
-class IncidenceMatrix
-{   int size;
-    int[][] matrix;
-    int maxCnt;
-    int[] maxRows;
-    int[] rowSums;
-    int rowMax;
-    public IncidenceMatrix(int s)
-    {   size = s;
-        matrix = new int[size][size];
-    }    
-    public void setElement(int i, int j, int val)
-    {   if ((i >= 0) && (i < size) &&
-            (j >= 0) && (j < size))
-            matrix[i][j] = val;
-    }    
-    public int getElement(int i, int j)
-    {   if ((i >= 0) && (i < size) &&
-            (j >= 0) && (j < size))
-            return matrix[i][j];
-        else
-            return 0;
-    }    
-    public void relax()
-    {   for (int i = 0; i < size; i++)
-            for (int j = i + 1; j < size; j++)        
-            {   //if (i != j)
-                //{   
-                    if (matrix[i][j] == matrix[j][i])
-                    {   matrix[i][j] = 0;
-                        matrix[j][i] = 0;
-                    }    
-                //}    
-            }
-    }
-    // checkColumns bevat de indices van de rijen die nog meedoen
-    public void findMaximalElements(int[] checkColumns, int maxType)
-    {   int numRows = checkColumns.length;
-        switch (maxType)
-        {   case 0:
-            {   maxCnt = 0;
-                // te groot
-                maxRows = new int[numRows];
-                // vindt indices in checkColums van rijen waarin 
-                // alleen nullen of enen staan in de kolommen
-                // in checkColumns
-                for (int fCnt = numRows - 1; fCnt >= 0; fCnt--)
-                {   if (isTopRow(checkColumns[fCnt], checkColumns))
-                    {   maxRows[maxCnt] = fCnt;
-                        maxCnt++;
-                    }    
-                }
-
-            }    
-            break;
-            case 1:
-            {   maxCnt = 0;
-                // te groot
-                maxRows = new int[numRows];
-// lijkt iets beter met lijntjes erbij                
-                findRowSums2(checkColumns);
-                for (int fCnt = numRows - 1; fCnt >= 0; fCnt--)
-                {   if (rowSums[fCnt] == rowMax)
-                    {   maxRows[maxCnt] = fCnt;
-                        maxCnt++;
-                    }    
-                }                
-            }    
-            break;
-            default: //none?
-        }
-    }
-    // checkColumns bevat de indices van de rijen die nog meedoen
-    // i is an index from checkColumns
-    public boolean isTopRow(int i, int[] checkColumns)
-    {   boolean result = true;
-        for (int cnt = 0; cnt < checkColumns.length; cnt++)
-        {   result = result && (matrix[i][checkColumns[cnt]] >= 0);
-        }
-        return result;
-    }    
-    // find the rowSums of the matrix consisting only of
-    // checkColumns rows AND columns
-    public void findRowSums(int[] checkColumns)
-    {   int numRows = checkColumns.length;
-        rowMax = -10;
-        rowSums = new int[numRows];
-        for (int rowCnt = 0; rowCnt < numRows; rowCnt++)
-        {   int sum = 0;
-            for (int colCnt = 0; colCnt < numRows; colCnt++)
-                sum += matrix[checkColumns[rowCnt]][checkColumns[colCnt]];
-            rowSums[rowCnt] = sum;
-            if (sum > rowMax)
-                rowMax = sum;
-        }
-    }
-    
-    // find the rows of the matrix consisting only of
-    // checkColumns rows AND columns, which
-    // contain the minimum number of occurences of -1
-    public void findRowSums2(int[] checkColumns)
-    {   int numRows = checkColumns.length;
-        rowMax = -10000;
-        rowSums = new int[numRows];
-        for (int rowCnt = 0; rowCnt < numRows; rowCnt++)
-        {   int sum = 0;
-            for (int colCnt = 0; colCnt < numRows; colCnt++)
-            {   if (matrix[checkColumns[rowCnt]][checkColumns[colCnt]] == -1)
-                    sum += matrix[checkColumns[rowCnt]][checkColumns[colCnt]];
-            }    
-            rowSums[rowCnt] = sum;
-            if (sum > rowMax)
-                rowMax = sum;
-        }
-    }
-    
-    public String toString()
-    {   String result = "";
-        for (int i = 0; i < size; i++)
-        {   result += "row " + i + " = ";
-            for (int j = 0; j < size; j++)
-                result += matrix[i][j] + " ";                
-            result += "\n";
-        }
-        return result;
-    }    
-}    
-
-
-// initializing an empty Object3D
-class EmptyObject3D extends Object3D
-{   // default constructor
-    public EmptyObject3D()
-    {}
-    public Object3D deepCopy()
-    {   EmptyObject3D copy = new EmptyObject3D();
-        makeDeepObjectCopy(copy);
-        return copy;
-    }    
-}    
-

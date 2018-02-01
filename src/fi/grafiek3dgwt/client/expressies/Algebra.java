@@ -1,11 +1,7 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.text.DecimalFormat;
 import java.util.*;
-import java.awt.*;
 
-//import fi.wiskopdr.WiskOpdr;
-//import fi.grafiek3dtest.formuleobjects.*;
 
 public class Algebra
 {	
@@ -76,7 +72,6 @@ public class Algebra
 		if(varNamen.length==0  || (!Double.isNaN(e1Waarde) && !Double.isNaN(e2Waarde)))
 		{	boolean nan1 = (Double.isInfinite (e1Waarde) || Double.isNaN(e1Waarde));
 			boolean nan2 = (Double.isInfinite (e2Waarde) || Double.isNaN(e2Waarde));
-			//boolean ongelijk = Math.abs(e1Waarde - e2Waarde)>0.000000001 &&  Math.abs(e1Waarde/e2Waarde-1)>0.000000001;
 			if(!(nan1 && nan2))
 			{	return true;
 			}
@@ -176,123 +171,6 @@ public class Algebra
 	}
 	
 	
-	
-		
-	/*public static boolean isGelijkwaardig(Expressie e1, Expressie e2)
-	{	double d = 5.1; //verschuiving
-		double a = 1;
-		String[] vars = geefVarNamen((new Optelling(e1,e2)));
-		int aantalVars = vars.length;
-		boolean gelijkwaardig = true;
-		if(aantalVars<2)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	double subst = a*i+d;
-				boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst)) || Double.isNaN(e1.geefWaarde(subst)));
-				boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst)) || Double.isNaN(e2.geefWaarde(subst)));
-				boolean ongelijk = Math.abs(e1.geefWaarde(subst) - e2.geefWaarde(subst))>0.000000001 &&  Math.abs(e1.geefWaarde(subst)/e2.geefWaarde(subst)-1)>0.000000001;
-				//System.out.println(""+e1.geefWaarde(subst) + "  "+e2.geefWaarde(subst));
-				if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-				{	gelijkwaardig = false;
-					break;
-				}
-			}
-			return gelijkwaardig;
-		}
-		else if(aantalVars==2)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	for(int j=-5 ; j<6 ; j++)
-				{	double[] subst = {a*i+d,a*j+d};
-					boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst,vars)) || Double.isNaN(e1.geefWaarde(subst,vars)));
-					boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst,vars)) || Double.isNaN(e2.geefWaarde(subst,vars)));
-					boolean ongelijk = Math.abs(e1.geefWaarde(subst,vars) - e2.geefWaarde(subst,vars))>0.000000001 &&  Math.abs(e1.geefWaarde(subst,vars)/e2.geefWaarde(subst,vars)-1)>0.000000001;
-					
-					if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-					{	gelijkwaardig = false;
-						break;
-					}
-				}
-			}
-		}
-		else if(aantalVars==3)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	for(int j=-5 ; j<6 ; j++)
-				{	for(int k=-5 ; k<6 ; k++)
-					{	double[] subst = {a*i+d,a*j+d,a*k+d};
-						boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst,vars)) || Double.isNaN(e1.geefWaarde(subst,vars)));
-						boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst,vars)) || Double.isNaN(e2.geefWaarde(subst,vars)));
-						boolean ongelijk = Math.abs(e1.geefWaarde(subst,vars) - e2.geefWaarde(subst,vars))>0.000000001 &&  Math.abs(e1.geefWaarde(subst,vars)/e2.geefWaarde(subst,vars)-1)>0.000000001;
-						if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-						{	gelijkwaardig = false;
-							break;
-						}
-					}
-				}
-			}
-		}
-		else if(aantalVars==4)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	for(int j=-5 ; j<6 ; j++)
-				{	for(int k=-5 ; k<6 ; k++)
-					{	for(int l=-5 ; l<6 ; l++)
-						{	double[] subst = {a*i+d,a*j+d,a*k+d,a*l+d};
-							boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst,vars)) || Double.isNaN(e1.geefWaarde(subst,vars)));
-							boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst,vars)) || Double.isNaN(e2.geefWaarde(subst,vars)));
-							boolean ongelijk = Math.abs(e1.geefWaarde(subst,vars) - e2.geefWaarde(subst,vars))>0.000000001 &&  Math.abs(e1.geefWaarde(subst,vars)/e2.geefWaarde(subst,vars)-1)>0.000000001;
-							if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-							{	gelijkwaardig = false;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		else if(aantalVars==5)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	for(int j=-5 ; j<6 ; j++)
-				{	for(int k=-5 ; k<6 ; k++)
-					{	for(int l=-5 ; l<6 ; l++)
-						{	for(int m=-5 ; m<6 ; m++)
-							{	double[] subst = {a*i+d,a*j+d,a*k+d,a*l+d,a*m+d};
-								boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst,vars)) || Double.isNaN(e1.geefWaarde(subst,vars)));
-								boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst,vars)) || Double.isNaN(e2.geefWaarde(subst,vars)));
-								boolean ongelijk = Math.abs(e1.geefWaarde(subst,vars) - e2.geefWaarde(subst,vars))>0.000000001 &&  Math.abs(e1.geefWaarde(subst,vars)/e2.geefWaarde(subst,vars)-1)>0.000000001;
-								if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-								{	gelijkwaardig = false;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else if(aantalVars==6)
-		{	for(int i=-5 ; i<6 ; i++)
-			{	for(int j=-5 ; j<6 ; j++)
-				{	for(int k=-5 ; k<6 ; k++)
-					{	for(int l=-5 ; l<6 ; l++)
-						{	for(int m=-5 ; m<6 ; m++)
-							{	for(int n=-5 ; n<6 ; n++)
-								{	double[] subst = {a*i+d,a*j+d,a*k+d,a*l+d,a*m+d,a*n+d};
-									boolean nan1 = (Double.isInfinite (e1.geefWaarde(subst,vars)) || Double.isNaN(e1.geefWaarde(subst,vars)));
-									boolean nan2 = (Double.isInfinite (e2.geefWaarde(subst,vars)) || Double.isNaN(e2.geefWaarde(subst,vars)));
-									boolean ongelijk = Math.abs(e1.geefWaarde(subst,vars) - e2.geefWaarde(subst,vars))>0.000000001 &&  Math.abs(e1.geefWaarde(subst,vars)/e2.geefWaarde(subst,vars)-1)>0.000000001;
-									if(nan1 && !nan2 || !nan1 &&nan2 || (ongelijk && !(nan1 && nan2)))
-									{	gelijkwaardig = false;
-										break;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else if(aantalVars>6)gelijkwaardig = false;
-		return gelijkwaardig;
-		
-	}*/
 	
 	/*Bepaalt of twee expressies evenredig zijn. e1 = k*e2
 	 *Dit gebeurt door voor de aanwezige variabelen een tiental waarden
@@ -489,21 +367,6 @@ public class Algebra
 			{	zijnGelijk[i][j] = gelijkGevormd(vm1.vergelijkingen[i], vm2.vergelijkingen[j]);
 			}
 		}
-		/*
-		boolean gelijk = true;
-		
-		for(int i=0 ; i<vm1.vergelijkingen.length ; i++)
-		{	boolean fout;
-			boolean start=false;
-			for(int j=0 ; j<vm1.vergelijkingen.length && j!=i; j++)
-			{	start = i==0 && j==1;
-				fout = !zijnGelijk[i][i] || !zijnGelijk[j][j] && !zijnGelijk[i][j] || !zijnGelijk[j][i];	
-				
-			}
-			
-			if(!start) fout = fout && 
-		}
-		*/
 		if(aantal==2)
 		{
 			if((!zijnGelijk[0][0] || !zijnGelijk[1][1]) && (!zijnGelijk[0][1] || !zijnGelijk[1][0]))
@@ -524,16 +387,7 @@ public class Algebra
 	}
 	
 	public static boolean gelijkGevormd(Expressie e1, Expressie e2)
-	{	/*if(e1==null || e2==null)return false;
-		if(e2 instanceof BasisExpressie && e2.toString().equals("Q")) return true;
-		if(e1 instanceof BasisExpressie && e2 instanceof BasisExpressie && e1.toString().equals(e2.toString())) return true;
-		if(e1.getClass().getName().equals(e2.getClass().getName()))
-		{	if(e1.kind2==null && e2.kind2==null) return gelijkGevormd(e1.kind1, e2.kind1);
-			else if(e1.kind3==null && e2.kind3==null) return gelijkGevormd(e1.kind1, e2.kind1)&& gelijkGevormd(e1.kind2, e2.kind2);
-			else if(e1.kind4==null && e2.kind4==null) return gelijkGevormd(e1.kind1, e2.kind1)&& gelijkGevormd(e1.kind2, e2.kind2) && gelijkGevormd(e1.kind3, e2.kind3);
-			else return gelijkGevormd(e1.kind1, e2.kind1)&& gelijkGevormd(e1.kind2, e2.kind2) && gelijkGevormd(e1.kind3, e2.kind3) && gelijkGevormd(e1.kind4, e2.kind4);
-		}
-		return false;*/
+	{	
 		return zijnGelijk(e1,e2,true);
 	}
 	
@@ -550,10 +404,6 @@ public class Algebra
 		if( vorm && e2 instanceof BasisExpressie && e2.toString().equals("Q")) return true;
 	
 		if(e1.toStringStrikt().equals(e2.toStringStrikt())) return true;
-		//else if(e1 instanceof BasisExpressie && e2 instanceof BasisExpressie)
-		//{	if(e1.toStringStrikt().equals(e2.toStringStrikt())) return true;
-		//	else return false;
-		//}
 		else if(e1 instanceof BasisExpressie && e2 instanceof BasisExpressie)
 		{	return false;
 		}
@@ -638,90 +488,12 @@ public class Algebra
 		else if(e1 instanceof NdeLog || e2 instanceof NdeLog)
 		{	return false;
 		}
-		//else if(e1 instanceof Abs && e2 instanceof Abs)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-		//}
-		//else if(e1 instanceof Abs || e2 instanceof Abs)
-		//{	return false;
-		//}
-		//else if(e1 instanceof Conjug && e2 instanceof Conjug)
-        //{   return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-        //}
-        //else if(e1 instanceof Conjug || e2 instanceof Conjug)
-        //{   return false;
-        //}
-		//else if(e1 instanceof Faculteit && e2 instanceof Faculteit)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-		//}
-		//else if(e1 instanceof Faculteit || e2 instanceof Faculteit)
-		//{	return false;
-		//}
 		else if(e1 instanceof Bin && e2 instanceof Bin)
 		{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
 		}
 		else if(e1 instanceof Bin || e2 instanceof Bin)
 		{	return false;
 		}
-		//else if(e1 instanceof Diff && e2 instanceof Diff)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-		//}
-		//else if(e1 instanceof Diff || e2 instanceof Diff)
-		//{	return false;
-		//}
-		//else if(e1 instanceof DiffPartial && e2 instanceof DiffPartial)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-		//}
-		//else if(e1 instanceof DiffPartial || e2 instanceof DiffPartial)
-		//{	return false;
-		//}
-		//else if(e1 instanceof Prv && e2 instanceof Prv)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm) && zijnGelijk(e1.kind4,e2.kind4,vorm);
-		//}
-		//else if(e1 instanceof Prv || e2 instanceof Prv)
-		//{	return false;
-		//}
-		//else if(e1 instanceof Sigma && e2 instanceof Sigma)
-        //{   return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm) && zijnGelijk(e1.kind4,e2.kind4,vorm);
-        //}
-        //else if(e1 instanceof Sigma || e2 instanceof Sigma)
-        //{   return false;
-        //}
-		//else if(e1 instanceof Integraal && e2 instanceof Integraal)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm) && zijnGelijk(e1.kind4,e2.kind4,vorm);
-		//}
-		//else if(e1 instanceof Integraal || e2 instanceof Integraal)
-		//{	return false;
-		//}
-		//else if(e1 instanceof GCD && e2 instanceof GCD)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm);
-		//}
-		//else if(e1 instanceof GCD || e2 instanceof GCD)
-		//{	return false;
-		//}
-		//else if(e1 instanceof NormalCDF && e2 instanceof NormalCDF)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm) && zijnGelijk(e1.kind4,e2.kind4,vorm);
-		//}
-		//else if(e1 instanceof NormalCDF || e2 instanceof NormalCDF)
-		//{	return false;
-		//}
-		//else if(e1 instanceof InvNorm && e2 instanceof InvNorm)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm);
-		//}
-		//else if(e1 instanceof InvNorm || e2 instanceof InvNorm)
-		//{	return false;
-		//}
-		//else if(e1 instanceof BinomCDF && e2 instanceof BinomCDF)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm);
-		//}
-		//else if(e1 instanceof BinomCDF || e2 instanceof BinomCDF)
-		//{	return false;
-		//}
-		//else if(e1 instanceof BinomPDF && e2 instanceof BinomPDF)
-		//{	return zijnGelijk(e1.kind1,e2.kind1,vorm) && zijnGelijk(e1.kind2,e2.kind2,vorm) && zijnGelijk(e1.kind3,e2.kind3,vorm);
-		//}
-		//else if(e1 instanceof BinomPDF || e2 instanceof BinomPDF)
-		//{	return false;
-		//}
 		else if(e1 instanceof Aftrekking && e2 instanceof Aftrekking && e1.kind1 instanceof BasisExpressie && e1.kind1.geefWaarde()==0 && e2.kind1 instanceof BasisExpressie && e2.kind1.geefWaarde()==0)
 		{	return zijnGelijk(e1.kind2,e2.kind2,vorm);
 		}
@@ -813,7 +585,6 @@ public class Algebra
 	
 	/*Controleert de gelijkwaardigheid van de twee lineaire vergelijkingen
 	 *eLinks1 = eRechts1 en eLinks2 = eRechts2
-	 *
 	 *(wordt niet gebruikt. In feite overbodig geworden)
 	 */
 	public static boolean isGelijkwaardigeLinVergelijking(Expressie eLinks1,Expressie eRechts1,Expressie eLinks2,Expressie eRechts2)
@@ -906,33 +677,6 @@ public class Algebra
 	 */
 	public static boolean zijnEvenredigePolynomen(Expressie e1, Expressie e2)
 	{	return zijnEvenredig(e1,e2);
-		/*e1 = benaderWortels(e1);
-		e2 = benaderWortels(e2);
-		e1 = verwijderHaakjes(e1);
-		e2 = verwijderHaakjes(e2);
-		e1 = herleid(e1);
-		e2 = herleid(e2);
-		double[] coeff1 = geefCoefficienten(e1);
-		double[] coeff2 = geefCoefficienten(e2);
-		int graad1 = coeff1.length-1;
-		int graad2 = coeff2.length-1;
-		if(graad1==graad2)
-		{	int graad = graad1;
-			double factor = coeff1[graad]/coeff2[graad];
-			{	for(int i=0 ; i<graad ; i++)
-				{	if(Math.abs(factor*coeff2[i] - coeff1[i]) >	0.0000001)
-					{	return false;
-					}
-				}
-			}
-			return true;
-		}
-		//is eigenlijk een beetje raar. het zijn dan niet evenredige polynomen, maar hebben wel dezelfde nulpuntenverzameling
-		else if(graad1==2 && graad2==1 && coeff1[1]*coeff1[1] -4*coeff1[2]*coeff1[0]==0)
-		{	e2 = new Vermenigvuldiging(e2,e2);
-			return zijnEvenredigePolynomen(e1, e2);
-		}
-		return false;*/
 	}
 	/*Bepaalt of de oplossing van vergelijking e1 = 0 één van de oplossingen is
 	 *van e2 = 0.
@@ -991,70 +735,6 @@ public class Algebra
 			e[2] = new Aftrekking(new BasisExpressie(0),e2Wortel);
 		}
 		return e;
-		
-		
-		/*Expressie[] e = new Expressie[3];
-		Expressie e1Wortel = new Wortel(e1);
-		Expressie e2Wortel = new Wortel(e2);
-		
-		if(e1 instanceof Macht && e1.kind2.geefWaarde()==2)e1Wortel = e1.kind1;
-		if(e2 instanceof Macht && e2.kind2.geefWaarde()==2)e2Wortel = e2.kind1;
-		
-		
-		if( e1 instanceof Macht && e1.kind2.geefWaarde()==2 && !(e2 instanceof Macht && e2.kind2.geefWaarde()==2))//!Double.isNaN(e2.geefWaarde()) &&
-		{	if(e2.geefWaarde()<0)return null;
-			double wortel = Math.sqrt(e2.geefWaarde());
-			e[0] = e1.kind1;
-			if(wortel==0)
-			{	e[1] = new BasisExpressie(wortel);
-				e[2] = null;
-			}
-			else 
-			{	e[1] = evalueerGetalsExpressie(new Wortel(e2));
-				e[2] = new Aftrekking(new BasisExpressie(0),e[1]);
-			}
-		}
-		else if(e2 instanceof Macht && e2.kind2.geefWaarde()==2 && !(e1 instanceof Macht && e1.kind2.geefWaarde()==2))//!Double.isNaN(e1.geefWaarde()) && 
-		{	if(e1.geefWaarde()<0)return null;
-			double wortel = Math.sqrt(e1.geefWaarde());
-			e[0] = e2.kind1;
-			if(wortel==0)
-			{	e[1] = new BasisExpressie(wortel);
-				e[2] = null;
-			}
-			else 
-			{	e[1] = evalueerGetalsExpressie(new Wortel(e1));
-				e[2] = new Aftrekking(new BasisExpressie(0),e[1]);
-			}
-			
-		}
-		else if( e1 instanceof Macht && e1.kind2.geefWaarde()==2 && e2 instanceof Macht && e2.kind2.geefWaarde()==2)//!Double.isNaN(e2.geefWaarde()) &&
-		{	e[0] = e1.kind1;
-			e[1] = e2.kind1;
-			e[2] = new Aftrekking(new BasisExpressie(0),e[1]);
-		}
-		else
-		{	double wortel1 = Math.sqrt(e1.geefWaarde());
-			double wortel2 = Math.sqrt(e2.geefWaarde());
-			if(wortel1==0)
-			{	e[0] = new Wortel(e2);
-				e[1] = new BasisExpressie(0);
-				e[2] = null;
-			}
-			else if(wortel2==0)
-			{	e[0] = new Wortel(e1);
-				e[1] = new BasisExpressie(0);
-				e[2] = null;
-			}
-			else 
-			{	e[0] = new Wortel(e1);
-				e[1] = new Wortel(e2);
-				e[2] = new Aftrekking(new BasisExpressie(0),e[1]);
-			}
-		}
-		
-		
-		return e;*/
 	}
 	/*Probeert de vergelijking e1 = e2 te splitsen. 
 	 *Lukt alleen als e1 van de vorm e3*e4 is en e2 een waarde heeft van 0
@@ -1349,7 +1029,7 @@ public class Algebra
 			v.addElement(new BasisExpressie(-1));
 		}
 		else if(e instanceof Deling)
-		{	//if(!(e.kind1 instanceof BasisExpressie && e.kind1.geefWaarde()==1)) 
+		{	 
 			v = Algebra.geefFactoren(e.kind1,v);
 			Vector u = Algebra.geefFactoren(e.kind2,new Vector());
 			for (int i=0 ; i<u.size() ; i++)
@@ -1378,7 +1058,7 @@ public class Algebra
 					for (int j=0 ; j<u.size() ; j++)
 					{	v.addElement(new Deling(new BasisExpressie(1),(Expressie)u.elementAt(j)));
 					}
-					//v.addElement(new Deling(new BasisExpressie(1),e.kind1));
+					
 				}
 			}
 		}
@@ -1736,24 +1416,7 @@ public class Algebra
 		if(e instanceof DecRound)return new DecRound(herleid(e.kind1),herleid(e.kind2));
 		if(e instanceof SigRound)return new SigRound(herleid(e.kind1),herleid(e.kind2),herleid(e.kind2));
 		if(e instanceof DecRoundStrict)return new DecRoundStrict(herleid(e.kind1),herleid(e.kind2));
-		//if(e instanceof Integraal)return new Integraal(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3),herleid(e.kind4));
-        //if(e instanceof Prv)return new Prv(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3),herleid(e.kind4));
-        //if(e instanceof Sigma)return new Sigma(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3),herleid(e.kind4));
-        //if(e instanceof Abs)return new Abs(herleid(e.kind1));
-        //if(e instanceof Conjug)return new Conjug(herleid(e.kind1));
-        //if(e instanceof Faculteit)return new Faculteit(herleid(e.kind1));
         if(e instanceof Bin)return new Bin(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof Diff)return new Diff(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof DiffPartial)return new DiffPartial(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof Primitieve)return new Primitieve(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof Limiet)return new Limiet(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3),herleid(e.kind4));
-        //if(e instanceof GCD)return new GCD(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof Max)return new Max(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof Min)return new Min(herleid(e.kind1),herleid(e.kind2));
-        //if(e instanceof NormalCDF)return new NormalCDF(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3),herleid(e.kind4));
-        //if(e instanceof InvNorm)return new InvNorm(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3));
-        //if(e instanceof BinomCDF)return new BinomCDF(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3));
-        //if(e instanceof BinomPDF)return new BinomPDF(herleid(e.kind1),herleid(e.kind2),herleid(e.kind3));
 		if(e instanceof E)return e;
 		if(e instanceof PI)return e;
 		Vector v = Algebra.geefTermen(e,new Vector());
@@ -1774,10 +1437,6 @@ public class Algebra
 		if(e.kind4!=null)e.kind4 = herleidMild(e.kind4, breukenGemengd);
 		if(e.isWaarde())
 		{	e = evalueerGetalsExpressie(e, breukenGemengd);
-			
-			//Vector v = Algebra.geefTermen(e,new Vector());
-			//v = sorteerTermen(v);
-			//e = Algebra.maakTermenExpressie(v);
 		}
 		
 		if(e instanceof Vermenigvuldiging)
@@ -1810,15 +1469,6 @@ public class Algebra
 		else if(e instanceof Deling)
 		{	if(isGelijkDouble(e.kind2.geefWaarde(),1)) return e.kind1;
 		}
-//		else if(e instanceof Diff)
-//		{	return Expressie.evalWithCAS(e);
-//		}
-//		else if(e instanceof DiffPartial)
-//		{	return Expressie.evalWithCAS(e);
-//		}
-//		else if(e instanceof Sigma)
-//        {   return Expressie.evalWithCAS(e);
-//        }
 		else if(e instanceof BasisExpressie && e.geefWaarde()<0)
 		{	return new Aftrekking(new BasisExpressie(0),new BasisExpressie(-e.geefWaarde()));
 		}
@@ -1918,8 +1568,7 @@ public class Algebra
 			}
 		}
 		
-		/**/
-		
+	
 		return v;
 	}
 	/*Werkt de haakjes weg.
@@ -2156,7 +1805,6 @@ public class Algebra
 		//controle op aantal variabelen
 		if(varnamen.length>1 || varnamen.length<1)
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
 		
 		//varnaam vastleggen
@@ -2166,7 +1814,6 @@ public class Algebra
 		Expressie[] exp = geefCoefficientenExpressies(herleid(verwijderHaakjes(e)));
 		if(exp==null)
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
 		double[] coeff = new double[exp.length];
 		for(int i=0 ; i<exp.length ; i++)
@@ -2175,10 +1822,7 @@ public class Algebra
 		//graad ongelijk aan 2
 		if(coeff.length!=3)
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
-		
-		
 		
 		//coefficienten noemen we a,b en c
 		double a = coeff[2];
@@ -2211,7 +1855,6 @@ public class Algebra
 		double d = b*b-4*a*c;
 		if(d<0) 
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
 		
 		//D=0 Schrijf als p(x+q)^2 (
@@ -2238,7 +1881,6 @@ public class Algebra
 		}
 		else
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
 		exp[2] = vermenigvuldig(exp[2], new BasisExpressie(kgv));
 		exp[1] = vermenigvuldig(exp[1], new BasisExpressie(kgv));
@@ -2249,7 +1891,6 @@ public class Algebra
 		Expressie discr = new Aftrekking(new Vermenigvuldiging(exp[1],exp[1]),new Vermenigvuldiging(new BasisExpressie(4),new Vermenigvuldiging(exp[2], exp[0])));
 		if(eval(new Wortel(discr))==null)
 		{	return(e);
-			//return(ontbindExtra(e));
 		}
 		else
 		{	Expressie expX1 = evalueerGetalsExpressie(new Optelling(evalueerGetalsExpressie(new Vermenigvuldiging(new BasisExpressie(-1),exp[1])),new Wortel(discr)));
@@ -2313,19 +1954,6 @@ public class Algebra
 		for(int j=0 ; j<v.size() ; j++)
 		{	Vector u;
 			u = geefFactoren((Expressie)v.elementAt(j),new Vector());
-			/*for(int k=0 ; k<u.size() ; k++)
-			{	Expressie exp = (Expressie)u.elementAt(k);
-				if(eval(exp)==null && !(exp instanceof BasisExpressie) && !(exp instanceof Deling && exp.kind1.geefWaarde()==1  && exp.kind2 instanceof BasisExpressie)) 
-				{	Expressie ontbindingExtra = ontbindExtra(exp);
-					Vector vOntbinding = geefFactoren(ontbindingExtra, new Vector());
-					if(vOntbinding.size()>1)
-					{	u.setElementAt(new BasisExpressie(1),k);
-						for(int m=0 ; m<vOntbinding.size() ; m++)
-						{	u.addElement(vOntbinding.elementAt(m));
-						}
-					}
-				}
-			}*/
 			for(int k=0 ; k<u.size() ; k++)
 			{	Expressie exp = (Expressie)u.elementAt(k);
 				for(int i=0 ; i<varNamen.length ; i++)
@@ -2402,43 +2030,6 @@ public class Algebra
 			{	exponentenExtra[i][j] = exponentenExtra[i][j] - minAantalF;
 			}
 		}
-		
-		/*for(int i=0 ; i<varNamen.length ; i++)
-		{	int minAantalF = 1000;
-			int maxAantalF = -1000;
-			for(int j=0 ; j<v.size() ; j++)
-			{	if(exponenten[i][j]<minAantalF)
-				{	minAantalF = exponenten[i][j];
-				}
-				if(exponenten[i][j]>maxAantalF)
-				{	maxAantalF = exponenten[i][j];
-				}
-			}
-			if(minAantalF<0 && maxAantalF>=0)minAantalF = 0;
-			else if(minAantalF<0 && maxAantalF<0)minAantalF = maxAantalF;
-			factorExponenten[i] = minAantalF;
-			for(int j=0 ; j<v.size() ; j++)
-			{	exponenten[i][j] = exponenten[i][j] - minAantalF;
-			}
-		}
-		for(int i=0 ; i<extraTermen.size() ; i++)
-		{	int minAantalF = 1000;
-			int maxAantalF = -1000;
-			for(int j=0 ; j<v.size() ; j++)
-			{	if(exponentenExtra[i][j]<minAantalF)
-				{	minAantalF = exponentenExtra[i][j];
-				}
-				if(exponentenExtra[i][j]>maxAantalF)
-				{	maxAantalF = exponentenExtra[i][j];
-				}
-			}
-			if(minAantalF<0 && maxAantalF>=0)minAantalF = 0;
-			else if(minAantalF<0 && maxAantalF<0)minAantalF = maxAantalF;
-			factorExponentenExtra[i] = minAantalF;
-			for(int j=0 ; j<v.size() ; j++)
-			{	exponentenExtra[i][j] = exponentenExtra[i][j] - minAantalF;
-			}
-		}*/
 		
 		
 		//de termen (het deel binnen de 'haakjes')worden opnieuw opgebouwd 
@@ -2843,10 +2434,6 @@ public class Algebra
 	{	if(e instanceof E) return null;
 		if(e instanceof PI) return null;
 		if(e instanceof Bin)return eval(new BasisExpressie(e.geefWaarde()));
-		//if(e instanceof Faculteit)return eval(new BasisExpressie(e.geefWaarde()));
-		//if(e instanceof GCD)return eval(new BasisExpressie(e.geefWaarde()));
-		//if(e instanceof Min)return eval(new BasisExpressie(e.geefWaarde()));
-		//if(e instanceof Max)return eval(new BasisExpressie(e.geefWaarde()));
 		if(e instanceof BasisExpressie && !Double.isNaN(e.geefWaarde()))
 		{	
 			if(Math.rint(e.geefWaarde())-e.geefWaarde()!=0)
@@ -2862,15 +2449,9 @@ public class Algebra
 						y = (long)Math.pow(10,i);
 						break;
 					}
-					//else if(i==6)
-					//{	isBreuk = true;
-					//	x = (long)Math.rint(w);
-					//	y = (long)Math.pow(10,i);
-					//}
 				}
 				if(isBreuk)
 				{	PointLong p = new PointLong(x,y);
-					//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 					if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 					return vereenvoudigBreuk(p);
 				}
@@ -2896,7 +2477,6 @@ public class Algebra
 				x=-x;
 			}
 			PointLong p = new PointLong(x,y);
-			//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 			if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 			return vereenvoudigBreuk(p);
 		}
@@ -2915,7 +2495,6 @@ public class Algebra
 				x=-x;
 			}
 			PointLong p = new PointLong(x,y);
-			//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 			if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 			return vereenvoudigBreuk(p);
 		}
@@ -2934,7 +2513,6 @@ public class Algebra
 				x=-x;
 			}
 			PointLong p = new PointLong(x,y);
-			//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 			if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 			return vereenvoudigBreuk(p);
 		}
@@ -2953,7 +2531,6 @@ public class Algebra
 				x=-x;
 			}
 			PointLong p = new PointLong(x,y);
-			//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 			if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 			return vereenvoudigBreuk(p);
 		}
@@ -2977,7 +2554,6 @@ public class Algebra
 				x=-x;
 			}
 			PointLong p = new PointLong(x,y);
-			//if(x==9223372036854775807L  || y==9223372036854775807L) return null;
 			if(!withinLongRange(x)  || !withinLongRange(y)) return null;
 			return vereenvoudigBreuk(p);
 		}
@@ -2989,20 +2565,6 @@ public class Algebra
 			long y1 = p1.y;
 			boolean tellerIsKwadraat = false;
 			boolean noemerIsKwadraat = false;
-			/*for(int i=1 ; i<x1+1 ; i++)
-			{	if(i*i==x1)
-				{	tellerIsKwadraat = true;
-					x1 = i;
-					break;
-				}
-			}
-			for(int i=1 ; i<y1+1 ; i++)
-			{	if(i*i==y1)
-				{	noemerIsKwadraat = true;
-					y1 = i;
-					break;
-				}
-			}*/
 			double wx1 = Math.rint(Math.sqrt((double)x1));
 			double wy1 = Math.rint(Math.sqrt((double)y1));
 			if(isGelijkDouble(wx1*wx1,(double)x1)) tellerIsKwadraat = true;
@@ -3010,7 +2572,6 @@ public class Algebra
 			
 			if(tellerIsKwadraat && noemerIsKwadraat)
 			{	PointLong p = new PointLong((long)wx1,(long)wy1);
-				//if((long)wx1==9223372036854775807L  || (long)wy1==9223372036854775807L) return null;
 				if(!withinLongRange((long)wx1)  || !withinLongRange((long)wy1)) return null;
 				return p;
 			}
@@ -3035,7 +2596,6 @@ public class Algebra
 			if(isGelijkDouble(Math.pow((double)wy1,x2),(double)y1)) noemerIsNdeMacht = true;
 			if(tellerIsNdeMacht && noemerIsNdeMacht)
 			{	PointLong p = new PointLong((long)wx1,(long)wy1);
-				//if((long)wx1==9223372036854775807L  || (long)wy1==9223372036854775807L) return null;
 				if(!withinLongRange((long)wx1)  || !withinLongRange((long)wy1)) return null;
 				return p;
 			}
@@ -3065,25 +2625,12 @@ public class Algebra
 			
 			if(tellerIsNdeLog && noemerIsNdeLog)
 			{	PointLong p = new PointLong((long)wx1-(long)wy1,1);
-				//if((long)wx1==9223372036854775807L  || (long)wy1==9223372036854775807L) return null;
 				if(!withinLongRange((long)wx1)  || !withinLongRange((long)wy1)) return null;
 				return p;
 			}
 			else return null;
 		}
 		
-		/*
-		
-		double waarde = e.geefWaarde();
-		for(int i=1 ; i<1000 ; i++)
-		{	double mogelijkeTeller = i*waarde;
-			if(Math.rint(mogelijkeTeller)-mogelijkeTeller==0)
-			{	long x1 = (long)mogelijkeTeller;
-				long y1 = i;
-				PointLong p = new PointLong(x1,y1);
-				return p;
-			}
-		}*/
 		return null;
 	}
 	
@@ -3101,31 +2648,8 @@ public class Algebra
 	public static Expressie evalueerGetalsExpressie(Expressie exp, boolean breukenGemengd)
 	{	if(exp instanceof DecRound)
 		{	
-			/*if("MW".equals(WiskOpdr.deployVariant) && exp.kind2.geefWaarde()>0.000000001)
-			{	String formatString = "0.";
-				for(int i=0 ; i<exp.kind2.geefWaarde() ; i++)
-				{
-					formatString = formatString + "0";
-				}
-				DecimalFormat df = new DecimalFormat(formatString, Expressie.dfs);
-				return new BasisExpressie(df.format(exp.geefWaarde()));
-			}
-			else*/ 
-    	    //if(exp.kind1.geefWaarde()<0.000000001)
-            //{   return exp = new Aftrekking(new BasisExpressie(0),new BasisExpressie(-exp.geefWaarde()));
-            //}
-            //else 
                 return new BasisExpressie(exp.geefWaarde());
 		}
-/*	
-		if(exp instanceof SigRound)
-		{   int macht = (int)exp.kind2.geefWaarde();
-			int signf = (int)exp.kind3.geefWaarde(); 
-			BasisExpressie b = new BasisExpressie(exp.geefWaarde());
-			b.setScientificNotation(true, macht, signf);
-			return b;
-		}
-*/		
 		if(exp instanceof DecRoundStrict)
 		{	
 			if(exp.kind2.geefWaarde()>0.000000001)
@@ -3134,12 +2658,10 @@ public class Algebra
 				{
 					formatString = formatString + "0";
 				}
-				//DecimalFormat df = new DecimalFormat(formatString, Expressie.dfs);
 				if(exp.kind1.geefWaarde()<0.000000001)
-		        {   //return exp = new Aftrekking(new BasisExpressie(0),new BasisExpressie(df.format(-exp.geefWaarde())));
+		        {   
 					return exp = new Aftrekking(new BasisExpressie(0),new BasisExpressie(-exp.geefWaarde()));
 		        }
-				//else return new BasisExpressie(df.format(exp.geefWaarde()));
 				else return new BasisExpressie(exp.geefWaarde());
 			}
 			else 
@@ -3153,9 +2675,6 @@ public class Algebra
 		{	if(exp.isWaarde() && !withinLongRange((long)exp.geefWaarde()))return new BasisExpressie(exp.geefWaarde());
 			return exp;
 		}
-		//if(isWortelBenadering(exp))return new BasisExpressie(exp.geefWaarde());
-		
-		
 		
 		long teller = p.x;
 		long noemer = p.y;

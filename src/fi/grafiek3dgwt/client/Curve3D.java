@@ -1,44 +1,151 @@
 package fi.grafiek3dgwt.client;
 
-//import java.awt.Color;
+
 import fi.grafiek3dgwt.client.expressies.*;
+
+/**
+ * class representing a curve in 3-space as an Object3D;
+ * note how this is done: points on the curve are given
+ * in the form (expX(t),expY(t),expZ(t)), where 
+ * for t tPoints values (given) are taken between a given
+ * tMin and tMax; the vertices of the curve are then given
+ * by the points (expX(t),expY(t),expZ(t)) which connected 
+ * by facets consisting of 2 vertices by calculating them
+ * at subsequent t-values<br>     
+ * note that minima and maxima of x-, y- and z- axis are also
+ * given, so that it can be determined if the curve should
+ * be cut at x=xMax, x=xMin, y=yMax, y=yMin, z = zMax or z = zMin
+ * in order to for in the coordinate cube; undefined vertices are
+ * omitted and not used for making facets; near asymptotes
+ * facets should be omitted when one of their edges crosses an
+ * asymptote, but the algorithm for detecting this is very inefficient. 
+ */
+
 
 public class Curve3D extends Object3D
 {
+	/**
+	 * a very large double
+	 */
 	final double VERYBIG = 1e10d;
+	/**
+	 * a very small double
+	 */
 	final double NZERO = 1e-5d;
 
+	/**
+	 * should the top of the curve be trimmed?
+	 */
 	boolean trimTop = false;
+	/**
+	 * should the bottom of the curve be trimmed?
+	 */
 	boolean trimBottom = false;
+	/**
+	 * should the front of the curve be trimmed?
+	 */
 	boolean trimFront = false;
+	/**
+	 * should the back of the curve be trimmed?
+	 */
 	boolean trimBack = false;
+	/**
+	 * should the left of the curve be trimmed?
+	 */
 	boolean trimLeft = false;
+	/**
+	 * should the right of the curve be trimmed?
+	 */
 	boolean trimRight = false;
 	
+	/**
+	 * the vertex with the largest z value smaller then zMax
+	 */
 	Vector3D topMaxVertex = null;
+	/**
+	 * the vertex with the smallest z value larger then zMin
+	 */
 	Vector3D bottomMinVertex = null;
+	/**
+	 * the vertex with the smallest y value larger then yMin (negative y-axis point to the front)
+	 */
 	Vector3D frontMinVertex = null;
+	/**
+	 * the vertex with the largest y value smaller then yMax (positive y-axis point to the back)
+	 */
 	Vector3D backMaxVertex = null;
+	/**
+	 * the vertex with the smallest x value larger then xMin (negative x-axis point to the left)
+	 */
 	Vector3D leftMinVertex = null;
+	/**
+	 * the vertex with the largest x value smaller then xMax (positive x-axis point to the right)
+	 */
 	Vector3D rightMaxVertex = null;
-	
+	/**
+	 * a vertex of the graph inside the axes-cube
+	 * with maximum distance to the center of the axes-cube
+	 */
 	Vector3D insideVertex = null;
 	
+	/**
+	 * distance between insideVertex and the center of the axes-cube
+	 */
 	double centerDis = 0;
 
+	/**
+	 * some big positive xValue, see method isUnwanted 
+	 */
 	double bigPosX = 0;
+	/**
+	 * some big negative xValue, see method isUnwanted 
+	 */
 	double bigMinX = 0;
+	/**
+	 * some big positive yValue, see method isUnwanted 
+	 */
 	double bigPosY = 0;
+	/**
+	 * some big negative yValue, see method isUnwanted 
+	 */
 	double bigMinY = 0;
+	/**
+	 * some big positive zValue, see method isUnwanted 
+	 */
 	double bigPosZ = 0;
+	/**
+	 * some big negative zValue, see method isUnwanted 
+	 */
 	double bigMinZ = 0;
 	
-//	String[] vLabels; 
-	
+	/**
+	 * check if the defining functions have asymptotes,
+	 * see class Grafiek3DComponent 
+	 */
 	boolean checkForAsymptotes = false;
-	
+
+	/**
+	 * default constructor
+	 */
     public Curve3D()
     {}
+    /**
+     * constructor
+     * @param expX in t for x-coordinates 
+     * @param expY in t for y-coordinates
+     * @param expZ in t for z-coordinates
+     * @param cfa checking for asymptotes
+     * @param tMin minimum t-value
+     * @param tMax maximum t-value
+     * @param tPoints number of points between tMin and tMax
+     * @param xMin minimum x-axis
+     * @param xMax maximum x-axis
+     * @param yMin minimum y-axis
+     * @param yMax maximum y-axis
+     * @param zMin minimum z-axis
+     * @param zMax maximum z-axis
+     * @param paramNaam name of t-variable
+     */
     public Curve3D(Expressie expX, Expressie expY, Expressie expZ,
     			   boolean cfa,
     			   double tMin, double tMax, int tPoints, 
@@ -48,39 +155,6 @@ public class Curve3D extends Object3D
     			   String paramNaam)
     {
     	checkForAsymptotes = cfa;
-    	
-		double xAsyPos = 0;
-		double xAszPos = 0;
-		double yAsxPos = 0;
-		double yAszPos = 0;
-		double zAsxPos = 0;
-		double zAsyPos = 0;
-		
-		if (xMin > NZERO)
-		{	yAsxPos = xMin;
-			zAsxPos = xMin;
-		}
-		if (xMax < -NZERO)
-		{	yAsxPos = xMax;
-			zAsxPos = xMax;
-		}
-		if (yMin > NZERO)
-		{	xAsyPos = yMin;
-			zAsyPos = yMin;
-		}
-		if (yMax < -NZERO)
-		{	xAsyPos = yMax;
-			zAsyPos = yMax;
-		}
-		if (zMin > NZERO)
-		{	xAszPos = zMin;
-			yAszPos = zMin;
-		}
-		if (zMax < -NZERO)
-		{	xAszPos = zMax;
-			yAszPos = zMax;
-		}
-		
 		bigPosX = 10 * xMax;
 		bigMinX = 10 * xMin;
 		bigPosY = 10 * yMax;
@@ -111,8 +185,6 @@ public class Curve3D extends Object3D
 			double expYWaarde = expY.geefWaarde(subst, vars);
 			double expZWaarde = expZ.geefWaarde(subst, vars);
 
-// LATER "oneindige" vertices omlabelen tot iets onschuldigs
-				
 			vertices[tCnt] = new Vector3D(expXWaarde, expYWaarde, expZWaarde);
 
 			if (!isUnDefined(expXWaarde))
@@ -210,12 +282,7 @@ public class Curve3D extends Object3D
 					
 			}
 		
-//if (insideVertex == null)		
-//System.out.println("insideVertex = null");
-//else
-//System.out.println("insideVertex = " + insideVertex.toString());
-
-		// maximale aantal
+		// maximum number
 	    int tempNumFacets = numCurveFacets;
 	    int numNonNullFacets = 0;
 	    Facet3D[] tempFacets = new Facet3D[tempNumFacets];
@@ -228,7 +295,6 @@ public class Curve3D extends Object3D
 
    			boolean equal = false;
    			
-       		// hier voor de "oneindige" vertices geen facet maken
        		int unDefinedCnt = 0;
        		int unDefinedIndex = -1;
        		if (isUnDefined(vertices[indices[0]]))
@@ -245,7 +311,6 @@ public class Curve3D extends Object3D
        			equal = vertices[indices[0]].equals(vertices[indices[1]]);
        		
       		
-       		// test alleen als de vertices "normaal" zijn
        		int unWantedCnt = 0;
        		if (!vertexUnDefined)
        		{	if (isUnWanted(tMin + tCnt * tStep, tMin + tCnt * tStep + tStep, expX, expY, expZ, paramNaam))
@@ -257,26 +322,17 @@ public class Curve3D extends Object3D
 	       	if (!equal && !vertexUnDefined && !edgeUnWanted)
 	       	{
 	       			
-	       			// check op dubbele verices was hierboven 
+	       			// creating tempFacet eliminates subsequent identical vertices in tempFacet, see class Facet3D 
 	       			Facet3D tempFacet = new Facet3D(vertices, indices, Grafiek3DComponent.curveColor);
-
 	       			
        				numNonNullFacets++;
 	       			tempFacets[facetCount] = tempFacet;
 	       			tempFacets[facetCount].outlineColor = Grafiek3DComponent.curveOutlineColor;
 	       			facetCount++;
 	       			
-	       			//numNonNullFacets++;
-	       			//tempFacets[facetCount] = new Facet3D(vertices, indices, Grafiek3DComponent.graphColor);
-	       			//tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       			//facetCount++;
        		}
         }
 
-// hier de null-facets opruimen en numFacets aanpassen	        
-	        
-//System.out.println("tempNumFacets = " + tempNumFacets);
-//System.out.println("numNonNullFacets = " + numNonNullFacets);
 	    
 	    numFacets = numNonNullFacets;
 	    facets = new Facet3D[numFacets];
@@ -289,12 +345,6 @@ public class Curve3D extends Object3D
 	    	}
 	    }
 	    
-//for (int fCnt = 0; fCnt < numFacets; fCnt++)
-//{	if (facets[fCnt] == null)
-//	System.out.println("" + fCnt + " null");
-//}
-	    
-	    // label "oneindige" vertices tot iets onschuldigs	    
         for (int vCnt = 0; vCnt < numVertices; vCnt++)
         {	if (isUnDefined(vertices[vCnt]))
         		vertices[vCnt] = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
@@ -304,17 +354,20 @@ public class Curve3D extends Object3D
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
                 facets[fCnt].vertexLabels[vCnt] = "";
-//                    vLabels[facets[fCnt].indices[vCnt]];
-                    
 
         // find the center !!
         Vector3D center = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
-        //initObject3D(true, false);
+
         initObject3D(true, center, false);
                 
     	
     }
-    
+
+    /**
+     * check if double d is NotaNumber or is Infinite
+     * @param d double to be checked
+     * @return true/false
+     */
     public boolean isUnDefined(double d)
     {
     	boolean unDefined = false;
@@ -323,21 +376,30 @@ public class Curve3D extends Object3D
     	
     	return unDefined;
     }
-    
+
+    /**
+     * check if one or more of the coordinates of Vector3D v are undefined
+     * @param v Vector3D to be checked
+     * @return true/false
+     */
     public boolean isUnDefined(Vector3D v)
     {
     	return isUnDefined(v.x) || isUnDefined(v.y) || isUnDefined(v.z);
     }
-    
-/*    
-    public boolean isUnWanted(double d)
-    {	boolean unWanted = false;
-    	
-    	unWanted = Double.isNaN(d) || Double.isInfinite(d) || (Math.abs(d) > VERYBIG); 
-    	
-    	return unWanted;
-    }
-*/    
+
+    /**
+     * very inefficient method to locate asymptotes: given two t-values
+     * evaluate 100 values of expX, expY and expZ along the segment [t1,t2] and 
+     * determine their maximum and minimum; if one of the maxima is large positive and
+     * corresponding minimum is large negative, there must be an asymptote between t1 and t2   
+     * @param t1 first t-value
+     * @param t2 second t-value
+     * @param expX x-expression
+     * @param expY y-expression
+     * @param expZ z-expression
+     * @param paramNaam name of t-variable
+     * @return true/false
+     */
     public boolean isUnWanted(double t1, double t2, Expressie expX, Expressie expY, Expressie expZ, String paramNaam)
     {	
     	if (!checkForAsymptotes)
@@ -404,6 +466,9 @@ public class Curve3D extends Object3D
     	return unWanted;	
     }
     
+    /**
+     * make a deep copy of this Curve3D
+     */
     public Object3D deepCopy()
     {   Curve3D copy = new Curve3D();
         makeDeepObjectCopy(copy);

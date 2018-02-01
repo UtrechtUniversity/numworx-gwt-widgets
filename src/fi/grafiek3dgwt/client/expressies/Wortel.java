@@ -1,6 +1,5 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
 
 public class Wortel extends Expressie  
 {	
@@ -21,7 +20,7 @@ public class Wortel extends Expressie
 	}
 	
 	public double geefWaarde(double subst)
-	{	//return Math.sqrt(kind1.geefWaarde(subst));
+	{	
 		double d1 = kind1.geefWaarde(subst);
 		if(d1>=0)
 		{	return Math.sqrt(d1);
@@ -40,7 +39,7 @@ public class Wortel extends Expressie
 	}
 	
 	public double geefWaarde(double[] subst, String[] vars)
-	{	//return Math.sqrt(kind1.geefWaarde(subst,vars));
+	{	
 		double d1 = kind1.geefWaarde(subst,vars);
 		if(d1>=0)
 		{	return Math.sqrt(d1);

@@ -1,6 +1,5 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
 
 public class Bin extends Expressie  
 {	
@@ -29,14 +28,6 @@ public class Bin extends Expressie
 	public double geefWaarde()
 	{	int w1 = (int)Math.round(kind1.geefWaarde());
 		int w2 = (int)Math.round(kind2.geefWaarde());
-		/*
-		long teller = 1;
-		for(int i=w1 ; i>w1-w2 ; i--)	teller = teller*i;
-		long noemer = 1;
-		for(int i=w2 ; i>0 ; i--)	noemer = noemer*i;
-		System.out.println("" + teller + "/" + noemer);
-		return teller/noemer;
-		*/
 		return binom(w1, w2);
 	}
 	

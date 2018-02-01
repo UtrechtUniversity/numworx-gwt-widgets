@@ -1,5 +1,7 @@
 package fi.grafiek3dgwt.client.expressies;
 
+
+
 class PointLong
 
 {	long x, y;

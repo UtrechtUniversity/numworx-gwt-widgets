@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.logging.Logger;
 
-//import javax.swing.JComboBox;
-
-//import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -17,7 +14,6 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.dom.client.Style.Unit;
 
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -25,23 +21,12 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 
-import com.google.gwt.dom.client.Touch;
-import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
-import com.google.gwt.canvas.client.Canvas;
-import com.google.gwt.canvas.dom.client.CssColor;
-
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -55,40 +40,67 @@ import fi.grafiek3dgwt.client.expressies.*;
 
 import fi.grafiek3dgwt.client.text.Text;
 
+/**
+ * main class for Grafiek3DGWT; note that the Object3D which is shown 
+ * (a 3d-graph, 3d-surface or 3d-curve) is defined in the Java-version
+ * Grafiek3D inside the DWO; the user can also (optionally) look at  
+ * built-in examples of the 3 types of 3d-objects;
+ * the launch data also include possible options to modify the
+ * 3-d figure, such as zooming in or -out, translating the figure
+ * along of of the axes, showing the figure as a solid or a wireframe,
+ * refining the approximation to the figure, showing axes, 
+ * showing labels on the axes, choosing the type of projection.
+ * @author huub
+ */
+		
+
 public class Grafiek3DGWT implements EntryPoint, InteractionStub //, InteractionView
 {
+	/**
+	 * internationalization
+	 */
 	public static Text rb;
 	
 	static Logger logger = Logger.getLogger("Grafiek3DGWT");
 	
-	public static final String languageString = "nl";
-	public static String deployVariant = "";
+	public static String languageString = "nl";
 	
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
-	
-	// UI
+
+	/**
+	 * GUI: drawing in dlp-center, panels north and east
+	 */
 	DockLayoutPanel dlp;
 	LayoutPanel topPanel;
 	LayoutPanel rightPanel;
 	Grafiek3DComponent grafiek3DComponent;
 	
+	/**
+	 * GUI-components for topPanel: choosing the type of Object3D and the corresponding example list
+	 */
 	ListBox figuurKeuzeBox;
 	ListBox voorbeeldKeuzeBox;
+	/**
+	 * GUI-components for topPanel: label displaying the type of Object3D shown
+	 */
 	Label figuurKeuzeLabel;
-	//ListBox grafiekKeuzeBox, oppervlakKeuzeBox, krommeKeuzeBox;
-	
+
+	/**
+	 * arrayLists with predefined examples
+	 */
 	ArrayList<GrafiekVoorbeeld> grafiekVoorbeelden;
 	ArrayList<OppervlakVoorbeeld> oppervlakVoorbeelden;
 	ArrayList<KrommeVoorbeeld> krommeVoorbeelden;
 	
-	boolean voorbeeldenEnabled = true;
-	boolean functieTypeKeuze = true;
-	
-	int functieType = 0;
-	
+	/** 
+	 * predefined graph
+	 */
 	String graphString = "$f@";
+	/**
+	 * predefined surface
+	 */
 	String surfaceXString = "$f@";
 	String surfaceYString = "$f@";
 	String surfaceZString = "$f@";
@@ -98,6 +110,9 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 	String vMinString = "$f@";
 	String vMaxString = "$f@";
 	String vPointsString = "$f@";
+	/**
+	 * predefined curve
+	 */
 	String curveXString = "$f@";
 	String curveYString = "$f@";
 	String curveZString = "$f@";
@@ -105,10 +120,19 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 	String tMaxString = "$f@";
 	String tPointsString = "$f@";
 	
+	/**
+	 * very small double
+	 */
 	final double NZERO = 1e-5d;
 	
+	/**
+	 * width and height
+	 */
 	int breedte = 500;
 	int hoogte = 450;
+	/**
+	 * layout constants
+	 */
 	int topHeight = 32;
 	int rightWidth = 32;
 	int leftOffset = 5;
@@ -116,16 +140,27 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 	int figuurKeuzeWidth = 170;
 	int figuurKeuzeHeight = 22;
 	int voorbeeldKeuzeWidth = 200;
-	
 	int buttonSize = 22;
-	
+
+	/**
+	 * constants for type of Object3D 
+	 */
     public static final int FUNCTION = 0;
     public static final int SURFACE = 1;
     public static final int CURVE = 2;
+    /**
+     * actual type of Object3D (redundant)
+     */
 	int figuurKeuze = FUNCTION;
-	
+	int functieType = 0;
+	/**
+	 * actual type of Object3D-example
+	 */
 	int voorbeeldKeuze = 0;
 	
+	/**
+	 * launch data
+	 */
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
@@ -141,15 +176,35 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
     	  fijnerImage, groverImage, centraalImage, parallelImage,
     	  assenImage, geenAssenImage;
 	
+	/**
+	 * reset, zoom in, zoom out, finer, coarser
+	 */
 	PushButton resetButton, zoomInButton, zoomUitButton, fijnerButton, groverButton;
-	ToggleButton solidWireButton, projectieButton, assenButton;
+	/**
+	 * central/parallel projection
+	 */
+	ToggleButton projectieButton;
+	/**
+	 * solid/wireframe
+	 */
 	PushButton solidButton, wireButton;
+	/**
+	 * axes/no axes
+	 */
 	PushButton axesButton, noAxesButton;
 	
+	/**
+	 * translate along the positive, negative part of an axis
+	 */
 	PushButton transPlusButton, transMinButton;
+	/**
+	 * choice of axis to translate along (one only)
+	 */
 	ToggleButton xAsButton, yAsButton, zAsButton;
 	
-	// edit state variables
+	/**
+	 * launch state variables
+	 */
 	boolean zoomOptie = true;
 	boolean translateOptie = true;
 	boolean solidDraadKeuzeOptie = true;
@@ -158,21 +213,39 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 	boolean labelKeuzeOptie = true;
 	boolean projectieKeuzeOptie = true;
 	boolean kleurKeuzeOptie = true;
-	
 	boolean figuurIsDemo = false;
+	boolean voorbeeldenEnabled = true;
+	boolean functieTypeKeuze = true;
 	
+	/**
+	 * constants for translation of axes
+	 */
 	public static int XTRANS = 0;
 	public static int YTRANS = 1;
 	public static int ZTRANS = 2;
+	/**
+	 * actual translation axis
+	 */
 	int transDirection = XTRANS;
 
+	/** 
+	 * flagg for being on a tablet: used for preventing Mouse Events, since
+	 * Touch Events seem to generate Mouse Events, so everything is carried out twice 
+	 */
 	boolean touchStart = false;
-	
+
+	/**
+	 * flagg for examples being shown (necessary for correct reset
+	 */
 	boolean voorbeeldenUsed = false;
 	
 	public void getImages() 
 	{
 		rb = GWT.create(Text.class);
+
+		// trick
+		if (!rb.grafiekLabel().equals("grafiek"))
+			languageString = "en";
 		
 		grafiek3DGWTClientBundle = GWT.create(Grafiek3DGWTClientBundle.class);
 		grafiek3DGWTCss = grafiek3DGWTClientBundle.getGrafiek3DGWTCSS();
@@ -196,7 +269,6 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 		
 		solidResource = grafiek3DGWTClientBundle.solidResource();
 		solidImage = new Image(solidResource);
-		//solidImage.addStyleName(grafiek3DGWTCss.downimage());
 		solidImage.addStyleName(grafiek3DGWTCss.pushimage());
 		
 		fijnerResource = grafiek3DGWTClientBundle.fijnerResource();
@@ -213,7 +285,6 @@ public class Grafiek3DGWT implements EntryPoint, InteractionStub //, Interaction
 		
 		assenResource = grafiek3DGWTClientBundle.assenResource();
 		assenImage = new Image(assenResource);
-		//assenImage.addStyleName(grafiek3DGWTCss.downimage());
 		assenImage.addStyleName(grafiek3DGWTCss.pushimage());
 		
 		parallelResource = grafiek3DGWTClientBundle.parallelResource();
@@ -244,47 +315,21 @@ logger.info("grafiek3dgwt onModuleLoad");
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
-/*
-		grafiek3DComponent = new Grafiek3DComponent(this, breedte - rightWidth, hoogte - topHeight);
-
-		if (grafiek3DComponent.grafiek3DCanvas == null) 
-		{
-	      RootPanel.get(holderId).add(new Label(upgradeMessage));
-	      return;
-	    }
-		
-		// de eerste krijgt de volle hoogte cq breedte
-		rightPanel = new LayoutPanel();
-		rightPanel.addStyleName(grafiek3DGWTCss.right());
-
-		dlp.addEast(rightPanel, rightWidth);
-
-		topPanel = new LayoutPanel();
-		topPanel.addStyleName(grafiek3DGWTCss.bottom());
-
-		dlp.addNorth(topPanel, topHeight);
-		//dlp.addSouth(topPanel, topHeight);
-		
-		dlp.add(grafiek3DComponent.grafiek3DCanvas);		
-		
-		makeTop();
-		makeRight();
-		
-		processInput(voorbeeldKeuze);
-		
-*/			
 	}
-	
+
+	/**
+	 * create content of the right Panel with figure modifying options
+	 */
 	public void makeRight()
 	{
 		int currentX = leftOffset;
 		int currentY = topOffset;
 
+		// resetting
 		resetButton = new PushButton(resetImage);
-		
+
 	   	if ((zoomOptie || translateOptie) && !figuurIsDemo)
     	{
-	   		//resetButton = new PushButton(resetImage);
 			rightPanel.add(resetButton);
 			rightPanel.setWidgetLeftWidth(resetButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(resetButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -294,13 +339,12 @@ logger.info("grafiek3dgwt onModuleLoad");
     		currentY += buttonSize + topOffset;
     	}
 
+	   	// zooming in and out
 	   	zoomInButton = new PushButton(zoomInImage);
 	   	zoomUitButton = new PushButton(zoomUitImage);
 	   	
     	if (zoomOptie && !figuurIsDemo)
     	{
-    		
-	   		//zoomInButton = new PushButton(zoomInImage);
 			rightPanel.add(zoomInButton);
 			rightPanel.setWidgetLeftWidth(zoomInButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(zoomInButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -309,7 +353,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 	   		
     		currentY += buttonSize + topOffset;
     		
-	   		//zoomUitButton = new PushButton(zoomUitImage);
 			rightPanel.add(zoomUitButton);
 			rightPanel.setWidgetLeftWidth(zoomUitButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(zoomUitButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -320,6 +363,7 @@ logger.info("grafiek3dgwt onModuleLoad");
     		
     	}
 
+    	// translating the 3d-object along the axes
     	transPlusButton = new PushButton("+");
     	transPlusButton.addStyleName(grafiek3DGWTCss.pushbutton());
 		xAsButton = new ToggleButton("x", "X");
@@ -333,9 +377,6 @@ logger.info("grafiek3dgwt onModuleLoad");
     	
     	if (translateOptie && !figuurIsDemo)
     	{	
-    		
-	   		//transPlusButton = new PushButton("+");
-	   		//transPlusButton.addStyleName(grafiek3DGWTCss.pushbutton());
 			rightPanel.add(transPlusButton);
 			rightPanel.setWidgetLeftWidth(transPlusButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(transPlusButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -344,8 +385,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 	   		
     		currentY += buttonSize + topOffset;
     		
-    		//xAsButton = new ToggleButton("x", "X");
-    		//xAsButton.addStyleName(grafiek3DGWTCss.togglebutton());
 			rightPanel.add(xAsButton);
 			rightPanel.setWidgetLeftWidth(xAsButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(xAsButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -354,8 +393,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 			
     		currentY += buttonSize + topOffset;
     		
-    		//yAsButton = new ToggleButton("y", "Y");
-    		//yAsButton.addStyleName(grafiek3DGWTCss.togglebutton());
 			rightPanel.add(yAsButton);
 			rightPanel.setWidgetLeftWidth(yAsButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(yAsButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -364,8 +401,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 			
     		currentY += buttonSize + topOffset;
     		
-    		//zAsButton = new ToggleButton("z", "Z");
-    		//zAsButton.addStyleName(grafiek3DGWTCss.togglebutton());
 			rightPanel.add(zAsButton);
 			rightPanel.setWidgetLeftWidth(zAsButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(zAsButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -374,8 +409,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 			
     		currentY += buttonSize + topOffset;
     		
-	   		//transMinButton = new PushButton("-");
-	   		//transMinButton.addStyleName(grafiek3DGWTCss.pushbutton1());
 			rightPanel.add(transMinButton);
 			rightPanel.setWidgetLeftWidth(transMinButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(transMinButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -386,18 +419,12 @@ logger.info("grafiek3dgwt onModuleLoad");
     		
     	}
 
-    	solidWireButton = new ToggleButton(wireFrameImage, solidImage);
+    	// showing the 3d-object as a solid or a wireframe
     	solidButton = new PushButton(solidImage);
     	wireButton = new PushButton(wireFrameImage);
     	
     	if (solidDraadKeuzeOptie && !figuurIsDemo && functieType != CURVE)
     	{	
-    		//solidWireButton = new ToggleButton(wireFrameImage, solidImage);
-    		
-			//rightPanel.add(solidWireButton);
-			//rightPanel.setWidgetLeftWidth(solidWireButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
-			//rightPanel.setWidgetTopHeight(solidWireButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
-			
 			rightPanel.add(solidButton);
 			rightPanel.setWidgetLeftWidth(solidButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(solidButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -409,19 +436,19 @@ logger.info("grafiek3dgwt onModuleLoad");
 	   		
     		currentY += buttonSize + topOffset;
     		
-    		//solidWireButton.addMouseDownHandler(new ToggleMouseDownHandler());
-    		
     		solidButton.addMouseDownHandler(new PushMouseDownHandler());
     		wireButton.addMouseDownHandler(new PushMouseDownHandler());
 
     	}	
 
+    	/**
+    	 * refining the calciulating grid, only for 3d-graphs
+    	 */
     	fijnerButton = new PushButton(fijnerImage);
     	groverButton = new PushButton(groverImage);
     	
     	if (finerKeuzeOptie  && !figuurIsDemo && functieType == FUNCTION)	
     	{	
-	   		//fijnerButton = new PushButton(fijnerImage);
 			rightPanel.add(fijnerButton);
 			rightPanel.setWidgetLeftWidth(fijnerButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(fijnerButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -430,7 +457,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 			
     		currentY += buttonSize + topOffset;
     		
-	   		//groverButton = new PushButton(groverImage);
 			rightPanel.add(groverButton);
 			rightPanel.setWidgetLeftWidth(groverButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(groverButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -439,23 +465,14 @@ logger.info("grafiek3dgwt onModuleLoad");
 			
     		currentY += buttonSize + topOffset;
     		
-    		//if (grafiek3DComponent.xFinerStepsG == 2)
-    		//	groverButton.setEnabled(false);
     	}
     	
-    	assenButton = new ToggleButton(geenAssenImage, assenImage);
+    	// adding/omitting axes
     	axesButton = new PushButton(assenImage);
     	noAxesButton = new PushButton(geenAssenImage);
     	
     	if (asKeuzeOptie  && !figuurIsDemo)
     	{
-    		
-    		//assenButton = new ToggleButton(geenAssenImage, assenImage);
-    		
-			//rightPanel.add(assenButton);
-			//rightPanel.setWidgetLeftWidth(assenButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
-			//rightPanel.setWidgetTopHeight(assenButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
-			
 			rightPanel.add(axesButton);
 			rightPanel.setWidgetLeftWidth(axesButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(axesButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -468,28 +485,16 @@ logger.info("grafiek3dgwt onModuleLoad");
 	   		
     		currentY += buttonSize + topOffset;
     		
-    		assenButton.addMouseDownHandler(new ToggleMouseDownHandler());
     		axesButton.addMouseDownHandler(new PushMouseDownHandler());
     		noAxesButton.addMouseDownHandler(new PushMouseDownHandler());
     		
     	}
 
-/*    	
-    	if (labelKeuzeOptie)
-    	{	
-    		labelKeuzeButton.setBounds(5, currentY, 31, 21);
-    		labelKeuzeButton.setVisible(true);
-    		currentY += 31;
-    	}
-*/    	
-    	
+    	// choosing the projection (central/parallel)
 		projectieButton = new ToggleButton(parallelImage, centraalImage);
 		
     	if (projectieKeuzeOptie && !figuurIsDemo)
     	{
-    		
-    		//projectieButton = new ToggleButton(parallelImage, centraalImage);
-    		
 			rightPanel.add(projectieButton);
 			rightPanel.setWidgetLeftWidth(projectieButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 			rightPanel.setWidgetTopHeight(projectieButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
@@ -499,39 +504,35 @@ logger.info("grafiek3dgwt onModuleLoad");
     		projectieButton.addMouseDownHandler(new ToggleMouseDownHandler());
     		
     	}
-
-/*    	
-    	if (kleurKeuzeOptie && (objectType != CURVE))
-    	{	
-    		kleurKeuzeButton.setBounds(5, currentY, 31, 21);
-    		kleurKeuzeButton.setVisible(true);
-    		currentY += 31;
-    	}
-    	
-*/    	
  		
 	}
 	
+	/**
+	 * create the content of the top Panel: in case of examples, checkboxes for
+	 * choice of 3d-object (graph, surface, curve) and corresponding choice of 
+	 * example, or just a label indicating the kind of 3d-object (graph, surface, curve)
+	 * shown 
+	 */
 	public void makeTop()
 	{
 		int currentX = leftOffset;
 		int currentY = topOffset;
 		
 		figuurKeuzeBox = new ListBox();
-		figuurKeuzeBox.addItem("grafiek");
-		figuurKeuzeBox.addItem("oppervlak");
-		figuurKeuzeBox.addItem("kromme");
+		figuurKeuzeBox.addItem(rb.grafiekLabel()); //"grafiek");
+		figuurKeuzeBox.addItem(rb.oppervlakLabel()); //"oppervlak");
+		figuurKeuzeBox.addItem(rb.krommeLabel()); //"kromme");
 		
 		figuurKeuzeBox.setVisibleItemCount(1);
 		figuurKeuzeBox.setSelectedIndex(functieType);
 		
 		String figuurKeuzeTekst = "";
 		if (functieType == FUNCTION)
-			figuurKeuzeTekst = "grafiek";
+			figuurKeuzeTekst = rb.grafiekLabel(); //"grafiek";
 		else if (functieType == SURFACE)
-			figuurKeuzeTekst = "oppervlak";
+			figuurKeuzeTekst = rb.oppervlakLabel(); //"oppervlak";
 		else if (functieType == CURVE)
-			figuurKeuzeTekst = "kromme";
+			figuurKeuzeTekst = rb.krommeLabel(); //"kromme";
 		figuurKeuzeLabel = new Label(figuurKeuzeTekst);
 		figuurKeuzeLabel.addStyleName(grafiek3DGWTCss.label());
 		
@@ -560,10 +561,13 @@ logger.info("grafiek3dgwt onModuleLoad");
 		voorbeeldKeuzeBox = new ListBox();
 		voorbeeldKeuzeBox.addItem("voorbeelden");
 		for (int gCnt = 0; gCnt < grafiekVoorbeelden.size(); gCnt++)
-		{	String name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).nlNaam;
+		{	String name = "";
+			if (languageString.equals("nl"))
+				name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).nlNaam;
+			else 
+				name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).enNaam;
 			voorbeeldKeuzeBox.addItem(name);
 		}
-//System.out.println("gv = " + grafiekVoorbeelden.size());
 		
 		voorbeeldKeuzeBox.setVisibleItemCount(1);
 
@@ -575,51 +579,6 @@ logger.info("grafiek3dgwt onModuleLoad");
 			topPanel.setWidgetTopHeight(voorbeeldKeuzeBox, currentY, Style.Unit.PX, figuurKeuzeHeight, Style.Unit.PX);
 			voorbeeldKeuzeBox.addChangeHandler(new ListChangeHandler());
 		}	
-	
-/*		
-		grafiekKeuzeBox = new ListBox();
-		for (int gCnt = 0; gCnt < grafiekVoorbeelden.size(); gCnt++)
-		{	String name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).nlNaam;
-			grafiekKeuzeBox.addItem(name);
-		}
-		
-		topPanel.add(grafiekKeuzeBox);
-		topPanel.setWidgetLeftWidth(grafiekKeuzeBox, currentX, Style.Unit.PX, voorbeeldKeuzeWidth, Style.Unit.PX);
-		topPanel.setWidgetTopHeight(grafiekKeuzeBox, currentY, Style.Unit.PX, figuurKeuzeHeight, Style.Unit.PX);
-
-		grafiekKeuzeBox.addTouchStartHandler(new ListTouchStartHandler());
-		grafiekKeuzeBox.addMouseDownHandler(new ListMouseDownHandler());
-		
-		oppervlakKeuzeBox = new ListBox();
-		for (int gCnt = 0; gCnt < oppervlakVoorbeelden.size(); gCnt++)
-		{	String name = ((OppervlakVoorbeeld) oppervlakVoorbeelden.get(gCnt)).nlNaam;
-			oppervlakKeuzeBox.addItem(name);
-		}
-		
-		topPanel.add(oppervlakKeuzeBox);
-		topPanel.setWidgetLeftWidth(oppervlakKeuzeBox, currentX, Style.Unit.PX, voorbeeldKeuzeWidth, Style.Unit.PX);
-		topPanel.setWidgetTopHeight(oppervlakKeuzeBox, currentY, Style.Unit.PX, figuurKeuzeHeight, Style.Unit.PX);
-
-		oppervlakKeuzeBox.addTouchStartHandler(new ListTouchStartHandler());
-		oppervlakKeuzeBox.addMouseDownHandler(new ListMouseDownHandler());
-		
-		oppervlakKeuzeBox.setVisible(false);
-		
-		krommeKeuzeBox = new ListBox();
-		for (int gCnt = 0; gCnt < krommeVoorbeelden.size(); gCnt++)
-		{	String name = ((KrommeVoorbeeld) krommeVoorbeelden.get(gCnt)).nlNaam;
-		krommeKeuzeBox.addItem(name);
-		}
-		
-		topPanel.add(krommeKeuzeBox);
-		topPanel.setWidgetLeftWidth(krommeKeuzeBox, currentX, Style.Unit.PX, voorbeeldKeuzeWidth, Style.Unit.PX);
-		topPanel.setWidgetTopHeight(krommeKeuzeBox, currentY, Style.Unit.PX, figuurKeuzeHeight, Style.Unit.PX);
-
-		krommeKeuzeBox.addTouchStartHandler(new ListTouchStartHandler());
-		krommeKeuzeBox.addMouseDownHandler(new ListMouseDownHandler());
-		
-		krommeKeuzeBox.setVisible(false);
-*/		
 		
 		currentX += voorbeeldKeuzeWidth + leftOffset;
 	}
@@ -666,6 +625,7 @@ logger.info("Grafiek3DGWT init");
 
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 
+		// parametriation
 		if (launchState.containsKey("zoomOptie"))
 			zoomOptie = launchState.getBoolean("zoomOptie");
 		if (launchState.containsKey("translateOptie"))
@@ -683,7 +643,6 @@ logger.info("Grafiek3DGWT init");
 		if (launchState.containsKey("kleurKeuzeOptie"))
 			kleurKeuzeOptie = launchState.getBoolean("kleurKeuzeOptie");
 
-		
 		if (launchState.containsKey("voorbeeldenEnabled"))
 			voorbeeldenEnabled = launchState.getBoolean("voorbeeldenEnabled");
 		if (launchState.containsKey("functieTypeKeuze"))
@@ -694,13 +653,14 @@ logger.info("Grafiek3DGWT init");
 			
 		if (launchState.containsKey("functieType")) 
 		{	functieType = launchState.getInt("functieType");
-//System.out.println("ft = " + functieType);		
 		}
 		figuurKeuze = functieType;
-		
+
+		// predefined graph
 		if (launchState.containsKey("graphString")) 
 			graphString = launchState.getString("graphString");
 
+		// predefined surface
 		if (launchState.containsKey("surfaceXString")) 
 			surfaceXString = launchState.getString("surfaceXString");
 		if (launchState.containsKey("surfaceYString")) 
@@ -749,7 +709,6 @@ logger.info("Grafiek3DGWT init");
 	      return;
 	    }
 		
-		// de eerste krijgt de volle hoogte cq breedte
 		rightPanel = new LayoutPanel();
 		rightPanel.addStyleName(grafiek3DGWTCss.right());
 
@@ -766,14 +725,10 @@ logger.info("Grafiek3DGWT init");
 
 		if (!figuurIsDemo)
 			makeTop();
-		//if (!figuurIsDemo)
+
 		makeRight();
 		
-		//processInput(voorbeeldKeuze);
-		
-//logger.info("Grafiek3DGWT init before g3d.setState");		
 		grafiek3DComponent.setState(map, false);
-//logger.info("Grafiek3DGWT init after g3d.setState");
 		
 		grafiek3DComponent.resetState = (HashMap) map;
 		
@@ -782,7 +737,6 @@ logger.info("Grafiek3DGWT init");
 		processLaunchInput();
 logger.info("Grafiek3DGWT init after processLaunch");		
 		
-//System.out.println("g3DC graphColor = " + grafiek3DComponent.graphColor.toString());
 		
 		dlp.forceLayout();
 		
@@ -790,6 +744,9 @@ logger.info("Grafiek3DGWT init after processLaunch");
 
 	}
 	
+	/**
+	 * create the 3d-graph examples
+	 */
 	public void maakGrafiekVoorbeelden()
 	{
 		grafiekVoorbeelden = new ArrayList<GrafiekVoorbeeld>();		
@@ -809,7 +766,10 @@ logger.info("Grafiek3DGWT init after processLaunch");
 		
 		
 	}
-	
+
+	/**
+	 * create the 3d-surface examples
+	 */
 	public void maakOppervlakVoorbeelden()
 	{
 		oppervlakVoorbeelden = new ArrayList<OppervlakVoorbeeld>();
@@ -836,7 +796,10 @@ logger.info("Grafiek3DGWT init after processLaunch");
 		oppervlakVoorbeelden.add(oppervlakVoorbeeld10);
 		
 	}
-	
+
+	/**
+	 * create the 3d-curve examples
+	 */
 	public void maakKrommeVoorbeelden()
 	{
 		krommeVoorbeelden = new ArrayList<KrommeVoorbeeld>();		
@@ -852,6 +815,11 @@ logger.info("Grafiek3DGWT init after processLaunch");
 		
 	}
 
+	/**
+	 * show the example list corresponding to the type of 3d-object;
+	 * take care of internationalisation
+	 * @param type 3d-graph/3d-surface/3d-curve
+	 */
 	public void toonVoorbeeldenBox(int type)
 	{
 		voorbeeldKeuzeBox.clear();
@@ -860,60 +828,71 @@ logger.info("Grafiek3DGWT init after processLaunch");
 		{
 			voorbeeldKeuzeBox.addItem("voorbeelden");
 			for (int gCnt = 0; gCnt < grafiekVoorbeelden.size(); gCnt++)
-			{	String name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).nlNaam;
+			{	String name = "";
+				if (languageString.equals("nl"))
+					name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).nlNaam;
+				else
+					name = ((GrafiekVoorbeeld) grafiekVoorbeelden.get(gCnt)).enNaam;
 				voorbeeldKeuzeBox.addItem(name);
 			}
-			
-			//grafiekKeuzeBox.setVisible(true);
-			//oppervlakKeuzeBox.setVisible(false);
-			//krommeKeuzeBox.setVisible(false);
 			
 		}
 		else if (type == SURFACE)
 		{
 			voorbeeldKeuzeBox.addItem("voorbeelden");
 			for (int oCnt = 0; oCnt < oppervlakVoorbeelden.size(); oCnt++)
-			{	String name = ((OppervlakVoorbeeld) oppervlakVoorbeelden.get(oCnt)).nlNaam;
+			{	String name = "";
+				if (languageString.equals("nl"))
+					name = ((OppervlakVoorbeeld) oppervlakVoorbeelden.get(oCnt)).nlNaam;
+				else
+					name = ((OppervlakVoorbeeld) oppervlakVoorbeelden.get(oCnt)).enNaam;
 				voorbeeldKeuzeBox.addItem(name);
 
 			}
-			
-			//grafiekKeuzeBox.setVisible(false);
-			//oppervlakKeuzeBox.setVisible(true);
-			//krommeKeuzeBox.setVisible(false);
-			
 			
 		}
 		else if (type == CURVE)
 		{
 			voorbeeldKeuzeBox.addItem("voorbeelden");
 			for (int kCnt = 0; kCnt < krommeVoorbeelden.size(); kCnt++)
-			{	String name = ((KrommeVoorbeeld) krommeVoorbeelden.get(kCnt)).nlNaam;
+			{	String name = "";
+				if (languageString.equals("nl"))
+					name = ((KrommeVoorbeeld) krommeVoorbeelden.get(kCnt)).nlNaam;
+				else
+					name = ((KrommeVoorbeeld) krommeVoorbeelden.get(kCnt)).enNaam;
 				voorbeeldKeuzeBox.addItem(name);
 			}
 
-			//grafiekKeuzeBox.setVisible(false);
-			//oppervlakKeuzeBox.setVisible(false);
-			//krommeKeuzeBox.setVisible(true);
-			
 		}
 		
 		voorbeeldKeuze = 0;
 	}
-	
-	public void zetTestString(String ts)
-	{
-		grafiek3DComponent.panel3D.testString = ts;
-	}
-	
+
+	/**
+	 * create and show the example of index i belonging to the current value
+	 * of figuurKeuze
+	 * @param voorbeeldKeuze the index of the example
+	 */
 	public void processInput(int voorbeeldKeuze)
 	{
 		voorbeeldenUsed = true;
 		
 		// knoppen terugzetten
-		solidWireButton.setDown(false);
+		if (solidDraadKeuzeOptie)	
+		{	if (solidButton.getParent() == rightPanel)
+				rightPanel.setWidgetVisible(solidButton,false);
+			if (wireButton.getParent() == rightPanel)
+				rightPanel.setWidgetVisible(wireButton,true);
+		}	
+		
 		projectieButton.setDown(false);
-		assenButton.setDown(false);
+		
+		if (asKeuzeOptie)
+		{	if (axesButton.getParent() == rightPanel)
+				rightPanel.setWidgetVisible(axesButton,false);
+			if (noAxesButton.getParent() == rightPanel)
+				rightPanel.setWidgetVisible(noAxesButton,true);
+		}	
 		
 		// zet alles op null
 		grafiek3DComponent.zetGrafiek3D(null);
@@ -927,13 +906,10 @@ logger.info("Grafiek3DGWT init after processLaunch");
 		{	
 			GrafiekVoorbeeld gv = (GrafiekVoorbeeld) grafiekVoorbeelden.get(voorbeeldKeuze);
 			Expressie exp = FormuleParser.geefExpressie(gv.graphString);
-			//Expressie exp = gv;
 			
 			grafiek3DComponent.objectType = FUNCTION;
 			grafiek3DComponent.zetGrafiekVoorbeeld(gv);
 			grafiek3DComponent.zetGrafiek3D(exp);
-			
-			//grafiek3DComponent.panel3D.repaint();
 				
 		}
 		else if (figuurKeuze == SURFACE)
@@ -962,8 +938,6 @@ logger.info("Grafiek3DGWT init after processLaunch");
 			grafiek3DComponent.zetOppervlakVoorbeeld(ov);
 			grafiek3DComponent.zetSurface3D(expX, expY, expZ, uMin, uMax, uPoints, vMin, vMax, vPoints);
 			
-			//grafiek3DComponent.panel3D.repaint();
-			
 		}
 		else if (figuurKeuze == CURVE)
 		{	
@@ -983,14 +957,13 @@ logger.info("Grafiek3DGWT init after processLaunch");
 			grafiek3DComponent.zetKrommeVoorbeeld(kv);
 			grafiek3DComponent.zetCurve3D(expX, expY, expZ, tMin, tMax, tPoints);
 			
-			//grafiek3DComponent.panel3D.repaint();
-			
 		}
-		
-		
 		
 	}
 
+	/**
+	 * create and show the 3d-object contained in the launch data
+	 */
 	public void processLaunchInput()
 	{
 		
@@ -1001,9 +974,6 @@ logger.info("Grafiek3DGWT init after processLaunch");
 			grafiek3DComponent.objectType = FUNCTION;
 			grafiek3DComponent.zetGrafiek3D(exp);
 			
-			//grafiek3DComponent.zetVulKleur(grafiek3DComponent.graphColor, grafiek3DComponent.objectType);
-			
-//System.out.println("g3DC zetVulKleur " + grafiek3DComponent.graphColor.toString());			
 			
 		}
 		else if (functieType == SURFACE)
@@ -1029,38 +999,33 @@ logger.info("Grafiek3DGWT init after processLaunch");
 			grafiek3DComponent.objectType = SURFACE;
 			grafiek3DComponent.zetSurface3D(expX, expY, expZ, uMin, uMax, uPoints, vMin, vMax, vPoints);
 			
-			//grafiek3DComponent.zetVulKleur(grafiek3DComponent.surfaceColor, grafiek3DComponent.objectType);
-			
 			
 		}
 		else if (functieType == CURVE)
 		{	
 			
-logger.info("Grafiek3DGWT processLaunch curve");			
 			Expressie expX = FormuleParser.geefExpressie(curveXString);
 			Expressie expY = FormuleParser.geefExpressie(curveYString);
 			Expressie expZ = FormuleParser.geefExpressie(curveZString);
-logger.info("Grafiek3DGWT processLaunch expressies");			
+			
 			Expressie expTMin = FormuleParser.geefExpressie(tMinString);
 			double tMin = expTMin.geefWaarde();
-logger.info("Grafiek3DGWT processLaunch tMin");			
 			Expressie expTMax = FormuleParser.geefExpressie(tMaxString);
 			double tMax = expTMax.geefWaarde();
-logger.info("Grafiek3DGWT processLaunch tMax");			
 			Expressie expTPointsDouble = FormuleParser.geefExpressie(tPointsString);
 			int tPoints = (int) Math.round(expTPointsDouble.geefWaarde());
-logger.info("Grafiek3DGWT processLaunch tPoints");			
 			
 			grafiek3DComponent.objectType = CURVE;
 			grafiek3DComponent.zetCurve3D(expX, expY, expZ, tMin, tMax, tPoints);
-logger.info("Grafiek3DGWT processLaunch zetCurve");			
 			
 		}
 		
-		
-		
 	}
 
+	/**
+	 * only one of xAsButton, yAsButton, zAsButton can be down
+	 * @param tb Togglebutton set to down
+	 */
    	void buttonsUp(ToggleButton tb)
    	{
    		if (!xAsButton.equals(tb))
@@ -1071,11 +1036,14 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
    			zAsButton.setDown(false);
    	}
 	
+	/**
+	 * inner class handling Mouse Down Events on the modify ToggleButtons in the right Panel
+	 * @author huub
+	 */
 	class ToggleMouseDownHandler implements MouseDownHandler
 	{
 		public void onMouseDown(MouseDownEvent e)
 		{
-			// deze LIJKT niet nodig (mag wel)
 			//e.preventDefault();
 			// deze zorgt dat je niet scollt in de DWOPlayer
 			e.stopPropagation();
@@ -1101,37 +1069,6 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 					transDirection = ZTRANS;
 				}
 			}
-			else if (e.getSource() == solidWireButton)
-			{
-				
-//System.out.println("swDown = " + solidWireButton.isDown());
-
-				if (!solidWireButton.isDown())
-				{
-//System.out.println("swDown true " + solidWireButton.isDown());					
-					grafiek3DComponent.zetDraadFiguur(true, figuurKeuze);
-//System.out.println("swDown true = " + solidWireButton.isDown());		
-
-				}
-				else
-				{
-//System.out.println("swDown false = " + solidWireButton.isDown());					
-					grafiek3DComponent.zetDraadFiguur(false, figuurKeuze);
-//System.out.println("swDown false = " + solidWireButton.isDown());
-
-				}
-			}
-			else if (e.getSource() == assenButton)
-			{
-				if (!assenButton.isDown())
-				{
-					grafiek3DComponent.zetGeenAssen(true, figuurKeuze);
-				}
-				else
-				{
-					grafiek3DComponent.zetxyzAs(true, figuurKeuze);
-				}
-			}
 			else if (e.getSource() == projectieButton)
 			{
 				if (!projectieButton.isDown())
@@ -1149,6 +1086,10 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 		}
 	}
 
+	/**
+	 * inner class handling Mouse Down Events on the modify PushButtons in the right Panel
+	 * @author huub
+	 */
 	class PushMouseDownHandler implements MouseDownHandler
 	{
 		public void onMouseDown(MouseDownEvent e)
@@ -1156,8 +1097,6 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 			if (touchStart)
 				return;
 			
-			// deze LIJKT niet nodig (mag wel)
-			//e.preventDefault();
 			// deze zorgt dat je niet scollt in de DWOPlayer
 			e.stopPropagation();
 
@@ -1274,13 +1213,15 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 		}
 	}
 
-	//class ListMouseDownHandler implements MouseDownHandler
+	/**
+	 * inner class handling Change Events on the figuurKeuzeBox or
+	 * the voorbeeldKeuzeBox 
+	 * @author huub
+	 */
 	class ListChangeHandler implements ChangeHandler
 	{
-		//public void onMouseDown(MouseDownEvent e)
 		public void onChange(ChangeEvent e)
 		{
-			// deze LIJKT niet nodig (mag wel)
 			//e.preventDefault();
 			
 			// deze zorgt dat je niet scollt in de DWOPlayer
@@ -1296,16 +1237,12 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 					
 					toonVoorbeeldenBox(FUNCTION);
 					
-					//processInput(voorbeeldKeuze);
-					
 				}
 				else if ((index == 1) && (figuurKeuze != SURFACE))
 				{
 					figuurKeuze = SURFACE;
 
 					toonVoorbeeldenBox(SURFACE);
-					
-					//processInput(voorbeeldKeuze);
 					
 				}
 				else if ((index == 2) && (figuurKeuze != CURVE))
@@ -1314,8 +1251,6 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 
 					toonVoorbeeldenBox(CURVE);					
 					
-					//processInput(voorbeeldKeuze);
-					
 				}
 				
 			}
@@ -1323,21 +1258,22 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 			{
 				int index = voorbeeldKeuzeBox.getSelectedIndex();
 				
-				//if ((index - 1) != voorbeeldKeuze)
-				//{
-					voorbeeldKeuze = index - 1;
+				voorbeeldKeuze = index - 1;
 				 
-					processInput(voorbeeldKeuze);
-				//}	
+				processInput(voorbeeldKeuze);
 			}
 		}
 	}
 
+	/**
+	 * inner class handling Touch Start Events on the modify ToggleButtons in the right Panel
+	 * @author huub
+	 */
 	class ToggleTouchStartHandler implements TouchStartHandler
 	{
 		public void onTouchStart(TouchStartEvent e)
 		{
-			// deze LIJKT niet nodig (mag wel)
+
 			//e.preventDefault();
 			// deze zorgt dat je niet scollt in de DWOPlayer
 			e.stopPropagation();
@@ -1363,28 +1299,6 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 					transDirection = ZTRANS;
 				}
 			}
-			else if (e.getSource() == solidWireButton)
-			{
-				if (!solidWireButton.isDown())
-				{
-					grafiek3DComponent.zetDraadFiguur(true, figuurKeuze);
-				}
-				else
-				{
-					grafiek3DComponent.zetDraadFiguur(false, figuurKeuze);
-				}
-			}
-			else if (e.getSource() == assenButton)
-			{
-				if (!assenButton.isDown())
-				{
-					grafiek3DComponent.zetGeenAssen(true, figuurKeuze);
-				}
-				else
-				{
-					grafiek3DComponent.zetxyzAs(true, figuurKeuze);
-				}
-			}
 			else if (e.getSource() == projectieButton)
 			{
 				if (!projectieButton.isDown())
@@ -1402,15 +1316,17 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 		}
 	}
 
+	/**
+	 * inner class handling Touch Start Events on the modify PushButtons in the right Panel
+	 * @author huub
+	 */
 	class PushTouchStartHandler implements TouchStartHandler
 	{
 		public void onTouchStart(TouchStartEvent e)
 		{
 			touchStart = true;
 			
-			// deze LIJKT niet nodig (mag wel)
-			//e.preventDefault();
-			// deze zorgt dat je niet scollt in de DWOPlayer
+			// deze zorgt dat je niet scrollt in de DWOPlayer
 			e.stopPropagation();
 
 			if (e.getSource() == resetButton)
@@ -1419,10 +1335,22 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 				figuurKeuze = functieType;
 				toonVoorbeeldenBox(functieType);
 				voorbeeldKeuzeBox.setSelectedIndex(0);
-				
-				solidWireButton.setDown(false);
+
+				if (solidDraadKeuzeOptie)	
+				{	if (solidButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(solidButton,false);
+					if (wireButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(wireButton,true);
+				}	
+
 				projectieButton.setDown(false);
-				assenButton.setDown(false);
+
+				if (asKeuzeOptie)
+				{	if (axesButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(axesButton,false);
+					if (noAxesButton.getParent() == rightPanel)
+						rightPanel.setWidgetVisible(noAxesButton,true);
+				}	
 
 				grafiek3DComponent.zetGrafiek3D(null);
 				grafiek3DComponent.zetSurface3D(null, null, null, 0, 0, 0, 0, 0, 0);
@@ -1513,112 +1441,53 @@ logger.info("Grafiek3DGWT processLaunch zetCurve");
 		}
 	}
 	
-	class ListTouchStartHandler implements TouchStartHandler
-	{
-		public void onTouchStart(TouchStartEvent e)
-		{
-    		// DIT NIET toevoegen!!
-    		//e.preventDefault();
-			e.stopPropagation();
-
-			if (e.getSource() == figuurKeuzeBox)
-			{
-				int index = figuurKeuzeBox.getSelectedIndex();
-				
-				if ((index == 0) && (figuurKeuze != FUNCTION))
-				{
-					figuurKeuze = FUNCTION;
-					
-					toonVoorbeeldenBox(FUNCTION);
-					
-					//processInput(voorbeeldKeuze);
-					
-				
-				}
-				else if ((index == 1) && (figuurKeuze != SURFACE))
-				{
-					figuurKeuze = SURFACE;
-
-					toonVoorbeeldenBox(SURFACE);
-					
-					//processInput(voorbeeldKeuze);
-					
-				}
-				else if ((index == 2) && (figuurKeuze != CURVE))
-				{
-					figuurKeuze = CURVE;
-
-					toonVoorbeeldenBox(CURVE);					
-					
-					//processInput(voorbeeldKeuze);
-					
-				}
-			}	
-			else if (e.getSource() == voorbeeldKeuzeBox)
-			{
-				int index = voorbeeldKeuzeBox.getSelectedIndex();
-				
-				if ((index - 1) != voorbeeldKeuze)
-				{
-					voorbeeldKeuze = index - 1;
-				 
-					processInput(voorbeeldKeuze);
-				}
-			}
-			
-		}
-	}
-
 	public Widget asWidget()
-	{
-		return dlp;
+	{	return dlp;
 	}
 	
-	@Override
+	/**
+	 * get the viewing options for the 3d-object from the launch data; 
+	 * if the user plays with examples, this playing is not saved     
+	 */
 	public HashMap<String, Object> getState()
 	{
-System.out.println("g3D getState");
-
 		if (!voorbeeldenUsed)
 			return grafiek3DComponent.getState();
 		else
 			return grafiek3DComponent.resetState;
 	}
 
-	@Override
+	/**
+	 * set the viewing options for the 3d-object from the launch data; see method getState()
+	 */
 	public void setState(HashMap<String, Object> h)
 	{
 		if(h == null || h.isEmpty()) 
 			return;
-System.out.println("g3D setState");		
 		grafiek3DComponent.setState(h,true);
 
 	}
 
 	@Override
 	public int getScore()
-	{
-		// TODO Auto-generated method stub
+	{	// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public Boolean isCorrect()
-	{
-		// TODO Auto-generated method stub
+	{	// TODO Auto-generated method stub
 		return Boolean.TRUE;
 	}
 	
 	@Override
 	public void kijkNa() 
 	{		 
-
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
-	{
-		// TODO Auto-generated method stub
+	{	// TODO Auto-generated method stub
 
 	}
 	
@@ -1633,16 +1502,12 @@ System.out.println("g3D setState");
 		return 0;
 	}
 
-	@Override
 	public int getHeight() 
-	{
-		return hoogte;
+	{	return hoogte;
 	}
 
-	@Override
 	public int getWidth() 
-	{
-		return breedte;
+	{	return breedte;
 	}
 
 	@Override
@@ -1651,13 +1516,12 @@ System.out.println("g3D setState");
 		
 	}
 	
-	//@Override
+	@Override
 	public void zetNagekeken(boolean b) {
 	}
 
-	
 
-	//@Override
+	@Override
 	public int[][] getScoreObjectives() {
 		return null;
 	}
@@ -1665,57 +1529,3 @@ System.out.println("g3D setState");
 
 }
 
-class Point
-{
-	int x; int y;
-	
-	public Point()
-	{
-		x = 0; y = 0;
-	}
-	
-	public Point(int x, int y)
-	{
-		this.x = x; this.y = y;
-	}
-	
-    // redefine for method contains in Vector     
-    // equality of this Point and Point obj
-    public boolean equals(Object obj)
-    {    if (obj instanceof Point)
-             return (x == ((Point) obj).x) && (y == ((Point) obj).y);
-         return false;    
-    }
-	
-}
-
-class Rectangle
-{
-	int x; int y; int width; int height;
-	
-	public Rectangle(int x, int y, int w, int h)
-	{
-		this.x = x; this.y = y;
-		width = w; height = h;
-	}
-	
-	public Rectangle(Rectangle r)
-	{
-		x = r.x;
-		y = r.y;
-		width = r.width;
-		height = r.height;
-	}
-	
-	public boolean contains(int px, int py)
-	{
-		return (px >= x) && (px <= (x + width)) &&
-		       (py >= y) && (py <= (y + height));
-	}
-	
-	public void translate(int dx, int dy)
-	{
-		x += dx;
-		y += dy;
-	}
-}

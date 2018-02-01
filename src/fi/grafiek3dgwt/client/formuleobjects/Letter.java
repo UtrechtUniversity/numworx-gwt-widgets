@@ -3,13 +3,12 @@ package fi.grafiek3dgwt.client.formuleobjects;
 /** Utility class, replacement for java.lang.Character.isXXX() methods.
  * @author Wim van Velthoven
  */
-public class Letter {
+public class Letter 
+{
 	private Letter() {}
-
 
 	/**
      * A better implementation of isLetter -- the default GWT version doesn't support non-English characters.
-     *
      * @param c the character to check
      * @return whether the character represents and alphabetic symbol.
      */

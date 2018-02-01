@@ -4,7 +4,6 @@ public class Complex
 {
 	/*
 	*   Class   Complex
-	*
 	*   Defines a complex number as an object and includes
 	*   the methods needed for standard complex arithmetic
 	*
@@ -21,7 +20,6 @@ public class Complex
 	*   See Michael T Flanagan's Java library on-line web pages:
 	*   http://www.ee.ucl.ac.uk/~mflanaga/java/Complex.html
 	*   http://www.ee.ucl.ac.uk/~mflanaga/java/
-	*
 	*   Copyright (c) February 2002, April 2007    Michael Thomas Flanagan
 	*
 	*   PERMISSION TO COPY:
@@ -56,8 +54,7 @@ public class Complex
 	                                            //      standard arithmetic performed
 
 
-	/*********************************************************/
-
+	
 	        // CONSTRUCTORS
 	        // default constructor - real and imag = zero
 	        public Complex()
@@ -87,8 +84,7 @@ public class Complex
 	                this.imag = c.imag;
 	        }
 
-	/*********************************************************/
-
+	
 	        // PUBLIC METHODS
 
 	        // SET VALUES

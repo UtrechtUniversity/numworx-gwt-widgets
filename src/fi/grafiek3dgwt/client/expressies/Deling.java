@@ -1,6 +1,5 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
 
 public class Deling extends Expressie  
 {	

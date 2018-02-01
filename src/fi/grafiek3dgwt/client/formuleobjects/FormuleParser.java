@@ -1,18 +1,6 @@
 package fi.grafiek3dgwt.client.formuleobjects;
 
-import java.awt.*;
-import java.awt.event.*;
-//import java.util.Hashtable;
 import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.Vector;
-
-//import fi.grafiek3dtest.expressies.*;
-//import fi.grafiek3dtest.Grafiek3DTest;
-//import fi.beans.stringutils.*;
-
-
-
 
 import fi.grafiek3dgwt.client.Grafiek3DGWT;
 import fi.grafiek3dgwt.client.expressies.*;
@@ -52,7 +40,6 @@ public class FormuleParser
 			s = s.substring(2,s.length()-1);
 			if(s.length()==0)return null;
 			String[] vergelijkingStrings = s.split("of");
-			//StringUtils.split(s,WiskOpdr.rb.getString("ofLabel"));
 			Vergelijking[] vergelijkingen = new Vergelijking[vergelijkingStrings.length];
 			
 			for(int j=0 ; j<vergelijkingStrings.length; j++) 
@@ -61,7 +48,6 @@ public class FormuleParser
 				if(index1>-1 && index2>index1)
 				{	
 					String[] expressieStrings = vergelijkingStrings[j].substring(index1 + 1, index2).split(":");
-					//String[] expressieStrings = StringUtils.split(vergelijkingStrings[j].substring(index1+1,index2),":");
 					if(expressieStrings.length==3)
 					{	Expressie e1 = parse(schoon(formuleString("$f" + expressieStrings[0] + "@")));
 			    		Expressie e2 = parse(schoon(formuleString("$f" + expressieStrings[1] + "@")));
@@ -103,14 +89,13 @@ public class FormuleParser
 		    {	boolean split = false;
 			    for(int j=0 ; j<vergTekens.length && !split  && vergelijkingen[i]==null; j++)
 			    {	String[] expressieStrings  = vergelijkingStrings[i].split(vergTekens[j]);
-			    	//StringUtils.split(vergelijkingStrings[i],vergTekens[j]);
 			    	if(expressieStrings.length==2)
-			    	{	//if(expressieStrings[1].trim().equals(WiskOpdr.rb.getString("antwoordModelGeen"))) expressieStrings[1] = "0.1234567";
+			    	{	
 				    	if(expressieStrings[1].trim().equals("geen") || expressieStrings[1].trim().equals("none")) expressieStrings[1] = "0.1234567";
 			    		Expressie e1 = null;
 			    		Expressie e2 = null;
 			    		String[] eindoplStrings = expressieStrings[1].split("::"); 
-			    		//StringUtils.split(expressieStrings[1],"::");
+			    		
 			    		int aantalEO = eindoplStrings.length;
 			    		if(aantalEO>1)
 			    		{ 	Expressie[] eindoplossingen = new Expressie[aantalEO];
@@ -394,10 +379,6 @@ public class FormuleParser
 		int index = 0;
 		while(index >-1)
 		{	index = s.indexOf(" ");
-			//if(index>0 && index<s.length()-1 && Character.isDigit(s.charAt(index-1)) && Character.isDigit(s.charAt(index+1)))
-			//{	s = s.substring(0,index) + "+" + s.substring(index+1);
-			//}
-			//else 
 			if(index >-1)s = s.substring(0,index) + s.substring(index+1);
 		}
 		
@@ -407,19 +388,6 @@ public class FormuleParser
 		{	index = s.indexOf("--");
 			if(index >-1)s = s.substring(0,index) + "+" + s.substring(index+2);
 		}
-		
-		
-		/*index = 0;
-		while(index >-1)
-		{	index = s.indexOf("*-");
-			
-			int tel = index+2;
-			while(tel<s.length() && Character.isDigit(s.charAt(tel)))
-			{	tel++;
-			}
-			
-			if(index >-1 && tel>index+2)s = s.substring(0,index) + "(" + s.substring(index+1,tel) + ")" + s.substring(tel);
-		}*/
 		
 		//vervangt *-6 door *(-6)
 		index = 0;
@@ -829,18 +797,12 @@ public class FormuleParser
 		}
 		if(isGetal)
 		{	exp = new BasisExpressie(Double.valueOf(s).doubleValue());
-			if("MW".equals(Grafiek3DGWT.deployVariant)) 
-				exp = new BasisExpressie(s);
+			//if("MW".equals(Grafiek3DGWT.deployVariant)) 
+			//	exp = new BasisExpressie(s);
 			return exp;
 		}
-//		if(s.equals("\u03C0"))
-//		{
-//			exp = new PI();
-//			return exp;
-//		}
 		
-		
-		// is + of - oneidig?
+		// is + of - oneindig?
 		if(s.equals("\u221e")) 
 		{	double d = Double.POSITIVE_INFINITY;
 			exp = new BasisExpressie(s);
@@ -851,31 +813,6 @@ public class FormuleParser
 			exp = new BasisExpressie(s);
 		}
 		
-		//is het een optelling, aftrekking, enz?
-		/*char[] operatoren = {'+','-','*','/','^','|'};
-		for(int j=0 ; j<operatoren.length ; j++)
-		{	int niv = 0;
-			for(int i=s.length()-1 ; i>-1 ; i--)
-			{	if(s.charAt(i)==')')
-				{	niv++;
-				}
-				else if(s.charAt(i)=='(')
-				{	niv--;
-				}
-				else if(s.charAt(i)==operatoren[j] && niv==0)
-				{	Expressie e1 = parse(s.substring(0,i));
-					Expressie e2 = parse(s.substring(i+1));
-					if(e1==null || e2==null)return null;
-					if(j==0)return new Optelling(e1,e2);
-					else if(j==1)return new Aftrekking(e1,e2);
-					else if(j==2)return new Vermenigvuldiging(e1,e2);
-					else if(j==3)return new Deling(e1,e2);
-					else if(j==4)return new Macht(e1,e2);
-					else if(j==5)return new NdeWortel(e1,e2);
-					return exp;
-				}
-			}
-		}*/
 		
 		int niv = 0;
 			for(int i=s.length()-1 ; i>-1 ; i--)
@@ -892,7 +829,7 @@ public class FormuleParser
 					return new Optelling(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		
 		niv = 0;
@@ -904,15 +841,14 @@ public class FormuleParser
 				{	niv--;
 				}
 				else if(s.charAt(i)=='-' && niv==0)
-				{	//Expressie e1 = new BasisExpressie(0);
-					//if(i!=0)
+				{	
 					Expressie e1 = parse(s.substring(0,i));
 					Expressie e2 = parse(s.substring(i+1));
 					if(e1==null || e2==null)return null;
 					return new Aftrekking(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		niv = 0;
 		if(s.length()>4)
@@ -930,7 +866,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		niv = 0;
@@ -949,7 +885,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		niv = 0;
@@ -968,7 +904,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		
@@ -988,7 +924,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		niv = 0;
@@ -1007,7 +943,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		niv = 0;
@@ -1026,7 +962,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		} 
 		 
@@ -1046,7 +982,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		niv = 0;
@@ -1065,7 +1001,7 @@ public class FormuleParser
 					return new Vermenigvuldiging(e1,e2);
 					
 				}
-				//else return exp;
+
 			}
 		}
 		
@@ -1262,21 +1198,6 @@ public class FormuleParser
 			}
 		
 		niv = 0;
-			/*for(int i=s.length()-1 ; i>-1 ; i--)
-			{	if(s.charAt(i)==')')
-				{	niv++;
-				}
-				else if(s.charAt(i)=='(')
-				{	niv--;
-				}
-				else if(s.charAt(i)=='^' && niv==0)
-				{	Expressie e1 = parse(s.substring(0,i));
-					Expressie e2 = parse(s.substring(i+1));
-					if(e1==null || e2==null)return null;
-					return new Macht(e1,e2);
-					
-				}
-			}*/
 			for(int i=0 ; i<s.length() ; i++)
 			{	if(s.charAt(i)==')')
 				{	niv++;
@@ -1348,130 +1269,16 @@ public class FormuleParser
 			if(e==null)return null;
 			return new Wortel(e);
 		}
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("abs"))
-		{	Expressie e = parse(s.substring(3,s.length()));
-			if(e==null)return null;
-			return new Abs(e);
-		}
-*/
-/*		
-		else if(s.length()>6 && s.substring(0,6).equals("conjug"))
-        {   Expressie e = parse(s.substring(6,s.length()));
-            if(e==null)return null;
-            return new Conjug(e);
-        }
-*/        
-/*		
-		else if(s.length()>8 && s.substring(0,8).equals("binomcdf"))
-		{	String string = s.substring(9,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			Expressie e1 = parse(string.substring(0,lastIndex1));
-			Expressie e2 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e3 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null)return null;
-			else return new BinomCDF(e1,e2,e3);
-		}
-*/
-/*		
-		else if(s.length()>8 && s.substring(0,8).equals("binompdf"))
-		{	String string = s.substring(9,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			Expressie e1 = parse(string.substring(0,lastIndex1));
-			Expressie e2 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e3 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null)return null;
-			else return new BinomPDF(e1,e2,e3);
-		}
-*/		
 		else if(s.length()>3 && s.substring(0,3).equals("bin"))
 		{	String string = s.substring(4,s.length()-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
 			int lastIndex = string.lastIndexOf('_');
 			Expressie e1 = parse(string.substring(0,lastIndex));
 			Expressie e2 = parse(string.substring(lastIndex+1));
 			if(e1==null || e2==null)return null;
 			else return new Bin(e1,e2);
 		}
-/*		
-		else if(s.length()>6 && s.substring(0,6).equals("difpar"))
-		{	String string = s.substring(7,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new DiffPartial(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("dif"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new Diff(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("prm"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new Primitieve(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("lim"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
-			//Expressie e3 = parse(stringDelen[2]);
-			//Expressie e4 = parse(stringDelen[3]);
-			Expressie e1 = parse(string.substring(0,lastIndex2));
-			Expressie e2 = parse(string.substring(lastIndex2+1,lastIndex1));
-			Expressie e3 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e4 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null || e4==null)return null;
-			else return new Limiet(e1,e2,e3,e4);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("sig"))
-        {   String string = s.substring(4,s.length()-1);
-            int lastIndex0 = string.lastIndexOf('_');
-            int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-            int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-            //String[] stringDelen = StringUtils.split(string, "_");
-            //Expressie e1 = parse(stringDelen[0]);
-            //Expressie e2 = parse(stringDelen[1]);
-            //Expressie e3 = parse(stringDelen[2]);
-            //Expressie e4 = parse(stringDelen[3]);
-            Expressie e1 = parse(string.substring(0,lastIndex2));
-            Expressie e2 = parse(string.substring(lastIndex2+1,lastIndex1));
-            Expressie e3 = parse(string.substring(lastIndex1+1,lastIndex0));
-            Expressie e4 = parse(string.substring(lastIndex0+1));
-            if(e1==null || e2==null || e3==null || e4==null)return null;
-            else return new Sigma(e1,e2,e3,e4);
-        }
-*/        
 		else if(s.length()>3 && s.substring(0,3).equals("rnd"))
 		{	String string = s.substring(4,s.length()-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
 			int lastIndex = string.lastIndexOf('_');
 			Expressie e1 = parse(string.substring(0,lastIndex));
 			Expressie e2 = parse(string.substring(lastIndex+1));
@@ -1481,7 +1288,6 @@ public class FormuleParser
 		else if(s.length()>3 && s.substring(0,3).equals("rns"))
 		{	String string = s.substring(4,s.length()-1);
 			String[] stringDelen = string.split("_");
-			//StringUtils.split(string, "_");
 			int lastIndex0 = string.lastIndexOf('_');
 			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
 			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
@@ -1493,111 +1299,13 @@ public class FormuleParser
 		}
 		else if(s.length()>3 && s.substring(0,3).equals("rnq"))
 		{	String string = s.substring(4,s.length()-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
 			int lastIndex = string.lastIndexOf('_');
 			Expressie e1 = parse(string.substring(0,lastIndex));
 			Expressie e2 = parse(string.substring(lastIndex+1));
 			if(e1==null || e2==null)return null;
 			else return new DecRoundStrict(e1,e2);
 		}
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("int"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
-			//Expressie e3 = parse(stringDelen[2]);
-			//Expressie e4 = parse(stringDelen[3]);
-			Expressie e1 = parse(string.substring(0,lastIndex2));
-			Expressie e2 = parse(string.substring(lastIndex2+1,lastIndex1));
-			Expressie e3 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e4 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null || e4==null)return null;
-			else return new Integraal(e1,e2,e3,e4);
-		}
-*/		
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("gcd"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new GCD(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("min"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new Min(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("max"))
-		{	String string = s.substring(4,s.length()-1);
-			int lastIndex = string.lastIndexOf('_');
-			Expressie e1 = parse(string.substring(0,lastIndex));
-			Expressie e2 = parse(string.substring(lastIndex+1));
-			if(e1==null || e2==null)return null;
-			else return new Max(e1,e2);
-		}
-*/
-/*		
-		else if(s.length()>9 && s.substring(0,9).equals("normalcdf"))
-		{	String string = s.substring(10,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			Expressie e1 = parse(string.substring(0,lastIndex2));
-			Expressie e2 = parse(string.substring(lastIndex2+1,lastIndex1));
-			Expressie e3 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e4 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null || e4==null)return null;
-			else return new NormalCDF(e1,e2,e3,e4);
-		}
-*/
-/*		
-		else if(s.length()>7 && s.substring(0,7).equals("invNorm"))
-		{	String string = s.substring(8,s.length()-1);
-			int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			Expressie e1 = parse(string.substring(0,lastIndex1));
-			Expressie e2 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e3 = parse(string.substring(lastIndex0+1));
-			if(e1==null || e2==null || e3==null)return null;
-			else return new InvNorm(e1,e2,e3);
-		}
-*/
-/*		
-		else if(s.length()>3 && s.substring(0,3).equals("prv"))
-        {   String string = s.substring(4,s.length()-1);
-	    	int lastIndex0 = string.lastIndexOf('_');
-			int lastIndex1 = string.lastIndexOf('_',lastIndex0-1);
-			int lastIndex2 = string.lastIndexOf('_',lastIndex1-1);
-			//String[] stringDelen = StringUtils.split(string, "_");
-			//Expressie e1 = parse(stringDelen[0]);
-			//Expressie e2 = parse(stringDelen[1]);
-			//Expressie e3 = parse(stringDelen[2]);
-			//Expressie e4 = parse(stringDelen[3]);
-			Expressie e1 = parse(string.substring(0,lastIndex2));
-			Expressie e2 = parse(string.substring(lastIndex2+1,lastIndex1));
-			Expressie e3 = parse(string.substring(lastIndex1+1,lastIndex0));
-			Expressie e4 = parse(string.substring(lastIndex0+1));
-            if(e1==null || e2==null || e3==null || e4==null)return null;
-            else return new Prv(e1,e2,e3,e4);
-        }
-*/        
-//		is het een arcsinus
+		//	is het een arcsinus
 		else if(s.length()>7 && s.substring(0,7).equals("arcsin("))
 		{	Expressie e = parse(s.substring(6,s.length()));
 			if(e==null)return null;
@@ -1644,17 +1352,8 @@ public class FormuleParser
 		{	Expressie e = parse(s.substring(2,s.length()));
 			if(e==null)return null;
 			return new Ln(e);
-		}/**/
-		
-/*
-		else if(s.length()>0 && s.charAt(s.length()-1)==('!'))
-		{	Expressie e = parse(s.substring(0,s.length()-1));
-			if(e==null)return null;
-			//System.out.println(e.toString());
-			return new Faculteit(e);
 		}
 		
-*/		
 		}
 		catch(Exception e)
 		{}
@@ -1670,80 +1369,6 @@ public class FormuleParser
 	{	return parse(schoon(formuleString(codeString),woordformule),woordformule);
 	}
 	
-/*	
-	public static String randomizeString(String s, String[] randomVars, HashMap<String,Object> randomValues) throws Exception
-	{	for(int i=s.length()-1 ; i>-1; i--)
-		{	if(s.charAt(i)=='@')
-			{	int index = s.substring(0,i).lastIndexOf("$f");
-				String formString = s.substring(index,i+1);
-				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='�')
-					{	int index1 = formString.substring(0,j).lastIndexOf("�");
-						String parseString = formString.substring(index1+1,j);
-						parseString = substitueerRandom(parseString, randomVars, randomValues, false);
-						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
-						j=index1;
-					}	
-				}
-				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='#')
-					{	int index1 = formString.substring(0,j).lastIndexOf("#");
-						String parseString = formString.substring(index1+1,j);
-						parseString = substitueerRandom(parseString, randomVars, randomValues);
-						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
-						j=index1;
-					}	
-				}		
-				s = ""+s.substring(0,index)+formString+s.substring(i+1);
-				i=index;
-			}
-		}
-		return s;
-	}
-*/
-/*	
-	public static String randomizeTekstVakString(String tekst, String[] randomVars, HashMap<String,Object> randomValues) throws Exception
-	{	for(int i=tekst.length()-1 ; i>-1; i--)
-		{	if(tekst.charAt(i)=='@')
-			{	int index = tekst.substring(0,i).lastIndexOf("$f");
-				
-				int indexF = tekst.substring(0,i).lastIndexOf("$f");
-				int indexA = tekst.substring(0,i).lastIndexOf("$A");
-				int indexV = tekst.substring(0,i).lastIndexOf("$V");
-				int indexH = tekst.substring(0,i).lastIndexOf("$H");
-				int indexI = tekst.lastIndexOf("$I", i);
-				index = Math.max(indexF, indexA);
-				index = Math.max(index, indexV);
-				index = Math.max(index, indexH);
-				index = Math.max(index, indexI);
-				
-				String formString = tekst.substring(index,i+1);
-				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='#')
-					{	int index1 = formString.substring(0,j).lastIndexOf("#");
-						String parseString = formString.substring(index1+1,j);
-						parseString = FormuleParser.substitueerRandom(parseString, randomVars, randomValues);
-						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
-						j=index1;
-					}	
-				}	
-				for(int j=formString.length()-1 ; j>-1; j--)
-				{	if(formString.charAt(j)=='�')
-					{	int index1 = formString.substring(0,j).lastIndexOf("�");
-						String parseString = formString.substring(index1+1,j);
-						parseString = FormuleParser.substitueerRandom(parseString, randomVars, randomValues,false);
-						formString = ""+formString.substring(0,index1)+parseString+formString.substring(j+1);
-						j=index1;
-					}	
-				}
-				tekst = ""+tekst.substring(0,index)+formString+tekst.substring(i+1);
-				
-				i=index;
-			}
-		}
-		return tekst;
-	}
-*/	
 	public static String substitueerRandom(String formString, String[] varnamen, HashMap<String,Object> waarden)
 	{	return substitueerRandom(formString,  varnamen,  waarden, true);
 	}

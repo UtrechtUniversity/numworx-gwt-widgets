@@ -1,7 +1,5 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
-//import java.text.DecimalFormat;
 import java.util.*;
 
 import fi.grafiek3dgwt.client.StringUtils;
@@ -30,10 +28,9 @@ public class BasisExpressie extends Expressie
 	public BasisExpressie(double d)
 	{	super();
 		waarde = d;
-		//basisString = df.format(d);
 		basisString = UF.format(d,10);
 		if (!Algebra.withinLongRange((long) waarde))
-		{	//basisString = dfe.format(d);
+		{	
 			basisString = UF.format(d,10);
 		}
 		
@@ -138,40 +135,6 @@ public class BasisExpressie extends Expressie
 		return v;
 	}
 	
-/*	
-	public void setScientificNotation(boolean b, int macht, int signf)
-	{
-		int digits = basisString.length();
-		int intDigits = digits;
-		if(basisString.indexOf(',')>-1)
-		{
-			intDigits = basisString.substring(0,basisString.indexOf(',')).length();
-			digits -=1;
-		}
-		else if(basisString.indexOf('.')>-1)
-		{
-			intDigits = basisString.substring(0,basisString.indexOf('.')).length();
-			digits -=1;
-		}
-		int fracDigits = digits-intDigits;
-		if(signf<intDigits-macht)
-			macht = intDigits-signf;
-		
-		String formatString = "";
-		for (int i=0 ; i<intDigits-macht-1 ; i++ ) 
-			formatString = formatString + "0";
-		if (signf-intDigits+macht>0)
-			formatString = formatString + "0.";
-		else 
-			formatString = formatString + "0";
-		for (int i=0 ; i<signf-intDigits+macht ; i++ ) 
-			formatString = formatString + "0";
-		if (macht!=0)
-			formatString = formatString + "E0";
-		DecimalFormat dfee = new DecimalFormat(formatString);
-		basisString = dfee.format(waarde);
-	}
-*/	
 	public String toString()
 	{	
 		String basisStringUit = StringUtils.replaceStr(basisString, "?(", "$s");
@@ -179,9 +142,6 @@ public class BasisExpressie extends Expressie
 		
 		if (!Double.isNaN(waarde) && (!Algebra.withinLongRange((long)waarde) || basisString.indexOf('E') > -1))
 			basisStringUit = StringUtils.replaceStr(basisString, "E", "*$p10$n") + "@@";
-		//if(!Double.isNaN(waarde) && (Math.abs(1.0/waarde)>10000000000.0))basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
-        
-        //if(Grafiek3DTest.language.toString().equals("nl"))
 		if(Grafiek3DGWT.languageString.equals("nl"))
         	basisStringUit = basisStringUit.replace('.',',');
         
@@ -195,17 +155,10 @@ public class BasisExpressie extends Expressie
         basisStringUit = StringUtils.replaceStr(basisStringUit,")","@");
         
         if(!Double.isNaN(waarde) && (!Algebra.withinLongRange((long)waarde) || basisString.indexOf('E')>-1))basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
-		//if(!Double.isNaN(waarde) && (Math.abs(1.0/waarde)>10000000000.0))basisStringUit = StringUtils.replaceStr(basisString,"E","*$p10$n") + "@@";
-        
-        //if(Grafiek3DTest.language.toString().equals("nl"))
+
         if(Grafiek3DGWT.languageString.equals("nl"))
         	basisStringUit = basisStringUit.replace('.',',');
         return basisStringUit;
-		//basisString = basisString.replace('.',',');
-		//if(isWaarde())
-	    //{
-	    //}
-		//return basisString;
 	}
     
     public String toStringCAS()

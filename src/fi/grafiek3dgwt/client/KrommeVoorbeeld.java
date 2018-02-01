@@ -1,6 +1,16 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.*;
+/**
+ * superclass for creating examples of 3d-curvess: 
+ * the superclass sets all 3d-curve-attributes
+ * (see class Grafiek3DComponent);<br> 
+ * subclasses can reset some of these, but must
+ * redefine the Strings defining the curve:
+ * curveXString, curveYString, curveZString,
+ * tMinString, tMaxnString, tPointsString,
+ * and the name of the 3d-curve (nlNaam and enNaam)
+ * @author huub
+ */
 
 public class KrommeVoorbeeld 
 {

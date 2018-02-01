@@ -1,9 +1,8 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
+
 import java.util.Vector;
 
-//import fi.grafiek3dtest.Grafiek3DTest;
 import fi.grafiek3dgwt.client.expressies.Algebra;
 
 public class Vergelijking 
@@ -145,9 +144,6 @@ public class Vergelijking
 	
 	private Expressie evalCAS(Expressie e)
 	{	boolean casNodig = e.toString().indexOf("$i")>-1 || e.toString().indexOf("$d")>-1 || e.toString().indexOf("$T")>-1 || e.toString().indexOf("$P")>-1;
-		//if(casNodig)
-		//	return Expressie.evalWithCAS(e);
-		//else 
 			return e;
 		
 	}
@@ -324,19 +320,6 @@ public class Vergelijking
 		return false;
 	}
 	
-	/*public boolean isEindOplossing()
-	{	return(kind1.isVar() && kind2.isWaarde() || kind2.isVar() && kind1.isWaarde());
-	}
-	
-	public double geefEindOplossing()
-	{	if(isEindOplossing())
-		{	if(kind1.isWaarde())return kind1.geefWaarde();
-			else if(kind2.isWaarde())return kind2.geefWaarde();
-			//else if(kind1.isVar() && kind2.geefVarNaam().equals("D"))return new Optelling(kind1, new BasisExpressie(0.1234567));
-			else return Double.NaN;
-		}
-		else return Double.NaN;
-	}*/
 	
 	public Expressie geefEindOplossing(String var)
 	{	if(isEindOplossing(var))
@@ -346,7 +329,6 @@ public class Vergelijking
 			else if(kind1.isVar() && kind1.geefVarNaam().equals("Q"))return new Optelling(kind2, new BasisExpressie(0.2345678));
 			else return null;
 		}
-		//if(kind1.isVar() && kind1.geefVarNaam().equals("D"))return new Optelling(kind2, new BasisExpressie(0.1234567));
 	
 		else return null;
 	}
@@ -383,7 +365,7 @@ public class Vergelijking
 			s = s1 + tekenParen[comb][0] + kind1.toString() + tekenParen[comb][1] + s2;
 		}
 		else if(Algebra.isGelijkDouble(kind2.geefWaarde(), 0.1234567)) 
-		{	//s = Grafiek3DTest.rb.getString("geenOplossingen");
+		{	
 			s = "geenOplossingen";
 		}
 		else  s = kind1.toString() +""+  vergelijkingsTeken  +""+ kind2.toString();
@@ -399,7 +381,7 @@ public class Vergelijking
 			s = s1 + tekenParen[comb][0] + kind1.toString() + tekenParen[comb][1] + s2;
 		}
 		else if(Algebra.isGelijkDouble(kind2.geefWaarde(), 0.1234567)) 
-		{	//s = Grafiek3DTest.rb.getString("geenOplossingen");
+		{	
 			s = "geenOplossingen";
 		}
 		else  s = kind1.toStringStrikt() +""+  vergelijkingsTeken  +""+ kind2.toStringStrikt();

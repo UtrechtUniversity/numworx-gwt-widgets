@@ -1,23 +1,49 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.Color;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
-
+/**
+ * class representing (different kinds of axes) as an Object3D;
+ * note that, instead of the traditional x- and y-axis, the
+ * x-y-plane can be shown as a grid (a "floor"), but this is not used;
+ * for the label codes see class Facet3D
+ * @author huub
+ */
 public class Axes extends Object3D
 {
-	//DecimalFormatSymbols dfs;
-	//DecimalFormat df;
-	
+	/**
+	 * a very small double
+	 */
 	final double NZERO = 1e-5d;
 	
+	/**
+	 * axes labels
+	 */
 	String[] vLabels; 
 	
+	/**
+	 * default floor type
+	 */
 	int floorType = Grafiek3DComponent.NOFLOOR;
 	
     public Axes()
     {}
+    
+    /**
+     * constructor
+     * @param xMin minimum of x-axis
+     * @param xMax maximum of x-axis
+     * @param xStep step size on x-axis
+     * @param yMin minimum of y-axis
+     * @param yMax maximum of y-axis
+     * @param yStep step size on y-axis
+     * @param zMin minimum of z-axis
+     * @param zMax maximum of z-axis
+     * @param zStep step size on z-axis
+     * @param floorType type of floor
+     * @param labelType type of labels
+     * @param xFinerSteps x refinement
+     * @param yFinerSteps y refinement
+     */
     public Axes(double xMin, double xMax, double xStep, 
     		    double yMin, double yMax, double yStep,
     		    double zMin, double zMax, double zStep,
@@ -25,10 +51,7 @@ public class Axes extends Object3D
     {
     	this.floorType = floorType;
     	
-		//dfs = new DecimalFormatSymbols();
-		//dfs.setDecimalSeparator('.');
-		//df = new DecimalFormat("0.####", dfs);
-    	
+    	// determine position of axis relative to the other two axes
 		double xAsyPos = 0;
 		double xAszPos = 0;
 		double yAsxPos = 0;
@@ -74,7 +97,6 @@ public class Axes extends Object3D
     	
     	int numFloorFacets = (numXFineFacets - 2 * xFinerSteps) * (numYFineFacets - 2 * yFinerSteps + 1) +
     						 (numXFineFacets - 2 * xFinerSteps + 1) * (numYFineFacets - 2 * yFinerSteps);
-//System.out.println("flf = " + numFloorFacets);    	
     	
     	if (floorType == Grafiek3DComponent.NOFLOOR)
     	{	
@@ -84,8 +106,6 @@ public class Axes extends Object3D
     		// do NOT forget this
     		trVertices = new Vector3D[numVertices];
     		vLabels = new String[numVertices];
-
-// elke as een apart Object3D?        
         
     		for (int xCnt = 0; xCnt < (numXFineFacets + 1); xCnt++)
     		{
@@ -170,7 +190,7 @@ public class Axes extends Object3D
         		indices[1] = xCnt + 1;
         		facets[xCnt] = new Facet3D(vertices, indices, Grafiek3DComponent.axesColor);
         		facets[xCnt].isOnAxis = true;
-        		//facets[xCnt].thickenVertices = true;
+
     		}
 
     		for (int yCnt = 0; yCnt < numYFineFacets; yCnt++)
@@ -179,7 +199,7 @@ public class Axes extends Object3D
         		indices[1] = numXFineFacets + 1 + yCnt + 1;
         		facets[numXFineFacets + yCnt] = new Facet3D(vertices, indices, Grafiek3DComponent.axesColor);
         		facets[numXFineFacets + yCnt].isOnAxis = true;
-        		//facets[numXFacets + yCnt].thickenVertices = true;
+
     		}
         
     		for (int zCnt = 0; zCnt < numZFacets; zCnt++)
@@ -188,11 +208,11 @@ public class Axes extends Object3D
         		indices[1] = numXFineFacets + 1 + numYFineFacets + 1 + zCnt + 1;
         		facets[numXFineFacets + numYFineFacets + zCnt] = new Facet3D(vertices, indices, Grafiek3DComponent.axesColor);
         		facets[numXFineFacets + numYFineFacets + zCnt].isOnAxis = true;
-        		//facets[numXFacets + numYFacets + zCnt].thickenVertices = true;
+
     		}
         
     	} // NOFLOOR
-    	else
+    	else // FLOOR
     	{	
     		int numPointVertices = 2 * (xFinerSteps + 1) + 2 * (yFinerSteps + 1);
     		
@@ -204,12 +224,10 @@ public class Axes extends Object3D
 			// do NOT forget this
 			trVertices = new Vector3D[numVertices];
 			vLabels = new String[numVertices];
-
-//elke as een apart Object3D?        
 			
 			// points
 			for (int xMinCnt = 0; xMinCnt < (xFinerSteps + 1); xMinCnt++)
-			{	//vertices[xMinCnt] = new Vector3D(xMin + xMinCnt * xStepFine, xAsyPos, xAszPos);
+			{	
 				vertices[xMinCnt] = new Vector3D(xMin + xMinCnt * xStepFine, (yMin + yMax) / 2, xAszPos);
 				if (labelType == Grafiek3DComponent.ALLLABELS)
 				{	if (xMinCnt == 0)
@@ -228,7 +246,7 @@ public class Axes extends Object3D
 			}	
 
 			for (int xMaxCnt = 0; xMaxCnt < (xFinerSteps + 1); xMaxCnt++)
-			{	//vertices[(xFinerSteps + 1) + xMaxCnt] = new Vector3D(xMax - xStep + xMaxCnt * xStepFine, xAsyPos, xAszPos);
+			{	
 				vertices[(xFinerSteps + 1) + xMaxCnt] = new Vector3D(xMax - xStep + xMaxCnt * xStepFine, (yMin + yMax) / 2, xAszPos);
 				if (labelType == Grafiek3DComponent.ALLLABELS)
 				{	if (xMaxCnt == xFinerSteps)
@@ -247,7 +265,7 @@ public class Axes extends Object3D
 			}	
 
 			for (int yMinCnt = 0; yMinCnt < (yFinerSteps + 1); yMinCnt++)
-			{	//vertices[2 * (xFinerSteps + 1) + yMinCnt] = new Vector3D(yAsxPos, yMin + yMinCnt * yStepFine, yAszPos);
+			{	
 				vertices[2 * (xFinerSteps + 1) + yMinCnt] = new Vector3D((xMin + xMax) / 2, yMin + yMinCnt * yStepFine, yAszPos);
 				if (labelType == Grafiek3DComponent.ALLLABELS)
 				{	if (yMinCnt == 0)
@@ -267,7 +285,6 @@ public class Axes extends Object3D
 
 			for (int yMaxCnt = 0; yMaxCnt < (yFinerSteps + 1); yMaxCnt++)
 			{	vertices[2 * (xFinerSteps + 1) + (yFinerSteps + 1) + yMaxCnt] = 
-					//new Vector3D(yAsxPos, yMax - yStep + yMaxCnt * yStepFine, yAszPos);
 					new Vector3D((xMin + xMax) / 2, yMax - yStep + yMaxCnt * yStepFine, yAszPos);
 				if (labelType == Grafiek3DComponent.ALLLABELS)
 				{	if (yMaxCnt == yFinerSteps)
@@ -294,26 +311,10 @@ public class Axes extends Object3D
 						new Vector3D(xMin + xCnt * xStepFine, yMin + yCnt * yStepFine, xAszPos);
 					
 					if (labelType == Grafiek3DComponent.ALLLABELS)
-					{	//if (((xCnt == numXFineFacets - xFinerSteps) || (xCnt == xFinerSteps)) && (yCnt % yFinerSteps == 0))
-						//	vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = 
-						//		"F" + format(yMin + yCnt * yStepFine);
-						//else if (((yCnt == numYFineFacets - yFinerSteps) ||(yCnt == yFinerSteps)) && (xCnt % xFinerSteps == 0))
-						//	vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = 
-						//		"F" + format(xMin + xCnt * xStepFine);					
-						//else
-							vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = "";
+					{	vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = "";
 					}
 					else if (labelType == Grafiek3DComponent.ENDLABELS)
-					{	//if ((xCnt == numXFacets) && ((yMin + yCnt * yStep) == xAsyPos) ||
-						//	(xCnt == 0) && ((yMin + yCnt * yStep) == xAsyPos))
-						//	vLabels[numPointVertices + (xCnt - 1) + (numXFacets - 1) * (yCnt - 1)] = 
-						//		"F" + "x = " + format(xMin + xCnt * xStep);
-						//else if (((xMin + xCnt * xStep) == yAsxPos) && (yCnt == numYFacets) ||
-						//		 ((xMin + xCnt * xStep) == yAsxPos) && (yCnt == 0))
-						//	vLabels[numPointVertices + (xCnt - 1) + (numXFacets - 1) * (yCnt - 1)] = 
-						//		"F" + "y = " + format(yMin + yCnt * yStep);
-						//else	
-							vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = "";
+					{	vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = "";
 					}
 		        	else if (labelType == Grafiek3DComponent.NOLABELS)
 		        		vLabels[numPointVertices + (xCnt - xFinerSteps) + (numXFineFacets - 2 * xFinerSteps + 1) * (yCnt - yFinerSteps)] = "";
@@ -371,7 +372,7 @@ public class Axes extends Object3D
 		        facets[2 * xFinerSteps + yFinerSteps + yMaxCnt].isOnAxis = true;
 	        }
 	        
-	        // "horizontals"
+	        // "horizontals" of floor
 	        for (int yCnt = yFinerSteps; yCnt < (numYFineFacets - yFinerSteps + 1); yCnt++)
 	        	for (int xCnt = xFinerSteps; xCnt < (numXFineFacets - xFinerSteps); xCnt++)
 	        	{	int[] indicesH = new int[2];
@@ -384,18 +385,16 @@ public class Axes extends Object3D
 	        		if (yCnt % yFinerSteps == 0)
 	        			facets[facetIndex].outlineColor = Grafiek3DComponent.floorOutlineColor;
 	        		else
-	        		{	//facets[facetIndex].outlineColor = Color.red;
-	        			facets[facetIndex].visible = false;
+	        		{	facets[facetIndex].visible = false;
 	        		}
 	        			
 	        		if (floorType == Grafiek3DComponent.TRANSFLOOR)
 	        		{	facets[facetIndex].filled = false;
 	        		}
-//System.out.println("fih = " + facetIndex);	        		
 	        }
 
 	        
-	        // "verticale"
+	        // "verticals" of floor
 	        for (int xCnt = xFinerSteps; xCnt < (numXFineFacets - xFinerSteps + 1); xCnt++)
 	        	for (int yCnt = yFinerSteps; yCnt < (numYFineFacets - yFinerSteps); yCnt++)
 	        	{	int[] indicesV = new int[2];
@@ -410,16 +409,12 @@ public class Axes extends Object3D
 	        		if (xCnt % xFinerSteps == 0)
 	        			facets[facetIndex].outlineColor = Grafiek3DComponent.floorOutlineColor;
 	        		else
-	        		{	//facets[facetIndex].outlineColor = Color.red;
-	        			facets[facetIndex].visible = false;
+	        		{	facets[facetIndex].visible = false;
 	        		}
 	        		
 	        		if (floorType == Grafiek3DComponent.TRANSFLOOR)
 	        		{	facets[facetIndex].filled = false;
-	        			//if (xCnt > finerSteps)
-	        			//facets[facetIndex].visible = false;
 	        		}
-//System.out.println("fiv = " + facetIndex);	        		
 	        }
 	        
 	        
@@ -429,7 +424,6 @@ public class Axes extends Object3D
 	        	indices[1] = numPointVertices + numFloorVertices + zCnt + 1;
 	        	facets[numPointFacets + numFloorFacets + zCnt] = new Facet3D(vertices, indices, Grafiek3DComponent.axesColor);
 	        	facets[numPointFacets + numFloorFacets + zCnt].isOnAxis = true;
-	        	//facets[numPointFacets + numFloorFacets + zCnt].thickenVertices = true;
 	        }
 	        
     	} // FLOOR
@@ -447,12 +441,17 @@ public class Axes extends Object3D
         Vector3D center = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
         Vector3D corner = new Vector3D(xMax, yMax, zMax);
         double diam = Vector3D.distance(corner, center);
-        //initObject3D(true, false);
         initObject3D(true, center, diam, false);
                 
     	
     }
-    
+
+    /**
+     * trim trailing zeros of a String representing a fraction
+     * @param s String representing a fraction 
+     * @param decSep decimal separator
+     * @return trimmed String
+     */
 	public String trimTrailingZeros(String s, char decSep)
 	{	String txt = new String(s);
 		if (txt.indexOf(decSep) < 0)
@@ -468,15 +467,21 @@ public class Axes extends Object3D
 		return txt;		
 	}				
     
+	/**
+	 * remove the character at a given index from a String
+	 * @param s String from which character should be removed
+	 * @param index index of character to be removed
+	 * @return modified String
+	 */
 	public String removeCharAt(String s, int index)
 	{	String txt = new String(s);
-		// eerste
+		// first
 		if (index == 0)
 			txt = txt.substring(1);
-		// laatste	
+		// last	
 		else if (index == (txt.length() - 1))
 			txt = txt.substring(0, txt.length() - 1);
-		// middenin	
+		// somewhere in the middle	
 		else
 		{	String txt1 = txt.substring(0, index);
 			String txt2 = txt.substring(index + 1);
@@ -485,6 +490,11 @@ public class Axes extends Object3D
 		return txt;
 	}		
     
+	/**
+	 * format a double with a maximum of 4 decimals
+	 * @param d double to be formatted
+	 * @return formatted double (a String)
+	 */
     public String format(double d)
     {	
     	String result = UF.format(d, 4);
@@ -492,6 +502,9 @@ public class Axes extends Object3D
     	return result;
     }
     
+    /**
+     * make a deep copy of this Axes Object3D
+     */
     public Object3D deepCopy()
     {   Axes copy = new Axes();
         makeDeepObjectCopy(copy);

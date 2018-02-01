@@ -1,9 +1,20 @@
 package fi.grafiek3dgwt.client;
 
-import java.awt.*;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * superclass for creating examples of 3d-surfaces: 
+ * the superclass sets all 3d-surface-attributes
+ * (see class Grafiek3DComponent);<br> 
+ * subclasses can reset some of these, but must
+ * redefine the Strings defining the surface:
+ * surfaceXString, surfaceYString, surfaceZString,
+ * uMinString, uMaxnString, uPointsString,
+ * vMinString, vMaxnString, vPointsString,   
+ * and the name of the 3d-surface (nlNaam and enNaam)
+ * @author huub
+ */
 
 public class OppervlakVoorbeeld 
 {
@@ -57,7 +68,6 @@ class Cylinder extends OppervlakVoorbeeld
 		surfaceYString = "$fsinu@";
 		surfaceZString = "$fv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f-\u03C0/2@";
@@ -84,7 +94,6 @@ class Cones extends OppervlakVoorbeeld
 		surfaceYString = "$fv*sinu@";
 		surfaceZString = "$fv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f-\u03C0/2@";
@@ -134,7 +143,6 @@ class Sphere extends OppervlakVoorbeeld
 		surfaceYString = "$f1.5*cosv*sinu@";
 		surfaceZString = "$f1.5*sinv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f-\u03C0/2@";
@@ -158,7 +166,6 @@ class Ellipsoid extends OppervlakVoorbeeld
 		surfaceYString = "$f3*cosv*sinu@";
 		surfaceZString = "$f1.5*sinv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f-\u03C0/2@";
@@ -185,11 +192,9 @@ class Torus extends OppervlakVoorbeeld
 		surfaceYString = "$f(3+cosv)*sinu@";
 		surfaceZString = "$fsinv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f35@";
 		vMinString = "$f0@";
-		//vMaxString = "$f2\u03C0@";
 		vMaxString = "$f2*\u03C0@";
 		vPointsString = "$f25@";
 		
@@ -217,7 +222,6 @@ class Trumpet extends OppervlakVoorbeeld
 		surfaceYString = "$f(v/2)*(v/2)*sinu@";
 		surfaceZString = "$fv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f0@";
@@ -247,7 +251,6 @@ class EightSurface extends OppervlakVoorbeeld
 		surfaceYString = "$fsinu*cosv*sinv@";
 		surfaceZString = "$fsinv@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f25@";
 		vMinString = "$f0@";
@@ -304,11 +307,9 @@ class KleinBagel extends OppervlakVoorbeeld
 		surfaceYString = "$f(2.5+cos(u/2)*cosv-sin(u/2)*sin(2v))*sinu@";
 		surfaceZString = "$fsin(u/2)*cosv+cos(u/2)*sin(2v)@";
 		uMinString = "$f0@";
-		//uMaxString = "$f2\u03C0@";
 		uMaxString = "$f2*\u03C0@";
 		uPointsString = "$f35@";
 		vMinString = "$f0@";
-		//vMaxString = "$f2\u03C0@";
 		vMaxString = "$f2*\u03C0@";
 		vPointsString = "$f25@";
 		

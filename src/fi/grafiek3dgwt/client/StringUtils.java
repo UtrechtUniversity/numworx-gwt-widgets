@@ -4,7 +4,6 @@
  */
 package fi.grafiek3dgwt.client;
 
-//import java.util.Random;
 
 /*
 

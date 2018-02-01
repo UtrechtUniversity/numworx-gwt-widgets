@@ -1,9 +1,30 @@
 package fi.grafiek3dgwt.client;
 
+
+/**
+ * given a Grafiek3D, Surface3D or Curve3D, create a new Object3D obtained by 
+ * "trimming" (cutting) the Grafiek3D, Surface3D or Curve3D by a plane passing
+ * through the minimum or maximum value on one of the axes and parallel to the 
+ * plane through the other two axis; note that a Grafiek3D needs at most 
+ * top and bottom "trimming"; the necessity of "trimming" is determined at
+ * the creation of the Grafiek3D, Surface3D or Curve3D;      
+ * after repeated "trimming", the Grafiek3D, Surface3D or Curve3D will 
+ * fit into the cube determined by the x-, y- and z-axis;   
+ * @author huub
+ */
 public class Trim 
 {
+	/**
+	 * a very small double
+	 */
 	static double NZERO = 1e-5d;
 	
+	/**
+	 * trimming constants describing the type of trimming, e.g. 
+	 * type XMIN means cur the object with a plane through the minimum
+	 * of the x-axis parallel to the y-z-plane; this minimum must be given
+	 * separately 
+	 */
 	static final int XMIN = 0; 
 	static final int XMAX = 1;
 	static final int YMIN = 2; 
@@ -11,6 +32,13 @@ public class Trim
 	static final int ZMIN = 4; 
 	static final int ZMAX = 5;
 	
+	/**
+	 * static method which trims an Object3D by cutting it with a plane  
+	 * @param ob Object3D to be cut
+	 * @param planeValue minimum or maximum value needed for trimming 
+	 * @param planeType the type of trimming wanted 
+	 * @return the part if Object3d that will be kept
+	 */
 	public static Object3D trimObject3D(Object3D ob, double planeValue, int planeType)
 	{
 		Object3D trimmedObject = new EmptyObject3D();
@@ -81,8 +109,8 @@ public class Trim
             // arrays for indices of these points (maximum)
             int[] insideInds = new int[pts + 1];
 
-			// facet ligt inside of op de rand
-			// maak een nieuw facet voor trimmedObject 
+			// the whole facet is located "inside" or on the plane
+			// create a new facet for trimmedObject 
 			if (vertexPositions[1] == 0)
 			{
 				// add facet to trimmedObject
@@ -101,71 +129,64 @@ public class Trim
                 
                 
 			}
-			// facet cuts the plane en 
-			// moet doorgesneden worden
+			// the facet intersects the plane and must be cut
 			else if ((vertexPositions[0] > 0) && (vertexPositions[1] > 0)) 
 			{
 				// now walk along the facet edgewise, if edge v1->v2 
                 // is studied v1 is updated
                 for (int j = 0; j < pts; j++)
                 {   // find current side vj -> v(j+1)
-                        // vj, last is v(pts-1)
-                        Vector3D v1 = new Vector3D(facet.points[j]);
-                        // position of v1
-                        //int pos1 = plane.planePosition(v1);
-                        boolean inside1 = insideValue(v1, planeValue, planeType);
-                        // v(j+1), last is v0
-                        Vector3D v2 = new Vector3D(facet.points[(j + 1) % pts]);
+                    // vj, last is v(pts-1)
+                    Vector3D v1 = new Vector3D(facet.points[j]);
+                    // position of v1
+                    boolean inside1 = insideValue(v1, planeValue, planeType);
+                    // v(j+1), last is v0
+                    Vector3D v2 = new Vector3D(facet.points[(j + 1) % pts]);
                         // position of v2
-                        //int pos2 = plane.planePosition(v2);                      
-                        boolean inside2 = insideValue(v2, planeValue, planeType);
-                        // both "inside" 
-                        //if ((pos1 == -1) && (pos2 == -1))
-                        if (inside1 && inside2)
-                        {   // add copy of vj to replacement
-                            // keep track of index
-                            trimmedObject.addVertex(v1, null);
-                            // point to current last
-                            insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
-                            insideIndCnt++;
+                    boolean inside2 = insideValue(v2, planeValue, planeType);
+                    // both "inside" 
+                    if (inside1 && inside2)
+                    {   // add copy of vj to trimmedObject
+                       // keep track of index
+                       trimmedObject.addVertex(v1, null);
+                       // point to current last
+                       insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
+                       insideIndCnt++;
                            
-                        }
-                        
-                        // vj "inside" v(j+1) "outside"
-                        // add vj->v to left, copy of v to right
-                        // and copy of v to cut
-                        //else if ((pos1 == -1) && (pos2 == 1))
-                        else if (inside1 && !inside2)
-                        {   trimmedObject.addVertex(v1, null);
-                            insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
-                            insideIndCnt++;
-                            // find v
-                            Plane3D plane = getPlane(planeValue, planeType); 
-                            Vector3D v = Plane3D.getIntersectionPoint(new Line3D(v1, v2), plane);
-                            // add to left
-                            trimmedObject.addVertex(v, null);
-                            insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
-                            insideIndCnt++;
-                           
-                        }
-                        // vj "outside" v(j+1) "inside"
-                        // add vj->v to right, a copy of v to left
-                        // and a copy of v to cut
-                        //else if ((pos1 == 1) && (pos2 == -1))
-                        else if (!inside1 && inside2)	
-                        {   
-                            // find v
-                        	Plane3D plane = getPlane(planeValue, planeType);
-                            Vector3D v = Plane3D.getIntersectionPoint(new Line3D(v1, v2), plane);
-                            // add to left
-                            trimmedObject.addVertex(v, null);
-                            insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
-                            insideIndCnt++;
+                    }
+                    // vj "inside" v(j+1) "outside"
+                    // add vj->v to left, copy of v to right
+                    // and copy of v to cut
+                    else if (inside1 && !inside2)
+                    {   trimmedObject.addVertex(v1, null);
+                        insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
+                        insideIndCnt++;
+                        // find v
+                        Plane3D plane = getPlane(planeValue, planeType); 
+                        Vector3D v = Plane3D.getIntersectionPoint(new Line3D(v1, v2), plane);
+                        // add to left
+                        trimmedObject.addVertex(v, null);
+                        insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
+                        insideIndCnt++;
+                      
+                    }
+                    // vj "outside" v(j+1) "inside"
+                    // add vj->v to right, a copy of v to left
+                    // and a copy of v to cut
+                    else if (!inside1 && inside2)	
+                    {   
+                        // find v
+                    	Plane3D plane = getPlane(planeValue, planeType);
+                        Vector3D v = Plane3D.getIntersectionPoint(new Line3D(v1, v2), plane);
+                        // add to left
+                        trimmedObject.addVertex(v, null);
+                        insideInds[insideIndCnt] = trimmedObject.numVertices - 1;
+                        insideIndCnt++;
           
-                        }
-                    } // for - points
+                    }
+                } // for - points
 
-			} // else facet doorsnijden
+			} // else cut facet
 	
         	// arrange indices to correct length
         	// create new facets
@@ -177,40 +198,31 @@ public class Trim
             	Facet3D insideFacet =  
             		new Facet3D(trimmedObject.vertices, finalInsideInds, facet.color);
             	Facet3D.copyAttributes(facet, insideFacet, false);        
-            	//leftFacet.isReplacementOf = facet;
             	
             	trimmedObject.addFacet(insideFacet);
             	
-            	
-            	/*                
-            	if (facet.numPoints == 2)                    
-            	{
-            	//copy the normal so that segment is treated as an INNER segment
-            	//by the new Painter's
-            	leftFacet.normal = new Vector3D(facet.normal);
-            	if (plane.planePosition(leftFacet.points[0]) == 0)
-            	leftFacet.vertexLabels[0] = "XX";
-            	if (plane.planePosition(leftFacet.points[1]) == 0)
-            	leftFacet.vertexLabels[1] = "XX";
-            	}
-            	*/
         	} // inside
-			
 			
 		} // for facet loop
 		
 		
-		// attributen ob overnemen
+		// copy attributes of ob
 		trimmedObject.filled = ob.filled;
 		trimmedObject.outlined = ob.outlined;
-		
 		trimmedObject.initObject3D(true, false);
 		
 		return trimmedObject;
 	}
 	
 	
-	
+	/**
+	 * given a Facet3D, determine the number of vertices which are "inside" or 
+	 * "not inside" the the plane determined by planeValue and planeType  
+	 * @param f the Facet3D to be checked
+	 * @param planeValue minimum/maximum value determining the cutting plane
+	 * @param planeType type of plane to be used for cutting
+	 * @return array two integers, the "inside"count and the "not inside" count  
+	 */
 	public static int[] getVertexPositions(Facet3D f, double planeValue, int planeType)
 	{	int[] result = new int[2];
 		for (int vCnt = 0; vCnt < f.numPoints; vCnt++)
@@ -222,8 +234,14 @@ public class Trim
 		return result;
 	}
 
-			
-	// inside of op de rand
+	/**
+	 * check if Vector3D v is on the side of the plane determined by 
+	 * planeValue and planeType that should be retained (this is called "inside") 
+	 * @param v Vector3D to be checked
+	 * @param planeValue minimum/maximum value determining the cutting plane
+	 * @param planeType type of plane to be used for cutting
+	 * @return true/false
+	 */
 	public static boolean insideValue(Vector3D v, double planeValue, double planeType)
 	{	if (planeType == XMIN)
 			return v.x >= planeValue - NZERO;
@@ -241,6 +259,13 @@ public class Trim
 		return false;	
 	}
 	
+	/**
+	 * given planeValue and planeType, find the plane 
+	 * with which the Object3D should be cut
+	 * @param planeValue minimum/maximum value determining the cutting plane
+	 * @param planeType type of plane to be used for cutting
+	 * @return the Plane3D to be used
+	 */
 	public static Plane3D getPlane(double planeValue, double planeType)
 	{
 		if ((planeType == XMIN) || (planeType == XMAX)) 

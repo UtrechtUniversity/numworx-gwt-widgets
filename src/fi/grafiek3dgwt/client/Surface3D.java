@@ -2,43 +2,156 @@ package fi.grafiek3dgwt.client;
 
 import fi.grafiek3dgwt.client.expressies.*;
 
+/**
+ * class representing a surface in 3-space as an Object3D;
+ * note how this is done: points on the surface are given
+ * in the form (expX(u,v),expY(u,v),expZ(u,v)), where 
+ * for u uPoints values (given) are taken between a given
+ * uMin and uMax, and similar for v; the vertices of   
+ *  the surface are then given by the points 
+ * (expX(u,v),expY(u,v),expZ(u,v)) which result in square 
+ * 3d-facets for the surface calculating them on the corners of 
+ * the u-v-grid; these square facets are not accurate enough to
+ * smoothly approximate the surface, so each of them is subdivided
+ * into two triangular facets (choice depending on the longest diagonal
+ * of the square facet); <br>     
+ * note that minima and maxima of x-, y- and z- axis are also
+ * given, so that it can be determined if the surface should
+ * be cut at x=xMax, x=xMin, y=yMax, y=yMin, z=zMax or z=zMin
+ * in order to for in the coordinate cube; undefined vertices are
+ * omitted and not used for making facets; near asymptotes
+ * facets should be omitted when one of their edges crosses an
+ * asymptote, but the algorithm for detecting this is very inefficient. 
+ */
 
 public class Surface3D extends Object3D
 {
+	/**
+	 * a very large double
+	 */
 	final double VERYBIG = 1e10d;
+	/**
+	 * a very small double
+	 */
 	final double NZERO = 1e-5d;
 
+	/**
+	 * should the top of the surface be trimmed?
+	 */
 	boolean trimTop = false;
+	/**
+	 * should the bottom of the surface be trimmed?
+	 */
 	boolean trimBottom = false;
+	/**
+	 * should the front of the surface be trimmed?
+	 */
 	boolean trimFront = false;
+	/**
+	 * should the back of the surface be trimmed?
+	 */
 	boolean trimBack = false;
+	/**
+	 * should the left of the surface be trimmed?
+	 */
 	boolean trimLeft = false;
+	/**
+	 * should the right of the surface be trimmed?
+	 */
 	boolean trimRight = false;
 	
+	/**
+	 * the vertex with the largest z value smaller then zMax
+	 */
 	Vector3D topMaxVertex = null;
+	/**
+	 * the vertex with the smallest z value larger then zMin
+	 */
 	Vector3D bottomMinVertex = null;
+	/**
+	 * the vertex with the smallest y value larger then yMin (negative y-axis point to the front)
+	 */
 	Vector3D frontMinVertex = null;
+	/**
+	 * the vertex with the largest y value smaller then yMax (positive y-axis point to the back)
+	 */
 	Vector3D backMaxVertex = null;
+	/**
+	 * the vertex with the smallest x value larger then xMin (negative x-axis point to the left)
+	 */
 	Vector3D leftMinVertex = null;
+	/**
+	 * the vertex with the largest x value smaller then xMax (positive x-axis point to the right)
+	 */
 	Vector3D rightMaxVertex = null;
-	
+	/**
+	 * a vertex of the graph inside the axes-cube
+	 * with maximum distance to the center of the axes-cube
+	 */
 	Vector3D insideVertex = null;
 	
+	/**
+	 * distance between insideVertex and the center of the axes-cube
+	 */
 	double centerDis = 0;
-	
+
+	/**
+	 * some big positive xValue, see method isUnwanted 
+	 */
 	double bigPosX = 0;
+	/**
+	 * some big negative xValue, see method isUnwanted 
+	 */
 	double bigMinX = 0;
+	/**
+	 * some big positive yValue, see method isUnwanted 
+	 */
 	double bigPosY = 0;
+	/**
+	 * some big negative yValue, see method isUnwanted 
+	 */
 	double bigMinY = 0;
+	/**
+	 * some big positive zValue, see method isUnwanted 
+	 */
 	double bigPosZ = 0;
+	/**
+	 * some big negative zValue, see method isUnwanted 
+	 */
 	double bigMinZ = 0;
 	
-//	String[] vLabels; 
-	
+	/**
+	 * check if the defining functions have asymptotes,
+	 * see class Grafiek3DComponent 
+	 */
 	boolean checkForAsymptotes = false;
 	
+	/**
+	 * default constructor
+	 */
     public Surface3D()
     {}
+    /**
+     * constructor
+     * @param expX expression in u and v for x-coordinates
+     * @param expY expression in u and v for y-coordinates
+     * @param expZ expression in u and v for z-coordinates
+     * @param cfa checking for asymptotes
+     * @param uMin minimum u-value
+     * @param uMax maximum u-value 
+     * @param uPoints number of points between uMin and uMax
+     * @param vMin minimum v-value
+     * @param vMax maximum v-value
+     * @param vPoints number of points between vMin and vMax
+     * @param xMin minimum x-axis
+     * @param xMax maximum x-axis
+     * @param yMin minimum y-axis
+     * @param yMax maximum y-axis
+     * @param zMin minimum z-axis
+     * @param zMax maximum z-axis
+     * @param paramNaamU name of u-variable
+     * @param paramNaamV name of v-variable
+     */
     public Surface3D(Expressie expX, Expressie expY, Expressie expZ,
     				 boolean cfa,
     				 double uMin, double uMax, int uPoints, 
@@ -49,38 +162,6 @@ public class Surface3D extends Object3D
     				 String paramNaamU, String paramNaamV)
     {
     	checkForAsymptotes = cfa;
-    	
-		double xAsyPos = 0;
-		double xAszPos = 0;
-		double yAsxPos = 0;
-		double yAszPos = 0;
-		double zAsxPos = 0;
-		double zAsyPos = 0;
-		
-		if (xMin > NZERO)
-		{	yAsxPos = xMin;
-			zAsxPos = xMin;
-		}
-		if (xMax < -NZERO)
-		{	yAsxPos = xMax;
-			zAsxPos = xMax;
-		}
-		if (yMin > NZERO)
-		{	xAsyPos = yMin;
-			zAsyPos = yMin;
-		}
-		if (yMax < -NZERO)
-		{	xAsyPos = yMax;
-			zAsyPos = yMax;
-		}
-		if (zMin > NZERO)
-		{	xAszPos = zMin;
-			yAszPos = zMin;
-		}
-		if (zMax < -NZERO)
-		{	xAszPos = zMax;
-			yAszPos = zMax;
-		}
 
 		bigPosX = 10 * xMax;
 		bigMinX = 10 * xMin;
@@ -104,6 +185,7 @@ public class Surface3D extends Object3D
 		
     	int numSurfaceFacets = uPoints * vPoints;
     	
+        // generate vertices, compare class Grafiek3D
 		double[] subst = new double[2];
 		String[] vars = new String[2];
 		vars[0] = paramNaamU;
@@ -116,8 +198,6 @@ public class Surface3D extends Object3D
 				double expYWaarde = expY.geefWaarde(subst, vars);
 				double expZWaarde = expZ.geefWaarde(subst, vars);
 
-// LATER "oneindige" vertices omlabelen tot iets onschuldigs
-				
 				vertices[uCnt + (uPoints + 1) * vCnt] = 
 					new Vector3D(expXWaarde, expYWaarde, expZWaarde);
 
@@ -189,7 +269,6 @@ public class Surface3D extends Object3D
 					{	trimTop = true;
 						if ((topMaxVertex == null) || (topMaxVertex.z < (expZWaarde - NZERO)))
 							topMaxVertex = new Vector3D(vertices[uCnt + (uPoints + 1) * vCnt]);
-//System.out.println("ez>zMax " + expZWaarde);						
 					}
 				
 					if (expZWaarde < (zMin - NZERO))
@@ -217,18 +296,13 @@ public class Surface3D extends Object3D
 					
 			}
 		
-//if (insideVertex == null)		
-//System.out.println("insideVertex = null");
-//else
-//System.out.println("insideVertex = " + insideVertex.toString());
-		
-
-		// maximale aantal
+		// maximum number
 	    int tempNumFacets = 2 * numSurfaceFacets;
 	    int numNonNullFacets = 0;
 	    Facet3D[] tempFacets = new Facet3D[tempNumFacets];
 	    int facetCount = 0;
-	        
+	    
+	    // compare class Grafiek3D
 	    for (int vCnt = 0; vCnt < vPoints; vCnt++)
 	     	for (int uCnt = 0; uCnt < uPoints; uCnt++)
 	       	{	int[] indices = new int[4];
@@ -254,7 +328,6 @@ public class Surface3D extends Object3D
        			indices4[1] = indices[2];
        			indices4[2] = indices[3];
 	       		
-	       		// hier voor de "oneindige" vertices geen facet maken
 	       		int unDefinedCnt = 0;
 	       		int unDefinedIndex = -1;
 	       		if (isUnDefined(vertices[indices[0]]))
@@ -344,16 +417,11 @@ public class Surface3D extends Object3D
 	       		
 	       		
 	       		boolean vertexUnDefined = (unDefinedCnt > 0);
-//if (vertexUnDefined)
-//System.out.println("vertexUnDefined = " + unDefinedCnt);	       		
-	       		
 
 				int unWantedCnt = 0;
 	        	if (!vertexUnDefined)
 	        	{	
-	        		int[] unWantedIndices = new int[6]; // 4 zijden + 2 diagonalen
-	        		//for (int i = 0; i < unWantedIndices.length; i++)
-	        		//	unWantedIndices[i] = -1;
+	        		int[] unWantedIndices = new int[6]; // 4 sides + 2 diagonals
 	        		if (isUnWanted(uMin + uCnt * uStep, vMin + vCnt * vStep,
 	        					   uMin + uCnt * uStep + uStep, vMin + vCnt * vStep,
 	        					   expX, expY, expZ, paramNaamU, paramNaamV))
@@ -394,16 +462,12 @@ public class Surface3D extends Object3D
 	       		
 	        	
 	        	boolean edgeUnWanted = (unWantedCnt > 0);
-//if (edgeUnWanted)
-//System.out.println("edgeUnWanted = " + unWantedCnt);	       		
-	       		
 	       		
 	       		if (!vertexUnDefined && !edgeUnWanted)
 	       		{
 	       			
-	       			// check op dubbele verices
+	       			// creating tempFacet eliminates subsequent identical vertices in tempFacet, see class Facet3D 
 	       			Facet3D tempFacet = new Facet3D(vertices, indices, Grafiek3DComponent.surfaceColor);
-	       			//tempFacet.reverseNormal();
 	       			
 	       			if (tempFacet.numPoints == 3)
 	       			{	numNonNullFacets++;
@@ -416,13 +480,12 @@ public class Surface3D extends Object3D
 	       				double distance1 = Vector3D.distance(vertices[indices[0]], vertices[indices[2]]);
 	       				double distance2 = Vector3D.distance(vertices[indices[1]], vertices[indices[3]]);
 	       			
-	       			//if (dotProduct1 < dotProduct2)
 	       				if (distance1 < distance2)
-	       				{	// neem 1 en 2 
+	       				{	// take 1 and 2 
 	       					numNonNullFacets++;
 	       					tempFacets[facetCount] = new Facet3D(vertices, indices1, Grafiek3DComponent.surfaceColor);
 	       					tempFacets[facetCount].outlineColor = Grafiek3DComponent.surfaceOutlineColor;
-	       					//tempFacet.reverseNormal();
+			       			// force edge colors, see class Facet3D
 	       					tempFacets[facetCount].edgeCodes[0] = 52;
 	       					tempFacets[facetCount].edgeCodes[1] = 52;
 	       					tempFacets[facetCount].edgeCodes[2] = 51;
@@ -431,7 +494,7 @@ public class Surface3D extends Object3D
 	       					numNonNullFacets++;
 	       					tempFacets[facetCount] = new Facet3D(vertices, indices2, Grafiek3DComponent.surfaceColor);
 	       					tempFacets[facetCount].outlineColor = Grafiek3DComponent.surfaceOutlineColor;
-	       					//tempFacet.reverseNormal();
+			       			// force edge colors, see class Facet3D
 	       					tempFacets[facetCount].edgeCodes[0] = 51;
 	       					tempFacets[facetCount].edgeCodes[1] = 52;
 	       					tempFacets[facetCount].edgeCodes[2] = 52;
@@ -440,11 +503,11 @@ public class Surface3D extends Object3D
 	       				       				
 	       				}
 	       				else // distance1 > distance2
-	       				{	// neem 3 en 4
+	       				{	// take 3 and 4
 	       					numNonNullFacets++;
 	       					tempFacets[facetCount] = new Facet3D(vertices, indices3, Grafiek3DComponent.surfaceColor);
 	       					tempFacets[facetCount].outlineColor = Grafiek3DComponent.surfaceOutlineColor;
-	       					//tempFacet.reverseNormal();
+			       			// force edge colors, see class Facet3D
 	       					tempFacets[facetCount].edgeCodes[0] = 52;
 	       					tempFacets[facetCount].edgeCodes[1] = 51;
 	       					tempFacets[facetCount].edgeCodes[2] = 52;
@@ -453,7 +516,7 @@ public class Surface3D extends Object3D
 	       					numNonNullFacets++;
 	       					tempFacets[facetCount] = new Facet3D(vertices, indices4, Grafiek3DComponent.surfaceColor);
 	       					tempFacets[facetCount].outlineColor = Grafiek3DComponent.surfaceOutlineColor;
-	       					//tempFacet.reverseNormal();
+			       			// force edge colors, see class Facet3D
 	       					tempFacets[facetCount].edgeCodes[0] = 52;
 	       					tempFacets[facetCount].edgeCodes[1] = 52;
 	       					tempFacets[facetCount].edgeCodes[2] = 51;
@@ -462,17 +525,9 @@ public class Surface3D extends Object3D
 	       				}
 	       			}	
 	       			
-	       			//numNonNullFacets++;
-	       			//tempFacets[facetCount] = new Facet3D(vertices, indices, Grafiek3DComponent.graphColor);
-	       			//tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       			//facetCount++;
 	       		}
 	        }
 
-// hier de null-facets opruimen en numFacets aanpassen	        
-	        
-//System.out.println("tempNumFacets = " + tempNumFacets);
-//System.out.println("numNonNullFacets = " + numNonNullFacets);
 	    
 	    numFacets = numNonNullFacets;
 	    facets = new Facet3D[numFacets];
@@ -485,12 +540,7 @@ public class Surface3D extends Object3D
 	    	}
 	    }
 	    
-//for (int fCnt = 0; fCnt < numFacets; fCnt++)
-//{	if (facets[fCnt] == null)
-//	System.out.println("" + fCnt + " null");
-//}
-	    
-	    // label "oneindige" vertices tot iets onschuldigs	    
+	    // change "undefined" vertices to something innocent	    
         for (int vCnt = 0; vCnt < numVertices; vCnt++)
         {	if (isUnDefined(vertices[vCnt]))
         		vertices[vCnt] = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
@@ -500,17 +550,20 @@ public class Surface3D extends Object3D
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
                 facets[fCnt].vertexLabels[vCnt] = "";
-//                    vLabels[facets[fCnt].indices[vCnt]];
                     
 
         // find the center !!
         Vector3D center = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
-        //initObject3D(true, false);
+
         initObject3D(true, center, false);
                 
     	
     }
-    
+    /**
+     * check if double d is NotaNumber or is Infinite
+     * @param d double to be checked
+     * @return true/false
+     */
     public boolean isUnDefined(double d)
     {
     	boolean unDefined = false;
@@ -519,21 +572,33 @@ public class Surface3D extends Object3D
     	
     	return unDefined;
     }
-    
+
+    /**
+     * check if one or more of the coordinates of Vector3D v are undefined
+     * @param v Vector3D to be checked
+     * @return true/false
+     */
     public boolean isUnDefined(Vector3D v)
     {
     	return isUnDefined(v.x) || isUnDefined(v.y) || isUnDefined(v.z);
     }
   
-/*    
-    public boolean isUnWanted(double d)
-    {	boolean unWanted = false;
-    	
-    	unWanted = Double.isNaN(d) || Double.isInfinite(d) || (Math.abs(d) > VERYBIG); 
-    	
-    	return unWanted;
-    }
-*/    
+    /**
+     * very inefficient method to locate asymptotes: given two points in the u-v-plane
+     * evaluate 100 values of expX, expY and expZ along the segment [v1,v2] and 
+     * determine their maximum and minimum; if one of the maxima is large positive and
+     * corresponding minimum is large negative, there must be an asymptote between v1 and v2   
+     * @param u1 u-coordinate first point in u-v-plane 
+     * @param v1 v-coordinate first point in u-v-plane
+     * @param u2 u-coordinate second point in u-v-plane
+     * @param v2 v-coordinate second point in u-v-plane
+     * @param expX x-expression
+     * @param expY y-expression
+     * @param expZ z-expression
+     * @param paramNaamU name of u-variable
+     * @param paramNaamV name of v-variable
+     * @return true/false
+     */
     public boolean isUnWanted(double u1, double v1, double u2, double v2, 
     						  Expressie expX, Expressie expY, Expressie expZ, String paramNaamU, String paramNaamV)
     {	
@@ -616,7 +681,10 @@ public class Surface3D extends Object3D
     
     	return unWanted;	
     }
-    
+
+    /**
+     * make a deep copy of this Surface3D
+     */
     public Object3D deepCopy()
     {   Surface3D copy = new Surface3D();
         makeDeepObjectCopy(copy);

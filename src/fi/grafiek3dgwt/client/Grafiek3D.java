@@ -1,30 +1,101 @@
 package fi.grafiek3dgwt.client;
 
-//import java.awt.Color;
 import fi.grafiek3dgwt.client.expressies.*;
 
+/**
+ * class representing a graph in 3-space as an Object3D;
+ * note how this is done: the distance between the minimum
+ * xMin and the maximum xMax of the x-axis is divided into 
+ * (xMax-xMin)/xStep segments (which can be taken smaller); 
+ * the same for the y-axis, so that the x-y-plane is divided
+ * into squares; calculating function values at the corners
+ * of each square, gives vertices of the form (u,v,f(u,v)),
+ * which result in square 3d-facets for the graph; 
+ * these square facets are not accurate enough to
+ * smoothly approximate the graph, so each of them is subdivided
+ * into two triangular facets (choice depending on the longest
+ * diagonal of the square facet); <br>     
+ * note that zMin and zMax are also given so that it can be determined
+ * if the graph should be cut at z = zMax or z = zMin; undefined
+ * vertices are omitted and not used for making facets; near asymptotes
+ * facets should be omitted when one of their edges crosses an
+ * asymptote, but the algorithm for detecting this is very inefficient. 
+ */
 
 public class Grafiek3D extends Object3D
 {
+	/**
+	 * a very large double
+	 */
 	final double VERYBIG = 1e10d;
+	/**
+	 * a very small double
+	 */
 	final double NZERO = 1e-5d;
+	/**
+	 * should the top of the graph be trimmed?
+	 */
 	boolean trimTop = false;
+	/**
+	 * should the bottom of the graph be trimmed?
+	 */
 	boolean trimBottom = false;
+	/**
+	 * the vertex with the largest z value smaller then zMax
+	 */
 	Vector3D topMaxVertex = null;
+	/**
+	 * the vertex with the smallest z value larger then zMin
+	 */
 	Vector3D bottomMinVertex = null;
+	/**
+	 * a vertex of the graph inside the axes-cube
+	 * with maximum distance to the center of the axes-cube
+	 */
 	Vector3D insideVertex = null;
+	/**
+	 * distance between insideVertex and the center of the axes-cube
+	 */
 	double centerDis = 0;
+	
+	/**
+	 * some big positive zValue, see method isUnwanted 
+	 */
 	double bigPos = 0;
+	/**
+	 * some big negative zValue, see method isUnwanted
+	 */
 	double bigMin = 0;
 	
+	/**
+	 * check if the defining function has asymptotes,
+	 * see class Grafiek3DComponent 
+	 */
 	boolean checkForAsymptotes = false;
-//	String[] vLabels; 
 	
-// tijdelijk
-int unWantedSkipped = 0;	
-	
+	/**
+	 * default constructor
+	 */
     public Grafiek3D()
     {}
+    /**
+     * constructor
+     * @param exp function expression
+     * @param cfa checking for asymptotes
+     * @param xMin minimum x-axis
+     * @param xMax maximum x-axis
+     * @param xStep step size on x-axis
+     * @param yMin minimum y-axis
+     * @param yMax maximum y-axis
+     * @param yStep step size on y-axis
+     * @param zMin minimum z-axis
+     * @param zMax maximum z-axis
+     * @param zStep step size on z-axis
+     * @param varNaamX name x-variable
+     * @param varNaamY name y-variable
+     * @param xFinerSteps finer factor for x-axis (see class Grafiek3DComponent)
+     * @param yFinerSteps finer factor for y-axis (see class Grafiek3DComponent)
+     */
     public Grafiek3D(Expressie exp, boolean cfa,
     			double xMin, double xMax, double xStep, 
     		    double yMin, double yMax, double yStep,
@@ -33,39 +104,7 @@ int unWantedSkipped = 0;
     {
     	
     	checkForAsymptotes = cfa;
-    	
-		double xAsyPos = 0;
-		double xAszPos = 0;
-		double yAsxPos = 0;
-		double yAszPos = 0;
-		double zAsxPos = 0;
-		double zAsyPos = 0;
-		
-		if (xMin > NZERO)
-		{	yAsxPos = xMin;
-			zAsxPos = xMin;
-		}
-		if (xMax < -NZERO)
-		{	yAsxPos = xMax;
-			zAsxPos = xMax;
-		}
-		if (yMin > NZERO)
-		{	xAsyPos = yMin;
-			zAsyPos = yMin;
-		}
-		if (yMax < -NZERO)
-		{	xAsyPos = yMax;
-			zAsyPos = yMax;
-		}
-		if (zMin > NZERO)
-		{	xAszPos = zMin;
-			yAszPos = zMin;
-		}
-		if (zMax < -NZERO)
-		{	xAszPos = zMax;
-			yAszPos = zMax;
-		}
-		
+
 		bigPos = 10 * zMax;
 		bigMin = 10 * zMin;
 		
@@ -76,43 +115,35 @@ int unWantedSkipped = 0;
 		double xStepFine = xStep / xFinerSteps;
 		double yStepFine = yStep / yFinerSteps;
 		
+		// determine the number of facets needed
     	int numXFacets = (int) Math.round((xMax - xMin) / xStepFine);
     	int numYFacets = (int) Math.round((yMax - yMin) / yStepFine);
     	int numGraphFacets = numXFacets * numYFacets;
 
-//System.out.println("numGraphfacets = " + numGraphFacets);    	
-   		
+    	// determine the number of vertices needed
 		int numGraphVertices = (numXFacets + 1) * (numYFacets + 1);
     	numVertices = numGraphVertices;
 		numVertexLabels = numVertices;
 		vertices = new Vector3D[numVertices];
 		// do NOT forget this
 		trVertices = new Vector3D[numVertices];
-//		vLabels = new String[numVertices];
 
 		double[] subst = new double[2];
 		String[] vars = new String[2];
 		vars[0] = varNaamX;
 		vars[1] = varNaamY;
-		
-		//for (int yCnt = 0; yCnt < (numYFacets + 1); yCnt++)			
-		//	for (int xCnt = 0; xCnt < (numXFacets + 1); xCnt++)
+
+		// create the vertices by calculating the function
+		// values at the points of the x-y-grid; 
 		for (int yCnt = numYFacets; yCnt >= 0; yCnt--)			
 			for (int xCnt = numXFacets; xCnt >= 0; xCnt--)
 			{	subst[0] = xMin + xCnt * xStepFine;
 				subst[1] = yMin + yCnt * yStepFine;
 				double expWaarde = exp.geefWaarde(subst, vars);
-				//double xWaarde = xMin + xCnt * xStepFine;
-				//double yWaarde = yMin + yCnt * yStepFine;
-				//double expWaarde = exp.geefWaarde(xWaarde, yWaarde);
-
-// LATER "oneindige" vertices omlabelen tot iets onschuldigs
 				
 				vertices[xCnt + (numXFacets + 1) * yCnt] = 
-				//	new Vector3D(xWaarde, yWaarde, expWaarde);	
 					new Vector3D(subst[0], subst[1], expWaarde);
 				
-				// dit is maar een(1)check
 				if (!isUnDefined(expWaarde))
 				{
 					if (expWaarde > (zMax + NZERO))
@@ -146,29 +177,25 @@ int unWantedSkipped = 0;
 					
 			}
 		
-//if (insideVertex == null)		
-//System.out.println("insideVertex = null");
-//else
-//System.out.println("insideVertex = " + insideVertex.toString());
-
-		// maximale aantal
+		// maximum number (each square facet divided in to 2 triangles
 	    int tempNumFacets = 2 * numGraphFacets;
 	    int numNonNullFacets = 0;
 	    Facet3D[] tempFacets = new Facet3D[tempNumFacets];
 	    int facetCount = 0;
 	        
-	    //for (int yCnt = 0; yCnt < numYFacets; yCnt++)
-	    // 	for (int xCnt = 0; xCnt < numXFacets; xCnt++)
+	    // for each square facet check if one or more vertices are undefined
+	    // and create one triangle if one vertex is undefined and two triangles if
+	    // all 4 vertices are defined 
 	    for (int yCnt = numYFacets - 1; yCnt >= 0; yCnt--)
 	    	for (int xCnt = numXFacets - 1; xCnt >= 0; xCnt--)
-	       	{	// indices van de 4 vertices
+	       	{	// indices of the 4 vertices
 	     		int[] indices = new int[4];
 	       		indices[0] = xCnt + (numXFacets + 1) * yCnt;
 	       		indices[1] = xCnt + 1 + (numXFacets + 1) * yCnt;
 	       		indices[2] = xCnt + 1 + (numXFacets + 1) * (yCnt + 1);
 	       		indices[3] = xCnt + (numXFacets + 1) * (yCnt + 1);	
 
-	       		// 4 mogelijke deeldriehoekjes
+	       		// 4 possible triangles
        			int[] indices1 = new int[3];
        			indices1[0] = indices[0];
        			indices1[1] = indices[1];
@@ -186,7 +213,7 @@ int unWantedSkipped = 0;
        			indices4[1] = indices[2];
        			indices4[2] = indices[3];
 	       		
-	       		// hier voor de "oneindige" vertices geen facet maken
+	       		// check which of the 4 vertices in undefined
 	       		int unDefinedCnt = 0;
 	       		int unDefinedIndex = -1;
 	       		if (isUnDefined(vertices[indices[0]].z))
@@ -206,19 +233,15 @@ int unWantedSkipped = 0;
 	       			unDefinedIndex = 3;
 	       		}
 	       		
+	       		// only one undefined, create a triangle out of the other 3
 	       		if (unDefinedCnt == 1)
 	       		{
-//System.out.println("unDefinedCnt = 1");	       			
 	       			if (unDefinedIndex == 0)
 	       			{	
-	       				
 //CHECK UNWANTED	       				
 	       				numNonNullFacets++;
 	       				tempFacets[facetCount] = new Facet3D(vertices, indices4, Grafiek3DComponent.graphColor);
 	       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       				//tempFacets[facetCount].edgeCodes[0] = 50;
-	       				//tempFacets[facetCount].edgeCodes[1] = 50;
-	       				//tempFacets[facetCount].edgeCodes[2] = 51;
 	       				facetCount++;
 	       				
 	       			}
@@ -228,9 +251,6 @@ int unWantedSkipped = 0;
 	       				numNonNullFacets++;
 	       				tempFacets[facetCount] = new Facet3D(vertices, indices2, Grafiek3DComponent.graphColor);
 	       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       				//tempFacets[facetCount].edgeCodes[0] = 50;
-	       				//tempFacets[facetCount].edgeCodes[1] = 50;
-	       				//tempFacets[facetCount].edgeCodes[2] = 51;
 	       				facetCount++;
 	       			}
 	       			if (unDefinedIndex == 2)
@@ -239,9 +259,6 @@ int unWantedSkipped = 0;
 	       				numNonNullFacets++;
 	       				tempFacets[facetCount] = new Facet3D(vertices, indices3, Grafiek3DComponent.graphColor);
 	       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       				//tempFacets[facetCount].edgeCodes[0] = 50;
-	       				//tempFacets[facetCount].edgeCodes[1] = 50;
-	       				//tempFacets[facetCount].edgeCodes[2] = 51;
 	       				facetCount++;
 	       			}
 	       			if (unDefinedIndex == 3)
@@ -250,23 +267,18 @@ int unWantedSkipped = 0;
 	       				numNonNullFacets++;
 	       				tempFacets[facetCount] = new Facet3D(vertices, indices1, Grafiek3DComponent.graphColor);
 	       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       				//tempFacets[facetCount].edgeCodes[0] = 50;
-	       				//tempFacets[facetCount].edgeCodes[1] = 50;
-	       				//tempFacets[facetCount].edgeCodes[2] = 51;
 	       				facetCount++;
 	       			}
 	       		}
 	       		
 	       		boolean vertexUnDefined = (unDefinedCnt > 0);
-//if (vertexUnDefined)
-//System.out.println("vertexUnDefined = " + unDefinedCnt);	       		
 
 				int unWantedCnt = 0;
+				// all 4 vertices are defined 
 	        	if (!vertexUnDefined)
 	        	{	
-	        		int[] unWantedIndices = new int[6]; // 4 zijden + 2 diagonalen
-	        		//for (int i = 0; i < unWantedIndices.length; i++)
-	        		//	unWantedIndices[i] = -1;
+	        		int[] unWantedIndices = new int[6]; // 4 sides + 2 diagonals
+	        		// check for asymptotes on the 6 possible sides 
 	        		if (isUnWanted(vertices[indices[0]], vertices[indices[1]], exp, varNaamX, varNaamY))
 	        		{	unWantedCnt++;
 	        			unWantedIndices[0] = 1;
@@ -299,95 +311,71 @@ int unWantedSkipped = 0;
 	        		else if (unWantedCnt == 2)
 	        		{
 	        			if ((unWantedIndices[0] == 1) && (unWantedIndices[1] == 1))
-	        			{	// neem driehoek 0,2,3 (indices2)
+	        			{	// take triangle  0,2,3 (indices2)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices2, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[1] == 1) && (unWantedIndices[2] == 1))
-	        			{	// neem drieheoek 0,1,3 (indices3)
+	        			{	// take triangle  0,1,3 (indices3)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices3, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[2] == 1) && (unWantedIndices[3] == 1))
-	        			{   // neem driehoeh 0,1,2 (indices1)
+	        			{   // take triangle  0,1,2 (indices1)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices1, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[3] == 1) && (unWantedIndices[0] == 1))
-	        			{	// neem driehoek 1,2,3 (indices4)
+	        			{	// take triangle  1,2,3 (indices4)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices4, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
-//HIER NOG MEER?	        			
+//HERE MORE?	        			
 	        			
 	        		}
 	        		else if (unWantedCnt == 3)
 	        		{
 	        			if ((unWantedIndices[0] == 1) && (unWantedIndices[1] == 1) && (unWantedIndices[5] == 1))
-	        			{	// neem driehoek 0,2,3 (indices2)
+	        			{	// take triangle  0,2,3 (indices2)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices2, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[1] == 1) && (unWantedIndices[2] == 1) && (unWantedIndices[4] == 1))
-	        			{	// neem drieheoek 0,1,3 (indices3)
+	        			{	// take triangle  0,1,3 (indices3)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices3, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[2] == 1) && (unWantedIndices[3] == 1) && (unWantedIndices[5] == 1))
-	        			{   // neem driehoeh 0,1,2 (indices1)
+	        			{   // take triangle 0,1,2 (indices1)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices1, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
 	        			if ((unWantedIndices[3] == 1) && (unWantedIndices[0] == 1) && (unWantedIndices[4] == 1))
-	        			{	// neem driehoek 1,2,3 (indices4)
+	        			{	// take triangle 1,2,3 (indices4)
 		       				numNonNullFacets++;
 		       				tempFacets[facetCount] = new Facet3D(vertices, indices4, Grafiek3DComponent.graphColor);
 		       				tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-		       				//tempFacets[facetCount].edgeCodes[0] = 50;
-		       				//tempFacets[facetCount].edgeCodes[1] = 50;
-		       				//tempFacets[facetCount].edgeCodes[2] = 51;
 		       				facetCount++;
 	        				
 	        			}
@@ -398,21 +386,19 @@ int unWantedSkipped = 0;
 	        		
 	        	}
 	        	boolean edgeUnWanted = (unWantedCnt > 0);
-//if (edgeUnWanted)
-//System.out.println("edgeUnWanted = " + unWantedCnt);	       		
-	        	
+	        	// no problems
 	       		if (!vertexUnDefined && !edgeUnWanted)
 	       		{
 	       			
 	       			double distance1 = Vector3D.distance(vertices[indices[0]], vertices[indices[2]]);
 	       			double distance2 = Vector3D.distance(vertices[indices[1]], vertices[indices[3]]);
 	       			
-	       			//if (dotProduct1 < dotProduct2)
 	       			if (distance1 < distance2)
-	       			{	// neem 1 en 2 
+	       			{	// take 1 and 2 
 		       			numNonNullFacets++;
 		       			tempFacets[facetCount] = new Facet3D(vertices, indices1, Grafiek3DComponent.graphColor);
 		       			tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
+		       			// force edge colors, see class Facet3D
 		       			tempFacets[facetCount].edgeCodes[0] = 50;
 		       			tempFacets[facetCount].edgeCodes[1] = 50;
 		       			tempFacets[facetCount].edgeCodes[2] = 51;
@@ -421,6 +407,7 @@ int unWantedSkipped = 0;
 		       			numNonNullFacets++;
 		       			tempFacets[facetCount] = new Facet3D(vertices, indices2, Grafiek3DComponent.graphColor);
 		       			tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
+		       			// force edge colors, see class Facet3D
 		       			tempFacets[facetCount].edgeCodes[0] = 51;
 		       			tempFacets[facetCount].edgeCodes[1] = 50;
 		       			tempFacets[facetCount].edgeCodes[2] = 50;
@@ -430,10 +417,11 @@ int unWantedSkipped = 0;
 	       				
 	       			}
 	       			else // distance1 > distance2
-	       			{	// neem 3 en 4
+	       			{	// take 3 and 4
 		       			numNonNullFacets++;
 		       			tempFacets[facetCount] = new Facet3D(vertices, indices3, Grafiek3DComponent.graphColor);
 		       			tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
+		       			// force edge colors, see class Facet3D
 		       			tempFacets[facetCount].edgeCodes[0] = 50;
 		       			tempFacets[facetCount].edgeCodes[1] = 51;
 		       			tempFacets[facetCount].edgeCodes[2] = 50;
@@ -443,6 +431,7 @@ int unWantedSkipped = 0;
 		       			numNonNullFacets++;
 		       			tempFacets[facetCount] = new Facet3D(vertices, indices4, Grafiek3DComponent.graphColor);
 		       			tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
+		       			// force edge colors, see class Facet3D
 		       			tempFacets[facetCount].edgeCodes[0] = 50;
 		       			tempFacets[facetCount].edgeCodes[1] = 50;
 		       			tempFacets[facetCount].edgeCodes[2] = 51;
@@ -450,19 +439,11 @@ int unWantedSkipped = 0;
 		       			facetCount++;
 	       				
 	       			}
-	       			
-	       			//numNonNullFacets++;
-	       			//tempFacets[facetCount] = new Facet3D(vertices, indices, Grafiek3DComponent.graphColor);
-	       			//tempFacets[facetCount].outlineColor = Grafiek3DComponent.graphOutlineColor;
-	       			//facetCount++;
 	       		}
 	        }
 
-// hier de null-facets opruimen en numFacets aanpassen	        
-	        
-//System.out.println("tempNumFacets = " + tempNumFacets);
-//System.out.println("numNonNullFacets = " + numNonNullFacets);
-	    
+
+	    // remove null-facets and adapt numFacets
 	    numFacets = numNonNullFacets;
 	    facets = new Facet3D[numFacets];
 	    int nonNullCnt = 0;
@@ -474,12 +455,8 @@ int unWantedSkipped = 0;
 	    	}
 	    }
 	    
-//for (int fCnt = 0; fCnt < numFacets; fCnt++)
-//{	if (facets[fCnt] == null)
-//	System.out.println("" + fCnt + " null");
-//}
 	    
-	    // label "oneindige" vertices tot iets onschuldigs	    
+	    // change "undefined" vertices to something innocent	    
         for (int vCnt = 0; vCnt < numVertices; vCnt++)
         {	if (isUnDefined(vertices[vCnt].z))
         		vertices[vCnt] = new Vector3D(vertices[vCnt].x, vertices[vCnt].y, (zMin + zMax) / 2);
@@ -489,42 +466,43 @@ int unWantedSkipped = 0;
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
                 facets[fCnt].vertexLabels[vCnt] = "";
-//                    vLabels[facets[fCnt].indices[vCnt]];
-                    
 
         // find the center !!
         Vector3D center = new Vector3D((xMin + xMax) / 2, (yMin + yMax) / 2, (zMin + zMax) / 2);
         //initObject3D(true, false);
         initObject3D(true, center, false);
-                
-//System.out.println("Grafiek3D uws = " + unWantedSkipped);
-//System.out.println("Grafiek3D fc = " + numFacets);
     	
     }
-    
+
+    /**
+     * check if double d is NotaNumber or is Infinite
+     * @param d double to be checked
+     * @return true/false
+     */
     public boolean isUnDefined(double d)
     {
     	boolean unDefined = false;
-    	
     	unDefined = Double.isNaN(d) || Double.isInfinite(d); 
-    	
     	return unDefined;
     }
  
-/*    
-    public boolean isUnWanted(double d)
-    {	boolean unWanted = false;
-    	
-    	unWanted = Double.isNaN(d) || Double.isInfinite(d) || (Math.abs(d) > VERYBIG); 
-    	
-    	return unWanted;
-    }
-*/    
+    
+    /**
+     * very inefficient method to locate asymptotes: given two points in the x-y-plane
+     * evaluate 100 function values along the segment [v1,v2] and determine their 
+     * maximum and minimum; if the maximum is large positive and the minimum is
+     * large negative, there must be an asymptote between v1 and v2   
+     * @param v1 first point in x-y-plane
+     * @param v2 second point in x-y-plane
+     * @param exp the function expression
+     * @param varNaamX name of x-variable
+     * @param varNaamY name of y-variable
+     * @return true/false
+     */
     public boolean isUnWanted(Vector3D v1, Vector3D v2, Expressie exp, String varNaamX, String varNaamY)
     {	
     	if (!checkForAsymptotes)
     	{
-    		unWantedSkipped++;
     		return false;
     	}	
     	
@@ -537,7 +515,6 @@ int unWantedSkipped = 0;
     	subst[0] = v1.x;
 		subst[1] = v1.y;
 		double expWaarde = exp.geefWaarde(subst, vars);
-		//double expWaarde = exp.geefWaarde(v1.x, v1.y);
     
     	double max = expWaarde;
     	double min = expWaarde;
@@ -549,7 +526,6 @@ int unWantedSkipped = 0;
     		subst[0] = v1.x + stepCnt * stepX;
     		subst[1] = v1.y + stepCnt * stepY;
     		expWaarde = exp.geefWaarde(subst, vars);
-    		//expWaarde = exp.geefWaarde(v1.x + stepCnt * stepX, v1.y + stepCnt * stepY);
     		
     		if (!Double.isNaN(expWaarde) && !Double.isInfinite(expWaarde))
     		{
@@ -562,12 +538,14 @@ int unWantedSkipped = 0;
     	
     	if ((max > bigPos) && (min < bigMin))
     	{	unWanted = true;
-//System.out.println("unWanted " + v1.toString() + " " + v2.toString());
     	}
     
     	return unWanted;	
     }
     
+    /**
+     * make a deep copy of this Grafiek3D
+     */
     public Object3D deepCopy()
     {   Grafiek3D copy = new Grafiek3D();
         makeDeepObjectCopy(copy);

@@ -2,9 +2,18 @@ package fi.grafiek3dgwt.client;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 
-//import fi.grafiek3dgwt.client.expressies.Expressie;
+/**
+ * superclass for creating examples of 3d-graphs: 
+ * the superclass sets all 3d-graph-attributes
+ * (see class Grafiek3DComponent);<br> 
+ * subclasses can reset some of these, but must
+ * redefine the function defining the 3d-graph (GraphString),
+ * the name of the 3d-graph (nlNaam and enNaam)
+ * and method geefWaarde(x,y)  
+ * @author huub
+ */
 
-public class GrafiekVoorbeeld// extends Expressie
+public class GrafiekVoorbeeld
 {
 	double angleXG = 75;
 	double angleZG = 25;

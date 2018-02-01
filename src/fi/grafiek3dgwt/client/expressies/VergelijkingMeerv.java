@@ -2,12 +2,10 @@ package fi.grafiek3dgwt.client.expressies;
 
 import java.util.Vector;
 
-//import fi.grafiek3dtest.Grafiek3DTest;
 
 public class VergelijkingMeerv 
 {	
 	Vergelijking[] vergelijkingen;
-	//OngelijkheidObject[] ongelijkheidObjecten;
 	
 	public VergelijkingMeerv(Vergelijking[] v)
 	{	vergelijkingen = v;
@@ -207,16 +205,6 @@ public class VergelijkingMeerv
 		return isOplossing;
 	}
 	
-	/*public boolean bevatFouteOplossing(VergelijkingMeerv antw)
-	{	boolean isOplossing = true;
-		for(int j=0 ; j<vergelijkingen.length ; j++)
-		{	if(vergelijkingen[j].isEindOplossing())
-			{	isOplossing = antw.isOplossing(vergelijkingen[j].geefEindOplossing());
-				if(!isOplossing)return true;
-			}
-		}
-		return false;
-	}*/
 	
 	public boolean bevatFouteOplossing(VergelijkingMeerv antw, String var)
 	{	for(int j=0 ; j<vergelijkingen.length ; j++)
@@ -392,18 +380,6 @@ public class VergelijkingMeerv
 		return true;
 	}
 	
-	
-	
-	/*
-	public double[] geefEindOplossing()
-	{	double[] oplossingen = new double[vergelijkingen.length];
-		if(isEindOplossing())
-		{	for(int i=0 ; i<vergelijkingen.length ; i++)
-			{	oplossingen[i] = vergelijkingen[i].geefEindOplossing();
-			}
-		}
-		return oplossingen;
-	}*/
 	
 	public Expressie[] geefEindOplossing(String var)
 	{	Expressie[] oplossingen = new Expressie[vergelijkingen.length];

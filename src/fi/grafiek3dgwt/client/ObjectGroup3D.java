@@ -134,9 +134,10 @@ public class ObjectGroup3D extends Object3D
         return result;
     }
     
-    
-    // define separately for objectgroups, treat as subclass
-    // see remarks in class Object3D, treat ObjectGroup as a subclass 
+    /**
+     * make a deep copy of this ObjectGroup3D by copying all its objects
+     * @param copy the deep copy
+     */
     public void makeDeepGroupCopy(ObjectGroup3D copy)
     {   
         for (int i = 0; i < objects.size(); i++)

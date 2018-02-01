@@ -1,6 +1,5 @@
 package fi.grafiek3dgwt.client.expressies;
 
-import java.awt.*;
 
 public class DecRoundStrict extends Expressie  
 {	
@@ -16,8 +15,6 @@ public class DecRoundStrict extends Expressie
 	public double geefWaarde()
 	{	double d = 0;
 		d = kind1.geefWaarde()*1.000000000000001;
-		//if(kind1.geefWaarde()<0) d = kind1.geefWaarde()-0.000000000000001;
-		//else d = kind1.geefWaarde()+0.000000000000001;
 		System.out.println(""+Math.rint(d*Math.pow(10, kind2.geefWaarde()))/Math.pow(10, kind2.geefWaarde()));
 		double w = Math.rint(d*Math.pow(10, kind2.geefWaarde()))/Math.pow(10, kind2.geefWaarde());
 		if(kind2.geefWaarde() < 0) w = Math.rint(w);
@@ -36,15 +33,11 @@ public class DecRoundStrict extends Expressie
 	
 	public Expressie substitueer(double subst, String var)
 	{	DecRoundStrict exp = new DecRoundStrict(kind1.substitueer(subst,var), kind2.substitueer(subst,var));
-		//if(exp.isWaarde())return new BasisExpressie(exp.geefWaarde());
-		//else 
 			return exp;
 	}
 	
 	public Expressie substitueer(Expressie subst, String var)
 	{	DecRoundStrict exp = new DecRoundStrict(kind1.substitueer(subst,var), kind2.substitueer(subst,var));
-		//if(exp.isWaarde())return new BasisExpressie(exp.geefWaarde());
-		//else 
 			return exp;
 	}
 	
@@ -64,12 +57,12 @@ public class DecRoundStrict extends Expressie
 	}
 	
 	public String toString()
-	{	//if(isWaarde())return new BasisExpressie(geefWaarde()).toString();
+	{	
 		return "rnq" + "$h" + kind1.toString() + "_" + kind2.toString() + "@";
 	}
 	
 	public String toStringStrikt()
-	{	//if(isWaarde())return new BasisExpressie(geefWaarde()).toString();
+	{	
 		return "rnq" + "$h" + kind1.toStringStrikt() + "_" + kind2.toStringStrikt() + "@";
 	}
     
