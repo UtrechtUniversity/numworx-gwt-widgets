@@ -25,6 +25,7 @@
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='org.vectomatic.libgwtfile' />
+  <inherits name='com.googlecode.gwt.charts.Charts' />
   <!--  <inherits name='com.alkacon.geranium.Geranium' />	-->
   
   <extend-property name="locale" values="en"/>
