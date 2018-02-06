@@ -2,6 +2,7 @@ package nl.numworx.geodefinergwt.client;
 
 import nl.numworx.geodefiner.common.AddCirkelHandler;
 import nl.numworx.geodefiner.common.AddPolygonHandler;
+import nl.numworx.geodefiner.common.FilteredDestroyHandler;
 import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
@@ -13,6 +14,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.ToggleButton;
 
 import fi.euclides.event.AddBissectriceHandler;
 import fi.euclides.event.AddBoogHandler;
@@ -40,17 +42,20 @@ import fi.euclides.util.Messages;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
-	static class Action implements ClickHandler {
+	class Action implements ClickHandler {
 
 		final private EventHandler h;
+		final private ToggleButton btn;
 
-		public Action(EventHandler h, Tracker t) {
+		public Action(EventHandler h, Tracker t, ToggleButton btn) {
 			this.h = h;
+			this.btn = btn;
 			h.setTracker(t);
 		}
 
 		@Override
 		public void onClick(ClickEvent event) {
+			down(btn);
 			h.command();
 			h.getTracker().paint();
 		}
@@ -58,12 +63,21 @@ public class ToolBoxPanel extends Composite implements Tools {
 	}
 
 	FlowPanel panel;
+	ToggleButton downBtn;
 	
 	public ToolBoxPanel() {
 		panel = new FlowPanel();
 		initWidget(panel);
 	}
 	
+	void down(ToggleButton btn) {
+		if(downBtn != null && downBtn != btn)
+			downBtn.setDown(false);
+		downBtn = btn;
+		btn.setDown(true);
+		
+	}
+
 	void destroy() {
 		int size = panel.getWidgetCount();
 		for(int i = 0; i < size; i++)
@@ -77,7 +91,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 	}
 	
 	void init(ObjectList list, Tracker tracker, GeoDefinerGWT geoDefinerGWT) {		
-		PushButton btn;
+		ToggleButton btn;
 		width = geoDefinerGWT.getWidth();
 		height = ((list.size()*38-1)/width+1)*38;
 		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
@@ -99,7 +113,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case CIRCLE:
 				btn = newBtn(url + "/circle.png", new AddCirkelHandler(), tracker);break;
 			case DESTROY:
-				btn = newBtn(url + "/delete.png", new DestroyHandler(), tracker);break;
+				btn = newBtn(url + "/delete.png", new FilteredDestroyHandler(geoDefinerGWT), tracker);break;
 			case HALFLINE:
 				btn = newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker);break;		
 			case ARC:
@@ -142,7 +156,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 		
 */			
 			case FORMULA: // definitie, /formuleknop.gif
-				btn = newBtn(url + "/formuleknop.gif", new FormuleHandler("Definitie"), tracker);break;
+				btn = newBtn(url + "/function.png", new FormuleHandler("Definitie"), tracker);break;
 			case TEXT: 
 				btn = newBtn(url + "/text.png", new TextHandler("Text"), tracker); break;
 			case TRAIL: // trail
@@ -159,10 +173,10 @@ public class ToolBoxPanel extends Composite implements Tools {
 		}
 	}
 
-	PushButton newBtn(String url, EventHandler handler, Tracker tracker) {
-		PushButton btn;
-		btn = new PushButton(new Image(url));
-				btn.addClickHandler(new Action(handler, tracker));
+	ToggleButton newBtn(String url, EventHandler handler, Tracker tracker) {
+		ToggleButton btn;
+		btn = new ToggleButton(new Image(url));
+		btn.addClickHandler(new Action(handler, tracker,btn));
 		return btn;
 	}
 }

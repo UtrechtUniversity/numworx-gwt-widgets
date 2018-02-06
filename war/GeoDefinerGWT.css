@@ -28,7 +28,7 @@ body {
 	visibility: hidden;
 }
 
-.toolbox .gwt-PushButton {
+.toolbox .gwt-ToggleButton {
 	padding: 0px !important;
 	display: inline-block;
 }

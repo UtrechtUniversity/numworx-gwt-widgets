@@ -59,7 +59,7 @@ class TextHandler extends AbstractTextHandler implements Owner {
 		Label label = new Label();
 		label.setString(text);
 		Volgpunt v = new Volgpunt(p);
-		v.setDxy(Numbers.createInteger(4), Numbers.ZERO);
+		v.setDxy(Numbers.createInteger(6),Numbers.createInteger(-5));
 		v.setFree(false);
 		label.setP(v);
 		getModel().add(label);

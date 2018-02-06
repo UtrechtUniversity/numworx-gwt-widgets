@@ -73,7 +73,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
 	private void lognagekeken() {
-		LOG.info("nagekeken = " + nagekeken + ", score = " + score + ", feedback = " + getStatus());
+		LOG.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus());
 	}
 	
 	
@@ -168,7 +168,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		@SuppressWarnings("unchecked")
 		@Override
 		public <T> T adapt(Class<T> cls) {
-			if(fi.euclides.openmath.Expression.class == cls) 
+			if(fi.euclides.openmath.Expression.class == cls
+					||nl.numworx.geodefiner.common.math.Expression.class == cls) 
 				return (T) expression;
 			if(Randomizer.class == cls) 
 				return (T) GeoDefinerGWT.this;
@@ -253,7 +254,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		setState(map);
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
-		if(nagekeken) {
+		if(isNagekeken()) {
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
 			fetchScore();
 			feedback();
@@ -277,7 +278,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void kijkNa() {
 		update(null, "changed");
 		feedback();
-		nagekeken = true;LOG.info("KijkNA");
+		setNagekeken(true);LOG.info("KijkNA");
 		lognagekeken();
 	}
 
@@ -298,11 +299,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		check.removeStyleName(GOED_CSS);
 		if(checkObjects != null)
 			checkObjects.removeFeedback();
-		nagekeken=false;
+		setNagekeken(false);
 	}
 
 	public void zetNagekeken(boolean b) {
-		this.nagekeken = b;
+		setNagekeken(b);
 	}
 
 	private void addFireUpdates() {
