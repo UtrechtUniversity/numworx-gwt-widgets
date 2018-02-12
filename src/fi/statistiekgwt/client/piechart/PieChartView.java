@@ -3,11 +3,10 @@ package fi.statistiekgwt.client.piechart;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.Style.FontWeight;
-import com.google.gwt.dom.client.Style.TextAlign;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
@@ -16,7 +15,7 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
-import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
@@ -24,21 +23,19 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.googlecode.gwt.charts.client.ChartLoader;
 import com.googlecode.gwt.charts.client.ChartPackage;
 import com.googlecode.gwt.charts.client.DataTable;
-import com.googlecode.gwt.charts.client.Selection;
 import com.googlecode.gwt.charts.client.corechart.PieChart;
 import com.googlecode.gwt.charts.client.corechart.PieChartOptions;
 import com.googlecode.gwt.charts.client.event.ReadyEvent;
 import com.googlecode.gwt.charts.client.event.ReadyHandler;
-import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
-
+import com.googlecode.gwt.charts.client.options.PieSliceText;
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.ColorUtils.RGBColor;
-import fi.statistiekgwt.client.ColorPreviewer;
 import fi.statistiekgwt.client.DialogButton;
+import fi.statistiekgwt.client.SplitOptions;
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
@@ -74,11 +71,19 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 	 * Op panel 'alles' staan mainpanel en dialogbuttonpanel.
 	 */
 	private FlowPanel alles;
-	private FlowPanel mainPanel;
+	private DockLayoutPanel mainPanel;
 	private ScrollPanel scrollPanel;
 	private HorizontalPanel dialogButtonPanel;
 	private PieChart chart;
-
+	/**
+	 * Data table for pie chart.
+	 */
+	private DataTable dataTable;
+	/**
+	 * Options for the pie chart.
+	 */
+	private PieChartOptions options;
+	
 	/**
 	 * The frequencies of the enum variable
 	 */
@@ -158,7 +163,7 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 		this.outlierChangeEventHandlerRegistration = this.model.getStatTableModel().addOutlierChangeEventHandler(this);
 		
 		// create GUI
-		this.mainPanel = new FlowPanel();
+		this.mainPanel = new DockLayoutPanel(Unit.PX);
 		
 		this.scrollPanel = new ScrollPanel(this.mainPanel);
 		this.scrollPanel.setAlwaysShowScrollBars(false);
@@ -293,8 +298,6 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 		// update the components in the useroptionspanel
 		userOptionsPanel.update();
 
-		StatistiekUtils.removeAllWidgetsFromPanel(this.mainPanel);
-
 		if (this.model.columnIndexValid())
 		{
 			frequencies_enum = this.model.enumClassFrequency();
@@ -353,9 +356,22 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 
 			@Override
 			public void run() {
+				StatistiekUtils.removeAllWidgetsFromPanel(mainPanel);
+
 				// Create and attach the chart
+				// test add own legend
+				VerticalPanel legend = new VerticalPanel();
+				legend.add(new Label("links 15 30%"));
+				legend.add(new Label("rechts 35 70%"));
+				VerticalPanel legend2 = new VerticalPanel();
+				legend2.add(new Label("links 15 30%"));
+				legend2.add(new Label("rechts 35 70%"));
+//				mainPanel.addEast(legend, 100);
+//				mainPanel.addSouth(legend2, 50);
+				
 				chart = new PieChart();
 				mainPanel.add(chart);
+				
 				draw();
 			}
 		});
@@ -368,41 +384,59 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 	private void draw()
 	{
 		// Prepare the data
-		DataTable dataTable = DataTable.create();
-		dataTable.addColumn(com.googlecode.gwt.charts.client.ColumnType.STRING, "Task");
-		dataTable.addColumn(com.googlecode.gwt.charts.client.ColumnType.NUMBER, "Hours per Day");
-		dataTable.addRows(5);
-		dataTable.setValue(0, 0, "Work");
-		dataTable.setValue(0, 1, 11);
-		dataTable.setValue(1, 0, "Sleep");
-		dataTable.setValue(1, 1, 7);
-		dataTable.setValue(2, 0, "Watch TV");
-		dataTable.setValue(2, 1, 3);
-		dataTable.setValue(3, 0, "Eat");
-		dataTable.setValue(3, 1, 2);
-		dataTable.setValue(4, 0, "Commute");
-		dataTable.setValue(4, 1, 1);
+		dataTable = DataTable.create();
+		String columnName = this.model.getStatTableModel().getColumnName(model.getColumnIndex());
+		dataTable.addColumn(com.googlecode.gwt.charts.client.ColumnType.STRING, columnName);
+		dataTable.addColumn(com.googlecode.gwt.charts.client.ColumnType.NUMBER, "Number");
+		
+		FrequencyTuple[] ft = frequencies_enum[0]; // er is geen split, dus splitclass 0
+		
+		dataTable.addRows(ft.length);
+		
+		// for-loop over de categorieen
+		for (int i = 0; i < ft.length; i++)
+		{
+			FrequencyTuple ft_category = ft[i];
+			
+			// set the category name
+			dataTable.setValue(i, 0, ft_category.label);
+			// set the frequency of the category
+			dataTable.setValue(i, 1, ft_category.frequency);
+		}
 
 		// Set options
-		PieChartOptions options = PieChartOptions.create();
-		options.setBackgroundColor("#f0f0f0");
+		options = PieChartOptions.create();
+		options.setBackgroundColor("transparent");
 
 		// options.setColors(colors);
 		options.setFontName("Tahoma");
 		options.setIs3D(false);
 		options.setPieResidueSliceColor("#000000");
 		options.setPieResidueSliceLabel("Others");
-		options.setSliceVisibilityThreshold(0.1);
-		options.setTitle("So, how was your day?");
+		options.setSliceVisibilityThreshold(0);
+		options.setTitle(columnName);
+		options.setPieSliceText(PieSliceText.PERCENTAGE);
 
 		// Draw the chart
 		chart.draw(dataTable, options);
+		
+		// how get click on pie?
+		chart.addDomHandler(new ClickHandler(){
+			public void onClick(ClickEvent e)
+			{
+				NativeEvent event = e.getNativeEvent();
+				System.out.println("PieChartView.draw().onClick(): source = " + e.getSource().toString());
+			}
+		}, ClickEvent.getType());
+
+		
 		chart.addReadyHandler(new ReadyHandler()
 		{
 			@Override
 			public void onReady(ReadyEvent event)
 			{
 				//chart.setSelection(Selection.create(1, null));
+//				System.out.println("PieChartView.draw().onReady(): w = " + chart.getOffsetWidth() + ", h = " + chart.getOffsetHeight());
 			}
 		});
 	}
@@ -423,6 +457,7 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 		this.scrollPanel.setPixelSize(this.getWidth(), this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 		this.scrollPanel.setAlwaysShowScrollBars(false);
 		this.alles.setPixelSize(this.getWidth(), this.getHeight());
+		this.mainPanel.setPixelSize(this.getWidth(), this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight());
 	}
 	
 	// Override setBound
@@ -437,11 +472,6 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 		userOptionsPanel.setModel(model);
 		this.update();
 		this.userOptionsPanel.update();
-	}
-
-	public int getSplitBinsBoxSelectedInt()
-	{
-		return userOptionsPanel.getColumnIndexBoxSelectedIndex();
 	}
 
 	/*
@@ -504,7 +534,7 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 					&& ((String) o).equals(clicked)
 					&& PieChartView.this.model.getStatTableModel()
 						.classifyObject(i,
-							PieChartView.this.model.getSplitOptions()) == enumIndex);
+							new SplitOptions()) == enumIndex);
 			}
 			PieChartView.this.model.getStatTableModel().setSelectionList(
 				selectionList);
@@ -535,34 +565,7 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 			}
 			else
 			{
-				if (event.getInfo().equals(TableChangeEvent.REMOVE_ROW)
-					|| event.getInfo().equals(TableChangeEvent.REMOVE_ROWS))
-				{
-					this.recalculateRowsBinBoundaries();
-					
-					if (this.model.getSplitOptions().getColumnSplitIndex() > -1)
-					{
-						// er is een split
-						
-						// split bins opnieuw berekenen
-						this.recalculateColumnsBinBoundaries();
-					}
-				}
-				else if (event.getInfo().equals(TableChangeEvent.SET_VALUE_AT)
-					|| event.getInfo().equals(TableChangeEvent.EDIT_COLUMN))
-				{
-					if (event.getColumnIndex() == this.model.getColumnIndex())
-					{
-						// bins opnieuw berekenen
-						this.recalculateRowsBinBoundaries();
-					}
-					else if (event.getColumnIndex() == this.model.getSplitOptions().getColumnSplitIndex())
-					{
-						// split bins opnieuw berekenen
-						this.recalculateColumnsBinBoundaries();
-					}
-				}
-				else if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
+				if (event.getInfo().equals(TableChangeEvent.REMOVE_COLUMN))
 				{
 					this.model.updateColumnIndex(event.getColumnIndex());
 				}
@@ -581,84 +584,6 @@ public class PieChartView extends LayoutPanel implements TableChangeEventHandler
 		this.tableChangeEventHandlerRegistration.removeHandler();
 		this.selectionChangeEventHandlerRegistration.removeHandler();
 		this.outlierChangeEventHandlerRegistration.removeHandler();
-	}
-
-	/**
-	 * Recalculate the bin boundaries for crosstab's columnIndex
-	 * if possible.
-	 * This is necessary to calculate the frequencies, in the whole data set and
-	 * in the selection. There is always one bin.
-	 * 
-	 * @param typeHasChanged
-	 * 		The type has changed yes/no.
-	 */
-	public void recalculateRowsBinBoundaries()
-	{
-		if (this.model.columnIndexValid())
-		{
-			ArrayList<ColumnType> list = this.model.getStatTableModel()
-				.getColumnTypes();
-			if (list.get(this.model.getColumnIndex()).getType().isNumber())
-			{
-				// binBoundaries worden hier standaard gezet
-				ArrayList<Double> binBoundaries = StatistiekGWT
-					.appropriateBoundaries(
-						this.model.getStatTableModel().getColumnMin(
-							this.model.getColumnIndex()),
-						this.model.getStatTableModel().getColumnMax(
-							this.model.getColumnIndex()), this.model
-							.getNoBins());
-				this.model.setBinBoundaries(binBoundaries);
-
-				// opnieuw berekenen met de berekende binboundaries, omdat er
-				// mogelijk minder bins nodig zijn
-				int bin0Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(0).toString());
-				int bin1Decimals = StatistiekGWT.getNumberOfDecimals(binBoundaries.get(1).toString());
-				int maxNumberOfDecimals = Math.max(bin0Decimals, bin1Decimals);
-				
-				binBoundaries = StatistiekGWT
-					.appropriateBoundariesFromBinSettings(
-						this.model.getStatTableModel().getColumnMin(this.model.getColumnIndex()),
-						this.model.getStatTableModel().getColumnMax(this.model.getColumnIndex()), 
-    					// door afronding kan de aftreksom heel veel decimalen hebben
-    					StatistiekGWT.round(binBoundaries.get(1) - binBoundaries.get(0), maxNumberOfDecimals), 
-						binBoundaries.get(0));
-				this.model.setBinBoundaries(binBoundaries);
-			}
-		}
-	}
-	
-	/**
-	 * Recalculate the column's bin boundaries for the column with columnSplitIndex
-	 * if possible. In crosstab the column's variable is the split variable.
-	 * 
-	 * @param columnIndex
-	 * 		The index of the column for which the bin
-	 *      boundaries will be calculated.
-	 * @param typeHasChanged
-	 * 		The type has changed yes/no.
-	 */
-	public void recalculateColumnsBinBoundaries()
-	{
-		if (this.model.columnIndexValid())
-		{
-			int splitIndex = this.model.getSplitOptions().getColumnSplitIndex();
-			AllowedTypes splitType = this.model.getStatTableModel().getColumnTypes().get(splitIndex).getType();
-			if (splitType.isNumber())
-			{
-				ArrayList<Double> boundaries = new ArrayList<Double>();
-				boundaries = StatistiekGWT.appropriateBoundaries(
-					this.model.getStatTableModel().getColumnMin(
-						this.model.getSplitOptions().getColumnSplitIndex()),
-					this.model.getStatTableModel().getColumnMax(
-						this.model.getSplitOptions().getColumnSplitIndex()),
-					this.getSplitBinsBoxSelectedInt());
-	
-				this.model.setSplitBoundaries(boundaries);
-				this.model.setSplitOptions(this.model.getSplitOptions());
-				this.setModel(this.model);
-			}
-		}
 	}
 
 	@Override
