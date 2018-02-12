@@ -871,11 +871,13 @@ public class StatInteractiePanelView extends LayoutPanel
 	 */
 	public void updateViewIfNecessary(String viewName)
 	{
-		// tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk)
+		// - Tabel-views moeten geupdate worden anders toont datagrid geen inhoud in de tab ((datagrid) table.redraw() is noodzakelijk).
+		// - Cirkeldiagram moet geupdate worden anders klopt de maat niet.
 		for (int i = 0; i < model.getViews().size(); i++)
 		{
 			StatistiekView view = model.getViews().get(i);
-			if (view.getViewName().equals(viewName) && view.getViewType().equals(StatistiekGWT.VIEWS[0]) // tabel view
+			if (view.getViewName().equals(viewName)
+				&& (view.getViewType().equals(StatistiekGWT.VIEWS[0]) || view.getViewType().equals(StatistiekGWT.VIEWS[9])) // tabel of cirkeldiagram view
 				&& this.isSelected(view))
 			{
 				view.update();
@@ -1059,7 +1061,7 @@ public class StatInteractiePanelView extends LayoutPanel
 	/*
 	 * Update the startVarBox with the variable names.
 	 */
-	private void updateStartVarBox()
+	void updateStartVarBox()
 	{
 //		GWT.log("StatInteractiePanelView.updateStartVarBox()");
 
@@ -1079,16 +1081,43 @@ public class StatInteractiePanelView extends LayoutPanel
 			String firstItem = StatistiekGWT.rb.chooseAVariableOption();
 			this.startVarBox.addItem(firstItem);
 			
-			// add column names
-			ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+			// add all column names to the list
+			addColumnNamesToStartVar();
 			
-			for (String varName : list)
-			{
-				this.startVarBox.addItem(varName);
-			}
+			// voor enum-only views alleen de enum kolomnamen enabled
+			//setEnumOnlyColumnsStartVar(isEnumerationOnlyView());
+			boolean ignoreFirstItem = true;
+			StatistiekUtils.setEnumOnlyColumnsVarListBox(startVarBox, isEnumerationOnlyView(), ignoreFirstItem, model.getStatTableModel());
 			
 			this.startVarBoxHandlerRegistration = this.startVarBox.addChangeHandler(controller);
 		} // if there are column names
+	}
+
+	/**
+	 * True if the selected view is only suitable for enumeration columns.
+	 * False is the selected view is suitable for all views or
+	 * if no view is selected.
+	 * @return
+	 */
+	boolean isEnumerationOnlyView()
+	{
+		boolean isEnumOnly = false;
+		
+		if (StatistiekGWT.rb.piechartOption().equals(getViewsBoxString())) // cirkeldiagram is alleen zinvol voor kolommen van type opsomming
+			isEnumOnly = true;
+		
+		return isEnumOnly;
+	}
+
+	private void addColumnNamesToStartVar()
+	{
+		// add column names
+		ArrayList<String> list = this.model.getStatTableModel().getColumnNames();
+		
+		for (String varName : list)
+		{
+			this.startVarBox.addItem(varName);
+		}
 	}
 
 	/*
