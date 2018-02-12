@@ -496,6 +496,9 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * Handelt het veranderen van views box en variabele boxes (startVar en startVar2) af.
+	 */
 	@Override
 	public void onChange(ChangeEvent event)
 	{
@@ -541,6 +544,9 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 			}
 			else
 			{
+				// update startVar-box: toon alleen kolommen die van toepassing zijn, bijv. alleen van type opsomming bij cirkeldiagram
+				this.view.updateStartVarBox();
+
 				// bied variabelekeuze aan
 				this.view.setStartVarLabel(StatistiekGWT.rb.chooseStartVarLabel());
 				this.view.setStartVarBox(true);
@@ -593,6 +599,10 @@ public class StatInteractiePanel extends LayoutPanel implements ChangeHandler, C
 				else if (s.equals(StatistiekGWT.rb.descriptivesOption()))
 				{
 					t = StatistiekGWT.VIEWS[8];
+				}
+				else if (s.equals(StatistiekGWT.rb.piechartOption()))
+				{
+					t = StatistiekGWT.VIEWS[9];
 				}
 				
 				// Als Tabel gekozen, dan is de actionPerformed van startVarBox niet relevant
