@@ -96,6 +96,9 @@ public class PieChartUserOptionsPanel extends FlowPanel
 		this.basisPanel = new FlowPanel();
 
 		// variable settings
+		this.varLabel = new Label(StatistiekGWT.rb.variableLabel());
+		this.varLabel.addStyleName(statistiekCss.titlelabel());
+
 		this.columnIndexBox = new ListBox();
 
 		// ok-cancel
@@ -152,6 +155,10 @@ public class PieChartUserOptionsPanel extends FlowPanel
 		{
 			this.columnIndexBox.addItem(varName);
 		}
+		
+		boolean isEnumOnlyView = true;
+		boolean ignoreFirstItem = false;
+		StatistiekUtils.setEnumOnlyColumnsVarListBox(columnIndexBox, isEnumOnlyView, ignoreFirstItem, model.getStatTableModel());
 		
 		if (this.model.columnIndexValid())
 		{
