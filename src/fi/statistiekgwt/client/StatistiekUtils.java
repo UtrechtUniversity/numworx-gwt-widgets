@@ -1,7 +1,12 @@
 package fi.statistiekgwt.client;
 
+import java.util.ArrayList;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.SelectElement;
 import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchEndHandler;
@@ -16,6 +21,9 @@ import com.google.gwt.user.client.ui.HorizontalScrollbar;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalScrollbar;
+
+import fi.statistiekgwt.client.types.AllowedTypes;
+import fi.statistiekgwt.client.types.ColumnType;
 
 /**
  * Class that provides utility classes.
@@ -133,6 +141,41 @@ public class StatistiekUtils
 		for (int i = count - 1; i > -1; i--)
 		{
 			panel.remove(i);
+		}
+	}
+	
+	/**
+	 * Zet voor enum-only view j/n de kolomnamen in de gegeven varListBox 
+	 * al dan niet enabled.
+	 * Als enumOnlyView true is, dan worden alleen de 
+	 * kolomnamen van kolommen van type enum enabled.
+	 * Als enumOnlyView false, dan worden alle kolomnamen enabled.
+	 * 
+	 * @param varListBox     De lijst met kolomnamen.
+	 * @param isEnumOnlyView
+	 * @param ignoreFirstItem De eerste overslaan (bijv "kies een variabele")
+	 * @param model
+	 */
+	public static void setEnumOnlyColumnsVarListBox(ListBox varListBox, boolean isEnumOnlyView, boolean ignoreFirstItem, StatTableModel model)
+	{
+		ArrayList<ColumnType> types = model.getColumnTypes();
+		
+		NodeList startVarOptions = varListBox.getElement().<SelectElement>cast().getOptions();
+		
+		for (int i = 0; i < types.size(); i++)
+		{
+			Node option;
+			if (ignoreFirstItem)
+				option = startVarOptions.getItem(i + 1); // de eerste overslaan (bijv "kies een variabele")
+			else
+				option = startVarOptions.getItem(i);
+
+			if (isEnumOnlyView && AllowedTypes.ENUM.toString().equals(types.get(i).getType().toString()))
+			{
+				((SelectElement) option).setDisabled(!isEnumOnlyView);
+			}
+			else
+				((SelectElement) option).setDisabled(isEnumOnlyView);
 		}
 	}
 }
