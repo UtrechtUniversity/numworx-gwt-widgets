@@ -162,7 +162,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 
 	static void initViews()
 	{
-		VIEWS_translated = new String[9];
+		VIEWS_translated = new String[10];
 		VIEWS_translated[0] = StatistiekGWT.rb.tableOption();
 		VIEWS_translated[1] = StatistiekGWT.rb.histogramOption();
 		VIEWS_translated[2] = StatistiekGWT.rb.dotplotOption();
@@ -172,9 +172,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		VIEWS_translated[6] = StatistiekGWT.rb.crosstabOption();
 		VIEWS_translated[7] = StatistiekGWT.rb.scatterplotOption();
 		VIEWS_translated[8] = StatistiekGWT.rb.descriptivesOption();
-//		VIEWS_translated[9] = StatistiekGWT.rb.piechartOption();
+		VIEWS_translated[9] = StatistiekGWT.rb.piechartOption();
 
-		VIEWS = new String[9];
+		VIEWS = new String[10];
 		VIEWS[0] = "Table";
 		VIEWS[1] = "Histogram";
 		VIEWS[2] = "Dotplot";
@@ -184,7 +184,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		VIEWS[6] = "Kruistabel";
 		VIEWS[7] = "Spreidingsdiagram";
 		VIEWS[8] = "Kengetallen";
-//		VIEWS[9] = "Cirkeldiagram";
+		VIEWS[9] = "Cirkeldiagram";
 		
 		// sort the arrays
 //		Arrays.sort(VIEWS_translated);
