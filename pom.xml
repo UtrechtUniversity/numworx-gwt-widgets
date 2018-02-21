@@ -58,11 +58,6 @@
 			<artifactId>MGWT</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>nl.uu.fi.dwo.ideas</groupId>
-			<artifactId>IdeasGWT</artifactId>
-			<version>0.0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.vectomatic</groupId>
 			<artifactId>lib-gwt-svg</artifactId>
 			<version>0.5.11</version>
@@ -70,7 +65,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.4-SNAPSHOT</version>
+			<version>0.0.4</version>
 		</dependency>
 	</dependencies>
 	<build>
