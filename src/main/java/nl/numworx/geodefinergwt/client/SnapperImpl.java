@@ -12,7 +12,6 @@ class SnapperImpl extends Snapper {
 	}
 	
 	
-	final int SNAP = 5;
 	public boolean isGravityM() { return gravity && moved; }
 	private boolean moved;
 	boolean isMoved() {
@@ -76,4 +75,6 @@ class SnapperImpl extends Snapper {
 		ph.pmDrag(x0, y0);
 
 	}
+
+	
 }

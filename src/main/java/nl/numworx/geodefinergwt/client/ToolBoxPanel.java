@@ -2,6 +2,7 @@ package nl.numworx.geodefinergwt.client;
 
 import nl.numworx.geodefiner.common.AddCirkelHandler;
 import nl.numworx.geodefiner.common.AddPolygonHandler;
+import nl.numworx.geodefiner.common.AddSnapPuntHandler;
 import nl.numworx.geodefiner.common.FilteredDestroyHandler;
 import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
@@ -103,7 +104,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case SELECTOR:
 				btn = newBtn(url + "/move.png", new SelectHandler(), tracker);break;
 			case POINT: 
-				btn = newBtn(url + "/point.png", new AddPuntHandler(), tracker);break;		
+				btn = newBtn(url + "/point.png", new AddSnapPuntHandler(), tracker);break;		
 			case LINE:
 				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
 			case SEGMENT:
