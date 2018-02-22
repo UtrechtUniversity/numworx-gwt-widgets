@@ -189,6 +189,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
 				Tools.POINT,
+				Tools.RESET,
 				Tools.LINE,
 				Tools.HALFLINE,
 				Tools.SEGMENT,
@@ -203,7 +204,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		checkDWO.put("formule", "$ftrue@");
 		checkDWO.put("score", 10);
 		checkDWO.put("check", Boolean.TRUE);
-		checkDWO.put("extern", Boolean.TRUE);
+		checkDWO.put("extern", Boolean.FALSE);
 		List<String> definitions = Arrays.asList(
 				"$fa=9..10@" 
 				,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"

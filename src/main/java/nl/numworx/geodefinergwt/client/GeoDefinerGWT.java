@@ -487,6 +487,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		{
 			boolean visible = checkDWO.isExtern();
 			checkBtn.setStyleName("extern", visible);
+			nofeedback();
 			return true;
 		}
 		root.setWidgetHidden(southPanel, true);
