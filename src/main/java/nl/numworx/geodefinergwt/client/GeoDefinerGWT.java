@@ -221,6 +221,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			if(list.size() > 0) {
 				toolbox.init(list, viewer, this);
 				root.setWidgetSize(toolbox, toolbox.getHeight());
+				root.setWidgetHidden(southPanel, false);
+				if(checkDWO == null) {
+					southPanel.setWidgetHidden(check, true);
+				}
 				return;
 			}
 		}

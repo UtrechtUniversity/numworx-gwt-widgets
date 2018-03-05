@@ -8,6 +8,8 @@ import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
+import java.util.Vector;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,15 +37,18 @@ import fi.euclides.event.EventHandler;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.expr.TrailHandler;
+import fi.euclides.model.Destroyable;
 import fi.euclides.proof.AfstandHandler;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
 import fi.euclides.proof.VectorHandler;
 import fi.euclides.util.Messages;
+import fi.euclides.util.Observable;
+import fi.euclides.util.Observer;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
-	class Action implements ClickHandler {
+	class Action implements ClickHandler, Observer {
 
 		final private EventHandler h;
 		final private ToggleButton btn;
@@ -59,6 +64,20 @@ public class ToolBoxPanel extends Composite implements Tools {
 			down(btn);
 			h.command();
 			h.getTracker().paint();
+		}
+
+		@Override
+		public void update(Observable observable, Object arg) {
+			Tracker viewer = h.getTracker();
+			if (observable == viewer) {
+				viewer.getModel().addObserver(this);
+			}  
+			Vector<Destroyable> selection = viewer.getModel().getSelect();
+			setEnabled(h.allowSelection(selection));
+		}
+
+		private void setEnabled(boolean enabled) {
+			btn.setEnabled(enabled);
 		}
 
 	}
