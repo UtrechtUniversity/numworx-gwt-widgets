@@ -294,16 +294,25 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 	
 	private void nofeedback() {
+		setNagekeken(false);
+	}
+
+	private void nofeedbackImpl() {
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
 		if(checkObjects != null)
 			checkObjects.removeFeedback();
-		setNagekeken(false);
 	}
 
 	public void zetNagekeken(boolean b) {
 		setNagekeken(b);
+	}
+
+	public void setNagekeken(boolean b) {
+		super.setNagekeken(b);
+		if( !isNagekeken())
+			nofeedbackImpl();
 	}
 
 	private void addFireUpdates() {

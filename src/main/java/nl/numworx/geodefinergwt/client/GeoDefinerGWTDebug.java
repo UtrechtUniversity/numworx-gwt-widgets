@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +216,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				);
 		launchDebug.put("definitions", definitions);
 		launchDebug.put("checkDWO", checkDWO);
+	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}
+		Map<String,Object> checkObject = new HashMap<>();
+		checkObject.put("score", 5);
+		checkObject.put("value", "$fpoint(2,1)@");		
+		launchDebug.put("checkObjects", Collections.singletonList(checkObject));
+
 		Map<String, Number> values = new HashMap<String, Number>();
 		init(getWidth(), getHeight(), launchDebug, values);
 		MockOpdrNav opdrnav = new MockOpdrNav();
