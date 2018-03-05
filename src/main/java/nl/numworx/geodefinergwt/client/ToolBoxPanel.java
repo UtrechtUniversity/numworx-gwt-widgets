@@ -16,7 +16,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ToggleButton;
 
 import fi.euclides.event.AddBissectriceHandler;
@@ -29,10 +28,8 @@ import fi.euclides.event.AddLoodLijnHandler;
 import fi.euclides.event.AddMiddelPuntHandler;
 import fi.euclides.event.AddParallelHandler;
 import fi.euclides.event.AddPoollijnHandler;
-import fi.euclides.event.AddPuntHandler;
 import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
-import fi.euclides.event.DestroyHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
@@ -57,6 +54,9 @@ public class ToolBoxPanel extends Composite implements Tools {
 			this.h = h;
 			this.btn = btn;
 			h.setTracker(t);
+			Observable o = t.getModel();
+			if(o != null)
+				o.addObserver(this);
 		}
 
 		@Override
