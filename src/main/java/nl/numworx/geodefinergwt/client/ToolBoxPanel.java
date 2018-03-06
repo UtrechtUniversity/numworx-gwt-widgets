@@ -35,6 +35,8 @@ import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.expr.TrailHandler;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.Lijn;
+import fi.euclides.model.Model;
 import fi.euclides.proof.AfstandHandler;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
@@ -47,8 +49,8 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	class Action implements ClickHandler, Observer {
 
-		final private EventHandler h;
-		final private ToggleButton btn;
+		final EventHandler h;
+		final ToggleButton btn;
 
 		public Action(EventHandler h, Tracker t, ToggleButton btn) {
 			this.h = h;
@@ -80,6 +82,59 @@ public class ToolBoxPanel extends Composite implements Tools {
 			btn.setEnabled(enabled);
 		}
 
+	}
+
+	public class PuntAction extends Action {
+
+		public PuntAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
+			super(h, t, btn);
+			puntIcon = images[0];
+			puntOpIcon = images[1];
+			puntOp2Icon = images[2];
+		}
+
+		Image puntOpIcon; // FIXME icons not same size!
+		Image puntOp2Icon;
+		Image puntIcon;
+
+		/* (non-Javadoc)
+		 * @see fi.euclides.swing.XXXAction#update(fi.euclides.util.Observable, java.lang.Object)
+		 */
+		public void update(Observable observable, Object arg) {
+			super.update(observable, arg);
+			Tracker viewer = h.getTracker();
+			if(arg != Model.SELECT)
+				return;
+			int cnt;
+			if(!btn.isEnabled())
+				cnt = 0;
+			else
+				cnt = viewer.getModel().getSelect().size();
+			switch(cnt)
+			{
+			case 1: 
+				Object d = viewer.getModel().getSelect().firstElement();
+				String string;
+				if(d instanceof Lijn)
+				{ 
+					string = Messages.getString("AddPuntHandler.1"); //$NON-NLS-1$
+				} else
+				{
+					string = Messages.getString("AddPuntHandler.2"); //$NON-NLS-1$
+				} 
+//				putValue(SHORT_DESCRIPTION, string);
+				btn.getUpFace().setImage(puntOpIcon);
+				break;
+			case 2: 
+//				putValue(SHORT_DESCRIPTION, Messages.getString("AddPuntHandler.3"));
+				btn.getUpFace().setImage(puntOp2Icon);
+				break;
+			default:
+//				putValue(SHORT_DESCRIPTION,Messages.getString("AddPuntHandler.0"));
+				btn.getUpFace().setImage(puntIcon);
+				break;
+			}
+		}
 	}
 
 	FlowPanel panel;
@@ -123,7 +178,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case SELECTOR:
 				btn = newBtn(url + "/move.png", new SelectHandler(), tracker);break;
 			case POINT: 
-				btn = newBtn(url + "/point.png", new AddSnapPuntHandler(), tracker);break;		
+				btn = newPBtn(url, new AddSnapPuntHandler(), tracker);break;		
 			case LINE:
 				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
 			case SEGMENT:
@@ -199,4 +254,16 @@ public class ToolBoxPanel extends Composite implements Tools {
 		btn.addClickHandler(new Action(handler, tracker,btn));
 		return btn;
 	}
+
+	ToggleButton newPBtn(String url, EventHandler handler, Tracker tracker) {
+		ToggleButton btn;
+		String u = url + "/point.png";
+		Image puntIcon = new Image(u);
+		Image puntOpIcon = new Image(url + "/qpointon.png");
+		Image puntOp2Icon = new Image(url + "/intersection.png");
+		btn = new ToggleButton(puntIcon);
+		btn.addClickHandler(new PuntAction(handler, tracker,btn, puntIcon, puntOpIcon, puntOp2Icon));
+		return btn;
+	}
+
 }

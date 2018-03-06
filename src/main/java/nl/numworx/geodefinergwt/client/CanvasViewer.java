@@ -220,10 +220,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		super.drawArc(x, y, k, start, length);
 	}
 
-	private Segment drawTips(Segment s) {
+	private Segment drawTips(Segment s, Destroyable o) {
 		Tips tip = s.adapt(Tips.class);
 		if(tip == null) return s;
-		selectColor(s);
+		selectColor(o);
 		double dx = s.getDX();
 		double dy = s.getDY();
 		double len = Math.hypot(dx, dy);
@@ -255,7 +255,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	@Override
 	public void visitSegment(Segment s) {
-		s = drawTips(s);
+		s = drawTips(s,s);
 		super.visitSegment(s);
 		
 	}
@@ -486,7 +486,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	private void visitRay(Lijn l) {
 		rr.setLijn(l);
-		visitSegment(rr);
+		Segment s = rr;
+		s = drawTips(s,l);
+		selectColor(l);
+		drawLine(s.getX1(), s.getY1() , s.getX2(), s.getY2());
 	}
 
 	@Override
