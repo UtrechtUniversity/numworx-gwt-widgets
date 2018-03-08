@@ -31,12 +31,12 @@ import fi.euclides.event.AddPoollijnHandler;
 import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
-import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.expr.TrailHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Model;
+import fi.euclides.model.Segment;
 import fi.euclides.proof.AfstandHandler;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
@@ -84,9 +84,45 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	}
 
-	public class PuntAction extends Action {
+	class CirkelAction extends Action {
 
-		public PuntAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
+		Image[] images;
+		CirkelAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
+			super(h, t, btn);
+			this.images = images;
+		}
+
+		@Override
+		public void update(Observable observable, Object arg) {
+			super.update(observable, arg);
+			if(arg != Model.SELECT)
+				return;
+			int cnt;
+			Vector<Destroyable> select = h.getTracker().getModel().getSelect();
+			if( btn.isEnabled()) {
+				cnt = select.size();
+			} else 
+				cnt = 0;
+			switch(cnt) {
+			case 1:
+			case 2:
+				Object f = select.firstElement();
+				Object l = select.lastElement();
+				if (f instanceof Segment || l instanceof Segment) {
+					btn.getUpFace().setImage(images[1]);
+					break;
+				}
+			default:
+				btn.getUpFace().setImage(images[0]); break;
+			case 3:
+				btn.getUpFace().setImage(images[2]); break;
+			}	
+		}
+	}
+
+	class PuntAction extends Action {
+
+		PuntAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
 			super(h, t, btn);
 			puntIcon = images[0];
 			puntOpIcon = images[1];
@@ -102,9 +138,9 @@ public class ToolBoxPanel extends Composite implements Tools {
 		 */
 		public void update(Observable observable, Object arg) {
 			super.update(observable, arg);
-			Tracker viewer = h.getTracker();
 			if(arg != Model.SELECT)
 				return;
+			Tracker viewer = h.getTracker();
 			int cnt;
 			if(!btn.isEnabled())
 				cnt = 0;
@@ -176,7 +212,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			ResetHandler resetter;
 			switch(n) {
 			case SELECTOR:
-				btn = newBtn(url + "/move.png", new SelectHandler(), tracker);break;
+				btn = newBtn(url + "/move.png", geoDefinerGWT.selector, tracker);break;
 			case POINT: 
 				btn = newPBtn(url, new AddSnapPuntHandler(), tracker);break;		
 			case LINE:
@@ -186,7 +222,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			case TRIANGLE:
 				btn = newBtn(url + "/triangle.png", new AddPolygonHandler("Veelhoek"), tracker);break;
 			case CIRCLE:
-				btn = newBtn(url + "/circle.png", new AddCirkelHandler(), tracker);break;
+				btn = newCBtn(url, new AddCirkelHandler(), tracker);break;
 			case DESTROY:
 				btn = newBtn(url + "/delete.png", new FilteredDestroyHandler(geoDefinerGWT), tracker);break;
 			case HALFLINE:
@@ -264,6 +300,17 @@ public class ToolBoxPanel extends Composite implements Tools {
 		Image puntOp2Icon = new Image(url + "/intersection.png");
 		btn = new ToggleButton(puntIcon);
 		btn.addClickHandler(new PuntAction(handler, tracker,btn, puntIcon, puntOpIcon, puntOp2Icon));
+		return btn;
+	}
+
+	ToggleButton newCBtn(String url, EventHandler handler, Tracker tracker) {
+		ToggleButton btn;
+		String u = url + "/circle.png";
+		Image cirkelIcon = new Image(u);
+		Image compassIcon = new Image(url + "/circle3.png");
+		Image cirkel3Icon = new Image(url + "/4.png");
+		btn = new ToggleButton(cirkelIcon);
+		btn.addClickHandler(new CirkelAction(handler, tracker,btn, cirkelIcon, compassIcon, cirkel3Icon));
 		return btn;
 	}
 
