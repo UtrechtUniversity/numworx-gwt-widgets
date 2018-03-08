@@ -428,6 +428,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		String random = (String) launchData.get("random");
 		values = launchRandomVars(random, values);
 // configuration
+		checkObjects = new CheckObjectList(viewer);
 		setLaunchData(launchData, values);
 		viewer.paint();
 	}
@@ -526,7 +527,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	public void reset() {
 		toolbox.destroy();
-		if(checkObjects != null) checkObjects.destroy();
+		if(checkObjects != null) checkObjects.clear();
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
 		start();

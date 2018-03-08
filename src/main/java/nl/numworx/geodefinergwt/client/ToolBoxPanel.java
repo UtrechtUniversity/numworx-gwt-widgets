@@ -215,14 +215,15 @@ public class ToolBoxPanel extends Composite implements Tools {
 				btn = newBtn(url + "/line.png", new AddPoollijnHandler(), tracker);break;		
 // labels
 			case DISTANCE:
-				btn = newBtn(url + "/segment.png", new AfstandHandler("lengte"), tracker); break;
+				btn = newBtn(url + "/distance.png", new AfstandHandler("lengte"), tracker); break;
 			case AREA:
 				btn = newBtn(url + "/area.png", new OppHandler("oppervlakte"), tracker); break;
 			case ANGLE:
 				btn = newBtn(url + "/angle.png", new HoekHandler("hoek"), tracker); break;
 			case VECTOR:
 				btn = newBtn(url + "/ray.png", new VectorHandler("vector"), tracker); break;
-				
+			case CIRCLE_WITH_RADIUS:
+				btn = newBtn(url + "/fixedcircle.png", new CirkelRadiusHandler(Messages.getString("AddCirkelHandler.0")), tracker);break;
 /*			
 		item = new MenuItem("Signed Area", new Action(new OppHandler("Signed Area", true), tracker ));
 		item = new MenuItem("Ratio", new Action(new RatioHandler("Ratio"), tracker ));

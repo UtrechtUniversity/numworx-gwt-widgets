@@ -199,6 +199,8 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.TRIANGLE,
 				Tools.PERPENDICULAR,
 				Tools.PARALLEL,
+				Tools.CIRCLE_WITH_RADIUS,
+				Tools.DISTANCE,
 				10,11,12,13,19,20,21,22,23,24,25,26);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();

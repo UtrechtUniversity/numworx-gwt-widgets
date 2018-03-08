@@ -53,7 +53,6 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 				oma.addElement(o);
 				fi.euclides.openmath.Expression expr;
 				expr = tracker.adapt(fi.euclides.openmath.Expression.class);
-				if(expr == null) expr = new Expression(tracker);
 				visibility.destroy();
 				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
 				v.setVisible(false);
