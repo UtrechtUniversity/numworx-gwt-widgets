@@ -26,6 +26,7 @@
 <!-- dependent formule -->
    <inherits name="com.googlecode.mgwt.MGWTMin" />
    <inherits name="nl.uu.fi.dwo.ideas.Ideas" />
+  <inherits name='dagger.Dagger'/>
    
   <!-- Specify the app entry point class.                         -->
   <entry-point class='nl.numworx.geodefinergwt.client.GeoDefinerGWT'/>

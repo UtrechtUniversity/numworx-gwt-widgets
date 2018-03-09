@@ -7,15 +7,20 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.Randomizer;
+import nl.numworx.geodefiner.common.locus.Builder;
+import nl.numworx.geodefiner.common.math.Expression;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
-import nl.numworx.geodefinergwt.client.ui.HerleidList;
-import nl.numworx.geodefinergwt.client.ui.UIModelFactory;
+import nl.numworx.geodefinergwt.client.module.Components;
+import nl.numworx.geodefinergwt.client.module.DaggerComponents;
+import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -40,21 +45,16 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import fi.euclides.event.EventHandler;
-import fi.euclides.event.HitTester;
-import fi.euclides.event.NameMapper;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
-import fi.euclides.model.Model;
-import fi.euclides.model.Track;
+import fi.euclides.model.Locus;
 import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.Const;
-import fi.euclides.proof.LabelDelegate;
 import fi.euclides.proof.LabelValue;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
@@ -64,6 +64,7 @@ import fi.wiskopdr.VariableCollection;
 
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer, Randomizer {
 
+	private static final messages MESSAGES = GWT.create(messages.class);
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
 	private static final String HALF_CSS = "half";
@@ -83,104 +84,19 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private static final String CHECK = "check";
 
 	@UiField DockLayoutPanel southPanel;
-	@UiField Label status;
+	@UiField
+	public Label status;
 	DockLayoutPanel  root;
-	@UiField ViewerWidget widget;
+	public @UiField ViewerWidget widget;
 	@UiField FlowPanel check;
 	@UiField Button checkBtn;
 	@UiField ToolBoxPanel toolbox;
-	@UiField messages rb = GWT.create(messages.class);
+	@UiField(provided=true) messages rb = MESSAGES;
 	private int mode;
-	
-	/**
-	 * Decorator pattern. Decorate with a NameMapper.
-	 * @author wim
-	 *
-	 */
-	class TrackerImpl implements Tracker 
-	{
-		Tracker viewer;
-		NameMapper mapper;
-		Map<String,LabelDelegate> register;
-		
-		TrackerImpl(Tracker viewer, NameMapper mapper) {
-			super();
-			this.viewer = viewer;
-			this.mapper = mapper;
-			this.register = new TreeMap<String,LabelDelegate>();
-		}
-
-		@Override
-		public void setTrack(Track track) {
-			viewer.setTrack(track);
-		}
-
-		@Override
-		public void setPointerHandler(EventHandler eventHandler) {
-			viewer.setPointerHandler(eventHandler);
-		}
-
-		@Override
-		public void setStatus(String string) {
-			status.setText(string);
-		}
-
-		@Override
-		public Model getModel() {
-			return viewer.getModel();
-		}
-
-		@Override
-		public void paint() {
-			viewer.paint();
-		}
-
-		@Override
-		public boolean contains(double x, double y) {
-			return viewer.contains(x, y);
-		}
-
-		@Override
-		public String describe(Destroyable d) {
-			return "";
-		}
-
-		@Override
-		public NameMapper getMapper() {
-			return mapper;
-		}
-
-		@Override
-		public void register(String key, LabelDelegate delegate) {
-			register.put(key, delegate);
-		}
-
-		@Override
-		public LabelDelegate getRegistered(String key) {
-			return register.get(key);
-		}
-
-		@Override
-		public HitTester getHitTester() {
-			return viewer.getHitTester();
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public <T> T adapt(Class<T> cls) {
-			if(fi.euclides.openmath.Expression.class == cls
-					||nl.numworx.geodefiner.common.math.Expression.class == cls) 
-				return (T) expression;
-			if(Randomizer.class == cls) 
-				return (T) GeoDefinerGWT.this;
-			return viewer.adapt(cls);
-		}
-
-		fi.euclides.openmath.Expression expression;
-	}
 	
 	static {
 		Numbers.setFactory(IntegerFactory.INSTANCE);
+		Messages.setInstance(new MessagesImpl(MESSAGES));
 	}
 	
 	
@@ -397,29 +313,48 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void setAsHoogte(int ashoogte) {
 	}
 
+	@Inject void setUiModelFactory(UIModelFactoryGWT f) {
+		uiModelFactory = f;
+	}
 
+	@Inject void setViewer(Tracker viewer) {
+		this.viewer = viewer;
+	}
+	
+	@Inject void setDefinitions(Definitions definitions) {
+		this.definitions = definitions;
+	}
+	
+	@Inject void setNamingModel(NamingModel m) {
+		widget.setMapper(m);
+	}
 	
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
+		DoubleFormat.setInstance(new PrettyFormat());
+		Locus.BUILDER = new Builder();
 		widget.init(width, height);
 		this.width = width;
 		this.height = height;
-		DoubleFormat.setInstance(new PrettyFormat());
-		Messages.setInstance(new MessagesImpl(rb));
-		viewer = widget.getViewer();
-		TrackerImpl ti;
-		NamingModel mapper = new NamingModel(viewer, new HashMap<String,Destroyable>());
-		viewer = ti = new TrackerImpl(viewer, mapper);
-		ti.expression = new nl.numworx.geodefiner.common.math.Expression(ti);
-		LabelDelegate value = new HerleidList(ti);
-		ti.expression.symbolmap.put("list1.list", value);
-		uiModelFactory = new UIModelFactory(viewer);
-		widget.setMapper(mapper);
+		Components c = DaggerComponents.builder()
+				.status(status)
+				.randomizer(this)
+				.widget(widget)
+				.build();
+		c.provideComponent(this);
+		
+//		NamingModel mapper = new NamingModel(widget.getViewer(), new HashMap<String,Destroyable>());
+//		viewer = new TrackerImpl(widget.getViewer(), mapper,status,this, new nl.numworx.geodefiner.common.math.Expression());
+
+		//LabelDelegate value = new HerleidList(viewer);
+		viewer.adapt(Expression.class).symbolmap.putAll(c.symbols());
+//		uiModelFactory = new UIModelFactoryGWT(viewer);
+
 		SelectHandler h = selector;
 		h.setTracker(viewer);
 		viewer.setPointerHandler(h);
 		viewer.setStatus("");
-		definitions = new Definitions(viewer);
+//		definitions = c.definitions();
 		
 		root.setPixelSize(width, height);
 // initial model		

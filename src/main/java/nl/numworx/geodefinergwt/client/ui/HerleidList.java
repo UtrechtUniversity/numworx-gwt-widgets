@@ -2,6 +2,9 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import nl.numworx.geodefiner.common.CELL;
 import nl.numworx.geodefiner.common.UIModel;
+
+import javax.inject.Inject;
+
 import fi.euclides.event.Tracker;
 import fi.euclides.expr.List;
 import fi.euclides.model.Label;
@@ -15,7 +18,7 @@ public class HerleidList extends List {
 	public HerleidList() {
 	}
 
-	public HerleidList(Tracker viewer) {
+	@Inject public HerleidList(Tracker viewer) {
 		setTracker(viewer);
 	}
 

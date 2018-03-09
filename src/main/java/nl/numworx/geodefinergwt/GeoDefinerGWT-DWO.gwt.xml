@@ -21,6 +21,7 @@
 <!-- dependent formule -->
    <inherits name="com.googlecode.mgwt.MGWTMin" />
    <inherits name="nl.uu.fi.dwo.ideas.Ideas" />
+   <inherits name='dagger.Dagger'/>
    
 
   <!-- Specify the paths for translatable code                    -->

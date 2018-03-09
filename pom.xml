@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.3</version>
+		<version>0.0.5</version>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
@@ -12,6 +12,11 @@
 	<packaging>war</packaging>
 	<name>GeoDefiner GWT</name>
 	<dependencies>
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-user</artifactId>
@@ -60,18 +65,42 @@
 		<dependency>
 			<groupId>org.vectomatic</groupId>
 			<artifactId>lib-gwt-svg</artifactId>
-			<version>0.5.11</version>
+			<version>0.5.13</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
 			<version>0.0.4</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.dagger</groupId>
+			<artifactId>dagger-gwt</artifactId>
+			<version>${daggerVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.dagger</groupId>
+			<artifactId>dagger-compiler</artifactId>
+			<version>${daggerVersion}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<outputDirectory>target/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+<!-- 		<annotationProcessorPaths> -->
+<!-- 			<path> -->
+<!-- 			<groupId>com.google.dagger</groupId> -->
+<!-- 			<artifactId>dagger-compiler</artifactId> -->
+<!-- 			<version>${daggerVersion}</version> -->
+<!-- 			</path> -->
+<!-- 		</annotationProcessorPaths> -->
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
@@ -146,9 +175,10 @@
 		<euclidesVersion>0.0.3-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.5</formuleVersion>
 		<debug />
-		<gwtVersion>2.7.0</gwtVersion>
+		<gwtVersion>2.8.1</gwtVersion>
 		<gwt.style>OBFUSCATED</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
+		<daggerVersion>2.11</daggerVersion>
 	</properties>
 	<scm>
 		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/trunk</developerConnection>
