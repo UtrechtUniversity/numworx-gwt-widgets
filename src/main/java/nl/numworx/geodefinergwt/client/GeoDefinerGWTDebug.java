@@ -196,6 +196,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.SEGMENT,
 				Tools.CIRCLE,
 				Tools.ARC,
+				Tools.FORMULA,
 				Tools.TRIANGLE,
 				Tools.PERPENDICULAR,
 				Tools.PARALLEL,
@@ -203,7 +204,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.DISTANCE,
 				Tools.MIDPOINT,
 				Tools.LOCUS,
-				11,12,13,19,20,21,22,23,24,25,26);
+				11,12,13,19,20,21,22,23,25,26);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
@@ -212,7 +213,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		checkDWO.put("extern", Boolean.FALSE);
 		List<String> definitions = Arrays.asList(
 				"$fa=9..10@" 
-				,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
+				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
 				//,"$ft=text(\"M$s8@ M$sx@\",O)@"
 				,"$fP=point(1,1)@"
 				,"$fh=halfline(O,P)@"

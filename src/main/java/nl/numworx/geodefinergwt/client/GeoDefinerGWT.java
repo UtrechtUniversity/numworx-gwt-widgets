@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Definitions;
@@ -20,6 +21,7 @@ import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
+import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -43,8 +45,10 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
 
+import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.PrettyFormat;
@@ -64,7 +68,7 @@ import fi.wiskopdr.VariableCollection;
 
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer, Randomizer {
 
-	private static final messages MESSAGES = GWT.create(messages.class);
+	public static final messages MESSAGES = GWT.create(messages.class);
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
 	private static final String HALF_CSS = "half";
@@ -135,7 +139,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				toolbox.init(list, viewer, this);
+				toolbox.init(list, width, buttons.get());
 				root.setWidgetSize(toolbox, toolbox.getHeight());
 				root.setWidgetHidden(southPanel, false);
 				if(checkDWO == null) {
@@ -317,8 +321,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		uiModelFactory = f;
 	}
 
-	@Inject void setViewer(Tracker viewer) {
+	private TrackerImpl tracker;
+	@Inject void setViewer(TrackerImpl viewer) {
 		this.viewer = viewer;
+		this.tracker = viewer;
 	}
 	
 	@Inject void setDefinitions(Definitions definitions) {
@@ -328,6 +334,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@Inject void setNamingModel(NamingModel m) {
 		widget.setMapper(m);
 	}
+
+	@Inject void setCheckObjects(CheckObjectList c) {
+		checkObjects = c;
+	}
+
+	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
@@ -340,6 +352,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				.status(status)
 				.randomizer(this)
 				.widget(widget)
+				.instance(this)
 				.build();
 		c.provideComponent(this);
 		
@@ -347,25 +360,25 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 //		viewer = new TrackerImpl(widget.getViewer(), mapper,status,this, new nl.numworx.geodefiner.common.math.Expression());
 
 		//LabelDelegate value = new HerleidList(viewer);
-		viewer.adapt(Expression.class).symbolmap.putAll(c.symbols());
+		//tracker.adapt(Expression.class).symbolmap.putAll(c.symbols());
 //		uiModelFactory = new UIModelFactoryGWT(viewer);
 
 		SelectHandler h = selector;
-		h.setTracker(viewer);
-		viewer.setPointerHandler(h);
-		viewer.setStatus("");
+		h.setTracker(tracker);
+		tracker.setPointerHandler(h);
+		tracker.setStatus("");
 //		definitions = c.definitions();
 		
 		root.setPixelSize(width, height);
 // initial model		
-		createModel(viewer.getModel(), width, height);
+		createModel(tracker.getModel(), width, height);
 // random variables
 		String random = (String) launchData.get("random");
 		values = launchRandomVars(random, values);
 // configuration
-		checkObjects = new CheckObjectList(viewer);
+//		checkObjects = new CheckObjectList(tracker);
 		setLaunchData(launchData, values);
-		viewer.paint();
+		tracker.paint();
 	}
 
 

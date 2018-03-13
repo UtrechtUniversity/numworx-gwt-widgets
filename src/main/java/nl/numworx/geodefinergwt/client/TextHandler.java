@@ -15,7 +15,7 @@ import nl.numworx.geodefiner.common.Volgpunt;
 import nl.numworx.geodefinergwt.client.ui.TekstPopup;
 import nl.numworx.geodefinergwt.client.ui.TekstPopup.Owner;
 
-class TextHandler extends AbstractTextHandler implements Owner {
+public class TextHandler extends AbstractTextHandler implements Owner {
 
 	public TextHandler(String string) {
 		super(string);

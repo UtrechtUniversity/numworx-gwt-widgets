@@ -15,10 +15,10 @@ import fi.wiskopdr.expressies.Expressie;
 
 public class HerleidList extends List {
 
-	public HerleidList() {
+	@Inject public HerleidList() {
 	}
 
-	@Inject public HerleidList(Tracker viewer) {
+	public HerleidList(Tracker viewer) {
 		setTracker(viewer);
 	}
 

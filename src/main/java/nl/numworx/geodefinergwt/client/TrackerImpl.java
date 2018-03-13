@@ -52,9 +52,16 @@ public class TrackerImpl implements Tracker
 		viewer.setTrack(track);
 	}
 
+	private EventHandler pointerHandler;
+	
 	@Override
 	public void setPointerHandler(EventHandler eventHandler) {
+		pointerHandler = eventHandler;
 		viewer.setPointerHandler(eventHandler);
+	}
+
+	public EventHandler getPointerHandler() {
+		return pointerHandler;
 	}
 
 	@Override

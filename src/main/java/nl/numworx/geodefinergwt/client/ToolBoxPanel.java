@@ -1,80 +1,62 @@
 package nl.numworx.geodefinergwt.client;
 
-import nl.numworx.geodefiner.common.AddCirkelHandler;
-import nl.numworx.geodefiner.common.AddPolygonHandler;
-import nl.numworx.geodefiner.common.AddSnapPuntHandler;
-import nl.numworx.geodefiner.common.FilteredDestroyHandler;
-import nl.numworx.geodefiner.common.ResetHandler;
-import nl.numworx.geodefiner.common.Tools;
-import nl.uu.fi.dwo.interaction.client.json.ObjectList;
-
+import java.util.Map;
 import java.util.Vector;
 
-import com.google.gwt.core.client.GWT;
+import javax.inject.Provider;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 
-import fi.euclides.event.AddBissectriceHandler;
-import fi.euclides.event.AddBoogHandler;
-import fi.euclides.event.AddFocusHandler;
-import fi.euclides.event.AddKegelsnedeHandler;
-import fi.euclides.event.AddLijnHandler;
-import fi.euclides.event.AddLocusHandler;
-import fi.euclides.event.AddLoodLijnHandler;
-import fi.euclides.event.AddMiddelPuntHandler;
-import fi.euclides.event.AddParallelHandler;
-import fi.euclides.event.AddPoollijnHandler;
-import fi.euclides.event.AddRaakLijnHandler;
-import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.event.Tracker;
-import fi.euclides.expr.TrailHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Model;
 import fi.euclides.model.Segment;
-import fi.euclides.proof.AfstandHandler;
-import fi.euclides.proof.HoekHandler;
-import fi.euclides.proof.OppHandler;
-import fi.euclides.proof.VectorHandler;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
+import nl.numworx.geodefiner.common.Tools;
+import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
-	class Action implements ClickHandler, Observer {
+	
+	
+	public static class Action implements ClickHandler, Observer, AttachEvent.Handler {
 
 		final EventHandler h;
 		final ToggleButton btn;
+		final TrackerImpl  tracker;
+		final RadioMode model;
 
-		public Action(EventHandler h, Tracker t, ToggleButton btn) {
+		public Action(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model) {
 			this.h = h;
 			this.btn = btn;
+			this.tracker = t;
+			this.model = model;
 			h.setTracker(t);
-			Observable o = t.getModel();
-			if(o != null)
-				o.addObserver(this);
+			btn.addAttachHandler(this);
 		}
 
 		@Override
 		public void onClick(ClickEvent event) {
-			down(btn);
+			model.down(btn);
 			h.command();
-			h.getTracker().paint();
+			tracker.paint();
+			model.down(model.toggles.get(tracker.getPointerHandler()));
 		}
 
 		@Override
 		public void update(Observable observable, Object arg) {
-			Tracker viewer = h.getTracker();
-			if (observable == viewer) {
-				viewer.getModel().addObserver(this);
-			}  
-			Vector<Destroyable> selection = viewer.getModel().getSelect();
+			Vector<Destroyable> selection = tracker.getModel().getSelect();
 			setEnabled(h.allowSelection(selection));
 		}
 
@@ -82,13 +64,28 @@ public class ToolBoxPanel extends Composite implements Tools {
 			btn.setEnabled(enabled);
 		}
 
+		@Override
+		public void onAttachOrDetach(AttachEvent event) {
+			if(event.isAttached())
+			{	model.toggles.put(h,btn);
+				tracker.getModel().addObserver(this);
+				//update(null,null);
+			}
+			else
+			{
+				tracker.getModel().deleteObserver(this);
+				model.toggles.remove(h);
+			}
+			
+		}
+
 	}
 
-	class CirkelAction extends Action {
+	public static class CirkelAction extends Action {
 
 		Image[] images;
-		CirkelAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
-			super(h, t, btn);
+		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, Image... images) {
+			super(h, t, btn, model);
 			this.images = images;
 		}
 
@@ -120,10 +117,10 @@ public class ToolBoxPanel extends Composite implements Tools {
 		}
 	}
 
-	class PuntAction extends Action {
+	public static class PuntAction extends Action {
 
-		PuntAction(EventHandler h, Tracker t, ToggleButton btn, Image... images) {
-			super(h, t, btn);
+		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, Image... images) {
+			super(h, t, btn, model);
 			puntIcon = images[0];
 			puntOpIcon = images[1];
 			puntOp2Icon = images[2];
@@ -174,20 +171,12 @@ public class ToolBoxPanel extends Composite implements Tools {
 	}
 
 	FlowPanel panel;
-	ToggleButton downBtn;
 	
 	public ToolBoxPanel() {
 		panel = new FlowPanel();
 		initWidget(panel);
 	}
 	
-	void down(ToggleButton btn) {
-		if(downBtn != null && downBtn != btn)
-			downBtn.setDown(false);
-		downBtn = btn;
-		btn.setDown(true);
-		
-	}
 
 	void destroy() {
 		int size = panel.getWidgetCount();
@@ -196,122 +185,22 @@ public class ToolBoxPanel extends Composite implements Tools {
 	}
 	
 	private int height = 38;
-	private int width;
 	int getHeight() {
 		return height;
 	}
 	
-	void init(ObjectList list, Tracker tracker, GeoDefinerGWT geoDefinerGWT) {		
+	void init(ObjectList list, int w, Map<Integer,Provider<ToggleButton>> buttons) {		
 		ToggleButton btn;
-		width = geoDefinerGWT.getWidth();
-		height = ((list.size()*38-1)/width+1)*38;
-		String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
+		height = ((list.size()*38-1)/w+1)*38;
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
 			btn = null;
-			ResetHandler resetter;
-			switch(n) {
-			case SELECTOR:
-				btn = newBtn(url + "/move.png", geoDefinerGWT.selector, tracker);break;
-			case POINT: 
-				btn = newPBtn(url, new AddSnapPuntHandler(), tracker);break;		
-			case LINE:
-				btn = newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker);break;
-			case SEGMENT:
-				btn = newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker);break;
-			case TRIANGLE:
-				btn = newBtn(url + "/triangle.png", new AddPolygonHandler("Veelhoek"), tracker);break;
-			case CIRCLE:
-				btn = newCBtn(url, new AddCirkelHandler(), tracker);break;
-			case DESTROY:
-				btn = newBtn(url + "/delete.png", new FilteredDestroyHandler(geoDefinerGWT), tracker);break;
-			case HALFLINE:
-				btn = newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker);break;		
-			case ARC:
-				btn = newBtn(url + "/angle.png", new AddBoogHandler("Boog"), tracker);break;		
-			case MIDPOINT:
-				btn = newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker);break;		
-			case PERPENDICULAR:
-				btn = newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker);break;		
-			case PARALLEL:
-				btn = newBtn(url + "/parallel.png", new AddParallelHandler(), tracker);break;		
-			case BISECTRICE:
-				btn = newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker);break;		
-			case MIRROR:
-				btn = newBtn(url + "/mirror.png", new AddSpiegelHandler(), tracker);break;		
-			case CONIC_SECTION:
-				btn = newBtn(url + "/quadric.png", new AddKegelsnedeHandler("Kegelsnede"), tracker);break;		
-			case FOCUS:
-				btn = newBtn(url + "/quadric.png", new AddFocusHandler(), tracker);break;		
-			case LOCUS:
-				btn = newBtn(url + "/objecttracker.png", new AddLocusHandler("Meetkundige plaats"), tracker);break;		
-			case TANGENT:
-				btn = newBtn(url + "/line.png", new AddRaakLijnHandler(), tracker);break;		
-			case POLELINE:
-				btn = newBtn(url + "/line.png", new AddPoollijnHandler(), tracker);break;		
-// labels
-			case DISTANCE:
-				btn = newBtn(url + "/distance.png", new AfstandHandler("lengte"), tracker); break;
-			case AREA:
-				btn = newBtn(url + "/area.png", new OppHandler("oppervlakte"), tracker); break;
-			case ANGLE:
-				btn = newBtn(url + "/angle.png", new HoekHandler("hoek"), tracker); break;
-			case VECTOR:
-				btn = newBtn(url + "/ray.png", new VectorHandler("vector"), tracker); break;
-			case CIRCLE_WITH_RADIUS:
-				btn = newBtn(url + "/fixedcircle.png", new CirkelRadiusHandler(Messages.getString("AddCirkelHandler.0")), tracker);break;
-/*			
-		item = new MenuItem("Signed Area", new Action(new OppHandler("Signed Area", true), tracker ));
-		item = new MenuItem("Ratio", new Action(new RatioHandler("Ratio"), tracker ));
-		item = new MenuItem("Signed Ratio", new Action(new RatioHandler("Signed Ratio", true), tracker ));
-		item = new MenuItem("CrossRatio", new Action(new CrossRatio("CrossRatio"), tracker ));
-		
-*/			
-			case FORMULA: // definitie, /formuleknop.gif
-				btn = newBtn(url + "/function.png", new FormuleHandler("Definitie"), tracker);break;
-			case TEXT: 
-				btn = newBtn(url + "/text.png", new TextHandler("Text"), tracker); break;
-			case TRAIL: // trail
-				btn = newBtn(url+"/thickness2.png", new TrailHandler(Messages.getString("Euclides.44")), tracker);
-					break;					
-			case PAN: // pan
-				btn = newBtn(url + "/pan.png", geoDefinerGWT.widget.getPanHandler(), tracker);
-					break;
-			case RESET: // reset
-				resetter = new ResetHandler("Reset",geoDefinerGWT);
-				btn = newBtn(url + "/reseticon.gif", resetter, tracker); break;
-			}
+			Provider<ToggleButton> provider = buttons.get(n);
+			if(provider != null)
+				btn = provider.get();
 			if(btn != null)	panel.add(btn);
 		}
 	}
 
-	ToggleButton newBtn(String url, EventHandler handler, Tracker tracker) {
-		ToggleButton btn;
-		btn = new ToggleButton(new Image(url));
-		btn.addClickHandler(new Action(handler, tracker,btn));
-		return btn;
-	}
-
-	ToggleButton newPBtn(String url, EventHandler handler, Tracker tracker) {
-		ToggleButton btn;
-		String u = url + "/point.png";
-		Image puntIcon = new Image(u);
-		Image puntOpIcon = new Image(url + "/qpointon.png");
-		Image puntOp2Icon = new Image(url + "/intersection.png");
-		btn = new ToggleButton(puntIcon);
-		btn.addClickHandler(new PuntAction(handler, tracker,btn, puntIcon, puntOpIcon, puntOp2Icon));
-		return btn;
-	}
-
-	ToggleButton newCBtn(String url, EventHandler handler, Tracker tracker) {
-		ToggleButton btn;
-		String u = url + "/circle.png";
-		Image cirkelIcon = new Image(u);
-		Image compassIcon = new Image(url + "/circle3.png");
-		Image cirkel3Icon = new Image(url + "/4.png");
-		btn = new ToggleButton(cirkelIcon);
-		btn.addClickHandler(new CirkelAction(handler, tracker,btn, cirkelIcon, compassIcon, cirkel3Icon));
-		return btn;
-	}
 
 }
