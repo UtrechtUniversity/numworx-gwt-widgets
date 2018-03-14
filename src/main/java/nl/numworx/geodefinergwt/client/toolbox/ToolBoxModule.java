@@ -51,11 +51,17 @@ public class ToolBoxModule {
 	private final static String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
 	private final static messages rb = GeoDefinerGWT.MESSAGES;
 	
-	private static ToggleButton newBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
+	private static ToggleButton newBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model, String t) {
 		ToggleButton btn;
 		btn = new ToggleButton(new Image(url));
+		if(t!=null)
+			btn.setTitle(t);
 		btn.addClickHandler(new Action(handler, tracker,btn,model));
 		return btn;
+	}
+
+	private static ToggleButton newBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
+		return newBtn(url,handler,tracker,model,null);
 	}
 
 	private static ToggleButton newPBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
@@ -65,17 +71,19 @@ public class ToolBoxModule {
 		Image puntOpIcon = new Image(url + "/qpointon.png");
 		Image puntOp2Icon = new Image(url + "/intersection.png");
 		btn = new ToggleButton(puntIcon);
+		btn.setTitle(rb.Euclides_46());
 		btn.addClickHandler(new PuntAction(handler, tracker,btn, model, puntIcon, puntOpIcon, puntOp2Icon));
 		return btn;
 	}
 
-	static private ToggleButton newCBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
+	static private ToggleButton newCBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model, String string) {
 		ToggleButton btn;
 		String u = url + "/circle.png";
 		Image cirkelIcon = new Image(u);
 		Image compassIcon = new Image(url + "/circle3.png");
 		Image cirkel3Icon = new Image(url + "/4.png");
 		btn = new ToggleButton(cirkelIcon);
+		btn.setTitle(string);
 		btn.addClickHandler(new CirkelAction(handler, tracker,btn, model, cirkelIcon, compassIcon, cirkel3Icon));
 		return btn;
 	}
@@ -87,16 +95,16 @@ public class ToolBoxModule {
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static
 	ToggleButton line(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker, model);
+		return newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
 	}
 	@Provides @IntKey(Tools.SELECTOR) @IntoMap static
 	ToggleButton selector(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newBtn(url + "/move.png", instance.selector, tracker, model);
+		return newBtn(url + "/move.png", instance.selector, tracker, model,rb.Euclides_35());
 	}
 
 	@Provides @IntKey(Tools.DESTROY) @IntoMap static
 	ToggleButton destroy(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newBtn(url + "/delete.png", new FilteredDestroyHandler(instance), tracker, model);
+		return newBtn(url + "/delete.png", new FilteredDestroyHandler(instance), tracker, model,rb.Euclides_37());
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
 	ToggleButton reset(TrackerImpl tracker, RadioMode model, Instance instance) {
@@ -105,16 +113,16 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
 	ToggleButton pan(TrackerImpl tracker, RadioMode model, ViewerWidget widget) {
-		return newBtn(url + "/pan.png", widget.getPanHandler(), tracker, model);
+		return newBtn(url + "/pan.png", widget.getPanHandler(), tracker, model, rb.Euclides_41());
 	}
 	
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
 	ToggleButton segment(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model);
+		return newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
 	}
 	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
 	ToggleButton halfline(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker, model);
+		return newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker, model,rb.Euclides_49());
 	}
 	@Provides @IntKey(Tools.TRIANGLE) @IntoMap static
 	ToggleButton triangle(TrackerImpl tracker, RadioMode model) {
@@ -123,7 +131,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CIRCLE) @IntoMap static
 	ToggleButton circle(TrackerImpl tracker, RadioMode model) {
-		return newCBtn(url, new AddCirkelHandler(), tracker, model);
+		return newCBtn(url, new AddCirkelHandler(), tracker, model,rb.Euclides_52());
 	}
 
 	@Provides @IntKey(Tools.ARC) @IntoMap static
@@ -132,27 +140,27 @@ public class ToolBoxModule {
 	}
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
 	ToggleButton midpoint(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker, model);
+		return newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker, model,rb.Euclides_54());
 	}
 
 	@Provides @IntKey(Tools.PERPENDICULAR) @IntoMap static
 	ToggleButton perpendicular(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker, model);
+		return newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker, model,rb.Euclides_56());
 	}
 
 	@Provides @IntKey(Tools.PARALLEL) @IntoMap static
 	ToggleButton parallel(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/parallel.png", new AddParallelHandler(), tracker, model);
+		return newBtn(url + "/parallel.png", new AddParallelHandler(), tracker, model,rb.Euclides_58());
 	}
 
 	@Provides @IntKey(Tools.BISECTRICE) @IntoMap static
 	ToggleButton bissectrice(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker, model);
+		return newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker, model,rb.Euclides_60());
 	}
 
 	@Provides @IntKey(Tools.MIRROR) @IntoMap static
 	ToggleButton mirror(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/mirror.png", new AddSpiegelHandler(), tracker, model);
+		return newBtn(url + "/mirror.png", new AddSpiegelHandler(), tracker, model, rb.Euclides_62());
 	}
 
 	@Provides @IntKey(Tools.CONIC_SECTION) @IntoMap static
@@ -182,17 +190,17 @@ public class ToolBoxModule {
 	//labels
 	@Provides @IntKey(Tools.DISTANCE) @IntoMap static
 	ToggleButton distance(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/distance.png", new AfstandHandler("lengte"), tracker, model);
+		return newBtn(url + "/distance.png", new AfstandHandler(rb.Euclides_88()), tracker, model,rb.Euclides_88());
 	}
 
 	@Provides @IntKey(Tools.AREA) @IntoMap static
 	ToggleButton area(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/area.png", new OppHandler("oppervlakte"), tracker, model);
+		return newBtn(url + "/area.png", new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91());
 	}
 
 	@Provides @IntKey(Tools.ANGLE) @IntoMap static
 	ToggleButton angle(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/angle2.png", new HoekHandler("hoek"), tracker, model);
+		return newBtn(url + "/angle2.png", new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85());
 	}
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
@@ -217,7 +225,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.TRAIL) @IntoMap static
 	ToggleButton trail(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/thickness2.png", new TrailHandler(rb.Euclides_44()), tracker, model);
+		return newBtn(url + "/thickness2.png", new TrailHandler(rb.Euclides_44()), tracker, model,rb.Euclides_44());
 	}
 
 }

@@ -16,6 +16,7 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.proof.LabelDelegate;
 import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Definitions;
+import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.math.Expression;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
@@ -42,6 +43,7 @@ public class Modules {
 		expression.symbolmap.putAll(symbols);
 		return expression;
 	}
+
 	@Provides @Singleton static Definitions definitions(Tracker t) {
 		return new Definitions(t);
 	}
@@ -52,7 +54,9 @@ public class Modules {
 		return delegate;
 	}
 	
-	@Provides static CheckObjectList checkObjectList(Tracker t, Expression e) {
-		return new CheckObjectList(t,e);
+	@Provides static CheckObjectList checkObjectList(Tracker t, Expression e, Instance instance) {
+		CheckObjectList l = new CheckObjectList(t,e);
+		l.setInstance(instance);
+		return l;
 	}
 }
