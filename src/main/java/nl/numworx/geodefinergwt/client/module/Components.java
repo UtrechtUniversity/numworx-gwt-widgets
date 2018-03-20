@@ -23,8 +23,6 @@ import nl.numworx.geodefinergwt.client.TrackerImpl;
 @Singleton
 public interface Components {
 	void provideComponent(GeoDefinerGWT main);
-	Map<String, LabelDelegate> symbols();
-	Lazy<Map<Integer, Provider<ToggleButton>>> buttons();
 	@Component.Builder
 	interface Builder {
 		Components build();

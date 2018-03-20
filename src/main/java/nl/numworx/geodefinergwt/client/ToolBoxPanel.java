@@ -150,20 +150,20 @@ public class ToolBoxPanel extends Composite implements Tools {
 				String string;
 				if(d instanceof Lijn)
 				{ 
-					string = Messages.getString("AddPuntHandler.1"); //$NON-NLS-1$
+					string = GeoDefinerGWT.MESSAGES.AddPuntHandler_1(); //$NON-NLS-1$
 				} else
 				{
-					string = Messages.getString("AddPuntHandler.2"); //$NON-NLS-1$
+					string = GeoDefinerGWT.MESSAGES.AddPuntHandler_2(); //$NON-NLS-1$
 				} 
-//				putValue(SHORT_DESCRIPTION, string);
+				btn.setTitle(string);
 				btn.getUpFace().setImage(puntOpIcon);
 				break;
 			case 2: 
-//				putValue(SHORT_DESCRIPTION, Messages.getString("AddPuntHandler.3"));
+				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_3());
 				btn.getUpFace().setImage(puntOp2Icon);
 				break;
 			default:
-//				putValue(SHORT_DESCRIPTION,Messages.getString("AddPuntHandler.0"));
+				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_0());
 				btn.getUpFace().setImage(puntIcon);
 				break;
 			}

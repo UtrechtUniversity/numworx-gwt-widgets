@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class TrackerImpl implements Tracker
 	Label status;
 	Randomizer randomizer;
 	
-	@Inject TrackerImpl(AbstractViewer viewer, NamingModel mapper, @Named("status") Label status, Randomizer r, Expression e) {
+	@Inject TrackerImpl(AbstractViewer viewer, NamingModel mapper, @Named("status") Label status, Randomizer r, Expression e, Set<LabelDelegate> set) {
 		super();
 		this.viewer = viewer;
 		this.mapper = mapper;
@@ -44,6 +45,7 @@ public class TrackerImpl implements Tracker
 		this.randomizer = r;
 		this.expression = e;
 		this.register = new TreeMap<String,LabelDelegate>();
+		for(LabelDelegate ld: set) ld.setTracker(this);
 		e.setAllTracker(this);
 	}
 

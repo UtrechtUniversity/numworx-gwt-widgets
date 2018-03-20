@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoMap;
+import dagger.multibindings.IntoSet;
 import dagger.multibindings.StringKey;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.ViewerWidget;
@@ -19,6 +20,7 @@ import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.math.Expression;
+import nl.numworx.geodefiner.common.math.ToC;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
 import nl.numworx.geodefinergwt.client.ui.HerleidList;
@@ -58,5 +60,9 @@ public class Modules {
 		CheckObjectList l = new CheckObjectList(t,e);
 		l.setInstance(instance);
 		return l;
+	}
+	
+	@Provides @IntoSet static LabelDelegate toc() {
+		return new ToC();
 	}
 }

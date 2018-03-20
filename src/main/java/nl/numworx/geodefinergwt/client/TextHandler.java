@@ -7,11 +7,14 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.euclides.event.EventHandler;
+import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Punt;
 import fi.euclides.model.math.Numbers;
+import fi.euclides.proof.LabelDelegate;
 import nl.numworx.geodefiner.common.AbstractTextHandler;
 import nl.numworx.geodefiner.common.Volgpunt;
+import nl.numworx.geodefiner.common.math.ToC;
 import nl.numworx.geodefinergwt.client.ui.TekstPopup;
 import nl.numworx.geodefinergwt.client.ui.TekstPopup.Owner;
 
@@ -55,8 +58,11 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 	public void setText(String text) {
 		if(fuse||text.isEmpty()) return;
 		fuse = true;
+		LabelDelegate ld = getTracker().getRegistered(ToC.TYPE);
 		this.text = text;
-		Label label = new Label();
+		Destroyable[] depend = ld.createDepend(1);
+		depend[0] = p;
+		Label label = ld.define(depend);
 		label.setString(text);
 		Volgpunt v = new Volgpunt(p);
 		v.setDxy(Numbers.createInteger(6),Numbers.createInteger(-5));
