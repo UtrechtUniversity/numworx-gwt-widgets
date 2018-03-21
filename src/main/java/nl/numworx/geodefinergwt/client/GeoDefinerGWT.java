@@ -63,10 +63,9 @@ import fi.euclides.proof.LabelValue;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
-import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.VariableCollection;
 
-public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer, Randomizer {
+public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer {
 
 	public static final messages MESSAGES = GWT.create(messages.class);
 	private static final String GOED_CSS = "goed";
@@ -348,9 +347,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		widget.init(width, height);
 		this.width = width;
 		this.height = height;
+		this.random = new GWTRandomizer();
 		Components c = DaggerComponents.builder()
 				.status(status)
-				.randomizer(this)
+				.randomizer(random)
 				.widget(widget)
 				.instance(this)
 				.build();
@@ -456,22 +456,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		return false;
 	}
 
-	@Override
-	public String randomize(String input) {
-		return randomize(random, input);
-	}
 
-	@Override
-	public String randomize(Map<String, Number> random, String text) {
-		try {
-			HashMap<String, Number> m = new HashMap<String, Number>(random);
-			String[] keys = random.keySet().toArray(new String[random.size()]);
-			return FormuleParser.randomizeString(text, keys, m);
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "randomize " + text, e);
-		}
-		return super.randomize(random, text);
-	}
 
 	public void reset() {
 		toolbox.destroy();
