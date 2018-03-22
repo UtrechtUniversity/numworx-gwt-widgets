@@ -212,7 +212,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		checkDWO.put("check", Boolean.TRUE);
 		checkDWO.put("extern", Boolean.FALSE);
 		List<String> definitions = Arrays.asList(
-				"$fa=9..10@" 
+				"$fa=9..#a#@" 
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
 				//,"$ft=text(\"M$s8@ M$sx@\",O)@"
 				,"$fP=point(1,1)@"
@@ -228,6 +228,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		launchDebug.put("checkObjects", Collections.singletonList(checkObject));
 
 		Map<String, Number> values = new HashMap<String, Number>();
+		values.put("a", Integer.valueOf(10));
 		init(getWidth(), getHeight(), launchDebug, values);
 		MockOpdrNav opdrnav = new MockOpdrNav();
 		FocusOnTouch.installKeyboard(opdrnav, opdrnav);
