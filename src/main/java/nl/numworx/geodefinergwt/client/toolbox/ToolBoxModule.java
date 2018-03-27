@@ -220,7 +220,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.TEXT) @IntoMap static
 	ToggleButton text(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/text.png", new TextHandler("Tekst"), tracker, model);
+		return newBtn(url + "/showname.png", new TextHandler("Tekst"), tracker, model);
 	}
 
 	@Provides @IntKey(Tools.TRAIL) @IntoMap static
