@@ -158,7 +158,7 @@ public class PieChartUserOptionsPanel extends FlowPanel
 		
 		boolean isEnumOnlyView = true;
 		boolean ignoreFirstItem = false;
-		StatistiekUtils.setEnumOnlyColumnsVarListBox(columnIndexBox, isEnumOnlyView, ignoreFirstItem, model.getStatTableModel());
+		StatistiekUtils.setEnumOnlyColumnsEnabledVarListBox(columnIndexBox, isEnumOnlyView, ignoreFirstItem, model.getStatTableModel());
 		
 		if (this.model.columnIndexValid())
 		{
