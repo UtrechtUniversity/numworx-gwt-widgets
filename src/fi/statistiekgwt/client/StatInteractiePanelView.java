@@ -1087,7 +1087,7 @@ public class StatInteractiePanelView extends LayoutPanel
 			// voor enum-only views alleen de enum kolomnamen enabled
 			//setEnumOnlyColumnsStartVar(isEnumerationOnlyView());
 			boolean ignoreFirstItem = true;
-			StatistiekUtils.setEnumOnlyColumnsVarListBox(startVarBox, isEnumerationOnlyView(), ignoreFirstItem, model.getStatTableModel());
+			StatistiekUtils.setEnumOnlyColumnsEnabledVarListBox(startVarBox, isEnumerationOnlyView(), ignoreFirstItem, model.getStatTableModel());
 			
 			this.startVarBoxHandlerRegistration = this.startVarBox.addChangeHandler(controller);
 		} // if there are column names
