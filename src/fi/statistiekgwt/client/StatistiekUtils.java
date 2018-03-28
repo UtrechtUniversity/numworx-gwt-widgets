@@ -156,7 +156,7 @@ public class StatistiekUtils
 	 * @param ignoreFirstItem De eerste overslaan (bijv "kies een variabele")
 	 * @param model
 	 */
-	public static void setEnumOnlyColumnsVarListBox(ListBox varListBox, boolean isEnumOnlyView, boolean ignoreFirstItem, StatTableModel model)
+	public static void setEnumOnlyColumnsEnabledVarListBox(ListBox varListBox, boolean isEnumOnlyView, boolean ignoreFirstItem, StatTableModel model)
 	{
 		ArrayList<ColumnType> types = model.getColumnTypes();
 		
