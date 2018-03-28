@@ -7,6 +7,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.euclides.event.EventHandler;
+import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Punt;
@@ -32,8 +33,11 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		Widget root = getTracker().adapt(Widget.class);
 		if(root == null)
 			root = RootPanel.get();
-		final int x = (int) p.getXd() + root.getAbsoluteLeft(); // OFFSETX 
-		final int y = (int) p.getYd() + root.getAbsoluteTop() + 5; // OFFSETY
+		AbstractViewer viewer = getTracker().adapt(AbstractViewer.class);
+		final int offx=viewer.clipLeft().intValue();
+		final int offy=viewer.clipTop().intValue();
+		final int x = p.getX().intValue() + root.getAbsoluteLeft()    - offx; // OFFSETX 
+		final int y = p.getY().intValue() + root.getAbsoluteTop() + 5 - offy; // OFFSETY
 		this.p = p;
 		this.text = ""; // empty
 		final TekstPopup tf  = new TekstPopup(this, true);
