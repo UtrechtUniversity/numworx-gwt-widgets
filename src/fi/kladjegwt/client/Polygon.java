@@ -3,18 +3,48 @@ package fi.kladjegwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * klasse die een polygon in het vlak representeert (GWT heeft geen klasse Polygon) 
+ * @author Peter Boon
+ */
+
 class Polygon
 {
+	/**
+	 * aantal punten
+	 */
 	int aantalPunten;
+	/**
+	 * x-coordinaten van de punten als integers
+	 */
 	int[] puntenX;
+	/**
+	 * y-coordinaten van de punten als integers
+	 */
 	int[] puntenY;
+	/**
+	 * x-coordinaten van de punten als doubles
+	 */
 	double[] doubleX;
+	/**
+	 * y-coordinaten van de punten als doubles
+	 */
 	double[] doubleY;
 	
+	/**
+	 * default constructor
+	 */
 	public Polygon()
 	{
 		
 	}
+	
+	/**
+	 * constructor, gehele coordinaten en aantal punten voorgeschreven
+	 * @param puntenX x-coordinaten van de punten als integers
+	 * @param puntenY y-coordinaten van de punten als integers
+	 * @param aantalPunten aantal punten
+	 */
 	public Polygon(int[] puntenX, int[]puntenY, int aantalPunten)
 	{
 		this.aantalPunten = aantalPunten;
@@ -31,6 +61,10 @@ class Polygon
 		}
 	}
 	
+	/**
+	 * constructor, hard copy van Polygon p
+	 * @param p Polygon dat gekopieerd moet worden 
+	 */
 	public Polygon (Polygon p)
 	{	
 		aantalPunten = p.aantalPunten;
@@ -47,6 +81,12 @@ class Polygon
 		}
 	}
 	
+	/**
+	 * voeg het punt (x,y) met gehele coordinaten toe aan
+	 * dit Polygon
+	 * @param x x-coordinaat nieuw punt
+	 * @param y y-coordinaat nieuw punt
+	 */
 	public void addPoint(int x, int y)
 	{
 		int[] oudePuntenX = puntenX;
@@ -72,7 +112,13 @@ class Polygon
 		doubleX[aantalPunten - 1] = x;
 		doubleY[aantalPunten - 1] = y;
 	}
-	
+
+	/**
+	 * overloaded: voeg het punt (x,y) met double coordinaten toe aan
+	 * dit Polygon
+	 * @param x x-coordinaat nieuw punt
+	 * @param y y-coordinaat nieuw punt
+	 */
 	public void addPoint(double x, double y)
 	{
 		int[] oudePuntenX = puntenX;
@@ -98,7 +144,13 @@ class Polygon
 		doubleX[aantalPunten - 1] = x;
 		doubleY[aantalPunten - 1] = y;
 	}
-		
+
+	/**
+	 * teken dit Polygon (omlijning en binnengebied)
+	 * @param gIm de Context2d om te tekenen 
+	 * @param lijnkleur de kleur voor de omlijning 
+	 * @param vulkleur de vulkleur
+	 */
 	public void draw(Context2d gIm, CssColor lijnkleur, CssColor vulkleur)
   	{
 		if (vulkleur != null)
@@ -126,26 +178,55 @@ class Polygon
 		
   	}
 	
+	/**
+	 * getter voor de gehele x-waarde van punt nr
+	 * @param nr index van punt 
+	 * @return gehele x-waarde van punt nr
+	 */
 	public int geefPuntX(int nr)
 	{ 	return puntenX[nr];
 	}
 	
+	/**
+	 * getter voor de gehele y-waarde van punt nr
+	 * @param nr index van punt 
+	 * @return gehele y-waarde van punt nr
+	 */
 	public int geefPuntY(int nr)
 	{ 	return puntenY[nr];
 	}
 	
+	/**
+	 * getter voor de double x-waarde van punt nr
+	 * @param nr index van punt 
+	 * @return double x-waarde van punt nr
+	 */
 	public double geefPuntXD(int nr)
 	{ 	return doubleX[nr];
 	}
-	
+
+	/**
+	 * getter voor de double y-waarde van punt nr
+	 * @param nr index van punt 
+	 * @return double y-waarde van punt nr
+	 */
 	public double geefPuntYD(int nr)
 	{ 	return doubleY[nr];
 	}
 
+	/**
+	 * getter voor het aantal punten
+	 * @return aantalPunten
+	 */
 	public int geefAantalPunten()
 	{	return aantalPunten;
 	}
 	
+	/**
+	 * verschuif (transleer) dit Polygon langs de vector (dx,dy) 
+	 * @param dx translatie in x-richting
+	 * @param dy translatie in y-richting
+	 */
 	public void translate(int dx, int dy)
 	{
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -158,6 +239,13 @@ class Polygon
 		}
 	}
 
+	/**
+	 * roteer dit Polygon tegen de klok in over rotation radialen
+	 * en gebruik het punt (cx,cy) als centrum van de rotatie
+	 * @param rotation rotatie tegen de klok in in radialen
+	 * @param cx x-coordinaat rotatie centrum
+	 * @param cy y-coordinaat rotatie centrum
+	 */
 	public void rotate(double rotation, double cx, double cy)
 	{	
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -174,6 +262,12 @@ class Polygon
 		
 	}
 	
+	/**
+	 * schaal dit Polygon met een factor s vanuit het punt (cx,xy)
+	 * @param s schaal factor
+	 * @param cx x-coordinaat schaal-centrum
+	 * @param cy y-coordinaat schaal-centrum
+	 */
 	public void scale(double s, double cx, double cy)
 	{
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -184,6 +278,14 @@ class Polygon
 		}
 	}
 
+	/**
+	 * schaal dit Polygon met een factor sx in de x-richting en met een
+	 * factor sy in de y-richting vanuit het punt (cx,xy)
+	 * @param sx schaal factor in de x-richting
+	 * @param sy schaal factor in de y-richting
+	 * @param cx x-coordinaat schaal-centrum
+	 * @param cy y-coordinaat schaal-centrum
+	 */
 	public void scale(double sx, double sy, double cx, double cy)
 	{
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -194,6 +296,17 @@ class Polygon
 		}
 	}
 	
+	
+	/**
+	 * translate this Polygon over (-cx,-cy), transform it by the linear transformation
+	 * M and translate the result over (cx,cy)
+	 * @param m00 M linksboven
+	 * @param m01 M rechtboven
+	 * @param m10 M linksonder
+	 * @param m11 M rechtsonder
+	 * @param cx x-coordinaat pseudo-centrum
+	 * @param cy y-coordinaat pseudo-centrum
+	 */
 	public void transformBy(double m00, double m01, double m10, double m11, double cx, double cy)
 	{
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -207,7 +320,11 @@ class Polygon
 			
 		}
 	}
-	
+
+	/**
+	 * transformeer dit Polygon m.b.v. de affiene transformatie at
+	 * @param at affiene transformatie 
+	 */
 	public void transformBy(AffineTransform at)
 	{
 		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
@@ -222,12 +339,23 @@ class Polygon
 		}
 	}
 
-	
+	/**
+	 * check of dit Polygon het gehele punt (x,y) bevat
+	 * @param x gehele x-coordinaat
+	 * @param y gehele y-coordinaat
+	 * @return true/false
+	 */
 	public boolean contains(int x, int y) 
 	{
 		return contains((double)x, (double)y);
 	}
-	
+
+	/**
+	 * check of dit Polygon het double punt (x,y) bevat
+	 * @param x double x-coordinaat
+	 * @param y double y-coordinaat
+	 * @return true/false
+	 */
 	public boolean contains(double x, double y) 
 	{
 		 	 if (aantalPunten <= 2) 

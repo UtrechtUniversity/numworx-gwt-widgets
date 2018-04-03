@@ -1,8 +1,6 @@
 package fi.kladjegwt.client;
 
-import java.awt.Color;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -32,42 +30,148 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
+/**
+ * klasse die het werkveld beheert: de klasse bevat een Canvas en handelt ook de
+ * Mouse/Touch Events op dit Canvas af; de uitgevoerde actie bij een Mouse/Touch
+ * Event hangt af van de mouse mode, die gekozen wordt m.b.v. de ToggleButtons
+ * onder het werkveld (zie ook klasse KLadjeGWT):<br>
+ * mouse mode = tekenen: zie klasse Streep <br>
+ * mouse mode = lijnTekenen: zie klasse Lijn <br>
+ * mouse mode = rechthoekTekenen: zie klasse Rechthoek <br>
+ * mouse mode = cirkelTekenen: zie klasse Ellips <br>
+ * mouse mode = tekstTekenen: zie klasse TekstElement <br>
+ * mouse mode = selecteren: twee mogelijkheden: <br>
+ * klik op een object, het object krijgt dan een handle box en kan 
+ * geschaald (als dat mag), gedraaid (als dat mag), verplaatst of
+ * gewist worden; ergens anders klikken verwijderd de handle box;<br>
+ * klik ergens op het werkveld en sleep een rechthoek tevoorschijn 
+ * (de selecteerRechthoek); bij mouseUp/touchEnd verschijnt een handle box
+ * waarbij alle objecten die zich in de handle box bevinden geselecteerd
+ * zijn; alle geselecteerde objecten kunnen dan geschaald (als dat mag), 
+ * gedraaid (als dat mag, TekstElementen worden niet gedraaid), 
+ * verplaatst of gewist worden; ergens anders klikken verwijderd
+ * de selecteerRechthoek;<br>
+ * de achterground van het Canvas wordt niet getekened, zodat KladjeGWT
+ * b.v. over een foto heengelegd kan worden.<br>
+ * er is een history die maximaal r voorafgaande tekensituaties onthoudt
+ * en de bediend wordt via de "terug"-knop; let op dat de history niet
+ * in de state van de opdracht wordt onthouden, d.w.z. ga je naar een andere
+ * opdracht en weer terug, dan is je history een "diep", d.w.z. alles wat de
+ * leerling getekend heeft; "terug" wist dit allemaal.     
+ * @author huub
+ */
 
 public class KladjeGWTVeld 
 {
+	/**
+	 * het Canvas om op te tekenen
+	 */
 	public Canvas kladjeHWTCanvas;
+	/**
+	 * de Context2d om mee te tekenen
+	 */
 	public static Context2d gIm;
 	
+	/**
+	 * een hele kleine positieve double
+	 */
 	static double NZERO = 1e-5d;
 	
+	/**
+	 * instelling: true: er mag gedraaid worden (er verschijnen draaihandles)   
+	 */
 	static boolean roteren = true;
+	/**
+	 * instelling: true: er mag geschaald worden (er verschijnen schaalhandles)   
+	 */
 	static boolean schalen = true;
-	
+
+	/**
+	 * true: een van de handles van de handle box van een individueel object werd aangeklikt
+	 */
 	boolean handleAction = false;
+	/**
+	 * true: een van de handles (als die er al zijn) van de selecteerRechthoek
+	 * werd aangeklikt
+	 */
 	boolean groupHandleAction = false;
+	/**
+	 * true: de schaalhandle rechtsboven van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean scalingTopRight = false;
+	/**
+	 * true: de schaalhandle linksboven van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean scalingTopLeft = false;
+	/**
+	 * true: de schaalhandle rechtsbeneden van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean scalingBottomRight = false;
+	/**
+	 * true: de schaalhandle linksbeneden van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean scalingBottomLeft = false;
+	/**
+	 * true: de draaihandle rechte van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean rotatingEast = false;
+	/**
+	 * true: de draaihandle links van de selecteerRechthoek werd aangeklikt
+	 */
 	boolean rotatingWest = false;
-	
+	/**
+	 * instelling: true: het werkveld bevat horizontale lijnen
+	 */
 	boolean lijnen = false;
+	/**
+	 * instelling: true: het werkveld bevat ruitjes 
+	 */
 	boolean ruitjes = true;
 	
+	/**
+	 * instelling: afstand in pixels tussen de horizontale lijnen 
+	 */
 	int lineDistance = 20;
+	/**
+	 * instelling: afmeting in pixels van de ruitses
+	 */
 	int gridSize = 20;
 	
+	/**
+	 * lichtblauw
+	 */
 	static CssColor lightBlue = CssColor.make(148, 148, 255);
+	/**
+	 * de kleur van de lijnen (lichtblauw)
+	 */
 	CssColor lijnenKleur = CssColor.make(150, 150, 255);
+	/**
+	 * de kleur van de ruitjes (grijs)
+	 */
 	CssColor ruitjesKleur = CssColor.make(210, 210, 210);
+	
+	/**
+	 * de kleur van de bounding boxes van objecten
+	 */
 	static CssColor bbColor = lightBlue; 
+	/**
+	 * de kleur van de handle boxes van objecten (blauw) 
+	 */
 	static CssColor hbColor = CssColor.make(0, 0, 255);
 	
+	/**
+	 * de minimum breedte en hoogte van een handle box
+	 */
 	static int minHandleBoxSize = 50;
 
+	/**
+	 * de kleur van de selectierechthoek
+	 */
 	CssColor selectieColor = CssColor.make(0, 0, 255);
 		
+	/**
+	 * voorgedefinieerde kleuren
+	 */
 	static CssColor zwart = CssColor.make(0, 0, 0);
 	static CssColor grijs = CssColor.make(220, 220, 220);
 	static CssColor rood = CssColor.make(255, 0, 0);
@@ -78,112 +182,234 @@ public class KladjeGWTVeld
 	static CssColor magenta = CssColor.make(255, 0, 255);
 	static CssColor geel = CssColor.make(255, 255, 0);
 	
+	/**
+	 * de actuele tekenkleur (default zwart)
+	 */
 	CssColor drawingColor = CssColor.make(0, 0, 0);
-	int bgRed = 255;
-	int bgGreen = 255;
-	int bgBlue = 255;
-	CssColor backgroundColor = CssColor.make(bgRed, bgGreen, bgBlue);
 	
-//	Color[] kleuren = {Color.black, Color.lightGray, Color.red, Color.orange,
-//	           Color.green, Color.cyan, Color.blue, Color.magenta};
-
+	/**
+	 * mouse/touch modes
+	 */
 	final int inert = 0;
 	final int tekenen = 1;
-	//final int gummen = 2;
 	final int lijnTekenen = 3;
 	final int rechthoekTekenen = 4;
 	final int cirkelTekenen = 5;
 	final int tekstTekenen = 6;
 	final int selecteren = 7;
+	/**
+	 * de actuele mouse mode
+	 */
 	int mouseMode = inert;
 	
+	/**
+	 * true na MouseDown/TouchStart, moet true zijn voor MouseMove
+	 * (dit is dan dragging) 
+	 */
 	boolean mouseDown;
-//	Point start = null;
 	
+	/**
+	 * smoothing types voor getekende strepen
+	 */
 	final int GAUSSIAN = 0;
 	final int AVERAGE = 1;
 	final int AVERAGE2 = 2;
+	/**
+	 * actuele smoothing type
+	 */
 	int smoothType = AVERAGE2;
 
+	/**
+	 * tijdelijke lijst van getekende punten bij slepen in mouse mode = tekenen; deze punten 
+	 * worden een Streep by MouseUp/TouchStart
+	 */
 	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();	
-//	Vector<Point> draggPoints = new Vector<Point>();
-	//Vector gumPunten = new Vector();
-	//int gumGrootte = 7; // oneven	
 
+	/**
+	 * tijdelijk startpunt bij slepen in alle mouse modes, gefixeerd door mouseDowm/TouchStart 
+	 */
 	Point figuurStart = null;
+	/**
+	 * tijdelijk eindpunt bij slepen in mouse mode = lijntekenen, bij mouseUp/TouchEnd wordt een
+	 * Lijn gecreeerd  
+	 */
 	Point lijnEinde = null;
+	
+	/**
+	 * tijdelijke rechthoek bij slepen in mouse mode = rechthoek of mouse mode = ellips;
+	 * de linker bovenhoek figuurStart wordt gefixeerd door mouseDowm/TouchStart, in het geval van
+	 * mouse mode = rechthoek, teken de rechthoek, in het geval van mouse mode = ellips,
+	 * teken een ellips in de rechthoek; bij mouseUp/TouchEnd wordt een Rechthoek resp.
+	 * een Ellips gecreeerd  
+	 */
 	Rectangle tekenRechthoek = null;
-//	KladjeRectangle tekstRechthoek = null;
+
+	/**
+	 * de rechthoek om te selecteren
+	 */
 	Rectangle selecteerRechthoek = null;
-//	KladjeRectangle wisRechthoek = null;
+
+	/**
+	 * het actuele TekstElement dat ge-edit wordt (of null) 
+	 */
 	TekstElement tekstEdited = null;
 
+	/**
+	 * schaal handles voor de selecteerRechthoek
+	 */
 	Polygon topRightHandle, bottomRightHandle, topLeftHandle, bottomLeftHandle;
+	/**
+	 * klikken op de schaal handles voor de selecteerRechthoek
+	 */
 	Rectangle topRightRect, bottomRightRect, topLeftRect, bottomLeftRect;
+	/**
+	 * draai handles voor de selecteerRechthoek
+	 */
 	Rectangle rotateEastHandle, rotateWestHandle;
+	/**
+	 * aantal pixels offset voor de selecteerRechthoek
+	 */
 	int hbFactor = 4;
 
-	// backwards compatibility
-	//ColorBytes[][] pixels = null;
-	//Vector<ColorBytes> pixels = new Vector<ColorBytes>();
-	
+	/**
+	 * afmetingen Canvas
+	 */
 	int breedte, hoogte;
+	
+	/**
+	 * Strepen getekend door de leerling
+	 */
 	Vector<Streep> streepVector = new Vector<Streep>();
+	/**
+	 * Lijnen getekend door de leerling
+	 */
 	Vector<Lijn> lijnVector = new Vector<Lijn>();
+	/**
+	 * Rechthoeken getekend door de leerling
+	 */
 	Vector<Rechthoek> rechthoekVector = new Vector<Rechthoek>();
+	/**
+	 * Ellipsen getekend door de leerling
+	 */
 	Vector<Ellips> ellipsVector = new Vector<Ellips>();
+	/**
+	 * TekstElementen getekend door de leerling
+	 */
 	Vector<TekstElement> tekstElementVector = new Vector<TekstElement>();
 
+	/**
+	 * Strepen uit de launchdata, kunnen niet veranderd worden 
+	 */
 	Vector<Streep> docentStreepVector = new Vector<Streep>();
+	/**
+	 * Strepen uit de launchdata, kunnen niet veranderd worden 
+	 */
 	Vector<Lijn> docentLijnVector = new Vector<Lijn>();
+	/**
+	 * Rechthoeken uit de launchdata, kunnen niet veranderd worden 
+	 */
 	Vector<Rechthoek> docentRechthoekVector = new Vector<Rechthoek>();
+	/**
+	 * Ellipsen uit de launchdata, kunnen niet veranderd worden 
+	 */
 	Vector<Ellips> docentEllipsVector = new Vector<Ellips>();
+	/**
+	 * TekstElementen uit de launchdata, kunnen niet veranderd worden 
+	 */
 	Vector<TekstElement> docentTekstElementVector = new Vector<TekstElement>();
 
+	/**
+	 * maximum aantal snapshots voor "terug"
+	 */
 	int maxHistories = 5;
+	/**
+	 *  aantal beschikbare snapshots voor "terug"
+	 */
 	int numHistories = 0;
+	/**
+	 * de snapshots voor "terug"
+	 */
 	HashMap<String,Object>[] histories = new HashMap[maxHistories + 1];
 
-//Cursor selectCursor = null;
+	/**
+	 * true: een of meer objecten kunnen gesleept worden 
+	 */
 	boolean sleepSelectie = false;
+	/**
+	 * true: een of meer objecten werden verplaatst
+	 * maak een snapshot voor de history 
+	 */
 	boolean objectMoved = false;
+	/**
+	 * true: een of meer objecten werden geschaald of gedraaid
+	 * maak een snapshot voor de history 
+	 */
 	boolean objectHandled = false;
+	/**
+	 * coordinaten voor MouseDown/TouchStart en MouseMove/TouchMove 
+	 */
 	int startX, startY;
-	//Vector sleepPoints = new Vector();
-	//ImageData sleepRectangleData = null;
 
+	/**
+	 * de geselcteerde Streep
+	 */
 	Streep selectedStreep = null;
+	/**
+	 * de geselecteerde Lijn
+	 */
 	Lijn selectedLijn = null;
+	/** 
+	 * de geselecteerde Rechthoek
+	 */
 	Rechthoek selectedRechthoek = null;
+	/**
+	 * de geselecteerde Ellips
+	 */
 	Ellips selectedEllips = null;
+	/**
+	 * het geselecteerde TekstElement
+	 */
 	TekstElement selectedTekstElement = null;
-	TekstElement oldSelectedTekstElement = null;
+	/**
+	 * een groep geselecteerde objecten
+	 */
 	Vector<Object> objectsSelected = new Vector<Object>();
-	
 
-//Cursor textCursor = null;
-
-//Font tekstFont;
-//Font tekenTekstFont;
-//FontMetrics tekstFM;
-	
+	/**
+	 * de popup voor tekstinvoer (voor TekstElementen)
+	 */
 	TekstPopup tekstPopup;	
 	
-	int tekstBreedte = 50;
-	int tekstHoogte;
-	//boolean sleepTekst;
-	//int tekstRand = 5;
+	/**
+	 * tekst uitgelezen uit de actieve TeksPopup 
+	 */
 	String tekstString = "";
+	/**
+	 * x- en y-coordinaten van MouseDown/TouchStart in mouse mode = teksttekeken,
+	 * hier komt het neiuwe TekstElement
+	 */
 	int tekstX = 0;
 	int tekstY = 0;
 	
-	double rotateStep = Math.PI / 18; // 10 degrees in radians
+	/**
+	 * draaistap voor slepen aan de draaihandles;
+	 * 10 degrees in radians
+	 */
+	double rotateStep = Math.PI / 18; 
+	/**
+	 * cumulative draaiing bij slepen aan de draaihandles
+	 */
 	double angleSum = 0;
+	/**
+	 * schaal stapjes voor slepen aan de schaalhandles;
+	 */
 	double scaleUpStep = 105e-2d;
 	double scaleDownStep = 1 / 105e-2d;
-	
-	boolean noUpdate = true; 
-	
+	/**
+	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
+	 * @param w breedte
+	 * @param h hoogte
+	 */
 	public KladjeGWTVeld(int w, int h)
 	{	
 		
@@ -196,27 +422,19 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.addMouseMoveHandler(mouseHandler);
 		kladjeHWTCanvas.addMouseUpHandler(mouseHandler);
 		
-		//TouchWidgetMobileImpl twmi = new TouchWidgetMobileImpl();		
-	
-		//MGWTTouchHandler touchHandler = new MGWTTouchHandler();
-		//twmi.addTouchStartHandler(kladjeGWTCanvas, touchHandler);
-		//twmi.addTouchMoveHandler(kladjeGWTCanvas, touchHandler);
-		//twmi.addTouchEndHandler(kladjeGWTCanvas, touchHandler);
-		
 		MGWTTouchHandler touchHandler = new MGWTTouchHandler();
 		kladjeHWTCanvas.addTouchStartHandler(touchHandler);
 		kladjeHWTCanvas.addTouchMoveHandler(touchHandler);
 		kladjeHWTCanvas.addTouchEndHandler(touchHandler);
-		
-		
-		// tekstinvoer??
 	}
 
 	/**
-	 * @param w
-	 * @param h
+	 * zet nieuwe afmetingen
+	 * @param w nieuwe breedte
+	 * @param h nieuwe hoogte
 	 */
-	void setSize(int w, int h) {
+	void setSize(int w, int h) 
+	{
 		breedte = w;
 		hoogte = h;
 		kladjeHWTCanvas.setWidth(w + "px");
@@ -225,32 +443,40 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.setCoordinateSpaceHeight(h);
 	}
 
+	/**
+	 * getter voor het tekenCanvas
+	 * @return het kladjeHWTCanvas
+	 */
 	public Canvas getCanvas()
 	{
 		return kladjeHWTCanvas;
 	}
 	
+	/**
+	 * zet de Context2d van het tekenCanvas
+	 */
 	public void initContext2d() 
 	{
 		gIm = kladjeHWTCanvas.getContext2d();
 		
 	}
 	
+	/**
+	 * er is een tekstPopup open en zichtbaar: verwerkt de inhoud
+	 * (creeer of edit een TekstElement) en verberg de TekstPopup
+	 * @param empty if true, maak de (verborgen) TekstPopup leeg
+	 */
 	public void hideTekstVeld(boolean empty)
 	{
 		if ((tekstPopup == null) || !tekstPopup.isVisible())
 			return;
 		
 		tekstString = tekstPopup.getText();
-
-		//tekstX = tekstVeld.getLocation().x + 2;
-		//tekstY = tekstVeld.getLocation().y;
 		tekstX = tekstPopup.tekstX;
 		tekstY = tekstPopup.tekstY;
-		
-		
 		tekstPopup.setVisible(false);
 
+		// tekstPopup hoort niet bij een TekstElement
 		if (!tekstString.equals("") && (tekstEdited == null))
 		{
 			TekstElement tekstElement = 
@@ -260,35 +486,35 @@ public class KladjeGWTVeld
 			addToHistory();
 			paint();
 		}
+		// tekstPopup hoort bij een TekstElement
 		else if (!tekstString.equals("") && (tekstEdited != null))
 		{
 			tekstEdited.zetTekst(tekstString, gIm);
-			//tekstEdited.tekst = tekstString;
 			addToHistory();
 			paint();
 			tekstEdited = null;
 		}
+		// TekstElement verwijderen
 		else if (tekstString.equals("") && (tekstEdited != null))
 		{
 			tekstElementVector.removeElement(tekstEdited);
 			addToHistory();
 			paint();
 		}
-		
-		//drawTekstString();
 	
 		if (empty)
-		{	
-			tekstString = "";
+		{	tekstString = "";
 			tekstPopup.setText("");
-		
 		}
 	}
 	
-	
+
+	/**
+	 * voeg een snapshot (zie methode getState) toe aan 
+	 * de history
+	 */
 	void addToHistory()
 	{
-//System.out.println("get his");
 
 		HashMap<String,Object> stateTable = getState();
 		
@@ -302,280 +528,196 @@ public class KladjeGWTVeld
 		}		
 	}
 	
+	/**
+	 * haal het laatst gemaakte snapshot uit de history
+	 * @return een HashMap, zie ook methode setState 
+	 */
 	public HashMap<String,Object> getFromHistory()
 	{	
 		if (numHistories > 0)
 			numHistories--;
 		
-//System.out.println("gfh " + numHistories);
-
 		if (numHistories > 0)
 		{	
-//System.out.println("returned " + numHistories);			
 			return histories[numHistories - 1];
-		
 		}
 		else
 		{	numHistories = 0;
-//System.out.println("returned null " + numHistories);		
-		
 			return null;
 		}
 	}
 
-
+	/**
+	 * stop de status van het werkveld in een HashMap
+	 * @return HashMap met status werkveld
+	 */
 	public HashMap<String,Object> getState()
 	{
-		
 		HashMap<String,Object> h = new HashMap<String,Object>();
-		
-		// backwards compatibility
-//		Vector<ArrayList<Short>> gwtStateVector = getGWTState();
-//		if (gwtStateVector.size() > 0)
-//		{	h.put("gwtpixels", gwtStateVector);
-//		}
 
+		// stop de status van de Strepen in een ArrayList
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>(); 
-		//HashMap<String,Object>[] strepen = new HashMap[streepVector.size()];
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
-			//strepen[sCnt] = streep.getState();
 			strepen.add(streep.getState());
 		}
 		h.put("strepen", strepen);
 		
+		// stop de status van de Lijnen in een ArrayList
 		List<Map<String,Object>> lijnenAL = new ArrayList<Map<String,Object>>();		
-		//HashMap<String,Object>[] lijnenHash = new HashMap[lijnVector.size()];
 		for (int lCnt = 0; lCnt < lijnVector.size(); lCnt++)
 		{	Lijn lijn = (Lijn) lijnVector.elementAt(lCnt);
-			//lijnenHash[lCnt] = lijn.getState();
 			lijnenAL.add(lijn.getState());
 		}
-		h.put("lijnenhash", lijnenAL); // !!!
+		h.put("lijnenhash", lijnenAL); // !!! lijnen is al in gebruik voor lijntjesop het werkveld
 		
+		// stop de status van de Rechthoeken in een ArrayList
 		List<Map<String,Object>> rechthoeken = new ArrayList<Map<String,Object>>();		
-		//HashMap<String,Object>[] rechthoeken = new HashMap[rechthoekVector.size()];
 		for (int rCnt = 0; rCnt < rechthoekVector.size(); rCnt++)
 		{	Rechthoek rechthoek = (Rechthoek) rechthoekVector.elementAt(rCnt);
-			//rechthoeken[rCnt] = rechthoek.getState();
 			rechthoeken.add(rechthoek.getState());
 		}
 		h.put("rechthoeken", rechthoeken);
-		
+
+		// stop de status van de Ellipsen in een ArrayList
 		List<Map<String,Object>> ellipsen = new ArrayList<Map<String,Object>>();		
-		//HashMap<String,Object>[] ellipsen = new HashMap[ellipsVector.size()];
 		for (int eCnt = 0; eCnt < ellipsVector.size(); eCnt++)
 		{	Ellips ellips = (Ellips) ellipsVector.elementAt(eCnt);
-			//ellipsen[eCnt] = ellips.getState();
 			ellipsen.add(ellips.getState());
 		}
 		h.put("ellipsen", ellipsen);
-		
+
+		// stop de status van de TekstElementen in een ArrayList
 		List<Map<String,Object>> tekstElementen = new ArrayList<Map<String,Object>>();		
-		//HashMap<String,Object>[] tekstElementen = new HashMap[tekstElementVector.size()];
 		for (int tCnt = 0; tCnt < tekstElementVector.size(); tCnt++)
 		{	TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(tCnt);
-			//tekstElementen[tCnt] = tekstElement.getState();
 			tekstElementen.add(tekstElement.getState());
 		}
 		h.put("tekstElementen", tekstElementen);
 
-//System.out.println("kgwtv get " + tekstElementen.size());		
-		
-		
 		return h;
-
-
-		//return stateMap;
-	}
-
-/*	
-	public Vector<ArrayList<Short>> getGWTState()
-	{	
-		//ArrayList<ArrayList<Short>> gwtStateAL = new ArrayList<ArrayList<Short>>(); 
-		
-		Vector<ArrayList<Short>> gwtStateVector = new Vector<ArrayList<Short>>();
-		for (int pCnt = 0; pCnt < pixels.size(); pCnt++)
-		{	ColorBytes cb = (ColorBytes) pixels.elementAt(pCnt);
-			
-			ArrayList<Short> gwtPixels = new ArrayList<Short>();
-		
-			gwtPixels.add(new Short((short) cb.x));
-			gwtPixels.add(new Short((short) cb.y));
-			gwtPixels.add(new Short(cb.red));
-			gwtPixels.add(new Short(cb.green));
-			gwtPixels.add(new Short(cb.blue));
-			
-			//short[] gwtPixels = new short[5];
-			//gwtPixels[0] = (short) cb.x;
-			//gwtPixels[1] = (short) cb.y;
-			//gwtPixels[2] = cb.red;
-			//gwtPixels[3] = cb.green;			
-			//gwtPixels[4] = cb.blue;						
-			gwtStateVector.addElement(gwtPixels);
-				
-		}
-//System.out.println("kladjeVeld getGWTState " + gwtStateVector.size());
-		return gwtStateVector;
-	}
-*/
-	
-	@SuppressWarnings("unchecked")
-	public static List<Object> toArrayList(Object object)
-	{
-		if (object instanceof List || object == null)
-			return (List<Object>) object;
-		if (object instanceof Object[])
-		{
-			Object[] objects = (Object[]) object;
-			return Arrays.asList(objects);
-		}
-		return null;
 	}
 
 	
+	/**
+	 * haal de status uit een HashMap en toon deze op het werkveld
+	 * @param map de HashMap met se status
+	 * @param init true: inlezen launchdata, d.w.z. docent-objecten
+	 * false: dit zijn de door de leerling gecreeerde objecten 
+	 */
 	public void setState(Map<String, Object> map, boolean init)
 	{
-		
-		//System.out.println("kv setState");
 		if(map == null || map.isEmpty())
 			return;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
-// accepteer alleen GWTPixels
 		
-/*		
-		Vector<ArrayList<Short>> gwtStateVector = new Vector<ArrayList<Short>>();
-		if (h.containsKey("gwtpixels"))
-		{	gwtStateVector = (Vector<ArrayList<Short>>) h.get("gwtpixels");
-			if (gwtStateVector.size() > 0)
-				setOldGWTState(gwtStateVector);
-		}
-*/
-		
-		// hier de rest
+		// alle Strepen verwijderen
 		if (init)
 		{	streepVector.removeAllElements();
 			docentStreepVector.removeAllElements();
 		}
-		else
+		else // alleen leerling-Strepen verwijderen
 			streepVector.removeAllElements();
-		//HashMap<String,Object>[] strepen = new HashMap[0];
+
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
+		
 		if (launchState.containsKey("strepen"))
 			strepen = launchState.getMapList("strepen");
 		for (int sCnt = 0; sCnt < strepen.size(); sCnt++)
 		{	Streep streep = Streep.setState(strepen.get(sCnt));
-			//streep.deletable = !init;
 			if (init)
 				docentStreepVector.addElement(streep);
 			else
 				streepVector.addElement(streep);
 		}
 		
+		// alle Lijnen verwijderen
 		if (init)
 		{	lijnVector.removeAllElements();
 			docentLijnVector.removeAllElements();
 		}
-		else
+		else // alleen leerling-Lijnen verwijderen
 			lijnVector.removeAllElements();
-		//HashMap<String,Object>[] lijnenHash = new HashMap[0];
+
 		List<Map<String,Object>> lijnenAL = new ArrayList<Map<String,Object>>();
-		// launchdata and setState
+
 		if (launchState.containsKey("lijnenhash"))
 			lijnenAL = launchState.getMapList("lijnenhash");
 		for (int lCnt = 0; lCnt < lijnenAL.size(); lCnt++)
 		{	Lijn lijn = Lijn.setState(lijnenAL.get(lCnt));
-			//lijn.deletable = !init;
+
 			if (init)
 				docentLijnVector.addElement(lijn);
 			else
 				lijnVector.addElement(lijn);
 		}
 		
+		// alle Rechthoeken verwijderen
 		if (init)
 		{	rechthoekVector.removeAllElements();
 			docentRechthoekVector.removeAllElements();
 		}
-		else
+		else // alleen leerling-Rechthoeken verwijderen
 			rechthoekVector.removeAllElements();
-		//HashMap<String,Object>[] rechthoeken = new HashMap[0];
+
 		List<Map<String,Object>> rechthoeken = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("rechthoeken"))
 			rechthoeken = launchState.getMapList("rechthoeken");
 		for (int rCnt = 0; rCnt < rechthoeken.size(); rCnt++)
 		{	Rechthoek rechthoek = Rechthoek.setState(rechthoeken.get(rCnt));
-			//rechthoek.deletable = !init;
+
 			if (init)
 				docentRechthoekVector.addElement(rechthoek);
 			else
 				rechthoekVector.addElement(rechthoek);
 		}
 
+		// alle Ellipsen verwijderen
 		if (init)
 		{	ellipsVector.removeAllElements();
 			docentEllipsVector.removeAllElements();
 		}
-		else
+		else // alleen leerling-Ellipsen verwijderen
 			ellipsVector.removeAllElements();
-		//HashMap<String,Object>[] ellipsen = new HashMap[0];
+
 		List<Map<String,Object>> ellipsen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("ellipsen"))
 			ellipsen = launchState.getMapList("ellipsen");
 		for (int eCnt = 0; eCnt < ellipsen.size(); eCnt++)
 		{	Ellips ellips = Ellips.setState(ellipsen.get(eCnt));
-			//ellips.deletable = !init;
+
 			if (init)
 				docentEllipsVector.addElement(ellips);
 			else
 				ellipsVector.addElement(ellips);
 		}
 
+		// alle TekstElementen verwijderen
 		if (init)
 		{	tekstElementVector.removeAllElements();
 			docentTekstElementVector.removeAllElements();
 		}
-		else
+		else // alleen leerling-TekstElementen verwijderen
 			tekstElementVector.removeAllElements();
-		//HashMap<String,Object>[] tekstElementen = new HashMap[0];
+
 		List<Map<String,Object>> tekstElementen = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("tekstElementen"))
 			tekstElementen = launchState.getMapList("tekstElementen");
 		for (int tCnt = 0; tCnt < tekstElementen.size(); tCnt++)
 		{	TekstElement tekstElement = TekstElement.setState(tekstElementen.get(tCnt));
-			//tekstElement.deletable = !init;
+
 			if (init)
 				docentTekstElementVector.addElement(tekstElement);
 			else
 				tekstElementVector.addElement(tekstElement);
 		}
-//System.out.println("kgwtv set " + tekstElementen.size());		
 
 		paint();
 	}
 
-/*	
-	//public void setOldGWTState(Vector<short[]> gwtStateVector)
-	public void setOldGWTState(Vector<ArrayList<Short>> gwtStateVector)
-	{
-//System.out.println("kladjeVeld setGWTState " + gwtStateVector.size());
-
-		//int cnt = 0;
-		for (int pCnt = 0; pCnt < gwtStateVector.size(); pCnt++)
-		{
-			ArrayList<Short> gwtPixels = new ArrayList<Short>();
-			gwtPixels = (ArrayList<Short>) gwtStateVector.elementAt(pCnt);
-			pixels.removeAllElements();
-			ColorBytes cb = new ColorBytes(((Short) gwtPixels.get(0)).shortValue(), 
-										   ((Short) gwtPixels.get(1)).shortValue(), 
-										   ((Short) gwtPixels.get(2)).shortValue(), 
-										   ((Short) gwtPixels.get(3)).shortValue(), 
-										   ((Short) gwtPixels.get(4)).shortValue());
-			pixels.addElement(cb);
-		}
-
-	}
-*/	
-	
+	/**
+	 * toon het laatst gemaakte snapshot uit de history op het werkveld
+	 */
 	void undo()
 	{
 		wis(false);
@@ -586,7 +728,12 @@ public class KladjeGWTVeld
 
 		paint();
 	}
-	
+	/**
+	 * wis een enkel geselecteerd object, meerdere geselecteerde
+	 * objecten of alle objecten; in het laatste geval, wis ook
+	 * de history als complete == true
+	 * @param complete true: wis ook de history
+	 */
 	void wis(boolean complete)
 	{	
 		if ((mouseMode == selecteren) && objectSelected())
@@ -600,18 +747,12 @@ public class KladjeGWTVeld
 		}
 		else
 		{
-//			pixels.removeAllElements();
-			
+
 			streepVector.removeAllElements();
 			lijnVector.removeAllElements();
 			rechthoekVector.removeAllElements();
 			ellipsVector.removeAllElements();
 			tekstElementVector.removeAllElements();
-			//removeDeletableStrepen();
-			//removeDeletableLijnen();
-			//removeDeletableRechthoeken();
-			//removeDeletableEllipsen();
-			//removeDeletableTekstElementen();
 			
 			if (complete)
 				numHistories = 0;
@@ -619,56 +760,11 @@ public class KladjeGWTVeld
 		paint();
 	}
 	
-	public void removeDeletableStrepen()
-	{
-		for (int cnt = streepVector.size()-1; cnt >= 0; cnt--)
-		{
-			Streep streep = (Streep) streepVector.elementAt(cnt);
-			if (streep.deletable)
-				streepVector.removeElementAt(cnt);
-		}
-	}
-	
-	public void removeDeletableLijnen()
-	{
-		for (int cnt = lijnVector.size()-1; cnt >= 0; cnt--)
-		{
-			Lijn lijn = (Lijn) lijnVector.elementAt(cnt);
-			if (lijn.deletable)
-				lijnVector.removeElementAt(cnt);
-		}
-	}
-
-	public void removeDeletableRechthoeken()
-	{
-		for (int cnt = rechthoekVector.size()-1; cnt >= 0; cnt--)
-		{
-			Rechthoek rechthoek = (Rechthoek) rechthoekVector.elementAt(cnt);
-			if (rechthoek.deletable)
-				rechthoekVector.removeElementAt(cnt);
-		}
-	}
-
-	public void removeDeletableEllipsen()
-	{
-		for (int cnt = ellipsVector.size()-1; cnt >= 0; cnt--)
-		{
-			Ellips ellips = (Ellips) ellipsVector.elementAt(cnt);
-			if (ellips.deletable)
-				ellipsVector.removeElementAt(cnt);
-		}
-	}
-
-	public void removeDeletableTekstElementen()
-	{
-		for (int cnt = tekstElementVector.size()-1; cnt >= 0; cnt--)
-		{
-			TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(cnt);
-			if (tekstElement.deletable)
-				tekstElementVector.removeElementAt(cnt);
-		}
-	}
-	
+	/**
+	 * smooth een ArrayList of DoublePoints volgens de Gauss-methode
+	 * @param doublePoints ArrayList of DoublePoints om the smoothen
+	 * @return gesmoothe ArrayList of DoublePoints
+	 */
 	public ArrayList<DoublePoint> gaussianSmooth(ArrayList<DoublePoint> doublePoints)
 	{
 		if (doublePoints.size() < 3) 
@@ -690,6 +786,11 @@ public class KladjeGWTVeld
 		
 	}
 
+	/**
+	 * smooth een ArrayList of DoublePoints volgens de average-methode
+	 * @param doublePoints ArrayList of DoublePoints om the smoothen
+	 * @return gesmoothe ArrayList of DoublePoints
+	 */
 	public ArrayList<DoublePoint> averageSmooth(ArrayList<DoublePoint> doublePoints)
 	{
 		if (doublePoints.size() < 5) 
@@ -715,6 +816,12 @@ public class KladjeGWTVeld
 		
 	}
 
+	/**
+	 * smooth een ArrayList of DoublePoints
+	 * @param doublePoints ArrayList of DoublePoints om the smoothen
+	 * @param smoothType type smooth: Gauss, average of 2 keer average achter elkaar
+	 * @return gesmoothe ArrayList of DoublePoints
+	 */
 	public ArrayList<DoublePoint> smooth(ArrayList<DoublePoint> doublePoints, int smoothType)
 	{
 		if (smoothType == GAUSSIAN)
@@ -734,33 +841,20 @@ public class KladjeGWTVeld
 		paint(gIm);
 	}
 	
-/*	
-	public void paint(boolean metDecoratie)
-	{
-		paint(gIm, metDecoratie);
-	}
-*/
+	/**
+	 * teken de achtergrond (lijnen/ruitjes, als gewenst) van het werkveld;
+	 * NB er is geen achergrondkleur, het werkveld is tramsparent;
+	 * roep dan de methode tekenProgramma aan 
+	 * @param g Context2d om the tekenen
+	 */
 	public void paint(Context2d g)
 	{
-		
 		g.setLineWidth(1.0d);
-
-		
-		//g.setFillStyle(backgroundColor);
-		//g.fillRect(0, 0, breedte, hoogte);
-		
-		
+		// alles weg
 		g.clearRect(0, 0, breedte, hoogte);
-	
-		
-		
-//		g.setStrokeStyle(zwart);
-//		g.strokeRect(0, 0, breedte, hoogte);
-		
-		
+		// achtergrond horizontale lijnen 
 		if (lijnen)
 		{
-			
 			g.setStrokeStyle(lijnenKleur);
 			int steps = hoogte / lineDistance;
 			for (int lCnt = 1; lCnt <= steps; lCnt++)
@@ -769,11 +863,10 @@ public class KladjeGWTVeld
 				g.moveTo(0, lCnt * lineDistance);
 				g.lineTo(breedte - 1, lCnt * lineDistance);
 				g.stroke();
-				
-				//g.drawLine(0, lCnt * lineDistance, getSize().width - 1, lCnt * lineDistance);
 			}
 			
 		}
+		// achtergrond ruitjes
 		if (ruitjes)
 		{
 			g.setStrokeStyle(ruitjesKleur);
@@ -784,7 +877,6 @@ public class KladjeGWTVeld
 				g.moveTo(0, vCnt * lineDistance);
 				g.lineTo(breedte - 1, vCnt * lineDistance);
 				g.stroke();
-				//g.drawLine(0, vCnt * lineDistance, getSize().width - 1, vCnt * lineDistance);
 			}
 			int hSteps = breedte / lineDistance;
 			for (int hCnt = 1; hCnt <= hSteps; hCnt++)
@@ -793,58 +885,30 @@ public class KladjeGWTVeld
 				g.moveTo(hCnt * lineDistance, 0);
 				g.lineTo(hCnt * lineDistance, hoogte - 1);
 				g.stroke();
-				//g.drawLine(hCnt * lineDistance, 0, hCnt * lineDistance, getSize().height - 5);
 			}
-
-//System.out.println("ruitjes");
-//System.out.println("lw = " + g.getLineWidth());
-//System.out.println("ss = " + g.getStrokeStyle().toString());
 		}
 		
-
-// tijdelijk		
 		g.setStrokeStyle(zwart);
 		g.strokeRect(0, 0, breedte, hoogte);
-//System.out.println("outline");		
 		
 		g.setLineWidth(1.5d); 
 		tekenProgramma(g);
 
 	}
-	
+
+	/**
+	 * teken de inhoud van het werkveld: <br>
+	 * 1) de objecten die door de docent klaargezet zijn<br>
+	 * 2) de objecten die de leerling al gecreeerd heeft<br>
+	 * 3) objecten die de leerling nog aan het tekenen is, zoals
+	 * de punten van een Streep die nog getrokken wordt, 
+	 * een lijn waarvan het einde nog gesleept wordt,
+	 * een rechthoek of een ellips die nog gesleept worden,
+	 * alles wat nog geselecteerd wordt of al geslecteerd is  
+	 * @param g Context2d om te tekenen
+	 */
 	void tekenProgramma(Context2d g)
 	{
-
-/*		
-		// backwards compatibility
-		if (pixels != null)
-		{
-			for (int cbCnt = 0; cbCnt < pixels.size(); cbCnt++)
-			{
-				ColorBytes cb = (ColorBytes) pixels.elementAt(cbCnt);
-				g.setStrokeStyle(cb.makeColor());
-				
-				g.beginPath();
-				g.strokeRect(cb.x, cb.y, 1, 1);
-				
-			}
-			//g.putImageData(pixels, 0, 0);
-//System.out.println("imageData");			
-		}
-*/		
-		
-/*		
-		if (wisRechthoek != null)
-		{
-			g.setFillStyle(backgroundColor);
-			g.fillRect(wisRechthoek.x, wisRechthoek.y, wisRechthoek.width, wisRechthoek.height);
-			wisRechthoek = null;
-			updatePixelArray();
-			if (pixels != null)
-			{	g.putImageData(pixels, 0, 0);
-			}
-		}
-*/
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
 		{	Streep streep = (Streep) docentStreepVector.elementAt(sCnt);
@@ -866,8 +930,6 @@ public class KladjeGWTVeld
 		{	TekstElement tekstElement = (TekstElement) docentTekstElementVector.elementAt(tCnt);
 			tekstElement.teken(g);
 		}
-
-		
 		// elementen leerling
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
@@ -891,11 +953,10 @@ public class KladjeGWTVeld
 		}
 		
 		g.setStrokeStyle(drawingColor);		
-		
+
+		// er wordt een streep getekend
 		if (draggDoublePoints.size() == 1)
 		{	DoublePoint p = (DoublePoint) draggDoublePoints.get(0);
-			//g.moveTo(p.x, p.y);
-			//g.lineTo(p.x, p.y);
 			g.strokeRect(p.x, p.y, 1, 1);
 		}
 		if (draggDoublePoints.size() > 1)
@@ -913,17 +974,9 @@ public class KladjeGWTVeld
 			g.stroke();
 			
 		}
-/*
-		for (int pCnt = 0; pCnt < gumPunten.size(); pCnt++)
-		{
-			Point p = (Point) gumPunten.elementAt(pCnt);
-			g.setFillStyle(backgroundColor);
-			g.fillRect(p.x - gumGrootte / 2, p.y - gumGrootte / 2, gumGrootte, gumGrootte);
-			
-		}
-*/		
 		g.setStrokeStyle(drawingColor);
 		
+		// er wordt een lijn getekend
 		if ((mouseMode == lijnTekenen) && (figuurStart != null) && (lijnEinde != null))
 		{	
 			
@@ -931,30 +984,18 @@ public class KladjeGWTVeld
 			g.moveTo(figuurStart.x, figuurStart.y);
 			g.lineTo(lijnEinde.x, lijnEinde.y);
 			g.stroke();
-//System.out.println("lijn");		
-//System.out.println("lw = " + g.getLineWidth());
-//System.out.println("ss = " + g.getStrokeStyle().toString());
-
-//			g.drawLine(figuurStart.x, figuurStart.y, lijnEinde.x, lijnEinde.y);
-			
 		}
-		
+
+		// er wordt een rechthoek getekend
 		if ((mouseMode == rechthoekTekenen) && (tekenRechthoek != null))
 		{
-//System.out.println("mm = rh && trh not null");
 			g.beginPath();
 			g.strokeRect(tekenRechthoek.x, tekenRechthoek.y, tekenRechthoek.width, tekenRechthoek.height);
 		}
-
-//		else if ((mouseMode == rechthoekTekenen) && mouseDragged && (tekenRechthoek == null))
-//		{
-//			g.strokeRect(10, 10, 10, 10);
-//		}
 		
-		
+		// er wordt een ellips getekend
 		if ((mouseMode == cirkelTekenen) && (tekenRechthoek != null))
 		{
-//System.out.println("mm = ci && trh not null");			
 			double centerX = tekenRechthoek.x + tekenRechthoek.width / 2;
 			double centerY = tekenRechthoek.y + tekenRechthoek.height / 2;
 			int steps = 35;
@@ -970,156 +1011,116 @@ public class KladjeGWTVeld
 			g.closePath();
 			g.stroke();
 			
-//			g.beginPath();
-//			g.arc(centerX, centerY, tekenRechthoek.height / 2, 0, 2 * Math.PI);
-			//g.stroke();
-			
-//			g.drawOval(tekenRechthoek.x, tekenRechthoek.y, tekenRechthoek.width, tekenRechthoek.height);
 		}
 		
-		// alleen op het scherm
+		// niets te tekenen
 		if (mouseMode == tekstTekenen)
 		{
 			
 		}
 
-		// alleen op het scherm
-		if ((mouseMode == selecteren) && (selecteerRechthoek != null))// && !sleepSelectie)
+		// de selecteerRechthoek wordt nog gesleept of is uitgesleept;
+		// de handles (als die er al zijn) zijn alleen !null als de selecteerRechthoek uitgesleept is
+		if ((mouseMode == selecteren) && (selecteerRechthoek != null))
 		{
-			//if (mouseDown)
-			//{	
-				g.setLineWidth(0.8d);
-				g.setStrokeStyle(selectieColor);
-				g.beginPath();
-				g.strokeRect(selecteerRechthoek.x, selecteerRechthoek.y, 
-							selecteerRechthoek.width, selecteerRechthoek.height);
-				g.setLineWidth(1.5d);
-			//}
-				if (schalen)
+			g.setLineWidth(0.8d);
+			g.setStrokeStyle(selectieColor);
+			g.beginPath();
+			g.strokeRect(selecteerRechthoek.x, selecteerRechthoek.y, 
+    					selecteerRechthoek.width, selecteerRechthoek.height);
+			g.setLineWidth(1.5d);
+			if (schalen)
+			{	
+				if (topRightHandle != null)
 				{	
-					if (topRightHandle != null)
-					{	//g.setColor(hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawPolygon(topRightHandle);
-						
-						g.beginPath();		
-						g.moveTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
-						for (int k = 1; k < topRightHandle.aantalPunten; k++) 
-						{	g.lineTo(topRightHandle.doubleX[k], topRightHandle.doubleY[k]);
-						}
-						g.lineTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
-						g.closePath();
-						g.stroke();
-
-		//g.setColor(Color.red);
-		//g.drawRect(topRightRect.x,topRightRect.y,topRightRect.width,topRightRect.height);
+					g.setStrokeStyle(hbColor);
+					g.beginPath();		
+					g.moveTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
+					for (int k = 1; k < topRightHandle.aantalPunten; k++) 
+					{	g.lineTo(topRightHandle.doubleX[k], topRightHandle.doubleY[k]);
 					}
-					if (topLeftHandle != null)
-					{	//g.setColor(hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawPolygon(topLeftHandle);
-						
-						g.beginPath();		
-						g.moveTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
-						for (int k = 1; k < topLeftHandle.aantalPunten; k++) 
-						{	g.lineTo(topLeftHandle.doubleX[k], topLeftHandle.doubleY[k]);
-						}
-						g.lineTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
-						g.closePath();
-						g.stroke();
-		//g.setColor(Color.red);
-		//g.drawRect(topLeftRect.x,topLeftRect.y,topLeftRect.width,topLeftRect.height);
+					g.lineTo(topRightHandle.doubleX[0], topRightHandle.doubleY[0]);
+					g.closePath();
+					g.stroke();
+				}
+				if (topLeftHandle != null)
+				{	
+					g.setStrokeStyle(hbColor);
+					g.beginPath();		
+					g.moveTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
+					for (int k = 1; k < topLeftHandle.aantalPunten; k++) 
+					{	g.lineTo(topLeftHandle.doubleX[k], topLeftHandle.doubleY[k]);
+					}
+					g.lineTo(topLeftHandle.doubleX[0], topLeftHandle.doubleY[0]);
+					g.closePath();
+					g.stroke();
 					
-					}
-					if (bottomRightHandle != null)
-					{	//g.setColor(hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawPolygon(bottomRightHandle);
+				}
+				if (bottomRightHandle != null)
+				{	
+					g.setStrokeStyle(hbColor);
 						
-						g.beginPath();		
-						g.moveTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
-						for (int k = 1; k < bottomRightHandle.aantalPunten; k++) 
-						{	g.lineTo(bottomRightHandle.doubleX[k], bottomRightHandle.doubleY[k]);
-						}
-						g.lineTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
-						g.closePath();
-						g.stroke();
-		//g.setColor(Color.red);
-		//g.drawRect(bottomRightRect.x,bottomRightRect.y,bottomRightRect.width,bottomRightRect.height);
-					
+					g.beginPath();		
+					g.moveTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
+					for (int k = 1; k < bottomRightHandle.aantalPunten; k++) 
+					{	g.lineTo(bottomRightHandle.doubleX[k], bottomRightHandle.doubleY[k]);
 					}
-					if (bottomLeftHandle != null)
-					{	//g.setColor(hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawPolygon(bottomLeftHandle);
-						
-						g.beginPath();		
-						g.moveTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
-						for (int k = 1; k < bottomLeftHandle.aantalPunten; k++) 
-						{	g.lineTo(bottomLeftHandle.doubleX[k], bottomLeftHandle.doubleY[k]);
-						}
-						g.lineTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
-						g.closePath();
-						g.stroke();
-
-		//g.setColor(Color.red);
-		//g.drawRect(bottomLeftRect.x,bottomLeftRect.y,bottomLeftRect.width,bottomLeftRect.height);
-					
-					}
-				} // if schalen
-				if (roteren)
-				{
-					if (rotateEastHandle != null)
-					{	//g.setColor(KladjeVeld.hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawOval(selecteerRechthoek.x + selecteerRechthoek.width, // - 2 * hbFactor,
-						//		   selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor, 
-						//		   4 * hbFactor, 4 * hbFactor);
-						
-						g.beginPath();
-			            g.arc(selecteerRechthoek.x + selecteerRechthoek.width + 2 * hbFactor, 
-			            	  selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
-			       	 	g.stroke();
-						
-			//g.setColor(Color.red);			
-			//g.drawRect(rotateEastHandle.x, rotateEastHandle.y, rotateEastHandle.width, rotateEastHandle.height);
-					}
-					if (rotateWestHandle != null)
-					{	//g.setColor(KladjeVeld.hbColor);
-						g.setStrokeStyle(hbColor);
-						//g.drawOval(selecteerRechthoek.x - 4 * hbFactor, 
-						//		   selecteerRechthoek.y + selecteerRechthoek.height/2 - 2 * hbFactor, 
-						//		   4 * hbFactor, 4 * hbFactor);
-						
-						g.beginPath();
-			            g.arc(selecteerRechthoek.x - 2 * hbFactor, 
-			            		selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
-			       	 	g.stroke();
-			//g.setColor(Color.red);			
-			//g.drawRect(rotateWestHandle.x, rotateWestHandle.y, rotateWestHandle.width, rotateWestHandle.height);
-					}
+					g.lineTo(bottomRightHandle.doubleX[0], bottomRightHandle.doubleY[0]);
+					g.closePath();
+					g.stroke();
 
 				}
+				if (bottomLeftHandle != null)
+				{	
+					g.setStrokeStyle(hbColor);
+						
+					g.beginPath();		
+					g.moveTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
+					for (int k = 1; k < bottomLeftHandle.aantalPunten; k++) 
+					{	g.lineTo(bottomLeftHandle.doubleX[k], bottomLeftHandle.doubleY[k]);
+					}
+					g.lineTo(bottomLeftHandle.doubleX[0], bottomLeftHandle.doubleY[0]);
+					g.closePath();
+					g.stroke();
+					}
+			} // if schalen
+			if (roteren)
+			{
+				if (rotateEastHandle != null)
+				{	
+					g.setStrokeStyle(hbColor);
+					g.beginPath();
+		            g.arc(selecteerRechthoek.x + selecteerRechthoek.width + 2 * hbFactor, 
+		            	  selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
+		       	 	g.stroke();
+				}
+				if (rotateWestHandle != null)
+				{	
+					g.setStrokeStyle(hbColor);
+						
+					g.beginPath();
+		            g.arc(selecteerRechthoek.x - 2 * hbFactor, 
+		            		selecteerRechthoek.y + selecteerRechthoek.height/2, 2 * hbFactor, 0, 2 * Math.PI);
+		       	 	g.stroke();
+				}
+
+			}
 
 		}
-		
+		// geselcteeerde elementen (individuaal of als groep
 		if (mouseMode == selecteren)
 		{
 			if (selectedStreep != null)
-			{	//selectedStreep.tekenBB(g);
-				selectedStreep.tekenHandleBox(g);
+			{	selectedStreep.tekenHandleBox(g);
 			}
 			if (selectedLijn != null)
-			{	//selectedLijn.tekenBB(g);
-				selectedLijn.tekenHandleBox(g);
+			{	selectedLijn.tekenHandleBox(g);
 			}
 			if (selectedRechthoek != null)
-			{	//selectedRechthoek.tekenBB(g);
-				selectedRechthoek.tekenHandleBox(g);
+			{	selectedRechthoek.tekenHandleBox(g);
 			}
 			if (selectedEllips != null)
-			{	//selectedEllips.tekenBB(g);
-				selectedEllips.tekenHandleBox(g);
+			{	selectedEllips.tekenHandleBox(g);
 			}
 			if (selectedTekstElement != null)
 			{	selectedTekstElement.tekenBB(g);
@@ -1143,40 +1144,13 @@ public class KladjeGWTVeld
 			}
 		}	
 		
-/*		
-		if ((mouseMode == selecteren) && (selecteerRechthoek != null) && sleepSelectie)
-		{
-		
-			if (mouseDown)
-			{	g.setLineWidth(0.8d);
-				g.setStrokeStyle(selectieColor);
-				g.beginPath();
-				g.strokeRect(selecteerRechthoek.x, selecteerRechthoek.y, 
-					     	 selecteerRechthoek.width, selecteerRechthoek.height);
-			}	
-			
-		}
-*/		
 	}
 
-/*	
-	void updatePixelArray()
-	{	
-		pixels = gIm.getImageData(0, 0, breedte, hoogte);
-		
-	}	
-*/
-	
-/*	
-	void gumPunt(int x, int y, Context2d g)
-	{
-		
-		g.setFillStyle(backgroundColor);
-		g.fillRect(x - gumGrootte / 2, y - gumGrootte / 2, gumGrootte, gumGrootte);
-
-	}
-*/	
-	
+	/**
+	 * de objecten in de selecteerRechthoek zijn verplaatst, geschaald of
+	 * gedraaid; pas de selecteerRechthoek aan zodat ze er weer allemaal inpassen;
+	 * doe dit door te zorgen dat hun handle boxes in de selecteerRechthoek passen
+	 */
 	public void updateSelecteerRechthoek()
 	{
 		if (selecteerRechthoek == null)
@@ -1257,6 +1231,9 @@ public class KladjeGWTVeld
 		
 	}
 	
+	/**
+	 * maak de vier handles om the schalen en de bijbehorende klik-rechthoeken van de selecteerRechthoek
+	 */
 	public void makeScaleHandles()
 	{
 		if (selecteerRechthoek == null)
@@ -1297,6 +1274,9 @@ public class KladjeGWTVeld
 		
 	}
 	
+	/**
+	 * zet de vier handles om the schalen en de bijbehorende klikrechthoeken van de selecteerRechthoek op null
+	 */
 	public void killScaleHandles()
 	{
 		topRightHandle = null; 
@@ -1310,6 +1290,9 @@ public class KladjeGWTVeld
 		
 	}
 	
+	/**
+	 * maak de klik-rechtoeken voor de twee draai-handles van de selecteerRechthoek
+	 */
 	public void makeRotateHandles()
 	{
 		
@@ -1324,12 +1307,18 @@ public class KladjeGWTVeld
 										 4 * hbFactor, 4 * hbFactor);
 	}
 
+	/**
+	 * zet de klik-rechtoeken voor de twee draai-handles van de selecteerRechthoek op null
+	 */
 	public void killRotateHandles()
 	{
 		rotateEastHandle = null; 
 		rotateWestHandle = null;
 	}
 
+	/**
+	 * zet alle selected objects op null
+	 */
 	public void resetSelectedObject()
 	{
 		selectedStreep = null;
@@ -1339,12 +1328,20 @@ public class KladjeGWTVeld
 		selectedTekstElement = null;
 	}
 	
+	/**
+	 * maak de Vector objectsSelected leeg
+	 */
 	public void resetSelectedObjects()
 	{
 		objectsSelected.removeAllElements();
 	}
 	
-	
+	/**
+	 * check of een object geselecteerd is, d.w.z. 
+	 * een van selectedStreep, selectedLijn, selectedRechthoek,
+	 * selectedEllips of selectedTekstElement is niet null
+	 * @return true/false
+	 */
 	public boolean objectSelected()
 	{
 		return (selectedStreep != null)|| 
@@ -1354,6 +1351,15 @@ public class KladjeGWTVeld
 		   (selectedTekstElement != null);		
 	}
 	
+	/**
+	 * kijk of de bounding box van een van de objecten 
+	 * het punt met coordinaten (x,y) bevat en als ja, zet 
+	 * het corresponderende selectedObject  
+	 * NB er kan maar een object geselecteerd worden
+	 * @param x x-coordinaat te checken punt
+	 * @param y y-coordinaat te checken punt
+	 * @return true als er een object het punt bevat 
+	 */
 	public boolean setSelectedObject(int x, int y)
 	{	boolean found = false;
 	
@@ -1418,6 +1424,13 @@ public class KladjeGWTVeld
 		return found;
 	}
 	
+	/**
+	 * kijk of de bounding box van een TeksElement het punt met coordinaten
+	 * (x,y) bevat
+	 * @param x x-coordinaat te checken punt
+	 * @param y y-coordinaat te checken punt
+	 * @return het TekstElement of null 
+	 */
 	public TekstElement getClickedTekstElement(int x, int y)
 	{
 		TekstElement result = null;
@@ -1430,6 +1443,12 @@ public class KladjeGWTVeld
 		return result;
 	}
 	
+	/**
+	 * zoek alle objecten die binnen de rechthoek r liggen  
+	 * en stop ze in objectsSelected (maak deze Vector eerst leeg!)
+	 * @param r de zoek rechthoek
+	 * @return true als er objecten gevonden zijn, false als niet
+	 */
 	public boolean findObjectsSelected(Rectangle r)
 	{	boolean found = false;
 		objectsSelected.removeAllElements();
@@ -1474,6 +1493,12 @@ public class KladjeGWTVeld
 	}
 	
 	
+	/**
+	 * wis het geselecteerde object (als dat er is en als wissen mag, 
+	 * d.i. het object is niet deel van de launchdata);
+	 * zet sleepSelectie op false 
+	 * als er iets gewist is, update de history 
+	 */
 	public void wisObjectSelected()
 	{ 
 		boolean gewist = false;
@@ -1510,6 +1535,12 @@ public class KladjeGWTVeld
 		paint();
 	}
 
+	/**
+	 * wis alle geselecteerde objecten (dus een groep van meer dan een) 
+	 * als die er zijn en als wissen mag (d.i. het object is niet deel van de launchdata);
+	 * zet sleepSelectie op false en verwijder se seelcteerRechthoek en handles 
+	 * als er iets gewist is, update de history 
+	 */
 	public void wisObjectsSelected()
 	{ 
 		boolean gewist = false;
@@ -1537,7 +1568,6 @@ public class KladjeGWTVeld
 				gewist = true;
 			}
 			
-			//gewist = true;
 		}
 		
 		sleepSelectie = false;
@@ -1545,45 +1575,17 @@ public class KladjeGWTVeld
 		selecteerRechthoek = null;
 		killScaleHandles();
 		killRotateHandles();
-
 		
 		if (gewist)
 			addToHistory();
 		paint();
 	}
-	
-	public void rotateObjectSelected(double rotateStep)
-	{ 
-		if (selectedStreep != null)
-			selectedStreep.rotate(rotateStep);
-		if (selectedLijn != null)  
-			selectedLijn.rotate(rotateStep);		   
-		if (selectedRechthoek != null)  
-			selectedRechthoek.rotate(rotateStep);
-		if (selectedEllips != null) 
-			selectedEllips.rotate(rotateStep);		
-		if  (selectedTekstElement != null)
-			selectedTekstElement.rotate(rotateStep);
-	
-		paint();
-	}
 
-	public void scaleObjectSelected(double scaleStep)
-	{ 
-		if (selectedStreep != null)
-			selectedStreep.scale(scaleStep);
-		if (selectedLijn != null)  
-			selectedLijn.scale(scaleStep);		   
-		if (selectedRechthoek != null)  
-			selectedRechthoek.scale(scaleStep);
-		if (selectedEllips != null) 
-			selectedEllips.scale(scaleStep);		
-		if  (selectedTekstElement != null)
-			selectedTekstElement.scale(scaleStep);
-		
-		paint();
-	}
-	
+	/**
+	 * verplaats het geselecteerde object over de vector (dx,dy)
+	 * @param dx x-verplaatsing
+	 * @param dy y-verplaatseing
+	 */
 	public void translateObjectSelected(int dx, int dy)
 	{ 
 		if (selectedStreep != null)
@@ -1599,6 +1601,11 @@ public class KladjeGWTVeld
 		
 	}
 
+	/**
+	 * verplaats alle geselecteerde objecten over de vector (dx,dy)
+	 * @param dx x-verplaatsing
+	 * @param dy y-verplaatseing
+	 */
 	public void translateObjectsSelected(int dx, int dy)
 	{ 
 		for (int oCnt = 0; oCnt < objectsSelected.size(); oCnt++)
@@ -1618,46 +1625,53 @@ public class KladjeGWTVeld
 		}
 		
 	}
-	
+
+	/**
+	 * kijk of de handle box van het geselecteerde object het punt
+	 * (x,y) bevat 
+	 * @param x x-coordinaat te checken punt
+	 * @param y y-coordinaat te checken punt
+	 * @return true/false
+	 */
 	public boolean objectSelectedContains(int x, int y)
 	{ 
 		return ((selectedStreep != null) && 
-				 //selectedStreep.bbContains(x, y)) ||
 				 selectedStreep.handleBox.contains(x, y)) ||
 			   ((selectedLijn != null) && 
-				 //selectedLijn.bbContains(x, y)) ||
 			     selectedLijn.handleBox.contains(x, y)) ||	   
 			   ((selectedRechthoek != null) && 
-				 //selectedRechthoek.bbContains(x, y)) ||
 				 selectedRechthoek.handleBox.contains(x, y)) ||	   
 			   ((selectedEllips != null) && 
-				 //selectedEllips.bbContains(x, y)) ||
 				 selectedEllips.handleBox.contains(x, y)) ||	   
 			   ((selectedTekstElement != null) && 
-				 //selectedTekstElement.bbContains(x, y));
 			     selectedTekstElement.handleBox.contains(x, y));	   
 	}
-	
+
+	/**
+	 * een van de handles (schaal of draai) van de selecteerRechthoek werd aangeklikt
+	 * en is nu een stukje versleept over de vector (dx,dy); afhankelijk van het type
+	 * handle, schaal of roteer alle objecten in de selecteerRechthoek en bereken daarna
+	 * een nieuwe selecteerRechthoek en handles 
+	 * @param dx x-translatie
+	 * @param dy y-translatie
+	 */
 	public void processSelecteerRechthoekHandleAction(int dx, int dy)
 	{
+		// dit wordt het schaal- en draaicentrum
 		int crx = selecteerRechthoek.x + selecteerRechthoek.width / 2;
 		int cry = selecteerRechthoek.y + selecteerRechthoek.height / 2;
 		
 		if (scalingTopRight)
 		{
-			double aspectDirX = selecteerRechthoek.x + selecteerRechthoek.width - 
-								crx;
+			double aspectDirX = selecteerRechthoek.x + selecteerRechthoek.width - crx;
 			double aspectDirY = selecteerRechthoek.y - cry;
 			double dxDouble = (double) dx;
 			double dyDouble = (double) dy;
 			double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 			double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 			double asXDouble = s * aspectDirX;
-			double asYDouble = s * aspectDirY;
 			double oldWidth = (double) selecteerRechthoek.width / 2;
-			double oldHeight = (double) selecteerRechthoek.height / 2;
 			double newWidth = oldWidth + asXDouble;
-			double newHeight = oldHeight - asYDouble;
 			double sc = ((double) newWidth) / oldWidth;
 			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
 			{
@@ -1670,8 +1684,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).scale(sc, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).scale(sc, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).scale(sc, crx, cry);
 				
 			}
 
@@ -1704,14 +1716,6 @@ public class KladjeGWTVeld
 		}
 		else if (scalingTopLeft)
 		{
-			double dxDouble = (double) dx;
-			double dyDouble = (double) dy;
-			
-			//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-			//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-			//double oldWidth = (double) selectedStreep.breedte / 2;
-			//double oldHeight = (double) selectedStreep.hoogte / 2;
-			
 			double oldWidth = (double) selecteerRechthoek.width / 2;
 			double oldHeight = (double) selecteerRechthoek.height / 2;
 
@@ -1731,8 +1735,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).scale(sx, sy, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).scale(sx, sy, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).scale(sx, sy, crx, cry);
 				
 			}
 
@@ -1765,14 +1767,6 @@ public class KladjeGWTVeld
 		}
 		else if (scalingBottomLeft)
 		{
-			double dxDouble = (double) dx;
-			double dyDouble = (double) dy;
-			
-			//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-			//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-			//double oldWidth = (double) selectedStreep.breedte / 2;
-			//double oldHeight = (double) selectedStreep.hoogte / 2;
-			
 			double oldWidth = (double) selecteerRechthoek.width / 2;
 			double oldHeight = (double) selecteerRechthoek.height / 2;
 
@@ -1792,8 +1786,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).scale(sx, sy, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).scale(sx, sy, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).scale(sx, sy, crx, cry);
 				
 			}
 			
@@ -1833,11 +1825,8 @@ public class KladjeGWTVeld
 			double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 			double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 			double asXDouble = s * aspectDirX;
-			double asYDouble = s * aspectDirY;
 			double oldWidth = (double) selecteerRechthoek.width / 2;
-			double oldHeight = (double) selecteerRechthoek.height / 2;
 			double newWidth = oldWidth + asXDouble;
-			double newHeight = oldHeight + asYDouble;
 			double sc = ((double) newWidth) / oldWidth;
 			
 			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
@@ -1851,8 +1840,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).scale(sc, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).scale(sc, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).scale(sc, crx, cry);
 				
 			}
 
@@ -1888,7 +1875,6 @@ public class KladjeGWTVeld
 		{
 			// hier is alleen dy van belang
 			double angle = Math.atan(((double) dy) / (selecteerRechthoek.width/2));
-			//selectedStreep.rotate(angle);
 			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
 			{
 				Object ob = objectsSelected.elementAt(cnt);
@@ -1900,8 +1886,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).rotate(angle, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).rotate(angle, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).rotate(angle, crx, cry);
 				
 			}
 			
@@ -1916,7 +1900,6 @@ public class KladjeGWTVeld
 			angleSum += angle; 
 			int rotateSteps = (int) Math.round(angleSum / rotateStep);
 			angleSum -= rotateSteps * rotateStep;
-			//selectedStreep.rotate(rotateSteps * rotateStep);
 			
 			for (int cnt = 0; cnt < objectsSelected.size(); cnt++)
 			{
@@ -1929,8 +1912,6 @@ public class KladjeGWTVeld
 					((Rechthoek) ob).rotate(rotateSteps * rotateStep, crx, cry);
 				else if (ob instanceof Ellips)
 					((Ellips) ob).rotate(rotateSteps * rotateStep, crx, cry);
-				else if (ob instanceof TekstElement)
-					((TekstElement) ob).rotate(rotateSteps * rotateStep, crx, cry);
 				
 			}
 			
@@ -1940,6 +1921,13 @@ public class KladjeGWTVeld
 		
 	}
 
+	/**
+	 * een van de handles (schaal of draai) van een geslecteerd object werd aangeklikt
+	 * en is nu een stukje versleept over de vector (dx,dy); afhankelijk van het type
+	 * handle, schaal of roteer dit object; de handle box wordt vanzelf aangepast
+	 * @param dx x-translatie
+	 * @param dy y-translatie
+	 */
 	public void processHandleAction(int dx, int dy)
 	{
 		if (selectedStreep != null)
@@ -1954,23 +1942,13 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedStreep.handleBox.width / 2;
-				double oldHeight = (double) selectedStreep.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight - asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedStreep.scale(sc);
 			}
 			else if (scalingTopLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedStreep.breedte / 2;
-				//double oldHeight = (double) selectedStreep.hoogte / 2;
 				
 				double oldWidth = (double) selectedStreep.handleBox.width / 2;
 				double oldHeight = (double) selectedStreep.handleBox.height / 2;
@@ -1983,13 +1961,6 @@ public class KladjeGWTVeld
 			}
 			else if (scalingBottomLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-
-				//double dxInvRot = selectedStreep.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedStreep.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedStreep.breedte / 2;
-				//double oldHeight = (double) selectedStreep.hoogte / 2;
 				
 				double oldWidth = (double) selectedStreep.handleBox.width / 2;
 				double oldHeight = (double) selectedStreep.handleBox.height / 2;
@@ -2010,17 +1981,14 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedStreep.handleBox.width / 2;
-				double oldHeight = (double) selectedStreep.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedStreep.scale(sc);
 			}
 			else if (rotatingEast)
 			{
-				// hier is alleen dy van belang
+				// hier is alleen dy van belang; naar beneden = dy < 0 = met de klok mee
 				double angle = Math.atan(((double) dy) / (selectedStreep.handleBox.width/2));
 				selectedStreep.rotate(angle);
 				
@@ -2034,10 +2002,7 @@ public class KladjeGWTVeld
 				angleSum -= rotateSteps * rotateStep;
 				selectedStreep.rotate(rotateSteps * rotateStep);
 				
-				
 			}
-			
-			
 			
 		}
 		else if (selectedLijn != null)
@@ -2052,25 +2017,13 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedLijn.handleBox.width / 2;
-				double oldHeight = (double) selectedLijn.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight - asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedLijn.scale(sc);
 			}
 			else if (scalingTopLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
-				//double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
-				//double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
-				//double oldWidth = breedte / 2;
-				//double oldHeight = hoogte / 2;
 				
 				double oldWidth = (double) selectedLijn.handleBox.width / 2;
 				double oldHeight = (double) selectedLijn.handleBox.height / 2;
@@ -2084,16 +2037,6 @@ public class KladjeGWTVeld
 			}
 			else if (scalingBottomLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedLijn.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedLijn.inverseRotY(dxDouble, dyDouble);
-				//double breedte = Math.abs(selectedLijn.toX - selectedLijn.fromX);
-				//double hoogte = Math.abs(selectedLijn.toY - selectedLijn.fromY);
-				//double oldWidth = breedte / 2;
-				//double oldHeight = hoogte / 2;
-				
 				double oldWidth = (double) selectedLijn.handleBox.width / 2;
 				double oldHeight = (double) selectedLijn.handleBox.height / 2;
 				
@@ -2114,11 +2057,8 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedLijn.handleBox.width / 2;
-				double oldHeight = (double) selectedLijn.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedLijn.scale(sc);
 			}
@@ -2155,23 +2095,13 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
-				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight - asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedRechthoek.scale(sc);
 			}
 			else if (scalingTopLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedRechthoek.breedte / 2;
-				//double oldHeight = (double) selectedRechthoek.hoogte / 2;
 				
 				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
 				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
@@ -2185,14 +2115,6 @@ public class KladjeGWTVeld
 			}
 			else if (scalingBottomLeft)
 			{
-				
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedRechthoek.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedRechthoek.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedRechthoek.breedte / 2;
-				//double oldHeight = (double) selectedRechthoek.hoogte / 2;
 				
 				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
 				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
@@ -2215,11 +2137,8 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedRechthoek.handleBox.width / 2;
-				double oldHeight = (double) selectedRechthoek.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedRechthoek.scale(sc);
 			}
@@ -2256,23 +2175,13 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedEllips.handleBox.width / 2;
-				double oldHeight = (double) selectedEllips.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight - asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedEllips.scale(sc);
 			}
 			else if (scalingTopLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedEllips.breedte / 2;
-				//double oldHeight = (double) selectedEllips.hoogte / 2;
 				
 				double oldWidth = (double) selectedEllips.handleBox.width / 2;
 				double oldHeight = (double) selectedEllips.handleBox.height / 2;
@@ -2285,13 +2194,6 @@ public class KladjeGWTVeld
 			}
 			else if (scalingBottomLeft)
 			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				//double dxInvRot = selectedEllips.inverseRotX(dxDouble, dyDouble);
-				//double dyInvRot = selectedEllips.inverseRotY(dxDouble, dyDouble);
-				//double oldWidth = (double) selectedEllips.breedte / 2;
-				//double oldHeight = (double) selectedEllips.hoogte / 2;
 				
 				double oldWidth = (double) selectedEllips.handleBox.width / 2;
 				double oldHeight = (double) selectedEllips.handleBox.height / 2;
@@ -2314,11 +2216,8 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedEllips.handleBox.width / 2;
-				double oldHeight = (double) selectedEllips.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				selectedEllips.scale(sc);
 			}
@@ -2345,57 +2244,8 @@ public class KladjeGWTVeld
 		}
 		else if (selectedTekstElement != null)
 		{
-// wordt niet gberuikt
-			if (scalingTopRight)
-			{
-				double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox. width - 
-									selectedTekstElement.cx;
-				double aspectDirY = selectedTekstElement.handleBox.y - selectedTekstElement.cy;
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
-				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
-				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
-				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
-				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
-				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight - asYDouble;
-				double sc = ((double) newWidth) / oldWidth;
-				selectedTekstElement.scale(sc);
-			}
-// wordt niet gberuikt			
-			else if (scalingTopLeft)
-			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-				
-				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
-				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
 
-				double newWidth = oldWidth - dx;
-				double newHeight = oldHeight - dy;
-				double sx = newWidth / oldWidth;
-				double sy = newHeight / oldHeight;
-				selectedTekstElement.scale(sx,sy);
-			}
-// wordt niet gberuikt			
-			else if (scalingBottomLeft)
-			{
-				double dxDouble = (double) dx;
-				double dyDouble = (double) dy;
-
-				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
-				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
-
-				double newWidth = oldWidth - dx;
-				double newHeight = oldHeight + dy;
-				double sx = newWidth / oldWidth;
-				double sy = newHeight / oldHeight;
-				selectedTekstElement.scale(sx,sy);
-			}
-			
-			else if (scalingBottomRight)
+			if (scalingBottomRight)
 			{
 				double aspectDirX = selectedTekstElement.handleBox.x + selectedTekstElement.handleBox.width - 
 								    selectedTekstElement.cx;
@@ -2407,45 +2257,24 @@ public class KladjeGWTVeld
 				double aa = aspectDirX * aspectDirX + aspectDirY * aspectDirY;
 				double s = (aspectDirX * dxDouble + aspectDirY * dyDouble) / aa;
 				double asXDouble = s * aspectDirX;
-				double asYDouble = s * aspectDirY;
 				double oldWidth = (double) selectedTekstElement.handleBox.width / 2;
-				double oldHeight = (double) selectedTekstElement.handleBox.height / 2;
 				double newWidth = oldWidth + asXDouble;
-				double newHeight = oldHeight + asYDouble;
 				double sc = ((double) newWidth) / oldWidth;
 				
 				selectedTekstElement.scale(sc);
 				
-				updateAction2();
-				
 			}
-			else if (rotatingEast)
-			{
-				// hier is alleen dy van belang
-				double angle = Math.atan(((double) dy) / (selectedTekstElement.handleBox.width/2));
-				selectedTekstElement.rotate(angle);
-				
-				updateAction2();
-				
-			}
-// wordt niet gebruikt			
-			else if (rotatingWest)
-			{
-				// hier is alleen dy van belang
-				double angle = - Math.atan(((double) dy) / (selectedTekstElement.handleBox.width/2));
-				angleSum += angle; 
-				int rotateSteps = (int) Math.round(angleSum / rotateStep);
-				angleSum -= rotateSteps * rotateStep;
-				selectedTekstElement.rotate(rotateSteps * rotateStep);
-				
-				
-			}
-			
 		}
-
-			
 	}
 
+	/**
+	 * check of een van de schaal- of draaihandles (als die er al zijn)
+	 * van de selecteerRechthoek het punt met coordinaten (x,y) bevat
+	 * en zet de booleans groupHandleAction en de action-booleans
+	 * @param x x-coordinaat te checken punt
+	 * @param y y-coordinaat te checken punt
+	 * @return true/false
+	 */
 	public boolean selecteerRechthoekHandlesContain(int x, int y)
 	{
 				
@@ -2477,7 +2306,14 @@ public class KladjeGWTVeld
 		return groupHandleAction;
 	}
 
-	
+	/**
+	 * check of een van de schaal- of draaihandles (als die er al zijn)
+	 * van een geselecteerd object het punt met coordinaten (x,y) bevat
+	 * en zet de booleans handleAction en de action-booleans
+	 * @param x x-coordinaat te checken punt
+	 * @param y y-coordinaat te checken punt
+	 * @return true/false
+	 */
 	public boolean objectSelectedHandlesContain(int x, int y)
 	{
 		if (selectedStreep != null)
@@ -2597,79 +2433,29 @@ public class KladjeGWTVeld
 		}
 		else if (selectedTekstElement != null)
 		{
-			if ((selectedTekstElement.topRightRect != null) && selectedTekstElement.topRightRect.contains(x,y))
-			{	handleAction = true;
-				scalingTopRight = true;
-			}
-			else if ((selectedTekstElement.topLeftRect != null) && selectedTekstElement.topLeftRect.contains(x,y))
-			{	handleAction = true;
-				scalingTopLeft = true;
-			}
-			else if ((selectedTekstElement.bottomRightRect != null) && selectedTekstElement.bottomRightRect.contains(x,y))
+			if ((selectedTekstElement.bottomRightRect != null) && selectedTekstElement.bottomRightRect.contains(x,y))
 			{	handleAction = true;
 				scalingBottomRight = true;
 			}
-			else if ((selectedTekstElement.bottomLeftRect != null) && selectedTekstElement.bottomLeftRect.contains(x,y))
-			{	handleAction = true;
-				scalingBottomLeft = true;
-			}
-			else if ((selectedTekstElement.rotateEastHandle != null) && selectedTekstElement.rotateEastHandle.contains(x,y))
-			{	handleAction = true;
-				rotatingEast = true;
-			}
-			else if ((selectedTekstElement.rotateWestHandle != null) && selectedTekstElement.rotateWestHandle.contains(x,y))
-			{	handleAction = true;
-				rotatingWest = true;
-			}
-			
-
 		}
 		
 		return handleAction;
 	}
 
-	public void updateAction()
-	{
-		if (selectedTekstElement != null )
-		{
-
-//System.out.println("ua");
-
-			for (int tCnt = 0; tCnt < tekstElementVector.size(); tCnt++)
-			{	TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(tCnt);
-
-				if (oldSelectedTekstElement.isEqualTo(tekstElement))
-				{	
-					selectedTekstElement = selectedTekstElement.updateState();
-					// extra want selectedTekstElement wordt niet getekend
-					selectedTekstElement.makeBB();
-					selectedTekstElement.setCenter();
-					selectedTekstElement.bb2.rotate(selectedTekstElement.rotation, selectedTekstElement.cx, selectedTekstElement.cy);
-					selectedTekstElement.makeHandleBox();
-					tekstElement = tekstElement.updateState(selectedTekstElement);
-					tekstElementVector.setElementAt(tekstElement, tCnt);
-//System.out.println(selectedTekstElement.printTekst());
-//System.out.println(tekstElement.printTekst());
-				}	
-			}
-		}
-		
-	}
-	
-	public void updateAction2()
-	{
-		if (selectedTekstElement != null )
-		{
-			selectedTekstElement = selectedTekstElement.updateState();
-			// extra want selectedTekstElement wordt niet getekend
-			selectedTekstElement.makeBB();
-			selectedTekstElement.setCenter();
-			//selectedTekstElement.bb2.rotate(selectedTekstElement.rotation, selectedTekstElement.cx, selectedTekstElement.cy);
-			selectedTekstElement.makeHandleBox();
-		}
-				
-	}
-
+	/**
+	 * actie bij MouseDown/TouchStart met coordinaten (eventX,eventY): <br>
+	 * tekenen: voeg (eventX,eventY) toe aan draggDoublePoints<br>
+	 * lijn/rechthoek/cirkel tekenen: fixeer figuurStart op (eventX,eventY)<br>
+	 * teksttekenen: maak en open een TekstPopup en bepaal of die dient voor een nieuw
+	 * TekstElement of om een bestaand TekstElement te editen<br>
+	 * selecteren: kijk of er een selecteerRechthoek is en of een van de handles daarvan 
+	 * aangeklikt is of dat een punt binnen de selecteerRechthoek aangeklikt is (dit wordt een sleep);<br>
+	 * kijk of een individeel object geselecteerd is en of een van de handles van dit object aangeklikt is
+	 * of dat een punt binnen de handle box aangeklikt is (dit wordt een sleep);<br> "niets" aanklikken
+	 * verwijderd selecteerRechthoek en andere handle boxes en is de start van een nieuwe selecteerRechthoek     
+	 * @param eventX x-coordinaat MouseDown/TouchStart
+	 * @param eventY y-coordinaat MouseDown/TouchStart
+	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
 		if (mouseMode == tekenen)
@@ -2678,15 +2464,6 @@ public class KladjeGWTVeld
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
 		}
-/*		
-		else if (mouseMode == gummen)
-		{
-			mouseDown = true;
-			//gumPunt(e.getX(), e.getY(), gIm);
-			gumPunten.addElement(new Point(eventX, eventY));
-			paint();
-		}
-*/		
 		else if ((mouseMode == lijnTekenen) ||
 				 (mouseMode == rechthoekTekenen) ||
 				 (mouseMode == cirkelTekenen))
@@ -2699,50 +2476,32 @@ public class KladjeGWTVeld
 		{
 			mouseDown = true;
 			
+			// positie tekstPopup bij nieuwe tekst
 			startX = eventX + kladjeHWTCanvas.getAbsoluteLeft();
 			startY = eventY + kladjeHWTCanvas.getAbsoluteTop();
-			
+
+			// verwerk openstaande en zichtbare TekstPopup
 			if ((tekstPopup != null) && tekstPopup.isVisible())
 			{
 				hideTekstVeld(true);
 			}
-
+			// is er een TekstElement aangeklikt
 			tekstEdited = getClickedTekstElement(eventX, eventY);
+			// nieuwe TekstPopup
 			tekstPopup = new TekstPopup(this, eventX, eventY);
+			// tekst bewerken
 			if (tekstEdited != null)
 			{	tekstPopup.setText(tekstEdited.tekst);
 				tekstPopup.setTextColor(tekstEdited.kleur.toString());
-				//tekstPopup.setPopupPosition(tekstEdited.bb.x, tekstEdited.bb.y);
 				tekstPopup.setPopupPosition(tekstEdited.bb2.geefPuntX(0) + kladjeHWTCanvas.getAbsoluteLeft(),
 						                    tekstEdited.bb2.geefPuntY(0) + kladjeHWTCanvas.getAbsoluteTop());
-//System.out.println("tekstEdited " + tekstEdited.bb2.puntenX[0] + " " + tekstEdited.bb2.puntenY[0]);				
 			}
-			else 
+			else  // nieuwe tekst
 			{	tekstPopup.setTextColor(drawingColor.toString());
 				tekstPopup.setPopupPosition(startX - 8, startY - 8);
-//System.out.println("no tekstEdited " + startX + " " + startY);				
 			}
-				
-			//else	
-			//	tekstVeld.setText("");
-			//tekstPopup.setModal(true);
-			
-			//tekstPopup.setPopupPosition(startX, startY);
 			tekstPopup.show();
 			tekstPopup.textBox.setFocus(true);
-
-			
-/*				
-				if (tekstVeld.isVisible())
-				{
-					hideTekstVeld(true);
-				}
-				tekstVeld.setLocation(e.getX(), e.getY());
-				tekstVeld.setText("");
-				tekstVeld.setVisible(true);
-				tekstVeld.requestFocus();
-
-*/			
 			paint();
 			
 		}
@@ -2750,53 +2509,41 @@ public class KladjeGWTVeld
 		{
 			mouseDown = true;
 
+			// geklikt op een van de handles van de selecteerRechthoek (start van 
+			// schalen of draaien van een groep objecten) 
 			if (selecteerRechthoekHandlesContain(eventX, eventY))
 			{
 				startX = eventX;
 				startY = eventY;
-//System.out.println("mp oshc");			
 				
 				objectHandled = false;
 			}
+			// geklikt op een punt in de selecteerRechthoek (start van een groepssleep)
 			else if ((selecteerRechthoek != null) && selecteerRechthoek.contains(eventX, eventY))
 			{
 				resetSelectedObject();
 				sleepSelectie = true;
-				startX = eventX;//e.getX();
-				startY = eventY;//e.getY();
+				startX = eventX;
+				startY = eventY;
 			}
 
+			// geklikt op een van de handles van de handle box van een geselecteerd object (start van 
+			// schalen of draaien van individueel objecten) 
 			else if (objectSelectedHandlesContain(eventX, eventY))
 			{
 				startX = eventX;
 				startY = eventY;
-//System.out.println("mousedown oshc");			
-				
+			
 				objectHandled = false;
 				
-				if (selectedTekstElement != null)
-				{	oldSelectedTekstElement = selectedTekstElement;
-//System.out.println("old = " + oldSelectedTekstElement.printTekst());					
-				}
-				
 			}
-/*			
-			else if (selecteerRechthoekHandlesContain(eventX, eventY))
-			{
-				startX = eventX;
-				startY = eventY;
-//System.out.println("mp oshc");			
-				
-				objectHandled = false;
-			}
-*/
 			// individueel object aangeklikt, was mogelijk al geselecteerd
-			//if (setSelectedObject(e.getX(), e.getY()) || objectSelectedContains(e.getX(), e.getY()))
+			// verwijder de selecteerRechthoek
 			else if (setSelectedObject(eventX, eventY) || objectSelectedContains(eventX, eventY))
 			{
 				sleepSelectie = true;
-				startX = eventX;//e.getX();
-				startY = eventY;//e.getY();
+				startX = eventX;
+				startY = eventY;
 				selecteerRechthoek = null;
 				killScaleHandles();
 				killRotateHandles();
@@ -2805,7 +2552,8 @@ public class KladjeGWTVeld
 
 				objectMoved = false;
 			}
-			else
+			else // niets relevants aangeklikt, unselect alles, verwijder de selecteerRechthoek
+				 // fixeer (eventX,eventY) als mogelijk startpunt van een nieuwe selecteerRechthoek 
 			{
 				sleepSelectie = false;
 				resetSelectedObject();
@@ -2820,7 +2568,24 @@ public class KladjeGWTVeld
 		}
 		
 	}
-	
+
+	/**
+	 * actie bij MouseMove/TouchMove met coordinaten (eventX,eventY): <br>
+	 * tekenen: voeg (eventX,eventY) toe aan de streep die getekend wordt <br>
+	 * lijntekenen; verbindt figuurStart met (eventX,eventY), maak er een horizontale/
+	 * vertikale/diagonale lijn van als ShiftPressed == true (alleen op de PC)<br>
+	 * rechthoek/cirkel tekenen: teken een rechthoek (of een ellips in die rechthoek) met
+	 * tegenoverliggende hoekpunten figuurStart en (eventX,eventY); maak er een
+	 * vierkant/cirkel van als ShiftPressed == true (alleen op de PC)<br>
+	 * teksttekenen: niets te doen<br>
+	 * selecteren: als groupHandleAction == true: process de handle actie voor de geselecteerde
+	 * groep<br> als handleAction == true: process de handle actie voor het geselecteerde
+	 * object<br> als sleepselectie == true: sleep de geslecteerdr groep of het geselecteerde 
+	 * object<br> anders: vorm de selecteerRechthoek        
+	 * @param eventX x-coordinaat MouseMove/TouchMove
+	 * @param eventY y-coordinaat MouseMove/TouchMove
+	 * @param shiftPressed is de Shift-key ingedrukt (alleen op de PC)
+	 */
 	public void mouseMoveTouchMoveAction(int eventX, int eventY, boolean shiftPressed)
 	{
 		if (!mouseDown)
@@ -2828,23 +2593,13 @@ public class KladjeGWTVeld
 		
 		if (mouseMode == tekenen)
 		{
-			//draggPoints.addElement(new Point(eventX, eventY));
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
 		}
-/*		
-		else if (mouseMode == gummen)
-		{
-			//gumPunt(e.getX(), e.getY(), gIm);
-			gumPunten.addElement(new Point(eventX, eventY));
-			paint();
-		}
-*/		
 		else if (mouseMode == lijnTekenen)
 		{
-			//if (figuurStart == null)
-			//	figuurStart = new Point(eventX, eventY);
-				
+
+			// maak er een horizontale/vertikale/diagoale lijn van 
 			if (shiftPressed)
 			{
 				if ((eventX > figuurStart.x) && (eventY > figuurStart.y))
@@ -2968,7 +2723,7 @@ public class KladjeGWTVeld
 				}
 				
 			}
-			else
+			else // vrije lijn
 			{	
 				lijnEinde = new Point(eventX, eventY);
 			}
@@ -2976,19 +2731,16 @@ public class KladjeGWTVeld
 			paint();
 			
 		} // lijnTekenen
+
 		else if ((mouseMode == rechthoekTekenen) || (mouseMode == cirkelTekenen))
 		{
-//			mouseDragged = true;
-			
-			//if (figuurStart == null)
-			//	figuurStart = new Point(eventX, eventY);
 			
 			if (figuurStart != null)
 			{
 				
+				// maak er een vierkant/cirkel van
 				if (shiftPressed)
 				{
-//System.out.println("ShiftDown");
 					if ((eventX > figuurStart.x) && (eventY > figuurStart.y))
 					{	
 						int zijde = Math.min(eventX - figuurStart.x, eventY - figuurStart.y);
@@ -3014,7 +2766,7 @@ public class KladjeGWTVeld
 						        
 					}
 				}
-				else
+				else // vindt de juiste rechthoek
 				{	
 					if ((eventX > figuurStart.x) && (eventY > figuurStart.y))
 					{	tekenRechthoek = new Rectangle(figuurStart.x, figuurStart.y, 
@@ -3036,29 +2788,16 @@ public class KladjeGWTVeld
 				
 				paint();
 			}
-			else
+			else // kan eigenlijk niet
 			{	tekenRechthoek = new Rectangle(10, 10, 10, 10);
 				paint();
 			}
 			
 		} //rechthoek && cirkel
+		
+		// niets te doen
 		else if (mouseMode == tekstTekenen)
 		{
-/*				
-
-			if (sleepTekst) // verplaats de tekstRechthoek en het tekstVeld!!
-			{	
-			
-				int dx = e.getX() - startX;
-				int dy = e.getY() - startY;
-				tekstRechthoek.translate(dx, dy);
-				tekstVeld.setLocation(tekstVeld.getLocation().x + dx, tekstVeld.getLocation().y + dy);
-				
-				startX = e.getX();
-				startY = e.getY();
-			
-			}
-*/				
 			paint();
 		}
 		else if (mouseMode == selecteren)
@@ -3096,15 +2835,12 @@ public class KladjeGWTVeld
 				
 			}
 
-
-			else if (sleepSelectie) // verplaats de selecteerRechthoek met inhoud!!
+			// verplaats de selecteerRechthoek met inhoud of het geselecteerde object
+			else if (sleepSelectie) 
 			{
-				
 				
 				int dx = eventX - startX;
 				int dy = eventY - startY;
-				//int dx = eventX - start.x;
-				//int dy = eventY - start.y;
 				if (selecteerRechthoek != null)
 				{	selecteerRechthoek.translate(dx, dy);
 					if (schalen)
@@ -3131,7 +2867,6 @@ public class KladjeGWTVeld
 
 				startX = eventX;
 				startY = eventY;
-				//start = new Point(eventX, eventY);
 				
 				objectMoved = true;
 				
@@ -3144,7 +2879,6 @@ public class KladjeGWTVeld
 				
 				if (figuurStart == null)
 					return;
-					//	figuurStart = new Point(eventX, eventY);
 				
 				if ((eventX > figuurStart.x) && (eventY > figuurStart.y))
 				{	selecteerRechthoek = new Rectangle(figuurStart.x, figuurStart.y, 
@@ -3172,36 +2906,37 @@ public class KladjeGWTVeld
 		
 		
 	}
-	
+
+	/**
+	 * actie bij MouseUp/TouchEnd<br>
+	 * tekenen: smooth alle getekende punten en maak er een Streep van <br>
+	 * lijntekenen; maak een Lijn van figuurStart naar lijnEinde <br>
+	 * rechthoek tekeken: maak een Rechthoek van tekenRechthoek<br>
+	 * cirkel tekenen: maak een Ellips die in tekenRechthoek past<br>
+	 * teksttekenen: niets te doen<br>
+	 * selecteren: als sleepSelectie == true: be-eindig de sleep;<br>
+	 * kijk dan naar ObjectsSelected: als size == 0: sleepRechthoek weg;
+	 * als size == 1: sleepRechthoek weg en toon handle box van dit geselecteerde
+	 * object; als size groter dan 1: geef de selecteerRechthoek handles (als dat mag)         
+	 */
 	public void mouseUpTouchEndAction()
 	{
 		if (mouseMode == tekenen)
 		{	
 			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
 			
-			//Streep streep = new Streep(drawingColor, draggPoints);
 			Streep streep = new Streep(drawingColor, smoothedDraggDoublePoints);
 			streepVector.addElement(streep);
 			if (draggDoublePoints.size() > 1)
 				addToHistory();
-			//draggPoints.removeAllElements();
+
 			draggDoublePoints.clear();
 			
 			paint();
 		}
-/*		
-		else if (mouseMode == gummen)
-		{
-			updatePixelArray();
-			gumPunten.removeAllElements();
-			addToHistory();
-
-		}
-*/		
+		
 		else if (mouseMode == lijnTekenen)
 		{
-			
-//			mouseDragged = false;
 			
 			if (lijnEinde != null)
 			{	
@@ -3235,6 +2970,8 @@ public class KladjeGWTVeld
 			addToHistory();
 			paint();
 		}
+		
+		
 		else if (mouseMode == cirkelTekenen)
 		{	if (tekenRechthoek != null)
 			{
@@ -3256,6 +2993,7 @@ public class KladjeGWTVeld
 		{
 
 		}
+		
 		else if (mouseMode == selecteren)
 		{
 			mouseDown = false;
@@ -3264,11 +3002,9 @@ public class KladjeGWTVeld
 			{	
 
 				sleepSelectie = false;
-				//resetSelectedObject();
 				if (objectMoved)
 					addToHistory();
 				objectMoved = false;
-				//sleepSelectie = false;
 				paint();
 			}
 			
@@ -3283,7 +3019,6 @@ public class KladjeGWTVeld
 			else if (objectsSelected.size() == 1)
 			{	
 				
-//System.out.println("oss = 1");					
 				Object objectSelected = objectsSelected.elementAt(0);
 				if (objectSelected instanceof Streep)
 					selectedStreep = (Streep) objectSelected;
@@ -3315,8 +3050,7 @@ public class KladjeGWTVeld
 			}
 			
 			if (objectHandled)
-			{	updateAction();
-				addToHistory();
+			{	addToHistory();
 			
 			}
 			objectHandled = false;
@@ -3331,19 +3065,22 @@ public class KladjeGWTVeld
 			angleSum = 0; 
 
 			paint();
-		}
+		
+		} // selecteren
 		
 	}
 	
-	//class MLMML extends MouseAdapter implements MouseMotionListener
+	/**
+	 * inner class voor afhandelen Mouse Events;
+	 * roep de corresponderende actie aan 
+	 * @author huub
+	 */
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		
-		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
 			e.preventDefault();
-			
 			// prevent scrolling 
 			e.stopPropagation();
 			
@@ -3354,15 +3091,11 @@ public class KladjeGWTVeld
 			
 		}
 		
-		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
 			e.preventDefault();
-			
 			// prevent scrolling
 			e.stopPropagation();
-			
-//System.out.println("mouse move veld");			
 			
 			if (!mouseDown)
 				return;
@@ -3371,32 +3104,27 @@ public class KladjeGWTVeld
 			int eventY = e.getY();
 			boolean shiftPressed = e.isShiftKeyDown();
 
-//System.out.println("sp = " + shiftPressed);
-
 			mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
-			
-			
 			
 		} // onMouseMove
 		
-		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
 			e.preventDefault();
-			
 			// prevent scrolling
 			e.stopPropagation();
-			
 			mouseDown = false;
-		
 			mouseUpTouchEndAction();
-
 		}
 
-	} //MLMML
+	}
 
 
-	// tablet, dwo 
+	/**
+	 * inner class voor afhandelen Touch Events
+	 * roep de corresponderende actie aan 
+	 * @author huub
+	 */
 	class MGWTTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		
@@ -3408,11 +3136,6 @@ public class KladjeGWTVeld
 			if (e.getTouches().length() > 0)
 			{
 				Touch touch = e.getTouches().get(0);
-				
-				//Widget sender = (Widget) e.getSource();
-			    //Element elem = sender.getElement();
-				//int eventX = touch.getRelativeX(elem);
-				//int eventY = touch.getRelativeY(elem);
 				
 				int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
@@ -3433,12 +3156,6 @@ public class KladjeGWTVeld
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				//Widget sender = (Widget) e.getSource();
-			    //Element elem = sender.getElement();
-				//int eventX = touch.getRelativeX(elem);
-				//int eventY = touch.getRelativeY(elem);
-				//boolean shiftPressed = e.isShiftKeyDown();
-
 			    boolean shiftPressed = false;
 			    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
@@ -3459,108 +3176,3 @@ public class KladjeGWTVeld
 
 }
 
-/*
-class ColorBytes implements Serializable
-{	
-	int x, y;
-	byte red, green, blue;
-	
-	public ColorBytes(int x, int y, int r, int g, int b)
-	{	
-		this.x = x;
-		this.y = y;
-		
-		red = new Integer(r).byteValue(); 
-		green = new Integer(g).byteValue();
-		blue = new Integer(b).byteValue();;
-	}
-	
-	public ColorBytes(int x, int y, CssColor c)
-	{
-		
-		this.x = x;
-		this.y = y;
-		
-		String cString = c.toString().substring(4, c.toString().length() - 1);
-		String[] kleurenStr = StringUtils.split(cString, ",");
-
-		int intBlue =  Integer.parseInt(kleurenStr[2]);
-		int intGreen = Integer.parseInt(kleurenStr[1]);
-		int intRed =   Integer.parseInt(kleurenStr[0]);
-		
-		red = new Integer(intRed).byteValue(); 
-		green = new Integer(intGreen).byteValue();
-		blue = new Integer(intBlue).byteValue();;
-	}
-
-	public CssColor makeColor()
-	{	int intRed = red;
-		if (intRed < 0)
-			intRed += 256;
-		int intGreen = green;
-		if (intGreen < 0)
-			intGreen += 256;
-		int intBlue = blue;
-		if (intBlue < 0)
-			intBlue += 256;
-		
-		return CssColor.make(intRed, intGreen, intBlue);
-	}
-	
-	public void zetColor(CssColor c)
-	{
-		
-		String cString = c.toString().substring(4, c.toString().length() - 1);
-		String[] kleurenStr = StringUtils.split(cString, ",");
-
-		int intBlue =  Integer.parseInt(kleurenStr[2]);
-		int intGreen = Integer.parseInt(kleurenStr[1]);
-		int intRed =   Integer.parseInt(kleurenStr[0]);
-		
-		red = new Integer(intRed).byteValue(); 
-		green = new Integer(intGreen).byteValue();
-		blue = new Integer(intBlue).byteValue();;
-		
-	}
-}
-*/
-class Point
-{
-	int x; int y;
-	
-	public Point(int x, int y)
-	{
-		this.x = x; this.y = y;
-	}
-}
-
-class Rectangle
-{
-	int x; int y; int width; int height;
-	
-	public Rectangle(int x, int y, int w, int h)
-	{
-		this.x = x; this.y = y;
-		width = w; height = h;
-	}
-	
-	public Rectangle(Rectangle r)
-	{
-		x = r.x;
-		y = r.y;
-		width = r.width;
-		height = r.height;
-	}
-	
-	public boolean contains(int px, int py)
-	{
-		return (px >= x) && (px <= (x + width)) &&
-		       (py >= y) && (py <= (y + height));
-	}
-	
-	public void translate(int dx, int dy)
-	{
-		x += dx;
-		y += dy;
-	}
-}

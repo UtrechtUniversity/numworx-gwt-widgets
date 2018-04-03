@@ -7,18 +7,49 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 
+/**
+ * een PopupPanel met daarin een LayoutPanel met ToggleButtons om de tekenkleur in
+ * KladjeGWTVeld te kiezen; de ToggleButtons werken zodanig dat er altijd 
+ * een ingedrukt is, nl. degene die correspondeert met de actuele tekenkleur 
+ * @author huub
+ */
+
 public class ColorPopup extends PopupPanel
 {
+	/**
+	 * eigenaar van dit PopupPanel
+	 */
 	KladjeGWT owner;
-	int numColors = 8; 
+	/**
+	 * aantal beschikbare kleuren
+	 */
+	int numColors = 8;
+	/**
+	 * een Panel voor de ToggelButtons
+	 */
 	LayoutPanel togglePanel;
+	/**
+	 * afmeting van de ToggleButtons in pixels
+	 */
 	int toggleSize = 20;
+	/**
+	 * afstand tussen de ToggleButtons
+	 */
 	int offset = 5;
+	/**
+	 * breedte en hoogte van het togglePanel (en dus van dit PopupPanel) 
+	 */
 	int breedte, hoogte;
 	
-	ToggleButton zwartButton, grijsButton, roodButton, oranjeButton, groenButton, cyaanButton, blauwButton, magentaButton, 
-		         geelButton;
+	/**
+	 * de ToggleButtons
+	 */
+	ToggleButton zwartButton, grijsButton, roodButton, oranjeButton, groenButton, cyaanButton, blauwButton, magentaButton; 
 	
+	/**'
+	 * constructor
+	 * @param o eigenaar
+	 */
 	public ColorPopup(KladjeGWT o)
 	{
 		super(true);
@@ -26,7 +57,7 @@ public class ColorPopup extends PopupPanel
 		breedte = (offset + toggleSize) * numColors + offset;
 		hoogte = toggleSize + 2 * offset;
 		togglePanel = new LayoutPanel();
-		togglePanel.addStyleName(owner.kladjeCss.colorpanel());
+		togglePanel.addStyleName(KladjeGWT.kladjeCss.colorpanel());
 		togglePanel.setSize("" + breedte + "px", "" + hoogte + "px");
 		
 		makeTogglePanel();
@@ -35,6 +66,10 @@ public class ColorPopup extends PopupPanel
 		
 	}
 	
+	/**
+	 * zet de ToggleButtons op het TogglePanel, voeg ClickHandlers toe
+	 * en zet de ToggleButton voor zwart op ingedrukt (default tekenkleur)
+	 */
 	public void makeTogglePanel()
 	{
 		int currentX = offset;
@@ -99,17 +134,13 @@ public class ColorPopup extends PopupPanel
 		magentaButton.addClickHandler(toggleClickHandler);
 		currentX += toggleSize + offset;
 
-/*		
-		geelButton = new ToggleButton(owner.geelImage, owner.geelImage);
-		togglePanel.add(geelButton);
-		togglePanel.setWidgetLeftWidth(geelButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
-		togglePanel.setWidgetTopHeight(geelButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
-		geelButton.addClickHandler(toggleClickHandler);
-		currentX += toggleSize + offset;
-*/		
-		
 	}
 
+	/**
+	 * ToggleButton tb werd ingedrukt, dus zorg dat alle andere
+	 * ToggelButtons niet ingedrukt zijn (GWT heeft niet zoiets als een RadioButtonGroup)   
+	 * @param tb de ToggleButton die werd ingedrukt
+	 */
   	void buttonsUp(ToggleButton tb)
    	{
    		if (!zwartButton.equals(tb))
@@ -128,10 +159,13 @@ public class ColorPopup extends PopupPanel
    			blauwButton.setDown(false);
  		if (!magentaButton.equals(tb))
    			magentaButton.setDown(false);
-// 		if (!geelButton.equals(tb))
-// 			geelButton.setDown(false);
    	}
   	
+  	/**
+  	 * inner class voor ClickEvents op de ToggleButtons;
+  	 * actie: zet de corresponderende tekenkleur in KladjeGWTVeld 
+  	 * @author huub
+  	 */
    	class ToggleClickHandler implements ClickHandler
 	{
    		public void onClick(ClickEvent e)
@@ -186,19 +220,6 @@ public class ColorPopup extends PopupPanel
      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.magenta;
     			}
     		}
-/*    		
-    		else if (e.getSource() == geelButton)
-    		{
-    			if (geelButton.isDown())
-    			{
-    				buttonsUp(geelButton);
-    				
-      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.geel;
-      				
-    			}
-    		}
-*/    		
-    			
 		}
 		
 	}

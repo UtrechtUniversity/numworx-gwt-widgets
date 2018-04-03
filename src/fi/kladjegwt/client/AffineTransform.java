@@ -1,16 +1,39 @@
 package fi.kladjegwt.client;
 
-
+/**
+ * klasse die aan affiene transformatie A in het vlak representeert,
+ * dus een 2x2 matrix M en een vector b, zodat voor een punt x in het
+ * vlak, A(x)=M(x)+b 
+ * @author huub
+ */
 
 public class AffineTransform 
 {
-	double m00 = 1, m01 = 0, m10 = 0, m11 = 1, b0 = 0, b1 = 0;
-	
+	/**
+	 * de matrix M
+	 */
+	double m00 = 1, m01 = 0, m10 = 0, m11 = 1;
+	/**
+	 * de vector b
+	 */
+	double b0 = 0, b1 = 0;
+
+	/**
+	 * default constructor
+	 */
 	public AffineTransform()
 	{
-		
 	}
 	
+	/**
+	 * constructor, alle waarden gegeven
+	 * @param m00 M linksboven
+	 * @param m01 M rechtsboven
+	 * @param m10 M linksonder
+	 * @param m11 M rechtsonder
+	 * @param b0 b x-coordinaat
+	 * @param b1 b-y-coordinaat
+	 */
 	public AffineTransform(double m00, double m01, double m10, double m11, double b0, double b1)
 	{
 		this.m00 = m00;
@@ -21,6 +44,12 @@ public class AffineTransform
 		this.b1 = b1;
 	}
 	
+	/**
+	 * vermenigvuldig deze affiene transformatie A=M+b van links met de affiene
+	 * transformatie at, d.w.z. als at=M'+b', dan is (at)A=M'M+(M'b+b') 
+	 * @param at de affiene transformatie at 
+	 * @return (at)A
+	 */
 	public AffineTransform leftMultiplyBy(AffineTransform at)
 	{
 		AffineTransform result = new AffineTransform(
@@ -34,6 +63,12 @@ public class AffineTransform
 		return result;
 	}
 	
+	/**
+	 * vindt de inverse affiene transformatie inv(A) van de affiene
+	 * transformatie at=M+b , d.w.z. vind inv(at)=inv(M)-(inv(M))(b)   
+	 * @param at affiene transformatie waarvan inverse bepaald moet worden
+	 * @return inv(at) of id als det(M)=0 
+	 */
 	public AffineTransform inverseTransform(AffineTransform at)
 	{
 		AffineTransform result = new AffineTransform(1,0,0,1,0,0);
@@ -64,6 +99,9 @@ public class AffineTransform
 		return result;
 	}
 	
+	/**
+	 * output deze affiene transformatie als String
+	 */
 	public String toString()
 	{
 		String result = "";

@@ -102,7 +102,9 @@ public class StringUtils {
      * characters not contained within legalChars, containsOnly() will return
      * true, otherwise it will return false.
      * </P>
-     * 
+     * @param inputString String to check
+     * @param legalChars String containing legal characters
+     * @return true/false
      * <P>
      * Note that containsOnly will always return true if inputString is null.
      * </P>
@@ -132,6 +134,9 @@ public class StringUtils {
      * This method takes an inputString and counts the number of times that
      * patternString occurs within it.
      * </P>
+     * @param inputString String to check
+     * @param patternString  pattern to seek
+     * @return incidence of patternString in inputString
      */
     public static int count(String inputString, String patternString) {
         int index = 0;
@@ -161,7 +166,9 @@ public class StringUtils {
      * splitString. The splitString divider will not be returned in the split
      * strings.
      * </P>
-     * 
+     * @param inputString String to split
+     * @param splitString String to to use as splitting divider
+     * @return an array of String  
      * <P>
      * In particular, this can be used to split a multiline String into an array
      * of Strings by using a splitString of "\n". The resulting strings will not
@@ -202,6 +209,10 @@ public class StringUtils {
      * This method behaves like String.replace(), but replaces substrings rather
      * than chars.
      * </p>
+     * @param inputString String in whoch substrings should be replaced
+     * @param splitString the substring whhich should be replaces
+     * @param joinString the replacement String
+     * @return the String with all occurrences of splitString replaced with joinString 
      */
 
     public static String replaceStr(String inputString, String splitString,

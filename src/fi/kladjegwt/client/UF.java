@@ -1,15 +1,23 @@
 package fi.kladjegwt.client;
 
-// universal formatter
+/**
+ * formatting class
+ * @author huub
+ */
 class UF
-{   // basic formatting with decs decimals
-    // no error handling (decs < 0)
+{   
+	/**
+	 * basic formatting with decs decimals
+	 * @param val double to format
+	 * @param decs required number of decimals
+	 * @return formatted double as a String
+	 */
     public static String format(double val, int decs)
     {   String result = "";
         if (val == 0)
             return "0";
         // no decimals required
-        if (decs == 0)
+        if (decs <= 0)
             result = String.valueOf(Math.round(val));
         else //
         {   // factor for decimal part
@@ -37,22 +45,34 @@ class UF
                 fractionalString = zeros(decs - fractionalString.length()) +
                                    fractionalString;
             result = integerString + "." +
-            	//DoorzienDWO.rb.getString("decSep") + 
+            	// replace . with character depending on internationalization 
             	fractionalString;
         }
         return result;
     }
     
-    
-    // as above but with sign always displayed
+    /**
+     * as format but with sign always displayed 
+     * @param val double to format
+     * @param decs required number of decimals
+     * @return formatted double as a String
+     */
     public static String sformat(double val, int decs)
     {   String result = format(val, decs);
         if (val >= 0)
             result = "+" + result;
         return result;
     }
-    // as above, but aligned (0=center, 1=left, 2=right) in a field of
-    // width characters (if possible)
+
+    /**
+     * as format but aligned (0=center, 1=left, 2=right) in a field of
+     * width characters (if possible)
+     * @param val double to format
+     * @param decs required number of decimals
+     * @param width field width in characters 
+     * @param al alignment (0=center, 1=left, 2=right)
+     * @return formatted double as an aligned String 
+     */
     public static String fformat(double val, int decs, int width, int al)
     {   String result = format(val, decs);
         int len = result.length();
@@ -77,14 +97,24 @@ class UF
             }
         return result;
     }
-    // returns a string of c zeros
+
+    /**
+     * produce a String of c zero's
+     * @param c number of zero's wanted
+     * @return String of zeros
+     */
     private static String zeros(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
             result += "0";
         return result;
     }
-    // returns a string of c spaces
+
+    /**
+     * produce a String of c spaces (blanks)
+     * @param c number of zero's wanted
+     * @return String of spaces (blanks)
+     */
     private static String spaces(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)

@@ -9,17 +9,53 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
+/**
+ * een PopupPanel met een TextBox erin om tekst in te voeren;
+ * de breedte van het PopupPanel past zich aan aan de breedte vasn de TextBox 
+ * de TekstPopup verschijnt op het werkveld bij mouseDown/touchStart
+ * in modus teksttekenen (zie methode mouseDownTouchStartAction 
+ * in klasse KladjeGWTVeld)  
+ * @author huub
+ */
 
 public class TekstPopup extends PopupPanel
 {
+	/**
+	 * eigenaar van deze TekstPopup
+	 */
 	KladjeGWTVeld owner;
+	/**
+	 * de Textbox voor invoer
+	 */
 	TextBox textBox;
+	/**
+	 * x- en y-coordinaat in het werkveld waar de ingevoerde tekst moet
+	 * verschijnen, zie methode hideTekstVeld in klasse KladjeGWTVeld)   
+	 */
 	int tekstX, tekstY;
+	/**
+	 * minimum aantal zichtbare characteres in de TekstBox
+	 */
 	int minVisibleCharacters = 10;
+	/**
+	 * maximale lengte van de TextBox in characters 
+	 */
 	int maxCharacters = 300;
+	/**
+	 * breedte van de TextBox in pixels
+	 */
 	int breedte = 50;
+	/**
+	 * hoogte van de TextBox in pixels
+	 */
 	int hoogte = 20;
 
+	/**
+	 * constructor
+	 * @param o eigenaar
+	 * @param eventX x-coordinaat in werkveld waar tekst moet verschijnen
+	 * @param eventY y-coordinaat in werkveld waar tekst moet verschijnen
+	 */
 	public TekstPopup(KladjeGWTVeld o, int eventX, int eventY)
 	{
 		super(true);
@@ -29,9 +65,8 @@ public class TekstPopup extends PopupPanel
 		tekstY = eventY;
 		
 		textBox = new TextBox();
-		//textBox.setText("text here");
 		textBox.setMaxLength(maxCharacters);
-		//textBox.setVisibleLength(maxVisibleCharacters);
+
 		textBox.setWidth("" + breedte + "px");
 		textBox.setHeight("" + hoogte + "px");
 		textBox.addStyleName(KladjeGWT.kladjeCss.textbox());
@@ -43,6 +78,11 @@ public class TekstPopup extends PopupPanel
 		
 	}
 	
+	/**
+	 * zet de kleur van de tekst in de TextBox: N.B. dit kan alleen via een
+	 * style (i.t.t. Java)
+	 * @param tColorString kleur van de tekst als String
+	 */
 	public void setTextColor(String tColorString)
 	{
 		if (tColorString.equals(KladjeGWTVeld.zwart.toString()))
@@ -70,31 +110,46 @@ public class TekstPopup extends PopupPanel
 		{	textBox.setStyleName(KladjeGWT.kladjeCss.textmagenta());
 		}
 	}
-	
+
+	/**
+	 * get de tekst in de TextBox
+	 * @return de tekst in de TextBox 
+	 */
 	public String getText()
 	{
 		return textBox.getText();
 	}
+	
+	/**
+	 * zet de tekst in de TextBox, pas de breedte van de TextBox aan
+	 * (dit verandert ook de breedte van de Popup)
+	 * @param text nieuwe tekst in de TekstBox
+	 */
 	public void setText(String text)
 	{
 		textBox.setText(text);
 		String fontString = "16px bold, sans-serif";
-		owner.gIm.setFont(fontString);
-		TextMetrics tm = owner.gIm.measureText(text);
+		KladjeGWTVeld.gIm.setFont(fontString);
+		TextMetrics tm = KladjeGWTVeld.gIm.measureText(text);
 		int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
 
 		textBox.setWidth("" + tekstBreedte + "px");
 
 	}
 	
+	/**
+	 * inner class die de breedte van de Textbox (en dus van dit PopupPanel)
+	 * aanpast tijdens tekstinvoer  
+	 * @author huub
+	 */
 	class TextBoxKeyPressHandler implements KeyPressHandler
 	{
 		public void onKeyPress(KeyPressEvent e)
 		{
 			String tekst = textBox.getText();
 			String fontString = "16px bold, sans-serif";
-			owner.gIm.setFont(fontString);
-			TextMetrics tm = owner.gIm.measureText(tekst);
+			KladjeGWTVeld.gIm.setFont(fontString);
+			TextMetrics tm = KladjeGWTVeld.gIm.measureText(tekst);
 			int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
 
 			textBox.setWidth("" + tekstBreedte + "px");
@@ -104,6 +159,11 @@ public class TekstPopup extends PopupPanel
 		}
 	}
 	
+	/**
+	 * inner class die de tekst uit de TextBox verwerkt en vervolgens 
+	 * dit PopupPanel verbergt 
+	 * @author huub
+	 */
 	class TextBoxKeyDownHandler implements KeyDownHandler
 	{
 		public void onKeyDown(KeyDownEvent e)

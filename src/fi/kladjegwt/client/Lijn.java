@@ -1,6 +1,7 @@
 package fi.kladjegwt.client;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -9,49 +10,54 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
 /**
- * klasse die een streep representeert: <br> een streep is de collectie punten die wordt getekend 
- * door te slepen tussen een mouseDown/touchStart en de eerstvolgende mouseUp/touchEnd;
- * de mouseUp/touchEnd fixeert de streep;<br>
- * streep verplaatsten, schalen, draaien of verwijderen: <br>
- * ga in modus selecteren (togglebuttons), klik op de streep, waarna een handlebox
+ * klasse die een lijn representeert; 
+ * een lijn wordt als volgt getekend (zie ook klassen KladjeGWT en KladjeVeldGWT): <br>
+ * ga in modus lijntekenen (togglebuttons), klik op het werkveld waar het beginpunt van de 
+ * lijn moet komen en sleep waarna een lijn verschijnt;
+ * de lijn wordt gefixeerd bij het be-eindigen van de sleep;<br>  
+ * NB: op de PC (niet op de tablet) levert slepen met de Shift-key ingedrukt horizontale, vertikale
+ * of diagonale lijnen op;<br>
+ * lijn verplaatsten, schalen, draaien of verwijderen: <br>
+ * ga in modus selecteren (togglebuttons), klik op de lijn, waarna een handlebox
  * (met vier schaal handles op de hoeken en twee rotatie handles op de zijden) verschijnt; 
- * klikken plus slepen in de handlebox verplaatst de streep, klikken plus slepen in de schaal handles
- * schaalt de streep, klikken plus slepen in de rotatie handles draait de streep, klikken op
- * de wisknop verwijderd de streep;
- * een streep wordt ook verplaatst, geschaald, gedraaid of verwijderd als deel van een geselecteerde
+ * klikken plus slepen in de handlebox verplaatst de lijn, klikken plus slepen in de schaal handles
+ * schaalt de lijn, klikken plus slepen in de rotatie handles draait de lijn, klikken op
+ * de wisknop verwijderd de lijn;
+ * een lijn wordt ook verplaatst, geschaald, gedraaid of verwijderd als deel van een geselecteerde
  * groep van figuren.<br>
- * een Streep wordt als volgt "onthouden": onthoudt initiele punten bij creatie,
+ * een Lijn wordt als volgt "onthouden": onthoudt de coordinaten van begin- en einpunt bij creatie,
  * en stop alle wijzigingen (verplaatsingen, schalingen, draaiingen)
  * cumulatief in een affiene transformatie en onthoudt deze affiene transformatie     
  * @author huub
  */
-
-public class Streep 
+public class Lijn 
 {
 	/**
-	 * de kleur van deze Streep
+	 * de kleur van deze Lijn
 	 */
 	CssColor kleur;
 	/**
-	 * de initiele punten van deze streep
+	 * initiele coordinaten begin- en eindpunt
 	 */
-	double[] puntenXD, puntenYD;
+	int fromX, fromY, toX, toY;
 	/**
-	 * de actuele punten van deze Streep (dus na verplaatsingen, draaiingen, schaling) 
+	 * actuele coordinaten begin- en eindpunt (dus na verplaatsing, draaiing en schaling)
 	 */
-	double[] pXD, pYD;
+	double fX, fY, tX, tY;
 	/**
-	 * dikte van de bounding box van deze Streep
+	 * dikte van de bounding box van deze Lijn
 	 */
 	int bbFactor = 4;
 	/**
-	 * de bounding box van deze Streep
+	 * de bounding box van deze Lijn
 	 */
 	Polygon bb;
+
 	/**
-	 * het middelpunt (barycentrum) van deze streep 
+	 * het middlepunt van deze Lijn
 	 */
-	double cx = 0, cy = 0;
+	double cx, cy;
+	
 	/**
 	 * gebruik een affiene transformatie om cumulatief alle
 	 * veranderingen (verplaatsing, schaling, draaing) aan deze
@@ -59,8 +65,8 @@ public class Streep
 	 */
 	AffineTransform at = new AffineTransform();
 	
-	/**
-	 * de handle box van deze Rechthoek
+	/** 
+	 * de handle box van deze Lijn
 	 */
 	Rectangle handleBox;
 	/**
@@ -80,139 +86,52 @@ public class Streep
 	 * klikken en slepen op de twee draai-handles
 	 */
 	Rectangle rotateEastHandle, rotateWestHandle;
-
-	/** 
-	 * kan deze Streep verwijderd worden?
+	
+	/**
+	 * kan deze Lijn verwijderd worden?
 	 */
 	boolean deletable = true;
-
-	/**
-	 * constructor, bereken meteen het middelpunt
-	 * @param c de kleur van de Streep
-	 * @param punten de punten (ArrayList met DoublePoints)
-	 */
-	public Streep(CssColor c, ArrayList<DoublePoint> punten)
-	{	kleur = c;
-		puntenXD = new double[punten.size()];
-		puntenYD = new double[punten.size()];
-
-		for (int pCnt = 0; pCnt < punten.size(); pCnt++)
-		{	DoublePoint pt = punten.get(pCnt);
-			puntenXD[pCnt] = pt.x;
-			puntenYD[pCnt] = pt.y;
-			
-			cx += puntenXD[pCnt];
-			cy += puntenYD[pCnt];
-		}
-		
-		cx /= puntenXD.length;
-		cy /= puntenYD.length;
-
-		maakStreep();
-	}
 	
 	/**
-	 * constructor (overloaded), bereken meteen het middelpunt
-	 * @param c de kleur van de Streep
-	 * @param punten de punten (Vector met Points)
+	 * constructor, vindt meteen het middelpunt
+	 * @param c de kleur van de Lijn
+	 * @param fromX x-coordinaat beginpunt
+	 * @param fromY y-coordinaat beginpunt
+	 * @param toX x-coordinaat eindpunt
+	 * @param toY y-coordinaat eindpunt
 	 */
-	public Streep(CssColor c, Vector<Point> punten)
-	{	kleur = c;
-		puntenXD = new double[punten.size()];
-		puntenYD = new double[punten.size()];
-
-		for (int pCnt = 0; pCnt < punten.size(); pCnt++)
-		{	Point pt = (Point) punten.elementAt(pCnt);
-			puntenXD[pCnt] = pt.x;
-			puntenYD[pCnt] = pt.y;
-		
-			cx += puntenXD[pCnt];
-			cy += puntenYD[pCnt];
-		}
-		
-		cx /= puntenXD.length;
-		cy /= puntenYD.length;
-
-		maakStreep();
-	}
-	
-	/**
-	 * constructor (overloaded), bereken meteen het middelpunt
-	 * @param c de kleur van de Streep
-	 * @param ptXD x-coordinaten van de punten als doubles
-	 * @param ptYD y-coordinaten van de punten als doubles
-	 */
-	public Streep(CssColor c, double[] ptXD, double[] ptYD)
-	{	kleur = c;
-	
-		puntenXD = new double[ptXD.length];
-		puntenYD = new double[ptYD.length];
-
-		for (int cnt = 0; cnt < ptXD.length; cnt++) 
-		{	puntenXD[cnt] = ptXD[cnt];
-			puntenYD[cnt] = ptYD[cnt];
-			
-			cx += puntenXD[cnt];
-			cy += puntenYD[cnt];
-			
-		}
-
-		cx /= puntenXD.length;
-		cy /= puntenYD.length;
-
-		maakStreep();
-
-	}
-
-	/**
-	 * constructor (overloaded), bereken meteen het middelpunt
-	 * @param c de kleur van de Streep
-	 * @param ptX x-coordinaten van de punten als integers
-	 * @param ptY y-coordinaten van de punten als integers
-	 */
-	public Streep(CssColor c, int[] ptX, int[] ptY)
-	{	kleur = c;
-		puntenXD = new double[ptX.length];
-		puntenYD = new double[ptY.length];
-
-		for (int cnt = 0; cnt < ptX.length; cnt++) 
-		{	puntenXD[cnt] = ptX[cnt];
-			puntenYD[cnt] = ptY[cnt];
-			
-			cx += puntenXD[cnt];
-			cy += puntenYD[cnt];
-
-		}
-
-		cx /= puntenXD.length;
-		cy /= puntenYD.length;
-
-		maakStreep();
-		//maakBBs();
-		//makeHandleBox();
-	}
-	
-	/**
-	 * kopieer initiele punten in actuele punten,
-	 * bepaal de bounding en handle box
-	 */
-	public void maakStreep()
+	public Lijn(CssColor c, int fromX, int fromY, int toX, int toY)
 	{
-		pXD = new double[puntenXD.length];
-		pYD = new double[puntenYD.length];
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{
-			pXD[pCnt] = puntenXD[pCnt];
-			pYD[pCnt] = puntenYD[pCnt];
-		}
-		
-		maakBBs();
+		kleur = c;
+		this.fromX = fromX;
+		this.fromY = fromY;
+		this.toX = toX;
+		this.toY = toY;
 
+		cx = ((double) fromX + (double) toX) / 2;
+		cy = ((double) fromY + (double) toY) / 2;
+		
+		maakLijn();
+	}
+
+	/**
+	 * kopier initiele begin- en eindcoordinaten in actuele
+	 * begin- en eindcoordinaten, maak de bouding box en de handle box
+	 */
+	public void maakLijn()
+	{
+		fX = fromX;
+		fY = fromY;
+		tX = toX;
+		tY = toY;
+				
+		makeBB();
+		
 		makeHandleBox();
 	}
 	
 	/**
-	 * maak de handle box voor deze Streep (minimum breedte en hoogte in KladjeVeldGWT)
+	 * maak de handle box voor deze Lijn (minimum breedte en hoogte in KladjeVeldGWT)
 	 * en voeg handles toe als er geschaald en/of geroteerd mag worden
 	 */
 	public void makeHandleBox()
@@ -245,7 +164,7 @@ public class Streep
 			handleBox = new Rectangle(minX - hbFactor + dw/2, minY - hbFactor, KladjeGWTVeld.minHandleBoxSize, h);
 		else if ((dw < 0) && (dh < 0))
 			handleBox = new Rectangle(minX - hbFactor + dw/2, minY - hbFactor + dh/2, KladjeGWTVeld.minHandleBoxSize, KladjeGWTVeld.minHandleBoxSize);
-		
+
 		if (KladjeGWTVeld.schalen)
 			makeScaleHandles();
 		if (KladjeGWTVeld.roteren)
@@ -292,6 +211,7 @@ public class Streep
 									   4 * hbFactor, 4 * hbFactor);		
 		
 	}
+
 	/**
 	 * zet de vier handles om the schalen en de bijbehorende klikrechthoeken op null
 	 */
@@ -307,6 +227,7 @@ public class Streep
 		bottomLeftRect = null;
 		
 	}
+
 	/**
 	 * maak de klik-rechtoeken voor de twee draai-handles
 	 */
@@ -316,7 +237,7 @@ public class Streep
 										 handleBox.y + handleBox.height/2 - 2 * hbFactor,
 										 4 * hbFactor, 4 * hbFactor);
 		rotateWestHandle = new Rectangle(handleBox.x - 4 * hbFactor, 
-										 handleBox.y + handleBox.height/2 - 2 * hbFactor,
+				                         handleBox.y + handleBox.height/2 - 2 * hbFactor,
 										 4 * hbFactor, 4 * hbFactor);
 	}
 
@@ -327,156 +248,78 @@ public class Streep
 	{
 		rotateEastHandle = null; 
 		rotateWestHandle = null;
+		
 	}
 	
 	/**
-	 * maak een bounding box voor de Streep als volgt:
-	 * loop langs de Streep van het begin to het einde en bepaal de punten van de ene kant van 
-	 * de bounding box; loop dan weer terug naar het begin en bepaal de punten van de andere kant van
-	 * de bounding box
+	 * maak een bounding box voor deze Lijn
 	 */
-	public void maakBBs()
+	public void makeBB()
 	{
 		bb = new Polygon();
 		
-		if (puntenXD.length == 1)
-		{	bb.addPoint((int) Math.round(puntenXD[0] - bbFactor), (int) Math.round(puntenYD[0] - bbFactor));
-			bb.addPoint((int) Math.round(puntenXD[0] + bbFactor), (int) Math.round(puntenYD[0] - bbFactor));
-			bb.addPoint((int) Math.round(puntenXD[0] + bbFactor), (int) Math.round(puntenYD[0] + bbFactor));
-			bb.addPoint((int) Math.round(puntenXD[0] - bbFactor), (int) Math.round(puntenYD[0] + bbFactor));
+		// richtingsvector
+		double rX = toX - fromX;
+		double rY = toY - fromY;
+		// normaalvector
+		double nx = 0;
+		double ny = 0;
+		if (Math.abs(rX) > Math.abs(rY))
+		{	nx = rY;
+			ny = -rX;
 		}
-		if (puntenXD.length > 1)
-		{  
-			
-			// for loop 1
-			for (int pCnt = 1; pCnt < puntenXD.length; pCnt++)
-			{	
-				double fromX = puntenXD[pCnt - 1];
-				double fromY = puntenYD[pCnt - 1];
-				double toX = puntenXD[pCnt];
-				double toY = puntenYD[pCnt];
-				// richtingsvector
-				double rX = toX - fromX;
-				double rY = toY - fromY;
-				// normaalvector
-				double nx = 0;
-				double ny = 0;
-				boolean normal1 = true;
-				if (Math.abs(rX) > Math.abs(rY))
-				{	nx = rY;
-					ny = -rX;
-					normal1 = false;
-				}
-				else
-				{	nx = -rY;
-					ny = rX;
-				}
-				// eenheids normaalvector
-				double nl = Math.sqrt(nx * nx + ny * ny);
-				if (nl > 0)
-				{	 
-					if (normal1)
-					{	
-						// eerste punt
-						double px = fromX + nx * bbFactor / nl;
-						double py = fromY + ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py)); 
-						// 	tweede punt
-						px = toX + nx * bbFactor / nl;
-						py = toY + ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-					}
-					else
-					{	
-						//	vierde punt
-						double px = fromX - nx * bbFactor / nl;
-						double py = fromY - ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-						
-						//derde punt
-						px = toX - nx * bbFactor / nl;
-						py = toY - ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-
-					}	
-				}	
-		
-			}
-		
-			// for loop 2
-			for (int pCnt = puntenXD.length - 1; pCnt > 0; pCnt--)
-			{	
-				double fromX = puntenXD[pCnt - 1];
-				double fromY = puntenYD[pCnt - 1];
-				double toX = puntenXD[pCnt];
-				double toY = puntenYD[pCnt];
-				// richtingsvector
-				double rX = toX - fromX;
-				double rY = toY - fromY;
-				// normaalvector
-				double nx = 0;
-				double ny = 0;
-				boolean normal1 = true;
-				if (Math.abs(rX) > Math.abs(rY))
-				{	nx = rY;
-					ny = -rX;
-					normal1 = false;
-				}
-				else
-				{	nx = -rY;
-					ny = rX;
-				}
-				// eenheids normaalvector
-				double nl = Math.sqrt(nx * nx + ny * ny);
-				if (nl > 0)
-				{	
-					if (!normal1)
-					{	
-						// 	tweede punt
-						double px = toX + nx * bbFactor / nl;
-						double py = toY + ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-					
-						// eerste punt
-						px = fromX + nx * bbFactor / nl;
-						py = fromY + ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-					}
-					else
-					{	
-						
-						// derde punt
-						double px = toX - nx * bbFactor / nl;
-						double py = toY - ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-						// 	vierde punt
-						px = fromX - nx * bbFactor / nl;
-						py = fromY - ny * bbFactor / nl;
-						bb.addPoint((int) Math.round(px), (int) Math.round(py));
-					}
-				}	
-		
-			}
+		else
+		{	nx = -rY;
+			ny = rX;
 		}
+		// eenheids normaalvector
+		double nl = Math.sqrt(nx * nx + ny * ny);
+		if (nl > 0)
+		{	// eerste punt
+			double px = fromX + nx * bbFactor / nl;
+			double py = fromY + ny * bbFactor / nl;
+			bb.addPoint(px, py); 
+			// tweede punt
+			px = toX + nx * bbFactor / nl;
+			py = toY + ny * bbFactor / nl;
+			bb.addPoint(px, py);
+			// derde punt
+			px = toX - nx * bbFactor / nl;
+			py = toY - ny * bbFactor / nl;
+			bb.addPoint(px, py);
+			// vierde punt
+			px = fromX - nx * bbFactor / nl;
+			py = fromY - ny * bbFactor / nl;
+			bb.addPoint(px, py);
 		
+		
+		}
+		else // doosje
+		{
+			bb.addPoint(fromX - bbFactor, fromY - bbFactor);
+			bb.addPoint(fromX + bbFactor, fromY - bbFactor);
+			bb.addPoint(fromX + bbFactor, fromY + bbFactor);
+			bb.addPoint(fromX - bbFactor, fromY + bbFactor);
+		}
 	}
-	
+
 	/**
-	 * draai deze Streep over rotateStep radialen tegen de klok in met
-	 * als draaicentrum het middelpunt van deze Streep; update de affiene transformatie,
+	 * draai deze Lijn over rotateStep radialen tegen de klok in met
+	 * als draaicentrum het middelpunt van deze Lijn; update de affiene transformatie,
 	 * de bounding box en de handle box  
 	 * @param rotateStep draaihoek (radialen)
 	 */
 	public void rotate(double rotateStep)
 	{		
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			double pXDNew = Math.cos(rotateStep) * (pXD[pCnt] - cx) - Math.sin(rotateStep) * (pYD[pCnt] - cy);
-			double pYDNew = Math.sin(rotateStep) * (pXD[pCnt] - cx) + Math.cos(rotateStep) * (pYD[pCnt] - cy);
-			pXD[pCnt] = pXDNew + cx;
-			pYD[pCnt] = pYDNew + cy;
-		}
-		
+		double fXNew = Math.cos(rotateStep) * (fX - cx) - Math.sin(rotateStep) * (fY - cy);
+		double fYNew = Math.sin(rotateStep) * (fX - cx) + Math.cos(rotateStep) * (fY - cy);
+		double tXNew = Math.cos(rotateStep) * (tX - cx) - Math.sin(rotateStep) * (tY - cy);
+		double tYNew = Math.sin(rotateStep) * (tX - cx) + Math.cos(rotateStep) * (tY - cy);
+		fX = fXNew + cx;
+		fY = fYNew + cy;
+		tX = tXNew + cx;
+		tY = tYNew + cy;
+	
 		AffineTransform rot = new AffineTransform(Math.cos(rotateStep),- Math.sin(rotateStep),
 				  Math.sin(rotateStep), Math.cos(rotateStep), 
 				  cx - Math.cos(rotateStep) * cx + Math.sin(rotateStep) * cy, 
@@ -484,12 +327,13 @@ public class Streep
 		at = at.leftMultiplyBy(rot);
 
 		bb.rotate(rotateStep, cx, cy);
-	
-		makeHandleBox();
 		
+		makeHandleBox();
+	
 	}
+
 	/**
-	 * draai deze Streep over rotateStep radialen tegen de klok in met
+	 * draai deze Lijn over rotateStep radialen tegen de klok in met
 	 * als draaicentrum het punt (dx,dy); update het middelpunt, de affiene transformatie,
 	 * de bounding rechthoek en de handle box  
 	 * @param rotateStep draaihoek (radialen)
@@ -497,68 +341,67 @@ public class Streep
 	 * @param dy y-coordinaat draaicentrum
 	 */
 	public void rotate(double rotateStep, double dx, double dy)
-	{	
-	
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			double pXDNew = Math.cos(rotateStep) * (pXD[pCnt] - dx) - Math.sin(rotateStep) * (pYD[pCnt] - dy);
-			double pYDNew = Math.sin(rotateStep) * (pXD[pCnt] - dx) + Math.cos(rotateStep) * (pYD[pCnt] - dy);
-			pXD[pCnt] = pXDNew + dx;
-			pYD[pCnt] = pYDNew + dy;
-		}
-
+	{		
+		double fXNew = Math.cos(rotateStep) * (fX - dx) - Math.sin(rotateStep) * (fY - dy);
+		double fYNew = Math.sin(rotateStep) * (fX - dx) + Math.cos(rotateStep) * (fY - dy);
+		double tXNew = Math.cos(rotateStep) * (tX - dx) - Math.sin(rotateStep) * (tY - dy);
+		double tYNew = Math.sin(rotateStep) * (tX - dx) + Math.cos(rotateStep) * (tY - dy);
+		fX = fXNew + dx;
+		fY = fYNew + dy;
+		tX = tXNew + dx;
+		tY = tYNew + dy;
+		
 		double cxNew = Math.cos(rotateStep) * (cx - dx) - Math.sin(rotateStep) * (cy - dy);
 		double cyNew = Math.sin(rotateStep) * (cx - dx) + Math.cos(rotateStep) * (cy - dy);
 		cx = cxNew + dx;
 		cy = cyNew + dy;
 		
 		AffineTransform rot = new AffineTransform(Math.cos(rotateStep),- Math.sin(rotateStep),
-												  Math.sin(rotateStep), Math.cos(rotateStep), 
-												  dx - Math.cos(rotateStep) * dx + Math.sin(rotateStep) * dy, 
-												  dy - Math.sin(rotateStep) * dx - Math.cos(rotateStep) * dy);
+				  Math.sin(rotateStep), Math.cos(rotateStep), 
+				  dx - Math.cos(rotateStep) * dx + Math.sin(rotateStep) * dy, 
+				  dy - Math.sin(rotateStep) * dx - Math.cos(rotateStep) * dy);
 		at = at.leftMultiplyBy(rot);
-		
+
 		bb.rotate(rotateStep, dx, dy);
-	
+		
 		makeHandleBox();
-	}
 	
+	}
 	/**
-	 * schaal deze Streep vanuit het middelpunt met een factor scaleStep; update de affiene transformatie,
+	 * schaal deze Lijn vanuit het middelpunt met een factor scaleStep; update de affiene transformatie,
 	 * de bounding box en de handle box 
 	 * @param scaleStep schaalfactor
 	 */
 	public void scale(double scaleStep)
-	{
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			pXD[pCnt] = scaleStep * pXD[pCnt] + (1 - scaleStep) * cx;
-			pYD[pCnt] = scaleStep * pYD[pCnt] + (1 - scaleStep) * cy;
-		}
+	{	
+		
+		fX = scaleStep * fX + (1 - scaleStep) * cx;
+		fY = scaleStep * fY + (1 - scaleStep) * cy;
+		tX = scaleStep * tX + (1 - scaleStep) * cx;
+		tY = scaleStep * tY + (1 - scaleStep) * cy;
 		
 		AffineTransform sc = new AffineTransform(scaleStep, 0, 0, scaleStep, (1 - scaleStep) * cx, (1 - scaleStep) * cy);
 		at = at.leftMultiplyBy(sc);
 
-		bb.scale(scaleStep, cx, cy);
+		bb.scale(scaleStep, scaleStep, cx, cy);
 		
 		makeHandleBox();
 		
 	}
-	
+
 	/**
-	 * schaal deze Streep vanuit het punt (dx,dy) met een factor scaleStep; update het middelpunt, 
+	 * schaal deze Lijn vanuit het punt (dx,dy) met een factor scaleStep; update het middelpunt, 
 	 * de affiene transformatie, de bounding box en de handle box 
 	 * @param scaleStep schaalfactor
 	 * @param dx x-coordinaat schaalcentrum 
 	 * @param dy y-coordinaat schaalcentrum
 	 */
 	public void scale(double scaleStep, double dx, double dy)
-	{
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			pXD[pCnt] = scaleStep * pXD[pCnt] + (1 - scaleStep) * dx;
-			pYD[pCnt] = scaleStep * pYD[pCnt] + (1 - scaleStep) * dy;
-		}
+	{	
+		fX = scaleStep * fX + (1 - scaleStep) * dx;
+		fY = scaleStep * fY + (1 - scaleStep) * dy;
+		tX = scaleStep * tX + (1 - scaleStep) * dx;
+		tY = scaleStep * tY + (1 - scaleStep) * dy;
 		
 		cx = scaleStep * cx + (1 - scaleStep) * dx;
 		cy = scaleStep * cy + (1 - scaleStep) * dy;
@@ -566,73 +409,66 @@ public class Streep
 		AffineTransform sc = new AffineTransform(scaleStep, 0, 0, scaleStep, (1 - scaleStep) * dx, (1 - scaleStep) * dy);
 		at = at.leftMultiplyBy(sc);
 		
-		bb.scale(scaleStep, dx, dy);
+		bb.scale(scaleStep, scaleStep, dx, dy);
 
 		makeHandleBox();
 		
 	}
 
-
 	/**
-	 * schaal deze Streep vanuit het middelpunt met een factor sx in de x-richting en een
+	 * schaal deze Lijn vanuit het middelpunt met een factor sx in de x-richting en een
 	 * factor sy in de y-richting; update de affiene transformatie,
 	 * de bounding box en de handle box 
-	 * @param scaleStepX schaalfactor x-richting
-	 * @param scaleStepY schaalfactor y-richting
+	 * @param sx schaalfactor x-richting
+	 * @param sy schaalfactor y-richting
 	 */
-	public void scale(double scaleStepX, double scaleStepY)
-	{
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			pXD[pCnt] = scaleStepX * pXD[pCnt] + (1 - scaleStepX) * cx;
-			pYD[pCnt] = scaleStepY * pYD[pCnt] + (1 - scaleStepY) * cy;
-		}
-		
-		AffineTransform sc = new AffineTransform(scaleStepX, 0, 0, scaleStepY, (1 - scaleStepX) * cx, (1 - scaleStepY) * cy);
-		at = at.leftMultiplyBy(sc);
+	public void scale(double sx, double sy)
+	{	
+		fX = sx * fX + (1 - sx) * cx;
+		fY = sy * fY + (1 - sy) * cy;
+		tX = sx * tX + (1 - sx) * cx;
+		tY = sy * tY + (1 - sy) * cy;
 
-		bb.scale(scaleStepX, scaleStepY, cx, cy);
+		AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * cx, (1 - sy) * cy);
+		at = at.leftMultiplyBy(sc);
 		
-		maakStreep();
+		bb.scale(sx, sy, cx, cy);
 		
 		makeHandleBox();
 		
 	}
 	
 	/**
-	 * schaal deze Streep vanuit het punt (dx,dy) met een factor sx in de x-richting en een
+	 * schaal deze Lijn vanuit het punt (dx,dy) met een factor sx in de x-richting en een
 	 * factor sy in de y-richting; update het middelpunt, de affiene transformatie,
 	 * de bounding box en de handle box 
-	 * @param scaleStepX schaalfactor x-richting
-	 * @param scaleStepY schaalfactor y-richting
+	 * @param sx schaalfactor x-richting
+	 * @param sy schaalfactor y-richting
 	 * @param dx x-coordinaat schaalcentrum
 	 * @param dy y-coordinaat schaalcentrum
 	 */
-	public void scale(double scaleStepX, double scaleStepY, double dx, double dy)
-	{
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			pXD[pCnt] = scaleStepX * pXD[pCnt] + (1 - scaleStepX) * dx;
-			pYD[pCnt] = scaleStepY * pYD[pCnt] + (1 - scaleStepY) * dy;
-		}
+	public void scale(double sx, double sy, double dx, double dy)
+	{	
+		fX = sx * fX + (1 - sx) * dx;
+		fY = sy * fY + (1 - sy) * dy;
+		tX = sx * tX + (1 - sx) * dx;
+		tY = sy * tY + (1 - sy) * dy;
 		
-		cx = scaleStepX * cx + (1 - scaleStepX) * dx;
-		cy = scaleStepY * cy + (1 - scaleStepY) * dy;
+		cx = sx * cx + (1 - sx) * dx;
+		cy = sy * cy + (1 - sy) * dy;
 		
-		AffineTransform sc = new AffineTransform(scaleStepX, 0, 0, scaleStepY, (1 - scaleStepX) * dx, (1 - scaleStepY) * dy);
+		AffineTransform sc = new AffineTransform(sx, 0, 0, sy, (1 - sx) * dx, (1 - sy) * dy);
 		at = at.leftMultiplyBy(sc);
-		
-		
-		bb.scale(scaleStepX, scaleStepY, dx, dy);
-		
+
+		bb.scale(sx, sy, dx, dy);
 		
 		makeHandleBox();
 		
 	}
 
 	/**
-	 * sla de state van deze Streep op in een HashMap, dus x- en y coordinaten  
-	 * initiele punten (maak van de arrays ArrayLists) en
+	 * sla de state van deze Lijn op in een HashMap, dus x- en y coordinaten  
+	 * initieel begin- en eindpunt en
 	 * de affiene transformatie met (cumulatief) alle wijzigingen 
 	 * @return state HashMap
 	 */
@@ -640,18 +476,11 @@ public class Streep
 	{	HashMap<String, Object> h = new HashMap<String, Object>();
 		
 		h.put("kleurgwt", kleur.value());
-		
-		ArrayList<Double> puntenXDAL = new ArrayList<Double>();
-		ArrayList<Double> puntenYDAL = new ArrayList<Double>();
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{
-			puntenXDAL.add(new Double(puntenXD[pCnt]));
-			puntenYDAL.add(new Double(puntenYD[pCnt]));
-		}
+		h.put("fromX", new Integer(fromX));
+		h.put("fromY", new Integer(fromY));
+		h.put("toX", new Integer(toX));
+		h.put("toY", new Integer(toY));
 
-		h.put("puntenXD", puntenXDAL);
-		h.put("puntenYD", puntenYDAL);
-		
 		// affiene transformatie
 		h.put("m00", new Double(at.m00));
 		h.put("m10", new Double(at.m10));
@@ -660,28 +489,27 @@ public class Streep
 		h.put("b0", new Double(at.b0));
 		h.put("b1", new Double(at.b1));
 
-
-	
+		
 		return h;
 	}
-
+	
 	/**
-	 * lees de state van een Streep uit een HashMap en creeer
+	 * lees de state van een Lijn uit een HashMap en creeer
 	 * deze Streep; houdt rekening met oudere versies
-	 * @param map de HashMap waarin de state van een Streep
-	 * @return de Streep  
+	 * @param map de HashMap waarin de state van een Lijn
+	 * @return de Lijn  
 	 */
-	public static Streep setState(Map<String, Object> map)
+	public static Lijn setState(Map<String, Object> map)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
 		CssColor kleur = KladjeGWTVeld.zwart;
-		double[] puntenXD = new double[0];
-		double[] puntenYD = new double[0];
-		List<Double> puntenXDAL = new ArrayList<Double>();
-		List<Double> puntenYDAL = new ArrayList<Double>();
+		int fromX = 0; 
+		int fromY = 0;
+		int toX = 0;
+		int toY = 0;
 		double rotation = 0;
-		
+
 		double m00 = 1;
 		double m01 = 0;
 		double m10 = 0;
@@ -692,18 +520,19 @@ public class Streep
 		
 		if (h.containsKey("kleurgwt"))
 			kleur = CssColor.make(h.getString("kleurgwt"));
-		
-		// launchdata or data from getState
-		if (h.containsKey("puntenXD"))
-			puntenXDAL = h.getDoubleList("puntenXD");
-		if (h.containsKey("puntenYD"))
-			puntenYDAL = h.getDoubleList("puntenYD");
+		if (h.containsKey("fromX"))
+			fromX = h.getInt("fromX");
+		if (h.containsKey("fromY"))
+			fromY = h.getInt("fromY");
 
-		// compatibility oude versie
+		if (h.containsKey("toX"))
+			toX = h.getInt("toX");
+		if (h.containsKey("toY"))
+			toY = h.getInt("toY");
+
 		if (h.containsKey("rotation"))
 			rotation = h.getDouble("rotation");
 
-		// affiene transformatie
 		if (h.containsKey("m00"))
 			m00 = h.getDouble("m00");
 		if (h.containsKey("m10"))
@@ -717,35 +546,28 @@ public class Streep
 		if (h.containsKey("b1"))
 			b1 = h.getDouble("b1");
 
-		// maak van de ArayLists arrays
-		puntenXD = new double[puntenXDAL.size()];
-		puntenYD = new double[puntenYDAL.size()];
-		for (int pCnt = 0; pCnt < puntenXDAL.size(); pCnt++)
-		{
-			puntenXD[pCnt] = ((Number) puntenXDAL.get(pCnt)).doubleValue();
-			puntenYD[pCnt] = ((Number) puntenYDAL.get(pCnt)).doubleValue();
-		}
 		
-		
-		Streep streep = new Streep(kleur, puntenXD, puntenYD);
-		streep.maakStreep();
-		
+		Lijn lijn = new Lijn(kleur, fromX, fromY, toX, toY);
+		lijn.maakLijn();
+
+		// oudste versie
 		if (h.containsKey("rotation"))
-		{	streep.rotate(rotation);
+		{	lijn.rotate(rotation);
 		}
-		else if (h.containsKey("b0"))
-		{	streep.transformBy(m00, m01, m10, m11, b0, b1);
+		// nieuwste versie
+		else if (h.containsKey("b00"))
+		{	lijn.transformBy(m00, m01, m10, m11, b0, b1);
 		}
-		else
-		{	streep.transformBy(m00, m01, m10, m11);
+		else // tussenversie
+		{	lijn.transformBy(m00, m01, m10, m11);
 		}
 		
-		return streep;
+		return lijn;
 	}
 
 	/**
-	 * transformeer deze Streep m.b.v. een lineaire transformatie M;
-	 * alleen gebruikt in setState na creatie van de initiele Streep; 
+	 * transformeer deze Lijn m.b.v. een lineaire transformatie M;
+	 * alleen gebruikt in setState na creatie van de initiele Lijn; 
 	 * bepaal de affiene transformatie, de bounding box en 
 	 * de handle box
 	 * @param m00 M linksboven
@@ -757,24 +579,27 @@ public class Streep
 	{
 		
 		at = new AffineTransform(m00, m01, m10, m11, - m00*cx - m01*cy + cx, - m10*cx - m11*cy + cy);
+
+		double fXNew = at.m00 * fX + at.m01 * fY + at.b0;
+		double fYNew = at.m10 * fX + at.m11 * fY + at.b1;
+		fX = fXNew;
+		fY = fYNew;
 		
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			double pXDNew = at.m00 * pXD[pCnt] + at.m01 * pYD[pCnt] + at.b0;
-			double pYDNew = at.m10 * pXD[pCnt] + at.m11 * pYD[pCnt] + at.b1;
-			pXD[pCnt] = pXDNew;
-			pYD[pCnt] = pYDNew;
-			
-		}
-		
+		double tXNew = at.m00 * tX + at.m01 * tY + at.b0;
+		double tYNew = at.m10 * tX + at.m11 * tY + at.b1;
+		tX = tXNew;
+		tY = tYNew;
+
 		bb.transformBy(at);
 		
 		makeHandleBox();
+		
+		
 	}
-
+	
 	/**
-	 * transformeer deze Streep m.b.v. een affiene transformatie Ax=Mx+b;
-	 * alleen gebruikt in setState na creatie van de initiele Streep; 
+	 * transformeer deze Lijn m.b.v. een affiene transformatie Ax=Mx+b;
+	 * alleen gebruikt in setState na creatie van de initiele Lijn; 
 	 * update het middelpunt, bepaal de affiene transformatie, de bounding box en 
 	 * de handle box
 	 * @param m00 M linksboven
@@ -788,61 +613,51 @@ public class Streep
 	{
 		
 		at = new AffineTransform(m00, m01, m10, m11, b0, b1);
+
+		double fXNew = at.m00 * fX + at.m01 * fY + at.b0;
+		double fYNew = at.m10 * fX + at.m11 * fY + at.b1;
+		fX = fXNew;
+		fY = fYNew;
 		
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	
-			double pXDNew = at.m00 * pXD[pCnt] + at.m01 * pYD[pCnt] + at.b0;
-			double pYDNew = at.m10 * pXD[pCnt] + at.m11 * pYD[pCnt] + at.b1;
-			pXD[pCnt] = pXDNew;
-			pYD[pCnt] = pYDNew;
-			
-		}
-		
+		double tXNew = at.m00 * tX + at.m01 * tY + at.b0;
+		double tYNew = at.m10 * tX + at.m11 * tY + at.b1;
+		tX = tXNew;
+		tY = tYNew;
+
+		bb.transformBy(at);
+
 		double cxNew = at.m00 * cx + at.m01 * cy + at.b0;
 		double cyNew = at.m10 * cx + at.m11 * cy + at.b1;
 		cx = cxNew;
 		cy = cyNew;
 
-		bb.transformBy(at);
-		
 		makeHandleBox();
-	}
-	
-	/**
-	 * teken deze Streep
-	 * @param g Context2d om te tekenen
-	 */
-	public void teken(Context2d g)
-	{
-		
-		g.setStrokeStyle(kleur);		
-		
-		if (puntenXD.length == 1)
-		{	g.beginPath();
-			g.strokeRect(pXD[0], pYD[0], 1, 1);
-		}
-		if (puntenXD.length > 1)
-		{	
-			g.beginPath();
-			g.moveTo(pXD[0], pYD[0]);
-			for (int pCnt = 1; pCnt < puntenXD.length; pCnt++)
-			{	g.lineTo(pXD[pCnt], pYD[pCnt]);
-			}
-			g.stroke();
-			
-		}
 		
 	}
 
 	/**
-	 * teken de handle box van deze Streep
+	 * teken deze Lijn
+	 * @param g Context2d om te tekenen
+	 */
+	public void teken(Context2d g)
+	{
+		g.setStrokeStyle(kleur);
+		g.beginPath();
+		g.moveTo(fX, fY);
+		g.lineTo(tX, tY);
+		g.stroke();
+
+	}
+
+	/**
+	 * teken de handle box van deze Lijn
 	 * @param g Context2d om te tekenen
 	 */
 	public void tekenHandleBox(Context2d g)
 	{
 		g.setLineWidth(0.8d);
-		g.setStrokeStyle(KladjeGWTVeld.hbColor);
 		
+		g.setStrokeStyle(KladjeGWTVeld.hbColor);
 		g.strokeRect(handleBox.x, handleBox.y, handleBox.width, handleBox.height);
 		
 		g.setLineWidth(1.5d);
@@ -851,7 +666,7 @@ public class Streep
 	}
 	
 	/**
-	 * teken de handles van de handle box van deze Streep,
+	 * teken de handles van de handle box van deze Lijn,
 	 * de handles zijn null als er niet geschaald/gedraaid mag worden
 	 * @param g Context2d om te tekenen
 	 */
@@ -927,9 +742,9 @@ public class Streep
 		}
 
 	}
-
+	
 	/**
-	 * teken de bounding box van deze Streep
+	 * teken de bounding box van deze Lijn
 	 * @param g Context2d om te tekenen
 	 */
 	public void tekenBB(Context2d g)
@@ -950,45 +765,45 @@ public class Streep
 			
 		g.setLineWidth(1.5d);
 	}
-
-
+	
 	/**
-	 * check if the bounding box van deze Streep het punt (x,y) bevat
+	 * check if the bounding box van deze Lijn het punt (x,y) bevat
 	 * @param x x-coordinaat te checken punt 
 	 * @param y y-coordinaat te checken punt
 	 * @return true/false
 	 */
 	public boolean bbContains(int x, int y)
 	{
-
 		return bb.contains(x, y);
 	}
-	
+
 	/**
-	 * verplaats deze Streep over de vector (dx,dy) 
+	 * verplaats deze Lijn over de vector (dx,dy) 
 	 * @param dx x-verplaatsing
 	 * @param dy y-verplaatsing
 	 */
 	public void translate(int dx, int dy)
 	{
-		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
-		{	pXD[pCnt] += dx;
-			pYD[pCnt] += dy; 
-		}
+		cx += dx;
+		cy += dy;
+		
+		fX += dx;
+		fY += dy;
+		tX += dx; 
+		tY += dy;
 
 		AffineTransform trans = new AffineTransform(1,0,0,1,dx,dy);
 		at = at.leftMultiplyBy(trans);
-		
-		cx += dx;
-		cy += dy;
 
 		bb.translate(dx, dy);
-		
+
 		makeHandleBox();
-	}
-	
+
+		
+	}	
+
 	/**
-	 * check of deze Streep bevat is in een gegeven rechthoek;
+	 * check of deze Lijn bevat is in een gegeven rechthoek;
 	 * doe dit door te kijken of de bounding box in deze rechthoek past  
 	 * @param r gegeven rechthoek
 	 * @return true/false
@@ -996,17 +811,15 @@ public class Streep
 	public boolean isContainedIn(Rectangle r)
 	{
 		if (r == null)
-			return false;		
+			return false;
 		
 		boolean isContainedIn = true;
 		
 		for (int pCnt = 0; pCnt < bb.aantalPunten; pCnt++)
 		{
-			isContainedIn = isContainedIn && r.contains(bb.puntenX[pCnt], bb.puntenY[pCnt]);
-
-		}
+			isContainedIn = isContainedIn && r.contains(bb.puntenX[pCnt], bb.puntenY[pCnt]);		}
 		
 		return isContainedIn;
-	}
-}
+	}	
 
+}

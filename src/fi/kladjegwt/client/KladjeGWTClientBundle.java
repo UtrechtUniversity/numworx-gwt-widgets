@@ -2,7 +2,6 @@ package fi.kladjegwt.client;
 
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.resources.client.ClientBundle.Source;
 
 public interface KladjeGWTClientBundle extends ClientBundle 
 {
@@ -12,12 +11,6 @@ public interface KladjeGWTClientBundle extends ClientBundle
 
    @Source("fi/kladjegwt/client/images/teken_penknop_down.gif")
    public ImageResource tekenKnopDownResource();
-   
-   @Source("fi/kladjegwt/client/images/teken_gumknop_up.gif")
-   public ImageResource gumKnopUpResource();
-
-   @Source("fi/kladjegwt/client/images/teken_gumknop_down.gif")
-   public ImageResource gumKnopDownResource();
    
    @Source("fi/kladjegwt/client/images/teken_lijn_up.gif")
    public ImageResource tekenLijnUpResource();
@@ -49,18 +42,6 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/teken_selecteren_down.gif")
    public ImageResource selecterenDownResource();
 
-   @Source("fi/kladjegwt/client/images/roteer-links.gif")
-   public ImageResource roteerLinksomResource();
-   
-   @Source("fi/kladjegwt/client/images/roteer-rechts.gif")
-   public ImageResource roteerRechtsomResource();
-
-   @Source("fi/kladjegwt/client/images/zoominknop.gif")
-   public ImageResource vergrootResource();
-
-   @Source("fi/kladjegwt/client/images/zoomuitknop.gif")
-   public ImageResource verkleinResource();
-
    @Source("fi/kladjegwt/client/images/regenboog3.gif")
    public ImageResource regenboogResource();
    
@@ -88,10 +69,7 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/magenta.gif")
    public ImageResource magentaResource();
    
-//   @Source("fi/kladjehwt/client/images/geel.gif")
-//   public ImageResource geelResource();
-
-   
+  
    @Source("fi/kladjegwt/client/css/KladjeGWT.css")
    public  KladjeCssResource getKladjeGWTCSS();
 
