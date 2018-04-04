@@ -67,12 +67,12 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
-			<version>0.0.3</version>
+			<version>0.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.5-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>IdeasGWT</artifactId>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>0.0.8</version>
+			<version>0.0.12-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.beans</groupId>
@@ -110,16 +110,14 @@
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
 		<relativePath>../ParentGWT</relativePath>
-		<version>0.0.5</version>
+		<version>0.0.6</version>
 	</parent>
-	<version>2.1.24-SNAPSHOT</version>
-	<properties>
-		<gwtVersion>2.8.1</gwtVersion>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-	</properties>
+	<version>2.2.1-SNAPSHOT</version>
 	<scm>
 		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/GraphToolGWT/trunk</developerConnection>
 		<connection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/GraphToolGWT/trunk</connection>
 	</scm>
+	<properties>
+		<gwtVersion>2.8.2</gwtVersion>
+	</properties>
 </project>
