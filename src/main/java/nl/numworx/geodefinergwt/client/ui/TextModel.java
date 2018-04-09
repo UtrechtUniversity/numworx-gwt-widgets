@@ -31,7 +31,8 @@ public class TextModel extends ColorModel<Label> {
 	}
 
 	public UIModel<Label, Void> init(Label item) {
-		align = item.adapt(Align.class);
+		if(item != null) 
+			align = item.adapt(Align.class);
 		if(align == null) align= Align.BASE;
 		this.item = item;
 		super.init(item);
@@ -41,10 +42,10 @@ public class TextModel extends ColorModel<Label> {
 	@Override
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = super.toMap();
-		map.put("align", align.name());
-		map.put("font", font.toMap());
-		if( Boolean.TRUE.equals(alwaysF))
-			map.put("alwaysF", alwaysF);
+//		map.put("align", align.name());
+//		map.put("font", font.toMap());
+//		if( Boolean.TRUE.equals(alwaysF))
+//			map.put("alwaysF", alwaysF);
 		return map;
 	}
 

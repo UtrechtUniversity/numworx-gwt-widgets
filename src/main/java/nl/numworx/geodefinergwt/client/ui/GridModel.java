@@ -15,7 +15,7 @@ public class GridModel extends LineModel {
 	@Override
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = super.toMap();
-		map.put("gravity", gravity);
+//		map.put("gravity", gravity);
 		return map;
 	}
 

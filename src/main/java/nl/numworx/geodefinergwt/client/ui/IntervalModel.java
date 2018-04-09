@@ -86,11 +86,11 @@ public class IntervalModel extends TextModel {
 	@Override
 	public Map<String, Object> toMap() {
 		Map<String, Object> map = super.toMap();
-		map.put("animate", animate.name());
-		map.put("interval", interval);
-		map.put("length", length);
-		if(step!=null) map.put("step", step); else map.remove("step"); 
-		if(width!= null) map.put("width", width);else map.remove("width");
+//		map.put("animate", animate.name());
+//		map.put("interval", interval);
+//		map.put("length", length);
+//		if(step!=null) map.put("step", step); else map.remove("step"); 
+//		if(width!= null) map.put("width", width);else map.remove("width");
 		return map;
 	}
 

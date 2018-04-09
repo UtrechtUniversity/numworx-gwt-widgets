@@ -215,12 +215,14 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<String> definitions = Arrays.asList(
 				"$fa=9..#a#@" 
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
-				//,"$ft=text(\"M$s8@ M$sx@\",O)@"
+				,"$ft=text(\"M$s8@ M$sx@\",O)@"
 				,"$fP=point(1,1)@"
 				,"$fh=halfline(O,P)@"
 				,"$fy=$px$n2@@/2-2@"
 				);
 		launchDebug.put("definitions", definitions);
+		Map<String,Object> textConfig = Collections.singletonMap("color", 0);
+		launchDebug.put("configuration", Collections.singletonMap("t", textConfig));
 		launchDebug.put("checkDWO", checkDWO);
 	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}
 		Map<String,Object> checkObject = new HashMap<>();
