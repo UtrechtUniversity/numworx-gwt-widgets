@@ -710,13 +710,20 @@ public class BoxplotModel
 				}
 				else
 				{
-					this.lowerQuartiles.add(sortedData.get(i).get(
-						(int) Math.ceil(0.25 * size) - 1));
+					ArrayList<Double> lowerDataHalf = new ArrayList<Double>(sortedData.get(i).subList(0, (int) Math.ceil(0.5 * size)));
+					this.lowerQuartiles
+						.add(this.determineMedian(lowerDataHalf));
 					
 					addMedian(sortedData.get(i));
-					
-					this.upperQuartiles.add(sortedData.get(i).get(
-						(int) Math.ceil(0.75 * size) - 1));
+
+					int fromIndex;
+					if (size % 2 == 0) // even
+						fromIndex = (int) Math.ceil(0.5 * size);
+					else
+						fromIndex = (int) Math.ceil(0.5 * size) - 1;
+					ArrayList<Double> upperDataHalf = new ArrayList<Double>(sortedData.get(i).subList(fromIndex, size));
+					this.upperQuartiles
+						.add(this.determineMedian(upperDataHalf));
 
 					// Voor tukey boxplot andere waarden bij de uiteinden, afhankelijk van lowerQuartile en upperQuartile
 					Double minValue;
