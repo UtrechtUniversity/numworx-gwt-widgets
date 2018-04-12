@@ -9,7 +9,6 @@ import dagger.BindsInstance;
 import dagger.Component;
 import fi.euclides.gwt.ViewerWidget;
 import nl.numworx.geodefiner.common.Instance;
-import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 
 @Component(modules={Modules.class})
@@ -20,8 +19,7 @@ public interface Components {
 	interface Builder {
 		Components build();
 		@BindsInstance Builder widget(ViewerWidget w);
-		@BindsInstance Builder randomizer(Randomizer r);
-		@BindsInstance  Builder status(@Named("status") Label status);
+		@BindsInstance Builder status(@Named("status") Label status);
 		@BindsInstance Builder instance(Instance instance);
 		
 	}

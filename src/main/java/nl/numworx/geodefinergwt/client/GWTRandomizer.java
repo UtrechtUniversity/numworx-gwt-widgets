@@ -4,17 +4,18 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import fi.wiskopdr.FormuleParser;
 import nl.numworx.geodefiner.common.DefaultRandomizer;
 
+
+@Singleton
 public class GWTRandomizer extends DefaultRandomizer {
 
 	private static Logger LOG = Logger.getLogger("GWTRandomizer");
-	public GWTRandomizer() {
-	}
-
-	public GWTRandomizer(Map<String, Number> map) {
-		super(map);
+	@Inject public GWTRandomizer() {
 	}
 
 	@Override

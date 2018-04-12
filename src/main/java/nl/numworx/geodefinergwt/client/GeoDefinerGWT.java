@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -14,14 +13,11 @@ import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
-import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.locus.Builder;
-import nl.numworx.geodefiner.common.math.Expression;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
-import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
@@ -50,7 +46,6 @@ import com.google.gwt.user.client.ui.Widget;
 
 import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
-import fi.euclides.event.Tracker;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.math.IntegerFactory;
@@ -87,10 +82,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private static final String CHECK = "check";
 
 	@UiField DockLayoutPanel southPanel;
-	@UiField
-	public Label status;
+	@UiField Label status;
 	DockLayoutPanel  root;
-	public @UiField ViewerWidget widget;
+	@UiField ViewerWidget widget;
 	@UiField FlowPanel check;
 	@UiField Button checkBtn;
 	@UiField ToolBoxPanel toolbox;
@@ -338,6 +332,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		checkObjects = c;
 	}
 
+	@Inject void setRandomizer(GWTRandomizer r) {
+		random = r;
+	}
+	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	
 	public void init(int width, int height, Map<String, Object> launchData,
@@ -347,27 +345,17 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		widget.init(width, height);
 		this.width = width;
 		this.height = height;
-		this.random = new GWTRandomizer();
 		Components c = DaggerComponents.builder()
 				.status(status)
-				.randomizer(random)
 				.widget(widget)
 				.instance(this)
 				.build();
 		c.provideComponent(this);
-		
-//		NamingModel mapper = new NamingModel(widget.getViewer(), new HashMap<String,Destroyable>());
-//		viewer = new TrackerImpl(widget.getViewer(), mapper,status,this, new nl.numworx.geodefiner.common.math.Expression());
-
-		//LabelDelegate value = new HerleidList(viewer);
-		//tracker.adapt(Expression.class).symbolmap.putAll(c.symbols());
-//		uiModelFactory = new UIModelFactoryGWT(viewer);
 
 		SelectHandler h = selector;
 		h.setTracker(tracker);
 		tracker.setPointerHandler(h);
 		tracker.setStatus("");
-//		definitions = c.definitions();
 		
 		root.setPixelSize(width, height);
 // initial model		
@@ -376,7 +364,6 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		String random = (String) launchData.get("random");
 		values = launchRandomVars(random, values);
 // configuration
-//		checkObjects = new CheckObjectList(tracker);
 		setLaunchData(launchData, values);
 		tracker.paint();
 	}
@@ -460,7 +447,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	public void reset() {
 		toolbox.destroy();
-		if(checkObjects != null) checkObjects.clear();
+		if(checkObjects != null) checkObjects.destroyAll();
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
 		start();
