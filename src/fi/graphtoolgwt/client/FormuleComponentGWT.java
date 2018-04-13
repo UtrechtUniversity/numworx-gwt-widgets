@@ -1088,6 +1088,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				for(int i = 0; i < isEnList.size(); i++)
 					isEn[i] = isEnList.get(i);
 					*/
+			} else {
+				isEn = new boolean[maxAantalFormules]; // nooit null
 			}
 	    	this.geselecteerd = geselecteerd;
 	    	//System.out.println("geselecteerd.length: " + geselecteerd.length);
