@@ -178,5 +178,38 @@ public class StatistiekUtils
 				((SelectElement) option).setDisabled(isEnumOnlyView);
 		}
 	}
+	
+	/**
+	 * Als isNumericOnly true is, dan worden alleen de 
+	 * kolomnamen van kolommen van type geheel en decimaal getal enabled.
+	 * Als isNumericOnly false, dan worden alle kolomnamen enabled.
+	 * 
+	 * @param listBox     De lijst met kolomnamen.
+	 * @param isEnumOnlyView
+	 * @param ignoreFirstItem De eerste overslaan (bijv "kies een variabele")
+	 * @param model
+	 */
+	public static void setNumericColumnsEnabledListBox(ListBox listBox, boolean isNumericOnly, boolean ignoreFirstItem, StatTableModel model)
+	{
+		ArrayList<ColumnType> types = model.getColumnTypes();
+		
+		NodeList startVarOptions = listBox.getElement().<SelectElement>cast().getOptions();
+		
+		for (int i = 0; i < types.size(); i++)
+		{
+			Node option;
+			if (ignoreFirstItem)
+				option = startVarOptions.getItem(i + 1); // de eerste overslaan (bijv "kies een variabele")
+			else
+				option = startVarOptions.getItem(i);
+
+			if (isNumericOnly && types.get(i).getType().isNumber())
+			{
+				((SelectElement) option).setDisabled(!isNumericOnly);
+			}
+			else
+				((SelectElement) option).setDisabled(isNumericOnly);
+		}
+	}
 }
 
