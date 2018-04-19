@@ -37,6 +37,8 @@ import fi.statistiekgwt.client.event.ViewSelectionChangeEventHandler;
 import fi.statistiekgwt.client.histogram.HistogramModel.FrequencyTuple;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
+import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.expressies.Expressie;
 
 /**
  * data model, implements TableModel for Table
@@ -101,6 +103,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 * Used to keep track of the previous sort direction.
 	 */
 	private int sortDirection = -1;
+	
+//	/**
+//	 * Nodig? Het aantal decimalen dat maximaal voorkomt in doubleStrings.
+//	 * Gebruikt in getComputedValue(formula, rowIndex).
+//	 */
+//	int numberOfDecimals;
 
 	/**
 	 * Constructor
@@ -872,16 +880,36 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 *            this column's name
 	 * @param columnType
 	 *            this colum's ColumnType
+	 * @param formula
+	 * 		eventueel de formula om de kolom te berekenen o.b.v. andere kolommen
 	 */
-	public void addColumn(String columnName, ColumnType columnType)
+	public void addColumn(String columnName, ColumnType columnType, String formula)
 	{
 		this.columnClass.add(columnType);
-		this.columnNames.add(columnName);
 
-		for (int i = 0; i < this.rowCount; i++)
+		if ("".equals(formula))
 		{
-			this.values.get(i).add(ColumnType.WILDCARD);
+			for (int i = 0; i < this.rowCount; i++)
+			{
+				this.values.get(i).add(ColumnType.WILDCARD);
+			}
 		}
+		else
+		{
+			// compute variable
+			for (int i = 0; i < this.rowCount; i++)
+			{
+				Object value = getComputedValue(formula, i);
+				if (columnType.getType().equals(AllowedTypes.INTEGER))
+				{
+					// afronden op geheel getal
+					value = StatistiekGWT.getFormatted(Double.parseDouble((String) value), 0);
+				}
+				this.values.get(i).add(value);
+			}			
+		}
+		
+		this.columnNames.add(columnName);
 		this.columnCount++;
 
 		this.stringFrequencies.add(this.buildColumnStringOptions(this.columnCount - 1));
@@ -899,10 +927,121 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		}
 		
 		this.cellOutlierList.add(newArray);
-
+		
 		// send an event
 		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.ADD_COLUMN, this.columnCount - 1);
 		this.fireEvent(event);
+	}
+
+	/**
+	 * Get the computed value for the given row for the given formula.
+	 * 
+	 * @param formula
+	 * @param rowIndex
+	 * @return
+	 */
+	private Object getComputedValue(String formula, int rowIndex)
+	{
+		String computedValue = "";
+		
+		// FormuleParser met woordformule aan om de kolomnaam-variabelen te herkennen
+		FormuleParser.zetWoordFormule(true);
+		Expressie expressie = FormuleParser.geefExpressie(addFormulaCodes(formula), true);
+
+//		int nr = StatistiekGWT.getNumberOfDecimals(s);
+//		if (nr > numberOfDecimals)
+//			numberOfDecimals = nr;
+
+		double d = expressie.geefWaarde(
+			toPrimitive(this.values.get(rowIndex)), 
+			getStrippedColumnNames().toArray(new String[0]));
+		computedValue = String.valueOf(d);
+		
+		return computedValue;
+	}
+
+	/**
+	 * Geef een array van kolomnamen waaruit de spaties zijn weggehaald.
+	 * T.b.v. toevoegen van kolom met 'compute variable'.
+	 * @return
+	 */
+	private ArrayList<String> getStrippedColumnNames()
+	{
+		ArrayList<String> strippedList = new ArrayList<>(columnNames);
+		
+		for (int i = 0; i < strippedList.size(); i++)
+		{
+			strippedList.set(i, strippedList.get(i).replaceAll("\\s", ""));
+		}
+		return strippedList;
+	}
+
+	/**
+	 * 
+	 * @param arrayList
+	 * @return
+	 */
+	public static double[] toPrimitive(ArrayList<Object> arrayList)
+	{
+		if (arrayList == null)
+		{
+			return null;
+		}
+		else if (arrayList.size() == 0)
+		{
+			return new double[0];//EMPTY_DOUBLE_ARRAY;
+		}
+		final double[] result = new double[arrayList.size()];
+		for (int i = 0; i < arrayList.size(); i++)
+		{
+			try
+			{
+				result[i] = Double.parseDouble((String) arrayList.get(i));
+			}
+			catch (NumberFormatException e)
+			{
+				// doe niets, result[i] blijft 0, niet-numerieke
+				// kolommen worden niet gebruikt
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param list
+	 * @param element
+	 * @return
+	 */
+	private boolean listContainsElement(ArrayList<String> list, String element)
+	{
+		boolean contains = false;
+		
+		for (String s: list)
+		{
+			if (s.equals(element))
+			{
+				contains = true;
+				break;
+			}
+		}
+			
+		return contains;
+	}
+
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * Used for fomula editor.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
 	}
 
 	/**
@@ -1150,11 +1289,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 *            the new column name
 	 * @param cType
 	 *            the new column type
+	 * @param formula 
 	 */
 	public void editColumn(int columnIndex, String columnName,
-		ColumnType cType)
+		ColumnType cType, String formula)
 	{
-		this.editColumnWithoutEvent(columnIndex, columnName, cType);
+		this.editColumnWithoutEvent(columnIndex, columnName, cType, formula);
 
 		// send an event
 		TableChangeEvent event = new TableChangeEvent(TableChangeEvent.EDIT_COLUMN, columnIndex);
@@ -1170,9 +1310,11 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 	 *            the new column name
 	 * @param cType
 	 *            the new column type
+	 * @param formula 
+	 * 		eventueel de formula om de kolom te berekenen o.b.v. andere kolommen
 	 */
 	public void editColumnWithoutEvent(int columnIndex, String columnName,
-		ColumnType cType)
+		ColumnType cType, String formula)
 	{
 		this.columnNames.set(columnIndex, columnName);
 		this.columnClass.set(columnIndex, cType);
@@ -1190,33 +1332,52 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			this.stringOptions.set(columnIndex, new ArrayList<String>());
 		}
 
-		for (int row = 0; row < this.rowCount; row++)
+		// TODO hoe zit het met de outliers van gewijzigde kolommen? Outlier-rij blijft outlier-rij. Outliercel kan gereset?
+		
+		if ("".equals(formula))
 		{
-			if (!cType.isValidInput(this.getValueAt(row, columnIndex)))
+			for (int row = 0; row < this.rowCount; row++)
 			{
-				this.setValueAtWithoutEvent(ColumnType.WILDCARD, row, columnIndex);
-			}
-			else
-			{
-				// valid input but comma in double fields should be replaced
-				if (cType.getType().equals(AllowedTypes.DOUBLE) 
-					&& (((String) this.getValueAt(row, columnIndex)).indexOf(",") > -1))
+				if (!cType.isValidInput(this.getValueAt(row, columnIndex)))
 				{
-					String s = "";
-					try
+					this.setValueAtWithoutEvent(ColumnType.WILDCARD, row, columnIndex);
+				}
+				else
+				{
+					// valid input but comma in double fields should be replaced
+					if (cType.getType().equals(AllowedTypes.DOUBLE) 
+						&& (((String) this.getValueAt(row, columnIndex)).indexOf(",") > -1))
 					{
-						// Allow commas in doubles
-						s = ((String) this.getValueAt(row, columnIndex)).replaceAll(",", ".");
-						Double.parseDouble((String) s);
+						String s = "";
+						try
+						{
+							// Allow commas in doubles
+							s = ((String) this.getValueAt(row, columnIndex)).replaceAll(",", ".");
+							Double.parseDouble((String) s);
+						}
+						catch (NumberFormatException e)
+						{
+							// This should not happen since it is validInput
+						}
+	
+						this.setValueAtWithoutEvent(s, row, columnIndex);
 					}
-					catch (NumberFormatException e)
-					{
-						// This should not happen since it is validInput
-					}
-
-					this.setValueAtWithoutEvent(s, row, columnIndex);
 				}
 			}
+		}
+		else
+		{
+			// compute variable values with formula
+			for (int row = 0; row < this.rowCount; row++)
+			{
+				Object value = getComputedValue(formula, row);
+				if (cType.getType().equals(AllowedTypes.INTEGER))
+				{
+					// afronden op geheel getal
+					value = StatistiekGWT.getFormatted(Double.parseDouble((String) value), 0);
+				}
+				this.setValueAtWithoutEvent(value, row, columnIndex);
+			}			
 		}
 	}
 
@@ -3474,12 +3635,12 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 			if (this.hasIntegerValues(i))
 			{
 				this.editColumnWithoutEvent(i, this.getColumnName(i), 
-					new ColumnType(AllowedTypes.INTEGER));
+					new ColumnType(AllowedTypes.INTEGER), "");
 			}
 			else if (this.hasDoubleValues(i))
 			{
 				this.editColumnWithoutEvent(i, this.getColumnName(i), 
-					new ColumnType(AllowedTypes.DOUBLE));
+					new ColumnType(AllowedTypes.DOUBLE), "");
 			} 
 		}
 	}
@@ -3593,15 +3754,18 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 		
 		ArrayList<String> enumOptionsList = event.getEnumOptions();
 		String[] array = enumOptionsList.toArray(new String[enumOptionsList.size()]);
+		String formula = event.getComputeVariableFormula();
 		
 		this.addColumn(event.getName(), 
-			new ColumnType(event.getType(), array, event.getUitleg()));		
+			new ColumnType(event.getType(), array, event.getUitleg()),
+			formula);
 	}
 
 	@Override
 	public void onEditColumn(EditColumnEvent event)
 	{
-		if (event.hasChangedType() || event.hasChangedEnumOptions() || event.hasChangedUitleg())
+		if (event.hasChangedType() || event.hasChangedEnumOptions() 
+			|| event.hasChangedUitleg() || event.hasFormula())
 		{
 			this.editColumn(
 				event.getColumnIndex(),
@@ -3609,7 +3773,8 @@ public class StatTableModel implements HasHandlers, AddColumnEventHandler, EditC
 				new ColumnType(
 					event.getType(), 
 					event.getEnumOptions().toArray(new String[event.getEnumOptions().size()]), 
-					event.getUitleg()));
+					event.getUitleg()),
+				event.getComputeVariableFormula());
 		}
 		else if (event.hasChangedName())
 		{
