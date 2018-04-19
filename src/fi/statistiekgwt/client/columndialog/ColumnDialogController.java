@@ -12,6 +12,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+
 import fi.statistiekgwt.client.event.AddColumnEvent;
 import fi.statistiekgwt.client.event.EditColumnEvent;
 import fi.statistiekgwt.client.types.AllowedTypes;
@@ -125,6 +126,12 @@ public class ColumnDialogController
 				ColumnDialogController.this.view.update();
 				
 				ColumnDialogController.this.model.setHasChangedType(true);
+			}
+			else if (e.getSource() == ColumnDialogController.this.view.getColumnsListBox())
+			{
+				ColumnDialogController.this.view.addToEditor();
+				// reset de listbox zodat je ook twee keer dezelfde variabele kunt kiezen
+				ColumnDialogController.this.view.getColumnsListBox().setSelectedIndex(0);
 			}
 		}
 	}
@@ -267,9 +274,17 @@ public class ColumnDialogController
 					ColumnDialogController.this.view.setSelectedOptionInListIndex(index + 1);
 				}
 			}
+			else if (e.getSource() == ColumnDialogController.this.view.getComputeVariableButton())
+			{
+				ColumnDialogController.this.view.setHasClickedComputeVariable(!ColumnDialogController.this.view.hasClickedComputeVariable());
+ 				ColumnDialogController.this.view.update();
+			}
 			else if (e.getSource() == ColumnDialogController.this.view.getOkButton())
 			{
 				ColumnDialogController.this.view.hide();
+				// DWO-toetsenbord verbergen
+				ColumnDialogController.this.view.kb.blur();
+				ColumnDialogController.this.view.kb.setEditor(null); // clear
 				
 				// als type gewijzigd in enum, update enum options
 				if (!ColumnDialogController.this.wasEnum() 
@@ -285,7 +300,8 @@ public class ColumnDialogController
 						ColumnDialogController.this.view.getCurrentName(),
 						ColumnDialogController.this.view.getSelectedType(),
 						ColumnDialogController.this.model.getEnumOptions(),
-						ColumnDialogController.this.view.getUitleg());
+						ColumnDialogController.this.view.getUitleg(),
+						ColumnDialogController.this.view.getComputeVariableFormula()); 
 					ColumnDialogController.this.model.fireEvent(event);
 				}
 				else
@@ -296,7 +312,8 @@ public class ColumnDialogController
 						ColumnDialogController.this.view.getCurrentName(), ColumnDialogController.this.model.hasChangedName(),
 						ColumnDialogController.this.view.getSelectedType(), ColumnDialogController.this.model.hasChangedType(),
 						ColumnDialogController.this.model.getEnumOptions(), ColumnDialogController.this.model.hasChangedEnumOptions(),
-						ColumnDialogController.this.view.getUitleg(), ColumnDialogController.this.model.hasChangedUitleg());
+						ColumnDialogController.this.view.getUitleg(), ColumnDialogController.this.model.hasChangedUitleg(),
+						ColumnDialogController.this.view.getComputeVariableFormula());
 					ColumnDialogController.this.model.fireEvent(event);
 				}
 				
@@ -306,6 +323,9 @@ public class ColumnDialogController
 			{
 				ColumnDialogController.this.view.setVisible(false);
 				ColumnDialogController.this.view.hide();
+				// DWO-toetsenbord verbergen
+				ColumnDialogController.this.view.kb.blur();
+				ColumnDialogController.this.view.kb.setEditor(null); // clear
 
 				// reset stringOptions voor het geval er een stringoption verwijderd is
 				ColumnDialogController.this.view.resetOriginalStringOptions();
