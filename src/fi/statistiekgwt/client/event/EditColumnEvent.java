@@ -14,6 +14,12 @@ public class EditColumnEvent extends GwtEvent<EditColumnEventHandler>
 	private final AllowedTypes type;
 	private final ArrayList<String> enumOptions;
 	private final String uitleg;
+	/**
+	 * Eventueel de formule-string om de nieuwe (numerieke) kolom te berekenen
+	 * m.b.v. andere (numerieke) kolommen, bijv. "kolomnaam1 + kolomnaam2".
+	 */
+	private final String computeVariableFormula;
+	
 	
 	private final boolean hasChangedName;
 	private final boolean hasChangedType;
@@ -34,6 +40,24 @@ public class EditColumnEvent extends GwtEvent<EditColumnEventHandler>
         this.hasChangedEnumOptions = hasChangedEnumOptions;
         this.uitleg = uitleg;
         this.hasChangedUitleg = hasChangedUitleg;
+        this.computeVariableFormula = "";
+    }
+
+    public EditColumnEvent(int columnIndex, String name, boolean hasChangedName, 
+    	AllowedTypes type, boolean hasChangedType,
+    	ArrayList<String> enumOptions, boolean hasChangedEnumOptions,
+    	String uitleg, boolean hasChangedUitleg, String computeVariableFormula) 
+    {
+    	this.columnIndex = columnIndex;
+        this.name = name;
+        this.hasChangedName = hasChangedName;
+        this.type = type;
+        this.hasChangedType = hasChangedType;
+        this.enumOptions = enumOptions;
+        this.hasChangedEnumOptions = hasChangedEnumOptions;
+        this.uitleg = uitleg;
+        this.hasChangedUitleg = hasChangedUitleg;
+        this.computeVariableFormula = computeVariableFormula;
     }
 
 	@Override
@@ -92,4 +116,17 @@ public class EditColumnEvent extends GwtEvent<EditColumnEventHandler>
 	{
 		return this.hasChangedUitleg;
 	}
+
+	public boolean hasFormula()
+	{
+		boolean hasFormula = this.computeVariableFormula.equals("") ? false : true;
+		
+		return hasFormula;
+	}
+	
+
+	public String getComputeVariableFormula()
+	{
+        return this.computeVariableFormula;
+    }
 }
