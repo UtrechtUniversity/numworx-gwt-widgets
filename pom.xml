@@ -76,7 +76,28 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		</dependency>
+  	</dependency>
+	<dependency>
+		<groupId>nl.uu.fi.dwo.mobile</groupId>
+		<artifactId>formule</artifactId>
+		<version>0.0.6</version>
+	</dependency>
+			<dependency>
+			<groupId>nl.uu.fi.dwo.ideas</groupId>
+			<artifactId>IdeasGWT</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>fi.wiskopdrgwt</groupId>
+			<artifactId>WiskOpdrGWT</artifactId>
+			<version>0.0.3</version>
+	  		<exclusions>
+	  			<exclusion>
+	  				<artifactId>IdeasGWT</artifactId>
+	  				<groupId>nl.uu.fi.dwo.ideas</groupId>
+	  			</exclusion>
+	  		</exclusions>
+		</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
