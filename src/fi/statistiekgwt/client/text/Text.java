@@ -508,4 +508,12 @@ public interface Text extends Constants
 	@DefaultStringValue("nl")
 	String language();
 
+	@DefaultStringValue("Bereken variabele")
+	String computeVariable();
+	
+	@DefaultStringValue("Annuleer bereken variabele")
+	String cancelComputeVariable();
+	
+	@DefaultStringValue("Voer formule in m.b.v. kolomnamen:")
+	String computeVariableLabel();
 }
