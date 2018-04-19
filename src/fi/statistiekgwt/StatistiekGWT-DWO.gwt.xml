@@ -26,6 +26,7 @@
   <inherits name='org.vectomatic.libgwtfile' />
   <inherits name='com.googlecode.gwt.charts.Charts' />
   <!--  <inherits name='com.alkacon.geranium.Geranium' />	-->
+  <inherits name='nl.uu.fi.dwo.formule.Formule' />
   
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
