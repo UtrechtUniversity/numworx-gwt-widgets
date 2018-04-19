@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -235,6 +237,9 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 		this.comRoot = comRoot;
 		
 		comRoot.addCBookEventListener(TEXT_CSV, this.basisPanel);
+		
+		FormuleKeyboardIF kb = comRoot.getKeyboard();
+		FormuleHolder.installKeyboard(kb);
 	}
 
 	@Override
