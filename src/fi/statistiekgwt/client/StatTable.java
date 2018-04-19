@@ -2530,7 +2530,15 @@ public class StatTable extends DockLayoutPanel implements StatistiekView, TableC
             	//Window.alert("StatTableInputCell.onBrowserEvent()");
             	try
             	{
-            		super.onBrowserEvent(context, parent, value, event, valueUpdater);
+            		if (event.getType().equals("focus"))
+            		{
+            			// geen keyboard
+            			statTable.getStatInteractiePanel().comRoot.getKeyboard().blur();
+            			// geen focus in editor
+            			statTable.getStatInteractiePanel().comRoot.getKeyboard().setEditor(null);
+            		}
+            		
+           			super.onBrowserEvent(context, parent, value, event, valueUpdater);
             	}
             	catch (Exception e)
             	{
