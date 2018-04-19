@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -18,16 +19,23 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekGWTClientBundle;
+import fi.statistiekgwt.client.StatistiekUtils;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogBlurHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogChangeHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogKeyDownHandler;
 import fi.statistiekgwt.client.columndialog.ColumnDialogController.ColumnDialogValueChangeHandler;
 import fi.statistiekgwt.client.types.AllowedTypes;
 import fi.statistiekgwt.client.types.ColumnType;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 
 /**
  * View for add column dialog
@@ -48,7 +56,46 @@ public class ColumnDialogView extends DialogBox
 
 	private Label kiesType;
 	private ListBox typeBox;
+	private HTML separatorComputeVariable;
+	/**
+	 * hr element, used to create an invisible separator.
+	 */
+	private static final String hrString = new String("<hr  style=\"width:100%; visibility: hidden\" />");
+
 	private FlowPanel setTypePanel;
+
+	/**
+	 *  Compute variable button.
+	 */
+	private Button computeVariableButton;
+	/**
+	 * The panel for computing the variable.
+	 */
+	private FlowPanel computeVariablePanel;
+	/**
+	 * Listbox met de kolomnamen, t.b.v. bereken veriabele.
+	 */
+	private ListBox columnsListBox;
+	/**
+	 * De editor voor het invoeren van de berekening
+	 * voor 'bereken variabele'.
+	 */
+	private FormuleEditor computeVariableEditor;
+	/**
+	 * Het dwo-toetsenbord.
+	 */
+	FormuleKeyboardIF kb;
+	/**
+	 * Touch panel om een FormuleEditorTouchHandler aan te koppelen opdat je
+	 * binnen de formule-editor de focus kunt zetten voor de verschillende 
+	 * invulvakken van een formule.
+	 */
+	TouchPanel touchPanel = null;
+	/**
+	 * Boolean indicating 'Computer variable' button
+	 * has been clicked yes or no.
+	 */
+	private boolean hasClickedComputeVariable = false;
 
 	private FlowPanel createEnumPanel;
 	private FlowPanel addEnumElementPanel;
@@ -108,7 +155,8 @@ public class ColumnDialogView extends DialogBox
 	 */
 	public ColumnDialogView(ColumnDialogModel model, String text)
 	{
-		super(false, true);
+		// voor DWO-toetsenbord modal false
+		super(false, false);
 		super.setText(text);
 		
 		if (text.equals(StatistiekGWT.rb.columninfo()))
@@ -151,12 +199,44 @@ public class ColumnDialogView extends DialogBox
 			this.typeBox.addItem(types[i]);
 		}
 		setTypeBox();
+		
+		this.separatorComputeVariable = new HTML(ColumnDialogView.hrString);
+		this.separatorComputeVariable.addStyleName(statistiekCss.horizontalrule());
+		this.computeVariableButton = new Button(StatistiekGWT.rb.computeVariable());
+		this.columnsListBox = new ListBox();
+		fillColumnsListBox();
+		StatistiekUtils.setNumericColumnsEnabledListBox(columnsListBox, true, true, model.getTableModel());
+		this.computeVariableEditor = new FormuleEditor();
+		this.kb = computeVariableEditor.getKeyboard();
+		kb.setEnterType(EnterType.APPLY);
+		touchPanel = new TouchPanel();
+		touchPanel.add(computeVariableEditor.getAsPanel());
+		
+		// compute variable panel
+		this.computeVariablePanel = new FlowPanel();
+		this.computeVariablePanel.add(new Label(StatistiekGWT.rb.computeVariableLabel()));
+		this.computeVariablePanel.add(columnsListBox);
+		this.computeVariablePanel.add(touchPanel);
+		
+		this.computeVariableEditor.setFormuleToolBijFocus(true);
+
+		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(computeVariableEditor) {
+
+			@Override
+			public void onTouchStart(TouchStartEvent event)
+			{
+				super.onTouchStart(event);
+			}
+			
+		});
 
 		this.setTypePanel = new FlowPanel();
 		this.setTypePanel.add(this.kiesNaam);
 		this.setTypePanel.add(this.nameField);
 		this.setTypePanel.add(this.kiesType);
 		this.setTypePanel.add(this.typeBox);
+		this.setTypePanel.add(this.separatorComputeVariable);
+		this.setTypePanel.add(this.computeVariableButton);
 
 		this.addEnumElementLabel = new Label(
 			StatistiekGWT.rb.addenumeration());
@@ -223,6 +303,7 @@ public class ColumnDialogView extends DialogBox
 		this.typePanel = new FlowPanel();
 		this.typePanel.addStyleName(statistiekCss.margin());
 		this.typePanel.add(this.setTypePanel);
+		this.typePanel.add(this.computeVariablePanel);
 		this.typePanel.add(this.createEnumPanel);
 		
 		this.uitlegLabel = new Label(StatistiekGWT.rb.uitlegbijkolom());
@@ -265,6 +346,20 @@ public class ColumnDialogView extends DialogBox
 		}
 
 		this.update();
+	}
+
+	/**
+	 * Vul columnslistbox met de kolomnamen.
+	 */
+	private void fillColumnsListBox()
+	{
+		columnsListBox.addItem(StatistiekGWT.rb.chooseItem());
+		
+		for (int i = 0; i < model.getTableModel().getColumnCount(); i++)
+		{
+			String name = model.getTableModel().getColumnName(i);
+			columnsListBox.addItem(name);
+		}
 	}
 
 	/**
@@ -368,6 +463,14 @@ public class ColumnDialogView extends DialogBox
 	}
 
 	/**
+	 * @return De formulestring om de variabele te berekenen.
+	 */
+	public String getComputeVariableFormula()
+	{
+		return computeVariableEditor.toString();
+	}
+
+	/**
 	 * @return Get the text in the addEnumElementField textfield
 	 */
 	public String getEnumOption()
@@ -408,6 +511,7 @@ public class ColumnDialogView extends DialogBox
 	 */
 	public void addClickHandlers(ClickHandler handler)
 	{
+		this.computeVariableButton.addClickHandler(handler);
 		this.removeSelectedElement.addClickHandler(handler);
 		this.removeAllElements.addClickHandler(handler);
 		this.sortElements.addClickHandler(handler);
@@ -420,6 +524,7 @@ public class ColumnDialogView extends DialogBox
 	public void addChangeHandlers(ColumnDialogChangeHandler handler)
 	{
 		this.typeBox.addChangeHandler(handler);
+		this.columnsListBox.addChangeHandler(handler);
 	}
 
 	public void addValueChangeHandlers(
@@ -470,6 +575,7 @@ public class ColumnDialogView extends DialogBox
 			AllowedTypes.ENUM));
 		this.enumElementsList.setVisible(this.model.getType().equals(
 			AllowedTypes.ENUM));
+		this.computeVariableButton.setVisible(this.model.getType().isNumber());
 
 		// Update the list with options of current enumeration
 		// or with string options if there is no current enumeration
@@ -485,7 +591,44 @@ public class ColumnDialogView extends DialogBox
 
 		this.nameField.setText(this.model.getName());
 
+		// zet de tekst van de knop
+		if (hasClickedComputeVariable())
+			setTextComputeVariableButton(StatistiekGWT.rb.cancelComputeVariable());
+		else
+			setTextComputeVariableButton(StatistiekGWT.rb.computeVariable());
+
+		// toon compute variable panel als op de knop is gedrukt
+		this.computeVariablePanel.setVisible(hasClickedComputeVariable() && this.model.getType().isNumber());
+		if (hasClickedComputeVariable() && this.model.getType().isNumber())
+		{
+			setFocus(true);
+			touchPanel.setVisible(true);
+		}
+		else
+		{
+			setFocus(false);
+		}
+
 		this.uitlegArea.setText(this.model.getUitleg());
+	}
+
+	public void setFocus(boolean b)
+	{
+		if (b)
+		{
+			computeVariableEditor.requestFocus();
+			kb.focus();
+
+			//om te zorgen dat cursor ook getekend wordt:
+			if (computeVariableEditor.getCurrentElement() == null)
+			{	
+				computeVariableEditor.setCurrentElementRepaint(computeVariableEditor.getMainRegel());
+			}
+		}
+		else
+		{
+			kb.blur();
+		}
 	}
 
 	/**
@@ -550,6 +693,11 @@ public class ColumnDialogView extends DialogBox
 		return this.originalColumnType;
 	}
 
+	boolean hasClickedComputeVariable()
+	{
+		return hasClickedComputeVariable;
+	}
+	
 	/**
 	 * Return whether the column originally was of type enumeration.
 	 * @return
@@ -713,6 +861,11 @@ public class ColumnDialogView extends DialogBox
 		return this.typeBox;
 	}
 
+	public ListBox getColumnsListBox()
+	{
+		return this.columnsListBox;
+	}
+
 	public Button getOkButton()
 	{
 		return this.okButton;
@@ -723,4 +876,35 @@ public class ColumnDialogView extends DialogBox
 		return this.cancelButton;
 	}
 
+	public Button getComputeVariableButton()
+	{
+		return this.computeVariableButton;
+	}
+	
+	public void setHasClickedComputeVariable(boolean b)
+	{
+		hasClickedComputeVariable = b;
+	}
+	
+	/**
+	 * Zet de gegeven tekst op de computeVariableButton.
+	 * 
+	 * @param text
+	 */
+	void setTextComputeVariableButton(String text)
+	{
+		computeVariableButton.setText(text);
+	}
+
+	/**
+	 * Voeg de huidige geselecteerde kolomnaam in columnsListBox 
+	 * zonder spaties toe aan computeVariableEditor.
+	 *  
+	 */
+	public void addToEditor()
+	{
+		String strippedColumnName = columnsListBox.getSelectedItemText().replaceAll("\\s", "");
+		computeVariableEditor.insert(strippedColumnName);
+		setFocus(true);
+	}
 }
