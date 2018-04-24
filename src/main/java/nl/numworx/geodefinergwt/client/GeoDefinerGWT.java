@@ -72,7 +72,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
 	private void lognagekeken() {
-		LOG.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus());
+		LOG.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
 	}
 	
 	
@@ -196,6 +196,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		update(null, "changed");
 		feedback();
 		setNagekeken(true);LOG.info("KijkNA");
+		incErrorCount();
+		fire();
 		lognagekeken();
 	}
 
@@ -214,7 +216,23 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		setNagekeken(false);
 	}
 
-	private void nofeedbackImpl() {
+  private void fire() {
+    Boolean status = getStatus();
+    if (Boolean.TRUE.equals(status))
+      fire("action.correct");
+    else if (Boolean.FALSE.equals(status)) {
+      if (getErrorCount() > 1) {
+        fire("action.false_2");
+      } else {
+        fire("action.false");
+      }
+    }
+  }
+  private void fire(String action) {
+    comRoot.fireEvent(new CBookEvent(action));
+  }
+
+  private void nofeedbackImpl() {
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);

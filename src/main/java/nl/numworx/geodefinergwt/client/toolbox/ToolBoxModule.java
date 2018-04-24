@@ -21,6 +21,7 @@ import fi.euclides.event.AddPoollijnHandler;
 import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
+import fi.euclides.event.SelectHandler;
 import fi.euclides.expr.TrailHandler;
 import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.proof.AfstandHandler;
@@ -95,16 +96,27 @@ public class ToolBoxModule {
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static
 	ToggleButton line(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/line.png", new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
+		return newBtnSpan("line", new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
 	}
+
 	@Provides @IntKey(Tools.SELECTOR) @IntoMap static
 	ToggleButton selector(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newBtn(url + "/move.png", instance.selector, tracker, model,rb.Euclides_35());
+      return newBtnSpan("move", instance.selector, tracker, model, rb.Euclides_35());
 	}
+
+  private static ToggleButton newBtnSpan(String cls, EventHandler handler, TrackerImpl tracker,
+      RadioMode model, String t) {
+    ToggleButton btn;
+    btn = new ToggleButton();
+    btn.getUpFace().setHTML("<span class='" + cls + "'></span>");
+    if (t != null) btn.setTitle(t);
+    btn.addClickHandler(new Action(handler, tracker,btn,model));
+    return btn;
+  }
 
 	@Provides @IntKey(Tools.DESTROY) @IntoMap static
 	ToggleButton destroy(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newBtn(url + "/delete.png", new FilteredDestroyHandler(instance), tracker, model,rb.Euclides_37());
+		return newBtnSpan("delete", new FilteredDestroyHandler(instance), tracker, model,rb.Euclides_37());
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
 	ToggleButton reset(TrackerImpl tracker, RadioMode model, Instance instance) {
@@ -113,20 +125,20 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
 	ToggleButton pan(TrackerImpl tracker, RadioMode model, ViewerWidget widget) {
-		return newBtn(url + "/pan.png", widget.getPanHandler(), tracker, model, rb.Euclides_41());
+		return newBtnSpan("pan", widget.getPanHandler(), tracker, model, rb.Euclides_41());
 	}
 	
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
 	ToggleButton segment(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/segment.png", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
+		return newBtnSpan("segment", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
 	}
 	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
 	ToggleButton halfline(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/ray.png", new AddLijnHandler(AddLijnHandler.RAY), tracker, model,rb.Euclides_49());
+		return newBtnSpan("ray", new AddLijnHandler(AddLijnHandler.RAY), tracker, model,rb.Euclides_49());
 	}
 	@Provides @IntKey(Tools.TRIANGLE) @IntoMap static
 	ToggleButton triangle(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/triangle.png", new AddPolygonHandler("Veelhoek"), tracker, model);
+		return newBtnSpan("triangle", new AddPolygonHandler("Veelhoek"), tracker, model,"Veelhoek");
 	}
 
 	@Provides @IntKey(Tools.CIRCLE) @IntoMap static
