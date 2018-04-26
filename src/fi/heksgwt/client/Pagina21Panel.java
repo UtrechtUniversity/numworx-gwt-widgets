@@ -352,7 +352,7 @@ System.out.println("p21 getState");
 		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
+		tf.setFocus(true);
 
 	}
 

@@ -308,8 +308,8 @@ emmerSleep.zetNaam("sleep");
 		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
-
+//		tf.textBox.setFocus(true);
+		tf.setFocus(true);
 	}
 
 	

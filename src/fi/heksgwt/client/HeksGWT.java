@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -31,6 +33,7 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.resources.client.DataResource;
@@ -54,6 +57,8 @@ public class HeksGWT implements EntryPoint, InteractionStub
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
+	private OpdrNavIF comRoot;
+
 	// UI
 	LayoutPanel dlp;
 	//LayoutPanel canvasPanel;
@@ -128,8 +133,10 @@ public class HeksGWT implements EntryPoint, InteractionStub
 		dlp.addStyleName("dock");
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
-		RootPanel.get(holderId).add(dlp);
-		RootPanel.get(holderId).addStyleName("root");
+//		RootPanel.get(holderId).add(dlp);
+//		RootPanel.get(holderId).addStyleName("root");
+		RootLayoutPanel.get().add(dlp);
+		RootLayoutPanel.get().addStyleName("root");
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
@@ -248,8 +255,9 @@ System.out.println("HeksGWT setState");
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// TODO Auto-generated method stub
-
+		this.comRoot = comRoot;
+		FormuleKeyboardIF kb = comRoot.getKeyboard();
+		FormuleHolder.installKeyboard(kb);
 	}
 	
 	public void init(int width, int height, Map<String, Object> map, //launchState,

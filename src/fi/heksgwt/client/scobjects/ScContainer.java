@@ -42,7 +42,6 @@ public class ScContainer implements ScObject
 	public void setBounds(int x, int y, int b, int h)
 	{
 		xPos = x; yPos = y; breedte = b; hoogte = h;
-//System.out.println("ScCont setBounds " + x + " " + y + " " + b + " " + h);		
 	}
 
 	public void setLocation(int x, int y)
@@ -146,7 +145,6 @@ public class ScContainer implements ScObject
 
 		int n = getComponentCount();
 		
-//System.out.println("cc = " + n);		
 		for (int i = 0; i < n; i++) 
 		{
 			Object c = getComponent(i);

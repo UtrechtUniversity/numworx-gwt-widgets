@@ -276,8 +276,8 @@ public class Pagina24OefenPanel //extends ScContainer //Panel implements MouseLi
 		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
-
+//		tf.textBox.setFocus(true);
+		tf.setFocus(true);
 	}
 
 	//public void mousePressed(MouseEvent e)

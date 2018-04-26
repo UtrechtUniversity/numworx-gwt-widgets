@@ -330,25 +330,24 @@ System.out.println("p22 getState");
 		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
-
+//		tf.textBox.setFocus(true);
+		tf.setFocus(true);
 	}
 
-	//public void mousePressed(MouseEvent e)
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
 		laatstex = eventX;
 		laatstey = eventY;
 		
-System.out.println("mouseDown " + eventX + "," + eventY);		
-
 		if (beginLabel.contains(eventX, eventY)) 
-		{	showTekstPopup(beginTemp);
+		{	
+			showTekstPopup(beginTemp);
 			//beginTemp.vulIn();
 		}
 
 		if (beginTemp.contains(eventX, eventY)) 
-		{	showTekstPopup(beginTemp);
+		{
+			showTekstPopup(beginTemp);
 			//beginTemp.vulIn();
 		}
 		
