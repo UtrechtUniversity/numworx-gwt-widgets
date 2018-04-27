@@ -87,3 +87,18 @@ body {
 .gwt-ToggleButton span.bissectrice {
 	background-image: url("geodefinergwt/fi/euclides/resources/bissectrice.png");
 }
+.gwt-ToggleButton span.distance {
+	background-image: url("geodefinergwt/fi/euclides/resources/distance.png");
+}
+.gwt-ToggleButton span.area {
+	background-image: url("geodefinergwt/fi/euclides/resources/area.png");
+}
+.gwt-ToggleButton span.angle {
+	background-image: url("geodefinergwt/fi/euclides/resources/angel2.png");
+}
+.gwt-ToggleButton span.vector {
+	background-image: url("geodefinergwt/fi/euclides/resources/arrow.png");
+}
+.gwt-ToggleButton span.circleradius {
+	background-image: url("geodefinergwt/fi/euclides/resources/fixedcircle.png");
+}

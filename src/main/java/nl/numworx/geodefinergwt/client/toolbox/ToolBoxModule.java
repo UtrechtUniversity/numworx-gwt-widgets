@@ -201,27 +201,27 @@ public class ToolBoxModule {
 	//labels
 	@Provides @IntKey(Tools.DISTANCE) @IntoMap static
 	ToggleButton distance(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/distance.png", new AfstandHandler(rb.Euclides_88()), tracker, model,rb.Euclides_88());
+		return newBtnSpan("distance", new AfstandHandler(rb.Euclides_88()), tracker, model,rb.Euclides_88());
 	}
 
 	@Provides @IntKey(Tools.AREA) @IntoMap static
 	ToggleButton area(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/area.png", new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91());
+		return newBtnSpan("area", new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91());
 	}
 
 	@Provides @IntKey(Tools.ANGLE) @IntoMap static
 	ToggleButton angle(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/angle2.png", new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85());
+		return newBtnSpan("angle", new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85());
 	}
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
 	ToggleButton vector(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/arrow.png", new VectorHandler("vector"), tracker, model);
+		return newBtnSpan("vector", new VectorHandler("vector"), tracker, model,null);
 	}
 
 	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
 	ToggleButton circleWithRadius(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/fixedcircle.png", new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model);
+		return newBtnSpan("circleradius", new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,null);
 	}
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static
