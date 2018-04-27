@@ -21,7 +21,6 @@ import fi.euclides.event.AddPoollijnHandler;
 import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
-import fi.euclides.event.SelectHandler;
 import fi.euclides.expr.TrailHandler;
 import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.proof.AfstandHandler;
@@ -120,7 +119,7 @@ public class ToolBoxModule {
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
 	ToggleButton reset(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newBtn(url + "/reseticon.gif", new ResetHandler("Reset",instance), tracker, model);
+		return newBtnSpan("reset", new ResetHandler("Reset",instance), tracker, model,null);
 	}
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
@@ -148,26 +147,26 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.ARC) @IntoMap static
 	ToggleButton arc(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/angle.png", new AddBoogHandler("Boog"), tracker, model);
+		return newBtn("arc", new AddBoogHandler("Boog"), tracker, model,null);
 	}
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
 	ToggleButton midpoint(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/midpoint.png", new AddMiddelPuntHandler(), tracker, model,rb.Euclides_54());
+		return newBtnSpan("midpoint", new AddMiddelPuntHandler(), tracker, model,rb.Euclides_54());
 	}
 
 	@Provides @IntKey(Tools.PERPENDICULAR) @IntoMap static
 	ToggleButton perpendicular(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/plumb.png", new AddLoodLijnHandler(), tracker, model,rb.Euclides_56());
+		return newBtnSpan("perpendicular", new AddLoodLijnHandler(), tracker, model,rb.Euclides_56());
 	}
 
 	@Provides @IntKey(Tools.PARALLEL) @IntoMap static
 	ToggleButton parallel(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/parallel.png", new AddParallelHandler(), tracker, model,rb.Euclides_58());
+		return newBtnSpan("parallel", new AddParallelHandler(), tracker, model,rb.Euclides_58());
 	}
 
 	@Provides @IntKey(Tools.BISECTRICE) @IntoMap static
 	ToggleButton bissectrice(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/bissectrice.png", new AddBissectriceHandler(), tracker, model,rb.Euclides_60());
+		return newBtnSpan("bissectrice", new AddBissectriceHandler(), tracker, model,rb.Euclides_60());
 	}
 
 	@Provides @IntKey(Tools.MIRROR) @IntoMap static

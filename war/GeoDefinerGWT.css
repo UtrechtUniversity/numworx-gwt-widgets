@@ -48,7 +48,6 @@ body {
 .gwt-ToggleButton span.move {
 	background-image: url("geodefinergwt/fi/euclides/resources/move.png");
 }
-
 .gwt-ToggleButton span.line {
 	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
 }
@@ -58,19 +57,33 @@ body {
 .gwt-ToggleButton span.ray {
 	background-image: url("geodefinergwt/fi/euclides/resources/ray.png");
 }
-
 .gwt-ToggleButton span.move {
 	background-image: url("geodefinergwt/fi/euclides/resources/move.png");
 }
-
 .gwt-ToggleButton span.delete {
 	background-image: url("geodefinergwt/fi/euclides/resources/delete.png");
 }
-
 .gwt-ToggleButton span.pan {
 	background-image: url("geodefinergwt/fi/euclides/resources/pan.png");
 }
-
 .gwt-ToggleButton span.triangle {
 	background-image: url("geodefinergwt/fi/euclides/resources/triangle.png");
+}
+.gwt-ToggleButton span.reset {
+	background-image: url("geodefinergwt/fi/euclides/resources/reseticon.gif");
+}
+.gwt-ToggleButton span.arc {
+	background-image: url("geodefinergwt/fi/euclides/resources/angle.png");
+}
+.gwt-ToggleButton span.midpoint {
+	background-image: url("geodefinergwt/fi/euclides/resources/midpoint.png");
+}
+.gwt-ToggleButton span.perpendicular {
+	background-image: url("geodefinergwt/fi/euclides/resources/plumb.png");
+}
+.gwt-ToggleButton span.parallel {
+	background-image: url("geodefinergwt/fi/euclides/resources/parallel.png");
+}
+.gwt-ToggleButton span.bissectrice {
+	background-image: url("geodefinergwt/fi/euclides/resources/bissectrice.png");
 }
