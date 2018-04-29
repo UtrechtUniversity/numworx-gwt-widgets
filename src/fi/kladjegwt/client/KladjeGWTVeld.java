@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.HashMap;
+//import java.awt.Point;
 import java.util.ArrayList;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -63,6 +65,9 @@ import com.google.gwt.event.dom.client.TouchStartEvent;
 
 public class KladjeGWTVeld 
 {
+	
+	private static Logger logger = Logger.getLogger("KladjeGWTVeld");
+	
 	/**
 	 * het Canvas om op te tekenen
 	 */
@@ -405,13 +410,19 @@ public class KladjeGWTVeld
 	 */
 	double scaleUpStep = 105e-2d;
 	double scaleDownStep = 1 / 105e-2d;
+	
+	Point translation = new Point(30,20);
+	double scale = 2.0;
+	KladjeGWT eigenaar;
+	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
 	 * @param w breedte
 	 * @param h hoogte
 	 */
-	public KladjeGWTVeld(int w, int h)
+	public KladjeGWTVeld(int w, int h, KladjeGWT eigenaar)
 	{	
+		this.eigenaar = eigenaar;
 		
 		kladjeHWTCanvas = Canvas.createIfSupported();
 
@@ -829,8 +840,8 @@ public class KladjeGWTVeld
 		else if (smoothType == AVERAGE)
 			return averageSmooth(doublePoints);
 		else if (smoothType == AVERAGE2)
-		{	ArrayList<DoublePoint> oneSmooth = averageSmooth(doublePoints);
-			return averageSmooth(oneSmooth);			
+		{	//ArrayList<DoublePoint> oneSmooth = averageSmooth(doublePoints);
+			return averageSmooth(doublePoints);			
 		}
 		else
 			return doublePoints;
@@ -909,6 +920,10 @@ public class KladjeGWTVeld
 	 */
 	void tekenProgramma(Context2d g)
 	{
+		
+		g.scale(scale, scale);
+		g.translate(translation.x,translation.y);
+		
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
 		{	Streep streep = (Streep) docentStreepVector.elementAt(sCnt);
@@ -1144,6 +1159,8 @@ public class KladjeGWTVeld
 			}
 		}	
 		
+		g.translate(-translation.x,-translation.y);
+		g.scale(1/scale, 1/scale);
 	}
 
 	/**
@@ -2458,6 +2475,9 @@ public class KladjeGWTVeld
 	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
+		eventX = (int)(eventX/scale -translation.x);
+		eventY = (int)(eventY/scale -translation.y);
+		
 		if (mouseMode == tekenen)
 		{
 			mouseDown = true;
@@ -2588,6 +2608,9 @@ public class KladjeGWTVeld
 	 */
 	public void mouseMoveTouchMoveAction(int eventX, int eventY, boolean shiftPressed)
 	{
+		eventX = (int)(eventX/scale -translation.x);
+		eventY = (int)(eventY/scale -translation.y);
+		
 		if (!mouseDown)
 			return;
 		
@@ -2933,6 +2956,7 @@ public class KladjeGWTVeld
 			draggDoublePoints.clear();
 			
 			paint();
+			eigenaar.setChanged();
 		}
 		
 		else if (mouseMode == lijnTekenen)
@@ -3110,6 +3134,7 @@ public class KladjeGWTVeld
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
+			logger.info("mouse up");
 			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();

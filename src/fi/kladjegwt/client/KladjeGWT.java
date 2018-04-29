@@ -1,11 +1,18 @@
 package fi.kladjegwt.client;
 
+
+//import java.awt.Point;
 import java.util.HashMap;
+//import java.util.Hashtable;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -36,12 +43,15 @@ import fi.kladjegwt.client.text.Text;
  * @author huub
  */
 
-public class KladjeGWT implements EntryPoint, InteractionStub 
+public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
 {
+	private static Logger logger = Logger.getLogger("KladjeGWT");
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	static final Text rb = GWT.create(Text.class);
 
+	OpdrNavIF comRoot;
+	
 	/**
 	 * GUI componenten: dlp hangt aan de root, bottomPanel
 	 * zit in dlp-south, het Canvas van KladjeGWTVeld zit
@@ -171,6 +181,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	 */
 	boolean schalen = true;
 	
+	private Point translation = new Point(30,20);
+	
+	private double scale = 0.5;
+	
 	private int asHoogte;
 	
 	/**
@@ -275,8 +289,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
@@ -303,9 +317,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		{
 			tekenLijnButton = new ToggleButton(tekenLijnUpImage, tekenLijnDownImage);
 			tekenLijnButton.addStyleName("togglebutton");
-			bottomPanel.add(tekenLijnButton);
-			bottomPanel.setWidgetLeftWidth(tekenLijnButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
-			bottomPanel.setWidgetTopHeight(tekenLijnButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			//bottomPanel.add(tekenLijnButton);
+			//bottomPanel.setWidgetLeftWidth(tekenLijnButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			//bottomPanel.setWidgetTopHeight(tekenLijnButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
 		
 			tekenLijnButton.addClickHandler(toggleClickHandler);
 		
@@ -431,6 +445,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		init(breedte, hoogte, launchState, randomVarWaarden);
 
 	}
+	
+	
 	
 	public Widget asWidget()
 	{
@@ -667,7 +683,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-
+		this.comRoot = comRoot;
+		comRoot.addCBookEventListener("drawing", this);
 	}
 
 	
@@ -705,13 +722,24 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 			roteren = launchState.getBoolean("roteren");
 		if (launchState.containsKey("schalen"))
 			schalen = launchState.getBoolean("schalen");
-
+		
+		int translationx = translation.x;
+		if(launchState.containsKey("translationX"))
+			translationx = launchState.getInt("translationX");
+		int translationy = translation.y;
+		if(launchState.containsKey("translationY"))
+			translationy = launchState.getInt("translationY");
+		translation = new Point(translationx,translationy);
+		
+		if(launchState.containsKey("scale"))
+			scale = launchState.getDouble("scale");
+		
 		bottomPanel = new LayoutPanel();
 		bottomPanel.addStyleName(kladjeCss.bottom());
 
 		dlp.addSouth(bottomPanel, bottomHeight);
 
-		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight); 
+		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
 		kladjeGWTCanvas = kladjeGWTVeld.getCanvas();
 		if (kladjeGWTCanvas == null) 
@@ -728,8 +756,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 		kladjeGWTVeld.lijnen = lijnen;
 		kladjeGWTVeld.ruitjes = ruitjes;
 		kladjeGWTVeld.lineDistance = ruitjesSize;
-		KladjeGWTVeld.roteren = roteren;
-		KladjeGWTVeld.schalen = schalen;
+		kladjeGWTVeld.roteren = roteren;
+		kladjeGWTVeld.schalen = schalen;
+		kladjeGWTVeld.translation = translation;
+		kladjeGWTVeld.scale = scale;
 	
 		// docent tekeningen
 		kladjeGWTVeld.setState(map, true);
@@ -777,6 +807,47 @@ public class KladjeGWT implements EntryPoint, InteractionStub
 	//@Override
 	public int[][] getScoreObjectives() {
 		return null;
+	}
+	
+	public void setChanged() {
+		Map<String,Object> map = kladjeGWTVeld.getState();
+		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+		logger.info("in setChanged");
+	}
+
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+		if (command.startsWith("drawing"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	kladjeGWTVeld.setState(map, false);
+				kladjeGWTVeld.paint();
+			}
+		}
+		if (command.startsWith("double.translationX"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	int valueX = ((Integer)map.get("value")).intValue();
+				translation = new Point(-valueX, translation.y);
+				kladjeGWTVeld.translation = translation;
+				kladjeGWTVeld.paint();
+			}
+		}
+		if (command.startsWith("double.translationY"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	int valueY = ((Integer)map.get("value")).intValue();
+				translation = new Point(translation.x, -valueY);
+				kladjeGWTVeld.translation = translation;
+				kladjeGWTVeld.paint();
+			}
+		}
+		
 	}
 
     

@@ -530,6 +530,11 @@ public class Streep
 	 */
 	public void scale(double scaleStep)
 	{
+//		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
+//		{	
+//			puntenXD[pCnt] = scaleStep * puntenXD[pCnt] + (1 - scaleStep) * cx;
+//			puntenYD[pCnt] = scaleStep * puntenYD[pCnt] + (1 - scaleStep) * cy;
+//		}
 		for (int pCnt = 0; pCnt < puntenXD.length; pCnt++)
 		{	
 			pXD[pCnt] = scaleStep * pXD[pCnt] + (1 - scaleStep) * cx;
