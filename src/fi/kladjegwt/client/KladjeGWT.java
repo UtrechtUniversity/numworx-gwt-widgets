@@ -181,9 +181,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	boolean schalen = true;
 	
-	private Point translation = new Point(30,20);
+	private Point translation = new Point(0,0);
 	
-	private double scale = 0.5;
+	private double scale = 1.0;
 	
 	private int asHoogte;
 	
@@ -317,9 +317,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		{
 			tekenLijnButton = new ToggleButton(tekenLijnUpImage, tekenLijnDownImage);
 			tekenLijnButton.addStyleName("togglebutton");
-			//bottomPanel.add(tekenLijnButton);
-			//bottomPanel.setWidgetLeftWidth(tekenLijnButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
-			//bottomPanel.setWidgetTopHeight(tekenLijnButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.add(tekenLijnButton);
+			bottomPanel.setWidgetLeftWidth(tekenLijnButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(tekenLijnButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
 		
 			tekenLijnButton.addClickHandler(toggleClickHandler);
 		
