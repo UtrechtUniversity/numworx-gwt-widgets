@@ -263,13 +263,9 @@ System.out.println("HeksGWT setState");
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
-		
-// launchdata/state		
-logger.info("HeksGWT init");		
-		
+		// launchdata/state		
 		this.breedte = width;
 		this.hoogte = height;
-		//this.launchState = launchState;
 		
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		
@@ -377,7 +373,6 @@ logger.info("HeksGWT init");
 			((Pagina21Panel) pagina21Panel).setState(map);
 			
 			pagina21Panel.paint(heksGWTContext2d);
-			
 		}
 		else if (paginaNummer == 2)
 		{	
@@ -396,7 +391,6 @@ logger.info("HeksGWT init");
 			((Pagina22Panel) pagina22Panel).setState(map);
 			
 			pagina22Panel.paint(heksGWTContext2d);
-				
 		}
 		else if (paginaNummer == 3)
 		{	
@@ -407,9 +401,7 @@ logger.info("HeksGWT init");
 			double sy = ((1.0 * hoogte) / pagina23Panel.hoogte);
 			double schaal = Math.min(sx, sy);//* 0.95;
 
-//System.out.println("schaal = " + schaal);			
 			pagina23Panel.schaal(schaal);
-			
 			
 			((Pagina23Panel) pagina23Panel).initHandlers();
 			((Pagina23Panel) pagina23Panel).initOpnieuwKnop();
@@ -434,10 +426,7 @@ logger.info("HeksGWT init");
 			double sy = ((1.0 * hoogte) / pagina24Panel.hoogte);
 			double schaal = Math.min(sx, sy);//* 0.95;
 
-//System.out.println("schaal = " + schaal);			
 			pagina24Panel.schaal(schaal);
-			
-			
 			
 			((Pagina24Panel) pagina24Panel).initHandlers();
 
@@ -446,12 +435,9 @@ logger.info("HeksGWT init");
 			//((Pagina24Panel) pagina24Panel).setState(map);
 			
 			pagina24Panel.paint(heksGWTContext2d);
-				
 		}
 
 		dlp.forceLayout();
-		
-
 	}
 	
 	public void paint()
@@ -464,7 +450,6 @@ logger.info("HeksGWT init");
 			pagina23Panel.paint(heksGWTContext2d);
 		else if ((paginaNummer == 4) && (pagina24Panel != null))
 			pagina24Panel.paint(heksGWTContext2d);
-		
 	}
 	
 	@Override

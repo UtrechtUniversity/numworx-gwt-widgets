@@ -353,7 +353,7 @@ System.out.println("p21 getState");
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
 		tf.setFocus(true);
-
+		tf.setSelected();
 	}
 
 	public void mouseDownTouchStartAction(int eventX, int eventY) 
@@ -363,20 +363,17 @@ System.out.println("p21 getState");
 
 		if (beginLabel.contains(eventX, eventY)) 
 		{
-System.out.println("beginLabel contains");			
-			
 			showTekstPopup(beginTemp);
 			//beginTemp.vulIn();
 		}
 		if (beginTemp.contains(eventX, eventY)) 
 		{
-System.out.println("beginTemp contains");			
 			showTekstPopup(beginTemp);			
 			//beginTemp.vulIn();
 		}
 		
 
-// dit is voor eruithalen?		
+		// dit is voor eruithalen?		
 		p = new Polygon[11];
 		for (int i = 0; i < 11; i++) 
 		{
@@ -385,23 +382,18 @@ System.out.println("beginTemp contains");
 
 		if (blokjePlus.contains(eventX, eventY)) 
 		{
-//System.out.println("blokjePlus contains");			
 			raakPlusBuiten = true;
 		}
 
 		if (blokjeSleep.contains(eventX, eventY)) 
 		{
-System.out.println("blokjeSleep contains " + eventX + "," + eventY);			
 			raakSleep = true;
 		}
 
 		if (blokjeSleepMin.contains(eventX, eventY)) 
 		{
-System.out.println("blokjeMin contains");			
 			raakSleepMin = true;
 		}
-
-
 	}
 
 	public void mouseMoveTouchMoveAction(int eventX, int eventY) 
@@ -410,12 +402,8 @@ System.out.println("blokjeMin contains");
 		int dx = eventX - laatstex;
 		int dy = eventY - laatstey;
 
-//System.out.println("dx = " + dx);
-
 		if (raakSleep) 
 		{
-//System.out.println("mmtm raakSleep");			
-			
 			//blokjeSleep.setLocation(blokjeSleep.getLocation().x + dx, blokjeSleep.getLocation().y + dy);
 			blokjeSleep.verplaats(dx, dy);
 			
@@ -439,7 +427,6 @@ System.out.println("blokjeMin contains");
 			{
 				raakSleep = false;
 				blokjeSleep.setLocation((int) (blokjePlus.getLocation().x), (int) (blokjePlus.getLocation().y));
-//System.out.println("plus bb");					
 			}
 			
 			paint(eigenaar.heksGWTContext2d);
@@ -449,8 +436,6 @@ System.out.println("blokjeMin contains");
 		}
 		if (raakSleepMin) 
 		{
-//System.out.println("mmtm raakSleepMin");
-
 			//blokjeSleepMin.setLocation(blokjeSleepMin.getLocation().x + dx, blokjeSleepMin.getLocation().y + dy);
 			blokjeSleepMin.verplaats(dx, dy);
 			
@@ -474,7 +459,6 @@ System.out.println("blokjeMin contains");
 			{
 				raakSleepMin = false;
 				blokjeSleepMin.setLocation((int) (blokjeMin.getLocation().x), (int) (blokjeMin.getLocation().y));
-//System.out.println("min bb");					
 			}
 
 			paint(eigenaar.heksGWTContext2d);
@@ -496,11 +480,7 @@ System.out.println("blokjeMin contains");
 				blokjeSleep.getLocation().x > za.getLocation().x && 
 				blokjeSleep.getLocation().y > za.getLocation().y && 
 				blokjeSleep.getLocation().y + blokjeSleep.getSize().y < za.getLocation().y + za.getSize().y) 
-		{ 
-System.out.println("!plusEruit");	
-			
-//GWT
-			
+		{
 			//za.start(true, blokjeSleep.getLocation().x - za.getLocation().x);
 			tc.verhoog();
 			tm.tempPlus();
@@ -523,10 +503,7 @@ System.out.println("!plusEruit");
 				blokjeSleepMin.getLocation().x > za.getLocation().x && 
 				blokjeSleepMin.getLocation().y > za.getLocation().y && 
 				blokjeSleepMin.getLocation().y + blokjeSleepMin.getSize().y < za.getLocation().y + za.getSize().y) 
-		{ 
-System.out.println("!minEruit");			
-//GWT
-			
+		{
 			//za.start(false, blokjeSleepMin.getLocation().x - za.getLocation().x);
 			tc.verlaag();
 			tm.tempMin();
@@ -548,33 +525,12 @@ System.out.println("!minEruit");
 		{
 			plusEruit = false;
 			pasEruit = true;
-
-//GWT(4x)
-/*			
-			tc.verlaag();
-			tm.tempMin();
-			eindTemp.verlaag();
-			eruitContainer.voegBlokjeToe(true);
-*/			
 		}
 		if (minEruit && blokjeSleepMin.getLocation().y < za.getLocation().y) 
 		{
 			minEruit = false;
 			pasEruit = true;
-
-//GWT(4x)
-/*			
-			tc.verhoog();
-			tm.tempPlus();
-			eindTemp.verhoog();
-			eruitContainer.voegBlokjeToe(false);
-*/			
 		}
-		
-// deze 2 regels doet hij niet		
-//		laatstex = eventX;
-//		laatstey = eventY;
-//System.out.println("reset laatste " + laatstex + "," + laatstey);
 	}
 
 	public void mouseUpTouchEndAction() 
@@ -587,9 +543,6 @@ System.out.println("!minEruit");
 			blokjeSleep.getLocation().x > pot.getLocation().x && 
 			blokjeSleep.getLocation().y + blokjeSleep.getSize().y < za.getLocation().y + za.getSize().y) 
 		{
-			
-System.out.println("mute !plusEruit");
-
 			int x = blokjeSleep.getLocation().x;
 			int y = blokjeSleep.getLocation().y;
 			blokjeSleep.setLocation((int) (blokjePlus.getLocation().x), (int) (blokjePlus.getLocation().y));
@@ -618,9 +571,6 @@ System.out.println("mute !plusEruit");
 			blokjeSleepMin.getLocation().x > pot.getLocation().x && 
 			blokjeSleepMin.getLocation().y + blokjeSleepMin.getSize().y < za.getLocation().y + za.getSize().y) 
 		{
-			
-System.out.println("mute !minEruit");
-
 			int x = blokjeSleepMin.getLocation().x;
 			blokjeSleepMin.setLocation((int) (blokjeMin.getLocation().x), (int) (blokjeMin.getLocation().y));
 
@@ -633,8 +583,7 @@ System.out.println("mute !minEruit");
 				erinContainer.voegBlokjeToe(false);
 //			else
 //				eruitContainer.verwijderBlokje();
-				
-			
+
 			paint(eigenaar.heksGWTContext2d);
 		} 
 		else 
@@ -654,8 +603,6 @@ System.out.println("mute !minEruit");
 	{
 		if (beginTemp.isBekend()) 
 		{
-			
-System.out.println("opnieuw bekend");			
 			eindTemp.zetBekend(true);
 			tc.zetBekend(true);
 			eindTemp.zetWaarde(beginTemp.geefWaarde());
@@ -664,7 +611,6 @@ System.out.println("opnieuw bekend");
 		} 
 		else 
 		{
-System.out.println("opnieuw onbekend");			
 			eindTemp.zetBekend(false);
 			eindTemp.paint();
 			tc.zetBekend(false);
@@ -683,8 +629,6 @@ System.out.println("opnieuw onbekend");
 	
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
-		
-		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
 			e.preventDefault();
@@ -698,10 +642,8 @@ System.out.println("opnieuw onbekend");
 			mouseDown = true;
 			
 			mouseDownTouchStartAction(eventX, eventY);
-			
 		}
 		
-		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
 			e.preventDefault();
@@ -709,23 +651,15 @@ System.out.println("opnieuw onbekend");
 			// prevent scrolling
 			e.stopPropagation();
 			
-//System.out.println("onMouseMove");			
-			
 			if (!mouseDown)
 				return;
 
 			int eventX = e.getX();
 			int eventY = e.getY();
 
-//System.out.println("sp = " + shiftPressed);
-
 			mouseMoveTouchMoveAction(eventX, eventY);
-			
-			
-			
 		} // onMouseMove
 		
-		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
 			e.preventDefault();
@@ -736,9 +670,7 @@ System.out.println("opnieuw onbekend");
 			mouseDown = false;
 		
 			mouseUpTouchEndAction();
-
 		}
-
 	} //MLMML
 
 
@@ -755,7 +687,6 @@ System.out.println("opnieuw onbekend");
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				
 				int eventX = touch.getPageX() - eigenaar.heksGWTCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - eigenaar.heksGWTCanvas.getAbsoluteTop();				
 				
@@ -765,9 +696,9 @@ System.out.println("opnieuw onbekend");
 			e.preventDefault();
 			e.stopPropagation();
 		}
+		
 		public void onTouchMove(TouchMoveEvent e)
 		{
-			
 			e.preventDefault();
 			e.stopPropagation();
 			
@@ -781,9 +712,9 @@ System.out.println("opnieuw onbekend");
 				mouseMoveTouchMoveAction(eventX, eventY);
 				
 		    }
+			
 			e.preventDefault();
 			e.stopPropagation();
-			
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
@@ -794,7 +725,6 @@ System.out.println("opnieuw onbekend");
 	
     class PushClickHandler implements ClickHandler
 	{
-	   	//public void onMouseDown(MouseDownEvent e)
 	   	public void onClick(ClickEvent e)
 	   	{
 			//e.preventDefault();
@@ -804,10 +734,6 @@ System.out.println("opnieuw onbekend");
 	   		{
 	   			opnieuwAction();    			
 	   		}
-	    		
 	   	}
-	    	
 	}
-
-
 }

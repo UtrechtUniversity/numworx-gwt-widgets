@@ -2,6 +2,7 @@ package fi.heksgwt.client;
 
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -11,6 +12,7 @@ import com.google.gwt.event.logical.shared.CloseHandler;
 
 import fi.heksgwt.client.scobjects.ScContainer;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
 import nl.uu.fi.dwo.formule.client.formuleobjects.FormuleElement;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 
@@ -101,6 +103,16 @@ public class TekstPopup extends PopupPanel
 		}
 
 		addCloseHandler(new PopupCloseHandler());
+		
+		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(editor) {
+
+			@Override
+			public void onTouchStart(TouchStartEvent event)
+			{
+				super.onTouchStart(event);
+			}
+			
+		});
 	}
 
 	// public String getText()
