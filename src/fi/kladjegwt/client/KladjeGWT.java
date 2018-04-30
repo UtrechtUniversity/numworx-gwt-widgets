@@ -685,6 +685,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	{
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("drawing", this);
+		comRoot.addCBookEventListener("double.translationX", this);
+		comRoot.addCBookEventListener("double.translationY", this);
 	}
 
 	
@@ -827,6 +829,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				kladjeGWTVeld.paint();
 			}
 		}
+		logger.info("command ontvangen");
 		if (command.startsWith("double.translationX"))
 		{
 			Map map = (Map)event.getParameters();
@@ -847,8 +850,5 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				kladjeGWTVeld.paint();
 			}
 		}
-		
 	}
-
-    
 }
