@@ -5,18 +5,23 @@ import java.util.*;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
-//import fi.beans.base64code.StringCodeObject;
+
+/**
+ * utility class facilitating saving and retrieving an Object3D in a 
+ * non-serializable way; note that all methods are static 
+ * @author huub
+ */
 
 public class NoSer 
 {
-	//public static double[] getVectorDState(Vector3D vec)
+	/**
+	 * convert a Vector3D to a List of 3 Doubles
+	 * @param vec Vector3D to be converted
+	 * @return List of 3 Doubles
+	 */
 	public static List<Double> getVectorDState(Vector3D vec)
 	{
-		//double[] coeff = new double[9];
 		List<Double> coeff = new ArrayList<Double>();
-		//coeff[0] = vec.x;
-		//coeff[1] = vec.y;
-		//coeff[2] = vec.z;
 		coeff.add(new Double(vec.x));
 		coeff.add(new Double(vec.y));
 		coeff.add(new Double(vec.z));
@@ -25,13 +30,15 @@ public class NoSer
 		
 	}
 
-	//public static Vector3D setVector3DState(double[] coeff)
+	/**
+	 * convert a List of 3 Doubles to a Vector3D
+	 * @param coeff List of 3 Doubles to be converted
+	 * @return Vector3D
+	 */
 	public static Vector3D setVector3DState(List<Double> coeff)
 	{
 		Vector3D vec = new Vector3D();
 		
-		//if (coeff.length >= 3)
-		//	vec = new Vector3D(coeff[0], coeff[1], coeff[2]);
 		if (coeff.size() >= 3)
 		{
 			double vecx = ((Double) coeff.get(0)).doubleValue();
@@ -46,20 +53,15 @@ public class NoSer
 	}
 	
 	
-	//public static double[] getMatrix3DState(Matrix3D mat)
+	/**
+	 * convert a Matrix3D to a List of 9 Doubles
+	 * @param mat Matrix3D to be converted
+	 * @return List of 9 Doubles
+	 */
 	public static List<Double> getMatrix3DState(Matrix3D mat)
 	{
-		//double[] coeff = new double[9];
+
 		List<Double> coeff = new ArrayList<Double>();
-		//coeff[0] = mat.row1.x;
-		//coeff[1] = mat.row1.y;
-		//coeff[2] = mat.row1.z;
-		//coeff[3] = mat.row2.x;
-		//coeff[4] = mat.row2.y;
-		//coeff[5] = mat.row2.z;
-		//coeff[6] = mat.row3.x;
-		//coeff[7] = mat.row3.y;
-		//coeff[8] = mat.row3.z;
 		coeff.add(new Double(mat.row1.x));
 		coeff.add(new Double(mat.row1.y));
 		coeff.add(new Double(mat.row1.z));
@@ -70,18 +72,18 @@ public class NoSer
 		coeff.add(new Double(mat.row3.y));
 		coeff.add(new Double(mat.row3.z));
 		
-		
 		return coeff;
 	}
-	
+
+	/**
+	 * convert a List of 9 Doubles to a Matrix3D
+	 * @param coeff List of 9 Doubles
+	 * @return Matrix3D
+	 */
 	public static Matrix3D setMatrix3DState(List<Double> coeff)
 	{
 		Matrix3D mat = new Matrix3D(0, 0, 0, 0, 0, 0, 0, 0, 0);
 		
-		//if (coeff.length >= 9)
-		//	mat = new Matrix3D(coeff[0], coeff[1], coeff[2], 
-		//			           coeff[3], coeff[4], coeff[5], 
-		//			           coeff[6], coeff[7], coeff[8]);
 		if (coeff.size() >= 9)
 		{
 			double c0 = ((Double) coeff.get(0)).doubleValue();
@@ -101,18 +103,14 @@ public class NoSer
 		return mat;
 	}
 
-	//public static double[] getLine3DState(Line3D li)
+	/**
+	 * convert a Line3D to a List of 6 Doubles (coordinates of two points on the Line3D) 
+	 * @param li Line3D to be converted
+	 * @return List of 6 Doubles
+	 */
 	public static List<Double> getLine3DState(Line3D li)
 	{
-		//double[] params = new double[6];
 		List<Double> params = new ArrayList<Double>();
-		
-		//params[0] = li.point1.x;
-		//params[1] = li.point1.y;
-		//params[2] = li.point1.z;
-		//params[3] = li.point2.x;
-		//params[4] = li.point2.y;
-		//params[5] = li.point2.z;
 		
 		params.add(new Double(li.point1.x));
 		params.add(new Double(li.point1.y));
@@ -121,10 +119,14 @@ public class NoSer
 		params.add(new Double(li.point2.y));
 		params.add(new Double(li.point2.z));
 		
-		
 		return params;
 	}
 
+	/**
+	 * convert a List of 6 Doubles to a Line3D (Doubles are the coordinates of two points on the Line3D)
+	 * @param params List of 6 Doubles
+	 * @return Line3D
+	 */
 	public static Line3D setLine3DState(List<Double> params)
 	{
 		double p0 = ((Double) params.get(0)).doubleValue();
@@ -140,26 +142,20 @@ public class NoSer
 		return new Line3D(vec1, vec2);
 	}
 
-	//public static double[] getPlane3DState(Plane3D pl)
+	/**
+	 * convert a Plane3D to a List of 9 Doubles (the coordinates of the 
+	 * support vector and the two direction vectors, see class Plane3D)
+	 * @param pl Plane3D to be converted
+	 * @return List of 9 Doubles
+	 */
 	public static List<Double> getPlane3DState(Plane3D pl)
 	{
-		//double[] params = new double[9];
 		List<Double> params = new ArrayList<Double>();
 		
 		Vector3D v1 = new Vector3D(pl.support);
 		Vector3D v2 = Vector3D.plus(pl.direction1, v1);
 		Vector3D v3 = Vector3D.plus(pl.direction2, v1);
 		
-//		params[0] = v1.x;
-//		params[1] = v1.y;
-//		params[2] = v1.z;
-//		params[3] = v2.x;
-//		params[4] = v2.y;
-//		params[5] = v2.z;
-//		params[6] = v3.x;
-//		params[7] = v3.y;
-//		params[8] = v3.z;
-
 		params.add(new Double(v1.x));
 		params.add(new Double(v1.y));
 		params.add(new Double(v1.z));
@@ -173,6 +169,12 @@ public class NoSer
 		return params;
 	}
 
+	/**
+	 * convert a List of 9 Doubles to a Plane3D (Doubles are the coordinates
+	 * of the support and the two direction vectors)
+	 * @param params List of 9 Doubles to be converted
+	 * @return Plane3D
+	 */
 	public static Plane3D setPlane3DState(List<Double> params)
 	{
 		double p0 = ((Double) params.get(0)).doubleValue();
@@ -193,17 +195,16 @@ public class NoSer
 	}
 	
 	//public static double[] getVerticesState(Vector3D[] vertices)
+	/**
+	 * convert an array of Vector3D to a List of Doubles (where the length
+	 * of the List is 3 times the length of the array)    
+	 * @param vertices array of Vector3D to be converted
+	 * @return List of Doubles 
+	 */
 	public static List<Double> getVerticesState(Vector3D[] vertices)
 	{
-		//double[] vert = new double[3 * vertices.length];
 		List<Double> vert = new ArrayList<Double>();
 		
-//		for (int vCnt = 0; vCnt < vertices.length; vCnt++)
-//		{	vert[3 * vCnt] = vertices[vCnt].x;
-//			vert[3 * vCnt + 1] = vertices[vCnt].y;
-//			vert[3 * vCnt + 2] = vertices[vCnt].z;
-//		}
-
 		for (int vCnt = 0; vCnt < vertices.length; vCnt++)
 		{	vert.add(vertices[vCnt].x);
 			vert.add(vertices[vCnt].y);
@@ -213,14 +214,18 @@ public class NoSer
 		return vert;
 	}
 	
+	/**
+	 * convert a List of Doubles to an array of Vector3D, where the length of
+	 * the array is one-third of the length of the List)
+	 * @param vert List of Doubles to be converted
+	 * @return array of Vector3D
+	 */
 	public static Vector3D[] setVerticesState(List<Double> vert)
 	{
-		//Vector3D[] vertices = new Vector3D[vert.length / 3];
 		Vector3D[] vertices = new Vector3D[vert.size() / 3];
 		
 		for (int vCnt = 0; vCnt < vertices.length; vCnt++)
 		{	
-			//vertices[vCnt] = new Vector3D(vert[3 * vCnt], vert[3 * vCnt + 1], vert[3 * vCnt + 2]);
 			vertices[vCnt] = new Vector3D( ((Double) vert.get(3 * vCnt)).doubleValue(),
 										   ((Double) vert.get(3 * vCnt + 1)).doubleValue(),
 										   ((Double) vert.get(3 * vCnt + 2)).doubleValue());
@@ -228,14 +233,17 @@ public class NoSer
 		
 		return vertices;
 	}
-	
+
+	/**
+	 * convert a Facet3D to a Map containing a List with the vertex-indices
+	 * and a List with the vertex-labels 
+	 * @param facet Facet3D to be converted
+	 * @return Map 
+	 */
 	public static Map<String,Object> getFacet3DState(Facet3D facet)
 	{
-		//Hashtable h = new Hashtable();
 		Map<String,Object> h = new HashMap<String,Object>();
 		
-		//int[] indices = facet.indices;
-		//String[] vertexLabels = facet.vertexLabels;
 		List<Integer> indices = new ArrayList<Integer>();
 		List<String> vertexLabels = new ArrayList<String>();
 		for (int pCnt = 0; pCnt < facet.numPoints; pCnt++)
@@ -254,6 +262,12 @@ public class NoSer
 		return h;
 	}
 	
+	/**
+	 * convert the vertex-array if a Facet3D to a List of Doubles;
+	 * used for saving the startFacet of a foldout
+	 * @param facet Facet3D whose vertex-array should be converted
+	 * @return List of Doubles
+	 */
 	public static List<Double> getFacet3DVertexState(Facet3D facet)
 	{
 		List<Double> vert = getVerticesState(facet.points);
@@ -261,12 +275,18 @@ public class NoSer
 		return vert;
 	}
 	
+	/**
+	 * reconstruct a Facet3D form a Map containing a List with the vertex-indices
+	 * and a List with the vertex-labels, and an array of vertices  
+	 * @param map Map containing a List with the vertex-indices
+	 * and a List with the vertex-labels
+	 * @param vertices array of Vector3D (the vertices)
+	 * @return Facet3D
+	 */
 	public static Facet3D setFacet3DState(Map<String,Object> map, Vector3D[] vertices)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
 		
-		//int[] indices = new int[0];
-		//String[] vertexLabels = new String[0];
 		List<Integer> indices = new ArrayList<Integer>();
 		List<String> vertexLabels = new ArrayList<String>();
 		
@@ -289,7 +309,14 @@ public class NoSer
 		return facet;
 	}
 	
-	//public static Facet3D setFacet3DVertexState(double[] vertices)
+
+	/**
+	 * convert a List of Doubles to an array of Vector3D and use these
+	 * as vertices of a Facet3D; used for retrieving the startFacet
+	 * of a foldout
+	 * @param vertices List of Doubles to be converted
+	 * @return Facet3D
+	 */
 	public static Facet3D setFacet3DVertexState(List<Double> vertices)
 	{
 		Vector3D[] points = setVerticesState(vertices);
@@ -301,13 +328,20 @@ public class NoSer
 		return new Facet3D(points, indices, DrawConstants.objectColor);
 	}
 	
-	
+	/**
+	 * convert an Object3D to a Map containing: <br>
+	 * the number of vertices, the vertex-array coverted to a List of Doubles,
+	 * the number of vertex labels, the vertex-label-array converted to a List of String,
+	 * the number of facets, the facet array converted to a List of Maps
+	 * various parameters related to center and diameter   
+	 * @param object Object3D to be converted
+	 * @return Map
+	 */
 	public static HashMap<String,Object> getObject3DState(Object3D object)
 	{
 		HashMap<String,Object> h = new HashMap<String,Object>();
 		
 		int numVertices = object.numVertices;
-		//double[] vertices = getVerticesState(object.vertices);
 		List<Double> vertices = getVerticesState(object.vertices);
 		int numVertexLabels = object.numVertexLabels;
 		String[] vertexLabelsArray = object.vertexLabels;
@@ -321,24 +355,15 @@ public class NoSer
 					
 		}
 
-//System.out.println("get numVertices " + numVertices);
-//System.out.println("get vertstate " + vertices.length);
-		
 		h.put("numVertices", new Integer(numVertices));
 		h.put("vertices", vertices);
 		h.put("numVertexLabels", new Integer(numVertexLabels));
 		h.put("vertexLabels", vertexLabels);
 
 		int numFacets = object.numFacets;
-		//Hashtable[] facets = new Hashtable[numFacets];
-		//for (int fCnt = 0; fCnt < numFacets; fCnt++)
-		//	facets[fCnt] = getFacet3DState(object.facets[fCnt]);
 		List<Map<String,Object>> facets = new ArrayList<Map<String,Object>>();
 		for (int fCnt = 0; fCnt < numFacets; fCnt++)
 			facets.add(getFacet3DState(object.facets[fCnt]));
-
-//System.out.println("get numFacets " + numFacets);
-//System.out.println("get facstate " + facets.length);
 		
 		h.put("numFacets", new Integer(numFacets));
 		h.put("facets", facets);
@@ -346,7 +371,6 @@ public class NoSer
         boolean centerSet = object.centerSet;
         boolean diamSet = object.diamSet;
         double diameter = object.diameter;
-        //double[] center = getVectorDState(object.center);
         List<Double> center = getVectorDState(object.center);
         int modelCode = object.modelCode;
 		
@@ -358,7 +382,12 @@ public class NoSer
         
 		return h;
 	}
-	
+
+	/**
+	 * convert a Map (contents see method getObject3DState) to an Object3D
+	 * @param map Map to be converted
+	 * @return Object3D
+	 */
 	public static Object3D setObject3DState(Map<String,Object> map)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
@@ -366,10 +395,8 @@ public class NoSer
 		Object3D object = new EmptyObject3D();
 		
 		int numVertices = 0;
-		//double[] vertices = new double[0];
 		List<Double> vertices = new ArrayList<Double>(); 
 		int numVertexLabels = 0;
-		//String[] vertexLabels = new String[0];
 		List<String> vertexLabels = new ArrayList<String>(); 
 		
 		if (h.containsKey("numVertices"))
@@ -381,26 +408,17 @@ public class NoSer
 		if (h.containsKey("vertexLabels"))
 			vertexLabels = h.getStringList("vertexLabels");
 
-//System.out.println("set numVertices " + numVertices);
-//System.out.println("set vertstate " + vertices.length);
-		
 		int numFacets = 0;
-		//Hashtable[] facets = new Hashtable[0];
 		List<Map<String,Object>> facets = new ArrayList<Map<String,Object>>();  
 		
 		if (h.containsKey("numFacets"))
 			numFacets = h.getInt("numFacets");
 		if (h.containsKey("facets"))
 			facets = h.getMapList("facets");
-
-//System.out.println("set numFacets " + numFacets);
-//System.out.println("set facstate " + facets.length);
-		
 		
 		boolean centerSet = false;
 		boolean diamSet = false;
 		double diameter = 0;
-		//double[] center = new double[0];
 		List<Double> center = new ArrayList<Double>();  
 		int modelCode = 0;
 		
@@ -426,17 +444,13 @@ public class NoSer
 		object.numVertexLabels = numVertexLabels;
 		object.vertexLabels = vertexLabelsArray;
 		
-//System.out.println("set vertices " + object.vertices.length);
-		
 		object.numFacets = numFacets;
 		object.facets = new Facet3D[numFacets];
 		for (int fCnt = 0; fCnt < numFacets; fCnt++)
-		{	//object.facets[fCnt] = setFacet3DState(facets[fCnt], object.vertices);
+		{	
 			object.facets[fCnt] = setFacet3DState((Map<String,Object>) facets.get(fCnt), object.vertices);
-//System.out.println("facets " + fCnt);			
+		
 		}
-
-//System.out.println("set facets " + object.facets.length);
 
 		object.centerSet = centerSet;
 		object.diamSet = diamSet;
@@ -446,10 +460,16 @@ public class NoSer
 		
 		return object;
 	}
-	
+
+	/**
+	 * convert a Vector containing the contruction of an ObjectGroup3D (the elements of such construction are
+	 * Lines3D's and Plane3D's, see class ObjectWithPlane) to a List (of Object) by converting the Lines3D's and Plane3D's,
+	 * to Lists of Doubles   
+	 * @param construction construction Vector to be converted
+	 * @return List of Object
+	 */
 	public static List<Object> getConstructionState(Vector construction)
 	{
-		//Vector conState = new Vector();
 		List<Object> conState = new ArrayList<Object>();
 		
 		for (int cCnt = 0; cCnt < construction.size(); cCnt++)
@@ -458,26 +478,26 @@ public class NoSer
 			
 			if (o instanceof Line3D)
 			{	Line3D line3D = (Line3D) o;
-				//double[] line = getLine3DState(line3D);
 				List<Double> line = getLine3DState(line3D);
-				//conState.addElement(line);
 				conState.add(line);
 			}
 			else if (o instanceof Plane3D)
 			{	Plane3D plane3D = (Plane3D) o;
-				//double[] plane = getPlane3DState(plane3D);
 				List<Double> plane = getPlane3DState(plane3D);
-				//conState.addElement(plane);
 				conState.add(plane);
 				
 			}
 				
 		}
-		
-		
 		return conState;
 	}
 	
+	/**
+	 * convert a List of Object (each Object being a List of Doubles representing a Line3D or a Plane3D)
+	 * to a Vector containing these Lines3D's and Plane3D's  
+	 * @param l List of Object to be converted
+	 * @return construction Vector
+	 */
 	public static Vector setConstructionState(List<Object> l)
 	{
 		Vector construction = new Vector();
@@ -486,16 +506,12 @@ public class NoSer
 		
 		for (int cCnt = 0; cCnt < conState.size(); cCnt++)
 		{
-			//double[] instruct = (double[]) conState.elementAt(cCnt);
-			//List<Double> instruct = (ArrayList<Double>) conState.elementAt(cCnt);
 			List<Double> instruct = conState.getDoubleList(cCnt);
 			
-			//if (instruct.length == 6)
 			if (instruct.size() == 6)
 			{	Line3D line3D = setLine3DState(instruct);
 				construction.addElement(line3D);
 			}
-			//else if (instruct.length == 9)
 			else if (instruct.size() == 9)
 			{	Plane3D plane3D = setPlane3DState(instruct);
 				construction.addElement(plane3D);
@@ -506,7 +522,13 @@ public class NoSer
 		return construction;
 	}
 
-	
+
+	/**
+	 * check if Object3D o contains Facet3D f
+	 * @param o Object3D to check
+	 * @param f Facet3D to check
+	 * @return true/false
+	 */
 	public static int containsFacet(Object3D o, Facet3D f)
     {   o.fixFacetArray();
         int result = -1;

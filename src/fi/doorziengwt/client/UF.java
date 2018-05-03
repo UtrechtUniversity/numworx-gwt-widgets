@@ -1,6 +1,10 @@
 package fi.doorziengwt.client;
 
-// universal formatter
+/**
+ * universal formatter
+ * @author huub
+ */
+
 class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)

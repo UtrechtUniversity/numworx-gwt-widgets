@@ -2,9 +2,6 @@ package fi.doorziengwt.client;
 
 
 import java.util.*;
-import java.io.Serializable;
-
-//import javax.swing.*;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -30,239 +27,380 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
-import fi.doorziengwt.client.DrawingShell.TouchHandler;
-
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.ListBox;
-
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ChangeEvent;
 
 
-// class for main drawing area
-// a Panel containing one or more objects to be drawn in
-// such as an Object3DContainer or others
-// also contains all control routines
+/**
+ * class for the main drawing area; the class contains a Canvas for drawing and intercepting
+ * Mouse and Touch Events on the Canvas, and a second Canvas which is only used to show
+ * the cut of a 3d-object; this class also contains all methods for manipulating 3d-objects; 
+ * manipulating the 3d-object in general works as follows:<br>
+ * all changes to the 3d-object need Mouse/Touch actions, e.g. selecting points to put a plane
+ * through; the tool bars call the relevant method, e.g. drawPlane in which the mouseMode
+ * is changed to (e.g.) DRAWPLANE and the program waits for (repeated) Mouse/Touch action, which can be
+ * handled correctly since the mouseMode is known     
+ * @author huub
+ */
 public class DrawingPanel2 extends LayoutPanel
-{   // applet frame
+{   
+	/**
+	 * owner, handles button actions from the toolbars
+	 */
     DoorzienGWT owner;
 
-    // the 3D panel(s)
-    Object3DContainer panel3D;// = new Object3DContainer();
-    Object3DContainer cutPanel;// = new Object3DContainer();
+    /**
+     * drawing the main 3d-object and a cut (if needed) 
+     */
+    Object3DContainer panel3D;
+    Object3DContainer cutPanel;
     
+    /**
+     * default model code
+     */
     int modelCode = DoorzienGWT.CUBE;
 
+    /**
+     * zoom parameters
+     */
     public static double MAXZOOM = 15e-1d;
     public static double MINZOOM = 2e-1d; 
     public static double ZOOMSTEP = 1e-1d;
     public static double defaultZoom = 8e-1d;
+    /**
+     * actual zoom
+     */
     public double zoom = defaultZoom;
-    // projections
+
+    /**
+     * projections
+     */
     public static int CENTRALPROJ = 0;
     public static int PARALLELPROJ = 1;
+    /**
+     * actual projection
+     */
     public int projection = CENTRALPROJ;
     
-    // object is wireframe/solid
+    /**
+     * should the object be shown as a solid (or a wireframe)
+     */
     boolean filled = false;
-    // fill planes
+    /**
+     * should planes be filled or transparent
+     */
     boolean planesFilled = false;
-    // show cut
+
+    /**
+     * should a cut be shown
+     */
     boolean showCut = false;
-    // figure is cut
+    /**
+     * is the object cut into two pieces?
+     */
     boolean figureCut = false;
 
-    // mouse modes
-    // lines
+    /**
+     * mouse mode for rotating
+     */
     public static final int INERT = 0;
+    /**
+     * line mouse modes
+     */
     public static final int DRAWLINE = 1;
     public static final int DELETELINE = 2;
     
-    // planes
+    /**
+     * plane mouse modes
+     */
     public static final int DRAWPLANE = 5;
-    // voor EPN
     public static final int DRAWPARPLANE = 12;    
-    
     public static final int DELETEPLANE = 6;
-    public static final int ROTATEPLANE = 7;
-    public static final int TRANSLATEPLANE = 8;
+    
+    /**
+     * cut(ting) mouse modes
+     */
     public static final int SHOWHIDECUT = 9; 
     public static final int CUTOBJECT = 10;    
     
-    // fold out
+    /**
+     * mouse mode for fold out
+     */
     public static final int FOLDOUT = 11;        
 
-    // default for mouseMode
+    /**
+     * default mouse mode
+     */
     public int mouseMode = INERT;
+    /**
+     * remembering a mouse mode
+     */
     public int oldMouseMode;
     
-    // listener for mouse movements on panel3D
-    //MLMML listener;
-
-    // drawing
-    boolean startUp = false;//true;
-    //Image offscreen = null;
-
-    // code of originalObject
-//    int modelCode = 0;
-    // the object (not group) being studied
+    /**
+     * the initial object
+     */
     Object3D originalObject;
-    // the objectgroup being manipulated
-    // after successfully finishing the manipulation update
+    /**
+     * the ObjectGroup3D representing the manipulated initial object  
+     */
     ObjectGroup3D currentObjectGroup;
-    // temporary version of object being studied, nodig?
+    /**
+     * temporary copies of originalObject
+     */
     Object3D tempOrigObject, tempOrigObject2;
-    // a temporary objectgroup in case we abort the manipulation
+
+    /**
+     * temporary copies of currentObjectGroup;
+     */
     ObjectGroup3D tempObjectGroup, tempObjectGroup2;    
-    // two halves if object was cut
+    /**
+     * the two halves if the object was cut into two pieces
+     */
     ObjectGroup3D cutObjectGroup;
 
-    // drawing lines and planes
+    /**
+     * drawing lines and planes
+     */
     int pointsSelected = 0;
     Vector3D point1, point2, point3;
-    Vector3D movedPoint, clickedPoint;
-    Vector3D[] movedEdgeWithPoint, clickedEdgeWithPoint;
+    /**
+     * clicked vertex or clicked point on an edge (not a vertex)
+     */
+    Vector3D clickedPoint;
+    Vector3D[] clickedEdgeWithPoint;
+    /**
+     * idem for preview, not implemented
+     */
+    Vector3D movedPoint;
+    Vector3D[] movedEdgeWithPoint;
     
+    /**
+     * a selected line, e.g. for deleting
+     */
     Line3D lineChoosen;
+    /**
+     * a selected plane, e.g. for deleting
+     */
     Plane3D planeChoosen;
 
-    Vector construction, transRotConstruct;
+    /**
+     * the recipe for the current object
+     */
+    Vector construction; 
+    /**
+     * the color recipe for the current object
+     */
     Vector constructionColors;
 
-    Plane3D rotPlane, rotPlaneChoosen;
-    Line3D rotLine;
-    //Vector3D[] rotEdgeWithPoint;
-    
-    double minRot, maxRot;
-    Plane3D transPlane, transPlaneChoosen;
-    double minTrans, maxTrans;
-
+    /**
+     * plane selected to be copied to a parallel plane  
+     */
     Plane3D parPlaneChoosen;
+    /**
+     * selected point of the parallel plane to be constructed
+     */
     Vector3D parPointChoosen;
 
+    /**
+     * plane selected for showing cut or cutting object 
+     */
     Plane3D cutPlane, cutPlaneChoosen;
+    /**
+     * remembering planesFilled
+     */
     boolean oldPlanesFilled;
 
+    /**
+     * facet chosen as center of fold out
+     */
     Facet3D facetChoosen;
     
+    /**
+     * number of lines in currentObjectGroup3D
+     */
     int numLines = 0;
+    /**
+     * number of planes in currentObjectGroup3D
+     */
     int numPlanes = 0;
 
-    // lengthening lines
-    // percentwise or absolute?
-    public static double MAXLLFACTOR = 3;
-    public static double LLSTEP = 2e-1d;
-//    public static double llFactor = 0;
-
-    // making a foldout    
+    /**
+     * making a fold out: copies of initial object and  
+     * currentObjectGroup3D to be used for the fold out 
+     */
     Object3D foldOutObject;
     ObjectGroup3D foldOutObjectGroup;
+    /**
+     * central facet of the fold out
+     */
     Facet3D startFacet = null;
+    
+    /**
+     * keeping track of facets during construction of fold out  
+     */
     boolean[] facetsUsed;
+    
+    /**
+     * root of the fold out tree, see class FoldOutTreeNode 
+     */
     FoldOutTreeNode foldOutTreeRoot;
-    // initial fold out factor
-    double foldOutInit = 2e-1d;
-    // current fold out factor
-    double currentFoldOut;
-    // filling at foldout
-    boolean oldFilled;
-    // flattening
-    boolean flattened = false;
-    // position of whole figure at foldout
-    Matrix3D oldPos;
-    // zoom at foldout
-//    double oldZoom;
 
-    // using the slider
+    /**
+     * initial fold out factor (just a little folded open)
+     */
+    double foldOutInit = 2e-1d;
+
+    /**
+     * actual fold out factor
+     */
+    double currentFoldOut;
+
+    /**
+     * fill of object before becoming a fold out
+     */
+    boolean oldFilled;
+
+    /** 
+     * is the fold out flattened?
+     */
+    boolean flattened = false;
+    /**
+     * position of object before becoming a fold out
+     */
+    Matrix3D oldPos;
+
+    /**
+     * value of the fold out slider 
+     */
     double sliderValue = 0;
+    /**
+     * the fold-out slider
+     */
     Slider2 slider;
 
-  
+    /**
+     * button for flattening the fold out
+     */
     PushButton flatButton;
     
-    // tick modes
-    public static int NOTICKS = 0;
-    public static int INHERITED = 1;
-    public static int INDIVIDUAL = 2;
-    public int tickMode = NOTICKS;
-
-    //public static int TICKNUM = 0;    
-    //public static boolean TICKSVISIBLE = false;
-    
-//GWT    
-    //public DropButton dropButton;
-//GWT    
-//    public LWPopUp2 dropMenu;
-    
-    public ListBox dropBox;
-    
-    // undo
+    /**
+     * history for undo/redo
+     */
     Vector history = new Vector();
+    /**
+     * maximum size of history
+     */
     public static int MAXHISTORY = 20;
+    /**
+     * index in history of current object being drawn 
+     */
     public int historyPointer = 0;
     
-    // managing the cursor
-    // coordinates
+    /**
+     * keeping track of mouseDown/TouchStart Events 
+     */
     int xClicked;
     int yClicked;
+    
+    /**
+     * help point for preview, not implemented 
+     */
     int xMoved;
     int yMoved;
-    // circle radius for rotate modes
+    
+    /**
+     * circle radius for rotate modes
+     */
     public static double RADFACTOR = 1d;
-    // managing the crosshair
-    boolean helpPoint = false;
-    // using the preview
+
+    /**
+     * using the preview, preview is not implemented
+     */
     boolean previewOn = false;
     
-    //MLMML ml;
-    //CutMLMML cutml;
-    
-    // voor de demo
-    boolean draaibaar = true;
-    
-// for testing
-String testString = "";
-// font for testing
-//Font fo = new Font("Helvetica", Font.PLAIN, 11);
-//GWT
-//FontMetrics fm = getFontMetrics(fo);
+    /** 
+     * Sting for testing
+     */
+    String testString = "";
 
-
+    /**
+     * Canvas for drawing
+     */
 	Canvas drawingPanelCanvas;
+	/**
+	 * Context2d to draw with
+	 */
 	Context2d drawingPanelContext2d;
+	
+	/**
+	 * width and height
+	 */
 	int breedte, hoogte;
+	
+	/**
+	 * additional Canvas for drawing the cut by a plane
+	 */
 	Canvas cutPanelCanvas;
+	/**
+	 * Context2d for drawing on cutPanelCanvas 
+	 */
 	Context2d cutPanelContext2d;
 	
+	/**
+	 * flagg for dragging
+	 */
 	boolean dragging = false;
+	/**
+	 * circle determining the type of dragging, see method MouseMoveTouchMoveAction
+	 */
     boolean inCircle = false;
+    /**
+     * start coordinates for MouseDown/Touch Start Events
+     */
     int xStart, yStart;
 	
-// for testing speed
+    /**
+     * testing speed
+     */
+    public static Date date;
+    public static long startTime;
+    public static long endTime;
 
-public static Date date;
-public static long startTime;
-public static long endTime;
+    /**
+     * set start time
+     */
+    public static void setStart()
+    {   date = new Date();
+    	startTime = date.getTime();
+    }    
 
-public static void setStart()
-{   date = new Date();
-    startTime = date.getTime();
-}    
+    /**
+     * get time elapsed since start time
+     * @return elapsed time
+     */
+    public static long getTime()
+    {   date = new Date();
+    	endTime = date.getTime();
+    	return (endTime - startTime);
+    }    
 
-public static long getTime()
-{   date = new Date();
-    endTime = date.getTime();
-    return (endTime - startTime);
-}    
-
-public static void showTime(String comment)
-{   System.out.println(comment + " " + getTime());
+    /**
+     * show elepsed time in console
+     * @param comment some comment
+     */
+    public static void showTime(String comment)
+    {   System.out.println(comment + " " + getTime());
     
-}    
+    }    
 
-    // constructor    
+    /**
+     * constructor: create drawing and cutPanel Canvas, add handlers
+     * @param o owner
+     * @param b width
+     * @param h height
+     * @param startModel code for initial model
+     */
     public DrawingPanel2(DoorzienGWT o, int b, int h, int startModel)
     {   owner = o;
     
@@ -312,61 +450,21 @@ public static void showTime(String comment)
       	cutPanelCanvas.addTouchMoveHandler(cutTouchHandler);
       	cutPanelCanvas.addTouchEndHandler(cutTouchHandler);
       	
-    	//add(cutPanelCanvas);
-    	//setWidgetLeftWidth(cutPanelCanvas, 0, Style.Unit.PX, breedte/2, Style.Unit.PX);
-		//setWidgetTopHeight(cutPanelCanvas, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-		//cutPanelCanvas.setVisible(false);
-		//cutPanelContext2d = drawingPanelCanvas.getContext2d();
-    	
     	
     	panel3D = new Object3DContainer(drawingPanelContext2d, breedte, hoogte);
-//GWT    	
-    	//cutPanel = new Object3DContainer(cutPanelContext2d, breedte/2, hoogte);
-        
-// ALLEEN VOOR FI        
+    	
+    	// preview is not implemented
         if (DoorzienGWT.version == DoorzienGWT.FI)
             previewOn = true;
-            
-//GWT
-/*        
-        dropButton = new DropButton(owner.tt("divideSidesText"), 20);
-        dropButton.setLocation(panel3D.getSize().width - 
-                               dropButton.getSize().width, 0);
-        dropButton.addMouseListener(new DropML());
-*/        
-                               
-//GWT
-/*        
-        dropMenu = new LWPopUp2(this, "", owner.dropNumHelpPoints);
-        dropMenu.setCheckable(true);
-        dropMenu.setLocation(panel3D.getSize().width - 
-                             dropMenu.getSize().width, 
-                             dropButton.getSize().height);
-*/                             
-        
-/*        
-        dropBox = new ListBox();
-        dropBox.addItem("verdeel in");
-        dropBox.addItem("2 delen");
-        dropBox.addItem("3 delen");
-        dropBox.addItem("4 delen");
-        dropBox.addItem("5 delen");
-        dropBox.addItem("6 delen");
-        
-        add(dropBox);
-    	setWidgetLeftWidth(dropBox, breedte - 90, Style.Unit.PX, 90, Style.Unit.PX);
-		setWidgetTopHeight(dropBox, 0, Style.Unit.PX, 20, Style.Unit.PX);
-		dropBox.setVisible(false);
-		
-		dropBox.addChangeHandler(new ListChangeHandler());
-*/		
-		
+
+        // slider for foldout
 		slider = new Slider2(this, 0, 1);
 		add(slider.sliderCanvas);
     	setWidgetLeftWidth(slider.sliderCanvas, breedte - Slider2.horSize - 1, Style.Unit.PX, Slider2.horSize, Style.Unit.PX);
 		setWidgetTopHeight(slider.sliderCanvas, 1, Style.Unit.PX, Slider2.vertSize, Style.Unit.PX);
 		slider.setVisible(false);
 		
+		// button to flatten foldout
 		flatButton = new PushButton("plat");
 		flatButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		add(flatButton);
@@ -376,21 +474,15 @@ public static void showTime(String comment)
 		flatButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		flatButton.addClickHandler(new FlatCL());
 		
-		
-        
-//GWT                                     
-//        cutml = new CutMLMML();
-//        cutPanel.addMouseListener(cutml);
-//        cutPanel.addMouseMotionListener(cutml);        
-        
         setNewModel(startModel);
         
     }  // constructor  
 
-    public void zetDraaibaar(boolean b)
-    {   draaibaar = b; 
-    }
-    
+
+    /**
+     * set the projection
+     * @param proj code for projection
+     */
     public void setProjection(int proj)
     {   if (proj == CENTRALPROJ)
             projection = CENTRALPROJ;
@@ -401,6 +493,11 @@ public static void showTime(String comment)
         if (cutPanel != null)
             cutPanel.setProjection(projection);
     }
+    
+    /**
+     * set lettering vertices
+     * @param b true/false
+     */
     public void setLetters(boolean b)
     {   DrawConstants.letters = b;
         panel3D.repaint();
@@ -415,6 +512,12 @@ public static void showTime(String comment)
             cutPanel.repaint();
     }
     
+    /**
+     * set the number of help points (tickmarks); note how this works: <br>
+     * change the parameter DrawConstants.TICKNUM, set the help points in 
+     * origianlObject and rebuild currentObjectGroup
+     * @param num number of help points per edge
+     */
     public void setHelpPoints(int num)
     {   DrawConstants.TICKNUM = num;
     
@@ -460,110 +563,43 @@ public static void showTime(String comment)
             fillPlanes(planesFilled);        
             if (tempVisible)
                 panel3D.initializeModel(tempObjectGroup, false);        
-            
-        
         }
-// voor FI nog tempObjectGroup2        
     
     }
-    
-    // switching on and off from the MENU
-    // default on is divide in two parts
-    public void setHelpPointDrop(boolean b)
-    {   
-    	
 
-   	
-    	if (b)
-        {   setHelpPoints(1);
-//            dropMenu.switchTo(owner.tt("twoPartsText"));
-            if ((mouseMode == DRAWLINE) ||
-                (mouseMode == DRAWPLANE) ||
-                (mouseMode == DRAWPARPLANE)
-               )
-            {   //dropBox.setVisible(true);
-            	//panel3D.add(dropButton);
-                //panel3D.repaint();
-            }    
-        }
-        else
-        {   setHelpPoints(0);
-        	//dropBox.setVisible(false);
-            //panel3D.remove(dropMenu);
-            //panel3D.remove(dropButton);
-            //panel3D.repaint();
-        }    
-   
-    }
-    
-    // showing the drop button etc.
-    public void showHelpPointDrop(boolean b)
-    {   
-  
-    	if (b)
-        {   if (DrawConstants.TICKNUM > 0)
-            {
-        		//dropBox.setVisible(true);
-                //if (dropButton != null)
-                //    panel3D.add(dropButton);
-                //panel3D.repaint();
-            }
-        }
-        else
-        {   
-        	//dropBox.setVisible(false);
-        	
-        	//if (dropMenu != null)
-            //    panel3D.remove(dropMenu);
-            //if (dropButton != null)    
-            //    panel3D.remove(dropButton);
-            //panel3D.repaint();
-        }
-            
-    
-    }
-    
-    // changing the model to a new one
+    /**
+     * change the model to a new one
+     * @param modelCode code for new model
+     */
     public void setNewModel(int modelCode)
     {   
-		// algemene reset
-		// boven
+		// general reset
         owner.topToolBar.resetDefaults();
         numLines = 0; 
         DrawConstants.llFactor = 0;
         numPlanes = 0;
         planesFilled = false;
-        // cutPanel3D verwijderen                        
+        // remove cutPanel3D                        
         if (showCut)
             setCutPanel(false);
         showCut = false;
         figureCut = false;
-        // slider verwijderen
+        // remove slider
         setSlider(false, 0, 0, 1);
 
-		// rechts
         owner.rightToolBar.resetDefaults();
 
-        // enable options
-//GWT        
-//        owner.enableOptions(true);
         DrawConstants.letters = false;
-        
+        // menu
         owner.resetLetters();
-
-		// projectie
-        //if (DoorzienDWO.version == DoorzienDWO.EPN)
-        //    setProjection(PARALLELPROJ);        
-        //else
-            setProjection(CENTRALPROJ);
-            
+        setProjection(CENTRALPROJ);
+        // menu
         owner.resetProjection();
         
-        // hulppunten
+        // help points
         DrawConstants.TICKNUM = 0;
         
         owner.resetHelpPoints();
-        showHelpPointDrop(false);
         
         tempObjectGroup = null;
         tempObjectGroup2 = null;
@@ -572,17 +608,16 @@ public static void showTime(String comment)
         
         panel3D.hideHelpLine();                
         panel3D.hideHelpPoint();                
-        helpPoint = false;
         panel3D.testString = "";
 
         mouseMode = INERT;
         history.removeAllElements();        
 
-		// vanaf hier splitsen
+        // always the case?
 		if (modelCode < owner.MYFIGURE)
 		{
 	        currentObjectGroup = makeNewModel(modelCode);        
-    	    // HIER!
+    	    // HERE!
 	        setFilled(false);        
     	    panel3D.initializeModel(currentObjectGroup, true);
 
@@ -591,24 +626,20 @@ public static void showTime(String comment)
         	panel3D.setZoomFactor(zoom);        
         
         	addToHistory();
-        	
-//        	owner.helpBar.setText(owner.tt("rotateText"));
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         }
-        //else if ((modelCode == owner.MYFIGURE) && !startUp)
-        //	owner.viewer.setScormedObject3D();	
         
     }    
 
+    /**
+     * create a new model of type code in originalObject  
+     * @param code code of the new model 
+     * @return the new model as an ObjectGroup3D 
+     */
     public ObjectGroup3D makeNewModel(int code)
     {   modelCode = code;
         Object3D model;
         ObjectGroup3D modelGroup;
-        // default?
-// binnenvulling is onzichtbaar
-// maar voor buitenkant toch NZMINFIRST
-// is dit ook OK voor filled = false?
-        //panel3D.paintType = Object3DContainer.PUREZ;        
         switch (code)
         {   case (DoorzienGWT.CUBE):
                 model = new Box(1, 1, 1, DrawConstants.objectColor);
@@ -716,13 +747,17 @@ public static void showTime(String comment)
         }
         model.modelCode = code;
         originalObject = model;
-//System.out.println("model-numFacets = " + model.numFacets);        
+        // put new model in a group        
         modelGroup = new ObjectGroup3D(model, false);
         modelGroup.numVertexLabels = model.numVertexLabels;
         return modelGroup;
     }    
 
-    // overloaded
+    /**
+     * overloaded: put Object3D object in currentObjectGroup 
+     * @param object given Object3D
+     * @return currentObjectGroup
+     */
     public ObjectGroup3D makeNewModel(Object3D object)
     {
     	originalObject = object;
@@ -732,6 +767,9 @@ public static void showTime(String comment)
         return currentObjectGroup;
     }
     
+    /**
+     * add a deep copy of currentObjectGroup to the history Vector
+     */
     public void addToHistory()
     {   int hisSize = history.size();
         ObjectGroup3D og = (ObjectGroup3D) currentObjectGroup.deepCopy();
@@ -746,20 +784,20 @@ public static void showTime(String comment)
         }
         if (history.size() > 1)
             owner.rightToolBar.undoButton.setEnabled(true);
-//System.out.println("added, his = " + history.size());                
         owner.rightToolBar.redoButton.setEnabled(false);            
     }
-    
+
+    /**
+     * set currentObjectGroup to the previous ObjectGroup3D in the history Vector  
+     */
     public void previousObjectGroup()
     {   int hisSize = history.size();
-//System.out.println("his = " + hisSize);    
+    
         if (hisSize > 1)
         {   historyPointer--;
-            //history.removeElementAt(hisSize - 1);
-//System.out.println("removed, his = " + history.size());                        
             currentObjectGroup = (ObjectGroup3D) ((ObjectGroup3D) history.elementAt(historyPointer)).deepCopy();
-            originalObject = currentObjectGroup.leftMostLeaf();             
-            //panel3D.initializeModel(currentObjectGroup, false);
+            originalObject = currentObjectGroup.leftMostLeaf();
+            // use construction to find numLines and numPlanes
             Vector construction = new Vector();
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
@@ -775,20 +813,14 @@ public static void showTime(String comment)
                 {   numPlanes++;
                 }
             }
-//System.out.println("numLines = " + numLines);
-//System.out.println("numPlanes = " + numPlanes);
-
             DrawConstants.llFactor = 0;
             if (currentObjectGroup instanceof ObjectWithLine)
             {    DrawConstants.llFactor = ((ObjectWithLine) currentObjectGroup).getLlFactor();
-//System.out.println("OWL ll = " + llFactor);                            
             }
             else if (currentObjectGroup instanceof ObjectWithPlane)
-            {
-            	DrawConstants.llFactor = ((ObjectWithPlane) currentObjectGroup).getLlFactor();
+            {  	DrawConstants.llFactor = ((ObjectWithPlane) currentObjectGroup).getLlFactor();
             }    
             
-//System.out.println("ll = " + llFactor);                
             originalObject.setTickMarks(DrawConstants.TICKNUM);
             currentObjectGroup = rebuild(originalObject, construction, null);
             originalObject = currentObjectGroup.leftMostLeaf();                         
@@ -803,17 +835,17 @@ public static void showTime(String comment)
         
     }    
 
-
+    /**
+     * set currentObjectGroup to the next ObjectGroup3D in the history Vector  
+     */
     public void nextObjectGroup()
     {   int hisSize = history.size();
-//System.out.println("his = " + hisSize);    
+   
         if ((hisSize - 1) > historyPointer)
         {   historyPointer++;
-            //history.removeElementAt(hisSize - 1);
-//System.out.println("removed, his = " + history.size());                        
             currentObjectGroup = (ObjectGroup3D) ((ObjectGroup3D) history.elementAt(historyPointer)).deepCopy();
-            originalObject = currentObjectGroup.leftMostLeaf();             
-            //panel3D.initializeModel(currentObjectGroup, false);
+            originalObject = currentObjectGroup.leftMostLeaf();
+            // use construction to find numLines and numPlanes
             Vector construction = new Vector();
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
@@ -829,19 +861,14 @@ public static void showTime(String comment)
                 {   numPlanes++;
                 }
             }
-//System.out.println("numLines = " + numLines);
-//System.out.println("numPlanes = " + numPlanes);
-
             DrawConstants.llFactor = 0;
             if (currentObjectGroup instanceof ObjectWithLine)
             {    DrawConstants.llFactor = ((ObjectWithLine) currentObjectGroup).getLlFactor();
-//System.out.println("OWL ll = " + llFactor);                            
             }
             else if (currentObjectGroup instanceof ObjectWithPlane)
             {
             	DrawConstants.llFactor = ((ObjectWithPlane) currentObjectGroup).getLlFactor();
             }    
-//System.out.println("ll = " + llFactor);                
             originalObject.setTickMarks(DrawConstants.TICKNUM);
             currentObjectGroup = rebuild(originalObject, construction, null);
             originalObject = currentObjectGroup.leftMostLeaf();                         
@@ -856,7 +883,10 @@ public static void showTime(String comment)
         
     }    
 
-
+    /**
+     * set the number of lines to nLines, inform the topToolBar
+     * @param nLines new value of numLines
+     */
     public void setNumLines(int nLines)
     {   numLines = nLines;
         if (nLines == 0)
@@ -870,6 +900,10 @@ public static void showTime(String comment)
 
     }
     
+    /**
+     * set the number of planes to nPlanes, inform the topToolBar
+     * @param nPlanes the new number of planes
+     */
     public void setNumPlanes(int nPlanes)
     {   numPlanes = nPlanes;
         if (nPlanes == 0)
@@ -885,15 +919,23 @@ public static void showTime(String comment)
 
     }
     
+    /**
+     * rebuild a start Object3D according to a recipe; use the recipe in
+     * the given order! 
+     * @param sObject start Object3D
+     * @param recipe list with points, lines and planes 
+     * @param colors list with corresponding colors
+     * @return an ObjectGroup3D with points added and cut by lines and planes
+     */
     public ObjectGroup3D rebuild(Object3D sObject, Vector recipe, Vector colors)
     {   Object3D start = sObject.deepCopy();
         start.setVisible(true);
-        // dummy object group
+        // create dummy object group
         ObjectGroup3D startGroup = new ObjectGroup3D(start, false);   
         startGroup.filled = start.filled; 
         startGroup.numVertexLabels = start.numVertexLabels;
         startGroup.fixFacetArray(); //!!!
-        // nu bouwen volgens recipe
+        // now build according to recipe
         for (int i = 0; i < recipe.size(); i++)
         {   Object ob = recipe.elementAt(i);
             if (ob instanceof Plane3D)
@@ -944,123 +986,55 @@ public static void showTime(String comment)
             
         }
         return startGroup;
-// dit kan ook deep copy in OWL en OWP vervangen
-// wanneer die methode niet goed werkt
     }
     
+    /**
+     * set the slider for the fold out visible/not visible; 
+     * when setting to visible, also set the initial value, minimum and maximum value
+     * (see also class Slider2)  
+     * @param b slider visible/not visible
+     * @param init initial value of the slider
+     * @param min minimum value of the slider  
+     * @param max maximum value of the slider
+     */
     public void setSlider(boolean b, double init, double min, double max)
     {   
-//    	if (mouseMode == FOLDOUT)
-//    	{
-//    		currentFoldOut = init;
-//    	}
-    	
-//GWT
-    	
     	if (b)
         {   sliderValue = init;
-//System.out.println("initValue = " + UF.format(sliderValue, 2));            
-            //slider = new Slider2(this, min, max);
             slider.setMinMax(min, max);
             slider.setPosition(sliderValue);
             if (mouseMode == FOLDOUT)
             {   currentFoldOut = sliderValue;
-//            	flatButton = new LWButton(Table.lookUp("flatText"),
-//                             30, slider.getSize().height);
-//                flatButton.setLocation(
-//                    panel3D.getSize().width - flatButton.getSize().width,
-//                    0);
-             
-//                panel3D.add(flatButton);
-                // add listener                
-//                flatButton.addMouseListener(new FlatML());
                 flattened = false;
-//                slider.setLocation(
-//                    panel3D.getSize().width - slider.getSize().width -
-//                        flatButton.getSize().width,
-//                    0);    
-
             }    
-            else    
-            {   //slider.setLocation(
-                //    panel3D.getSize().width - slider.getSize().width,
-                //    0);
-            }    
-            //slider.setVisible(b);
-            //panel3D.add(slider);    
             panel3D.repaint();
-            
-        }
-        else
-        {   //if (slider != null)
-            //    panel3D.remove(slider); 
-            //slider = null;    
-            //if (flatButton != null)
-            //    panel3D.remove(flatButton); 
-            //flatButton = null;    
         }
     	slider.setVisible(b);
     	flatButton.setVisible(b);
             
     }
     
-
+    /**
+     * the slider has been moved to a new value, make a new fold out
+     * and display this object
+     * @param newValue the new value of the slider
+     */
     public void processSlider(double newValue)
     {   sliderValue = newValue;
-    
-//System.out.println("newValue = " + UF.format(newValue, 2));    
         if (mouseMode == FOLDOUT)
         {	currentFoldOut = sliderValue;
             foldOut(foldOutTreeRoot, sliderValue);
             panel3D.initializeModel(foldOutObjectGroup, false);
         }
-        else if (mouseMode == ROTATEPLANE)
-        {   Plane3D oldRotPlane = rotPlane.copy();
-            transRotConstruct.removeElement(rotPlane);
-            rotPlane = rotPlaneChoosen.rotateBy(rotLine, newValue);
-            if (!transRotConstruct.contains(rotPlane))
-            {   transRotConstruct.addElement(rotPlane);
-                currentObjectGroup = rebuild(originalObject, transRotConstruct, null);
-                originalObject = currentObjectGroup.leftMostLeaf();
-                fillPlanes(planesFilled);                
-                panel3D.initializeModel(currentObjectGroup, false);        
-                //fillPlanes(planesFilled);
-                if (showCut)
-                {    if (oldRotPlane.equals(cutPlane))
-                        cutPlane = rotPlane.copy();
-                     updateCutPanel();
-                
-                }
-            }
-            // else do nothing
-            
-        }
-        else if (mouseMode == TRANSLATEPLANE)
-        {   Plane3D oldTransPlane = transPlane.copy();
-            transRotConstruct.removeElement(transPlane);
-            Vector3D transVec = new Vector3D(transPlaneChoosen.normal);
-            Vector3D.scaleBy(transVec, newValue);
-            //transVec = Vector3D.plus(transVec, planeChoosen.point);
-            transPlane = transPlaneChoosen.translateBy(transVec);
-            if (!transRotConstruct.contains(transPlane))
-            {   transRotConstruct.addElement(transPlane);
-                currentObjectGroup = rebuild(originalObject, transRotConstruct, null);
-                originalObject = currentObjectGroup.leftMostLeaf();
-                fillPlanes(planesFilled);                
-                panel3D.initializeModel(currentObjectGroup, false);        
-                //fillPlanes(planesFilled);
-                if (showCut)
-                {    if (oldTransPlane.equals(cutPlane))
-                        cutPlane = transPlane.copy();
-                     updateCutPanel();
-                
-                }
-            }
-            // else do nothing
-        }
     }
     
-    // note: this is only removing-adding 
+    /**
+     * add/remove the Canvas for displaying a cut: when adding the 
+     * width of the drawingPanelCanvas is halved and the cutPanel
+     * displayed side by side with the drawingPanelCanvas,
+     * when removing, the drawingPanelCanvas takes full width  
+     * @param b true/false
+     */
     public void setCutPanel(boolean b)
     {   
     	
@@ -1092,49 +1066,16 @@ public static void showTime(String comment)
     		panel3D.resetModel();
 
     		remove(cutPanelCanvas);
-    		
-    		
     	}
     	
-//GWT
-/*    	
-        if (b)
-        {   
-            cutPanel.setBounds(0, 0, getSize().width / 2, getSize().height);        
-            panel3D.setBounds(getSize().width / 2, 0, 
-                              getSize().width / 2, getSize().height);                    
-            cutPanel.resetModel();
-            panel3D.resetModel();                              
-            //cutPanel.offscreen = null;
-            //panel3D.offscreen = null;
-            add(cutPanel);        
-        }    
-        else // remove
-        {   remove(cutPanel);
-            panel3D.setBounds(0, 0, getSize().width, getSize().height);        
-            panel3D.resetModel();    
-            //panel3D.offscreen = null;            
-        }
-        if (slider != null)            
-            slider.setLocation(
-                panel3D.getSize().width - slider.getSize().width,
-                0);
-                //panel3D.getSize().height - slider.getSize().height);
-        if (dropButton != null)        
-            dropButton.setLocation(panel3D.getSize().width - 
-                                   dropButton.getSize().width, 0);
-        if (dropMenu != null)        
-            dropMenu.setLocation(panel3D.getSize().width - 
-                                 dropMenu.getSize().width, 
-                                 dropButton.getSize().height);
-                                   
-        
-        repaint();
-*/        
     }
-    // rotate here
-    // make sure diameter of flatModel equals diameter
-    // of currentObjectGroup
+    
+    /**
+     * given a plane in currentObjectGroup (cutPlane), find the
+     * cut of currentObjectGroup by cutPlane, turn this into a flat
+     * object and display thia object in cutPanel;
+     * see method getCut() in ObjectWithPlane  
+     */
     public void updateCutPanel()
     {   
         ObjectGroup3D flatModel = ObjectWithPlane.getCut(currentObjectGroup, cutPlane);
@@ -1143,17 +1084,21 @@ public static void showTime(String comment)
         cutPanel.initializeModel(flatModel, false);
         cutPanel.setZoomFactor(zoom);        
     }
-    
+
+    /**
+     * remove the Canvas for displaying a cut
+     */
     public void killCutPanel()
     {   setCutPanel(false);
         showCut = false;
-//GWT        
-//        owner.topToolBar.showCutButton.setImage(owner.showCutImage);
     }
     
-    
-    // methods corresponding to buttons
-    // right tool bar
+
+    /**
+     * display all relevant objectgroups as solid objects or
+     * as wireframe objects 
+     * @param b true/false
+     */
     public void setFilled(boolean b)
     {   filled = b;
         currentObjectGroup.setFilled(b);
@@ -1185,8 +1130,7 @@ public static void showTime(String comment)
             panel3D.paintType = Object3DContainer.NZMINFIRST;
         else
         {   if (planesFilled && (foldOutObjectGroup == null))
-            {   //panel3D.paintType = Object3DContainer.HYBRID2;
-                panel3D.paintType = Object3DContainer.SEMIEXACT;
+            {   panel3D.paintType = Object3DContainer.SEMIEXACT;
                 panel3D.showInside = false;
             }
             else // !planesFilled || (foldOutObjectGroup != null)
@@ -1197,6 +1141,9 @@ public static void showTime(String comment)
         panel3D.repaint();    
     }    
     
+    /**
+     * zoom in (one ZOOMSTEP)
+     */
     public void zoomIn()
     {   double temp = zoom + ZOOMSTEP;
         if (temp <= (MAXZOOM + ZOOMSTEP / 10))
@@ -1208,6 +1155,9 @@ public static void showTime(String comment)
         }    
     }
     
+    /**
+     * zoom out (one ZOOMSTEP)
+     */
     public void zoomOut()
     {   double temp = zoom - ZOOMSTEP;
         if (temp >= (MINZOOM - ZOOMSTEP / 10))
@@ -1221,79 +1171,58 @@ public static void showTime(String comment)
 
     }
     
+    /**
+     * make a fold out in two steps: <br>
+     * step 0: user must chose the central facet (startFacet) of the foldout; <br>
+     * Note: for EPN and cylinder or cone, Doorzien chooses the startFacet and proceeds to step 1; if
+     * startFacet is not null (as in setState), also proceed to step 1<br>   
+     * step 2: make the actual fold out<br>
+     * Note: the fold out is made using the original object!!
+     * @param stepNum number of steps (0-1)
+     * @param b abort if 
+     */
     public void makeFoldOut(int stepNum, boolean b)
     {   
-    	
-//System.out.println("make foldout " + stepNum + " " + b);
-    	
-    	// facet must be choosen
-        // pressing the button
+        // button was pressed, startfacet must be choosen
         if (stepNum == 0)
         {   
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
-            if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-            	
-//System.out.println("mm = " + mouseMode);
-
+            // untoggle other relevant buttons
+        	if (mouseMode != INERT)
+            {   
                 owner.topToolBar.drawLineButton.setDown(false);                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
                 owner.topToolBar.parPlaneButton.setDown(false);
                 owner.topToolBar.deletePlaneButton.setDown(false);
-                
                 owner.topToolBar.showCutButton.setDown(false);                
-                
                 owner.topToolBar.cutButton.setDown(false);  
-                
-                //deze NIET!!
-                //owner.rightToolBar.conDrawButton.setDown(false);
                 
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;
                 foldOutObjectGroup = null;
-                cutObjectGroup = null;                
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
+                cutObjectGroup = null;
                 
-                }
-                //originalObject = currentObjectGroup.leftMostLeaf();
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 
                 DrawConstants.TICKSVISIBLE = false;
-                
-                showHelpPointDrop(false);
-                
+                // aborts other active mouse modes
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
             setCutPanel(false);
-            // request for whole figure
+            // abort FOLDOUT
             if (!b)
             {   
-            	
-//System.out.println("figure");
-
             	mouseMode = INERT;
-                
             	setCutPanel(showCut);
-                
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT                
-//                owner.enableOptions(true);
                 
-if (historyPointer > 0)
-owner.rightToolBar.undoButton.setEnabled(true);
-if (historyPointer < (history.size() - 1))
-owner.rightToolBar.redoButton.setEnabled(true);
+                if (historyPointer > 0)
+                	owner.rightToolBar.undoButton.setEnabled(true);
+                if (historyPointer < (history.size() - 1))
+                	owner.rightToolBar.redoButton.setEnabled(true);
 
                 setNumLines(numLines);
                 setNumPlanes(numPlanes);
@@ -1301,19 +1230,14 @@ owner.rightToolBar.redoButton.setEnabled(true);
                 setFilled(filled);
                 if (filled)
                 {    
-                	
-                	//owner.rightToolBar.wireSolidButton.setImage(owner.wireFrameImage);
                 	owner.rightToolBar.wireSolidButton.setDown(true);
-                
                 }
                 else
                 {    
-                	
-                	//owner.rightToolBar.wireSolidButton.setImage(owner.solidImage);
                 	owner.rightToolBar.wireSolidButton.setDown(false);
-                
                 }
 
+                // set to position before foldout
                 if (oldPos != null)
                 {   panel3D.mat.row1 = new Vector3D(oldPos.row1);
                     panel3D.mat.row2 = new Vector3D(oldPos.row2);
@@ -1326,18 +1250,15 @@ owner.rightToolBar.redoButton.setEnabled(true);
                 return;
             }
             mouseMode = FOLDOUT;
-            
-//System.out.println("foldout");
 
-//GWT
-//            owner.enableOptions(false);      
-            
+            // foldoutObjectGroup is copy of currentObjectGroup
             foldOutObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
             foldOutObject = foldOutObjectGroup.leftMostLeaf(); 
             
+            // make sure facets have no references to the same vertices in common, 
+            // see class Object3D
             foldOutObject.loosenVertices();
 
-            //startFacet = null;
             panel3D.initializeModel(foldOutObjectGroup, false);
             
             if ((DoorzienGWT.version == DoorzienGWT.EPN) && 
@@ -1378,50 +1299,37 @@ owner.rightToolBar.redoButton.setEnabled(true);
             }
             else if (startFacet != null)
             {
-//System.out.println("makeFoldout - 0 sf != null");            
             	makeFoldOut(1, true);
             }
             else
             {	
-            	
-            	  owner.helpBar.setText(DoorzienGWT.rb.bouwplaatVlakTekst());
-//GWT            	
-//                owner.rightToolBar.conDrawButton.setPressed(true);
-            	  
+          	    owner.helpBar.setText(DoorzienGWT.rb.bouwplaatVlakTekst());
+          	    
                 // wait for mouse action
-                helpPoint = true;
                 panel3D.helpPointColor = DrawConstants.planeOutlineColor;
             }
             
         }     
         else if (stepNum == 1)
         {   
-//GWT        	
-//        	owner.rightToolBar.conDrawButton.setPressed(false);
             foldOutObjectGroup.setTickMarks(0);
-
-            helpPoint = false;
             panel3D.hideHelpPoint();
-
-//GWT            
-//            owner.enableOptions(false);
             
             owner.topToolBar.disableLineButtons();
             owner.topToolBar.disablePlaneButtons();
-owner.rightToolBar.undoButton.setEnabled(false);
-owner.rightToolBar.redoButton.setEnabled(false);
+            owner.rightToolBar.undoButton.setEnabled(false);
+            owner.rightToolBar.redoButton.setEnabled(false);
             
-			// asumed >= 0    
-            //int startIndex = foldOutObject.containsFacet(startFacet);    
+			// find index of startFacet, assumed >= 0    
 			int startIndex = NoSer.containsFacet(foldOutObject, startFacet);
             
-            
-            // init facet labels
+            // init facet labels as false
             facetsUsed = new boolean[foldOutObject.numFacets]; 
             // create root node, mark facet as labeled
             foldOutTreeRoot = new FoldOutTreeNode(startFacet, 0, 0, 0);
             facetsUsed[startIndex] = true;
             
+            // modified fold out for cylinder and cones
             if ((DoorzienGWT.version == DoorzienGWT.EPN) && 
                 (foldOutObject.modelCode == owner.CYLINDER))
                 addTreeCylinderNode(foldOutTreeRoot);            
@@ -1437,32 +1345,15 @@ owner.rightToolBar.redoButton.setEnabled(false);
             {
                 Vector thisLevel = new Vector();
                 thisLevel.addElement(foldOutTreeRoot);
-                // this constructs the whole tree
+                // this recursively constructs the whole tree
                 addTreeLevel(thisLevel);
             }
+            // here the fold out tree has been constructed
 
-            
+            // add replacements to the tree
             findRotationComponents(foldOutTreeRoot);        
         
-//        Vector nodes = new Vector();
-//        enumTree(foldOutTreeRoot, nodes, 0);
-/*        
-System.out.println("nodes = " + nodes.size()); 
-int aCnt = 0;
-for (int j = 0; j < nodes.size(); j++)
-{   FoldOutTreeNode fotn = (FoldOutTreeNode) nodes.elementAt(j);
-    int index = foldOutObject.containsFacet(fotn.facet);
-
-if (Math.abs(fotn.minAngle - Math.PI) < Vector3D.NZero)
-{   aCnt++;
-}
- 
-        
-}        
-System.out.println("aCnt = " + aCnt);        
-*/
-
-            // set inside invisible
+            // set facets that were replaced to invisible
             for (int p = 0; p < foldOutObjectGroup.numFacets; p++)
             {   Facet3D f = foldOutObjectGroup.facets[p];
                 boolean include = true;
@@ -1477,46 +1368,37 @@ System.out.println("aCnt = " + aCnt);
                 f.visible = include;    
             } // for
 
+            // now fold the whole tree over the factor foldOutInit 
             foldOut(foldOutTreeRoot, foldOutInit);
             panel3D.showInside = true;
-            //foldOutObjectGroup.findDiameter();
+            // fill status befor fold out
             oldFilled = filled;
+            // position of object before fold out
             oldPos = Matrix3D.copy(panel3D.mat);
             setFilled(true);
             panel3D.initializeModel(foldOutObjectGroup, false);
             
-            
-            //owner.rightToolBar.wireSolidButton.setImage(owner.wireFrameImage);
             owner.rightToolBar.wireSolidButton.setDown(true);
-
+            // add slider
             setSlider(true, foldOutInit, 0, 1);
-            
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
-//GWT            
-//          //owner.rightToolBar.conDrawButton.setImage(owner.figureImage);
-            //owner.rightToolBar.conDrawButton.setDown(true);
-            
-            
         } // else if (stepNum == 1)
-    }
+    } // makeFoldout
     
     
     
-/*    
-// tijdelijk
-public void enumTree(FoldOutTreeNode startNode, Vector nodes, int level)
-{   nodes.addElement(startNode);
-    startNode.level = level;
-    for (int i = 0; i < startNode.childNodes.size(); i++)
-    {    FoldOutTreeNode fotn = (FoldOutTreeNode) startNode.childNodes.elementAt(i); 
-         enumTree(fotn, nodes, level+1);
-    }
-}    
-*/
-
-    // lastLevel contains the FoldTreeNodes constructed in the 
-    // last pass
+    /**
+     * recursive procedure to construct a fold out:<br>
+     * start with lastLevel containing only one FoldOutTreeNode which contains the startFacet, which is labeled
+     * as true; then find all facets adjacent to startFacet, label them as true, put each of them in a
+     * FoldOutTreeNode (together with the axis connecting this facet to the startFacet) and add all of
+     * them to a new Vector thisLevel; <br>
+     * then continue with lastLevel containing the FoldTreeNodes constructed in the last pass, and for each facet
+     * in such FoldOutTreeNode find only those adjacent facets that have not been labeled as true, and with these
+     * produce another level in the fold out tree   
+     * @param lastLevel Vector containing the FoldTreeNodes constructed in the last pass 
+     */
     public void addTreeLevel(Vector lastLevel)
     {   Vector thisLevel = new Vector();
         // for each node created in the last level
@@ -1528,12 +1410,12 @@ public void enumTree(FoldOutTreeNode startNode, Vector nodes, int level)
             for (int j = 0; j < fa.numPoints; j++)
             {   Vector3D edgeStart = fa.points[j];
                 Vector3D edgeEnd = fa.points[(j + 1) % fa.numPoints];
-                // could be invisible
+                // adjacent facet, could be invisible
                 Facet3D adjacent = 
                     foldOutObject.facetContaining(edgeEnd, edgeStart, true);
                 // find the index
                 int adjIndex = foldOutObject.containsFacet(adjacent);
-                // facet not yet labeled
+                // if facet is not yet labeled
                 if (!facetsUsed[adjIndex])
                 {
                     // minimum angle
@@ -1548,26 +1430,11 @@ public void enumTree(FoldOutTreeNode startNode, Vector nodes, int level)
                         cosAngle = 1;
                     if (cosAngle < -1)
                         cosAngle = -1;
-                    double minAngle = Math.PI - Math.acos(cosAngle);    
-/*                    
-int aCnt = 0;
-if (cosAngle == 1)
-{   System.out.println("un = " + UF.format(fNormal.x, 3) +
-                       " & = " + UF.format(fNormal.y, 3) +
-                       " & = " + UF.format(fNormal.z, 3));
-System.out.println("uadj = " + UF.format(adjNormal.x, 3) +
-                       " & = " + UF.format(adjNormal.y, 3) +
-                       " & = " + UF.format(adjNormal.z, 3));    
-aCnt++;                       
-    
-} 
-
-System.out.println("aCnt = " + aCnt);
-*/
+                    double minAngle = Math.PI - Math.acos(cosAngle);
+                    
+                    // rotation axis
                     int axisFrom = Facet3D.containsVertex(adjacent, edgeStart);
                     int axisTo = Facet3D.containsVertex(adjacent, edgeEnd);
-                    // rotation axis    
-//                    Line3D rotAxis = new Line3D(edgeStart, edgeEnd);
                     // create a node for this facet
                     FoldOutTreeNode newNode = 
                         new FoldOutTreeNode(adjacent, minAngle, axisFrom, axisTo);
@@ -1576,86 +1443,28 @@ System.out.println("aCnt = " + aCnt);
                     ftn.childNodes.addElement(newNode);
                     // add to this level
                     thisLevel.addElement(newNode);
-                    // label facet
+                    // label facet as true
                     facetsUsed[adjIndex] = true;
                 }
                 // else do nothing
             }    
         }
+        // recurse
         if (thisLevel.size() > 0)
             addTreeLevel(thisLevel);
         // else finished    
     }
 
 
-    // depth tree construction algo
-    public void addTreeNode(FoldOutTreeNode lastNode)
-    {   
-        // get the facet of lastNode
-        Facet3D fa = lastNode.facet;
-        // walk along the edges of fa
-        for (int j = 0; j < fa.numPoints; j++)
-        {   Vector3D edgeStart = fa.points[j];
-            Vector3D edgeEnd = fa.points[(j + 1) % fa.numPoints];
-            // could be invisible, but only 1
-            Facet3D adjacent = 
-                 foldOutObject.facetContaining(edgeEnd, edgeStart, true);
-            // find the index
-            int adjIndex = foldOutObject.containsFacet(adjacent);
-            // facet not yet labeled
-            if (!facetsUsed[adjIndex])
-            {
-                // minimum angle
-                Vector3D fNormal = new Vector3D(fa.normal);
-                Vector3D.makeUnitary(fNormal);
-                Vector3D adjNormal = new Vector3D(adjacent.normal);
-                Vector3D.makeUnitary(adjNormal);
-                double cosAngle = Vector3D.dotProduct(
-                    fNormal, adjNormal);
-                // round off    
-                if (cosAngle > 1)
-                    cosAngle = 1;
-                if (cosAngle < -1)
-                    cosAngle = -1;
-                double minAngle = Math.PI - Math.acos(cosAngle);    
-/*                    
-int aCnt = 0;
-if (cosAngle == 1)
-{   System.out.println("un = " + UF.format(fNormal.x, 3) +
-                       " & = " + UF.format(fNormal.y, 3) +
-                       " & = " + UF.format(fNormal.z, 3));
-System.out.println("uadj = " + UF.format(adjNormal.x, 3) +
-                       " & = " + UF.format(adjNormal.y, 3) +
-                       " & = " + UF.format(adjNormal.z, 3));    
-aCnt++;                       
-    
-} 
-
-System.out.println("aCnt = " + aCnt);
-*/
-                int axisFrom = Facet3D.containsVertex(adjacent, edgeStart);
-                int axisTo = Facet3D.containsVertex(adjacent, edgeEnd);
-                // create a node for this facet
-                FoldOutTreeNode newNode = 
-                    new FoldOutTreeNode(adjacent, minAngle, axisFrom, axisTo);
-                // fix tree structure
-                newNode.parentNode = lastNode;
-                lastNode.childNodes.addElement(newNode);
-                // label facet
-                facetsUsed[adjIndex] = true;
-                addTreeNode(newNode);
-            }
-            // else do nothing
-        }
-    }
-
-
-    // depth tree construction algo modified for CYLINDER
-    // assume we start at a SIDE facet
+    /**
+     * version == EPN: modified fold out for a cylinder starting at a side(!) facet: 
+     * add top and bottom of the cylinder to the side facet, then proceed as usual 
+     * @param startNode FoldOutTreeNode containing the side facet
+     */
     public void addTreeCylinderNode(FoldOutTreeNode startNode)
     {   Vector thisLevel = new Vector();
         thisLevel.addElement(startNode);      
-        // get the facet of lastNode
+        // get the facet of startNode
         Facet3D fa = startNode.facet;
         // walk along the edges of fa
         for (int j = 0; j < fa.numPoints; j++)
@@ -1681,22 +1490,8 @@ System.out.println("aCnt = " + aCnt);
                     cosAngle = 1;
                 if (cosAngle < -1)
                     cosAngle = -1;
-                double minAngle = Math.PI - Math.acos(cosAngle);    
-/*                    
-int aCnt = 0;
-if (cosAngle == 1)
-{   System.out.println("un = " + UF.format(fNormal.x, 3) +
-                       " & = " + UF.format(fNormal.y, 3) +
-                       " & = " + UF.format(fNormal.z, 3));
-System.out.println("uadj = " + UF.format(adjNormal.x, 3) +
-                       " & = " + UF.format(adjNormal.y, 3) +
-                       " & = " + UF.format(adjNormal.z, 3));    
-aCnt++;                       
-    
-} 
-
-System.out.println("aCnt = " + aCnt);
-*/
+                double minAngle = Math.PI - Math.acos(cosAngle);
+                
                 int axisFrom = Facet3D.containsVertex(adjacent, edgeStart);
                 int axisTo = Facet3D.containsVertex(adjacent, edgeEnd);
                 // create a node for this facet
@@ -1715,8 +1510,11 @@ System.out.println("aCnt = " + aCnt);
     }
 
 
-    // depth tree construction algo modified for CONE
-    // assume we start at a SIDE facet    
+    /**
+     * version == EPN: modified fold out for a cone starting at a side(!) facet:<br>
+     * add bottom of the cone to the side facet, then proceed as usual 
+     * @param startNode FoldOutTreeNode containing the side facet
+     */
     public void addTreeConeNode(FoldOutTreeNode startNode)
     {   Vector thisLevel = new Vector();
         thisLevel.addElement(startNode);      
@@ -1747,21 +1545,6 @@ System.out.println("aCnt = " + aCnt);
                 if (cosAngle < -1)
                     cosAngle = -1;
                 double minAngle = Math.PI - Math.acos(cosAngle);    
-/*                    
-int aCnt = 0;
-if (cosAngle == 1)
-{   System.out.println("un = " + UF.format(fNormal.x, 3) +
-                       " & = " + UF.format(fNormal.y, 3) +
-                       " & = " + UF.format(fNormal.z, 3));
-System.out.println("uadj = " + UF.format(adjNormal.x, 3) +
-                       " & = " + UF.format(adjNormal.y, 3) +
-                       " & = " + UF.format(adjNormal.z, 3));    
-aCnt++;                       
-    
-} 
-
-System.out.println("aCnt = " + aCnt);
-*/
                 int axisFrom = Facet3D.containsVertex(adjacent, edgeStart);
                 int axisTo = Facet3D.containsVertex(adjacent, edgeEnd);
                 // create a node for this facet
@@ -1780,57 +1563,57 @@ System.out.println("aCnt = " + aCnt);
         addTreeLevel(thisLevel);
     }
 
-    // recursively
+    /**
+     * as the fold out was constructed using the original object, in the 
+     * fold out tree, recursively substitute facets by their replacements (if any)    
+     * @param startNode FoldOutTreeNode whose foldOutFacets should be fixed
+     */
     public void findRotationComponents(FoldOutTreeNode startNode)
     {   if (startNode.parentNode != null)
         {
-        Facet3D startFacet = startNode.facet;
-        // find and add replacements of startFacet here   
-        Vector replacements = new Vector();
-        if (foldOutObjectGroup instanceof ObjectWithLine)
-            replacements = ((ObjectWithLine) foldOutObjectGroup).getReplacements(startFacet);
-        else if (foldOutObjectGroup instanceof ObjectWithPlane)
-            replacements = ((ObjectWithPlane) foldOutObjectGroup).getReplacements(startFacet);    
-        //else // unchanged dummy object group
-// always add startFacet since this contains
-// the axisdata
+        	Facet3D startFacet = startNode.facet;
+        	// find and add replacements of startFacet here   
+        	Vector replacements = new Vector();
+        	if (foldOutObjectGroup instanceof ObjectWithLine)
+        		replacements = ((ObjectWithLine) foldOutObjectGroup).getReplacements(startFacet);
+        	else if (foldOutObjectGroup instanceof ObjectWithPlane)
+        		replacements = ((ObjectWithPlane) foldOutObjectGroup).getReplacements(startFacet);    
+        	// always add startFacet since this contains
+        	// the axisdata; should also be tehre if there are no replacements
             replacements.addElement(startFacet);
-        for (int m = 0; m < replacements.size(); m++)    
-            startNode.foldOutFacets.addElement(replacements.elementAt(m));
+            for (int m = 0; m < replacements.size(); m++)    
+            	startNode.foldOutFacets.addElement(replacements.elementAt(m));
         }
         for (int i = 0; i < startNode.childNodes.size(); i++)
         {   FoldOutTreeNode childNode = (FoldOutTreeNode) startNode.childNodes.elementAt(i);
-            // this fixes the whole subtree!!
-            findRotationComponents(childNode);
-            if (startNode.parentNode != null)
-            {
-            for (int j = 0; j < childNode.foldOutFacets.size(); j++)
-                startNode.foldOutFacets.addElement(
-                    childNode.foldOutFacets.elementAt(j));
-            }        
+           	// this fixes the whole subtree!!
+           	findRotationComponents(childNode);
+           	if (startNode.parentNode != null)
+           	{
+           		for (int j = 0; j < childNode.foldOutFacets.size(); j++)
+           			startNode.foldOutFacets.addElement(
+           					childNode.foldOutFacets.elementAt(j));
+           	}        
         }
     }
     
-    // recursively
-    // foldOutFactor bewteen 0 and 1
+    /**
+     * recursively realize the actual folding using a foldOutFactor
+     * between 0 (no folding out) and 1 (flat fold out)
+     * @param startNode the FoldOutTreeNode containing the startFacet
+     * @param foldOutFactor factor between 0 (no folding out) and 1 (flat fold out)
+     */
     public void foldOut(FoldOutTreeNode startNode, double foldOutFactor)
     {   // skip the root completely
         if (startNode.parentNode != null)
         {   // determine angle which is needed if no folding
             // occured yet, between minAngle and Math.PI
             // relative to minAngle
-            double foldAngle = //startNode.minAngle +
+            double foldAngle = 
                 (Math.PI - startNode.minAngle)* foldOutFactor; 
             // adapt to current fold status    
             // note: currentAngle is also relative to minAngle
             double rotAngle = foldAngle - startNode.currentAngle;    
-if (Math.abs(rotAngle) > Vector3D.NZero)
-{
-//System.out.println("sNode-level = " + startNode.level);
-//System.out.println("cos = " + UF.format(Math.cos(rotAngle), 12));
-//System.out.println("sNode-rotAngle = " + 
-//                   UF.format(rotAngle * 360 / (2 * Math.PI), 12));
-}                   
             startNode.currentAngle = foldAngle;
             // find rotation axis            
             Vector3D axisStart = startNode.facet.points[startNode.axisFrom];
@@ -1846,12 +1629,10 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                     // rotate it around axis
                     Vector3D rotV = rotationAxis.rotateBy(v, rotAngle);
                     // replace vertex in vertex array
-                    // deze vertex staat op index fa.indices[k]
+                    // this vertex has index fa.indices[k]
                     // in ob.vertices
-//System.out.println("ob.vertices = " + ob.vertices.length);                    
                     ob.vertices[fa.indices[k]] = rotV;
                     fa.points[k] = rotV;                
-//                    fa.setNormal();
                 }
                 fa.setNormal();                
             }
@@ -1865,31 +1646,29 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
         
     }
     
-// optie hulppunten:
-// via een rebuild, 3 modes possible!
     
-    
-// bij andere knoppen waar nodig kijken of mouseMode == INERT    
-    
-    // top tool bar
-    // lines
+    /**
+     * drawing a line in stages:<br>
+     * stepNum == 0: terminate other active mouse modes, make object-copies and wait 
+     * for user to select the first point of the line<br>
+     * stepNum == 1: process the first point of the line and wait for user to select the second
+     * point of the line<br>
+     * stepNum == 2: process the second point of the line and add this line to currentObjectGroup
+     * (that is, cut currentObjectGroup with this line, see class ObjectWithLine)  
+     * @param stepNum the step number (0,1 or 2)
+     * @param b if false and stepNum == 0 abort 
+     */
     public void drawLine(int stepNum, boolean b)
     {    
-        // pressing the button
+        // draw line button was pressed, no points chosen
         if (stepNum == 0)
         {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
+            // untoggle other relevant buttons
             if ((mouseMode != INERT) && 
                 ((mouseMode != DRAWLINE) ||
                  (DoorzienGWT.version == DoorzienGWT.EPN))
                )  
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-            	
-            	// deze NIET!!
-                //owner.topToolBar.drawLineButton.setDown(false);
-                
+            {                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
                 owner.topToolBar.parPlaneButton.setDown(false);
@@ -1904,61 +1683,41 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 tempObjectGroup2 = null;
                 foldOutObjectGroup = null;
                 
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);
-                
                 cutObjectGroup = null;                
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
 
-                }
-                //originalObject = currentObjectGroup.leftMostLeaf();
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 DrawConstants.TICKSVISIBLE = false;    
-                showHelpPointDrop(false);                
-                
+
+                // aborts other active mouse modes 
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
-            // drawLine afzetten
-            // met FI blijf je in tool
-// hier moet je dus nog meer resetten voor FI?            
+            // abort DRAWLINE            
             if (!b)
             {   owner.topToolBar.drawLineButton.setEnabled(true);
                 mouseMode = INERT;
-                panel3D.hideHelpLine();                        
-                panel3D.hideHelpPoint();                                        
-                helpPoint = false;
                 panel3D.initializeModel(currentObjectGroup, false);
-                
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT                
-//                owner.enableOptions(true);
-                
                 return;
             }
             mouseMode = DRAWLINE;
             DrawConstants.TICKSVISIBLE = true;            
-            showHelpPointDrop(true);            
-//GWT            
-//            owner.topToolBar.drawLineButton.setPressed(true);
                 
-            // kopieer current naar temp en stop dit in Panel3D
+            // copy currentObjectGroup to tempObjectGroup and show this Panel3D
             tempObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
             tempOrigObject = tempObjectGroup.leftMostLeaf();
-            
+
+            // for preview, not used
             tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
             tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
+            
             fillPlanes(planesFilled);
             panel3D.initializeModel(tempObjectGroup, false);        
             // reset
             pointsSelected = 0;
-            point1= null;
+            point1 = null;
             point2 = null;
             movedPoint = null;
             movedEdgeWithPoint = null;
@@ -1971,14 +1730,12 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
         }
         else if (stepNum == 1)
         {   
-
+        	// for preview, not implemented
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
                 )
             {
-                
-                
                 // reset
                 // tempObjectGroup equals currentObjectGroup                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
@@ -1987,11 +1744,8 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 // temporarily replace with point added
                 tempObjectGroup2 = 
                     new ObjectWithPoint(tempObjectGroup2, movedPoint, DrawConstants.lineColorIndex);
-                // remains unchanged                       
-                // original2Object = tempObjectGroup2.leftMostLeaf();
                 fillPlanes(planesFilled);                                
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 panel3D.setPreviewModel(tempObjectGroup2);                
 
                 // reset
@@ -1999,6 +1753,7 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 movedEdgeWithPoint = null;
                 return;
             }
+            // for preview, not implemented
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
@@ -2017,7 +1772,6 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 // originalObject2 = tempObjectGroup2.leftMostLeaf();
                 fillPlanes(planesFilled);                                
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 panel3D.setPreviewModel(tempObjectGroup2);
                 
                 // reset
@@ -2025,38 +1779,28 @@ if (Math.abs(rotAngle) > Vector3D.NZero)
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("all null");                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
-                panel3D.showHelpPoint(xMoved, yMoved,
-                    //new Point(xMoved, yMoved),
-                    DrawConstants.lineColor);
+                panel3D.showHelpPoint(xMoved, yMoved, DrawConstants.lineColor);
                     
                 return;
 
             }    
             // if one of clickedPoint or clickedEdgeWithPoint
-            // is not null, tempObjectGroup2 contains the
-            // object wanted, but recreate the exact one
+            // is not null add the point to tempObjectGroup
             else if (clickedPoint != null)
             {   
-System.out.println("clickedPoint");            	
-            	
             	// replace with point added
-
-            	
                 tempObjectGroup = 
                     new ObjectWithPoint(tempObjectGroup, clickedPoint, DrawConstants.lineColorIndex);
-                    
-                   
                 // remains unchanged                       
                 // originalObject = tempObjectGroup.leftMostLeaf();
                 fillPlanes(planesFilled);
@@ -2076,9 +1820,7 @@ System.out.println("clickedPoint");
             }
             else if (clickedEdgeWithPoint != null)
             {   
-System.out.println("clickedEdgeWithPoint");               
                 // replace with point added
-               
                 tempObjectGroup = 
                     new ObjectWithPoint(tempObjectGroup, clickedEdgeWithPoint, DrawConstants.lineColorIndex);
                     
@@ -2105,7 +1847,7 @@ System.out.println("clickedEdgeWithPoint");
         }    
         else if (stepNum == 2)
         {   
-            
+        	// for preview, not implemented
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
@@ -2116,13 +1858,12 @@ System.out.println("clickedEdgeWithPoint");
                     movedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // line will be added to currentObjectGroup
+                // line is already part of currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
                         new Line3D(point1, movedPoint))
                    )
                 {
-//System.out.println("OWL contains");             
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
@@ -2132,21 +1873,16 @@ System.out.println("clickedEdgeWithPoint");
                         new Line3D(point1, movedPoint))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;    
                 }   
-                
-                
-//System.out.println("MP not null & ps = " + pointsSelected);                
                 // reset
-// this keeps the first point thickened                
+                // this keeps the first point thickened                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
                 
                 // temporarily replace with line added
-// thicken second point via ObjectWithLine?                
                 tempObjectGroup2 = 
                     new ObjectWithLine(tempObjectGroup2, 
                         point1, movedPoint, DrawConstants.lineColorIndex, 0);
@@ -2160,19 +1896,19 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
+        	// for preview, not implemented
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
                      )
             {   
                 
-                // line will be added to currentObjectGroup
+                // line is already part of currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
                         new Line3D(point1, movedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
@@ -2182,20 +1918,16 @@ System.out.println("clickedEdgeWithPoint");
                         new Line3D(point1, movedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;    
                 }   
-                
-//System.out.println("MEWP not null & ps = " + pointsSelected);                                
                 // reset
-// this keeps the first point thickened                                
+                // this keeps the first point thickened                                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
                 
                 // replace with line added
-// thicken second point via ObjectWithLine?                                
                 tempObjectGroup2 = 
                     new ObjectWithLine(tempObjectGroup2, 
                         point1, movedEdgeWithPoint[2], DrawConstants.lineColorIndex, 0);
@@ -2209,14 +1941,13 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be  != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("MP and MEWP null");                                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
@@ -2226,16 +1957,15 @@ System.out.println("clickedEdgeWithPoint");
                 if (!previewOn)
                 {
                     panel3D.showHelpPoint(xMoved, yMoved,
-                        //new Point(xMoved, yMoved),
                         DrawConstants.lineColor);
                 }    
                 return;
 
             }    
-            // check here for type of point AND if this was not 
-            // equal to the first
+            // check here if the second point is equal to the first 
+            // or if the line already exists; if not, add the line 
             else if (clickedPoint != null)
-            {   // twice the same vertex
+            {   // twice the same vertex clicked
                 if (Vector3D.equals(point1, clickedPoint))
                 {   
                     movedPoint = null;
@@ -2245,13 +1975,12 @@ System.out.println("clickedEdgeWithPoint");
                     clickedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // line will be added to currentObjectGroup
+                // line already exists in currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
                         new Line3D(point1, clickedPoint))
                    )
                 {
-//System.out.println("OWL contains");             
                     movedPoint = null;
                     movedEdgeWithPoint = null;
 
@@ -2264,7 +1993,6 @@ System.out.println("clickedEdgeWithPoint");
                         new Line3D(point1, clickedPoint))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
 
@@ -2274,36 +2002,27 @@ System.out.println("clickedEdgeWithPoint");
                 }   
                 point2 = clickedPoint;   
                 // now the line can be added
-//setStart();                
                 currentObjectGroup = new ObjectWithLine(currentObjectGroup,
                     point1, point2, DrawConstants.lineColorIndex, DrawConstants.llFactor);
-//showTime("creating OWL-v");                    
                 // remains unchanged                       
                 // originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.previewModel = null;                
-                panel3D.hideHelpLine();
-                panel3D.hideHelpPoint();
-                helpPoint = false;
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
                 fillPlanes(planesFilled);                            
                 panel3D.initializeModel(currentObjectGroup, false);        
-                
                 
                 
             }
             else if (clickedEdgeWithPoint != null)
             {   
-                // line will be added to currentObjectGroup
+                // line was already part of currentObjectGroup 
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
                         new Line3D(point1, clickedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
-
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
@@ -2313,71 +2032,61 @@ System.out.println("clickedEdgeWithPoint");
                         new Line3D(point1, clickedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
-
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action   
-                }   
+                }
+                
                 point2 = clickedEdgeWithPoint[2];   
                 // now the line can be added
-                
                 currentObjectGroup = new ObjectWithLine(currentObjectGroup,
                     point1, point2, DrawConstants.lineColorIndex, DrawConstants.llFactor);
                    
-                // remains unchanged                       
-                // originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.previewModel = null;                
-                panel3D.hideHelpLine();
-                panel3D.hideHelpPoint();
-                helpPoint = false;
                 fillPlanes(planesFilled);                            
                 DrawConstants.TICKSVISIBLE = false;
-                showHelpPointDrop(false);                                
                 panel3D.initializeModel(currentObjectGroup, false);        
             }    
             addToHistory();
             
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-            
             tempObjectGroup = null;
-            tempObjectGroup2 = null;            
-            //fillPlanes(planesFilled);            
+            tempObjectGroup2 = null;
             
-            //mouseMode = INERT;
             setNumLines(numLines + 1);
             if (showCut)
                 updateCutPanel();
             // for FI: stay in tool
             if (DoorzienGWT.version == DoorzienGWT.FI)
                 drawLine(0, true);
+            // for EPN: exit tool
             else if (DoorzienGWT.version == DoorzienGWT.EPN)
             {   mouseMode = INERT;
-//GWT            
-//                owner.enableOptions(true);
                 owner.topToolBar.drawLineButton.setDown(false);
             }
         }
         
     }    
-    
+ 
+    /**
+     * deleting a line in stages:<br>
+     * stepNum == 0: terminate other active mouse modes, if there is only one line,
+     * continue to stepNum == 1, otherwise wait for the user to select the line to be deleted<br>
+     * stepNum == 1: delete the indicated line from currentObjectGroup using rebiuld<br>
+     * @param stepNum the step number (0 or 1)
+     * @param b if false and stepNum == 0 abort 
+     */
     public void deleteLine(int stepNum, boolean b)
-    {   // als meer lijnen kies een lijn
-        // gebruik mousemode
+    {   
+    	// button was pressed
         if (stepNum == 0)
-        {   // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
+        {  
+            // untoggle other relevant buttons
             if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-            	
+            {               	
                 owner.topToolBar.drawLineButton.setDown(false);
-                
-                // deze NIET!!
-                //owner.topToolBar.deleteLineButton.setDown(false);
                 
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
                 owner.topToolBar.parPlaneButton.setDown(false);
@@ -2389,53 +2098,34 @@ System.out.println("clickedEdgeWithPoint");
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;                
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
-
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
-                //originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
-                DrawConstants.TICKSVISIBLE = false;                
-                showHelpPointDrop(false);                                
+                DrawConstants.TICKSVISIBLE = false;
+                // aborts other active mouse modes
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
-            // deleteLine afzetten
+            // abort DELETELINE
             if (!b)
             {   mouseMode = INERT;
-            
             	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT            
-//                owner.enableOptions(true);                
                 return;
             }
 
             mouseMode = DELETELINE;
-//GWT            
-//            owner.enableOptions(false);
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
             else if (currentObjectGroup instanceof ObjectWithPlane)
                 construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-//System.out.println("co-size = " + construction.length);                        
+                        
             if (numLines > 1)
             {   // get the line via the mouse, check with construction
-            	  owner.helpBar.setText(DoorzienGWT.rb.verwijderLijnTekst());
-//GWT            	
-//                owner.topToolBar.deleteLineButton.setPressed(true);
+            	owner.helpBar.setText(DoorzienGWT.rb.verwijderLijnTekst());
                 lineChoosen = null;
-                // wait for mouse action
-                helpPoint = true;
                 panel3D.helpPointColor = DrawConstants.lineColor;
+                // wait for mouse action
                 
             }    
             else if (numLines == 1)
@@ -2446,7 +2136,6 @@ System.out.println("clickedEdgeWithPoint");
                     if (ob instanceof Line3D)
                         lineChoosen = (Line3D) ob;
                     DrawConstants.llFactor = 0;    
-                        
                 }
                 deleteLine(1, true);
             }    
@@ -2455,10 +2144,9 @@ System.out.println("clickedEdgeWithPoint");
         {
         	
             owner.topToolBar.deleteLineButton.setDown(false);
-            helpPoint = false;
             panel3D.hideHelpPoint();
             
-//System.out.println("lineChoosen = " + lineChoosen.toString());        
+            // reconstruct without the deleted line 
             construction.removeElement(lineChoosen);
             currentObjectGroup = rebuild(originalObject, construction, null);
             originalObject = currentObjectGroup.leftMostLeaf();
@@ -2466,30 +2154,27 @@ System.out.println("clickedEdgeWithPoint");
             fillPlanes(planesFilled);            
             panel3D.initializeModel(currentObjectGroup, false);        
             addToHistory();
-            //fillPlanes(planesFilled);
-            // originalObject opnieuw!
             mouseMode = INERT;
-            
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-            
             tempObjectGroup = null;
             setNumLines(numLines - 1);        
             if (showCut)
                 updateCutPanel();
-//GWT            
-//            owner.enableOptions(true);
         }
     }
     
+    /**
+     * lengthen all lines in the 3d-object by a factor LLSTEP (this can be done
+     * repeatedly); this is done by adding 2-dimensional facets with correct
+     * new intersections (if any) 
+     */
     public void lengthenLines()
     {   
-// uitzondering voor rotate translate        
-        if ((mouseMode != INERT) && (mouseMode != TRANSLATEPLANE) &&
-            (mouseMode != ROTATEPLANE)
+       
+        if ((mouseMode != INERT)
             )
-        {   // zet model gelijk aan current
-            // dit aborteert andere LOPENDE muis acties
-        	
+        {   
+        	// disable other relevant buttons 
             owner.topToolBar.drawLineButton.setDown(false);                
             owner.topToolBar.deleteLineButton.setDown(false);                                
             owner.topToolBar.drawPlaneButton.setDown(false);                                
@@ -2502,39 +2187,26 @@ System.out.println("clickedEdgeWithPoint");
             tempObjectGroup = null;
             tempObjectGroup2 = null;            
             foldOutObjectGroup = null;
-//GWT            
-//            owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                            
             cutObjectGroup = null;                
-            if (numPlanes > 0)
-            {   
-//GWT            	
-//            	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-            }
-            //originalObject = currentObjectGroup.leftMostLeaf();
             // slider weg                                
             setSlider(false, 0, 0, 0);
             panel3D.hideHelpLine();                    
             panel3D.hideHelpPoint();
-            helpPoint = false;
-            DrawConstants.TICKSVISIBLE = false;            
-            showHelpPointDrop(false);                            
+            DrawConstants.TICKSVISIBLE = false;
+            // aborts other active mouse modes
             panel3D.initializeModel(currentObjectGroup, false);                    
             mouseMode = INERT;
         }
-        // doe dit via een rebuild
-        // omdat je dan ook nieuwe relevante snijpunten kan zien    
-        // using llFactor in the constructors!
-        // stapsgewijs
+        // lengthen via rebuild since new intersection points 
+        // might appear
+        // get construction for rebuild
         if (currentObjectGroup instanceof ObjectWithLine)
            construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
         else if (currentObjectGroup instanceof ObjectWithPlane)
            construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-        // doe dit via een rebuild
-        // omdat je dan ook nieuwe relevante snijpunten kan zien    
-        // using llFactor in the constructors!
-        double temp = DrawConstants.llFactor + LLSTEP;
-        if (temp <= (MAXLLFACTOR + LLSTEP / 10))
+        // set new lengthen factor
+        double temp = DrawConstants.llFactor + DrawConstants.LLSTEP;
+        if (temp <= (DrawConstants.MAXLLFACTOR + DrawConstants.LLSTEP / 10))
         	DrawConstants.llFactor = temp;
         // rebuild
         currentObjectGroup = rebuild(originalObject, construction, null);
@@ -2544,22 +2216,20 @@ System.out.println("clickedEdgeWithPoint");
 
         owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
-       if (showCut)
-           updateCutPanel();
-//GWT        
-//        owner.enableOptions(true);
+        if (showCut)
+            updateCutPanel();
     }    
 
+    /**
+     * remove all line extensions
+     */
     public void shortenLines()
     {   
-// uitzondering voor rotate translate        
-        if ((mouseMode != INERT) && (mouseMode != TRANSLATEPLANE) &&
-            (mouseMode != ROTATEPLANE)
+        if ((mouseMode != INERT)
             )
 
-        {   // zet model gelijk aan current
-            // dit aborteert andere LOPENDE muis acties
-
+        {   
+        	// untoggle other buttons
         	owner.topToolBar.drawLineButton.setDown(false);                
             owner.topToolBar.deleteLineButton.setDown(false);                                
             owner.topToolBar.drawPlaneButton.setDown(false);                                
@@ -2568,39 +2238,25 @@ System.out.println("clickedEdgeWithPoint");
             owner.topToolBar.showCutButton.setDown(false);                
             owner.topToolBar.cutButton.setDown(false);                                
             owner.rightToolBar.conDrawButton.setDown(false);                                                
-            
-        	
         	tempObjectGroup = null;
             tempObjectGroup2 = null;            
             foldOutObjectGroup = null;
-//GWT            
-//             owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                            
             cutObjectGroup = null;                
-            if (numPlanes > 0)
-            {   
-//GWT            	
-//            	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-            }
-
-            //originalObject = currentObjectGroup.leftMostLeaf();
             // slider weg                                
             setSlider(false, 0, 0, 0);
             panel3D.hideHelpLine();                    
             panel3D.hideHelpPoint();
-            helpPoint = false;
             DrawConstants.TICKSVISIBLE = false;            
-            showHelpPointDrop(false);                            
+            // this aborts other active mouse modes
             panel3D.initializeModel(currentObjectGroup, false);                    
             mouseMode = INERT;            
         }
+        // find the construction
         if (currentObjectGroup instanceof ObjectWithLine)
            construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
         else if (currentObjectGroup instanceof ObjectWithPlane)
            construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-        // doe dit via een rebuild
-        // omdat je dan ook nieuwe relevante snijpunten kan zien    
-        // using llFactor in the constructors!
+        // new lengthen factor
         DrawConstants.llFactor = 0;
         // rebuild
         currentObjectGroup = rebuild(originalObject, construction, null);
@@ -2611,44 +2267,34 @@ System.out.println("clickedEdgeWithPoint");
         owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         if (showCut)
             updateCutPanel();
-//GWT        
-//        owner.enableOptions(true);
-        
-        
-        // originalObject opnieuw!
     }    
     
-    // top tool bar
-    // drawing planes
+    /**
+     * drawing a plane in stages:<br>
+     * stepNum == 0: terminate other active mouse modes, make object-copies and wait 
+     * for user to select the first point of the plane<br>
+     * stepNum == 1: process the first point of the plane and wait for user to select the second
+     * point of the plane<br>
+     * stepNum == 2: process the second point of the plane and wait for user to select the third 
+     * point of the plane<br>
+     * stepNum == 3 process the third point of the plane and add this plane to currentObjectGroup
+     * (that is, cut currentObjectGroup with this plane, see class ObjectWithPlane)  
+     * @param stepNum the step number (0,1,2 or 3)
+     * @param b if false and stepNum == 0 abort 
+     */
     public void drawPlane(int stepNum, boolean b)
     {    
-    	
-//System.out.println("draw plane " + stepNum + " " + b);
-
-        // no points choosen
+        // button was pressed, no points chosen
         if (stepNum == 0)
         {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
-            if ((mouseMode != INERT) && 
+            // untoggle other relevant buttons
+        	if ((mouseMode != INERT) && 
                 ((mouseMode != DRAWPLANE) || 
                  (DoorzienGWT.version == DoorzienGWT.EPN))
                 ) 
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-            	
+            {               	
             	owner.topToolBar.drawLineButton.setDown(false);
-            	
-//System.out.println("mm = " + mouseMode);            
-//System.out.println("dlb is down mm = " + owner.topToolBar.drawLineButton.isDown());
-            	                
                 owner.topToolBar.deleteLineButton.setDown(false);
-                
-                // deze NIET!!
-                //owner.topToolBar.drawPlaneButton.setDown(false); 
-                
-//System.out.println("dlb is down mm = " + owner.topToolBar.drawLineButton.isDown());
                 
                 owner.topToolBar.parPlaneButton.setDown(false);
                 owner.topToolBar.deletePlaneButton.setDown(false);
@@ -2659,56 +2305,30 @@ System.out.println("clickedEdgeWithPoint");
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
 
                 // slider weg                                
                 setSlider(false, 0, 0, 0);
-                
+                DrawConstants.TICKSVISIBLE = false;
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
-                DrawConstants.TICKSVISIBLE = false;                
-                showHelpPointDrop(false);                                
-                //originalObject = currentObjectGroup.leftMostLeaf();
+                // this aborts other current mouse actions
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
-            // drawPlane afzetten
-            // met FI blijf je in tool, dus alles nodig
+            // abort DRAWPLANE
             if (!b)
             {   
-            	//owner.topToolBar.drawLineButton.setDown(false);
-            	
-            	//owner.topToolBar.drawPlaneButton.setEnabled(true);
-            	
                 mouseMode = INERT;
                 panel3D.hideHelpLine();
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 panel3D.initializeModel(currentObjectGroup, false);
-               
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT                
-//                owner.enableOptions(true);                
-                
-//System.out.println("dlb is down !b = " + owner.topToolBar.drawLineButton.isDown());                
                 return;
             }
             
             mouseMode = DRAWPLANE;
             DrawConstants.TICKSVISIBLE = true;  
-            showHelpPointDrop(true);
-//GWT            
-//                owner.topToolBar.drawPlaneButton.setPressed(true);            
-            // kopieer current naar temp en stop dit in Panel3D
-//System.out.println("making deep copy");            
+            // copy current to temp and put temp in Panel3D
             tempObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
             tempOrigObject = tempObjectGroup.leftMostLeaf();
             
@@ -2733,12 +2353,12 @@ System.out.println("clickedEdgeWithPoint");
         // one point indicated/choosen, process this
         else if (stepNum == 1)
         {   
+        	// for preview, not used
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
                 )
             {
-//System.out.println("MP not null & ps = " + pointsSelected);                
                 // reset
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
@@ -2751,8 +2371,6 @@ System.out.println("clickedEdgeWithPoint");
                 // original2Object = tempObjectGroup2.leftMostLeaf();
                 fillPlanes(planesFilled);                                
                 panel3D.hideHelpPoint();
-                helpPoint = false;
-
                 panel3D.setPreviewModel(tempObjectGroup2);                
 
                 // reset
@@ -2760,12 +2378,12 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
+            // for preview, not used
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
                      )
             {   
-//System.out.println("MEWP not null & ps = " + pointsSelected);                                
                 // reset
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
@@ -2778,7 +2396,6 @@ System.out.println("clickedEdgeWithPoint");
                 // originalObject2 = tempObjectGroup2.leftMostLeaf();
                 fillPlanes(planesFilled);                                
                 panel3D.hideHelpPoint();
-                helpPoint = false;
 
                 panel3D.setPreviewModel(tempObjectGroup2);
                 // reset
@@ -2786,20 +2403,18 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("MP and MEWP null");                                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
                 panel3D.showHelpPoint(xMoved, yMoved, //new Point(xMoved, yMoved),
                     DrawConstants.planeOutlineColor);
-                    
                 return;
 
             }    
@@ -2850,19 +2465,13 @@ System.out.println("clickedEdgeWithPoint");
         // two points choosen, process these
         else if (stepNum == 2)
         {   
-            
-            
+            // for preview, not used
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
                 )
             {
-//System.out.println("MP not null & ps = " + pointsSelected);                
-                // reset
-//                tempObjectGroup2 = (ObjectGroup3D) tempObjectGroup.deepCopy();
-//                tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
-
-                // twice the same vertex
+                // twice the same point
                 if (Vector3D.equals(point1, movedPoint))
                 {
                     movedPoint = null;
@@ -2870,20 +2479,18 @@ System.out.println("clickedEdgeWithPoint");
                     return; // i.e. wait for mouse action
                 }    
                 boolean hasLine = false;
-                // line could be in currentObjectGroup
+                // line through the two points could be in currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
                         new Line3D(point1, movedPoint))
                    )
                 {   hasLine = true;
-//System.out.println("line in OWL");                
                 }   
                 if ((currentObjectGroup instanceof ObjectWithPlane) &&
                     ((ObjectWithPlane) currentObjectGroup).containsLine(
                         new Line3D(point1, movedPoint))
                    )
                 {   hasLine = true;
-//System.out.println("line in OWP");                                
                 }   
                 if (hasLine)                
                 {   // tempObjectGroup is ObjectWithPoint
@@ -2894,18 +2501,15 @@ System.out.println("clickedEdgeWithPoint");
                     tempObjectGroup2 = 
                         new ObjectWithPoint(tempObjectGroup2, movedPoint, 
                         		DrawConstants.planeOutlineColorIndex);
-//System.out.println("second point");                                                            
                 }
                 else
                 {
                     // add line to copy of original
                     tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                     tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
-// reset to current, thicken second point through ObjectWithLine?
                     tempObjectGroup2 = 
                         new ObjectWithLine(tempObjectGroup2, point1, movedPoint, 
                         		DrawConstants.planeOutlineColorIndex, 0);
-//System.out.println("line added");                                                                                        
                 }    
                 fillPlanes(planesFilled);                  
                 // remains unchanged                       
@@ -2918,21 +2522,20 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
+            // for preview, not used
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
                      )
             {   
-//System.out.println("MEWP not null & ps = " + pointsSelected);                                
-                // reset
-//                tempObjectGroup2 = (ObjectGroup3D) tempObjectGroup.deepCopy();
-//                tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
 
-// note: if the first point was a point on an edge
-// this is now a vertex
-// at free drawing we could "hit" an earlier line??
+            	// note: if the first point was a point on an edge
+            	// this is now a vertex
                 boolean hasLine = false;
-/*                
+/*        
+this causes sometimes a stack overflow error
+probably when the chosen edge point is too close
+to point1 
                 // line could be in currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
@@ -2951,11 +2554,6 @@ System.out.println("clickedEdgeWithPoint");
 */
                 if (hasLine)                
                 {   
-                    
-// dit zorgt voor stack overflow error
-// vermoedelijk omdat je het nieuwe edge
-// point te dicht bij een oude vertex 
-// gekozen hebt?
                     // tempObjectGroup is ObjectWithPoint
                     tempObjectGroup2 = (ObjectGroup3D) tempObjectGroup.deepCopy();
                     tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
@@ -2968,62 +2566,46 @@ System.out.println("clickedEdgeWithPoint");
                 }
                 else
                 {
-// twee keer dezelfde lijn mag hier wel??
-// tijdelijk??
-                    
                     tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                     tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
-// reset to current, thicken second point through ObjectWithLine?
-// nee, kleur is niet goed?
                     tempObjectGroup2 = 
                         new ObjectWithLine(tempObjectGroup2, point1, 
                             movedEdgeWithPoint[2], 
                             DrawConstants.planeOutlineColorIndex, 0);
-//System.out.println("line added");                                                                                                                    
-                            
                 }    
                 fillPlanes(planesFilled);                                
                 // remains unchanged                       
                 // originalObject2 = tempObjectGroup2.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.setPreviewModel(tempObjectGroup2);
-                
-                
                 // reset
                 movedPoint = null;
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("MP and MEWP null");                                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
                 panel3D.showHelpLine(point1,xMoved, yMoved,
-                    //new Point(xMoved, yMoved),
                     DrawConstants.planeOutlineColor);
                 if (!previewOn)
                 {
                     panel3D.showHelpPoint(xMoved, yMoved,
-                        //new Point(xMoved, yMoved),
                         DrawConstants.planeOutlineColor);
                 }    
                     
                 return;
 
             }    
-            
-            
             // check here for type of point AND if this was not 
             // equal to the first
-// of: twee keer zelfde edge selecteerd edge als lijn!
-// d.i. consistent met Doorzien3
             else if (clickedPoint != null)
             {   
                 // twice the same vertex
@@ -3051,7 +2633,6 @@ System.out.println("clickedEdgeWithPoint");
                 }   
                 if (hasLine)                
                 {   // replace with second point added
-
                     tempObjectGroup = 
                         new ObjectWithPoint(tempObjectGroup, clickedPoint, 
                         		DrawConstants.planeOutlineColorIndex);
@@ -3060,7 +2641,6 @@ System.out.println("clickedEdgeWithPoint");
                 {
                     tempObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
                     tempOrigObject = tempObjectGroup.leftMostLeaf();
-// reset to current, thicken second point through ObjectWithLine?
                     tempObjectGroup = 
                         new ObjectWithLine(tempObjectGroup, point1, clickedPoint, 
                         		DrawConstants.planeOutlineColorIndex, 0);
@@ -3081,10 +2661,13 @@ System.out.println("clickedEdgeWithPoint");
             }
             else if (clickedEdgeWithPoint != null)
             {
-// note: if the first point was a point on an edge
-// this is now a vertex
+            	// note: if the first point was a point on an edge
+            	// this is now a vertex
                 boolean hasLine = false;
-/*                
+/* 
+this causes sometimes a stack overflow error
+probably when the chosen edge point is too close
+to point1 
                 // line could be in currentObjectGroup
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsLine(
@@ -3099,7 +2682,6 @@ System.out.println("clickedEdgeWithPoint");
                 {   hasLine = true;
                 }   
 */
-// zie boven, stack overflow error
                 if (hasLine)                
                 {   // replace with second point added
                     tempObjectGroup = 
@@ -3110,8 +2692,6 @@ System.out.println("clickedEdgeWithPoint");
                 {
                     tempObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
                     tempOrigObject = tempObjectGroup.leftMostLeaf();
-// reset to current, thicken second point through ObjectWithLine?
-// nee, kleur is niet goed?
                     tempObjectGroup = 
                         new ObjectWithLine(tempObjectGroup, point1, clickedEdgeWithPoint[2], 
                         		DrawConstants.planeOutlineColorIndex, 0);
@@ -3129,17 +2709,14 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 clickedPoint = null;
                 clickedEdgeWithPoint = null;
-// hier even geen objectWithLine maken: 
-// je kan de lijn al hebben, die zou je dan rood moeten kleuren
-
-// maak de lijn als je hem nog niet hebt
             }            
             
             owner.helpBar.setText(DoorzienGWT.rb.vlakPunt3Tekst());            
         }
         // third point choosen
         else if (stepNum == 3)
-        {   
+        {
+        	// for preview, not used
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
@@ -3159,43 +2736,36 @@ System.out.println("clickedEdgeWithPoint");
                     return; // i.e. wait for mouse action
                 }    
                 // 3 collinear points    
-                //if ((point1 != null) && (point2 != null) &&
                 if (Line3D.areCollinear(point1, point2, movedPoint))
                 {   // message?
-//System.out.println("collinear");                
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // plane will be added to currentObjectGroup
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, movedPoint))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
                 }   
+             // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithPlane) &&
                     ((ObjectWithPlane) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, movedPoint))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;    
                 }   
                 
-//System.out.println("MP not null & ps = " + pointsSelected);                
                 // reset
-// add to current, highlighting?                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
-  
-                
                 // temporarily replace with plane added
                 tempObjectGroup2 = 
                     new ObjectWithPlane(tempObjectGroup2, 
@@ -3212,13 +2782,12 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
+            // for preview, not used
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
                      )
             {   
-//System.out.println("MEWP not null & ps = " + pointsSelected);                                
-
                 // 3 collinear points    
                 if (Line3D.areCollinear(point1, point2, movedEdgeWithPoint[2]))                
                 {   // message?
@@ -3226,30 +2795,28 @@ System.out.println("clickedEdgeWithPoint");
                     movedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // plane will be added to currentObjectGroup
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, movedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
-                }   
+                }
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithPlane) &&
                     ((ObjectWithPlane) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, movedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWP contains");   
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
                 }   
 
                 // reset
-// take current, highlighting?                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
                 
@@ -3268,34 +2835,30 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("MP and MEWP null");                                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
                 panel3D.showHelpLine(point2,xMoved, yMoved,
-                    //new Point(xMoved, yMoved),
                     DrawConstants.planeOutlineColor);
                 if (!previewOn)
                 {
                     panel3D.showHelpPoint(xMoved, yMoved,
-                        //new Point(xMoved, yMoved),
                         DrawConstants.planeOutlineColor);
                 }    
                     
                 return;
 
             }    
-            // vertex choosen    
+            // third point chosen is a vertex     
             else if (clickedPoint != null)
             {   
-                
                 // twice the same vertex
                 if (Vector3D.equals(point1, clickedPoint))
                 {
@@ -3314,35 +2877,32 @@ System.out.println("clickedEdgeWithPoint");
                     return; // i.e. wait for mouse action
                 }    
                 // 3 collinear points    
-                //if ((point1 != null) && (point2 != null) &&
                 if (Line3D.areCollinear(point1, point2, clickedPoint))
                 {   // message?
-//System.out.println("collinear");                
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // plane will be added to currentObjectGroup
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, clickedPoint))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     return;
                 }   
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithPlane) &&
                     ((ObjectWithPlane) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, clickedPoint))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
@@ -3358,18 +2918,16 @@ System.out.println("clickedEdgeWithPoint");
                 panel3D.previewModel = null;                
                 panel3D.hideHelpLine();
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 fillPlanes(planesFilled);            
                 DrawConstants.TICKSVISIBLE = false;                                
-                showHelpPointDrop(false);                                
                 panel3D.initializeModel(currentObjectGroup, false);        
                    
             }
-            // point on edge choosen
+            // third point chosen is a point on an edge 
             else if (clickedEdgeWithPoint != null)
             {
-// note: if the first or second point was a point on an edge
-// these are now a vertices
+            	// note: if the first or second point was a point on an edge
+            	// these are now a vertices
                 // 3 collinear points    
                 if (Line3D.areCollinear(point1, point2, clickedEdgeWithPoint[2]))                
                 {   // message?
@@ -3379,25 +2937,24 @@ System.out.println("clickedEdgeWithPoint");
                     clickedEdgeWithPoint = null;
                     return; // i.e. wait for mouse action
                 }
-                // plane will be added to currentObjectGroup
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, clickedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
                     clickedEdgeWithPoint = null;
                     return;
                 }   
+                // plane cannot be added to currentObjectGroup twice
                 if ((currentObjectGroup instanceof ObjectWithPlane) &&
                     ((ObjectWithPlane) currentObjectGroup).containsPlane(
                         new Plane3D(point1, point2, clickedEdgeWithPoint[2]))
                    )
                 {
-//System.out.println("OWP contains");   
                     movedPoint = null;
                     movedEdgeWithPoint = null;
 
@@ -3409,27 +2966,21 @@ System.out.println("clickedEdgeWithPoint");
                 // now the plane can be added
                 currentObjectGroup = new ObjectWithPlane(currentObjectGroup,
                     point1, point2, point3, DrawConstants.planeOutlineColorIndex, true);
-//System.out.println("plane added");                    
                 // remains unchanged                       
                 // originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.previewModel = null;
                 panel3D.hideHelpLine();
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 fillPlanes(planesFilled);            
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
                 panel3D.initializeModel(currentObjectGroup, false);        
 
             }
             addToHistory();
-            // aan het einde
-            
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;            
             tempObjectGroup2 = null;                        
-//            fillPlanes(planesFilled);
             setNumPlanes(numPlanes + 1);
             if (showCut)
                 updateCutPanel();
@@ -3439,36 +2990,36 @@ System.out.println("clickedEdgeWithPoint");
             // for EPN out of tool    
             else if (DoorzienGWT.version == DoorzienGWT.EPN)
             {   mouseMode = INERT;
-//GWT            
-//                owner.enableOptions(true);
                 owner.topToolBar.drawPlaneButton.setDown(false);                            
             }
         }
         
-// check voor collinear en of je het vlak al hebt                
     } // drawPlane    
 
-
+    
+    /**
+     * draw a plane parallel to a given plane in two steps:<br>
+     * step 0: terminate other active mouse modes, make object-copies and wait 
+     * for user to choose the plane to which the new plane should be parallel;
+     * if the object contains only one plane, proceed to step 1; <br>
+     * step 1: ask user for a point through which the new plane should pass, then
+     * cut the object with this new plane 
+     * @param stepNum the step number (0 or 1)
+     * @param b abort if stepNum == 0 and false
+     */
     public void drawParPlane(int stepNum, boolean b)
-    {   // als meer vlakken kies een vlak
-        // gebruik mousemode
+    {   
         boolean wasReplaced = false;
         
+        // button pressed, plane should be choosen
         if (stepNum == 0)
         {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
+        	// untoggle other relevant buttons
             if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-            	// dit aborteert andere LOPENDE muis acties
-            	
+            {   
                 owner.topToolBar.drawLineButton.setDown(false);                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);
-                
-                // deze NIET!!
-                //owner.topToolBar.parPlaneButton.setDown(false);
                 
                 owner.topToolBar.deletePlaneButton.setDown(false);
                 owner.topToolBar.showCutButton.setDown(false);                
@@ -3479,51 +3030,38 @@ System.out.println("clickedEdgeWithPoint");
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
                 
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
                 originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
+
                 DrawConstants.TICKSVISIBLE = false;                
-                showHelpPointDrop(false);                                
+                //this aborts other active mouse modes                                 
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
-            // drawParPlane afzetten
-            // later met FI je in tool? dan meer toevoegen
-            // zie drawPlane
+            // abort DRAWPARPLANE
             if (!b)
             {   
                 mouseMode = INERT;
-                
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());                
-//GWT                
-//                owner.enableOptions(true);                
                 return;
             }
             
             mouseMode = DRAWPARPLANE;
-//GWT
-//            owner.topToolBar.parPlaneButton.setPressed(true);                                            
             DrawConstants.TICKSVISIBLE = true;        
-            showHelpPointDrop(true);                
-            // construction wiil always be created since there 
-            // is at least one plane
+                
+            // create construction 
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
             else if (currentObjectGroup instanceof ObjectWithPlane)
                 construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-//System.out.println("co-size = " + construction.size());                        
+
+            // object contains more then one plane
+            // if all these planes are parallel, no plane
+            // needs to be choosen
             if (numPlanes > 1)
             {   Plane3D firstPlane = null;
                 boolean allParallel = true;
@@ -3543,7 +3081,6 @@ System.out.println("clickedEdgeWithPoint");
                 if (allParallel)                    
                 {   parPlaneChoosen = firstPlane;
                     parPointChoosen = null;
-                    helpPoint = true;
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
@@ -3561,9 +3098,9 @@ System.out.println("clickedEdgeWithPoint");
                     owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakTekst());                                        
                     parPlaneChoosen = null;
                     parPointChoosen = null;
-                    helpPoint = true;
                     panel3D.helpPointColor = DrawConstants.planeOutlineColor;
                     // wait for mouse action
+                    // choosing the plane
                 }
             }    
             else // numPlanes = 1
@@ -3574,7 +3111,6 @@ System.out.println("clickedEdgeWithPoint");
                         parPlaneChoosen = ((Plane3D) ob).copy();
                 }
                 parPointChoosen = null;
-                helpPoint = true;
                 movedPoint = null;
                 movedEdgeWithPoint = null;
                 clickedPoint = null;
@@ -3587,14 +3123,14 @@ System.out.println("clickedEdgeWithPoint");
             }
         }
         else if (stepNum == 1)
-        {   //owner.helpBar.setText(owner.tt("parPlanePointText"));            
-            // for preview
+        {               
+            // for preview, not used
             if ((movedPoint != null) && 
                 (clickedPoint == null) &&
                 (clickedEdgeWithPoint == null)
                 )
             {
-                // plane will be added to currentObjectGroup
+                // plane already there
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(movedPoint,
@@ -3602,7 +3138,6 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, movedPoint)))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
@@ -3614,18 +3149,14 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, movedPoint)))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;    
                 }   
                 
-//System.out.println("MP not null & ps = " + pointsSelected);                
                 // reset
-// add to current, highlighting?                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
-  
                 
                 // temporarily replace with plane added
                 tempObjectGroup2 = 
@@ -3644,14 +3175,13 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
+            // for preview, not used
             else if ((movedEdgeWithPoint != null) && 
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)
                      )
             {   
-//System.out.println("MEWP not null & ps = " + pointsSelected);                                
-
-                // plane will be added to currentObjectGroup
+                // plane already there
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(movedEdgeWithPoint[2],
@@ -3659,7 +3189,6 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, movedEdgeWithPoint[2])))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
@@ -3671,14 +3200,12 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, movedEdgeWithPoint[2])))
                    )
                 {
-//System.out.println("OWP contains");   
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     return;
                 }   
 
                 // reset
-// take current, highlighting?                
                 tempObjectGroup2 = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 tempOrigObject2 = tempObjectGroup2.leftMostLeaf();
                 
@@ -3698,24 +3225,19 @@ System.out.println("clickedEdgeWithPoint");
                 movedEdgeWithPoint = null;
                 return;
             }
-            // at clicking one of the moved is != null
+            // at clicking one of the moved should be  != null
             else if ((movedPoint == null) && 
                      (movedEdgeWithPoint == null) &&
                      (clickedPoint == null) && 
                      (clickedEdgeWithPoint == null)            
                     )
             {   
-//System.out.println("MP and MEWP null");                                
                 // reset if necessary
                 if (panel3D.previewModel != null)
                     panel3D.setPreviewModel(null);        
-//                panel3D.showHelpLine(point2,
-//                    new Point(xMoved, yMoved),
-//                    planeOutlineColor);
                 if (!previewOn)
                 {
                     panel3D.showHelpPoint(xMoved, yMoved,
-                        //new Point(xMoved, yMoved),
                         DrawConstants.planeOutlineColor);
                 }    
                     
@@ -3725,8 +3247,7 @@ System.out.println("clickedEdgeWithPoint");
             // vertex choosen    
             else if (clickedPoint != null)
             {   
-                
-                // plane will be added to currentObjectGroup
+                // plane already there
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(clickedPoint,
@@ -3734,7 +3255,6 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, clickedPoint)))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
@@ -3748,7 +3268,6 @@ System.out.println("clickedEdgeWithPoint");
                             Vector3D.plus(parPlaneChoosen.direction2, clickedPoint)))
                    )
                 {
-//System.out.println("OWP contains");                                                        
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
@@ -3757,29 +3276,11 @@ System.out.println("clickedEdgeWithPoint");
                 }   
                 parPointChoosen = new Vector3D(clickedPoint);   
                 // now the plane can be added
-/*                
-System.out.println("going to create plane");                
-Plane3D test = new Plane3D(parPointChoosen,
-                    Vector3D.plus(parPlaneChoosen.direction1, parPointChoosen),
-                    Vector3D.plus(parPlaneChoosen.direction2, parPointChoosen));
-System.out.println("test = " + test.toString());                    
-*/
-// om een of ander reden is soms de "structuur" van
-// currentObjectGroup hier niet goed
-// wel na een deep copy
 
-// er wordt in de snijalgorithme een facet niet doorgesneden
-// dit is altijd een facet van origObject
-// maar niet omgekeerd!
-// de cut bevat WEL voldoende vertices maar kan daardoor
-// NIET gemaakt worden
-
-// het niet doorgesneden facet heeft GEEN replacement maar wordt
-// incorrect geclassificeerd als liggend "left" van het vlak
-// i.p.v. "to be cut"
-// dit verdwijnt na de deep copy
-// dus: de coordinaten zijn niet goed
-// maar waarom werkt alles dan in drawPlane wel OK?
+// for an unknown reason at this point the structure 
+// of currentObjectGroup is not correct and the 
+// cut algorithm does not work correctly                
+// however, after a deep copy, there is no problem
 
                 currentObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();
                 originalObject = currentObjectGroup.leftMostLeaf();
@@ -3790,34 +3291,27 @@ System.out.println("test = " + test.toString());
                     Vector3D.plus(parPlaneChoosen.direction2, parPointChoosen),
                     DrawConstants.planeOutlineColorIndex, true);
                     
-                    
-                    
-                    
-wasReplaced = false;
-if (currentObjectGroup.objects.size() > 1)
-    wasReplaced = true;
-//System.out.println("wasReplaced = " + wasReplaced);
-
-                    
-//System.out.println("plane created");                                    
+                wasReplaced = false;
+                if (currentObjectGroup.objects.size() > 1)
+                	wasReplaced = true;
                 // remains unchanged                       
                 // originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.previewModel = null;                
                 panel3D.hideHelpLine();
                 panel3D.hideHelpPoint();
-                helpPoint = false;
+
                 fillPlanes(planesFilled);            
                 DrawConstants.TICKSVISIBLE = false;                                
-                showHelpPointDrop(false);                                
+                               
                 panel3D.initializeModel(currentObjectGroup, false);        
                    
             }
             // point on edge choosen
             else if (clickedEdgeWithPoint != null)
             {
-// note: if the first or second point was a point on an edge
-// these are now a vertices
-                // plane will be added to currentObjectGroup
+            	// note: if the first or second point was a point on an edge
+            	// these are now a vertices
+                // plane already there
                 if ((currentObjectGroup instanceof ObjectWithLine) &&
                     ((ObjectWithLine) currentObjectGroup).containsPlane(
                         new Plane3D(clickedEdgeWithPoint[2],
@@ -3825,7 +3319,6 @@ if (currentObjectGroup.objects.size() > 1)
                             Vector3D.plus(parPlaneChoosen.direction2, clickedEdgeWithPoint[2])))
                    )
                 {
-//System.out.println("OWL contains");                                    
                     movedPoint = null;
                     movedEdgeWithPoint = null;
                     clickedPoint = null;
@@ -3839,7 +3332,6 @@ if (currentObjectGroup.objects.size() > 1)
                             Vector3D.plus(parPlaneChoosen.direction2, clickedEdgeWithPoint[2])))
                    )
                 {
-//System.out.println("OWP contains");   
                     movedPoint = null;
                     movedEdgeWithPoint = null;
 
@@ -3849,9 +3341,8 @@ if (currentObjectGroup.objects.size() > 1)
                 }   
                 parPointChoosen = new Vector3D(clickedEdgeWithPoint[2]);   
                 
-// om een of ander reden is de "structuur" van
-// currentObjectGroup hier niet goed
-// wel na een kopie
+// see note above, make a deep copy
+                
                 currentObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();                
                 originalObject = currentObjectGroup.leftMostLeaf();
                 
@@ -3861,28 +3352,24 @@ if (currentObjectGroup.objects.size() > 1)
                     Vector3D.plus(parPlaneChoosen.direction1, parPointChoosen),
                     Vector3D.plus(parPlaneChoosen.direction2, parPointChoosen),
                     DrawConstants.planeOutlineColorIndex, true);
-//System.out.println("plane added");                    
 
-
-wasReplaced = false;
-if (currentObjectGroup.objects.size() > 1)
-    wasReplaced = true;
-//System.out.println("wasReplaced = " + wasReplaced);
+                wasReplaced = false;
+                if (currentObjectGroup.objects.size() > 1)
+                	wasReplaced = true;
 
                 // remains unchanged                       
                 // originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.previewModel = null;
                 panel3D.hideHelpLine();
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 fillPlanes(planesFilled);
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
+                              
                 panel3D.initializeModel(currentObjectGroup, false);        
 
             }
-            // dit alleen als er een nieuw vlak
-            // bijgekomen is
+
+            // a new plane was added
             if (wasReplaced)
             {
                 setNumPlanes(numPlanes + 1);
@@ -3890,33 +3377,31 @@ if (currentObjectGroup.objects.size() > 1)
                     updateCutPanel();
                 addToHistory();
             }
-            // dit altijd
-            // aan het einde 
-            
-//            owner.helpBar.setText(Table.lookUp("rotateText"));
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
             
             tempObjectGroup = null;            
             tempObjectGroup2 = null;                        
             mouseMode = INERT;
-//GWT            
-//            owner.enableOptions(true);
             owner.topToolBar.parPlaneButton.setDown(false);                                            
         }
     }    
 
-
+    /**
+     * deleting a plane in stages:<br>
+     * stepNum == 0: terminate other active mouse modes, if there is only one plane,
+     * continue to stepNum == 1, otherwise wait for the user to select the plane to be deleted<br>
+     * stepNum == 1: delete the indicated plane from currentObjectGroup using rebuild<br>
+     * @param stepNum the step number (0 or 1)
+     * @param b if false and stepNum == 0 abort 
+     */
     public void deletePlane(int stepNum, boolean b)
-    {   // als meer vlakken kies een vlak
-        // gebruik mousemode
+    {   
+    	// button pressed, plane should be choosen
         if (stepNum == 0)
         {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
-            if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
+        	// untoggle other relevant buttons
+        	if (mouseMode != INERT)
+            {   
                 owner.topToolBar.drawLineButton.setDown(false);                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
@@ -3933,54 +3418,36 @@ if (currentObjectGroup.objects.size() > 1)
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
-//fout?                
-//                    owner.topToolBar.cutButton.setImage(owner.cutImage);
                 
-                // slider weg                                
+                // remove slider weg                                
                 setSlider(false, 0, 0, 0);
                 originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
+                //this aborts other active mouse modes                                
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
+        	// abort
             if (!b)
             {   mouseMode = INERT;
-            
             	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT            
-//                owner.enableOptions(true);                
                 return;
             }
             
             mouseMode = DELETEPLANE;
-//GWT            
-//            owner.enableOptions(false);
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
             else if (currentObjectGroup instanceof ObjectWithPlane)
                 construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-//System.out.println("co-size = " + construction.length);                        
+                        
             if (numPlanes > 1)
             {   // get the plane via the mouse
                 owner.helpBar.setText(DoorzienGWT.rb.verwijderVlakTekst());            	
-
-//GWT            	
-//                owner.topToolBar.deletePlaneButton.setPressed(true);
                 planeChoosen = null;
-                helpPoint = true;
                 panel3D.helpPointColor = DrawConstants.planeOutlineColor;
+                // wait for mouse action
                 
             }    
             else
@@ -3997,7 +3464,6 @@ if (currentObjectGroup.objects.size() > 1)
         {
         	
             owner.topToolBar.deletePlaneButton.setDown(false);
-            helpPoint = false;
             panel3D.hideHelpPoint();
             
             // rebuild
@@ -4007,8 +3473,6 @@ if (currentObjectGroup.objects.size() > 1)
             fillPlanes(planesFilled);            
             panel3D.initializeModel(currentObjectGroup, false);        
             addToHistory();
-            //fillPlanes(planesFilled);
-            // originalObject opnieuw!
             mouseMode = INERT;
             
             owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
@@ -4021,11 +3485,13 @@ if (currentObjectGroup.objects.size() > 1)
                     updateCutPanel();
                 
             }
-//GWT            
-//            owner.enableOptions(true);
         }
     }    
 
+    /**
+     * make all planes in all relevant objects opaque (true) or transparent 
+     * @param b true/false
+     */
     public void fillPlanes(boolean b)
     {   planesFilled = b;
         // this sets the flaggs
@@ -4069,509 +3535,74 @@ if (currentObjectGroup.objects.size() > 1)
                 ((ObjectWithPlane) right).fillCuts(b);
             else if (right instanceof ObjectWithLine)
                 ((ObjectWithLine) right).fillCuts(b);    
-            
-            
-            
-            
-            
         }    
         setFilled(filled);    
-        //owner.enableOptions(true);
+
     }
-    public void translatePlane(int stepNum, boolean b)
-    {   // als meer vlakken kies een vlak via een edge
-        // als subset van origObject i.e. aan de buitenkant?
-        // gebruik mousemode
-        if (stepNum == 0)
-        {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
-            if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-                owner.topToolBar.drawLineButton.setDown(false);                
-                owner.topToolBar.deleteLineButton.setDown(false);                                
-                owner.topToolBar.drawPlaneButton.setDown(false);                                
-                owner.topToolBar.parPlaneButton.setDown(false);
-                owner.topToolBar.deletePlaneButton.setDown(false);
-                owner.topToolBar.showCutButton.setDown(false);                
-                owner.topToolBar.cutButton.setDown(false);                                
-                owner.rightToolBar.conDrawButton.setDown(false);                                                
-            	
-                tempObjectGroup = null;
-                tempObjectGroup2 = null;                
-                foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
-                cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
-                // slider weg                                
-                setSlider(false, 0, 0, 0);
-                //originalObject = currentObjectGroup.leftMostLeaf();
-                panel3D.hideHelpLine();                        
-                panel3D.hideHelpPoint();
-                helpPoint = false;
-                DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
-                panel3D.initializeModel(currentObjectGroup, false);                    
-            }
-            if (!b)
-            {   mouseMode = INERT;
-            
-//                owner.helpBar.setText(owner.tt("rotateText"));     
-            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-
-                return;
-            }
-            mouseMode = TRANSLATEPLANE;
-            if (currentObjectGroup instanceof ObjectWithLine)
-                transRotConstruct = ((ObjectWithLine) currentObjectGroup).getConstruction();
-            else if (currentObjectGroup instanceof ObjectWithPlane)
-                transRotConstruct = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-            if (numPlanes > 1)
-            {
-                // help message
-//GWT            	
-//                owner.helpBar.setText(owner.tt("selectTranslatePlaneText"));                
-                //owner.topToolBar.transPlaneButton.setPressed(true);                
-                transPlaneChoosen = null;
-                // wait for mouse action
-                helpPoint = true;
-                panel3D.helpPointColor = DrawConstants.planeOutlineColor;
-                
-            }
-            else
-            {   // find the one plane here
-                for (int i = 0; i < transRotConstruct.size(); i++)
-                {   Object ob = transRotConstruct.elementAt(i);
-                    if (ob instanceof Plane3D)
-                    {    Plane3D pl = (Plane3D) ob;
-                         transPlaneChoosen = pl.copy();
-                    
-                    
-                    }
-                }
-                translatePlane(1, true);
-            }
-        }    
-        else if (stepNum == 1)
-        {
-            //owner.topToolBar.transPlaneButton.setPressed(false);            
-            helpPoint = false;
-            panel3D.hideHelpPoint();
-            
-            // extremen:
-            // in het extreme geval snijdt het vlak origObject in een
-            // vertex (convexiteit)
-            // vindt dus de vertices met de kleinste(-) en grootste(+)
-            // plane position t.o.v. vlak??????
-            
-// is originalObject updated?            
-            minTrans = 0;
-            maxTrans = 0;
-            Line3D normalLine = new Line3D(transPlaneChoosen.point,
-                Vector3D.plus(transPlaneChoosen.point,
-                              transPlaneChoosen.normal));  
-            for (int i = 0; i < originalObject.numVertices; i++)
-            {   Plane3D normalPlane = new Plane3D(
-                    transPlaneChoosen.normal.x, 
-                    transPlaneChoosen.normal.y,
-                    transPlaneChoosen.normal.z,
-                    Vector3D.dotProduct(transPlaneChoosen.normal,
-                        originalObject.vertices[i]));
-                int isType = Plane3D.intersectionType(normalLine, 
-                                                      normalPlane);                      
-                // isType == 2 levert 0
-                if (isType == 1)
-                {   Vector3D v = Plane3D.getIntersectionPoint(
-                        normalLine, normalPlane);
-                    double pos = 
-                        Vector3D.dotProduct(transPlaneChoosen.normal, v) -
-                        Vector3D.dotProduct(transPlaneChoosen.normal, 
-                            transPlaneChoosen.point);    
-                    if (pos < minTrans)
-                        minTrans = pos;
-                    if (pos > maxTrans)
-                        maxTrans = pos;
-                }    
-            }
-        
-            // wat betekenen deze getallen nu??
-            // verschuif over een vector tussen 
-            // transPlaneChoosen.normal * minTrans
-            // en transPlaneChoosen.normal * maxTrans
-            
-//System.out.println("minTrans = " + UF.format(minTrans, 3));
-//System.out.println("maxTrans = " + UF.format(maxTrans, 3));
-
-// hier min ophogen, max verlagen
-// zeg met 5% van de range?
-            minTrans += Vector3D.NZero;
-            maxTrans -= Vector3D.NZero;
-
-
-//            double rangeFac = (maxTrans - minTrans) * 5e-2d;
-//            minTrans += rangeFac;
-//            maxTrans -= rangeFac;
-
-            transPlane = transPlaneChoosen.copy();
-
-            setSlider(true, 0, minTrans, maxTrans);
-                        
-//            owner.helpBar.setText(owner.tt("rotateText"));
-            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-        
-        // kijk bij rebuild uit dat je niet twee keer hetzelfde
-        // vlak snijdt (er kan een parallel vlak zijn)
-        
-        // verschuiven via een vector loodrecht op vlak
-        // neem normaalvector en twee constanten
-        
-        // rebuild, etc. gebeurt in processSlider
-        // ook original opnieuw zetten
-        
-        
-        }
-    }    
-
-    public void rotatePlane(int stepNum, boolean b)
-    {   // als meer vlakken kies een vlak EN draaias via edge 
-        // aan de buitenkant??
-        // zijn er meer vlakken, kies er dan een of weer vragen?
-        // gebruik mousemode      
-        if (stepNum == 0)
-        {
-            // hier of andere relevante knoppen "doof maken"
-            // of als je wat anders aanklikt drawline aborteren
-            // zo kun je ook drawLine opnieuw starten
-            if (mouseMode != INERT)
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-                owner.topToolBar.drawLineButton.setDown(false);                
-                owner.topToolBar.deleteLineButton.setDown(false);                                
-                owner.topToolBar.drawPlaneButton.setDown(false);                                
-                owner.topToolBar.parPlaneButton.setDown(false);
-                owner.topToolBar.deletePlaneButton.setDown(false);
-                owner.topToolBar.showCutButton.setDown(false);                
-                owner.topToolBar.cutButton.setDown(false);                                
-                owner.rightToolBar.conDrawButton.setDown(false);                                                
-
-                tempObjectGroup = null;
-                tempObjectGroup2 = null;                
-                foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
-                cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-
-                }
-                // slider weg                                
-                setSlider(false, 0, 0, 0);
-                originalObject = currentObjectGroup.leftMostLeaf();
-                panel3D.hideHelpLine();                        
-                panel3D.hideHelpPoint();
-                helpPoint = false;
-                DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
-                panel3D.initializeModel(currentObjectGroup, false);                    
-            }
-            if (!b)
-            {   mouseMode = INERT;
-            
-//                owner.helpBar.setText(owner.tt("rotateText"));
-            	owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-                
-                return;
-            }
-            mouseMode = ROTATEPLANE;
-            //owner.topToolBar.rotPlaneButton.setPressed(true);                            
-            if (currentObjectGroup instanceof ObjectWithLine)
-                transRotConstruct = ((ObjectWithLine) currentObjectGroup).getConstruction();
-            else if (currentObjectGroup instanceof ObjectWithPlane)
-                transRotConstruct = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-            // altijd klikken voor draaias
-//GWT            
-//            owner.helpBar.setText(owner.tt("selectRotatePlaneText"));
-            // help message
-            rotPlaneChoosen = null;
-            rotLine = null;
-            helpPoint = true;
-            panel3D.helpPointColor = DrawConstants.planeOutlineColor;
-            
-        }
-        else if (stepNum == 1)
-        {
-           //owner.topToolBar.rotPlaneButton.setPressed(false);                            
-           helpPoint = false;
-           panel3D.hideHelpPoint();
-            
-        // extremen:
-        // 1) as is een edge van origobject: zoek hoek (<180) tussen
-        // de facets, geeft samen met hoek vlak min en max
-        // beginstand is hoek vlak
-        
-// is originalObject updated?
-
-        Facet3D f = originalObject.facetContaining(
-            rotLine.point1, rotLine.point2, true);
-        if (f != null)
-        {
-//System.out.println("original edge");        
-            Facet3D adjf = originalObject.facetContaining(
-                rotLine.point2, rotLine.point1, true);
-            Vector3D fNormal = new Vector3D(f.normal);
-            Vector3D adjfNormal = new Vector3D(adjf.normal);
-            Vector3D.makeUnitary(fNormal);
-            Vector3D.makeUnitary(adjfNormal);
-            double angle = Math.acos(
-                Vector3D.dotProduct(fNormal, adjfNormal));
-//System.out.println("angle = " + angle);                
-            angle = Math.PI - angle;
-//System.out.println("angle = " + UF.format(angle * 360 / (2 * Math.PI), 0));                                                           
-
-// rotLine has direction as segment of f
-            double dot = Vector3D.dotProduct(fNormal, rotPlaneChoosen.normal);
-            double angle2 = Math.acos(dot);
-            double angle2A = Math.acos(- dot);
-                
-// rotLine has direction opposite to segment of adjf                
-            double angle3 = angle - angle2;
-            double angle3A = angle - angle2A;
-
-// rotating is clockwise relative to segment of adjf                
-                
-//            if (angle2 > angle)
-//                angle2 = Math.PI - angle2;
-//System.out.println("angle2 = " + UF.format(angle2 * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle2A = " + UF.format(angle2A * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle3 = " + UF.format(angle3 * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle3A = " + UF.format(angle3A * 360 / (2 * Math.PI), 0));                                
-
-//System.out.println("angle2+3 = " + (angle2 + angle3));                                
-
-        if (angle2 > angle2A)
-        {   minRot = - angle2A;
-            maxRot = angle3A;
-        }
-        else
-        {   minRot = - angle2;
-            maxRot = angle3;
-        }
-        
-            
-// bijna goed!!            
-//System.out.println("Min+Max = " + 
-//    UF.format((Math.abs(minRot) + Math.abs(maxRot)) * 360 / (2 * Math.PI), 0));                                                                            
-
-//            minRot += Vector3D.NZero;
-//            maxRot -= Vector3D.NZero;
-//System.out.println("minRot = " + UF.format(minRot * 360 / (2 * Math.PI), 0));                                
-//System.out.println("maxRot = " + UF.format(maxRot * 360 / (2 * Math.PI), 0));                                
-//            double rangeFac = (maxRot - minRot) * 1e-2d;
-//            minRot += rangeFac;
-//            maxRot -= rangeFac;
-
-        }
-        else
-        {   f = currentObjectGroup.facetContaining(
-                rotLine.point1, rotLine.point2, false);
-            if (f != null) 
-            {   boolean replacesOrigObject = false;
-                if (currentObjectGroup instanceof ObjectWithPlane)
-                    replacesOrigObject =
-                    ((ObjectWithPlane) currentObjectGroup).replacesOrigObject(f);
-                else if (currentObjectGroup instanceof ObjectWithLine)
-                    replacesOrigObject =
-                    ((ObjectWithLine) currentObjectGroup).replacesOrigObject(f);
-                    
-                if (replacesOrigObject)
-                {
-//System.out.println("replacement edge");        
-                    Vector3D fNormal = new Vector3D(f.normal);
-                    Vector3D.makeUnitary(fNormal);
-                    
-//System.out.println("fNormal " + fNormal.toString());
-//System.out.println("rotPlaneNormal " + rotPlaneChoosen.normal.toString());
-                    
-// f contains rotLine as segment                    
-                    double dotProd =
-                        Vector3D.dotProduct(fNormal, rotPlaneChoosen.normal);                    
-                    double angle2 = Math.acos(dotProd);
-                    double angle2A = Math.acos(- dotProd);
-// rotation clockwise opposite to segment              
-                    
-                    double angle3 = Math.PI - angle2;
-                    double angle3A = Math.PI - angle2A;
-
-//System.out.println("angle2 = " + UF.format(angle2 * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle2A = " + UF.format(angle2A * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle3 = " + UF.format(angle3 * 360 / (2 * Math.PI), 0));                                
-//System.out.println("angle3A = " + UF.format(angle3A * 360 / (2 * Math.PI), 0));                                
-
-
-
-//if (modelCode <= owner.ICOSAHEDRON)
-//{
-        if (angle2 > angle2A)
-        {   minRot = - angle3A;
-            maxRot = angle2A;
-        }
-        else
-        {   minRot = - angle3;
-            maxRot = angle2;
-        }
-/*
-
-
-// hier paramsurfaces apart?
-// ook bij draaien om een segment
-}
-else
-{
-        if (angle2 > angle2A)
-        {   minRot = - angle3A;
-            maxRot = angle2A;
-        }
-        else
-        {   minRot = - angle2;
-            maxRot = angle3;
-        }
-}
-*/
-
-//System.out.println("Min+Max = " + 
-//    UF.format((Math.abs(minRot) + Math.abs(maxRot)) * 360 / (2 * Math.PI), 0));                                                                            
-
-//System.out.println("minRot = " + UF.format(minRot * 360 / (2 * Math.PI), 0));                                
-//System.out.println("maxRot = " + UF.format(maxRot * 360 / (2 * Math.PI), 0));                                
-
-            //minRot += Vector3D.NZero;
-            //maxRot -= Vector3D.NZero;
-                    
-                    
-//                    double rangeFac = (maxRot - minRot) * 5e-2d;
-//                    minRot += rangeFac;
-//                    maxRot -= rangeFac;
-                    
-                }
-                else
-                {
-//System.out.println("inner edge");                                    
-                    minRot = -Math.PI / 2;
-                    maxRot = Math.PI / 2;
-                }
-            }    
-        // 2) as IN een facet van origObject
-        // dan max - min = 180, beginstand is hoek vlak  
-        }
-        // kijk bij rebuild uit dat je niet twee keer hetzelfde
-        // vlak snijdt (er kan een parallel vlak zijn)
-        
-        // rebuild
-        // original opnieuw zetten
-            rotPlane = rotPlaneChoosen.copy();
-
-            setSlider(true, 0, minRot, maxRot);
-            
-//            owner.helpBar.setText(owner.tt("rotateText"));
-            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-       
-        
-        }
-    }    
-
+    
+    /**
+     * show the intersection of the object with a chosen plane as a flat object
+     * in a separate viewer; there are two steps<br>
+     * step 0: terminate other active mouse modes, make object-copies and wait
+     * for user to chose the plane whose cut should be shown; if the object
+     * contains only one plane, proceed to step 1; <br>
+     * step 1: construct the cut by the chosen plane and show it in a separate viewer
+     * @param stepNum the step number (0-1) 
+     * @param b abort if stepNum == 0 and false
+     */
     public void showCut(int stepNum, boolean b)
-    {   //showCut = b;
-        // als meer vlakken kies een vlak
-        // gebruik mousemode,  
+    {   
+    	// button pressed, plane should be chosen
         if (stepNum == 0)
         {
-// voorlopig even zo,
-// eventueel uitzondering voor rotate, translate?
-//
-            oldMouseMode = mouseMode;
-//System.out.println("oldMouseMode = " + oldMouseMode);                    
-            if ((mouseMode != INERT) && 
-                (mouseMode != TRANSLATEPLANE) &&
-                (mouseMode != ROTATEPLANE)
-                ) 
-            {   // zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
+        	
+            // untoggle other relevant buttons                    
+            if ((mouseMode != INERT)) 
+            {   
                 owner.topToolBar.drawLineButton.setDown(false);                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
                 owner.topToolBar.parPlaneButton.setDown(false);
                 owner.topToolBar.deletePlaneButton.setDown(false);
-                // deze niet!
-//                owner.topToolBar.showCutButton.setDown(false);                
+                
                 owner.topToolBar.cutButton.setDown(false);                                
                 owner.rightToolBar.conDrawButton.setDown(false);                                                
 
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;
-                if (numPlanes > 0)
-                {	
-//GWT                    
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-                }
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
                 originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
+                //this aborts other active mouse modes                                
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
-            //showCut = b;
+            // abort
             if (!b)
             {   showCut = false;
-                // hiding
-                if ((mouseMode != TRANSLATEPLANE) &&
-                    (mouseMode != ROTATEPLANE))
-                    mouseMode = INERT;
-                    
+                mouseMode = INERT;
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//System.out.println("hiding cut, mouseMode = " + mouseMode);
-//GWT                
-//                owner.helpBar.setText(owner.tt("rotateText"));
-//                owner.topToolBar.showCutButton.setPressed(false);                                
                 setCutPanel(showCut);
                 return;   
             }    
-            // nodig voor selectie
+
             mouseMode = SHOWHIDECUT;
-//GWT            
-//            owner.enableOptions(false);
+            
             if (currentObjectGroup instanceof ObjectWithLine)
                 construction = ((ObjectWithLine) currentObjectGroup).getConstruction();
             else if (currentObjectGroup instanceof ObjectWithPlane)
                 construction = ((ObjectWithPlane) currentObjectGroup).getConstruction();
-//System.out.println("numPlanes = " + numPlanes);                
+               
             if (numPlanes > 1)
             {
                 // help message
             	owner.helpBar.setText(DoorzienGWT.rb.doorsnedeTekst());
-//GWT            	
-//                owner.helpBar.setText(owner.tt("selectShowCutText"));                
-//                owner.topToolBar.showCutButton.setPressed(true);                                
                 cutPlaneChoosen = null;
                 // wait for mouse action
-                helpPoint = true;
                 panel3D.helpPointColor = DrawConstants.planeOutlineColor;
                 
             }
@@ -4589,91 +3620,62 @@ else
         }
         else if (stepNum == 1)
         {
-//GWT        	
-//           owner.topToolBar.showCutButton.setPressed(false);                            
-           helpPoint = false;
-           panel3D.hideHelpPoint();
+            panel3D.hideHelpPoint();
             
-            showCut = b;
+            showCut = b; // will be true
             
-//GWT            
-//           owner.topToolBar.showCutButton.setImage(owner.hideCutImage);
-            
-//ObjectGroup3D cutGroup = ObjectWithPlane.getCut(currentObjectGroup, cutPlane);
-// tijdelijk
-cutPlane = cutPlaneChoosen.copy();
-//updateCutPanel();
-setCutPanel(true);
-updateCutPanel();
-        // open een nieuwe Object3DContainer
-        // maak een deepCopy van de cut en alles wat de cut
-        // replaced
-        // en draai dit object totdat het "plat" ligt
-        // aanpassen na translate en rotate, delete, draw
-        if ((oldMouseMode != TRANSLATEPLANE) &&
-            (oldMouseMode != ROTATEPLANE))
+            cutPlane = cutPlaneChoosen.copy();
+            setCutPanel(true);
+
+            // this produces the cut as a flat object
+            updateCutPanel();
             mouseMode = INERT;        
-        else
-            mouseMode = oldMouseMode;
-        
-        owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT        
-//        owner.helpBar.setText(owner.tt("rotateText"));
-//        owner.enableOptions(true);
-//System.out.println("cut choosen, mouseMode = " + mouseMode);                            
-        
+            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         }
     }    
 
+    /**
+     * cut the object in two pieces along a plane indicated by the user;
+     * after cutting, clicking on one of the pieces makes that piece the current object;
+     * otherwise use the button the put the two pieces together again; three steps:
+     * step 0: terminate other active mouse modes, make object-copies and wait
+     * for user to chose the plane by which to cut the object; if the object
+     * contains only one plane, proceed to step 1; <br>  
+     * step 1: cut the object into two pieces and wait for mouse or button action
+     * step 2: if the user 
+     * @param stepNum the step number (0, 1 or 2)
+     * @param b abort if stepNum == 0 and false
+     */
     public void cutObject(int stepNum, boolean b)
     {   
-    	
-System.out.println("make foldout " + stepNum + " " + b);
 
-    	// als meer vlakken kies een vlak
-        // gebruik mousemode
+        // button pressed, plane should be chosen
         if (stepNum == 0)
         {
+        	// untoggle other relevant buttons
             if (mouseMode != INERT)
             {   
-            	
-System.out.println("mm = " + mouseMode);
-
-            	// zet model gelijk aan current
-                // dit aborteert andere LOPENDE muis acties
-                owner.topToolBar.drawLineButton.setDown(false);                
+            	owner.topToolBar.drawLineButton.setDown(false);                
                 owner.topToolBar.deleteLineButton.setDown(false);                                
                 owner.topToolBar.drawPlaneButton.setDown(false);                                
                 owner.topToolBar.parPlaneButton.setDown(false);
                 owner.topToolBar.deletePlaneButton.setDown(false);
                 owner.topToolBar.showCutButton.setDown(false);
                 
-                // deze NIET!!
-                //owner.topToolBar.cutButton.setDown(false);                                
-   
                 owner.rightToolBar.conDrawButton.setDown(false);                                                
 
                 tempObjectGroup = null;
                 tempObjectGroup2 = null;                
                 foldOutObjectGroup = null;
-//GWT                
-//                owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
                 cutObjectGroup = null;
-                if (numPlanes > 0)
-                {   
-                    //owner.topToolBar.transPlaneButton.setImage(owner.transPlaneImage);
-                    //owner.topToolBar.rotPlaneButton.setImage(owner.rotPlaneImage);
-
-                }
                 
-                // slider weg                                
+                // remove slider                                
                 setSlider(false, 0, 0, 0);
                 originalObject = currentObjectGroup.leftMostLeaf();
                 panel3D.hideHelpLine();                        
                 panel3D.hideHelpPoint();
-                helpPoint = false;
                 DrawConstants.TICKSVISIBLE = false;                    
-                showHelpPointDrop(false);                                
+                //this aborts other active mouse modes                                
                 panel3D.initializeModel(currentObjectGroup, false);                    
             }
             setCutPanel(false);
@@ -4694,14 +3696,10 @@ System.out.println("mm = " + mouseMode);
 	            if (planesFilled)
 	            {
 	            	owner.topToolBar.planesFilledButton.setDown(true);
-//	            	owner.topToolBar.planesFilledButton.setImage(owner.planesEmptyImage);
-	            
 	            }
 	            else
 	            {    
 	            	owner.topToolBar.planesFilledButton.setDown(false);
-//	            	owner.topToolBar.planesFilledButton.setImage(owner.planesFilledImage);
-	            
 	            }
         
         		if (historyPointer > 0)
@@ -4732,7 +3730,7 @@ System.out.println("mm = " + mouseMode);
 //                owner.topToolBar.cutButton.setPressed(true);                                                            
                 planeChoosen = null;
                 // wait for mouse action
-                helpPoint = true;
+                //helpPoint = true;
                 panel3D.helpPointColor = DrawConstants.planeOutlineColor;
             }
             else
@@ -4749,29 +3747,28 @@ System.out.println("mm = " + mouseMode);
         }
         else if (stepNum == 1)
         {
-//GWT        	
-//            owner.topToolBar.cutButton.setPressed(false);                                                        
             panel3D.hideHelpPoint();
-            helpPoint = false;
-// hier zijvlak onderscheppen
-// via return en alles terugzetten
-boolean isSide = false;    
-for (int i = 0; i < originalObject.numFacets; i++)
-{   Vector3D sideNormal = new Vector3D(originalObject.facets[i].normal);
-    Plane3D sidePlane = new Plane3D(sideNormal.x, sideNormal.y,
-        sideNormal.z, Vector3D.dotProduct(sideNormal,
-            originalObject.facets[i].points[0]));
-    if (sidePlane.equals(planeChoosen))
-        isSide = true;
-}    
-if (isSide)
-{   planeChoosen = null; 
-	figureCut = false;
-    return;
-}
+
+            // if the user has chosen a side of the original object
+            // abort
+            boolean isSide = false;    
+            for (int i = 0; i < originalObject.numFacets; i++)
+            {   Vector3D sideNormal = new Vector3D(originalObject.facets[i].normal);
+            	Plane3D sidePlane = new Plane3D(sideNormal.x, sideNormal.y,
+            			sideNormal.z, Vector3D.dotProduct(sideNormal,
+            					originalObject.facets[i].points[0]));
+            	if (sidePlane.equals(planeChoosen))
+            		isSide = true;
+            }    
+            if (isSide)
+            {   planeChoosen = null; 
+            	figureCut = false;
+            	return;
+            }
+            
             double totalVolume = originalObject.getVolume();
 
-     
+            // this produces the two pieces
             cutObjectGroup = ObjectWithPlane.cutObjectGroup(
                 currentObjectGroup, planeChoosen);
                 
@@ -4784,9 +3781,6 @@ if (isSide)
 
             owner.topToolBar.disableLineButtons();            
             owner.topToolBar.disablePlaneButtons2();
-            //owner.topToolBar.cutButton.setEnabled(true);
-//GWT            
-//            owner.topToolBar.cutButton.setImage(owner.glueImage);                
             owner.rightToolBar.undoButton.setEnabled(false);
             owner.rightToolBar.redoButton.setEnabled(false);
             
@@ -4802,29 +3796,11 @@ if (isSide)
             double largePerc = leftPerc;
             if (largePerc < 50)
                 largePerc = 100 - largePerc;
-//GWT
-/*            
-panel3D.testString = owner.tt("volumeText") + ": " +
-                     owner.tt("largeFigureText") + " " +
-                     UF.format(largePerc, 1) + "%, " +
-                     owner.tt("smallFigureText") + " " +
-                     UF.format(100 - largePerc, 1) + "%"
-                     ;
-*/                     
 
-        // neem originalObject
-        // snij dit door
-        // resultaat beetje verschuiven
-        // dan beide weer rebuilden volgens recipe
-        // denk erom dat je het recipe ook verschuift!
-        // dan weer wachten op muisactie eventueel om figuur te kiezen
-        
-        
         }
-        else if (stepNum == 2)
+        else if (stepNum == 2) // user has clicked a facet
         {
 
-//System.out.println("step 2");            
             ObjectGroup3D left = (ObjectGroup3D) cutObjectGroup.objects.elementAt(0);
             ObjectGroup3D right = (ObjectGroup3D) cutObjectGroup.objects.elementAt(1);
             Object3D topLeft = left.leftMostLeaf();
@@ -4842,22 +3818,17 @@ panel3D.testString = owner.tt("volumeText") + ": " +
                 
             Vector newLeftConstruction = new Vector();
             Vector newRightConstruction = new Vector();
-            
+
+            // choose left piece, translate to center of viewer
+            // and apply translated (!) contruction
             if (left.containsFacet(facetChoosen) >= 0)
             {               
                 ObjectWithPlane.letterObject(topLeft);
-//System.out.println("topleftcenter = " + topLeft.center.toString());
-
                 Vector3D leftTrans = Vector3D.minus(
                     new Vector3D(0,0,0), topLeft.center);
                     
-//System.out.println("leftTrans = " + leftTrans.toString());                    
-
-                topLeft.center();    
+                topLeft.center();
                 
-//System.out.println("leftcenter = " + left.center.toString());                
-                
-                //topLeft.diameter = topLeft.getDiameter();
                 int nLines = 0;
                 int nPlanes = 0;
                 for (int i = 0; i < leftConstruction.size(); i++)
@@ -4873,32 +3844,24 @@ panel3D.testString = owner.tt("volumeText") + ": " +
                         nLines++;
                     }
                 }
-//System.out.println("leftco = " + newLeftConstruction.size());                                
-                //topLeft.setTickMarks(TICKNUM);
+                               
                 currentObjectGroup = rebuild(topLeft, newLeftConstruction, null);
-//currentObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();                                
                 originalObject = currentObjectGroup.leftMostLeaf();
 
-//System.out.println("leftrebuildcenter = " + currentObjectGroup.center.toString());                                
-                //currentObjectGroup = left;
-                //originalObject = topLeft;
                 cutObjectGroup = null;
                 addToHistory();                
                 
-            planesFilled = oldPlanesFilled;
-            fillPlanes(planesFilled);
-            if (planesFilled)
-            {    owner.topToolBar.planesFilledButton.setDown(true);
-//            	owner.topToolBar.planesFilledButton.setImage(owner.planesEmptyImage);
+                planesFilled = oldPlanesFilled;
+                fillPlanes(planesFilled);
+                if (planesFilled)
+                {    owner.topToolBar.planesFilledButton.setDown(true);
+
+                }
+                else
+                {    owner.topToolBar.planesFilledButton.setDown(false);
             
-            }
-            else
-            {    owner.topToolBar.planesFilledButton.setDown(false);
-//            	owner.topToolBar.planesFilledButton.setImage(owner.planesFilledImage);
-            
-            }
+                }
                 
-panel3D.testString = "";                
                 panel3D.initializeModel(currentObjectGroup, false);                                    
                 mouseMode = INERT;
                 
@@ -4907,33 +3870,18 @@ panel3D.testString = "";
                 setNumLines(nLines);
                 setNumPlanes(nPlanes);
                 owner.rightToolBar.undoButton.setEnabled(true);                                
-                if (numPlanes > 0)                
-                {    
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-                
-                }
-//GWT                
-//                owner.enableOptions(true);                        
-//                owner.resetHelpPoints(); 
-                setHelpPointDrop(false);                
-//System.out.println("left");                            
-
-// numPlanes numLines
 
             }
+            // choose right piece, translate to center of viewer
+            // and apply translated (!) contruction
             else if (right.containsFacet(facetChoosen) >= 0)
             {   
             
                 ObjectWithPlane.letterObject(topRight);
-//if (topRight.center.equals(topRight.getCenter()))
-//System.out.println("right equal");
-            
                 Vector3D rightTrans = Vector3D.minus(
                     new Vector3D(0,0,0), topRight.center);
                 topRight.center();    
                 
-                //topRight.diameter = topRight.getDiameter();
                 int nLines = 0;
                 int nPlanes = 0;
                 for (int i = 0; i < rightConstruction.size(); i++)
@@ -4949,65 +3897,44 @@ panel3D.testString = "";
                         nLines++;
                     }
                 }
-//System.out.println("rightco = " + newRightConstruction.size());                
-                //topRight.setTickMarks(TICKNUM);
                 currentObjectGroup = rebuild(topRight, newRightConstruction, null);
-//currentObjectGroup = (ObjectGroup3D) currentObjectGroup.deepCopy();                
                 originalObject = currentObjectGroup.leftMostLeaf();
                 cutObjectGroup = null;
                 addToHistory();
                 
-            planesFilled = oldPlanesFilled;
-            fillPlanes(planesFilled);
-            if (planesFilled)
-            {    owner.topToolBar.planesFilledButton.setDown(true);
-//            	owner.topToolBar.planesFilledButton.setImage(owner.planesEmptyImage);
+                planesFilled = oldPlanesFilled;
+                fillPlanes(planesFilled);
+                if (planesFilled)
+                {    owner.topToolBar.planesFilledButton.setDown(true);
             
-            }
-            else
-            {    owner.topToolBar.planesFilledButton.setDown(false);
-//            	owner.topToolBar.planesFilledButton.setImage(owner.planesFilledImage);
+                }
+                else
+                {    owner.topToolBar.planesFilledButton.setDown(false);
             
-            }
+                }
 
-                
-panel3D.testString = "";                                
-                //currentObjectGroup = right;
-                //originalObject = topRight;
                 panel3D.initializeModel(currentObjectGroup, false);                                    
                 mouseMode = INERT;
                 
-//                owner.helpBar.setText(owner.tt("rotateText"));
                 owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
                 
                 setNumLines(nLines);
                 setNumPlanes(nPlanes);
                 owner.rightToolBar.undoButton.setEnabled(true);                                
-                if (numPlanes > 0)
-                {    
-//GWT                	
-//                	owner.topToolBar.cutButton.setImage(owner.cutImage);
-                
-                }
-//GWT                
-//                owner.enableOptions(true);    
-//                owner.resetHelpPoints();
-                setHelpPointDrop(false);
-//System.out.println("right");                                            
-// numPlanes numLines
-
-        // na stap 2 weer mouseMode = INERT
-        
             }
-//System.out.println("nothing");                                        
+                                       
         }
     }
-    
-    public void undo()
-    {   if (mouseMode != INERT)
-        {   // zet model gelijk aan current
-            // dit aborteert andere LOPENDE muis acties
 
+    /**
+     * reset buttons, abort active mouse modes
+     * and show the previous object from the history  
+     */
+    public void undo()
+    {   
+    	// untoggle other buttons
+    	if (mouseMode != INERT)
+        {   
     		owner.topToolBar.drawLineButton.setDown(false);                
     		owner.topToolBar.deleteLineButton.setDown(false);                                
     		owner.topToolBar.drawPlaneButton.setDown(false);                                
@@ -5017,42 +3944,25 @@ panel3D.testString = "";
     		owner.topToolBar.cutButton.setDown(false);                                
     		owner.rightToolBar.conDrawButton.setDown(false);                                                
     	
-    	
             tempObjectGroup = null;
             tempObjectGroup2 = null;                
             foldOutObjectGroup = null;
-//GWT            
-//            owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
             cutObjectGroup = null;
-            // slider weg                                
+            // remove slider                                
             setSlider(false, 0, 0, 0);
             panel3D.hideHelpLine();                        
             panel3D.hideHelpPoint();
-            helpPoint = false;
             DrawConstants.TICKSVISIBLE = false;                        
-            showHelpPointDrop(false);                            
-//            setCutPanel(false);
         }    
         mouseMode = INERT;
        
-//        owner.helpBar.setText(owner.tt("rotateText"));
         owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
         previousObjectGroup();
-//        fillPlanes(planesFilled);
-//        setNumLines(numLines);
-//        setNumPlanes(numPlanes);
+
         if ((numLines > 0) && (DrawConstants.llFactor > 0))
             owner.topToolBar.shortLinesButton.setEnabled(true);
-        if (numPlanes > 0)
-        {   
-            //owner.topToolBar.transPlaneButton.setImage(owner.transPlaneImage);
-            //owner.topToolBar.rotPlaneButton.setImage(owner.rotPlaneImage);
-        }
-//GWT        
-//        owner.enableOptions(true);
         
-// kijk of         
         if (showCut)
         {   boolean hasCutPlane = false;
             if (currentObjectGroup instanceof ObjectWithLine)
@@ -5060,12 +3970,9 @@ panel3D.testString = "";
             }
             else if (currentObjectGroup instanceof ObjectWithPlane)
             {    hasCutPlane = ((ObjectWithPlane) currentObjectGroup).containsPlane(cutPlane);
-//System.out.println("OWP");      
-//System.out.println("has = " + hasCutPlane);
             }
             if (!hasCutPlane)
             {    killCutPanel();
-//System.out.println("killed");            
             }
             else
             {    updateCutPanel();
@@ -5075,11 +3982,14 @@ panel3D.testString = "";
         
     }    
 
-
+    /**
+     * reset buttons, abort active mouse modes
+     * and show the next object from the history  
+     */
     public void redo()
-    {   if (mouseMode != INERT)
-        {   // zet model gelijk aan current
-            // dit aborteert andere LOPENDE muis acties
+    {   // untoggle other buttons
+    	if (mouseMode != INERT)
+        {   
         	owner.topToolBar.drawLineButton.setDown(false);                
         	owner.topToolBar.deleteLineButton.setDown(false);                                
         	owner.topToolBar.drawPlaneButton.setDown(false);                                
@@ -5092,38 +4002,22 @@ panel3D.testString = "";
             tempObjectGroup = null;
             tempObjectGroup2 = null;                
             foldOutObjectGroup = null;
-//GWT            
-//            owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
             cutObjectGroup = null;
-            // slider weg                                
+            // remove slider                                
             setSlider(false, 0, 0, 0);
             panel3D.hideHelpLine();                        
             panel3D.hideHelpPoint();
-            helpPoint = false;
             DrawConstants.TICKSVISIBLE = false;                            
-            showHelpPointDrop(false);                            
 
         }    
         mouseMode = INERT;
         
-//        owner.helpBar.setText(owner.tt("rotateText"));
         owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
         
         nextObjectGroup();
-//        fillPlanes(planesFilled);
-//        setNumLines(numLines);
-//        setNumPlanes(numPlanes);
         if ((numLines > 0) && (DrawConstants.llFactor > 0))
             owner.topToolBar.shortLinesButton.setEnabled(true);
-        if (numPlanes > 0)
-        {   
-            //owner.topToolBar.transPlaneButton.setImage(owner.transPlaneImage);
-            //owner.topToolBar.rotPlaneButton.setImage(owner.rotPlaneImage);
-        }
-//GWT        
-//        owner.enableOptions(true);
         
-// kijk of         
         if (showCut)
         {   boolean hasCutPlane = false;
             if (currentObjectGroup instanceof ObjectWithLine)
@@ -5131,12 +4025,9 @@ panel3D.testString = "";
             }
             else if (currentObjectGroup instanceof ObjectWithPlane)
             {    hasCutPlane = ((ObjectWithPlane) currentObjectGroup).containsPlane(cutPlane);
-//System.out.println("OWP");      
-//System.out.println("has = " + hasCutPlane);
             }
             if (!hasCutPlane)
             {    killCutPanel();
-//System.out.println("killed");            
             }
             else
             {    updateCutPanel();
@@ -5146,186 +4037,20 @@ panel3D.testString = "";
         
     }    
 
-    public boolean escapeActive()
-    {   
-//System.out.println("ea");                        
-        return ((mouseMode != INERT) &&
-                !((mouseMode == FOLDOUT) && (startFacet != null)) &&
-                !((mouseMode == CUTOBJECT) && (planeChoosen != null)) &&
-                !((mouseMode == SHOWHIDECUT) && (cutPlaneChoosen != null))
-               );
-    }
-    
-    
-    public void rotate()
-    {   
-//System.out.println("rotate");                        
-//if (startFacet == null)
-//System.out.println("sf = null");                        
-//else
-//System.out.println("sf != null");                        
-//System.out.println("mm = " + mouseMode);                        
-        if ((mouseMode != INERT) &&
-            !((mouseMode == FOLDOUT) && (startFacet != null)) &&
-            !((mouseMode == CUTOBJECT) && (planeChoosen != null)) &&
-            !((mouseMode == SHOWHIDECUT) && (cutPlaneChoosen != null))
-           )
-        {   // zet model gelijk aan current
-            // dit aborteert andere LOPENDE muis acties
-            owner.topToolBar.drawLineButton.setDown(false);                
-            owner.topToolBar.deleteLineButton.setDown(false);                                
-            owner.topToolBar.drawPlaneButton.setDown(false);                                
-            owner.topToolBar.parPlaneButton.setDown(false);
-            owner.topToolBar.deletePlaneButton.setDown(false);
-            owner.topToolBar.showCutButton.setDown(false);                
-            owner.topToolBar.cutButton.setDown(false);                                
-            owner.rightToolBar.conDrawButton.setDown(false);                                                
-            
-//System.out.println("rotated");                
-            tempObjectGroup = null;
-            tempObjectGroup2 = null;                
-            foldOutObjectGroup = null;
-            startFacet = null;
-//GWT            
-//            owner.rightToolBar.conDrawButton.setImage(owner.conDrawImage);                
-            cutObjectGroup = null;
-            // slider weg                                
-            setSlider(false, 0, 0, 0);
-            originalObject = currentObjectGroup.leftMostLeaf();
-            panel3D.hideHelpLine();                        
-            panel3D.hideHelpPoint();
-            helpPoint = false;
-            DrawConstants.TICKSVISIBLE = false;                                
-            showHelpPointDrop(false);                            
-            panel3D.initializeModel(currentObjectGroup, false);                    
-            mouseMode = INERT;
-            
-            owner.helpBar.setText(DoorzienGWT.rb.draaiTekst());
-//GWT            
-//            owner.helpBar.setText(owner.tt("rotateText"));
-//            owner.enableOptions(true);
-        }    
-//        else
-//System.out.println("not rotated");                        
-        
-    }    
-
-/*    
-    public void setBounds(int x, int y, int b, int h)
-    {
-    	super.setBounds(x, y, b, h);
-    	updateWork();
-    }
-*/
-    
-/*    
-    // update workSpace after resizing
-    public void updateWork()
-    {   
-        // nieuwe afmeting panel3D
-        if (showCut)
-        {
-            panel3D.setBounds(getSize().width / 2, 0, 
-                              getSize().width / 2, getSize().height);
-            //panel3D.offscreen = null;    
-            panel3D.resetModel();
-            cutPanel.setBounds(0, 0, getSize().width / 2, getSize().height);
-            //cutPanel.offscreen = null;    
-            cutPanel.resetModel();
-        }    
-        else
-        {
-            panel3D.setBounds(0, 0, getSize().width, getSize().height);
-            //panel3D.offscreen = null;    
-            panel3D.resetModel();
-//System.out.println("resetModel");       
-            
-            owner.toolsButton.setLocation(5, panel3D.getSize().height - 35);
-            owner.resetButton.setLocation(5, 5);
-        }
-        if (slider != null)            
-        {   if (flatButton != null)
-            {  flatButton.setLocation(
-                    panel3D.getSize().width - flatButton.getSize().width,
-                    0);
-                    //panel3D.getSize().height - flatButton.getSize().height);
-                slider.setLocation(
-                    panel3D.getSize().width - slider.getSize().width
-                        - flatButton.getSize().width,
-                    0);    
-                    //panel3D.getSize().height - slider.getSize().height);
-
-            }
-            else
-            {
-                slider.setLocation(
-                    panel3D.getSize().width - slider.getSize().width,
-                    0);
-                    //panel3D.getSize().height - slider.getSize().height);
-            }                
-        }                
-        if (dropButton != null)
-        {   
-            dropButton.setLocation(panel3D.getSize().width - 
-                                   dropButton.getSize().width, 0);
-            
-        }                           
-        if (dropMenu != null)        
-            dropMenu.setLocation(panel3D.getSize().width - 
-                                 dropMenu.getSize().width, 
-                                 dropButton.getSize().height);
-
-        repaint();
-        
-    }  // updateWork  
-*/
-
-/*    
-    // private method to find a darker or a brighter version of color c, using the
-    // HSB color model; factor determines the amount of change, a negative
-    // factor produces darker colors, a positive factor brighter colors
-    public static Color hsbChange(Color c, int factor)
-    {   // array for storing hue, saturation, brigtness
-        float[] hsbValues = new float[3];
-        // the resulting variant of Color c
-        Color result;
-        // find hsbValues for Color c
-        hsbValues = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(),
-                    hsbValues);
-        // if a darker color is wanted
-        if (factor < 0)
-        {   // if possible decrease brightness by |factor|*0.1
-            if (hsbValues[2] >= -factor * 1e-1f)
-                hsbValues[2] -= -factor * 1e-1f;
-            // else try to increase saturation by |factor|*0.1        
-            else    
-                if (hsbValues[1] <= 1.0f + factor * 1e-1f)
-                    hsbValues[1] += -factor * 1e-1f;
-        }
-        else // a brighter color is wanted
-        {   // if possible increase brightness by factor*0.1
-            if (hsbValues[2] <= 1.0f - factor * 1e-1f)
-                hsbValues[2] += factor * 1e-1f;
-            // else try to decrease saturation by factor*0.1        
-            else    
-                if (hsbValues[1] >= factor * 1e-1f)
-                    hsbValues[1] -= factor * 1e-1f;
-        }
-        // get the resulting color in the RGB model            
-        result = Color.getHSBColor(hsbValues[0], hsbValues[1], hsbValues[2]);            
-        return result;
-    }
-*/         
-
-/*
-    public void invalidate()
-    {   super.invalidate();
-        //offscreen = null;
-    }
-*/
+    /**
+     * a vertex of a facet was clicked; check if this vertex is allowed, that is:<br>
+     * 1) all versions: the vertex cannot be a vertex of a facet that is a line extension<br>
+     * 2) EPN-version: the vertex must belong to a facet (replacing part of) a facet
+     * of the original 3d-object (that is the 3d-object without lines and planes);
+     * thus in the EPN-version no vertices can be clicked on added lines (except
+     * when this line is an edge of the original 3d-object) or on lines which are intersections
+     * of a plane with an original facet or two planes (with the line not being an edge);  
+     * @param fwv the facet and its vertex that was clicked
+     * @return true/false
+     */
     public boolean vertexAllowed(FacetWithVertex fwv)
     {
-        // ESSENTIELE RESTRICTIE voor alle versies       
+        // ESSENTIAL RESTRICTION for all versions       
         if (DoorzienGWT.version == DoorzienGWT.FI)
         {
                 boolean isOnExt = false;
@@ -5341,10 +4066,9 @@ panel3D.testString = "";
                          
                 return !isOnExt;                
         }
-        // RESTRICTIE TOT ORIGINAL OBJECT VOOR EPN        
+        // RESTRICTION TO THE ORIGINAL OBJECT for the EPN-version        
         else if (DoorzienGWT.version == DoorzienGWT.EPN)
         {
-//setStart();
             boolean isOnOrig = true;
             if (panel3D.model instanceof ObjectWithLine)
                 isOnOrig = ((ObjectWithLine) panel3D.model).
@@ -5355,12 +4079,23 @@ panel3D.testString = "";
             else if (panel3D.model instanceof ObjectWithPoint)
                 isOnOrig = ((ObjectWithPoint) panel3D.model).
                     vertexOnOrigObject(fwv.vertex, fwv.facet);
-//showTime("checking vertex");
+
             return isOnOrig;
         }
         return false;
     }
 
+    /**
+     * a point on an edge was clicked; check if this point is allowed, that is:<br>
+     * 1) all versions: the point cannot be a point on a facet that is a line extension<br>
+     * 2) EPN-version: the point must be on an edge of a facet (replacing part of) a facet
+     * of the original 3d-object (that is the 3d-object without lines and planes);
+     * thus in the EPN-version no points can be clicked on added lines (except
+     * when this line is an edge of the original 3d-object) or on lines which are intersections
+     * of a plane with an original facet or two planes (with the line not being an edge);  
+     * @param fwep the edge and the point on it that was clicked
+     * @return true/false
+     */
     public boolean edgePointAllowed(FacetWithEdgePoint fwep)
     {    
         // ESSENTIELE RESTRICTIE voor alle versie       
@@ -5381,7 +4116,6 @@ panel3D.testString = "";
         // RESTRICTIE TOT ORIGINAL OBJECT VOOR EPN
         else if (DoorzienGWT.version == DoorzienGWT.EPN)        
         {
-//setStart();
             boolean isOnOrig = true;
             if (panel3D.model instanceof ObjectWithLine)
                 isOnOrig = ((ObjectWithLine) panel3D.model).
@@ -5395,52 +4129,36 @@ panel3D.testString = "";
                 isOnOrig = ((ObjectWithPoint) panel3D.model).
                      edgeOnOrigObject(fwep.edgeWithPoint[0], 
                         fwep.edgeWithPoint[1], fwep.facet);
-//showTime("checking edge");                                
             return isOnOrig;
         }
         return false;
     }    
     
-
+    /**
+     * make the fold out angle maximal, producing flat
+     * object and display this as a flat object by rotating  
+     */
     public void flattenAction()
     {
-        // roteer de foldOutGroup in view space
+        // rotate the foldOutGroup in view space
         Vector3D from = new Vector3D(
             startFacet.unitNormal.x,
             startFacet.unitNormal.y,
             startFacet.unitNormal.z);
-//System.out.println("from = " + from.toString());            
+            
         Vector3D to = new Vector3D(0, 0, 1);
         panel3D.vwRotate(from, to);
-//System.out.println("new from = " + startFacet.unitNormal.toString());                        
-        
 
-//ook (tijdelijk) parallele projectie??
-
-        // zet slider op 100% (maakt maximale foldout)
-        
+        // put slider to 100% (maximal fold out)
         processSlider(1);
         slider.setPosition(1);
     	
     }
-/*
-	class ListChangeHandler implements ChangeHandler
-	{
-		//public void onMouseDown(MouseDownEvent e)
-		public void onChange(ChangeEvent e)
-		{
-			// deze LIJKT niet nodig (mag wel)
-			//e.preventDefault();
-			
-			// deze zorgt dat je niet scollt in de DWOPlayer
-			e.stopPropagation();
-			
-			//int index = dropBox.getSelectedIndex();
-		}
-	}	
-*/			
-
 	
+    /**
+     * inner class for handling Click Events on the flatButton
+     * @author huub
+     */
 	class FlatCL implements ClickHandler
 	{
 		public void onClick(ClickEvent e)
@@ -5450,48 +4168,10 @@ panel3D.testString = "";
 		}
 	}
 			
-/*    
-    // inner class for listening to the flatButton
-    class FlatML extends MouseAdapter
-    {   public void mousePressed(MouseEvent e)
-        {   
-            // roteer de foldOutGroup in view space
-            Vector3D from = new Vector3D(
-                startFacet.unitNormal.x,
-                startFacet.unitNormal.y,
-                startFacet.unitNormal.z);
-//System.out.println("from = " + from.toString());            
-            Vector3D to = new Vector3D(0, 0, 1);
-            panel3D.vwRotate(from, to);
-//System.out.println("new from = " + startFacet.unitNormal.toString());                        
-            
-
-// ook (tijdelijk) parallele projectie??
-
-            // zet slider op 100% (maakt maximale foldout)
-            
-            processSlider(1);
-            slider.setPosition(1);
-            flattened = true;
-        }    
-    }
-*/    
-    
-//GWT
-/*    
-    // inner class for DropButton
-    class DropML extends MouseAdapter
-    {   public void mousePressed(MouseEvent e)
-        {   
-    	
-    		panel3D.remove(dropMenu);
-            panel3D.add(dropMenu);
-            panel3D.repaint();
-    
-        }
-    }
-*/    
-    
+    /**
+     * inner class handling Mouse Events of the drawing Canvas 
+     * @author huub
+     */
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		boolean mouseDown = false;
@@ -5542,6 +4222,10 @@ panel3D.testString = "";
 
 	} //MouseHandler
 
+    /**
+     * inner class handling Touch Events of the drawing Canvas 
+     * @author huub
+     */
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		
@@ -5553,11 +4237,6 @@ panel3D.testString = "";
 			if (e.getTouches().length() > 0)
 			{
 				Touch touch = e.getTouches().get(0);
-				
-				//Widget sender = (Widget) e.getSource();
-			    //Element elem = sender.getElement();
-				//int eventX = touch.getRelativeX(elem);
-				//int eventY = touch.getRelativeY(elem);
 				
 				int eventX = touch.getPageX() - drawingPanelCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - drawingPanelCanvas.getAbsoluteTop();
@@ -5583,13 +4262,6 @@ panel3D.testString = "";
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				//Widget sender = (Widget) e.getSource();
-			    //Element elem = sender.getElement();
-				//int eventX = touch.getRelativeX(elem);
-				//int eventY = touch.getRelativeY(elem);
-				//boolean shiftPressed = e.isShiftKeyDown();
-
-			    boolean shiftPressed = false;
 			    int eventX = touch.getPageX() - drawingPanelCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - drawingPanelCanvas.getAbsoluteTop();				
 			    
@@ -5607,70 +4279,213 @@ panel3D.testString = "";
 
 	}
 	
-	public void mouseDownTouchStartAction(int eventX, int eventY)
+	/**
+	 * action at MouseDown/TouchStart Event: 
+	 * mouseMode == INERT start dragging the object<br>
+	 * in all the following: if nothing relevant is clicked, rotate<br>  
+	 * mouseMode == DRAWLINE check if a a vertex or a point on an edge
+	 * was clicked (if clicking this point is allowed); this is done twice;<br> 
+	 * mouseMode == DELETELINE check if an edge was clicked which is part of
+	 * a line in the current object (this line will subsequently be deleted);<br> 
+	 * mouseMode == DRAWPLANE check if a a vertex or a point on an edge
+	 * was clicked (if clicking this point is allowed); this is done three times;<br>
+	 * mouseMode == PARPLANE if no plane was choosen, check if an edge of a plane
+	 * in the object was clicked and fix this plane; if a plane was choosen,
+	 * check if a vertex or a point on an edge of the object was clicked;<br>
+	 * mouseMode == DELETEPLANE check if an edge was clicked which is part of
+	 * a plane in the current object (this plane will subsequently be deleted);<br> 
+	 * mouseMode == SHOWHIDECUT if no plane was choosen, check if an edge of a plane
+	 * in the object was clicked and show the cut of the object with this plane;<br>
+	 * mouseMode == CUTOBJECT if no plane was choosen, check if an edge of a plane
+	 * in the object was clicked and cut the object in two pieces along this plane;
+	 * if a plane was choosen (and the object was cut), check if a facet of one of these
+	 * pieces was clicked, and if yes, make this piece the new current object;<br>
+	 * mouseMode == FOLDOUT of a start facet for the foldout was chosen, rotate (the fold out);
+	 * if no startFacet was choosen, check if a facet was clicked; note: this facet must be
+	 * a facet replacing a facet of the origianl object; if the facet clicked is acceptable,
+	 * make the fold out;  
+	 * @param eventX x-coordinate of Event
+	 * @param eventY y-coordinate of Event
+	 */
+    public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
-    	if (!draaibaar)
-    		return;
 
-        	xClicked = eventX;
-            yClicked = eventY;
-//GWT                
-//            panel3D.remove(dropMenu);                
-            if (mouseMode == INERT)
+      	xClicked = eventX;
+        yClicked = eventY;
+            
+        if (mouseMode == INERT)
+        {   panel3D.oldX = eventX;
+            panel3D.oldY = eventY;
+            xStart = eventX;
+            yStart = eventY;
+            dragging = true;
+                
+        }    
+        else if (mouseMode == DRAWLINE) 
+        {   
+            FacetWithVertex fwv = 
+                panel3D.facetWithVertexClicked(xClicked, yClicked);
+                    
+            // restrictions for EPN
+            // 1) only vertices of originalObject (visible or invisible)
+            // 2) only vertices of tempObjectGroup which are located
+            //    on originalObject, i.e. new points on edges of originalObject  
+            //    can also be used
+            // general restriction
+            // 3) no points on extended lines
+                                          
+            if (fwv != null)
+            {   
+                if (vertexAllowed(fwv))    
+                {
+                    // process this point
+                    clickedPoint = fwv.vertex;
+                    drawLine(pointsSelected + 1, true);
+                }
+            }    
+            else // no vertex clicked, check for an edge
+            {      
+                FacetWithEdgePoint fwep = 
+                    panel3D.facetWithEdgePointClicked(xClicked, yClicked);
+                            
+                // restrictions see above 
+                if (fwep != null)
+                {
+                    if (edgePointAllowed(fwep))    
+                    {
+                        // process this edge with new point
+                        clickedEdgeWithPoint = fwep.edgeWithPoint;
+                        drawLine(pointsSelected + 1, true);
+                    }
+                }
+                else // nothing relevant clicked
+                {
+                    panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
+                       
+                    dragging = true;                            
+                }    
+            }    
+                           
+        } // mouseMode == DRAWLINE
+            
+        else if (mouseMode == DELETELINE)
+        {
+            Vector3D[] edgeWithPoint = 
+                panel3D.edgeClicked(xClicked, yClicked);
+            if (edgeWithPoint != null)
+            {   Line3D line = new Line3D(
+                    edgeWithPoint[0],
+                    edgeWithPoint[1]);
+                if (construction.contains(line))
+                {   lineChoosen = line;
+                    deleteLine(1, true);
+                }
+                else // rotate
+                {   panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
+                        
+                    dragging = true;                            
+                }
+            }
+            else // nothing relevant clicked
             {   panel3D.oldX = eventX;
                 panel3D.oldY = eventY;
-//                startF = panel3D.clickedFacet(e.getX(), e.getY());
                 xStart = eventX;
                 yStart = eventY;
-                dragging = true;
-                
-            }    
-            else if (mouseMode == DRAWLINE) 
-            {   // ObjectWithPoint finds only visible facets containing
-                // this vertex so use the top object in the tree
                    
+                dragging = true;                            
+            }    
+            
+        }
+        else if (mouseMode == DRAWPLANE) 
+        {   
+            FacetWithVertex fwv = 
+                panel3D.facetWithVertexClicked(xClicked, yClicked);
+                
+            // restrictions for EPN
+            // 1) only vertices of originalObject (visible or invisible)
+            // 2) only vertices of tempObjectGroup which are located
+            //    on originalObject, i.e. new points on edges of originalObject  
+            //    can also be used
+            // general restriction
+            // 3) no points on extended lines
+            if (fwv != null)
+            {
+                if (vertexAllowed(fwv))    
+                {
+                    // process this point
+                    clickedPoint = fwv.vertex;
+                    drawPlane(pointsSelected + 1, true);
+                }
+                    
+            }    
+            else // no vertex clicked, check for an edge
+            {                           
+
+                FacetWithEdgePoint fwep = 
+                    panel3D.facetWithEdgePointClicked(xClicked, yClicked);
+                // restrictions see above
+                if (fwep != null)
+                {   
+                    if (edgePointAllowed(fwep))    
+                    {
+                        // process this edge with new point
+                        clickedEdgeWithPoint = fwep.edgeWithPoint;
+                        drawPlane(pointsSelected + 1, true);
+                    }
+                }
+                else // nothing relevant clicked
+                {
+                    panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
+                        
+                    dragging = true;                            
+                }
+            }    
+        } // mouseMode == DRAWPLANE
+            
+        else if (mouseMode == DRAWPARPLANE)
+        {
+         	// plane choosen, so get the point
+            if (parPlaneChoosen != null)
+            {   
                 FacetWithVertex fwv = 
                     panel3D.facetWithVertexClicked(xClicked, yClicked);
-                    
-                // restrictions here
+                // restrictions for EPN
                 // 1) only vertices of originalObject (visible or invisible)
-                // 2 only vertices of tempObjectGroup die op
-                //   op originalObject liggen, d.w.z. je mag nieuw
-                //  punten op edges ook gebruiken
-                // 2A geen verlengde lijnen, verder alles
-                // DIT MOET
-                // 3) free i.e. any visible(!) vertex of tempObjectGroup
-                                          
+                // 2) only vertices of tempObjectGroup which are located
+                //    on originalObject, i.e. new points on edges of originalObject  
+                //    can also be used
+                // general restriction
+                // 3) no points on extended lines
                 if (fwv != null)
                 {   
                     if (vertexAllowed(fwv))    
                     {
                         // process this point
                         clickedPoint = fwv.vertex;
-                        drawLine(pointsSelected + 1, true);
+                        drawParPlane(1, true);
                     }
+                    
                 }    
                 else // no vertex clicked, check for an edge
-                {   // ObjectWithPoint finds only visible facets containing
-                    // this edge so use the top object in the tree                        
-                       
+                {   
                     FacetWithEdgePoint fwep = 
                         panel3D.facetWithEdgePointClicked(xClicked, yClicked);
-                            
-                    // restrictions here
-                    // 1) only points on the edges of origObject
-                    // beter:
-                    // 2) points on edges replacing edges of origObject
-                    // gebruik containsDirSegment o.i.d. 
-                    // 2A) geen punten op verlengde lijnen
-                    // 3) any point on any edge                      
                     if (fwep != null)
-                    {
+                    {   
                         if (edgePointAllowed(fwep))    
                         {
                             // process this edge with new point
                             clickedEdgeWithPoint = fwep.edgeWithPoint;
-                            drawLine(pointsSelected + 1, true);
+                            drawParPlane(1, true);
                         }
                     }
                     else // nothing relevant clicked
@@ -5681,12 +4496,109 @@ panel3D.testString = "";
                         yStart = eventY;
                         
                         dragging = true;                            
-                    }    
+                    }
                 }    
+            }
+            else // parPlaneChoosen == null, so get the plane
+            {
+                Vector3D[] edgeWithPoint = 
+                    panel3D.edgeClicked(xClicked, yClicked);
+                if (edgeWithPoint != null)
+                {   Line3D line = new Line3D(edgeWithPoint[0], edgeWithPoint[1]);
+                    for (int i = 0; i < construction.size(); i++)
+                    {   Object ob = construction.elementAt(i);
+                        if (ob instanceof Plane3D)
+                        {   Plane3D plane = ((Plane3D) ob).copy();
+                            int isType = Plane3D.intersectionType(line, plane);
+                            if (isType == 2)    
+                            {   parPlaneChoosen = plane.copy();
+                            }    
+                             // else clicked on an edge not 
+                            // on a plane
+                        }
+                    }
+                    if (parPlaneChoosen != null)
+                    {   
+                        movedPoint = null;
+                        movedEdgeWithPoint = null;
+                        clickedPoint = null;
+                        clickedEdgeWithPoint = null;
+                             
+                        owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakPuntTekst());                                                                
+                        // wait for mouse action choosing the point
+
+                    }
+                    else // rotate
+                    {   panel3D.oldX = eventX;
+                        panel3D.oldY = eventY;
+                        xStart = eventX;
+                        yStart = eventY;
                             
-            } // mouseMode == DRAWLINE
+                        dragging = true;                            
+                    }
+                }    
+                else // nothing relevant clicked
+                {   panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
+                        
+                    dragging = true;                            
+                }    
+            }
+        } // mouseMode == DRAWPARPLANE   
             
-            else if (mouseMode == DELETELINE)
+        else if (mouseMode == DELETEPLANE)
+        {
+            Vector3D[] edgeWithPoint = 
+                panel3D.edgeClicked(xClicked, yClicked);
+            if (edgeWithPoint != null)
+            {   Line3D line = new Line3D(
+                    edgeWithPoint[0],
+                    edgeWithPoint[1]);
+                for (int i = 0; i < construction.size(); i++)
+                {   Object ob = construction.elementAt(i);
+                    if (ob instanceof Plane3D)
+                    {   Plane3D plane = (Plane3D) ob;
+                        int isType = Plane3D.intersectionType(
+                            line, plane);
+                        if (isType == 2)    
+                        {   planeChoosen = plane.copy();
+                        }    
+                    }
+                }
+                if (planeChoosen != null)
+                    deletePlane(1, true);
+                else // rotate
+                {   panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
+                        
+                    dragging = true;                            
+                }
+            }
+            else // nothing relevant clicked
+            {   panel3D.oldX = eventX;
+                panel3D.oldY = eventY;
+                xStart = eventX;
+                yStart = eventY;
+                    
+                dragging = true;                            
+            }    
+            
+        }
+            
+        else if (mouseMode == SHOWHIDECUT)
+        {   if (cutPlaneChoosen != null)
+            {   panel3D.oldX = eventX;
+                panel3D.oldY = eventY;
+                xStart = eventX;
+                yStart = eventY;
+                    
+                dragging = true;                            
+            }
+            else // cutPlaneChoosen == null
             {
                 Vector3D[] edgeWithPoint = 
                     panel3D.edgeClicked(xClicked, yClicked);
@@ -5694,215 +4606,57 @@ panel3D.testString = "";
                 {   Line3D line = new Line3D(
                         edgeWithPoint[0],
                         edgeWithPoint[1]);
-                    if (construction.contains(line))
-                    {   lineChoosen = line;
-                        deleteLine(1, true);
+                    for (int i = 0; i < construction.size(); i++)
+                    {   Object ob = construction.elementAt(i);
+                        if (ob instanceof Plane3D)
+                        {   Plane3D plane = (Plane3D) ob;
+                            int isType = Plane3D.intersectionType(
+                                line, plane);
+                            if (isType == 2)    
+                            {   cutPlaneChoosen = plane.copy();
+                            }    
+                        }
                     }
+                    if (cutPlaneChoosen != null)
+                        showCut(1, true);
                     else // rotate
                     {   panel3D.oldX = eventX;
                         panel3D.oldY = eventY;
-                        //startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
                         xStart = eventX;
                         yStart = eventY;
-                        
+                            
                         dragging = true;                            
                     }
-                }
+                }    
                 else // nothing relevant clicked
                 {   panel3D.oldX = eventX;
                     panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
                     xStart = eventX;
                     yStart = eventY;
-                    
+                        
                     dragging = true;                            
                 }    
-            
             }
-            else if (mouseMode == DRAWPLANE) 
-            {   // ObjectWithPoint finds only visible facets containing
-                // this vertex so use the "last" object in the tree
-                FacetWithVertex fwv = 
-                    panel3D.facetWithVertexClicked(xClicked, yClicked);
-                // restrictions here
-                // 1) only vertices of originalObject (visible or invisible)
-                // 2 only vertices of tempObjectGroup die op
-                //   op originalObject liggen, d.w.z. je mag nieuw
-                //  punten op edges ook gebruiken
-                // 2A geen verlengde lijnen, verder alles
-                // DIT MOET
-                // 3) free i.e. any visible(!) vertex of tempObjectGroup
-                if (fwv != null)
-                {
-                	
-//System.out.println("fwv not null");
-                	
-                    if (vertexAllowed(fwv))    
-                    {
-                    	
-//System.out.println("fwv allowed");
-
-                        // process this point
-                        clickedPoint = fwv.vertex;
-                        drawPlane(pointsSelected + 1, true);
-                    }
-                    
-                }    
-                else // no vertex clicked, check for an edge
-                {   // ObjectWithPoint finds only visible facets containing
-                    // this edge so use the "last" object in the tree                        
-
-                    FacetWithEdgePoint fwep = 
-                        panel3D.facetWithEdgePointClicked(xClicked, yClicked);
-                    // restrictions here
-                    // 1) only points on the edges of origObject
-                    // beter:
-                    // 2) points on edges replacing edges of origObject
-                    // gebruik containsDirSegment o.i.d. 
-                    // 2A) geen punten op verlengde lijnen
-                    // DIT MOET
-                    // 3) any point on any edge                      
-                    if (fwep != null)
-                    {   
-//System.out.println("fwep not null");                    	
-                    	
-                        if (edgePointAllowed(fwep))    
-                        {
-                            // process this edge with new point
-                            clickedEdgeWithPoint = fwep.edgeWithPoint;
-                            drawPlane(pointsSelected + 1, true);
-                        }
-                    }
-                    else // nothing relevant clicked
-                    {
-                        panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }
-                }    
-            } // mouseMode == DRAWPLANE
-            else if (mouseMode == DRAWPARPLANE)
-            {   
-                if (parPlaneChoosen != null)
-                // get the point
-                {   
-//System.out.println("ppc != null");                                                
-                    // ObjectWithPoint finds only visible facets containing
-                    // this vertex so use the "last" object in the tree
-                    FacetWithVertex fwv = 
-                        panel3D.facetWithVertexClicked(xClicked, yClicked);
-                    // restrictions here
-                    // 1) only vertices of originalObject (visible or invisible)
-                    // 2 only vertices of tempObjectGroup die op
-                    //   op originalObject liggen, d.w.z. je mag nieuw
-                    //  punten op edges ook gebruiken
-                    // 2A geen verlengde lijnen, verder alles
-                    // DIT MOET
-                    // 3) free i.e. any visible(!) vertex of tempObjectGroup
-                    if (fwv != null)
-                    {   
-                        if (vertexAllowed(fwv))    
-                        {
-                            // process this point
-                            clickedPoint = fwv.vertex;
-                            drawParPlane(1, true);
-                        }
-                    
-                    }    
-                    else // no vertex clicked, check for an edge
-                    {   // ObjectWithPoint finds only visible facets containing
-                        // this edge so use the "last" object in the tree                        
-
-                        FacetWithEdgePoint fwep = 
-                            panel3D.facetWithEdgePointClicked(xClicked, yClicked);
-                        // restrictions here
-                        // 1) only points on the edges of origObject
-                        // beter:
-                        // 2) points on edges replacing edges of origObject
-                        // gebruik containsDirSegment o.i.d. 
-                        // 2A) geen punten op verlengde lijnen
-                        // DIT MOET
-                        // 3) any point on any edge                      
-                        if (fwep != null)
-                        {   
-                            if (edgePointAllowed(fwep))    
-                            {
-                                // process this edge with new point
-                                clickedEdgeWithPoint = fwep.edgeWithPoint;
-                                drawParPlane(1, true);
-                            }
-                        }
-                        else // nothing relevant clicked
-                        {
-                            panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                            xStart = eventX;
-                            yStart = eventY;
-                        
-                            dragging = true;                            
-                        }
-                    }    
+        }
+        else if (mouseMode == CUTOBJECT)
+        {   if (planeChoosen != null)
+            {   Facet3D fChoosen = 
+                    panel3D.clickedFacet(xClicked, yClicked);
+                if (fChoosen != null)
+                {   facetChoosen = fChoosen;
+                    cutObject(2, true);
                 }
-                else // parPlaneChoosen == null
-                // so get the plane
+                else
                 {
-                    
-//System.out.println("ppc = null");                        
-                    Vector3D[] edgeWithPoint = 
-                        panel3D.edgeClicked(xClicked, yClicked);
-                    if (edgeWithPoint != null)
-                    {   Line3D line = new Line3D(edgeWithPoint[0], edgeWithPoint[1]);
-                        for (int i = 0; i < construction.size(); i++)
-                        {   Object ob = construction.elementAt(i);
-                            if (ob instanceof Plane3D)
-                            {   Plane3D plane = ((Plane3D) ob).copy();
-                                int isType = Plane3D.intersectionType(line, plane);
-                                if (isType == 2)    
-                                {   parPlaneChoosen = plane.copy();
-                                    //lineChoosen = line;
-                                }    
-                                // else clicked on an edge not 
-                                // on a plane
-                            }
-                        }
-                        if (parPlaneChoosen != null)
-                        {   
-                            movedPoint = null;
-                            movedEdgeWithPoint = null;
-                            clickedPoint = null;
-                            clickedEdgeWithPoint = null;
-                                
-                            owner.helpBar.setText(DoorzienGWT.rb.kiesParVlakPuntTekst());                                                                
-                            // wait for mouse action choosing the point
-
-                        }
-                        else // rotate
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }
-                    }    
-                    else // nothing relevant clicked
-                    {   panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
+                    panel3D.oldX = eventX;
+                    panel3D.oldY = eventY;
+                    xStart = eventX;
+                    yStart = eventY;
                         
-                        dragging = true;                            
-                    }    
+                    dragging = true;                            
                 }
-            } // mouseMode == DRAWPARPLANE   
-            else if (mouseMode == DELETEPLANE)
+            }
+            else // planeChoosen == null
             {
                 Vector3D[] edgeWithPoint = 
                     panel3D.edgeClicked(xClicked, yClicked);
@@ -5922,329 +4676,113 @@ panel3D.testString = "";
                         }
                     }
                     if (planeChoosen != null)
-                        deletePlane(1, true);
+                        cutObject(1, true);
                     else // rotate
                     {   panel3D.oldX = eventX;
                         panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
                         xStart = eventX;
                         yStart = eventY;
-                        
+                            
                         dragging = true;                            
                     }
-                }
+                }    
                 else // nothing relevant clicked
                 {   panel3D.oldX = eventX;
                     panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
                     xStart = eventX;
                     yStart = eventY;
-                    
+                        
                     dragging = true;                            
                 }    
+            } // planeChoosen == null
+        }
             
-            }
-            else if (mouseMode == TRANSLATEPLANE)
-            {   if (transPlaneChoosen != null)
-                {   panel3D.oldX = eventX;
-                    panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
-                    xStart = eventX;
-                    yStart = eventY;
+        else if (mouseMode == FOLDOUT)
+        {   // startFacet choosen: rotate
+            if (startFacet != null)
+            {   panel3D.oldX = eventX;
+                panel3D.oldY = eventY;
+                xStart = eventX;
+                yStart = eventY;
                     
-                    dragging = true;                            
-                }
-                else // transPlaneChoosen == null
-                {
-                    Vector3D[] edgeWithPoint = 
-                        panel3D.edgeClicked(xClicked, yClicked);
-                    if (edgeWithPoint != null)
-                    {   Line3D line = new Line3D(
-                            edgeWithPoint[0],
-                            edgeWithPoint[1]);
-                        for (int i = 0; i < transRotConstruct.size(); i++)
-                        {   Object ob = transRotConstruct.elementAt(i);
-                            if (ob instanceof Plane3D)
-                            {   Plane3D plane = (Plane3D) ob;
-                                int isType = Plane3D.intersectionType(
-                                    line, plane);
-                                if (isType == 2)    
-                                {   transPlaneChoosen = plane.copy();
-                                    //lineChoosen = line;
-                                }    
-                            }
-                        }
-                        if (transPlaneChoosen != null)
-                            translatePlane(1, true);
-                        else // rotate
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }
-                    }    
-                    else // nothing relevant clicked
-                    {   panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }    
-                }
+                dragging = true;                            
             }
-            else if (mouseMode == ROTATEPLANE)
-            {   if (rotPlaneChoosen != null)
-                {   panel3D.oldX = eventX;
-                    panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
-                    xStart = eventX;
-                    yStart = eventY;
-                    
-                    dragging = true;                            
-                }
-                else // rotPlaneChoosen == null
+            else // startFacet == null
+            {   Facet3D temp = panel3D.clickedFacet(eventX, eventY);
+                if (temp != null)
                 {
-                    Vector3D[] edgeWithPoint = 
-                        panel3D.edgeClicked(xClicked, yClicked);
-                    if (edgeWithPoint != null)
-                    {   Line3D line = new Line3D(
-                            edgeWithPoint[0],
-                            edgeWithPoint[1]);
-                        for (int i = 0; i < transRotConstruct.size(); i++)
-                        {   Object ob = transRotConstruct.elementAt(i);
-                            if (ob instanceof Plane3D)
-                            {   Plane3D plane = (Plane3D) ob;
-                                int isType = Plane3D.intersectionType(
-                                    line, plane);
-                                if (isType == 2)    
-                                {   rotPlaneChoosen = plane.copy();
-                                    rotLine = line;
-                                }    
-                            }
-                        }
-                        if (rotPlaneChoosen != null)
-                            rotatePlane(1, true);
-                        else // rotate
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }
-                    }    
-                    else // nothing relevant clicked
-                    {   panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }    
-                }
-            }
-            else if (mouseMode == SHOWHIDECUT)
-            {   if (cutPlaneChoosen != null)
-                {   panel3D.oldX = eventX;
-                    panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
-                    xStart = eventX;
-                    yStart = eventY;
-                    
-                    dragging = true;                            
-                }
-                else // cutPlaneChoosen == null
-                {
-                    Vector3D[] edgeWithPoint = 
-                        panel3D.edgeClicked(xClicked, yClicked);
-                    if (edgeWithPoint != null)
-                    {   Line3D line = new Line3D(
-                            edgeWithPoint[0],
-                            edgeWithPoint[1]);
-                        for (int i = 0; i < construction.size(); i++)
-                        {   Object ob = construction.elementAt(i);
-                            if (ob instanceof Plane3D)
-                            {   Plane3D plane = (Plane3D) ob;
-                                int isType = Plane3D.intersectionType(
-                                    line, plane);
-                                if (isType == 2)    
-                                {   cutPlaneChoosen = plane.copy();
-                                    //clickedEdgeWithPoint = edgeWithPoint;
-                                }    
-                            }
-                        }
-                        if (cutPlaneChoosen != null)
-                            showCut(1, true);
-                        else // rotate
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }
-                    }    
-                    else // nothing relevant clicked
-                    {   panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }    
-                }
-            }
-            else if (mouseMode == CUTOBJECT)
-            {   if (planeChoosen != null)
-                {   Facet3D fChoosen = 
-                        panel3D.clickedFacet(xClicked, yClicked);
-                    if (fChoosen != null)
-                    {   facetChoosen = fChoosen;
-                        cutObject(2, true);
+                    // check if this facet makes any sense
+                    if (foldOutObjectGroup instanceof ObjectWithPlane)
+                    {   ObjectWithPlane owp = (ObjectWithPlane) foldOutObjectGroup;
+                        if (owp.replacesOrigObject(temp))
+                        {   while (temp.isReplacementOf != null)
+                                temp = temp.isReplacementOf;
+                            startFacet = temp;    
+                        }    
                     }
+                    else if (foldOutObjectGroup instanceof ObjectWithLine)
+                    {   ObjectWithLine owl = (ObjectWithLine) foldOutObjectGroup;
+                        if (owl.replacesOrigObject(temp))
+                        {   while (temp.isReplacementOf != null)
+                                temp = temp.isReplacementOf;
+                            startFacet = temp;    
+                        }    
+                        
+                    }
+                    else 
+                    {   startFacet = temp;
+                    }    
+                    // facet does not make sense
+                    if (startFacet == null)
+                    {   panel3D.oldX = eventX;
+                        panel3D.oldY = eventY;
+                        xStart = eventX;
+                        yStart = eventY;
+                            
+                        dragging = true;                            
+                    }    
                     else
-                    {
-                        panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }
+                        makeFoldOut(1, true);
                 }
-                else // planeChoosen == null
+                else // nothing clicked, dragging
                 {
-                    Vector3D[] edgeWithPoint = 
-                        panel3D.edgeClicked(xClicked, yClicked);
-                    if (edgeWithPoint != null)
-                    {   Line3D line = new Line3D(
-                            edgeWithPoint[0],
-                            edgeWithPoint[1]);
-                        for (int i = 0; i < construction.size(); i++)
-                        {   Object ob = construction.elementAt(i);
-                            if (ob instanceof Plane3D)
-                            {   Plane3D plane = (Plane3D) ob;
-                                int isType = Plane3D.intersectionType(
-                                    line, plane);
-                                if (isType == 2)    
-                                {   planeChoosen = plane.copy();
-                                    //lineChoosen = line;
-                                }    
-                            }
-                        }
-                        if (planeChoosen != null)
-                            cutObject(1, true);
-                        else // rotate
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }
-                    }    
-                    else // nothing relevant clicked
-                    {   panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                                                        
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }    
-                } // planeChoosen == null
-            }
-            
-            else if (mouseMode == FOLDOUT)
-            {   // als vlakje gekozen draaien
-                if (startFacet != null)
-                {   panel3D.oldX = eventX;
+                    panel3D.oldX = eventX;
                     panel3D.oldY = eventY;
-//                    startF = panel3D.clickedFacet(e.getX(), e.getY());                                                    
                     xStart = eventX;
                     yStart = eventY;
-                    
+                        
                     dragging = true;                            
                 }
-                else // startFacet == null
-                {   Facet3D temp = panel3D.clickedFacet(eventX, eventY);
-                    if (temp != null)
-                    {
-                        // check if this facet makes any sense
-                        if (foldOutObjectGroup instanceof ObjectWithPlane)
-                        {   ObjectWithPlane owp = (ObjectWithPlane) foldOutObjectGroup;
-                            if (owp.replacesOrigObject(temp))
-                            {   while (temp.isReplacementOf != null)
-                                    temp = temp.isReplacementOf;
-                                startFacet = temp;    
-                            }    
-                        }
-                        else if (foldOutObjectGroup instanceof ObjectWithLine)
-                        {   ObjectWithLine owl = (ObjectWithLine) foldOutObjectGroup;
-                            if (owl.replacesOrigObject(temp))
-                            {   while (temp.isReplacementOf != null)
-                                    temp = temp.isReplacementOf;
-                                startFacet = temp;    
-                            }    
-                        
-                        }
-                        else // dummy group with foldOutObject
-                        {   startFacet = temp;
-                        }    
-                        // facet does not make sense
-                        if (startFacet == null)
-                        {   panel3D.oldX = eventX;
-                            panel3D.oldY = eventY;
-//                            startF = panel3D.clickedFacet(e.getX(), e.getY());                                                            
-                            xStart = eventX;
-                            yStart = eventY;
-                            
-                            dragging = true;                            
-                        }    
-                        else
-                            makeFoldOut(1, true);
-                    }
-                    else // nothing clicked, dragging
-                    {
-                        panel3D.oldX = eventX;
-                        panel3D.oldY = eventY;
-//                        startF = panel3D.clickedFacet(e.getX(), e.getY());                            
-                        xStart = eventX;
-                        yStart = eventY;
-                        
-                        dragging = true;                            
-                    }
-                }
-            
             }
-
-//        } // other button(s)
+            
+        }
 
 	}
 	
+	/**
+	 * dragg action action at MouseMove/TouchMove Event
+	 * two types of dragg actions:<br>
+	 * 1) dragg in a circle around the center of the screen: the usual dragging,
+	 * that is, object rotates around an axis perpendicular to the dragg
+	 * direction <br>
+	 * 2) dragg outside a circle around the center of the screen: object rotates around
+	 * the screen-z-axis
+	 * @param eventX x-coordinate of Event
+	 * @param eventY y-coordinate of Event
+	 */
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
 	{
        	if (dragging)
         {
 
-            int xCenter = panel3D.breedte / 2; //getSize().width / 2;
-            int yCenter = panel3D.hoogte / 2; //getSize().height / 2;
+            int xCenter = panel3D.breedte / 2; 
+            int yCenter = panel3D.hoogte / 2; 
             int minRad = Math.min(xCenter, yCenter);
             
             inCircle = Math.sqrt((xStart - xCenter) * (xStart - xCenter) +
                                  (yStart - yCenter) * (yStart - yCenter)) < minRad * RADFACTOR;
 
+            // dragg outside of drawing area
             if ((eventX <= 0) || (eventY <= 0) || (eventX >= panel3D.breedte) ||
                 (eventY >= panel3D.hoogte))
             {    
@@ -6255,62 +4793,33 @@ panel3D.testString = "";
             if (inCircle)
             {
                     
-// hier checken voor buiten beeld                    
-
-//System.out.println("dragging");
-//dit doet WireFrame met 360 i.p.v. 180 graden
                 double xTheta = (panel3D.oldY - eventY) * 180.0d / panel3D.breedte; //getSize().width;
                 double yTheta = (panel3D.oldX - eventX) * 180.0d / panel3D.hoogte; //getSize().height;
-// Peter's versie
-//                double xTheta = (panel3D.oldY - e.getY()) * 5e-1d;
-//                double yTheta = (panel3D.oldX - e.getX()) * 5e-1d;
-
-               
-// ECHT draaien
-/*
-                double xChange = panel3D.oldY - e.getY();
-                double yChange = panel3D.oldX - e.getX();
-                double theta = 5e-1d * Math.sqrt(
-                    xChange * xChange + yChange * yChange);
-                Vector3D axis = new Vector3D(xChange, yChange, 0);    
-                // axis is no zo gekozen dat er theta gedraaid moet worden
-                // met de klok mee gezien vanuit axis
-*/
                                 
                 panel3D.rotateBy(xTheta, yTheta);
-                panel3D.updateHelpPoint(eventX, eventY);
-                panel3D.updateHelpLine(eventX, eventY);
-//                panel3D.rotateBy(theta, axis);
-//                panel3D.rotateCake(xTheta, yTheta);
                 panel3D.repaint();
                 
-                panel3D.oldX = eventX; //.getX();
-                panel3D.oldY = eventY; //.getY();
+                panel3D.oldX = eventX; 
+                panel3D.oldY = eventY; 
             }
             else // not inCircle
             {
-                    
-// hier afkappen voor buiten beeld                    
-                    // choose correct direction
-                double centerX = ((double) panel3D.breedte) / 2; //getSize().width) / 2;
-                double centerY = ((double) panel3D.hoogte) / 2; //getSize().height) / 2;                    
+                double centerX = ((double) panel3D.breedte) / 2; 
+                double centerY = ((double) panel3D.hoogte) / 2;                     
                 double xTheta = 0;
                 double yTheta = 0;
 
+                // choose correct direction
                 if (eventX < centerX)
-                    yTheta = (panel3D.oldY - eventY) * 180.0d / panel3D.hoogte; //getSize().height;
+                    yTheta = (panel3D.oldY - eventY) * 180.0d / panel3D.hoogte; 
                 else                    
-                    yTheta = (eventY - panel3D.oldY) * 180.0d / panel3D.hoogte; //getSize().height;
+                    yTheta = (eventY - panel3D.oldY) * 180.0d / panel3D.hoogte; 
                 if (eventY < centerY)             
-                    xTheta = (eventX - panel3D.oldX) * 180.0d / panel3D.breedte; //getSize().width;
+                    xTheta = (eventX - panel3D.oldX) * 180.0d / panel3D.breedte; 
                 else                 
-                    xTheta = (panel3D.oldX - eventX) * 180.0d / panel3D.breedte;//getSize().width;
+                    xTheta = (panel3D.oldX - eventX) * 180.0d / panel3D.breedte;
                                      
-// Peter's versie
-//                double xTheta = (panel3D.oldY - e.getY()) * 5e-1d;
-//                double yTheta = (panel3D.oldX - e.getX()) * 5e-1d;
-
-                    double zTheta = 0;
+                double zTheta = 0;
                     
                 if (Math.abs(yTheta) > Math.abs(xTheta))
                     zTheta = yTheta;
@@ -6318,12 +4827,10 @@ panel3D.testString = "";
                     zTheta = xTheta;
                     
                 panel3D.rotateByZ(zTheta);
-                panel3D.updateHelpPoint(eventX, eventY);                    
-                panel3D.updateHelpLine(eventX, eventY);                    
                 panel3D.repaint();
                 
-                panel3D.oldX = eventX; //e.getX();
-                panel3D.oldY = eventY; //e.getY();
+                panel3D.oldX = eventX; 
+                panel3D.oldY = eventY; 
                     
             }    
         } // if (dragging)
@@ -6333,7 +4840,10 @@ panel3D.testString = "";
         }    
 
 	}
-	
+
+	/**
+	 * action at MouseUp/TouchEnd Event: repaint and end dragging 
+	 */
 	public void mouseUpTouchEndAction()
 	{
 		if (dragging)
@@ -6344,7 +4854,12 @@ panel3D.testString = "";
         }
 	}
   
-	
+
+	/**
+	 * inner class handling Mouse Events of the Canvas in the cutPanel; in this case dragging
+	 * rotates the cut in the screen plane 
+	 * @author huub
+	 */
 	class CutMouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		boolean mouseDown = false;
@@ -6352,29 +4867,19 @@ panel3D.testString = "";
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
 			
-			int eventX = e.getX();
-			int eventY = e.getY();
-			
 			mouseDown = true;
 			
-			if (!draaibaar)
-    			return;
-    	
-    	
     		cutPanel.oldX = e.getX();
             cutPanel.oldY = e.getY();
             dragging = true;
             
-			
 		}
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
 			
@@ -6417,23 +4922,15 @@ panel3D.testString = "";
                     zTheta = xTheta;
                     
                 cutPanel.rotateByZ(zTheta);
-                //cutPanel.paint(cutPanel.getGraphics());
                 cutPanel.repaint();
                 cutPanel.oldX = e.getX();
                 cutPanel.oldY = e.getY();
             }
 			
-			//int eventX = e.getX();
-			//int eventY = e.getY();
-			
-			//mouseMoveTouchMoveAction(eventX, eventY);
-			
-			
 		} // onMouseMove
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
 			
@@ -6448,8 +4945,13 @@ panel3D.testString = "";
 
 		}
 
-	} //MouseHandler
+	} // CutMouseHandler
 
+	/**
+	 * inner class handling Touch Events of the Canvas in the cutPanel; in this case dragging
+	 * rotates the cut in the screen plane  
+	 * @author huub
+	 */
 	class CutTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		boolean dragging = false;
@@ -6471,9 +4973,6 @@ panel3D.testString = "";
 					DrawConstants.SSTT = DrawConstants.touchSSTT;
 				}
 				
-				if (!draaibaar)
-        			return;
-        	
         		cutPanel.oldX = eventX;
                 cutPanel.oldY = eventY;
                 dragging = true;
@@ -6493,8 +4992,6 @@ panel3D.testString = "";
 			{
 				Touch touch = e.getTouches().get(0);
 				
-
-			    boolean shiftPressed = false;
 			    int eventX = touch.getPageX() - cutPanelCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - cutPanelCanvas.getAbsoluteTop();				
 			    
@@ -6534,7 +5031,6 @@ panel3D.testString = "";
 	                    zTheta = xTheta;
 	                    
 	                cutPanel.rotateByZ(zTheta);
-	                //cutPanel.paint(cutPanel.getGraphics());
 	                cutPanel.repaint();
 	                cutPanel.oldX = eventX;
 	                cutPanel.oldY = eventY;
@@ -6556,129 +5052,7 @@ panel3D.testString = "";
             }
 		}
 
-	}
-    
-    
-/*    
-    // inner class for cutPanel
-    class CutMLMML extends MouseAdapter implements MouseMotionListener
-    {   boolean dragging = false; 
-        public void mousePressed(MouseEvent e)
-        {       
-        		if (!draaibaar)
-        			return;
-        	
-        	
-        		cutPanel.oldX = e.getX();
-                cutPanel.oldY = e.getY();
-                dragging = true;
-        }
-        public void mouseReleased(MouseEvent e)
-        {   if (dragging)
-            {
-                // make sure the dragg-event-queue for rotating is completed!!
-                cutPanel.repaint();
-                dragging = false;
-            }
-        
-        }
-        public void mouseDragged(MouseEvent e)
-        {   if (dragging)
-            {
-                if ((e.getX() <= 0) || (e.getY() <= 0) ||
-                    (e.getX() >= cutPanel.breedte) ||
-                    (e.getY() >= cutPanel.hoogte) 
-                    )
-                {    
-                    dragging = false;
-                    return;    
-                }
-                // choose correct direction
-                double centerX = ((double) cutPanel.breedte) / 2;
-                double centerY = ((double) cutPanel.hoogte) / 2;                    
-                double xTheta = 0;
-                double yTheta = 0;
-
-                if (e.getX() < centerX)
-                    yTheta = (cutPanel.oldY - e.getY()) * 180.0d /
-                             cutPanel.hoogte;
-                else                    
-                    yTheta = (e.getY() - cutPanel.oldY) * 180.0d /
-                             cutPanel.hoogte;
-                if (e.getY() < centerY)             
-                    xTheta = (e.getX() - cutPanel.oldX) * 180.0d /
-                             cutPanel.breedte;
-                else                 
-                    xTheta = (cutPanel.oldX - e.getX()) * 180.0d /
-                             cutPanel.breedte;
-                double zTheta = 0;
-                  
-                if (Math.abs(yTheta) > Math.abs(xTheta))
-                    zTheta = yTheta;
-                else
-                    zTheta = xTheta;
-                    
-                cutPanel.rotateByZ(zTheta);
-                //cutPanel.paint(cutPanel.getGraphics());
-                cutPanel.repaint();
-                cutPanel.oldX = e.getX();
-                cutPanel.oldY = e.getY();
-            }
-        }    
-        public void mouseMoved(MouseEvent e)
-        {   // nothing to do
-        }    
-        public void mouseEntered(MouseEvent e)
-        {   
-//GWT        	
-//        	cutPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));               
-        }    
-        public void mouseExited(MouseEvent e)
-        {   
-//GWT        	
-//        	cutPanel.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));   
-        }    
-    } // class CutMLMML
-*/    
-	
+	} // // CutTouchHandler
 	
 } // class DrawingPanel2
 
-class FoldOutTreeNode implements Serializable
-{   // tree attributes
-    // parent
-    FoldOutTreeNode parentNode = null;
-    // children of type FoldOutTreeNode
-    Vector childNodes = new Vector();
-    
-    // info attributes
-    // the facet represented by the node
-    Facet3D facet;
-    // the fold out component, elements of type facet
-    // en wel dit facet en die van de kinderen,
-    // met toegevoegd alle ZICHTBARE facets die deze facets vervangen 
-    Vector foldOutFacets = new Vector();
-    // (minimum) angle and rotation axis relative
-    // to parentNode.facet
-    double minAngle;
-    double currentAngle; // foldout relative to minAngle
-    // axis is common edge to facet in parentNode
-    // remember the indices of the edgepoints
-    // in this facet with the correct orientation!!
-    // this because the axis is also rotated!!
-    int axisFrom, axisTo;
-    
-// tijdelijk
-int level;
-    
-    // constructor
-    public FoldOutTreeNode(Facet3D f, double angle, int aFrom, int aTo)
-    {   facet = f;
-        minAngle = angle;
-        axisFrom = aFrom;
-        axisTo = aTo;
-    }
-    
-    
-    
-}

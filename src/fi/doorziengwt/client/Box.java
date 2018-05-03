@@ -1,12 +1,11 @@
 package fi.doorziengwt.client;
 
-
-import java.awt.*;
-import java.util.*;
 import com.google.gwt.canvas.dom.client.CssColor;
 
-// nonparametric objects
-// a box length (x+-dir) width (y+-dir) height (z+-dir)
+/**
+ * a box, with different length, width and height
+ * @author huub
+ */
 public class Box extends Object3D
 {   double length, width, height;
     // indices for oriented box
@@ -59,7 +58,7 @@ public class Box extends Object3D
         facets[3] =  new Facet3D(vertices, iFacet3, oc);
         facets[4] =  new Facet3D(vertices, iFacet4, oc);
         facets[5] =  new Facet3D(vertices, iFacet5, oc);
-// niet centreren?        
+        
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
                 facets[fCnt].vertexLabels[vCnt] =
@@ -79,8 +78,10 @@ public class Box extends Object3D
 } // box
 
 
-
-
+/**
+ * very simple axes
+ * @author huub
+ */
 class Axes extends Object3D
 {
     int[] iFacet0 = {0, 1};
@@ -119,7 +120,10 @@ class Axes extends Object3D
     
 }
 
-// a tetrahedron with edge length sqrt(3) (thus height sqrt(2)!)
+/**
+ * a tetrahedron with edge length sqrt(3) (thus height sqrt(2)!)
+ * @author huub
+ */
 class Tetrahedron extends Object3D
 {   // bottom
     int[] iFacet0 = {0, 2, 1}; 
@@ -128,7 +132,6 @@ class Tetrahedron extends Object3D
     int[] iFacet2 = {1, 2, 3};
     int[] iFacet3 = {2, 0, 3};     
 
-//    String[] vLabels = {"A", "B", "C", "D"};
     String[] vLabels = {"B", "C", "A", "D"};
 
     public Tetrahedron()
@@ -170,8 +173,10 @@ class Tetrahedron extends Object3D
 
 }
 
-
-// an octahedron 
+/**
+ * an octahedron
+ * @author huub
+ */
 class Octahedron extends Object3D
 {   // bottom facets
     int[] iFacet0 = {0, 2, 1}; 
@@ -233,8 +238,11 @@ class Octahedron extends Object3D
 
 }
 
-// a three sided piramid
-// height = edge length bottom, i.e. sqrt(3)
+/**
+ * a three sided piramid
+ * height = edge length bottom, i.e. sqrt(3)
+ * @author huub
+ */
 class Piramid3 extends Object3D
 {   // bottom
     int[] iFacet0 = {0, 2, 1}; 
@@ -284,8 +292,11 @@ class Piramid3 extends Object3D
 
 }
 
-// a three sided prism
-// height = 3 * edge length bottom, i.e. 3 * sqrt(3)
+/**
+ * a three sided prism
+ * height = 3 * edge length bottom, i.e. 3 * sqrt(3)
+ * @author huub
+ */
 class Prism3 extends Object3D
 {   // bottom
     int[] iFacet0 = {0, 2, 1}; 
@@ -296,7 +307,6 @@ class Prism3 extends Object3D
     int[] iFacet3 = {1, 2, 5, 4};
     int[] iFacet4 = {2, 0, 3, 5};     
 
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F"};
     String[] vLabels = {"B", "C", "A", "E", "F", "D"};
     public Prism3()
     {};
@@ -341,7 +351,11 @@ class Prism3 extends Object3D
 
 }
 
-// a four sided pyramid with edge length 1 and height h
+/**
+ * a four sided pyramid with edge length 1 and height h
+ * @author huub
+ *
+ */
 class Piramid extends Object3D
 {   double height;
     // bottom
@@ -397,9 +411,12 @@ class Piramid extends Object3D
     }   
 }
 
-// a four sided prism with edge length 1 and height 3
+/**
+ * a four sided prism with edge length 1 and height 3
+ * @author huub
+ */
 class Prism4 extends Object3D
-{   //double height;
+{   
     // bottom
     int[] iFacet0 = {0, 3, 2, 1}; 
     // top
@@ -454,15 +471,18 @@ class Prism4 extends Object3D
     
     public Object3D deepCopy()
     {   Prism4 copy = new Prism4();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
 
-// a five sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/5 and height h = 1.5 * edge length
+/**
+ * a five sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/5 and height h = 1.5 * edge length
+ * @author huub
+ *
+ */
 class Piramid5 extends Object3D
 {   
     // bottom
@@ -474,7 +494,6 @@ class Piramid5 extends Object3D
     int[] iFacet4 = {3, 4, 5};     
     int[] iFacet5 = {4, 0, 5};     
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F"};    
     String[] vLabels = {"C", "D", "E", "A", "B", "F"};        
     
     public Piramid5()
@@ -518,15 +537,17 @@ class Piramid5 extends Object3D
     
     public Object3D deepCopy()
     {   Piramid5 copy = new Piramid5();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
 
-// a five sided prism with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/5 and height h = 3 * edge length
+/**
+ * a five sided prism with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/5 and height h = 3 * edge length
+ * @author huub
+ */
 class Prism5 extends Object3D
 {   
     // bottom
@@ -541,9 +562,6 @@ class Prism5 extends Object3D
     int[] iFacet5 = {3, 4, 9, 8};     
     int[] iFacet6 = {4, 0, 5, 9};     
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", 
-//                        "F", "G", "H", "I", "J"};    
-
     String[] vLabels = {"C", "D", "E", "A", "B", 
                         "H", "I", "J", "F", "G"};    
     
@@ -593,14 +611,16 @@ class Prism5 extends Object3D
     
     public Object3D deepCopy()
     {   Prism5 copy = new Prism5();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
-// a six sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/6 and height h = 2 * edge length
+/**
+ * a six sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/6 and height h = 2 * edge length
+ * @author huub
+ */
 class Piramid6 extends Object3D
 {   
     // bottom
@@ -613,7 +633,6 @@ class Piramid6 extends Object3D
     int[] iFacet5 = {4, 5, 6};     
     int[] iFacet6 = {5, 0, 6};         
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F", "G"};    
     String[] vLabels = {"D", "E", "F", "A", "B", "C", "G"};        
     public Piramid6()
     {};
@@ -658,15 +677,16 @@ class Piramid6 extends Object3D
     
     public Object3D deepCopy()
     {   Piramid6 copy = new Piramid6();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
-
-// a six sided prism with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/6 and height h = 3 * edge length
+/**
+ * a six sided prism with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/6 and height h = 3 * edge length
+ * @author huub
+ */
 class Prism6 extends Object3D
 {   
     // bottom
@@ -681,9 +701,6 @@ class Prism6 extends Object3D
     int[] iFacet6 = {4, 5, 11, 10};     
     int[] iFacet7 = {5, 0, 6, 11};         
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F", 
-//                        "G", "H", "I", "J", "K", "L"};    
-
     String[] vLabels = {"D", "E", "F", "A", "B", "C", 
                         "J", "K", "L", "G", "H", "I"};    
     
@@ -737,15 +754,17 @@ class Prism6 extends Object3D
     
     public Object3D deepCopy()
     {   Prism6 copy = new Prism6();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
 
-// a seven sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/7 and height h = 2.5 * edge length
+/**
+ * a seven sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/7 and height h = 2.5 * edge length
+ * @author huub
+ */
 class Piramid7 extends Object3D
 {   
     // bottom
@@ -759,7 +778,6 @@ class Piramid7 extends Object3D
     int[] iFacet6 = {5, 6, 7};         
     int[] iFacet7 = {6, 0, 7};         
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F", "G", "H"};    
     String[] vLabels = {"D", "E", "F", "G", "A", "B", "C", "H"};        
     
     public Piramid7()
@@ -807,15 +825,17 @@ class Piramid7 extends Object3D
     
     public Object3D deepCopy()
     {   Piramid7 copy = new Piramid7();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
 
-// a eight sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
-// alpha = 2*PI/8 and height h = 3 * edge length
+/**
+ * an eight sided pyramid with edge length sqrt(2 - 2 cos(alpha)) where
+ * alpha = 2*PI/8 and height h = 3 * edge length
+ * @author huub
+ */
 class Piramid8 extends Object3D
 {   
     // bottom
@@ -830,7 +850,6 @@ class Piramid8 extends Object3D
     int[] iFacet7 = {6, 7, 8};         
     int[] iFacet8 = {7, 0, 8};             
     
-//    String[] vLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I"};    
     String[] vLabels = {"E", "F", "G", "H", "A", "B", "C", "D", "I"};        
     public Piramid8()
     {};
@@ -879,13 +898,15 @@ class Piramid8 extends Object3D
     
     public Object3D deepCopy()
     {   Piramid8 copy = new Piramid8();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
-// an icodahedron with edge length 2
+/**
+ * an icosahedron with edge length 2
+ * @author huub
+ */
 class Icosahedron extends Object3D
 {   // normal to the outside
     // vertices are arranged as bottom (counterclock) top (counterclock)
@@ -915,10 +936,6 @@ class Icosahedron extends Object3D
     int[] iFacet18 = {8, 11, 10};
     int[] iFacet19 = {9, 10, 11};
     
-    
-    
-    //String[] vLabels = {"A", "B", "C", "D", "F", "G",
-    //                    "H", "E", "I", "J", "L", "K"};        
     String[] vLabels = {"J", "K", "L", "G", "I", "D",
                         "E", "H", "F", "A", "C", "B"};        
                         
@@ -989,7 +1006,10 @@ class Icosahedron extends Object3D
     
 } // Icosahedron
 
-// a Dodecahedron
+/**
+ * a Dodecahedron
+ * @author huub
+ */
 class Dodecahedron extends Object3D
 {   // normal to the outside
     // vertices are arranged as bottom (counterclock) top (counterclock)
@@ -1086,9 +1106,12 @@ class Dodecahedron extends Object3D
     
 } // Dodecahedron
 
-// a house with piramidal roof, height roof = height house
+/**
+ * a house with piramidal roof, height roof = height house
+ * @author huub
+ */
 class PirHouse extends Object3D
-{   //double height;
+{   
     // bottom house
     int[] iFacet0 = {0, 3, 2, 1}; 
     // sides house
@@ -1152,16 +1175,17 @@ class PirHouse extends Object3D
     
     public Object3D deepCopy()
     {   PirHouse copy = new PirHouse();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   
 }
 
-
-// a house with piramidal roof, height roof = height house
+/**
+ * a house with a hip roof (nl: schilddak), height roof = height house
+ * @author huub
+ */
 class EdgeHouse extends Object3D
-{   //double height;
+{   
     // bottom house
     int[] iFacet0 = {0, 3, 2, 1}; 
     // sides house
@@ -1226,7 +1250,6 @@ class EdgeHouse extends Object3D
     
     public Object3D deepCopy()
     {   EdgeHouse copy = new EdgeHouse();
-//        copy.height = height;
         makeDeepObjectCopy(copy);
         return copy;        
     }   

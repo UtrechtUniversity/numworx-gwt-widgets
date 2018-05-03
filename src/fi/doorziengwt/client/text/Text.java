@@ -115,64 +115,12 @@ public interface Text extends ConstantsWithLookup {
 	String doorsnedeTekst();
 	@DefaultStringValue("Klik met de muis op een lijn van het vlak waarlangs de figuur doorgesneden moet worden")
 	String snijdoorTekst();
-	@DefaultStringValue("Klik met de muis op een stuk van de figuur gebruik de Plak-knop")
+	@DefaultStringValue("Klik met de muis op een stuk van de figuur of gebruik de Plak-knop")
 	String kiesDoorsnedeTekst();
 	
 	@DefaultStringValue("Klik met de muis op het vlakje dat het centrum van de bouwplaat moet worden")
 	String bouwplaatVlakTekst();
 	
 
-/*	
-                        
-    // right toolbar                    
-    {"escapeText",      "Abort action" },
-                        
-    
-    
-                        
-    {"conDrawSelectText", "Click with the mouse on the side which will be the center of the fold-out" },
-                          
-    {"wholeFigureText", "Object" },
-                        
-    {"volumeText",      "Volume" },
-                        
-    {"largeFigureText", "large object" },
-                        
-    {"smallFigureText", "small object" },
-                        
-                        
-                        
-    
-    // top toolbar                    
-                                 
-                    
-    {"selectShowCutText", "Click with the mouse on a line of the plane whose intersection with the object should be shown" },
-                          
-    {"hideCutText", "Hide intersection" } ,
-                    
-    {"cutFigureText", "Split object" } ,
-                      
-    {"glueFigureText", "Paste objects together" },
-                       
-                      
-                      
-    {"selectCutPlaneText", "Click with the mouse on a line of the plane along which the object should be cut" },
-                           
-    {"selectCutFigureText", "Click with the mouse to select the part of the object which should become the new object, or use the Paste-button" },
-                            
-
-    {"undoText", "Undo" } ,
-
-    {"redoText", "Redo" },
-                            
-                        
-    {"decSep",          "." } ,   
-    
-    // ViewPanel
-    {"startButtonViewerText", "Start program for editing" } , 
-    {"opnieuwButtonViewerText", "Again" } , 
-    {"uitlegButtonViewerText", "Help" } , 
-     
-*/	
 
 }

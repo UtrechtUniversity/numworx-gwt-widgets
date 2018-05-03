@@ -4,10 +4,10 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 
-
-import java.awt.*;
-//import java.io.Serializable;
-
+/**
+ * a facet of a 3D figure, see class Facet3D in Grafiek3DGWT 
+ * @author huub
+ */
 
 // a facet of a 3D figure, i.e. a polygon with its points located in some
 // plane of 3-space
@@ -39,21 +39,9 @@ public class Facet3D //implements Serializable
     // drawing labels for vertices
     public String[] vertexLabels;
     
-    //public static Font vertexFont = new Font("SansSerif", Font.ITALIC, 12);
-        
-// hier vertexLabels, references to Strings
-// regel:
-// maak de vertexlabels van een object in initObject,
-// dus na initObject de vertexlabels "zetten"
-// initialiseer daarna de vertex labels van de facets
-// ze staan op dezelfde plaatsen als de vertices
-// vgl. updatePoints
-// voor het tekenen heb je de vertexLabels HIER nodig
-    
     // normal vector of the polygon and its unitary transformed
     public Vector3D normal, unitNormal;
-    // reference to all vertices array
-//    public Vector3D[] allPoints;
+
     // true if edges should be drawn
     public boolean outlined = true;
     // true if filled
@@ -69,7 +57,6 @@ public class Facet3D //implements Serializable
     // the color of the outline
     public CssColor outlineColor = DrawConstants.black;
 
-// changing via rebuild!    
     // how to draw "hidden" outlines in non-filled mode
     // voor later 0 = lighter, 1 = dashed 2 = dashed and lighter    
     public int hiddenOutlineMode = DrawConstants.hiddenOutlineMode;
@@ -83,8 +70,14 @@ public class Facet3D //implements Serializable
     // barycenter in view space
     public Vector3D barycenter;
     
-    // voor Doorzien
+    /**
+     * Doorzien: some Facet3D f has been cut by a line (in the plane of f) or
+     * a plane (intersecting the plane of f), resulting in two Facet3D's f1 and f2 
+     * if this Facet3D equals one of f1 or f2, isReplacementOf = f. 
+     * see classes ObjectWithLine and ObjectWithPlane 
+     */
     Facet3D isReplacementOf;
+    
     public static int HIDDENSHIFT = 10;
     public static int HIGHLIGHTSHIFT = 20;
     
@@ -95,18 +88,14 @@ public class Facet3D //implements Serializable
     public static int BIGPOINT = 7;
     public static int SMALLPOINT = 4;
     
-
     Vector3D[] tickStart;
     Vector3D[] tickStep;
     int[] numTicks;
-    boolean[] drawTicks; 
-// zorg in edgeClicked dat je ook alleen de ticks 
-// mag aanklikken!!!!!!
+    boolean[] drawTicks;
     
     // constructor from vertices and indices
     public Facet3D(Vector3D[] pts, int[] inds, CssColor c)
-    {   // set reference
-//        allPoints = pts;
+    {   
         // init indices
         indices = inds; // new int[inds.length];
         // get the number of points in the facet as the length
@@ -202,13 +191,6 @@ public class Facet3D //implements Serializable
     // used after transforming
     public void calculateZValue(Vector3D origin, double distance)
     {   
-/*        
-        double zSum = 0;
-        for (int i = 0; i < numPoints; i++)
-            zSum += trPoints[i].z;
-        zValue= zSum / numPoints;
-*/        
-        
         double bX = 0;
         double bY = 0;        
         double bZ = 0;                
@@ -221,8 +203,6 @@ public class Facet3D //implements Serializable
             bX / numPoints, bY / numPoints, bZ / numPoints);
         Vector3D eye = new Vector3D(origin.x, origin.y, distance);    
         zValue = distance - Vector3D.distance(bC, eye);    
-        
-        
         
     }
     
@@ -245,8 +225,7 @@ public class Facet3D //implements Serializable
     // thus from the view point (o.x, o.y, d)
     // projecting on another plane can be done analogously
     public Polygon project(double d, Vector3D o)
-    {   //if (!visible)
-        //    return null;
+    {  
         // projected polygon
         int nPoints = numPoints;
         int[] xPoints = new int[numPoints];
@@ -255,8 +234,6 @@ public class Facet3D //implements Serializable
         {   // view space, origin at (o.x, o.y, o.z)
             // xy-projection
             // project point on plane through (o.x, o.y, 0)
-//if (trPoints[i] == null)         	
-//System.out.println("tr " + i + " null");        	
             double temp =  d / (d - trPoints[i].z);
             xPoints[i] = (int) Math.round((o.x + (trPoints[i].x - o.x) * temp));
             yPoints[i] = (int) Math.round((o.y + (trPoints[i].y - o.y) * temp));
@@ -266,8 +243,7 @@ public class Facet3D //implements Serializable
 
     // exact REAL projection
     public Polygon2D project2D(double d, Vector3D o)
-    {   //if (!visible)
-        //    return null;
+    {   
         // projected polygon
         int nPoints = numPoints;
         double[] xPoints = new double[numPoints];
@@ -303,17 +279,17 @@ public class Facet3D //implements Serializable
                              double dis, Matrix3D mat, Object3D ob)
     {
         
-// NOTE ob != null requests exact drawing through edge coverings       
+		// NOTE ob != null requests exact drawing through edge coverings       
         Polygon2D p = project2D(dis, mat.origin);
 
-// the transformed facet is visible from (origin.x, origin.y, d) if 
-// (origin.x, origin.y, d) is at the side of the transformed
-// facet from which the normal vector points out
-// the transformed facet is of the vector form
-// trPoints[0] + "some plane through (0, 0, 0)" and that plane
-// has normal vector unitNormal, so:
-// find the angle between (origin.x, origin.y, d) minus trPoints[0]
-// and unitNormal
+        // the transformed facet is visible from (origin.x, origin.y, d) if 
+        // (origin.x, origin.y, d) is at the side of the transformed
+        // facet from which the normal vector points out
+        // the transformed facet is of the vector form
+        // trPoints[0] + "some plane through (0, 0, 0)" and that plane
+        // has normal vector unitNormal, so:
+        // find the angle between (origin.x, origin.y, d) minus trPoints[0]
+        // and unitNormal
 
         Vector3D eye = new Vector3D(mat.origin.x, mat.origin.y, dis);
         // work with normal support here
@@ -322,47 +298,46 @@ public class Facet3D //implements Serializable
         Vector3D.makeUnitary(eye);
         boolean visFromD = Vector3D.dotProduct(eye, unitNormal) >= -Vector3D.NZero;
         
-// determine the fill color of the facet
-// and fill
+        // determine the fill color of the facet
+        // and fill
         // inside = false geeft zelfde kleur met goede schaduw
         // via  -unitNormal
         if (inside && shadow)
         {   if (visFromD)
-        	{   //g.setColor(Facet3D.shadowColor(this, false));
+        	{   
         		g.setFillStyle(Facet3D.shadowColor(this, false));
         	}
             else
-            {   //g.setColor(Facet3D.shadowGrayColor(this));
+            {   
             	g.setFillStyle(Facet3D.shadowGrayColor(this));
             }
         }
         else if (!inside && shadow)
         {   if (visFromD)
-            {    //g.setColor(Facet3D.shadowColor(this, false));
+            {   
         		g.setFillStyle(Facet3D.shadowColor(this, false));
             }
             else
-            {   //g.setColor(Facet3D.shadowColor(this, true));
+            {   
             	g.setFillStyle(Facet3D.shadowColor(this, true));
             }
         }
         else if (inside && !shadow)
         {   if (visFromD)
-        	{   //g.setColor(color);
+        	{   
         		g.setFillStyle(color);
         	}
             else
-            {   //g.setColor(Color.lightGray);
+            {   
             	g.setFillStyle(DrawConstants.lightGray);
             }
         }
         else // none
-        {   //g.setColor(color);
+        {   
         	g.setFillStyle(color);
         }
         if (filled)
-        {	//g.fillPolygon(p);
-//GWT        	
+        {	
         	g.moveTo(p.xpoints[0], p.ypoints[0]);
 			g.beginPath();
 			for (int k = 1; k < p.npoints; k++)
@@ -373,50 +348,42 @@ public class Facet3D //implements Serializable
 			g.fill();
         }    
 
-// determine outline color and draw outline
-// voor filled facets (dus geen segmenten) 
-// is nooit exacte tekening gewenst
+        // determine outline color and draw outline
+        // voor filled facets (dus geen segmenten) 
+        // is nooit exacte tekening gewenst
         if (outlined)
         {    
              // facet filled, no edge colors overidden
              if (filled && !edgesLabeled())
              {   // for lines change outlineColor externally
                  if (visFromD)             
-                 {   //g.setColor(outlineColor);
+                 {   
                 	 g.setStrokeStyle(outlineColor);
                  }
                  else
-                 {   //g.setColor(getHiddenOutlineColor(outlineColor));
+                 {   
                 	 g.setStrokeStyle(getHiddenOutlineColor(outlineColor));
                  }
              }
              // facet transparent, no edge colors overridden 
              else if (!filled && !edgesLabeled())
              {   
-// aparte constructor voor 2-dim facets
-
-// wanneer is een lijn nu hidden?                
-// "inside line" kleur extern "hidden" zetten
-// hidden line normaal 
-// anders normalvector = "directed segment"?
                  // for lines change (hidden)outlineColor externally
                  if (!visFromD && (hiddenOutlineMode % 2 == 0))
-                 {   //g.setColor(getHiddenOutlineColor(outlineColor));
+                 {   
                 	 g.setStrokeStyle(getHiddenOutlineColor(outlineColor));
                  }
                  else    
-                 {   //g.setColor(outlineColor);
+                 {   
                 	 g.setStrokeStyle(outlineColor);
                  }
              }    
-// hier kijken of exacte tekening gewenst             
+                          
              // edge colors overridden
              if (edgesLabeled() || (hiddenOutlineMode != 0))
-//GWT            	 
                  drawPolygon(g, p, visFromD);
              else
-             { 	 //g.drawPolygon(p);
-//GWT            	 
+             { 	 
              	g.moveTo(p.xpoints[0], p.ypoints[0]);
     			g.beginPath();
     			for (int k = 1; k < p.npoints; k++)
@@ -442,105 +409,79 @@ public class Facet3D //implements Serializable
                      // edge "hidden"
                      if (!visFromD && (hiddenOutlineMode % 2 == 0)
                         )
-                     {   //g.setColor(getHiddenOutlineColor(edgeColors[vertexCodes[cnt]]));
+                     {   
                     	 g.setStrokeStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt]]));
                     	 g.setFillStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt]]));
                      }        
                      else // not "hidden"
-                     {   //g.setColor(edgeColors[vertexCodes[cnt]]);
+                     {   
                     	 g.setStrokeStyle(edgeColors[vertexCodes[cnt]]);
                     	 g.setFillStyle(edgeColors[vertexCodes[cnt]]);
                      }
-                     //hidden = !visFromD;    
+   
                  }
                  // externally hidden
                  else if ((vertexCodes[cnt] >= 10) && (vertexCodes[cnt] < 20))
                  {   if (hiddenOutlineMode % 2 == 0)
-                 	 {    //g.setColor(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 10]));
+                 	 {    
                 	 	  g.setStrokeStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 10]));
                 	 	  g.setFillStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 10]));
                  	 }
                      else // no "hidden" color
-                     {    //g.setColor(edgeColors[vertexCodes[cnt] % 10]);
+                     {   
                     	 g.setStrokeStyle(edgeColors[vertexCodes[cnt] % 10]);
                     	 g.setFillStyle(edgeColors[vertexCodes[cnt] % 10]);
                      }
-                     //hidden = true;    
+    
                  }    
                  // hightlighted and hiding through normal
                  else if ((vertexCodes[cnt] >= 20) && (vertexCodes[cnt] < 30))
                  {   highlighted = true;
                      if (!visFromD && (hiddenOutlineMode % 2 == 0))
-                     {   //g.setColor(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 20]));
+                     {   
                     	 g.setStrokeStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 20]));
                     	 g.setFillStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 20]));
                      }        
                      else // not "hidden"
-                     {   //g.setColor(edgeColors[vertexCodes[cnt] % 20]);
+                     {   
                     	 g.setStrokeStyle(edgeColors[vertexCodes[cnt] % 20]);
                     	 g.setFillStyle(edgeColors[vertexCodes[cnt] % 20]);
                      }
-                     //hidden = !visFromD;    
+    
                  }
                  // highlighted and externally hidden
                  else if ((vertexCodes[cnt] >= 30) && (vertexCodes[cnt] < 40))
                  {   
                      if (hiddenOutlineMode % 2 == 0)
-                     {    //g.setColor(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 30]));
+                     {   
                     	 g.setStrokeStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 30]));
                     	 g.setFillStyle(getHiddenOutlineColor(edgeColors[vertexCodes[cnt] % 30]));
                      }
                      else // no "hidden" color
-                     {   //g.setColor(edgeColors[vertexCodes[cnt] % 10]);
+                     {   
                     	 g.setStrokeStyle(edgeColors[vertexCodes[cnt] % 30]);
                     	 g.setFillStyle(edgeColors[vertexCodes[cnt] % 30]);
                      }
                      highlighted = true;
-                     //hidden = true;
+
                  }    
                  // extern unhidden
                  else if ((vertexCodes[cnt] >= 40) && (vertexCodes[cnt] < 50))
-                 {   //g.setColor(edgeColors[vertexCodes[cnt] % 40]);
+                 {   
                 	 g.setStrokeStyle(edgeColors[vertexCodes[cnt] % 40]);
                 	 g.setFillStyle(edgeColors[vertexCodes[cnt] % 40]);
                  }    
                  if (highlighted)
                  {	 
-//GWT   
-//ARC IS NOT FILLED!!                 	 
-                     //g.fillOval(p.xpoints[cnt] - BIGPOINT / 2,
-                     //           p.ypoints[cnt] - BIGPOINT / 2, 
-                     //           BIGPOINT, BIGPOINT);
-                     
                      g.beginPath();
                      g.arc(p.xpoints[cnt], p.ypoints[cnt], BIGPOINT / 2, 0, 2 * Math.PI);
                 	 g.fill();
-                	 
-//                	 g.beginPath();
-//                	 g.fillRect(p.xpoints[cnt] - BIGPOINT / 2,
-//                                p.ypoints[cnt] - BIGPOINT / 2, 
-//                                BIGPOINT, BIGPOINT);
                  }    
                  else
                  {
-//GWT                
-//ARC IS NOT FILLED!!                	 
-                     //g.fillOval(p.xpoints[cnt] - SMALLPOINT / 2,
-                     //           p.ypoints[cnt] - SMALLPOINT / 2, 
-                     //           SMALLPOINT, SMALLPOINT);
-                     //g.drawOval(p.xpoints[cnt] - SMALLPOINT / 2,
-                     //           p.ypoints[cnt] - SMALLPOINT / 2, 
-                     //           SMALLPOINT - 1, SMALLPOINT - 1);
-                     
                      g.beginPath();
                      g.arc(p.xpoints[cnt], p.ypoints[cnt], SMALLPOINT / 2, 0, 2 * Math.PI);
                 	 g.fill();
-                	 
-//                	 g.fillRect(p.xpoints[cnt] - SMALLPOINT / 2,
-//                                p.ypoints[cnt] - SMALLPOINT / 2, 
-//                                SMALLPOINT, SMALLPOINT);
-                     
-                                
                  }               
             } // if (vertexCodes[i] >= 0)  
         } // for
@@ -549,12 +490,12 @@ public class Facet3D //implements Serializable
         // drawing tickmarks
         if (DrawConstants.TICKSVISIBLE && (DrawConstants.TICKNUM > 0))
         {   if (visFromD)
-        	{   //g.setColor(DrawConstants.tickColor);
+        	{   
         		g.setStrokeStyle(DrawConstants.tickColor);
         		g.setFillStyle(DrawConstants.tickColor);
         	}
             else    
-            {   //g.setColor(DrawConstants.hiddenTickColor);
+            {   
             	g.setStrokeStyle(DrawConstants.hiddenTickColor);
             	g.setFillStyle(DrawConstants.hiddenTickColor);
             }
@@ -564,16 +505,6 @@ public class Facet3D //implements Serializable
                     Vector2D[] projTicks = projectPoints(trTicks, dis, mat.origin);
                     for (int pCnt = 0; pCnt < projTicks.length; pCnt++)
                     {
-                    	
-//GWT
-//ARC IS NOR FILLED!!!                    	
-                         //g.fillOval(projTicks[pCnt].x - SMALLPOINT / 2,
-                         //           projTicks[pCnt].y - SMALLPOINT / 2, 
-                         //           SMALLPOINT, SMALLPOINT);
-                         //g.drawOval(projTicks[pCnt].x - SMALLPOINT / 2,
-                         //           projTicks[pCnt].y - SMALLPOINT / 2, 
-                         //           SMALLPOINT - 1, SMALLPOINT - 1);
-                    
                          g.beginPath();
                          g.arc(projTicks[pCnt].x, projTicks[pCnt].y, SMALLPOINT / 2, 0, 2 * Math.PI);
                          g.fill();
@@ -584,13 +515,7 @@ public class Facet3D //implements Serializable
         // drawing letters        
         if (DrawConstants.letters)
         {   
-        	//g.setFont(vertexFont);
-            //g.setColor(Color.magenta);
-        	//g.setStrokeStyle(DrawConstants.magenta);
         	g.setFillStyle(DrawConstants.magenta);
-//GWT        	
-            //FontMetrics vertexFM = g.getFontMetrics(g.getFont());
-            
             String fontString = "14px italic, sans-serif";
     		g.setFont(fontString);
     		
@@ -611,7 +536,7 @@ public class Facet3D //implements Serializable
                     double oy = mat.origin.y;
                     double shiftX = ox - bx;
                     if (shiftX >= 0)
-                    {   //bx -= (3 + vertexFM.stringWidth(vertexLabels[vCnt]));
+                    {   
                     	bx -= (3 + letterBreedte);
                     }
                     else
@@ -619,20 +544,15 @@ public class Facet3D //implements Serializable
                     double shiftY = oy - by;
                     // y-axis reversed!
                     if (shiftY <= 0)
-                    {   //by += vertexFM.getAscent();
+                    {   
                     	by += 10; //AD HOC!!
                     }
                     else
                         by -= 3;
-//GWT
-                    //g.drawString(vertexLabels[vCnt], bx, by);
                     g.fillText(vertexLabels[vCnt], bx, by);
                 }
             }
         }
-        
-        
-        
         
     }  // paintFacet  
     
@@ -699,49 +619,46 @@ public class Facet3D //implements Serializable
     
     // draw edge by edge, only when non-filled and
     // some edgelabel != 0
-// highlighting edges
-// gebruik een shift, zeg 10
-// highlighting: tel 10 op bij edgeLabels[i] i>=0
-// kies kleuren via edgeLabels[i % 10]
-// de-highlighting: als i / 10 >= 1 dan i = i - 10
-// dan dikker tekenen: alles twee keer
-// hoek > 45 graden een pixel naar rechts
-// anders een pixel naar beneden
-/*
-tot nu toe 
-0 default outline color
-1 line color
-2 plane color
-hidden via normaal
+    // highlighting edges
+    // gebruik een shift, zeg 10
+    // highlighting: tel 10 op bij edgeLabels[i] i>=0
+    // kies kleuren via edgeLabels[i % 10]
+    // de-highlighting: als i / 10 >= 1 dan i = i - 10
+    // dan dikker tekenen: alles twee keer
+    // hoek > 45 graden een pixel naar rechts
+    // anders een pixel naar beneden
+    /*
+	tot nu toe 
+	0 default outline color
+	1 line color
+	2 plane color
+	hidden via normaal
 
-extra
-10 default outline color
-11 line color
-12 plane color
-extern op hidden gezet
+	extra
+	10 default outline color
+	11 line color
+	12 plane color
+	extern op hidden gezet
 
-extra
-20 default outline color
-21 line color
-22 plane color
-highlighted en hidden via normaal
+	extra
+	20 default outline color
+	21 line color
+	22 plane color
+	highlighted en hidden via normaal
 
-extra
-30 default outline color
-31 line color
-32 plane color
-highlighted en extern op hidden gezet
+	extra
+	30 default outline color
+	31 line color
+	32 plane color
+	highlighted en extern op hidden gezet
 
-extra
-40 default outline color
-41 line color
-42 plane color
-extern op UNhidden gezet
-
-
-  
-*/    
-    //public void drawPolygon(Graphics g, Polygon p, boolean visFromD)
+	extra
+	40 default outline color
+	41 line color
+	42 plane color
+	extern op UNhidden gezet
+     */    
+    
     public void drawPolygon(Context2d g, Polygon2D p, boolean visFromD)
     {   for (int i = 0; i < p.npoints; i++)
         {   // outline requested
@@ -755,11 +672,11 @@ extern op UNhidden gezet
                     // edgeColors[edgeLabels[0]] is the global outlineColor
                     // edge "hidden"
                     if (!visFromD && (hiddenOutlineMode % 2 == 0))
-                    {   //g.setColor(getHiddenOutlineColor(edgeColors[edgeCodes[i]]));
+                    {   
                     	g.setStrokeStyle(getHiddenOutlineColor(edgeColors[edgeCodes[i]]));
                     }        
                     else // not "hidden"
-                    {    //g.setColor(edgeColors[edgeCodes[i]]);
+                    {   
                     	g.setStrokeStyle(edgeColors[edgeCodes[i]]);
                     }
                     hidden = !visFromD;    
@@ -767,11 +684,11 @@ extern op UNhidden gezet
                 // externally hidden
                 else if ((edgeCodes[i] >= 10) && (edgeCodes[i] < 20))
                 {   if (hiddenOutlineMode % 2 == 0)
-                	{    //g.setColor(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 10]));
+                	{   
                 		g.setStrokeStyle(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 10]));
                 	}
                     else // no "hidden" color
-                    {    //g.setColor(edgeColors[edgeCodes[i] % 10]);
+                    {   
                     	g.setStrokeStyle(edgeColors[edgeCodes[i] % 10]);
                     }
                     hidden = true;    
@@ -780,15 +697,13 @@ extern op UNhidden gezet
                 else if ((edgeCodes[i] >= 20) && (edgeCodes[i] < 30))
                 {   highlighted = true;
                     if (!visFromD &&
-                        //(unitNormal.z <= - Vector3D.NZero) &&
                         (hiddenOutlineMode % 2 == 0)
                         )
                     {    
-                        //g.setColor(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 20]));
-                    	g.setStrokeStyle(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 20]));
+                        g.setStrokeStyle(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 20]));
                     }        
                     else // not "hidden"
-                    {    //g.setColor(edgeColors[edgeCodes[i] % 20]);
+                    {    
                     	g.setStrokeStyle(edgeColors[edgeCodes[i] % 20]);
                     }
                     hidden = !visFromD;    
@@ -797,11 +712,11 @@ extern op UNhidden gezet
                 else if ((edgeCodes[i] >= 30) && (edgeCodes[i] < 40))
                 {   
                     if (hiddenOutlineMode % 2 == 0)
-                    {    //g.setColor(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 30]));
+                    {   
                     	g.setStrokeStyle(getHiddenOutlineColor(edgeColors[edgeCodes[i] % 30]));
                     }
                     else // no "hidden" color
-                    {    //g.setColor(edgeColors[edgeCodes[i] % 10]);
+                    {   
                     	g.setStrokeStyle(edgeColors[edgeCodes[i] % 10]);
                     }
                     highlighted = true;
@@ -809,29 +724,19 @@ extern op UNhidden gezet
                 }    
                 // extern unhidden
                 else if ((edgeCodes[i] >= 40) && (edgeCodes[i] < 50))
-                {   //g.setColor(edgeColors[edgeCodes[i] % 40]);
+                {   
                 	g.setStrokeStyle(edgeColors[edgeCodes[i] % 40]);
                 }    
 
-                
-// hier hightlighten!!!
-// drawHighlightedLine
-// drawHighlightedDashedLine
                 // drawing    
                 if (!hidden || (hiddenOutlineMode == 0))
                 {	g.beginPath();
                 	g.moveTo(p.xpoints[i], p.ypoints[i]);
                 	g.lineTo(p.xpoints[(i+1) % p.npoints],p.ypoints[(i+1) % p.npoints]);
                 	g.stroke();
-                
-//GWT                	
-                    //g.drawLine(p.xpoints[i], p.ypoints[i],
-                    //           p.xpoints[(i+1) % p.npoints], 
-                    //           p.ypoints[(i+1) % p.npoints]);
                 }    
                 else if (hidden && (hiddenOutlineMode != 0))    // dashed
                 {	
-//GWT                	
                     drawDashedLine(g, p.xpoints[i], p.ypoints[i],
                                       p.xpoints[(i+1) % p.npoints], 
                                       p.ypoints[(i+1) % p.npoints]);
@@ -847,8 +752,7 @@ extern op UNhidden gezet
         double xStart, xEnd, yStart, yEnd;
         // points too close to dash
         if (dis <= DASH)
-        {   //g.drawLine(x1, y1, x2, y2);
-//GWT
+        {   
         	g.beginPath();
         	g.moveTo(x1, y1);
         	g.lineTo(x2, y2);
@@ -867,8 +771,7 @@ extern op UNhidden gezet
             }    
             while (yStart < yEnd)
             {   if (dashOn)
-                {   //g.drawLine(xStart, yStart, xStart, Math.min(yStart + DASH, yEnd));
-//GWT                
+                {   
                 	g.beginPath();
             		g.moveTo(xStart, yStart);
             		g.lineTo(xStart, Math.min(yStart + DASH, yEnd));
@@ -895,8 +798,7 @@ extern op UNhidden gezet
             }    
             while (xStart < xEnd)
             {   if (dashOn)
-                {   //g.drawLine(xStart, yStart, Math.min(xStart + DASH, xEnd), yStart);
-//GWT                
+                {   
                 	g.beginPath();
                 	g.moveTo(xStart, yStart);
                 	g.lineTo(Math.min(xStart + DASH, xEnd), yStart);
@@ -928,11 +830,10 @@ extern op UNhidden gezet
             // find slope of segment
             double slope = ((double) (yEnd - yStart))/(xEnd - xStart);
             double alpha = Math.atan(slope);            
-//System.out.println("alpha = " + UF.format(alpha, 4));            
+            
             double length = pixDisD(xStart, yStart, xEnd, yEnd);
             int steps = (int) Math.round(
                 pixDisD(xStart, yStart, xEnd, yEnd) / DASH);
-//System.out.println("steps = " + steps);
                 
             for (int i = 1; i <= steps; i++)
             {   double xFrom = xStart + Math.cos(alpha) * DASH * (i - 1);
@@ -948,8 +849,7 @@ extern op UNhidden gezet
                     
                     
                 if ((i % 2) != 0)
-                {   //g.drawLine(xFrom, yFrom, xTo, yTo);
-//GWT
+                {   
                 	g.beginPath();
                 	g.moveTo(xFrom, yFrom);
                 	g.lineTo(xTo, yTo);
@@ -960,13 +860,6 @@ extern op UNhidden gezet
             
         }    
     }
-    
-    private double pixDis(int x1, int y1, int x2, int y2)
-    {   return Math.sqrt((x1 - x2) * (x1 - x2) +
-                         (y1 - y2) * (y1 - y2));
-        
-    }    
-
     private double pixDisD(double x1, double y1, double x2, double y2)
     {   return Math.sqrt((x1 - x2) * (x1 - x2) +
                          (y1 - y2) * (y1 - y2));
@@ -977,7 +870,7 @@ extern op UNhidden gezet
     {   CssColor result = c;
         if (c.toString().equals(DrawConstants.black.toString()))
             return DrawConstants.lightGray;
-// tijdelijk
+
         if (c.toString().equals(DrawConstants.blue.toString()))
             return DrawConstants.mediumBlue;
             
@@ -998,11 +891,10 @@ extern op UNhidden gezet
         // this should be >=0 and <= 1
         // see shadowGrayColor
         
-// voor 2D facets aparte kleurmogelijkheid        
         if (Vector3D.equals(f.unitNormal, new Vector3D()))
             return DrawConstants.black;
             
-// hier lichtrichting inbrengen            
+        // hier lichtrichting inbrengen            
         double grayFactor;
         if (reverseNormal)
             grayFactor = (f.unitNormal.x + f.unitNormal.y - f.unitNormal.z +
@@ -1030,15 +922,13 @@ extern op UNhidden gezet
         int red = 50 + (int)(fRed * grayFactor * (8e-1d) );
         int green = 50 + (int)(fGreen * grayFactor * (8e-1d) );
         int blue = 50 + (int)(fBlue * grayFactor * (8e-1d) );
-// nodig?
-if (red > 255)
-    red = 255;
-if (green > 255)
-    green = 255;
-if (blue > 255)
-    blue = 255;
-    
-    
+        // nodig?
+        if (red > 255)
+        	red = 255;
+        if (green > 255)
+        	green = 255;
+        if (blue > 255)
+        	blue = 255;
         
         return CssColor.make(red, green, blue);
     }
@@ -1060,14 +950,12 @@ if (blue > 255)
             grayFactor = 1;
         // use this for contrast
         // grayFactor = Math.pow(grayFactor, 3);
-            
-            
         int gray = (int)(255 * grayFactor * (8e-1d));
-// nodig?        
-if (gray > 255)
-    gray = 255;
-if (gray < 0)
-    gray = 0;
+        // nodig?        
+        if (gray > 255)
+        	gray = 255;
+        if (gray < 0)
+        	gray = 0;
         
         return CssColor.make(gray, gray, gray);
     }
@@ -1082,7 +970,6 @@ if (gray < 0)
         copy.hiddenOutlineMode = orig.hiddenOutlineMode;
         copy.edgeColors = orig.edgeColors;
         
-        //if (orig.numPoints == copy.numPoints)
         if (exact)
         {   for (int m = 0; m < orig.numPoints; m++)            
             {   copy.vertexCodes[m] = orig.vertexCodes[m];
@@ -1193,10 +1080,8 @@ if (gray < 0)
         if (f.numPoints > 2)
         {   Plane3D tPlane = new Plane3D(
                 f.normal.x, f.normal.y, f.normal.z,
-                Vector3D.dotProduct(f.normal,
-                                    f.points[0]));  
-// avoid collinearity        
-                //f.points[0], f.points[1], f.points[2]);
+                Vector3D.dotProduct(f.normal,f.points[0]));  
+        	// avoid collinearity        
             if (!tPlane.contains(v))
                 return false;
             // now v is in tPlane    
@@ -1282,12 +1167,6 @@ if (gray < 0)
         return f2Index;
     }
     
-/*
-hier wordt een nieuw facet gemaakt (de vertices blijven dezelfde!)
-beter?: draai alleen de vertices om
-van de referentie naar Facet3D f wordt een lokale kopie gemaakt
-dit is geen probleem zie Vector3D
-*/
     // reverse the orientation of this facet
     public static void reverse(Facet3D f)
     {   // new index array

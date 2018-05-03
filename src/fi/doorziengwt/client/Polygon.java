@@ -1,5 +1,10 @@
 package fi.doorziengwt.client;
 
+/**
+ * GWT does not have a class Polygon
+ * @author Peter Boon
+ */
+
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 

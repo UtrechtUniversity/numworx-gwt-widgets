@@ -1,22 +1,57 @@
 package fi.doorziengwt.client;
 
-
-//import java.awt.Color;
 import com.google.gwt.canvas.dom.client.CssColor;
 
-// for parametrized surfaces use another abstract class in between
-// Object3D and the actual object
+/**
+ * creating parametric surfaces; use another abstract class in between
+ * Object3D and the actual parametric surface; note that a parameric surface
+ * is obtained as the image of a map [uMin,uMax]x[vMin,vMax] into 3d-space;
+ * points on the surface (thus facets of the surface) are generated
+ * by taking uSteps resp. vSteps of size uStep resp. vStep in the u- resp. v-direction; <br>
+ * NB: it is assumed that uMin+uSteps*uStep=uMax, similar for v;
+ * see Grafiek3DGWT for more parametric surfaces
+ * @author huub
+ */
+
 public abstract class ParamSurface extends Object3D
-{   int paramNum;
+{   
+	/**
+	 * the number of parameters of the parametric surface 
+	 */
+	int paramNum;
+	/**
+	 * the parameters of the parametric surface
+	 */
     double[] params;
-    double uMin, uMax, vMin, vMax, uStep, vStep;
+    /**
+     * minimum, maximum u-coordinates, u-step size
+     */
+    double uMin, uMax, uStep;
+    /**
+     * minimum, maximum v-coordinates, v-step size
+     */
+    double vMin, vMax, vStep;
+    /**
+     * number of u- resp. v-steps
+     */
     int uSteps, vSteps;
+    /**
+     * should the normal be reversed? <br>
+     * depending on the parametrization, the normal of
+     * each facet might point to the inside of the surface;
+     * in case case, set reverseNormal to true 
+     */
     boolean reverseNormal = false;
+    /**
+     * the color of the paramatric surface
+     */
     CssColor sColor;
-    // create vertices then facets    
+
+    /**
+     * creates the vertices, then the facets, take care of reverseNormal
+     */
     public void create()
     {   
-        
         numVertices = (uSteps + 1) * (vSteps + 1);
         vertices = new Vector3D[numVertices];
         // do NOT forget this
@@ -45,7 +80,12 @@ public abstract class ParamSurface extends Object3D
             }
            
     }    
-    // redefined??
+    /**
+     * use more points and smaller facets (less points and larger facets)
+     * to render this parametric surface; do this by doubling (halving)
+     * uSteps and vSteps, then recalculating uStep and vStep   
+     * @param b true: more points; false: less points
+     */
     public void setFiner(boolean b)
     {   if (b && (uSteps * vSteps < 1000))
         {   uSteps *= 2; vSteps *= 2;
@@ -54,14 +94,17 @@ public abstract class ParamSurface extends Object3D
         if (!b && (uSteps * vSteps > 100))
         {   uSteps /= 2; vSteps /= 2;
         }    
-        // finds stepsizes
+        // finds step sizes
         uStep = (uMax - uMin) / uSteps;
         vStep = (vMax - vMin) / vSteps;
         create();
         // center/diameter remain unchanged
     }    
-    // set the parameters of copy equal to the parameters of
-    // this surface
+    /**
+     * copy the parameters of this parametric surface into the the parameters of
+     * parametric surface copy
+     * @param copy parametric surface whose parameters are set 
+     */
     public void copyParameters(ParamSurface copy)
     {   copy.paramNum = paramNum;
         copy.params = new double[paramNum];
@@ -79,8 +122,12 @@ public abstract class ParamSurface extends Object3D
         copy.sColor = sColor;
         
     }    
-    // A is label number 1, Z is number 26
-    // AA is number 27
+    /**
+     * given an index, get the corresponding label:
+     * A is label number 1, Z is number 26, AA is label number 27 etc. 
+     * @param i index of label
+     * @return corresponding label (a String)
+     */
     public String getLabel(int i)
     {   String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int cycles = (i - 1) / 26;
@@ -93,17 +140,37 @@ public abstract class ParamSurface extends Object3D
     
         return result;
     }
-    
+
+    /**
+     * redefine in subclasses
+     * @param u u-coordinate for the function value (a point in 3-space)
+     * @param v v-coordinate for the function value (a point in 3-space)
+     * @return the function value (a point in 3-space) at the point (u,v)
+     */
     abstract public Vector3D getValueAt(double u, double v);
 }
 
-
-// an ellipsoid
+/**
+ * an ellipsoid as parametric surface: parametrization<br>
+ * (a*cos(v)*cos(u),b*cos(v)*sin(u),c*sin(v)) with (u,v) in 
+ * [0,2Pi)x[-Pi/2,Pi/2)
+ * @author huub
+  */
 class Ellipsoid extends ParamSurface
-{   // "empty" ellipsoid, use for copying
+{   
+	/**
+	 * empty ellipsoid, use for copying
+	 */
     public Ellipsoid()
     {
     }    
+    /**
+     * constructor
+     * @param bigC half-length of first axis (in the x-direction)
+     * @param smallC1 half-length of second axis (in the y-direction)
+     * @param smallC2 half-length of third axis (in the z-direction)
+     * @param oc color of this ellipsoid
+     */
     public Ellipsoid(double bigC, double smallC1, double smallC2, CssColor oc)
     {   paramNum = 3;
         params = new double[3];
@@ -124,7 +191,8 @@ class Ellipsoid extends ParamSurface
         // create facets
         sColor = oc;
         create();
-        
+
+        // add labels to vertices
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
             {   int index = facets[fCnt].indices[vCnt];
@@ -141,7 +209,6 @@ class Ellipsoid extends ParamSurface
                     if (cyclePos < uSteps)
                     {    facets[fCnt].vertexLabels[vCnt] =
                             getLabel(uSteps * (cycleNum - 1) + cyclePos + 2);
-//                         numVertexLabels++;              
                     }        
                     else // cyclePos == uSteps
                     {   facets[fCnt].vertexLabels[vCnt] =
@@ -165,15 +232,18 @@ class Ellipsoid extends ParamSurface
         initObject3D(true, new Vector3D(), false);        
     } // constructor
     
-    // parametrization
-    // [0,2Pi)x[-Pi/2,Pi/2)->space
-    // ( a*cos(v)*cos(u), b*cos(v)*sin(u), c*sin(v) )
+    /**
+     * see parametrization in class description 
+     */
     public Vector3D getValueAt(double u, double v)
     {   return new Vector3D( params[0] * Math.cos(v) * Math.cos(u),
                              params[1] * Math.cos(v) * Math.sin(u),
                              params[2] * Math.sin(v));
     }
-    
+
+    /**
+     * make a deep copy of this Ellipsoid
+     */
     public Object3D deepCopy()
     {   Ellipsoid copy = new Ellipsoid();
         copyParameters(copy);
@@ -183,13 +253,33 @@ class Ellipsoid extends ParamSurface
     
 } // class Ellipsoid
 
-// a cylinder
+/**
+ * a cylinder standing upright in space; parametrization: <br>
+ * (radius*cos(u),radius*sin(u),v) with (u,v) in
+ * [0,2Pi)x[-height/2,height/2]
+ * @author huub
+ */
 class Cylinder extends ParamSurface
-{   boolean top, bottom;
-    // "empty" cylinder, use for copying
+{   
+	/**
+	 * does the cylinder have a top or a bottom?
+	 */
+	boolean top, bottom;
+
+	/**
+	 * empty cylinder, use for copying
+	 */
     public Cylinder()
     {
-    }    
+    }
+    /**
+     * constructor
+     * @param radius radius of the cylinder
+     * @param height height of the cylinder
+     * @param oc color of the cylinder
+     * @param t should a top be added?
+     * @param b should a bottom be added?
+     */
     public Cylinder(double radius, double height, CssColor oc, boolean t, boolean b)
     {   top = t;
         bottom = b;
@@ -212,9 +302,7 @@ class Cylinder extends ParamSurface
         sColor = oc;
         create();
         
-        
-//        numVertexLabels = 0;
-        
+        // add labels to vertices
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
             {   int index = facets[fCnt].indices[vCnt];
@@ -226,7 +314,7 @@ class Cylinder extends ParamSurface
                     if (cyclePos < uSteps)
                     {   facets[fCnt].vertexLabels[vCnt] =
                             getLabel(cyclePos + 1);                
-//                         numVertexLabels++;           
+          
                     }
                     else // cyclePos == uSteps
                         facets[fCnt].vertexLabels[vCnt] =
@@ -238,7 +326,6 @@ class Cylinder extends ParamSurface
                     if (cyclePos < uSteps)
                     {    facets[fCnt].vertexLabels[vCnt] =
                             getLabel(uSteps * cycleNum + cyclePos + 1);
-//                         numVertexLabels++;              
                     }        
                     else // cyclePos == uSteps
                     {   facets[fCnt].vertexLabels[vCnt] =
@@ -247,7 +334,7 @@ class Cylinder extends ParamSurface
                 }        
             }    
         
-        
+        // add top (one facet)
         if (top)
         {
             // by construction the vertices of the top are in positions
@@ -266,10 +353,11 @@ class Cylinder extends ParamSurface
             addFacet(f);
             
         }
+        //add bottom (one facet)
         if (bottom)
         {
             // by construction the vertices of the bottom are in positions
-            // 0...uSteps with first and last equal
+            // 0,...,uSteps with first and last equal
             int[] inds = new int[uSteps];
             for (int i = 0; i < uSteps; i++)
                 inds[i] = uSteps - i - 1;
@@ -284,8 +372,6 @@ class Cylinder extends ParamSurface
             addFacet(f);
             
         }    
-        
-                
         numVertexLabels = (vSteps + 1) * uSteps;      
         
         // find diameter
@@ -294,31 +380,18 @@ class Cylinder extends ParamSurface
         
     } // constructor
 
-/*    
-    // A is label number 1, Z is number 26
-    // AA is number 27
-    public String getLabel(int i)
-    {   String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int cycles = (i - 1) / 26;
-        int character = (i - 1) % 26;
-        String result = "";
-        // assume maximum 26*26=676 labels
-        if (cycles >= 1)
-            result += alphabet.charAt(cycles - 1);
-        result += alphabet.charAt(character);
-    
-        return result;
-    }
-*/    
-    // parametrization
-    // [0,2Pi)x[-height/2,height/2]->space
-    // ( radius*cos(u), radius*sin(u), v )
+    /**
+     * see parametrization in class description 
+     */
     public Vector3D getValueAt(double u, double v)
     {   return new Vector3D( params[0] * Math.cos(u),
                              params[0] * Math.sin(u),
                              v);
     }
-    
+
+    /**
+     * make a deep copy of this Cylinder
+     */
     public Object3D deepCopy()
     {   Cylinder copy = new Cylinder();
         copyParameters(copy);
@@ -331,13 +404,32 @@ class Cylinder extends ParamSurface
 } // class Cylinder
 
 
-// a (single) cone
+/**
+ * a cone (standing upright); parametrization: <br>
+ * (radius*cos(u),radius*sin(u),(-radius/height)*v+radius/2)
+ * with (u,v) in [0,2Pi)x[-height/2,height/2] 
+ * @author huub
+ */
 class Cone extends ParamSurface
-{   boolean bottom;
-    // "empty" cone, use for copying
+{   
+	/**
+	 * does this cone have a bottom?
+	 */
+	boolean bottom;
+
+	/**
+	 * empty cone, use for copying
+	 */
     public Cone()
     {
-    }    
+    }
+    /**
+     * constructor
+     * @param radius radius (at the bottom) of the cone
+     * @param height height of the cone
+     * @param oc color of the cone
+     * @param b should a bottom be added?
+     */
     public Cone(double radius, double height, CssColor oc, boolean b)
     {   bottom = b;
         paramNum = 2;
@@ -359,7 +451,7 @@ class Cone extends ParamSurface
         sColor = oc;
         create();
         
-        
+        // add labels to vertices
         for (int fCnt = 0; fCnt < numFacets; fCnt++)
             for (int vCnt = 0; vCnt < facets[fCnt].numPoints; vCnt++)
             {   int index = facets[fCnt].indices[vCnt];
@@ -383,11 +475,11 @@ class Cone extends ParamSurface
                         getLabel(uSteps * cycleNum + 1);                
                 }        
             }    
-        
+        // add bottom
         if (bottom)
         {  
             // by construction the vertices of the bottom are in positions
-            // 0, uSteps with first and last equal
+            // 0,...,uSteps with first and last equal
             int[] inds = new int[uSteps];
             for (int i = 0; i < uSteps; i++)
                 inds[i] = uSteps - i - 1;
@@ -408,26 +500,9 @@ class Cone extends ParamSurface
         initObject3D(true, new Vector3D(0, 0, - params[0] / 6), false);        
     } // constructor
     
-    
-    // A is label number 1, Z is number 26
-    // AA is number 27
-    public String getLabel(int i)
-    {   String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int cycles = (i - 1) / 26;
-        int character = (i - 1) % 26;
-        String result = "";
-        // assume maximum 26*26=676 labels
-        if (cycles >= 1)
-            result += alphabet.charAt(cycles - 1);
-        result += alphabet.charAt(character);
-    
-        return result;
-    }
-    
-    
-    // parametrization
-    // [0,2Pi)x[-height/2,height/2]->space
-    // ( radius*cos(u), radius*sin(u), (-radius/height)*v+radius/2 )
+    /**
+     * see parametrization in class description 
+     */
     public Vector3D getValueAt(double u, double v)
     {   // factor(v) is choosen such that 
         // factor(-height/2)=radius and factor(height/2)=0
@@ -436,7 +511,10 @@ class Cone extends ParamSurface
                              factorv * params[0] * Math.sin(u),
                              v);
     }
-    
+  
+    /**
+     * make a deep copy of this Cylinder
+     */
     public Object3D deepCopy()
     {   Cone copy = new Cone();
         copyParameters(copy);
@@ -448,133 +526,3 @@ class Cone extends ParamSurface
 } // class Cone
 
 
-/*
-// a double cone
-class DoubleCone extends ParamSurface
-{   boolean top, bottom;
-    // "empty" cone, use for copying
-    public DoubleCone()
-    {
-    }    
-    public DoubleCone(double radius, double height, Color oc, 
-                      boolean t, boolean b)
-    {   top = t;
-        bottom = b;
-        paramNum = 2;
-        params = new double[2];
-        params[0] = radius;
-        params[1] = height;
-        // u-range, v-range
-        uMin = 0;
-        uMax = 2 * Math.PI;
-        vMin = - params[1] / 2;
-        vMax = params[1] / 2;
-        // step number
-        uSteps = 20;
-        vSteps = 10;
-        // finds steps
-        uStep = (uMax - uMin) / uSteps;
-        vStep = (vMax - vMin) / vSteps;
-        // create facets
-        sColor = oc;
-        create();
-        if (top)
-        {
-            // by construction the vertices of the top are in positions
-            // 0+vSteps*(uSteps+1),...,uSteps+vSteps*(uSteps+1)with first
-            // and last equal
-            int[] inds = new int[uSteps];
-            for (int i = 0; i < uSteps; i++)
-                inds[i] = i + vSteps*(uSteps+1);
-            Facet3D f = new Facet3D(vertices, inds, sColor);
-            addFacet(f);
-        }
-        if (bottom)
-        {  
-            // by construction the vertices of the bottom are in positions
-            // 0, uSteps with first and last equal
-            int[] inds = new int[uSteps];
-            for (int i = 0; i < uSteps; i++)
-                inds[i] = uSteps - i - 1;
-            Facet3D f = new Facet3D(vertices, inds, sColor);
-            addFacet(f);
-        }    
-        // find diameter
-        // center is at (0,0,0) no need to calculate or center
-        initObject3D(true, new Vector3D(), false);        
-    }
-    // parametrization
-    // [0,2Pi)x[-height/2,height/2]->space
-    // ( radius*cos(u), radius*sin(u), (-radius/height)*v+radius/2 )
-    public Vector3D getValueAt(double u, double v)
-    {   // factor(v) is choosen such that 
-        // factor(-height/2)=radius and factor(0)=0
-        double factorv = (-2*params[0]/params[1])*v;
-        return new Vector3D( factorv * params[0] * Math.cos(u),
-                             factorv * params[0] * Math.sin(u),
-                             v);
-    }
-    
-    public Object3D deepCopy()
-    {   DoubleCone copy = new DoubleCone();
-        copyParameters(copy);
-        copy.top = top;
-        copy.bottom = bottom;
-        makeDeepObjectCopy(copy);
-        return copy;        
-    }   
-    
-} // class DoubleCone
-*/
-/*
-// a torus
-class Torus extends ParamSurface
-{   public Torus()
-    {
-    }
-    public Torus(double bigC, double smallC1, double smallC2, Color oc)
-    {   
-        paramNum = 3;
-        params = new double[3];
-        params[0] = bigC;
-        params[1] = smallC1;
-        params[2] = smallC2;
-        // u-range, v-range
-        uMin = 0;
-        uMax = 2 * Math.PI;
-        vMin = 0;
-        vMax = 2 * Math.PI;
-        // step number
-        uSteps = 20;
-        vSteps = 10;
-        // finds steps
-        uStep = (uMax - uMin) / uSteps;
-        vStep = (vMax - vMin) / vSteps;
-        // find facet number
-//        numFacets = uSteps * vSteps;
-        // create facets
-        sColor = oc;
-        create();
-        double d = 2 * (params[0] + params[1]);
-        // center is at (0,0,0) no need to calculate or center        
-        initObject3D(true, new Vector3D(), false);
-        
-    }
-    // parametrization
-    // [0,2Pi)x[0,2Pi)->space
-    // ( (a+b*cos(v))*cos(u), (a+b*cos(v))*sin(u), c*sin(v) )
-    public Vector3D getValueAt(double u, double v)
-    {   return new Vector3D( (params[0] + params[1] * Math.cos(v)) * Math.cos(u),
-                             (params[0] + params[1] * Math.cos(v)) * Math.sin(u),
-                             params[2] * Math.sin(v));
-    }
-    
-    public Object3D deepCopy()
-    {   Torus copy = new Torus();
-        copyParameters(copy);
-        makeDeepObjectCopy(copy);
-        return copy;        
-    }   
-    
-} // class Torus
-*/

@@ -4,7 +4,6 @@
  */
 package fi.doorziengwt.client;
 
-//import java.util.Random;
 
 /*
 
@@ -102,7 +101,9 @@ public class StringUtils {
      * characters not contained within legalChars, containsOnly() will return
      * true, otherwise it will return false.
      * </P>
-     * 
+     * @param inputString String to check
+     * @param legalChars String containing legal characters 
+     * @return true/false
      * <P>
      * Note that containsOnly will always return true if inputString is null.
      * </P>
@@ -131,6 +132,9 @@ public class StringUtils {
      * <P>
      * This method takes an inputString and counts the number of times that
      * patternString occurs within it.
+     * @param inputString String to check
+     * @param patternString String with pattern to search for
+     * @return number of times that patternString occurs within inputString
      * </P>
      */
     public static int count(String inputString, String patternString) {
@@ -161,7 +165,9 @@ public class StringUtils {
      * splitString. The splitString divider will not be returned in the split
      * strings.
      * </P>
-     * 
+     * @param inputString String to split
+     * @param splitString splitting occurs at splitString
+     * @return array of Strings between occurrences of SplitString
      * <P>
      * In particular, this can be used to split a multiline String into an array
      * of Strings by using a splitString of "\n". The resulting strings will not
@@ -201,6 +207,10 @@ public class StringUtils {
      * <p>
      * This method behaves like String.replace(), but replaces substrings rather
      * than chars.
+     * @param inputString String to modify
+     * @param splitString subString to replace
+     * @param joinString replacement for splitString
+     * @return modified String 
      * </p>
      */
 

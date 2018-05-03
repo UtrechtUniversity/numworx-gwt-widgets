@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
-//import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -13,49 +12,86 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-
-import com.google.gwt.canvas.dom.client.CssColor;
-
 import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
-import java.util.logging.Logger;
-
 import fi.doorziengwt.client.text.Text;
 
-public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionView 
+/**
+ * main class for DoorzienGWT; note that DoorzienGWT has two 
+ * appearances: <br>
+ * 1) just a viewer where the 3d-object can be rotated (and folded in or out if it is a foldout) <br>
+ * 2) a toolpanel consisting of a viewer with a menubar (a menu for choosing figures and a menu for options)
+ * on top and toolbars on top and on the right with (toggle)buttons to modify the figure; availability of the 
+ * menus and the tools are determined by the launch data<br>
+ * optionally the viewer contains a tools-button to open the toolpanel (with the same 3d-object),
+ * and a reset button (resetting to the original launch data figure),
+ * while the toolpanel contains a close-button to close the toolpanel and show the same 3d-object
+ * in just the viewer; 
+ * this class handles button action in viewer mode and menu choices in toolpanel mode;
+ * versions: <br>
+ * EPN: drawing lines and planes one at a time, that is, after finishing a line or plane, the drawing mode is ended;<br>
+ * only points on the initial object can be used to draw lines or planes;<br>
+ * FI: drawing multiple lines and planes, that is, after finishing a line or plane, we stay in drawing mode; <br>
+ * all points can be used for drawing lines, planes etc.<br>
+ * preview (FI-mode) is not implemented since there is no MouseMove on the tablet.  
+ * @author huub
+ */
+
+public class DoorzienGWT implements EntryPoint, InteractionStub 
 {
 	public static Text rb;
 	
 	private static Logger logger = Logger.getLogger("DoorzienGWT");
 	
+	/**
+	 * the menu bar
+	 */
 	MenuBar menuBar;
+	/**
+	 * the menus for choosing figures or options 
+	 */
 	MenuBar figurenMenu, optiesMenu;
 	
+	/**
+	 * options menu: number of help points (tick marks), lettering vertices
+	 */
 	MenuItem geenHulpPuntenItem, eenHulpPuntItem, tweeHulpPuntenItem, drieHulpPuntenItem, vierHulpPuntenItem, lettersItem;
+	/**
+	 * options menu: central or parallel projection
+	 */
 	MenuItem centraleProjectieItem, parallelProjectieItem;
-	MenuItem achtvlakItem, balkItem, cilinderItem, piramideHuisItem, schildHuisItem,
-		     kegel1Item, kegel2Item, kegel3Item, kegel4Item, kubusItem, 
-		     piramide3Item, piramide4Item, piramide5Item, piramide6Item, piramide7Item, piramide8Item,
-		     prisma3Item, prisma4Item, prisma5Item, prisma6Item, twaalfvlakItem, twintigvlakItem, viervlakItem,
-		     mijnFiguurItem;
-	MenuBar huizenMenu, kegelsMenu,piramidesMenu, prismasMenu; 
 	
-	// constants for figures
+	/**
+	 * figures menu: 
+	 */
+	MenuItem achtvlakItem, balkItem, cilinderItem, kubusItem, twaalfvlakItem, twintigvlakItem, viervlakItem;
+
+	/**
+	 * figure submenus
+	 */
+	MenuBar huizenMenu, kegelsMenu,piramidesMenu, prismasMenu;
+	/**
+	 * figure submenus items: piramideHuisItem, schildHuisItem, kegel1Item, kegel2Item, kegel3Item, kegel4Item,  
+	 */
+	MenuItem piramideHuisItem, schildHuisItem, kegel1Item, kegel2Item, kegel3Item, kegel4Item,
+			 piramide3Item, piramide4Item, piramide5Item, piramide6Item, piramide7Item, piramide8Item,
+			 prisma3Item, prisma4Item, prisma5Item, prisma6Item;
+	
+	/**
+	 * constants for figures
+	 */
 	public static final int OCTAHEDRON = 0;
 	public static final int BLOCK = 1;
 	public static final int CYLINDER = 2;
@@ -84,56 +120,86 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	public static final int ICOSAHEDRON = 9;	
 	public static final int TETRAHEDRON = 10;
 
+	/**
+	 * constant for user figure 
+	 */
 	public static final int MYFIGURE = 100;
 	
-	// versions
+	/**
+	 * version constants
+	 */
     public static final int EPN = 0;
     public static final int FI = 1;
-    public static int version = EPN;
+    /**
+     * actual version
+     */
+    public static int version = FI; //EPN; 
 	
-    ObjectGroup3D startModel;
-    
- // circle radius for rotate modes
-    public static double RADFACTOR = 1d;
-    boolean dragging = false;
-    boolean inCircle = false;
-    int xStart, yStart;
-    
     static final String holderId = "dockholder";
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	
-	// UI
+	/**
+	 * basic LayoutPanel: contains an instance canvasPanel of LayoutPanel in viewer mode
+	 * and contains an instance doorzienGWTDock of DockLayoutPanel in toolpanel mode  
+	 */
 	LayoutPanel dlp;
-	LayoutPanel bottomPanel;
-	LayoutPanel canvasPanel;
+	/**
+	 * class managing the viewer (simplified version of DrawingPanel2)
+	 */
 	DrawingShell drawingShell;
+	/**
+	 * a LayoutPanel containing an instance of Canvas from drawingShell and (optionally) 
+	 * a toolsButton and a resetButton 
+	 */
+	LayoutPanel canvasPanel;
 	
-	// Popup met inhoud
-	//PopupPanel doorzienGWTPopup;
-	DockLayoutPanel doorzienGWTDock; //tool
+	/**
+	 * DockLayoutPanel for the toolPanel mode: this contains a menu bar (optional) and a tool bar on top,
+	 * a tool bar on the right and an instance of DrawingPanel2 (a LayoutPanel) which in turn contains
+	 * the drawing Canvas, see method amkeTool()  
+	 */
+	DockLayoutPanel doorzienGWTDock; 
 	
+	/**
+	 * general layout constants
+	 */
 	int breedte = 500;
 	int hoogte = 450;
-	int bottomHeight = 32;
 	int leftOffset = 5;
 	int topOffset = 5;
 	
-	//int popupBreedte = 600;
-	//int popupHoogte = 550;
-	
+	/**
+	 * toolpanel layout constants 
+	 */
 	int topBarHeight;
 	int menuHeight = 25;
-	int topToolBarHeight = 55; // inclusief de helpbar
+	int topToolBarHeight = 55; 
 	int rightToolBarWidth = 50;
+	/**
+	 * top bar of toolpanel, contains (optionally) a menubar and a top tool bar
+	 */
 	LayoutPanel topBar;
+	/**
+	 * top tool bar of toolpanel, this included the help label
+	 */
 	TopToolBar2 topToolBar;
+	/**
+	 * right tool bar of toolpanel
+	 */
 	RightToolBar2 rightToolBar;
+	/**
+	 * instance of LatoutPanel containing a drawing Canvas and managing all design changes to the 3d-figure
+	 */
 	DrawingPanel2 drawingPanel;
+	/**
+	 * label displaying help, included in TopToolBar2 
+	 */
 	Label helpBar;
 	
-	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
-	
+	/**
+	 * launch data
+	 */
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
@@ -154,11 +220,16 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	  hideCutImage, showCutImage, lengLinesImage, shortLinesImage, solidImage, wireframeImage,
     	  redoImage, undoImage;
 	
+	/**
+	 * (optional) buttons for viewer mode
+	 */
 	PushButton toolsButton, resetButton;
-	
+
+	/**
+	 * parametrisation: toolpanel mode
+	 */
 	boolean figurenMenuOptie = true;
 	boolean optiesMenuOptie = true;
-	boolean helpBarOptie = true;
 	
 	boolean lijnTekenOptie = true;
 	boolean lijnVerlengOptie = true;
@@ -170,26 +241,45 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	
 	boolean bouwplaatOptie = true;
 	
+	/**
+	 * not implemented
+	 */
 	boolean previewOptie = false;
 	
+	/**
+	 * parametrisation: viewer mode 
+	 */
 	boolean designOption = true;
 	boolean resetOption = true;
-	
 	boolean borderOption = false;
-	
+
+	/**
+	 * user options
+	 */
 	boolean letters = false;
 	boolean hulpPunten = false;
 	boolean centraleProjectie = true;
 	
+	/**
+	 * initial 3d-figure from launchdata
+	 */
 	HashMap<String,Object> resetState = null;
-	
+
+	/**
+	 * number of lines/planes in the initial 3d-figure from launchdata;
+	 * necessary to correctly initialize the top tool bar in toolpanel mode
+	 */
 	int numLines = 0;
 	int numPlanes = 0;
 	
+	/**
+	 * is the toolpanel visible? if not, the viewer is visible (this used to be a popup)
+	 */
 	boolean popupVisible = false;
 	
-	boolean touchStart = false;
-	
+	/**
+	 * insert Css, get ImageResources and tirn them into Images
+	 */
 	public void getImages() 
 	{
 		rb = GWT.create(Text.class);
@@ -309,11 +399,13 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 	}
 
+	/**
+	 * create the toolPanel: on top a menubar (optional) and a toolbar (including help bar),
+	 * on the right another toolbar  
+	 */
 	public void makeTool()
 	{
-		//if (doorzienGWTPopup != null)
-		//	return;
-		
+		// any menu's?
 		if (figurenMenuOptie || optiesMenuOptie)
 			topBarHeight = menuHeight + topToolBarHeight;
 		else
@@ -326,6 +418,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		topBar = new LayoutPanel();
 		topBar.setSize("" + breedte + "px", "" + topBarHeight + "px");
 		
+		// create the menus
 		if (figurenMenuOptie || optiesMenuOptie)
 		{	makeMenus();
 			topBar.add(menuBar);
@@ -333,6 +426,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			topBar.setWidgetTopHeight(menuBar, 0, Style.Unit.PX, menuHeight, Style.Unit.PX);
 		}
 		
+		// top tool bar
 		topToolBar = new TopToolBar2(this, breedte);
 		topToolBar.addStyleName(doorzienGWTCss.toolbar());
 		topBar.add(topToolBar);
@@ -343,35 +437,28 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			topBar.setWidgetTopHeight(topToolBar, 0, Style.Unit.PX, topBarHeight, Style.Unit.PX);
 		
 		doorzienGWTDock.addNorth(topBar, topBarHeight);
-		//doorzienGWTDock.addNorth(topToolBar, topToolBarHeight);
-		
+
+		// right tool bar
 		rightToolBar = new RightToolBar2(this);
 		rightToolBar.addStyleName(doorzienGWTCss.toolbar());
 		doorzienGWTDock.addEast(rightToolBar, rightToolBarWidth);
 		
 		drawingPanel = new DrawingPanel2(this, breedte - rightToolBarWidth,
 										 hoogte - topBarHeight, CUBE);
-		//doorzienGWTDock.add(drawingPanel.drawingPanelCanvas);
+		// drawing area
 		doorzienGWTDock.add(drawingPanel);
 		
-/*		
-		figureToPopup();
-			
-		int popupX = dlp.getAbsoluteLeft();
-		int popupY = dlp.getAbsoluteTop();
-		
-		//if (doorzienGWTPopup == null)
-		doorzienGWTPopup = new PopupPanel();
-		doorzienGWTPopup.setWidget(doorzienGWTDock);
-		doorzienGWTPopup.setPopupPosition(popupX, popupY);
-		doorzienGWTPopup.show();
-*/
 	}
-	
+
+	/**
+	 * create menus and submenus
+	 */
 	public void makeMenus()
 	{
+		// main menu bar
 		menuBar = new MenuBar();
 		
+		// figure menu
 		figurenMenu = new MenuBar(true);
 		figurenMenu.addItem(rb.achtvlakTekst(), new MenuCommand("achtvlak"));
 		figurenMenu.addItem(rb.balkTekst(), new MenuCommand("balk"));
@@ -380,17 +467,19 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		figurenMenu.addItem(rb.twaalfVlakTekst(), new MenuCommand("twaalfvlak"));
 		figurenMenu.addItem(rb.twintigVlakTekst(), new MenuCommand("twintigvlak"));
 		figurenMenu.addItem(rb.vierVlakTekst(), new MenuCommand("viervlak"));
+		// submenu huizen
 		huizenMenu = new MenuBar(true);
 		huizenMenu.addItem(rb.piramideDakTekst(), new MenuCommand("piramidehuis"));
 		huizenMenu.addItem(rb.schildDakTekst(), new MenuCommand("schildhuis"));
 		figurenMenu.addItem(rb.huizenTekst(), huizenMenu);
+		// submenu cones
 		kegelsMenu = new MenuBar(true);
 		kegelsMenu.addItem(rb.kegel1Tekst(), new MenuCommand("kegel1"));
 		kegelsMenu.addItem(rb.kegel2Tekst(), new MenuCommand("kegel2"));
 		kegelsMenu.addItem(rb.kegel3Tekst(), new MenuCommand("kegel3"));
 		kegelsMenu.addItem(rb.kegel4Tekst(), new MenuCommand("kegel4"));
 		figurenMenu.addItem(rb.kegelsTekst(), kegelsMenu);
-		//figurenMenu.addItem(rb.kubusTekst(), new MenuCommand("kubus"));
+		// submenu piramides
 		piramidesMenu = new MenuBar(true);
 		piramidesMenu.addItem(rb.piramide3Tekst(), new MenuCommand("piramide3"));
 		piramidesMenu.addItem(rb.piramide4Tekst(), new MenuCommand("piramide4"));
@@ -399,18 +488,16 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		piramidesMenu.addItem(rb.piramide7Tekst(), new MenuCommand("piramide7"));
 		piramidesMenu.addItem(rb.piramide8Tekst(), new MenuCommand("piramide8"));
 		figurenMenu.addItem(rb.piramidesTekst(), piramidesMenu);
+		// submenu prisms
 		prismasMenu = new MenuBar(true);
 		prismasMenu.addItem(rb.prisma3Tekst(), new MenuCommand("prisma3"));
 		prismasMenu.addItem(rb.prisma4Tekst(), new MenuCommand("prisma4"));
 		prismasMenu.addItem(rb.prisma5Tekst(), new MenuCommand("prisma5"));
 		prismasMenu.addItem(rb.prisma6Tekst(), new MenuCommand("prisma6"));
 		figurenMenu.addItem(rb.prismasTekst(), prismasMenu);
-		//figurenMenu.addItem(rb.twaalfVlakTekst(), new MenuCommand("twaalfvlak"));
-		//figurenMenu.addItem(rb.twintigVlakTekst(), new MenuCommand("twintigvlak"));
-		//figurenMenu.addItem(rb.vierVlakTekst(), new MenuCommand("viervlak"));
-		
+
+		// options menu
 		optiesMenu = new MenuBar(true);
-		
 		geenHulpPuntenItem = new MenuItem(rb.geenHulppuntenTekst(),new MenuCommand("hp0"));
 		eenHulpPuntItem = new MenuItem(rb.eenHulppuntTekst(),new MenuCommand("hp1"));
 		tweeHulpPuntenItem = new MenuItem(rb.tweeHulppuntenTekst(),new MenuCommand("hp2"));
@@ -418,12 +505,10 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		vierHulpPuntenItem = new MenuItem(rb.vierHulppuntenTekst(),new MenuCommand("hp4"));
 		
 		if (hulpPunten)
-		{	//geenHulpPuntenItem = new MenuItem("geen hulppunten",new MenuCommand("hulppunten"));
-			eenHulpPuntItem.setStyleName(doorzienGWTCss.boldmenuitem());
+		{	eenHulpPuntItem.setStyleName(doorzienGWTCss.boldmenuitem());
 		}
 		else
-		{	//hulpPuntenItem = new MenuItem("toon hulppunten",new MenuCommand("hulppunten"));
-			geenHulpPuntenItem.setStyleName(doorzienGWTCss.boldmenuitem());
+		{	geenHulpPuntenItem.setStyleName(doorzienGWTCss.boldmenuitem());
 		}
 
 		if (letters)
@@ -435,17 +520,12 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		parallelProjectieItem = new MenuItem(rb.parallelProjTekst(),new MenuCommand("pprojectie"));
 		if (centraleProjectie)
 		{
-//			centraleProjectieItem = new MenuItem("centrale projectie",new MenuCommand("cprojectie"));
-//			parallelProjectieItem = new MenuItem("parallelprojectie",new MenuCommand("pprojectie"));
 			centraleProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
 		}
 		else
 		{
-//			centraleProjectieItem = new MenuItem("centrale projectie",new MenuCommand("cprojectie"));
-//			parallelProjectieItem = new MenuItem("parallelprojectie",new MenuCommand("pprojectie"));
 			parallelProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
 		}
-		
 		
 		optiesMenu.addItem(geenHulpPuntenItem);
 		optiesMenu.addItem(eenHulpPuntItem);
@@ -466,12 +546,18 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 	}	
 		
+	/**
+	 * set lettering to default none, adapt menu
+	 */
 	public void resetLetters()
 	{
 		letters = false; 
 		lettersItem.setText(rb.toonLettersTekst());
 	}
 	
+	/**
+	 * set projection to default central projection, adapt menu
+	 */
 	public void resetProjection()
 	{
 		centraleProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
@@ -480,6 +566,9 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 	}
 	
+	/**
+	 * set help points to default none, adapt menu
+	 */
 	public void resetHelpPoints()
 	{
 		setHulpToNormal(geenHulpPuntenItem);
@@ -488,6 +577,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 	}
 	
+	/**
+	 * after selecting a menuItem for help points (which is boldened)
+	 * "unbold" the other help points menuItems   
+	 * @param mi menuItem selected
+	 */
 	public void setHulpToNormal(MenuItem mi)
 	{
 		if (mi != geenHulpPuntenItem)
@@ -501,9 +595,14 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (mi != vierHulpPuntenItem)
 			vierHulpPuntenItem.setStyleName(doorzienGWTCss.normalmenuitem());
 	}
-	
+
+	/**
+	 * menu actions
+	 * @param s String from menuCommand
+	 */
 	public void menuAction(String s)
 	{
+		// figures
 		if (s.equals("achtvlak"))
 		{	drawingPanel.setNewModel(OCTAHEDRON);
 		}
@@ -574,23 +673,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		{	drawingPanel.setNewModel(TETRAHEDRON);
 		}
 		
-/*		
-		else if (s.equals("hulppunten"))
-		{
-			if (hulpPuntenItem.getText().equals("toon hulppunten"))
-			{
-				hulpPuntenItem.setText("geen hulppunten");
-				drawingPanel.setHelpPointDrop(true);
-			}
-			else 
-			{
-				hulpPuntenItem.setText("toon hulppunten");
-				drawingPanel.setHelpPointDrop(false);
-				
-			}
-		}
-*/		
-		
+		// help points
 		else if (s.equals("hp0"))
 		{
 			setHulpToNormal(geenHulpPuntenItem);
@@ -627,8 +710,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			hulpPunten = true;
 		}
 
-
-			
+		// lettering, change meniItem text
 		else if (s.equals("letters"))
 		{
 			if (lettersItem.getText().equals(rb.toonLettersTekst()))
@@ -646,34 +728,29 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				
 			}
 		}
+		// central projection
 		else if (s.equals("cprojectie"))
 		{
-			//if (centraleProjectieItem.getText().equals("- centrale projectie"))
-			//{
-				//centraleProjectieItem.setText("+ centrale projectie");
-				//parallelProjectieItem.setText("- parallelprojectie");
-				centraleProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
-				parallelProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
-				drawingPanel.setProjection(DrawingPanel2.CENTRALPROJ);
-				centraleProjectie = true;
-			//}
+			centraleProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
+			parallelProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
+			drawingPanel.setProjection(DrawingPanel2.CENTRALPROJ);
+			centraleProjectie = true;
 		}
+		// parallel projection
 		else if (s.equals("pprojectie"))
 		{
-			//if (parallelProjectieItem.getText().equals("- parallelprojectie"))
-			//{
-				//centraleProjectieItem.setText("- centrale projectie");
-				//parallelProjectieItem.setText("+ parallelprojectie");
-				centraleProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
-				parallelProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
-				drawingPanel.setProjection(DrawingPanel2.PARALLELPROJ);
-				centraleProjectie = false;
-			//}
+			centraleProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
+			parallelProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
+			drawingPanel.setProjection(DrawingPanel2.PARALLELPROJ);
+			centraleProjectie = false;
 		}
 		
 		
 	}
-	
+
+	/**
+	 * inner class for handling menu choices 
+	 */
 	class MenuCommand implements Command
 	{
 		String cmdString = "";
@@ -691,15 +768,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 	
 	public DoorzienGWT()
 	{
-		//this(null, null, null);
 	}
-	
-	
 	
 	public DoorzienGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
 		
-//System.out.println("constructor");
 		ObjectMap h = JSONUtilities.wrapMap(map);
 
 		this.randomVarNamen = randomVarNamen;
@@ -710,7 +783,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (h.containsKey("hoogte"))
 			hoogte = h.getInt("hoogte");
 		if (h.containsKey("interactiePanelLaunchState"))
-			//launchState = (Map<String, Object>) h.get("interactiePanelLaunchState");
 			launchState = h.getMap("interactiePanelLaunchState");
 		
 		getImages();
@@ -719,118 +791,25 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		dlp.addStyleName(doorzienGWTCss.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
-		//RootPanel.get(holderId).add(dlp);
-		//RootPanel.get(holderId).addStyleName(doorzienGWTCss.root());
-		
-		
-		//Stub.publish(this);
 		init(breedte, hoogte, launchState, randomVarWaarden);
 
-/*
-		if (launchState != null && launchState.get("lijnTekenOptie") != null)
-			lijnTekenOptie = (Boolean) launchState.get("lijnTekenOptie");
-		if (launchState != null && launchState.get("lijnVerlengOptie") != null)
-			lijnVerlengOptie = (Boolean) launchState.get("lijnVerlengOptie");
-
-		if (launchState != null && launchState.get("vlakTekenOptie") != null)
-			vlakTekenOptie = (Boolean) launchState.get("vlakTekenOptie");
-		if (launchState != null && launchState.get("evenwijdigVlakOptie") != null)
-			evenwijdigVlakOptie = (Boolean) launchState.get("evenwijdigVlakOptie");
-
-		if (launchState != null && launchState.get("toonDoorsnedeOptie") != null)
-			toonDoorsnedeOptie = (Boolean) launchState.get("toonDoorsnedeOptie");
-		if (launchState != null && launchState.get("splitsFiguurOptie") != null)
-			splitsFiguurOptie = (Boolean) launchState.get("splitsFiguurOptie");
-		
-		if (launchState != null && launchState.get("bouwplaatOptie") != null)
-			bouwplaatOptie = (Boolean) launchState.get("bouwplaatOptie");
-		
-		if (launchState != null && launchState.get("previewOptie") != null)
-			previewOptie = (Boolean) launchState.get("previewOptie");
-
-		if (launchState != null && launchState.get("designOption") != null)
-			designOption = (Boolean) launchState.get("designOption");
-
-		if (launchState != null && launchState.get("resetOption") != null)
-			resetOption = (Boolean) launchState.get("resetOption");
-
-		if (launchState != null && launchState.get("letters") != null)	
-			letters = ((Boolean) launchState.get("letters"));
-		if (launchState != null && launchState.get("hulpPunten") != null)
-			hulpPunten = ((Boolean) launchState.get("hulpPunten"));
-		if (launchState != null && launchState.get("centraleProjectie") != null)
-			centraleProjectie = ((Boolean) launchState.get("centraleProjectie"));
-		
-		// beginfiguur
-		if (launchState != null && launchState.get("origObject") != null)
-		{	resetState = launchState;
-		}
-		
-		
-		getImages();
-		
-		dlp = new DockLayoutPanel(Style.Unit.PX);
-		//dlp.addStyleName("dock");
-		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
-
-//		bottomPanel = new LayoutPanel();
-//		bottomPanel.addStyleName(doorzienGWTCss.bottom());
-//		dlp.addSouth(bottomPanel, bottomHeight);
-		
-		canvasPanel = new LayoutPanel();
-		dlp.add(canvasPanel);
-
-		
-		drawingShell = new DrawingShell(this, breedte, hoogte, CUBE);
-
-		if (drawingShell.drawingPanelCanvas == null) 
-		{
-	      RootPanel.get(holderId).add(new Label(upgradeMessage));
-	      return;
-	    }
-		
-		drawingShell.drawingPanelCanvas.addStyleName(doorzienGWTCss.canvas());
-//		dlp.add(drawingShell.drawingPanelCanvas);
-
-		canvasPanel.add(drawingShell.drawingPanelCanvas);
-		canvasPanel.setWidgetLeftWidth(drawingShell.drawingPanelCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-		canvasPanel.setWidgetTopHeight(drawingShell.drawingPanelCanvas, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
-		
-		drawingShell.slider = new Slider2(drawingShell, 0, 1);
-		canvasPanel.add(drawingShell.slider.sliderCanvas);
-		canvasPanel.setWidgetLeftWidth(drawingShell.slider.sliderCanvas, breedte - drawingShell.slider.horSize - 1, 
-				                       Style.Unit.PX, drawingShell.slider.horSize, Style.Unit.PX);
-		canvasPanel.setWidgetTopHeight(drawingShell.slider.sliderCanvas, 1, 
-				                       Style.Unit.PX, drawingShell.slider.vertSize, Style.Unit.PX);
-//		drawingShell.slider.setVisible(false);
-		
-		makeBottom();
-		
-		if (resetState != null)
-			setState(launchState);
-*/		
 	}
 	
 
+	/**
+	 * add (optionally) toolsButton and resetButton in viewer mode
+	 */
 	public void makeBottom()
 	{
 		if (designOption)
 		{	
 			toolsButton = new PushButton(toolsImage);
 		
-//		bottomPanel.add(toolsButton);
-//		bottomPanel.setWidgetLeftWidth(toolsButton, leftOffset, Style.Unit.PX, 33, Style.Unit.PX);
-//		bottomPanel.setWidgetTopHeight(toolsButton, 0, Style.Unit.PX, 32, Style.Unit.PX);
-
 			canvasPanel.add(toolsButton);
 			canvasPanel.setWidgetLeftWidth(toolsButton, leftOffset, Style.Unit.PX, 33, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(toolsButton, hoogte - topOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
 		
-			//toolsButton.addMouseDownHandler(new PushMouseDownHandler());
 			toolsButton.addClickHandler(new PushClickHandler());
-		//twmi.addTouchStartHandler(toolsButton, new PushTouchStartHandler());
-			//toolsButton.addTouchStartHandler(new PushTouchStartHandler());
-		
 		}
 		
 		if (resetOption)
@@ -841,14 +820,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			canvasPanel.setWidgetLeftWidth(resetButton, breedte - leftOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
 			canvasPanel.setWidgetTopHeight(resetButton, hoogte - topOffset - 32, Style.Unit.PX, 32, Style.Unit.PX);
 		
-			//resetButton.addMouseDownHandler(new PushMouseDownHandler());
 			resetButton.addClickHandler(new PushClickHandler());
-		//twmi.addTouchStartHandler(resetButton, new PushTouchStartHandler());
-			//resetButton.addTouchStartHandler(new PushTouchStartHandler());			
 		}
 	}
 	
-	
+
+	/**
+	 * extract the current3d figure from the toolpanel and show it in the viewer
+	 * (hiding the toolpanel and showing the viewer)
+	 */
     public void figureToViewer()
     {
     	Map<String,Object> h = getToolState();
@@ -856,13 +836,14 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	
     	dlp.setWidgetVisible(doorzienGWTDock,false);
     	dlp.setWidgetVisible(canvasPanel,true);
-    	//if (doorzienGWTPopup != null)
-    	//	doorzienGWTPopup.setVisible(false);
-    	//doorzienGWTPopup = null;
     	popupVisible = false;
     	drawingShell.panel3D.repaint();
     }
     
+	/**
+	 * extract the current3d figure from the viewer and show it in the toolpanel
+	 * (hiding the viewer and showing the toolpanel) 
+	 */
     public void figureToPopup()
     {
     	popupVisible = true;
@@ -875,56 +856,31 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	drawingPanel.paint();
     }
 
-    
+    /**
+     * set the 3d-object in the viewer 
+     * @param map Map containing the 3d-object, see class NoSer 
+     */
     public void setViewerState(Map<String,Object> map)
     {
     	
     	ObjectMap h = JSONUtilities.wrapMap(map);
     	
-//		boolean letters = false;
-//		boolean hulpPunten = false;
-//		boolean centraleProjectie = true;
-
-//		if (b.containsKey("letters"))
-//			letters = ((Boolean) b.get("letters")).booleanValue();
-//		if (b.containsKey("hulpPunten"))
-//			hulpPunten = ((Boolean) b.get("hulpPunten")).booleanValue();
-//		if (b.containsKey("centraleProjectie"))
-//			centraleProjectie = ((Boolean) b.get("centraleProjectie")).booleanValue();
-
-		// true voegt de helpPointDrop toe maar laat
-		// die niet zien
-//		if (hulpPunten)
-//			drawingPanel.setHelpPointDrop(true);		    
-//		else
-//			drawingPanel.setHelpPointDrop(false);
-//		helpPuntenItem.setSelected(hulpPunten);
-		
-//		drawingPanel.setLetters(letters);
-
-//		lettersItem.setSelected(letters);
-
-//		if (centraleProjectie)
-//		{	drawingPanel.setProjection(DrawingPanel.CENTRALPROJ);
-//			centraleProjectieItem.setSelected(true);
-//		}
-//		else
-//		{	drawingPanel.setProjection(DrawingPanel.PARALLELPROJ);
-//			parallelProjectieItem.setSelected(true);
-//		}
+    	// letters is taken care of in DrawConstants
+		if (centraleProjectie)
+		{	drawingShell.setProjection(DrawingShell.CENTRALPROJ);
+		}
+		else
+		{	drawingShell.setProjection(DrawingShell.PARALLELPROJ);
+		}
 
 		int figuurCode = CUBE;
 		if (h.containsKey("figuurCode"))
 			figuurCode = h.getInt("figuurCode");
 		
-//		selectItem(figuurCode);
-		
-		
 		int numLines = 0;
 		int numPlanes = 0;
 		boolean filled = false;
 		boolean planesFilled = false;
-
 		if (h.containsKey("numLines"))
 			numLines = h.getInt("numLines");
 		if (h.containsKey("numPlanes"))
@@ -934,32 +890,19 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (h.containsKey("planesFilled"))
 			planesFilled = h.getBoolean("planesFilled");
 		
-
 		drawingShell.setNumLines(numLines);
 		drawingShell.setNumPlanes(numPlanes);
 
-//		if (filled)
-//		{	rightToolBar.wireSolidButton.setDown(true);
-//		}	
-//		if (planesFilled)
-//		{	topToolBar.planesFilledButton.setDown(true);
-//		}
+		// take care of filled and planesFilled after creating the Object3D
 		
 		double lengthFactor = 0;
 		if (h.containsKey("lengthFactor"))
 			lengthFactor = h.getDouble("lengthFactor");
 
 		DrawConstants.llFactor = lengthFactor;
-		
-		// dit betekent dat er zeker lijnen zijn!
-//		if (lengthFactor > 0)
-//		{	topToolBar.shortLinesButton.setEnabled(true);
-//            if (lengthFactor >= (drawingPanel.MAXLLFACTOR - drawingPanel.LLSTEP / 10))
-//                topToolBar.lengLinesButton.setEnabled(false);    
-//		}
-		
+
+		// parameters for drawingShell.panel3D 
 		Matrix3D mat = new Matrix3D();
-		//double[] coeff = new double[9];
 		List<Double> coeff = new ArrayList<Double>(); 
 		int paintType = Object3DContainer.PUREZ;
 		double zoomFactor = 9e-1d;
@@ -975,7 +918,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (h.containsKey("showInside"))
 			showInside = h.getBoolean("showInside");
 		
-		// moet dit VOOR of NA het creeeren van het Object3D?
 		drawingShell.panel3D.mat = mat;
 		drawingShell.panel3D.mat.setOrigin(
 				drawingShell.panel3D.breedte / 2,
@@ -988,65 +930,38 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		
 		drawingShell.zoom = zoomFactor;
         
-//		if (drawingPanel.zoom <= (drawingPanel.MINZOOM + drawingPanel.ZOOMSTEP / 10))
-//        {	rightToolBar.zoomOutButton.setEnabled(false);    
-//        }
-//        if (drawingPanel.zoom >= (drawingPanel.MAXZOOM - drawingPanel.ZOOMSTEP / 10))
-//        {   rightToolBar.zoomInButton.setEnabled(false);    
-//		}
-		
         int mode = drawingShell.INERT;
         if (h.containsKey("mode"))
         {	mode = h.getInt("mode");
-//System.out.println("contains mode");        
         }
         
         drawingShell.mouseMode = mode;
         
-//System.out.println("dp mode = " + mode);        
-        
+        // this Map describes the original object
 		Map<String,Object> origObject = new HashMap<String,Object>();
-		//Vector conState = new Vector();
-		Object conStateOb = null;
+		// this List contains the construction list
 		List<Object> conStateList = new ArrayList<Object>();
 		
 		if (h.containsKey("origObject"))
 		{	origObject = h.getMap("origObject");
 		}
 		if (h.containsKey("conState"))
-		{	//conStateOb = h.get("conState");
-			conStateList = h.getList("conState");
+		{	conStateList = h.getList("conState");
 		}
-/*		
-		if (conStateOb instanceof Vector)
-		{
-			conState = (Vector) conStateOb;
-		}
-		else if (conStateOb instanceof ArrayList)
-		{
-			ArrayList conStateArr = (ArrayList) conStateOb;
-			for (int c = 0; c < conStateArr.size(); c++)
-			{
-				Object o = conStateArr.get(c);
-				conState.addElement(o);
-			}
-		}
-*/
 		
 		Object3D originalObject = NoSer.setObject3DState(origObject);
 		Vector construction = NoSer.setConstructionState(conStateList);
-		
-//drawingShell.panel3D.testString2 = "pv = " + popupVisible + " nvob = " + originalObject.numVertices;		
-		
+
+		// construct the 3d-object from originalObject and construction 
 		drawingShell.currentObjectGroup = drawingShell.rebuild(originalObject, construction, null);
 		drawingShell.originalObject = drawingShell.currentObjectGroup.leftMostLeaf();
 
+		// foldout
 		if (drawingShell.mouseMode == drawingShell.FOLDOUT)
 		{
-			// toestand originele object
+			// state of stand original object
 			boolean oldFilled = false;
 			Matrix3D oldPos = new Matrix3D();
-			//double[] oldCoeff = new double[9];
 			List<Double> oldCoeff = new ArrayList<Double>();
 			if (h.containsKey("oldFilled"))
 				oldFilled = h.getBoolean("oldFilled");
@@ -1054,7 +969,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				oldCoeff = h.getDoubleList("oldPos");
 			oldPos = NoSer.setMatrix3DState(oldCoeff);
 			
-			// toestand fold out
+			// state of fold out
 			boolean flattened = false;
 			double angle = 2e-1d;
 			if (h.containsKey("flattened"))
@@ -1064,14 +979,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			drawingShell.flattened = flattened;
 			drawingShell.currentFoldOut = angle;
 			
-//System.out.println("set angle = " + angle);			
-			
+			// reconstruct startFacet for fold out
 			Facet3D startFacet = null;
-			//double[] vertices = new double[0];;
 			List<Double> vertices = new ArrayList<Double>(); 
 			if (h.containsKey("startFacet"))
 			{	vertices = h.getDoubleList("startFacet");
-//System.out.println("contains sf");			
 			}
 	
 			startFacet = NoSer.setFacet3DVertexState(vertices);
@@ -1079,11 +991,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			if (startFacet != null)
 			{	
 				drawingShell.startFacet = startFacet; 
-
-//System.out.println("sf != null");						
-				
 				drawingShell.makeFoldOut(0, true);
-				
 				drawingShell.processSlider(angle);
 				
 				if (flattened)
@@ -1092,27 +1000,26 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			}
 			else
 			{
-//System.out.println("sf == null");				
 			}
 			
 		}
+		// object was cut into two pieces
 		else if (drawingShell.mouseMode == drawingShell.CUTOBJECT)
 		{
-			// toestand originele object
+			// state of original object
 			boolean oldPlanesFilled = false;
 			if (h.containsKey("oldPlanesFilled"))
 				oldPlanesFilled = h.getBoolean("oldPlanesFilled");
 			drawingShell.oldPlanesFilled = oldPlanesFilled;
 
-			// toestand cut object
+			// state of cut object
 			String volumeString = "";
 			if (h.containsKey("volumeString"))
 				volumeString = h.getString("volumeString");
 			drawingShell.panel3D.testString = volumeString;
 			
-			
+			// cutting plane
 			Plane3D planeChoosen = new Plane3D(1, 0, 0, 0);
-			//double[] planeChoosenCoeff = new double[9];
 			List<Double> planeChoosenCoeff = new ArrayList<Double>(); 
 			if (h.containsKey("planeChoosen"))
 				planeChoosenCoeff = h.getDoubleList("planeChoosen");
@@ -1123,56 +1030,38 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			drawingShell.cutObject(1, true);
 			
 		}
-		else // geen bouwplaat of versneden object
+		else // object is not a foldout or a cut object
 		{
-/*			
-			if (drawingPanel != null)
-				drawingShell.panel3D.initializeModel(drawingPanel.currentObjectGroup, false); 
-				// FIXME Als er geen popup is, dan NPE
-			else // FIXME WAT MOET HIER STAAN HUUB?
-				drawingShell.panel3D.initializeModel(drawingShell.makeNewModel(drawingShell.modelCode), true);
-*/				 
 			drawingShell.panel3D.initializeModel(drawingShell.currentObjectGroup, false);
 			drawingShell.slider.setVisible(false);
 			drawingShell.flatButton.setVisible(false);
 		}
 
-		// dit moet NA het creeeren van het Object3D
+		// this after creating the 3d-object
 		drawingShell.setFilled(filled);
 		drawingShell.fillPlanes(planesFilled);
-		
-		drawingShell.addToHistory();
-		
-//		if (drawingPanel.mouseMode != drawingPanel.INERT)
-//		{
-//			rightToolBar.undoButton.setEnabled(false);
-//		}
-		
 			
 		drawingShell.panel3D.repaint();
 
-
     } // setViewerState
     
+    
+    /**
+     * get the 3d-object from the viewer
+     * @return a HashMap containing the 3d-object, see class NoSer
+     */
     public Map<String,Object> getViewerState()
     {
     	Map<String,Object> h = new HashMap<String,Object>();
     	
-		// de leerling KAN deze veranderd hebben
-//		boolean letters = this.letters;
-//		boolean hulpPunten = this.hulpPunten;
-//		boolean centraleProjectie = this.centraleProjectie;
+		// user cannot change lettering, projection in viewer mode
+    	// there are no help points in viewer mode
 		
-//		h.put("letters", new Boolean(letters));
-//		h.put("hulpPunten", new Boolean(hulpPunten));
-//		h.put("centraleProjectie", new Boolean(centraleProjectie));
-		
-		// status van de knoppen/het object
+		// status of the 3d-object for toolbuttons in toolpanel mode
 		int numLines = drawingShell.numLines;
 		int numPlanes = drawingShell.numPlanes;
 		boolean filled = drawingShell.filled;
 		boolean planesFilled = drawingShell.planesFilled;
-		
 		h.put("numLines", new Integer(numLines));
 		h.put("numPlanes", new Integer(numPlanes));
 		h.put("filled", new Boolean(filled));
@@ -1186,13 +1075,13 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		double lengthFactor = DrawConstants.llFactor;
 		h.put("lengthFactor", new Double(lengthFactor));
 		
-		// drawingPanel.panel3D items
+		// drawingShell.panel3D items
 		Matrix3D mat = drawingShell.panel3D.mat;
 		int paintType = drawingShell.panel3D.paintType;
 		double zoomFactor = drawingShell.panel3D.zoomFactor;
 		boolean showInside = drawingShell.panel3D.showInside;
-		
-		//double[] coeff = NoSer.getMatrix3DState(mat);
+
+		// convert mat to a List
 		List<Double> coeff = NoSer.getMatrix3DState(mat);
 		h.put("matrix3D", coeff);
 		h.put("paintType", new Integer(paintType));
@@ -1207,60 +1096,53 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         else if (drawingShell.currentObjectGroup instanceof ObjectWithPlane)
             construction = ((ObjectWithPlane) drawingShell.currentObjectGroup).getConstruction();
         
-        //Vector conState = NoSer.getConstructionState(construction);
         List<Object> conState = NoSer.getConstructionState(construction);
 		
 		h.put("origObject", origObject);
 		h.put("conState", conState);
 		
 		int mode = drawingShell.INERT;
-		
+
+		// fold out
 		if ((drawingShell.mouseMode == drawingShell.FOLDOUT) && 
 			(drawingShell.startFacet != null))
 		{
 			mode = drawingShell.FOLDOUT;
 			
-			// toestand originele object
+			// state original object
 			boolean oldFilled = drawingShell.oldFilled;
 			Matrix3D oldPos = drawingShell.oldPos;
-			//double[] oldCoeff = NoSer.getMatrix3DState(oldPos);
 			List<Double> oldCoeff = NoSer.getMatrix3DState(oldPos);
 			h.put("oldFilled", new Boolean(oldFilled));
 			h.put("oldPos", oldCoeff);
 			
-			// toestand fold out
+			// state fold out
 			boolean flattened = drawingShell.flattened;
 			double angle = drawingShell.currentFoldOut;
 			h.put("flattened", new Boolean(flattened));
 			h.put("angle", new Double(angle));
 			
-//System.out.println("get angle = " + angle);
-
 			Facet3D theStartFacet = drawingShell.startFacet;
-			//double[] startFacet = NoSer.getFacet3DVertexState(theStartFacet);
 			List<Double> startFacet = NoSer.getFacet3DVertexState(theStartFacet);
 			h.put("startFacet", startFacet);
 			
-			//scormedObject3D.theFoldOutGroup = dp.foldOutObjectGroup;			
-			//scormedObject3D.theFoldOutTreeRoot = dp.foldOutTreeRoot;
 		}
+		// object in two pieces
 		if ((drawingShell.mouseMode == drawingShell.CUTOBJECT) && 
 			(drawingShell.planeChoosen != null))
 		{
 			mode = drawingShell.CUTOBJECT;
-			// toestand originele object
+			// state original object
 			boolean oldPlanesFilled = drawingShell.oldPlanesFilled;
 			h.put("oldPlanesFilled", new Boolean("oldPlanesFilled"));
-			// toestand cut object
+			// state cut object
 			String volumeString = drawingShell.panel3D.testString;
 			h.put("volumeString", volumeString);
 			
 			Plane3D thePlaneChoosen = drawingShell.planeChoosen;
-			//double[] planeChoosen = NoSer.getPlane3DState(thePlaneChoosen);
 			List<Double> planeChoosen = NoSer.getPlane3DState(thePlaneChoosen);
 			h.put("planeChoosen", planeChoosen);
 			
-			//scormedObject3D.theCutObjectGroup = dp.cutObjectGroup;
 		}
 		
 		h.put("mode", new Integer(mode));
@@ -1271,34 +1153,17 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     	
     }
 
+    /**
+     * set the 3d-object in the toolpanel 
+     * @param map Map containing the 3d-object, see class NoSer 
+     */
     public void setToolState(Map<String,Object> map)
     {
-//		boolean letters = false;
-//		boolean hulpPunten = false;
-//		boolean centraleProjectie = true;
-
-//		if (b.containsKey("letters"))
-//			letters = ((Boolean) b.get("letters")).booleanValue();
-//		if (b.containsKey("hulpPunten"))
-//			hulpPunten = ((Boolean) b.get("hulpPunten")).booleanValue();
-//		if (b.containsKey("centraleProjectie"))
-//			centraleProjectie = ((Boolean) b.get("centraleProjectie")).booleanValue();
-
-		// true voegt de helpPointDrop toe maar laat
-		// die niet zien
     	
     	ObjectMap h = JSONUtilities.wrapMap(map);
+
+    	// help points after creating the object
     	
-		if (hulpPunten)
-		{	drawingPanel.setHelpPointDrop(true);
-			eenHulpPuntItem.setStyleName(doorzienGWTCss.boldmenuitem());
-		}
-		else
-		{	drawingPanel.setHelpPointDrop(false);
-			geenHulpPuntenItem.setStyleName(doorzienGWTCss.boldmenuitem());
-    	}
-
-
     	if (letters)
 		{
 			lettersItem.setText(rb.geenLettersTekst());
@@ -1312,13 +1177,11 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 		if (centraleProjectie)
 		{	drawingPanel.setProjection(DrawingPanel2.CENTRALPROJ);
-			//centraleProjectieItem.setSelected(true);
 			centraleProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
 			parallelProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
 		}
 		else
 		{	drawingPanel.setProjection(DrawingPanel2.PARALLELPROJ);
-			//parallelProjectieItem.setSelected(true);
 			centraleProjectieItem.setStyleName(doorzienGWTCss.normalmenuitem());
 			parallelProjectieItem.setStyleName(doorzienGWTCss.boldmenuitem());
 		}
@@ -1326,9 +1189,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		int figuurCode = CUBE;
 		if (h.containsKey("figuurCode"))
 			figuurCode = h.getInt("figuurCode");
-		
-//		selectItem(figuurCode);
-		
 		
 		int numLines = 0;
 		int numPlanes = 0;
@@ -1344,17 +1204,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (h.containsKey("planesFilled"))
 			planesFilled = h.getBoolean("planesFilled");
 		
-		// dit enabled/disabled de lijn knoppen
+		// this enables/disables the line buttons
 		drawingPanel.setNumLines(numLines);
-		// dit enabled/disabled de vlak knoppen
+		// this enables/disables the plane buttons
 		drawingPanel.setNumPlanes(numPlanes);
 		if (filled)
 		{	rightToolBar.wireSolidButton.setDown(true);
-			//rightToolBar.wireSolidButton.setImage(getImage("wireframe.gif"));
 		}	
 		if (planesFilled)
-		{	//topToolBar.planesFilledButton.setImage(getImage("planesempty.gif"));
-			topToolBar.planesFilledButton.setDown(true);
+		{	topToolBar.planesFilledButton.setDown(true);
 		}
 		
 		double lengthFactor = 0;
@@ -1362,16 +1220,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			lengthFactor = h.getDouble("lengthFactor");
 
 		DrawConstants.llFactor = lengthFactor;
-		// dit betekent dat er zeker lijnen zijn!
+		// this means there are lines
 		if (lengthFactor > 0)
-		{	//topToolBar.shortLinesButton.setImage(getImage("shortLines.gif"));		
-			topToolBar.shortLinesButton.setEnabled(true);
-            if (lengthFactor >= (drawingPanel.MAXLLFACTOR - drawingPanel.LLSTEP / 10))
+		{	topToolBar.shortLinesButton.setEnabled(true);
+            if (lengthFactor >= (DrawConstants.MAXLLFACTOR - DrawConstants.LLSTEP / 10))
                 topToolBar.lengLinesButton.setEnabled(false);    
 		}
-		
+
+		// drawingPanel.panel3D items
 		Matrix3D mat = new Matrix3D();
-		//double[] coeff = new double[9];
 		List<Double> coeff = new ArrayList<Double>(); 
 		int paintType = Object3DContainer.PUREZ;
 		double zoomFactor = 9e-1d;
@@ -1387,7 +1244,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		if (h.containsKey("showInside"))
 			showInside = h.getBoolean("showInside");
 		
-		// moet dit VOOR of NA het creeeren van het Object3D?
 		drawingPanel.panel3D.mat = mat;
 		drawingPanel.panel3D.mat.setOrigin(
 				drawingPanel.panel3D.breedte / 2,
@@ -1409,54 +1265,35 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         int mode = drawingPanel.INERT;
         if (h.containsKey("mode"))
         {	mode = h.getInt("mode");
-//System.out.println("contains mode");        
         }
         
         drawingPanel.mouseMode = mode;
-        
-//System.out.println("dp mode = " + mode);        
-        
+
+        // this Map describes the original object 
 		Map<String,Object> origObject = new HashMap<String,Object>();
-		//Vector conState = new Vector();
-		Object conStateOb = null;
+		// List containing the construction
 		List<Object> conStateList = new ArrayList<Object>(); 
 		
 		if (h.containsKey("origObject"))
 		{	origObject = h.getMap("origObject");
 		}
 		if (h.containsKey("conState"))
-		{	//conState = (Vector) h.get("conState");
-			//conStateOb = h.getObject("conState");
-			conStateList = h.getList("conState");
+		{	conStateList = h.getList("conState");
 		}
-/*		
-		if (conStateOb instanceof Vector)
-		{
-			conState = (Vector) conStateOb;
-		}
-		else if (conStateOb instanceof ArrayList)
-		{
-			ArrayList conStateArr = (ArrayList) conStateOb;
-			for (int c = 0; c < conStateArr.size(); c++)
-			{
-				Object o = conStateArr.get(c);
-				conState.addElement(o);
-			}
-		}
-*/		
 		
 		Object3D originalObject = NoSer.setObject3DState(origObject);
 		Vector construction = NoSer.setConstructionState(conStateList);
-		
+
+		// create the 3d-object
 		drawingPanel.currentObjectGroup = drawingPanel.rebuild(originalObject, construction, null);
 		drawingPanel.originalObject = drawingPanel.currentObjectGroup.leftMostLeaf();
 
+		// fold out
 		if (drawingPanel.mouseMode == drawingPanel.FOLDOUT)
 		{
-			// toestand originele object
+			// state originale object
 			boolean oldFilled = false;
 			Matrix3D oldPos = new Matrix3D();
-			//double[] oldCoeff = new double[9];
 			List<Double> oldCoeff = new ArrayList<Double>();
 			if (h.containsKey("oldFilled"))
 				oldFilled = h.getBoolean("oldFilled");
@@ -1464,7 +1301,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				oldCoeff = h.getDoubleList("oldPos");
 			oldPos = NoSer.setMatrix3DState(oldCoeff);
 			
-			// toestand fold out
+			// state fold out
 			boolean flattened = false;
 			double angle = 2e-1d;
 			if (h.containsKey("flattened"))
@@ -1473,15 +1310,12 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 				angle = h.getDouble("angle");
 			drawingPanel.flattened = flattened;
 			drawingPanel.currentFoldOut = angle;
-			
-//System.out.println("set angle = " + angle);			
-			
+
+			// reconstruct startFacet fold out
 			Facet3D startFacet = null;
-			//double[] vertices = new double[0];;
 			List<Double> vertices = new ArrayList<Double>(); 
 			if (h.containsKey("startFacet"))
 			{	vertices = h.getDoubleList("startFacet");
-//System.out.println("contains sf");			
 			}
 	
 			startFacet = NoSer.setFacet3DVertexState(vertices);
@@ -1489,9 +1323,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			if (startFacet != null)
 			{	
 				drawingPanel.startFacet = startFacet; 
-
-//System.out.println("sf != null");						
-				
 				drawingPanel.makeFoldOut(0, true);
 				
 				drawingPanel.processSlider(angle);
@@ -1504,19 +1335,19 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			}
 			else
 			{
-//System.out.println("sf == null");				
 			}
 			
 		}
+		// object was cut into two pieces
 		else if (drawingPanel.mouseMode == drawingPanel.CUTOBJECT)
 		{
-			// toestand originele object
+			// state original object
 			boolean oldPlanesFilled = false;
 			if (h.containsKey("oldPlanesFilled"))
 				oldPlanesFilled = h.getBoolean("oldPlanesFilled");
 			drawingPanel.oldPlanesFilled = oldPlanesFilled;
 
-			// toestand cut object
+			// state cut object
 			String volumeString = "";
 			if (h.containsKey("volumeString"))
 				volumeString = h.getString("volumeString");
@@ -1524,7 +1355,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			
 			
 			Plane3D planeChoosen = new Plane3D(1, 0, 0, 0);
-			//double[] planeChoosenCoeff = new double[9];
 			List<Double> planeChoosenCoeff = new ArrayList<Double>(); 
 			if (h.containsKey("planeChoosen"))
 				planeChoosenCoeff = h.getDoubleList("planeChoosen");
@@ -1537,14 +1367,24 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			topToolBar.cutButton.setDown(true);
 			
 		}
-		else
+		else // no foldout or cut object
 		{	drawingPanel.panel3D.initializeModel(drawingPanel.currentObjectGroup, false);
 		
 		}
 
-		// dit moet NA het creeeren van het Object3D
+		// do this AFTER creating the Object3D
 		drawingPanel.setFilled(filled);
 		drawingPanel.fillPlanes(planesFilled);
+		if (hulpPunten)
+		{	drawingPanel.setHelpPoints(1);
+			setHulpToNormal(eenHulpPuntItem);
+			eenHulpPuntItem.setStyleName(doorzienGWTCss.boldmenuitem());
+		}
+		else
+		{	drawingPanel.setHelpPoints(0);
+			setHulpToNormal(geenHulpPuntenItem);
+			geenHulpPuntenItem.setStyleName(doorzienGWTCss.boldmenuitem());
+    	}
 		
 		drawingPanel.addToHistory();
 		
@@ -1556,27 +1396,25 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			
 		drawingPanel.panel3D.repaint();
 
-    } // setPopupState
+    } // setToolState
     
+    /**
+     * get the 3d-object from the toolpanel
+     * @return a HashMap containing the 3d-object, see class NoSer
+     */
     public Map<String,Object> getToolState()
     {
     	Map<String,Object> h = new HashMap<String,Object>();
     	
-		// de leerling KAN deze veranderd hebben
-//		boolean letters = this.letters;
-//		boolean hulpPunten = this.hulpPunten;
-//		boolean centraleProjectie = this.centraleProjectie;
+		// letters is taken care of in DrawConstants
+    	hulpPunten = DrawConstants.TICKNUM > 0;
+    	centraleProjectie = (drawingPanel.projection == DrawingPanel2.CENTRALPROJ);
 		
-//		h.put("letters", new Boolean(letters));
-//		h.put("hulpPunten", new Boolean(hulpPunten));
-//		h.put("centraleProjectie", new Boolean(centraleProjectie));
-		
-		// status van de knoppen/het object
+		// status of the 3d-object 
 		int numLines = drawingPanel.numLines;
 		int numPlanes = drawingPanel.numPlanes;
 		boolean filled = drawingPanel.filled;
 		boolean planesFilled = drawingPanel.planesFilled;
-		
 		h.put("numLines", new Integer(numLines));
 		h.put("numPlanes", new Integer(numPlanes));
 		h.put("filled", new Boolean(filled));
@@ -1596,7 +1434,7 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		double zoomFactor = drawingPanel.panel3D.zoomFactor;
 		boolean showInside = drawingPanel.panel3D.showInside;
 		
-		//double[] coeff = NoSer.getMatrix3DState(mat);
+		// convert mat to a List
 		List<Double> coeff = NoSer.getMatrix3DState(mat);
 		h.put("matrix3D", coeff);
 		h.put("paintType", new Integer(paintType));
@@ -1611,60 +1449,53 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
         else if (drawingPanel.currentObjectGroup instanceof ObjectWithPlane)
             construction = ((ObjectWithPlane) drawingPanel.currentObjectGroup).getConstruction();
         
-        //Vector conState = NoSer.getConstructionState(construction);
         List<Object> conState = NoSer.getConstructionState(construction);
 		
 		h.put("origObject", origObject);
 		h.put("conState", conState);
 		
 		int mode = drawingPanel.INERT;
-		
+	
+		// fold out
 		if ((drawingPanel.mouseMode == drawingPanel.FOLDOUT) && 
 			(drawingPanel.startFacet != null))
 		{
 			mode = drawingPanel.FOLDOUT;
 			
-			// toestand originele object
+			// state original object
 			boolean oldFilled = drawingPanel.oldFilled;
 			Matrix3D oldPos = drawingPanel.oldPos;
-			//double[] oldCoeff = NoSer.getMatrix3DState(oldPos);
 			List<Double> oldCoeff = NoSer.getMatrix3DState(oldPos);
 			h.put("oldFilled", new Boolean(oldFilled));
 			h.put("oldPos", oldCoeff);
 			
-			// toestand fold out
+			// state  fold out
 			boolean flattened = drawingPanel.flattened;
 			double angle = drawingPanel.currentFoldOut;
 			h.put("flattened", new Boolean(flattened));
 			h.put("angle", new Double(angle));
-			
-//System.out.println("get angle = " + angle);
 
 			Facet3D theStartFacet = drawingPanel.startFacet;
-			//double[] startFacet = NoSer.getFacet3DVertexState(theStartFacet);
 			List<Double> startFacet = NoSer.getFacet3DVertexState(theStartFacet);
 			h.put("startFacet", startFacet);
 			
-			//scormedObject3D.theFoldOutGroup = dp.foldOutObjectGroup;			
-			//scormedObject3D.theFoldOutTreeRoot = dp.foldOutTreeRoot;
 		}
+		// object cut into two pieces
 		if ((drawingPanel.mouseMode == drawingPanel.CUTOBJECT) && 
 			(drawingPanel.planeChoosen != null))
 		{
 			mode = drawingPanel.CUTOBJECT;
-			// toestand originele object
+			// state original object
 			boolean oldPlanesFilled = drawingPanel.oldPlanesFilled;
 			h.put("oldPlanesFilled", new Boolean("oldPlanesFilled"));
-			// toestand cut object
+			// state cut object
 			String volumeString = drawingPanel.panel3D.testString;
 			h.put("volumeString", volumeString);
 			
 			Plane3D thePlaneChoosen = drawingPanel.planeChoosen;
-			//double[] planeChoosen = NoSer.getPlane3DState(thePlaneChoosen);
 			List<Double> planeChoosen = NoSer.getPlane3DState(thePlaneChoosen);
 			h.put("planeChoosen", planeChoosen);
 			
-			//scormedObject3D.theCutObjectGroup = dp.cutObjectGroup;
 		}
 		
 		h.put("mode", new Integer(mode));
@@ -1674,15 +1505,15 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
     }
     
      
-    //class PushMouseDownHandler implements MouseDownHandler
+    /**
+     * inner class for handling toolsButton/resetButton/flatButton in viewer mode 
+     * @author huub
+     *
+     */
     class PushClickHandler implements ClickHandler
 	{
-	   	//public void onMouseDown(MouseDownEvent e)
     	public void onClick(ClickEvent e)
 		{   
-	   		if (touchStart)
-	   			return;
-	   		
 	   		//e.preventDefault();
 	   		e.stopPropagation();
 	    	
@@ -1707,38 +1538,17 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		}
 	}	
 
-/*    
-    class PushTouchStartHandler implements TouchStartHandler
-	{
-	   	public void onTouchStart(TouchStartEvent e)
-		{   	
-	   		touchStart = true;
-	   		
-	   		//e.preventDefault();
-	   		e.stopPropagation();
-	    	
-	   		if (e.getSource() == toolsButton)
-	   		{
-	   			makePopup();
-	   		}
-	    		
-	   		else if (e.getSource() == resetButton)
-	   		{
-	   			if (resetState != null)
-	   				setViewerState(resetState);
-	   			else
-	   				drawingShell.setNewModel(CUBE);
-	   		}
-	    		
-		}
-	}	
-*/    
 	public Widget asWidget()
 	{
 		return dlp;
 	}
 	
-	@Override
+	/**
+	 * get the state of the current 3d-figure, that is:
+	 * save the state of the toolpanel (visible or not),
+	 * if the toolpanel is visible, extract its figure
+	 * to the viewer and then save the figure from the viewer  
+	 */
 	public HashMap<String, Object> getState()
 	{
 		HashMap<String, Object> h = new HashMap<String, Object>();
@@ -1746,24 +1556,23 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		h.put("popupVisible", new Boolean(popupVisible));
 		
 		if (popupVisible)
-		{	//h.put("state", getPopupState());
-			figureToViewer();
+		{	figureToViewer();
 		
 		}
-		//else
-		//{	
-			h.put("state", getViewerState());
-		
-		//}
-		
+		h.put("state", getViewerState());
 		return h;
 	}
 
-	@Override
+	/**
+	 *  set the state of the current 3d-figure, that is:
+	 *  find out if the toolpanel or the viewer should be 
+	 *  visible, then extract the 3d-figure from the
+	 *  HashMap and put in in the toolpanel or the viewer
+	 */
 	public void setState(HashMap<String, Object> h)
 	{
 		if(h == null || h.isEmpty()) return;
-		//boolean popupVisible = false;
+	
 		if (h.containsKey("popupVisible"))
 			popupVisible = ((Boolean) h.get("popupVisible")).booleanValue();
 		
@@ -1773,17 +1582,13 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 		else
 			state = h;
 		
-		
-		//this.popupVisible = popupVisible;
-		
 		if (popupVisible)
-		{	//makePopup();
+		{	
 			setToolState(state);
 			dlp.setWidgetVisible(doorzienGWTDock,true);
 			dlp.setWidgetVisible(canvasPanel,false);
 			drawingPanel.paint();
 			
-			//dlp.forceLayout();
 			doorzienGWTDock.forceLayout();
 		}
 		else
@@ -1792,7 +1597,6 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 			dlp.setWidgetVisible(canvasPanel,true);
 			drawingShell.panel3D.repaint();
 			
-			//dlp.forceLayout();
 			canvasPanel.forceLayout();
 		}
 		 
@@ -1800,41 +1604,38 @@ public class DoorzienGWT implements EntryPoint, InteractionStub //InteractionVie
 
 	@Override
 	public int getScore()
-	{
-		// TODO Auto-generated method stub
+	{	// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public Boolean isCorrect()
-	{
-		return Boolean.TRUE;
+	{	return Boolean.TRUE;
 	}
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
-	{
-		// TODO Auto-generated method stub
+	{	// TODO Auto-generated method stub
 
 	}
 
-	
-
-	@Override
-	public void init(int width, int height, Map<String, Object> map, //launchState, 
-			    Map<String, Number> values) 
+	/**
+	 * read launch data, create viewer and toolpanel, and show initial figure (if any)
+	 * in viewer or toolpanel (as requested in the launch data) 
+	 */
+	public void init(int width, int height, Map<String, Object> map, Map<String, Number> values) 
 	{
 		
 logger.info("DoorzienGWT init");
 
 		this.breedte = width;
 		this.hoogte = height;
-		//this.launchState = launchState;
 		
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
-		
+
+		// parametrisation for toolpanel mode
 		if (launchState.containsKey("lijnTekenOptie"))
 			lijnTekenOptie = launchState.getBoolean("lijnTekenOptie");
 		if (launchState.containsKey("lijnVerlengOptie"))
@@ -1856,6 +1657,7 @@ logger.info("DoorzienGWT init");
 		if (launchState.containsKey("previewOptie"))
 			previewOptie = launchState.getBoolean("previewOptie");
 
+		// parametrisation for viewer mode
 		if (launchState.containsKey("designOption"))
 			designOption = launchState.getBoolean("designOption");
 
@@ -1865,10 +1667,10 @@ logger.info("DoorzienGWT init");
 		if (launchState.containsKey("borderOption"))
 			borderOption = launchState.getBoolean("borderOption");
 
+		// true: start with viewer panel, false: start with toolpanel 
 		if (launchState.containsKey("demo"))
 			popupVisible = !(launchState.getBoolean("demo"));
 
-		
 		if (launchState.containsKey("letters"))	
 			letters = launchState.getBoolean("letters");
 		if (launchState.containsKey("hulpPunten"))
@@ -1876,16 +1678,15 @@ logger.info("DoorzienGWT init");
 		if (launchState.containsKey("centraleProjectie"))
 			centraleProjectie = launchState.getBoolean("centraleProjectie");
 		
-		//Object origObject = launchState.get("origObject");
-		
-		// beginfiguur
+		// starting figure from the launchdata (if any)
 		if (launchState != null && launchState.getMap("origObject") != null)
-		{	resetState = mapToHashMap(map); //launchState;
+		{	resetState = mapToHashMap(map); 
 			 
 		}
 		
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 		
+		// viewer mode
 		canvasPanel = new LayoutPanel();
 		dlp.add(canvasPanel);
 		
@@ -1903,7 +1704,7 @@ logger.info("DoorzienGWT init");
 		canvasPanel.setWidgetLeftWidth(drawingShell.drawingPanelCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		canvasPanel.setWidgetTopHeight(drawingShell.drawingPanelCanvas, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		
-		      
+		// slider for fold out (initially not visible)
 		drawingShell.slider = new Slider2(drawingShell, 0, 1);
 		canvasPanel.add(drawingShell.slider.sliderCanvas);
 		canvasPanel.setWidgetLeftWidth(drawingShell.slider.sliderCanvas, breedte - Slider2.horSize - 1, 
@@ -1912,6 +1713,7 @@ logger.info("DoorzienGWT init");
 				                       Style.Unit.PX, Slider2.vertSize, Style.Unit.PX);
 		drawingShell.slider.setVisible(false);
 		
+		// flat button for foldout (initilally not visible)
 		drawingShell.flatButton = new PushButton(rb.platTekst());
 		drawingShell.flatButton.addStyleName(doorzienGWTCss.pushbutton());
 		canvasPanel.add(drawingShell.flatButton);
@@ -1920,23 +1722,23 @@ logger.info("DoorzienGWT init");
 		drawingShell.flatButton.setVisible(false);
 		drawingShell.flatButton.addStyleName(DoorzienGWT.doorzienGWTCss.pushbutton());
 		drawingShell.flatButton.addClickHandler(new PushClickHandler());
-      
+		// add optional tool- and resetButton 
 		makeBottom();
 		
 		drawingShell.panel3D.setBordered(borderOption);
 		
+		// create the toolpanel
 		makeTool();
+		
 		dlp.add(doorzienGWTDock);
 		dlp.setWidgetLeftWidth(doorzienGWTDock, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		dlp.setWidgetTopHeight(doorzienGWTDock, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		dlp.setWidgetVisible(doorzienGWTDock, false);
-		
-		
+
+		// this shows viewer or toolpanel (as determined by popupVisible)
+		// with the initial launchdata figure 
 		if (resetState != null)
 			setState(resetState);
-		
-//if (resetState == null)
-//drawingShell.panel3D.testString2 = "rs null";	
 		
 		drawingShell.panel3D.repaint();
 
@@ -1945,7 +1747,12 @@ logger.info("DoorzienGWT init");
 		doorzienGWTDock.forceLayout();
 
 	} //init	
-	
+
+	/**
+	 * convert a Map to a HashMap
+	 * @param m Map to covert
+	 * @return Map as HashMap
+	 */
 	private HashMap<String,Object> mapToHashMap(Map<String,Object> m)
 	{	HashMap<String,Object> result = new HashMap<String,Object>();
 		Set<String> keys = m.keySet();
@@ -1977,16 +1784,12 @@ logger.info("DoorzienGWT init");
 		return 0;
 	}
 
-	@Override
 	public int getHeight() 
-	{
-		return hoogte;
+	{	return hoogte;
 	}
 
-	@Override
 	public int getWidth() 
-	{
-		return breedte;
+	{	return breedte;
 	}
 
 	@Override
