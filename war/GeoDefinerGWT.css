@@ -102,3 +102,23 @@ body {
 .gwt-ToggleButton span.circleradius {
 	background-image: url("geodefinergwt/fi/euclides/resources/fixedcircle.png");
 }
+.gwt-ToggleButton span.formula {
+	background-image: url("geodefinergwt/fi/euclides/resources/function.png");
+}
+.gwt-ToggleButton span.text {
+	background-image: url("geodefinergwt/fi/euclides/resources/showname.png");
+}
+.gwt-ToggleButton span.trail {
+	background-image: url("geodefinergwt/fi/euclides/resources/thickness2.png");
+}
+
+.gwt-ToggleButton span.circle0 {
+	background-image: url("geodefinergwt/fi/euclides/resources/circle.png");
+}
+.gwt-ToggleButton span.circle1 {
+	background-image: url("geodefinergwt/fi/euclides/resources/circle3.png");
+}
+.gwt-ToggleButton span.circle2 {
+	background-image: url("geodefinergwt/fi/euclides/resources/4.png");
+}
+

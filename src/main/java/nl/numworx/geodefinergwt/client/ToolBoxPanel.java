@@ -5,9 +5,12 @@ import java.util.Vector;
 
 import javax.inject.Provider;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.safehtml.client.SafeHtmlTemplates;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -28,7 +31,16 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
+	static interface FaceTemplate extends SafeHtmlTemplates {
+	  @Template("<span class='{0}' ></span>")
+	  SafeHtml face(String cls);
+	}
 	
+	static FaceTemplate faceTemplace = GWT.create(FaceTemplate.class);
+	
+	public static SafeHtml face(String cls) {
+	    return faceTemplace.face(cls);
+	}
 	
 	public static class Action implements ClickHandler, Observer, AttachEvent.Handler {
 
@@ -83,10 +95,13 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	public static class CirkelAction extends Action {
 
-		Image[] images;
-		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, Image... images) {
+		SafeHtml[] faces;
+		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
 			super(h, t, btn, model);
-			this.images = images;
+			faces = new SafeHtml[images.length]; 
+			for(int i = 0; i < images.length; i++)
+			  faces[i] = face(images[i]);
+			btn.getUpFace().setHTML(faces[0]);
 		}
 
 		@Override
@@ -106,13 +121,13 @@ public class ToolBoxPanel extends Composite implements Tools {
 				Object f = select.firstElement();
 				Object l = select.lastElement();
 				if (f instanceof Segment || l instanceof Segment) {
-					btn.getUpFace().setImage(images[1]);
+					btn.getUpFace().setHTML(faces[1]);
 					break;
 				}
 			default:
-				btn.getUpFace().setImage(images[0]); break;
+				btn.getUpFace().setHTML(faces[0]); break;
 			case 3:
-				btn.getUpFace().setImage(images[2]); break;
+				btn.getUpFace().setHTML(faces[2]); break;
 			}	
 		}
 	}

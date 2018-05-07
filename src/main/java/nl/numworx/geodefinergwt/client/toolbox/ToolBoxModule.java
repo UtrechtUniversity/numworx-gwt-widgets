@@ -41,6 +41,7 @@ import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 import nl.numworx.geodefinergwt.client.TextHandler;
+import nl.numworx.geodefinergwt.client.ToolBoxPanel;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.Action;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.CirkelAction;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.PuntAction;
@@ -76,15 +77,14 @@ public class ToolBoxModule {
 		return btn;
 	}
 
-	static private ToggleButton newCBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model, String string) {
+	static private ToggleButton newCBtn(EventHandler handler, TrackerImpl tracker, RadioMode model, String string) {
 		ToggleButton btn;
-		String u = url + "/circle.png";
-		Image cirkelIcon = new Image(u);
-		Image compassIcon = new Image(url + "/circle3.png");
-		Image cirkel3Icon = new Image(url + "/4.png");
-		btn = new ToggleButton(cirkelIcon);
+		String cirkelIcon  = "circle0";
+		String compassIcon = "circle1";
+		String cirkel3Icon = "circle2";
+		btn = new ToggleButton();
 		btn.setTitle(string);
-		btn.addClickHandler(new CirkelAction(handler, tracker,btn, model, cirkelIcon, compassIcon, cirkel3Icon));
+		btn.addClickHandler(new CirkelAction(handler, tracker, btn, model, cirkelIcon, compassIcon, cirkel3Icon));
 		return btn;
 	}
 
@@ -107,7 +107,7 @@ public class ToolBoxModule {
       RadioMode model, String t) {
     ToggleButton btn;
     btn = new ToggleButton();
-    btn.getUpFace().setHTML("<span class='" + cls + "'></span>");
+    btn.getUpFace().setHTML(ToolBoxPanel.face(cls));
     if (t != null) btn.setTitle(t);
     btn.addClickHandler(new Action(handler, tracker,btn,model));
     return btn;
@@ -142,7 +142,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CIRCLE) @IntoMap static
 	ToggleButton circle(TrackerImpl tracker, RadioMode model) {
-		return newCBtn(url, new AddCirkelHandler(), tracker, model,rb.Euclides_52());
+		return newCBtn(new AddCirkelHandler(), tracker, model,rb.Euclides_52());
 	}
 
 	@Provides @IntKey(Tools.ARC) @IntoMap static
@@ -226,17 +226,17 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static
 	ToggleButton formula(TrackerImpl tracker, RadioMode model, Definitions definitions) {
-		return newBtn(url + "/function.png", new FormuleHandler("Definitie", definitions), tracker, model);
+		return newBtn("formula", new FormuleHandler("Formule", definitions), tracker, model,"Formule");
 	}
 
 	@Provides @IntKey(Tools.TEXT) @IntoMap static
 	ToggleButton text(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/showname.png", new TextHandler("Tekst"), tracker, model);
+		return newBtnSpan("text", new TextHandler("Label"), tracker, model, "Label bij punt");
 	}
 
 	@Provides @IntKey(Tools.TRAIL) @IntoMap static
 	ToggleButton trail(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/thickness2.png", new TrailHandler(rb.Euclides_44()), tracker, model,rb.Euclides_44());
+		return newBtnSpan("trail", new TrailHandler(rb.Euclides_44()), tracker, model,rb.Euclides_44());
 	}
 
 }
