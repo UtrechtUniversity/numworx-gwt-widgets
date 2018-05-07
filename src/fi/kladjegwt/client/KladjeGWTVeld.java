@@ -75,7 +75,7 @@ public class KladjeGWTVeld
 	/**
 	 * de Context2d om mee te tekenen
 	 */
-	public static Context2d gIm;
+	public Context2d gIm;
 	
 	/**
 	 * een hele kleine positieve double
@@ -902,7 +902,7 @@ public class KladjeGWTVeld
 		g.setStrokeStyle(zwart);
 		g.strokeRect(0, 0, breedte, hoogte);
 		
-		g.setLineWidth(1.5d); 
+		g.setLineWidth(1.2d); 
 		tekenProgramma(g);
 
 	}

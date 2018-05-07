@@ -623,11 +623,13 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     		{
     			kladjeGWTVeld.hideTekstVeld(true);
     			kladjeGWTVeld.undo();
+    			setChanged();
     			    			
     		}
     		else if (e.getSource() == wisButton)
     		{
     			kladjeGWTVeld.wis(true);
+    			setChanged();
     		}
     		else if (e.getSource() == kleurkeuzeButton)
     		{
@@ -829,12 +831,16 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				kladjeGWTVeld.paint();
 			}
 		}
-		logger.info("command ontvangen");
+		
 		if (command.startsWith("double.translationX"))
 		{
+			logger.info("command ontvangen");
 			Map map = (Map)event.getParameters();
 			if (map!=null)
-			{	int valueX = ((Integer)map.get("value")).intValue();
+			{	
+				logger.info("map!=null");
+				logger.info(map.toString());
+				int valueX = (int)((Double)map.get("value")).doubleValue();
 				translation = new Point(-valueX, translation.y);
 				kladjeGWTVeld.translation = translation;
 				kladjeGWTVeld.paint();
@@ -844,7 +850,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		{
 			Map map = (Map)event.getParameters();
 			if (map!=null)
-			{	int valueY = ((Integer)map.get("value")).intValue();
+			{	int valueY = (int)((Double)map.get("value")).doubleValue();
 				translation = new Point(translation.x, -valueY);
 				kladjeGWTVeld.translation = translation;
 				kladjeGWTVeld.paint();

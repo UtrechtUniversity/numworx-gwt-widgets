@@ -337,7 +337,7 @@ public class TekstElement
 		else // status komt uit launchdata
 		{
 			// dit bepaalt de breedte
-			tekstElement.zetTekst(tekst, KladjeGWTVeld.gIm);
+			//tekstElement.zetTekst(tekst, KladjeGWTVeld.gIm);
 			// ad hoc correctie
 			tekstElement.breedte += 15;
 		}

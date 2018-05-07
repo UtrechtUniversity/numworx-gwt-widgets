@@ -129,11 +129,11 @@ public class TekstPopup extends PopupPanel
 	{
 		textBox.setText(text);
 		String fontString = "16px bold, sans-serif";
-		KladjeGWTVeld.gIm.setFont(fontString);
-		TextMetrics tm = KladjeGWTVeld.gIm.measureText(text);
-		int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
+		//KladjeGWTVeld.gIm.setFont(fontString);
+		//TextMetrics tm = KladjeGWTVeld.gIm.measureText(text);
+		//int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
 
-		textBox.setWidth("" + tekstBreedte + "px");
+		//textBox.setWidth("" + tekstBreedte + "px");
 
 	}
 	
@@ -148,11 +148,11 @@ public class TekstPopup extends PopupPanel
 		{
 			String tekst = textBox.getText();
 			String fontString = "16px bold, sans-serif";
-			KladjeGWTVeld.gIm.setFont(fontString);
-			TextMetrics tm = KladjeGWTVeld.gIm.measureText(tekst);
-			int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
+			//KladjeGWTVeld.gIm.setFont(fontString);
+			//TextMetrics tm = KladjeGWTVeld.gIm.measureText(tekst);
+			//int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
 
-			textBox.setWidth("" + tekstBreedte + "px");
+			//textBox.setWidth("" + tekstBreedte + "px");
 			
 		
 			
