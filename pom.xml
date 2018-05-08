@@ -119,5 +119,6 @@
 	</scm>
 	<properties>
 		<gwtVersion>2.8.2</gwtVersion>
+		<gwt.style>PRETTY</gwt.style>
 	</properties>
 </project>

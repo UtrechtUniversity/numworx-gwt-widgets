@@ -30,6 +30,7 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.TextAlign;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
@@ -55,6 +56,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.canvas.client.Canvas;
@@ -378,8 +380,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 //			basisPanel.add(kbp);
 // einde		
 		
-		RootPanel.get(holderId).add(basisPanel); // was basisPanel
-		RootPanel.get(holderId).setStyleName("root");
+		RootLayoutPanel root = RootLayoutPanel.get();
+        root.add(basisPanel); // was basisPanel
+        root.setWidgetTopBottom(basisPanel, 0, Unit.PX, 0, Unit.PX);
+        root.setWidgetLeftRight(basisPanel, 0, Unit.PX, 0, Unit.PX);
+
 //		if (grafiekGWTCanvas == null) {
 //		      RootPanel.get(holderId).add(new Label(upgradeMessage));
 //		      return;
@@ -3259,7 +3264,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	public int closestFreePixX(double pressedX)
 	{	
-		Vector points = getPoints(getActiveIndex(), false);
+		Vector<RealPoint> points = getPoints(getActiveIndex(), false);
 
 		// check pressedX en zoek naar links	
 		boolean found = false;	
@@ -4008,6 +4013,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			{	for (int pCnt = 0; pCnt < points.size(); pCnt++)
 				{	RealPoint rp = (RealPoint) points.elementAt(pCnt);
 					Point rpPix = realPointToPixels(rp);
+					if(rpPix == null) continue;
 					int dis = (int) Math.round(
 						Math.sqrt((rpPix.getX() - e.getX()) * (rpPix.getX() - e.getX()) +
 								  (rpPix.getY() - e.getY()) * (rpPix.getY() - e.getY())));
