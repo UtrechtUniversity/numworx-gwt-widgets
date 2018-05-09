@@ -33,7 +33,14 @@ import fi.heksgwt.client.vectortek.VulKrommeTek;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.PopupPanel;
 
-public class Pagina21Panel extends ScContainer //implements MouseListener, MouseMotionListener, ActionListener 
+/**
+ * Pagina21 is het complete panel om blokjes erin te doen.
+ * In instellingenpanel docentomgeving 'blokjes erin', in HeksGWT paginanummer 1. 
+ * 
+ * @author borku102
+ *
+ */
+public class Pagina21Panel extends ScContainer 
 {
 	HeksGWT eigenaar;
 
@@ -69,23 +76,6 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		
 		refresh = true;
 
-		//setBackground(heip.bgColor);
-		//setOpaque(true);
-		
-//GWT?		
-		//zetVastePlaats(true);
-
-//GWT		
-		//Image opnieuwknop = null;
-		//if (Heks.rb.getLocale().getLanguage().equals("nl")) 
-		//{
-		//	opnieuwknop = heip.opnieuwNLImage; //au.getImage("resources/opnieuwknop.gif");
-		//} 
-		//else 
-		//{
-			//opnieuwknop = heip.opnieuwENImage; //au.getImage("resources/againKnop.gif");
-		//}
-		
 		raakPlusBuiten = false;
 		raakPlusBinnen = false;
 		raakMinBuiten = false;
@@ -95,44 +85,18 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		minEruit = false;
 		pasEruit = false;
 
-		//sleeppanel = new ScPanel(350, 30, b - 320, h - 5);
-		//sleeppanel.setBackground(Color.white);
-		//sleeppanel.addMouseListener(this);
-		//sleeppanel.addMouseMotionListener(this);
-		
-		//achtergrond = new AchtergrondContainer(0, 0, b - 320, h - 5);
-
-//GWT(4X)		
-		//opnieuwKnop = new ImageButton(opnieuwknop);
-		//opnieuwKnop.setBounds(20, 600, 95, 35);
-		//opnieuwKnop.addActionListener(this);
-		//add(opnieuwKnop);
-		
-		//opnieuwKnop = new PushButton(eigenaar.rb.opnieuwKnopLabel());
-		//eigenaar.dlp.add(opnieuwKnop);
-		//eigenaar.dlp.setWidgetLeftWidth(opnieuwKnop, 20, Style.Unit.PX, 95, Style.Unit.PX);
-		//eigenaar.dlp.setWidgetTopHeight(opnieuwKnop, 350, Style.Unit.PX, 25, Style.Unit.PX);
-
-
-		// x plus 350, y plus 30
-		//vloer = new Tekening(-10, 450, 430, 175, heip, "vloer.gif", true);
 		vloer = new Tekening(340, 480, 430, 175, eigenaar.vloerMap);
 		add(vloer);
 
-		// x plus 350, y plus 30
-		//pot = new Tekening(20, 280, 380, 330, heip, "potnieuw.gif", true);
 		pot = new Tekening(370, 310, 380, 330, eigenaar.potMap);
 		add(pot);
 		
-		// x plus 350, y plus 30
-		//potinhoud = new Tekening(20, 305, 375, 300, heip, "inhoudnieuw.gif", true);
 		potinhoud = new Tekening(370, 335, 375, 300, eigenaar.potinhoudMap);
 		add(potinhoud);
 		
 		beginTemp = new GetalComponent(170, 100, 80, 40, eigenaar);
 		beginTemp.zetInstelbaar(true);
 		beginTemp.zetAlsTemp(true);
-		//beginTemp.addActionListener(this);
 		add(beginTemp);
 
 		beginPot = new Tekening(35, 85, 90, 65, eigenaar.beginEindPotMap);
@@ -140,7 +104,6 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		
 		beginLabel = new ScLabel(50, 105, 60, 30, "begin");
 		//activeert de getalcompoenent met begintemp
-		//beginLabel.addMouseListener(this);
 		add(beginLabel);
 
 		potErin = new Tekening(30, 170, 100, 90, eigenaar.potErinMap);
@@ -149,14 +112,6 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		erinLabel = new ScLabel(65, 215, 60, 30, "erin");
 		add(erinLabel);
 		
-/*
- 		potEruit = new Tekening(30, 260, 100, 90, heip, "potEruit.gif");
-		// add(potEruit);
- 
-		eruitLabel = new ScLabel(35, 365, 60, 30, Heks.rb.getString("eruitLabel"));
-		// add(eruitLabel);
-
-*/
 		eindTemp = new GetalComponent(170, 290, 80, 40, eigenaar);
 		eindTemp.zetAlsTemp(true);
 		add(eindTemp);
@@ -169,56 +124,32 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		add(eindLabel);
 		
 
-		//erinContainer = new BlokjesContainer(180, 190, 165, 127, eigenaar);
 		erinContainer = new BlokjesContainer(180, 190, 165, 90, eigenaar);
 		erinContainer.zetMaxRijen(2);
 		add(erinContainer);
-/*
-		eruitContainer = new BlokjesContainer(150, 380, 110, 85, heip);
-		// add(eruitContainer);
-*/
-		//blokjePlus = new Tekening(350, 80, 65, 65, heip, "blokjePlus.gif", true);
 		blokjePlus = new Tekening(700, 110, 65, 65, eigenaar.blokjePlusMap);
-		//achtergrond.add(blokjePlus);
 		add(blokjePlus);
 
-		//blokjeMin = new Tekening(350, 150, 65, 65, heip, "blokjeMin.gif");
 		blokjeMin = new Tekening(700, 180, 65, 65, eigenaar.blokjeMinMap);
-		//achtergrond.add(blokjeMin);
 		add(blokjeMin);
 
 
-		//za = new ZinkAnimatie(110, 290, 210, 200, heip);
 		za = new ZinkAnimatie(450, 320, 220, 200, eigenaar, this);
-		//sleeppanel.add(za, 0);
 		add(za);
 
-		//blokjeSleep = new Tekening(350, 80, 65, 65, heip, "blokjePlus.gif");
 		blokjeSleep = new Tekening(700, 110, 65, 65, eigenaar.blokjePlusMap);
-		//sleeppanel.add(blokjeSleep, 0);
 		add(blokjeSleep);
 
-		//blokjeSleepMin = new Tekening(350, 150, 65, 65, heip, "blokjeMin.gif");
 		blokjeSleepMin = new Tekening(700, 180, 65, 65, eigenaar.blokjeMinMap);
-		//sleeppanel.add(blokjeSleepMin, 0);
 		add(blokjeSleepMin);
 
-		//tc = new GetalComponent(320, 360, 120, 40);
 		tc = new GetalComponent(720, 390, 100, 40, eigenaar);
 		tc.zetAlsTemp(true);
-		//sleeppanel.add(tc, 0);
 		add(tc, 0);
 		
 
-		// x plus 350, y plus 30
-		//tm = new Thermometer(100, 0, 55, 400);
 		tm = new Thermometer(450, 30, 55, 400, eigenaar.heksGWTContext2d);
 		add(tm);
-/*
-		sleeppanel.add(achtergrond);
-		add(sleeppanel);
-*/		
-
 	}
 	
 	public void initHandlers()
@@ -232,7 +163,6 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		eigenaar.heksGWTCanvas.addTouchStartHandler(touchHandler);
 		eigenaar.heksGWTCanvas.addTouchMoveHandler(touchHandler);
 		eigenaar.heksGWTCanvas.addTouchEndHandler(touchHandler);
-
 	}
 	
 	public void initOpnieuwKnop()
@@ -244,14 +174,13 @@ public class Pagina21Panel extends ScContainer //implements MouseListener, Mouse
 		eigenaar.dlp.setWidgetTopHeight(opnieuwKnop, knopY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		opnieuwKnop.addClickHandler(new PushClickHandler());
-
 	}
 
 	public void setState(Map map) 
 	{
-		if(map==null)
+		if (map==null)
 			return;
-System.out.println("p21 setState");		
+
 		ObjectMap h = JSONUtilities.wrapMap(map);
 
 		int begintemp = 0; 
@@ -281,57 +210,29 @@ System.out.println("p21 setState");
 		eindTemp.zetWaarde(eindtemp);
 		tc.zetWaarde(eindtemp);
 		
-		
 		tm.zetTemp(eindtemp);
 		
 		paint(eigenaar.heksGWTContext2d);
-		
 	}
 
 	public HashMap getState() 
 	{
-System.out.println("p21 getState");		
 		HashMap h = new HashMap();
-		
 		
 		h.put("begintemp", new Integer(beginTemp.geefWaarde()));
 		h.put("blokjespluserin", new Integer(erinContainer.getalPlus.geefWaarde()));
-//System.out.println("pluserin " + erinContainer.getalPlus.geefWaarde());		
 		h.put("blokjesminerin", new Integer(erinContainer.getalMin.geefWaarde()));
-//System.out.println("minerin " + erinContainer.getalPlus.geefWaarde());		
 		h.put("eindtemp", new Integer(eindTemp.geefWaarde()));
 
 		return h;
 	}
 
-/*	
-	public double getScore() 
-	{
-		if (textArea.getText() != null && textArea.getText().length() > 100)
-			return 100;
-		if (textArea.getText() != null && textArea.getText().length() > 5)
-			return 10;
-		return 0;
-	}
-*/
 	public void start() 
 	{
-//GWT
-/*		
-		beginTemp.zetWaarde(0);
-		eindTemp.zetWaarde(0);
-		tc.zetWaarde(0);
-		tm.zetTemp(0);
-		erinContainer.removeAll();
-		eruitContainer.removeAll();
-		za.start();
-*/		
 	}
 
 	public void stop() 
 	{
-//GWT		
-		//za.stop();
 	}
 
 	public void showTekstPopup(GetalComponent gc)
@@ -364,14 +265,11 @@ System.out.println("p21 getState");
 		if (beginLabel.contains(eventX, eventY)) 
 		{
 			showTekstPopup(beginTemp);
-			//beginTemp.vulIn();
 		}
 		if (beginTemp.contains(eventX, eventY)) 
 		{
 			showTekstPopup(beginTemp);			
-			//beginTemp.vulIn();
 		}
-		
 
 		// dit is voor eruithalen?		
 		p = new Polygon[11];
@@ -398,23 +296,20 @@ System.out.println("p21 getState");
 
 	public void mouseMoveTouchMoveAction(int eventX, int eventY) 
 	{
-		
 		int dx = eventX - laatstex;
 		int dy = eventY - laatstey;
 
 		if (raakSleep) 
 		{
-			//blokjeSleep.setLocation(blokjeSleep.getLocation().x + dx, blokjeSleep.getLocation().y + dy);
 			blokjeSleep.verplaats(dx, dy);
 			
 			Polygon p = ((VulKrommeTek) (pot.to[2])).buigPolygon;
-			int lx = 0;// pot.getLocation().x;
-			int ly = 0; //pot.getLocation().y;
+			int lx = 0;
+			int ly = 0;
 			for (int i = 0; i < p.geefAantalPunten(); i++) 
 			{
 				if (blokjeSleep.contains(p.geefPuntX(i) + lx, p.geefPuntY(i) + ly)) 
 				{
-					//blokjeSleep.setLocation(blokjeSleep.getLocation().x - dx, blokjeSleep.getLocation().y - dy);
 					blokjeSleep.verplaats(-dx, -dy);
 					raakSleep = false;
 				}
@@ -436,17 +331,15 @@ System.out.println("p21 getState");
 		}
 		if (raakSleepMin) 
 		{
-			//blokjeSleepMin.setLocation(blokjeSleepMin.getLocation().x + dx, blokjeSleepMin.getLocation().y + dy);
 			blokjeSleepMin.verplaats(dx, dy);
 			
 			Polygon p = ((VulKrommeTek) (pot.to[2])).buigPolygon;
-			int lx = 0; //pot.getLocation().x;
-			int ly = 0; //pot.getLocation().y;
+			int lx = 0;
+			int ly = 0;
 			for (int i = 0; i < p.geefAantalPunten(); i++) 
 			{
 				if (blokjeSleepMin.contains(p.geefPuntX(i) + lx, p.geefPuntY(i) + ly)) 
 				{
-					//blokjeSleepMin.setLocation(blokjeSleepMin.getLocation().x - dx, blokjeSleepMin.getLocation().y - dy);
 					blokjeSleepMin.verplaats(-dx, -dy);
 					raakSleepMin = false;
 				}
@@ -464,32 +357,20 @@ System.out.println("p21 getState");
 			paint(eigenaar.heksGWTContext2d);
 			laatstex = eventX;
 			laatstey = eventY;
-		} 
-/*		
-		else if (blokjeSleep.contains(eventX, eventY)) 
-		{
-			raakSleep = true;
-		} 
-		else if (blokjeSleepMin.contains(eventX, eventY)) 
-		{
-			raakSleepMin = true;
 		}
-*/
+
 		if (!plusEruit && 
 				blokjeSleep.getLocation().x + blokjeSleep.getSize().x < za.getLocation().x + za.getSize().x && 
 				blokjeSleep.getLocation().x > za.getLocation().x && 
 				blokjeSleep.getLocation().y > za.getLocation().y && 
 				blokjeSleep.getLocation().y + blokjeSleep.getSize().y < za.getLocation().y + za.getSize().y) 
 		{
-			//za.start(true, blokjeSleep.getLocation().x - za.getLocation().x);
 			tc.verhoog();
 			tm.tempPlus();
 			eindTemp.verhoog();
 			
 			if (!pasEruit)
 				erinContainer.voegBlokjeToe(true);
-//			else
-//				eruitContainer.verwijderBlokje();
 				
 			blokjeSleep.setLocation((int) (blokjePlus.getLocation().x), (int) (blokjePlus.getLocation().y));
 			raakSleep = false;
@@ -504,15 +385,12 @@ System.out.println("p21 getState");
 				blokjeSleepMin.getLocation().y > za.getLocation().y && 
 				blokjeSleepMin.getLocation().y + blokjeSleepMin.getSize().y < za.getLocation().y + za.getSize().y) 
 		{
-			//za.start(false, blokjeSleepMin.getLocation().x - za.getLocation().x);
 			tc.verlaag();
 			tm.tempMin();
 			eindTemp.verlaag();
 			
 			if (!pasEruit)
 				erinContainer.voegBlokjeToe(false);
-//			else
-//				eruitContainer.verwijderBlokje();
 				
 			blokjeSleepMin.setLocation((int) (blokjeMin.getLocation().x), (int) (blokjeMin.getLocation().y));
 			raakSleepMin = false;
@@ -554,9 +432,6 @@ System.out.println("p21 getState");
 			
 			if (!pasEruit)
 				erinContainer.voegBlokjeToe(true);
-//			else
-//				eruitContainer.verwijderBlokje();
-			
 			
 			paint(eigenaar.heksGWTContext2d);
 		} 
@@ -581,8 +456,6 @@ System.out.println("p21 getState");
 			
 			if (!pasEruit)
 				erinContainer.voegBlokjeToe(false);
-//			else
-//				eruitContainer.verwijderBlokje();
 
 			paint(eigenaar.heksGWTContext2d);
 		} 
@@ -617,13 +490,9 @@ System.out.println("p21 getState");
 			tc.paint();
 			tm.zetTemp(0);
 		}
+
 		erinContainer.removeAll();
 		erinContainer.paint();
-		//eruitContainer.removeAll();
-		//eruitContainer.paint();
-		
-		//paint(eigenaar.heksGWTContext2d);
-
 	}
 
 	
@@ -674,7 +543,9 @@ System.out.println("p21 getState");
 	} //MLMML
 
 
-	// tablet, dwo 
+	/**
+	 * tablet, dwo
+	 */
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		
@@ -727,7 +598,6 @@ System.out.println("p21 getState");
 	{
 	   	public void onClick(ClickEvent e)
 	   	{
-			//e.preventDefault();
 			e.stopPropagation();
 	   		
 	   		if (e.getSource() == opnieuwKnop)
