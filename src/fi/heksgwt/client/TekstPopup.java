@@ -1,19 +1,14 @@
 package fi.heksgwt.client;
 
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 
 import fi.heksgwt.client.scobjects.ScContainer;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditorTouchHandler;
-import nl.uu.fi.dwo.formule.client.formuleobjects.FormuleElement;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 
 public class TekstPopup extends PopupPanel
@@ -42,8 +37,6 @@ public class TekstPopup extends PopupPanel
 	 */
 	private boolean popupOpened = false;
 
-	// TextBox textBox;
-	// int tekstX, tekstY;
 	int maxVisibleCharacters = 10;
 	int maxCharacters = 30;
 	boolean isForLabel = false;
@@ -56,22 +49,11 @@ public class TekstPopup extends PopupPanel
 
 		owner = o;
 		bigOwner = bigO;
-		// tekstX = eventX;
-		// tekstY = eventY;
-
-		// textBox = new TextBox();
-		//
-		// //textBox.setText("text here");
-		// textBox.setMaxLength(maxCharacters);
-		// textBox.setVisibleLength(maxVisibleCharacters);
-		// textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
-		// setWidget(textBox);
 
 		touchPanel = new TouchPanel();
 
 		editor = new FormuleEditor()
 		{
-
 			@Override
 			public void insert(String text)
 			{
@@ -114,15 +96,6 @@ public class TekstPopup extends PopupPanel
 			
 		});
 	}
-
-	// public String getText()
-	// {
-	// return textBox.getText();
-	// }
-	// public void setText(String text)
-	// {
-	// textBox.setText(text);
-	// }
 
 	public String getText()
 	{
@@ -167,7 +140,8 @@ public class TekstPopup extends PopupPanel
 		if (getText().equals(""))
 			return;
 
-		owner.zetWaarde(getText());
+		owner.zetInvulWaarde(getText());
+		
 		if (bigOwner instanceof Pagina21Panel)
 		{
 			((Pagina21Panel) bigOwner).opnieuwAction();
@@ -230,20 +204,6 @@ public class TekstPopup extends PopupPanel
 			setHeight(editor.getHeight() + "px");	
 	}
 
-//	class TextBoxKeyDownHandler implements KeyDownHandler
-//	{
-//		public void onKeyDown(KeyDownEvent e)
-//		{
-//
-//			if (e.getNativeKeyCode() == KeyCodes.KEY_ENTER)
-//			{
-//				// System.out.println("enter");
-//				exitAction();
-//				setVisible(false);
-//			}
-//		}
-//	}
-
 	class PopupCloseHandler implements CloseHandler<PopupPanel>
 	{
 		public void onClose(CloseEvent<PopupPanel> e)
@@ -251,5 +211,4 @@ public class TekstPopup extends PopupPanel
 			exitAction();
 		}
 	}
-
 }
