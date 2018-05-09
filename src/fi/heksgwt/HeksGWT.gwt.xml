@@ -19,6 +19,7 @@
 
   <!-- Other module inherits                                      -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+  <inherits name='nl.uu.fi.dwo.formule.Formule' />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.heksgwt.client.HeksGWT'/>

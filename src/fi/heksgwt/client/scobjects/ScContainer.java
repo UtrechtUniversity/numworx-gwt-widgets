@@ -1,14 +1,10 @@
 package fi.heksgwt.client.scobjects;
 
-//import java.awt.*;
-
 import java.util.Vector;
-import fi.heksgwt.client.vectortek.TekenObjectTek;
 import fi.heksgwt.client.vectortek.Point;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
-//public class ScContainer extends Container implements ScObject
 public class ScContainer implements ScObject
 {
 	int componenetCnt = 0;
@@ -24,13 +20,11 @@ public class ScContainer implements ScObject
 	
 	public ScContainer() 
 	{
-//		setLayout(null);
 		schaal = 1;
 	}
 
 	public ScContainer(int x, int y, int b, int h) 
 	{
-//		setLayout(null);
 		schaal = 1;
 		relx = x;
 		rely = y;
@@ -42,7 +36,6 @@ public class ScContainer implements ScObject
 	public void setBounds(int x, int y, int b, int h)
 	{
 		xPos = x; yPos = y; breedte = b; hoogte = h;
-//System.out.println("ScCont setBounds " + x + " " + y + " " + b + " " + h);		
 	}
 
 	public void setLocation(int x, int y)
@@ -88,12 +81,6 @@ public class ScContainer implements ScObject
 
 	public void add(Object o, int insertPos)
 	{
-		
-//		if (o instanceof TekenObjectTek)
-//		{
-//			((TekenObjectTek) o).verplaats(xPos,yPos); 
-//		}
-		
 		components.insertElementAt(o, insertPos);
 	}
 
@@ -120,7 +107,6 @@ public class ScContainer implements ScObject
 		int n = getComponentCount();
 		for (int i = 0; i < n; i++) 
 		{
-			//Component c = getComponent(i);
 			Object c = getComponent(i);
 			ScObject scc = null;
 			try 
@@ -132,7 +118,6 @@ public class ScContainer implements ScObject
 			}
 			if (scc != null)
 				scc.schaal(schaal);
-
 		}
 	}
 	
@@ -146,7 +131,6 @@ public class ScContainer implements ScObject
 
 		int n = getComponentCount();
 		
-//System.out.println("cc = " + n);		
 		for (int i = 0; i < n; i++) 
 		{
 			Object c = getComponent(i);
@@ -162,6 +146,4 @@ public class ScContainer implements ScObject
 		return (x >= xPos) && (x <= (xPos + breedte)) &&
 			   (y >= yPos) && (y <= (yPos + hoogte));
 	}
-
-	
 }

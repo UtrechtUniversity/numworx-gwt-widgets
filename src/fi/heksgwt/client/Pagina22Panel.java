@@ -23,11 +23,6 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.PopupPanel;
-
-import fi.heksgwt.client.Pagina21Panel.MouseHandler;
-import fi.heksgwt.client.Pagina21Panel.PushClickHandler;
-import fi.heksgwt.client.Pagina21Panel.TouchHandler;
 import fi.heksgwt.client.scobjects.ScContainer;
 import fi.heksgwt.client.scobjects.ScLabel;
 import fi.heksgwt.client.vectortek.Tekening;
@@ -35,13 +30,17 @@ import fi.heksgwt.client.vectortek.Polygon;
 import fi.heksgwt.client.vectortek.VeelhoekTek;
 import fi.heksgwt.client.vectortek.VulKrommeTek;
 
-
-public class Pagina22Panel extends ScContainer //Panel implements MouseListener, MouseMotionListener, ActionListener 
+/**
+ * Pagina22 is het complete panel om blokjes eruit te doen.
+ * In instellingenpanel docentomgeving 'blokjes eruit', in HeksGWT paginanummer 2. 
+ * 
+ * @author borku102
+ *
+ */
+public class Pagina22Panel extends ScContainer 
 {
 	HeksGWT eigenaar;
 	
-	//private AchtergrondContainer achtergrond;
-
 	Tekening blokjePlus, blokjeMin, blokjeSleep, blokjeSleepMin;
 	Tekening pot, potEruit, potErin, beginPot, eindPot, potinhoud, vloer, schrijfheks, werkheks;
 	ZinkAnimatie za;
@@ -58,8 +57,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 	boolean plusEruit, minEruit, pasEruit;
 	boolean[] kleurBlokjes = { true, false, true, true, true, true, false, false, false, false, true };
 
-//GWT
-	//ImageButton opnieuwKnop;
 	PushButton opnieuwKnop;
 	TekstPopup tf;
 	
@@ -70,30 +67,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		super(x, y, b, h);
 		eigenaar = heksGWT;
 
-		// setBackground(new Color(255,255,220));
-		//setBackground(heip.bgColor);
-
-//GWT?		
-		//zetVastePlaats(true);
-
-		//GWT		
-		//Image opnieuwknop = null;
-		//if (Heks.rb.getLocale().getLanguage().equals("nl")) 
-		//{
-		//	opnieuwknop = heip.opnieuwNLImage; //au.getImage("resources/opnieuwknop.gif");
-		//} 
-		//else 
-		//{
-			//opnieuwknop = heip.opnieuwENImage; //au.getImage("resources/againKnop.gif");
-		//}
-
-//GWT(4)
-		//opnieuwKnop = new ImageButton(opnieuwknop);
-		//opnieuwKnop.setBounds(20, 300, 150, 24);
-		//opnieuwKnop.addActionListener(this);
-		//add(opnieuwKnop);
-
-
 		raakPlusBuiten = false;
 		raakPlusBinnen = false;
 		raakMinBuiten = false;
@@ -103,26 +76,12 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		minEruit = false;
 		pasEruit = false;
 
-
-		//sleeppanel = new ScPanel(350, 30, b - 320, h - 5);
-		//sleeppanel.setBackground(Color.white);
-		//sleeppanel.addMouseListener(this);
-		//sleeppanel.addMouseMotionListener(this);
-		
-		//achtergrond = new AchtergrondContainer(0, 0, b - 300, h - 5);
-
-		// x plus 350, y plus 30
-		//vloer = new Tekening(-10, 450, 430, 175, heip, "vloer.gif", true);
 		vloer = new Tekening(340, 480, 430, 175, eigenaar.vloerMap);
 		add(vloer);
 
-		// x plus 350, y plus 30
-		//pot = new Tekening(20, 280, 380, 330, heip, "potnieuw.gif", true);
 		pot = new Tekening(370, 310, 380, 330, eigenaar.potMap);
 		add(pot);
 		
-		// x plus 350, y plus 30
-		//potinhoud = new Tekening(20, 305, 375, 300, heip, "inhoudnieuw.gif", true);
 		potinhoud = new Tekening(370, 335, 375, 300, eigenaar.potinhoudMap);
 		add(potinhoud);
 
@@ -130,7 +89,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		beginTemp = new GetalComponent(170, 70, 80, 40, eigenaar);
 		beginTemp.zetInstelbaar(true);
 		beginTemp.zetAlsTemp(true);
-		//beginTemp.addActionListener(this);
 		add(beginTemp);
 
 		beginPot = new Tekening(35, 55, 90, 65, eigenaar.beginEindPotMap);
@@ -138,7 +96,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		
 		beginLabel = new ScLabel(50, 75, 60, 30, "begin");
 		//activeert de getalcompoenent met begintemp
-		//beginLabel.addMouseListener(this);
 		add(beginLabel);
 
 		potErin = new Tekening(30, 140, 100, 90, eigenaar.potErinMap);
@@ -176,7 +133,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		add(blokjePlus);
 
 		blokjeMin = new Tekening(700, 180, 65, 65, eigenaar.blokjeMinMap);
-		//achtergrond.add(blokjeMin);
 		add(blokjeMin);
 
 		za = new ZinkAnimatie(450, 320, 220, 200, eigenaar, this);
@@ -184,25 +140,17 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		add(za, 0);
 
 		blokjeSleep = new Tekening(700, 110, 65, 65, eigenaar.blokjePlusMap);
-		//sleeppanel.add(blokjeSleep, 0);
 		add(blokjeSleep);
 
 		blokjeSleepMin = new Tekening(700, 180, 65, 65, eigenaar.blokjeMinMap);
-		//sleeppanel.add(blokjeSleepMin, 0);
 		add(blokjeSleepMin);
 
 		tc = new GetalComponent(720, 390, 100, 40, eigenaar);
 		tc.zetAlsTemp(true);
-		//sleeppanel.add(tc, 0);
 		add(tc, 0);
 
 		tm = new Thermometer(450, 30, 55, 400,eigenaar.heksGWTContext2d);
-		//sleeppanel.add(tm, 0);
 		add(tm);
-
-		//sleeppanel.add(achtergrond);
-		//add(sleeppanel);
-
 	}
 	
 	public void initHandlers()
@@ -216,7 +164,6 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		eigenaar.heksGWTCanvas.addTouchStartHandler(touchHandler);
 		eigenaar.heksGWTCanvas.addTouchMoveHandler(touchHandler);
 		eigenaar.heksGWTCanvas.addTouchEndHandler(touchHandler);
-
 	}
 
 	public void initOpnieuwKnop()
@@ -228,13 +175,10 @@ public class Pagina22Panel extends ScContainer //Panel implements MouseListener,
 		eigenaar.dlp.setWidgetTopHeight(opnieuwKnop, knopY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		opnieuwKnop.addClickHandler(new PushClickHandler());
-
 	}
 
 	public void setState(Map map) 
 	{
-		
-System.out.println("p22 setState");
 		ObjectMap h = JSONUtilities.wrapMap(map);
 
 		int begintemp = 0; 
@@ -273,14 +217,11 @@ System.out.println("p22 setState");
 		tm.zetTemp(eindtemp);
 		
 		paint(eigenaar.heksGWTContext2d);
-
 	}
 
 	public HashMap getState() 
 	{
-System.out.println("p22 getState");		
 		HashMap h = new HashMap();
-
 		
 		h.put("begintemp", new Integer(beginTemp.geefWaarde()));
 		h.put("blokjespluserin", new Integer(erinContainer.getalPlus.geefWaarde()));
@@ -294,22 +235,10 @@ System.out.println("p22 getState");
 
 	public void start() 
 	{
-//GWT
-/*		
-		beginTemp.zetWaarde(0);
-		eindTemp.zetWaarde(0);
-		tc.zetWaarde(0);
-		tm.zetTemp(0);
-		erinContainer.removeAll();
-		eruitContainer.removeAll();
-		za.start();
-(*/		
 	}
 
 	public void stop() 
 	{
-//GWT		
-		//za.stop();
 	}
 
 	public void showTekstPopup(GetalComponent gc)
@@ -330,26 +259,22 @@ System.out.println("p22 getState");
 		//tf.setModal(true);
 		tf.setPopupPosition(popupX, popupY);
 		tf.show();
-		tf.textBox.setFocus(true);
-
+		tf.setFocus(true);
 	}
 
-	//public void mousePressed(MouseEvent e)
 	public void mouseDownTouchStartAction(int eventX, int eventY)
 	{
 		laatstex = eventX;
 		laatstey = eventY;
 		
-System.out.println("mouseDown " + eventX + "," + eventY);		
-
 		if (beginLabel.contains(eventX, eventY)) 
-		{	showTekstPopup(beginTemp);
-			//beginTemp.vulIn();
+		{	
+			showTekstPopup(beginTemp);
 		}
 
 		if (beginTemp.contains(eventX, eventY)) 
-		{	showTekstPopup(beginTemp);
-			//beginTemp.vulIn();
+		{
+			showTekstPopup(beginTemp);
 		}
 		
 		
@@ -366,46 +291,27 @@ System.out.println("mouseDown " + eventX + "," + eventY);
 
 		if (blokjeSleep.contains(eventX, eventY)) 
 		{
-//System.out.println("blokjeSleep contains");
-//System.out.println("blokjeSleep x = " + blokjeSleep.getLocation().x);
-//System.out.println("blokjeSleep y = " + blokjeSleep.getLocation().y);
-//System.out.println("blokjeSleep b = " + blokjeSleep.getSize().x);
-//System.out.println("blokjeSleep h = " + blokjeSleep.getSize().y);
-			
 			raakSleep = true;
 		}
 
 		if (blokjeSleepMin.contains(eventX, eventY)) 
 		{
-//System.out.println("blokjeSleepMin contains");
-//System.out.println("blokjeSleepMin x = " + blokjeSleepMin.getLocation().x);
-//System.out.println("blokjeSleepMin y = " + blokjeSleepMin.getLocation().y);
-			
 			raakSleepMin = true;
 		}
-		//int x = e.getX() - potinhoud.getLocation().x;
-		//int y = e.getY() - potinhoud.getLocation().y;
 
 		for (int i = 10; i > -1; i--) 
 		{
-			//if (p[i].contains(x, y))
 			if (p[i].contains(eventX, eventY))
 			{
-System.out.println("p[" + i + "] contains");
-
 				if (kleurBlokjes[i]) 
 				{
-System.out.println("kleurBlokjes[" + i + "]");					
 					blokjeSleep.setLocation(eventX - blokjeSleep.breedte / 2, eventY - blokjeSleep.hoogte / 2);
-					//blokjeSleep.repaint();
 					plusEruit = true;
 					paint(eigenaar.heksGWTContext2d);
 				} 
 				else 
 				{
-System.out.println("not kleurBlokjes[" + i + "]");					
 					blokjeSleepMin.setLocation(eventX - blokjeSleep.breedte / 2, eventY - blokjeSleep.hoogte / 2);
-					//blokjeSleepMin.repaint();
 					minEruit = true;
 					paint(eigenaar.heksGWTContext2d);
 				}
@@ -413,29 +319,24 @@ System.out.println("not kleurBlokjes[" + i + "]");
 				return;
 			}
 		}
-
 	}
 
-	//public void mouseDragged(MouseEvent e)
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
 	{
-
 		int dx = eventX - laatstex;
 		int dy = eventY - laatstey;
 
 		if (raakSleep) 
 		{
-			//blokjeSleep.setLocation(blokjeSleep.getLocation().x + dx, blokjeSleep.getLocation().y + dy);
 			blokjeSleep.verplaats(dx, dy);
 			
 			Polygon p = ((VulKrommeTek) (pot.to[2])).buigPolygon;
-			int lx = 0; //pot.getLocation().x;
-			int ly = 0; //pot.getLocation().y;
+			int lx = 0;
+			int ly = 0;
 			for (int i = 0; i < p.geefAantalPunten(); i++) 
 			{
 				if (blokjeSleep.contains(p.geefPuntX(i) + lx, p.geefPuntY(i) + ly)) 
 				{
-					//blokjeSleep.setLocation(blokjeSleep.getLocation().x - dx, blokjeSleep.getLocation().y - dy);
 					blokjeSleep.verplaats(-dx, -dy);
 					raakSleep = false;
 				}
@@ -451,7 +352,6 @@ System.out.println("not kleurBlokjes[" + i + "]");
 				
 			}
 			
-			//blokjeSleep.repaint();
 			paint(eigenaar.heksGWTContext2d);
 			laatstex = eventX;
 			laatstey = eventY;
@@ -460,13 +360,12 @@ System.out.println("not kleurBlokjes[" + i + "]");
 		{
 			blokjeSleepMin.setLocation(blokjeSleepMin.getLocation().x + dx, blokjeSleepMin.getLocation().y + dy);
 			Polygon p = ((VulKrommeTek) (pot.to[2])).buigPolygon;
-			int lx = 0; //pot.getLocation().x;
-			int ly = 0; //pot.getLocation().y;
+			int lx = 0;
+			int ly = 0;
 			for (int i = 0; i < p.geefAantalPunten(); i++) 
 			{
 				if (blokjeSleepMin.contains(p.geefPuntX(i) + lx, p.geefPuntY(i) + ly)) 
 				{
-					//blokjeSleepMin.setLocation(blokjeSleepMin.getLocation().x - dx, blokjeSleepMin.getLocation().y - dy);
 					blokjeSleepMin.verplaats(-dx, -dy);
 					raakSleepMin = false;
 				}
@@ -481,8 +380,7 @@ System.out.println("not kleurBlokjes[" + i + "]");
 				blokjeSleepMin.setLocation((int) (blokjeMin.getLocation().x), (int) (blokjeMin.getLocation().y));
 					
 			}
-			
-			//blokjeSleepMin.repaint();
+
 			paint(eigenaar.heksGWTContext2d);
 			laatstex = eventX;
 			laatstey = eventY;
@@ -502,8 +400,7 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			blokjeSleep.getLocation().x > za.getLocation().x && 
 			blokjeSleep.getLocation().y > za.getLocation().y && 
 			blokjeSleep.getLocation().y + blokjeSleep.getSize().y < za.getLocation().y + za.getSize().y) 
-		{ 
-			//za.start(true, blokjeSleep.getLocation().x - za.getLocation().x);
+		{
 			tc.verhoog();
 			tm.tempPlus();
 			eindTemp.verhoog();
@@ -523,9 +420,7 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			blokjeSleepMin.getLocation().x > za.getLocation().x && 
 			blokjeSleepMin.getLocation().y > za.getLocation().y && 
 			blokjeSleepMin.getLocation().y + blokjeSleepMin.getSize().y < za.getLocation().y + za.getSize().y) 
-		{ 
-			
-			//za.start(false, blokjeSleepMin.getLocation().x - za.getLocation().x);
+		{
 			tc.verlaag();
 			tm.tempMin();
 			eindTemp.verlaag();
@@ -564,7 +459,6 @@ System.out.println("not kleurBlokjes[" + i + "]");
 		laatstey = eventY;
 	}
 
-	//public void mouseReleased(MouseEvent e)
 	public void mouseUpTouchEndAction()
 	{
 		raakSleep = false;
@@ -650,13 +544,10 @@ System.out.println("not kleurBlokjes[" + i + "]");
 				eruitContainer.removeAll();
 				eruitContainer.paint();
 			}
-
 	}
 
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
-		
-		//public void mousePressed(MouseEvent e)
 		public void onMouseDown(MouseDownEvent e)
 		{
 			e.preventDefault();
@@ -673,7 +564,6 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			
 		}
 		
-		//public void mouseDragged(MouseEvent e)
 		public void onMouseMove(MouseMoveEvent e)	
 		{
 			e.preventDefault();
@@ -681,23 +571,15 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			// prevent scrolling
 			e.stopPropagation();
 			
-//System.out.println("onMouseMove");			
-			
 			if (!mouseDown)
 				return;
 
 			int eventX = e.getX();
 			int eventY = e.getY();
 
-//System.out.println("sp = " + shiftPressed);
-
 			mouseMoveTouchMoveAction(eventX, eventY);
-			
-			
-			
 		} // onMouseMove
 		
-		//public void mouseReleased(MouseEvent e)
 		public void onMouseUp(MouseUpEvent e)	
 		{
 			e.preventDefault();
@@ -708,16 +590,15 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			mouseDown = false;
 		
 			mouseUpTouchEndAction();
-
 		}
 
 	} //MLMML
 
-
-	// tablet, dwo 
+	/**
+	 * tablet, dwo
+	 */
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
-		
 		public void onTouchStart(TouchStartEvent e)
 		{
 			e.preventDefault();
@@ -727,19 +608,18 @@ System.out.println("not kleurBlokjes[" + i + "]");
 			{
 				Touch touch = e.getTouches().get(0);
 				
-				
 				int eventX = touch.getPageX() - eigenaar.heksGWTCanvas.getAbsoluteLeft();
 				int eventY = touch.getPageY() - eigenaar.heksGWTCanvas.getAbsoluteTop();				
 				
 				mouseDownTouchStartAction(eventX, eventY);
-				
 		    }
+			
 			e.preventDefault();
 			e.stopPropagation();
 		}
+		
 		public void onTouchMove(TouchMoveEvent e)
 		{
-			
 			e.preventDefault();
 			e.stopPropagation();
 			
@@ -751,12 +631,12 @@ System.out.println("not kleurBlokjes[" + i + "]");
 				int eventY = touch.getPageY() - eigenaar.heksGWTCanvas.getAbsoluteTop();				
 			    
 				mouseMoveTouchMoveAction(eventX, eventY);
-				
 		    }
+			
 			e.preventDefault();
 			e.stopPropagation();
-			
 		}
+		
 		public void onTouchEnd(TouchEndEvent e)
 		{
 			mouseUpTouchEndAction();
@@ -765,7 +645,6 @@ System.out.println("not kleurBlokjes[" + i + "]");
 	}
     class PushClickHandler implements ClickHandler
 	{
-	   	//public void onMouseDown(MouseDownEvent e)
 	   	public void onClick(ClickEvent e)
 	   	{
 			//e.preventDefault();
@@ -775,9 +654,6 @@ System.out.println("not kleurBlokjes[" + i + "]");
 	   		{
 	   			opnieuwAction();    			
 	   		}
-	    		
 	   	}
-	    	
 	}
-
 }

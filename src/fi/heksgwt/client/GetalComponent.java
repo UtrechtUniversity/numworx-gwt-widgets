@@ -1,22 +1,20 @@
 package fi.heksgwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
-
 import fi.heksgwt.client.scobjects.*;
+import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.RestartException;
+
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.i18n.client.NumberFormat;
 
-public class GetalComponent extends ScComponent //implements ActionListener, FocusListener, MouseListener 
+public class GetalComponent extends ScComponent 
 {
 	private int waarde;
 	private String waardeText = "";
-//GWT	
-	//private ScTextField beginWaardeTf;
+	private String formula = "";
 	private boolean isTemp, instelbaar, bekend, leeg;
-//GWT	
-	//private ActionListener actionListener;
 	
 	Context2d getalContext2d;
 	
@@ -28,51 +26,31 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	
 	HeksGWT owner;
 
-	public GetalComponent(int x, int y, int b, int h, HeksGWT owner) //Context2d c2d) 
+	public GetalComponent(int x, int y, int b, int h, HeksGWT owner) 
 	{
 		super(x, y, b, h);
 		this.owner = owner;
-		
-		//getalContext2d = c2d;
 		
 		waarde = 0;
 		bekend = true;
 		leeg = false;
 		instelbaar = false;
 		isTemp = false;
-//GWT
-/*		
-		beginWaardeTf = new ScTextField(5, 0, b - 10, h, "0");
-		beginWaardeTf.addActionListener(this);
-		beginWaardeTf.addFocusListener(this);
-		beginWaardeTf.setVisible(false);
-		beginWaardeTf.setEnabled(false);
-		beginWaardeTf.setLocation(getLocation().x, getLocation().y);
-		add(beginWaardeTf);
-*/		
 	}
 
 	public void setVisible(boolean b)
 	{
 		visible = b;
 	}
-	//public void paint(Graphics gr)
+
 	public void paint(Context2d g)
 	{
 		if (!visible)
 			return;
 		
-//System.out.println("gc paint");
-
-		//Graphics g = (Graphics2D) gr;
-		//((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
 		int fontSize = (int) Math.round(3 * schaal * relh / 4);
 		String fontString = "" + fontSize + "px arial, sans-serif";
 		
-		//Font f = new Font("SansSerif", Font.PLAIN, (int) (3 * schaal * relh / 4));
-		//g.setColor(getForeground());
-		//g.setFont(f);
 		g.setFont(fontString);
 		
 		String s;
@@ -92,11 +70,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 			else
 				s = "...";
 		}
-		//FontMetrics fm = g.getFontMetrics();
-		//int woordbreedte = fm.stringWidth(s);
-		
-//g.setStrokeStyle(CssColor.make(0,0,255));
-//g.strokeRect(xPos, yPos, breedte, hoogte);
 		
 		TextMetrics tm = g.measureText(s);
 		int woordbreedte = (int) Math.round(tm.getWidth());
@@ -107,7 +80,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 			g.fillRect(xPos, yPos, breedte, hoogte);
 		}
 		
-		//g.drawString(s, (getSize().width - woordbreedte) / 2, (getSize().height + fm.getHeight()) / 2 - fm.getDescent());
 		g.setFillStyle(CssColor.make(0,0,0));
 		if (p23Klein)
 			g.fillText(s, xPos + (breedte - woordbreedte) / 2, yPos + 30 * schaal);
@@ -115,9 +87,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 			g.fillText(s, xPos + (breedte - woordbreedte) / 2, yPos + 4 * schaal);
 		else
 			g.fillText(s, xPos + (breedte - woordbreedte) / 2, yPos + 42 * schaal);
-		
-//GWT??		
-		//super.paint(g);
 	}
 
 	public String geefWaardeText() 
@@ -128,6 +97,7 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	public void zetWaarde(String t) 
 	{
 		waardeText = t;
+		
 		int w;
 		try 
 		{
@@ -137,12 +107,101 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 		} 
 		catch (NumberFormatException ex) 
 		{}
-
 	}	
+
+	/**
+	 * kijk of de tekst in de invoerpopup valide invoer is m.b.v. expressie.
+	 */
+	public void zetInvulWaarde(String formula)
+	{
+		try
+		{
+			this.formula = formula;
+			zetInvulWaarde0();
+		}
+		catch (RestartException r)
+		{
+			r.restart(new Runnable()
+			{
+				public void run()
+				{
+					try
+					{
+						zetInvulWaarde0();
+					}
+					catch (RestartException e)
+					{
+						e.restart(this);
+					}
+				}
+			});
+		}
+	}
+	
+	public void zetInvulWaarde0() throws RestartException
+	{
+		try
+		{	
+			String s = formula;
+			s = s.replace(',','.');
+			
+			// formules uit formuleeditor zoals 3$m2@ verwerken
+			fi.wiskopdr.expressies.Expressie exp = FormuleParser.geefExpressie(addFormulaCodes(formula));
+			
+			if (s.equals("") || (exp == null))
+			{
+				zetWaarde("");
+			}
+			else
+			{ 
+				boolean casNodig = false;
+				if (exp!=null) 
+					casNodig = exp.toString().indexOf("$i")>-1 
+						|| exp.toString().indexOf("$d")>-1 
+						|| exp.toString().indexOf("$T")>-1  
+						|| exp.toString().indexOf("$S")>-1  
+						|| exp.toString().indexOf("$P")>-1;
+				if (casNodig)
+					exp = fi.wiskopdr.expressies.Expressie.evalWithCAS(exp); // deze kan een restartexception geven
+				Double d = null;
+				if (exp != null && exp.isWaarde())
+				{
+					d = exp.geefWaarde();
+					// afronden op 3 decimalen; format voor grote getallen met wetenschappelijke notatie zoals 1234567^2 = 1524155677489...
+					String formatted = NumberFormat.getFormat("0.###").format(d);
+					formatted = formatted.replace(',', '.'); // dit moet, anders gaat BasisExpressie.geefWaarde() met Double.valueOf(basisString) mis
+					zetWaarde(formatted);
+				}
+				else
+				{
+					zetWaarde("");
+				}
+			}
+		}	
+		catch (NumberFormatException ex)
+		{
+			zetWaarde("");
+		}
+	}
+  
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * Used for fomula editor.
+	 * 
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
+	}
 
 	public int geefWaarde() 
 	{
-		String s = waardeText; //beginWaardeTf.getText();
+		String s = waardeText;
 		int w;
 		try 
 		{
@@ -165,48 +224,41 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 		zetBekend(true);
 		waarde = t;
 		waardeText = Integer.toString(waarde);
-//GWT?		
-		//beginWaardeTf.setText(Integer.toString(waarde));
 		paint();
 	}
 
 	public void zetBekend(boolean b) 
 	{
 		bekend = b;
-//GWT		
+		
 		if (!b)
-		//	beginWaardeTf.setText("");
 			waardeText = "";
 		if (!b)
 			waarde = -999;
 	}
 
-	public void zetLeeg(boolean b) {
+	public void zetLeeg(boolean b)
+	{
 		leeg = b;
 	}
 
-	public void zetAlsTemp(boolean b) {
+	public void zetAlsTemp(boolean b)
+	{
 		isTemp = b;
 	}
 
-	public boolean isBekend() {
+	public boolean isBekend()
+	{
 		return bekend;
 	}
 
-	public boolean isInstelbaar() {
+	public boolean isInstelbaar()
+	{
 		return instelbaar;
 	}
 
 	public void zetInstelbaar(boolean b) 
 	{
-//GWT		
-		//if (b && !instelbaar)
-		//{	addMouseListener(this);
-		//}
-		//else if (!b && instelbaar)
-		//{	removeMouseListener(this);
-//System.out.println("mouseListener remove");		
-		//}
 		instelbaar = b;
 	}
 
@@ -214,8 +266,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	{
 		waarde++;
 		waardeText = Integer.toString(waarde);
-//GWT		
-		//beginWaardeTf.setText(Integer.toString(waarde));
 		paint();
 	}
 
@@ -223,8 +273,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	{
 		waarde--;
 		waardeText = Integer.toString(waarde);
-//GWT		
-		//beginWaardeTf.setText(Integer.toString(waarde));
 		paint();
 	}
 
@@ -232,8 +280,6 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	{
 		waarde += d;
 		waardeText = Integer.toString(waarde);
-//GWT		
-		//beginWaardeTf.setText(Integer.toString(waarde));
 		paint();
 	}
 
@@ -241,112 +287,37 @@ public class GetalComponent extends ScComponent //implements ActionListener, Foc
 	{
 		waarde -= d;
 		waardeText = Integer.toString(waarde);
-//GWT		
-		//beginWaardeTf.setText(Integer.toString(waarde));
 		paint();
 	}
-/*
-	public void addActionListener(ActionListener listener) 
-	{
-		actionListener = AWTEventMulticaster.add(actionListener, listener);
-	}
-*/
-/*	
-	public void removeActionListener(ActionListener listener) 
-	{
-		actionListener = AWTEventMulticaster.remove(actionListener, listener);
-	}
-*/
+
 	public void vulIn() 
 	{
-//System.out.println("gc vulIn inst " + instelbaar);		
 		if (instelbaar) 
 		{
-//GWT
-/*			
-			beginWaardeTf.schaal(schaal);
-			beginWaardeTf.setVisible(true);
-			beginWaardeTf.setEnabled(true);
-			beginWaardeTf.selectAll();
-			beginWaardeTf.requestFocus();
-*/			
 		}
-//System.out.println("gc vulIn Tf " + beginWaardeTf.isVisible());
 	}
-
-	
-	//public void mouseClicked(MouseEvent e){;}
-
-//GWT	
-	//public void mousePressed(MouseEvent e) 
-	//{
-//System.out.println("gc mP");
-		
-		//if (actionListener != null) 
-		//{	actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "vulin"));
-		//}
-//	}
 
 	public void mouseUpTouchEndAction() 
 	{	vulIn();
 	}
 
-	//public void mouseExited(MouseEvent e){;}
-
-	//public void mouseEntered(MouseEvent e){;}
-
 	public void actionPerformed() 
 	{
-		String s = waardeText; //beginWaardeTf.getText();
+		String s = waardeText;
 		int w;
 		try 
 		{
 			w = Integer.parseInt(s);
 			zetBekend(true);
 			zetWaarde(w);
-		} catch (NumberFormatException ex) 
+		}
+		catch (NumberFormatException ex) 
 		{
-			//beginWaardeTf.setText("");
 			waardeText = "";
 			zetBekend(false);
 			waarde = -999;
 			paint();
 		}
-		//beginWaardeTf.setEnabled(false);
-		//beginWaardeTf.setVisible(false);
 		paint();
-		//if (actionListener != null) 
-		//{
-		//	actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "action"));
-		//}
-		//this.requestFocus();
 	}
-
-//GWT?	
-/*	
-	public void focusLost(FocusEvent e) 
-	{
-		
-		String s = beginWaardeTf.getText();
-		int w;
-		try {
-			w = Integer.parseInt(s);
-			zetBekend(true);
-			zetWaarde(w);
-		} catch (NumberFormatException ex) {
-			beginWaardeTf.setText("");
-			zetBekend(false);
-			waarde = -999;
-			repaint();
-		}
-		beginWaardeTf.setEnabled(false);
-		// remove(beginWaardeTf);
-		beginWaardeTf.setVisible(false);
-		repaint();
-		if (actionListener != null) {
-			actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "focuslost"));
-		}
-	}
-*/
-	//public void focusGained(FocusEvent e){;}
 }
