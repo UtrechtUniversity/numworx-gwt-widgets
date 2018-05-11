@@ -81,6 +81,10 @@ public class ProgrammaImporter
 	private void importDeeltaakHeader(int i, String code) 
 	{
 		DeeltaakBodyComponent ccont = veld.getDeeltaakBody(i);
+		
+		if (!ccont.isOpen)
+			ccont.changeHeight();
+
 		// get the first line, that is the remainder of the line after "Deeltaak:"
 		String s = code.substring(0,code.indexOf("\n")).trim();
 		int bracketpos = s.indexOf("(");
