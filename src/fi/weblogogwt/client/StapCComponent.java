@@ -1,14 +1,7 @@
 package fi.weblogogwt.client;
 
-//import java.awt.Color;
-//import java.awt.FontMetrics;
-//import java.awt.Graphics;
 
 import fi.weblogogwt.client.logotekenap.TraceBeheerder;
-import fi.weblogogwt.client.formuleobjects.StringUtils;
-import fi.weblogogwt.client.expressies.BasisExpressie;
-import fi.weblogogwt.client.expressies.Expressie;
-import fi.weblogogwt.client.formuleobjects.FormuleParser;
 import fi.weblogogwt.client.parameters.NumericParameter;
 import fi.weblogogwt.client.logotekenap.Uitvoerblad;
 
@@ -16,7 +9,7 @@ import fi.weblogogwt.client.logotekenap.Uitvoerblad;
  * class representing the stap(dx,dy) command: move (dx,dy) 
  * relative to the direction of the cursor; 
  * note how this works: the direction of the cursor defines the positive y-axis
- * of a coordinate system; in this coordinater system change the position by (dx,dy)
+ * of a coordinate system; in this coordinate system change the position by (dx,dy)
  * see class TekenBlad; <br>
  * the command has two parameters: Strings representing
  * the doubles dx and dy, see class NumericParameter   

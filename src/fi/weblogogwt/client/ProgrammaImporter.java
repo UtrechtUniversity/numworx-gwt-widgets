@@ -119,7 +119,14 @@ public class ProgrammaImporter
 	 */
 	private void importDeeltaakHeader(int i, String code) 
 	{
+		
+//System.out.println("DTH " + i + " code = " + code);
+
 		DeeltaakBodyComponent ccont = veld.getDeeltaakBody(i);
+		
+		if (!ccont.isOpen)
+			ccont.changeHeight();
+		
 		// get the first line, that is the remainder of the line after "Deeltaak:" or "Subroutine:"
 		String s = code.substring(0,code.indexOf("\n")).trim();
 		int bracketpos = s.indexOf("(");
@@ -135,7 +142,7 @@ public class ProgrammaImporter
 			// deeltaakNaam equals the default, replace by the default name in the choosen language 
 			if (deeltaakNaam.equals(deeltaaknamen[i]) || deeltaakNaam.equals(deeltaaknamenTrans[i]))
 				deeltaaknamen[i] = deeltaaknamenTrans[i];
-			else // user defiend subroutine name 
+			else // user defined subroutine name 
 				deeltaaknamen[i] = s.substring(0, bracketpos).trim();
 			String param = getParamText(s);
 			ccont.setDeeltaakHeader(deeltaaknamen[i], param.trim());

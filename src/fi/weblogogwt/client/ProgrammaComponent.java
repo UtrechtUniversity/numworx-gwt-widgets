@@ -199,7 +199,7 @@ public class ProgrammaComponent extends CompositeCommandComponent
 
 	/**
 	 * DeeltaakBodyComponent: change the height when '--' or square in header is clicked:
-	 * alternate between two header only and real height;
+	 * alternate between two optiones: header only and real height;
 	 * if DBC has been moved while closed, and on open the open height of DBC is larger then
 	 * the height of JavaLogoSchuifVeld minus the y-position of DBC, move DBC up 
 	 */

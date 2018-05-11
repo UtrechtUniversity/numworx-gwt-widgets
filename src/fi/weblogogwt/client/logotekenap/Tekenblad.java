@@ -348,7 +348,7 @@ public class Tekenblad extends Uitvoerblad
 	}
 
 	/**
-	 * activate the pern with RGB-color given by the integers (r,g,b)
+	 * activate the pen with RGB-color given by the integers (r,g,b)
 	 */
 	public void penAan(int r, int g, int b)
 	{	pen = true;
