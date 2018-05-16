@@ -172,7 +172,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.3-SNAPSHOT</euclidesVersion>
+		<euclidesVersion>0.0.3</euclidesVersion>
 		<formuleVersion>0.0.5</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.1</gwtVersion>
