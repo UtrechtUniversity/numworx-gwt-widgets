@@ -226,7 +226,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static
 	ToggleButton formula(TrackerImpl tracker, RadioMode model, Definitions definitions) {
-		return newBtn("formula", new FormuleHandler("Formule", definitions), tracker, model,"Formule");
+		return newBtnSpan("formula", new FormuleHandler("Formule", definitions), tracker, model,"Formule");
 	}
 
 	@Provides @IntKey(Tools.TEXT) @IntoMap static
