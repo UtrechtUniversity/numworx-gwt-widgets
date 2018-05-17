@@ -95,25 +95,25 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	SnapperImpl snapper = new SnapperImpl();
 	private StrokeStyle stroke;
 	@Override
-	public void processMouseUp(int x0, int y0) {
+	public void processMouseUp(int x0, int y0, int id) {
 		down = false;
-		snapper.pmUp(x0, y0, this);
+		snapper.pmUp(x0, y0, id, this);
 	}
-	public void pmUp(int x, int y) {
-		super.processMouseUp(x, y);
+	public void pmUp(int x, int y, int id) {
+		super.processMouseUp(x, y, id);
 	}
 	@Override
-	public void processMouseDrag(int x0, int y0) {
-		snapper.pmDrag(x0, y0, this);
+	public void processMouseDrag(int x0, int y0, int id) {
+		snapper.pmDrag(x0, y0, id, this);
 	}
-	public void pmDrag(int x, int y) {
-		super.processMouseDrag(x, y);
+	public void pmDrag(int x, int y, int id) {
+		super.processMouseDrag(x, y, id);
 	}
 
 	@Override
-	public void processMouseDown(int x, int y) {
+	public void processMouseDown(int x, int y, int id) {
 		snapper.setMoved(false);
-		super.processMouseDown(x, y);
+		super.processMouseDown(x, y, id);
 		down = true;
 	}
 	

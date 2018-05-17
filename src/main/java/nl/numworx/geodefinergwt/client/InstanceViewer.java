@@ -58,24 +58,24 @@ public class InstanceViewer extends SVGWidget implements PH {
 	private AnimationHandle animator;
 
 	@Override
-	public void processMouseUp(int x0, int y0) {
-		snapper.pmUp(x0, y0, this);
+	public void processMouseUp(int x0, int y0, int id) {
+		snapper.pmUp(x0, y0, id, this);
 	}
-	public void pmUp(int x, int y) {
-		super.processMouseUp(x, y);
+	public void pmUp(int x, int y, int id) {
+		super.processMouseUp(x, y, id);
 	}
 	@Override
-	public void processMouseDrag(int x0, int y0) {
-		snapper.pmDrag(x0, y0, this);
+	public void processMouseDrag(int x0, int y0, int id) {
+		snapper.pmDrag(x0, y0, id, this);
 	}
-	public void pmDrag(int x, int y) {
-		super.processMouseDrag(x, y);
+	public void pmDrag(int x, int y, int id) {
+		super.processMouseDrag(x, y, id);
 	}
 
 	@Override
-	public void processMouseDown(int x, int y) {
+	public void processMouseDown(int x, int y,  int id) {
 		snapper.setMoved(false);
-		super.processMouseDown(x, y);
+		super.processMouseDown(x, y, id);
 	}
 
 	private NameMapper mapper = super.getMapper();

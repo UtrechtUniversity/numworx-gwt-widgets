@@ -49,11 +49,6 @@ public class TrackerImpl implements Tracker
 		e.setAllTracker(this);
 	}
 
-	@Override
-	public void setTrack(Track track) {
-		viewer.setTrack(track);
-	}
-
 	private EventHandler pointerHandler;
 	
 	@Override

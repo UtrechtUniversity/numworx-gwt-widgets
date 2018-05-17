@@ -51,7 +51,7 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -172,7 +172,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.3</euclidesVersion>
+		<euclidesVersion>0.0.4-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.0.5</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.1</gwtVersion>

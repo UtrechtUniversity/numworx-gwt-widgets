@@ -6,8 +6,8 @@ import nl.numworx.geodefiner.common.Snapper;
 class SnapperImpl extends Snapper {
 	
 	interface PH {
-		void pmUp(int x, int y);
-		void pmDrag(int x, int y);
+		void pmUp(int x, int y,  int id);
+		void pmDrag(int x, int y, int id);
 		Model getModel();
 	}
 	
@@ -21,7 +21,7 @@ class SnapperImpl extends Snapper {
 		this.moved = moved;
 	}
 	
-	void pmUp(int x0, int y0, PH ph) {
+	void pmUp(int x0, int y0, int id, PH ph) {
 		if(isGravityM()) {
 			int ox = (int) ph.getModel().getO().getX().longValue();
 			int dx = (int) ph.getModel().getU().getX().longValue() - ox;
@@ -44,11 +44,11 @@ class SnapperImpl extends Snapper {
 			x0 = x0-x;
 			y0 = y0-y;
 		}
-		ph.pmUp(x0, y0);
+		ph.pmUp(x0, y0, id);
 
 	}
 	
-	void pmDrag(int x0, int y0, PH ph) {
+	void pmDrag(int x0, int y0, int id, PH ph) {
 		setMoved(true);
 		if(isGravityM()) {
 			int ox = (int) ph.getModel().getO().getXd();
@@ -72,7 +72,7 @@ class SnapperImpl extends Snapper {
 			x0 = x0-x;
 			y0 = y0-y;
 		}
-		ph.pmDrag(x0, y0);
+		ph.pmDrag(x0, y0, id);
 
 	}
 
