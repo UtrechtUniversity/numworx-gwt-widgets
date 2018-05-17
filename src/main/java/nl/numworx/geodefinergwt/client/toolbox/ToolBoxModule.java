@@ -54,7 +54,7 @@ public class ToolBoxModule {
 		String puntIcon = "point";
 		String puntOpIcon = "pointon";
 		String puntOp2Icon = "intersection.png";
-		btn = new ToggleButton(puntIcon);
+		btn = new ToggleButton();
 		btn.setTitle(rb.Euclides_46());
 		btn.addClickHandler(new PuntAction(handler, tracker,btn, model, puntIcon, puntOpIcon, puntOp2Icon));
 		return btn;

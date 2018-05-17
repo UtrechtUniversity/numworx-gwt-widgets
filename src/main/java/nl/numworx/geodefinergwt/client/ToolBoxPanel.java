@@ -140,9 +140,10 @@ public class ToolBoxPanel extends Composite implements Tools {
 			for (int i = 0; i < images.length; i++) {
 				faces[i] = face(images[i]);
 			}
+			btn.getUpFace().setHTML(faces[0]);
 		}
 
-		SafeHtml[] faces;
+		private SafeHtml[] faces;
 		/* (non-Javadoc)
 		 * @see fi.euclides.swing.XXXAction#update(fi.euclides.util.Observable, java.lang.Object)
 		 */
