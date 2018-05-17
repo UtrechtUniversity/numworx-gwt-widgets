@@ -122,3 +122,37 @@ body {
 	background-image: url("geodefinergwt/fi/euclides/resources/4.png");
 }
 
+.gwt-ToggleButton span.mirror {
+	background-image: url("geodefinergwt/fi/euclides/resources/mirror.png");
+}
+
+.gwt-ToggleButton span.conic-section {
+	background-image: url("geodefinergwt/fi/euclides/resources/quadric.png");
+}
+
+.gwt-ToggleButton span.focus {
+	background-image: url("geodefinergwt/fi/euclides/resources/quadric.png");
+}
+.gwt-ToggleButton span.locus {
+	background-image: url("geodefinergwt/fi/euclides/resources/objecttracker.png");
+}
+
+.gwt-ToggleButton span.tangent {
+	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
+}
+
+.gwt-ToggleButton span.poleline {
+	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
+}
+
+.gwt-ToggleButton span.point {
+	background-image: url("geodefinergwt/fi/euclides/resources/point.png");
+}
+
+.gwt-ToggleButton span.pointon {
+	background-image: url("geodefinergwt/fi/euclides/resources/qpointon.png");
+}
+.gwt-ToggleButton span.intersection {
+	background-image: url("geodefinergwt/fi/euclides/resources/intersection.png");
+}
+

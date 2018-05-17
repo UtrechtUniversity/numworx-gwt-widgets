@@ -134,17 +134,15 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	public static class PuntAction extends Action {
 
-		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, Image... images) {
+		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
 			super(h, t, btn, model);
-			puntIcon = images[0];
-			puntOpIcon = images[1];
-			puntOp2Icon = images[2];
+			faces = new SafeHtml[images.length];
+			for (int i = 0; i < images.length; i++) {
+				faces[i] = face(images[i]);
+			}
 		}
 
-		Image puntOpIcon; // FIXME icons not same size!
-		Image puntOp2Icon;
-		Image puntIcon;
-
+		SafeHtml[] faces;
 		/* (non-Javadoc)
 		 * @see fi.euclides.swing.XXXAction#update(fi.euclides.util.Observable, java.lang.Object)
 		 */
@@ -171,15 +169,15 @@ public class ToolBoxPanel extends Composite implements Tools {
 					string = GeoDefinerGWT.MESSAGES.AddPuntHandler_2(); //$NON-NLS-1$
 				} 
 				btn.setTitle(string);
-				btn.getUpFace().setImage(puntOpIcon);
+				btn.getUpFace().setHTML(faces[1]);
 				break;
 			case 2: 
 				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_3());
-				btn.getUpFace().setImage(puntOp2Icon);
+				btn.getUpFace().setHTML(faces[2]);
 				break;
 			default:
 				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_0());
-				btn.getUpFace().setImage(puntIcon);
+				btn.getUpFace().setHTML(faces[0]);
 				break;
 			}
 		}

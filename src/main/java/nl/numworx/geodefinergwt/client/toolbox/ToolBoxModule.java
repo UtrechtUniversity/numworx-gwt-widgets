@@ -1,7 +1,5 @@
 package nl.numworx.geodefinergwt.client.toolbox;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 
 import dagger.Module;
@@ -49,28 +47,13 @@ import nl.numworx.geodefinergwt.client.ToolBoxPanel.PuntAction;
 @Module
 public class ToolBoxModule {
 
-	private final static String url = GWT.getModuleBaseURL() + "fi/euclides/resources";
 	private final static messages rb = GeoDefinerGWT.MESSAGES;
 	
-	private static ToggleButton newBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model, String t) {
+	private static ToggleButton newPBtn(EventHandler handler, TrackerImpl tracker, RadioMode model) {
 		ToggleButton btn;
-		btn = new ToggleButton(new Image(url));
-		if(t!=null)
-			btn.setTitle(t);
-		btn.addClickHandler(new Action(handler, tracker,btn,model));
-		return btn;
-	}
-
-	private static ToggleButton newBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
-		return newBtn(url,handler,tracker,model,null);
-	}
-
-	private static ToggleButton newPBtn(String url, EventHandler handler, TrackerImpl tracker, RadioMode model) {
-		ToggleButton btn;
-		String u = url + "/point.png";
-		Image puntIcon = new Image(u);
-		Image puntOpIcon = new Image(url + "/qpointon.png");
-		Image puntOp2Icon = new Image(url + "/intersection.png");
+		String puntIcon = "point";
+		String puntOpIcon = "pointon";
+		String puntOp2Icon = "intersection.png";
 		btn = new ToggleButton(puntIcon);
 		btn.setTitle(rb.Euclides_46());
 		btn.addClickHandler(new PuntAction(handler, tracker,btn, model, puntIcon, puntOpIcon, puntOp2Icon));
@@ -90,7 +73,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.POINT) @IntoMap static
 	ToggleButton point(TrackerImpl tracker, RadioMode model) {
-		return newPBtn(url, new AddSnapPuntHandler(), tracker, model);
+		return newPBtn(new AddSnapPuntHandler(), tracker, model);
 	}
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static
@@ -147,7 +130,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.ARC) @IntoMap static
 	ToggleButton arc(TrackerImpl tracker, RadioMode model) {
-		return newBtn("arc", new AddBoogHandler("Boog"), tracker, model,null);
+		return newBtnSpan("arc", new AddBoogHandler("Boog"), tracker, model,null);
 	}
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
 	ToggleButton midpoint(TrackerImpl tracker, RadioMode model) {
@@ -171,32 +154,32 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.MIRROR) @IntoMap static
 	ToggleButton mirror(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/mirror.png", new AddSpiegelHandler(), tracker, model, rb.Euclides_62());
+		return newBtnSpan("mirror", new AddSpiegelHandler(), tracker, model, rb.Euclides_62());
 	}
 
 	@Provides @IntKey(Tools.CONIC_SECTION) @IntoMap static
 	ToggleButton conic(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/quadric.png", new AddKegelsnedeHandler("Kegelsnede"), tracker, model);
+		return newBtnSpan("conic-section", new AddKegelsnedeHandler("Kegelsnede"), tracker, model, "Kegelsnede");
 	}
 
 	@Provides @IntKey(Tools.FOCUS) @IntoMap static
 	ToggleButton focus(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/quadric.png", new AddFocusHandler(), tracker, model);
+		return newBtnSpan("focus", new AddFocusHandler(), tracker, model, "Brandpunt");
 	}
 
 	@Provides @IntKey(Tools.LOCUS) @IntoMap static
 	ToggleButton locus(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/objecttracker.png", new AddLocusHandler("Meetkundige plaats"), tracker, model);
+		return newBtnSpan("locus", new AddLocusHandler("Meetkundige plaats"), tracker, model, "Meetkundige plaats");
 	}
 
 	@Provides @IntKey(Tools.TANGENT) @IntoMap static
 	ToggleButton tangent(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/line.png", new AddRaakLijnHandler(), tracker, model); // FIXME icon
+		return newBtnSpan("tangent", new AddRaakLijnHandler(), tracker, model, "Raaklijn"); // FIXME icon
 	}
 
 	@Provides @IntKey(Tools.POLELINE) @IntoMap static
 	ToggleButton pole(TrackerImpl tracker, RadioMode model) {
-		return newBtn(url + "/line.png", new AddPoollijnHandler(), tracker, model); // FIXME icon
+		return newBtnSpan("poleline", new AddPoollijnHandler(), tracker, model, "Poollijn"); // FIXME icon
 	}
 	//labels
 	@Provides @IntKey(Tools.DISTANCE) @IntoMap static
