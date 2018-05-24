@@ -922,6 +922,8 @@ System.out.println("b = " + b);
 		if (eigenaar.nagekeken)
 			eigenaar.zetIsVeranderdNaNakijken(true);
 		
+		eigenaar.setChanged(true);
+		
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
 			int n = sorteerRij[q];
