@@ -8,6 +8,10 @@
 <module rename-to='kladjegwt'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  <inherits name="com.google.gwt.logging.Logging"/>
+  <define-property name="gwt.logging.popupHandler"
+		values="ENABLED, DISABLED" />
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -21,7 +25,7 @@
   <!-- <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.formule.Formule' />
- <inherits name='fi.writemathgwt.WriteMathGWT' />
+<!--  <inherits name='fi.writemathgwt.WriteMathGWT' /> -->
  
   <add-linker name='xsiframe' />
 
