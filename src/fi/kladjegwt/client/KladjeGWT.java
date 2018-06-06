@@ -35,7 +35,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 import fi.kladjegwt.client.text.Text;
+import fi.writemathgwt.client.engine.*;
 import fi.writemathgwt.client.engine.StrokeContainer;
+
 
 /**
  * hoofdklasse voor KladjeGWT; deze klasse creeert en beheert de teken- en selectie knoppen 
@@ -192,6 +194,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	private double scale = 1.0;
 	
 	private int asHoogte;
+	
+	private StrokeContainer strokeContainer = new StrokeContainer();
+	
+	private FormuleViewer formuleViewer;
 	
 	/**
 	 * maak de css in ore en haal via de resources alle plaatjes op 
@@ -752,11 +758,18 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		topPanel.addStyleName(kladjeCss.bottom());
 		dlp.addNorth(topPanel, bottomHeight);
 		
-		FormuleViewer fv = new FormuleViewer("$f$b2$n3+$b2$n3@@@@@");
-		fv.setFont(FormuleFont.createFromFontSize(10));
+//		FormuleViewer fv = new FormuleViewer("$f$b2$n3+$b2$n3@@@@@");
+//		fv.setFont(FormuleFont.createFromFontSize(8));
+//		topPanel.add(fv.getAsPanel());
+		
+//		StrokeContainer sc = new StrokeContainer();
+		Stroke sample = ReferenceSamples.getReferenceStroke("p");
+		strokeContainer.addStroke(sample);
+		
+		FormuleViewer fv = new FormuleViewer(strokeContainer.getFormulaString());
+		fv.setFont(FormuleFont.createFromFontSize(8));
 		topPanel.add(fv.getAsPanel());
 		
-		//StrokeContainer sc = new StrokeContainer();
 
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
@@ -829,6 +842,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	}
 	
 	public void setChanged() {
+		strokeContainer.addStroke(kladjeGWTVeld.getLastStroke());
+		
 		Map<String,Object> map = kladjeGWTVeld.getState();
 		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
 		logger.info("in setChanged");
