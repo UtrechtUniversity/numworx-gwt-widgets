@@ -228,7 +228,9 @@ public class KladjeGWTVeld
 	 * tijdelijke lijst van getekende punten bij slepen in mouse mode = tekenen; deze punten 
 	 * worden een Streep by MouseUp/TouchStart
 	 */
-	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();	
+	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();
+	ArrayList<fi.writemathgwt.client.engine.Point> newStrokePoints = new ArrayList<fi.writemathgwt.client.engine.Point>();
+	Stroke lastStroke;
 
 	/**
 	 * tijdelijk startpunt bij slepen in alle mouse modes, gefixeerd door mouseDowm/TouchStart 
@@ -470,6 +472,11 @@ public class KladjeGWTVeld
 	{
 		gIm = kladjeHWTCanvas.getContext2d();
 		
+	}
+	
+	public Stroke getLastStroke()
+	{
+		return lastStroke;
 	}
 	
 	/**
@@ -2482,6 +2489,7 @@ public class KladjeGWTVeld
 		{
 			mouseDown = true;
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
+			newStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
 		}
 		else if ((mouseMode == lijnTekenen) ||
@@ -2617,6 +2625,7 @@ public class KladjeGWTVeld
 		if (mouseMode == tekenen)
 		{
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
+			newStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
 		}
 		else if (mouseMode == lijnTekenen)
@@ -2949,6 +2958,7 @@ public class KladjeGWTVeld
 			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
 			
 			Streep streep = new Streep(drawingColor, smoothedDraggDoublePoints);
+			lastStroke = new Stroke(newStrokePoints);
 			streepVector.addElement(streep);
 			if (draggDoublePoints.size() > 1)
 				addToHistory();
