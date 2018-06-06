@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -62,6 +63,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 * LayoutPanel voor knoppen
 	 */
 	LayoutPanel bottomPanel;
+	
+	LayoutPanel topPanel;
+	
 	/**
 	 * klasse die het tekengebeuren afhandelt
 	 */
@@ -289,8 +293,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		Stub.publish(this);
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this);
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
@@ -740,8 +744,14 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 		bottomPanel = new LayoutPanel();
 		bottomPanel.addStyleName(kladjeCss.bottom());
-
 		dlp.addSouth(bottomPanel, bottomHeight);
+		
+		topPanel = new LayoutPanel();
+		topPanel.addStyleName(kladjeCss.bottom());
+		dlp.addNorth(topPanel, bottomHeight);
+		
+		FormuleViewer fv = new FormuleViewer("$f$b2$n3@@@");
+		topPanel.add(fv.getAsPanel());
 
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
