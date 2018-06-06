@@ -766,7 +766,7 @@ public class TekenComponentGWT extends LayoutPanel {
     		}
     		
     		grafiekGWTVeld.paint();
-    		interactiePanel.setChanged(false);	
+    		interactiePanel.setComRootChanged(false);	
     	}
 		
 	}
