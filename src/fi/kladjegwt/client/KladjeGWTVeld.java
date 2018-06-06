@@ -26,6 +26,9 @@ import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+
+import fi.writemathgwt.client.engine.Stroke;
+
 import com.google.gwt.event.dom.client.TouchEndHandler;
 
 import com.google.gwt.event.dom.client.TouchEndEvent;
