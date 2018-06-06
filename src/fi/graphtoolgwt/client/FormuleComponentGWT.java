@@ -59,7 +59,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 /* naar een 'factory' die bij TriFork gepatched is. */
   			if (fc.fromuser)
 			{   fc.parseFormule(regelnummer, false);
-				fc.interactiePanel.setChanged(false);
+				fc.interactiePanel.setComRootChanged(false);
 			}
 		
 			
@@ -101,7 +101,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 			if(fc.alsOpdracht)
 				fc.interactiePanel.kijkNa();
 			else
-				fc.interactiePanel.setChanged(false);
+				fc.interactiePanel.setComRootChanged(false);
 			fc.grafiekGWTVeld.paint();
 		}
 		
@@ -941,7 +941,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	    		  && interactiePanel.mode != OpdrNavIF.EINDTOETS)
 	    	  interactiePanel.kijkNa();
 	      else
-	    	  interactiePanel.setChanged(false);
+	    	  interactiePanel.setComRootChanged(false);
 	      //grafiekGWTVeld.paint();
     }
 	
