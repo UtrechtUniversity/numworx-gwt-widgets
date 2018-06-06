@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 import fi.kladjegwt.client.text.Text;
+import fi.writemathgwt.client.engine.StrokeContainer;
 
 /**
  * hoofdklasse voor KladjeGWT; deze klasse creeert en beheert de teken- en selectie knoppen 
@@ -293,7 +295,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		//Stub.publish(this);
+		//Stub.publish(this); 
 		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
@@ -750,8 +752,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		topPanel.addStyleName(kladjeCss.bottom());
 		dlp.addNorth(topPanel, bottomHeight);
 		
-		FormuleViewer fv = new FormuleViewer("$f$b2$n3@@@");
+		FormuleViewer fv = new FormuleViewer("$f$b2$n3+$b2$n3@@@@@");
+		fv.setFont(FormuleFont.createFromFontSize(10));
 		topPanel.add(fv.getAsPanel());
+		
+		//StrokeContainer sc = new StrokeContainer();
 
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
