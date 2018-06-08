@@ -2737,7 +2737,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	@Override
 	public void init(int width, int height, Map<String, Object> map, 
 			Map<String, Number> randomValues) {
-		breedte = width - 2 * offset;
+      if(randomValues instanceof HashMap)
+	    this.randomVarWaarden = (HashMap) randomValues;
+      else {
+        this.randomVarWaarden = new HashMap(randomValues);
+      }
+      this.randomVarNamen = new String[randomVarWaarden.size()];
+      this.randomVarNamen = (String[]) randomVarWaarden.keySet().toArray(this.randomVarNamen);
+
+      breedte = width - 2 * offset;
 		hoogte = height;
 //logger.finest("launchData: " + map);		
 		maakStandaardKleuren();
