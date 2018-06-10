@@ -24,6 +24,12 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/teken_rechthoek_down.gif")
    public ImageResource tekenRechthoekDownResource();
    
+   @Source("fi/kladjegwt/client/images/teken_formule_up.gif")
+   public ImageResource tekenFormuleUpResource();
+   
+   @Source("fi/kladjegwt/client/images/teken_formule_down.gif")
+   public ImageResource tekenFormuleDownResource();
+   
    @Source("fi/kladjegwt/client/images/teken_cirkel_up.gif")
    public ImageResource tekenCirkelUpResource();
    

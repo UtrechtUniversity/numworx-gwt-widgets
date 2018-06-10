@@ -1,6 +1,7 @@
 package fi.kladjegwt.client;
 
 
+
 //import java.awt.Point;
 import java.util.HashMap;
 //import java.util.Hashtable;
@@ -35,7 +36,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
 import fi.kladjegwt.client.text.Text;
-import fi.writemathgwt.client.engine.*;
+import fi.writemathgwt.client.engine.ReferenceSamples;
+import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
 
 
@@ -82,7 +84,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	/**
 	 * toggle knoppen: tekenen en selecteren is altijd mogelijk, de andere acties zijn instelbaar 
 	 */
-	ToggleButton tekenButton, tekenLijnButton, tekenRechthoekButton, tekenCirkelButton,
+	ToggleButton formuleButton, tekenButton, tekenLijnButton, tekenRechthoekButton, tekenCirkelButton,
     			 tekenTekstButton, selecterenButton;
 	
 	/**
@@ -126,7 +128,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 * resources voor de plaatjes: alle ToggleButtons hebben twee resources: een voor de normale toestand
 	 * en een voor de ingedrukte toestand
 	 */
-	ImageResource tekenKnopUpResource, tekenKnopDownResource, tekenLijnUpResource, tekenLijnDownResource, 
+	ImageResource tekenFormuleUpResource, tekenFormuleDownResource, tekenKnopUpResource, tekenKnopDownResource, tekenLijnUpResource, tekenLijnDownResource, 
 				  tekenRechthoekUpResource, tekenRechthoekDownResource, tekenCirkelUpResource, tekenCirkelDownResource, 
 				  tekenTekstUpResource, tekenTekstDownResource, selecterenUpResource, selecterenDownResource, 
 	              regenboogResource, 
@@ -137,7 +139,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 * de actuele plaatjes: alle ToggleButtons hebben twee plaatjes: een voor de normale toestand
 	 * en een voor de ingedrukte toestand
 	 */
-	Image tekenKnopUpImage, tekenKnopDownImage, tekenLijnUpImage, tekenLijnDownImage, 
+	Image tekenFormuleUpImage, tekenFormuleDownImage, tekenKnopUpImage, tekenKnopDownImage, tekenLijnUpImage, tekenLijnDownImage, 
 		  tekenRechthoekUpImage, tekenRechthoekDownImage, tekenCirkelUpImage, tekenCirkelDownImage, 
 		  tekenTekstUpImage, tekenTekstDownImage, selecterenUpImage, selecterenDownImage,
 		  regenboogImage, 
@@ -162,9 +164,12 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 * instelbaarheid: afmeting van de ruitjes als achtergrond (in pixels)
 	 */
 	int ruitjesSize = 20;
-	
 	/**
 	 * instelbaarheid: lijnen tekenen?
+	 */
+	boolean formuleOptie = true;
+	/**
+	 * instelbaarheid: formule tekenen?
 	 */
 	boolean lijnTekenen = true;
 	/**
@@ -214,6 +219,13 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		tekenKnopDownImage = new Image(tekenKnopDownResource);
 		tekenKnopUpImage.addStyleName(kladjeCss.upimage());
 		tekenKnopDownImage.addStyleName(kladjeCss.downimage());
+		
+		tekenFormuleUpResource = kladjeGWTClientBundle.tekenFormuleUpResource();
+		tekenFormuleDownResource = kladjeGWTClientBundle.tekenFormuleDownResource();
+		tekenFormuleUpImage = new Image(tekenFormuleUpResource);
+		tekenFormuleDownImage = new Image(tekenFormuleDownResource);
+		tekenFormuleUpImage.addStyleName(kladjeCss.upimage());
+		tekenFormuleDownImage.addStyleName(kladjeCss.downimage());
 		
 		tekenLijnUpResource = kladjeGWTClientBundle.tekenLijnUpResource();
 		tekenLijnDownResource = kladjeGWTClientBundle.tekenLijnDownResource();
@@ -314,13 +326,27 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	{
 		int currentX = leftOffset;
 		int currentY = topOffset;
+		ToggleClickHandler toggleClickHandler = new ToggleClickHandler();
+		
+		if (formuleOptie)
+		{
+			formuleButton = new ToggleButton(tekenFormuleUpImage, tekenFormuleDownImage);
+			formuleButton.addStyleName("togglebutton");
+			bottomPanel.add(formuleButton);
+			bottomPanel.setWidgetLeftWidth(formuleButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(formuleButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+			formuleButton.addClickHandler(toggleClickHandler);
+		
+			currentX += toggleSize + leftOffset;
+		}
 		
 		tekenButton = new ToggleButton(tekenKnopUpImage, tekenKnopDownImage);
 		bottomPanel.add(tekenButton);
 		bottomPanel.setWidgetLeftWidth(tekenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
 		bottomPanel.setWidgetTopHeight(tekenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
 
-		ToggleClickHandler toggleClickHandler = new ToggleClickHandler();
+		
 		tekenButton.addClickHandler(toggleClickHandler);
 
 		currentX += toggleSize + leftOffset;
@@ -474,6 +500,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
    	{
    		if (tekenButton != null && !tekenButton.equals(tb))
    			tekenButton.setDown(false);
+   		if (formuleButton != null && !formuleButton.equals(tb))
+   			formuleButton.setDown(false);
    		if (tekenLijnButton != null && !tekenLijnButton.equals(tb))
    			tekenLijnButton.setDown(false);
  		if (tekenRechthoekButton != null && !tekenRechthoekButton.equals(tb))
@@ -509,6 +537,24 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     			{
     				buttonsUp(tekenButton);
     				kladjeGWTVeld.mouseMode = kladjeGWTVeld.tekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);    				
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    			}
+    			else // ToggleButton werd uitgedrukt
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		else if (e.getSource() == formuleButton)
+    		{
+    			// ToggleButton werd ingedrukt
+    			if (formuleButton.isDown())
+    			{
+    				buttonsUp(formuleButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
     				kladjeGWTVeld.hideTekstVeld(true);    				
     				kladjeGWTVeld.selecteerRechthoek = null;
     				kladjeGWTVeld.paint();
@@ -599,7 +645,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     			if (selecterenButton.isDown())
     			{
     				buttonsUp(selecterenButton);
-    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.selecteren;
+    				kladjeGWTVeld.setSelecteerMode();
     				kladjeGWTVeld.hideTekstVeld(true);
     				kladjeGWTVeld.selecteerRechthoek = null;
     				kladjeGWTVeld.resetSelectedObject();
@@ -758,19 +804,6 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		topPanel.addStyleName(kladjeCss.bottom());
 		dlp.addNorth(topPanel, bottomHeight);
 		
-//		FormuleViewer fv = new FormuleViewer("$f$b2$n3+$b2$n3@@@@@");
-//		fv.setFont(FormuleFont.createFromFontSize(8));
-//		topPanel.add(fv.getAsPanel());
-		
-//		StrokeContainer sc = new StrokeContainer();
-		Stroke sample = ReferenceSamples.getReferenceStroke("p");
-		strokeContainer.addStroke(sample);
-		
-		FormuleViewer fv = new FormuleViewer(strokeContainer.getFormulaString());
-		fv.setFont(FormuleFont.createFromFontSize(8));
-		topPanel.add(fv.getAsPanel());
-		
-
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
 		kladjeGWTCanvas = kladjeGWTVeld.getCanvas();
@@ -842,11 +875,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	}
 	
 	public void setChanged() {
-		strokeContainer.addStroke(kladjeGWTVeld.getLastStroke());
+		if(formuleViewer!=null)
+			topPanel.remove(formuleViewer.getAsPanel());
+		formuleViewer = new FormuleViewer(kladjeGWTVeld.getFormula());
+		formuleViewer.setFont(FormuleFont.createFromFontSize(12));
+		topPanel.add(formuleViewer.getAsPanel());
 		
-		Map<String,Object> map = kladjeGWTVeld.getState();
-		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
-		logger.info("in setChanged");
+//		Map<String,Object> map = kladjeGWTVeld.getState();
+//		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+//		logger.info("in setChanged");
 	}
 
 

@@ -28,6 +28,7 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 
 import fi.writemathgwt.client.engine.Stroke;
+import fi.writemathgwt.client.engine.StrokeContainer;
 
 import com.google.gwt.event.dom.client.TouchEndHandler;
 
@@ -200,6 +201,7 @@ public class KladjeGWTVeld
 	 */
 	final int inert = 0;
 	final int tekenen = 1;
+	final int formuleOptie = 2;
 	final int lijnTekenen = 3;
 	final int rechthoekTekenen = 4;
 	final int cirkelTekenen = 5;
@@ -232,7 +234,7 @@ public class KladjeGWTVeld
 	 * worden een Streep by MouseUp/TouchStart
 	 */
 	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();
-	ArrayList<fi.writemathgwt.client.engine.Point> newStrokePoints = new ArrayList<fi.writemathgwt.client.engine.Point>();
+	ArrayList<fi.writemathgwt.client.engine.Point> formulaStrokePoints = new ArrayList<fi.writemathgwt.client.engine.Point>();
 	Stroke lastStroke;
 
 	/**
@@ -361,6 +363,10 @@ public class KladjeGWTVeld
 	int startX, startY;
 
 	/**
+	 * de geselecteerde StrokeContainer
+	 */
+	StrokeContainer selectedStrokeContainer = null;
+	/**
 	 * de geselcteerde Streep
 	 */
 	Streep selectedStreep = null;
@@ -420,6 +426,9 @@ public class KladjeGWTVeld
 	double scale = 2.0;
 	KladjeGWT eigenaar;
 	
+	private ArrayList<StrokeContainer> strokeContainers = new ArrayList<StrokeContainer>();
+	private StrokeContainer currentStrokeContainer = new StrokeContainer();
+	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
 	 * @param w breedte
@@ -442,6 +451,8 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.addTouchStartHandler(touchHandler);
 		kladjeHWTCanvas.addTouchMoveHandler(touchHandler);
 		kladjeHWTCanvas.addTouchEndHandler(touchHandler);
+		
+		strokeContainers.add(currentStrokeContainer);
 	}
 
 	/**
@@ -477,9 +488,57 @@ public class KladjeGWTVeld
 		
 	}
 	
-	public Stroke getLastStroke()
+	public Rectangle getBoundingBox(StrokeContainer strokeContainer) 
 	{
-		return lastStroke;
+		int x = (int)strokeContainer.getBoundingBox().x;
+		int y = (int)strokeContainer.getBoundingBox().y;
+		int width = (int)strokeContainer.getBoundingBox().width;
+		int height = (int)strokeContainer.getBoundingBox().height;
+		
+		return new Rectangle(x, y, width, height);
+	}
+	
+	private StrokeContainer findStrokeContainer(int x, int y)
+	{
+		for(int k=0 ; k<strokeContainers.size() ; k++) 
+		{	
+			if(strokeContainers.get(k).getBoundingBox().contains(x,y));
+				return strokeContainers.get(k);
+		}
+		return null;
+	}
+	
+	private StrokeContainer findStrokeContainer(int x, int y, int distance)
+	{
+		if(currentStrokeContainer!=null && currentStrokeContainer.getBoundingBox()!=null)
+		{
+			int xb = (int)currentStrokeContainer.getBoundingBox().x;
+			int yb = (int)currentStrokeContainer.getBoundingBox().y;
+			int width = (int)currentStrokeContainer.getBoundingBox().width;
+			int height = (int)currentStrokeContainer.getBoundingBox().height;
+			Rectangle box = new Rectangle(xb-distance, yb-distance, width+2*distance, height+3*distance/2);
+			if(box.contains(x,y))
+				return currentStrokeContainer;
+		}
+		for(int k=0 ; k<strokeContainers.size() ; k++) 
+		{	
+			if(strokeContainers.get(k).getBoundingBox()!=null)
+			{
+				int xb = (int)strokeContainers.get(k).getBoundingBox().x;
+				int yb = (int)strokeContainers.get(k).getBoundingBox().y;
+				int width = (int)strokeContainers.get(k).getBoundingBox().width;
+				int height = (int)strokeContainers.get(k).getBoundingBox().height;
+				Rectangle box = new Rectangle(xb-distance, yb-distance, width+2*distance, height+3*distance/2);
+				if(box.contains(x,y))
+					return strokeContainers.get(k);
+			}
+		}
+		return null;
+	}
+	
+	public String getFormula()
+	{
+		return currentStrokeContainer.getFormulaString();
 	}
 	
 	/**
@@ -934,6 +993,8 @@ public class KladjeGWTVeld
 		g.scale(scale, scale);
 		g.translate(translation.x,translation.y);
 		
+		g.setLineWidth(2.0d);
+		
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
 		{	Streep streep = (Streep) docentStreepVector.elementAt(sCnt);
@@ -960,6 +1021,51 @@ public class KladjeGWTVeld
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
 			streep.teken(g);
 		}
+		
+		for(int k=0 ; k<strokeContainers.size() ; k++) 
+		{
+			if(strokeContainers.get(k)!=currentStrokeContainer)
+				paintStrokeContainer(g,strokeContainers.get(k));
+//			if(strokeContainers.get(k).getStrokes().size()>0) {
+//				g.setFillStyle(CssColor.make(230, 230, 230));
+//				if(strokeContainers.get(k)==currentStrokeContainer)
+//					g.setFillStyle(CssColor.make(255, 250, 220));
+//				int x = (int)strokeContainers.get(k).getBoundingBox().x;
+//				int y = (int)strokeContainers.get(k).getBoundingBox().y;
+//				int width = (int)strokeContainers.get(k).getBoundingBox().width;
+//				int height = (int)strokeContainers.get(k).getBoundingBox().height;
+//				g.fillRect(x-10, y-10, width+20, height+20);
+//			}
+//			
+//			
+//			g.setStrokeStyle(drawingColor);
+//			ArrayList<Stroke> strokes = strokeContainers.get(k).getStrokes();
+//			for(int i = 0 ; i < strokes.size() ; i++) {
+//				Stroke stroke = strokes.get(i);
+//				g.beginPath();
+//				double x0 = (int)stroke.getParsePoints().get(0).x;
+//				double y0 = (int)stroke.getParsePoints().get(0).y;
+//				g.moveTo(x0, y0);
+//				if(stroke.getParsePointsbox().width>3 ||  stroke.getParsePointsbox().height>3) {
+//					for(int j = 1 ; j < stroke.getParsePoints().size() ; j++) {
+//						double x = stroke.getParsePoints().get(j).x ;
+//						double y = stroke.getParsePoints().get(j).y;
+//						g.lineTo(x, y);
+//					}
+//					g.moveTo(x0, y0);
+//					g.closePath();
+//					g.stroke();
+//				}
+//				else {
+//					g.arc(x0, y0, 1.5, 0, 1.5* Math.PI);
+//					g.closePath();
+//					g.stroke();
+//				}
+//			}
+		}
+		if(currentStrokeContainer!=null)
+			paintStrokeContainer(g,currentStrokeContainer);
+		
 		for (int lCnt = 0; lCnt < lijnVector.size(); lCnt++)
 		{	Lijn lijn = (Lijn) lijnVector.elementAt(lCnt);
 			lijn.teken(g);
@@ -999,6 +1105,29 @@ public class KladjeGWTVeld
 			g.stroke();
 			
 		}
+		
+		// er wordt een formule stroke getekend
+		if (formulaStrokePoints.size() == 1)
+		{	fi.writemathgwt.client.engine.Point p =  formulaStrokePoints.get(0);
+			g.strokeRect(p.x, p.y, 1, 1);
+		}
+		if (formulaStrokePoints.size() > 1)
+		{	
+			//ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(formulaStrokePoints, smoothType);
+			
+			fi.writemathgwt.client.engine.Point p1 = formulaStrokePoints.get(0);
+			g.beginPath();
+			g.moveTo(p1.x, p1.y);
+			for (int pCnt = 1; pCnt < formulaStrokePoints.size(); pCnt++)
+			{	fi.writemathgwt.client.engine.Point p2 = formulaStrokePoints.get(pCnt);
+				g.lineTo(p2.x, p2.y);
+				p1 = p2;
+			}
+			g.stroke();
+			
+		}
+		
+		
 		g.setStrokeStyle(drawingColor);
 		
 		// er wordt een lijn getekend
@@ -1135,6 +1264,9 @@ public class KladjeGWTVeld
 		// geselcteeerde elementen (individuaal of als groep
 		if (mouseMode == selecteren)
 		{
+//			if (selectedStrokeContainer != null)
+//			{	selectedStrokeContainer.tekenHandleBox(g);
+//			}
 			if (selectedStreep != null)
 			{	selectedStreep.tekenHandleBox(g);
 			}
@@ -1171,6 +1303,55 @@ public class KladjeGWTVeld
 		
 		g.translate(-translation.x,-translation.y);
 		g.scale(1/scale, 1/scale);
+	}
+	
+	private void paintStrokeContainer(Context2d g, StrokeContainer strokeContainer)
+	{
+		if(strokeContainer.getStrokes().size()>0) {
+			if(strokeContainer==currentStrokeContainer)
+			{
+				g.setFillStyle(CssColor.make(255, 250, 220));
+				
+			}
+			else
+			{
+				g.setFillStyle(CssColor.make(230, 230, 230));
+				g.setLineWidth(1.0d);
+			}	
+			int x = (int)strokeContainer.getBoundingBox().x;
+			int y = (int)strokeContainer.getBoundingBox().y;
+			int width = (int)strokeContainer.getBoundingBox().width;
+			int height = (int)strokeContainer.getBoundingBox().height;
+			g.fillRect(x-10, y-10, width+20, height+20);
+		}
+		
+		
+		
+		g.setStrokeStyle(drawingColor);
+		ArrayList<Stroke> strokes = strokeContainer.getStrokes();
+		for(int i = 0 ; i < strokes.size() ; i++) {
+			Stroke stroke = strokes.get(i);
+			g.beginPath();
+			double x0 = (int)stroke.getParsePoints().get(0).x;
+			double y0 = (int)stroke.getParsePoints().get(0).y;
+			g.moveTo(x0, y0);
+			if(stroke.getParsePointsbox().width>3 ||  stroke.getParsePointsbox().height>3) {
+				for(int j = 1 ; j < stroke.getParsePoints().size() ; j++) {
+					double x = stroke.getParsePoints().get(j).x ;
+					double y = stroke.getParsePoints().get(j).y;
+					g.lineTo(x, y);
+				}
+				g.moveTo(x0, y0);
+				g.closePath();
+				g.stroke();
+			}
+			else {
+				g.arc(x0, y0, 1.5, 0, 1.5* Math.PI);
+				g.closePath();
+				g.stroke();
+			}
+		}
+		g.setLineWidth(2.0d);
 	}
 
 	/**
@@ -1378,6 +1559,13 @@ public class KladjeGWTVeld
 		   (selectedTekstElement != null);		
 	}
 	
+	public void setSelecteerMode()
+	{
+		mouseMode = selecteren;
+		currentStrokeContainer.scale(1.0/3.0);
+		currentStrokeContainer = null;
+	}
+	
 	/**
 	 * kijk of de bounding box van een van de objecten 
 	 * het punt met coordinaten (x,y) bevat en als ja, zet 
@@ -1390,10 +1578,23 @@ public class KladjeGWTVeld
 	public boolean setSelectedObject(int x, int y)
 	{	boolean found = false;
 	
+		for (int sCnt = 0; sCnt < strokeContainers.size(); sCnt++)
+		{	StrokeContainer sc = strokeContainers.get(sCnt);
+			if (sc.contains(x, y))
+			{	selectedStrokeContainer = sc;
+				selectedStreep = null;
+				selectedLijn = null;
+				selectedRechthoek  = null;
+				selectedEllips  = null;
+				selectedTekstElement  = null;
+				return true; 
+			}
+		}
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
 			if (streep.bbContains(x, y))
 			{	selectedStreep = streep;
+				selectedStrokeContainer = null;
 				selectedLijn = null;
 				selectedRechthoek  = null;
 				selectedEllips  = null;
@@ -1405,6 +1606,7 @@ public class KladjeGWTVeld
 		{	Lijn lijn = (Lijn) lijnVector.elementAt(lCnt);
 			if (lijn.bbContains(x, y))
 			{	selectedLijn = lijn;
+				selectedStrokeContainer = null;
 				selectedStreep = null;
 				selectedRechthoek  = null;
 				selectedEllips  = null;
@@ -1416,6 +1618,7 @@ public class KladjeGWTVeld
 		{	Rechthoek rechthoek = (Rechthoek) rechthoekVector.elementAt(rCnt);
 			if (rechthoek.bbContains(x, y))
 			{	selectedRechthoek = rechthoek;
+				selectedStrokeContainer = null;
 				selectedStreep = null;
 				selectedLijn  = null;
 				selectedEllips  = null;
@@ -1428,6 +1631,7 @@ public class KladjeGWTVeld
 		{	Ellips ellips = (Ellips) ellipsVector.elementAt(eCnt);
 			if (ellips.bbContains(x, y))
 			{	selectedEllips = ellips;
+				selectedStrokeContainer = null;
 				selectedStreep = null;
 				selectedLijn  = null;
 				selectedRechthoek  = null;
@@ -1440,6 +1644,7 @@ public class KladjeGWTVeld
 		{	TekstElement tekstElement = (TekstElement) tekstElementVector.elementAt(tCnt);
 			if (tekstElement.bbContains(x, y))
 			{	selectedTekstElement = tekstElement;
+				selectedStrokeContainer = null;
 				selectedStreep = null;
 				selectedLijn  = null;
 				selectedRechthoek  = null;
@@ -1529,6 +1734,11 @@ public class KladjeGWTVeld
 	public void wisObjectSelected()
 	{ 
 		boolean gewist = false;
+		if (selectedStrokeContainer != null)// && selectedStrokeContainer.deletable)
+		{	strokeContainers.remove(selectedStrokeContainer);
+			selectedStrokeContainer = null;
+			gewist = true;
+		}
 		if (selectedStreep != null && selectedStreep.deletable)
 		{	streepVector.removeElement(selectedStreep);
 			selectedStreep = null;
@@ -1615,6 +1825,8 @@ public class KladjeGWTVeld
 	 */
 	public void translateObjectSelected(int dx, int dy)
 	{ 
+		if (selectedStrokeContainer != null)
+			selectedStrokeContainer.translate(dx, dy);
 		if (selectedStreep != null)
 			selectedStreep.translate(dx, dy);
 		if (selectedLijn != null)  
@@ -2492,7 +2704,34 @@ public class KladjeGWTVeld
 		{
 			mouseDown = true;
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
-			newStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			paint();
+		}
+		else if (mouseMode == formuleOptie)
+		{
+			StrokeContainer lastCurrentSC = currentStrokeContainer;
+			//if(currentStrokeContainer!=null)
+				currentStrokeContainer = findStrokeContainer(eventX,eventY,50);
+			//else 
+			//	currentStrokeContainer = findStrokeContainer(eventX,eventY,0);
+			
+			if(lastCurrentSC!=null && currentStrokeContainer!=lastCurrentSC) {
+				lastCurrentSC.scale(1.0/3);
+				
+			}
+			if(currentStrokeContainer==null) {
+				currentStrokeContainer = new StrokeContainer();
+				strokeContainers.add(currentStrokeContainer);
+			}
+			else if(currentStrokeContainer!=lastCurrentSC){
+				currentStrokeContainer.scale(3.0);
+				paint();
+				eigenaar.setChanged();
+				return;
+			}
+				
+			formulaStrokePoints.clear();
+			mouseDown = true;
+			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
 		}
 		else if ((mouseMode == lijnTekenen) ||
@@ -2628,7 +2867,11 @@ public class KladjeGWTVeld
 		if (mouseMode == tekenen)
 		{
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
-			newStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			paint();
+		}
+		else if (mouseMode == formuleOptie)
+		{
+			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
 		}
 		else if (mouseMode == lijnTekenen)
@@ -2961,13 +3204,29 @@ public class KladjeGWTVeld
 			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
 			
 			Streep streep = new Streep(drawingColor, smoothedDraggDoublePoints);
-			lastStroke = new Stroke(newStrokePoints);
 			streepVector.addElement(streep);
 			if (draggDoublePoints.size() > 1)
 				addToHistory();
 
 			draggDoublePoints.clear();
 			
+			paint();
+			eigenaar.setChanged();
+		}
+		
+		else if (mouseMode == formuleOptie)
+		{	
+			lastStroke = new Stroke(formulaStrokePoints);
+			currentStrokeContainer.addStroke(lastStroke);
+			if(currentStrokeContainer.getStrokes().size()==0 || currentStrokeContainer.getDiagonal()<5)
+			{	strokeContainers.remove(currentStrokeContainer);
+				currentStrokeContainer = null;
+				formulaStrokePoints.clear();
+				paint();
+				setSelecteerMode();
+				return;
+			}
+			formulaStrokePoints.clear();
 			paint();
 			eigenaar.setChanged();
 		}
