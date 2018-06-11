@@ -1,6 +1,5 @@
 package fi.graphtoolgwt.client;
 
-import java.awt.Color;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 
-import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
 import nl.uu.fi.dwo.interaction.client.FacetHelper;
@@ -2239,8 +2237,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if (h != null && h.get("interactiePanelLaunchState") != null)
 			launchState = (HashMap<String, Object>) h.get("interactiePanelLaunchState");
 		
-		this.randomVarNamen = randomVarNamen;
-		this.randomVarWaarden = randomVarWaarden;
+//		this.randomVarNamen = randomVarNamen; should be set in  "init"
+//		this.randomVarWaarden = randomVarWaarden;
 		
 		//alle gegevens uit launchData halen: 
 		init(breedte, hoogte, launchState, randomVarWaarden);
