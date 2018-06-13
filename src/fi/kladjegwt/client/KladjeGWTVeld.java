@@ -365,7 +365,7 @@ public class KladjeGWTVeld
 	/**
 	 * de geselecteerde StrokeContainer
 	 */
-	StrokeContainer selectedStrokeContainer = null;
+	KStrokeContainer selectedStrokeContainer = null;
 	/**
 	 * de geselcteerde Streep
 	 */
@@ -426,8 +426,8 @@ public class KladjeGWTVeld
 	double scale = 2.0;
 	KladjeGWT eigenaar;
 	
-	private ArrayList<StrokeContainer> strokeContainers = new ArrayList<StrokeContainer>();
-	private StrokeContainer currentStrokeContainer = new StrokeContainer();
+	private ArrayList<KStrokeContainer> kStrokeContainers = new ArrayList<KStrokeContainer>();
+	private KStrokeContainer currentStrokeContainer;// = new KStrokeContainer();
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -452,7 +452,7 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.addTouchMoveHandler(touchHandler);
 		kladjeHWTCanvas.addTouchEndHandler(touchHandler);
 		
-		strokeContainers.add(currentStrokeContainer);
+		//kStrokeContainers.add(currentStrokeContainer);
 	}
 
 	/**
@@ -498,39 +498,25 @@ public class KladjeGWTVeld
 		return new Rectangle(x, y, width, height);
 	}
 	
-	private StrokeContainer findStrokeContainer(int x, int y)
+	private KStrokeContainer findInactiveStrokeContainer(int x, int y)
 	{
-		for(int k=0 ; k<strokeContainers.size() ; k++) 
+		for(int k=0 ; k<kStrokeContainers.size() ; k++) 
 		{	
-			if(strokeContainers.get(k).getBoundingBox().contains(x,y));
-				return strokeContainers.get(k);
+			if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive())
+				return kStrokeContainers.get(k);
 		}
 		return null;
 	}
 	
-	private StrokeContainer findStrokeContainer(int x, int y, int distance)
+	private KStrokeContainer findStrokeContainer(int x, int y, int distance)
 	{
-		if(currentStrokeContainer!=null && currentStrokeContainer.getBoundingBox()!=null)
-		{
-			int xb = (int)currentStrokeContainer.getBoundingBox().x;
-			int yb = (int)currentStrokeContainer.getBoundingBox().y;
-			int width = (int)currentStrokeContainer.getBoundingBox().width;
-			int height = (int)currentStrokeContainer.getBoundingBox().height;
-			Rectangle box = new Rectangle(xb-distance, yb-distance, width+2*distance, height+3*distance/2);
-			if(box.contains(x,y))
-				return currentStrokeContainer;
+		if(currentStrokeContainer!=null && currentStrokeContainer.contains(x,y, distance))
+		{		return currentStrokeContainer;
 		}
-		for(int k=0 ; k<strokeContainers.size() ; k++) 
+		for(int k=0 ; k<kStrokeContainers.size() ; k++) 
 		{	
-			if(strokeContainers.get(k).getBoundingBox()!=null)
-			{
-				int xb = (int)strokeContainers.get(k).getBoundingBox().x;
-				int yb = (int)strokeContainers.get(k).getBoundingBox().y;
-				int width = (int)strokeContainers.get(k).getBoundingBox().width;
-				int height = (int)strokeContainers.get(k).getBoundingBox().height;
-				Rectangle box = new Rectangle(xb-distance, yb-distance, width+2*distance, height+3*distance/2);
-				if(box.contains(x,y))
-					return strokeContainers.get(k);
+			if(kStrokeContainers.get(k).contains(x,y, distance))
+			{		return kStrokeContainers.get(k);
 			}
 		}
 		return null;
@@ -538,7 +524,9 @@ public class KladjeGWTVeld
 	
 	public String getFormula()
 	{
-		return currentStrokeContainer.getFormulaString();
+		if(currentStrokeContainer!=null)
+			return currentStrokeContainer.getFormulaString();
+		return "";
 	}
 	
 	/**
@@ -929,9 +917,14 @@ public class KladjeGWTVeld
 	 */
 	public void paint(Context2d g)
 	{
-		g.setLineWidth(1.0d);
+		g.setLineWidth(0.6d);
 		// alles weg
 		g.clearRect(0, 0, breedte, hoogte);
+		
+		if(currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
+		{	g.setFillStyle( CssColor.make("rgba(239,241,243,0.5)"));
+			g.fillRect(0, 0, breedte, hoogte);
+		}
 		// achtergrond horizontale lijnen 
 		if (lijnen)
 		{
@@ -968,8 +961,8 @@ public class KladjeGWTVeld
 			}
 		}
 		
-		g.setStrokeStyle(zwart);
-		g.strokeRect(0, 0, breedte, hoogte);
+		//g.setStrokeStyle(zwart);
+		//g.strokeRect(0, 0, breedte, hoogte);
 		
 		g.setLineWidth(1.2d); 
 		tekenProgramma(g);
@@ -993,7 +986,7 @@ public class KladjeGWTVeld
 		g.scale(scale, scale);
 		g.translate(translation.x,translation.y);
 		
-		g.setLineWidth(2.0d);
+		g.setLineWidth(3.0d);
 		
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
@@ -1022,49 +1015,22 @@ public class KladjeGWTVeld
 			streep.teken(g);
 		}
 		
-		for(int k=0 ; k<strokeContainers.size() ; k++) 
-		{
-			if(strokeContainers.get(k)!=currentStrokeContainer)
-				paintStrokeContainer(g,strokeContainers.get(k));
-//			if(strokeContainers.get(k).getStrokes().size()>0) {
-//				g.setFillStyle(CssColor.make(230, 230, 230));
-//				if(strokeContainers.get(k)==currentStrokeContainer)
-//					g.setFillStyle(CssColor.make(255, 250, 220));
-//				int x = (int)strokeContainers.get(k).getBoundingBox().x;
-//				int y = (int)strokeContainers.get(k).getBoundingBox().y;
-//				int width = (int)strokeContainers.get(k).getBoundingBox().width;
-//				int height = (int)strokeContainers.get(k).getBoundingBox().height;
-//				g.fillRect(x-10, y-10, width+20, height+20);
-//			}
-//			
-//			
-//			g.setStrokeStyle(drawingColor);
-//			ArrayList<Stroke> strokes = strokeContainers.get(k).getStrokes();
-//			for(int i = 0 ; i < strokes.size() ; i++) {
-//				Stroke stroke = strokes.get(i);
-//				g.beginPath();
-//				double x0 = (int)stroke.getParsePoints().get(0).x;
-//				double y0 = (int)stroke.getParsePoints().get(0).y;
-//				g.moveTo(x0, y0);
-//				if(stroke.getParsePointsbox().width>3 ||  stroke.getParsePointsbox().height>3) {
-//					for(int j = 1 ; j < stroke.getParsePoints().size() ; j++) {
-//						double x = stroke.getParsePoints().get(j).x ;
-//						double y = stroke.getParsePoints().get(j).y;
-//						g.lineTo(x, y);
-//					}
-//					g.moveTo(x0, y0);
-//					g.closePath();
-//					g.stroke();
-//				}
-//				else {
-//					g.arc(x0, y0, 1.5, 0, 1.5* Math.PI);
-//					g.closePath();
-//					g.stroke();
-//				}
-//			}
+		for(int k=0 ; k<kStrokeContainers.size() ; k++) 
+		{	if(kStrokeContainers.get(k)!=currentStrokeContainer)
+			{
+				if(currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
+					g.setStrokeStyle(CssColor.make(150, 150, 150));
+				else
+					g.setStrokeStyle(CssColor.make(80, 80, 80));
+				kStrokeContainers.get(k).draw(g);
+			}
 		}
 		if(currentStrokeContainer!=null)
-			paintStrokeContainer(g,currentStrokeContainer);
+		{
+			g.setStrokeStyle(CssColor.make(80, 80, 80));
+			currentStrokeContainer.draw(g);
+		}
+			
 		
 		for (int lCnt = 0; lCnt < lijnVector.size(); lCnt++)
 		{	Lijn lijn = (Lijn) lijnVector.elementAt(lCnt);
@@ -1305,54 +1271,7 @@ public class KladjeGWTVeld
 		g.scale(1/scale, 1/scale);
 	}
 	
-	private void paintStrokeContainer(Context2d g, StrokeContainer strokeContainer)
-	{
-		if(strokeContainer.getStrokes().size()>0) {
-			if(strokeContainer==currentStrokeContainer)
-			{
-				g.setFillStyle(CssColor.make(255, 250, 220));
-				
-			}
-			else
-			{
-				g.setFillStyle(CssColor.make(230, 230, 230));
-				g.setLineWidth(1.0d);
-			}	
-			int x = (int)strokeContainer.getBoundingBox().x;
-			int y = (int)strokeContainer.getBoundingBox().y;
-			int width = (int)strokeContainer.getBoundingBox().width;
-			int height = (int)strokeContainer.getBoundingBox().height;
-			g.fillRect(x-10, y-10, width+20, height+20);
-		}
-		
-		
-		
-		g.setStrokeStyle(drawingColor);
-		ArrayList<Stroke> strokes = strokeContainer.getStrokes();
-		for(int i = 0 ; i < strokes.size() ; i++) {
-			Stroke stroke = strokes.get(i);
-			g.beginPath();
-			double x0 = (int)stroke.getParsePoints().get(0).x;
-			double y0 = (int)stroke.getParsePoints().get(0).y;
-			g.moveTo(x0, y0);
-			if(stroke.getParsePointsbox().width>3 ||  stroke.getParsePointsbox().height>3) {
-				for(int j = 1 ; j < stroke.getParsePoints().size() ; j++) {
-					double x = stroke.getParsePoints().get(j).x ;
-					double y = stroke.getParsePoints().get(j).y;
-					g.lineTo(x, y);
-				}
-				g.moveTo(x0, y0);
-				g.closePath();
-				g.stroke();
-			}
-			else {
-				g.arc(x0, y0, 1.5, 0, 1.5* Math.PI);
-				g.closePath();
-				g.stroke();
-			}
-		}
-		g.setLineWidth(2.0d);
-	}
+	
 
 	/**
 	 * de objecten in de selecteerRechthoek zijn verplaatst, geschaald of
@@ -1562,7 +1481,8 @@ public class KladjeGWTVeld
 	public void setSelecteerMode()
 	{
 		mouseMode = selecteren;
-		currentStrokeContainer.scale(1.0/3.0);
+		if(currentStrokeContainer!=null)
+			currentStrokeContainer.scale(1.0/3.0);
 		currentStrokeContainer = null;
 	}
 	
@@ -1578,8 +1498,8 @@ public class KladjeGWTVeld
 	public boolean setSelectedObject(int x, int y)
 	{	boolean found = false;
 	
-		for (int sCnt = 0; sCnt < strokeContainers.size(); sCnt++)
-		{	StrokeContainer sc = strokeContainers.get(sCnt);
+		for (int sCnt = 0; sCnt < kStrokeContainers.size(); sCnt++)
+		{	KStrokeContainer sc = kStrokeContainers.get(sCnt);
 			if (sc.contains(x, y))
 			{	selectedStrokeContainer = sc;
 				selectedStreep = null;
@@ -1735,7 +1655,7 @@ public class KladjeGWTVeld
 	{ 
 		boolean gewist = false;
 		if (selectedStrokeContainer != null)// && selectedStrokeContainer.deletable)
-		{	strokeContainers.remove(selectedStrokeContainer);
+		{	kStrokeContainers.remove(selectedStrokeContainer);
 			selectedStrokeContainer = null;
 			gewist = true;
 		}
@@ -2680,6 +2600,10 @@ public class KladjeGWTVeld
 		
 		return handleAction;
 	}
+	
+	KStrokeContainer proActiveStrokeContainer;
+	int proActiveX;
+	int proActiveY;
 
 	/**
 	 * actie bij MouseDown/TouchStart met coordinaten (eventX,eventY): <br>
@@ -2708,31 +2632,45 @@ public class KladjeGWTVeld
 		}
 		else if (mouseMode == formuleOptie)
 		{
-			StrokeContainer lastCurrentSC = currentStrokeContainer;
-			//if(currentStrokeContainer!=null)
-				currentStrokeContainer = findStrokeContainer(eventX,eventY,50);
-			//else 
-			//	currentStrokeContainer = findStrokeContainer(eventX,eventY,0);
+			mouseDown = true;
+			startX = eventX;
+			startY = eventY;
 			
-			if(lastCurrentSC!=null && currentStrokeContainer!=lastCurrentSC) {
-				lastCurrentSC.scale(1.0/3);
-				
-			}
-			if(currentStrokeContainer==null) {
-				currentStrokeContainer = new StrokeContainer();
-				strokeContainers.add(currentStrokeContainer);
-			}
-			else if(currentStrokeContainer!=lastCurrentSC){
-				currentStrokeContainer.scale(3.0);
-				paint();
-				eigenaar.setChanged();
+			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.setActive(false);
+				currentStrokeContainer.scale(1.0/3);
+				currentStrokeContainer=null;
 				return;
 			}
-				
+					
+			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
+				currentStrokeContainer.setActive(false);
+				currentStrokeContainer.scale(1.0/3);
+				currentStrokeContainer=null;
+			}
+			
+			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
+			if(currentStrokeContainer==null && proActiveStrokeContainer!=null) {
+				proActiveX = proActiveStrokeContainer.getBox().x;
+				proActiveY = proActiveStrokeContainer.getBox().y;
+				return;
+			}
+			
+			if(currentStrokeContainer==null || !currentStrokeContainer.writeBoxContains(eventX, eventY) && proActiveStrokeContainer==null) {
+				currentStrokeContainer = new KStrokeContainer(this);
+				currentStrokeContainer.setActive(true);
+				kStrokeContainers.add(currentStrokeContainer);
+			}
+			
+			
+			proActiveStrokeContainer = null;
 			formulaStrokePoints.clear();
 			mouseDown = true;
 			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
+			eigenaar.setChanged();
+			
+
 		}
 		else if ((mouseMode == lijnTekenen) ||
 				 (mouseMode == rechthoekTekenen) ||
@@ -2871,7 +2809,16 @@ public class KladjeGWTVeld
 		}
 		else if (mouseMode == formuleOptie)
 		{
-			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			if(proActiveStrokeContainer!=null )
+			{
+				int dx = eventX - startX;
+				int dy = eventY - startY;
+				proActiveStrokeContainer.translate(dx, dy);
+				startX = eventX;
+				startY = eventY;
+			}
+			if(formulaStrokePoints.size()>0)
+				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
 		}
 		else if (mouseMode == lijnTekenen)
@@ -3216,14 +3163,31 @@ public class KladjeGWTVeld
 		
 		else if (mouseMode == formuleOptie)
 		{	
-			lastStroke = new Stroke(formulaStrokePoints);
-			currentStrokeContainer.addStroke(lastStroke);
-			if(currentStrokeContainer.getStrokes().size()==0 || currentStrokeContainer.getDiagonal()<5)
-			{	strokeContainers.remove(currentStrokeContainer);
+			if(proActiveStrokeContainer!=null) 
+			{
+				int pX = proActiveStrokeContainer.getBox().x - proActiveX;
+				int pY = proActiveStrokeContainer.getBox().y - proActiveY;
+				boolean verschoven = pX*pX+pY*pY<16;
+				if(verschoven)
+				{
+					currentStrokeContainer = proActiveStrokeContainer;
+					currentStrokeContainer.scale(3.0/1.0);
+					currentStrokeContainer.setActive(true);
+				}
+				proActiveStrokeContainer=null;
+			}
+			
+			if(formulaStrokePoints.size()>0) 
+			{
+				lastStroke = new Stroke(formulaStrokePoints);
+				currentStrokeContainer.addStroke(lastStroke);
+			}
+			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
+			{	kStrokeContainers.remove(currentStrokeContainer);
 				currentStrokeContainer = null;
 				formulaStrokePoints.clear();
 				paint();
-				setSelecteerMode();
+				//setSelecteerMode();
 				return;
 			}
 			formulaStrokePoints.clear();

@@ -10,6 +10,8 @@ public interface KladjeCssResource extends CssResource
 	
 	String bottom();
 	
+	String top();
+	
 	String canvas();
 	
 	String upimage();

@@ -99,9 +99,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	/**
 	 * layout constantes in pixels
 	 */
-	int breedte = 500;
-	int hoogte = 450;
+	int breedte = 700;
+	int hoogte = 550;
 	int bottomHeight = 32;
+	int topHeight = 52;
 	int leftOffset = 5;
 	int topOffset = 5;
 	int toggleSize = 22;
@@ -745,6 +746,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	{
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("drawing", this);
+		comRoot.addCBookEventListener("equation", this);
 		comRoot.addCBookEventListener("double.translationX", this);
 		comRoot.addCBookEventListener("double.translationY", this);
 	}
@@ -778,6 +780,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			cirkelTekenen = launchState.getBoolean("cirkelTekenen");
 		if (launchState.containsKey("tekstTekenen"))
 			tekstTekenen = launchState.getBoolean("tekstTekenen");
+		if (launchState.containsKey("formuleOptie"))
+			formuleOptie = launchState.getBoolean("formuleOptie");
 		
 		// instellingen schaal- en roteeroptie
 		if (launchState.containsKey("roteren"))
@@ -796,13 +800,16 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(launchState.containsKey("scale"))
 			scale = launchState.getDouble("scale");
 		
+		
+		
 		bottomPanel = new LayoutPanel();
 		bottomPanel.addStyleName(kladjeCss.bottom());
-		dlp.addSouth(bottomPanel, bottomHeight);
+		if(!formuleOptie)
+			dlp.addSouth(bottomPanel, bottomHeight);
 		
 		topPanel = new LayoutPanel();
-		topPanel.addStyleName(kladjeCss.bottom());
-		dlp.addNorth(topPanel, bottomHeight);
+		topPanel.addStyleName(kladjeCss.top());
+		dlp.addNorth(topPanel, topHeight);
 		
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
 
@@ -825,6 +832,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		kladjeGWTVeld.schalen = schalen;
 		kladjeGWTVeld.translation = translation;
 		kladjeGWTVeld.scale = scale;
+		if(formuleOptie)
+			kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
 	
 		// docent tekeningen
 		kladjeGWTVeld.setState(map, true);
@@ -878,7 +887,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(formuleViewer!=null)
 			topPanel.remove(formuleViewer.getAsPanel());
 		formuleViewer = new FormuleViewer(kladjeGWTVeld.getFormula());
-		formuleViewer.setFont(FormuleFont.createFromFontSize(12));
+		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		topPanel.add(formuleViewer.getAsPanel());
 		
 //		Map<String,Object> map = kladjeGWTVeld.getState();
@@ -891,6 +900,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	public void acceptCBookEvent(CBookEvent event) {
 		String command = event.getCommand();
 		if (command.startsWith("drawing"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	kladjeGWTVeld.setState(map, false);
+				kladjeGWTVeld.paint();
+			}
+		}
+		
+		if (command.startsWith("action.setCorrect"))
 		{
 			Map map = (Map)event.getParameters();
 			if (map!=null)
