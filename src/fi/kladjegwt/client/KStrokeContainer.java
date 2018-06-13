@@ -16,6 +16,8 @@ public class KStrokeContainer {
 	
 	private boolean active = false;
 	
+	private double activeTranslation;
+	
 	private CssColor drawingColor = CssColor.make(80, 80, 80);
 	private Rectangle box, writeBox;
 	
@@ -93,6 +95,12 @@ public class KStrokeContainer {
 	
 	public void setActive (boolean b) {
 		active = b;
+		if(active && getBox()!=null) {
+			activeTranslation = getBox().x - 40;
+			translate((int)-activeTranslation,0);
+		}
+		else if(getBox()!=null)
+			translate((int)activeTranslation,0);
 	}
 	
 	public boolean isActive() {
