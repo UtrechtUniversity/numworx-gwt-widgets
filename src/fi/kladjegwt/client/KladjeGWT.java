@@ -314,8 +314,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		Stub.publish(this); 
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this); 
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
@@ -746,7 +746,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	{
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("drawing", this);
-		comRoot.addCBookEventListener("equation", this);
+		comRoot.addCBookEventListener("action.setCorrect", this);
 		comRoot.addCBookEventListener("double.translationX", this);
 		comRoot.addCBookEventListener("double.translationY", this);
 	}
@@ -894,6 +894,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 		Map<String,Object> map = kladjeGWTVeld.getState();
 		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+		comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
 //		logger.info("in setChanged");
 	}
 
