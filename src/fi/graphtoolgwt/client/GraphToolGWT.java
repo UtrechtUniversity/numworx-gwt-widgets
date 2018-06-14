@@ -1585,7 +1585,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			{
 				score = 0;
 				correct = false;
-				if (comRoot != null)
+				if (setState && comRoot != null) // als setState false absoluut GEEN setChanged()!
 					comRoot.setChanged(false);
 				if (graphPoints.size() > 0)	
 				{
