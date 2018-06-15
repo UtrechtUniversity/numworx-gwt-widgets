@@ -478,13 +478,13 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	@Override
 	public void visitLijn(Lijn l) {
 		if(l instanceof Ray) {
-			visitRay(l);
+			visitRay((Ray)l);
 		} else {
 			super.visitLijn(l);			
 		}
 	}
 
-	private void visitRay(Lijn l) {
+	private void visitRay(Ray l) {
 		rr.setLijn(l);
 		Segment s = rr;
 		s = drawTips(s,l);

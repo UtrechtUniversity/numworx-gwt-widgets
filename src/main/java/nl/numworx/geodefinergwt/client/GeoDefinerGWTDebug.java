@@ -221,8 +221,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				,"$fy=$px$n2@@/2-2@"
 				);
 		launchDebug.put("definitions", definitions);
-		Map<String,Object> textConfig = Collections.singletonMap("color", 0);
-		launchDebug.put("configuration", Collections.singletonMap("t", textConfig));
+		Map<String,Object> h = new HashMap<>();
+	// Collections.singletonMap("color", 0);
+		h.put("color", 0XFFFF0000);
+		h.put("width", 3);
+		h.put("tip", "ATSTART");
+		launchDebug.put("configuration", Collections.singletonMap("h", h));
 		launchDebug.put("checkDWO", checkDWO);
 	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}
 		Map<String,Object> checkObject = new HashMap<>();
