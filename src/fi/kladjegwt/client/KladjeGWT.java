@@ -166,7 +166,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	int ruitjesSize = 20;
 	/**
-	 * instelbaarheid: lijnen tekenen?
+	 * instelbaarheid: formule tekenenlijnen tekenen?
 	 */
 	boolean formuleOptie = true;
 	/**
@@ -314,8 +314,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		Stub.publish(this); 
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this); 
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
