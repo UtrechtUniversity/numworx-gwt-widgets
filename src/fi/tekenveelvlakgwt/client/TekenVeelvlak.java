@@ -1,8 +1,6 @@
 package fi.tekenveelvlakgwt.client;
 
-//import java.awt.event.*;
-//import java.awt.*;
-//import java.io.*;
+
 import java.util.*;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -18,48 +16,211 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Label;
 
+/**
+ * klasse die een tool repesenteert waarmee de gebruiker een Veelvlak kan ontwerpen;
+ * de klasse bevat een regelpaneel met knoppen om het ontwerpen te realizeren; <br>
+ * gebruik makend van een basisfiguur (in dit geval een transparante kubus) kan de 
+ * gebruiker vlakken toevoegen (toggleknop "maak vlak" ingedrukt, dwz heeft opschrift
+ * MAAK VLAK") door achtereenvolgens minimaal drie hoekpunten van de basisfiguur of
+ * van reeds toegevoegde vlakken of lijnen aan te klikken en daarna het eerste punt
+ * nogmaals aan te klikken; als er pas twee hoekpunten geselecteerd zijn, dan 
+ * kunnen die gedeselecteerd worden door ze nogmaals aan te klikken; de volgorde
+ * van aanklikken is relevant: de normaal van het vlak (buitenkant) volgt
+ * de kurketrekkerregel <br>
+ * de gebruiker kan ook lijnen toevoegen (toggleknop "maak lijn" ingedrukt, dwz heeft opschrift
+ * MAAK LIJN") door achtereenvolgens twee hoekpunten van de basisfiguur of
+ * van reeds toegevoegde vlakken of lijnen aan te klikken; na toevoegen van een lijn
+ * worden de snijpunten (als deze er zijn) met bestaande lijnen berekend; <br>
+ * de gebruiker kan dus door tactisch lijnen toevoegen nieuwe punten creeren om er vlakken 
+ * door te tekenen.<br>
+ * merk op dat lijnen toegevoegd worden aan het veelvlak, gebruik dus als de constructie van het
+ * veelvlak klaar is, de knop "wis lijnen" <br>  
+ * @author Peter Boon
+ */
 
-public class TekenVeelvlak extends TekenApplet3D implements  ClickHandler// ItemListener
+
+public class TekenVeelvlak extends TekenApplet3D implements ClickHandler
 {	
-	//TekenVeelvlakInteractiePanel tvip;
-	
+	/**
+	 * breedte en hoogte (inclusief regelpaneel)
+	 */
 	int breedte, hoogte; 
 	
+	/**
+	 * zoomslider
+	 */
 	Slider zijdeSl;
 	
-	Matrix3D matrot, matres,mateenh;
+	/**
+	 * Matrix3D wordt gebruikt voor draaien van basisfiguur en veelvlak,
+	 * omdat tb.mat gelijk is een deze Matrix3D, zie klasse TekenBlad3D 
+	 */
+	Matrix3D matres;
+	/**
+	 * gebruik deze Matrix3D om verdikte punten te tekenen:
+	 * zorg ervoor dat tb.mat (zie klasse TekenBlad3D) tijdelijk gelijk is een deze Matrix3D
+	 */
+	Matrix3D mateenh;
+	/**
+	 * Matrix3D voor implementatie initiele draaing<br>
+	 * zie methode beginDraai 
+	 */
+	Matrix3D matrot;
+
+	/**
+	 * een vergroot/verklein factor afhankelijk van de
+	 * breedte van het Canvas
+	 */
 	double k;
+	/**
+	 * variabelen gebruikt bij het berekenen van k<br>
+	 * zie methode zetZoomFactor
+	 */
 	double kMinFac = 60e-2d;
 	double kMaxFac = 140e-2d;
 	double k50 = 180;
 	double kMin, kMax;
-	double zoomFac = 5e-1d;
-	double xhoek,yhoek;
-	double beginx = 20, beginy = -30;
 	
+	/**
+	 * zoomfactor
+	 */
+	double zoomFac = 5e-1d;
+	/**
+	 * actuele draaiing van het 3d-veelvlak om de x-as is beginx+xhoek;<br> 
+	 * xhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	double xhoek;
+	/**
+	 * actuele draaiing van het 3d-veelvlak om de y-as is beginy+yhoek;<br> 
+	 * yhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	double yhoek;
+	/**
+	 * de initiele draaiing van het 3d-veelvlak om de x-as resp. de y-as
+	 */
+	double beginx = 20, beginy = -30;
+
+	/**
+	 * wordt er geluisterd naar MouseDown/TouchStart? 
+	 */
 	boolean muisDrukAan = true;
 	
-	Veelvlak v, tv;
+	/**
+	 * de basisfiguur, een transparante kubus
+	 */
+	Veelvlak v;
+	/**
+	 * het Veelvlak onder constructie
+	 */
+	Veelvlak tv;
+	/**
+	 * pijl (een Veelvlak) die naar de voorkant van de figuur wijst
+	 */
 	Veelvlak voorkantPijl = null;
 	
-	Polygon[] p;
-	
+	/**
+	 * de punten die aangeklikt kunnen worden om lijnen of vlakken te
+	 * tekenen, zie methode maakTrefpunten
+	 */
 	Punt[] trefpunten;
+	/**
+	 * een array met booleans dat aangeeft welke van de trefpunten 
+	 * aangeklikt zijn/werden (waarde true)
+	 */
 	boolean[] trefpuntRaak;
-	int aantalHpNieuw, aantalGetekendeHoekpunten;
+	/**
+	 * niet gebruikt
+	 */
+	int aantalGetekendeHoekpunten;
+	/**
+	 * het aantal nieuwe hoekpunten (zie hoekpuntenNieuw)
+	 *  
+	 */
+	int aantalHpNieuw;
+	/**
+	 * punten die geen hoekpunt zijn van het Veelvlak dat ontworpen wordt: 
+	 * de hoekpunten van de baisfiguur aangevuld met de snijpunten van 
+	 * getekende lijnen 
+	 */
 	Hoekpunt[] hoekpuntenNieuw;
+	/**
+	 * de hoekpuntenNieuw die aangeklikt kunnen worden (alle dus)
+	 */
 	Punt[] trefpuntenNieuw;
-	boolean begin, basisZichtbaar,maakLijn, maakVlak, vaktekening;
-	
-	PushButton basisKnop, terugKnop, wisKnop, wisVKnop;
-	ToggleButton lijnKnop, vlakKnop;
+	/**
+	 * is dit de eerste keer dat de figuur getekend wordt?<br>
+	 * zie methode tekenProgramma
+	 */
+	boolean begin;
+	/**
+	 * true: basisfiguur zichtbaar
+	 */
+	boolean basisZichtbaar;
+	/**
+	 * true: modus lijnen maken
+	 */
+	boolean maakLijn;
+	/**
+	 * true: modus vlakken maken
+	 */
+	boolean maakVlak; 
+	/**
+	 * knop "verberg/toon basisfiguur"
+	 */
+	PushButton basisKnop;
+	/**
+	 * knop "maak ongedaan"
+	 */
+	PushButton terugKnop;
+	/**
+	 * knop "wis lijnen"
+	 */
+	PushButton wisKnop;
+	/**
+	 * knop "wis vlakken"
+	 */
+	PushButton wisVKnop;
+	/**
+	 * toggle "maak lijnen" aan/uit
+	 */
+	ToggleButton lijnKnop; 
+	/**
+	 * toggle "maak vlakken" aan/uit
+	 */
+	ToggleButton vlakKnop;
+	/**
+	 * label voor zoomslider
+	 */
 	Label zoomLabel;
 	
-	int aantalPuntenRood, puntnr1, puntnr2;
+	/**
+	 * de indices in trefpunten(Nieuw) van het eerste en
+	 * tweede aangeklikte punt van een lijn die getekend wordt<br>
+	 * zie methode muisDrukActie
+	 */
+	int puntnr1, puntnr2;
+	/**
+	 * het aantal aangeklikte punten in trefpunten(Nieuw) van een vlak dat getekend wordt<br>
+	 * zie methode muisDrukActie
+	 */
+	int aantalPuntenRood;
+	/**
+	 * de indices van de aangeklikte punten in trefpunten(Nieuw) van een vlak dat getekend wordt<br>
+	 * zie methode muisDrukActie
+	 */
 	int[] puntnr;	
 	
+	/**
+	 * verticale offset regelpaneel (pixels)
+	 */
 	int bStarH = 20;
-	
+
+	/**
+	 * constructor: roep de constructor van de superklasse aan;<br>
+	 * NB dit initialiseert i.h.b. het LayoutPanel rg 
+	 * @param b breedte
+	 * @param h hoogte
+	 */
 	public TekenVeelvlak(int b, int h)
 	{
 		super(b,h);
@@ -67,14 +228,15 @@ public class TekenVeelvlak extends TekenApplet3D implements  ClickHandler// Item
 		hoogte = h;
 	}
 	
+	/**
+	 * initialiseer de knoppen op het regelpaneel rg; initialiseer de attributen;
+	 * initialiseet de basisfiguur (een kubus) een een leeg Veelvlak onder constructie 
+	 */
 	public void initialiseer()
 	{	
 		
-System.out.println("initialiseer");
-
 		int currentY = bStarH;
 	    
-		//zoomLabel = new Label("zoom");
 		zoomLabel = new Label(TekenVeelvlakGWT.rb.zijdeLabel());
 		rg.add(zoomLabel);
 		rg.setWidgetLeftWidth(zoomLabel, 15, Style.Unit.PX, 100, Style.Unit.PX);
@@ -92,74 +254,62 @@ System.out.println("initialiseer");
 		
 		currentY += 30;
 		
-		//lijnKnop = new ToggleButton("Maak lijn","MAAK LIJN");
 		lijnKnop = new ToggleButton(TekenVeelvlakGWT.rb.lijnKnopLabel(),TekenVeelvlakGWT.rb.lijnKnopCapLabel());
 		rg.add(lijnKnop);
 		rg.setWidgetLeftWidth(lijnKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(lijnKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		lijnKnop.addClickHandler(this);
-		
 		lijnKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
 				
-		//vlakKnop = new ToggleButton("Maak vlak","MAAK VLAK");
 		vlakKnop = new ToggleButton(TekenVeelvlakGWT.rb.vlakKnopLabel(), TekenVeelvlakGWT.rb.vlakKnopCapLabel());
 		rg.add(vlakKnop);
 		rg.setWidgetLeftWidth(vlakKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(vlakKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		vlakKnop.addClickHandler(this);
-		
 		vlakKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
 		
-		//basisKnop = new PushButton("Verberg basis");
 		basisKnop = new PushButton(TekenVeelvlakGWT.rb.verbergBasisKnopLabel());
 		rg.add(basisKnop);
 		rg.setWidgetLeftWidth(basisKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(basisKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		basisKnop.addClickHandler(this);
-		
 		basisKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
 		
-		//terugKnop = new PushButton("Maak ongedaan");
 		terugKnop = new PushButton(TekenVeelvlakGWT.rb.terugKnopLabel());
 		rg.add(terugKnop);
 		rg.setWidgetLeftWidth(terugKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(terugKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 		
 		terugKnop.addClickHandler(this);
-		
 		terugKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
 
-		//wisKnop = new PushButton("Wis lijnen");
 		wisKnop = new PushButton(TekenVeelvlakGWT.rb.wisLijnKnopLabel());
 		rg.add(wisKnop);
 		rg.setWidgetLeftWidth(wisKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(wisKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 
 		wisKnop.addClickHandler(this);
-		
 		wisKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
 		
-		//wisVKnop = new PushButton("Wis vlakken");
 		wisVKnop = new PushButton(TekenVeelvlakGWT.rb.wisVlakKnopLabel());
 		rg.add(wisVKnop);
 		rg.setWidgetLeftWidth(wisVKnop, 8, Style.Unit.PX, 114, Style.Unit.PX);
 		rg.setWidgetTopHeight(wisVKnop, currentY, Style.Unit.PX, 25, Style.Unit.PX);
 
 		wisVKnop.addClickHandler(this);
-		
 		wisVKnop.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
 		
 		currentY += 35;
@@ -168,23 +318,27 @@ System.out.println("initialiseer");
 		matres = new Matrix3D();
 		mateenh = new Matrix3D();
 		tb.mat = matres;
-		k = 180; //k=180; // ik: 130
+				
+		k = 180; 
 		begin=true;
 		basisZichtbaar=true;
 		maakLijn=true;
 		maakVlak=false;
-		vaktekening = false;
+
 		trefpunten = new Punt[500];
 		trefpuntRaak = new boolean[500];
 		wisTrefpunten();
+
 		aantalHpNieuw = 0;
 		hoekpuntenNieuw = new Hoekpunt[500];
 		trefpuntenNieuw = new Punt[500];
 		aantalPuntenRood = 0;
 		puntnr = new int[20];
 		
+		// basisfiguur kubus 
 		v = (new Kubus(1));
 		
+		// geen extra punten op de ribben
 		int n = 0;
 		int aantalHp = 8;
 		int aantalRib = 12;
@@ -204,72 +358,64 @@ System.out.println("initialiseer");
 														((n-j)*v.hoekpunten[rib[2*i]].z + (j+1)*v.hoekpunten[rib[2*i+1]].z)/(n+1));
 			}
 		}
-											
+										
+		// alle vlakken transparant
 		for (int i = 0; i < v.aantalVlakken; i++)
 		{	v.vlakken[i].vulkleur = "transparant";
 		}
 		
+		// het Veelvlak onder constructie
 		tv = new Veelvlak();
 		
-		for(int i=0 ; i<v.aantalHoekpunten ; i++)
+		// de nieuwe hoekpunten zijn die van de basisfiguur		
+		for(int i=0 ; i < v.aantalHoekpunten ; i++)
 		{	hoekpuntenNieuw[aantalHpNieuw] = v.hoekpunten[i];
 			aantalHpNieuw++;
 		}
 		
+		// dit berekent k 
 		setBounds(0,0,breedte,hoogte);
 	}
 
+	/**
+	 * gebruik dit om k te berekenen
+	 * @param x niet gebruikt
+	 * @param y niet gebruikt
+	 * @param b breedte
+	 * @param h niet gebruikt
+	 */
 	public void setBounds(int x, int y, int b, int h)
 	{	
-
-//System.out.println("tv setBounds " + x + " " + y + " " + b + " " + h);
-//System.out.println("k before " + k);
-		
-		//k=180.0/500*Math.min(b-90, h);
 		k50 = 180.0/500*Math.min(b-150, h);
 		kMin = kMinFac * k50;
 		kMax = kMaxFac * k50;
-		
-//System.out.println("tvv kMin = " + UF.format(kMin, 1));
-//System.out.println("tvv kMax = " + UF.format(kMax, 1));
-
 		k = zoomFac * (kMax - kMin) + kMin;
-		
-		
-		
-		//k=180.0/500*Math.min(b-150, h);
-
-if (k > 0)		
-{	//System.out.println("tvvgwt b = " + b + " h = " + h);		
-	//System.out.println("tvvgwt k = " + UF.format(k, 1));
-}	
-
-		//super.setBounds(x,y,b,h);
-		
-		//if (tb != null)
-		//	tekenOpnieuw();
 	}
 	
+	/**'
+	 * zet een nieuwe zoomfacor, herbereken k
+	 * @param zFac nieuwe zoomfactor
+	 */
 	public void zetZoomFac(double zFac)
 	{
 		zoomFac = zFac;
-		
-		//k50 = 180.0/500*Math.min(getSize().width-150, getSize().height);
 		k50 = 180.0/500*Math.min(breedte-150, hoogte);
 		kMin = kMinFac * k50;
 		kMax = kMaxFac * k50;
-
 		k = zoomFac * (kMax - kMin) + kMin; 
-		
-//System.out.println("tvv setZoomFac k = " + UF.format(k, 1));		
-		
 	}
 	
+	/**
+	 * creeer het Veelvlak onder constructie m.b.v. de status data uit een Map:<br>
+	 * ook positie en zoomFactor maken deel uit van de status; merk op dat de
+	 * (al gecreerde) basisfiguur ongewijzigd wordt gelaten.  
+	 * @param map Map met status data
+	 */
 	public void setState(Map map)
 	{	
-		if(map == null || map.isEmpty()) return;
+		if(map == null || map.isEmpty())
+			return;
 		ObjectMap h = JSONUtilities.wrapMap(map);
-//System.out.println("tv setState");
 
 		double[] hoekpunten = null;
 		List<Double> hoekpuntenAL = new ArrayList<Double>();
@@ -286,6 +432,7 @@ if (k > 0)
 		
 		if (h.containsKey("hoekpunten"))
 		{	
+			// backwards compatibility
 			hoekpuntenAL = h.getDoubleList("hoekpunten");
 			if (hoekpuntenAL == null)
 			{	hoekpunten = h.getDoubleArray("hoekpunen"); 
@@ -298,6 +445,7 @@ if (k > 0)
 		}
 		if (h.containsKey("vlakken"))
 		{	
+			// backwards compatibility
 			vlakkenAL = h.getIntegerList("vlakken");
 			if (vlakkenAL == null)
 			{	vlakken = h.getIntArray("vlakken"); 
@@ -309,7 +457,9 @@ if (k > 0)
 			}
 		}
 		if (h.containsKey("lijnen"))
-		{	lijnenAL = h.getIntegerList("lijnen");
+		{	
+			// backwards compatibility
+			lijnenAL = h.getIntegerList("lijnen");
 			if (lijnenAL == null)
 			{	lijnen = h.getIntArray("lijnen"); 
 			}
@@ -331,15 +481,12 @@ if (k > 0)
 
 		aantalPuntenRood = 0;
 		wisTrefpunten();
-		//tv.wisLijnen();
 		aantalHpNieuw = 0;
 		
 		this.basisZichtbaar = basisZichtbaar;
 		
 		if (!basisZichtbaar) 
 			basisKnop.setText("Toon basis");
-		
-//System.out.println("zoomFac = " + UF.format(zoomFac,3));		
 		
 		this.zoomFac = zoomFac;
 		
@@ -348,7 +495,6 @@ if (k > 0)
 		zetZoomFac(zoomFac);
 
 		zetBeginHoeken(draaiX, draaiY);
-//System.out.println("draaiX = " + UF.format(draaiX,1) + " draaiY = " + UF.format(draaiY,1));		
 
 		tv = new Veelvlak(hoekpunten, vlakken, lijnen);
 
@@ -364,18 +510,16 @@ if (k > 0)
 		
 	}
 	
+	/**
+	 * sla de status data van het Veelvlak onder constructie op in een HashMap<br>
+	 * ook positie en zoomFactor maken deel uit van de status;
+	 * @return HashMap met status data van het Veelvlak onder constructie
+	 */
 	public HashMap getState()
 	{	
-//System.out.println("tv getState");		
-		
-		//double[] hoekpunten = null;
 		ArrayList<Double> hoekpuntenAL = new ArrayList<Double>();
-		//int[] vlakken = null;
 		ArrayList<Integer> vlakkenAL = new ArrayList<Integer>();
-		//int[] lijnen = null;
 		ArrayList<Integer> lijnenAL = new ArrayList<Integer>();
-		//String[] kleuren = null;
-		ArrayList<String> kleurenAL = new ArrayList<String>();
 				
 		boolean basisZichtbaar = true;
 		
@@ -384,36 +528,25 @@ if (k > 0)
 		double draaiX = 20;
 		double draaiY = -30;
 
-		//hoekpunten = tv.hpRij;
 		for (int h = 0; h < tv.hpRij.length; h++)
 			hoekpuntenAL.add(new Double(tv.hpRij[h]));
-		//vlakken = tv.vlRij;
+
 		for (int v = 0; v < tv.vlRij.length; v++)
 			vlakkenAL.add(new Integer(tv.vlRij[v]));
-		//lijnen = tv.lnRij;
+
 		for (int k = 0; k < tv.lnRij.length; k++)
 			lijnenAL.add(new Integer(tv.lnRij[k]));
-		//kleuren = new String[tv.aantalVlakken];
-		for (int vCnt = 0; vCnt < tv.aantalVlakken; vCnt++)
-		{	kleurenAL.add(tv.vlakken[vCnt].vulkleur);
-		}
-		
+
 		basisZichtbaar = this.basisZichtbaar;
 		
 		zoomFac = this.zoomFac;
 		draaiX = geefDraaiX();
 		draaiY = geefDraaiY();
-
-//System.out.println("zoomFac = " + UF.format(zoomFac,3));
-		
 		HashMap h = new HashMap();
 		
 		h.put("hoekpunten", hoekpuntenAL);
 		h.put("vlakken", vlakkenAL);
 		h.put("lijnen", lijnenAL);
-		h.put("kleuren", kleurenAL);
-		
-//		h.put("aantalVlakkenRood", new Integer(aantalVlakkenRood));
 		
 		h.put("basisZichtbaar", new Boolean(basisZichtbaar));
 		
@@ -421,126 +554,69 @@ if (k > 0)
 		
 		h.put("draaiX", new Double(draaiX));
 		h.put("draaiY", new Double(draaiY));
-//System.out.println("draaiX = " + UF.format(draaiX,1) + " draaiY = " + UF.format(draaiY,1));		
 
-		//h.put("viewerPosition", new Integer(viewerPosition));
-		//h.put("muisAan", new Boolean(muisAan));
-		
 		return h;
 	}
-	
+
+	/**
+	 * zet de positie van het oog op de positieve z-as
+	 * in het punt (0,0,afstand) 
+	 */
 	public void zetAfstand(double afst)
 	{	
 		tb.zetAfstand(afst);
 	}
+	/**
+	 * vlakjes van het Veelvlak met schaduw-effect tekenen?
+	 */
 	public void zetSchaduw(boolean s)
 	{	tb.zetSchaduw(s);
 	}
+	/**
+	 * zet de initiele draaiing om x- resp. y-as
+	 * @param hx draaiing om de x-as
+	 * @param hy draaiing om de y-as
+	 */
 	public void zetBeginHoeken(double hx, double hy)
 	{	beginx = hx;
 		beginy = hy;
 		xhoek = 0;
 		yhoek = 0;
 	}
-	
-/*	
-	public void zetKlikAan(boolean b)
-	{	klikAan = b;
-		muisDrukAan = !b;
-		//rg.setVisible(!b);
-	}
-	
-*/	
+
+	/**
+	 * geef de draaiing van de figuur om de x-as
+	 * @return beginx+xhoek
+	 */
 	public double geefDraaiX()
 	{	
-//System.out.println("gdX " + beginx + " " + xhoek);		
 		return beginx+xhoek;
 	}
+	/**
+	 * geef de draaiing van de figuur om de y-as
+	 * @return beginy+yhoek
+	 */
 	public double geefDraaiY()
 	{	
-//System.out.println("gdY " + beginy + " " + yhoek);		
 		return beginy+yhoek;
 	}
-	
-/*	
-	public int geefBasisFiguur()
-	{	return kiesV.getSelectedIndex();
-	}
-*/
-/*	
-	public void zetKiesV(int basisFiguur)
-	{
-		kiesV.setSelectedIndex(basisFiguur);
-	}
-*/	
+
+	/**
+	 * toon een pijl (Veelvlak) dat naar de voorkant van de figuur wijst
+	 * @param vkPijl de voorkantpijl
+	 */
 	public void toonVoorkantPijl(Veelvlak vkPijl)
 	{
 		voorkantPijl = vkPijl;
-		
-//GWT		
-		//repaint();
 		tekenOpnieuw();
 	}
-	
+
+	/**
+	 * teken basisfiguur (als gewenst) en het Veelvlak
+	 * onder constructie
+	 */
 	public void tekenprogramma()
 	{	
-		if(vaktekening)
-		{	
-/*			
-			begindraai(0,0);
-			
-			tb.gIm.drawRect(20,220,200,200);
-			tb.gIm.drawRect(220,220,200,200);
-			tb.gIm.drawRect(220,20,200,200);
-			tb.gIm.drawRect(420,220,200,200);
-			
-			
-			penUit(); stap(0,100,0); penAan();
-			xdraai(90);
-			if(basisZichtbaar)tekenVeelvlak(2,v);
-			tekenVeelvlak(1,tv);
-			xdraai(-90);
-			penUit(); stap(0,-100,0); penAan();
-			
-			penUit(); stap(0,-100,0); penAan();
-			xdraai(0);
-			if(basisZichtbaar)tekenVeelvlak(2,v);
-			tekenVeelvlak(1,tv);
-			xdraai(0);
-			penUit(); stap(0,100,0); penAan();
-			
-			penUit(); stap(-200,-100,0); penAan();
-			ydraai(90);
-			if(basisZichtbaar)tekenVeelvlak(2,v);
-			tekenVeelvlak(1,tv);
-			ydraai(-90);
-			penUit(); stap(200,100,0); penAan();
-			
-			penUit(); stap(200,-100,0); penAan();
-			ydraai(-90);
-			if(basisZichtbaar)tekenVeelvlak(2,v);
-			tekenVeelvlak(1,tv);
-			ydraai(90);
-			penUit(); stap(-200,100,0); penAan();
-			
-			k=92;
-			penUit(); stap(220,130,0); penAan();
-			xdraai(30);ydraai(-34);
-			if(basisZichtbaar)tekenVeelvlak(2,v);
-			tekenVeelvlak(1,tv);
-			ydraai(34);xdraai(-30);
-			penUit(); stap(-220,-130,0); penAan();
-*/			
-			
-		}
-		else
-		{	
-			
-//System.out.println("tekenProg");
-//System.out.println("mres = " + matres.toString());
-//System.out.println("tbm = " + tb.mat.toString());
-
-
 			if (begin)
 				begindraai(beginx,beginy);
 			if (basisZichtbaar)
@@ -552,26 +628,21 @@ if (k > 0)
 			{	tekenVeelvlak(1,voorkantPijl);
 			}
 			
-		}
+//		}
 	}
+	
+	/**
+	 * zet beginx resp. beginy op xdr resp. ydr en
+	 * draai basisfiguur en veelvlak   
+	 * @param xdr draaing om de x-as
+	 * @param ydr draaing om de y-as
+	 */
 	void begindraai(double xdr,double ydr)
 	{	
-		
-//System.out.println("begindraai " + begin);
-
-		if(begin)
-		{	//lijnKnop.setSize(100,25);
-			//basisKnop.setSize(100,25);
-			//terugKnop.setSize(100,25);
-			//wisKnop.setSize(100,25);
-			//wisVKnop.setSize(100,25);
-			//vlakKnop.setSize(100,25);
-			beginx = xdr;
+		if (begin)
+		{	beginx = xdr;
 			beginy = ydr;
 						
-//System.out.println("beginx = " + beginx);
-//System.out.println("beginy = " + beginy);
-
 			tb.mat.initialiseer();
 			matrot.initialiseer();
 			matrot.ydraaiAbs(ydr);
@@ -580,68 +651,82 @@ if (k > 0)
 			begin=false;
 		}
 	}
+	
+	/**
+	 * maak de punten die aangeklikt kunnen worden: dit zijn de hoekpunten
+	 * van vlakken van Veelvlak v en de eindpunten van lijnen van Veelvlak v,
+	 * (stop die in trefpunten[]), gevolgd door de nieuwe hoekpunten (stop die
+	 * in trefPuntenNieuw[]); als een trefpunt aangeklikt is, verdik het dan in groen  
+	 * @param v Veelvlak v
+	 */
 	void maakTrefpunten(Veelvlak v)
-	{	for(int i=0 ; i<v.aantalHoekpunten ; i++)
-		{	penUit();stap(k*v.hoekpunten[i].x, k*v.hoekpunten[i].y, k*v.hoekpunten[i].z);
+	{	
+		
+		for(int i=0 ; i<v.aantalHoekpunten ; i++)
+		{	penUit();
+			stap(k*v.hoekpunten[i].x, k*v.hoekpunten[i].y, k*v.hoekpunten[i].z);
 			trefpunten[i] = geefPunt(1);
-			if(trefpuntRaak[i])
+			if (trefpuntRaak[i])
 			{	tb.mat = mateenh;
-				stap(5,0);vulAan(1,"groen");stap(-5,-5);stap(-5,5);stap(5,5);stap(5,-5);vulUit(1);stap(-5,0);
+				stap(5,0);
+				vulAan(1,"groen");
+				stap(-5,-5);stap(-5,5);stap(5,5);stap(5,-5);
+				vulUit(1);
+				stap(-5,0);
 				tb.mat = matres;
 			}
-			
-			stap(-k*v.hoekpunten[i].x, -k*v.hoekpunten[i].y, -k*v.hoekpunten[i].z);penAan();
+			stap(-k*v.hoekpunten[i].x, -k*v.hoekpunten[i].y, -k*v.hoekpunten[i].z);
+			penAan();
 		}
 		for(int i=0 ; i<aantalHpNieuw ; i++)
-		{	penUit();stap(k*hoekpuntenNieuw[i].x, k*hoekpuntenNieuw[i].y, k*hoekpuntenNieuw[i].z);
+		{	penUit();
+			stap(k*hoekpuntenNieuw[i].x, k*hoekpuntenNieuw[i].y, k*hoekpuntenNieuw[i].z);
 			trefpuntenNieuw[i] = geefPunt(1);
-			//if(v.trefpuntRaak[i])
-			//{	tb.mat = mateenh;
-			//	stap(3,0);vulAan(1,"rood");stap(-3,-3);stap(-3,3);stap(3,3);stap(3,-3);vulUit(1);stap(-3,0);
-			//	tb.mat = matres;
-			//}
-			if(basisZichtbaar)// && i<aantalGetekendeHoekpunten)
+			if(basisZichtbaar)
 			{	tb.mat = mateenh;
-				stap(2,0);vulAan(1,"zwart");stap(-2,-2);stap(-2,2);stap(2,2);stap(2,-2);vulUit(1);stap(-2,0);
+				stap(2,0);
+				vulAan(1,"zwart");
+				stap(-2,-2);
+				stap(-2,2);
+				stap(2,2);
+				stap(2,-2);
+				vulUit(1);
+				stap(-2,0);
 				tb.mat = matres;
 			}
-			stap(-k*hoekpuntenNieuw[i].x, -k*hoekpuntenNieuw[i].y, -k*hoekpuntenNieuw[i].z);penAan();
+			stap(-k*hoekpuntenNieuw[i].x, -k*hoekpuntenNieuw[i].y, -k*hoekpuntenNieuw[i].z);
+			penAan();
 		}
 	}
+	
+	/**
+	 * zet alle waarden in het array trefpuntRaak op false
+	 */
 	public void wisTrefpunten()
 	{	for(int i=0 ; i<500 ; i++)
 		{	trefpuntRaak[i]=false;
 		}
 	}
+	
+	/**
+	 * teken Veelvlak vv (vlakken en lijnen) 
+	 * @param n zie methode tekenVlak
+	 * @param vv te tekeken Veelvlak
+	 */
 	void tekenVeelvlak(int n,Veelvlak vv)
 	{	
-		if ((n == 1) && (vv == tv))
-		{	p = new Polygon[vv.aantalVlakken];
-		}
 		for (int i = 0; i < vv.aantalVlakken; i++)
 		{	tekenVlak(n, vv.vlakken[i]);
-			if ((n == 1) && (vv == tv))
-			{	p[i] = tb.geefVlak(1);
-//System.out.println("p" + i + " " + polygonString(p[i]));			
-			}
 		}
 		for (int i = 0; i < vv.aantalLijnen; i++)
 		{	tekenLijn(vv.lijnen[i]);
 		}
 	}
-	
-/*	
-	public String polygonString(Polygon p)
-	{
-		String result = "";
-		for (int i = 0; i < p.npoints; i++)
-		{
-			result += "(" + p.xpoints[i] + "," + p.ypoints[i] + ") ";  
-		}
-		
-		return result;
-	}
-*/
+
+	/**
+	 * teken Lijn l
+	 * @param l te tekenen Lijn
+	 */
 	void tekenLijn(Lijn l)
 	{	penUit();
 		stap(k*l.hpunt1.x, k*l.hpunt1.y, k*l.hpunt1.z);
@@ -650,10 +735,15 @@ if (k > 0)
 		penUit(1);
 		stap(-k*l.hpunt2.x, -k*l.hpunt2.y, -k*l.hpunt2.z);
 	}
+	
+	/**
+	 * teken Vlak v 
+	 * @param n hier n == 1 (gebruik Lichaam3D nummer 1) of n == 2 (gebruik Lichaam3D nummer 1)
+	 * @param v het te tekenen Vlak
+	 */
 	void tekenVlak(int n,Vlak v)
 	{	penUit();
 		stap(k*v.punten[0].x, k*v.punten[0].y, k*v.punten[0].z);
-		
 		
 		if (!(v.lijnkleur=="transparant"))
 			penAan("lichtgrijs");
@@ -697,6 +787,13 @@ if (k > 0)
 		stap(-k*v.punten[0].x, -k*v.punten[0].y, -k*v.punten[0].z);
 		
 	}
+	
+	/**
+	 * vindt het snijpunt van Lijn l1 en Lijn l2 en als het snijpunt bestaat
+	 * voeg het toe aan hoekpuntenNieuw  
+	 * @param l1 eerste Lijn
+	 * @param l2 tweede Lijn
+	 */
 	void maakSnijpunt(Lijn l1, Lijn l2)
 	{	double ax = l1.hpunt1.x;double ay = l1.hpunt1.y;double az = l1.hpunt1.z;
 		double bx = l1.hpunt2.x;double by = l1.hpunt2.y;double bz = l1.hpunt2.z;
@@ -735,23 +832,16 @@ if (k > 0)
 			}
 		}
 		
-		
-		
 		if(afwijking<0.00001 && afwijking>-0.00001 && k<1 && k>0 && m<1 && m>0)
 		{	hoekpuntenNieuw[aantalHpNieuw] = new Hoekpunt(ax + k*(bx-ax) , ay + k*(by-ay) , az + k*(bz-az));
 			aantalHpNieuw++;
-			
-			/*Hoekpunt[] hp = new Hoekpunt[tv.aantalHoekpunten+1];
-			for(int i=0 ; i<tv.aantalHoekpunten ; i++)
-			{	hp[i]=tv.hoekpunten[i];
-			}
-			hp[tv.aantalHoekpunten]= new Hoekpunt(ax + k*(bx-ax) , ay + k*(by-ay) , az + k*(bz-az));
-			tv.hoekpunten = hp;
-			tv.aantalHoekpunten++;*/
-			
 		}
 		
 	}
+	/**
+	 * vindt de snijpunten (if any) van alle Lijnen in het Veelvlak onder
+	 * constructie en voeg ze toe aan hoekpuntenNieuw
+	 */
 	void maakAlleSnijpunten()
 	{	for(int i=0 ; i<tv.aantalLijnen ; i++)
 		{	for(int j=0 ; j<i ; j++)
@@ -759,13 +849,25 @@ if (k > 0)
 			}
 		}
 	}
-	
+
+	/**
+	 * vindt de snijpunten (if any) van de laatst gecreeerde Lijn in het Veelvlak onder
+	 * constructie met alle andere Lijnen in het Veelvlak en voeg ze toe aan hoekpuntenNieuw
+	 */
 	void zoekSnijpunten()
 	{	for(int i=0 ; i<tv.aantalLijnen-1 ; i++)
 		{	maakSnijpunt(tv.lijnen[tv.aantalLijnen-1],tv.lijnen[i]);
 		}
 		
 	}
+	
+	/**
+	 * er zijn drie punten geselecteerd, met indices in in het hoekpunten array
+	 * van het Veelvlak gegeven door het array puntnr; chack of Hoekpunt hpt
+	 * in het vlak door deze drie geselecteerde punten ligt 
+	 * @param hpt te chacken Hoekpunt
+	 * @return true/false
+	 */
 	boolean checkVlak(Hoekpunt hpt)
 	{	double ux = tv.hoekpunten[puntnr[1]].x - tv.hoekpunten[puntnr[0]].x;
 		double uy = tv.hoekpunten[puntnr[1]].y - tv.hoekpunten[puntnr[0]].y;
@@ -778,11 +880,15 @@ if (k > 0)
 		double nz = ux*vy - uy*vx;
 		double d = tv.hoekpunten[puntnr[0]].x*nx + tv.hoekpunten[puntnr[0]].y*ny + tv.hoekpunten[puntnr[0]].z*nz;
 		double dn = hpt.x*nx + hpt.y*ny + hpt.z*nz;
-		if(d-dn < 0.0001 && d-dn > -0.0001)return true;
-		else return false; 
+		if (d-dn < 0.0001 && d-dn > -0.0001)
+			return true;
+		else 
+			return false; 
 	}
 	
-	
+	/**
+	 * de stand van de zoomslider is veranderd, update k
+	 */
 	public void sliderAction()
 	{
 		int stand = zijdeSl.geefStand();
@@ -795,24 +901,14 @@ if (k > 0)
 		tekenOpnieuw();
 	}
 	
+	/**
+	 * afhandelen van Click Events op de knoppen 
+	 */
 	public void onClick(ClickEvent e)
 	{		
 	
-			//if (e.getSource() == zijdeSl)
-			//{	
-			//	int stand = zijdeSl.geefStand();
-			//	int lengte = zijdeSl.geefLengte();
-			//	double kMin = kMinFac * k50;
-			//	double kMax = kMaxFac * k50;
-			//	zoomFac = (double) stand / (double) (lengte);
-			//	k = zoomFac * (kMax - kMin) + kMin; 
-
-			//}
-			
 			if (e.getSource() == basisKnop)
 			{	
-
-				//if (basisKnop.getText().equals("Verberg basis"))
 				if (basisKnop.getText().equals(TekenVeelvlakGWT.rb.verbergBasisKnopLabel()))
 				{	
 					basisZichtbaar = false;
@@ -821,11 +917,10 @@ if (k > 0)
 				}
 				else
 				{	basisZichtbaar = true;
-					//basisKnop.setText("Verberg basis");
 					basisKnop.setText(TekenVeelvlakGWT.rb.verbergBasisKnopLabel());
 					
 				}
-			}	
+			}
 			else if (e.getSource() == terugKnop)
 			{	aantalPuntenRood = 0;
 				wisTrefpunten();
@@ -842,12 +937,12 @@ if (k > 0)
 			{	
 				if (lijnKnop.isDown())
 				{
-				maakLijn = true;
-				maakVlak = false;
-				aantalPuntenRood=0;
-				wisTrefpunten();
+					maakLijn = true;
+					maakVlak = false;
+					aantalPuntenRood=0;
+					wisTrefpunten();
 				
-				vlakKnop.setDown(false);
+					vlakKnop.setDown(false);
 				}
 				else
 				{
@@ -858,12 +953,12 @@ if (k > 0)
 			{	
 				if (vlakKnop.isDown())
 				{
-				maakLijn = false;
-				maakVlak = true;
-				aantalPuntenRood = 0;
-				wisTrefpunten();
+					maakLijn = false;
+					maakVlak = true;
+					aantalPuntenRood = 0;
+					wisTrefpunten();
 				
-				lijnKnop.setDown(false);
+					lijnKnop.setDown(false);
 				}
 				else
 				{
@@ -891,41 +986,12 @@ if (k > 0)
 	}
 
 	
-/*	
-	public void nieuw()
-	{	String soortV = (String) kiesV.getSelectedItem();
-
-		if (soortV == TekenVeelvlakOpdr.rb.getString("kubusLabel"))
-			v = new Kubus(1);
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("octaederLabel"))
-			v = (new Kubus(Math.sqrt(3))).dualiseer();
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("icosaederLabel"))
-			v = new Icosaeder(1);
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("dodecaederLabel"))
-			v = (new Icosaeder(1.3)).dualiseer();
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("tetraederLabel"))
-			v = new Tetraeder(1);
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("prismaLabel"))
-			v = new Prisma(0.7,6,1);
-		else if (soortV == TekenVeelvlakOpdr.rb.getString("ruiten12Label"))
-			v = new Kuboctaeder(1.8).dualiseerb();
-		
-		for (int i = 0; i < v.aantalVlakken; i++)
-		{	v.vlakken[i].vulkleur = "transparant";
-		}
-		aantalPuntenRood = 0;
-		wisTrefpunten();
-		tv.wisLijnen();
-		aantalHpNieuw = 0;
-		tv = new Veelvlak();
-		
-		for(int i=0 ; i<v.aantalHoekpunten ; i++)
-		{	hoekpuntenNieuw[aantalHpNieuw] = v.hoekpunten[i];
-			aantalHpNieuw++;
-		}
-		tekenOpnieuw();
-	}
-*/	
+	/**
+	 * neem het Veelvlak met code figNr als basisfiguur en voeg nog extra punten op de ribbe toe<br>
+	 * niet gebruikt 
+	 * @param figNr figuur code
+	 * @param aantalRibPunten aantal extra punten per ribbe 
+	 */
 	public void zetBasis(int figNr, int aantalRibPunten)
 	{	if (figNr==0)
 		{	v = new Kubus(1);
@@ -1069,25 +1135,23 @@ if (k > 0)
 		{	v.vlakken[i].vulkleur = "transparant";
 		}
 		
-//System.out.println("zetBasis fig = " + figNr + " hp = " + aantalRibPunten);		
 		tekenOpnieuw();
 	}
 	
-/*	
-	public void itemStateChanged(ItemEvent e)
-	{	boolean animatieWasAan = false;
-		
-		nieuw();
-		
-		if (animatieStatus())
-		{	onderbreekAnimatie();
-			animatieWasAan = true;
-		}
-		tekenOpnieuw();
-		if (animatieWasAan)
-			beginAnimatie();
-	}
-*/
+	/**
+	 * actie bij MouseDown/TouchStart: <br>
+	 * maak lijn: kijk of een hoekpunt van het Veelvlak in wording
+	 * aangeklikt is en onthoudt dit; als niet, kijk dan of een 
+	 * nieuw hoekpunt aangeklikt is, voeg het toe aan het Veelvlak in wording en 
+	 * onthoudt dit; zodra twee punten aangeklikt zijn, maak dan de lijn;<br>
+	 * maak vlak: kijk of een hoekpunt van het Veelvlak in wording
+	 * aangeklikt is en onthoudt dit; als niet, kijk dan of een 
+	 * nieuw hoekpunt aangeklikt is, voeg het toe aan het Veelvlak in wording en 
+	 * onthoudt dit; opnieuw aanklikken van de eerste twee punten is een reset;
+	 * opnieuw aanklikken van het eerste punt na drie aangeklikte punten
+	 * maakt het vlak; idem na meer dan drie aangeklikte punten mits deze
+	 * in hetzelfde vlak liggen    
+	 */
 	public void muisDrukActie()
 	{	
 		if (!muisDrukAan)
@@ -1098,7 +1162,7 @@ if (k > 0)
 		// loop langs de trefpunten, dat zijn tv's hoekpunten, 
 		for (int i = 0; i < max; i++)
 		{	double ax = trefpunten[i].x - geefDrukx();
-			double ay =  trefpunten[i].y - geefDruky();
+			double ay = trefpunten[i].y - geefDruky();
 			if ((ax < 4 && ax > -4) && (ay < 4 && ay > -4))
 			{	raak = true;
 				if (maakLijn)
@@ -1112,8 +1176,10 @@ if (k > 0)
 						if (puntnr1 != puntnr2)
 							tv.maakLijn(puntnr1,puntnr2,"rood");
 						aantalPuntenRood = 0;
+						// dubbel
 						wisTrefpunten();
 						trefpuntRaak[puntnr1] = false;
+						// nieuwe snijpunten?
 						if (tv.aantalLijnen > 1)
 							zoekSnijpunten();
 					}
@@ -1142,13 +1208,7 @@ if (k > 0)
 					}
 					else 
 					{	puntnr[aantalPuntenRood] = i; 
-						//Vlak vl = new Vlak(aantalPuntenRood);
-						//for(int j=0 ; j<aantalPuntenRood ; j++)
-						//{	vl.punten[j] = tv.hoekpunten[puntnr[j]];
-						//}
 						tv.voegVlakToe(aantalPuntenRood,puntnr);
-						//tv.vlakken[tv.aantalVlakken] = vl;
-						//tv.aantalVlakken++;
 						aantalPuntenRood=0;
 						wisTrefpunten();
 					}
@@ -1156,6 +1216,7 @@ if (k > 0)
 				break;
 			} // trefpunt geraakt
 		} // for loop trefpunten
+		
 		if (raak)
 		{	tekenOpnieuw();
 			return;
@@ -1163,15 +1224,13 @@ if (k > 0)
 		else 
 		{	raak = false; 
 			max = aantalHpNieuw;
+			// loop langs de nieuwe hoekpunten
 			for (int i = 0; i < max; i++)
 			{	double ax = trefpuntenNieuw[i].x - geefDrukx();
 				double ay = trefpuntenNieuw[i].y - geefDruky();
 				if ((ax < 4 && ax > -4) && (ay < 4 && ay > -4))
-				{	//if(aantalPuntenRood>2 && !checkVlak(hoekpuntenNieuw[i]))
-					//{	return;
-					//}
+				{	
 					raak = true;
-					//tv.hoekpunten[tv.aantalHoekpunten]=hoekpuntenNieuw[i];
 					tv.voegHoekpuntToe(hoekpuntenNieuw[i].x, hoekpuntenNieuw[i].y, hoekpuntenNieuw[i].z);
 					tv.aantalHoekpunten--;
 					trefpuntRaak[tv.aantalHoekpunten]= true;
@@ -1184,11 +1243,13 @@ if (k > 0)
 						}
 						else 
 						{	puntnr2 = tv.aantalHoekpunten;
-							if(puntnr1!=puntnr2)tv.maakLijn(puntnr1,puntnr2,"rood");
+							if(puntnr1!=puntnr2)
+								tv.maakLijn(puntnr1,puntnr2,"rood");
 							aantalPuntenRood=0;
 							wisTrefpunten();
 							trefpuntRaak[puntnr1]=false;
-							if(tv.aantalLijnen>1)zoekSnijpunten();
+							if(tv.aantalLijnen>1)
+								zoekSnijpunten();
 						}
 					}
 					else if(maakVlak)
@@ -1219,12 +1280,6 @@ if (k > 0)
 						}
 						else 
 						{	puntnr[aantalPuntenRood] = tv.aantalHoekpunten; 
-							//Vlak vl = new Vlak(aantalPuntenRood);
-							//for(int j=0 ; j<aantalPuntenRood ; j++)
-							//{	vl.punten[j] = tv.hoekpunten[puntnr[j]];
-							//}
-							//tv.vlakken[tv.aantalVlakken] = vl;
-							//tv.aantalVlakken++;
 							tv.voegVlakToe(aantalPuntenRood,puntnr);
 							aantalPuntenRood=0;
 							wisTrefpunten();
@@ -1241,209 +1296,18 @@ if (k > 0)
 			}
 		}
 	}
-	public void muisSleepActie()
-	{	if (!vaktekening)
-		{	
-		
-			xhoek -= 0.5*geefSleepdy();
-			yhoek += 0.5*geefSleepdx();
-			matres.initialiseer();
-			matres.xdraai(beginx+xhoek);
-			matres.ydraai(beginy+yhoek);
-			
-
-
-
-			tekenOpnieuw();
-			
-//System.out.println("xhoek = " + xhoek + " yhoek = " + yhoek);			
-		}
-	}
 	
-/*	
-	public void muisLosActie()
-	{	if ((klikAan && (geefDrukx()-geefX())*(geefDrukx()-geefX()) + 
-			            (geefDruky()-geefY())*(geefDruky()-geefY()) < 10))
-		{	muisKkActie();
-		}
+	/**
+	 * slepen resulteert in draaien van basisfiguur en veelvlak
+	 */
+	public void muisSleepActie()
+	{		
+		xhoek -= 0.5*geefSleepdy();
+		yhoek += 0.5*geefSleepdx();
+		matres.initialiseer();
+		matres.xdraai(beginx+xhoek);
+		matres.ydraai(beginy+yhoek);
 		tekenOpnieuw();
 	}
-*/	
-/*
-	public void muisKkActie()
-	{	
-		// p is vanzelf gesorteerd
-		for (int j = tv.aantalVlakken - 1; j > -1; j--)
-		{	
-			if (p[j].contains(geefDrukx(),geefDruky()))
-			{	
-				if (tv.vlakken[j].vulkleur.equals("oranje"))
-				{   tv.vlakken[j].vulkleur = "roodoranje";
-					aantalVlakkenRood++;
-				}
-				else 
-				{	tv.vlakken[j].vulkleur = "oranje";
-					aantalVlakkenRood--;
-				}
-				
-				tekenOpnieuw();
-				return;
-			}
-		}
-	}
-*/
-/*	
-	public void animatie()
-	{	while(animatieStatus() && !vaktekening)
-		{	matrot.initialiseer();
-			matrot.ydraaiAbs(1);
-			matrot.xdraaiAbs(0);
-			matres.mult(matrot);
-			tekenOpnieuw();
-		}
-	}
-*/
-/*	
-	public void numberChanged(String name,double val)
-	{	boolean animatieWasAan = false;
-		if(animatieStatus())
-		{	animatieWasAan = true;
-			onderbreekAnimatie();
-		}
-		
-		if(name=="zijde")
-		{	k = val;
-		}
-		if(!animatieStatus())tekenOpnieuw();
-		if(animatieWasAan)beginAnimatie();
-	}
-*/
-
-/*	
-	public void addActionListener(ActionListener al) 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-*/
 	
-
-	public int geefAsHoogte() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	//public InteractieEditPanel getEditPanel() {
-	//	return this;
-	//}
-
-
-	public HashMap getEditState() 
-	{
-		return getState();
-	}
-
-
-	public int getIpId() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public int getScore() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public int getScoreMax() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-
-	public boolean isCorrect() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	public boolean isFout() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-
-	public void kijkNa() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void kijkNa(int stapNr) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void opnieuw() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void setEditState(HashMap h) 
-	{
-		setState(h);
-		//rg.add(kiesV);
-		
-	}
-
-
-	public void wis() 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void zetMaat() 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void zetMode(int mode) 
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void zetNagekeken(boolean b) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void zetOpdracht(HashMap h, String[] randomVars, HashMap randomValues) 
-	{
-		setState(h);
-//		rg.remove(kiesV);
-		
-	}
-
-
-	public void zetBreedte(int b) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	public void zetHoogte(int h) {
-		// TODO Auto-generated method stub
-		
-	}
 }

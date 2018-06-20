@@ -3,6 +3,11 @@ package fi.tekenveelvlakgwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * GWT heeft geen klasse Polygon; zie klasse Polygon in KladjeGWT 
+ * @author Peter Boon
+ */
+
 class Polygon
 {
 	int aantalPunten;
@@ -207,22 +212,6 @@ class Polygon
 			
 		}
 	}
-	
-/*	
-	public void transformBy(AffineTransform at)
-	{
-		for (int pCnt = 0; pCnt < aantalPunten; pCnt++)
-		{
-			double doubleXpCnt = at.m00 * doubleX[pCnt] + at.m01 * doubleY[pCnt] + at.b0;
-			double doubleYpCnt = at.m10 * doubleX[pCnt] + at.m11 * doubleY[pCnt] + at.b1;
-			doubleX[pCnt] = doubleXpCnt;
-			doubleY[pCnt] = doubleYpCnt;
-			puntenX[pCnt] = (int) Math.round(doubleX[pCnt]);
-			puntenY[pCnt] = (int) Math.round(doubleY[pCnt]);
-			
-		}
-	}
-*/
 	
 	public boolean contains(int x, int y) 
 	{

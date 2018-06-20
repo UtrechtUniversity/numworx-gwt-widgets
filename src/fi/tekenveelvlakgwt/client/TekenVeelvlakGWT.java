@@ -1,7 +1,6 @@
 package fi.tekenveelvlakgwt.client;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
@@ -13,34 +12,27 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
-//import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
-
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchStartHandler;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-import com.google.gwt.event.dom.client.TouchEndHandler;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.resources.client.ImageResource;
 
 import fi.tekenveelvlakgwt.client.text.Text;
 
-import java.util.logging.Logger;
+/**
+ * entry class voor TekenVeelvlakGWT, zie ook de Java-versie waar alle instellingne gemaakt worden;
+ * TekenVeelvlakGWT heeft drie instelbare verschijningsvormen:<br>
+ * de tool: hiermee creeert de leerling 3d-figuren;<br>
+ * de viewer: deze toont een 3d-figuur die (instelbaar) gedraaid kan worden; de leerling kan gevraagd worden 
+ * om de 3d-figuur in een bepaalde stand te zetten (wordt nagekeken); een andere optie is dat de leerling gevraagd wordt
+ * aan de hand van een of meer aanzichten een aantal vlakken in de 3d-figuur te kleuren door ze aan te klikken (wordt nagekeken); <br>
+ * het vaktekpanel: dit toont een aantal aanzichten van een 3d-figuur; de leerling kan gevraagd worden
+ * aan de hand van een voorbeeld een aantal vlakken in de aanzichten te kleuren, door ze aan te klikken (wordt nagekeken);<br>  
+ * @author Peter Boon
+ */
 
 public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, InteractionView 
 {
@@ -48,60 +40,99 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
-	
-	// UI
+
+	/**
+	 * hang dit aan de Root en stop hier alles in
+	 */
 	DockLayoutPanel dlp;
-	LayoutPanel bottomPanel;
-	
+	/**
+	 * internationalisatie
+	 */
 	public static Text rb;
-	
+
+	/**
+	 * breedte en hoogte
+	 */
 	int breedte = 500;
 	int hoogte = 450;
-	int bottomHeight = 32;
-	int leftOffset = 5;
-	int topOffset = 5;
-	int toggleSize = 22;
-	int pushSize = 24;
-	int buttonWidth = 40;
-	int buttonHeight = 22;
 
+	/**
+	 * launch data
+	 */
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
 	
-	// css
 	TekenVeelvlakGWTClientBundle tekenVeelvlakGWTClientBundle;
 	static TekenVeelvlakGWTCssResource tekenVeelvlakGWTCssResource;
 	
 	private int mode;
 	private OpdrNavIF comRoot;
-	
-	// instelbaarheid
+
+	/**
+	 * instelbaarheid: toon viewer?
+	 */
 	boolean viewerOnly = false;
+	/**
+	 * instelbaarheid: toon aanzichten-panel?
+	 */
 	boolean profilesOnly = false;
+	/**
+	 * instelbaarheid: kan/moet de leerling vlakken kleuren?
+	 */
 	boolean vlakkenKleurenOptie;	
+	/**
+	 * het Veelvlak-tool
+	 */
 	TekenVeelvlak tvv;
+	/**
+	 * de viewer
+	 */
 	Viewer3d v3d;
+	/**
+	 * het aanzichten-panel
+	 */
 	VaktekPanel vaktek;
 	
+	/**
+	 * instelbaarheid: nakijk-opties
+	 */
 	boolean kijkVlakkenNa = false;
 	boolean kijkDraaihoekNa = false;
 	boolean checkExternalVlakken = false;
 	boolean checkExternalDraaihoek = false;
 	/**
-	 * kijkNaActief geeft aan of in nakijkmodus.
+	 * kijkNaActief geeft aan of er iets nagekeken kan/moet worden
 	 */
 	boolean kijkNaActief = false;
 	Boolean correct = null;
+	/**
+	 * is er al eens nagekeken?
+	 */
 	boolean nagekeken = false;
+	/**
+	 * is er iets door de leerling veranderd?
+	 */
 	boolean ingevuld = false;
 	
+	/**
+	 * array met kleurennamen van de door de docent gekleurde vlakken (zelfde volgorde als de vlakken)
+	 */
 	String[] docentKleuren = null;
+	/**
+	 * door de docent ingestelde draaihoek-x
+	 */
 	double docentDraaihoekX = 1e5d;
+	/**
+	 * door de docent ingestelde draaihoek-y
+	 */
 	double docentDraaihoekY = 1e5d;
 	int score;
 	int scoreMax = 10;
 	
+	/**
+	 * viewer constanten, zie klasse Viewer3d
+	 */
     static int MOVEABLE = 0;
     static int FRONTVIEW = 1;
     static int BACKVIEW = 2;
@@ -109,11 +140,12 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     static int BOTTOMVIEW = 4;
     static int LEFTVIEW = 5;
     static int RIGHTVIEW = 6;
-    static int TEACHER = 7;
 
-    // logger
     static Logger logger = Logger.getLogger("TekenVeelvlakGWT");
 
+    /**
+     * initialiseer Css 
+     */
 	public void getImages() 
 	{
 		rb = GWT.create(Text.class);
@@ -121,9 +153,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		tekenVeelvlakGWTClientBundle = GWT.create(TekenVeelvlakGWTClientBundle.class);
 		tekenVeelvlakGWTCssResource = tekenVeelvlakGWTClientBundle.getTekenVeelvlakGWTCssResource();
 		tekenVeelvlakGWTCssResource.ensureInjected();
-	} // getImages	
+	} 	
 
-	// stand-alone versie
 	public void onModuleLoad() 
 	{
 		getImages();
@@ -137,19 +168,12 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
-
-		
+	
 	}	
 		
-	
-	
-
 	public TekenVeelvlakGWT()
 	{
-		
 	}
-	
-	
 	
 	public TekenVeelvlakGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
 	{
@@ -164,19 +188,12 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 		
-		
-// constructie en initialisatie uit elkaar trekken.
-// constructie
-		
 		getImages(); 
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(tekenVeelvlakGWTCssResource.dock());
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
-		//RootPanel.get().add(dlp);
-		//RootPanel.get().addStyleName(kladjeCss.root());
-		
 		init(breedte, hoogte, launchState, randomVarWaarden);
 
 	}
@@ -186,7 +203,13 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		return dlp; 
 	}
 	
-	@Override
+	/**
+	 * stop de huidige status in een HashMap: bij een viewer kan de leerling
+	 * de figuur alleen draaien of kleuren (als dat mag), bij een aanzichten-panel
+	 * kan de leerling de aanzichten alleen kleuren (als dat mag); er hoeft dus geen
+	 * 3d-figuur onthouden te worden; dit moet natuurlijk wel bij de tool<br>
+	 * onthoudt ook of de leerling iets veranderd heeft en/of nagekeken heeft
+	 */
 	public HashMap<String, Object> getState()
 	{
 		// hier onderscheid maken tussen TVV, Viewer, Profiles 		
@@ -237,18 +260,18 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	}
     	h.put("nagekeken", new Boolean(nagekeken));
     	h.put("ingevuld", new Boolean(ingevuld));
-    			
-    			
 
     	return h;
 
 	}
 
-	@Override
+	/**
+	 * reconstrueer de laatste status uit een HashMap: zie methode getState; <br>
+	 * als nodig, kijk na
+	 */
 	public void setState(HashMap<String, Object> map)
 	{
-// hier onderscheid maken tussen TVV, Viewer, Profiles?		
-//logger.info("tvGWT setState: " + map);    	
+		// hier onderscheid maken tussen TVV, Viewer, Profiles		
 		
 		if ((map == null) || map.isEmpty())
 			return;
@@ -299,10 +322,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	if (leerlingKleuren != null)
     	{	
     		if (vlakkenKleurenOptie && viewerOnly)
-    		{	v3d.setKleuren(leerlingKleuren);
+    		{	v3d.zetKleuren(leerlingKleuren);
     		}
     		if (vlakkenKleurenOptie && profilesOnly)	
-    		{	vaktek.setVaktekKleuren(leerlingKleuren);
+    		{	vaktek.zetVaktekKleuren(leerlingKleuren);
     		}
     	}	
     	
@@ -316,41 +339,13 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	if (ingevuld && (nagekeken || mode == 0))
     		kijkNa();
     	
-/*    	
-    	if (kijkNaActief && nagekeken)
-    	{
-    		if (correct && viewerOnly)
-    		{	//viewer.vinkjeLabel.setVisible(true);
-    			v3d.kijkNaPanel.setWidgetVisible(goedKrulImage,true);
-    			//vaktek.vinkjeLabel.setVisible(true);
-    		}
-    		else if (!correct && viewerOnly)
-    		{
-    			v3d.kijkNaPanel.setWidgetVisible(foutKruisImage,true);
-    		}
-    		else if (correct && profilesOnly)
-    		{
-    			//viewer.kruisjeLabel.setVisible(true);
-    			//v3d.kijkNaPanel.setWidgetVisible(tvGWT.goedKrulImage,false);
-    			//vaktek.kruisjeLabel.setVisible(true);
-    			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelGoed,true);
-    		}
-    		else if (!correct && profilesOnly)
-    		{
-    			vaktek.kijkNaPanel.setWidgetVisible(vaktek.kijkNaLabelFout,true);
-    		}
-    	}
-		
-*/
 	}
 
-	@Override
 	public int getScore()
 	{
 		return score;
 	}
 
-	@Override
 	public Boolean isCorrect()
 	{
 		if (kijkNaActief)
@@ -359,7 +354,6 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 			return new Boolean(true);
 	}
 
-	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
@@ -374,6 +368,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 			kijkNaActief = (mode == 0 || mode == 1);
 	}
 	
+	/**
+	 * maak een pijl die naar de voorkant van de 3d-figuur wijst
+	 * @return de pijl als Veelvlak
+	 */
 	public Veelvlak maakPijl()
 	{	
 		
@@ -391,7 +389,13 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		return v;
 	}
 
-	public void init(int width, int height, Map<String, Object> map, //launchState,
+	/**
+	 * lees alle opties (inclusief de nakijkopties) uit de launchdata;
+	 * creeer een viewer, een vaktekpanel of een tool met daarin de 
+	 * docent-figuur (if any); lees ook de nakijkopties en de voor
+	 * het nakijken benodigde antwoorden
+	 */
+	public void init(int width, int height, Map<String, Object> map, 
 			Map<String, Number> values) 
 	{
 		logger.info("TekenVeelvlakGWT init");
@@ -399,13 +403,12 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		this.breedte = width;
 		this.hoogte = height;
 		dlp.setPixelSize(width, height);
-		//this.launchState = launchState;
+
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
 		// Wim: scoreMax uit launchstate halen.
 		if(launchState.containsKey("scoreMax"))
 			scoreMax = launchState.getInt("scoreMax");
-		
 		
 		boolean viewerOnly = false;
 		boolean profilesOnly = false;
@@ -422,7 +425,9 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		if (launchState.containsKey("tvState"))
 			tvState = launchState.getMap("tvState");
 
+		// viewer
         int viewerPosition = 0;
+        // tool
         int basisFiguur = 0;
         int aantalHulppunten = 0;
 
@@ -436,13 +441,15 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		boolean toonVooraanzichtPijl = false;
         if (launchState.containsKey("toonVooraanzichtPijl"))
           	 toonVooraanzichtPijl = launchState.getBoolean("toonVooraanzichtPijl");
-           
+        
+        // vlakken kleuren in viewer of vaktekpanel
         boolean vlakkenKleurenOptie = false;
         if (launchState.containsKey("vlakkenKleurenOptie"))
           	 vlakkenKleurenOptie = launchState.getBoolean("vlakkenKleurenOptie");
 
 		this.vlakkenKleurenOptie = vlakkenKleurenOptie;
 		
+        // vlakken al gekleurd in viewer of vaktekpanel
         List<String> viewerKleurenAL = null;
         String[] viewerKleuren = null;
         if (launchState.containsKey("viewerKleuren"))
@@ -454,8 +461,8 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
         		viewerKleuren[vk] = viewerKleurenAL.get(vk);
     	}
 
+    	// vlakken gekleurd door docent in viewer of vaktekpanel, dit is een antwoord voor nakijken
         List<String> docentKleurenAL = new ArrayList<String>();
-//        String[] docentKleuren = null;
         if (launchState.containsKey("docentKleuren"))
         {
         	docentKleurenAL = launchState.getStringList("docentKleuren");
@@ -492,7 +499,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 			
 			if (kijkNaActief)
 			{
-				// kijknapanel toevoegen aan south van docklayoutpanel dlp
+				// kijkna panel toevoegen aan south van docklayoutpanel dlp
 				dlp.addSouth(v3d.getKijkNaPanel(), 25);
 			}
 
@@ -554,7 +561,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 			
 			vaktek.paint();
 		}
-		else
+		else // tool
 		{
 			tvv = new TekenVeelvlak(breedte,hoogte);
 			tvv.initialiseer();
@@ -581,26 +588,30 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		ingevuld = false;
 	}
 	
-	   public void answerChanged()
-	    {
-	    	if (kijkNaActief)
-	    	{	
-	    		correct = null;
-	    		score = 0;
-	    		nagekeken = false;
-	    		ingevuld = true;
-	    		comRoot.setChanged(true);
-	    	}	
-	    }
+	/**
+	 * antwoord veranderd, reset
+	 */
+    public void answerChanged()
+	{
+	  	if (kijkNaActief)
+	   	{	
+	   		correct = null;
+	   		score = 0;
+	   		nagekeken = false;
+	   		ingevuld = true;
+	   		comRoot.setChanged(true);
+	   	}	
+	}
 
 
-	@Override
+	/**
+	 * kijk na, onderscheidt mogelijkheden   
+	 */
 	public void kijkNa() 
 	{
     	if (!kijkNaActief)
     		return;
     	
-    	//if (vlakkenKleurenOptie && profielenKleurenOptie && profilesOnly)
     	if (isVlakkenNakijkModus() && profilesOnly)
     	{
     		correct = vaktek.evalueer(docentKleuren);
@@ -651,6 +662,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	comRoot.setChanged(isCorrect().booleanValue());
 	}
 
+	/**
+	 * wordt de draaihoek nagekeken (mogelijk extern)?
+	 * @return true/false
+	 */
     private boolean isDraaihoekNakijkModus()
     {
     	boolean b = false;
@@ -660,6 +675,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	return b;
     }
     
+    /**
+     * worden vlakken nagekeken (mogelijk extern)
+     * @return true/false
+     */
     private boolean isVlakkenNakijkModus()
     {
     	boolean b = false;
@@ -669,6 +688,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	return b;
     }
     
+    /**
+     * wordt er extern nagekeken (draaihoek of vlakken)? 
+     * @return true/false
+     */
     boolean isCheckExternalModus()
     {
     	boolean b = false;
@@ -682,33 +705,47 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	{
 	}
 
-	public int getAsHoogte() {
+	public int getAsHoogte() 
+	{
 		return 0;
 	}
 
-	public int getHeight() {
+	public int getHeight() 
+	{
 		return hoogte;
 	}
 
-	public int getWidth() {
+	public int getWidth() 
+	{
 		return breedte;
 	}
 
-	public void setAsHoogte(int ashoogte) {
+	public void setAsHoogte(int ashoogte) 
+	{
 	}
 
-	public void zetNagekeken(boolean b) {
+	public void zetNagekeken(boolean b) 
+	{
 	}
 
-	public int[][] getScoreObjectives() {
+	public int[][] getScoreObjectives() 
+	{
 		return null;
 	}
 
+	/**
+	 * getter for CssResource 
+	 * @return tekenVeelvlakGWTCssResource
+	 */
 	public TekenVeelvlakGWTCssResource getTekenVeelvlakCss()
 	{
 		return tekenVeelvlakGWTCssResource;
 	}
 
+	/**
+	 * wordt er nagekeken?
+	 * @return true/false
+	 */
 	public boolean isNakijkModus()
 	{
     	boolean b = false;

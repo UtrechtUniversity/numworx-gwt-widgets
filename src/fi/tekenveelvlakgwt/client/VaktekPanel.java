@@ -1,75 +1,88 @@
 package fi.tekenveelvlakgwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
-
-//import javax.swing.ImageIcon;
-//import javax.swing.JButton;
-//import javax.swing.JLabel;
-//import javax.swing.JPanel;
-
 import java.util.Map;
 
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 
+/**
+ * klasse die d.m.v. 4 instanties van Viewer3d het bovenaanzicht, vooraanzicht, linkerzijaanzicht
+ * en rechterzijaanzicht van een 3d-veelvlak toont  
+ * @author Peter Boon
+ */
 class VaktekPanel extends LayoutPanel
 {
+	/**
+	 * eigenaar van dit VaktekPanel
+	 */
 	TekenVeelvlakGWT tvGWT;
 
+	/**
+	 * breedte en hoogte van dit VaktekPanel
+	 */
 	int breedte, hoogte;
+	/**
+	 * breedte en hoogte van een instantie van Viewer3d  
+	 */
 	int vakBreedte;
 	/**
-	 * Vooraanzicht.
+	 * viewer voor vooraanzicht 
 	 */
 	Viewer3d va;
 	/**
-	 * Bovenaanzicht.
+	 * viewer voor bovenaanzicht.
 	 */
 	Viewer3d ba;
 	/**
-	 * Rechterzijaanzicht.
+	 * viewer voor rechterzijaanzicht.
 	 */
 	Viewer3d ra;
 	/**
-	 * Linkerzijaanzicht.
+	 * viewer voor linkerzijaanzicht.
 	 */
 	Viewer3d la;
 
+	/**
+	 * kunnen vlakken in de aanzichten gekleurd worden door erop te klikken?
+	 */
 	boolean vlakkenKleurenOptie = false;
 
-	boolean docentModus = false;
-
+	/**
+	 * knop om na te kijken (instelbaar)
+	 */
 	PushButton kijkNaButton;
+	/**
+	 * Panel voor kijkNaButton
+	 */
 	LayoutPanel kijkNaPanel;
 
+	/**
+	 * constructor: maak een vaktekening met 4 lege viewers ingesteld voor de 4 aanzichten en met de gegeven maat.
+	 * @param x x-coordinaat 	
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param tvGWT eigenaar van dit VaktekPanel
+	 */
 	public VaktekPanel(int x, int y, int b, int h, TekenVeelvlakGWT tvGWT)
 	{
 		this(new Veelvlak(), new Veelvlak(), new Veelvlak(), new Veelvlak(), x, y, b, h, tvGWT);
 	}
-
 	/**
-	 * Maakt een vaktekening met de gegeven aanzichten met de gegeven maat.
-	 * 
-	 * @param vva
-	 *            vooraanzicht
-	 * @param vra
-	 *            rechterzijaanzicht
-	 * @param vla
-	 *            linkerzijaanzicht
-	 * @param vba
-	 *            bovenaanzicht
-	 * @param x
-	 * @param y
-	 * @param b
-	 *            breedte
-	 * @param h
-	 *            hoogte
-	 * @param tvGWT
+	 * constructor: maak een vaktekening met de gegeven Veelvlakken als aanzichten met de gegeven maat.<br>
+	 * gebruikt met lege Veelvlakken om de 4 viewers zo in te stellen dat ze de 4 aanzichten tonen 
+	 * @param vva Veelvlak voor vooraanzicht
+	 * @param vra Veelvlak voor rechterzijaanzicht
+	 * @param vla Veelvlak voor linkerzijaanzicht
+	 * @param vba Veelvlak voor bovenaanzicht
+	 * @param x x-coordinaat 	
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param tvGWT eigenaar van dit VaktekPanel
 	 */
 	public VaktekPanel(Veelvlak vva, Veelvlak vra, Veelvlak vla, Veelvlak vba, int x, int y, int b, int h,
 		TekenVeelvlakGWT tvGWT)
@@ -87,7 +100,7 @@ class VaktekPanel extends LayoutPanel
 		la.k = 230;
 		la.zetAfstand(10000000);
 		la.zetSchaduw(false);
-		la.zetBeginHoeken(0, 90);
+		la.zetBeginHoeken(0, 90); // linkerzijaanzicht
 		la.zetMuisAan(false);
 		la.border = true;
 		add(la.canvas);
@@ -102,20 +115,20 @@ class VaktekPanel extends LayoutPanel
 		ba.k = 230;
 		ba.zetAfstand(10000000);
 		ba.zetSchaduw(false);
-		ba.zetBeginHoeken(90, 0);
+		ba.zetBeginHoeken(90, 0); // bovenaanzicht
 		ba.zetMuisAan(false);
 		ba.border = true;
 		add(ba.canvas);
 		setWidgetLeftWidth(ba.canvas, breedte / 2 - vakBreedte / 2 + 1, Style.Unit.PX, vakBreedte - 1, Style.Unit.PX);
 		setWidgetTopHeight(ba.canvas, 1, Style.Unit.PX, vakBreedte - 1, Style.Unit.PX);
 
-		// vooraazicht (op rij 2)
+		// vooraanzicht (op rij 2)
 		va = new Viewer3d(vva, breedte / 2 - vakBreedte / 2 + 1, hoogte / 2 + 1, vakBreedte - 1, vakBreedte - 1, tvGWT);
 		va.vaktek = this;
 		va.k = 230;
 		va.zetAfstand(10000000);
 		va.zetSchaduw(false);
-		va.zetBeginHoeken(0, 0);
+		va.zetBeginHoeken(0, 0); // vooraanzicht
 		va.zetMuisAan(false);
 		va.border = true;
 		add(va.canvas);
@@ -129,7 +142,7 @@ class VaktekPanel extends LayoutPanel
 		ra.k = 230;
 		ra.zetAfstand(10000000);
 		ra.zetSchaduw(false);
-		ra.zetBeginHoeken(0, -90);
+		ra.zetBeginHoeken(0, -90); // rechterzijaanzicht
 		ra.zetMuisAan(false);
 		ra.border = true;
 		add(ra.canvas);
@@ -137,7 +150,6 @@ class VaktekPanel extends LayoutPanel
 			Style.Unit.PX);
 		setWidgetTopHeight(ra.canvas, vakBreedte + 1, Style.Unit.PX, vakBreedte - 1, Style.Unit.PX);
 
-		// kijkNaButton = new PushButton("Kijk Na");
 		kijkNaButton = new PushButton(TekenVeelvlakGWT.rb.kijkNaLabel());
 		kijkNaPanel = new LayoutPanel();
 		kijkNaPanel.setStylePrimaryName("kijknapanel");
@@ -159,6 +171,9 @@ class VaktekPanel extends LayoutPanel
 		setWidgetVisible(kijkNaPanel, false);
 	}
 
+	/**
+	 * init de Context2d voor de 4 viewers 
+	 */
 	public void initContext2d()
 	{
 		va.initContext2d();
@@ -167,6 +182,11 @@ class VaktekPanel extends LayoutPanel
 		ba.initContext2d();
 	}
 
+	/**
+	 * toon het 3d-veelvlak gecodeerd in map in elk
+	 * van de 4 viewers
+	 * @param map staus van het 3d-veelvlak
+	 */
 	public void setState(Map map)
 	{
 		va.setState(map);
@@ -175,6 +195,9 @@ class VaktekPanel extends LayoutPanel
 		ba.setState(map);
 	}
 
+	/**
+	 * teken de 4 viewers
+	 */
 	public void paint()
 	{
 		va.paint();
@@ -184,16 +207,10 @@ class VaktekPanel extends LayoutPanel
 
 	}
 
-	public void zetDocentModus(boolean b)
-	{
-		docentModus = b;
-		va.zetDocentModus(b);
-		ra.zetDocentModus(b);
-		la.zetDocentModus(b);
-		ba.zetDocentModus(b);
-
-	}
-
+	/**
+	 * zet de vlakkenKleurenOptie in de 4 viewers
+	 * @param b true/false
+	 */
 	public void zetVlakkenKleurenOptie(boolean b)
 	{
 		vlakkenKleurenOptie = b;
@@ -203,6 +220,9 @@ class VaktekPanel extends LayoutPanel
 		ba.zetVlakkenKleurenOptie(b);
 	}
 
+	/**
+	 * kleur alle vlakken in alle viewers weer oranje
+	 */
 	public void resetColors()
 	{
 		va.resetColors();
@@ -211,14 +231,12 @@ class VaktekPanel extends LayoutPanel
 		ba.resetColors();
 	}
 
-	public void resetLeerlingColors()
-	{
-		va.resetLeerlingColors();
-		ra.resetLeerlingColors();
-		la.resetLeerlingColors();
-		ba.resetLeerlingColors();
-	}
-
+	/**
+	 * get de huidige kleurnamen voor de vlakken in de 3d-figuur<br>
+	 * als een vlak in een van de aanzichten roodgekleurd is,
+	 * zorg dan dat het ook rood is in het array met kleurnamen 
+	 * @return array met kleurnamen
+	 */
 	public String[] getKleuren()
 	{
 		String[] vaKleuren = getVaKleuren();
@@ -241,26 +259,47 @@ class VaktekPanel extends LayoutPanel
 		return result;
 	}
 
+	/**
+	 * get de huidige kleurnamen voor de vlakken in het vooraanzicht
+	 * @return array met kleurnamen
+	 */
 	public String[] getVaKleuren()
 	{
 		return va.getKleuren();
 	}
 
+	/**
+	 * get de huidige kleurnamen voor de vlakken in het rechterzijaanzicht
+	 * @return array met kleurnamen
+	 */
 	public String[] getRaKleuren()
 	{
 		return ra.getKleuren();
 	}
 
+	/**
+	 * get de huidige kleurnamen voor de vlakken in het linkerzijaanzicht
+	 * @return array met kleurnamen
+	 */
 	public String[] getLaKleuren()
 	{
 		return la.getKleuren();
 	}
 
+	/**
+	 * get de huidige kleurnamen voor de vlakken in het bovenaanzicht
+	 * @return array met kleurnamen
+	 */
 	public String[] getBaKleuren()
 	{
 		return ba.getKleuren();
 	}
 
+	/**
+	 * kleur de vlakken in de 4 aanzichten met de gegeven kleurnamen<br>
+	 * zie methode zetKleuren in Viewer3d 
+	 * @param kleuren array met kleurnamen
+	 */
 	public void zetVaktekKleuren(String[] kleuren)
 	{
 		va.zetKleuren(kleuren);
@@ -269,38 +308,15 @@ class VaktekPanel extends LayoutPanel
 		ba.zetKleuren(kleuren);
 	}
 
-	public void setVaktekKleuren(String[] kleuren)
-	{
-		setVaKleuren(kleuren);
-		setRaKleuren(kleuren);
-		setLaKleuren(kleuren);
-		setBaKleuren(kleuren);
-	}
-
-	public void setVaKleuren(String[] kleuren)
-	{
-		va.setKleuren(kleuren);
-	}
-
-	public void setRaKleuren(String[] kleuren)
-	{
-		ra.setKleuren(kleuren);
-	}
-
-	public void setLaKleuren(String[] kleuren)
-	{
-		la.setKleuren(kleuren);
-	}
-
-	public void setBaKleuren(String[] kleuren)
-	{
-		ba.setKleuren(kleuren);
-	}
-
+	/**
+	 * in Viewer3d v3d is de kleur van een vlak van het veelvlak veranderd,
+	 * verander de kleur van dit vlak ook in de andere aanzichten
+	 * @param v3d viewer waarin de kleur van een vlak van het veelvlak veranderd is
+	 */
 	public void synchronizeViewerKleuren(Viewer3d v3d)
 	{
 
-		System.out.println("synchronize");
+System.out.println("synchronize");
 
 		String[] result = null;
 		if (v3d == va)
@@ -320,6 +336,7 @@ class VaktekPanel extends LayoutPanel
 			result = getBaKleuren();
 		}
 
+		// niet nodig? 
 		String[] vaKleuren = getVaKleuren();
 		String[] raKleuren = getRaKleuren();
 		String[] laKleuren = getLaKleuren();
@@ -332,43 +349,25 @@ class VaktekPanel extends LayoutPanel
 			laKleuren[cCnt] = result[cCnt];
 			baKleuren[cCnt] = result[cCnt];
 		}
+		// einde niet nodig
 
 		va.zetKleuren(result);
 		ra.zetKleuren(result);
 		la.zetKleuren(result);
 		ba.zetKleuren(result);
 
-		// paint();
 		va.tekenOpnieuw();
 		ra.tekenOpnieuw();
 		la.tekenOpnieuw();
 		ba.tekenOpnieuw();
 	}
 
-	public void updateViewerKleuren()
-	{
-
-		String[] vaKleuren = getVaKleuren();
-		String[] raKleuren = getRaKleuren();
-		String[] laKleuren = getLaKleuren();
-		String[] baKleuren = getBaKleuren();
-		String[] result = new String[vaKleuren.length];
-		for (int cCnt = 0; cCnt < vaKleuren.length; cCnt++)
-		{
-			result[cCnt] = vaKleuren[cCnt];
-			if (raKleuren[cCnt].equals("rood"))
-				result[cCnt] = "rood";
-			if (laKleuren[cCnt].equals("rood"))
-				result[cCnt] = "rood";
-			if (baKleuren[cCnt].equals("rood"))
-				result[cCnt] = "rood";
-
-		}
-
-		// tvGWT.viewerKleuren = result;
-
-	}
-
+	/**
+	 * kijk of de huidige kleuren van het veelvlak waarvan de aanzichten zichtbaar zijn
+	 * overeenkomen met de kleuren in het array nakijkKleuren
+	 * @param nakijkKleuren door docent voorgeschreven kleuren 
+	 * @return true/false
+	 */
 	public boolean evalueer(String[] nakijkKleuren)
 	{
 		String[] viewerKleuren = getKleuren();
@@ -382,6 +381,11 @@ class VaktekPanel extends LayoutPanel
 
 	}
 
+	/**
+	 * zet klikken met de muis aan of uit in de 4 aanzichtviewers<br>
+	 * zie klasse Viewer3D
+	 * @param b true/false
+	 */
 	public void zetKlikAan(boolean b)
 	{
 		va.zetKlikAan(b);
@@ -390,6 +394,14 @@ class VaktekPanel extends LayoutPanel
 		ba.zetKlikAan(b);
 	}
 
+	/**
+	 * zet het veelvlak in de 4 aanzicht-viewers<br>
+	 * zie klasse Viewer3D 
+	 * @param vva veelvlak voor vooraanzicht
+	 * @param vra veelvlak voor rechterzijaanzicht
+	 * @param vla veelvlak voor linkerzijaanzicht
+	 * @param vba veelvlak voor bovenaanzicht
+	 */
 	public void zetVeelvlak(Veelvlak vva, Veelvlak vra, Veelvlak vla, Veelvlak vba)
 	{
 		la.zetVeelvlak(vla);
@@ -398,15 +410,13 @@ class VaktekPanel extends LayoutPanel
 		ra.zetVeelvlak(vra);
 	}
 
+	/**
+	 * inner class voor het afhandelen van Click Events op de kijkNaButton: <br>
+	 */
 	class PushClickHandler implements ClickHandler
 	{
-		// public void onMouseDown(MouseDownEvent e)
 		public void onClick(ClickEvent e)
 		{
-
-			// if (touchStart)
-			// return;
-
 			// e.preventDefault();
 			e.stopPropagation();
 
@@ -427,13 +437,4 @@ class VaktekPanel extends LayoutPanel
 			}
 		}
 	}
-	/*
-	 * class VaktekRooster extends Component { public VaktekRooster() {
-	 * setBounds(0,0,breedte,hoogte); } public void paint(Graphics g) {
-	 * g.drawRect(breedte/2-3*vakBreedte/2, hoogte/2, vakBreedte, vakBreedte);
-	 * g.drawRect(breedte/2-vakBreedte/2, hoogte/2-vakBreedte, vakBreedte,
-	 * vakBreedte); g.drawRect(breedte/2-vakBreedte/2, hoogte/2, vakBreedte,
-	 * vakBreedte); g.drawRect(breedte/2-vakBreedte/2+vakBreedte, hoogte/2,
-	 * vakBreedte, vakBreedte); } }
-	 */
 }

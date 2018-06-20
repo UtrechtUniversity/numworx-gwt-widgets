@@ -15,64 +15,227 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 
+/**
+ * klasse die een (of meer) 3d-veelvlakken op een Canvas tekent; <br>
+ * de klasse handelt ook Mouse en Touch Events op het Canvas af, te
+ * weten het draaien van het 3d-veelvlak (instelbaar) en het kleuren
+ * (ontkleuren) van een vlakje van het veelvlak door erop te klikken
+ * (instelbaar)   
+ * @author Peter Boon
+ */
 public class Viewer3d extends LayoutPanel
 {
-	private static final CssColor WHITE = CssColor.make(255, 255, 255);
-	private static final CssColor RED = CssColor.make(255, 0, 0);
-
-	// TekenVeelvlakInteractiePanel tvip;
+	/**
+	 * eigenaar van deze Viewer3d
+	 */
 	TekenVeelvlakGWT tvGWT;
 
+	/**
+	 * Panel voor Canvas en nakijkPanel
+	 */
 	LayoutPanel alles;
+	/**
+	 * teken Canvas
+	 */
 	Canvas canvas;
+	/**
+	 * afhandelen mouse/Touch Events, zie klasse MuisBeheerder
+	 */
 	private MuisBeheerder mb;
+	/**
+	 * breeste en hoogte Canvas
+	 */
 	private int breedte, hoogte;
-	private Punt3D beginpunt, eindpunt, startpunt;
+	
+	/**
+	 * initiele positie van de tekencursor
+	 */
+	private Punt3D startpunt;
+	/**
+	 * huidige positie van de tekencursor
+	 */
+	private Punt3D beginpunt;
+	/**
+	 * nieuwe positie van de tekencursor na beweging
+	 */
+	private Punt3D eindpunt;
+	/**
+	 * 3d-objecten, zie klasse Lichaam3D, alleen l[0] wordt gebruikt
+	 */
 	public Lichaam3D[] l;
+	/**
+	 * Context2d om te tekenen
+	 */
 	public Context2d gIm;
+	/**
+	 * matrix die de bewegingsrichting van de tekencursor onthoudt en update, 
+	 * zie klasse Matrix3D 
+	 */
 	public Matrix3D mat;
-	private boolean pen, vul, leeg, schaduw;
+	/**
+	 * is de pen aan (punten worden verbonden)
+	 */
+	private boolean pen;
+	/**
+	 * is vul aan (punten worden opgespaard voor een polygon
+	 * waarvan de vulling getekend wordt bij aanroep van vulUit() 
+	 */
+	private boolean vul;
+	/**
+	 * is het huidige polygon leeg, d.w.z. het heeft wel punten, maar
+	 * wordt niet getekend
+	 */
+	private boolean leeg;
+	/**
+	 * moeten vlakjes van een 3d-veelvlak gekleurd worden met een schaduw-effect?
+	 */
+	private boolean schaduw;
+	/**
+	 * nummer van het huidige 3d-object
+	 */
 	private int lnummer;
-	private CssColor penkleur, vulkleur;
-	public boolean bezigMetTekenen;
+	/**
+	 * de kleur van de pen
+	 */
+	private CssColor penkleur;
+	/**
+	 * de kleur om polygons op te vullen
+	 */
+	private CssColor vulkleur;
+	/**
+	 * luisteren naar Mouse/Touch Events?
+	 */
 	public boolean muisAan;
+	/**
+	 * muisAan == true en klikAan == false: alleen slepen (roteren)<br>
+	 * muisAan == true en klikAan == true: vlakkenkleuren, zie muisLosActie
+	 */
 	public boolean klikAan = false;
+	/**
+	 * zichtafstand: het oog bevindt zich in (0,0,afstand)
+	 */
 	private double afstand;
+	/**
+	 * het aantal Veelvlakken zichtbaar in deze Viewer3d
+	 */
 	int aantalVeelvlakken;
+	/**
+	 * de Veelvlakken in deze Viewer3d (vvRij[0] voor het veelvlak, vvRij[1]
+	 * voor de voorkantpijl (indien gewenst)
+	 */
 	Veelvlak[] vvRij;
-	double k, xhoek, yhoek, beginx, beginy;
+	/**
+	 * een vergroot/verklein factor afhankelijk van de
+	 * breedte van het Canvas
+	 */
+	double k; 
+	
+	/**
+	 * de initiele draaiing van het 3d-veelvlak om de x-as resp. de y-as
+	 */
+	double beginx, beginy;
+	/**
+	 * actuele draaiing van het 3d-veelvlak om de x-as is beginx+xhoek;<br> 
+	 * xhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	double xhoek;
+	/**
+	 * actuele draaiing van het 3d-veelvlak om de y-as is beginy+yhoek;<br> 
+	 * yhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	double yhoek;
+
+	/**
+	 * initiele draaiingen voor setState (zie aldaar) 
+	 */
 	double draaiX = 20, draaiY = -30;
 
+	/**
+	 * array met vlakjes (geprojecteerd) van vvRij[0], zie methode muisKkActie()
+	 */
 	Polygon[] p;
 
+	/**
+	 * de positie van het veelvlak in de viewer, zie klasse TekenVeelvlakGWT<br>
+	 * de positie MOVEABLE (muisAan == true) of een aanzicht (muisAan == false), zie
+	 * methode zetViewerPosition 
+	 */
 	int viewerPosition = TekenVeelvlakGWT.MOVEABLE;
-
+	
+	/**
+	 * true: vrij draaien, false: het 3d-veelvlak kan niet helemaal om de x-as gedraaid worden
+	 */
 	boolean restrictRotation = true;
 
+	/**
+	 * parameters gebruikt om k te berekenen, zie methodes zetZoomFac
+	 * en setBounds  
+	 */
 	double k50;
 	double kMinFac = 60e-2d;
 	double kMaxFac = 140e-2d;
 	double zoomFac = 1.0;
 
+	/**
+	 * is een pijl die naar de voorkant van de figuur wijst zichtbaar?
+	 */
 	boolean voorkantPijlZichtbaar = false;
+	/**
+	 * index van de pijl (een veelvlak) die naar de voorkant van de figuur wijst in vvRij (-1 als geen pijl)
+	 */
 	int voorkantPijlIndex = -1;
 
+	/**
+	 * kunnen vlakken van de 3d-figuur gekleurd worden door aanklikken?
+	 */
 	boolean vlakkenKleurenOptie = false;
 
-	boolean docentModus = false;
-
+	/**
+	 * kijkNaKnop
+	 */
 	PushButton kijkNaButton;
+	/**
+	 * Panel met kijkNaKnop
+	 */
 	LayoutPanel kijkNaPanel;
 
+	/**
+	 * niet null indien deze Viewer3d onderdeel is van VaktekPanel vaktek
+	 * (zie klasse VaktekPanel)
+	 */
 	VaktekPanel vaktek = null;
 
+	/**
+	 * rand om de viewer tekeken?
+	 */
 	boolean border = false;
 
+	/**
+	 * constructor, creert een Viewer3d met een leeg Veelvlak:<br>
+	 * creeer het Canvas met mouse/TouchHandlers, initieer attributen
+	 * en het nakijkgebeuren (indien gewenst) 
+	 * @param x x-coordinaat
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param tvGWT eigenaar
+	 */
 	public Viewer3d(int x, int y, int b, int h, TekenVeelvlakGWT tvGWT)
 	{
 		this(new Veelvlak(), x, y, b, h, tvGWT);
 	}
 
+	/**
+	 * constructor, creert een Viewer3d met Veelvlak v
+	 * creeer het Canvas met mouse/TouchHandlers, initieer attributen
+	 * en het nakijkgebeuren (indien gewenst) 
+	 * @param v Veelvlak 
+	 * @param x x-coordinaat
+	 * @param y y-coordinaat
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param tvGWT eigenaar
+	 */
 	public Viewer3d(Veelvlak v, int x, int y, int b, int h, TekenVeelvlakGWT tvGWT)
 	{
 		this.tvGWT = tvGWT;
@@ -85,13 +248,10 @@ public class Viewer3d extends LayoutPanel
 			hoogteAlles = h + 30; // ruimte voor nakijkpanel
 		else
 			hoogteAlles = h;
-		//alles.setPixelSize(breedte, hoogteAlles);
 		
 		// maak het canvas waar de 3d-viewer op getekend wordt
 		canvas = Canvas.createIfSupported();
 		
-//		if (tvGWT.isNakijkModus())
-//			h = h + 25; // ruimte voor het nakijkpanel met knop en/of vink
 		canvas.setWidth(b + "px");
 		canvas.setHeight(h + "px");
 		canvas.setCoordinateSpaceWidth(b);
@@ -135,7 +295,6 @@ public class Viewer3d extends LayoutPanel
 		beginx = 20;
 		beginy = -30;
 
-		// kijkNaButton = new PushButton("Kijk Na");
 		kijkNaButton = new PushButton(TekenVeelvlakGWT.rb.kijkNaLabel());
 		kijkNaButton.addClickHandler(new PushClickHandler());
 		kijkNaButton.addStyleName(TekenVeelvlakGWT.tekenVeelvlakGWTCssResource.pushbutton());
@@ -159,57 +318,57 @@ public class Viewer3d extends LayoutPanel
 		alles.setWidgetVisible(canvas, true);
 	}
 
+	/**
+	 * initialiseer de Context2d van het Canvas
+	 */
 	public void initContext2d()
 	{
 		gIm = canvas.getContext2d();
 	}
 
 	/**
-	 * Wat doet dit? Waar dienen de parameters toe?
-	 * 
-	 * @param x
-	 * @param y
-	 * @param b
-	 * @param h
+	 * een nieuwe breedte levert een nieuw waarde voor k  
+	 * @param x x-coordinaat niet gebruikt
+	 * @param y y-coordinaat niet gebruikt
+	 * @param b breedte nieuwe breedte
+	 * @param h hoogte niet gebruikt
 	 */
 	public void setBounds(int x, int y, int b, int h)
 	{
 		k50 = 180 - (350 - b) * 25e-1d / 18;
 		double kMin = kMinFac * k50;
 		double kMax = kMaxFac * k50;
-
 		k = zoomFac * (kMax - kMin) + kMin;
-
-		if (k > 0)
-		{ // System.out.println("v3d b = " + b + " h = " + h);
-			// System.out.println("v3d k = " + UF.format(k, 1));
-		}
-
 		tekenOpnieuw();
 	}
-
-	public void zetDocentModus(boolean b)
-	{
-		docentModus = b;
-
-		tekenOpnieuw();
-	}
-
+	
+	/**
+	 * zet de optie vlakkenKleuren
+	 * @param b true/false
+	 */
 	public void zetVlakkenKleurenOptie(boolean b)
 	{
 		vlakkenKleurenOptie = b;
 	}
 
+	/**
+	 * zet een nieuwe zoom factor, herbereken k 
+	 * @param zFac nieuwe zoom factor
+	 */
 	public void zetZoomFac(double zFac)
 	{
 		zoomFac = zFac;
-		// k50 = 180 - (350 - getSize().width) * 25e-1d / 18;
 		k50 = 180 - (350 - breedte) * 25e-1d / 18;
 		double kMin = kMinFac * k50;
 		double kMax = kMaxFac * k50;
 		k = zoomFac * (kMax - kMin) + kMin;
 	}
 
+	/**
+	 * zet de positie van het 3d-veelvlak in de viewer: <br>
+	 * de positie is MOVEABLE (muisAan == true) of een aanzicht (muisAan == false) 
+	 * @param vPos zie klasse tekenVeelvlakGWT
+	 */
 	public void zetViewerPosition(int vPos)
 	{
 		muisAan = false;
@@ -258,10 +417,13 @@ public class Viewer3d extends LayoutPanel
 			zetAfstand(100000);
 			schaduw = false;
 		}
-
-		// tekenOpnieuw();
 	}
 
+	/**
+	 * stop de kleurnamen van de vlakken van het veelvlak vvRij[0] in een array
+	 * (in de zelfde volgorde als de vlakken in vvRij[0]) 
+	 * @return array met kleurnamen
+	 */
 	public String[] getKleuren()
 	{
 		String[] kleuren = new String[vvRij[0].aantalVlakken];
@@ -272,6 +434,12 @@ public class Viewer3d extends LayoutPanel
 		return kleuren;
 	}
 
+	/**
+	 * gegeven een array met kleurnamen, geef de vlakken van het veelvlak
+	 * vvRij[0] die kleuren (in dezelfde volgorde);<br>
+	 * aanname: aantal kleuren == aantal vlakken, geen error check   
+	 * @param kleuren array met kleurnamen
+	 */
 	public void zetKleuren(String[] kleuren)
 	{
 		for (int vCnt = 0; vCnt < kleuren.length; vCnt++)
@@ -279,9 +447,14 @@ public class Viewer3d extends LayoutPanel
 			vvRij[0].vlakken[vCnt].vulkleur = kleuren[vCnt];
 		}
 
-		// tekenOpnieuw();
 	}
 
+	/** 
+	 * kijk of de huidige kleuren van het veelvlak in deze viewer overeenkomen met
+	 * de kleur(namen) in het array nakijkKleuren
+	 * @param nakijkKleuren door docent voorgeschreven kleuren
+	 * @return true/false
+	 */
 	public boolean evalueer(String[] nakijkKleuren)
 	{
 		String[] viewerKleuren = getKleuren();
@@ -294,6 +467,13 @@ public class Viewer3d extends LayoutPanel
 		return result;
 	}
 
+	/**
+	 * kijk of de huidige positie van het veelvlak in deze viewer
+	 * overen komt de door de docent opgegeven positie
+	 * @param gevraagdX docent draaing om de x-as 
+	 * @param gevraagdY docent draaing om de y-as
+	 * @return true/false
+	 */
 	public boolean evalueer(double gevraagdX, double gevraagdY)
 	{
 		double drx = geefDraaiX();
@@ -315,6 +495,12 @@ public class Viewer3d extends LayoutPanel
 			return false;
 	}
 
+	/**
+	 * maak van een gegeven hoek (in graden) een
+	 * equivalente hoek tussen 0 en 360 graden
+	 * @param hoek gegegen hoek
+	 * @return hoek tussen 0 en 360
+	 */
 	public double putInRange(double hoek)
 	{
 		double inRange = hoek;
@@ -325,6 +511,12 @@ public class Viewer3d extends LayoutPanel
 		return inRange;
 	}
 
+	/**
+	 * zet het veelvlak in deze viewer waarvan de status is opgeslagen in
+	 * de Map map; als deze viewer geen deel uitmaakt van een VaktekPanel,
+	 * zet dan ook de zoomFactor en de positie van het veelvlak 
+	 * @param map Map met de status van een veelvlak
+	 */
 	public void setState(Map map)
 	{
 		ObjectMap h = JSONUtilities.wrapMap(map);
@@ -412,7 +604,8 @@ public class Viewer3d extends LayoutPanel
 
 		if (h.containsKey("viewerPosition"))
 			viewerPosition = h.getInt("viewerPosition");
-
+		
+		// niet gebruikt
 		String[] kleuren = new String[kleurenAL.size()];
 		for (int s = 0; s < kleurenAL.size(); s++)
 			kleuren[s] = kleurenAL.get(s);
@@ -428,40 +621,27 @@ public class Viewer3d extends LayoutPanel
 		Veelvlak v = new Veelvlak(hoekpunten, vlakken, lijnen);
 		vvRij[0] = v;
 
-		// tekenOpnieuw();
-		// paint();
 	}
 
-	public void setKleuren(String[] kleuren)
-	{
-		for (int i = 0; i < vvRij[0].aantalVlakken; i++)
-		{
-			vvRij[0].vlakken[i].vulkleur = kleuren[i];
-		}
-		tekenOpnieuw();
-	}
-
+	/**
+	 * deze viewer maakt deel uit van een VaktekPanel;
+	 * zorg dat de kleuren van de verschillende aanzichten in dit VaktekPanel
+	 * met elkaar overeenkomen; <br>
+	 * zie methode synchronizeViewerKleuren in klasse VaktekPanel  
+	 */
 	public void updateViewerKleuren()
 	{
-		String[] viewerKleuren = new String[vvRij[0].aantalVlakken];
-		for (int i = 0; i < viewerKleuren.length; i++)
-		{
-			viewerKleuren[i] = vvRij[0].vlakken[i].vulkleur;
-		}
-
-		/*
-		 * if (tvip.editMode != null) { if (docentModus) { tvip.docentKleuren =
-		 * viewerKleuren; } else if (vaktek == null) { tvip.viewerKleuren =
-		 * viewerKleuren; } else if (vaktek != null) {
-		 * vaktek.updateViewerKleuren(); } } else {
-		 */
-
 		if (vaktek != null)
 		{
 			vaktek.synchronizeViewerKleuren(this);
 		}
 	}
 
+	/**
+	 * zet de afstand van het oog (op de positive z-as)
+	 * tot het x-y vlak
+	 * @param afst nieuwe afstand
+	 */
 	public void zetAfstand(double afst)
 	{
 		afstand = afst;
@@ -471,11 +651,20 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
+	/**
+	 * zet schaduw-effect bij het tekeken van de vlakjes van het vleelvlak 
+	 * @param s true/false
+	 */
 	public void zetSchaduw(boolean s)
 	{
 		schaduw = s;
 	}
 
+	/**
+	 * zet de beginhoeken van het veelvlak
+	 * @param hx draaing om de x-as
+	 * @param hy draaing om de y-as
+	 */
 	public void zetBeginHoeken(double hx, double hy)
 	{
 		beginx = hx;
@@ -491,26 +680,47 @@ public class Viewer3d extends LayoutPanel
 		yhoek = 0;
 	}
 
+	/**
+	 * geef de huidige draaing van het veelvlak om de x-as
+	 * @return beginx+xhoek
+	 */
 	public double geefDraaiX()
 	{
 		return beginx + xhoek;
 	}
 
+	/**
+	 * geef de huidige draaing van het veelvlak om de y-as
+	 * @return beginy+yhoek
+	 */
 	public double geefDraaiY()
 	{
 		return beginy + yhoek;
 	}
 
+	/**
+	 * kunnen vlakjes van het veelvlak aangeklikt worden?
+	 * @param b true/false
+	 */
 	public void zetKlikAan(boolean b)
 	{
 		klikAan = b;
 	}
 
+	/**
+	 * luistert het Canvas naar Mouse/Touch Events?
+	 * @param b true/false
+	 */
 	public void zetMuisAan(boolean b)
 	{
 		muisAan = b;
 	}
 
+	/**
+	 * stop Veelvlak v in vvRij[0]; <br>
+	 * NB. de viewer start altijd met een (leeg) Veelvlak in vvRij[0]  
+	 * @param v nieuw Veelvlak
+	 */
 	public void zetVeelvlak(Veelvlak v)
 	{
 		vvRij[0] = v;
@@ -518,32 +728,36 @@ public class Viewer3d extends LayoutPanel
 		tekenOpnieuw();
 	}
 
-	public void zetVeelvlak(Veelvlak v, int n)
-	{
-		vvRij[n] = v;
-		tekenOpnieuw();
-	}
-
+	/**
+	 * voeg een Veelvlak toe aan vvRij 
+	 * @param v niew Veelvlak
+	 */
 	public void voegVeelvlakToe(Veelvlak v)
 	{
 		vvRij[aantalVeelvlakken] = v;
 		aantalVeelvlakken++;
 	}
 
+	/**
+	 * voeg de pijl die wijst naar de voorkant van het Veelvlak toe
+	 * @param p pijl die wijst naar de voorkant (als Veelvlak)
+	 */
 	public void voegVooraanzichtPijlToe(Veelvlak p)
 	{
 		vvRij[aantalVeelvlakken] = p;
 		voorkantPijlZichtbaar = true;
 		voorkantPijlIndex = aantalVeelvlakken;
 		aantalVeelvlakken++;
-		// tekenOpnieuw();
+
 	}
 
-	// neem aan pijl is de laatste
+	/**
+	 * verwijder de pijl die wijst naar de voorkant van het Veelvlak
+	 */
 	public void verwijderVooraanzichtPijl()
 	{
 		if (voorkantPijlZichtbaar)
-		{
+		{	// de pil is het laatste Veelvlak
 			vvRij[aantalVeelvlakken] = null;
 			voorkantPijlZichtbaar = false;
 			voorkantPijlIndex = -1;
@@ -552,6 +766,9 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
+	/**
+	 * teken vvRij[0] en (indien aanwezig) de pijl die wijst naar de voorkant van vvRij[0] 
+	 */
 	void tekenprogramma()
 	{
 		mat.initialiseer();
@@ -561,6 +778,12 @@ public class Viewer3d extends LayoutPanel
 			tekenVeelvlak(0, vvRij[i]);
 	}
 
+	/**
+	 * teken Veelvlak vv (vlaksgewijs); als vv == vvRij[0], bewaar alle 
+	 * (geprojecteerde) Vlakken van vv in array p 
+	 * @param n hier altijd 0
+	 * @param vv het te tekenen veelvlak
+	 */
 	void tekenVeelvlak(int n, Veelvlak vv)
 	{
 		if (vv == vvRij[0])
@@ -577,6 +800,10 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
+	/**
+	 * teken de Lijn l en beweeg de tekencursor terug naar (0,0,0)
+	 * @param l de te tekenen Lijn 
+	 */
 	void tekenLijn(Lijn l)
 	{
 		penUit();
@@ -587,6 +814,11 @@ public class Viewer3d extends LayoutPanel
 		stap(-k * l.hpunt2.x, -k * l.hpunt2.y, -k * l.hpunt2.z);
 	}
 
+	/**
+	 * teken Vlak v (voorkant en achterkant)
+	 * @param n hier altijd 0
+	 * @param v het te tekenen Vlak
+	 */
 	void tekenVlak(int n, Vlak v)
 	{
 		penUit();
@@ -650,10 +882,12 @@ public class Viewer3d extends LayoutPanel
 		paint(gIm);
 	}
 
+	/**
+	 * initialiseer en roep tekenOpImage aan 
+	 * @param g Context2d om te tekenen, redundant
+	 */
 	public void paint(Context2d g)
 	{
-		bezigMetTekenen = true;
-
 		double startschaal = Math.min((double) breedte / 400, (double) hoogte / 500);
 		mat.initialiseer(0, 0, 0, startschaal);
 		startpunt = new Punt3D(breedte / 2, hoogte / 2, 0);
@@ -663,9 +897,12 @@ public class Viewer3d extends LayoutPanel
 		}
 		tekenOpImage(true);
 
-		bezigMetTekenen = false;
 	}
 
+	/**
+	 * teken de veelvlakken in de 3d-lichamen (er zijn er maximaal 2)
+	 * @param wis wis het Canvas voor het tekenen, hier altijd true
+	 */
 	public void tekenOpImage(boolean wis)
 	{
 		if (gIm == null)
@@ -778,33 +1015,39 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
-	// -------------------------------------------------------------------------------------------
-	// deze methoden worden gebruikt door handlers van het leerlingprogramma
-	// -------------------------------------------------------------------------------------------
-
-	// beide methoden aleen paint()??
+	/**
+	 * repaint
+	 */
 	void tekenOpnieuw()
 	{
 		if (gIm == null)
 			return;
 
-		bezigMetTekenen = true;
 		tekenOpImage(true);
-		bezigMetTekenen = false;
 	}
 
-	void tekenErbij()
-	{
-		bezigMetTekenen = true;
-		tekenOpImage(false);
-		bezigMetTekenen = false;
-	}
-
+	/**
+	 * stap (dx,dy,dz) in de huidige richting, zie methode
+	 * naarVolgendPunt
+	 * @param dx x-verandering
+	 * @param dy y-verandering
+	 * @param dz z-verandering
+	 */
 	void stap(double dx, double dy, double dz)
 	{
 		naarVolgendPunt(dx, -dy, -dz);
 	}
 
+	/**
+	 * beweeg naar een nieuwe positie, berekend als nieuw = huidig + mat * (dx,dy,dz)T; 
+ 	 * als pen == true en vul == false, verbindt de oude en nieuwe positie met een lijn in penkleur, d.w.z., 
+ 	 * voeg twee punten toe aan Lichaam3D lnummer en maak daar een Polygon3D van (een 3d-segment dus); <br>
+ 	 * als vul == true, voeg de oude positie als punt toe aan Lichaam3D lnummer (al deze punten 
+ 	 * worden een Polygon3D bij vulUit())
+	 * @param dx x-verandering
+	 * @param dy y-verandering
+	 * @param dz z-verandering
+	 */
 	void naarVolgendPunt(double dx, double dy, double dz)
 	{
 		eindpunt = mat.geefVolgendPunt(beginpunt, dx, dy, dz);
@@ -823,21 +1066,35 @@ public class Viewer3d extends LayoutPanel
 		beginpunt.z = eindpunt.z;
 	}
 
+	/**
+	 * maak van de punten in Lichaam3D 0 een Polygon
+	 */
 	void tekenPolygon()
 	{
 		l[0].voegPolygonToe(vulkleur, penkleur, pen, leeg);
 	}
 
+	/**
+	 * maak van de punten in Lichaam3D n een Polygon 
+	 * @param n Lichaam3D nummer
+	 */
 	void tekenPolygon(int n)
 	{
 		l[n].voegPolygonToe(vulkleur, penkleur, pen, leeg);
 	}
 
+	/**
+	 * zet de pen aan 
+	 */
 	void penAan()
 	{
 		pen = true;
 	}
 
+	/**
+	 * zet de pen aan in kleur kl
+	 * @param kl kleurnaam
+	 */
 	void penAan(String kl)
 	{
 		pen = true;
@@ -845,6 +1102,12 @@ public class Viewer3d extends LayoutPanel
 		gIm.setStrokeStyle(penkleur);
 	}
 
+	/**
+	 * zet de pen aan in RGB-kleur (r,g,b)
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void penAan(int r, int g, int b)
 	{
 		pen = true;
@@ -852,12 +1115,21 @@ public class Viewer3d extends LayoutPanel
 		gIm.setStrokeStyle(penkleur);
 	}
 
+	/**
+	 * zet de pen aan en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 */
 	void penAan(int n)
 	{
 		pen = true;
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen aan in kleur kl en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param kl kleurnaam
+	 */
 	void penAan(int n, String kl)
 	{
 		pen = true;
@@ -866,6 +1138,13 @@ public class Viewer3d extends LayoutPanel
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen aan in RGB-kleur (r,g,b) en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void penAan(int n, int r, int g, int b)
 	{
 		pen = true;
@@ -874,22 +1153,36 @@ public class Viewer3d extends LayoutPanel
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen uit
+	 */
 	void penUit()
 	{
 		pen = false;
 	}
 
+	/**
+	 * zet de pen uit en lnummer op 0
+	 * @param n dummy
+	 */
 	void penUit(int n)
 	{
 		pen = false;
 		lnummer = 0;
 	}
 
+	/**
+	 * zet vul aan
+	 */
 	void vulAan()
 	{
 		vul = true;
 	}
 
+	/**
+	 * zet vul aan in kleur kl
+	 * @param kl kleurnaam
+	 */
 	void vulAan(String kl)
 	{
 		vul = true;
@@ -898,18 +1191,33 @@ public class Viewer3d extends LayoutPanel
 		vulkleur = maakKleur(kl);
 	}
 
+	/**
+	 * zet vul aan in RGB-kleur (r,g,b)
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void vulAan(int r, int g, int b)
 	{
 		vul = true;
 		vulkleur = CssColor.make(r, g, b);
 	}
 
+	/**
+	 * zet vul aan en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 */
 	void vulAan(int n)
 	{
 		vul = true;
 		lnummer = n;
 	}
 
+	/**
+	 * zet vul aan in kleur kl en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param kl kleurnaam
+	 */
 	void vulAan(int n, String kl)
 	{
 		vul = true;
@@ -919,6 +1227,13 @@ public class Viewer3d extends LayoutPanel
 		vulkleur = maakKleur(kl);
 	}
 
+	/**
+	 * zet vul aan in RGB-kleur (r,g,b) en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void vulAan(int n, int r, int g, int b)
 	{
 		vul = true;
@@ -926,12 +1241,20 @@ public class Viewer3d extends LayoutPanel
 		vulkleur = CssColor.make(r, g, b);
 	}
 
+	/**
+	 * zet vul aan in CssColor kl
+	 * @param kl nieuwe CssColor
+	 */
 	void vulAan(CssColor kl)
 	{
 		vul = true;
 		vulkleur = kl;
 	}
 
+	/**
+	 * maak van alle punten in Lichaam3D n een Polgon en teken dit;
+	 * zet vul uit en lnummer terug naar 0
+	 */
 	void vulUit()
 	{
 		tekenPolygon();
@@ -940,6 +1263,11 @@ public class Viewer3d extends LayoutPanel
 		leeg = false;
 	}
 
+	/**
+	 * maak van alle punten in Lichaam3D n een Polgon en teken dit;
+	 * zet vul uit en lnummer terug naar 0
+	 * @param n Lichaam3D nummer, geen error check
+	 */
 	void vulUit(int n)
 	{
 		tekenPolygon(n);
@@ -949,9 +1277,8 @@ public class Viewer3d extends LayoutPanel
 	}
 
 	/**
-	 * Geeft het laatst getekende Punt.
-	 * 
-	 * @return
+	 * Geeft het laatst getekende Punt van Lichaam 0
+	 * @return het laatst getekende Punt
 	 */
 	Punt geefPunt()
 	{
@@ -962,10 +1289,9 @@ public class Viewer3d extends LayoutPanel
 	}
 
 	/**
-	 * Geeft het laatst getekende Punt.
-	 * 
-	 * @param n
-	 * @return
+	 * Geeft het laatst getekende Punt van Lichaam n
+	 * @param n index van het Lichaam
+	 * @return het laatst getekende Punt
 	 */
 	Punt geefPunt(int n)
 	{
@@ -975,6 +1301,10 @@ public class Viewer3d extends LayoutPanel
 		return new Punt(begx, begy);
 	}
 
+	/**
+	 * geef het laatst getekende vlak van lichaam 0 indien dit zichtbaar is
+	 * @return een Polygon (mogelijk zonder punten)
+	 */
 	Polygon geefVlak()
 	{
 		if (l[0].vlakken[l[0].aantalPolygonen - 1].normaal.z > 0)
@@ -983,6 +1313,11 @@ public class Viewer3d extends LayoutPanel
 			return new Polygon();
 	}
 
+	/**
+	 * gegeven de naam van een kleur, maak die kleur
+	 * @param kl kleurnaam
+	 * @return corresponderende kleur
+	 */
 	private CssColor maakKleur(String kl)
 	{
 		if (kl.equals("rood"))
@@ -1006,17 +1341,16 @@ public class Viewer3d extends LayoutPanel
 		else if (kl.equals("magenta"))
 			return CssColor.make(255, 0, 255);
 		else if (kl.equals("wit"))
-			return WHITE;
+			return CssColor.make(255, 255, 255);
 		else if (kl.equals("oranje"))
 			return CssColor.make(255, 165, 0);
 		else
 			return CssColor.make(255, 128, 0);
 	}
 
-	public void animatie()
-	{
-	}
-
+	/**
+	 * kleur alle vlakken weer oranje 
+	 */
 	public void resetColors()
 	{
 		for (int j = vvRij[0].aantalVlakken - 1; j > -1; j--)
@@ -1025,11 +1359,13 @@ public class Viewer3d extends LayoutPanel
 		}
 		tekenOpnieuw();
 	}
-
-	public void resetLeerlingColors()
-	{
-	}
-
+	
+	/**
+	 * actie bij MouseUp/TouchEnd, klikAan == true en vlakkenKlerenOptie == true:<br>
+	 * kijk of een vlakje in array p aangeklikt is, 
+	 * kleur/ontkleur het aangeklikte vlakje, verwijder het nakijkresultaat 
+	 * van vlakkenkleuren in vaktek of viewer 
+	 */
 	public void muisKkActie()
 	{
 		for (int j = vvRij[0].aantalVlakken - 1; j > -1; j--)
@@ -1038,48 +1374,28 @@ public class Viewer3d extends LayoutPanel
 			{
 				if (vlakkenKleurenOptie)
 				{
-					// NB dit is vlakkenKleuren door de leerling
-					// de docent heeft alleen de eerste twee nodig
-					if (docentModus)
+					// een oranje vlak dat rood gekleurd wordt
+					if (vvRij[0].vlakken[j].vulkleur.equals("oranje"))
 					{
-						// een oranje vlak dat rood gekleurd wordt
-						if (vvRij[0].vlakken[j].vulkleur.equals("oranje"))
-						{
-							vvRij[0].vlakken[j].vulkleur = "rood";
-						}
-						// een rood vlak dat weer oranje gekleurd wordt
-						else if (vvRij[0].vlakken[j].vulkleur.equals("rood"))
-						{
-							vvRij[0].vlakken[j].vulkleur = "oranje";
-						}
-
+						vvRij[0].vlakken[j].vulkleur = "rood";
 					}
-					else // leerling
+					// een rood vlak dat weer oranje gekleurd wordt
+					else if (vvRij[0].vlakken[j].vulkleur.equals("rood"))
 					{
-						// een oranje vlak dat rood gekleurd wordt
-						if (vvRij[0].vlakken[j].vulkleur.equals("oranje"))
-						{
-							vvRij[0].vlakken[j].vulkleur = "rood";
-						}
-						// een rood vlak dat weer oranje gekleurd wordt
-						else if (vvRij[0].vlakken[j].vulkleur.equals("rood"))
-						{
-							vvRij[0].vlakken[j].vulkleur = "oranje";
-						}
+						vvRij[0].vlakken[j].vulkleur = "oranje";
+					}
 
-						if (vaktek != null)
-						{
-							vaktek.kijkNaPanel.setStyleName("goed", false);
-							vaktek.kijkNaPanel.setStyleName("fout", false);
-						}
-						else
-						{
-							kijkNaPanel.setStyleName("goed", false);
-							kijkNaPanel.setStyleName("fout", false);
-						}
-						// updateViewerKleuren();
-						tvGWT.answerChanged();
-					} // leerling
+					if (vaktek != null)
+					{
+						vaktek.kijkNaPanel.setStyleName("goed", false);
+						vaktek.kijkNaPanel.setStyleName("fout", false);
+					}
+					else
+					{
+						kijkNaPanel.setStyleName("goed", false);
+						kijkNaPanel.setStyleName("fout", false);
+					}
+					tvGWT.answerChanged();
 
 					updateViewerKleuren();
 				} // vlakkenkleurenOptie
@@ -1090,6 +1406,10 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
+	/**
+	 * actie bij MouseMove/TouchMove: draai het 3d-object;
+	 * verwijder het nakijkresultaat wanneer de positie wordt nagekeken 
+	 */
 	public void muisSleepActie()
 	{
 		if (muisAan)
@@ -1115,14 +1435,16 @@ public class Viewer3d extends LayoutPanel
 		}
 	}
 
+	/**
+	 * geen actie bij MouseDown/TouchStart
+	 */
 	public void muisDrukActie()
-	{
-	}
+	{}
 
-	public void muisKlikActie()
-	{
-	}
 
+	/**
+	 * initieer actie bij MouseUp/TouchEnd indien klikAan == true en er niet gesleept wordt
+	 */
 	public void muisLosActie()
 	{
 		if ((klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX())
@@ -1133,9 +1455,11 @@ public class Viewer3d extends LayoutPanel
 		tekenOpnieuw();
 	}
 
+	/**
+	 * inner class om klikken op de kijkNaButton af te handelen
+	 */
 	class PushClickHandler implements ClickHandler
 	{
-		// public void onMouseDown(MouseDownEvent e)
 		public void onClick(ClickEvent e)
 		{
 			e.stopPropagation();
@@ -1159,8 +1483,7 @@ public class Viewer3d extends LayoutPanel
 
 	/**
 	 * Geef het kijknapanel van de 3dviewer.
-	 * 
-	 * @return
+	 * @return het kijknapanel van de 3dviewer.
 	 */
 	public LayoutPanel getKijkNaPanel()
 	{

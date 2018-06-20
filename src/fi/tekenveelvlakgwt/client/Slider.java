@@ -1,10 +1,5 @@
 package fi.tekenveelvlakgwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
-
-//import javax.swing.JPanel;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -25,41 +20,77 @@ import com.google.gwt.event.dom.client.TouchEndEvent;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 
+/**
+ * klasse die een Slider representeert: de klasse bezit een Canvas
+ * waarop de slider getekend wordt en onderschept Mouse en Touch Events
+ * op dit Canvas waarmee de slider gemanipuleerd wordt; <br>
+ * de stand van de slider kan veranderd worden door:<br>
+ * 1) klikken oo de schuifKnop gevolgd door slepen naar een nieuwe positie<br>
+ * 2) direct klikken op een nieuwe positie<br>
+ * De nieuwe sliderstand wordt vervolgens doorgegeven aan de eigenaar van de slider 
+ * @author Peter Boon
+ */
 
-public class Slider	//extends JPanel implements MouseListener, MouseMotionListener
-{	//private Image im;
-	//private Graphics gIm;
-	
+public class Slider	
+{	
+	/**
+	 * eigenaar
+	 */
 	TekenVeelvlak eigenaar;
 	
+	/**
+	 * Canvas om de slider op te tekenen
+	 */
 	Canvas sliderCanvas;
+	/**
+	 * Context2d om de slider mee te tekenen
+	 */
 	Context2d sliderContext2d;
 
-	//protected ActionListener actionListener = null;
-	
+	/**
+	 * de lengte (in paxels) waarover de sliderknop bewogen kan worden 
+	 */
 	private int lengte;
+	/**
+	 * de huidige x-positie (in pixels) van de sliderknop  
+	 */
 	private int stand;
+	
+	/**
+	 * coordinaten laatste MouseDown/TouchStart
+	 */
 	private int muisStartX, muisStartY;
+	/**
+	 * de sliderknop
+	 */
 	private Polygon schuifKnop;
+	/**
+	 * true na MouseDown/TouchStart
+	 */
 	private boolean raak;
 	
+	/**
+	 * horzontale en vertikale afmetingne van de hele slider (in pixels)
+	 */
 	int horSize, vertSize;
 	
+	/**
+	 * achtergroundkleur van de slider
+	 */
 	CssColor achtergrondKleur;
 	
+	/**
+	 * constructor add Handlers
+	 * @param aantalPix lengte (in paxels) waarover de sliderknop bewogen kan worden
+	 * @param beginst de beginpositien van de sliderknop
+	 * @param eigen eigenaar van de slider
+	 */
 	public Slider(int aantalPix, int beginst, TekenVeelvlak eigen)
 	{	lengte = aantalPix;
 		stand = beginst;
-		
 		eigenaar = eigen;
-		
 		horSize = lengte+10;
 		vertSize = 20;
-		
-		//addMouseListener(this);
-		//addMouseMotionListener(this);
-		//setSize(lengte+10,20);
-		//setOpaque(true);
 		
 		sliderCanvas = Canvas.createIfSupported();
 		sliderCanvas.setWidth(horSize + "px");
@@ -88,31 +119,28 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		paint(sliderContext2d);
 	}
 	
-	//public void paint(Graphics g)
+	/**
+	 * teken achtergrond en roep telenSlider aan
+	 * @param g Context2d om te tekenen
+	 */
 	public void paint(Context2d g)
-	{	{ 	//if(im==null)
-			//{	im = createImage(getSize().width,getSize().height);
-  			//	gIm = im.getGraphics();
-			//}
-			//gIm.setColor(getBackground());
-			g.setFillStyle(achtergrondKleur);
-			g.fillRect(0,0,horSize, vertSize);
-			tekenSlider(g);
-			//g.drawImage(im, 0, 0, null);
-  		}
+	{	g.setFillStyle(achtergrondKleur);
+		g.fillRect(0,0,horSize, vertSize);
+		tekenSlider(g);
 	}
 	
-//	public void update(Graphics g)
-//	{	paint(g);
-//	}
 	
-//	public void tekenSlider(Graphics g)
+	/**
+	 * teken outline, maak en teken de schuifknop
+	 * @param g Context2d om te tekenen
+	 */
 	public void tekenSlider(Context2d g)
-	{	//g.setColor(Color.black);
+	{	
+		// outline
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		g.setFillStyle(CssColor.make(0,0,0));
-		//g.drawRect(5,7,lengte,6);
 		g.strokeRect(5,7,lengte,6);
+		
 		schuifKnop = new Polygon();
 		schuifKnop.addPoint(5+stand,0);
 		schuifKnop.addPoint(5+stand+3,5);
@@ -120,7 +148,8 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		schuifKnop.addPoint(5+stand,20);
 		schuifKnop.addPoint(5+stand-3,15);
 		schuifKnop.addPoint(5+stand-3,5);
-		//g.fillPolygon(schuifKnop);
+		
+		// schuifKnop
     	g.moveTo(schuifKnop.puntenX[0], schuifKnop.puntenY[0]);
 		g.beginPath();
 		for (int k = 1; k < schuifKnop.aantalPunten; k++)
@@ -130,7 +159,7 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		g.closePath();
 		g.fill();
 		
-		//g.drawPolygon(schuifKnop);
+		// outline schuifKnop
     	g.moveTo(schuifKnop.puntenX[0], schuifKnop.puntenY[0]);
 		g.beginPath();
 		for (int k = 1; k < schuifKnop.aantalPunten; k++)
@@ -142,39 +171,45 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 
 	}
 	
-//	public void addActionListener(ActionListener l) 
-// 	{	actionListener = AWTEventMulticaster.add(actionListener,l);
-// 	}
- 	
-// 	public void removeActionListener(ActionListener l)
-// 	{	actionListener = AWTEventMulticaster.remove(actionListener, l);
-// 	}
-	
+	/**
+	 * getter voor de stand van de slider (pixels)
+	 * @return stand
+	 */
 	public int geefStand()
 	{	return stand;
 	}
 
+	/**
+	 * getter voor de maximale schuifruimte van de slider (pixels)
+	 * @return lengte
+	 */
 	public int geefLengte()
 	{	return lengte;
 	}
 	
+	/**
+	 * zet de stand van de slider
+	 * @param std nieuwe stand
+	 */
 	public void zetStand(int std)
-	{	if (std > lengte)stand = lengte;
+	{	if (std > lengte)
+			stand = lengte;
 		else if(std < 0)
 			stand = 0;
 		else 
 			stand = std;
 		paint();
 	}
-	
+
+	/**
+	 * inner class om Mouse Events op het sliderCanvas af te handelen 
+	 */
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		boolean mouseDown = false;
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			//e.preventDefault();
-			// prevent scrolling 
 			e.stopPropagation();
 			
 			int eventX = e.getX();
@@ -188,8 +223,6 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			//e.preventDefault();
-			// prevent scrolling
 			e.stopPropagation();
 			
 			if (!mouseDown)
@@ -205,18 +238,17 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
-			//e.preventDefault();
-			// prevent scrolling
 			e.stopPropagation();
 			
 			mouseDown = false;
-		
-			//mouseUpTouchEndAction();
 
 		}
 
 	} //MouseHandler
 
+	/**
+	 * inner class om Touch Events op het sliderCanvas af te handelen 
+	 */
 	class TouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
 		
@@ -261,14 +293,18 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
-			//mouseUpTouchEndAction();
-		}
+					}
 
 	}
 
-	//public void mousePressed(MouseEvent e)
+	/**
+	 * afhandelen MouseDown/TouchStart Events
+	 * @param eventX x-coordinaat MouseDown/TouchStart Event
+	 * @param eventY y-coordinaat MouseDown/TouchStart Event
+	 */
 	public void mouseDownTouchStartAction(int eventX, int eventY)
-	{	raak = true;  //(new Rectangle(stand-5,0,20,20)).contains(e.getX(), e.getY());
+	{	
+		raak = true;  
 		stand = eventX-5;
 		if (stand > lengte) 
 		{	stand = lengte;
@@ -277,45 +313,37 @@ public class Slider	//extends JPanel implements MouseListener, MouseMotionListen
 		{	stand = 0;
 		}
 		paint();
-		//if (actionListener != null)
- 		//{	actionListener.actionPerformed( new ActionEvent(this, 0, "verschoven") );
- 		//}
 		eigenaar.sliderAction();
 		muisStartX = eventX;
 		muisStartY = eventY;
 	}
 	
-	//public void mouseDragged(MouseEvent e)
+	/**
+	 * afhandelen MouseMove/TouchMove Events
+	 * @param eventX x-coordinaat MouseMove/TouchMove Event
+	 * @param eventY y-coordinaat MouseMove/TouchMove Event
+	 */
 	public void mouseMoveTouchMoveAction(int eventX, int eventY)
-	{	if (!raak && new Rectangle(stand+5,0,10,20).contains(eventX, eventY))
+	{	
+		// kan dit? 
+		if (!raak && new Rectangle(stand+5,0,10,20).contains(eventX, eventY))
 		{	raak = true;
 			muisStartX = eventX;
 		}
 		if (raak)
 		{	int x = eventX;
 			int dx = x - muisStartX;
-			stand = x-5;//stand + dx;
+			stand = x-5;
 			if(stand>lengte) 
 			{	stand = lengte;
 			}
 			else if(stand<0) 
 			{	stand = 0;
 			}
-			if(x<10 || x>lengte+20)
-			{	//raak = false;
-			}
 			paint();
-			//if (actionListener != null)
- 			//{	actionListener.actionPerformed( new ActionEvent(this, 0, "verschoven") );
- 			//}
 			eigenaar.sliderAction();
 			muisStartX = x;
 		}
 	}
 	
-	//public void mouseReleased(MouseEvent e){;}
-	//public void mouseClicked(MouseEvent e){;}
-	//public void mouseExited(MouseEvent e){;}
-	//public void mouseEntered(MouseEvent e){;}
-	//public void mouseMoved(MouseEvent e){;}
 }

@@ -1,5 +1,8 @@
 package fi.tekenveelvlakgwt.client;
 
+/**
+ * GWT heeft geen klasse Rectangle, zie klasse Rectangle in KladjeGWT 
+ */
 public class Rectangle 
 {
 	int x; int y; int width; int height;
