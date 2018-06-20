@@ -168,7 +168,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	/**
 	 * instelbaarheid: formule tekenenlijnen tekenen?
 	 */
-	boolean formuleOptie = true;
+	boolean formuleOptie = false;
 	/**
 	 * instelbaarheid: formule tekenen?
 	 */
