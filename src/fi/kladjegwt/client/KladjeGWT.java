@@ -892,7 +892,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		topPanel.add(formuleViewer.getAsPanel());
 		
-		Map<String,Object> map = kladjeGWTVeld.getState();
+		Map<String,Object> map = kladjeGWTVeld.getState(false);
 		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
 		comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
 //		logger.info("in setChanged");

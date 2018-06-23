@@ -1,6 +1,8 @@
 package fi.kladjegwt.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -134,7 +136,7 @@ public class KStrokeContainer {
 //			int width = (int)strokeContainer.getBoundingBox().width;
 //			int height = (int)strokeContainer.getBoundingBox().height;
 			int x = 20;
-			int y = (int)strokeContainer.getBoundingBox().y - margin;
+			int y = (int)Math.max(5,strokeContainer.getBoundingBox().y - margin);
 			int width = parent.breedte-40;
 			int height = (int)strokeContainer.getBoundingBox().height + 2*margin;
 			writeBox = new Rectangle(x, y, width, height);
@@ -193,5 +195,13 @@ public class KStrokeContainer {
 	
 	public double getDiagonal() {
 		return strokeContainer.getDiagonal();
+	}
+	
+	public HashMap<String,Object> getState() {
+		return strokeContainer.getState();
+	}
+	
+	public void setState (Map<String,Object> map) {
+		strokeContainer.setState(map);
 	}
 }

@@ -619,10 +619,29 @@ public class KladjeGWTVeld
 	 * stop de status van het werkveld in een HashMap
 	 * @return HashMap met status werkveld
 	 */
+	
 	public HashMap<String,Object> getState()
 	{
+		return getState(true);
+	}
+	
+	public HashMap<String,Object> getState(boolean end)
+	{
 		HashMap<String,Object> h = new HashMap<String,Object>();
-
+		
+		if(end && currentStrokeContainer!=null) {
+			currentStrokeContainer.setActive(false);
+			currentStrokeContainer.scale(1.0/3);
+			currentStrokeContainer=null;
+		}
+		
+		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
+		for (int i = 0; i < kStrokeContainers.size(); i++)
+		{	KStrokeContainer sc = kStrokeContainers.get(i);
+			strokeContainerList.add(sc.getState());
+			}
+		h.put("strokeContainerList", strokeContainerList);
+		
 		// stop de status van de Strepen in een ArrayList
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>(); 
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
@@ -687,6 +706,18 @@ public class KladjeGWTVeld
 		else // alleen leerling-Strepen verwijderen
 			streepVector.removeAllElements();
 
+		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
+		
+		if (launchState.containsKey("strokeContainerList"))
+			strokeContainerList = launchState.getMapList("strokeContainerList");
+		logger.info(strokeContainerList.toString());
+		for (int sCnt = 0; sCnt < strokeContainerList.size(); sCnt++)
+		{	
+			KStrokeContainer sc = new KStrokeContainer(this);
+			sc.setState(strokeContainerList.get(sCnt));
+			kStrokeContainers.add(sc);
+		}
+		
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
 		
 		if (launchState.containsKey("strepen"))
@@ -3179,6 +3210,10 @@ public class KladjeGWTVeld
 			
 			if(formulaStrokePoints.size()>0) 
 			{
+//				if(currentStrokeContainer==null) {
+//					currentStrokeContainer = new KStrokeContainer(this);
+//					currentStrokeContainer.setActive(true);
+//				}
 				lastStroke = new Stroke(formulaStrokePoints);
 				currentStrokeContainer.addStroke(lastStroke);
 			}
