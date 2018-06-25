@@ -6,6 +6,9 @@ import com.google.gwt.resources.client.ImageResource;
 public interface KladjeGWTClientBundle extends ClientBundle 
 {
 
+   @Source("fi/kladjegwt/client/images/bin.png")
+   public ImageResource binResource();
+	 
    @Source("fi/kladjegwt/client/images/teken_penknop_up.gif")
    public ImageResource tekenKnopUpResource();
 

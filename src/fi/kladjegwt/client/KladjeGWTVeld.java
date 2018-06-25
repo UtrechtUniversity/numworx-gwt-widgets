@@ -22,10 +22,12 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
-
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Image;
 
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
@@ -428,6 +430,8 @@ public class KladjeGWTVeld
 	
 	private ArrayList<KStrokeContainer> kStrokeContainers = new ArrayList<KStrokeContainer>();
 	private KStrokeContainer currentStrokeContainer;// = new KStrokeContainer();
+	private Image binImage;
+	private ImageElement binImageElement;
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -451,6 +455,10 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.addTouchStartHandler(touchHandler);
 		kladjeHWTCanvas.addTouchMoveHandler(touchHandler);
 		kladjeHWTCanvas.addTouchEndHandler(touchHandler);
+		
+		ImageResource binResource = eigenaar.kladjeGWTClientBundle.binResource();
+		binImage = new Image(binResource);
+		binImageElement = ImageElement.as(binImage.getElement());
 		
 		//kStrokeContainers.add(currentStrokeContainer);
 	}
@@ -951,6 +959,9 @@ public class KladjeGWTVeld
 		g.setLineWidth(0.6d);
 		// alles weg
 		g.clearRect(0, 0, breedte, hoogte);
+		
+		if(mouseMode==formuleOptie)
+			g.drawImage(binImageElement, breedte-60, 10);
 		
 		if(currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
 		{	g.setFillStyle( CssColor.make("rgba(239,241,243,0.5)"));
@@ -3196,8 +3207,18 @@ public class KladjeGWTVeld
 		{	
 			if(proActiveStrokeContainer!=null) 
 			{
+				if(proActiveStrokeContainer.getBox().contains(breedte-25, 25) 
+						|| (new Rectangle(breedte-50,0,50,50)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
+					kStrokeContainers.remove(proActiveStrokeContainer);
+					proActiveStrokeContainer = null;
+					paint();
+					return;
+				}
 				int pX = proActiveStrokeContainer.getBox().x - proActiveX;
 				int pY = proActiveStrokeContainer.getBox().y - proActiveY;
+				
+				
+				
 				boolean verschoven = pX*pX+pY*pY<16;
 				if(verschoven)
 				{
