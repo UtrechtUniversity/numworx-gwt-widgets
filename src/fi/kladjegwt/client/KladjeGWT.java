@@ -166,11 +166,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	int ruitjesSize = 20;
 	/**
-	 * instelbaarheid: formule tekenenlijnen tekenen?
+	 * instelbaarheid: formule tekenen?
 	 */
 	boolean formuleOptie = false;
 	/**
-	 * instelbaarheid: formule tekenen?
+	 * instelbaarheid: ivm?
+	 */
+	boolean ivmOptie = false;
+	/**
+	 * instelbaarheid: lijnen tekenen?
 	 */
 	boolean lijnTekenen = true;
 	/**
@@ -314,8 +318,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		Stub.publish(this); 
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		//Stub.publish(this); 
+		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
@@ -726,7 +730,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 * zet de status van het werkveld, zie methode setState in klasse kladjeGWTVeld 
 	 */
 	public void setState(HashMap<String, Object> h)
-	{
+	{	if(h == null||h.isEmpty()) return;
 		kladjeGWTVeld.setState(h, false);
 
 	}
@@ -836,6 +840,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		kladjeGWTVeld.scale = scale;
 		if(formuleOptie)
 			kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
+		if(ivmOptie)
+			kladjeGWTVeld.mouseMode = kladjeGWTVeld.ivmOptie;
 	
 		// docent tekeningen
 		kladjeGWTVeld.setState(map, true);

@@ -209,6 +209,7 @@ public class KladjeGWTVeld
 	final int cirkelTekenen = 5;
 	final int tekstTekenen = 6;
 	final int selecteren = 7;
+	final int ivmOptie = 8;
 	/**
 	 * de actuele mouse mode
 	 */
@@ -1029,6 +1030,8 @@ public class KladjeGWTVeld
 		g.translate(translation.x,translation.y);
 		
 		g.setLineWidth(3.0d);
+		if(mouseMode==ivmOptie)
+			g.setLineWidth(6.0d);
 		
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
@@ -1071,6 +1074,11 @@ public class KladjeGWTVeld
 		{
 			g.setStrokeStyle(CssColor.make(80, 80, 80));
 			currentStrokeContainer.draw(g);
+		}
+		
+		if(mouseMode==ivmOptie) {
+			if(currentStrokeContainer!=null)
+				currentStrokeContainer.draw(g);
 		}
 			
 		
@@ -2467,6 +2475,40 @@ public class KladjeGWTVeld
 			}
 		}
 	}
+	
+	private void processIVM() {
+		streepVector.clear();
+		ArrayList<DoublePoint> pointsLeft = new ArrayList<DoublePoint>();
+		ArrayList<DoublePoint> pointsRight = new ArrayList<DoublePoint>();
+		ArrayList<DoublePoint> pointsBottom = new ArrayList<DoublePoint>();
+		double vaasX = 500;
+		double volumeUnit = 20*lastStroke.getParsePointsbox().height;
+		
+		//ArrayList<DoublePoint> points = smooth(lastStroke.getParsePoints(), smoothType);
+		double vaasY = lastStroke.getParsePoints().get(0).y;
+		for(int j = 1 ; j < lastStroke.getParsePoints().size() ; j++) {
+			double dx = lastStroke.getParsePoints().get(j).x - lastStroke.getParsePoints().get(j-1).x ;
+			double dy = lastStroke.getParsePoints().get(j).y - lastStroke.getParsePoints().get(j-1).y;
+			
+			double r = Math.sqrt(-volumeUnit*dx/dy);
+			pointsLeft.add(new DoublePoint(vaasX-r, lastStroke.getParsePoints().get(j).y));
+			pointsRight.add(new DoublePoint(vaasX+r, lastStroke.getParsePoints().get(j).y));
+			pointsBottom.add(pointsLeft.get(0));
+			pointsBottom.add(pointsRight.get(0));
+		}
+		ArrayList<DoublePoint> smoothedPointsLeft = pointsLeft;//smooth(pointsLeft, smoothType);
+		ArrayList<DoublePoint> smoothedPointsRight = pointsRight;//smooth(pointsRight, smoothType);
+		
+		Streep streepLeft = new Streep(drawingColor, smoothedPointsLeft);
+		Streep streepRight = new Streep(drawingColor, smoothedPointsRight);
+		Streep streepBottom = new Streep(drawingColor, pointsBottom);
+		
+		streepVector.addElement(streepLeft);
+		streepVector.addElement(streepRight);
+		streepVector.addElement(streepBottom);
+		
+		paint();
+	}
 
 	/**
 	 * check of een van de schaal- of draaihandles (als die er al zijn)
@@ -2672,6 +2714,17 @@ public class KladjeGWTVeld
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
 		}
+		else if (mouseMode == ivmOptie)
+		{
+			if(currentStrokeContainer==null)
+				currentStrokeContainer = new KStrokeContainer(this);
+			
+			formulaStrokePoints.clear();
+			mouseDown = true;
+			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			paint();
+			
+		}
 		else if (mouseMode == formuleOptie)
 		{
 			mouseDown = true;
@@ -2848,6 +2901,17 @@ public class KladjeGWTVeld
 		{
 			draggDoublePoints.add(new DoublePoint(eventX, eventY));
 			paint();
+		}
+		else if (mouseMode == ivmOptie)
+		{
+			if(formulaStrokePoints.size()>0) {
+				int dx = (int)(formulaStrokePoints.get(formulaStrokePoints.size()-1).x) - eventX;
+				int dy = (int)(formulaStrokePoints.get(formulaStrokePoints.size()-1).y) - eventY;
+				if(dx*dx+dy*dy>30)
+					formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			}
+			paint();
+			
 		}
 		else if (mouseMode == formuleOptie)
 		{
@@ -3202,7 +3266,16 @@ public class KladjeGWTVeld
 			paint();
 			eigenaar.setChanged();
 		}
-		
+		else if (mouseMode == ivmOptie)
+		{
+			//ArrayList<DoublePoint> smoothedPoints = smooth(formulaStrokePoints, smoothType);
+			currentStrokeContainer.clear();
+			lastStroke = new Stroke(formulaStrokePoints);
+			currentStrokeContainer.addStroke(lastStroke);
+			formulaStrokePoints.clear();
+			processIVM();
+			
+		}
 		else if (mouseMode == formuleOptie)
 		{	
 			if(proActiveStrokeContainer!=null) 
