@@ -3613,6 +3613,7 @@ public class KladjeGWTVeld
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			moving = false;
 			mouseUpTouchEndAction();
 		}
 
