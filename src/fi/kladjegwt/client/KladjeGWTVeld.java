@@ -23,6 +23,7 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
@@ -426,7 +427,7 @@ public class KladjeGWTVeld
 	double scaleUpStep = 105e-2d;
 	double scaleDownStep = 1 / 105e-2d;
 	
-	Point translation = new Point(30,20);
+	fi.kladjegwt.client.Point translation = new fi.kladjegwt.client.Point(30,20);
 	double scale = 2.0;
 	KladjeGWT eigenaar;
 	
@@ -2766,7 +2767,7 @@ public class KladjeGWTVeld
 			mouseDown = true;
 			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
-			eigenaar.setChanged();
+			//eigenaar.setChanged();
 			
 
 		}
@@ -2873,6 +2874,18 @@ public class KladjeGWTVeld
 			paint();
 		}
 		
+	}
+	
+	public void mouseMoveTouch2MoveAction(int eventX, int eventY)
+	{
+		if(currentStrokeContainer != null) {
+			int dx = eventX - startX;
+			int dy = eventY - startY;
+			currentStrokeContainer.translate(dx, dy);
+			paint();
+			startX = eventX;
+			startY = eventY;
+		}
 	}
 
 	/**
@@ -3467,6 +3480,7 @@ public class KladjeGWTVeld
 	 * roep de corresponderende actie aan 
 	 * @author huub
 	 */
+	boolean mouseOnRight = false;
 	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
 	{
 		
@@ -3479,8 +3493,13 @@ public class KladjeGWTVeld
 			int eventX = e.getX();
 			int eventY = e.getY();
 			
+			if (e.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
+				mouseOnRight = true;
+				startX = eventX;
+				startY = eventY;
+				return;
+			}
 			mouseDownTouchStartAction(eventX, eventY);
-			
 		}
 		
 		public void onMouseMove(MouseMoveEvent e)	
@@ -3495,8 +3514,11 @@ public class KladjeGWTVeld
 			int eventX = e.getX();
 			int eventY = e.getY();
 			boolean shiftPressed = e.isShiftKeyDown();
-
-			mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
+			
+			if(mouseOnRight)
+				mouseMoveTouch2MoveAction(eventX, eventY);
+			else
+				mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
 			
 		} // onMouseMove
 		
@@ -3507,6 +3529,10 @@ public class KladjeGWTVeld
 			// prevent scrolling
 			e.stopPropagation();
 			mouseDown = false;
+			mouseOnRight = false;
+			if (e.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
+				return;
+			}
 			mouseUpTouchEndAction();
 		}
 
@@ -3526,18 +3552,23 @@ public class KladjeGWTVeld
 			e.preventDefault();
 			e.stopPropagation();
 			
+			if (e.getTouches().length() == 0)
+				return;
+			
 			Touch touch = e.getTouches().get(0);
 			
 			int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
 			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
 			
-			if ( (e.getTouches().length() == 1) && !moving ) {
+			if (e.getTouches().length() == 1 && !moving ) {
 				writing = true;
 				mouseDownTouchStartAction(eventX, eventY);
 			}
 			if ( (e.getTouches().length() == 2) ) {
 				moving = true;
 				writing = false;
+				startX = eventX;
+				startY = eventY;
 			}			
 			if ( (e.getTouches().length() > 2) ) {
 				moving = false;
@@ -3554,7 +3585,7 @@ public class KladjeGWTVeld
 			e.preventDefault();
 			e.stopPropagation();
 			
-			if (e.getTouches().length() > 0)
+			if (e.getTouches().length() ==1)
 			{
 				Touch touch = e.getTouches().get(0);
 				
@@ -3563,6 +3594,17 @@ public class KladjeGWTVeld
 				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
 			    
 				mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
+				
+		    }
+			if (moving && e.getTouches().length() ==2)
+			{
+				Touch touch = e.getTouches().get(0);
+				
+			    boolean shiftPressed = false;
+			    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
+				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
+			    
+				mouseMoveTouch2MoveAction(eventX, eventY);
 				
 		    }
 			e.preventDefault();

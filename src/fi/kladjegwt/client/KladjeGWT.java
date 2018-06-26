@@ -18,7 +18,6 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
@@ -199,7 +198,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	boolean schalen = true;
 	
-	private Point translation = new Point(0,0);
+	private Point translation = new fi.kladjegwt.client.Point(0,0);
 	
 	private double scale = 1.0;
 	
@@ -799,7 +798,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		int translationy = translation.y;
 		if(launchState.containsKey("translationY"))
 			translationy = launchState.getInt("translationY");
-		translation = new Point(translationx,translationy);
+		translation = new fi.kladjegwt.client.Point(translationx,translationy);
 		
 		if(launchState.containsKey("scale"))
 			scale = launchState.getDouble("scale");
@@ -898,6 +897,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		topPanel.add(formuleViewer.getAsPanel());
 		
+		if(comRoot==null)
+			return;
 		Map<String,Object> map = kladjeGWTVeld.getState(false);
 		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
 		comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
@@ -935,7 +936,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				logger.info("map!=null");
 				logger.info(map.toString());
 				int valueX = (int)((Double)map.get("value")).doubleValue();
-				translation = new Point(-valueX, translation.y);
+				translation = new fi.kladjegwt.client.Point(-valueX, translation.y);
 				kladjeGWTVeld.translation = translation;
 				kladjeGWTVeld.paint();
 			}
@@ -945,7 +946,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			Map map = (Map)event.getParameters();
 			if (map!=null)
 			{	int valueY = (int)((Double)map.get("value")).doubleValue();
-				translation = new Point(translation.x, -valueY);
+				translation = new fi.kladjegwt.client.Point(translation.x, -valueY);
 				kladjeGWTVeld.translation = translation;
 				kladjeGWTVeld.paint();
 			}
