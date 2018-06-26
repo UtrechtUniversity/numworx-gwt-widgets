@@ -29,6 +29,7 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
 
+import fi.writemathgwt.client.engine.Point;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
 
@@ -2685,9 +2686,11 @@ public class KladjeGWTVeld
 		return handleAction;
 	}
 	
-	KStrokeContainer proActiveStrokeContainer;
-	int proActiveX;
-	int proActiveY;
+	private KStrokeContainer proActiveStrokeContainer;
+	private int proActiveX;
+	private int proActiveY;
+	private boolean writing;
+	private boolean moving;
 
 	/**
 	 * actie bij MouseDown/TouchStart met coordinaten (eventX,eventY): <br>
@@ -3523,16 +3526,25 @@ public class KladjeGWTVeld
 			e.preventDefault();
 			e.stopPropagation();
 			
-			if (e.getTouches().length() > 0)
-			{
-				Touch touch = e.getTouches().get(0);
-				
-				int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
-				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
-				
+			Touch touch = e.getTouches().get(0);
+			
+			int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
+			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
+			
+			if ( (e.getTouches().length() == 1) && !moving ) {
+				writing = true;
 				mouseDownTouchStartAction(eventX, eventY);
+			}
+			if ( (e.getTouches().length() == 2) ) {
+				moving = true;
+				writing = false;
+			}			
+			if ( (e.getTouches().length() > 2) ) {
+				moving = false;
+				writing = false;
 				
-		    }
+			}			
+
 			e.preventDefault();
 			e.stopPropagation();
 		}
