@@ -10,6 +10,8 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class KStrokeContainer {
 
@@ -17,11 +19,13 @@ public class KStrokeContainer {
 	private StrokeContainer strokeContainer;
 	
 	private boolean active = false;
-	
 	private double activeTranslation;
 	
 	private CssColor drawingColor = CssColor.make(80, 80, 80);
 	private Rectangle box, writeBox;
+	private boolean correct = false;
+	private boolean isfalse = false;
+	private boolean checkable;
 	
 	public KStrokeContainer (KladjeGWTVeld parent) {
 		this.parent = parent;
@@ -44,12 +48,21 @@ public class KStrokeContainer {
 		return new Rectangle(x,y,30,30);
 	}
 	
+	public Rectangle getCheckButtonArea() {
+		int x = getWriteBox().x + getWriteBox().width - 70; 
+		int y = getWriteBox().y; 
+		return new Rectangle(x,y,30,30);
+	}
+	
 	public void draw(Context2d g) {
 		if(strokeContainer.getStrokes().size()>0) {
 			if(active) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
+				
+				g.setFillStyle(CssColor.make(239, 241, 243));
+				g.fillRect(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34);
 				g.setLineWidth(1.2d);
 				g.beginPath();
 				g.moveTo(getWriteBox().x + getWriteBox().width-30, getWriteBox().y+10);
@@ -61,12 +74,54 @@ public class KStrokeContainer {
 				g.lineTo(getWriteBox().x + getWriteBox().width-10, getWriteBox().y+10);
 				g.closePath();
 				g.stroke();
+				
+//				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
+//				g.setStrokeStyle(CssColor.make(0, 200, 0));
+//				g.setLineWidth(5.0d);
+//				g.beginPath();
+//				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
+//				g.lineTo(getWriteBox().x + getWriteBox().width-60, getWriteBox().y+30);
+//				g.lineTo(getWriteBox().x + getWriteBox().width-50, getWriteBox().y+10);
+//				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
+//				g.closePath();
+//				g.stroke();
+				
+				g.setStrokeStyle(drawingColor);
 				g.setLineWidth(3.0d);
+				
+				if(correct||isfalse) {
+					//g.setFillStyle(CssColor.make(240, 255, 240));
+					if(correct)
+						g.setFillStyle(CssColor.make(0, 200, 0));
+					if(isfalse)
+						g.setFillStyle(CssColor.make(200, 0, 0));
+					g.beginPath();
+					g.arc(getWriteBox().x + 20, getWriteBox().y + 20 , 8, 0, 8* Math.PI);
+					g.closePath();
+					g.stroke();
+					g.fill();
+				}
+				
 			}
 			else {
-				g.setFillStyle(CssColor.make(243, 241, 239));
+				//g.setFillStyle(CssColor.make(243, 241, 239));
+				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.setLineWidth(1.5d);
-				g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
+				if(correct||isfalse) {
+					//g.setFillStyle(CssColor.make(240, 255, 240));
+					g.fillRect(getBox().x-30, getBox().y-5, getBox().width+35, getBox().height+10);
+					if(correct)
+						g.setFillStyle(CssColor.make(0, 200, 0));
+					if(isfalse)
+						g.setFillStyle(CssColor.make(200, 0, 0));
+					g.beginPath();
+					g.arc(getBox().x-20, getBox().y+getBox().height/2 , 5, 0, 5* Math.PI);
+					g.closePath();
+					g.stroke();
+					g.fill();
+				}
+				else
+					g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
 			}	
 		}
 		
@@ -97,6 +152,18 @@ public class KStrokeContainer {
 			}
 		}
 		g.setLineWidth(3.0d);
+	}
+	
+	public void setCorrect(boolean correct) {
+		this.correct = correct;
+		if(correct)
+			isfalse = false;
+	}
+	
+	public void setFalse(boolean isfalse) {
+		this.isfalse = isfalse;
+		if(isfalse)
+			correct = false;
 	}
 	
 	public void setActive (boolean b) {
@@ -202,10 +269,18 @@ public class KStrokeContainer {
 	}
 	
 	public HashMap<String,Object> getState() {
-		return strokeContainer.getState();
+		HashMap<String,Object> map = strokeContainer.getState();
+		map.put("correct", new Boolean(correct));
+		map.put("isfalse", new Boolean(isfalse));
+		return map;
 	}
 	
 	public void setState (Map<String,Object> map) {
 		strokeContainer.setState(map);
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		if(launchState.containsKey("correct"))
+			correct = launchState.getBoolean("correct");
+		if(launchState.containsKey("isfalse"))
+			isfalse = launchState.getBoolean("isfalse");
 	}
 }

@@ -750,6 +750,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("drawing", this);
 		comRoot.addCBookEventListener("action.setCorrect", this);
+		comRoot.addCBookEventListener("action.setFalse", this);
 		comRoot.addCBookEventListener("double.translationX", this);
 		comRoot.addCBookEventListener("double.translationY", this);
 	}
@@ -813,7 +814,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(formuleOptie) {
 			topPanel = new LayoutPanel();
 			topPanel.addStyleName(kladjeCss.top());
-			dlp.addNorth(topPanel, topHeight);
+			//dlp.addNorth(topPanel, topHeight);
 		}
 		
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
@@ -918,11 +919,18 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			}
 		}
 		
+		
+		
+		if (command.startsWith("action.setFalse"))
+		{ logger.info("action.setFalse binnen");
+			{	kladjeGWTVeld.setFalse(true);
+				kladjeGWTVeld.paint();
+			}
+		}
+		
 		if (command.startsWith("action.setCorrect"))
-		{
-			Map map = (Map)event.getParameters();
-			if (map!=null)
-			{	kladjeGWTVeld.setState(map, false);
+		{logger.info("action.setCorrect binnen");
+			{	kladjeGWTVeld.setCorrect(true);
 				kladjeGWTVeld.paint();
 			}
 		}

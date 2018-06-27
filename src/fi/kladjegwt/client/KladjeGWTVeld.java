@@ -432,7 +432,7 @@ public class KladjeGWTVeld
 	KladjeGWT eigenaar;
 	
 	private ArrayList<KStrokeContainer> kStrokeContainers = new ArrayList<KStrokeContainer>();
-	private KStrokeContainer currentStrokeContainer;// = new KStrokeContainer();
+	private KStrokeContainer currentStrokeContainer, lastCurrentStrokeContainer;// = new KStrokeContainer();
 	private Image binImage;
 	private ImageElement binImageElement;
 	
@@ -595,7 +595,7 @@ public class KladjeGWTVeld
 	void addToHistory()
 	{
 
-		HashMap<String,Object> stateTable = getState();
+		HashMap<String,Object> stateTable = getState(false);
 		
 		histories[numHistories] = stateTable;
 		numHistories++;
@@ -641,10 +641,11 @@ public class KladjeGWTVeld
 		HashMap<String,Object> h = new HashMap<String,Object>();
 		
 		if(end && currentStrokeContainer!=null) {
-			currentStrokeContainer.setActive(false);
-			currentStrokeContainer.scale(1.0/3);
-			currentStrokeContainer=null;
+			closeCurrentContainer();
 		}
+		
+		int lastCurrentIndex = kStrokeContainers.indexOf(lastCurrentStrokeContainer);
+		h.put("lastCurrentIndex", new Integer(lastCurrentIndex));
 		
 		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i < kStrokeContainers.size(); i++)
@@ -727,6 +728,10 @@ public class KladjeGWTVeld
 			KStrokeContainer sc = new KStrokeContainer(this);
 			sc.setState(strokeContainerList.get(sCnt));
 			kStrokeContainers.add(sc);
+		}
+		if (launchState.containsKey("lastCurrentIndex")) {
+			//int lastCurrentIndex = launchState.getInt("lastCurrentIndex");
+			//lastCurrentStrokeContainer = kStrokeContainers.get(lastCurrentIndex);
 		}
 		
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
@@ -1533,9 +1538,25 @@ public class KladjeGWTVeld
 	public void setSelecteerMode()
 	{
 		mouseMode = selecteren;
+		closeCurrentContainer();
+	}
+	
+	public void setCorrect(boolean correct) {
 		if(currentStrokeContainer!=null)
-			currentStrokeContainer.scale(1.0/3.0);
-		currentStrokeContainer = null;
+			currentStrokeContainer.setCorrect(correct);
+		else if(lastCurrentStrokeContainer!=null) {
+			lastCurrentStrokeContainer.setCorrect(correct);
+			lastCurrentStrokeContainer = null;
+		}
+	}
+	
+	public void setFalse(boolean isfalse) {
+		if(currentStrokeContainer!=null)
+			currentStrokeContainer.setFalse(isfalse);
+		else if(lastCurrentStrokeContainer!=null) {
+			lastCurrentStrokeContainer.setFalse(isfalse);
+			lastCurrentStrokeContainer = null;
+		}
 	}
 	
 	/**
@@ -2687,6 +2708,15 @@ public class KladjeGWTVeld
 		return handleAction;
 	}
 	
+	private void closeCurrentContainer() {
+		currentStrokeContainer.setActive(false);
+		currentStrokeContainer.scale(1.0/3);
+		if(currentStrokeContainer.getBox().x < 0)
+			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
+		lastCurrentStrokeContainer = currentStrokeContainer;
+		currentStrokeContainer=null;
+	}
+	
 	private KStrokeContainer proActiveStrokeContainer;
 	private int proActiveX;
 	private int proActiveY;
@@ -2736,16 +2766,18 @@ public class KladjeGWTVeld
 			startY = eventY;
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
-				currentStrokeContainer.setActive(false);
-				currentStrokeContainer.scale(1.0/3);
-				currentStrokeContainer=null;
+				closeCurrentContainer();
 				return;
 			}
+			
+//			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
+//				currentStrokeContainer.setCorrect(true); // hier checkprocedure toevoegen
+//				//closeCurrentContainer();
+//				return;
+//			}
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
-				currentStrokeContainer.setActive(false);
-				currentStrokeContainer.scale(1.0/3);
-				currentStrokeContainer=null;
+				closeCurrentContainer();
 			}
 			
 			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
@@ -2879,6 +2911,7 @@ public class KladjeGWTVeld
 	public void mouseMoveTouch2MoveAction(int eventX, int eventY)
 	{
 		if(currentStrokeContainer != null) {
+			formulaStrokePoints.clear();
 			int dx = eventX - startX;
 			int dy = eventY - startY;
 			currentStrokeContainer.translate(dx, dy);
@@ -3326,6 +3359,8 @@ public class KladjeGWTVeld
 //				}
 				lastStroke = new Stroke(formulaStrokePoints);
 				currentStrokeContainer.addStroke(lastStroke);
+				currentStrokeContainer.setCorrect(false);
+				currentStrokeContainer.setFalse(false);
 			}
 			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
 			{	kStrokeContainers.remove(currentStrokeContainer);
@@ -3560,16 +3595,18 @@ public class KladjeGWTVeld
 			int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
 			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
 			
-			if (e.getTouches().length() == 1 && !moving ) {
-				writing = true;
-				mouseDownTouchStartAction(eventX, eventY);
-			}
+			
 			if ( (e.getTouches().length() == 2) ) {
 				moving = true;
 				writing = false;
 				startX = eventX;
 				startY = eventY;
-			}			
+				return;
+			}	
+			if (e.getTouches().length() == 1 && !moving ) {
+				writing = true;
+				mouseDownTouchStartAction(eventX, eventY);
+			}
 			if ( (e.getTouches().length() > 2) ) {
 				moving = false;
 				writing = false;
