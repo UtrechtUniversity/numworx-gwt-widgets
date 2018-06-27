@@ -1546,8 +1546,12 @@ public class KladjeGWTVeld
 			currentStrokeContainer.setCorrect(correct);
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setCorrect(correct);
+			currentStrokeContainer = lastCurrentStrokeContainer;
+			currentStrokeContainer.scale(3.0/1.0);
+			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
+		//paint();
 	}
 	
 	public void setFalse(boolean isfalse) {
@@ -1555,8 +1559,12 @@ public class KladjeGWTVeld
 			currentStrokeContainer.setFalse(isfalse);
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setFalse(isfalse);
+			currentStrokeContainer = lastCurrentStrokeContainer;
+			currentStrokeContainer.scale(3.0/1.0);
+			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
+		//paint();
 	}
 	
 	/**
