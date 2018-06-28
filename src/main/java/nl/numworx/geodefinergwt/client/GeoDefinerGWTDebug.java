@@ -14,7 +14,6 @@ import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Role;
-import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -219,6 +218,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				,"$fP=point(1,1)@"
 				,"$fh=halfline(O,P)@"
 				,"$fy=$px$n2@@/2-2@"
+				,"$fwaarde=true@"
 				);
 		launchDebug.put("definitions", definitions);
 		Map<String,Object> h = new HashMap<>();
@@ -226,7 +226,14 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		h.put("color", 0XFFFF0000);
 		h.put("width", 3);
 		h.put("tip", "ATSTART");
-		launchDebug.put("configuration", Collections.singletonMap("h", h));
+		Map <String,Map<String,Object>> configuration = new HashMap<>();
+		configuration.put("h", h);
+		h = new HashMap<>();
+		h.put("font", Collections.singletonMap("size", 24));
+	       h.put("color", 0XFFFF0000);
+	       h.put("visible", Boolean.TRUE);
+	       configuration.put("waarde", h);
+		launchDebug.put("configuration", configuration);
 		launchDebug.put("checkDWO", checkDWO);
 	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}
 		Map<String,Object> checkObject = new HashMap<>();
@@ -234,6 +241,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		checkObject.put("value", "$fpoint(2,1)@");		
 		launchDebug.put("checkObjects", Collections.singletonList(checkObject));
 
+		Map<String,Object> positions = new HashMap<>();
+		positions.put("waarde", Arrays.asList(1, 40, 1, 40));
+		launchDebug.put("positions", positions);
+		
 		Map<String, Number> values = new HashMap<String, Number>();
 		values.put("a", Integer.valueOf(10));
 		init(getWidth(), getHeight(), launchDebug, values);

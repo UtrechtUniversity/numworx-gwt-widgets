@@ -391,20 +391,25 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		boolean value = label.getState() != Label.FALSE;
 		String off = "none";
 		String on = "gray";
+       
 		float x = (float) label.getXd();
 		float y = (float) label.getYd();
+        FontStyle fs = label.adapt(FontStyle.class);
+        if (fs == null) fs = FONT_STYLE;
+        float square = fs.getSize()+1; // ascent
+        float space = 2;
 		if(value) {
 			context.setFillStyle(on);
-			context.fillRect(x, y, 10, 10);
+			context.fillRect(x, y, square, square);
 		}
 		selectColor(label);
-		FONT_STYLE.toStyle(context);
+		fs.toStyle(context);
 		DEFAULT_STROKE.toStyle(context);
-		context.strokeRect(x, y, 10, 10);
+		context.strokeRect(x, y, square, square);
 		String string = getMapper().toString(label);
 		if(Align.NONE == label.adapt(Align.class)) string = "";
-		drawString(string, x+12, y+10, null, null, null);
-		RectShape r = new RectShape(x, y, 12 + context.measureText(string).getWidth(), 10);
+		drawString(string, x+square + space, y+square, null, null, null);
+		RectShape r = new RectShape(x, y, square + space + context.measureText(string).getWidth(), square);
 		DefaultAdapter.getDefault(label).put(Shape.class, r);
 	}
 

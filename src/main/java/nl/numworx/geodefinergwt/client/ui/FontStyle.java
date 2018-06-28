@@ -21,6 +21,9 @@ public class FontStyle {
 		ctx.setFont(getFont().toString());
 	}
 	
+	public float getSize() {
+	  return size;
+	}
 	
 	public FormuleFont getFont() {
 		return FormuleFont.createFromFontSize(Math.round(size), true);
