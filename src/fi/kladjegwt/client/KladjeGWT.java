@@ -814,7 +814,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(formuleOptie) {
 			topPanel = new LayoutPanel();
 			topPanel.addStyleName(kladjeCss.top());
-			dlp.addNorth(topPanel, topHeight);
+			//dlp.addNorth(topPanel, topHeight);
 		}
 		
 		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
