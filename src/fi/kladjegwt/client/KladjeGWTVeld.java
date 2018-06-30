@@ -2778,14 +2778,14 @@ public class KladjeGWTVeld
 				return;
 			}
 			
-//			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
-//				currentStrokeContainer.setCorrect(true); // hier checkprocedure toevoegen
-//				//closeCurrentContainer();
-//				return;
-//			}
+			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
+				eigenaar.fireCheck();
+				return;
+			}
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
+				eigenaar.setChanged();
 			}
 			
 			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
