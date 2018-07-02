@@ -113,7 +113,7 @@ public class StatistiekGWT implements EntryPoint, InteractionStub
 	{
 		// prevent the browser's default context menu
 		Element body = Document.get().getBody();
-		//body.setAttribute("oncontextmenu", "return false;");
+		body.setAttribute("oncontextmenu", "return false;");
 		
 		GWT.setUncaughtExceptionHandler(
 			new GWT.UncaughtExceptionHandler() {
