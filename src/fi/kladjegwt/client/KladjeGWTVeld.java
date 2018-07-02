@@ -640,18 +640,25 @@ public class KladjeGWTVeld
 	{
 		HashMap<String,Object> h = new HashMap<String,Object>();
 		
-		if(end && currentStrokeContainer!=null) {
+		if(end && mouseMode!=ivmOptie && currentStrokeContainer!=null) {
 			closeCurrentContainer();
 		}
 		
 		int lastCurrentIndex = kStrokeContainers.indexOf(lastCurrentStrokeContainer);
 		h.put("lastCurrentIndex", new Integer(lastCurrentIndex));
 		
+		if(mouseMode==ivmOptie && currentStrokeContainer!=null)
+		{
+			Map<String,Object> ivmStrokeContainer = new HashMap <String,Object>();
+			ivmStrokeContainer = currentStrokeContainer.getState();
+			h.put("ivmStrokeContainer", ivmStrokeContainer);
+		}
+		
 		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i < kStrokeContainers.size(); i++)
 		{	KStrokeContainer sc = kStrokeContainers.get(i);
 			strokeContainerList.add(sc.getState());
-			}
+		}
 		h.put("strokeContainerList", strokeContainerList);
 		
 		// stop de status van de Strepen in een ArrayList
@@ -717,12 +724,27 @@ public class KladjeGWTVeld
 		}
 		else // alleen leerling-Strepen verwijderen
 			streepVector.removeAllElements();
+		
+		if(mouseMode==ivmOptie)
+		{
+			Map<String,Object> ivmStrokeContainer = new HashMap<String,Object>();
+			
+			if (launchState.containsKey("ivmStrokeContainer"))
+				ivmStrokeContainer = launchState.getMap("ivmStrokeContainer");
+			currentStrokeContainer = new KStrokeContainer(this);
+			try {
+				currentStrokeContainer.setState(ivmStrokeContainer);
+			}
+			catch(Exception e) {
+				
+			}
+		}
 
 		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
 		
 		if (launchState.containsKey("strokeContainerList"))
 			strokeContainerList = launchState.getMapList("strokeContainerList");
-		logger.info(strokeContainerList.toString());
+		//logger.info(strokeContainerList.toString());
 		for (int sCnt = 0; sCnt < strokeContainerList.size(); sCnt++)
 		{	
 			KStrokeContainer sc = new KStrokeContainer(this);
@@ -971,7 +993,7 @@ public class KladjeGWTVeld
 		if(mouseMode==formuleOptie)
 			g.drawImage(binImageElement, breedte-60, 10);
 		
-		if(currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
+		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
 		{	g.setFillStyle( CssColor.make("rgba(239,241,243,0.5)"));
 			g.fillRect(0, 0, breedte, hoogte);
 		}
@@ -1038,7 +1060,7 @@ public class KladjeGWTVeld
 		
 		g.setLineWidth(3.0d);
 		if(mouseMode==ivmOptie)
-			g.setLineWidth(6.0d);
+			g.setLineWidth(2.0d);
 		
 		// elementen docent
 		for (int sCnt = 0; sCnt < docentStreepVector.size(); sCnt++)
@@ -1064,6 +1086,8 @@ public class KladjeGWTVeld
 		// elementen leerling
 		for (int sCnt = 0; sCnt < streepVector.size(); sCnt++)
 		{	Streep streep = (Streep) streepVector.elementAt(sCnt);
+			if(mouseMode==ivmOptie)
+				g.setLineWidth(6.0d);
 			streep.teken(g);
 		}
 		
@@ -2758,7 +2782,7 @@ public class KladjeGWTVeld
 		}
 		else if (mouseMode == ivmOptie)
 		{
-			if(currentStrokeContainer==null)
+			//if(currentStrokeContainer==null)
 				currentStrokeContainer = new KStrokeContainer(this);
 			
 			formulaStrokePoints.clear();

@@ -167,7 +167,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	/**
 	 * instelbaarheid: formule tekenen?
 	 */
-	boolean formuleOptie = true;
+	boolean formuleOptie = false;
 	/**
 	 * instelbaarheid: ivm?
 	 */
@@ -317,8 +317,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		//Stub.publish(this); 
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this); 
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
@@ -786,6 +786,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			tekstTekenen = launchState.getBoolean("tekstTekenen");
 		if (launchState.containsKey("formuleOptie"))
 			formuleOptie = launchState.getBoolean("formuleOptie");
+		if (launchState.containsKey("ivmOptie"))
+			ivmOptie = launchState.getBoolean("ivmOptie");
 		
 		// instellingen schaal- en roteeroptie
 		if (launchState.containsKey("roteren"))
@@ -808,7 +810,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 		bottomPanel = new LayoutPanel();
 		bottomPanel.addStyleName(kladjeCss.bottom());
-		if(!formuleOptie)
+		if(!formuleOptie && !ivmOptie)
 			dlp.addSouth(bottomPanel, bottomHeight);
 		
 		if(formuleOptie) {
