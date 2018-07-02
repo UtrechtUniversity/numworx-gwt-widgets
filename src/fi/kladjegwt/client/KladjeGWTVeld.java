@@ -144,11 +144,11 @@ public class KladjeGWTVeld
 	/**
 	 * instelling: afstand in pixels tussen de horizontale lijnen 
 	 */
-	int lineDistance = 20;
+	int lineDistance = 10;
 	/**
 	 * instelling: afmeting in pixels van de ruitses
 	 */
-	int gridSize = 20;
+	int gridSize = 10;
 	
 	/**
 	 * lichtblauw
@@ -161,7 +161,7 @@ public class KladjeGWTVeld
 	/**
 	 * de kleur van de ruitjes (grijs)
 	 */
-	CssColor ruitjesKleur = CssColor.make(210, 210, 210);
+	CssColor ruitjesKleur = CssColor.make(38, 115, 182);
 	
 	/**
 	 * de kleur van de bounding boxes van objecten
@@ -986,7 +986,7 @@ public class KladjeGWTVeld
 	 */
 	public void paint(Context2d g)
 	{
-		g.setLineWidth(0.6d);
+		g.setLineWidth(0.1d);
 		// alles weg
 		g.clearRect(0, 0, breedte, hoogte);
 		
@@ -994,7 +994,7 @@ public class KladjeGWTVeld
 			g.drawImage(binImageElement, breedte-60, 10);
 		
 		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
-		{	g.setFillStyle( CssColor.make("rgba(239,241,243,0.5)"));
+		{	g.setFillStyle( CssColor.make("rgba(200,200,200,0.5)"));
 			g.fillRect(0, 0, breedte, hoogte);
 		}
 		// achtergrond horizontale lijnen 
@@ -1014,6 +1014,8 @@ public class KladjeGWTVeld
 		// achtergrond ruitjes
 		if (ruitjes)
 		{
+			if(mouseMode == formuleOptie)
+				lineDistance = 10;
 			g.setStrokeStyle(ruitjesKleur);
 			int vSteps = hoogte / lineDistance;
 			for (int vCnt = 1; vCnt <= vSteps; vCnt++)

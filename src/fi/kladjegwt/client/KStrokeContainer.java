@@ -54,13 +54,52 @@ public class KStrokeContainer {
 		return new Rectangle(x,y,40,40);
 	}
 	
+	public void drawShadow(Context2d g, Rectangle r) {
+		for(int i=0 ; i<10 ; i++) {
+			g.setStrokeStyle( CssColor.make("rgba("+(150+10*i)+","+(150+10*i)+","+(150+10*i)+","+(1-0.1*i)+")"));
+			g.setLineWidth(2.0d);
+			g.beginPath();
+			g.rect(r.x-2*i, r.y-2*i, r.width+4*i, r.height+4*i);
+			g.closePath();
+			g.stroke();
+		}
+	}
+	
+	private void drawGrid (Context2d g, Rectangle r) {
+		CssColor ruitjesKleur = CssColor.make(38, 115, 182);
+				
+					int	lineDistance = 30;
+					g.setStrokeStyle(ruitjesKleur);
+					g.setLineWidth(0.2d);
+					int vSteps = r.height / lineDistance;
+					for (int vCnt = 1; vCnt <= vSteps; vCnt++)
+					{
+						g.beginPath();
+						g.moveTo(r.x, r.y + vCnt * lineDistance);
+						g.lineTo(r.x + r.width - 1, r.y + vCnt * lineDistance);
+						g.stroke();
+					}
+					int hSteps = r.width / lineDistance;
+					for (int hCnt = 1; hCnt <= hSteps; hCnt++)
+					{
+						g.beginPath();
+						g.moveTo(r.x + hCnt * lineDistance, r.y);
+						g.lineTo(r.x + hCnt * lineDistance, r.y + r.height - 1);
+						g.stroke();
+					}
+					
+					
+	}
+	
 	public void draw(Context2d g) {
 		if(strokeContainer.getStrokes().size()>0) {
 			if(active) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
-				
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
+				drawShadow(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
+				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
+				g.setStrokeStyle(CssColor.make(80, 80, 80));
 				g.setFillStyle(CssColor.make(239, 241, 243));
 				g.fillRect(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34);
 				g.setLineWidth(1.2d);
@@ -109,7 +148,7 @@ public class KStrokeContainer {
 				g.setLineWidth(1.5d);
 				if(correct||isfalse) {
 					//g.setFillStyle(CssColor.make(240, 255, 240));
-					g.fillRect(getBox().x-30, getBox().y-5, getBox().width+35, getBox().height+10);
+					//g.fillRect(getBox().x-30, getBox().y-5, getBox().width+35, getBox().height+10);
 					if(correct)
 						g.setFillStyle(CssColor.make(0, 200, 0));
 					if(isfalse)
@@ -120,8 +159,8 @@ public class KStrokeContainer {
 					g.stroke();
 					g.fill();
 				}
-				else
-					g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
+				//else
+					//g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
 			}	
 		}
 		
@@ -207,7 +246,7 @@ public class KStrokeContainer {
 //			int width = (int)strokeContainer.getBoundingBox().width;
 //			int height = (int)strokeContainer.getBoundingBox().height;
 			int x = 20;
-			int y = (int)Math.max(5,strokeContainer.getBoundingBox().y - margin);
+			int y = (int)Math.max(25,strokeContainer.getBoundingBox().y - margin);
 			int width = parent.breedte-40;
 			int height = (int)strokeContainer.getBoundingBox().height + 2*margin;
 			writeBox = new Rectangle(x, y, width, height);
