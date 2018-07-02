@@ -54,7 +54,34 @@ public class KStrokeContainer {
 		return new Rectangle(x,y,40,40);
 	}
 	
-	public void drawShadow(Context2d g, Rectangle r) {
+	private void drawcloseButton(Context2d g, Rectangle r) {
+		int m = 10;
+		
+		g.setStrokeStyle( CssColor.make(38, 115, 182));
+		g.setLineWidth(4.0d);
+		g.beginPath();
+		g.moveTo(r.x+m, r.y);
+		g.lineTo(r.x+m, r.y+m);
+		g.lineTo(r.x, r.y+m);
+		g.stroke();
+		
+		g.moveTo(r.x+r.width-m, r.y);
+		g.lineTo(r.x+r.width-m, r.y+m);
+		g.lineTo(r.x+r.width, r.y+m);
+		g.stroke();
+		
+		g.moveTo(r.x, r.y+r.height-m);
+		g.lineTo(r.x+m,  r.y+r.height-m);
+		g.lineTo(r.x+m, r.y+r.height);
+		g.stroke();
+		
+		g.moveTo(r.x+r.width, r.y+r.height-m);
+		g.lineTo(r.x+r.width-m,  r.y+r.height-m);
+		g.lineTo(r.x+r.width-m, r.y+r.height);
+		g.stroke();
+	}
+	
+	private void drawShadow(Context2d g, Rectangle r) {
 		for(int i=0 ; i<10 ; i++) {
 			g.setStrokeStyle( CssColor.make("rgba("+(150+10*i)+","+(150+10*i)+","+(150+10*i)+","+(1-0.1*i)+")"));
 			g.setLineWidth(2.0d);
@@ -100,30 +127,21 @@ public class KStrokeContainer {
 				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
 				g.setStrokeStyle(CssColor.make(80, 80, 80));
-				g.setFillStyle(CssColor.make(239, 241, 243));
-				g.fillRect(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34);
-				g.setLineWidth(1.2d);
-				g.beginPath();
-				g.moveTo(getWriteBox().x + getWriteBox().width-30, getWriteBox().y+10);
-				g.lineTo(getWriteBox().x + getWriteBox().width-10, getWriteBox().y+30);
-				g.closePath();
-				g.stroke();
-				g.beginPath();
-				g.moveTo(getWriteBox().x + getWriteBox().width-30, getWriteBox().y+30);
-				g.lineTo(getWriteBox().x + getWriteBox().width-10, getWriteBox().y+10);
-				g.closePath();
-				g.stroke();
+				//g.setFillStyle(CssColor.make(239, 241, 243));
+				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
+
+				drawcloseButton(g, new Rectangle(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34));
 				
-				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
-				g.setStrokeStyle(CssColor.make(0, 200, 0));
-				g.setLineWidth(5.0d);
-				g.beginPath();
-				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
-				g.lineTo(getWriteBox().x + getWriteBox().width-60, getWriteBox().y+30);
-				g.lineTo(getWriteBox().x + getWriteBox().width-50, getWriteBox().y+10);
-				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
-				g.closePath();
-				g.stroke();
+//				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
+//				g.setStrokeStyle(CssColor.make(0, 200, 0));
+//				g.setLineWidth(5.0d);
+//				g.beginPath();
+//				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
+//				g.lineTo(getWriteBox().x + getWriteBox().width-60, getWriteBox().y+30);
+//				g.lineTo(getWriteBox().x + getWriteBox().width-50, getWriteBox().y+10);
+//				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
+//				g.closePath();
+//				g.stroke();
 				
 				g.setStrokeStyle(drawingColor);
 				g.setLineWidth(3.0d);
@@ -247,6 +265,7 @@ public class KStrokeContainer {
 //			int height = (int)strokeContainer.getBoundingBox().height;
 			int x = 20;
 			int y = (int)Math.max(25,strokeContainer.getBoundingBox().y - margin);
+			y= (int)Math.min(y, parent.hoogte - strokeContainer.getBoundingBox().height-2*margin-25);
 			int width = parent.breedte-40;
 			int height = (int)strokeContainer.getBoundingBox().height + 2*margin;
 			writeBox = new Rectangle(x, y, width, height);

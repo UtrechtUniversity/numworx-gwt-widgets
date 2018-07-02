@@ -819,7 +819,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			//dlp.addNorth(topPanel, topHeight);
 		}
 		
-		kladjeGWTVeld = new KladjeGWTVeld(breedte, hoogte - bottomHeight, this); 
+		int veldhoogte = hoogte - (formuleOptie||ivmOptie ? 0 : bottomHeight);
+		
+		kladjeGWTVeld = new KladjeGWTVeld(breedte,veldhoogte, this); 
 
 		kladjeGWTCanvas = kladjeGWTVeld.getCanvas();
 		if (kladjeGWTCanvas == null) 
