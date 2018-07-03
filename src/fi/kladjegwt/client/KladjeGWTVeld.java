@@ -2745,8 +2745,11 @@ public class KladjeGWTVeld
 	private void closeCurrentContainer() {
 		currentStrokeContainer.setActive(false);
 		currentStrokeContainer.scale(1.0/3);
-		if(currentStrokeContainer.getBox().x < 0)
-			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
+//		if(currentStrokeContainer.getBox().x < 0)
+//			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
+		currentStrokeContainer.translate(-activeTranslation.x, -activeTranslation.y);
+		activeTranslation.x = 0;
+		activeTranslation.y = 0;
 		lastCurrentStrokeContainer = currentStrokeContainer;
 		currentStrokeContainer=null;
 	}
@@ -2756,6 +2759,7 @@ public class KladjeGWTVeld
 	private int proActiveY;
 	private boolean writing;
 	private boolean moving;
+	private Point activeTranslation = new Point(0,0);
 
 	/**
 	 * actie bij MouseDown/TouchStart met coordinaten (eventX,eventY): <br>
@@ -2804,10 +2808,10 @@ public class KladjeGWTVeld
 				return;
 			}
 			
-			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
-				eigenaar.fireCheck();
-				return;
-			}
+//			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
+//				eigenaar.fireCheck();
+//				return;
+//			}
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
@@ -2949,6 +2953,8 @@ public class KladjeGWTVeld
 			int dx = eventX - startX;
 			int dy = eventY - startY;
 			currentStrokeContainer.translate(dx, dy);
+			activeTranslation.x += dx;
+			activeTranslation.y += dy;
 			paint();
 			startX = eventX;
 			startY = eventY;

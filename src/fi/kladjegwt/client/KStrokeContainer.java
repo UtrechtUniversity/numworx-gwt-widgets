@@ -212,12 +212,20 @@ public class KStrokeContainer {
 	}
 	
 	public void setCorrect(boolean correct) {
+//		if(!correct && this.correct)
+//			activeTranslation -=25;
+//		if(correct && !this.correct)
+//			activeTranslation -=25;
 		this.correct = correct;
 		if(correct)
 			isfalse = false;
 	}
 	
 	public void setFalse(boolean isfalse) {
+//		if(!isfalse && this.isfalse)
+//			activeTranslation -=25;
+//		if(isfalse && !this.isfalse)
+//			activeTranslation -=25;
 		this.isfalse = isfalse;
 		if(isfalse)
 			correct = false;
