@@ -657,7 +657,8 @@ public class KladjeGWTVeld
 		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
 		for (int i = 0; i < kStrokeContainers.size(); i++)
 		{	KStrokeContainer sc = kStrokeContainers.get(i);
-			strokeContainerList.add(sc.getState());
+			if(sc != currentStrokeContainer)
+				strokeContainerList.add(sc.getState());
 		}
 		h.put("strokeContainerList", strokeContainerList);
 		
@@ -717,13 +718,7 @@ public class KladjeGWTVeld
 			return;
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
-		// alle Strepen verwijderen
-		if (init)
-		{	streepVector.removeAllElements();
-			docentStreepVector.removeAllElements();
-		}
-		else // alleen leerling-Strepen verwijderen
-			streepVector.removeAllElements();
+		kStrokeContainers.clear();
 		
 		if(mouseMode==ivmOptie)
 		{
@@ -739,6 +734,13 @@ public class KladjeGWTVeld
 				
 			}
 		}
+		
+		if (init)
+		{	
+			docentStreepVector.removeAllElements();
+		}
+		else // alleen leerling-Strepen verwijderen
+			streepVector.removeAllElements();
 
 		List<Map<String,Object>> strokeContainerList = new ArrayList<Map<String,Object>>();
 		
@@ -755,6 +757,15 @@ public class KladjeGWTVeld
 			//int lastCurrentIndex = launchState.getInt("lastCurrentIndex");
 			//lastCurrentStrokeContainer = kStrokeContainers.get(lastCurrentIndex);
 		}
+		
+		// alle Strepen verwijderen
+		
+		if (init)
+		{	streepVector.removeAllElements();
+			docentStreepVector.removeAllElements();
+		}
+		else // alleen leerling-Strepen verwijderen
+			streepVector.removeAllElements();
 		
 		List<Map<String,Object>> strepen = new ArrayList<Map<String,Object>>();
 		
@@ -3369,8 +3380,8 @@ public class KladjeGWTVeld
 		{	
 			if(proActiveStrokeContainer!=null) 
 			{
-				if(proActiveStrokeContainer.getBox().contains(breedte-25, 25) 
-						|| (new Rectangle(breedte-50,0,50,50)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
+				if(proActiveStrokeContainer.getBox().contains(breedte-60, 60) 
+						|| (new Rectangle(breedte-60,0,60,60)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
 					kStrokeContainers.remove(proActiveStrokeContainer);
 					proActiveStrokeContainer = null;
 					paint();
