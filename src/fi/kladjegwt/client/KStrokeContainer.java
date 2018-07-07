@@ -42,6 +42,10 @@ public class KStrokeContainer {
 		strokeContainer.getStrokes().clear();
 	}
 	
+	public int getStrokeCount() {
+		return strokeContainer.getStrokes().size();
+	}
+	
 	public Rectangle getCloseButtonArea() {
 		int x = getWriteBox().x + getWriteBox().width - 30; 
 		int y = getWriteBox().y; 

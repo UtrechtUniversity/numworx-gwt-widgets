@@ -1017,14 +1017,22 @@ public class KladjeGWTVeld
 				
 			}
 		}
+		if(proActiveStrokeContainer!=null)
+		{
+			proActiveStrokeContainer.draw(gIm);
+		}
 		
 	}
 	
 	public void paint()
 	{
-		paint(backgroundgIm);
-		gIm.clearRect(0, 0, breedte, hoogte);
-		gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+		if(mouseMode==formuleOptie) {
+			paint(backgroundgIm);
+			gIm.clearRect(0, 0, breedte, hoogte);
+			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+		}
+		else
+			paint(gIm);
 	}
 	
 	/**
@@ -1143,7 +1151,7 @@ public class KladjeGWTVeld
 		}
 		
 		for(int k=0 ; k<kStrokeContainers.size() ; k++) 
-		{	if(kStrokeContainers.get(k)!=currentStrokeContainer)
+		{	if(kStrokeContainers.get(k)!=currentStrokeContainer && kStrokeContainers.get(k)!=proActiveStrokeContainer)
 			{
 				if(currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
 					g.setStrokeStyle(CssColor.make(150, 150, 150));
@@ -1152,11 +1160,11 @@ public class KladjeGWTVeld
 				kStrokeContainers.get(k).draw(g);
 			}
 		}
-		if(currentStrokeContainer!=null)
-		{
-			g.setStrokeStyle(CssColor.make(80, 80, 80));
-			currentStrokeContainer.draw(g);
-		}
+//		if(currentStrokeContainer!=null)
+//		{
+//			g.setStrokeStyle(CssColor.make(80, 80, 80));
+//			currentStrokeContainer.draw(g);
+//		}
 		
 		if(mouseMode==ivmOptie) {
 			if(currentStrokeContainer!=null)
@@ -1209,7 +1217,7 @@ public class KladjeGWTVeld
 		{	fi.writemathgwt.client.engine.Point p =  formulaStrokePoints.get(0);
 			g.strokeRect(p.x, p.y, 1, 1);
 		}
-		if (formulaStrokePoints.size() > 1)
+		if (mouseMode!=formuleOptie && formulaStrokePoints.size() > 1)
 		{	
 			//ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(formulaStrokePoints, smoothType);
 			
@@ -2809,6 +2817,12 @@ public class KladjeGWTVeld
 	private boolean writing;
 	private boolean moving;
 	private Point activeTranslation = new Point(0,0);
+	
+	public void mouseDownTouch2StartAction(int eventX, int eventY)
+	{
+		mouseDownTouchStartAction(eventX, eventY);
+		paint();
+	}
 
 	/**
 	 * actie bij MouseDown/TouchStart met coordinaten (eventX,eventY): <br>
@@ -2854,6 +2868,7 @@ public class KladjeGWTVeld
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
 				closeCurrentContainer();
+				paint();
 				return;
 			}
 			
@@ -2867,10 +2882,15 @@ public class KladjeGWTVeld
 				eigenaar.setChanged();
 			}
 			
+			KStrokeContainer ksc = findInactiveStrokeContainer(eventX, eventY);
+			//if(ksc!=null)
+				
 			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
 			if(currentStrokeContainer==null && proActiveStrokeContainer!=null) {
 				proActiveX = proActiveStrokeContainer.getBox().x;
 				proActiveY = proActiveStrokeContainer.getBox().y;
+				paint();
+				paintFormule();
 				return;
 			}
 			
@@ -3004,7 +3024,7 @@ public class KladjeGWTVeld
 			currentStrokeContainer.translate(dx, dy);
 			activeTranslation.x += dx;
 			activeTranslation.y += dy;
-			paint();
+			paintFormule();
 			startX = eventX;
 			startY = eventY;
 		}
@@ -3063,10 +3083,10 @@ public class KladjeGWTVeld
 			}
 			if(formulaStrokePoints.size()>0) {
 				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
-				paintFormule();
+			//	paintFormule();
 			}
-			else 
-				paint();
+			//else 
+				paintFormule();
 		}
 		else if (mouseMode == lijnTekenen)
 		{
@@ -3439,6 +3459,7 @@ public class KladjeGWTVeld
 					currentStrokeContainer = proActiveStrokeContainer;
 					currentStrokeContainer.scale(3.0/1.0);
 					currentStrokeContainer.setActive(true);
+					paint();
 				}
 				proActiveStrokeContainer=null;
 			}
@@ -3453,7 +3474,8 @@ public class KladjeGWTVeld
 				currentStrokeContainer.addStroke(lastStroke);
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
-				
+				if(currentStrokeContainer.getStrokeCount()==1)
+					paint();
 			}
 			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
 			{	kStrokeContainers.remove(currentStrokeContainer);
@@ -3464,7 +3486,7 @@ public class KladjeGWTVeld
 				return;
 			}
 			formulaStrokePoints.clear();
-			paint();
+			paintFormule();
 			eigenaar.setChanged();
 		}
 		
@@ -3625,6 +3647,7 @@ public class KladjeGWTVeld
 				mouseOnRight = true;
 				startX = eventX;
 				startY = eventY;
+				mouseDownTouch2StartAction(eventX, eventY);
 				return;
 			}
 			mouseDownTouchStartAction(eventX, eventY);
@@ -3694,6 +3717,7 @@ public class KladjeGWTVeld
 				writing = false;
 				startX = eventX;
 				startY = eventY;
+				mouseDownTouch2StartAction(eventX, eventY);
 				return;
 			}	
 			if (e.getTouches().length() == 1 && !moving ) {
