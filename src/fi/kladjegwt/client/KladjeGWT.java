@@ -896,11 +896,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	}
 	
 	public void setChanged() {
-		if(formuleViewer!=null)
-			topPanel.remove(formuleViewer.getAsPanel());
-		formuleViewer = new FormuleViewer(kladjeGWTVeld.getFormula());
-		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
-		topPanel.add(formuleViewer.getAsPanel());
+//		if(formuleViewer!=null)
+//			topPanel.remove(formuleViewer.getAsPanel());
+//		formuleViewer = new FormuleViewer(kladjeGWTVeld.getFormula());
+//		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+//		topPanel.add(formuleViewer.getAsPanel());
 		
 		if(comRoot==null)
 			return;
@@ -933,14 +933,14 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if (command.startsWith("action.setFalse"))
 		{
 			{	kladjeGWTVeld.setFalse(true);
-				kladjeGWTVeld.paint();
+				kladjeGWTVeld.paintFormule();
 			}
 		}
 		
 		if (command.startsWith("action.setCorrect"))
 		{
 			{	kladjeGWTVeld.setCorrect(true);
-				kladjeGWTVeld.paint();
+				kladjeGWTVeld.paintFormule();
 			}
 		}
 		

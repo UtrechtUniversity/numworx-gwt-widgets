@@ -3453,8 +3453,8 @@ public class KladjeGWTVeld
 				
 				
 				
-				boolean verschoven = pX*pX+pY*pY<16;
-				if(verschoven)
+				boolean nietVerschoven = pX*pX+pY*pY<16;
+				if(nietVerschoven)
 				{
 					currentStrokeContainer = proActiveStrokeContainer;
 					currentStrokeContainer.scale(3.0/1.0);
