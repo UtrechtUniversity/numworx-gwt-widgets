@@ -79,11 +79,11 @@ public class KladjeGWTVeld
 	/**
 	 * het Canvas om op te tekenen
 	 */
-	public Canvas kladjeHWTCanvas;
+	public Canvas kladjeHWTCanvas, backgroundCanvas;
 	/**
 	 * de Context2d om mee te tekenen
 	 */
-	public Context2d gIm;
+	public Context2d gIm, backgroundgIm;
 	
 	/**
 	 * een hele kleine positieve double
@@ -446,6 +446,7 @@ public class KladjeGWTVeld
 		this.eigenaar = eigenaar;
 		
 		kladjeHWTCanvas = Canvas.createIfSupported();
+		backgroundCanvas = Canvas.createIfSupported();
 
 		setSize(w, h);
 		
@@ -479,6 +480,10 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.setHeight(h + "px");
 		kladjeHWTCanvas.setCoordinateSpaceWidth(w);
 		kladjeHWTCanvas.setCoordinateSpaceHeight(h);
+		backgroundCanvas.setWidth(w + "px");
+		backgroundCanvas.setHeight(h + "px");
+		backgroundCanvas.setCoordinateSpaceWidth(w);
+		backgroundCanvas.setCoordinateSpaceHeight(h);
 	}
 
 	/**
@@ -496,7 +501,7 @@ public class KladjeGWTVeld
 	public void initContext2d() 
 	{
 		gIm = kladjeHWTCanvas.getContext2d();
-		
+		backgroundgIm = backgroundCanvas.getContext2d();
 	}
 	
 	public Rectangle getBoundingBox(StrokeContainer strokeContainer) 
@@ -984,9 +989,42 @@ public class KladjeGWTVeld
 			return doublePoints;
 	}
 
+	public void paintFormule() {
+		gIm.clearRect(0, 0, breedte, hoogte);
+		gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+		if(currentStrokeContainer!=null)
+		{
+			gIm.setStrokeStyle(CssColor.make(80, 80, 80));
+			currentStrokeContainer.draw(gIm);
+			
+			if (formulaStrokePoints.size() == 1)
+			{	fi.writemathgwt.client.engine.Point p =  formulaStrokePoints.get(0);
+				gIm.strokeRect(p.x, p.y, 1, 1);
+			}
+			if (formulaStrokePoints.size() > 1)
+			{	
+				//ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(formulaStrokePoints, smoothType);
+				
+				fi.writemathgwt.client.engine.Point p1 = formulaStrokePoints.get(0);
+				gIm.beginPath();
+				gIm.moveTo(p1.x, p1.y);
+				for (int pCnt = 1; pCnt < formulaStrokePoints.size(); pCnt++)
+				{	fi.writemathgwt.client.engine.Point p2 = formulaStrokePoints.get(pCnt);
+				gIm.lineTo(p2.x, p2.y);
+					p1 = p2;
+				}
+				gIm.stroke();
+				
+			}
+		}
+		
+	}
+	
 	public void paint()
 	{
-		paint(gIm);
+		paint(backgroundgIm);
+		gIm.clearRect(0, 0, breedte, hoogte);
+		gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
 	}
 	
 	/**
@@ -2847,7 +2885,7 @@ public class KladjeGWTVeld
 			formulaStrokePoints.clear();
 			mouseDown = true;
 			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
-			paint();
+			paintFormule();
 			//eigenaar.setChanged();
 			
 
@@ -3023,9 +3061,12 @@ public class KladjeGWTVeld
 				startX = eventX;
 				startY = eventY;
 			}
-			if(formulaStrokePoints.size()>0)
+			if(formulaStrokePoints.size()>0) {
 				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
-			paint();
+				paintFormule();
+			}
+			else 
+				paint();
 		}
 		else if (mouseMode == lijnTekenen)
 		{
@@ -3412,6 +3453,7 @@ public class KladjeGWTVeld
 				currentStrokeContainer.addStroke(lastStroke);
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
+				
 			}
 			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
 			{	kStrokeContainers.remove(currentStrokeContainer);
