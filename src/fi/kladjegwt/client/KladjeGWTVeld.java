@@ -3490,6 +3490,8 @@ public class KladjeGWTVeld
 			paintFormule();
 			if(currentStrokeContainer==null)
 				eigenaar.setChanged();
+			else
+				eigenaar.sendDrawing();
 		}
 		
 		else if (mouseMode == lijnTekenen)

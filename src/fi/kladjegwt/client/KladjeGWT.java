@@ -910,6 +910,18 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 //		logger.info("in setChanged");
 	}
 	
+	public void sendDrawing() {
+		if(comRoot==null)
+			return;
+		Map<String,Object> map = kladjeGWTVeld.getState(false);
+		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+	}
+	
+	public void sendEquation() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
+	}
+	
 	public void fireCheck()
 	{
 		comRoot.fireEvent(new CBookEvent(this,"action.check"));
