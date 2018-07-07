@@ -3459,9 +3459,10 @@ public class KladjeGWTVeld
 					currentStrokeContainer = proActiveStrokeContainer;
 					currentStrokeContainer.scale(3.0/1.0);
 					currentStrokeContainer.setActive(true);
-					paint();
+					
 				}
 				proActiveStrokeContainer=null;
+				paint();
 			}
 			
 			if(formulaStrokePoints.size()>0) 
