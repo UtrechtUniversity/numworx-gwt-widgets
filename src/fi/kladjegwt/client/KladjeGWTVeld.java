@@ -1014,7 +1014,7 @@ public class KladjeGWTVeld
 			double dAngle = angleStep2-angleStep1;
 			dAngles[i-1] = dAngle;
 		}
-		for(int i=0 ; i<2 ; i++) {
+		for(int i=0 ; i<3 ; i++) {
 			if(dAngles[i]>80 || dAngles[i]<-80)
 				fp.remove(0);
 		}
@@ -1046,15 +1046,6 @@ public class KladjeGWTVeld
 				}
 				gIm.stroke();
 				
-				fi.writemathgwt.client.engine.Point p11 = formulaStrokePoints.get(0);
-				gIm.beginPath();
-				gIm.moveTo(8*p11.x, 8*p11.y);
-				for (int pCnt = 1; pCnt < formulaStrokePoints.size(); pCnt++)
-				{	fi.writemathgwt.client.engine.Point p2 = formulaStrokePoints.get(pCnt);
-					gIm.lineTo(8*p2.x, 8*p2.y);
-					p11 = p2;
-				}
-				gIm.stroke();
 				
 			}
 		}
