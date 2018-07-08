@@ -990,6 +990,35 @@ public class KladjeGWTVeld
 		else
 			return doublePoints;
 	}
+	
+	private void cleanFormulePoints(ArrayList<fi.writemathgwt.client.engine.Point> fp)
+	{
+		if(fp.size()<5)
+			return;
+		double[] angles = new double[fp.size()-1];
+		for(int i=1 ; i<fp.size() ; i++) {
+			double dx = fp.get(i).getX() - fp.get(i-1).getX();
+			double dy = fp.get(i).getY() - fp.get(i-1).getY();
+			angles[i-1] = (int)(180.0*(Math.atan2(-dy, dx)/Math.PI));
+		}
+		double[] dAngles = new double[angles.length-1];
+		for(int i=1 ; i<angles.length-1 ; i++) {
+			double angleStep1 = angles[i-1];
+			double angleStep2 = angles[i];
+			
+			if(angleStep2-angleStep1>180)
+				angleStep2 -= 360;
+			if(angleStep2-angleStep1<-180)
+				angleStep2 += 360;
+			
+			double dAngle = angleStep2-angleStep1;
+			dAngles[i-1] = dAngle;
+		}
+		for(int i=0 ; i<2 ; i++) {
+			if(dAngles[i]>80 || dAngles[i]<-80)
+				fp.remove(0);
+		}
+	}
 
 	public void paintFormule() {
 		gIm.clearRect(0, 0, breedte, hoogte);
@@ -3514,7 +3543,7 @@ public class KladjeGWTVeld
 //				DoubleRectangle r = lastStroke.getParsePointsbox();
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
-				
+				cleanFormulePoints(formulaStrokePoints);
 				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
 					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
 				currentStrokeContainer.setCorrect(false);
