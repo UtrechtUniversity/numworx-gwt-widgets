@@ -136,6 +136,12 @@ public class KStrokeContainer {
 
 				drawcloseButton(g, new Rectangle(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34));
 				
+
+//				int d = (int)strokeContainer.averageHeight;
+//				g.setFillStyle(CssColor.make(0,0,0));
+//				g.fillText(""+d, 300, 20);
+//				g.setFillStyle(CssColor.make(255, 255, 255));
+				
 //				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
 //				g.setStrokeStyle(CssColor.make(0, 200, 0));
 //				g.setLineWidth(5.0d);
