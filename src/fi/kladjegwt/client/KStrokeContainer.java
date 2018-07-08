@@ -25,6 +25,8 @@ public class KStrokeContainer {
 	private Rectangle box, writeBox;
 	private boolean correct = false;
 	private boolean isfalse = false;
+	
+	private double schrijfLeesFactor = 2;
 	//private boolean checkable;
 	
 	
@@ -100,7 +102,7 @@ public class KStrokeContainer {
 	private void drawGrid (Context2d g, Rectangle r) {
 		CssColor ruitjesKleur = CssColor.make(38, 115, 182);
 				
-					int	lineDistance = 30;
+					int	lineDistance = (int)(10*schrijfLeesFactor);
 					g.setStrokeStyle(ruitjesKleur);
 					g.setLineWidth(0.2d);
 					int vSteps = r.height / lineDistance;

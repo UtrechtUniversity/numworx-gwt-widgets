@@ -436,6 +436,7 @@ public class KladjeGWTVeld
 	private KStrokeContainer currentStrokeContainer, lastCurrentStrokeContainer;// = new KStrokeContainer();
 	private Image binImage;
 	private ImageElement binImageElement;
+	private double schrijfLeesFactor = 2;
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -1011,8 +1012,18 @@ public class KladjeGWTVeld
 				gIm.moveTo(p1.x, p1.y);
 				for (int pCnt = 1; pCnt < formulaStrokePoints.size(); pCnt++)
 				{	fi.writemathgwt.client.engine.Point p2 = formulaStrokePoints.get(pCnt);
-				gIm.lineTo(p2.x, p2.y);
+					gIm.lineTo(p2.x, p2.y);
 					p1 = p2;
+				}
+				gIm.stroke();
+				
+				fi.writemathgwt.client.engine.Point p11 = formulaStrokePoints.get(0);
+				gIm.beginPath();
+				gIm.moveTo(8*p11.x, 8*p11.y);
+				for (int pCnt = 1; pCnt < formulaStrokePoints.size(); pCnt++)
+				{	fi.writemathgwt.client.engine.Point p2 = formulaStrokePoints.get(pCnt);
+					gIm.lineTo(8*p2.x, 8*p2.y);
+					p11 = p2;
 				}
 				gIm.stroke();
 				
@@ -1658,7 +1669,7 @@ public class KladjeGWTVeld
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setCorrect(correct);
 			currentStrokeContainer = lastCurrentStrokeContainer;
-			currentStrokeContainer.scale(3.0/1.0);
+			currentStrokeContainer.scale(schrijfLeesFactor/1.0);
 			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
@@ -1671,7 +1682,7 @@ public class KladjeGWTVeld
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setFalse(isfalse);
 			currentStrokeContainer = lastCurrentStrokeContainer;
-			currentStrokeContainer.scale(3.0/1.0);
+			currentStrokeContainer.scale(schrijfLeesFactor/1.0);
 			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
@@ -2829,7 +2840,7 @@ public class KladjeGWTVeld
 	
 	private void closeCurrentContainer() {
 		currentStrokeContainer.setActive(false);
-		currentStrokeContainer.scale(1.0/3);
+		currentStrokeContainer.scale(1.0/schrijfLeesFactor);
 //		if(currentStrokeContainer.getBox().x < 0)
 //			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
 		currentStrokeContainer.translate(-activeTranslation.x, -activeTranslation.y);
@@ -3485,7 +3496,7 @@ public class KladjeGWTVeld
 				if(nietVerschoven)
 				{
 					currentStrokeContainer = proActiveStrokeContainer;
-					currentStrokeContainer.scale(3.0/1.0);
+					currentStrokeContainer.scale(schrijfLeesFactor/1.0);
 					currentStrokeContainer.setActive(true);
 					
 				}
