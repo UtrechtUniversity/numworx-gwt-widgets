@@ -30,6 +30,7 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
 
+import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Point;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
@@ -1022,6 +1023,31 @@ public class KladjeGWTVeld
 			proActiveStrokeContainer.draw(gIm);
 		}
 		
+//		if(lastStroke!=null && formulaStrokePoints.size()==0)
+//		{
+//			
+//			gIm.beginPath();
+//			double x0 = (int)lastStroke.getParsePoints().get(0).x;
+//			double y0 = (int)lastStroke.getParsePoints().get(0).y;
+//			gIm.moveTo(x0, y0);
+//			if(lastStroke.getParsePointsbox().width>3 ||  lastStroke.getParsePointsbox().height>3) {
+//				for(int j = 1 ; j < lastStroke.getParsePoints().size() ; j++) {
+//					double x = lastStroke.getParsePoints().get(j).x ;
+//					double y = lastStroke.getParsePoints().get(j).y;
+//					gIm.lineTo(x, y);
+//				}
+//				gIm.moveTo(x0, y0);
+//				gIm.closePath();
+//				gIm.stroke();
+//			}
+//			else {
+//				gIm.arc(x0, y0, 1.5, 0, 1.5* Math.PI);
+//				gIm.closePath();
+//				gIm.stroke();
+//			}
+//			//lastStroke=null;
+//		}
+		
 	}
 	
 	public void paint()
@@ -1165,6 +1191,8 @@ public class KladjeGWTVeld
 //			g.setStrokeStyle(CssColor.make(80, 80, 80));
 //			currentStrokeContainer.draw(g);
 //		}
+		
+		
 		
 		if(mouseMode==ivmOptie) {
 			if(currentStrokeContainer!=null)
@@ -3471,8 +3499,12 @@ public class KladjeGWTVeld
 //					currentStrokeContainer = new KStrokeContainer(this);
 //					currentStrokeContainer.setActive(true);
 //				}
-				lastStroke = new Stroke(formulaStrokePoints);
-				currentStrokeContainer.addStroke(lastStroke);
+//				lastStroke = new Stroke(formulaStrokePoints);
+//				DoubleRectangle r = lastStroke.getParsePointsbox();
+//				lastStroke.translate(-r.x, -r.y);
+//				lastStroke.scale(0, 0, 10);
+				
+				currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
