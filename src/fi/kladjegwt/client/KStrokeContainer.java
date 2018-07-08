@@ -25,17 +25,18 @@ public class KStrokeContainer {
 	private Rectangle box, writeBox;
 	private boolean correct = false;
 	private boolean isfalse = false;
-	private boolean checkable;
+	//private boolean checkable;
+	
 	
 	public KStrokeContainer (KladjeGWTVeld parent) {
 		this.parent = parent;
 		strokeContainer = new StrokeContainer();
 	}
 	
-	public void addStroke(Stroke stroke) {
-		strokeContainer.addStroke(stroke);
+	public boolean addStroke(Stroke stroke) {
 		box = null;
 		writeBox = null;
+		return strokeContainer.addStroke(stroke);
 	}
 	
 	public void clear() {
@@ -131,6 +132,7 @@ public class KStrokeContainer {
 				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
 				g.setStrokeStyle(CssColor.make(80, 80, 80));
+				
 				//g.setFillStyle(CssColor.make(239, 241, 243));
 				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
 
@@ -195,6 +197,10 @@ public class KStrokeContainer {
 		
 		
 		//g.setStrokeStyle(drawingColor);
+		if(!strokeContainer.isParseable())
+			g.setStrokeStyle(CssColor.make(38, 115, 182));
+		else
+			g.setStrokeStyle(CssColor.make(80, 80, 80));
 		ArrayList<Stroke> strokes = strokeContainer.getStrokes();
 		for(int i = 0 ; i < strokes.size() ; i++) {
 			Stroke stroke = strokes.get(i);
@@ -256,7 +262,9 @@ public class KStrokeContainer {
 	}
 	
 	public String getFormulaString() {
-		return strokeContainer.getFormulaString();
+		if(strokeContainer.isParseable())
+			return strokeContainer.getFormulaString();
+		return "";
 	}
 	
 	public DoubleRectangle getBoundingBox() {

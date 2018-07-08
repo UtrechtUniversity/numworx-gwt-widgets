@@ -3504,7 +3504,8 @@ public class KladjeGWTVeld
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
 				
-				currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
+				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
+					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
