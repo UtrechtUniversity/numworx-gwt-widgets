@@ -436,7 +436,7 @@ public class KladjeGWTVeld
 	private KStrokeContainer currentStrokeContainer, lastCurrentStrokeContainer;// = new KStrokeContainer();
 	private Image binImage;
 	private ImageElement binImageElement;
-	private double schrijfLeesFactor = 2;
+	protected double schrijfLeesFactor = 2.2;
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
