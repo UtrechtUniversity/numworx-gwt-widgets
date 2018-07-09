@@ -1014,9 +1014,12 @@ public class KladjeGWTVeld
 			double dAngle = angleStep2-angleStep1;
 			dAngles[i-1] = dAngle;
 		}
-		for(int i=0 ; i<3 ; i++) {
+		for(int i=3 ; i>-1 ; i--) {
 			if(dAngles[i]>80 || dAngles[i]<-80)
-				fp.remove(0);
+				for(int j=0 ; j<i+1 ; j++) {
+					fp.remove(0);
+					return;
+				}
 		}
 	}
 
