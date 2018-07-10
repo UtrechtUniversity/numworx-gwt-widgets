@@ -317,8 +317,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		RootPanel.get().add(dlp);
 		RootPanel.get().addStyleName(kladjeCss.root());
 		
-		//Stub.publish(this); 
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		Stub.publish(this); 
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 
 	}	
 
