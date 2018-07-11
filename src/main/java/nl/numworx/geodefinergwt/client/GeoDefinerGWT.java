@@ -84,7 +84,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@UiField DockLayoutPanel southPanel;
 	@UiField Label status;
 	DockLayoutPanel  root;
-	@UiField ViewerWidget widget;
+	@UiField CanvasViewer widget;
 	@UiField FlowPanel check;
 	@UiField Button checkBtn;
 	@UiField ToolBoxPanel toolbox;

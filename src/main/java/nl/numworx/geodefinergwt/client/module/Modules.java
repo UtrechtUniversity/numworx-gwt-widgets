@@ -3,16 +3,20 @@ package nl.numworx.geodefinergwt.client.module;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import dagger.Reusable;
 import dagger.multibindings.IntoMap;
 import dagger.multibindings.IntoSet;
 import dagger.multibindings.StringKey;
+import fi.euclides.event.EventHandler;
 import fi.euclides.event.Tracker;
 import fi.euclides.gwt.ViewerWidget;
+import fi.euclides.gwt.canvas.PanHandler;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.proof.LabelDelegate;
@@ -23,6 +27,7 @@ import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.math.Expression;
 import nl.numworx.geodefiner.common.math.ToC;
+import nl.numworx.geodefinergwt.client.CanvasViewer;
 import nl.numworx.geodefinergwt.client.GWTRandomizer;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
@@ -31,15 +36,17 @@ import nl.numworx.geodefinergwt.client.ui.HerleidList;
 @Module(includes= {ToolBoxModule.class})
 public abstract class Modules {
 	
-	@Provides static AbstractViewer viewer(ViewerWidget w) {
-		return w.getViewer();
-	}
+//	@Provides static AbstractViewer viewer(CanvasViewer w) {
+//		return w.getViewer();
+//	}
 
 	@Binds abstract Tracker tracker(TrackerImpl impl);
-
+	//@Binds abstract SpeelVeld speelVeld(CanvasViewer canvas);
+	@Binds abstract ViewerWidget viewerWidget(CanvasViewer canvas);
+	@Binds abstract AbstractViewer viewer(CanvasViewer w);
 	@Binds abstract Randomizer randomizer(GWTRandomizer r);
 	
-	@Provides @Singleton static NamingModel namingModel(AbstractViewer impl) {
+	@Provides @Singleton static NamingModel namingModel(CanvasViewer impl) {
 		return new NamingModel(impl, new HashMap<String, Destroyable>());
 	}
 
@@ -65,5 +72,14 @@ public abstract class Modules {
 	
 	@Provides @IntoSet static LabelDelegate toc() {
 		return new ToC();
+	}
+
+// ons kent ons
+//	@Provides static CanvasViewer canvasViewer(ViewerWidget w) {
+//	  return (CanvasViewer) w;
+//	}
+	
+	@Provides @Reusable @Named("panHandler") static EventHandler getPanHandler(CanvasViewer w) {
+	  return new PanHandler("Pan", w);
 	}
 }

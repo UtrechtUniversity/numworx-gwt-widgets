@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client.toolbox;
 
+import javax.inject.Named;
+
 import com.google.gwt.user.client.ui.ToggleButton;
 
 import dagger.Module;
@@ -20,7 +22,6 @@ import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.expr.TrailHandler;
-import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.proof.AfstandHandler;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
@@ -106,8 +107,8 @@ public class ToolBoxModule {
 	}
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
-	ToggleButton pan(TrackerImpl tracker, RadioMode model, ViewerWidget widget) {
-		return newBtnSpan("pan", widget.getPanHandler(), tracker, model, rb.Euclides_41());
+	ToggleButton pan(TrackerImpl tracker, RadioMode model, @Named("panHandler") EventHandler handler) {
+		return newBtnSpan("pan", handler, tracker, model, rb.Euclides_41());
 	}
 	
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static

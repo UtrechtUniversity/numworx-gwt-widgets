@@ -9,6 +9,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 import fi.euclides.gwt.ViewerWidget;
 import nl.numworx.geodefiner.common.Instance;
+import nl.numworx.geodefinergwt.client.CanvasViewer;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 
 @Component(modules={Modules.class})
@@ -18,7 +19,7 @@ public interface Components {
 	@Component.Builder
 	interface Builder {
 		Components build();
-		@BindsInstance Builder widget(ViewerWidget w);
+		@BindsInstance Builder widget(CanvasViewer w);
 		@BindsInstance Builder status(@Named("status") Label status);
 		@BindsInstance Builder instance(Instance instance);
 		
