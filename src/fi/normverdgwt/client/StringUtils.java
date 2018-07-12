@@ -106,6 +106,9 @@ public class StringUtils {
      * <P>
      * Note that containsOnly will always return true if inputString is null.
      * </P>
+     * @param inputString String to check
+     * @param legalChars String containing the legal characters
+     * @return true/false
      */
     public static boolean containsOnly(String inputString, String legalChars) {
         if (inputString == null || inputString.length() == 0) {
@@ -132,6 +135,9 @@ public class StringUtils {
      * This method takes an inputString and counts the number of times that
      * patternString occurs within it.
      * </P>
+     * @param inputString String in which to count the pattern
+     * @param patternString String containing the pattern
+     * @return number of occurrences of patternString in inputString
      */
     public static int count(String inputString, String patternString) {
         int index = 0;
@@ -167,6 +173,10 @@ public class StringUtils {
      * of Strings by using a splitString of "\n". The resulting strings will not
      * include their terminating newlines.
      * </P>
+     * @param inputString String to split
+     * @param splitString String to use as a divider
+     * @return array of String containing the substrings of inputString which are 
+     * left if all occurrences of splitString are removed 
      */
     public static String[] split(String inputString, String splitString) {
         int index;
@@ -202,6 +212,10 @@ public class StringUtils {
      * This method behaves like String.replace(), but replaces substrings rather
      * than chars.
      * </p>
+     * @param inputString String to modify
+     * @param splitString substring of to replace
+     * @param joinString String replacing splitString
+     * @return inputString with aall occerrences of splitString replaced by joinString
      */
 
     public static String replaceStr(String inputString, String splitString,

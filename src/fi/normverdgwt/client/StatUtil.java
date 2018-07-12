@@ -5,7 +5,6 @@ package fi.normverdgwt.client;
  * - Inverse Normal Cummulative Distribution Function Algorythm
  * - Error Function Algorythm
  * - Complimentary Error Function Algorythm
- *
  * @author Sherali Karimov (sherali.karimov@proxima-tech.com)
  */
 public class StatUtil

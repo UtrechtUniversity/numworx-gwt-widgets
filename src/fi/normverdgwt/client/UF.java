@@ -1,9 +1,18 @@
 package fi.normverdgwt.client;
 
-// universal formatter
+/**
+ * universele formatteer klasse
+ * @author huub
+ */
 class UF
-{   // basic formatting with decs decimals
-    // no error handling (decs < 0)
+{   
+	/**
+	 * formatteren met decs decimalen
+	 * geen error handling als decs negatief
+	 * @param val te formatteren double
+	 * @param decs aantal decimalen
+	 * @return String met val geformatteerd met dec decimalen
+	 */
     public static String format(double val, int decs)
     {   String result = "";
         // no decimals required
@@ -34,14 +43,19 @@ class UF
             if (fractionalString.length() < decs)
                 fractionalString = zeros(decs - fractionalString.length()) +
                                    fractionalString;
-//            else if (fractionalString.length() > decs)                       
-//                fractionalString = fractionalString.substring(0, decs + 1);
             result = integerString + "," + fractionalString;
         }
         return result;
     }
     
-    // as above with zeros at the end removed
+    /**
+     * als methode format, maar met overbodige nullen
+     * in het decimale deel verwijderd
+     * @param val te fomatteren double
+     * @param decs aantal decimalen
+     * @return String met val geformatteerd met dec decimalen
+     * en zonder overbodige nullen in het decimale deel
+     */
     public static String format0(double val, int decs)
     {	   
     	String result = format(val, decs);
@@ -49,6 +63,13 @@ class UF
     	return result;
     }
     
+    /**
+     * verwijder overbodige nullen in het decimale deel
+     * (d.w.z. de substring rechts can decSep) van String s
+     * @param s te wijzigen String
+     * @param decSep character gebruikt als scheiding gehele/decimale deel
+     * @return String s zonder overbodige nullen in het decimale deel
+     */
 	public static String trimTrailingZeros(String s, char decSep)
 	{	String txt = new String(s);
 		if (txt.indexOf(decSep) < 0)
@@ -64,6 +85,12 @@ class UF
 		return txt;		
 	}				
     
+	/**
+	 * verwijder het character op plaats index uit String s
+	 * @param s String waaruit character verwijderd moet worden
+	 * @param index index te verwijderen karakter
+	 * @return String s met character op plaats index verwijderd
+	 */
 	public static String removeCharAt(String s, int index)
 	{	String txt = new String(s);
 		// eerste
@@ -81,15 +108,30 @@ class UF
 		return txt;
 	}		
     
-    // as above but with sign always displayed
+	/**
+	 * als methode format maar met een + vooraan als val groter gelijk 0
+	 * @param val te formateren double
+	 * @param decs aantal decimalen
+	 * @return String met val geformatteerd met dec decimalen en voorzien van teken
+	 */
     public static String sformat(double val, int decs)
     {   String result = format(val, decs);
         if (val >= 0)
             result = "+" + result;
         return result;
     }
-    // as above, but aligned (0=center, 1=left, 2=right) in a field of
-    // width characters (if possible)
+
+    /**
+     * formatteer de double val met decs decimalen en stop het
+     * resultaat in een String met lengte width en een gegeven
+     * alignment; als het resultaat langer is dan width,
+     * return dan het resultaat 
+     * @param val te formatteren double
+     * @param decs aantal decimalen
+     * @param width maximum lengthe resultaat String
+     * @param al alignment: 0 centre, 1: left, 2: right
+     * @return String met geformatteerde waarde en gegeven alignment 
+     */
     public static String fformat(double val, int decs, int width, int al)
     {   String result = format(val, decs);
         int len = result.length();
@@ -114,9 +156,16 @@ class UF
             }
         return result;
     }
-    
-    // as above, but using exponential notation instead
-    // forcing to width characters (if possible)
+
+    /**
+     * formatteer de double val met decs decimalen zodat het
+     * resultaat een String met width characters is;
+     * gebruik als nodig exponentiele notatie   
+     * @param val te formatteren double
+     * @param decs aantal decimalen
+     * @param width lengte formatteer String
+     * @return String met geformatteerde double val 
+     */
     public static String eformat(double val, int decs, int width)
     {   String result = "";
         if (Math.abs(val) >= 1)
@@ -153,8 +202,6 @@ class UF
                     else
                         result = sign + format(temp, len - 2) + result;
                 }
-//                else if (len > 0)
-//                    result = sign + format(temp, 0) + result;                
                 else
                     result = stars(width);
             } // if (len > width)    
@@ -191,8 +238,6 @@ class UF
                     else
                        result = sign + format(temp, len - 2) + result;
                 }    
-//                else if (len > 0)
-//                    result = sign + format(temp, 0) + result;                
                 else
                     result = stars(width); 
             }
@@ -201,6 +246,12 @@ class UF
         return result;
     }
 
+    /**
+     * check of String s bestaat uit nullene en maximaal
+     * een decimale punt 
+     * @param s te checken String
+     * @return true/false
+     */
     private static boolean allZeros(String s)
     {   int index = 0;
         boolean found = false;
@@ -221,16 +272,22 @@ class UF
             return false;
     }    
 
-
-
-    // returns a string of c zeros
+    /**
+     * creeer een String bestaande uit c nullen
+     * @param c aantal nullen
+     * @return String bestaande uit c nullen
+     */
     private static String zeros(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
             result += "0";
         return result;
     }
-    // returns a string of c spaces
+    /**
+     * creeer een String bestaande uit c spaties
+     * @param c aantal spaties
+     * @return String bestaande uit c spaties
+     */
     private static String spaces(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
@@ -238,7 +295,11 @@ class UF
         return result;
     }
     
-    // returns a string of c stars
+    /**
+     * creeer een String bestaande uit c sterretjes
+     * @param c aantal sterretjes
+     * @return String bestaande uit c sterretjes
+     */
     private static String stars(int c)
     {   String result = "";
         for (int i = 1; i <=c; i++)
@@ -246,6 +307,15 @@ class UF
         return result;
     }
 
+    /**
+     * bepaal de OOM (order of magnitude) van een double val,
+     * d.w.z. OOM = 0 als abs(val) groter gelijk 1 en kleiner dan 10,
+     * OOM = 1 als abs(val) groter gelijk 10 en kleiner dan 100, etc.
+     * OOM = -1 als abs(val) groter gelijk 1/10 en kleiner dan 1,
+     * OOM = -2 als abs(val) groter gelijk 1/100 en kleiner dan 1/10, etc.
+     * @param val te onderzoeken double
+     * @return OOM
+     */
     public static int findOOM(double val)
     {   int oom = 0;
         double temp = Math.abs(val);

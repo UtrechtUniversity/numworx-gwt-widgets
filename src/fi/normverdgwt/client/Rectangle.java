@@ -1,5 +1,10 @@
 package fi.normverdgwt.client;
 
+/**
+ * GWT heeft geen klasse Rectangle 
+ * @author huub
+ */
+
 public class Rectangle 
 {
 	int x; int y; int width; int height;
