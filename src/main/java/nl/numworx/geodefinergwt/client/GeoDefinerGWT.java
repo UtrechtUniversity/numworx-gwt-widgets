@@ -47,7 +47,6 @@ import com.google.gwt.user.client.ui.Widget;
 import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.gwt.PrettyFormat;
-import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Locus;
