@@ -1,6 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
 import java.util.*;
 
 public class Vermenigvuldiging extends Expressie  
@@ -58,12 +57,10 @@ public class Vermenigvuldiging extends Expressie
 		   || g2 instanceof Macht && !Double.isNaN(g2.kind1.geefWaarde()))
 		{	op = "*";
 		}
-		//if(kind1.geefWaarde()==1)return s2;
 		if(kind1.isVeelterm)s1 = "$h" + s1 + "@";
 		if(kind2.isVeelterm)s2 = "$h" + s2 + "@";
 		
 		return s1 + op + s2;
-		//return s1 + "*" + s2;
 	}
 	
 	public String toStringStrikt()

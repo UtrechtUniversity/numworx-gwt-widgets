@@ -1,6 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
 
 public class Macht extends Expressie  
 {		

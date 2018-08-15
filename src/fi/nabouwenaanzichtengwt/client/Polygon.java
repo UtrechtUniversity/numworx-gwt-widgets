@@ -3,10 +3,12 @@ package fi.nabouwenaanzichtengwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * GWT heeft geen klasse Polygon; zie klasse Polygon in KladjeGWT 
+ * @author Peter Boon
+ */
 
-
-
-class Polygon
+public class Polygon
 {
 	int aantalPunten;
 	int[] puntenX;
@@ -77,74 +79,88 @@ class Polygon
 		}
 	}
 	
-	public boolean contains(int x, int y) {
+	public boolean contains(int x, int y) 
+	{
 		return contains((double)x, (double)y);
 	}
 	
-	public boolean contains(double x, double y) {
-		         if (aantalPunten <= 2) {
-		         return false;
-		     }
-		     int hits = 0;
+	public boolean contains(double x, double y) 
+	{
+		if (aantalPunten <= 2) 
+		{
+			return false;
+		}
+		int hits = 0;
 		 
-		     int lastx = puntenX[aantalPunten - 1];
-		     int lasty = puntenY[aantalPunten - 1];
-		     int curx, cury;
+		int lastx = puntenX[aantalPunten - 1];
+		int lasty = puntenY[aantalPunten - 1];
+		int curx, cury;
 		 
-		     // Walk the edges of the polygon
-		 for (int i = 0; i < aantalPunten; lastx = curx, lasty = cury, i++) {
-		         curx = puntenX[i];
-		         cury = puntenY[i];
+		// Walk the edges of the polygon
+		for (int i = 0; i < aantalPunten; lastx = curx, lasty = cury, i++) 
+		{
+		    curx = puntenX[i];
+		    cury = puntenY[i];
 		 
-		         if (cury == lasty) {
-		         continue;
-		         }
+            if (cury == lasty) 
+	        {
+	            continue;
+		    }
 		 
-		         int leftx;
-		         if (curx < lastx) {
-		         if (x >= lastx) {
-		             continue;
-		         }
-		         leftx = curx;
-		         } else {
-		         if (x >= curx) {
+		    int leftx;
+		    if (curx < lastx) 
+		    {
+		        if (x >= lastx) 
+		        {
+		            continue;
+		        }
+		        leftx = curx;
+		     } else 
+		     {
+		         if (x >= curx) 
+		         {
 		             continue;
 		         }
 		         leftx = lastx;
-		         }
+	         }
 		 
-		         double test1, test2;
-		         if (cury < lasty) {
-		         if (y < cury || y >= lasty) {
+	         double test1, test2;
+	         if (cury < lasty) 
+	         {
+		         if (y < cury || y >= lasty) 
+		         {
 		             continue;
 		         }
-		         if (x < leftx) {
+		         if (x < leftx) 
+		         {
 		             hits++;
 		             continue;
 		         }
 		         test1 = x - curx;
 		         test2 = y - cury;
-		         } else {
-		         if (y < lasty || y >= cury) {
+		     }
+	         else 
+	         {
+		         if (y < lasty || y >= cury) 
+		         {
 		             continue;
 		         }
-		         if (x < leftx) {
+		         if (x < leftx) 
+		         {
 		             hits++;
 		             continue;
 		         }
 		         test1 = x - lastx;
 		         test2 = y - lasty;
-		         }
-		 
-		         if (test1 < (test2 / (lasty - cury) * (lastx - curx))) {
+	         }
+
+	         if (test1 < (test2 / (lasty - cury) * (lastx - curx))) 
+	         {
 		         hits++;
-		         }
 		     }
+	     } // for
 		 
-		     return ((hits & 1) != 0);
-		 }
-		 
-	
-		     
+	     return ((hits & 1) != 0);
+	 }
 	
 }

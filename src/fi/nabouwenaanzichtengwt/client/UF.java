@@ -1,6 +1,10 @@
 package fi.nabouwenaanzichtengwt.client;
 
-// universal formatter
+/**
+ * formatting klasse, zie klasse UF in KladjeGWT
+ * @author huub
+ */
+
 public class UF
 {   // basic formatting with decs decimals
     // no error handling (decs < 0)

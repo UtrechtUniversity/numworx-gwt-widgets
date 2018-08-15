@@ -1,6 +1,10 @@
 package fi.nabouwenaanzichtengwt.client;
 
-class Punt3D
+/**
+ * een punt in 3d-space met double coordinaten 
+ */
+
+public class Punt3D
 
 {	double x, y, z;
 		

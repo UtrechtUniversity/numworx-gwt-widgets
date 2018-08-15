@@ -1,12 +1,32 @@
 package fi.nabouwenaanzichtengwt.client;
 
-public class RKubus extends Veelvlak {
-
-	Punt3D positie;
+/**
+ * klasse die een kubusje representeert 
+ * @author Peter Boon
+ */
+public class RKubus extends Veelvlak 
+{
+	/**
+	 * lengte halve ribbe van het kubusje
+	 */
 	double d;
+	/**
+	 * isOnbedekt[i] == true als er zich naast vlakje i geen ander kubusje
+	 * bevindt 
+	 */
 	boolean[] isOnbedekt;
+	/**
+	 * de vulkleur van de vlakjes van het kubusje
+	 */
 	String vulkleur;
 	
+	/**
+	 * constructor
+	 * @param r lengte ribbe
+	 * @param x x-coordinaat centrum kubusje
+	 * @param y y-coordinaat centrum kubusje
+	 * @param z z-coordinaat centrum kubusje
+	 */
 	public RKubus(double r, double x, double y, double z)
 	{	vulkleur = "geel";
 		aantalHoekpunten = 8;
@@ -42,18 +62,24 @@ public class RKubus extends Veelvlak {
 		for (int i = 0; i < aantalHoekpunten; i++)
 		{	Vlak[] hv = {vlakken[hoekpuntdata[3 * i]],vlakken[hoekpuntdata[3 * i + 1]],
 						 vlakken[hoekpuntdata[3 * i + 2]]};
-			//hoekpunten[i].maakVlakken(3,hv);
 		}
 		
-		
-															 
 	}
-	
+
+	/**
+	 * redefined: zet de vulkleur van de vlakjes van dit kubusje 
+	 */
 	public void zetVulkleur(String kleur)
 	{	vulkleur = kleur;
 		super.zetVulkleur(kleur);
 	}
 	
+	/**
+	 * verschuif dit kubusje over (dx,dy,dz)   
+	 * @param dx x-translatie
+	 * @param dy y-translatie
+	 * @param dz z-translatie
+	 */
 	public void verschuif(double dx,double dy,double dz)
 	{	for (int i = 0; i < aantalHoekpunten; i++)
 		{	hoekpunten[i].x += dx;

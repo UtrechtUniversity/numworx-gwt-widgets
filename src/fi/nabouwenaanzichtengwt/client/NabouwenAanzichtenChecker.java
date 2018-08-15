@@ -1,24 +1,42 @@
 package fi.nabouwenaanzichtengwt.client;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import fi.wiskopdr.AntwoordVakChecker;
-//import fi.wiskopdr.expressies.Algebra;
+/**
+ * klasse die genuanceerd nakijken mogelijk maakt;
+ * leest de launchdate om te bepalen wat nagekeken
+ * moet worden; <br>  
+ * merk op dat een gegeven aanzicht m.b.v. meerdere 
+ * kubusbouwsels verkregen kan worden; daarom is 
+ * er een instelbare optie om ook het aantal gebruikte
+ * kubusjes in het antwoord te checken; een fout kubusaantal en
+ * een correct aanzicht levert dan een halfgoed antwoord
+ * en een score aangepast aan het verschil tussen
+ * het aantal docent- en leerlingkubusjes.   
+ */
 
 public class NabouwenAanzichtenChecker {
 
+	/**
+	 * nakijk constanten
+	 */
 	public static final int GOED = 0;
 	public static final int DOOR = 1;
 	public static final int HALF = 2;
 	public static final int FOUT = 3;
 	public static final int GEEN = 4;
 	
+	/**
+	 * launch data
+	 */
 	private String[] randomVarNamen = null;
 	private Map<String,?> randomVarWaarden = null;
 	
+	/**
+	 * nakijk attributen
+	 */
 	private int score;
 	private int scoreMax;
 	private boolean correct;
@@ -26,7 +44,13 @@ public class NabouwenAanzichtenChecker {
 	private int goedHalfFout;
 	private String feedback;
 	
+	/**
+	 * kubusbouwsel van de docent (antwoord)
+	 */
 	KubusRooster docentKr = null;
+	/**
+	 * nakijkopties
+	 */
 	boolean checkBlokkenBouwsel;
 	boolean checkDrieAanzichten;
 	boolean checkVoorZijAanzicht;
@@ -37,6 +61,13 @@ public class NabouwenAanzichtenChecker {
 	boolean checkRechtsAanzicht;
 	boolean checkAantalKubus;
 	
+	/**
+	 * constructor, lees het antwoord (docentState) en de nakijkopties
+	 * uit de launchdata
+	 * @param launchState launchdata
+	 * @param randomVars launchdata
+	 * @param randomVarWaarden2 launchdata
+	 */
 	public NabouwenAanzichtenChecker(Map<String, Object> launchState, String[] randomVars, Map<String, ?> randomVarWaarden2 )
 	{	
 		randomVarNamen = randomVars;
@@ -124,26 +155,16 @@ public class NabouwenAanzichtenChecker {
 		
 		this.checkAantalKubus = checkAantalKubus;
 		
-//System.out.println("checkRechts = " + checkRechtsAanzicht);
-//System.out.println("checkKubus = " + checkAantalKubus);
-			
-		//zetKijkNaActief(kijkNaActief);
-		//this.kijkNaActief = kijkNaActief;
-		//zetCheckBlokkenBouwsel(checkBlokkenBouwsel);
-		//(checkDrieAanzichten);
-	    //zetCheckVoorZijAanzicht(checkVoorZijAanzicht);
-	    //zetCheckBovenVoorAanzicht(checkBovenVoorAanzicht);
-	    //zetCheckBovenZijAanzicht(checkBovenZijAanzicht);
-		//zetCheckBovenAanzicht(checkBovenAanzicht);		
-		//zetCheckVoorAanzicht(checkVoorAanzicht);		
-		//zetCheckRechtsAanzicht(checkRechtsAanzicht);		
-		//zetCheckAantalKubus(checkAantalKubus);
 	}
 	
+	/**
+	 * kijk het antwoord (een KubusRooster) na, zet
+	 * de nakijkattributen en sla deze op in een HashMap 
+	 * @param answer leerling KubusRooster
+	 * @return HashMap met nakijkattributen
+	 */
 	public HashMap<String,Object> checkAnswer(KubusRooster answer)
 	{
-		HashMap<String,Object> checkResult = new HashMap<String,Object>();
-		
 		this.score = 0;
 		this.correct = false;
 		this.fout = false;
@@ -152,7 +173,7 @@ public class NabouwenAanzichtenChecker {
 		
 		check(answer);
 			
-		HashMap checkResults = new HashMap();
+		HashMap<String,Object> checkResults = new HashMap<String,Object>();
 		checkResults.put("correct", new Boolean(correct));
 		checkResults.put("fout", new Boolean(fout));
 		checkResults.put("goedHalfFout", new Integer(goedHalfFout));
@@ -162,6 +183,11 @@ public class NabouwenAanzichtenChecker {
 		return checkResults;
 	}
 	
+	/**
+	 * vergelijk per nakijkoptie het antwoord (een KubusRooster) met
+	 * het kubusrooster van de docent en zet de nakijkattributen
+	 * @param answer leerling KubusRooster
+	 */
 	private void check(KubusRooster answer)
 	{
 		if (checkBlokkenBouwsel)
@@ -342,10 +368,5 @@ public class NabouwenAanzichtenChecker {
 		}
 
 
-	}
-	
-	private void evaluate()
-	{
-		
 	}
 }

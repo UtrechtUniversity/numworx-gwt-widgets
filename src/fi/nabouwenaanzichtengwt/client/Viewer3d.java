@@ -5,53 +5,213 @@ import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-
-import com.google.gwt.event.dom.client.MouseDownEvent;
-import com.google.gwt.event.dom.client.MouseUpEvent;
-
-import com.google.gwt.event.dom.client.TouchStartEvent;
-import com.google.gwt.event.dom.client.TouchEndEvent;
-
-//import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
-//import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
+/**
+ * klasse die het kubusbouwsel op een Canvas tekent; <br>
+ * de klasse handelt ook (instelbaar) Mouse en Touch Events op het Canvas af, te
+ * weten het draaien van het kubusbouwsel (MouseMove/TouchMove) en  
+ * het toevoegen/verwijderen van een kubusje (MouseUp/TouchEnd)
+ * @author Peter Boon
+ */
 
 public class Viewer3d
 {
+	/**
+	 * teken Canvas
+	 */
 	Canvas canvas;
+	/**
+	 * eigenaar van deze Viewer3d
+	 */
 	private NabouwenAanzichtenGWT eigenaar;
+	/**
+	 * getal rooster om over een bovenaanzicht te leggen,
+	 * zie klasse GetalRooster
+	 */
 	private GetalRooster gr;
-	//private AnimatieBeheerder ab;
+
+	/**
+	 * luisteren naar Mouse en Touch Events, zie klasse Muisbeheerder
+	 */
 	private MuisBeheerder mb;
+	/**
+	 * breedte en hoogte
+	 */
 	private int breedte, hoogte;
-	private Punt3D beginpunt, eindpunt, startpunt;
+	/**
+	 * actuele positie van de tekencursor
+	 */
+	private Punt3D beginpunt;
+	/**
+	 * nieuwe positie van de tekencursor na beweging
+	 */
+	private Punt3D eindpunt;
+	/**
+	 * initiele positie van de tekencursor
+	 */
+	private Punt3D startpunt;
+	/**
+	 * 3d-objecten, zie klasse Lichaam3D
+	 */
 	public Lichaam3D[] l;
-	//private Image im ;
+
+	/**
+	 * Context2d om te tekenen
+	 */
 	public Context2d gIm;
+	/**
+	 * matrix die de bewegingsrichting van de tekencursor onthoudt en update, 
+	 * zie klasse Matrix3D 
+	 */
 	public Matrix3D mat;
-	private boolean pen, vul, leeg, schaduw, grZichtbaar;
+	/**
+	 * is de pen aan (punten worden verbonden)?
+	 */
+	private boolean pen; 
+	/**
+	 * is vul aan (punten worden opgespaard voor een polygon
+	 * waarvan de vulling getekend wordt bij aanroep van vulUit() 
+	 */
+	private boolean vul;
+	/**
+	 * is het huidige polygon leeg, d.w.z. het heeft wel punten, maar
+	 * wordt niet getekend
+	 */
+	private boolean leeg;
+	/**
+	 * moeten vlakjes van de kubusjesk gekleurd worden met een schaduw-effect?
+	 */
+	private boolean schaduw;
+	/**
+	 * is het getalrooster zichtbaar?
+	 */
+	private boolean grZichtbaar;
+	/**
+	 * nummer van het actuele Lichaam3D
+	 */
 	private int lnummer;
-	private CssColor penkleur, vulkleur, achtergrondkleur;
-	public boolean bezigMetTekenen, muisAan, klikAan, pijlAan, balkAan, maakAanzicht;
+	/**
+	 * kleur van de pen
+	 */
+	private CssColor penkleur;
+
+	/**
+	 * kleur van de vlakjes van de kubusjes
+	 */
+	private CssColor vulkleur;
+	/**
+	 * achtergrondkleur
+	 */
+	private CssColor achtergrondkleur;
+	/**
+	 * wordt er naar de muis geluisterd?
+	 */
+	public boolean muisAan;
+	/**
+	 * wordt er naar een muisklik geluisterd (bouwen/slopen)
+	 * of kan er alleen gesleept worden (draaien)
+	 */
+	public boolean klikAan;
+	/**
+	 * is er een pijl die anar de voorkant van het kubusbouwsel wijst?
+	 */
+	public boolean pijlAan;
+	/**
+	 * is er een balk aan de voorkant van het grondvlak?
+	 */
+	public boolean balkAan;
+	/**
+	 * is het kubusbousel een bovenaanzicht?
+	 */
+	public boolean maakAanzicht;
+	/**
+	 * afstand oog op de positieve z-as tot x-y-vlak
+	 */
 	private double afstand;
-	int aantalVeelvlakken;
-	Veelvlak[] vvRij;
+	/**
+	 * de geprojecteerde vlakjes van de vierkantjes in het grondvlak
+	 */
 	Polygon[][] p;
+	/**
+	 * de geprojecteerde vlakjes van alle kubusjes in het KubusRooster:<br>
+	 * eerste 3 indices zijn de positie (elke coordinaat tussen 
+	 * 0 en kr.maxAantal-1), laatste index varieert van 0 tot 5
+	 * (6 vlakjes per kubusjes)
+	 */
 	Polygon[][][][] pp;
+	/**
+	 * alle klikbare vlakjes van kubusjes in het bouwsel, zie klasse KlikVlak
+	 */
 	Klikvlak[] kv;
+	/**
+	 * het aantal klikbare vlakjes van kubusjes in het bouwsel
+	 */
 	int aantalKv;
+	/**
+	 * het KubusRooster dat weergegeven wordt, zie klasse KubusRooster
+	 */
 	KubusRooster kr;
-	private double k, xhoek, yhoek, beginx, beginy;
-	private int[] sorteerRij;
-	//private CubeRemoveThread cubeRemoveThread;
-	private boolean removed = false;
-	private boolean removing = false;
-	private boolean holdMouse = false;
-	private long holdMouseStartTime = 0;
-	private long holdMouseEndTime = 0;
+	/**
+	 * een vergroot/verklein factor afhankelijk van de
+	 * breedte van het Canvas
+	 */
+	private double k;
+	/**
+	 * de initiele draaiing van het kubusbouwsel om de x-as resp. de y-as
+	 */
+	private double beginx, beginy;
 	
+	/**
+	 * actuele draaiing van het kubusbouwsel om de x-as is beginx+xhoek;<br> 
+	 * xhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	private double xhoek;
+	
+	/**
+	 * actuele draaiing van het kubusbouwsel om de y-as is beginy+yhoek;<br> 
+	 * yhoek wordt veranderd bij slepen, zie methode muisSleepActie 
+	 */
+	private double yhoek;
+	
+	/**
+	 * de gesorteerde vlakken uit een de verschillende Lichaam3D 
+	 */
+	private int[] sorteerRij;
+
+	/**
+	 * werd een kubusje verwijderd d.m.v. een long klik?
+	 */
+	private boolean removed = false;
+	/**
+	 * wordt er gesloopt?
+	 */
+	private boolean removing = false;
+	/**
+	 * was er een lange MouseDown/TouchStart?
+	 */
+	private boolean holdMouse = false;
+	/**
+	 * tijd laatste MouseDown/TouchStart
+	 */
+	private long holdMouseStartTime = 0;
+	/**
+	 * tijd laatste MouseUp/TouchEnd
+	 */
+	private long holdMouseEndTime = 0;
+	/**
+	 * het laatste bouw/sloop commando
+	 */
 	private String lastBuildCommand = "";
 
+	/**
+	 * constructor: initialiseer de attributen, het Canvas en de
+	 * Mouse/Touch handlers voor het Canvas  
+	 * @param kr het kubusrooster
+	 * @param x x-positie
+	 * @param y y-positie
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param hb de eigenaar van deze Viewer3D
+	 */
 	public Viewer3d(KubusRooster kr, int x, int y, int b, int h, NabouwenAanzichtenGWT hb)
 	{
 		canvas = Canvas.createIfSupported();
@@ -61,7 +221,6 @@ public class Viewer3d
 		canvas.setCoordinateSpaceHeight(h);
 		breedte = b;
 		hoogte = h;
-		aantalVeelvlakken = 0;
 		eigenaar = hb;
 
 		this.kr = kr;
@@ -110,9 +269,6 @@ public class Viewer3d
 		}
 		sorteerRij = new int[2000];
 		mat = new Matrix3D();
-		//if(mb!=null && ab!=null)				
-		//{	mb.meldAnimatieBeheerder(ab);		
-		//}
 		k = 230;
 		xhoek = 0;
 		yhoek = 0;
@@ -120,31 +276,53 @@ public class Viewer3d
 		beginy = -30;
 	}
 
-	 public String getLastBuildCommand()
+	/**
+	 * getter voor de laatste bouw/sloop opdracht 
+	 * @return lastBuildCommand
+	 */
+	public String getLastBuildCommand()
 	{	return lastBuildCommand;
 	}
 	    
+	/**
+	 * setter voor de laatste bouw/sloop opdracht
+	 * @param s nieuwe waarde lastBuildCommand
+	 */
 	public void setLastBuildCommand(String s)
 	{	lastBuildCommand = s;
 	}
 	 
+	/**
+	 * zet de MuisBeheerder
+	 * @param mb instantie van MuisBeheerder 
+	 */
 	public void zetMuisBeheerder(MuisBeheerder mb)
 	{
 		this.mb = mb;
 	}
 
+	/**
+	 * getter voor het teken canvas
+	 * @return canvas
+	 */
 	public Canvas getCanvas()
 	{
 		return canvas;
 	}
 
+	/**
+	 * zet de Context2d van het teken canvas
+	 */
 	public void initContext2d()
 	{
 		gIm = canvas.getContext2d();
-		//gIm.setFillStyle(achtergrondkleur);
-		//gIm.fillRect(0,0,200, 100);
 	}
 
+	/**
+	 * zet de afstand oog (op de positive z-as) to het 
+	 * x-y-vlak voor alle instanties van Lichaam3D
+	 * @param afst nieuwe afstand
+	 */
 	public void zetAfstand(double afst)
 	{
 		afstand = afst;
@@ -154,11 +332,21 @@ public class Viewer3d
 		}
 	}
 
+	/**
+	 * setter voor tekeken met schaduw-effect
+	 * @param s true/false
+	 */
 	public void zetSchaduw(boolean s)
 	{
 		schaduw = s;
 	}
 
+	/**
+	 * setter voor de draaing om x- en y-as;
+	 * zet beginx (beginy) op de nieuwe waarde en xhoek (yhoek) op 0 
+	 * @param hx draaing om x-as
+	 * @param hy draaing om y-as
+	 */
 	public void zetBeginHoeken(double hx, double hy)
 	{
 		beginx = hx;
@@ -167,28 +355,49 @@ public class Viewer3d
 		yhoek = 0;
 	}
 
+	/**
+	 * wordt er naar de muis geluisterd?
+	 * @param b true/false
+	 */
 	public void zetMuisAan(boolean b)
 	{
 		muisAan = b;
 	}
 
+	/**
+	 * wordt er naar een muisklik geluisterd (bouwen/slopen)
+	 * of kan er alleen gesleept worden (draaien)
+	 * @param b true/false
+	 */
 	public void zetKlikAan(boolean b)
 	{
 		klikAan = b;
 	}
 
+    /**
+     * toon/verberg de balk aan de voorkant van het kubusbouwsel
+     * @param b true/false
+     */
     public void zetPijlAan(boolean b)
     {   pijlAan = b;
         if (pijlAan)
         	balkAan = false;
     }
 
+    /**
+     * toon/verberg de balk aan de voorkant van het kubusbouwsel
+     * @param b true/false
+     */
     public void zetBalkAan(boolean b)
     {   balkAan = b;
         if (balkAan)
             pijlAan = false;
     }
    
+    /**
+     * zet deze Viewer3d op bovenaanzicht
+     * @param b alleen gebruikt met true
+     */
     public void zetMaakAanzicht(boolean b)
     {   maakAanzicht = b;
 	    if (maakAanzicht)
@@ -197,21 +406,17 @@ public class Viewer3d
 	    	zetMuisAan(false);
 	    	zetSchaduw(false);
 	    }
-	    else
-	    {	//zetBeginHoeken(30,-30);
-	    	//zetAfstand(1000);
-	    	//zetMuisAan(true);
-	    	//zetSchaduw(true);
-	    }
     }
 
-    
+    /**
+     * zet een nieuw kubusrooster in deze Viewer3d
+     * @param kur nieuw KubusRooster
+     */
 	public void zetKubusRooster(KubusRooster kur)
 	{
 		kr = kur;
 		if (grZichtbaar)
-		{ //if(gr!=null)remove(gr);
-			zetGetalRooster(true);
+		{ 	zetGetalRooster(true);
 			for (int i = 0; i < kr.maxAantal; i++)
 			{
 				for (int j = 0; j < kr.maxAantal; j++)
@@ -244,21 +449,12 @@ public class Viewer3d
 		}
 		aantalKv = 0;
 		kv = new Klikvlak[n * n * n * 7];
-		//if(im!=null)tekenOpnieuw();
 	}
 
-	public void zetVeelvlak(Veelvlak v)
-	{
-		vvRij[0] = v;
-		tekenOpnieuw();
-	}
-
-	public void zetVeelvlak(Veelvlak v, int n)
-	{
-		vvRij[n] = v;
-		tekenOpnieuw();
-	}
-
+	/**
+	 * toon/verberg het GetalRooster, zet deze Viewer3d op bovenaanzicht
+	 * @param bool true/false
+	 */
 	public void zetGetalRooster(boolean bool)
 	{
 		grZichtbaar = bool;
@@ -270,10 +466,6 @@ public class Viewer3d
 			int b = breedte * 38 / 300;
 			int h = hoogte * 57 / 300;
 			gr = new GetalRooster(n, x, y, b, h, breedte, hoogte);
-			//add(gr);
-		}
-		else
-		{ //if(gr!=null)remove(gr);
 		}
 		zetBeginHoeken(90, 0);
 		zetAfstand(1000000000);
@@ -281,48 +473,10 @@ public class Viewer3d
 		zetSchaduw(false);
 	}
 
-    public void zetGetalRooster2(boolean bool)
-    {   grZichtbaar = bool;
-        if (bool)
-        {   
-        	int n = kr.maxAantal;
-
-            int x = breedte * 80 / 300;
-            int y = hoogte * 80 / 300;
-            int b = Math.min(hoogte,breedte) * 140 / 300;
-            int h = b;
-
-            if (hoogte < breedte)
-            {   x += (breedte - hoogte) * 40 / 300;
-            
-            }
-            else // hoogte > breedte
-            {   y += (hoogte - breedte) * 40 / 300;
-            }
-            
-            gr = new GetalRooster(n, x, y, b, h, breedte, hoogte);
-            //add(gr);
-            
-System.out.println("breedte = " + breedte);
-System.out.println("hoogte = " + hoogte);
-System.out.println("x = " + x);
-System.out.println("y = " + y);
-System.out.println("b = " + b);
-        }
-        else
-        {   if (gr != null)
-            {   //remove(gr);
-                gr = null;
-            }
-        }
-        if (bool)
-        {	zetBeginHoeken(90,0);
-        	zetAfstand(1000000000);
-        	zetMuisAan(false);
-        	zetSchaduw(false);
-        }
-    }
-	
+	/**
+	 * vindt de hoogte van het kubusbouwsel op elke
+	 * (x,y)-positie en update dit in het GetalRooster
+	 */
     public void zetHoogtes()
     {   if (gr != null)
         {   for (int i = 0; i < kr.maxAantal; i++)
@@ -338,13 +492,10 @@ System.out.println("b = " + b);
         }
         
     }
-     
-	public void voegVeelvlakToe(Veelvlak v)
-	{
-		vvRij[aantalVeelvlakken] = v;
-		aantalVeelvlakken++;
-	}
 
+	/**
+	 * initialiseer, draai en teken het kubusrooster 
+	 */
 	void tekenprogramma()
 	{
 		mat.initialiseer();
@@ -353,17 +504,18 @@ System.out.println("b = " + b);
 		tekenKubusRooster();
 	}
 
+	/**
+	 * teken het kubusrooster: grondvlak (als nodig), pijl of
+	 * balk aan de voorkant (als nodig); actualiseer de 
+	 * geprojecteerde vlakjes en de KlikVlakken 
+	 */
 	void tekenKubusRooster()
 	{
 		aantalKv = 0;
 		if (!maakAanzicht)
 			tekenVeelvlak(0, kr.grondvlak);
-		//tekenVeelvlak(0, kr.grondvlak);
 		if (pijlAan)
 		{
-			
-//System.out.println("tkr pijlAan");
-
 			for (int i = 0; i < kr.pijl.aantalVlakken; i++)
 			{
 				tekenVlak(1, kr.pijl.vlakken[i]);
@@ -373,18 +525,12 @@ System.out.println("b = " + b);
 		}
 		if (balkAan)
 	    {
-			
-//System.out.println("tkr balkAan");
-
 	        for (int i = 0; i < kr.balk.aantalVlakken; i++)
 	        {   tekenVlak(1, kr.balk.vlakken[i]);
 	            kv[aantalKv] = new Klikvlak(i, 0, 1, 6);
 	            aantalKv++;
 	        }
 	    }
-
-		
-//System.out.println("tkr");		
 		for (int i = 0; i < kr.maxAantal; i++)
 		{
 			for (int j = 0; j < kr.maxAantal; j++)
@@ -422,6 +568,12 @@ System.out.println("b = " + b);
 		}
 	}
 
+	/**
+	 * teken Veelvlak vv (vlaksgewijs);  
+	 * @param n nummer van het Lichaam3D dat gebruikt wordt om de vlakken
+	 * te tekenen
+	 * @param vv het te tekenen veelvlak
+	 */
 	void tekenVeelvlak(int n, Veelvlak vv)
 	{
 		for (int i = 0; i < vv.aantalVlakken; i++)
@@ -430,6 +582,11 @@ System.out.println("b = " + b);
 		}
 	}
 
+	/**
+	 * teken Vlak v (alleen de voorkant)
+	 * @param n nummer van te gebruiken Lichaam3D 
+	 * @param v het te tekenen Vlak
+	 */
 	void tekenVlak(int n, Vlak v)
 	{
 		penUit();
@@ -454,24 +611,12 @@ System.out.println("b = " + b);
 		draw(gIm);
 	}
 
+	/**
+	 * initialiseer en roep tekenOpImage aan 
+	 * @param g Context2d om te tekenen, redundant
+	 */
 	public void draw(Context2d g)
 	{
-		bezigMetTekenen = true;
-		/*if(im==null)
-		{	breedte = getSize().width;
-			hoogte = getSize().height;	
-			// breedte/400 ipv breedte/500, dan past de langwerpige kr beter
-			double startschaal = Math.min((double)breedte/400,(double)hoogte/500);
-			mat.initialiseer(0,0,0,startschaal);	
-			startpunt = new Punt3D(breedte/2,hoogte/2,0);
-			for(int i=0 ; i<5 ; i++)
-			{	l[i].maakNulpunt(breedte/2,hoogte/2,0);
-			}
-			im = createImage(breedte,hoogte);
-			gIm = im.getGraphics();
-			tekenOpImage(true);
-		}
-		g.drawImage(im, 0, 0, null);*/
 		double startschaal = Math.min((double) breedte / 400, (double) hoogte / 500);
 		mat.initialiseer(0, 0, 0, startschaal);
 		startpunt = new Punt3D(breedte / 2, hoogte / 2, 0);
@@ -480,20 +625,16 @@ System.out.println("b = " + b);
 			l[i].maakNulpunt(breedte / 2, hoogte / 2, 0);
 		}
 		tekenOpImage(true);
-
-		//gIm.setFillStyle(achtergrondkleur);
-		//gIm.fillRect(0, 0, breedte, hoogte);
-		bezigMetTekenen = false;
 	}
 
+	/**
+	 * teken de veelvlakken in de 3d-lichamen
+	 * @param wis wis het Canvas voor het tekenen, hier altijd true
+	 */
 	public void tekenOpImage(boolean wis)
 	{
 		if (gIm == null)
 			return;
-		
-//gIm.setStrokeStyle(CssColor.make(0,0,0));
-//gIm.strokeRect(0, 0, breedte, hoogte);
-		
 		beginpunt = new Punt3D(startpunt);
 		eindpunt = new Punt3D(beginpunt);
 		mat.initialiseer();
@@ -520,39 +661,48 @@ System.out.println("b = " + b);
 			l[j].zetAfstand(afstand);
 			l[j].maakNulpunt(breedte / 2, hoogte / 2, 0);
 		}
-		//super.paint(gIm);
 		if (gr != null)
 		{    gr.paint(gIm, p);
-//System.out.println("gr paint");		
 		}
 	}
 
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt door handlers van het leerlingprogramma
-	//-------------------------------------------------------------------------------------------
+	/**
+	 * volledige repaint 
+	 */
 	void tekenOpnieuw()
 	{
-		bezigMetTekenen = true;
 		tekenOpImage(true);
-		//Graphics g = getGraphics();
-		//if(g!=null)g.drawImage(im, 0, 0, null); 
-		bezigMetTekenen = false;
 	}
 
+	/**
+	 * paint zonder wissen
+	 */
 	void tekenErbij()
 	{
-		bezigMetTekenen = true;
 		tekenOpImage(false);
-		//Graphics g = getGraphics();
-		//g.drawImage(im, 0, 0, null);
-		bezigMetTekenen = false;
 	}
-
+	/**
+	 * stap (dx,dy,dz) in de huidige richting, zie methode
+	 * naarVolgendPunt
+	 * @param dx x-verandering
+	 * @param dy y-verandering
+	 * @param dz z-verandering
+	 */
 	void stap(double dx, double dy, double dz)
 	{
 		naarVolgendPunt(dx, -dy, -dz);
 	}
 
+	/**
+	 * beweeg naar een nieuwe positie, berekend als nieuw = huidig + mat * (dx,dy,dz)T; 
+ 	 * als pen == true en vul == false, verbindt de oude en nieuwe positie met een lijn in penkleur, d.w.z., 
+ 	 * voeg twee punten toe aan Lichaam3D lnummer en maak daar een Polygon3D van (een 3d-segment dus); <br>
+ 	 * als vul == true, voeg de oude positie als punt toe aan Lichaam3D lnummer (al deze punten 
+ 	 * worden een Polygon3D bij vulUit())
+	 * @param dx x-verandering
+	 * @param dy y-verandering
+	 * @param dz z-verandering
+	 */
 	void naarVolgendPunt(double dx, double dy, double dz)
 	{
 		eindpunt = mat.geefVolgendPunt(beginpunt, dx, dy, dz);
@@ -571,21 +721,33 @@ System.out.println("b = " + b);
 		beginpunt.z = eindpunt.z;
 	}
 
+	/**
+	 * maak van de punten in Lichaam3D 0 een Polygon
+	 */
 	void tekenPolygon()
 	{
 		l[0].voegPolygonToe(vulkleur, penkleur, pen, leeg);
 	}
-
+	/**
+	 * maak van de punten in Lichaam3D n een Polygon 
+	 * @param n Lichaam3D nummer
+	 */
 	void tekenPolygon(int n)
 	{
 		l[n].voegPolygonToe(vulkleur, penkleur, pen, leeg);
 	}
 
+	/**
+	 * zet de pen aan 
+	 */
 	void penAan()
 	{
 		pen = true;
 	}
-
+	/**
+	 * zet de pen aan in kleur kl
+	 * @param kl kleurnaam
+	 */
 	void penAan(String kl)
 	{
 		pen = true;
@@ -593,6 +755,12 @@ System.out.println("b = " + b);
 		gIm.setStrokeStyle(penkleur);
 	}
 
+	/**
+	 * zet de pen aan in RGB-kleur (r,g,b)
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void penAan(int r, int g, int b)
 	{
 		pen = true;
@@ -600,12 +768,21 @@ System.out.println("b = " + b);
 		gIm.setStrokeStyle(penkleur);
 	}
 
+	/**
+	 * zet de pen aan en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 */
 	void penAan(int n)
 	{
 		pen = true;
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen aan in kleur kl en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param kl kleurnaam
+	 */
 	void penAan(int n, String kl)
 	{
 		pen = true;
@@ -614,6 +791,13 @@ System.out.println("b = " + b);
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen aan in RGB-kleur (r,g,b) en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void penAan(int n, int r, int g, int b)
 	{
 		pen = true;
@@ -622,22 +806,36 @@ System.out.println("b = " + b);
 		lnummer = n;
 	}
 
+	/**
+	 * zet de pen uit
+	 */
 	void penUit()
 	{
 		pen = false;
 	}
 
+	/**
+	 * zet de pen uit en lnummer op 0
+	 * @param n dummy
+	 */
 	void penUit(int n)
 	{
 		pen = false;
 		lnummer = 0;
 	}
 
+	/**
+	 * zet vul aan
+	 */
 	void vulAan()
 	{
 		vul = true;
 	}
 
+	/**
+	 * zet vul aan in kleur kl
+	 * @param kl kleurnaam
+	 */
 	void vulAan(String kl)
 	{
 		vul = true;
@@ -647,18 +845,33 @@ System.out.println("b = " + b);
 			vulkleur = maakKleur(kl);
 	}
 
+	/**
+	 * zet vul aan in RGB-kleur (r,g,b)
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void vulAan(int r, int g, int b)
 	{
 		vul = true;
 		vulkleur = CssColor.make(r, g, b);
 	}
 
+	/**
+	 * zet vul aan en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 */
 	void vulAan(int n)
 	{
 		vul = true;
 		lnummer = n;
 	}
 
+	/**
+	 * zet vul aan in kleur kl en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param kl kleurnaam
+	 */
 	void vulAan(int n, String kl)
 	{
 		vul = true;
@@ -669,6 +882,13 @@ System.out.println("b = " + b);
 			vulkleur = maakKleur(kl);
 	}
 
+	/**
+	 * zet vul aan in RGB-kleur (r,g,b) en het Lichaam3D-nummer op lnummer
+	 * @param n nieuw lnummer
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void vulAan(int n, int r, int g, int b)
 	{
 		vul = true;
@@ -676,12 +896,20 @@ System.out.println("b = " + b);
 		vulkleur = CssColor.make(r, g, b);
 	}
 
+	/**
+	 * zet vul aan in CssColor kl
+	 * @param kl nieuwe CssColor
+	 */
 	void vulAan(CssColor kl)
 	{
 		vul = true;
 		vulkleur = kl;
 	}
 
+	/**
+	 * maak van alle punten in Lichaam3D n een Polgon en teken dit;
+	 * zet vul uit en lnummer terug naar 0
+	 */
 	void vulUit()
 	{
 		tekenPolygon();
@@ -690,6 +918,11 @@ System.out.println("b = " + b);
 		leeg = false;
 	}
 
+	/**
+	 * maak van alle punten in Lichaam3D n een Polgon en teken dit;
+	 * zet vul uit en lnummer terug naar 0
+	 * @param n Lichaam3D nummer, geen error check
+	 */
 	void vulUit(int n)
 	{
 		tekenPolygon(n);
@@ -698,29 +931,40 @@ System.out.println("b = " + b);
 		leeg = false;
 	}
 
+	/**
+	 * zet de achtergrondkleur op kl 
+	 * @param kl kleurnaam
+	 */
 	void achtergrondkleur(String kl)
 	{
 		achtergrondkleur = maakKleur(kl);
 	}
 
+	/**
+	 * zet de achetgrondkleur op RGB-kleur (r,g,b)
+	 * @param r rood
+	 * @param g groen
+	 * @param b blauw
+	 */
 	void achtergrondkleur(int r, int g, int b)
 	{
 		achtergrondkleur = CssColor.make(r, g, b);
 	}
 
+	/**
+	 * zet de achetrgrondkleur op CssColor c
+	 * @param c CssColor
+	 */
 	void zetAchtergrond(CssColor c)
 	{
 		achtergrondkleur = c;
 	}
 
-	//	void schrijf(String s)
-	//	{	gIm.drawString(s, (int)beginpunt.x, (int)beginpunt.y);
-	//	}
-	//	void schrijf(String s, Font f)
-	//	{	gIm.setFont(f);
-	//		gIm.drawString(s, (int)beginpunt.x, (int)beginpunt.y);
-	//	}
-	Punt geefPunt() // geeft de laatst getekende Punt
+	/**
+	 * geef het laatst getekende Punt uit Lichaam3D nummer 0
+	 * @return laatstgetekende Punt
+	 */
+	Punt geefPunt() 
 	{
 		double pf = (afstand - beginpunt.z) / afstand;
 		double begx = l[0].nulpunt.x + (beginpunt.x - l[0].nulpunt.x) / pf;
@@ -728,7 +972,12 @@ System.out.println("b = " + b);
 		return new Punt(begx, begy);
 	}
 
-	Punt geefPunt(int n) // geeft de laatst getekende Punt
+	/**
+	 * geef het laatst getekende Punt uit Lichaam3D nummer n
+	 * @param n nummer van het Lichaam3D
+	 * @return laatstgetekende Punt
+	 */
+	Punt geefPunt(int n)
 	{
 		double pf = (afstand - beginpunt.z) / afstand;
 		double begx = l[n].nulpunt.x + (beginpunt.x - l[n].nulpunt.x) / pf;
@@ -736,6 +985,11 @@ System.out.println("b = " + b);
 		return new Punt(begx, begy);
 	}
 
+	/**
+	 * geef het laatst getekende Polygon uit Lichaam3D nummer 0 indien
+	 * de normaal naar het oog wijst, anders een leeg Polygon
+	 * @return Polygon als beschreven
+	 */
 	Polygon geefVlak()
 	{
 		if (l[0].vlakken[l[0].aantalPolygonen - 1].normaal.z > 0)
@@ -744,6 +998,12 @@ System.out.println("b = " + b);
 			return new Polygon();
 	}
 
+	/**
+	 * geef het laatst getekende Polygon uit Lichaam3D nummer n indien
+	 * de normaal naar het oog wijst, anders een leeg Polygon
+	 * @param n nummer van het Lichaam3D
+	 * @return Polygon als beschreven
+	 */
 	Polygon geefVlak(int n)
 	{
 		if (l[n].vlakken[l[n].aantalPolygonen - 1].normaal.z > 0)
@@ -752,6 +1012,11 @@ System.out.println("b = " + b);
 			return new Polygon();
 	}
 
+	/**
+	 * gegeven de naam van een kleur, maak de corresponderende CssColor
+	 * @param kl naam van de kleur 
+	 * @return corresponderende CssColor
+	 */
 	private CssColor maakKleur(String kl)
 	{
 		if (kl.equals("rood"))
@@ -782,24 +1047,31 @@ System.out.println("b = " + b);
 			return CssColor.make(0, 0, 0);
 	}
 
-	public void animatie()
-	{
-	}
 
+	/**
+	 * update de String lastBuildCommand; merk op dat de kubusjes
+	 * in het rooster coordinaten tussen 0 en maxAantal-1 hebben, 
+	 * in de build commands tussen 1 en maxAantal
+	 * @param changed is er iets veranderd?
+	 * @param bouw bouwen of slopen?
+	 * @param x x-positie veranderd kubusje
+	 * @param y y-positie veranderd kubusje
+	 * @param z z-positie veranderd kubusje
+	 */
     private void updateLastBuildCommand(boolean changed, boolean bouw, int x, int y, int z)
     {	if(changed && bouw)
-    	{	//lastBuildCommand = NabouwenAanzichten.rb.getString("bouwOpdracht") + " " + (x+1) + "," + (y+1) + "," + (z+1);
-    		lastBuildCommand = eigenaar.rb.bouwOpdracht() + " " + (x+1) + "," + (y+1) + "," + (z+1);
+    	{	lastBuildCommand = eigenaar.rb.bouwOpdracht() + " " + (x+1) + "," + (y+1) + "," + (z+1);
     	}
     	else if(changed && !bouw)
-    	{	//lastBuildCommand = NabouwenAanzichten.rb.getString("sloopOpdracht") + " " + (x+1) + "," + (y+1) + "," + (z+1);
-    		lastBuildCommand = eigenaar.rb.sloopOpdracht() + " " + (x+1) + "," + (y+1) + "," + (z+1);
+    	{	lastBuildCommand = eigenaar.rb.sloopOpdracht() + " " + (x+1) + "," + (y+1) + "," + (z+1);
     	}
     	else
     		lastBuildCommand = "";
     }
 
-	
+	/**
+	 * actie bij MouseMove/TouchMove Event: draai
+	 */
 	public void muisSleepActie()
 	{
 		if (removed)
@@ -818,105 +1090,13 @@ System.out.println("b = " + b);
 
 	}
 
-/*	
-	public void muisKkActie(MouseUpEvent e, boolean remove)
-	//public void muisKkActie(boolean remove)
-	{
-		boolean changed = false;
-		
-		for (int q = aantalKv - 1; q > -1; q--)
-		{
-			int n = sorteerRij[q];
-			if (kv[n].m == 6 && kv[n].k == 0 && p[kv[n].i][kv[n].j].contains(mb.geefDrukx(), mb.geefDruky()))
-			{
-				if (eigenaar.isBouwen() && !(e.isControlKeyDown() || remove))
-				{
-					changed = kr.voegKubusToe(kv[n].i, kv[n].j, 0);
-					updateLastBuildCommand(changed, true, kv[n].i, kv[n].j, 0);
-					if (gr != null)
-						gr.verhoog(kv[n].i, kv[n].j);
-				}
-				else
-				{
-					changed = kr.verwijderKubus(kv[n].i, kv[n].j, 0);
-					updateLastBuildCommand(changed, false, kv[n].i, kv[n].j, 0);
-					if (gr != null)
-						gr.verlaag(kv[n].i, kv[n].j);
-				}
-				return;
-			}
-			else if (kv[n].m != 6 && pp[kv[n].i][kv[n].j][kv[n].k][kv[n].m].contains(mb.geefDrukx(), mb.geefDruky()))
-			{
-				if (eigenaar.isBouwen() && !(e.isControlKeyDown() || remove))
-				{
-					if (kv[n].m == 0)
-					{
-						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k + 1);
-						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k+1);
-						if (gr != null)
-							gr.verhoog(kv[n].i, kv[n].j);
-					}
-					if (kv[n].m == 1)
-					{
-						changed = kr.voegKubusToe(kv[n].i, kv[n].j - 1, kv[n].k);
-						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j-1,kv[n].k);
-					}
-					if (kv[n].m == 2)
-					{
-						changed = kr.voegKubusToe(kv[n].i + 1, kv[n].j, kv[n].k);
-						updateLastBuildCommand(changed, true, kv[n].i+1,kv[n].j,kv[n].k);
-					}
-					if (kv[n].m == 3)
-					{
-						changed = kr.voegKubusToe(kv[n].i, kv[n].j + 1, kv[n].k);
-						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j+1,kv[n].k);
-					}
-					if (kv[n].m == 4)
-					{
-						changed = kr.voegKubusToe(kv[n].i - 1, kv[n].j, kv[n].k);
-						updateLastBuildCommand(changed, true, kv[n].i-1,kv[n].j,kv[n].k);
-					}
-					if (kv[n].m == 5)
-					{
-						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k - 1);
-						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k-1);
-					}
-				}
-				else
-				{
-					changed = kr.verwijderKubus(kv[n].i, kv[n].j, kv[n].k);
-					updateLastBuildCommand(changed, false, kv[n].i,kv[n].j,kv[n].k);
-					if (gr != null)
-						gr.verlaag(kv[n].i, kv[n].j);
-				}
-				return;
-			}
-		}
-	}
-*/
-/*	
-	public void muisDoubleKlikActie(DoubleClickEvent e)
-	{
-		for (int q = aantalKv - 1; q > -1; q--)
-		{
-			int n = sorteerRij[q];
-			if (kv[n].m == 6 && kv[n].k == 0 && p[kv[n].i][kv[n].j].contains(mb.geefDrukx(), mb.geefDruky()))
-			{
-				kr.verwijderKubus(kv[n].i, kv[n].j, 0);
-				if (gr != null)
-					gr.verlaag(kv[n].i, kv[n].j);
-				return;
-			}
-			else if (kv[n].m != 6 && pp[kv[n].i][kv[n].j][kv[n].k][kv[n].m].contains(mb.geefDrukx(), mb.geefDruky()))
-			{
-				kr.verwijderKubus(kv[n].i, kv[n].j, kv[n].k);
-				if (gr != null)
-					gr.verlaag(kv[n].i, kv[n].j);
-				return;
-			}
-		}
-	}
-*/
+	
+	/**
+	 * actie bij MouseUp/TouchEnd Event: bepaal of een vlakje van het grondvlak
+	 * of een vlakje van een kubusje was aangeklikt; voeg een kubusje toe of
+	 * verwijder een kubusje  
+	 * @param remove dummy, is altijd false
+	 */
 	public void muisKkActie(boolean remove)
 	{
 		if (eigenaar.nagekeken)
@@ -927,6 +1107,7 @@ System.out.println("b = " + b);
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
 			int n = sorteerRij[q];
+			
 			if (kv[n].m == 6 && kv[n].k == 0 && p[kv[n].i][kv[n].j].contains(mb.geefDrukx(), mb.geefDruky()))
 			{
 				boolean changed = false;
@@ -1006,32 +1187,16 @@ System.out.println("b = " + b);
 		}
 	}
 
-/*	
-	public void muisDrukActie(MouseDownEvent e)
-	{
-		if (removing)
-			return;
-		removing = true;
-		//if(cubeRemoveThread!=null)
-		{ //cubeRemoveThread.maakDood();
-			//cubeRemoveThread=null;
-		}
-		//cubeRemoveThread = new CubeRemoveThread(e);
-		//cubeRemoveThread.start();
-
-	}
-*/
+	/**
+	 * actie bij MouseDown/TouchStart Event:
+	 * kijk of een vlakje van een kubusje aangeklikt werd, zet holdMouse to true
+	 * neem de tijd op
+	 */
 	public void muisDrukActie()
 	{
 		if (removing)
 			return;
 		removing = true;
-		//if(cubeRemoveThread!=null)
-		{ //cubeRemoveThread.maakDood();
-			//cubeRemoveThread=null;
-		}
-		//cubeRemoveThread = new CubeRemoveThread(e);
-		//cubeRemoveThread.start();
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
 			int n = sorteerRij[q];
@@ -1041,84 +1206,31 @@ System.out.println("b = " + b);
 			}
 		}
 		holdMouseStartTime = System.currentTimeMillis();
-//System.out.println("hmstart " + holdMouseStartTime);
+
 	}
 
-	public void muisKlikActie()
-	{
-	}
-
-/*	
-	public void muisLosActie(MouseUpEvent e)
-	//public void muisLosActie()
-	{
-		removing = false;
-		if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) < 16))
-		{
-			muisKkActie(e, false);
-			tekenOpnieuw();
-			//eigenaar.zetVeranderd();
-		}
-		removed = false;
-	}
-*/
+	/**
+	 * actie bij MouseUp/TouchEnd Event: neem de tijd op, bepaal of
+	 * er sprake is van een lange muisDruk en roep methode muisKkActie aan  
+	 */
 	public void muisLosActie()
 	{
 		holdMouseEndTime = System.currentTimeMillis();
-//System.out.println("hmend " + holdMouseEndTime);		
 		long holdMouseTime = holdMouseEndTime - holdMouseStartTime; 
 		removing = false;
-		if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) < 16))
+		if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + 
+				                    (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) < 16))
 		{
-		
 			holdMouse = false;
 			if (holdMouseTime > 300)
 				holdMouse = true;
-
-//System.out.println("holdMouse " + holdMouse);			
-			
 			muisKkActie(false);
 			tekenOpnieuw();
-			//eigenaar.zetVeranderd();
 		}
-		//else if (!removed && (klikAan && (mb.geefDrukx() - mb.geefX()) * (mb.geefDrukx() - mb.geefX()) + (mb.geefDruky() - mb.geefY()) * (mb.geefDruky() - mb.geefY()) > 16 && holdMouse))
-		//{
-		//	muisKkActie(false);
-		//	tekenOpnieuw();
-			//eigenaar.zetVeranderd();
-		//}
 		removed = false;
 		holdMouse = false;
 		
 		eigenaar.ingevuld = true;
 	}
 
-	/*
-	class CubeRemoveThread extends Thread 
-	{	
-		final MouseEvent ee;
-		boolean dood = false;
-		
-		public CubeRemoveThread(MouseEvent e)
-		{	ee = e;
-		}
-		
-		public void run()
-		{	try
-			{   sleep(500);
-			}
-			catch(InterruptedException e)    
-			{ }
-			if((removing && !dood && klikAan && (mb.geefDrukx()-mb.geefX())*(mb.geefDrukx()-mb.geefX()) + (mb.geefDruky()-mb.geefY())*(mb.geefDruky()-mb.geefY()) < 16) )
-			{	removed = true;
-				muisKkActie(ee, true);
-				eigenaar.zetVeranderd();	
-			}
-			removing = false;
-		}
-		public void maakDood()
-		{	dood = true;
-		}
-	}
-	*/
 }

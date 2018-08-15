@@ -3,25 +3,81 @@ package fi.nabouwenaanzichtengwt.client;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 
+/**
+ * klasse die een 3D configuratie bestaande uit 3d-polygons (zie klasse
+ * Polygon3D) representeert; tijdens het tekenen worden 3d-punten toegevoegd aan 
+ * de arrays met coordinaten; aanroepen van methode VoegPolygonToe voegt al deze
+ * punten toe aan een Polygon3D en maakt de arrays met coordinaten weer leeg.<br>
+ * zie methoden naar volgendePunt, vulAan, vulUit en tekenPolygon in klasses Viewer3d<br>
+ * zie klasse Polygon3D; merk op dat in dit geval elk Polygon3D een zijvlakje
+ * is van een kubusje, zodat het (maximaal) vier punten bevat.
+ */
 
 class Lichaam3D
 {
+	/**
+	 * integer x-coordinaten van de punten
+	 */
 	public int[] xcoor;
+	/**
+	 * integer y-coordinaten van de punten
+	 */
 	public int[] ycoor;
+	/**
+	 * integer z-coordinaten van de punten
+	 */
 	public int[] zcoor;
+	/**
+	 * double x-coordinaten van de punten
+	 */
 	public double[] xcoord;
+	/**
+	 * double y-coordinaten van de punten
+	 */
 	public double[] ycoord;
+	/**
+	 * double z-coordinaten van de punten
+	 */
 	public double[] zcoord;
 	
+	/**
+	 * index-array gebruikt in methode sorteer()
+	 */
 	public int[] sorteerRij;
 
-	public Polygon3D[] vlakken, vlakkenSort;
-	public int aantalPunten, aantalPolygonen;
+	/**
+	 * alle 3d-polygons in dit Lichaam3D, zie klasse Polygon3D 
+	 */
+	public Polygon3D[] vlakken;
+	/**
+	 * actuele aantal punten 
+	 */
+	public int aantalPunten;
+	/**
+	 * actuele aantal 3d-polygons
+	 */
+	public int aantalPolygonen;
+	/**
+	 * een tijdelijk 3d-polygon tijdens constructie
+	 */
 	private Polygon3D huidigePolygon;
+	/**
+	 * de projectie factor voor projectie vanuit het oog op de z-as 
+	 * met coordinaten (0,0,afstand) op het x-y-vlak
+	 */
 	private double pf;
+	/**
+	 * z-coordinaat van het oog op de z-as
+	 */
 	public double afstand;
+	/**
+	 * oorsprong van het coordinaten-systeem
+	 */
 	Punt3D nulpunt;
 
+	/**
+	 * constructor, initialiseer arrays, nulpunt en afstand 
+	 */
 	public Lichaam3D()
 	{	xcoor = new int[4];
 		ycoor = new int[4];
@@ -37,25 +93,44 @@ class Lichaam3D
 		nulpunt = new Punt3D(0,0,0);
 		afstand = 1000;
 	}
-	
+
+	/**
+	 * teken (de projecties) van alle 3d-polygonen in dit Lichaam3D 
+	 * @param gIm Context2d om te tekenen
+	 * @param schaduw true: teken de vlakvulling met schaduw-effect
+	 */
 	public void draw(Context2d gIm, boolean schaduw)
   	{
 		for(int i=0 ; i<aantalPolygonen ; i++)
 		{	vlakken[i].draw(gIm, schaduw);
-			//System.out.println("vlak "+i);
 		}
   	}
 	
+	/**
+	 * zet de afstand
+	 * @param afst nieuwe waarde voor de afstand
+	 */
 	public void zetAfstand(double afst)
 	{	afstand = afst;
 	}
 	
+	/**
+	 * zet een nieuwe oorsprong
+	 * @param x nieuwe x-coordinaat
+	 * @param y nieuwe y-coordinaat
+	 * @param z nieuwe z-coordinaat
+	 */
 	public void maakNulpunt(double x,double y,double z)
 	{	nulpunt.x = x;
 		nulpunt.y = y;
 		nulpunt.z = z;
 	}
-	
+
+	/**
+	 * voeg een 3d-punt toe, als x- en y-coordinaat save de 
+	 * projectie op het x-y-vlak 
+	 * @param p nieuw 3d-punt
+	 */
 	public void voegPuntToe(Punt3D p)
 	{	pf = (afstand-p.z)/afstand;
 		xcoord[aantalPunten] = nulpunt.x + (p.x-nulpunt.x)/pf;
@@ -68,6 +143,14 @@ class Lichaam3D
 		aantalPunten++;
 	}
 	
+	/**
+	 * maak van alle punten in de arrays met coordinaten een Polygon3D en
+	 * maak de arrays met coordinaten leeg;
+	 * @param vulkl vulkleur
+	 * @param lijnkl kleur van de omlijning
+	 * @param isOmlnd moet de omlijning getekend worden?
+	 * @param isLg is dit 3d-Polygon leeg?
+	 */
 	public void voegPolygonToe(CssColor vulkl, CssColor lijnkl, boolean isOmlnd, boolean isLg )
 	{	huidigePolygon = new Polygon3D();
 		huidigePolygon.pol = new Polygon(xcoor,ycoor,aantalPunten);
@@ -107,6 +190,9 @@ class Lichaam3D
 		
 	}
 
+	/**
+	 * bubble sort de 3d-polygons op gemiddelde z-waarde van de punten
+	 */
 	public void sorteer()
 	{	for(int i=0 ; i<2000 ; i++)
 		{	sorteerRij[i] = i;

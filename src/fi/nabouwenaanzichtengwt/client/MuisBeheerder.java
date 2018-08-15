@@ -1,7 +1,5 @@
 package fi.nabouwenaanzichtengwt.client;
 
-//import java.awt.*;
-//import java.awt.event.*;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.MouseEvent;
@@ -20,29 +18,19 @@ import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
-//import com.google.gwt.event.dom.client.DoubleClickHandler;
-
-//import com.google.gwt.event.dom.client.DoubleClickEvent;
 
 import com.google.gwt.user.client.ui.Widget;
-/*
-import com.googlecode.mgwt.dom.client.event.touch.Touch;
-import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
-import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-*/
 
+/**
+ * afhandelen Mouse/Touch Events;<br>
+ * zie klasse Muisbeheerder in WebLogoGWT 
+ */
 
 class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler,
 							   TouchStartHandler, TouchMoveHandler, TouchEndHandler 
-							   //TouchHandler
 {
 	private int eerstex, laatstex, eerstey, laatstey, dx, dy;
 	private Viewer3d eigenaar;
-	//private AnimatieBeheerder ab;
-	//private boolean animatieWasAan;
 	private boolean mouseDown;
 	
 	public MuisBeheerder(Viewer3d v3d)
@@ -56,21 +44,8 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		v3d.zetMuisBeheerder(this);
 	}
 	
-	//-------------------------------------------------------------------------------------------
-	//de AnimatieBeheerder maakt zich met deze methode kenbaar aan de Muisbeheerder  
-	//-------------------------------------------------------------------------------------------
-	//public void meldAnimatieBeheerder(AnimatieBeheerder ab)
-	//{	this.ab = ab;
-	//}
-	
-	//-------------------------------------------------------------------------------------------
-	//afhandeling van de muis gebeurtenissen 
-	//-------------------------------------------------------------------------------------------
 	public void onMouseDown(MouseDownEvent e)
-	{	//if(ab!=null && ab.animatieStatus())
-		//{	animatieWasAan = true;
-		//	ab.onderbreekAnimatie();
-		//}
+	{	
 		e.preventDefault();
 		e.stopPropagation();
 		
@@ -105,39 +80,9 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	
 		mouseDown = false;
 		eigenaar.muisLosActie();
-		//if(animatieWasAan)
-		//{	animatieWasAan = false;
-		//	ab.beginAnimatie();
-		//}
 		
 	}
 	
-	
-	
-	public void mouseClicked(MouseEvent e)
-	{	//if(ab!=null && ab.animatieStatus())
-		//{	animatieWasAan = true;
-		//	ab.onderbreekAnimatie();
-		//}
-		eerstex = e.getX();
-		eerstey = e.getY();
-		laatstex = e.getX();
-		laatstey = e.getY();
-		eigenaar.muisKlikActie();
-		//if(animatieWasAan)
-		//{	animatieWasAan = false;
-		//	ab.beginAnimatie();
-		//}
-	
-	}
-	public void mouseExited(MouseEvent e){;}
-	
-	public void mouseEntered(MouseEvent e){;}
-	public void mouseMoved(MouseEvent e){;}
-	
-	//-------------------------------------------------------------------------------------------
-	//deze methoden worden gebruikt door de muishandlers in het leerlingenprogramma
-	//-------------------------------------------------------------------------------------------
 	public int geefSleepdx()
 	{	return dx;
 	}
@@ -157,7 +102,6 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 	{	return laatstey;
 	}
 
-	@Override
 	public void onTouchMove(TouchMoveEvent event) 
 	{
 		event.preventDefault();
@@ -180,7 +124,6 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		
 	}
 
-	@Override
 	public void onTouchStart(TouchStartEvent event) 
 	{
 		event.preventDefault();
@@ -201,15 +144,9 @@ class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandle
 		
 	}
 
-	@Override
 	public void onTouchEnd(TouchEndEvent event) 
 	{
 		eigenaar.muisLosActie();
 	}
-
-	//@Override
-	//public void onTouchCanceled(TouchCancelEvent event) {
-		// Not Used	
-	//}
 
 }	

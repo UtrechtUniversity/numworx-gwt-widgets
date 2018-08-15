@@ -1,8 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-//import java.awt.*;
-//import java.util.*;
-
 public class Aftrekking extends Expressie  
 {	
 	

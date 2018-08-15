@@ -1,7 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
-
 public class Deling extends Expressie  
 {	
 	

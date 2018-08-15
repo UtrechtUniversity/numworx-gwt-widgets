@@ -1,12 +1,32 @@
 package fi.nabouwenaanzichtengwt.client;
 
+/**
+ * klasse die een 3d-veelvlak representeert
+ * @author Peter Boon
+ */
 
 public class Veelvlak
-{	int aantalHoekpunten;
+{	
+	/**
+	 * het aantal hoekpunten in dit veelvlak
+	 */
+	int aantalHoekpunten;
+	/**
+	 * het aantal vlakken in dit Veelvlak
+	 */
 	int aantalVlakken;
+	/**
+	 * de hoekpunten in dit Veelvlak
+	 */
 	Hoekpunt[] hoekpunten;
+	/**
+	 * de vlakken in dit Veelvlak
+	 */
 	Vlak[] vlakken;
-	
+
+	/**
+	 * constructor voor een leeg veelvlak, initialiseer attributen
+	 */
 	public Veelvlak()
 	{	aantalHoekpunten = 0;
 		aantalVlakken = 0;
@@ -14,6 +34,13 @@ public class Veelvlak
 		vlakken = new Vlak[50];
 	}
 	
+	/**
+	 * overloaded constuctor: hoekpunten gegegeven als een array van doubles (3 per hoekpunt),
+	 * vlakken gegeven als het aantal vlakken in vl[0], gevolgd door n+1 integers voor elk vlak met n hoekpunten, nl.
+	 * het aantal hoekpunten n gevolgd door n indices in hoekpunten[] 
+	 * @param hp double array voor de hoekpunten
+	 * @param vl integer array voor vlakken met format als boven
+	 */
 	public Veelvlak(double[] hp, int[] vl)
 	{	aantalVlakken = 0;
 		hoekpunten = new Hoekpunt[100];
@@ -34,11 +61,22 @@ public class Veelvlak
 		}
 	}
 
+	/**
+	 * voeg een hoekpunt met coordinaten (x,y,z) toe  aan hoekpunten[]  
+	 * @param x x-coordinaat hoekpunt
+	 * @param y y-coordinaat hoekpunt
+	 * @param z z-coordinaat hoekpunt
+	 */
 	public void voegHoekpuntToe(double x, double y, double z)
 	{	hoekpunten[aantalHoekpunten] = new Hoekpunt(x,y,z);
 		aantalHoekpunten++;
 	}
 	
+	/**
+	 * voeg een vlak met n hoekpunten toe aan vlakken[]
+	 * @param n aantal hoekpunten van het toe te voegen vlak
+	 * @param hpnrs de indices van de hoekpunten van het toe te voegen vlak in hoekpunten[]
+	 */
 	public void voegVlakToe(int n, int[] hpnrs)
 	{	Hoekpunt[]hpv = new Hoekpunt[n];
 		for(int i=0 ; i<n ; i++)
@@ -48,6 +86,10 @@ public class Veelvlak
 		aantalVlakken++;
 	}
 	
+	/**
+	 * zet de vulkleur van alle vlakken 
+	 * @param kleur nieuwe vulkleur
+	 */
 	public void zetVulkleur(String kleur)
 	{	for(int i=0 ; i<aantalVlakken ; i++)
 		{	vlakken[i].zetVulkleur(kleur);
@@ -55,34 +97,3 @@ public class Veelvlak
 	}
 }
 
-class Vlak
-{	
-	int aantalHoekpunten;
-	Hoekpunt[] punten;
-	public String vulkleur,lijnkleur,vorigeKleur;
-	
-	public Vlak(int n ,Hoekpunt[] pnt)
-	{	vulkleur = "oranje";
-		lijnkleur = "zwart";
-		vorigeKleur = "oranje";
-		aantalHoekpunten=n;
-		punten = new Hoekpunt[aantalHoekpunten];
-		for(int i=0 ; i<aantalHoekpunten ; i++)
-		{	punten[i] = pnt[i];
-		}
-	}
-	
-	public void zetVulkleur(String kleur)
-	{	vulkleur = kleur;
-		vorigeKleur = kleur;
-	}
-}
-class Hoekpunt
-{	double x,y,z;
-	
-	public Hoekpunt(double x, double y, double z)
-	{	this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-}

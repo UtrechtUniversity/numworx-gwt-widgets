@@ -1,13 +1,10 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
 
 public class Kwadraat extends Expressie  
-{	//Expressie operatorExpr;
-	
+{		
 	public Kwadraat(Expressie e1 )
 	{	kind1 = e1;
-		//operatorExpr = new BasisExpressie(operatorString);
 		isVeelterm = false;
 		isProdukt = true;
 		isBasis = false;

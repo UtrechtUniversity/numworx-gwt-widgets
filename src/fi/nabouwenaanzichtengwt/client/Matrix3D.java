@@ -1,12 +1,15 @@
 package fi.nabouwenaanzichtengwt.client;
 
-class Matrix3D
-{	
-	//-------------------------------------------------------------------------------------------
-	//deze klasse onthoudt, en berekent steeds opnieuw de tekenrichting, en berekent voor het 
-	//Tekenblad aan de hand van een dx,dy en dz het volgende eindpunt van de tekenlijn.
-	//-------------------------------------------------------------------------------------------
+/**
+ * deze klasse onthoudt de tekenrichting in 3d-space en herberekent deze
+ * richting na draai-opdrachten<br>
+ * gegeven de huidige positie en een translatie vector (dx,dy,dz), berekent deze klasse
+ * ook de nieuwe positie, gebruik makend van de huidige tekenrichting  
+ * @author Peter Boon
+ */
 
+public class Matrix3D
+{	
 	private Rotatie3D[] rotatieRij;
 	private int aantalRotaties;
 	private double starthoekx,starthoeky,starthoekz,startschaal;

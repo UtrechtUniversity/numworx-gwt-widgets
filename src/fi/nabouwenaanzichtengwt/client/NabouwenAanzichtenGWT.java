@@ -29,77 +29,151 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 
-
-//import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-//import com.googlecode.mgwt.dom.client.event.touch.TouchStartHandler;
-//import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
-
-
-
 import fi.nabouwenaanzichtengwt.client.text.Msgs;
 import fi.nabouwenaanzichtengwt.client.text.Text;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+/**
+ * hoofdklasse voor NabouwenAanzichtenGWT, voor de instellingen zie ook de Java-versie; <br>
+ * afhankelijk van deze instellingen verschijnt de instantie van NabouwenAanzichten als:<br>
+ * A) een panel met 3, 2 of een onveranderbare aanzichten;<br>
+ * B) een viewer3d met daarin een kubusbouwsel weergegeven als<br>
+ * B1) als (onveranderbaar) bovenaanzicht al dan niet met hoogtes<br>
+ * B2) als kubusbouwsel dat (instelbaar) gedraaid kan worden, waaraan (instelbaar)
+ * kubusjes kunnen worden toegevoegd of waarvan kubusjes kunnen worden verwijderd,
+ * dit toevoegen/verwijderen kan (instelbaar) via een aparte keuze bouwen/slopen, of 
+ * toevoegen via mouse klik en verwijderen via long mouse klik; ook kan het kubusbouwsel
+ * weergegeven woden als silhouet (instelbaar); verder wordt (instelbaar) het aantal kubusjes getoond
+ * en is er (instelbaar) een knop die het bouwsel helemaal vol of helemaal leeg maakt.<br>     
+ * voor de nakijkopties zie de Java-versie; <br>
+ * CBook-communicatie:<br>
+ * 1) de gebruiker bouwt/sloopt in een instantie van NabouwenAanzichtenGWT met een Viewer3d en
+ * het resultaat wordt getoond in een instantie van NabouwenAanzichtenGWT met een Viewer3d of een
+ * VaktekPanel met aanzichten; <br>
+ * 2) de gebruiker bouwt/sloopt in een instantie van NabouwenAanzichtenGWT met een Viewer3d en
+ * de gebruikte bouw- en sloopopdrachten worden als bouwprogramma getoond in een TekstVak<br>
+ * 3) de gebruiker typt een bouwprogramma bestaande uit bouw- en sloopopdrachten in in een TekstVak
+ * en het resultaat wordt getoond in een instantie van NabouwenAanzichtenGWT met een Viewer3d of een
+ * VaktekPanel met aanzichten; <br>   
+ * @author Peter Boon
+ */
+
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
 {
+	/**
+	 * CBook constantes
+	 */
 	public static final String TEXT_CSV = "text.csv";
 	public static final String ACTION_CORRECT = "action.correct";
 	public static final String ACTION_FALSE = "action.false";
 	public static final String ACTION_FALSE2 = "action.false_2";
 
+	/**
+	 * voorgedefinieerde CBook Events
+	 */
 	private static final CBookEvent EVENT_CORRECT = new CBookEvent(ACTION_CORRECT); 
 	private static final CBookEvent EVENT_FALSE = new CBookEvent(ACTION_FALSE); 
 	private static final CBookEvent EVENT_FALSE2 = new CBookEvent(ACTION_FALSE2); 
 
-    // logger
     static Logger logger = Logger.getLogger("NabouwenaanzichtenGWT");
+    /**
+     * internationalisatie
+     */
 	static final Text rb = GWT.create(Text.class);
 
 	static final String upgradeMessage = "Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 
+	/**
+	 * Canvas van de Viewer3d (als die er is)
+	 */
 	Canvas canvas;
-	int mouseX, mouseY;
+	
 	OpdrNavIF comRoot;
 	int mode;
 
-	static final int refreshRate = 25;
-
-	final CssColor redrawColor = CssColor.make("rgba(255,255,255,0.6)");
-
+	/**
+	 * breedte en hoogte
+	 */
 	private int breedte = 600;
 	private int hoogte = 250;
+	
+	/**
+	 * launch data
+	 */
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	Map<String, ?> randomVarWaarden = null;
 
+	/**
+	 * main panel
+	 */
 	LayoutPanel panel = new LayoutPanel();
 	
-	//TouchPanel touchPanel = new TouchPanel();
-	
-	//TouchButton nakijkKnop = new TouchButton();
-	
+	/**
+	 * RadioButton groep bouwen/slopen
+	 */
 	String bouwenSlopenGroup = "bouwenSlopenGroup";
+	/**
+	 * bouwen RadioButton
+	 */
 	RadioButton bouwenButton;
+	/**
+	 * slopen RadioButton
+	 */
 	RadioButton slopenButton;
 
+	/**
+	 * PushButtons om het kubusrooster helemaal vol of helemaal leeg
+	 * te maken; gebruik twee Pushbuttons, waarvan er steeds een zichtbaar is,
+	 * i.p.v. het opschrift van een PushButton te veranderen (werkt niet goed) 
+	 */
 	PushButton volButton = new PushButton(rb.maakVol());
 	PushButton leegButton = new PushButton(rb.maakLeeg());
-	
+
+	/**
+	 * Label dat het aantal blokjes in het kubusbouwsel weergeeft
+	 */
 	Label blokjesLabel;
 	
+	/**
+	 * wordt er extern nagekeken?
+	 */
 	private boolean checkExternal = false;
 
-	PushButton kijkNaButton = new PushButton(rb.kijkNa()); 
+	/**
+	 * nakijkknop  
+	 */
+	PushButton kijkNaButton = new PushButton(rb.kijkNa());
+	/**
+	 * panel voor nakijkknop
+	 */
 	LayoutPanel kijkNaPanel = new LayoutPanel();
 	
+	/**
+	 * is het kubusbouwsel veranderd na de laatste keer dat er nagekeken werd?
+	 */
 	private boolean isVeranderdNaNakijken = false;
 	
+	/**
+	 * de viewer met het kubusbouwsel
+	 */
 	private Viewer3d vWerk = null;
+	/**
+	 * het Panel met 1,2 of 3 aanzichten
+	 */
 	private VaktekPanel vaktekPanel = null;
+	
+	/**
+	 * nakijk-klasse, zie aldaar
+	 */
 	private NabouwenAanzichtenChecker naChecker;
 
+	/**
+	 * nakijk paremeters
+	 */
 	private int goedHalfFout;
 	private int score = 0;
     private int errorCount;
@@ -108,19 +182,46 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     private boolean changed = false;
     private int foutStraf = 2;
 
+    /**
+     * het kubusbouwsel als silhouet tonen (d.w.z. helemaal zwart)?
+     */
 	boolean silhouet = false;
 	
+	/**
+	 * is er een keer nagekeken?
+	 */
 	boolean nagekeken;
+	/**
+	 * is het initiele kubus bouwsel veranderd?
+	 */
 	boolean ingevuld;
 
+	/**
+	 * moet er nagekeken worden?
+	 */
 	boolean kijkNaActief = false;
 
+	/**
+	 * het kubusrooster, zie klasse KubusRooster
+	 */
 	private KubusRooster startKr;
+	/**
+	 * default waarde maximum zijde van het kubusrooster (dus maximaal 
+	 * maxAantal x maxAantal x maxAantal kubusjes), wordt uitgelezen
+	 * uit de launch data
+	 */
 	int maxAantal = 4;
+	/**
+	 * boolean rooster voor het KubusRooster: true op een
+	 * positie betekent dat zich daar een kubusje bevindt 
+	 */
 	boolean[][][] b;
 
 	NabouwenAanzichtenGWTCssResource nabouwenAanzichtenCss;
 	
+	/**
+	 * String met bouwprogramma voor CBook
+	 */
 	String buildHistory = "";
 
 	public NabouwenAanzichtenGWT()
@@ -156,147 +257,36 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	public void onModuleLoad()
 	{
 		makeResources();
-		//initOnLoad();
 		RootPanel.get().add(panel);
 		
 		Stub.publish(this);
 		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
 	}
 
-	// 2 aanzichten
-	private void initOnLoad()
-	{
-		hoogte = 200;
-		breedte = 200;
-		int maxAantal = 4;
-		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-		for (int i = 0; i < maxAantal; i++)
-		{
-			for (int j = 0; j < maxAantal; j++)
-			{
-				for (int k = 0; k < maxAantal; k++)
-				{
-					if (k == 0 && j == 0 && i == 0)
-						;
-					b[i][j][k] = Math.random()>0.8;
-				}
-			}
-		}
-		startKr = new KubusRooster(b, 1.5);
-		vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 2, this);
-		panel.add(vaktekPanel.getPanel());
 
-	}
-	
-	// 3 aanzichten
-	private void initOnLoad_1()
-	{
-		hoogte = 200;
-		breedte = 200;
-		int maxAantal = 4;
-		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-		for (int i = 0; i < maxAantal; i++)
-		{
-			for (int j = 0; j < maxAantal; j++)
-			{
-				for (int k = 0; k < maxAantal; k++)
-				{
-					if (k == 0 && j == 0 && i == 0)
-						;
-					b[i][j][k] = Math.random()>0.8;
-				}
-			}
-		}
-		startKr = new KubusRooster(b, 1.5);
-		vaktekPanel = new VaktekPanel(startKr, breedte, hoogte, 3, this);
-		panel.add(vaktekPanel.getPanel());
-
-	}
-
-	private void initOnLoad_0() {
-		int maxAantal = 6;
-		boolean[][][] b = new boolean[maxAantal][maxAantal][maxAantal];
-		for (int i = 0; i < maxAantal; i++)
-		{
-			for (int j = 0; j < maxAantal; j++)
-			{
-				for (int k = 0; k < maxAantal; k++)
-				{
-					if (k == 0 && j == 0 && i == 0)
-						;
-					b[i][j][k] = false;
-				}
-			}
-		}
-		Viewer3d vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, 450, 450, this);
-		//vWerk.zetAchtergrond(bgcolor);
-		vWerk.zetAfstand(1000);
-		vWerk.zetSchaduw(true);
-		vWerk.zetBeginHoeken(30, -30);
-		vWerk.zetMuisAan(true);
-		//vWerk.zetGetalRooster(true);
-
-		canvas = vWerk.getCanvas();
-		vWerk.initContext2d();
-
-		vWerk.draw();
-
-		//touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		//touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
-		//touchPanel.add(canvas);
-		
-		//panel.add(touchPanel);
-		panel.add(canvas);
-		
-		//MuisBeheerder mb = new MuisBeheerder(vWerk);
-
-		//touchPanel.addTouchHandler(mb);
-	}
-
-/*	
-	private void addCheckButtonHandler(final TouchButton tb)
-	{
-		tb.addTouchStartHandler(new TouchStartHandler()
-		{
-			@Override
-			public void onTouchStart(TouchStartEvent event)
-			{
-				check();
-				if (vWerk == null || !ingevuld || !kijkNaActief)
-					comRoot.setChanged(goedHalfFout == NabouwenAanzichtenChecker.FOUT);
-			}
-
-		});
-	}
-*/
-	
+	/**
+	 * inner class voor Click Events op de kijkNaButton, de
+	 * volButton en de leegButton; van de vvolButton en de leegButton
+	 * is er steeds maar een zichtbaar
+	 */
     class PushClickHandler implements ClickHandler
     {
-    	//public void onMouseDown(MouseDownEvent e)
     	public void onClick(ClickEvent e)
     	{
-			//e.preventDefault();
 			e.stopPropagation();
     		
     		if (e.getSource() == kijkNaButton)
     		{
     			kijkNa();
-    			
-    			// hieronder nodig? in kijkNa() wordt ook comroot.setChanged gedaan
-//				boolean b = vWerk == null || !ingevuld || !kijkNaActief;
-//				if (!b)
-//					comRoot.setChanged(goedHalfFout == NabouwenAanzichtenChecker.FOUT);
     		}
     		else if (e.getSource() == volButton)
     		{
     			panel.setWidgetVisible(volButton, false);
     			panel.setWidgetVisible(leegButton, true);
     			buildHistory = "";
-    			//startKr.maakVol();
     			vWerk.kr.maakVol();
     			vWerk.tekenOpnieuw();
     			zetVeranderd(false);
-    			
     			setChanged(true);
     			if (nagekeken)
     				zetIsVeranderdNaNakijken(true);
@@ -305,7 +295,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
     		{
     			panel.setWidgetVisible(volButton, true);
     			panel.setWidgetVisible(leegButton, false);
-    			//startKr.maakLeeg();
     			vWerk.kr.maakLeeg();
     			buildHistory = "";
     			vWerk.tekenOpnieuw();
@@ -321,8 +310,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	/**
 	 * Retourneert true als nabouwen aanzichten in de nakijk-modus staat en
 	 * moet nakijken. 
-	 * 
-	 * @return
+	 * @return true/false
 	 */
 	private boolean isNakijkModus()
 	{
@@ -340,17 +328,14 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	}
 
 	/**
-	 * Wat doet dit?
-	 * 
-	 * @param state
+	 * er is iets veranderd aan het bouwsel;
+	 * update het blokjes-label; fire CBook Events;
+	 * als state == false reset het kijknagebeuren
+	 * (d.w.z.clear de feedback) 
+	 * @param state true: aangeroepen tijdens setState
 	 */
 	void zetVeranderd(boolean state)
 	{
-		//if (vWerk == null || !kijkNaActief)
-		//	return;
-
-		//nakijkKnop.clear();
-		//nakijkKnop.add(vinkjeGrijsImage);
 		if ((blokjesLabel != null) && (vWerk != null))
 		{
 			Msgs msgs = GWT.create(Msgs.class);
@@ -385,7 +370,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		
 		ingevuld = true;
 		
-		if (state) return;
+		if (state) 
+			return;
 		
 		clearFeedbackImages();
 		
@@ -395,24 +381,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			ingevuld = true;
 		else
 			ingevuld = false;
-		//comRoot.setChanged(false); // moet dit?
 
-/*		
-		if (vWerk != null)
-		{	
-			boolean[][][]  booleanKR = vWerk.kr.geefBooleanRooster();
-			Map<String,Object> map = new HashMap<String,Object>();
-			map.put("booleanKR", booleanKR);
-			comRoot.fireEvent(new CBookEvent(this,"blockBuilding",map));
-			
-			String lastBuildCommand = vWerk.getLastBuildCommand();
-			if(!"".equals(lastBuildCommand))
-				buildHistory = buildHistory + lastBuildCommand + "\n";
-			Map<String,Object> map1 = new HashMap<String,Object>();
-			map1.put("content", buildHistory);
-			comRoot.fireEvent(new CBookEvent(this,"text.buildingProgram",map1));
-		}
-*/
 	}
 
 	/**
@@ -425,6 +394,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		kijkNaPanel.setStyleName("goed", false);
 	}
 
+	/**
+	 * is de bouwenButton aangevinkt?
+	 * return true als er geen bouwenButton is (dan kunnen we altijd bouwen)
+	 * @return true/false
+	 */
 	boolean isBouwen()
 	{
 		if (bouwenButton != null)
@@ -433,14 +407,19 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			return true;
 	}
 
-	@Override
+	/**
+	 * stop het huidige kubusbouwsel (als een
+	 * boolean rooster) in een HashMap; bewaar ook
+	 * de actuele nakijkparameters
+	 * bij een VakTekPanel is er niets te doen, want daar zit het kubusbouwsel in
+	 * de launchdate en kan niet door de leerling veranderd worden
+	 */
 	public HashMap<String, Object> getState()
 	{
 		HashMap<String, Object> h = new HashMap<String, Object>();
 		if (vWerk == null)
 			return h;
 
-		// check(); FIXME waarom staat die hier? Leidt tot oneindige recursie! 
 		kijkNa(false, false);
 		
 		boolean[][][] stateNew = null;
@@ -457,8 +436,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		return h;
 	}
 
-	
-	@Override
+	/**
+	 * roep setState0 aan, vang Exceptions af
+	 */
 	public void setState(HashMap<String,Object> h)
 	{
 		try
@@ -471,6 +451,14 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		}
 	}
 	
+	/**
+	 * haal het boolean kubusrooster en de laatste nakijkparemeters uit de HashMap,
+	 * maak hiervan een kubusbouwsen, stop dit in de viewer3d en kijk na als
+	 * nodig;<br>
+	 * bij een VakTekPanel is er niets te doen, want daar zit het kubusbouwsel in
+	 * de launchdate en kan niet door de leerling veranderd worden
+	 * @param h HashMap met boolean kubusrooster en nakijkparameters
+	 */
 	private void setState0(HashMap<String, Object> h)
 	{
 		if (vWerk == null || h == null)
@@ -545,8 +533,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	/**
 	 * Retourneert true als er nagekeken moet worden (en vinkje/kruis getoond).
 	 * Retourneert false als er niet nagekeken moet worden.
-	 * 
-	 * @return
+	 * @return true/false
 	 */
 	boolean nakijkenNodig()
 	{
@@ -579,24 +566,20 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		return changed;
 	}
 
-	@Override
 	public int getScore()
 	{
 		return score;
 	}
 
-	@Override
 	public Boolean isCorrect()
 	{
 		if (!isNakijkModus())
 			return Boolean.TRUE;
 		if (!nagekeken) 
 			return null;
-		
 		return correct;
 	}
 
-	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
@@ -621,21 +604,26 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		}
 	}
 
-
-	@Override
 	public Widget asWidget()
 	{
 		return getAsPanel();
 	}
 
-	@Override
+	/**
+	 * lees het kubusbouwsel uit de launchdata (if any) en lees alle
+	 * instellingen uit de lauchdata; bepaal of deze instantie van
+	 * NabouwenAanzichten een VaktekPanel is of een Viewer3d; 
+	 * voeg een bouwen/slopen panel toe (indien gewenst), een 
+	 * kubusjesteller (indien gewenst) en een kijkna-panel
+	 * (ndien gewenst)
+	 */
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) 
 	{
 		breedte = width;
 		hoogte  = height;
 
-		logger.info("NabouwenAanzichtenGWT init");
+logger.info("NabouwenAanzichtenGWT init");
 		
 		launchState = launchData;
 		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
@@ -643,11 +631,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		randomVarNamen   = values.keySet().toArray(new String[values.size()]);
 		
 		panel.setSize(breedte + "px", hoogte + "px");
-		//panel.getElement().getStyle().setWidth(breedte, Unit.PX);
-		//panel.getElement().getStyle().setHeight(hoogte, Unit.PX);
-		//panel.getElement().getStyle().setProperty("textAlign", "right");
 
-		//int maxAantal = 4;
 		Object stateNew = null;
 
 		if (launchState.containsKey("stateNew"))
@@ -742,20 +726,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	    boolean voorAanzicht = false;
 	    boolean rechtsAanzicht = false;
 
-	    
 	    boolean kijkNaActief = false;		//impl
 	    
-	    boolean checkBlokkenBouwsel = true;
-	    boolean checkDrieAanzichten = false;
-	    boolean checkVoorZijAanzicht = false;
-	    boolean checkBovenVoorAanzicht = false;
-	    boolean checkBovenZijAanzicht = false;
-	    boolean checkBovenAanzicht = false;
-	    boolean checkVoorAanzicht = false;
-	    boolean checkRechtsAanzicht = false;
-	    
-	    boolean checkAantalKubus = false;
-
 		if (launchState.containsKey("volLeegOptie"))
 			volLeegOptie = ((Boolean) launchState.get("volLeegOptie")).booleanValue();
 		
@@ -771,14 +743,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		if (launchMap.containsKey("checkExternal"))
 			checkExternal = launchMap.getBoolean("checkExternal");
 
-		//System.out.println("init kijkNaActief = " + kijkNaActief);
-		
 		this.kijkNaActief = kijkNaActief; 
 
-		//boolean drieAanzichten = false;
 		if (launchState.containsKey("drieAanzichten"))
 			drieAanzichten = ((Boolean) launchState.get("drieAanzichten")).booleanValue();
-		//boolean voorZijAanzicht = false;
+
 		if (launchState.containsKey("voorZijAanzicht"))
 			voorZijAanzicht = ((Boolean) launchState.get("voorZijAanzicht")).booleanValue();
 		
@@ -797,7 +766,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			if(bovenAanzichtMetHoogtes)
 				rechtsAanzicht = false;
 		}
-		
 		
 		if (drieAanzichten)
 		{
@@ -862,20 +830,16 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			vWerk.zetBeginHoeken(30, -30);
 			vWerk.zetMuisAan(true);
 
-			//boolean rotatieVast = false;
 			if (launchState.containsKey("rotatieVast"))
 				rotatieVast = ((Boolean) launchState.get("rotatieVast")).booleanValue();
 			vWerk.zetMuisAan(!rotatieVast);
 
-			//double beginHoekX = 30;
-			//double beginHoekY = -30;
 			if (launchState.containsKey("beginHoekX"))
 				beginHoekX = ((Double) launchState.get("beginHoekX")).doubleValue();
 			if (launchState.containsKey("beginHoekY"))
 				beginHoekY = ((Double) launchState.get("beginHoekY")).doubleValue();
 			vWerk.zetBeginHoeken(beginHoekX, beginHoekY);
 
-			//boolean nietBouwenSlopen = false;
 			if (launchState.containsKey("nietBouwenSlopen"))
 				nietBouwenSlopen = ((Boolean) launchState.get("nietBouwenSlopen")).booleanValue();
 			vWerk.zetKlikAan(!nietBouwenSlopen);
@@ -902,9 +866,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 				if (bovenAanzichtMetHoogtes)
 				{	vWerk.zetGetalRooster(bovenAanzichtMetHoogtes);
 					vWerk.zetHoogtes();
-					//vWerk.zetAfstand(1000000000);
-					//vWerk.zetSchaduw(false);
-					//vWerk.zetMuisAan(false);
 				}
 			}
 			if (launchState.containsKey("silhouet"))
@@ -918,64 +879,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			}
 
 			
-// dit moet je dus niet zo doen. Wim			
-	// layout button panel:
-	// [BOUWEN][SLOPEN] gap [vol/leeg] gap [aantal] gap [kijkna]
-	//  70       70      10    90      30    70      ?    90     |
 			int slopenX = 70;
 			int gap1 = 10;
-//			int span = 0;
-//			if(!keuzeBouwenSlopen) 
-//			{	slopenX = 0;
-//				gap1 = 150;
-//			} 
-//			else
-//				span = slopenX * 2;;
-//			int volleegX = 150;
 			int volleegW = 90;
-//			int gap2 = 30;
-//			if (!volLeegOptie) 
-//			{
-//				volleegW = 0;
-//				gap2 = 120;
-//			} 
-//			else 
-//				span = volleegX + volleegW;
-//			int aantalX  = 270;
 			int aantalW  = 70;
-//			if(!aantalBlokjes) 
-//			{
-//				aantalW = 0;
-//			} else
-//				span = aantalX + aantalW;
-//			int kijknaW = kijkNaActief ? 90 : 0;
 			int kijknaW = showKijkNaKnop() ? 90 : 0;
-//			if (breedte - kijknaW < span) 
-//			{
-	// we have a problem, Huub!			
-//				int space = span - (breedte-kijknaW);
-//				if (space <= gap1 + gap2) 
-//				{					
-					// reduce gap, done
-//					int p1 = space * gap1 / (gap1 + gap2);
-//					gap1 -= p1;
-//					gap2 -= (space-p1);
-//					space = 0;
-//				} else 
-//				{
-					// take gaps, 
-//					space -= gap1 + gap2;
-//					gap1 = gap2 = 0;
-//				}
-//				if ( space > 0) 
-//				{
-					// take space from buttons/labels
-//				}
-// recalculate positions.				
-//				volleegX = slopenX * 2 + gap1;
-//				aantalX  = volleegX + volleegW + gap2;
-//			}
-			
 			int currentX = 0;
 			if (keuzeBouwenSlopen)
 			{
@@ -998,7 +906,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 				currentX = hSpace;
 			else
 				currentX = 0;
-			
 			
 			if (keuzeBouwenSlopen)
 			{
@@ -1052,11 +959,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 
 			canvas = vWerk.getCanvas();
 
-			//touchPanel.getElement().getStyle().setWidth(breedte, Unit.PX);
-			//touchPanel.getElement().getStyle().setHeight(hoogte - (kijkNaActief ? 32 : 0), Unit.PX);
-			//touchPanel.add(canvas);
-			//panel.add(touchPanel);
-			
 			panel.add(canvas);
 			panel.setWidgetLeftWidth(canvas, 0, Style.Unit.PX, vWerkBreedte, Style.Unit.PX);
 			panel.setWidgetTopHeight(canvas, 0, Style.Unit.PX, vWerkHoogte, Style.Unit.PX);
@@ -1095,15 +997,13 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	/**
 	 * Retourneert true als de nakijk-knop getoond moet worden,
 	 * anders false.
-	 * 
-	 * @return
+	 * @return true/false
 	 */
 	boolean showKijkNaKnop()
 	{
 		return kijkNaActief && !checkExternal;
 	}
 	
-	@Override
 	public void kijkNa() 
 	{
 		// reset isVeranderdNaNakijken
@@ -1116,6 +1016,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		kijkNa(true, setState);
 	}
 
+	/**
+	 * kijk na, geef feed back via CBook als gewenst 
+	 * @param show moet feed back getoond worden?
+	 * @param setState komen we terug bij een opgave die al eerder
+	 * nagekeken was en dus nagekeken moet worden?
+	 */
 	public void kijkNa(boolean show, boolean setState)
 	{
 		if (setState)
@@ -1160,9 +1066,6 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		nagekeken = true;
 		ingevuld = true;
 
-		//if (setState)// && teltMee)
-//			comRoot.setChanged(isCorrect().booleanValue());
-		
 		if (show) // alleen als feedback moet worden getoond
 		{
 			comRoot.setChanged(isCorrect().booleanValue());
@@ -1182,56 +1085,61 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	}
 	
 
-	@Override
 	public void zetVolledigeBreedte(int breedte)
 	{
 		if (this.breedte != breedte)
 		{
 			this.breedte = breedte;
-			// relayout!
 		}
 	}
 
-	@Override
-	public int getAsHoogte() {
-		// TODO Auto-generated method stub
+	public int getAsHoogte() 
+	{
 		return 0;
 	}
 
-	@Override
-	public int getHeight() {
+	public int getHeight() 
+	{
 		return hoogte;
 	}
 
-	@Override
-	public int getWidth() {
+	public int getWidth() 
+	{
 		return breedte;
 	}
 
-	@Override
-	public void setAsHoogte(int ashoogte) {
-		// TODO Auto-generated method stub
-		
+	public void setAsHoogte(int ashoogte) 
+	{
 	}
 	
-	//@Override
-	public void zetNagekeken(boolean b) {
+	public void zetNagekeken(boolean b) 
+	{
 		if (ingevuld) 
 			nagekeken = b;
 	}
 
-	//@Override
 	public int[][] getScoreObjectives() 
 	{
 		return null; 
 	}
 
+	/**
+	 * get de send commands for CBook
+	 * @return array met Strings
+	 */
 	public String[] getSendCmds() 
 	{
 		String[] commands = {"blockBuilding", "text.buildingProgram"};
 		return commands;
 	}
 
+	/**
+	 * maak van een boolean kubusrooster met roosterafmeting krSize een
+	 * array met krSize*krSize*krSize booleans 
+	 * @param boolKR boolean kubusrooster met roosterafmeting krSize
+	 * @param krSize rooster afmeting
+	 * @return array met krSize*krSize*krSize booleans
+	 */
 	public boolean[] boolKRtoBoolArray(boolean[][][] boolKR, int krSize)
 	{
 		boolean[] boolArray = new boolean[krSize*krSize*krSize];
@@ -1248,6 +1156,13 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		return boolArray;
 	}
 
+	/**
+	 * maak van een array met krSize*krSize*krSize booleans, een boolean
+	 * kubusrooster met roosterafmeting krSize 
+	 * @param boolArray array met krSize*krSize*krSize booleans
+	 * @param krSize rooster afmeting
+	 * @return een boolean kubusrooster met roosterafmeting krSize
+	 */
 	public boolean[][][] boolArraytoBoolKR(boolean[] boolArray, int krSize)
 	{
 		boolean[][][] boolKR = new boolean[krSize][krSize][krSize];
@@ -1264,13 +1179,20 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		return boolKR;
 	}
 
-	@Override
+	/**
+	 * accepteer een CBook Event; dit CBook Event komt
+	 * in twee typen:<br>
+	 * 1) het Event bevat een array met booleans dat omgezet
+	 * kan worden in een kubusbouwsel<br>
+	 * 2) het Event bevat een bouwprogramma (multiline String
+	 * met bouwopdrachten) dat door een instantie van
+	 * de Intepreter (zie die klasse) omgezet wordt
+	 * in een kubusbouwsel
+	 */
 	public void acceptCBookEvent(CBookEvent event) 
 	{
 		String command = event.getCommand();
 		
-		//System.out.println("NabouwenAanzichtenGWT.acceptCBookEvent(): command = " + command);
-
 		if (command.startsWith("blockBuilding"))
 		{
 			Map map = (Map) event.getParameters();
@@ -1278,10 +1200,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			ObjectMap oMap = JSONUtilities.wrapMap(map);	
 
 			if (oMap != null)
-			{	//boolean[][][] booleanKR = (boolean[][][]) oMap.get("booleanKR");
+			{	
 				boolean[] booleanArray = oMap.getBooleanArray("booleanArr");
 				int krSize = oMap.getInt("krSize");
-				
 				boolean[][][] booleanKR = boolArraytoBoolKR(booleanArray, krSize);
 				startKr = new KubusRooster(booleanKR, 1);
 				if (vWerk != null)
@@ -1307,12 +1228,9 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			if (map!=null)
 			{
 				String programText = (String) map.get("content");
-				//setCursor(new Cursor(Cursor.WAIT_CURSOR));
 				vWerk.kr.maakLeeg();
 				Interpreter interpreter = new Interpreter(vWerk.kr);
 				interpreter.execute(programText);
-				//setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-				//zetVeranderd();
 				vWerk.tekenOpnieuw();
 				Msgs msgs = GWT.create(Msgs.class);
 				if (blokjesLabel != null)

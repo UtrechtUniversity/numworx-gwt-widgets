@@ -1,6 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-//import java.awt.*;
 import java.util.*;
 
 import fi.nabouwenaanzichtengwt.client.UF;

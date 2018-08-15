@@ -9,27 +9,61 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 import fi.nabouwenaanzichtengwt.client.text.Text;
 
+/**
+ * klasse die een of meer aanzichten van een kubusrooster toont;<br>
+ * mogelijkheden: boven+voor+rechts, voor+rechts, boven, voor of rechts
+ * @author Peter Boon
+ */
 
-class VaktekPanel //Container
+public class VaktekPanel 
 {	
+	/**
+	 * internationalisatie labels
+	 */
 	static final Text rb = GWT.create(Text.class);
+	/**
+	 * breedte en hoogte van dit VaktekPanel
+	 */
 	int breedte, hoogte;
+	/**
+	 * breedte (en hoogte) van een individuele aanzichtviewer
+	 */
 	int vakBreedte;
-	Viewer3d va, ba, ra, la;
+	/**
+	 * viewers voor voor-, boven- en rechteraanzicht
+	 */
+	Viewer3d va, ba, ra; 
+	/**
+	 * eigenaar van dit VaktekPanel
+	 */
 	NabouwenAanzichtenGWT eigenaar;
+	/**
+	 * het kubusrooster waarvan de aanzichten getoond worden
+	 */
 	KubusRooster kr;
+	/**
+	 * het aantal aanzichten in dit VaktekPanel
+	 */
 	int aantalViews;
-	
-	final int BOVEN = 0;
-	final int VOOR = 1;
-	final int RECHTS = 2;
-	//final int LINKS = 3;
-	int typeAanzicht = BOVEN;
-	
+
+	/**
+	 * FlowPanel dat de viewers(s) en de labels bevat
+	 */
 	FlowPanel panel = new FlowPanel();
+	/**
+	 * Grid voor layout componenten
+	 */
 	private Grid grid = null;
 	
-	
+	/**
+	 * constructor: maak viewers en labels
+	 * @param k het kubusrooster waarvan de aanzichten getoond worden 
+	 * @param b breedte
+	 * @param h hoogte
+	 * @param aantalViews aantal aanzichten: 3 = boven, voor en rechts, 2 = voor en rechts<br>
+	 * trukje: 4 = boven, 5 = voor, 6 = rechts
+	 * @param bd eigenaar
+	 */
 	public VaktekPanel(KubusRooster k, int b, int h, int aantalViews, NabouwenAanzichtenGWT bd)
 	{	this.aantalViews = aantalViews;
 		
@@ -41,6 +75,7 @@ class VaktekPanel //Container
 		breedte = b;
 		hoogte = h;
 		
+		//voor,rechts
 		if (aantalViews == 2)
 		{	
 			grid = new Grid(1, 2);
@@ -97,8 +132,6 @@ class VaktekPanel //Container
 		{	
 			grid = new Grid(2, 2);
 			grid.addStyleName(bd.nabouwenAanzichtenCss.borderless());
-			//grid.setBorderWidth(1);
-			//grid.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 			grid.getElement().getStyle().setProperty("textAlign", "center");
 			vakBreedte = Math.min((breedte-6)/2, (hoogte-40)/2);
 			grid.getElement().getStyle().setMarginLeft(breedte/2-vakBreedte, Unit.PX);
@@ -169,11 +202,7 @@ class VaktekPanel //Container
 		// trukje: 4 = boven
 		else if (aantalViews == 4)
 		{
-			//grid = new Grid(2, 2);
-			//grid.addStyleName(bd.nabouwenAanzichtenCss.borderless());
-			//grid.getElement().getStyle().setProperty("textAlign", "center");
 			vakBreedte = Math.min(2*(breedte-6)/3, 2*(hoogte-40)/3);
-			//grid.getElement().getStyle().setMarginLeft(breedte/2-vakBreedte, Unit.PX);
 			
 			ba = new Viewer3d(kr, breedte/2-vakBreedte+1, hoogte/2-vakBreedte+1, vakBreedte-2, vakBreedte-2, bd);
 			ba.zetAfstand(10000000);
@@ -219,7 +248,6 @@ class VaktekPanel //Container
 			labelV.getElement().setInnerHTML(rb.voor());
 			panelV.add(va.getCanvas());
 			panelV.add(labelV);
-			//grid.setWidget(1,0,panelV);
 			panel.add(panelV);
 			
 		}
@@ -246,7 +274,6 @@ class VaktekPanel //Container
 			labelR.getElement().setInnerHTML(rb.rechts());
 			panelR.add(ra.getCanvas());
 			panelR.add(labelR);
-			//grid.setWidget(1,1,panelR);
 			
 			panel.add(panelR);
 
@@ -254,33 +281,38 @@ class VaktekPanel //Container
 
 		
 	}	
-	
+
+	/**
+	 * getter voor dit VaktekPanel 
+	 * @return panel
+	 */
 	public FlowPanel getPanel()
 	{	return panel;
 	}
-	
-	public void zetKlikAan(boolean b)
-	{	va.zetKlikAan(b);
-		ra.zetKlikAan(b);
-		la.zetKlikAan(b);
-		ba.zetKlikAan(b);
-	}
-	public void zetPijlAan(boolean b)
-	{	va.zetPijlAan(b);
-		ra.zetPijlAan(b);
-		la.zetPijlAan(b);
-		ba.zetPijlAan(b);
-	}
+	/**
+	 * zet KubusRooster kur in alle (non-null) aanzichtviewers
+	 * @param kur het kubusrooster
+	 */
 	public void zetKubusRooster(KubusRooster kur)
 	{	kr = kur;
-		la.zetKubusRooster(kur);	
-		ba.zetKubusRooster(kur);	
-		va.zetKubusRooster(kur);	
-		ra.zetKubusRooster(kur);
+		if (ba != null)
+			ba.zetKubusRooster(kur);
+		if (va != null)
+			va.zetKubusRooster(kur);
+		if (ra != null)
+			ra.zetKubusRooster(kur);
 	}
+	
+	/**
+	 * herteken dit VaktekPanel
+	 */
 	public void tekenOpnieuw()
-	{	ra.tekenOpnieuw();
-		ba.tekenOpnieuw();
-		va.tekenOpnieuw();
+	{	if (ra != null)
+			ra.tekenOpnieuw();
+		if (ba != null)
+			ba.tekenOpnieuw();
+		if (va != null)
+			va.tekenOpnieuw();
 	}
+	
 }

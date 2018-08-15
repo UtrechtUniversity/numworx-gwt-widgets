@@ -1,8 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Vector;
 
 public class FormuleParser
 {		
@@ -101,10 +98,6 @@ public class FormuleParser
 		s = s.replace(',','.');
 		while(index >-1)
 		{	index = s.indexOf(" ");
-			//if(index>0 && index<s.length()-1 && Character.isDigit(s.charAt(index-1)) && Character.isDigit(s.charAt(index+1)))
-			//{	s = s.substring(0,index) + "+" + s.substring(index+1);
-			//}
-			//else 
 			if(index >-1)s = s.substring(0,index) + s.substring(index+1);
 		}
 		//een breuk constructie als "2((1)/(2))" wordt vervangen door 2+1/2
@@ -214,10 +207,7 @@ public class FormuleParser
 		
 		
 		if(s.length()==1 && Character.isLetter(s.charAt(0)))
-		{	//aanpassing voor blokkendoosprogramma: geen pi en e
-			//if(s.charAt(0)=='e')exp = new E();
-			//else if(s.charAt(0)=='\u03C0')exp = new PI();
-			//else 
+		{	 
 			exp = new BasisExpressie(s);
 			return exp;
 		}
@@ -301,7 +291,6 @@ public class FormuleParser
 		catch(Exception e)
 		{}
 		return exp;
-		//return s;
 	}
 	
 	public static Expressie geefExpressie(String codeString)

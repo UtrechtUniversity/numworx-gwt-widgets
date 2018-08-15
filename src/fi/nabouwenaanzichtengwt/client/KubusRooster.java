@@ -1,21 +1,72 @@
 package fi.nabouwenaanzichtengwt.client;
 
+/**
+ * klasse die het kubusbouwsel representeert: <br>
+ * dit bouwsel bestaat uit een grondvlak (een groot vierkant)
+ * waarop maxAantal x maxAantal kleine vierkanten die de basis
+ * van de eerste laag kubusjes vormen; er zijn maximaal 
+ * maxAantal lagen kubusjes; de klasse houdt bij welke kubusjes
+ * aanwezig zijn en voegt kubusjes toe op een specifieke positie
+ * of verwijdert deze van een specifieke positie;<br>
+ * de klasse bevat ook methoden om een of meer aanzichten van dit
+ * kubusrooster tevergelijken met een gegeven kubusrooster.    
+ * @author Peter Boon
+ */
+
 public class KubusRooster
 {
+	/**
+	 * bouwsel bestaat uit maximaal maxAaantal x maxAantal x maxAantal kubusjes  
+	 */
 	int maxAantal;
+	/**
+	 * actuele aantal kubusjes
+	 */
 	int aantalKubussen;
-	int[][] maxy;
-	double totLengte, ribLengte;
+
+	/**
+	 * totale lengte van maxAantal kubusjes op een rij
+	 */
+	double totLengte;
+	/**
+	 * lengte ribbe van een(1) kubusje 	
+	 */
+	double ribLengte;
+	/**
+	 * de kubusjes in het rooster (null als geen kusbusje op een specifieke positie)
+	 */
 	RKubus[][][] kubussen;
-	//boolean[][][] isZichtbaar;
-	//boolean[][][][] isOnbedekt;
+	/**
+	 * de vierkanten op het grondvlak 
+	 */
 	RVierkant[][] vierkanten;
-	double beginpos;
+	/**
+	 * het vierkant voor het grondvlak
+	 */
 	RVierkant grondvlak;
+	/**
+	 * beginpositie bouwsel is (beginpos,beginpos,beginpos)
+	 */
+	double beginpos;
+	/**
+	 * balk aan de voorkant van het grondvlak (instelbaar)
+	 */
 	RBalk balk;
+	/**
+	 * pijl die wijst naar de voorkant van het grondvlak (instelbaar)
+	 */
 	Veelvlak pijl;
+	/**
+	 * vulkleur van de vlakjes van de kubusjes
+	 */
 	String vulkleur;
 
+	/**
+	 * constructor: construeer een grondvlak met daarop een leeg kubusbouwsel
+	 * van gegeven afmetingen
+	 * @param maxn bouwsel heeft maximaal maxn x maxn x maxn kubusjes 
+	 * @param totL totale lengte van het kubus
+	 */
 	public KubusRooster(int maxn, double totL)
 	{
 		vulkleur = "geel";
@@ -28,27 +79,22 @@ public class KubusRooster
 		balk = new RBalk(1.2 * totLengte, 0.1 * totLengte, 0, -0.5 * totLengte, 0);
 		pijl = maakPijl();
 		kubussen = new RKubus[maxAantal][maxAantal][maxAantal];
-		//isZichtbaar = new boolean[maxAantal][maxAantal][maxAantal];
-		//isOnbedekt = new boolean[maxAantal][maxAantal][maxAantal][6];
 		vierkanten = new RVierkant[maxAantal][maxAantal];
-		maxy = new int[maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
 		{
 			for (int j = 0; j < maxAantal; j++)
 			{
-				maxy[i][j] = 0;
 				vierkanten[i][j] = new RVierkant(ribLengte, beginpos + i * ribLengte, -totLengte / 2, beginpos + j * ribLengte);
-				//for(int k=0 ; k<maxAantal ; k++)
-				//{	//kubussen[i][j][k] = new RKubus(ribLengte, beginpos + i*ribLengte, beginpos + k*ribLengte, beginpos + j*ribLengte);
-				//isZichtbaar[i][j][k] = false;
-				//for(int m=0 ; m<6 ; m++)
-				//{	isOnbedekt[i][j][k][m] = true;
-				//}
-				//}
 			}
 		}
 	}
 
+	/**
+	 * constructor: construeer een grondvlak met daarop een kubusrooster
+	 * bestaande uit kubusjes op posities (i,j,k)  waar rooster[i][j][k] == true   
+	 * @param rooster boolean 3d-rooster voor de aanwezigheid van kubusjes op specifieke posities
+	 * @param totL totale lengte rooster.length kubusjes op een rij
+	 */
 	public KubusRooster(boolean[][][] rooster, double totL)
 	{
 		aantalKubussen = 0;
@@ -61,12 +107,10 @@ public class KubusRooster
 		pijl = maakPijl();
 		kubussen = new RKubus[maxAantal][maxAantal][maxAantal];
 		vierkanten = new RVierkant[maxAantal][maxAantal];
-		maxy = new int[maxAantal][maxAantal];
 		for (int i = 0; i < maxAantal; i++)
 		{
 			for (int j = 0; j < maxAantal; j++)
 			{
-				maxy[i][j] = 0;
 				vierkanten[i][j] = new RVierkant(ribLengte, beginpos + i * ribLengte, -totLengte / 2, beginpos + j * ribLengte);
 			}
 		}
@@ -85,6 +129,11 @@ public class KubusRooster
 		}
 	}
 
+	/**
+	 * compatibility
+	 * @param stateNew kubusrooster als Object[]
+	 * @return boolean 3d-rooster voor de aanwezigheid van kubusjes op specifieke posities 
+	 */
 	static boolean[][][] toBooleanArray(Object[] stateNew)
 	{
 		boolean[][][] result = new boolean[stateNew.length][][];
@@ -105,6 +154,10 @@ public class KubusRooster
 		return result;
 	}
 
+	/**
+	 * maak een boolean 3d-rooster voor de aanwezigheid van kubusjes in dit KubusRooster
+	 * @return boolean 3d-rooster voor de aanwezigheid van kubusjes op specifieke posities
+	 */
 	public boolean[][][] geefBooleanRooster()
 	{
 		boolean[][][] rooster = new boolean[maxAantal][maxAantal][maxAantal];
@@ -124,6 +177,10 @@ public class KubusRooster
 		return rooster;
 	}
 
+	/**
+	 * maak de pijl die naar de voorkant van het grondvlak wijst
+	 * @return de pijl als Veelvlak 
+	 */
 	Veelvlak maakPijl()
 	{
 		double[] hp =
@@ -138,6 +195,10 @@ public class KubusRooster
 		return v;
 	}
 
+	/**
+	 * zet de vulkleur van de vlakjes van alle aanwezige kubusjes
+	 * @param kleur nieuwe vulkleur
+	 */
 	public void zetVulkleur(String kleur)
 	{
 		vulkleur = kleur;
@@ -156,6 +217,15 @@ public class KubusRooster
 		}
 	}
 
+	/**
+	 * voeg een kubusje toe op positie (x,y,z) in het rooster;
+	 * pas het bedekt zijn van het nieuwe kubusje en eventuele 
+	 * aangrenzende kubusjes aan
+	 * @param x x-positie nieuwe kubusje 
+	 * @param z z-positie nieuwe kubusje
+	 * @param y y-positie nieuwe kubusje
+	 * @return true als een kubusje werd toegvoegd
+	 */
 	public boolean voegKubusToe(int x, int z, int y)
 	{
 		boolean toegevoegd = false;
@@ -198,6 +268,15 @@ public class KubusRooster
 		return toegevoegd;
 	}
 
+	/**
+	 * verwijder een kubusje van positie (x,y,z) in het rooster;
+	 * pas het bedekt zijn van eventuele 
+	 * aangrenzende kubusjes aan
+	 * @param x x-positie nieuwe kubusje 
+	 * @param z z-positie nieuwe kubusje
+	 * @param y y-positie nieuwe kubusje
+	 * @return true als een kubusje werd verwijderd
+	 */
 	public boolean verwijderKubus(int x, int z, int y)
 	{
 		boolean verwijderd = false;
@@ -226,18 +305,20 @@ public class KubusRooster
 		return verwijderd;
 	}
 
+	/**
+	 * maak het rooster helemaal vol mat kubusjes; 
+	 * pas de bedekking aan
+	 */
 	public void maakVol()
 	{
 		for (int i = 0; i < maxAantal; i++)
 		{
 			for (int j = 0; j < maxAantal; j++)
 			{
-				maxy[i][j] = 0;
 				vierkanten[i][j] = new RVierkant(ribLengte, beginpos + i * ribLengte, -totLengte / 2, beginpos + j * ribLengte);
 				for (int k = 0; k < maxAantal; k++)
 				{
 					kubussen[i][j][k] = new RKubus(ribLengte, beginpos + i * ribLengte, beginpos + k * ribLengte, beginpos + j * ribLengte);
-					//isZichtbaar[i][j][k] = true;
 
 					if (k == 0)
 						kubussen[i][j][k].isOnbedekt[5] = true;
@@ -269,41 +350,57 @@ public class KubusRooster
 		aantalKubussen = maxAantal * maxAantal * maxAantal;
 	}
 
+	/**
+	 * verwijder alle kubusjes uit het rooster
+	 */
 	public void maakLeeg()
 	{
 		for (int i = 0; i < maxAantal; i++)
 		{
 			for (int j = 0; j < maxAantal; j++)
-			{ //maxy[i][j]=0;
-				//vierkanten[i][j]=new RVierkant(ribLengte, beginpos + i*ribLengte, -totLengte/2, beginpos + j*ribLengte);
+			{ 
 				for (int k = 0; k < maxAantal; k++)
 				{
 					kubussen[i][j][k] = null;
-					//isZichtbaar[i][j][k] = false;
-					//for(int m=0 ; m<6 ; m++)
-					//{	isOnbedekt[i][j][k][m] = true;
-					//}
 				}
 			}
 		}
 		aantalKubussen = 0;
 	}
-	
+
+	/**
+	 * check of het rooster alle mogelijke kubusjes bevat
+	 * @return true/false
+	 */
 	public boolean isVol()
 	{
 		return aantalKubussen == maxAantal * maxAantal * maxAantal;
 	}
 
+	/** 
+	 * check of het rooster geen kubusjes bevat (leeg is)	
+	 * @return true/false
+	 */
 	public boolean isLeeg()
 	{
 		return aantalKubussen == 0;
 	}
 
+	/**
+	 * geef het actuele aantal kubusjes in het rooster
+	 * @return aantalKubussen
+	 */
 	public int geefAantalK()
 	{
 		return aantalKubussen;
 	}
 
+	/**
+	 * check of dit KubusRooster identiek is (i.e. kubusjes op
+	 * dezelfde posities) als KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijk(KubusRooster kr)
 	{
 		if (maxAantal != kr.maxAantal)
@@ -322,6 +419,12 @@ public class KubusRooster
 		return true;
 	}
 
+	/**
+	 * check of het boven-, voor- en rechtsaanzicht van dit KubusRooster
+	 * gelijk is aan het boven-, voor- en rechtsaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkAanzichten(KubusRooster kr)
 	{
 		if (maxAantal != kr.maxAantal)
@@ -393,7 +496,12 @@ public class KubusRooster
 		return true;
 	}
 
-	// idem voor en rechts
+	/**
+	 * check of het voor- en rechtsaanzicht van dit KubusRooster
+	 * gelijk is aan het voor- en rechtsaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkAanzichtenVB(KubusRooster kr)
 	{
 		if (maxAantal != kr.maxAantal)
@@ -424,7 +532,6 @@ public class KubusRooster
 							if (!br)
 								br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bv || !br)
 							return false;
 					}
@@ -457,7 +564,6 @@ public class KubusRooster
 							if (!br)
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bv || !br)
 							return false;
 					}
@@ -467,6 +573,12 @@ public class KubusRooster
 		return true;
 	}
 
+	/**
+	 * check of het voor- en rechtsaanzicht van dit KubusRooster
+	 * gelijk is aan het voor- en rechtsaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkVoorEnRechtsAanzicht(KubusRooster kr)
 	{
 		if (maxAantal != kr.maxAantal)
@@ -497,7 +609,6 @@ public class KubusRooster
 							if (!br)
 								br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bv || !br)
 							return false;
 					}
@@ -530,7 +641,6 @@ public class KubusRooster
 							if (!br)
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bv || !br)
 							return false;
 					}
@@ -539,7 +649,13 @@ public class KubusRooster
 		}
 		return true;
 	}
-	// boven en voor
+
+	/**
+	 * check of het boven- en vooraanzicht van dit KubusRooster
+	 * gelijk is aan het boven- en vooraanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkBovenEnVoorAanzicht(KubusRooster kr)
 	{	
 		if (maxAantal != kr.maxAantal)
@@ -563,7 +679,6 @@ public class KubusRooster
 						{	if (!br) 
 							br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bb || !bv)
 							return false;
 					}
@@ -589,8 +704,8 @@ public class KubusRooster
 						{	if (!br) 
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
-						if(!bb || !bv)return false;
+						if(!bb || !bv)
+							return false;
 					}
 				}
 			}
@@ -598,7 +713,12 @@ public class KubusRooster
 		return true;
 	}	
 
-	// boven en rechts
+	/**
+	 * check of het boven- en rechtsaanzicht van dit KubusRooster
+	 * gelijk is aan het boven- en rechtsaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkBovenEnRechtsAanzicht(KubusRooster kr)
 	{	
 		if (maxAantal != kr.maxAantal)
@@ -622,7 +742,6 @@ public class KubusRooster
 						{	if (!br) 
 							br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bb || !br)
 							return false;
 					}
@@ -648,8 +767,8 @@ public class KubusRooster
 						{	if (!br) 
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
-						if(!bb || !br)return false;
+						if(!bb || !br)
+							return false;
 					}
 				}
 			}
@@ -657,7 +776,12 @@ public class KubusRooster
 		return true;
 	}	
 
-	// boven
+	/**
+	 * check of het bovenaanzicht van dit KubusRooster
+	 * gelijk is aan het bovenaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkBovenAanzicht(KubusRooster kr)
 	{	
 		if (maxAantal != kr.maxAantal)
@@ -681,7 +805,6 @@ public class KubusRooster
 						{	if (!br) 
 							br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bb)
 							return false;
 					}
@@ -707,8 +830,8 @@ public class KubusRooster
 						{	if (!br) 
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
-						if(!bb)return false;
+						if(!bb)
+							return false;
 					}
 				}
 			}
@@ -716,7 +839,12 @@ public class KubusRooster
 		return true;
 	}	
 
-	// voor
+	/**
+	 * check of het vooraanzicht van dit KubusRooster
+	 * gelijk is aan het vooraanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkVoorAanzicht(KubusRooster kr)
 	{	
 		if (maxAantal != kr.maxAantal)
@@ -740,7 +868,6 @@ public class KubusRooster
 						{	if (!br) 
 							br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!bv)
 							return false;
 					}
@@ -766,8 +893,8 @@ public class KubusRooster
 						{	if (!br) 
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
-						if(!bv)return false;
+						if(!bv)
+							return false;
 					}
 				}
 			}
@@ -775,7 +902,12 @@ public class KubusRooster
 		return true;
 	}	
 	
-	// rechts
+	/**
+	 * check of het rechtsaanzicht van dit KubusRooster
+	 * gelijk is aan het rechtsaanzicht van KubusRooster kr
+	 * @param kr gegeven KubusRooster
+	 * @return true/false
+	 */
 	public boolean isGelijkRechtsAanzicht(KubusRooster kr)
 	{	
 		if (maxAantal != kr.maxAantal)
@@ -799,7 +931,6 @@ public class KubusRooster
 						{	if (!br) 
 							br = kr.kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
 						if (!br)
 							return false;
 					}
@@ -825,8 +956,8 @@ public class KubusRooster
 						{	if (!br) 
 								br = kubussen[m][j][k] != null;
 						}
-						//if(!bb || !bv || !br)return false;
-						if(!br)return false;
+						if(!br)
+							return false;
 					}
 				}
 			}

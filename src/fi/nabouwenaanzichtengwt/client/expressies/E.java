@@ -1,6 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-import java.awt.*;
 import java.util.Vector;
 
 public class E extends BasisExpressie  

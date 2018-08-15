@@ -1,6 +1,10 @@
 package fi.nabouwenaanzichtengwt.client;
 
-class Rotatie3D
+/**
+ * een rotatie in 3d-space 
+ * @author Peter Boon
+ */
+public class Rotatie3D
 {
 	public int as;
 	public double rotatieHoek;

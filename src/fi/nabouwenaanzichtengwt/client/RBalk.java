@@ -1,9 +1,24 @@
 package fi.nabouwenaanzichtengwt.client;
 
+/**
+ * klasse die de rode balk aan de voorzijde van het blokkenbouwsel representeert 
+ * @author Peter Boon
+ */
+
 public class RBalk extends Veelvlak 
 {	
-	Punt3D positie;
+	/**
+	 * halve lengte van de balk
+	 */
 	double d;
+	/**
+	 * constructor
+	 * @param r lengte balk
+	 * @param w breedte balk
+	 * @param x x-coordinaat centrum
+	 * @param y y-coordinaat centrum
+	 * @param z z-coordinaat centrum
+	 */
 	public RBalk(double r, double w, double x, double y, double z)
 	{	aantalHoekpunten = 4;
 		aantalVlakken = 1;
@@ -15,7 +30,6 @@ public class RBalk extends Veelvlak
 		hoekpunten[2] = new Hoekpunt( d, 0, -d);
 		hoekpunten[3] = new Hoekpunt(-d, 0, -d);
 		
-		
 		verschuif(x,y,z);
 		
 		int[] vlakdata = {0, 3, 2, 1};
@@ -26,17 +40,15 @@ public class RBalk extends Veelvlak
 			vlakken[i].vorigeKleur = "rood";
 			vlakken[i].vulkleur = "rood";
 		}
-		
-		//int[] hoekpuntdata = {0,1,4,	0,2,1,	0,3,2,	0,4,3,	5,4,1,	5,1,2,	5,2,3,	5,3,4};
-		//for(int i=0 ; i<aantalHoekpunten ; i++)
-		//{	Vlak[] hv = {vlakken[hoekpuntdata[3*i]],vlakken[hoekpuntdata[3*i+1]],vlakken[hoekpuntdata[3*i+2]]};
-		//	hoekpunten[i].maakVlakken(3,hv);
-		//}
-		
-		
 															 
 	}
 	
+	/**
+	 * verschuif deze RBalk over (dx,dy,dz)
+	 * @param dx x-translatie
+	 * @param dy y-translatie
+	 * @param dz z-translatie
+	 */
 	public void verschuif(double dx, double dy, double dz)
 	{	for (int i = 0; i < aantalHoekpunten; i++)
 		{	hoekpunten[i].x += dx;

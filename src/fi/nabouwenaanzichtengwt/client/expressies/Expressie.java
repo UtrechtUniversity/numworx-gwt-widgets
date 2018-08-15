@@ -1,7 +1,5 @@
 package fi.nabouwenaanzichtengwt.client.expressies;
 
-//import java.awt.*;
-//import java.text.*;
 import java.util.*;
 
 public class Expressie 
@@ -12,21 +10,9 @@ public class Expressie
 	boolean isProdukt;
 	boolean isBasis;
 
-//	static DecimalFormatSymbols dfs;
-//	public static DecimalFormat df;
-//	public static FontMetrics fm;
-	
 	public Expressie()
-	{	//dfs = new DecimalFormatSymbols();
-		//dfs.setDecimalSeparator('.');
-		//df = new DecimalFormat("0.###", dfs);
+	{	
 	}
-//	public void zetMaat(FontMetrics fm)
-// 	{
-//	}
-//	public void teken(Graphics g, int x, int y)
-// 	{ 
-//	}
 	public double geefWaarde()
 	{	return Double.NaN;
 	}

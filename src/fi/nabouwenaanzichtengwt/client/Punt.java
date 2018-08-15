@@ -1,5 +1,8 @@
 package fi.nabouwenaanzichtengwt.client;
 
+/**
+ * een punt in het vlak met double coordinaten 
+ */
 
 public class Punt
 {	
