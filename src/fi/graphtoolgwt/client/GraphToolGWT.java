@@ -1987,7 +1987,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				
 				int scorePerPunt = scoreMax / Math.max(docentGraphPoints.size(), llgPtsArray.length);
 				if (hits == 0)
+				{
 					score = 0;
+					fout = true;
+				}
 				else if (hits == llgPtsArray.length)
 				{
 					color = CssColor.make(0, 200, 0);
