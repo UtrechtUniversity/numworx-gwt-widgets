@@ -10,6 +10,7 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -26,6 +27,8 @@ public class KStrokeContainer {
 	private boolean correct = false;
 	private boolean isfalse = false;
 	
+	private FormuleViewer formuleViewer;
+	
 	//private double schrijfLeesFactor = 2;
 	//private boolean checkable;
 	
@@ -38,7 +41,10 @@ public class KStrokeContainer {
 	public boolean addStroke(Stroke stroke) {
 		box = null;
 		writeBox = null;
-		return strokeContainer.addStroke(stroke);
+		boolean b = strokeContainer.addStroke(stroke);
+		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
+		formuleViewer.setColor(CssColor.make(38, 115, 182));
+		return b;
 	}
 	
 	public void clear() {
@@ -144,6 +150,15 @@ public class KStrokeContainer {
 //				int d = (int)strokeContainer.averageHeight;
 //				g.setFillStyle(CssColor.make(0,0,0));
 //				g.fillText(""+d, 300, 20);
+				
+				if(formuleViewer!=null) {
+					int x = Math.max(getWriteBox().x+40, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
+					int y = getWriteBox().y+5;//-20-formuleViewer.getHeight();
+					g.translate(x, y);
+					formuleViewer.getMainRegel().paintAll(g);
+					g.translate(-x, -y);
+				}
+				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
 				
 //				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
@@ -292,7 +307,7 @@ public class KStrokeContainer {
 //			int width = (int)strokeContainer.getBoundingBox().width;
 //			int height = (int)strokeContainer.getBoundingBox().height;
 			int x = 20;
-			int y = (int)Math.max(25,strokeContainer.getBoundingBox().y - margin);
+			int y = (int)Math.max(25,strokeContainer.getBoundingBox().y - margin-10);
 			y= (int)Math.min(y, parent.hoogte - strokeContainer.getBoundingBox().height-2*margin-25);
 			int width = parent.breedte-40;
 			int height = (int)strokeContainer.getBoundingBox().height + 2*margin;

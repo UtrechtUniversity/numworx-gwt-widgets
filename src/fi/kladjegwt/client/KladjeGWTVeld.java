@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+import org.vectomatic.dom.svg.OMSVGDocument;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -437,6 +439,7 @@ public class KladjeGWTVeld
 	private Image binImage;
 	private ImageElement binImageElement;
 	protected double schrijfLeesFactor = 2.2;
+	
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -1094,6 +1097,8 @@ public class KladjeGWTVeld
 			paint(backgroundgIm);
 			gIm.clearRect(0, 0, breedte, hoogte);
 			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+			
+			
 		}
 		else
 			paint(gIm);
@@ -1158,6 +1163,8 @@ public class KladjeGWTVeld
 		
 		//g.setStrokeStyle(zwart);
 		//g.strokeRect(0, 0, breedte, hoogte);
+		
+		
 		
 		g.setLineWidth(1.2d); 
 		tekenProgramma(g);
@@ -1236,7 +1243,8 @@ public class KladjeGWTVeld
 			if(currentStrokeContainer!=null)
 				currentStrokeContainer.draw(g);
 		}
-			
+		
+		
 		
 		for (int lCnt = 0; lCnt < lijnVector.size(); lCnt++)
 		{	Lijn lijn = (Lijn) lijnVector.elementAt(lCnt);
@@ -3549,6 +3557,7 @@ public class KladjeGWTVeld
 				cleanFormulePoints(formulaStrokePoints);
 				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
 					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
+				
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
