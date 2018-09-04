@@ -11,6 +11,7 @@ import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -44,6 +45,7 @@ public class KStrokeContainer {
 		boolean b = strokeContainer.addStroke(stroke);
 		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
 		formuleViewer.setColor(CssColor.make(38, 115, 182));
+		//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		return b;
 	}
 	
@@ -62,8 +64,8 @@ public class KStrokeContainer {
 	}
 	
 	public Rectangle getCheckButtonArea() {
-		int x = getWriteBox().x + getWriteBox().width - 77; 
-		int y = getWriteBox().y; 
+		int x = getWriteBox().x + getWriteBox().width - 40; 
+		int y = getWriteBox().y + getWriteBox().height - 40; 
 		return new Rectangle(x,y,40,40);
 	}
 	
@@ -93,6 +95,23 @@ public class KStrokeContainer {
 		g.lineTo(r.x+r.width-m, r.y+r.height);
 		g.stroke();
 	}
+	
+	private void drawCheckButton(Context2d g, Rectangle r) {
+		int m = 10;
+		
+		g.setFillStyle(CssColor.make(255, 255, 255));
+		
+		g.fillRect(r.x, r.y, r.width, r.height);
+		g.setStrokeStyle(CssColor.make(38, 115, 182));
+		g.setLineWidth(4.0d);
+		g.beginPath();
+		g.moveTo(r.x+r.width/4 , r.y+r.height/2);
+		g.lineTo(r.x+r.width/2, r.y+r.height);
+		g.lineTo(r.x+r.width, r.y);
+		g.moveTo(r.x , r.y);
+		g.closePath();
+		g.stroke();
+	}	
 	
 	private void drawShadow(Context2d g, Rectangle r) {
 		for(int i=0 ; i<10 ; i++) {
@@ -159,15 +178,17 @@ public class KStrokeContainer {
 					g.translate(-x, -y);
 				}
 				
-//				g.setFillStyle(CssColor.make(255, 255, 255));
+				drawCheckButton(g, new Rectangle(getWriteBox().x + getWriteBox().width-40, getWriteBox().y+getWriteBox().height-40, 34, 34));
 				
+//				g.setFillStyle(CssColor.make(255, 255, 255));
+//				
 //				g.fillRect(getWriteBox().x + getWriteBox().width-77, getWriteBox().y+3, 34, 34);
 //				g.setStrokeStyle(CssColor.make(0, 200, 0));
 //				g.setLineWidth(5.0d);
 //				g.beginPath();
 //				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
 //				g.lineTo(getWriteBox().x + getWriteBox().width-60, getWriteBox().y+30);
-//				g.lineTo(getWriteBox().x + getWriteBox().width-50, getWriteBox().y+10);
+//				g.lineTo(getWriteBox().x + getWriteBox().width-40, getWriteBox().y+0);
 //				g.moveTo(getWriteBox().x + getWriteBox().width-70, getWriteBox().y+10);
 //				g.closePath();
 //				g.stroke();
@@ -289,6 +310,17 @@ public class KStrokeContainer {
 	}
 	
 	public Rectangle getBox() {
+		if(box == null && strokeContainer != null && strokeContainer.getBoundingBox()!=null) {
+			int x = (int)strokeContainer.getBoundingBox().x;
+			int y = (int)strokeContainer.getBoundingBox().y;
+			int width = (int)strokeContainer.getBoundingBox().width;
+			int height = (int)strokeContainer.getBoundingBox().height;
+			box = new Rectangle(x, y, width, height);
+		}
+		return box;
+	}
+	
+	public Rectangle getDragBox() {
 		if(box == null && strokeContainer != null && strokeContainer.getBoundingBox()!=null) {
 			int x = (int)strokeContainer.getBoundingBox().x;
 			int y = (int)strokeContainer.getBoundingBox().y;

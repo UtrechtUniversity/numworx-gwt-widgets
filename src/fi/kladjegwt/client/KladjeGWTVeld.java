@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
-import org.vectomatic.dom.svg.OMSVGDocument;
+//import org.vectomatic.dom.svg.OMSVGDocument;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
@@ -2946,10 +2946,11 @@ public class KladjeGWTVeld
 				return;
 			}
 			
-//			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
-//				eigenaar.fireCheck();
-//				return;
-//			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
+				eigenaar.fireCheck();
+				return;
+			}
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
@@ -3490,7 +3491,7 @@ public class KladjeGWTVeld
 	 * als size == 1: sleepRechthoek weg en toon handle box van dit geselecteerde
 	 * object; als size groter dan 1: geef de selecteerRechthoek handles (als dat mag)         
 	 */
-	public void mouseUpTouchEndAction()
+	public void mouseUpTouchEndAction(int eventX, int eventY)
 	{
 		if (mouseMode == tekenen)
 		{	
@@ -3520,8 +3521,14 @@ public class KladjeGWTVeld
 		{	
 			if(proActiveStrokeContainer!=null) 
 			{
-				if(proActiveStrokeContainer.getBox().contains(breedte-60, 60) 
-						|| (new Rectangle(breedte-60,0,60,60)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
+//				if(proActiveStrokeContainer.getBox().contains(breedte-60, 60) 
+//						|| (new Rectangle(breedte-60,0,60,60)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
+//					kStrokeContainers.remove(proActiveStrokeContainer);
+//					proActiveStrokeContainer = null;
+//					paint();
+//					return;
+//				}
+				if(eventX>breedte-60 && eventY<60 || proActiveStrokeContainer.getBox().x>breedte || proActiveStrokeContainer.getBox().y>hoogte) {
 					kStrokeContainers.remove(proActiveStrokeContainer);
 					proActiveStrokeContainer = null;
 					paint();
@@ -3766,6 +3773,9 @@ public class KladjeGWTVeld
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
+			int eventX = e.getX();
+			int eventY = e.getY();
+			
 			logger.info("mouse up");
 			e.preventDefault();
 			// prevent scrolling
@@ -3775,7 +3785,7 @@ public class KladjeGWTVeld
 			if (e.getNativeButton() == NativeEvent.BUTTON_RIGHT) {
 				return;
 			}
-			mouseUpTouchEndAction();
+			mouseUpTouchEndAction(eventX, eventY);
 		}
 
 	}
@@ -3858,8 +3868,13 @@ public class KladjeGWTVeld
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			Touch touch = e.getTouches().get(0);
+			
+		    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
+			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
+			
 			moving = false;
-			mouseUpTouchEndAction();
+			mouseUpTouchEndAction(eventX, eventY);
 		}
 
 	}
