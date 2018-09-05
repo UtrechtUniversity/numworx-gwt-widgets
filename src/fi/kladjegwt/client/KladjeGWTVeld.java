@@ -3906,6 +3906,8 @@ public class KladjeGWTVeld
 	 */
 	class MGWTTouchHandler implements TouchStartHandler, TouchMoveHandler, TouchEndHandler
 	{
+		int lastTouchX = 0;
+		int lastTouchY = 0;
 		
 		public void onTouchStart(TouchStartEvent e)
 		{
@@ -3954,7 +3956,9 @@ public class KladjeGWTVeld
 				
 			    boolean shiftPressed = false;
 			    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
-				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();				
+				int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();	
+				lastTouchX = eventX;
+				lastTouchY = eventY;
 			    
 				mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
 				
@@ -3976,13 +3980,13 @@ public class KladjeGWTVeld
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
-			Touch touch = e.getTouches().get(0);
-			
-		    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
-			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
+//			Touch touch = e.getTouches().get(0);
+//			
+//		    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
+//			int eventY = touch.getPageY() - kladjeHWTCanvas.getAbsoluteTop();
 			
 			moving = false;
-			mouseUpTouchEndAction(eventX, eventY);
+			mouseUpTouchEndAction(lastTouchX, lastTouchY);
 		}
 
 	}
