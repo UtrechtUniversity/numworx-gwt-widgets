@@ -917,6 +917,7 @@ public class KladjeGWTVeld
 			rechthoekVector.removeAllElements();
 			ellipsVector.removeAllElements();
 			tekstElementVector.removeAllElements();
+			kStrokeContainers.clear();
 			
 			if (complete)
 				numHistories = 0;
@@ -1031,6 +1032,64 @@ public class KladjeGWTVeld
 				}
 		}
 	}
+	
+	private Rectangle getBinArea() {
+		return new Rectangle(breedte-40,6,34,34);
+	}
+	
+	private Rectangle getUndoArea() {
+		return new Rectangle(breedte-90,6,34,34);
+	}
+	
+	private void drawBin(Context2d g) {
+		Rectangle r = getBinArea();
+		g.setFillStyle(CssColor.make(255, 255, 255));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		g.setStrokeStyle(CssColor.make(38, 115, 182));
+		if(kStrokeContainers.size()<1)
+			g.setStrokeStyle(CssColor.make(180, 195, 228));
+		g.setLineWidth(4.0d);
+		g.beginPath();
+		g.moveTo(r.x, r.y+r.height/4);
+		g.lineTo(r.x+r.width, r.y+r.height/4);
+		g.moveTo(r.x+r.width/6, r.y+r.height/4);
+		g.lineTo(r.x+r.width/4, r.y+r.height);
+		g.lineTo(r.x+r.width*3/4, r.y+r.height);
+		g.lineTo(r.x+r.width*5/6, r.y+r.height/4);
+		g.moveTo(r.x+r.width/2, r.y+r.height/4);
+		g.lineTo(r.x+r.width/2, r.y+r.height);
+		g.moveTo(r.x+r.width*3/8, r.y+r.height/4);
+		g.lineTo(r.x+r.width*3/8, r.y);
+		g.lineTo(r.x+r.width*5/8, r.y);
+		g.lineTo(r.x+r.width*5/8, r.y+r.height/4);
+		
+		g.moveTo(r.x, r.y+r.height/6);
+		g.closePath();
+		g.stroke();
+	}
+	
+	private void drawUndo(Context2d g) {
+		Rectangle r = getUndoArea();
+		g.setFillStyle(CssColor.make(255, 255, 255));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		
+		g.setStrokeStyle(CssColor.make(38, 115, 182));
+		if(numHistories<1)
+			g.setStrokeStyle(CssColor.make(180, 195, 228));
+		g.setLineWidth(4.0d);
+		g.beginPath();
+		g.moveTo(r.x+r.width/6, r.y+r.height);
+		g.arc(r.x+r.width/2, r.y+r.height, r.width*5/12, Math.PI, 0);
+		g.moveTo(r.x, r.y+r.height);
+		g.lineTo(r.x, r.y+r.height*3/4);
+		g.lineTo(r.x+r.width/4, r.y+r.height);
+		g.lineTo(r.x-2, r.y+r.height);
+		
+		g.moveTo(r.x, r.y+r.height);
+		g.closePath();
+		g.stroke();
+	}
+	
 	public void paintFormule(boolean refresh) {
 		if(refresh) {
 			gIm.clearRect(0, 0, breedte, hoogte);
@@ -1112,18 +1171,25 @@ public class KladjeGWTVeld
 	 */
 	public void paint(Context2d g)
 	{
-		g.setLineWidth(0.1d);
+		
 		// alles weg
 		g.clearRect(0, 0, breedte, hoogte);
 		
-		if(mouseMode==formuleOptie)
-			g.drawImage(binImageElement, breedte-60, 10);
+//		if(mouseMode==formuleOptie)
+//			g.drawImage(binImageElement, breedte-60, 10);
+		
+		if(mouseMode==formuleOptie) {
+			drawBin(g);
+			drawUndo(g);
+		}
+		
 		
 		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
 		{	g.setFillStyle( CssColor.make("rgba(200,200,200,0.5)"));
 			g.fillRect(0, 0, breedte, hoogte);
 		}
 		// achtergrond horizontale lijnen 
+		g.setLineWidth(0.1d);
 		if (lijnen)
 		{
 			g.setStrokeStyle(lijnenKleur);
@@ -1708,7 +1774,9 @@ public class KladjeGWTVeld
 			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
-		//paint();
+		closeCurrentContainer();
+		addToHistory();
+		paint();
 	}
 	
 	public void setFalse(boolean isfalse) {
@@ -1722,6 +1790,21 @@ public class KladjeGWTVeld
 			lastCurrentStrokeContainer = null;
 		}
 		//paint();
+	}
+	
+	public void setHalf(boolean half) {
+		if(currentStrokeContainer!=null)
+			currentStrokeContainer.setHalf(half);
+		else if(lastCurrentStrokeContainer!=null) {
+			lastCurrentStrokeContainer.setHalf(half);
+			currentStrokeContainer = lastCurrentStrokeContainer;
+			currentStrokeContainer.scale(schrijfLeesFactor/1.0);
+			currentStrokeContainer.setActive(true);
+			lastCurrentStrokeContainer = null;
+		}
+		closeCurrentContainer();
+		addToHistory();
+		paint();
 	}
 	
 	/**
@@ -2874,6 +2957,13 @@ public class KladjeGWTVeld
 	}
 	
 	private void closeCurrentContainer() {
+		if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevantWhenReady()) {
+			kStrokeContainers.remove(currentStrokeContainer);
+			currentStrokeContainer = null;
+			return;
+		}
+		if(currentStrokeContainer==null)
+			return;
 		currentStrokeContainer.setActive(false);
 		currentStrokeContainer.scale(1.0/schrijfLeesFactor);
 //		if(currentStrokeContainer.getBox().x < 0)
@@ -2942,6 +3032,7 @@ public class KladjeGWTVeld
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
 				closeCurrentContainer();
+				addToHistory();
 				paint();
 				return;
 			}
@@ -2954,6 +3045,19 @@ public class KladjeGWTVeld
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
+				addToHistory();
+				paint();
+				eigenaar.setChanged();
+			}
+			
+			if(currentStrokeContainer==null && getBinArea().contains(eventX, eventY)) {
+				kStrokeContainers.clear();
+				addToHistory();
+				eigenaar.setChanged();
+			}
+			
+			if(currentStrokeContainer==null && getUndoArea().contains(eventX, eventY)) {
+				undo();
 				eigenaar.setChanged();
 			}
 			
@@ -3531,6 +3635,7 @@ public class KladjeGWTVeld
 				if(eventX>breedte-60 && eventY<60 || proActiveStrokeContainer.getBox().x>breedte || proActiveStrokeContainer.getBox().y>hoogte) {
 					kStrokeContainers.remove(proActiveStrokeContainer);
 					proActiveStrokeContainer = null;
+					addToHistory();
 					paint();
 					return;
 				}
@@ -3548,6 +3653,7 @@ public class KladjeGWTVeld
 					
 				}
 				proActiveStrokeContainer=null;
+				addToHistory();
 				paint();
 			}
 			
@@ -3565,8 +3671,10 @@ public class KladjeGWTVeld
 				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
 					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
 				
+				
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
+				currentStrokeContainer.setHalf(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
 					paint();
 			}

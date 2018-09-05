@@ -27,6 +27,7 @@ public class KStrokeContainer {
 	private Rectangle box, writeBox;
 	private boolean correct = false;
 	private boolean isfalse = false;
+	private boolean isHalf = false;
 	
 	private FormuleViewer formuleViewer;
 	
@@ -58,15 +59,15 @@ public class KStrokeContainer {
 	}
 	
 	public Rectangle getCloseButtonArea() {
-		int x = getWriteBox().x + getWriteBox().width - 30; 
-		int y = getWriteBox().y; 
+		int x = getWriteBox().x + getWriteBox().width - 33; 
+		int y = getWriteBox().y + 6; 
 		return new Rectangle(x,y,30,30);
 	}
 	
 	public Rectangle getCheckButtonArea() {
-		int x = getWriteBox().x + getWriteBox().width - 40; 
-		int y = getWriteBox().y + getWriteBox().height - 40; 
-		return new Rectangle(x,y,40,40);
+		int x = getWriteBox().x + getWriteBox().width - 33; 
+		int y = getWriteBox().y + getWriteBox().height - 36; 
+		return new Rectangle(x,y,30,30);
 	}
 	
 	private void drawcloseButton(Context2d g, Rectangle r) {
@@ -97,11 +98,11 @@ public class KStrokeContainer {
 	}
 	
 	private void drawCheckButton(Context2d g, Rectangle r) {
-		int m = 10;
+		//int m = 10;
 		
-		g.setFillStyle(CssColor.make(255, 255, 255));
+		//g.setFillStyle(CssColor.make(255, 255, 255));
 		
-		g.fillRect(r.x, r.y, r.width, r.height);
+		//g.fillRect(r.x, r.y, r.width, r.height);
 		g.setStrokeStyle(CssColor.make(38, 115, 182));
 		g.setLineWidth(4.0d);
 		g.beginPath();
@@ -155,6 +156,8 @@ public class KStrokeContainer {
 			if(active) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
+				g.setFillStyle(CssColor.make(255, 243, 180));
+				g.fillRect(getWriteBox().x+getWriteBox().width-42, getWriteBox().y-5, 47, getWriteBox().height+10);
 				drawShadow(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
@@ -163,7 +166,7 @@ public class KStrokeContainer {
 				//g.setFillStyle(CssColor.make(239, 241, 243));
 				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
 
-				drawcloseButton(g, new Rectangle(getWriteBox().x + getWriteBox().width-37, getWriteBox().y+3, 34, 34));
+				drawcloseButton(g, getCloseButtonArea());
 				
 
 //				int d = (int)strokeContainer.averageHeight;
@@ -171,14 +174,14 @@ public class KStrokeContainer {
 //				g.fillText(""+d, 300, 20);
 				
 				if(formuleViewer!=null) {
-					int x = Math.max(getWriteBox().x+40, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
+					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
 					int y = getWriteBox().y+5;//-20-formuleViewer.getHeight();
 					g.translate(x, y);
 					formuleViewer.getMainRegel().paintAll(g);
 					g.translate(-x, -y);
 				}
 				
-				drawCheckButton(g, new Rectangle(getWriteBox().x + getWriteBox().width-40, getWriteBox().y+getWriteBox().height-40, 34, 34));
+				drawCheckButton(g, getCheckButtonArea());
 				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
 //				
@@ -196,12 +199,14 @@ public class KStrokeContainer {
 				g.setStrokeStyle(drawingColor);
 				g.setLineWidth(3.0d);
 				
-				if(correct||isfalse) {
+				if(correct||isfalse||isHalf) {
 					//g.setFillStyle(CssColor.make(240, 255, 240));
 					if(correct)
 						g.setFillStyle(CssColor.make(0, 200, 0));
 					if(isfalse)
 						g.setFillStyle(CssColor.make(200, 0, 0));
+					if(isHalf)
+						g.setFillStyle(CssColor.make(240, 240, 0));
 					g.beginPath();
 					g.arc(getWriteBox().x + 20, getWriteBox().y + 20 , 8, 0, 8* Math.PI);
 					g.closePath();
@@ -214,13 +219,15 @@ public class KStrokeContainer {
 				//g.setFillStyle(CssColor.make(243, 241, 239));
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.setLineWidth(1.5d);
-				if(correct||isfalse) {
+				if(correct||isfalse||isHalf) {
 					//g.setFillStyle(CssColor.make(240, 255, 240));
 					//g.fillRect(getBox().x-30, getBox().y-5, getBox().width+35, getBox().height+10);
 					if(correct)
 						g.setFillStyle(CssColor.make(0, 200, 0));
 					if(isfalse)
 						g.setFillStyle(CssColor.make(200, 0, 0));
+					if(isHalf)
+						g.setFillStyle(CssColor.make(240, 240, 0));
 					g.beginPath();
 					g.arc(getBox().x-20, getBox().y+getBox().height/2 , 5, 0, 5* Math.PI);
 					g.closePath();
@@ -271,8 +278,10 @@ public class KStrokeContainer {
 //		if(correct && !this.correct)
 //			activeTranslation -=25;
 		this.correct = correct;
-		if(correct)
+		if(correct) {
 			isfalse = false;
+			isHalf = false;
+		}
 	}
 	
 	public void setFalse(boolean isfalse) {
@@ -281,8 +290,21 @@ public class KStrokeContainer {
 //		if(isfalse && !this.isfalse)
 //			activeTranslation -=25;
 		this.isfalse = isfalse;
-		if(isfalse)
+		if(isfalse) {
 			correct = false;
+			isHalf = false;
+		}
+	}
+	public void setHalf(boolean isHalf) {
+//		if(!isfalse && this.isfalse)
+//			activeTranslation -=25;
+//		if(isfalse && !this.isfalse)
+//			activeTranslation -=25;
+		this.isHalf = isHalf;
+		if(isHalf) {
+			correct = false;
+			isfalse = false;
+		}
 	}
 	
 	public void setActive (boolean b) {
@@ -361,9 +383,35 @@ public class KStrokeContainer {
 	}
 	
 	public boolean isNotRelevant() {
-		if(strokeContainer.getStrokes().size()==0 || strokeContainer.getDiagonal()<7)
+		if(strokeContainer.getStrokes().size()==0 || strokeContainer.getDiagonal()<15)
 			return true;
 		return false;
+	}
+	
+	public boolean isNotRelevantWhenReady() {
+		if(strokeContainer.getStrokes().size()==1) {
+			double length = strokeContainer.getStrokes().get(0).getLength();
+			if(length<35)
+				return true;
+
+		}
+		if(strokeContainer.getStrokes().size()==2) {
+			double length1 = strokeContainer.getStrokes().get(0).getLength() ;
+			double length2 = strokeContainer.getStrokes().get(1).getLength();
+			if(length1<35 && length2<35)
+				return true;
+
+		}
+		if(strokeContainer.getStrokes().size()==3) {
+			double length1 = strokeContainer.getStrokes().get(0).getLength() ;
+			double length2 = strokeContainer.getStrokes().get(1).getLength();
+			double length3 = strokeContainer.getStrokes().get(2).getLength();
+			if(length1<35 && length2<35 && length3<35)
+				return true;
+
+		}
+		return false;
+		
 	}
 	
 	public boolean contains(int x, int y, int margin) {
@@ -405,6 +453,7 @@ public class KStrokeContainer {
 		HashMap<String,Object> map = strokeContainer.getState();
 		map.put("correct", new Boolean(correct));
 		map.put("isfalse", new Boolean(isfalse));
+		map.put("isHalf", new Boolean(isHalf));
 		return map;
 	}
 	
@@ -415,5 +464,7 @@ public class KStrokeContainer {
 			correct = launchState.getBoolean("correct");
 		if(launchState.containsKey("isfalse"))
 			isfalse = launchState.getBoolean("isfalse");
+		if(launchState.containsKey("isHalf"))
+			isHalf = launchState.getBoolean("isHalf");
 	}
 }

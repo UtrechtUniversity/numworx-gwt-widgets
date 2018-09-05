@@ -751,6 +751,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		comRoot.addCBookEventListener("drawing", this);
 		comRoot.addCBookEventListener("action.setCorrect", this);
 		comRoot.addCBookEventListener("action.setFalse", this);
+		comRoot.addCBookEventListener("action.setHalf", this);
 		comRoot.addCBookEventListener("double.translationX", this);
 		comRoot.addCBookEventListener("double.translationY", this);
 	}
@@ -953,6 +954,13 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if (command.startsWith("action.setCorrect"))
 		{
 			{	kladjeGWTVeld.setCorrect(true);
+				kladjeGWTVeld.paintFormule(false);
+			}
+		}
+		
+		if (command.startsWith("action.setHalf"))
+		{
+			{	kladjeGWTVeld.setHalf(true);
 				kladjeGWTVeld.paintFormule(false);
 			}
 		}
