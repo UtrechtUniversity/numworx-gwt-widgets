@@ -1771,7 +1771,7 @@ public class KladjeGWTVeld
 	public void setCorrect(boolean correct) {
 		if(currentStrokeContainer!=null) {
 			currentStrokeContainer.setCorrect(correct);
-			if(correct && !correctEquationSend) {
+			if(correct && !correctEquationSend && eigenaar.comRoot.hasListeners("equation.correct")) {
 				eigenaar.sendCorrectEquation();
 				correctEquationSend = true;
 				eigenaar.fireCheck();
@@ -1780,7 +1780,7 @@ public class KladjeGWTVeld
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setCorrect(correct);
 			currentStrokeContainer = lastCurrentStrokeContainer;
-			if(correct && !correctEquationSend) {
+			if(correct && !correctEquationSend && eigenaar.comRoot.hasListeners("equation.correct")) {
 				eigenaar.sendCorrectEquation();
 				correctEquationSend = true;
 				eigenaar.fireCheck();
