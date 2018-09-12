@@ -440,6 +440,9 @@ public class KladjeGWTVeld
 	private ImageElement binImageElement;
 	protected double schrijfLeesFactor = 2.2;
 	
+	private boolean correctEquationSend;
+	private boolean popupMode = false;
+	
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -549,6 +552,7 @@ public class KladjeGWTVeld
 		return null;
 	}
 	
+	
 	public String getFormula()
 	{
 		if(currentStrokeContainer!=null)
@@ -656,7 +660,7 @@ public class KladjeGWTVeld
 	{
 		HashMap<String,Object> h = new HashMap<String,Object>();
 		
-		if(end && mouseMode!=ivmOptie && currentStrokeContainer!=null) {
+		if(end && mouseMode!=ivmOptie && currentStrokeContainer!=null && !popupMode) {
 			closeCurrentContainer();
 		}
 		
@@ -1043,8 +1047,8 @@ public class KladjeGWTVeld
 	
 	private void drawBin(Context2d g) {
 		Rectangle r = getBinArea();
-		g.setFillStyle(CssColor.make(255, 255, 255));
-		g.fillRect(r.x, r.y, r.width, r.height);
+//		g.setFillStyle(CssColor.make(255, 255, 255));
+//		g.fillRect(r.x, r.y, r.width, r.height);
 		g.setStrokeStyle(CssColor.make(38, 115, 182));
 		if(kStrokeContainers.size()<1)
 			g.setStrokeStyle(CssColor.make(180, 195, 228));
@@ -1070,8 +1074,8 @@ public class KladjeGWTVeld
 	
 	private void drawUndo(Context2d g) {
 		Rectangle r = getUndoArea();
-		g.setFillStyle(CssColor.make(255, 255, 255));
-		g.fillRect(r.x, r.y, r.width, r.height);
+//		g.setFillStyle(CssColor.make(255, 255, 255));
+//		g.fillRect(r.x, r.y, r.width, r.height);
 		
 		g.setStrokeStyle(CssColor.make(38, 115, 182));
 		if(numHistories<1)
@@ -1178,13 +1182,13 @@ public class KladjeGWTVeld
 //		if(mouseMode==formuleOptie)
 //			g.drawImage(binImageElement, breedte-60, 10);
 		
-		if(mouseMode==formuleOptie) {
+		if(mouseMode==formuleOptie && !popupMode) {
 			drawBin(g);
 			drawUndo(g);
 		}
 		
 		
-		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
+		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !popupMode && !currentStrokeContainer.isNotRelevant())
 		{	g.setFillStyle( CssColor.make("rgba(200,200,200,0.5)"));
 			g.fillRect(0, 0, breedte, hoogte);
 		}
@@ -1765,16 +1769,28 @@ public class KladjeGWTVeld
 	}
 	
 	public void setCorrect(boolean correct) {
-		if(currentStrokeContainer!=null)
+		if(currentStrokeContainer!=null) {
 			currentStrokeContainer.setCorrect(correct);
+			if(correct && !correctEquationSend) {
+				eigenaar.sendCorrectEquation();
+				correctEquationSend = true;
+				eigenaar.fireCheck();
+			}
+		}
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setCorrect(correct);
 			currentStrokeContainer = lastCurrentStrokeContainer;
+			if(correct && !correctEquationSend) {
+				eigenaar.sendCorrectEquation();
+				correctEquationSend = true;
+				eigenaar.fireCheck();
+			}
 			currentStrokeContainer.scale(schrijfLeesFactor/1.0);
 			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
-		closeCurrentContainer();
+		if(!popupMode)
+			closeCurrentContainer();
 		addToHistory();
 		paint();
 	}
@@ -1802,7 +1818,8 @@ public class KladjeGWTVeld
 			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
 		}
-		closeCurrentContainer();
+		if(!popupMode)
+			closeCurrentContainer();
 		addToHistory();
 		paint();
 	}
@@ -2956,7 +2973,34 @@ public class KladjeGWTVeld
 		return handleAction;
 	}
 	
+//	public void startStrokeContainer() {
+//		currentStrokeContainer = new KStrokeContainer(this);
+//		currentStrokeContainer.setActive(true);
+//		kStrokeContainers.add(currentStrokeContainer);
+//		popupMode = true;
+//		currentStrokeContainer.setpopupMode(true);
+//		paintFormule(true);
+//	}
+	
+	public void startStrokeContainer() {
+		if(kStrokeContainers.size()==0) {
+			currentStrokeContainer = new KStrokeContainer(this);
+			kStrokeContainers.add(currentStrokeContainer);
+		}
+		else {
+			if(currentStrokeContainer!=null && currentStrokeContainer!=kStrokeContainers.get(0))
+				currentStrokeContainer.scale(schrijfLeesFactor/1.0);
+			currentStrokeContainer = kStrokeContainers.get(0);
+		}
+		
+		currentStrokeContainer.setActive(true);
+		popupMode = true;
+		currentStrokeContainer.setpopupMode(true);
+		paintFormule(true);
+	}
+	
 	private void closeCurrentContainer() {
+		
 		if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevantWhenReady()) {
 			kStrokeContainers.remove(currentStrokeContainer);
 			currentStrokeContainer = null;
@@ -2973,6 +3017,8 @@ public class KladjeGWTVeld
 		activeTranslation.y = 0;
 		lastCurrentStrokeContainer = currentStrokeContainer;
 		currentStrokeContainer=null;
+		
+		eigenaar.fireClose();
 	}
 	
 	private KStrokeContainer proActiveStrokeContainer;
@@ -3031,6 +3077,10 @@ public class KladjeGWTVeld
 			startY = eventY;
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
+				if(popupMode) {
+					eigenaar.fireCheck();
+					return;
+				}
 				closeCurrentContainer();
 				addToHistory();
 				paint();
@@ -3039,11 +3089,12 @@ public class KladjeGWTVeld
 			
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
+				correctEquationSend = false;
 				eigenaar.fireCheck();
 				return;
 			}
 					
-			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
+			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY) && !popupMode) {
 				closeCurrentContainer();
 				addToHistory();
 				paint();
@@ -3671,14 +3722,13 @@ public class KladjeGWTVeld
 				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
 					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
 				
-				
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				currentStrokeContainer.setHalf(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
 					paint();
 			}
-			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
+			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !popupMode)
 			{	kStrokeContainers.remove(currentStrokeContainer);
 				currentStrokeContainer = null;
 				formulaStrokePoints.clear();

@@ -3,6 +3,7 @@ package fi.kladjegwt.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -21,10 +22,13 @@ public class KStrokeContainer {
 	private StrokeContainer strokeContainer;
 	
 	private boolean active = false;
-	private double activeTranslation;
+	private boolean popupMode = false;
+	private double activeTranslationX;
+	private double activeTranslationY;
 	
 	private CssColor drawingColor = CssColor.make(80, 80, 80);
-	private Rectangle box, writeBox;
+	private Rectangle box;
+	private Rectangle writeBox;
 	private boolean correct = false;
 	private boolean isfalse = false;
 	private boolean isHalf = false;
@@ -33,10 +37,12 @@ public class KStrokeContainer {
 	
 	//private double schrijfLeesFactor = 2;
 	//private boolean checkable;
+	private static Logger logger = Logger.getLogger("KStrokeContainer");
 	
 	
 	public KStrokeContainer (KladjeGWTVeld parent) {
 		this.parent = parent;
+		
 		strokeContainer = new StrokeContainer();
 	}
 	
@@ -44,6 +50,7 @@ public class KStrokeContainer {
 		box = null;
 		writeBox = null;
 		boolean b = strokeContainer.addStroke(stroke);
+		logger.info(strokeContainer.getFormulaString());
 		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
 		formuleViewer.setColor(CssColor.make(38, 115, 182));
 		//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
@@ -59,12 +66,16 @@ public class KStrokeContainer {
 	}
 	
 	public Rectangle getCloseButtonArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
 		int x = getWriteBox().x + getWriteBox().width - 33; 
 		int y = getWriteBox().y + 6; 
 		return new Rectangle(x,y,30,30);
 	}
 	
 	public Rectangle getCheckButtonArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
 		int x = getWriteBox().x + getWriteBox().width - 33; 
 		int y = getWriteBox().y + getWriteBox().height - 36; 
 		return new Rectangle(x,y,30,30);
@@ -153,7 +164,7 @@ public class KStrokeContainer {
 	
 	public void draw(Context2d g) {
 		if(strokeContainer.getStrokes().size()>0) {
-			if(active) {
+			if(active && !popupMode) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
 				g.setFillStyle(CssColor.make(255, 243, 180));
@@ -181,7 +192,8 @@ public class KStrokeContainer {
 					g.translate(-x, -y);
 				}
 				
-				drawCheckButton(g, getCheckButtonArea());
+				if(parent.eigenaar.comRoot.hasListeners("action.check"))
+					drawCheckButton(g, getCheckButtonArea());
 				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
 //				
@@ -237,6 +249,50 @@ public class KStrokeContainer {
 				//else
 					//g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
 			}	
+		}
+		
+		if(active && popupMode) {
+			
+				Rectangle wbox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+				g.setFillStyle(CssColor.make(255, 255, 255));
+				g.fillRect(wbox.x, wbox.y, wbox.width, wbox.height);
+				g.setFillStyle(CssColor.make(255, 243, 180));
+				g.fillRect(wbox.x+wbox.width-42, wbox.y-5, 47, wbox.height+10);
+				drawShadow(g,new Rectangle((int)wbox.x-5, (int)wbox.y-5, (int)wbox.width+10, (int)wbox.height+10));
+				drawGrid(g,new Rectangle((int)wbox.x-5, (int)wbox.y-5, (int)wbox.width+10, (int)wbox.height+10));
+				
+				g.setStrokeStyle(CssColor.make(80, 80, 80));
+				
+				//g.setFillStyle(CssColor.make(239, 241, 243));
+				//g.fillRect(wbox.x + wbox.width-40, wbox.y, 40, 40);
+
+				drawcloseButton(g, getCloseButtonArea());
+				if(formuleViewer!=null) {
+					int x = Math.max(wbox.x+50, getBox()!=null ? getBox().x : 0) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
+					int y = wbox.y+5;//-20-formuleViewer.getHeight();
+					g.translate(x, y);
+					formuleViewer.getMainRegel().paintAll(g);
+					g.translate(-x, -y);
+				}
+				
+				if(parent.eigenaar.comRoot.hasListeners("action.check"))
+					drawCheckButton(g, getCheckButtonArea());
+				
+				if(correct||isfalse||isHalf) {
+					//g.setFillStyle(CssColor.make(240, 255, 240));
+					if(correct)
+						g.setFillStyle(CssColor.make(0, 200, 0));
+					if(isfalse)
+						g.setFillStyle(CssColor.make(200, 0, 0));
+					if(isHalf)
+						g.setFillStyle(CssColor.make(240, 240, 0));
+					g.beginPath();
+					g.arc(wbox.x + 20, wbox.y + 20 , 8, 0, 8* Math.PI);
+					g.closePath();
+					g.stroke();
+					g.fill();
+				}
+			
 		}
 		
 		
@@ -310,11 +366,20 @@ public class KStrokeContainer {
 	public void setActive (boolean b) {
 		active = b;
 		if(active && getBox()!=null) {
-			activeTranslation = getBox().x - 40;
-			translate((int)-activeTranslation,0);
+			activeTranslationX = getBox().x - 40;
+			activeTranslationY = 0; 
+			if(getBox().y<70)
+				activeTranslationY = getBox().y-70;
+			if(getBox().y+getBox().height>parent.hoogte-70) 
+				activeTranslationY = getBox().y+getBox().height - (parent.hoogte-70);
+			translate((int)-activeTranslationX,(int)-activeTranslationY);
 		}
 		else if(getBox()!=null)
-			translate((int)activeTranslation,0);
+			translate((int)activeTranslationX, (int)activeTranslationY);
+	}
+	
+	public void setpopupMode (boolean b) {
+		popupMode = b;
 	}
 	
 	public boolean isActive() {
@@ -360,11 +425,15 @@ public class KStrokeContainer {
 //			int y = (int)strokeContainer.getBoundingBox().y;
 //			int width = (int)strokeContainer.getBoundingBox().width;
 //			int height = (int)strokeContainer.getBoundingBox().height;
-			int x = 20;
-			int y = (int)Math.max(25,strokeContainer.getBoundingBox().y - margin-10);
-			y= (int)Math.min(y, parent.hoogte - strokeContainer.getBoundingBox().height-2*margin-25);
+			
 			int width = parent.breedte-40;
-			int height = (int)strokeContainer.getBoundingBox().height + 2*margin;
+			int height = Math.min(parent.hoogte-40, (int)strokeContainer.getBoundingBox().height + 2*margin);
+			
+			int x = 20;
+			int y = (int)Math.max(20,strokeContainer.getBoundingBox().y - margin-10);
+			y= (int)Math.min(y, parent.hoogte - height -20);
+			
+			
 			writeBox = new Rectangle(x, y, width, height);
 		}
 		return writeBox;
