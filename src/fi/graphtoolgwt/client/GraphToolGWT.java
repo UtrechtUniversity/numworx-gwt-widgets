@@ -2681,6 +2681,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		FormuleClipboardIF clip = comRoot.getFormuleClipboard();
 		FocusOnTouch.installKeyboard(kb, clip);
 		FormuleHolder.installKeyboard(kb);
+		try
+		{
+			FormuleParser.zetWoordFormule(comRoot.getConfiguration().getBoolean("woordFormule", false));
+		}
+		catch (Exception e)
+		{
+			// er gaat iets mis bij het ophalen van globale setting woordformule
+			e.printStackTrace();
+		}
 
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("expression.1", this);
