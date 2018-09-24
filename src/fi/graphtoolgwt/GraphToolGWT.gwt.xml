@@ -38,5 +38,9 @@
   
   <add-linker name='xsiframe' />
 
+<!-- Logging TRUE/FALSE FINEST/.../SEVERE -->   
+<!--     <set-property name="gwt.logging.logLevel" value="INFO"/> -->
+<!--     <set-property name="gwt.logging.enabled" value="TRUE"/> -->
+
 
 </module>

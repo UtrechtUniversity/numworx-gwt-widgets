@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
+import nl.uu.fi.dwo.formule.client.formuleobjects.FormuleTeken;
 import nl.uu.fi.dwo.interaction.client.FacetAware;
 import nl.uu.fi.dwo.interaction.client.FacetHelper;
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
@@ -73,7 +75,7 @@ import fi.graphtoolgwt.client.text.Text;
  */
 public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CBookEventListener {
 	
-//	private static Logger logger = Logger.getLogger("GraphToolGWT");
+	private static Logger logger = Logger.getLogger("GraphToolGWT");
 	
 	public static final String ACTION_CORRECT = "action.correct";
 	public static final String ACTION_FALSE = "action.false";
@@ -2683,12 +2685,28 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		FormuleHolder.installKeyboard(kb);
 		try
 		{
-			FormuleParser.zetWoordFormule(comRoot.getConfiguration().getBoolean("woordFormule", false));
+			ObjectMap wrap = comRoot.getConfiguration();
+// extract from DWOplayer XMLView.java
+			boolean maalTeken =  wrap.getBoolean("maalTeken");
+			FormuleTeken.zetMaalTeken(maalTeken);
+			boolean diffOperatoren = false;
+			if(wrap.containsKey("diffOperatoren"))
+				diffOperatoren = wrap.getBoolean("diffOperatoren");
+			FormuleTeken.zetDiffOperatoren(diffOperatoren);
+			FormuleParser.zetDiffOperatoren(diffOperatoren);
+			boolean hoekGraden = wrap.getBoolean("hoekGraden");
+			Expressie.zetHoekGraden(hoekGraden);
+			if(wrap.containsKey("woordFormule"))
+				FormuleParser.zetWoordFormule(wrap.getBoolean("woordFormule"));
+			if(wrap.containsKey("tweeHoofdletterVar"))
+				FormuleParser.zetTweeHoofdletterVariabele(wrap.getBoolean("tweeHoofdletterVar"));
+			if(wrap.containsKey("significantie"))
+				FormuleParser.zetSignificantie(wrap.getBoolean("significantie"));
 		}
 		catch (Exception e)
 		{
 			// er gaat iets mis bij het ophalen van globale setting woordformule
-			e.printStackTrace();
+			logger.log(Level.WARNING, "Zet woordFormule" , e);
 		}
 
 		this.comRoot = comRoot;
