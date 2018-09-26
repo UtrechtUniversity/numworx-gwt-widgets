@@ -128,6 +128,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	@Override
 	protected void installToolbox() {
+	    super.installToolbox();
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
