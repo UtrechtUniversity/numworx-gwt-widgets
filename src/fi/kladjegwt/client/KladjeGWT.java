@@ -2,10 +2,12 @@ package fi.kladjegwt.client;
 
 
 
+import java.awt.List;
 //import java.awt.Point;
 import java.util.HashMap;
 //import java.util.Hashtable;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
@@ -17,6 +19,7 @@ import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -207,6 +210,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	private StrokeContainer strokeContainer = new StrokeContainer();
 	
 	private FormuleViewer formuleViewer;
+	
+	private int[][] rectangleData;
 	
 	/**
 	 * maak de css in ore en haal via de resources alle plaatjes op 
@@ -808,7 +813,23 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(launchState.containsKey("scale"))
 			scale = launchState.getDouble("scale");
 		
-		
+		//ArrayList<Object> rectangless = null;
+		if(launchState.containsKey("formuleInstellingen")) {
+			ObjectMap formuleInstellingen = launchState.getObjectMap("formuleInstellingen");
+			if(formuleInstellingen.containsKey("rectangleData")) {
+				ObjectList rectangles = formuleInstellingen.getObjectList("rectangleData");
+				rectangleData = new int[rectangles.size()][4];
+				for(int i=0 ; i<rectangles.size() ; i++) {
+					int[] rectAttr = rectangles.getIntArray(i);
+					for(int j=0 ; j<4 ; j++) {
+						rectangleData[i][j]=rectAttr[j];
+					}
+				}
+				for(int i=0 ; i<rectangles.size() ; i++) {
+					logger.info(""+rectangleData[i][0]+" "+rectangleData[i][1]+" "+rectangleData[i][2]+" "+rectangleData[i][3]+" ");
+				}
+			}
+		}
 		
 		bottomPanel = new LayoutPanel();
 		bottomPanel.addStyleName(kladjeCss.bottom());
@@ -844,8 +865,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		kladjeGWTVeld.schalen = schalen;
 		kladjeGWTVeld.translation = translation;
 		kladjeGWTVeld.scale = scale;
-		if(formuleOptie)
+		if(formuleOptie) {
 			kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
+			if(rectangleData!=null)
+				kladjeGWTVeld.setRectangleData(rectangleData);
+		}
 		if(ivmOptie)
 			kladjeGWTVeld.mouseMode = kladjeGWTVeld.ivmOptie;
 	
@@ -923,6 +947,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	public void sendEquation() {
 		if(comRoot!=null)
 			comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
+	}
+	
+	public void sendEquation(int nr) {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"equation."+nr,kladjeGWTVeld.getFormula()));
 	}
 	
 	public void sendCorrectEquation() {

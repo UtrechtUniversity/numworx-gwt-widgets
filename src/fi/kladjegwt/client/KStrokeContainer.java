@@ -27,11 +27,14 @@ public class KStrokeContainer {
 	private double activeTranslationY;
 	
 	private CssColor drawingColor = CssColor.make(80, 80, 80);
+	private Rectangle defaultBox;
 	private Rectangle box;
 	private Rectangle writeBox;
 	private boolean correct = false;
 	private boolean isfalse = false;
 	private boolean isHalf = false;
+	
+	private boolean isInputSC = false;
 	
 	private FormuleViewer formuleViewer;
 	
@@ -46,6 +49,14 @@ public class KStrokeContainer {
 		strokeContainer = new StrokeContainer();
 	}
 	
+	public KStrokeContainer (KladjeGWTVeld parent, Rectangle defaultBox) {
+		this.parent = parent;
+		this.defaultBox = defaultBox;
+		this.box = defaultBox;
+		isInputSC = true;
+		strokeContainer = new StrokeContainer();
+	}
+	
 	public boolean addStroke(Stroke stroke) {
 		box = null;
 		writeBox = null;
@@ -57,8 +68,8 @@ public class KStrokeContainer {
 		return b;
 	}
 	
-	public void clear() {
-		strokeContainer.getStrokes().clear();
+	public void wis() {
+		strokeContainer.wis();
 	}
 	
 	public int getStrokeCount() {
@@ -392,6 +403,7 @@ public class KStrokeContainer {
 		return "";
 	}
 	
+	
 	public DoubleRectangle getBoundingBox() {
 		return strokeContainer.getBoundingBox();
 	}
@@ -404,6 +416,8 @@ public class KStrokeContainer {
 			int height = (int)strokeContainer.getBoundingBox().height;
 			box = new Rectangle(x, y, width, height);
 		}
+		if(box==null)
+			box = defaultBox;
 		return box;
 	}
 	
@@ -436,6 +450,17 @@ public class KStrokeContainer {
 			
 			writeBox = new Rectangle(x, y, width, height);
 		}
+//		else if(writeBox==null && strokeContainer != null) { //strokeContainer.getBoundingBox()==null
+//			int width = parent.breedte-40;
+//			int height = Math.min(parent.hoogte-40, defaultBox.height + 2*margin);
+//			
+//			int x = 20;
+//			int y = (int)Math.max(20,defaultBox.y - margin-10);
+//			y= (int)Math.min(y, parent.hoogte - height -20);
+//			
+//			
+//			writeBox = new Rectangle(x, y, width, height);
+//		}
 		return writeBox;
 	}
 	

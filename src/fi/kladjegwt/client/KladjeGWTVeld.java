@@ -435,6 +435,7 @@ public class KladjeGWTVeld
 	KladjeGWT eigenaar;
 	
 	private ArrayList<KStrokeContainer> kStrokeContainers = new ArrayList<KStrokeContainer>();
+	
 	private KStrokeContainer currentStrokeContainer, lastCurrentStrokeContainer;// = new KStrokeContainer();
 	private Image binImage;
 	private ImageElement binImageElement;
@@ -442,6 +443,10 @@ public class KladjeGWTVeld
 	
 	private boolean correctEquationSend;
 	private boolean popupMode = false;
+	
+	private ArrayList<KStrokeContainer> hiddenStrokeContainers = new ArrayList<KStrokeContainer>();
+	private ArrayList<Rectangle> hiddenSCRectangles = new ArrayList<Rectangle>();
+	private int activeHSCNumber = 0;
 	
 	
 	/**
@@ -473,7 +478,9 @@ public class KladjeGWTVeld
 		binImage = new Image(binResource);
 		binImageElement = ImageElement.as(binImage.getElement());
 		
-		//kStrokeContainers.add(currentStrokeContainer);
+		
+		
+		
 	}
 
 	/**
@@ -530,10 +537,21 @@ public class KladjeGWTVeld
 	
 	private KStrokeContainer findInactiveStrokeContainer(int x, int y)
 	{
-		for(int k=0 ; k<kStrokeContainers.size() ; k++) 
+		
+		for(int k=0 ; k<hiddenStrokeContainers.size() ; k++) 
 		{	
-			if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive())
+			if(hiddenSCRectangles.get(k).contains(x,y) && !hiddenStrokeContainers.get(k).isActive()) {
+				activeHSCNumber = k+1;
+				return hiddenStrokeContainers.get(k);
+			}
+				
+		}
+		for(int k=0 ; k<kStrokeContainers.size() ; k++)
+		{	
+			if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive()) {
+				activeHSCNumber = 0;
 				return kStrokeContainers.get(k);
+			}
 		}
 		return null;
 	}
@@ -664,8 +682,13 @@ public class KladjeGWTVeld
 			closeCurrentContainer();
 		}
 		
-		int lastCurrentIndex = kStrokeContainers.indexOf(lastCurrentStrokeContainer);
-		h.put("lastCurrentIndex", new Integer(lastCurrentIndex));
+//		int lastCurrentIndex = kStrokeContainers.indexOf(lastCurrentStrokeContainer);
+//		h.put("lastCurrentIndex", new Integer(lastCurrentIndex));
+		
+//		int currentSCIndex = -1;
+//		if(currentStrokeContainer!=null)
+//			currentSCIndex = kStrokeContainers.indexOf(currentStrokeContainer);
+//		h.put("currentSCIndex", new Integer(currentSCIndex));
 		
 		if(mouseMode==ivmOptie && currentStrokeContainer!=null)
 		{
@@ -773,10 +796,11 @@ public class KladjeGWTVeld
 			sc.setState(strokeContainerList.get(sCnt));
 			kStrokeContainers.add(sc);
 		}
-		if (launchState.containsKey("lastCurrentIndex")) {
-			//int lastCurrentIndex = launchState.getInt("lastCurrentIndex");
-			//lastCurrentStrokeContainer = kStrokeContainers.get(lastCurrentIndex);
-		}
+//		if (launchState.containsKey("currentSCIndex")) {
+//			int currentSCIndex = launchState.getInt("currentSCIndex");
+//			if(currentSCIndex>-1)
+//				currentStrokeContainer = kStrokeContainers.get(currentSCIndex);
+//		} 
 		
 		// alle Strepen verwijderen
 		
@@ -1766,6 +1790,14 @@ public class KladjeGWTVeld
 	{
 		mouseMode = selecteren;
 		closeCurrentContainer();
+	}
+	
+	public void setRectangleData(int[][] data)
+	{
+		for(int i=0 ; i<data.length ; i++) {
+			hiddenSCRectangles.add(new Rectangle(data[i][0],data[i][1],data[i][2],data[i][3]));
+			hiddenStrokeContainers.add(new KStrokeContainer(this,new Rectangle(0,0,20,20)));
+		}
 	}
 	
 	public void setCorrect(boolean correct) {
@@ -3017,6 +3049,7 @@ public class KladjeGWTVeld
 		activeTranslation.y = 0;
 		lastCurrentStrokeContainer = currentStrokeContainer;
 		currentStrokeContainer=null;
+		activeHSCNumber=0;
 		
 		eigenaar.fireClose();
 	}
@@ -3081,6 +3114,8 @@ public class KladjeGWTVeld
 					eigenaar.fireCheck();
 					return;
 				}
+				if(activeHSCNumber>0)
+					eigenaar.sendEquation(activeHSCNumber);
 				closeCurrentContainer();
 				addToHistory();
 				paint();
@@ -3090,6 +3125,11 @@ public class KladjeGWTVeld
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
 				correctEquationSend = false;
+				if(activeHSCNumber>0) {
+					eigenaar.sendEquation(activeHSCNumber);
+					closeCurrentContainer();
+					paint();
+				}
 				eigenaar.fireCheck();
 				return;
 			}
@@ -3112,19 +3152,24 @@ public class KladjeGWTVeld
 				eigenaar.setChanged();
 			}
 			
-			KStrokeContainer ksc = findInactiveStrokeContainer(eventX, eventY);
-			//if(ksc!=null)
-				
 			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
 			if(currentStrokeContainer==null && proActiveStrokeContainer!=null) {
+					
 				proActiveX = proActiveStrokeContainer.getBox().x;
 				proActiveY = proActiveStrokeContainer.getBox().y;
+				if(activeHSCNumber>0) {
+					currentStrokeContainer = proActiveStrokeContainer;
+					currentStrokeContainer.setActive(true);
+					currentStrokeContainer.scale(schrijfLeesFactor/1.0);
+					proActiveStrokeContainer=null;
+				}
 				paint();
 				paintFormule(true);
-				return;
+				if(activeHSCNumber==0 || currentStrokeContainer!=null && currentStrokeContainer.getStrokeCount()>0)
+					return;
 			}
 			
-			if(currentStrokeContainer==null || !currentStrokeContainer.writeBoxContains(eventX, eventY) && proActiveStrokeContainer==null) {
+			if(activeHSCNumber==0 && (currentStrokeContainer==null || !currentStrokeContainer.writeBoxContains(eventX, eventY)) && proActiveStrokeContainer==null) {
 				currentStrokeContainer = new KStrokeContainer(this);
 				currentStrokeContainer.setActive(true);
 				kStrokeContainers.add(currentStrokeContainer);
@@ -3665,7 +3710,7 @@ public class KladjeGWTVeld
 		else if (mouseMode == ivmOptie)
 		{
 			//ArrayList<DoublePoint> smoothedPoints = smooth(formulaStrokePoints, smoothType);
-			currentStrokeContainer.clear();
+			currentStrokeContainer.wis();
 			lastStroke = new Stroke(formulaStrokePoints);
 			currentStrokeContainer.addStroke(lastStroke);
 			formulaStrokePoints.clear();
@@ -3676,13 +3721,6 @@ public class KladjeGWTVeld
 		{	
 			if(proActiveStrokeContainer!=null) 
 			{
-//				if(proActiveStrokeContainer.getBox().contains(breedte-60, 60) 
-//						|| (new Rectangle(breedte-60,0,60,60)).contains(proActiveStrokeContainer.getBox().x, proActiveStrokeContainer.getBox().y)) {
-//					kStrokeContainers.remove(proActiveStrokeContainer);
-//					proActiveStrokeContainer = null;
-//					paint();
-//					return;
-//				}
 				if(eventX>breedte-60 && eventY<60 || proActiveStrokeContainer.getBox().x>breedte || proActiveStrokeContainer.getBox().y>hoogte) {
 					kStrokeContainers.remove(proActiveStrokeContainer);
 					proActiveStrokeContainer = null;
@@ -3708,7 +3746,7 @@ public class KladjeGWTVeld
 				paint();
 			}
 			
-			if(formulaStrokePoints.size()>0) 
+			if(currentStrokeContainer!=null && formulaStrokePoints.size()>0) 
 			{
 //				if(currentStrokeContainer==null) {
 //					currentStrokeContainer = new KStrokeContainer(this);
@@ -3719,24 +3757,32 @@ public class KladjeGWTVeld
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
 				cleanFormulePoints(formulaStrokePoints);
-				if(!currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints)))
-					currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints,""));
+				currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
 				
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				currentStrokeContainer.setHalf(false);
-				if(currentStrokeContainer.getStrokeCount()==1)
+				if(activeHSCNumber>0 ||currentStrokeContainer.getStrokeCount()==1)
 					paint();
 			}
-			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !popupMode)
+			if(activeHSCNumber==0 && currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !popupMode)
 			{	kStrokeContainers.remove(currentStrokeContainer);
 				currentStrokeContainer = null;
 				formulaStrokePoints.clear();
 				//draggDoublePoints.clear();
 				paint();
+				paintFormule(true);
 				//setSelecteerMode();
 				return;
 			}
+			if(activeHSCNumber>0 && currentStrokeContainer!=null && currentStrokeContainer.getStrokeCount()==1 && currentStrokeContainer.isNotRelevant())
+			{	currentStrokeContainer.wis();
+				formulaStrokePoints.clear();
+				paint();
+				paintFormule(true);
+				return;
+			}
+			
 			formulaStrokePoints.clear();
 			//draggDoublePoints.clear();
 			paintFormule(true);
