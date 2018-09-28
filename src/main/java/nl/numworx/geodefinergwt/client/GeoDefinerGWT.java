@@ -458,6 +458,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
             OMObject object = new fi.euclides.formuleobjects.FormuleParser(expr).parse();
             definitions.readonly = 4;
             definitions.define("$f" + expr, object);
+            definitions.redefine(random);
           } catch (Exception e) {
             LOG.warning(expr + " not accepted");
           } finally {
