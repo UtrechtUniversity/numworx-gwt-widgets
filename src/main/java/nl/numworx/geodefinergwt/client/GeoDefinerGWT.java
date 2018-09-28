@@ -1,9 +1,12 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -20,6 +23,9 @@ import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
+import nl.tue.win.riaca.openmath.lang.OMApplication;
+import nl.tue.win.riaca.openmath.lang.OMObject;
+import nl.tue.win.riaca.openmath.lang.OMVariable;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -46,6 +52,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
+import fi.euclides.formuleobjects.ParseException;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
@@ -426,9 +433,52 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				label.setValue(value);
 			}
 			viewer.paint();
+			return;
 		}
+        if (event.getCommand().startsWith("expression.") ) {
+          int dot = event.getCommand().indexOf('.');
+          String name = event.getCommand().substring(dot+1);
+          String expr = event.getMessage();
+          expr = expr.substring(2);
+          String x = "x"; // var of expr
+          try {
+            OMObject o = new fi.euclides.formuleobjects.FormuleParser(expr).expr();
+            Collection<String> vars = varsOf(o, new HashSet<String>());
+            if(vars.size() == 1) 
+              x = vars.iterator().next();
+            else  
+              return;
+          } catch (ParseException e1) {
+            LOG.warning(expr + " not accepted");
+            return;
+          }         
+          expr = name + "=" + x + "->" + expr;
+          int readonly = definitions.readonly;
+          try {
+            OMObject object = new fi.euclides.formuleobjects.FormuleParser(expr).parse();
+            definitions.readonly = 4;
+            definitions.define("$f" + expr, object);
+          } catch (Exception e) {
+            LOG.warning(expr + " not accepted");
+          } finally {
+            definitions.readonly = readonly;
+          }
+          viewer.paint();
+        }
 
 	}
+
+	private Collection<String> varsOf(OMObject o, HashSet<String> set) {
+    if(o instanceof OMVariable) {
+      set.add(((OMVariable) o).getName());
+    }
+    if (o instanceof OMApplication) {
+      @SuppressWarnings("unchecked")
+      Vector<OMObject> elements = ((OMApplication) o).getElements();
+      elements.forEach(p -> varsOf(p, set));      
+    }
+    return set;
+  }
 
 	/* (non-Javadoc)
 	 * @see nl.numworx.geodefiner.common.Instance#update(fi.euclides.util.Observable, java.lang.Object)
