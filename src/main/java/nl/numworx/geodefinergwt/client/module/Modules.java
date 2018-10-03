@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client.module;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -82,4 +83,9 @@ public abstract class Modules {
 	@Provides @Reusable @Named("panHandler") static EventHandler getPanHandler(CanvasViewer w) {
 	  return new PanHandler("Pan", w);
 	}
+	
+	@Provides @Named("expressions") static Map<String,String> expressions() {
+	  return new LinkedHashMap<String, String>();
+    }
+
 }

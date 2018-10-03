@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.Vector;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import nl.numworx.geodefiner.common.CheckObjectList;
@@ -23,9 +23,7 @@ import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
-import nl.tue.win.riaca.openmath.lang.OMApplication;
 import nl.tue.win.riaca.openmath.lang.OMObject;
-import nl.tue.win.riaca.openmath.lang.OMVariable;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -75,10 +73,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private int width = 500;
 	private int height = 450;
 	private OpdrNavIF comRoot;
-	private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
+	//private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
 	private void lognagekeken() {
-		LOG.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
+		logger.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
 	}
 	
 	
@@ -162,11 +160,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 	public HashMap<String, Object> getState() {
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
-		LOG.info("voor getState ");
+		logger.info("voor getState ");
 		lognagekeken();
 		super.getState(hashMap);
 		lognagekeken();
-		LOG.info("getState " + hashMap);
+		logger.info("getState " + hashMap);
 		return hashMap;
 	}
 
@@ -202,7 +200,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void kijkNa() {
 		update(null, "changed");
 		feedback();
-		setNagekeken(true);LOG.info("KijkNA");
+		setNagekeken(true);logger.info("KijkNA");
 		incErrorCount();
 		fire();
 		lognagekeken();
@@ -362,6 +360,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
+
+	@Inject void setExpressions(@Named("expressions") Map<String,String> map) {
+	    expressions = map;
+	}
 	
 	public void init(int width, int height, Map<String, Object> launchData,
 			Map<String, Number> values) {
@@ -390,6 +392,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		values = launchRandomVars(random, values);
 // configuration
 		setLaunchData(launchData, values);
+        definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
+
 		tracker.paint();
 	}
 
@@ -438,55 +442,19 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         if (event.getCommand().startsWith("expression.") ) {
           int dot = event.getCommand().indexOf('.');
           String name = event.getCommand().substring(dot+1);
-          String expr = event.getMessage();
-          expr = expr.substring(2);
-          String x = "x"; // var of expr
-          try {
-            OMObject o = new fi.euclides.formuleobjects.FormuleParser(expr).expr();
-            Collection<String> vars = varsOf(o, new HashSet<String>());
-            if(vars.size() == 1) 
-              x = vars.iterator().next();
-            else  
-              return;
-          } catch (ParseException e1) {
-            LOG.warning(expr + " not accepted");
-            return;
-          }         
-          expr = name + "=" + x + "->" + expr;
-          int readonly = definitions.readonly;
-          try {
-            OMObject object = new fi.euclides.formuleobjects.FormuleParser(expr).parse();
-            definitions.readonly = 4;
-            definitions.define("$f" + expr, object);
-            definitions.redefine(random);
-          } catch (Exception e) {
-            LOG.warning(expr + " not accepted");
-          } finally {
-            definitions.readonly = readonly;
-          }
-          viewer.paint();
+          String expr = event.getMessage(); 
+          acceptExpressionEvent(name, expr);
+          return;
         }
 
 	}
-
-	private Collection<String> varsOf(OMObject o, HashSet<String> set) {
-    if(o instanceof OMVariable) {
-      set.add(((OMVariable) o).getName());
-    }
-    if (o instanceof OMApplication) {
-      @SuppressWarnings("unchecked")
-      Vector<OMObject> elements = ((OMApplication) o).getElements();
-      elements.forEach(p -> varsOf(p, set));      
-    }
-    return set;
-  }
 
 	/* (non-Javadoc)
 	 * @see nl.numworx.geodefiner.common.Instance#update(fi.euclides.util.Observable, java.lang.Object)
 	 */
 	@Override
 	public void update(Observable observable, Object arg) {
-		LOG.info("update " + arg);
+		logger.info("update " + arg);
 		super.update(observable, arg);
 		lognagekeken();
 		if("changed".equals(arg) && comRoot != null) {
