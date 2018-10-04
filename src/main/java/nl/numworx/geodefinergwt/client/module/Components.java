@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.Label;
 
 import dagger.BindsInstance;
 import dagger.Component;
-import fi.euclides.gwt.ViewerWidget;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefinergwt.client.CanvasViewer;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
