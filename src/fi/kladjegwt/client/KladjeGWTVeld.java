@@ -3865,7 +3865,7 @@ public class KladjeGWTVeld
 				}
 				
 				if(currentHiddenStrokeContainer.isNotRelevant()) //currentStrokeContainer.getStrokeCount()==1 &&
-				{	//currentHiddenStrokeContainer.wis();
+				{	currentHiddenStrokeContainer.wis();
 					formulaStrokePoints.clear();
 					eigenaar.sendEquation(activeHSCNumber);
 					closeCurrentHiddenContainer();
