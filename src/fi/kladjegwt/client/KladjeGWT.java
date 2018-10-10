@@ -757,7 +757,6 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		comRoot.addCBookEventListener("action.setCorrect", this);
 		comRoot.addCBookEventListener("action.setFalse", this);
 		comRoot.addCBookEventListener("action.setHalf", this);
-		comRoot.addCBookEventListener("action.popup", this);
 		comRoot.addCBookEventListener("double.translationX", this);
 		comRoot.addCBookEventListener("double.translationY", this);
 	}
@@ -951,7 +950,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	
 	public void sendEquation(int nr) {
 		if(comRoot!=null)
-			comRoot.fireEvent(new CBookEvent(this,"equation."+nr,kladjeGWTVeld.getFormula()));
+			comRoot.fireEvent(new CBookEvent(this,"equation."+nr,kladjeGWTVeld.getInputFormula()));
 	}
 	
 	public void sendCorrectEquation() {
@@ -963,6 +962,11 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	public void fireCheck() {
 		if(comRoot!=null)
 			comRoot.fireEvent(new CBookEvent(this,"action.check"));
+	}
+	
+	public void fireCheck_n() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"action.check.n"));
 	}
 	
 	public void fireClose() {
@@ -1027,11 +1031,6 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				translation = new fi.kladjegwt.client.Point(translation.x, -valueY);
 				kladjeGWTVeld.translation = translation;
 				kladjeGWTVeld.paint();
-			}
-		}
-		if (command.startsWith("action.popup"))
-		{
-			{	kladjeGWTVeld.startStrokeContainer();
 			}
 		}
 	}

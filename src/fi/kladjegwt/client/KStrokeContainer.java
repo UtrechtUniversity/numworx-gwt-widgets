@@ -65,6 +65,10 @@ public class KStrokeContainer {
 		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
 		formuleViewer.setColor(CssColor.make(38, 115, 182));
 		//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+		
+		if(getStrokeCount()==0)
+			box = defaultBox;
+		
 		return b;
 	}
 	
@@ -225,16 +229,19 @@ public class KStrokeContainer {
 				if(correct||isfalse||isHalf) {
 					//g.setFillStyle(CssColor.make(240, 255, 240));
 					if(correct)
-						g.setFillStyle(CssColor.make(0, 200, 0));
+						g.drawImage(parent.goedvinkImageElement, getWriteBox().x + 20-14, getWriteBox().y + 20-14);
+						//g.setFillStyle(CssColor.make(0, 200, 0));
 					if(isfalse)
-						g.setFillStyle(CssColor.make(200, 0, 0));
+						g.drawImage(parent.foutkruisImageElement, getWriteBox().x + 20-14, getWriteBox().y + 20-14);
+						//g.setFillStyle(CssColor.make(200, 0, 0));
 					if(isHalf)
-						g.setFillStyle(CssColor.make(240, 240, 0));
-					g.beginPath();
-					g.arc(getWriteBox().x + 20, getWriteBox().y + 20 , 8, 0, 8* Math.PI);
-					g.closePath();
-					g.stroke();
-					g.fill();
+						g.drawImage(parent.halfvinkImageElement, getWriteBox().x + 20-14, getWriteBox().y + 20-14);
+						//g.setFillStyle(CssColor.make(240, 240, 0));
+//					g.beginPath();
+//					g.arc(getWriteBox().x + 20, getWriteBox().y + 20 , 8, 0, 8* Math.PI);
+//					g.closePath();
+//					g.stroke();
+//					g.fill();
 				}
 				
 			}
@@ -246,16 +253,19 @@ public class KStrokeContainer {
 					//g.setFillStyle(CssColor.make(240, 255, 240));
 					//g.fillRect(getBox().x-30, getBox().y-5, getBox().width+35, getBox().height+10);
 					if(correct)
-						g.setFillStyle(CssColor.make(0, 200, 0));
+						g.drawImage(parent.goedvinkImageElement, getBox().x-20-14, getBox().y+getBox().height/2-7);
+						//g.setFillStyle(CssColor.make(0, 200, 0));
 					if(isfalse)
-						g.setFillStyle(CssColor.make(200, 0, 0));
+						g.drawImage(parent.foutkruisImageElement, getBox().x-20-14, getBox().y+getBox().height/2-7);
+						//g.setFillStyle(CssColor.make(200, 0, 0));
 					if(isHalf)
-						g.setFillStyle(CssColor.make(240, 240, 0));
-					g.beginPath();
-					g.arc(getBox().x-20, getBox().y+getBox().height/2 , 5, 0, 5* Math.PI);
-					g.closePath();
-					g.stroke();
-					g.fill();
+						g.drawImage(parent.halfvinkImageElement, getBox().x-20-14, getBox().y+getBox().height/2-7);
+						//g.setFillStyle(CssColor.make(240, 240, 0));
+//					g.beginPath();
+//					g.arc(getBox().x-20, getBox().y+getBox().height/2 , 5, 0, 5* Math.PI);
+//					g.closePath();
+//					g.stroke();
+//					g.fill();
 				}
 				//else
 					//g.fillRect(getBox().x-5, getBox().y-5, getBox().width+10, getBox().height+10);
@@ -339,6 +349,12 @@ public class KStrokeContainer {
 		g.setLineWidth(3.0d);
 	}
 	
+	public void setDefaultRectangle(Rectangle r) {
+		defaultBox = r;
+		if(box==null)
+			box = defaultBox;
+	}
+	
 	public void setCorrect(boolean correct) {
 //		if(!correct && this.correct)
 //			activeTranslation -=25;
@@ -415,6 +431,9 @@ public class KStrokeContainer {
 			int width = (int)strokeContainer.getBoundingBox().width;
 			int height = (int)strokeContainer.getBoundingBox().height;
 			box = new Rectangle(x, y, width, height);
+			if(width<0 || height<0)
+				box=null;
+				
 		}
 		if(box==null)
 			box = defaultBox;
@@ -514,7 +533,10 @@ public class KStrokeContainer {
 			int yb = (int)strokeContainer.getBoundingBox().y;
 			int width = (int)strokeContainer.getBoundingBox().width;
 			int height = (int)strokeContainer.getBoundingBox().height;
-			Rectangle box = new Rectangle(xb-margin, yb-margin, width+2*margin, height+2*margin);
+			int leftMargin = 0;
+			if(correct||isHalf||isfalse)
+				leftMargin = 40;
+			Rectangle box = new Rectangle(xb-margin-leftMargin, yb-margin, width+2*margin+leftMargin, height+2*margin);
 			if(box.contains(x,y))
 				return true;
 		}
@@ -560,5 +582,7 @@ public class KStrokeContainer {
 			isfalse = launchState.getBoolean("isfalse");
 		if(launchState.containsKey("isHalf"))
 			isHalf = launchState.getBoolean("isHalf");
+		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
+		formuleViewer.setColor(CssColor.make(38, 115, 182));
 	}
 }

@@ -8,6 +8,15 @@ public interface KladjeGWTClientBundle extends ClientBundle
 
    @Source("fi/kladjegwt/client/images/bin.png")
    public ImageResource binResource();
+   
+   @Source("fi/kladjegwt/client/images/goedvink-new.png")
+   public ImageResource goedvinkResource();
+   
+   @Source("fi/kladjegwt/client/images/halfvink-new.png")
+   public ImageResource halfvinkResource();
+   
+   @Source("fi/kladjegwt/client/images/foutkruis-new.png")
+   public ImageResource foutkruisResource();
 	 
    @Source("fi/kladjegwt/client/images/teken_penknop_up.gif")
    public ImageResource tekenKnopUpResource();
