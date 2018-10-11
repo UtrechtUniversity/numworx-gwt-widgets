@@ -23,6 +23,7 @@ import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
+import nl.tue.win.riaca.openmath.lang.OMBinding;
 import nl.tue.win.riaca.openmath.lang.OMObject;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -50,6 +51,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
+import fi.euclides.formuleobjects.Lambda;
 import fi.euclides.formuleobjects.ParseException;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.math.IntegerFactory;
@@ -294,6 +296,13 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				if(label.getSubKey() == Const.TYPE) {
 					String name = viewer.getMapper().toString(label);
 					comRoot.addCBookEventListener("double." + name, this);
+				} else {
+                  boolean isExpression =
+                      label.getSubKey() == Lambda.TYPE && label.adapt(OMObject.class) instanceof OMBinding;
+                  if (isExpression) {
+                    String name = viewer.getMapper().toString(label);
+                    comRoot.addCBookEventListener("expression." + name, this);
+                  }
 				}
 			}
 		}
@@ -442,8 +451,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         if (event.getCommand().startsWith("expression.") ) {
           int dot = event.getCommand().indexOf('.');
           String name = event.getCommand().substring(dot+1);
-          String expr = event.getMessage(); 
+          String expr = event.getMessage();
+          if (!expr.startsWith("$f")) // missing from simpel formule vak.
+            expr = "$f" + expr + "@";
           acceptExpressionEvent(name, expr);
+          viewer.paint();
           return;
         }
 
