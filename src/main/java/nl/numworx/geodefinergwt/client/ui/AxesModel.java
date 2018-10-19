@@ -8,12 +8,12 @@ public class AxesModel extends LineModel {
 
 	public boolean numbers;
 
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> map = super.toMap();
-		if(numbers) map.put("numbers", Boolean.TRUE);
-		return map;
-	}
+//	@Override
+//	public Map<String, Object> toMap() {
+//		Map<String, Object> map = super.toMap();
+//		if(numbers) map.put("numbers", Boolean.TRUE);
+//		return map;
+//	}
 
 	@Override
 	public void fromMap(ObjectMap map) {

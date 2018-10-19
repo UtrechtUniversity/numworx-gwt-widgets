@@ -34,14 +34,14 @@ public class PointModel extends ColorModel<Punt> {
 		rigid = value.getBoolean("rigid", true);
 	}
 
-	/* (non-Javadoc)
-	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#toMap()
-	 */
-	@Override
-	public Map<String, Object> toMap() {
-		// TODO Auto-generated method stub
-		return super.toMap();
-	}
-
+//	/* (non-Javadoc)
+//	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#toMap()
+//	 */
+//	@Override
+//	public Map<String, Object> toMap() {
+//		// TODO Auto-generated method stub
+//		return super.toMap();
+//	}
+//
 	
 }

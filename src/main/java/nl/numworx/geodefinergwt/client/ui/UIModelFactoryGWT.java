@@ -4,6 +4,7 @@ import nl.numworx.geodefiner.common.Grid;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.UIModel;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import javax.inject.Inject;
 
@@ -27,8 +28,13 @@ public class UIModelFactoryGWT extends nl.numworx.geodefiner.common.UIModelFacto
 	private UIModel<?, Void> model;
 	private Tracker tracker;
 	
+	static  ObjectMap configuration;
 	
-	@Inject public UIModelFactoryGWT(Tracker tracker) {
+	public static void setConfiguration(ObjectMap configuration) {
+      UIModelFactoryGWT.configuration = configuration;
+    }
+
+    @Inject public UIModelFactoryGWT(Tracker tracker) {
 		this.tracker = tracker;
 	}
 

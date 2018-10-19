@@ -13,12 +13,12 @@ class SegmentModel extends LineModel {
 
 	Tips tip = Tips.NOTIP;
 	
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> map = super.toMap();
-//		if(tip != Tips.NOTIP) map.put("tip", tip.name());
-		return map;
-	}
+//	@Override
+//	public Map<String, Object> toMap() {
+//		Map<String, Object> map = super.toMap();
+////		if(tip != Tips.NOTIP) map.put("tip", tip.name());
+//		return map;
+//	}
 
 	@Override
 	public void fromMap(ObjectMap map) {

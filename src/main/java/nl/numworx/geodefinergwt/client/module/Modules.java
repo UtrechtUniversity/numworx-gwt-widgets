@@ -29,6 +29,7 @@ import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.math.Expression;
 import nl.numworx.geodefiner.common.math.ToC;
 import nl.numworx.geodefinergwt.client.CanvasViewer;
+import nl.numworx.geodefinergwt.client.DefinitionsGWT;
 import nl.numworx.geodefinergwt.client.GWTRandomizer;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
@@ -46,6 +47,7 @@ public abstract class Modules {
 	@Binds abstract ViewerWidget viewerWidget(CanvasViewer canvas);
 	@Binds abstract AbstractViewer viewer(CanvasViewer w);
 	@Binds abstract Randomizer randomizer(GWTRandomizer r);
+	@Binds abstract Definitions definitions(DefinitionsGWT definitions);
 	
 	@Provides @Singleton static NamingModel namingModel(CanvasViewer impl) {
 		return new NamingModel(impl, new HashMap<String, Destroyable>());
@@ -57,9 +59,9 @@ public abstract class Modules {
 		return expression;
 	}
 
-	@Provides @Singleton static Definitions definitions(Tracker t) {
-		return new Definitions(t);
-	}
+//	@Provides @Singleton static Definitions definitions(Tracker t) {
+//		return new Definitions(t);
+//	}
 	
 	@Binds
 	@IntoMap

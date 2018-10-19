@@ -39,15 +39,15 @@ public class TextModel extends ColorModel<Label> {
 		return this;
 	}
 
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> map = super.toMap();
-//		map.put("align", align.name());
-//		map.put("font", font.toMap());
-//		if( Boolean.TRUE.equals(alwaysF))
-//			map.put("alwaysF", alwaysF);
-		return map;
-	}
+//	@Override
+//	public Map<String, Object> toMap() {
+//		Map<String, Object> map = super.toMap();
+////		map.put("align", align.name());
+////		map.put("font", font.toMap());
+////		if( Boolean.TRUE.equals(alwaysF))
+////			map.put("alwaysF", alwaysF);
+//		return map;
+//	}
 
 	@Override
 	public void fromMap(ObjectMap map) {

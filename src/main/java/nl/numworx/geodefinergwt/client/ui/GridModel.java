@@ -12,12 +12,12 @@ import fi.euclides.model.Locus;
 public class GridModel extends LineModel {
 	boolean gravity;
 
-	@Override
-	public Map<String, Object> toMap() {
-		Map<String, Object> map = super.toMap();
-//		map.put("gravity", gravity);
-		return map;
-	}
+//	@Override
+//	public Map<String, Object> toMap() {
+//		Map<String, Object> map = super.toMap();
+////		map.put("gravity", gravity);
+//		return map;
+//	}
 
 	@Override
 	public void fromMap(ObjectMap map) {

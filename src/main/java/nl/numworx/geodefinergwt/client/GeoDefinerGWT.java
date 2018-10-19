@@ -151,7 +151,19 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		root.setWidgetHidden(toolbox, true);
 	}
 
-	@Override
+	
+	
+	
+  @Override
+  protected void install(ObjectMap configuration) {
+	if (configuration == null) {
+	  configuration = JSONUtilities.wrapMap(Collections.emptyMap());
+	}
+    UIModelFactoryGWT.setConfiguration(configuration); // for toMap();
+    super.install(configuration);
+  }
+
+  @Override
 	public void onModuleLoad() {
 		
 		root = uiBinder.createAndBindUi(this);		
@@ -341,7 +353,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	public void setAsHoogte(int ashoogte) {
 	}
-
+		
 	@Inject void setUiModelFactory(UIModelFactoryGWT f) {
 		uiModelFactory = f;
 	}
@@ -352,7 +364,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		this.tracker = viewer;
 	}
 	
-	@Inject void setDefinitions(Definitions definitions) {
+	@Inject void setDefinitions(DefinitionsGWT definitions) {
 		this.definitions = definitions;
 	}
 	
