@@ -57,7 +57,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -371,6 +370,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 	private FacetHelper facet;
 	private boolean fromuser;
+
+	private int init_width;
+
+	private int init_height;
+
+	private Map<String, Object> init_map;
+
+	private Map<String, Number> init_rondomValues;
 	
 	/**
 	 * This is the entry point method.
@@ -415,8 +422,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 /**
  * Roep deze methode aan na init(), niet ervoor.
  */
-	private void initialize( ) {
-		
+	private void initialize( )
+	{
 		grafiekVeldHoogte = hoogte - 2 - 2 * offset;
 		if(zoomOptie)
 			grafiekVeldHoogte -= zoomPanelHoogte + offset;
@@ -2678,37 +2685,53 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
-		// Dit komt na init()?
+		// Dit komt na init()! --> init() is dummy, de echte init1() volgt na het inlezen van de globale instellingen
+		
 		FormuleKeyboardIF kb = comRoot.getKeyboard();
 		FormuleClipboardIF clip = comRoot.getFormuleClipboard();
 		FocusOnTouch.installKeyboard(kb, clip);
 		FormuleHolder.installKeyboard(kb);
+		
+		// globale instellingen zetten
 		try
 		{
 			ObjectMap wrap = comRoot.getConfiguration();
-// extract from DWOplayer XMLView.java
-			boolean maalTeken =  wrap.getBoolean("maalTeken");
-			FormuleTeken.zetMaalTeken(maalTeken);
+			
+			// extract from DWOplayer XMLView.java
+			if (wrap.containsKey("maalTeken"))
+			{
+				boolean maalTeken =  wrap.getBoolean("maalTeken");
+				FormuleTeken.zetMaalTeken(maalTeken);
+			}
+
 			boolean diffOperatoren = false;
-			if(wrap.containsKey("diffOperatoren"))
+			if (wrap.containsKey("diffOperatoren"))
+			{
 				diffOperatoren = wrap.getBoolean("diffOperatoren");
-			FormuleTeken.zetDiffOperatoren(diffOperatoren);
-			FormuleParser.zetDiffOperatoren(diffOperatoren);
-			boolean hoekGraden = wrap.getBoolean("hoekGraden");
-			Expressie.zetHoekGraden(hoekGraden);
-			if(wrap.containsKey("woordFormule"))
+				FormuleTeken.zetDiffOperatoren(diffOperatoren);
+				FormuleParser.zetDiffOperatoren(diffOperatoren);
+			}
+			if(wrap.containsKey("hoekGraden"))
+			{
+				boolean hoekGraden = wrap.getBoolean("hoekGraden");
+				Expressie.zetHoekGraden(hoekGraden);
+			}
+			if (wrap.containsKey("woordFormule"))
 				FormuleParser.zetWoordFormule(wrap.getBoolean("woordFormule"));
-			if(wrap.containsKey("tweeHoofdletterVar"))
+			if (wrap.containsKey("tweeHoofdletterVar"))
 				FormuleParser.zetTweeHoofdletterVariabele(wrap.getBoolean("tweeHoofdletterVar"));
-			if(wrap.containsKey("significantie"))
+			if (wrap.containsKey("significantie"))
 				FormuleParser.zetSignificantie(wrap.getBoolean("significantie"));
 		}
 		catch (Exception e)
 		{
-			// er gaat iets mis bij het ophalen van globale setting woordformule
-			logger.log(Level.WARNING, "Zet woordFormule" , e);
+			// er gaat iets mis bij het ophalen van globale settings
+			logger.log(Level.WARNING, "Zet globale instellingen" , e);
 		}
 
+		// nu init uitvoeren incl. de globale instellingen die van invloed zijn
+		init1(this.init_width, this.init_height, this.init_map, this.init_rondomValues);
+		
 		this.comRoot = comRoot;
 		comRoot.addCBookEventListener("expression.1", this);
 		comRoot.addCBookEventListener("expression.2", this);
@@ -2724,6 +2747,152 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zetMode(comRoot.getMode());		
 	}
 
+	/**
+	 * Calculate expressies met random variabelen.
+	 */
+	private void calculateExpressiesMetRandomVariabelen()
+	{
+		if(randomVarNamen != null)
+		{	for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
+			{	RealPoint rp = (RealPoint) graphPoints.elementAt(pCnt);
+				String xString = rp.getxString();
+				String yString = rp.getyString();
+										
+				//vervangen door:
+				try 
+				{	xString = FormuleParser.randomizeString("$f" + xString + "@", randomVarNamen, randomVarWaarden);
+				}
+				catch(Exception e)
+				{	xString = "";
+				}
+				Expressie ex = FormuleParser.geefExpressie(xString);
+				if (ex != null)
+					rp.setX(ex.geefWaarde());
+				try 
+				{	yString = FormuleParser.randomizeString("$f" + yString + "@", randomVarNamen, randomVarWaarden);
+				}
+				catch(Exception e)
+				{	yString = "";
+				}
+				Expressie ey = FormuleParser.geefExpressie(yString);
+				if (ey != null)
+					rp.setY(ey.geefWaarde());
+				
+				// just in case
+				if (Double.isNaN(rp.getX()))
+					rp.setX(0);
+				if (Double.isNaN(rp.getY()))
+					rp.setY(0);
+				
+				rp.setIndex(rp.getIndex() % 100);
+			}
+		}
+				
+		if(randomVarNamen != null)
+    	{	for (int pCnt = 0; pCnt < docentGraphPoints.size(); pCnt++)
+			{	RealPoint rp = (RealPoint) docentGraphPoints.elementAt(pCnt);
+				String xString = rp.getxString();
+				String yString = rp.getyString();
+								
+				//vervangen door:
+				try 
+				{	xString = FormuleParser.randomizeString("$f" + xString + "@", randomVarNamen, randomVarWaarden);
+				
+				}
+				catch(Exception e)
+				{	xString = "";
+				}
+				Expressie ex = FormuleParser.geefExpressie(xString);
+				if (ex != null)
+					rp.setX(ex.geefWaarde());
+				try 
+				{	yString = FormuleParser.randomizeString("$f" + yString + "@", randomVarNamen, randomVarWaarden);
+				}
+				catch(Exception e)
+				{	yString = "";
+				}
+				Expressie ey = FormuleParser.geefExpressie(yString);
+				if (ey != null)
+					rp.setY(ey.geefWaarde());
+				
+				// just in case
+				if (Double.isNaN(rp.getX()))
+					rp.setX(0);
+				if (Double.isNaN(rp.getY()))
+					rp.setY(0);
+				
+				rp.setIndex(rp.getIndex() % 100);
+			}
+    	}
+	}
+
+	/**
+	 * Calculate docentdomeinen.
+	 */
+	private void calculateDocentDomeinen()
+	{
+		try
+		{
+			if (docentDomeinStrings != null)
+			{
+				for(int i = 0; i < docentDomeinStrings.length; i++)
+				{	try
+					{	docentDomeinStrings[i][0] = FormuleParser.randomizeString(docentDomeinStrings[i][0], randomVarNamen, randomVarWaarden);
+					}
+					catch(Exception e)
+					{	docentDomeinStrings[i][0] = "$f" + Double.toString(DEFAULTDOMEIN[0]) + "@";
+					}
+					try
+					{	docentDomeinStrings[i][1] = FormuleParser.randomizeString(docentDomeinStrings[i][1], randomVarNamen, randomVarWaarden);
+					}
+					catch(Exception e)
+					{	docentDomeinStrings[i][1] = "$f" + Double.toString(DEFAULTDOMEIN[1]) + "@";
+					}
+					if(docentDomeinStrings[i][0].equals("$f" + Double.toString(DEFAULTDOMEIN[0]) + "@"))
+					{	docentDomeinen[i][0] = DEFAULTDOMEIN[0];
+						
+					}
+					else
+						docentDomeinen[i][0] = FormuleParser.geefExpressie(docentDomeinStrings[i][0]).geefWaarde();
+					if(docentDomeinStrings[i][1].equals("$f" + Double.toString(DEFAULTDOMEIN[1]) + "@"))
+						docentDomeinen[i][1] = DEFAULTDOMEIN[1];
+					else
+						docentDomeinen[i][1] = FormuleParser.geefExpressie(docentDomeinStrings[i][1]).geefWaarde();	
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Calculate docentfuncties.
+	 */
+	private void calculateDocentFuncties()
+	{
+		if (docentFunctieStrings != null)
+		{
+			for(int i = 0; i < docentFunctieStrings.length; i++)
+			{
+				try         
+	        	{
+					docentFunctieStrings[i] = FormuleParser.randomizeString(docentFunctieStrings[i],randomVarNamen,randomVarWaarden);
+	        	}
+	        	catch(Exception e)
+	        	{
+	        		docentFunctieStrings[i] = "$f???@";
+	        	}
+
+				if (!docentFunctieStrings[i].equals("$f@"))
+				{
+					docentFuncties[i] = FormuleParser.geefExpressie(docentFunctieStrings[i]);
+					aantalFuncties++;
+				}
+			}
+		}
+	}
 	@Override
 	public Widget asWidget() {
 		return basisPanel;
@@ -2763,471 +2932,398 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	}
 
 	@Override
-	public void init(int width, int height, Map<String, Object> map, 
-			Map<String, Number> randomValues) {
-      if(randomValues instanceof HashMap)
-	    this.randomVarWaarden = (HashMap) randomValues;
-      else {
-        this.randomVarWaarden = new HashMap(randomValues);
-      }
-      this.randomVarNamen = new String[randomVarWaarden.size()];
-      this.randomVarNamen = (String[]) randomVarWaarden.keySet().toArray(this.randomVarNamen);
+	public void init(int width, int height, Map<String, Object> map, Map<String, Number> randomValues)
+	{
+		this.init_width = width; 
+		this.init_height = height;
+		this.init_map = map;
+		this.init_rondomValues = randomValues;
+	}
+	
+	public void init1(int width, int height, Map<String, Object> map, 
+			Map<String, Number> randomValues)
+	{
+		if (randomValues instanceof HashMap)
+			this.randomVarWaarden = (HashMap) randomValues;
+		else
+		{
+			this.randomVarWaarden = new HashMap(randomValues);
+		}
+		this.randomVarNamen = new String[randomVarWaarden.size()];
+		this.randomVarNamen = (String[]) randomVarWaarden.keySet().toArray(this.randomVarNamen);
 
-      breedte = width - 2 * offset;
+		breedte = width - 2 * offset;
 		hoogte = height;
-//logger.finest("launchData: " + map);		
+		// logger.finest("launchData: " + map);
 		maakStandaardKleuren();
-		//veldb = breedte - 2 * offset;
+		// veldb = breedte - 2 * offset;
 		ObjectMap launchData = JSONUtilities.wrapMap(map);
 		launchState = map;
 		if (launchData != null)
-		{	if(launchData.containsKey("beginxDocent"))
-				beginxDocent =  launchData.getDouble("beginxDocent");
-			if(launchData.containsKey("beginyDocent") )
+		{
+			if (launchData.containsKey("beginxDocent"))
+				beginxDocent = launchData.getDouble("beginxDocent");
+			if (launchData.containsKey("beginyDocent"))
 				beginyDocent = launchData.getDouble("beginyDocent");
-			if(launchData.containsKey("beginx") )
+			if (launchData.containsKey("beginx"))
 				beginx = launchData.getDouble("beginx");
-			if(launchData.containsKey("beginy"))
+			if (launchData.containsKey("beginy"))
 				beginy = launchData.getDouble("beginy");
-			if(launchData.containsKey("beginwaarde"))
+			if (launchData.containsKey("beginwaarde"))
 				beginwaarde = launchData.getInt("beginwaarde");
-			if(launchData.containsKey("selectnummer"))
-				selectnummer =  launchData.getInt("selectnummer");
-			//tracexD nog toevoegen?
-			if(launchData.containsKey("eenheidx"))
-				eenheidx =  launchData.getInt("eenheidx");
-			if(launchData.containsKey("eenheidy"))
-				eenheidy =  launchData.getInt("eenheidy");
-			if(launchData.containsKey("eenheidxD"))
+			if (launchData.containsKey("selectnummer"))
+				selectnummer = launchData.getInt("selectnummer");
+			// tracexD nog toevoegen?
+			if (launchData.containsKey("eenheidx"))
+				eenheidx = launchData.getInt("eenheidx");
+			if (launchData.containsKey("eenheidy"))
+				eenheidy = launchData.getInt("eenheidy");
+			if (launchData.containsKey("eenheidxD"))
 				eenheidxD = launchData.getDouble("eenheidxD");
-			if(launchData.containsKey("eenheidyD"))
+			if (launchData.containsKey("eenheidyD"))
 				eenheidyD = launchData.getDouble("eenheidyD");
-			if(launchData.containsKey("veldx"))
-				veldx =  launchData.getInt("veldx");
-			if(launchData.containsKey("veldy"))
-				veldy =  launchData.getInt("veldy");
-			//if(launchData.get("veldb"))
-			//	veldb = ((Number) launchData.get("veldb")).intValue();
-			//if(launchData.get("veldh"))
-			//	veldh = ((Number) launchData.get("veldh")).intValue();
-			if(launchData.containsKey("docentSchaalFactorX"))
+			if (launchData.containsKey("veldx"))
+				veldx = launchData.getInt("veldx");
+			if (launchData.containsKey("veldy"))
+				veldy = launchData.getInt("veldy");
+			if (launchData.containsKey("docentSchaalFactorX"))
 				docentSchaalFactorX = launchData.getDouble("docentSchaalFactorX");
-			if(launchData.containsKey("docentSchaalFactorY"))
-				docentSchaalFactorY =  launchData.getDouble("docentSchaalFactorY");
-			if(launchData.containsKey("schaalFactorX"))
+			if (launchData.containsKey("docentSchaalFactorY"))
+				docentSchaalFactorY = launchData.getDouble("docentSchaalFactorY");
+			if (launchData.containsKey("schaalFactorX"))
 				schaalFactorX = launchData.getDouble("schaalFactorX");
-			if(launchData.containsKey("schaalFactorY"))
-				schaalFactorY =  launchData.getDouble("schaalFactorY");
-			if(launchData.containsKey("factorRijNummerX"))
-				factorRijNummerX =  launchData.getInt("factorRijNummerX");
-			if(launchData.containsKey("factorRijNummerY"))
-				factorRijNummerY =  launchData.getInt("factorRijNummerY");
-			if(launchData.containsKey("xAsNaam"))
-				xAsNaam =  launchData.getString("xAsNaam");
-			if(launchData.containsKey("yAsNaam"))
-				yAsNaam =  launchData.getString("yAsNaam");
-			if(launchData.containsKey("grafiekXAsNaam"))
-				grafiekXAsNaam =  launchData.getString("grafiekXAsNaam");
-			if(launchData.containsKey("grafiekYAsNaam"))
-				grafiekYAsNaam =  launchData.getString("grafiekYAsNaam");
-			
-			if(launchData.containsKey("assenZichtbaar"))
-				assenZichtbaar =  launchData.getBoolean("assenZichtbaar");
-			if(launchData.containsKey("roosterZichtbaar"))
-				roosterZichtbaar =  launchData.getBoolean("roosterZichtbaar");
-			if(launchData.containsKey("roosterGrof"))
-				roosterGrof =  launchData.getBoolean("roosterGrof");
-			if(launchData.containsKey("roosterX"))
-				roosterX =  launchData.getBoolean("roosterX");
-			if(launchData.containsKey("roosterY"))
-				roosterY =  launchData.getBoolean("roosterY");
-			if(launchData.containsKey("schaalZichtbaar"))
-				schaalZichtbaar =  launchData.getBoolean("schaalZichtbaar");
-			if(launchData.containsKey("schaalX"))
-				schaalX =  launchData.getBoolean("schaalX");
-			if(launchData.containsKey("schaalY"))
-				schaalY =  launchData.getBoolean("schaalY");
-			if(launchData.containsKey("piLijnenZichtbaar"))
-				piLijnenZichtbaar =  launchData.getBoolean("piLijnenZichtbaar");
-			if(launchData.containsKey("xPositief"))
-				xPositief =  launchData.getBoolean("xPositief");
-			if(launchData.containsKey("yPositief"))
-				yPositief =  launchData.getBoolean("yPositief");
-			if(launchData.containsKey("xAsLog"))
-				xAsLog =  launchData.getBoolean("xAsLog");
-			if(launchData.containsKey("yAsLog"))
-				yAsLog =  launchData.getBoolean("yAsLog");
-			
-			if(xAsLog )
-			{	eenheidxD = eenheidxD*2;
+			if (launchData.containsKey("schaalFactorY"))
+				schaalFactorY = launchData.getDouble("schaalFactorY");
+			if (launchData.containsKey("factorRijNummerX"))
+				factorRijNummerX = launchData.getInt("factorRijNummerX");
+			if (launchData.containsKey("factorRijNummerY"))
+				factorRijNummerY = launchData.getInt("factorRijNummerY");
+			if (launchData.containsKey("xAsNaam"))
+				xAsNaam = launchData.getString("xAsNaam");
+			if (launchData.containsKey("yAsNaam"))
+				yAsNaam = launchData.getString("yAsNaam");
+			if (launchData.containsKey("grafiekXAsNaam"))
+				grafiekXAsNaam = launchData.getString("grafiekXAsNaam");
+			if (launchData.containsKey("grafiekYAsNaam"))
+				grafiekYAsNaam = launchData.getString("grafiekYAsNaam");
+
+			if (launchData.containsKey("assenZichtbaar"))
+				assenZichtbaar = launchData.getBoolean("assenZichtbaar");
+			if (launchData.containsKey("roosterZichtbaar"))
+				roosterZichtbaar = launchData.getBoolean("roosterZichtbaar");
+			if (launchData.containsKey("roosterGrof"))
+				roosterGrof = launchData.getBoolean("roosterGrof");
+			if (launchData.containsKey("roosterX"))
+				roosterX = launchData.getBoolean("roosterX");
+			if (launchData.containsKey("roosterY"))
+				roosterY = launchData.getBoolean("roosterY");
+			if (launchData.containsKey("schaalZichtbaar"))
+				schaalZichtbaar = launchData.getBoolean("schaalZichtbaar");
+			if (launchData.containsKey("schaalX"))
+				schaalX = launchData.getBoolean("schaalX");
+			if (launchData.containsKey("schaalY"))
+				schaalY = launchData.getBoolean("schaalY");
+			if (launchData.containsKey("piLijnenZichtbaar"))
+				piLijnenZichtbaar = launchData.getBoolean("piLijnenZichtbaar");
+			if (launchData.containsKey("xPositief"))
+				xPositief = launchData.getBoolean("xPositief");
+			if (launchData.containsKey("yPositief"))
+				yPositief = launchData.getBoolean("yPositief");
+			if (launchData.containsKey("xAsLog"))
+				xAsLog = launchData.getBoolean("xAsLog");
+			if (launchData.containsKey("yAsLog"))
+				yAsLog = launchData.getBoolean("yAsLog");
+
+			if (xAsLog)
+			{
+				eenheidxD = eenheidxD * 2;
 				eenheidx = (int) Math.round(eenheidxD);
 			}
-			if(yAsLog)
-			{	eenheidyD = eenheidyD*2;
+			if (yAsLog)
+			{
+				eenheidyD = eenheidyD * 2;
 				eenheidy = (int) Math.round(eenheidyD);
 			}
-			
-	    	if(launchData.containsKey("asDefXMin")) 
-	    		asDefXMin = launchData.getDouble("asDefXMin");
-	    	if(launchData.containsKey("asDefXMax")) 
-	    		asDefXMax = launchData.getDouble("asDefXMax");
-	    	if(launchData.containsKey("asDefXStap")) 
-	    		asDefXStap = launchData.getDouble("asDefXStap");
-	    	if(launchData.containsKey("asDefYMin")) 
-	    		asDefYMin = launchData.getDouble("asDefYMin");
-	    	if(launchData.containsKey("asDefYMax")) 
-	    		asDefYMax = launchData.getDouble("asDefYMax");
-	    	if(launchData.containsKey("asDefYStap")) 
-	    		asDefYStap = launchData.getDouble("asDefYStap");
-	    	
-			if(launchData.containsKey("manualScalingX"))
-				manualScalingX =  launchData.getBoolean("manualScalingX");
-			if(launchData.containsKey("manualScalingY"))
-				manualScalingY =  launchData.getBoolean("manualScalingY");
 
-			if(launchData.containsKey("xVarEditable"))
-				xVarEditable =  launchData.getBoolean("xVarEditable");
-			if(launchData.containsKey("yVarEditable"))
-				yVarEditable =  launchData.getBoolean("yVarEditable");
-			if(launchData.containsKey("snapToGridPoints"))
-				snapToGridPoints =  launchData.getBoolean("snapToGridPoints");
-			if(launchData.containsKey("rechteVerbindingen"))
+			if (launchData.containsKey("asDefXMin"))
+				asDefXMin = launchData.getDouble("asDefXMin");
+			if (launchData.containsKey("asDefXMax"))
+				asDefXMax = launchData.getDouble("asDefXMax");
+			if (launchData.containsKey("asDefXStap"))
+				asDefXStap = launchData.getDouble("asDefXStap");
+			if (launchData.containsKey("asDefYMin"))
+				asDefYMin = launchData.getDouble("asDefYMin");
+			if (launchData.containsKey("asDefYMax"))
+				asDefYMax = launchData.getDouble("asDefYMax");
+			if (launchData.containsKey("asDefYStap"))
+				asDefYStap = launchData.getDouble("asDefYStap");
+
+			if (launchData.containsKey("manualScalingX"))
+				manualScalingX = launchData.getBoolean("manualScalingX");
+			if (launchData.containsKey("manualScalingY"))
+				manualScalingY = launchData.getBoolean("manualScalingY");
+
+			if (launchData.containsKey("xVarEditable"))
+				xVarEditable = launchData.getBoolean("xVarEditable");
+			if (launchData.containsKey("yVarEditable"))
+				yVarEditable = launchData.getBoolean("yVarEditable");
+			if (launchData.containsKey("snapToGridPoints"))
+				snapToGridPoints = launchData.getBoolean("snapToGridPoints");
+			if (launchData.containsKey("rechteVerbindingen"))
 				rechteVerbindingen = launchData.getBoolean("rechteVerbindingen");
-			if(launchData.containsKey("krommeZonderExtrapolatie"))
-				krommeZonderExtrapolatie =  launchData.getBoolean("krommeZonderExtrapolatie");
-			if(launchData.containsKey("krommeMetExtrapolatie"))
-				krommeMetExtrapolatie =  launchData.getBoolean("krommeMetExtrapolatie");
-			if(launchData.containsKey("zoomInTabel"))
-				zoomInTabel =  launchData.getBoolean("zoomInTabel");
-			if(launchData.containsKey("zoomOptie"))
-				zoomOptie =  launchData.getBoolean("zoomOptie");
-			if(launchData.containsKey("traceOptie"))
-				traceOptie =  launchData.getBoolean("traceOptie");
-			if(launchData.containsKey("dragOptie"))
-				dragOptie =  launchData.getBoolean("dragOptie");
-			if(launchData.containsKey("grafiekKleuren"))
-				grafiekKleuren =  launchData.getBoolean("grafiekKleuren");
-			if(launchData.containsKey("kleurInstelbaar"))
-				kleurInstelbaar =  launchData.getBoolean("kleurInstelbaar");
-			if(launchData.containsKey("functieBeginZichtbaar"))
-				functieBeginZichtbaar =  launchData.getBoolean("functieBeginZichtbaar");
-			if(launchData.containsKey("functieBeginAanpasbaar"))
-				functieBeginAanpasbaar =  launchData.getBoolean("functieBeginAanpasbaar");
-			if(launchData.containsKey("formeleFuncties"))
-				formeleFuncties =  launchData.getBoolean("formeleFuncties");
-			if(launchData.containsKey("domeinInstelbaar"))
-				domeinInstelbaar =  launchData.getBoolean("domeinInstelbaar");
-			if(launchData.containsKey("formuleComponentHoogte"))
-				formuleComponentHoogte =  launchData.getInt("formuleComponentHoogte");
-			
-			if(launchData.containsKey("functieToegestaan"))
+			if (launchData.containsKey("krommeZonderExtrapolatie"))
+				krommeZonderExtrapolatie = launchData.getBoolean("krommeZonderExtrapolatie");
+			if (launchData.containsKey("krommeMetExtrapolatie"))
+				krommeMetExtrapolatie = launchData.getBoolean("krommeMetExtrapolatie");
+			if (launchData.containsKey("zoomInTabel"))
+				zoomInTabel = launchData.getBoolean("zoomInTabel");
+			if (launchData.containsKey("zoomOptie"))
+				zoomOptie = launchData.getBoolean("zoomOptie");
+			if (launchData.containsKey("traceOptie"))
+				traceOptie = launchData.getBoolean("traceOptie");
+			if (launchData.containsKey("dragOptie"))
+				dragOptie = launchData.getBoolean("dragOptie");
+			if (launchData.containsKey("grafiekKleuren"))
+				grafiekKleuren = launchData.getBoolean("grafiekKleuren");
+			if (launchData.containsKey("kleurInstelbaar"))
+				kleurInstelbaar = launchData.getBoolean("kleurInstelbaar");
+			if (launchData.containsKey("functieBeginZichtbaar"))
+				functieBeginZichtbaar = launchData.getBoolean("functieBeginZichtbaar");
+			if (launchData.containsKey("functieBeginAanpasbaar"))
+				functieBeginAanpasbaar = launchData.getBoolean("functieBeginAanpasbaar");
+			if (launchData.containsKey("formeleFuncties"))
+				formeleFuncties = launchData.getBoolean("formeleFuncties");
+			if (launchData.containsKey("domeinInstelbaar"))
+				domeinInstelbaar = launchData.getBoolean("domeinInstelbaar");
+			if (launchData.containsKey("formuleComponentHoogte"))
+				formuleComponentHoogte = launchData.getInt("formuleComponentHoogte");
+
+			if (launchData.containsKey("functieToegestaan"))
 				functieToegestaan = launchData.getBoolean("functieToegestaan");
-			if(launchData.containsKey("ongelijkheidToegestaan"))
+			if (launchData.containsKey("ongelijkheidToegestaan"))
 				ongelijkheidToegestaan = launchData.getBoolean("ongelijkheidToegestaan");
-			if(launchData.containsKey("implicieteFunctieToegestaan"))
+			if (launchData.containsKey("implicieteFunctieToegestaan"))
 				implicieteFunctieToegestaan = launchData.getBoolean("implicieteFunctieToegestaan");
-			if(launchData.containsKey("verticaleLijnToegestaan"))
+			if (launchData.containsKey("verticaleLijnToegestaan"))
 				verticaleLijnToegestaan = launchData.getBoolean("verticaleLijnToegestaan");
-			if(launchData.containsKey("parametrisatieToegestaan"))
+			if (launchData.containsKey("parametrisatieToegestaan"))
 				parametrisatieToegestaan = launchData.getBoolean("parametrisatieToegestaan");
-			
-			if(launchData.containsKey("formuleComponentAan"))
-				formuleComponentAan =  launchData.getBoolean("formuleComponentAan");
-			if(launchData.containsKey("veldComponentAan"))
-				veldComponentAan =  launchData.getBoolean("veldComponentAan");
-			
+
+			if (launchData.containsKey("formuleComponentAan"))
+				formuleComponentAan = launchData.getBoolean("formuleComponentAan");
+			if (launchData.containsKey("veldComponentAan"))
+				veldComponentAan = launchData.getBoolean("veldComponentAan");
+
 			/* veldComponent Parameters */
-			if(launchData.containsKey("veldGrafiekType"))
-				veldGrafiekType = VeldComponentGWT.FieldGraphType.values()[ ((Integer)launchData.getInt("veldGrafiekType")) ];
-			if(launchData.containsKey("veldPijlGrootteModus"))
-				veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode.values()[ ((Integer)launchData.getInt("veldPijlGrootteModus")) ];
-			if(launchData.containsKey("veldPijlGroottePixels"))
-				veldPijlGroottePixels = ((Integer)launchData.getInt("veldPijlGroottePixels"));
-			if(launchData.containsKey("veldPijlSchaalfactor"))
-				veldPijlSchaalfactor = ((Double)launchData.getDouble("veldPijlSchaalfactor"));
-			if(launchData.containsKey("veldLargerGridStartPoints"))
-				veldLargerGridStartPoints = ((Boolean)launchData.getBoolean("veldLargerGridStartPoints"));
-			
-			if(launchData.containsKey("veldComponentHoogte"))
-				veldComponentHoogte =  launchData.getInt("veldComponentHoogte");
+			if (launchData.containsKey("veldGrafiekType"))
+				veldGrafiekType = VeldComponentGWT.FieldGraphType
+					.values()[((Integer) launchData.getInt("veldGrafiekType"))];
+			if (launchData.containsKey("veldPijlGrootteModus"))
+				veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode
+					.values()[((Integer) launchData.getInt("veldPijlGrootteModus"))];
+			if (launchData.containsKey("veldPijlGroottePixels"))
+				veldPijlGroottePixels = ((Integer) launchData.getInt("veldPijlGroottePixels"));
+			if (launchData.containsKey("veldPijlSchaalfactor"))
+				veldPijlSchaalfactor = ((Double) launchData.getDouble("veldPijlSchaalfactor"));
+			if (launchData.containsKey("veldLargerGridStartPoints"))
+				veldLargerGridStartPoints = ((Boolean) launchData.getBoolean("veldLargerGridStartPoints"));
+
+			if (launchData.containsKey("veldComponentHoogte"))
+				veldComponentHoogte = launchData.getInt("veldComponentHoogte");
 			/* veldComponent Parameters */
 
-			if(launchData.containsKey("tekenComponentAan"))
-				tekenComponentAan =  launchData.getBoolean("tekenComponentAan");
-			if(launchData.containsKey("tabelComponentAan"))
-				tabelComponentAan =  launchData.getBoolean("tabelComponentAan");
-			if(launchData.containsKey("tabelAlsTekenTool"))
-				tabelAlsTekenTool =  launchData.getBoolean("tabelAlsTekenTool");
-			if(launchData.containsKey("activeIndex"))
-				activeIndex =  launchData.getInt("activeIndex");
-			if(launchData.containsKey("tekenGrafiekNauwkeurigheid"))
-				tekenGrafiekNauwkeurigheid =  launchData.getInt("tekenGrafiekNauwkeurigheid");
-			
-			
+			if (launchData.containsKey("tekenComponentAan"))
+				tekenComponentAan = launchData.getBoolean("tekenComponentAan");
+			if (launchData.containsKey("tabelComponentAan"))
+				tabelComponentAan = launchData.getBoolean("tabelComponentAan");
+			if (launchData.containsKey("tabelAlsTekenTool"))
+				tabelAlsTekenTool = launchData.getBoolean("tabelAlsTekenTool");
+			if (launchData.containsKey("activeIndex"))
+				activeIndex = launchData.getInt("activeIndex");
+			if (launchData.containsKey("tekenGrafiekNauwkeurigheid"))
+				tekenGrafiekNauwkeurigheid = launchData.getInt("tekenGrafiekNauwkeurigheid");
+
 			double[] graphPointsX = null;
 			double[] graphPointsY = null;
 			int[] graphPointsIndex = null;
 			int[] graphPointsTabelIndex = null;
 			String[] graphPointsXString = null;
 			String[] graphPointsYString = null;
-			//List<Double> graphPointsY = null;
-			//List<Object> graphPointsIndex = null;
-			//List<Object> graphPointsTabelIndex = null;
-			//List<Object> graphPointsXString = null;
-			//List<Object> graphPointsYString = null;
-			
-			if(launchData.containsKey("graphPointsX"))
-				graphPointsX =  launchData.getDoubleArray("graphPointsX");
-			if(launchData.containsKey("graphPointsY"))
+
+			if (launchData.containsKey("graphPointsX"))
+				graphPointsX = launchData.getDoubleArray("graphPointsX");
+			if (launchData.containsKey("graphPointsY"))
 				graphPointsY = launchData.getDoubleArray("graphPointsY");
-			if(launchData.containsKey("graphPointsIndex"))
+			if (launchData.containsKey("graphPointsIndex"))
 				graphPointsIndex = launchData.getIntArray("graphPointsIndex");
-			if(launchData.containsKey("graphPointsTabelIndex"))
+			if (launchData.containsKey("graphPointsTabelIndex"))
 				graphPointsTabelIndex = launchData.getIntArray("graphPointsTabelIndex");
-			if(launchData.containsKey("graphPointsXString"))
+			if (launchData.containsKey("graphPointsXString"))
 				graphPointsXString = launchData.getStringArray("graphPointsXString");
-			if(launchData.containsKey("graphPointsYString"))
+			if (launchData.containsKey("graphPointsYString"))
 				graphPointsYString = launchData.getStringArray("graphPointsYString");
-			
-			//graphPointsY = toList (launchData.get("graphPointsY"));
-			//graphPointsIndex = toList (launchData.get("graphPointsIndex"));
-			//graphPointsTabelIndex = toList (launchData.get("graphPointsTabelIndex"));
-			//graphPointsXString = toList (launchData.get("graphPointsXString"));
-	    	//graphPointsYString = toList (launchData.get("graphPointsYString"));
-	    	
-	    	this.graphPoints = new Vector();
-			if(graphPointsX != null) 
-			{	for(int i = 0; i < graphPointsX.length; i++)
-				{	RealPoint rp = new RealPoint(graphPointsX[i], graphPointsY[i]);
+
+			this.graphPoints = new Vector();
+			if (graphPointsX != null)
+			{
+				for (int i = 0; i < graphPointsX.length; i++)
+				{
+					RealPoint rp = new RealPoint(graphPointsX[i], graphPointsY[i]);
 					rp.setIndex(graphPointsIndex[i]);
 					rp.setTabelIndex(graphPointsTabelIndex[i]);
 					rp.setxString(graphPointsXString[i]);
 					rp.setyString(graphPointsYString[i]);
-					//rp.setIndex(((Number) graphPointsIndex.get(i)).intValue());
-					//rp.setTabelIndex(((Number)graphPointsTabelIndex.get(i)).intValue());
-					//rp.setxString((String) graphPointsXString.get(i));
-					//rp.setyString((String) graphPointsYString.get(i));
 					graphPoints.add(rp);
 				}
 			}
-			
+
 			String[] paramNamen = null;
-	    	double[] paramWaarden = null;
-	    	double[] paramOnderGrensWaarden = null;
-	    	double[] paramBovenGrensWaarden = null;
-	    	double[] paramStapGroottes = null;
+			double[] paramWaarden = null;
+			double[] paramOnderGrensWaarden = null;
+			double[] paramBovenGrensWaarden = null;
+			double[] paramStapGroottes = null;
 			int[] paramLengtes = null;
-	    	int[] paramX = null;
-	    	int[] paramY = null;
-	    	
-	    	if(launchData.containsKey("paramNamen"))
-	    		paramNamen = launchData.getStringArray("paramNamen");
-	    	if(launchData.containsKey("paramWaarden"))
-	    		paramWaarden = launchData.getDoubleArray("paramWaarden");
-	    	if(launchData.containsKey("paramOnderGrensWaarden"))
-	    		paramOnderGrensWaarden = launchData.getDoubleArray("paramOnderGrensWaarden");
-	    	if(launchData.containsKey("paramBovenGrensWaarden"))
-	    		paramBovenGrensWaarden = launchData.getDoubleArray("paramBovenGrensWaarden");
-	    	if(launchData.containsKey("paramStapGroottes"))
-	    		paramStapGroottes = launchData.getDoubleArray("paramStapGroottes");
-	    	if(launchData.containsKey("paramLengtes"))
-	    		paramLengtes = launchData.getIntArray("paramLengtes");
-	    	if(launchData.containsKey("paramX"))
-	    		paramX = launchData.getIntArray("paramX");
-	    	if(launchData.containsKey("paramY"))
-	    		paramY = launchData.getIntArray("paramY");
-			
-	    	if(paramNamen != null) {
-	    		int maxX = breedte;
-	    		int maxY = hoogte;
-	    		
-	    		
-	    		this.schuifParameters = new SchuifParameterGWT[paramNamen.length];
-				for(int i = 0; i < schuifParameters.length; i++) {	
+			int[] paramX = null;
+			int[] paramY = null;
+
+			if (launchData.containsKey("paramNamen"))
+				paramNamen = launchData.getStringArray("paramNamen");
+			if (launchData.containsKey("paramWaarden"))
+				paramWaarden = launchData.getDoubleArray("paramWaarden");
+			if (launchData.containsKey("paramOnderGrensWaarden"))
+				paramOnderGrensWaarden = launchData.getDoubleArray("paramOnderGrensWaarden");
+			if (launchData.containsKey("paramBovenGrensWaarden"))
+				paramBovenGrensWaarden = launchData.getDoubleArray("paramBovenGrensWaarden");
+			if (launchData.containsKey("paramStapGroottes"))
+				paramStapGroottes = launchData.getDoubleArray("paramStapGroottes");
+			if (launchData.containsKey("paramLengtes"))
+				paramLengtes = launchData.getIntArray("paramLengtes");
+			if (launchData.containsKey("paramX"))
+				paramX = launchData.getIntArray("paramX");
+			if (launchData.containsKey("paramY"))
+				paramY = launchData.getIntArray("paramY");
+
+			if (paramNamen != null)
+			{
+				int maxX = breedte;
+				int maxY = hoogte;
+
+				this.schuifParameters = new SchuifParameterGWT[paramNamen.length];
+				for (int i = 0; i < schuifParameters.length; i++)
+				{
 					schuifParameters[i] = new SchuifParameterGWT(paramLengtes[i], paramNamen[i]);
 					schuifParameters[i].zetGrensWaarden(paramOnderGrensWaarden[i], paramBovenGrensWaarden[i]);
 					schuifParameters[i].zetStapGrootte(paramStapGroottes[i]);
 					schuifParameters[i].zetWaarde(paramWaarden[i]);
 					schuifParameters[i].zetLocatie(paramX[i], paramY[i]);
 				}
-	    	}
-			
-			if(launchData.containsKey("colorRGBsGewoon"))
+			}
+
+			if (launchData.containsKey("colorRGBsGewoon"))
 			{
 				ObjectList list = launchData.getObjectList("colorRGBsGewoon");
 				int[][] colorRGBsGewoon = new int[list.size()][];
-				for (int i = 0; i < colorRGBsGewoon.length; i++) {
+				for (int i = 0; i < colorRGBsGewoon.length; i++)
+				{
 					colorRGBsGewoon[i] = list.getIntArray(i);
-					gewoneKleuren[i] = CssColor.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]).value();
+					gewoneKleuren[i] = CssColor
+						.make(colorRGBsGewoon[i][0], colorRGBsGewoon[i][1], colorRGBsGewoon[i][2]).value();
 				}
 			}
-			
-			if(launchData.containsKey("colorRGBsOpdrachten"))
+
+			if (launchData.containsKey("colorRGBsOpdrachten"))
 			{
 				ObjectList list = launchData.getObjectList("colorRGBsOpdrachten");
 				int[][] colorRGBsOpdrachten = new int[list.size()][];
-				for (int i = 0; i < colorRGBsOpdrachten.length; i++) {
+				for (int i = 0; i < colorRGBsOpdrachten.length; i++)
+				{
 					colorRGBsOpdrachten[i] = list.getIntArray(i);
-					opdrachtKleuren[i] = CssColor.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]).value();
+					opdrachtKleuren[i] = CssColor
+						.make(colorRGBsOpdrachten[i][0], colorRGBsOpdrachten[i][1], colorRGBsOpdrachten[i][2]).value();
 				}
 			}
-			
-			if (launchData.containsKey("typeOpdracht")) 
-				typeOpdracht =  launchData.getInt("typeOpdracht");		
-			if (launchData.containsKey("maxScores")) 
-			{	//List<Object> maxScoresList = JSONUtilities.toArrayList(launchData.get("maxScores"));
-				//ArrayList<Integer> maxScoresList = (ArrayList<Integer>) launchData.get("maxScores");
+
+			if (launchData.containsKey("typeOpdracht"))
+				typeOpdracht = launchData.getInt("typeOpdracht");
+			if (launchData.containsKey("maxScores"))
+			{
 				maxScores = launchData.getIntArray("maxScores");
-				//		new int[maxScoresList.size()];
-				//for(int i = 0; i < maxScoresList.size(); i++)
-				//	maxScores[i] =  maxScoresList.get(i);		
 			}
-			if (launchData.containsKey("docentFunctieStrings")) 
-			{	//docentFunctieStrings = JSONUtilities.toStringArray(launchData.get("docentFunctieStrings"));
+			if (launchData.containsKey("docentFunctieStrings"))
+			{ // docentFunctieStrings =
+				// JSONUtilities.toStringArray(launchData.get("docentFunctieStrings"));
 				docentFunctieStrings = launchData.getStringArray("docentFunctieStrings");
-				//ArrayList<String> docentFunctieStringsList = (ArrayList<String>) launchData.get("docentFunctieStrings");
-				//docentFunctieStrings = new String[docentFunctieStringsList.size()];
-				//for(int i = 0; i < docentFunctieStringsList.size(); i++)
-				//	docentFunctieStrings[i] = docentFunctieStringsList.get(i);
-				if(docentFunctieStrings != null)
-				{	docentFuncties = new Expressie[docentFunctieStrings.length];
-					for(int i = 0; i < docentFunctieStrings.length; i++)
-					{	try         
-			        	{   docentFunctieStrings[i] = FormuleParser.randomizeString(docentFunctieStrings[i],randomVarNamen,randomVarWaarden);
-			        	}
-			        	catch(Exception e)
-			        	{   docentFunctieStrings[i] = "$f???@";
-			        	}
-						if (!docentFunctieStrings[i].equals("$f@"))
-						{	docentFuncties[i] = FormuleParser.geefExpressie(docentFunctieStrings[i]);
-							aantalFuncties++;
-						}
-					}
-				}
+
+				calculateDocentFuncties();
 			}
 			if (launchData.containsKey("docentDomeinStrings"))
-			{	ObjectList docentDomeinStringList = (launchData.getObjectList("docentDomeinStrings"));
+			{
+				ObjectList docentDomeinStringList = (launchData.getObjectList("docentDomeinStrings"));
 				docentDomeinStrings = new String[docentDomeinStringList.size()][2];
-				for(int i = 0; i < docentDomeinStringList.size(); i++)
-				{	docentDomeinStrings[i] = (docentDomeinStringList.getStringArray(i));
-					//docentDomeinStrings[i][0] = docentDomeinStringList.get(i).get(0);
-					//docentDomeinStrings[i][1] = docentDomeinStringList.get(i).get(1);
+				docentDomeinen = new double[docentDomeinStringList.size()][2];
+				for (int i = 0; i < docentDomeinStringList.size(); i++)
+				{
+					docentDomeinStrings[i] = (docentDomeinStringList.getStringArray(i));
 				}
-				if(docentDomeinStrings != null)
-				{	docentDomeinen = new double[docentDomeinStrings.length][2];
-					for(int i = 0; i < docentDomeinStrings.length; i++)
-					{	try
-						{	docentDomeinStrings[i][0] = FormuleParser.randomizeString(docentDomeinStrings[i][0], randomVarNamen, randomVarWaarden);
-						}
-						catch(Exception e)
-						{	docentDomeinStrings[i][0] = "$f" + Double.toString(DEFAULTDOMEIN[0]) + "@";
-						}
-						try
-						{	docentDomeinStrings[i][1] = FormuleParser.randomizeString(docentDomeinStrings[i][1], randomVarNamen, randomVarWaarden);
-						}
-						catch(Exception e)
-						{	docentDomeinStrings[i][1] = "$f" + Double.toString(DEFAULTDOMEIN[1]) + "@";
-						}
-						if(docentDomeinStrings[i][0].equals("$f" + Double.toString(DEFAULTDOMEIN[0]) + "@"))
-						{	docentDomeinen[i][0] = DEFAULTDOMEIN[0];
-							
-						}
-						else
-							docentDomeinen[i][0] = FormuleParser.geefExpressie(docentDomeinStrings[i][0]).geefWaarde();
-						if(docentDomeinStrings[i][1].equals("$f" + Double.toString(DEFAULTDOMEIN[1]) + "@"))
-							docentDomeinen[i][1] = DEFAULTDOMEIN[1];
-						else
-							docentDomeinen[i][1] = FormuleParser.geefExpressie(docentDomeinStrings[i][1]).geefWaarde();
-						
-					}
-				}
+				calculateDocentDomeinen();
 			}
-			if (launchData.containsKey("nauwkeurigheid")) 
-			{	nauwkeurigheid = launchData.getIntArray("nauwkeurigheid");
-				//List<Object> nauwkeurigheidList = JSONUtilities.toArrayList(launchData.get("nauwkeurigheid"));
-				//ArrayList<Integer> nauwkeurigheidList = (ArrayList<Integer>) launchData.get("nauwkeurigheid");
-				//nauwkeurigheid = new int[nauwkeurigheidList.size()];
-				//for(int i = 0; i < nauwkeurigheidList.size(); i++)
-				//	nauwkeurigheid[i] =  nauwkeurigheidList.get(i);
+			if (launchData.containsKey("nauwkeurigheid"))
+			{
+				nauwkeurigheid = launchData.getIntArray("nauwkeurigheid");
 			}
-			if (launchData.containsKey("minimumPunten"))  
-			{	minimumPunten = launchData.getIntArray("minimumPunten");
-				//List<Object> minimumPuntenList = JSONUtilities.toArrayList(launchData.get("minimumPunten"));
-				//ArrayList<Integer> minimumPuntenList = (ArrayList<Integer>) launchData.get("minimumPunten");
-				//minimumPunten = new int[minimumPuntenList.size()];
-				//for(int i = 0; i < minimumPuntenList.size(); i++)
-				//	minimumPunten[i] =  minimumPuntenList.get(i);
+			if (launchData.containsKey("minimumPunten"))
+			{
+				minimumPunten = launchData.getIntArray("minimumPunten");
 			}
-			if(minimumPunten != null)
-			{	kleinsteMinimum = minimumPunten[0];
-				for(int i = 1; i < aantalFuncties; i++)
-				{	if(minimumPunten[i] < kleinsteMinimum)
+			if (minimumPunten != null)
+			{
+				kleinsteMinimum = minimumPunten[0];
+				for (int i = 1; i < aantalFuncties; i++)
+				{
+					if (minimumPunten[i] < kleinsteMinimum)
 						kleinsteMinimum = minimumPunten[i];
 				}
 			}
-			
+
 			if (launchData.containsKey("scoreMax"))
-				scoreMax =  launchData.getInt("scoreMax");
+				scoreMax = launchData.getInt("scoreMax");
 			if (launchData.containsKey("domeinControleren"))
-				domeinControleren =  launchData.getBoolean("domeinControleren");
-			if (launchData.containsKey("leerlingZietTabel")) 
-				leerlingZietTabel =  launchData.getBoolean("leerlingZietTabel");		
-			if (launchData.containsKey("ingevuld")) 
+				domeinControleren = launchData.getBoolean("domeinControleren");
+			if (launchData.containsKey("leerlingZietTabel"))
+				leerlingZietTabel = launchData.getBoolean("leerlingZietTabel");
+			if (launchData.containsKey("ingevuld"))
 				ingevuld = launchData.getBoolean("ingevuld");
-			if (launchData.containsKey("nagekeken")) 
+			if (launchData.containsKey("nagekeken"))
 				nagekeken = launchData.getBoolean("nagekeken");
 			if (launchData.containsKey("checkExternal"))
 				checkExternal = launchData.getBoolean("checkExternal");
-			
+
 			double[] docentGraphPointsX = null;
 			double[] docentGraphPointsY = null;
 			int[] docentGraphPointsIndex = null;
 			int[] docentGraphPointsTabelIndex = null;
 			String[] docentGraphPointsXString = null;
 			String[] docentGraphPointsYString = null;
-			
-			/*
-			List<Object> docentGraphPointsX = null;
-			List<Object> docentGraphPointsY = null;
-			List<Object> docentGraphPointsIndex = null;
-			List<Object> docentGraphPointsTabelIndex = null;
-			List<Object> docentGraphPointsXString = null;
-			List<Object> docentGraphPointsYString = null;
-			*/
-			
-			if(launchData.containsKey("docentGraphPointsX"))
-				docentGraphPointsX =  launchData.getDoubleArray("docentGraphPointsX");
-			if(launchData.containsKey("docentGraphPointsY"))
+
+			if (launchData.containsKey("docentGraphPointsX"))
+				docentGraphPointsX = launchData.getDoubleArray("docentGraphPointsX");
+			if (launchData.containsKey("docentGraphPointsY"))
 				docentGraphPointsY = launchData.getDoubleArray("docentGraphPointsY");
-			if(launchData.containsKey("docentGraphPointsIndex"))
+			if (launchData.containsKey("docentGraphPointsIndex"))
 				docentGraphPointsIndex = launchData.getIntArray("docentGraphPointsIndex");
-			if(launchData.containsKey("docentGraphPointsTabelIndex"))
+			if (launchData.containsKey("docentGraphPointsTabelIndex"))
 				docentGraphPointsTabelIndex = launchData.getIntArray("docentGraphPointsTabelIndex");
-			if(launchData.containsKey("docentGraphPointsXString"))
+			if (launchData.containsKey("docentGraphPointsXString"))
 				docentGraphPointsXString = launchData.getStringArray("docentGraphPointsXString");
-			if(launchData.containsKey("docentGraphPointsYString"))
+			if (launchData.containsKey("docentGraphPointsYString"))
 				docentGraphPointsYString = launchData.getStringArray("docentGraphPointsYString");
-			
-			/*
-			if(launchData.get("docentGraphPointsX") != null) {	
-				docentGraphPointsX = JSONUtilities.toArrayList(launchData.get("docentGraphPointsX"));
-			}
-	    	if(launchData.get("docentGraphPointsY") != null)
-	    		docentGraphPointsY = JSONUtilities.toArrayList(launchData.get("docentGraphPointsY"));
-	    	if(launchData.get("docentGraphPointsIndex") != null)
-	    		docentGraphPointsIndex = JSONUtilities.toArrayList(launchData.get("docentGraphPointsIndex"));
-	    	if(launchData.get("docentGraphPointsTabelIndex") != null)
-	    		docentGraphPointsTabelIndex = JSONUtilities.toArrayList(launchData.get("docentGraphPointsTabelIndex"));
-	    	if(launchData.get("docentGraphPointsXString") != null)
-	    		docentGraphPointsXString = JSONUtilities.toArrayList(launchData.get("docentGraphPointsXString"));
-	    	if(launchData.get("docentGraphPointsYString") != null)
-	    		docentGraphPointsYString = JSONUtilities.toArrayList(launchData.get("docentGraphPointsYString"));
-	    	*/
-			
-	    	this.docentGraphPoints = new Vector();
-			if(docentGraphPointsX != null ) 
-			{	for(int i = 0; i < docentGraphPointsX.length; i++)
-				{	RealPoint rp = new RealPoint(docentGraphPointsX[i], docentGraphPointsY[i]);
+
+			this.docentGraphPoints = new Vector();
+			if (docentGraphPointsX != null)
+			{
+				for (int i = 0; i < docentGraphPointsX.length; i++)
+				{
+					RealPoint rp = new RealPoint(docentGraphPointsX[i], docentGraphPointsY[i]);
 					rp.setIndex(docentGraphPointsIndex[i]);
 					rp.setTabelIndex(docentGraphPointsTabelIndex[i]);
 					rp.setxString(docentGraphPointsXString[i]);
@@ -3235,91 +3331,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					docentGraphPoints.add(rp);
 				}
 			}
-			
-			if(randomVarNamen != null)
-			{	for (int pCnt = 0; pCnt < graphPoints.size(); pCnt++)
-				{	RealPoint rp = (RealPoint) graphPoints.elementAt(pCnt);
-					String xString = rp.getxString();
-					String yString = rp.getyString();
-											
-					//vervangen door:
-					try 
-					{	xString = FormuleParser.randomizeString("$f" + xString + "@", randomVarNamen, randomVarWaarden);
-					}
-					catch(Exception e)
-					{	xString = "";
-					}
-					Expressie ex = FormuleParser.geefExpressie(xString);
-					if (ex != null)
-						rp.setX(ex.geefWaarde());
-					try 
-					{	yString = FormuleParser.randomizeString("$f" + yString + "@", randomVarNamen, randomVarWaarden);
-					}
-					catch(Exception e)
-					{	yString = "";
-					}
-					Expressie ey = FormuleParser.geefExpressie(yString);
-					if (ey != null)
-						rp.setY(ey.geefWaarde());
-					
-					// just in case
-					if (Double.isNaN(rp.getX()))
-						rp.setX(0);
-					if (Double.isNaN(rp.getY()))
-						rp.setY(0);
-					
-					rp.setIndex(rp.getIndex() % 100);
-				}
-			}
-					
-			if(randomVarNamen != null)
-	    	{	for (int pCnt = 0; pCnt < docentGraphPoints.size(); pCnt++)
-				{	RealPoint rp = (RealPoint) docentGraphPoints.elementAt(pCnt);
-					String xString = rp.getxString();
-					String yString = rp.getyString();
-									
-					//vervangen door:
-					try 
-					{	xString = FormuleParser.randomizeString("$f" + xString + "@", randomVarNamen, randomVarWaarden);
-					
-					}
-					catch(Exception e)
-					{	xString = "";
-					}
-					Expressie ex = FormuleParser.geefExpressie(xString);
-					if (ex != null)
-						rp.setX(ex.geefWaarde());
-					try 
-					{	yString = FormuleParser.randomizeString("$f" + yString + "@", randomVarNamen, randomVarWaarden);
-					}
-					catch(Exception e)
-					{	yString = "";
-					}
-					Expressie ey = FormuleParser.geefExpressie(yString);
-					if (ey != null)
-						rp.setY(ey.geefWaarde());
-					
-					// just in case
-					if (Double.isNaN(rp.getX()))
-						rp.setX(0);
-					if (Double.isNaN(rp.getY()))
-						rp.setY(0);
-					
-					rp.setIndex(rp.getIndex() % 100);
-				}
-	    	}
-		}
-		
-		
-		
-		//basisPanel.setSize("" + breedte + "px", "" + hoogte + "px");
-		//grafiekGWTVeld.setSize(breedte, hoogte - bottomHeight);
 
-		
-		
-		//plaatsComponenten();
-// initialize GUI nadat de launchdata is verwerkt.		
-		
+			calculateExpressiesMetRandomVariabelen();
+		}
+
+		// initialize GUI nadat de launchdata is verwerkt
 		initialize();
 		fromuser = true;
 	}
