@@ -844,9 +844,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 //	        		  String schoon = FormuleParser.schoon(formuleString);
 //	        		  logger.info("FormuleParser.schoon(blabla) = " + schoon);
 	        		  
-	        		  
 	        		  e2 = FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$f" + expressieStrings[1] + "@")));
-	                      
+	        		  
 	                  if(expressieStrings[0] == null || expressieStrings[1] == null) 
 	                  {     split = false;
 	                  }
@@ -1023,6 +1022,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
     {	//logger.fine("begin setState formuleComponent");
         //logger.info("maxAantalFormules: " + maxAantalFormules);
         //logger.info(String.valueOf(launchState2));
+		
 		fromuser = false;
 		String[] expressieStrings = null;
     	boolean[] geselecteerd = null;
@@ -1044,6 +1044,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	    	if (launchState2.get("expressieStrings") != null) 
 			{	//ArrayList<String> expressieStringsList = (ArrayList<String>) h.get("expressieStrings");
 	    		expressieStrings = JSONUtilities.toStringArray(launchState2.get("expressieStrings"));
+	    		
 	    		//logger.info("expressieStrings = " + expressieStrings);
 				/*
 	    		expressieStrings = new String[expressieStringsList.size()];
@@ -1178,6 +1179,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
      			}
      			//logger.info("voor parseFormule: " + i);
      			parseFormule(expressieStrings[i], i, true);
+
      			//logger.info("na parseFormule: " + i);
 				if(i>0 && expressieStrings[i].length() > 0 && !expressieStrings[i].endsWith("="))
 					//add(formuleVakken[i],0);
