@@ -11,6 +11,7 @@ import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
 import nl.uu.fi.dwo.interaction.client.FormuleEditorIF;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Role;
@@ -36,6 +37,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 		}
 
+		public ObjectMap getContext() {
+		  return JSONUtilities.wrapMap(Collections.singletonMap("premium", Boolean.TRUE));
+		}
+		
 		@Override
 		public FormuleKeyboardIF getKeyboard() {
 			return this;
@@ -214,7 +219,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<String> definitions = Arrays.asList(
 				"$fa=9..#a#@" 
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
-				,"$ft=text(\"M$s8@ M$sx@\",O)@"
+				,"$ft=text(\"M$s8@ $zM@$sx@\",O)@"
 				,"$fP=point(1,1)@"
 				,"$fh=halfline(O,P)@"
 				,"$fy=$px$n2@@/2-2@"

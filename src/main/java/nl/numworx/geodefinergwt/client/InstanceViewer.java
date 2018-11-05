@@ -138,7 +138,7 @@ public class InstanceViewer extends SVGWidget implements PH {
 		FormuleViewer viewer = new FormuleViewer(label.getString());
 		FontStyle fs = label.adapt(FontStyle.class);
 		if(fs != null) viewer.setFont(fs.getFont());
-		String url = viewer.getCanvas().toDataUrl();
+		String url = viewer.getMainRegel().getCanvas().toDataUrl();
 		float w = viewer.getWidth();
 		float h = viewer.getHeight();
 		float as = viewer.getAsHoogte();
