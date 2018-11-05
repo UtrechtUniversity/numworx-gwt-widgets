@@ -3253,7 +3253,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			{ // docentFunctieStrings =
 				// JSONUtilities.toStringArray(launchData.get("docentFunctieStrings"));
 				docentFunctieStrings = launchData.getStringArray("docentFunctieStrings");
-
+				if (docentFunctieStrings != null)
+					docentFuncties = new Expressie[docentFunctieStrings.length];
+				
 				calculateDocentFuncties();
 			}
 			if (launchData.containsKey("docentDomeinStrings"))
