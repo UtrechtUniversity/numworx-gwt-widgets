@@ -59,6 +59,13 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
 	static final Text rb = GWT.create(Text.class);
 
+	/**
+	 * Premium feature. True als de school een premium abonnement heeft.
+	 * Let op: wordt pas gezet bij {@link #setCommunicationRoot(OpdrNavIF)}.
+	 * Daarvoor is deze boolean nog false!
+	 */
+	public static boolean premium = false;
+	
 	OpdrNavIF comRoot;
 	
 	/**
@@ -753,6 +760,14 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
+		premium = comRoot.getContext().getBoolean("premium", premium); // installeer hier premium feature.
+// doe er wat mee...		
+		if ( premium ) {
+			GWT.log("met een premium abonnement");
+		} else {
+			GWT.log("zonder een premium abonnement");
+		}
+		
 		comRoot.addCBookEventListener("drawing", this);
 		comRoot.addCBookEventListener("action.setCorrect", this);
 		comRoot.addCBookEventListener("action.setFalse", this);

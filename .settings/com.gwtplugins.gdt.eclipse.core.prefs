@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
-lastWarOutDir=/Users/wim/workspace-oxygen/KladjeGWT/target/KladjeGWT-0.0.6
+jarsExcludedFromWebInfLib=
+lastWarOutDir=/Users/peterboon/workspace-oxygen/KladjeGWT/target/KladjeGWT-0.0.6
+launchConfigExternalUrlPrefix=
 warSrcDir=war
 warSrcDirIsOutput=false

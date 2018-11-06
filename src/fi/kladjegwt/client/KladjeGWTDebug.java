@@ -21,7 +21,7 @@ public class KladjeGWTDebug extends KladjeGWT {
 		
 		//Stub.publish(this); 
 		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
-
+		setCommunicationRoot(new MockOpdrNav());
 	}	
 
 
