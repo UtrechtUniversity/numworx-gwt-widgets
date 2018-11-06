@@ -177,7 +177,7 @@
 		<formuleVersion>0.1.1-SNAPSHOT</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.1</gwtVersion>
-		<gwt.style>OBFUSCATED</gwt.style> <!--  -D gwt.style=PRETTY -->
+		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
 		<daggerVersion>2.11</daggerVersion>
 	</properties>
