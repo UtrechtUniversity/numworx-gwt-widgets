@@ -511,6 +511,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void reset() {
 		toolbox.destroy();
 		if(checkObjects != null) checkObjects.destroyAll();
+		definitions.clear();
+		expressions.clear();
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
 		start();

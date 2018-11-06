@@ -87,8 +87,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 	@Override
 	public Map<String, Object> toMap() {
+		if (item == null) return null;
 		String name = tracker.getMapper().toString(item);
-		Map m = UIModelFactoryGWT.configuration.getMap(name);
+		Map<String, Object> m = UIModelFactoryGWT.configuration.getMap(name);
 		return m;
 	}
 
