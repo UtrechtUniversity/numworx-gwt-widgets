@@ -26,6 +26,8 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
+import fi.wiskopdr.FormuleParser;
+
 public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
@@ -190,6 +192,8 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		
 		RootPanel.get().add(FocusOnTouch.wrap(root, true));
 
+		//FormuleParser.zetWoordFormule(true);
+		
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
@@ -219,7 +223,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<String> definitions = Arrays.asList(
 				"$fa=9..#a#@" 
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
-				,"$ft=text(\"M$s8@ $zM@$sx@\",O)@"
+				,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
 				,"$fP=point(1,1)@"
 				,"$fh=halfline(O,P)@"
 				,"$fy=$px$n2@@/2-2@"
