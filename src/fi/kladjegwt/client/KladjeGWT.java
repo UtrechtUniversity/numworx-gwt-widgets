@@ -781,6 +781,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			Map<String, Number> values) 
 	{
 		
+	    logger.severe("KladjeGWT initializing");
 		this.breedte = width;
 		this.hoogte = height;
 		

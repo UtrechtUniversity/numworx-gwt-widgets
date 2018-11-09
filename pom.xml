@@ -27,7 +27,8 @@
          <configuration>
               <module>${project.groupId}.${project.artifactId}</module>
               <runTarget>${project.artifactId}.html</runTarget>
-        	  <warSourceDirectory>war</warSourceDirectory>        
+        	  <warSourceDirectory>war</warSourceDirectory>
+        	  <style>PRETTY</style>        
              </configuration>
         <executions>
           <execution>
