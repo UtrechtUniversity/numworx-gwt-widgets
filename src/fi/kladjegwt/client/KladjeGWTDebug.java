@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 
 public class KladjeGWTDebug extends KladjeGWT {
 
@@ -16,11 +16,13 @@ public class KladjeGWTDebug extends KladjeGWT {
 		dlp.addStyleName(kladjeCss.dock());
 		dlp.setPixelSize(breedte , hoogte );
 
-		RootPanel.get().add(dlp);
-		RootPanel.get().addStyleName(kladjeCss.root());
+		RootLayoutPanel.get().add(dlp);
+		RootLayoutPanel.get().addStyleName(kladjeCss.root());
 		
 		//Stub.publish(this); 
-		init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		HashMap<String, Object> launchdata = new HashMap<String, Object>();
+		launchdata.put("formuleOptie", Boolean.TRUE);
+		init(breedte, hoogte, launchdata, new HashMap<String, Number>());
 		setCommunicationRoot(new MockOpdrNav());
 	}	
 

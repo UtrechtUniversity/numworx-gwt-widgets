@@ -28,12 +28,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.resources.client.ImageResource;
 
@@ -221,7 +221,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	private int[][] rectangleData;
 	
 	/**
-	 * maak de css in ore en haal via de resources alle plaatjes op 
+	 * maak de css in orde en haal via de resources alle plaatjes op 
 	 */
 	public void getImages() 
 	{
@@ -324,13 +324,12 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(kladjeCss.dock());
-		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+		dlp.setPixelSize(breedte,hoogte);
 
-		RootPanel.get().add(dlp);
-		RootPanel.get().addStyleName(kladjeCss.root());
+		RootLayoutPanel.get().add(dlp);
+		RootLayoutPanel.get().addStyleName(kladjeCss.root());
 		
 		Stub.publish(this); 
-		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>()); // XXX gebruik de KladjeGWTDebug.gwt.xml module
 
 	}	
 
@@ -864,7 +863,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		kladjeGWTCanvas = kladjeGWTVeld.getCanvas();
 		if (kladjeGWTCanvas == null) 
 		{
-	      RootPanel.get().add(new Label(upgradeMessage));
+	      RootLayoutPanel.get().add(new Label(upgradeMessage));
 	      return;
 	    }
 		
