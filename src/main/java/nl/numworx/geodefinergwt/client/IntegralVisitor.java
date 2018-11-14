@@ -1,6 +1,9 @@
 package nl.numworx.geodefinergwt.client;
 
 import nl.numworx.geodefiner.common.Integral;
+
+import java.util.logging.Logger;
+
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Segment;
 import fi.euclides.model.SegmentVisitor;
@@ -12,11 +15,14 @@ class IntegralVisitor implements SegmentVisitor {
 	private final double y0;
 	private final Area shape;
 	private final AbstractViewer v;
+	private static Logger LOG = Logger.getLogger(SegmentVisitor.class.getName());
 
 	IntegralVisitor(Integral l, Area shape, AbstractViewer v) {
-		if(l.base > 0) y0 = clipTop().doubleValue();
-		else if( l.base < 0) y0 = clipBottom().doubleValue();
+	    LOG.fine("Integralvisitor " + l + " base " + l.base);
+		if(l.base > 0) y0 = v.clipTop().doubleValue();
+		else if( l.base < 0) y0 = v.clipBottom().doubleValue();
 		else y0 = v.getModel().getO().getYd();
+		LOG.fine(l + " baseline = "  + y0);
 		this.shape = shape;
 		this.v = v;
 	}
@@ -39,12 +45,12 @@ class IntegralVisitor implements SegmentVisitor {
 
 	@Override
 	public Numbers clipTop() {
-		return Numbers.createDouble(Double.NEGATIVE_INFINITY);
+		return Numbers.createDouble(-Float.MAX_VALUE);
 	}
 
 	@Override
 	public Numbers clipBottom() {
-		return Numbers.createDouble(Double.POSITIVE_INFINITY);
+		return Numbers.createDouble(Float.MAX_VALUE);
 	}
 
 	@Override

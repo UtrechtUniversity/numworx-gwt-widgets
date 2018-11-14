@@ -228,6 +228,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				,"$fh=halfline(O,P)@"
 				,"$fy=$px$n2@@/2-2@"
 				,"$fwaarde=true@"
+				, "$fy<-1@"
 				);
 		launchDebug.put("definitions", definitions);
 		Map<String,Object> h = new HashMap<>();
@@ -242,6 +243,9 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	       h.put("color", 0XFFFF0000);
 	       h.put("visible", Boolean.TRUE);
 	       configuration.put("waarde", h);
+	    h  = new HashMap<>();
+	    h.put("color", 0X6F808080);
+	    configuration.put("$fy<-1@", h);
 		launchDebug.put("configuration", configuration);
 		launchDebug.put("checkDWO", checkDWO);
 	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}
