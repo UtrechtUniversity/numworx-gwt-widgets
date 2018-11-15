@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client.ui;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import nl.numworx.geodefiner.common.PointType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -9,6 +10,7 @@ import fi.euclides.model.algo.FreePoint;
 import fi.euclides.util.DefaultAdapter;
 
 public class PointModel extends ColorModel<Punt> {
+	private static final Logger LOG = Logger.getLogger(PointModel.class.getName());
 	int   size = 5;
 	PointType  type = PointType.DISK;
 	public boolean rigid = true;
@@ -34,14 +36,11 @@ public class PointModel extends ColorModel<Punt> {
 		rigid = value.getBoolean("rigid", true);
 	}
 
-//	/* (non-Javadoc)
-//	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#toMap()
-//	 */
-//	@Override
-//	public Map<String, Object> toMap() {
-//		// TODO Auto-generated method stub
-//		return super.toMap();
-//	}
-//
+	@Override
+	public Map<String, Object> toMap() {
+		LOG.info("item = " + item);
+		return super.toMap();
+	}
+
 	
 }
