@@ -1285,7 +1285,7 @@ public class KladjeGWTVeld
 		
 		if(mouseMode!=ivmOptie && currentStrokeContainer!=null && !currentStrokeContainer.isNotRelevant())
 		{	g.setFillStyle( CssColor.make("rgba(200,200,200,0.5)"));
-			g.fillRect(0, 0, breedte, hoogte);
+			//g.fillRect(0, 0, breedte, hoogte);
 		}
 		
 		if(mouseMode == formuleOptie)
@@ -3205,7 +3205,7 @@ public class KladjeGWTVeld
 			startX = eventX;
 			startY = eventY;
 			
-			if(currentHiddenStrokeContainer==null)
+			if(currentHiddenStrokeContainer==null && currentStrokeContainer==null)
 			{
 				currentHiddenStrokeContainer = findHiddenStrokeContainer(eventX, eventY);
 				if(currentHiddenStrokeContainer!=null)
@@ -3298,7 +3298,7 @@ public class KladjeGWTVeld
 				return;
 			}
 			
-			if((currentStrokeContainer==null || !currentStrokeContainer.writeBoxContains(eventX, eventY)) && proActiveStrokeContainer==null) {
+			if((currentStrokeContainer==null && currentHiddenStrokeContainer==null || !currentStrokeContainer.writeBoxContains(eventX, eventY)) && proActiveStrokeContainer==null) {
 				currentStrokeContainer = new KStrokeContainer(this);
 				currentStrokeContainer.setActive(true);
 				kStrokeContainers.add(currentStrokeContainer);

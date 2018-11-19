@@ -25,6 +25,7 @@ public class KStrokeContainer {
 	private boolean popupMode = false;
 	private double activeTranslationX;
 	private double activeTranslationY;
+	private double correctieX;
 	
 	private CssColor drawingColor = CssColor.make(80, 80, 80);
 	private Rectangle defaultBox;
@@ -62,14 +63,27 @@ public class KStrokeContainer {
 		writeBox = null;
 		boolean b = strokeContainer.addStroke(stroke);
 		logger.info(strokeContainer.getFormulaString());
+		//if(!"-".equals(stroke.getOneStrokeTeken()))
 		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
 		formuleViewer.setColor(CssColor.make(38, 115, 182));
 		//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		
+		corrigeerSCPositie();
 		if(getStrokeCount()==0)
 			box = defaultBox;
 		
 		return b;
+	}
+	
+	public void corrigeerSCPositie() {
+		if(active && getBox()!=null) {
+			int correctieX = Math.max(0, getBox().x+getBox().width+80+47 - parent.breedte-20);
+			int correctieY = Math.min(0,getBox().y-70);
+			activeTranslationX += correctieX;
+			activeTranslationY += correctieY; 
+			
+			translate((int)-correctieX,(int)-correctieY);
+		}
 	}
 	
 	public void wis() {
@@ -187,10 +201,17 @@ public class KStrokeContainer {
 				drawShadow(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
-				g.setStrokeStyle(CssColor.make(80, 80, 80));
-				
 				//g.setFillStyle(CssColor.make(239, 241, 243));
 				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
+				
+//				g.setStrokeStyle(CssColor.make(255, 0, 0));
+//				
+//				g.beginPath();
+//				g.rect(getBox().x,(int)strokeContainer.averageBaseLine-strokeContainer.averageHeight, getBox().width, strokeContainer.averageHeight);
+//				g.closePath();
+//				g.stroke();
+//				
+//				g.setStrokeStyle(CssColor.make(80, 80, 80));
 
 				drawcloseButton(g, getCloseButtonArea());
 				
@@ -390,10 +411,25 @@ public class KStrokeContainer {
 		}
 	}
 	
+//	public void setActive (boolean b) {
+//		active = b;
+//		if(active && getBox()!=null) {
+//			activeTranslationX = getBox().x - 40;
+//			activeTranslationY = 0; 
+//			if(getBox().y<70)
+//				activeTranslationY = getBox().y-70;
+//			if(getBox().y+getBox().height>parent.hoogte-70) 
+//				activeTranslationY = getBox().y+getBox().height - (parent.hoogte-70);
+//			translate((int)-activeTranslationX,(int)-activeTranslationY);
+//		}
+//		else if(getBox()!=null)
+//			translate((int)activeTranslationX, (int)activeTranslationY);
+//	}
+	
 	public void setActive (boolean b) {
 		active = b;
 		if(active && getBox()!=null) {
-			activeTranslationX = getBox().x - 40;
+			activeTranslationX = Math.max(0, getBox().x+getBox().width+100+47 - parent.breedte-20);
 			activeTranslationY = 0; 
 			if(getBox().y<70)
 				activeTranslationY = getBox().y-70;
@@ -454,17 +490,19 @@ public class KStrokeContainer {
 	public Rectangle getWriteBox() {
 		int margin = 50;
 		if(writeBox==null && strokeContainer != null && strokeContainer.getBoundingBox()!=null) {
-//			int x = (int)strokeContainer.getBoundingBox().x;
-//			int y = (int)strokeContainer.getBoundingBox().y;
-//			int width = (int)strokeContainer.getBoundingBox().width;
-//			int height = (int)strokeContainer.getBoundingBox().height;
+			int xSC = (int)strokeContainer.getBoundingBox().x;
+			int ySC = (int)strokeContainer.getBoundingBox().y;
+			int widthSC = (int)strokeContainer.getBoundingBox().width;
+			int heightSC = (int)strokeContainer.getBoundingBox().height;
 			
-			int width = parent.breedte-40;
-			int height = Math.min(parent.hoogte-40, (int)strokeContainer.getBoundingBox().height + 2*margin);
+			int x = Math.max(20,xSC - margin);
+			int y = (int)Math.max(20, ySC - margin-10);
 			
-			int x = 20;
-			int y = (int)Math.max(20,strokeContainer.getBoundingBox().y - margin-10);
-			y= (int)Math.min(y, parent.hoogte - height -20);
+			int width = Math.min(parent.breedte-40, widthSC+3*margin+47); //47 is breedte gele strook met knoppen)
+			int height = Math.min(parent.hoogte-40, heightSC + 2*margin);
+			
+			x = (int)Math.min(x, parent.breedte - width -20);
+			y = (int)Math.min(y, parent.hoogte - height -20);
 			
 			
 			writeBox = new Rectangle(x, y, width, height);

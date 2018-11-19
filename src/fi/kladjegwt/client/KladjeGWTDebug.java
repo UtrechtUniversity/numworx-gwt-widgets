@@ -23,7 +23,7 @@ public class KladjeGWTDebug extends KladjeGWT {
 		HashMap<String, Object> launchdata = new HashMap<String, Object>();
 		launchdata.put("formuleOptie", Boolean.TRUE);
 		init(breedte, hoogte, launchdata, new HashMap<String, Number>());
-		setCommunicationRoot(new MockOpdrNav());
+		//setCommunicationRoot(new MockOpdrNav());
 	}	
 
 
