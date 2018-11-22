@@ -41,206 +41,205 @@ public class DomeinButtonGWT extends Button {
 	
 	private ClickHandler listener;
 	
-	private String[] domeinString = new String[] {"$f" + Double.NEGATIVE_INFINITY + "@", "$f" + Double.POSITIVE_INFINITY + "@"};
+	private String[] domeinStrings = new String[] {"$f" + Double.NEGATIVE_INFINITY + "@", "$f" + Double.POSITIVE_INFINITY + "@"};
 	
 	private boolean tabletAan;
 	//private Tablet tablet;
    // private FormuleVakHouder tabletUser;
     private boolean tabletAdded;
+    /**
+     * Interactiepanel is nodig om het ingestelde domein door te geven.
+     */
+    private GraphToolGWT interactiePanel;
+    /**
+     * De index van de domeinbutton.
+     */
+    private int index;
     
-    
-    public DomeinButtonGWT()
-    {	//zet tekst "D": 
-    	super("D");
-    	
-    	frame = new DialogBox(false);
-    	frame.setStyleName("domeinpanel");
-    	frameContents = new LayoutPanel();
-    	final IsWidget wrap = wrap(frameContents);
+    public DomeinButtonGWT(GraphToolGWT interactiePanel, int index)
+    {	
+		// zet tekst "D":
+		super("D");
+
+		this.interactiePanel = interactiePanel;
+		this.index = index;
+		
+		frame = new DialogBox(false);
+		//frame.setStyleName("domeinpanel");
+		frameContents = new LayoutPanel();
+		final IsWidget wrap = wrap(frameContents);
 		frame.add(wrap);
-		//this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX); 
-    	frameContents.setSize("250px", "80px");
-    	
-    	//domeinPanel = new JPanel();
-		//bottomPanel = new JPanel();
-        
-        //Box boxv = Box.createVerticalBox();
-        
-        //Box boxh = Box.createHorizontalBox();
-        //boxh.add(Box.createHorizontalStrut(10));
-        String xMinTekst = "";
-        String xMaxTekst = "";
-        if(domeinString[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
-        	xMinTekst = Double.toString(Double.NEGATIVE_INFINITY);
-        else if(FormuleParser.geefExpressie(domeinString[0]) != null)
-        	xMinTekst = "" + FormuleParser.geefExpressie(domeinString[0]).geefWaarde();
-        	//xMinTekst = df.format(FormuleParser.geefExpressie(domeinString[0]).geefWaarde());
-        else
-        	xMinTekst = (String) domeinString[0].subSequence(2, domeinString[0].length() - 1);
-        if(domeinString[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
-        	xMaxTekst = Double.toString(Double.POSITIVE_INFINITY);
-        else if(FormuleParser.geefExpressie(domeinString[1]) != null)
-        	xMaxTekst = "" + FormuleParser.geefExpressie(domeinString[1]).geefWaarde();
-        	//xMaxTekst = df.format(FormuleParser.geefExpressie(domeinString[1]).geefWaarde());
-        else
-        	xMaxTekst = (String) domeinString[1].subSequence(2, domeinString[1].length() - 1);
-       
-        huidigDomeinLabel = new Label(GraphToolGWT.rb.fc_huidigDomein() + " [ " + 
-        		xMinTekst + ";" + xMaxTekst + "]");
-        //boxh.add(label);
-        frameContents.add(huidigDomeinLabel);
-        frameContents.setWidgetLeftRight(huidigDomeinLabel, 5, Style.Unit.PX, 5, Style.Unit.PX);
-        frameContents.setWidgetTopHeight(huidigDomeinLabel, 5, Style.Unit.PX, 20, Style.Unit.PX);
-        
-        
-        //boxv.add(boxh);
-        //boxv.add(Box.createVerticalStrut(10));
-        
-        //Box boxh2 = Box.createHorizontalBox();
-        HorizontalPanel nieuwDomeinPanel = new HorizontalPanel();
-        frameContents.add(nieuwDomeinPanel);
-        frameContents.setWidgetLeftRight(nieuwDomeinPanel, 5, Style.Unit.PX, 5, Style.Unit.PX);
-        frameContents.setWidgetTopHeight(nieuwDomeinPanel, 30, Style.Unit.PX, 30, Style.Unit.PX);
-        
-        Label nieuwDomein = new Label(GraphToolGWT.rb.fc_nieuwDomein());
-        nieuwDomeinPanel.add(nieuwDomein);
-        //boxh2.add(nieuwDomein);
-        Label haakLinks = new Label("[");
-        nieuwDomeinPanel.add(haakLinks);
-        //boxh2.add(haakLinks);
-      
-        xMinVak = new DomeinVakGWT();
-		//xMinVak.addActionListener(this);
-        xMinVak.setSize("50px", "25px");
-        //xMinVak.setPreferredSize(new Dimension(50, 25));
-        nieuwDomeinPanel.add(xMinVak);
-       
-        Label komma = new Label(",");
-        nieuwDomeinPanel.add(komma);
-        xMaxVak = new DomeinVakGWT();
-        //xMaxVak.addActionListener(this);
-        //xMaxVak.setPreferredSize(new Dimension(50, 25));
-        xMaxVak.setSize("50px", "25px");
-        nieuwDomeinPanel.add(xMaxVak);
-      
-        Label haakRechts = new Label("]");
-        nieuwDomeinPanel.add(haakRechts);
-        //boxv.add(boxh2);
-        //domeinPanel.add(boxv);
-        
-       
-        // lijkt vrij zinloos:
-       
-        xMinVak.zetMinBreedte(50);
-        //xMinVak.zetMaat();
-        xMaxVak.zetMinBreedte(50);
-        //xMaxVak.zetMaat();
-        
-        
-        listener = new ClickHandler()
-        {
-        	public void onClick(ClickEvent e)
-        	{
-        		makeDomeinString();
-        		frame.hide();
-        	}
-        };
-        
-        okButton = new Button("Ok", listener);
-        //okButton.addActionListener(this);
-        frameContents.add(okButton);
-        frameContents.setWidgetLeftWidth(okButton, 5, Style.Unit.PX, 50, Style.Unit.PX);
-        frameContents.setWidgetTopHeight(okButton, 65, Style.Unit.PX, 20, Style.Unit.PX);
-        
-       // bottomPanel.add(okButton);
-        
-        listener = new ClickHandler()
-        {
-        	public void onClick(ClickEvent e)
-        	{
-        		xMinVak.maakEditorLeeg();
-        		xMaxVak.maakEditorLeeg();
-        		frame.hide();
-        	}
-        };
-        cancelButton = new Button("Cancel", listener);
-        //cancelButton.addActionListener(this);
-        frameContents.add(cancelButton);
-        frameContents.setWidgetRightWidth(cancelButton, 5, Style.Unit.PX, 50, Style.Unit.PX);
-        frameContents.setWidgetTopHeight(cancelButton, 65, Style.Unit.PX, 20, Style.Unit.PX);
-        //bottomPanel.add(cancelButton);
-        
-		//scrollPane = new JScrollPane(domeinPanel);
-    	
-    	frame.setWidget(frameContents);
-    	
-    	
-    	
-    	listener = new ClickHandler()
-    	{
-    		public void onClick(ClickEvent e)
-    		{
-    			System.out.println("D-knop handler");
-    			frame.center();
-    		}
-    	};
-    	this.addClickHandler(listener);
-    	
-    	
+		frameContents.setSize("250px", "90px");
+
+		String xMinTekst = "";
+		String xMaxTekst = "";
+		if (domeinStrings[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
+			xMinTekst = Double.toString(Double.NEGATIVE_INFINITY);
+		else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])) != null)
+			xMinTekst = "" + FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])).geefWaarde();
+		else
+			xMinTekst = (String) domeinStrings[0].subSequence(2, domeinStrings[0].length() - 1);
+		if (domeinStrings[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
+			xMaxTekst = Double.toString(Double.POSITIVE_INFINITY);
+		else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])) != null)
+			xMaxTekst = "" + FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])).geefWaarde();
+		else
+			xMaxTekst = (String) domeinStrings[1].subSequence(2, domeinStrings[1].length() - 1);
+
+		huidigDomeinLabel = new Label(GraphToolGWT.rb.fc_huidigDomein() + " [ " + xMinTekst + ";" + xMaxTekst + "]");
+		frameContents.add(huidigDomeinLabel);
+		frameContents.setWidgetLeftRight(huidigDomeinLabel, 5, Style.Unit.PX, 5, Style.Unit.PX);
+		frameContents.setWidgetTopHeight(huidigDomeinLabel, 5, Style.Unit.PX, 20, Style.Unit.PX);
+
+		HorizontalPanel nieuwDomeinPanel = new HorizontalPanel();
+		frameContents.add(nieuwDomeinPanel);
+		frameContents.setWidgetLeftRight(nieuwDomeinPanel, 5, Style.Unit.PX, 5, Style.Unit.PX);
+		frameContents.setWidgetTopHeight(nieuwDomeinPanel, 30, Style.Unit.PX, 30, Style.Unit.PX);
+
+		Label nieuwDomein = new Label(GraphToolGWT.rb.fc_nieuwDomein());
+		nieuwDomeinPanel.add(nieuwDomein);
+		Label haakLinks = new Label("[");
+		nieuwDomeinPanel.add(haakLinks);
+
+		xMinVak = new DomeinVakGWT();
+		xMinVak.setSize("50px", "25px");
+		nieuwDomeinPanel.add(xMinVak);
+		xMinVak.getEditor().requestFocus();
+
+		Label komma = new Label(",");
+		nieuwDomeinPanel.add(komma);
+		xMaxVak = new DomeinVakGWT();
+		xMaxVak.setSize("50px", "25px");
+		nieuwDomeinPanel.add(xMaxVak);
+
+		Label haakRechts = new Label("]");
+		nieuwDomeinPanel.add(haakRechts);
+
+		// lijkt vrij zinloos:
+		xMinVak.zetMinBreedte(50);
+		xMaxVak.zetMinBreedte(50);
+
+		listener = new ClickHandler()
+		{
+			public void onClick(ClickEvent e)
+			{
+				makeDomeinString();
+				frame.hide();
+			}
+		};
+
+		okButton = new Button("OK", listener);
+		frameContents.add(okButton);
+//		frameContents.setWidgetLeftWidth(okButton, 5, Style.Unit.PX, 50, Style.Unit.PX);
+		frameContents.setWidgetLeftWidth(okButton, 45, Style.Unit.PX, 60, Style.Unit.PX);
+		frameContents.setWidgetTopHeight(okButton, 65, Style.Unit.PX, 20, Style.Unit.PX);
+
+		listener = new ClickHandler()
+		{
+			public void onClick(ClickEvent e)
+			{
+//				xMinVak.maakEditorLeeg(); // waarom leegpoetsen bij cancel?
+//				xMaxVak.maakEditorLeeg();
+				frame.hide();
+			}
+		};
+		cancelButton = new Button("Cancel", listener);
+		frameContents.add(cancelButton);
+//		frameContents.setWidgetRightWidth(cancelButton, 5, Style.Unit.PX, 50, Style.Unit.PX);
+		frameContents.setWidgetRightWidth(cancelButton, 45, Style.Unit.PX, 60, Style.Unit.PX);
+		frameContents.setWidgetTopHeight(cancelButton, 65, Style.Unit.PX, 20, Style.Unit.PX);
+
+		frame.setWidget(frameContents);
+
+		listener = new ClickHandler()
+		{
+			public void onClick(ClickEvent e)
+			{
+				frame.center();
+			}
+		};
+
+		this.addClickHandler(listener);
     }
+    
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
+	}
     
     public void zetDomeinString(String[] domeinString)
 	{
-		if(domeinString == null)
-			this.domeinString = null;
+		if (domeinString == null)
+			this.domeinStrings = null;
 		else
-		{	this.domeinString = new String[2];
-			this.domeinString[0] = domeinString[0];
-			this.domeinString[1] = domeinString[1];
+		{
+			this.domeinStrings = new String[2];
+			this.domeinStrings[0] = domeinString[0];
+			this.domeinStrings[1] = domeinString[1];
 		}
 		String xMinTekst = "";
-        String xMaxTekst = "";
-        if(domeinString[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
-        	xMinTekst = Double.toString(Double.NEGATIVE_INFINITY);
-        else if(FormuleParser.geefExpressie(domeinString[0]) != null)
-        	xMinTekst = "" + FormuleParser.geefExpressie(domeinString[0]).geefWaarde();
-        else
-        	xMinTekst = (String) domeinString[0].subSequence(2, domeinString[0].length() - 1);
-        if(domeinString[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
-        	xMaxTekst = Double.toString(Double.POSITIVE_INFINITY);
-        else if(FormuleParser.geefExpressie(domeinString[1]) != null)
-        	xMaxTekst = "" + FormuleParser.geefExpressie(domeinString[1]).geefWaarde();
-        else
-        	xMaxTekst = (String) domeinString[1].subSequence(2, domeinString[1].length() - 1);
-        
-		huidigDomeinLabel.setText(GraphToolGWT.rb.fc_huidigDomein() + " [ " + 
-        		xMinTekst + ";" + xMaxTekst + "]");
+		String xMaxTekst = "";
 		
+		// zet oud minimum
+		if (domeinString[0].equals(addFormulaCodes(String.valueOf(Double.NEGATIVE_INFINITY)))
+			|| domeinString[0].equals(String.valueOf(Double.NEGATIVE_INFINITY)))
+			xMinTekst = Double.toString(Double.NEGATIVE_INFINITY);
+		else if (FormuleParser.geefExpressie(addFormulaCodes(domeinString[0])) != null)
+			xMinTekst = "" + FormuleParser.geefExpressie(addFormulaCodes(domeinString[0])).geefWaarde();
+		else
+			xMinTekst = (String) domeinString[0].subSequence(2, domeinString[0].length() - 1);
+		
+		// zet oud maximum
+		if (domeinString[1].equals(addFormulaCodes(String.valueOf(Double.POSITIVE_INFINITY)))
+			|| domeinString[1].equals(String.valueOf(Double.POSITIVE_INFINITY)))
+			xMaxTekst = Double.toString(Double.POSITIVE_INFINITY);
+		else if (FormuleParser.geefExpressie(addFormulaCodes(domeinString[1])) != null)
+			xMaxTekst = "" + FormuleParser.geefExpressie(addFormulaCodes(domeinString[1])).geefWaarde();
+		else
+			xMaxTekst = (String) domeinString[1].subSequence(2, domeinString[1].length() - 1);
+
+		// update huidig domein label
+		huidigDomeinLabel.setText(GraphToolGWT.rb.fc_huidigDomein() + " [ " + xMinTekst + ";" + xMaxTekst + "]");
 	}
     
-    private void makeDomeinString(){   
-    	String[] oudDomeinString = new String[2];
-		if(domeinString != null)
-		{	oudDomeinString[0] = domeinString[0];
-			oudDomeinString[1] = domeinString[1];
+	private void makeDomeinString()
+	{
+		String[] oudDomeinString = new String[2];
+		if (domeinStrings != null)
+		{
+			oudDomeinString[0] = domeinStrings[0];
+			oudDomeinString[1] = domeinStrings[1];
 		}
-		domeinString = new String[2];
-    	domeinString[0] = xMinVak.geefTekst();
-    	domeinString[1] = xMaxVak.geefTekst();
-    	if(domeinString[0].equals("$f@"))
-    		domeinString[0] = "$f" + Double.NEGATIVE_INFINITY + "@";
-    	if(domeinString[1].equals("$f@"))
-    		domeinString[1] = "$f" + Double.POSITIVE_INFINITY + "@";
-    	
-		//produceAction("maak Domein");
+		domeinStrings = new String[2];
+		domeinStrings[0] = xMinVak.geefTekst();
+		domeinStrings[1] = xMaxVak.geefTekst();
+		
+		// update grafiek
+		double[] domein;
+		if ("".equals(domeinStrings[0]))
+			domeinStrings[0] = String.valueOf(Double.NEGATIVE_INFINITY);
+		if ("".equals(domeinStrings[1]))
+			domeinStrings[1] = String.valueOf(Double.POSITIVE_INFINITY);
+		
+		zetDomeinString(domeinStrings);
+		
+		domein = new double[] {Double.parseDouble(domeinStrings[0]), Double.parseDouble(domeinStrings[1])};
+		interactiePanel.zetDomein(domein, index);
+		interactiePanel.grafiekGWTVeld.paint();
+		if (interactiePanel.formuleComponent.alsOpdracht)
+			interactiePanel.kijkNa();
 	}
     
     public String[] getDomeinString()
 	{
-		return domeinString;
+		return domeinStrings;
 	}
-    
-    
-
 }

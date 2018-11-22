@@ -2195,22 +2195,21 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		//	grafiekGWTVeld.paint();
 	}
 	
-	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update, boolean setState, boolean docent) {	
+	public void zetFunctie(int nr, Expressie e, String expString, String expNaam, double[] domein, boolean update,
+		boolean setState, boolean docent)
+	{
 		functies[nr] = e;
 		domeinen[nr][0] = domein[0];
 		domeinen[nr][1] = domein[1];
-		if (update) {
+		if (update)
+		{
 			grafiekGWTVeld.paint();
 		}
-		
-		if(!tabelAlsTekenTool)
-		{	
+
+		if (!tabelAlsTekenTool)
+		{
 			tabelComponent.zetFunctie(nr, e, expNaam, update, setState);
 		}
-		
-		
-		//if(paint)
-			//grafiekGWTVeld.paint();
 	}
 	
 	public void zetVectorVeld(int stelselNr, int functieNr, Expressie expressie) {
@@ -4767,51 +4766,55 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 	}
 	
-	public void acceptCBookEvent(CBookEvent event) {
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
+	}
+    
+	public void acceptCBookEvent(CBookEvent event)
+	{
 		String command = event.getCommand();
-// 		System.out.println("event = "+ event.toString());
-// 		System.out.println("command = "+ command.toString());
-//		System.out.println("accepted");
 		
-		if(command.equals("input")) {
-	 		String formuleString = (String)event.getMessage();
-//	 		System.out.println("input:: "+formuleString);
-//			getFormuleComponent().geefFormuleVak().vulVak(formuleString); RPJ == from active java version
-//			getFormuleComponent().geefFormuleVak().finish(); RPJ == from active java version
+		if(command.equals("input"))
+		{
+	 		String formuleString = (String) event.getMessage();
 		}
 
-		if ( command.startsWith("expression")) {	
+		if (command.startsWith("expression"))
+		{
 			String indexString = command.substring(11);
-			int index = Integer.parseInt(indexString)-1;
-			
-			String formuleString = (String)event.getMessage();
-			if ((formuleString.length()<3) || (!formuleString.substring(0,2).equals("$f"))) {
-				formuleString = "$f" + formuleString + "@";
+			int index = Integer.parseInt(indexString) - 1;
+
+			String formuleString = (String) event.getMessage();
+			if ((formuleString.length() < 3) || (!formuleString.substring(0, 2).equals("$f")))
+			{
+				formuleString = addFormulaCodes(formuleString);
 			}
 			
-//* Testmessages 
-//	 		System.out.println("command = "+ command.toString());
-//	 		System.out.println("indexString = "+ indexString);
-//	 		System.out.println("formuleString = "+formuleString);
-//*/
 	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
 	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
 	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
 		}
 				
-		if(command.equals("equation.twoGraphs"))
+		if (command.equals("equation.twoGraphs"))
 		{
-			String vergelijkingString = (String)event.getMessage();
-			if(!vergelijkingString.substring(0,2).equals("$f")) vergelijkingString = "$f"+vergelijkingString+"@";
-//			System.out.println("vergelijkingString: "+vergelijkingString);
-//			getFormuleComponent().zetVergelijking(0, vergelijkingString); RPJ == from active java version
-			
+			String vergelijkingString = (String) event.getMessage();
+			if (!vergelijkingString.substring(0, 2).equals("$f"))
+				vergelijkingString = "$f" + vergelijkingString + "@";
 		}
-		if(event.getCommand().equals("draw_functions")) {
-//	 		System.out.println("draw_functions:: "+(String)event.getMessage());
-
+		if (event.getCommand().equals("draw_functions"))
+		{
 			Map map = (Map)event.getParameters();
-			if(map!=null) {	
+			if (map!=null)
+			{	
 				
 //				 BEGIN OLD JAVA ANNOTATION :: could be hint for new implmentation :: see next RPJ statement
 //				String numberString = (String)map.get("number");
@@ -4854,13 +4857,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 		}
 		
-		if(event.getCommand().equals("double.trace")) {
-//	 		System.out.println("double.trace:: "+(String)event.getMessage());
-	 		
+		if (event.getCommand().equals("double.trace"))
+		{
 			Map map = (Map)event.getParameters();
-			if(map!=null)
-			{	String name = (String)map.get("name");
-				if(grafiekXAsNaam.equals(name)) {
+			if (map!=null)
+			{
+				String name = (String)map.get("name");
+				if (grafiekXAsNaam.equals(name))
+				{
 // RPJ START == from active java version					
 //					tracing = true;
 //					double xWaarde = ((Double)map.get("value")).doubleValue();
@@ -4873,11 +4877,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				}
 			}
 		}
-		if(event.getCommand().equals("double.parameter")) {	
-//	 		System.out.println("double.parameter:: "+(String)event.getMessage());
-
+		if(event.getCommand().equals("double.parameter"))
+		{
 			Map map = (Map)event.getParameters();
-			if(map!=null) {	
+			if (map!=null)
+			{	
 				String name = (String)map.get("name");
 				double waarde = ((Double)map.get("value")).doubleValue();
 // RPJ START == from active java version
@@ -4890,9 +4894,28 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 //				gv.repaint();
 //RPJ END 			
 			}
-		}
-		
+		}	
 	}
-
 	
+	/**
+	 * Zet de domeinen.
+	 * 
+	 * @param domeinen
+	 */
+	public void zetDomeinen(double[][] domeinen)
+	{
+		this.domeinen = domeinen;
+	}
+	
+	/**
+	 * Zet het domein met de gegeven index in domeinen.
+	 * 
+	 * @param domein
+	 * @param index
+	 */
+	public void zetDomein(double[] domein, int index)
+	{
+		if (index <= domeinen.length)
+			this.domeinen[index] = domein;
+	}
 }

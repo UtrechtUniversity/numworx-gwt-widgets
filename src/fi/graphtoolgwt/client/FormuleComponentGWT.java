@@ -98,7 +98,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 		public void enter() {
             
 			fc.parseFormule(regelnummer, false);
-			if(fc.alsOpdracht)
+			if (fc.alsOpdracht)
 				fc.interactiePanel.kijkNa();
 			else
 				fc.interactiePanel.setComRootChanged(false);
@@ -355,7 +355,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		
 		for(int i = 0; i < domeinButtons.length; i++)
 		{
-			domeinButtons[i] = new DomeinButtonGWT();
+			domeinButtons[i] = new DomeinButtonGWT(interactiePanel, i);
 		}
 		
 	
@@ -456,9 +456,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
 			if(functieBeginAanpasbaar && functieBeginZichtbaar)
 				editors[i].insert(functieBegin[i]);
-			if(domeinInstelbaar)
-			{	regelPanels[i].add(domeinButtons[i]);
-				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
+			if (domeinInstelbaar)
+			{
+				regelPanels[i].add(domeinButtons[i]);
+				regelPanels[i].setWidgetRightWidth(domeinButtons[i], 0, Style.Unit.PX, 25, Style.Unit.PX);
 				regelPanels[i].setWidgetTopHeight(domeinButtons[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
 			}
 			editors[i].setCurrentElementRepaint();
@@ -784,177 +785,214 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	*/
 	
 	public void parseFormule(int regelnummer, boolean setState)
-	{	//if(regelnummer >= viewers.size())
-		//	return;
-	
-		String s = editors[regelnummer].toString();
-        if(!functieBeginAanpasbaar)
-        {     s = functieBegin[regelnummer] + s;
-        }
-        //System.out.println("parseFormule: " + s);
-        parseFormule(s, regelnummer, setState);
+	{
+		// if(regelnummer >= viewers.size())
+		// return;
 
+		String s = editors[regelnummer].toString();
+		if (!functieBeginAanpasbaar)
+		{
+			s = functieBegin[regelnummer] + s;
+		}
+		
+		// System.out.println("parseFormule: " + s);
+		parseFormule(s, regelnummer, setState);
 	}
 	
-	public void updateFormulas() {
-		for (int i=0; i<aantalRegels; i++ ) {
+	public void updateFormulas()
+	{
+		for (int i = 0; i < aantalRegels; i++)
+		{
 			parseFormule(i, false);
 		}
 	}
 	
 	public void parseFormule(String s, int regelnummer, boolean setState)
-    {   
-		//In alle lijstjes met expressies het huidige regelnummer verwijderen. 
-          //Zo voorkom je dat expressies blijven staan als het type expressie verandert.
-        if(interactiePanel != null && interactiePanel.typeOpdracht != 1 && regelnummer < domeinButtons.length)
-        	domeinButtons[regelnummer].setVisible(false);
-          isOngelijkheid[regelnummer] = false;
-          if(interactiePanel != null)
-          {     interactiePanel.zetOngelijkheid(regelnummer, null, true, true, false);
-                interactiePanel.zetFunctie(regelnummer, null, "$f@", null, DEFAULTDOMEIN, true, setState, false);
-                interactiePanel.zetVerticaleLijn(regelnummer, null);
-          }
-          
-          try
-          {
-          //s = s.substring(2,s.length()-1);
-          
-	          if(s.length()==0)
-	          {   //grafiekGWTVeld.paint();  
-	        	  return;
-	          }
-	          String[] vergTekens = {"=", ">", "<", "\u2264", "\u2265"};
-	          int tekenGetal = 0;
-	          String[] expressieStrings = null;
-	          Expressie e1 = null; //nu nog niet gebruikt, maar dat komt nog wel bij parametrisaties.
-	          Expressie e2 = null;
-	                
-	          boolean split = false;
-	          for(int j=0 ; j<vergTekens.length && !split; j++)
-	          {	
-	        	  expressieStrings  = split(s,vergTekens[j]);
-	        	  //logger.info("vergTeken = " + vergTekens[j] + ", en aantal expressieStrings is: " + expressieStrings.length);
-	              
-	        	  if(expressieStrings.length==2)
-	        	  {
-	        		  e1 = FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$f" + expressieStrings[0] + "@")));
-//	        		  logger.info("in splitten: expressieStrings[1] =  " + expressieStrings[1] + "; gaat nu parsen"); 
-//	        		  String formuleString = FormuleParser.formuleString("$f" + expressieStrings[1] + "@");
-//	        		  logger.info("FormuleParser.formuleString(blabla) = " + formuleString);
-//	        		  String schoon = FormuleParser.schoon(formuleString);
-//	        		  logger.info("FormuleParser.schoon(blabla) = " + schoon);
-	        		  
-	        		  e2 = FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$f" + expressieStrings[1] + "@")));
-	        		  
-	                  if(expressieStrings[0] == null || expressieStrings[1] == null) 
-	                  {     split = false;
-	                  }
-	                  else 
-	                  {     split = true;
-	                        tekenGetal = j;
-	                  }
-	                  break;
-	        	  }
-	          }
-	          if(!functieBeginAanpasbaar && expressieStrings.length == 2)
-	        	  vulFunctieRegel(expressieStrings[0], expressieStrings[1], regelnummer);
-	          
-	  		    
-	  		  if(!split)
-	  		  {		//grafiekGWTVeld.paint();
-	  			  return;
-	  		  }
-	  		  while(expressieStrings[0].endsWith(" "))
-	  		  {    expressieStrings[0] = expressieStrings[0].substring(0, expressieStrings[0].length() - 1);
-	  		  }
-	          if(expressieStrings[0] == null || expressieStrings[1] == null)
-	          {
-	        	  //grafiekGWTVeld.paint();
-	    		  return;
-	          }
-	          if(tekenGetal > 0 && !ongelijkheidToegestaan) // geval ongelijkheid
-	          {	
-	        	  editors[regelnummer].clearAll();
-	        	  //formuleVakken[regelnummer].formuleVak.vulVak("$f@");
-	        	  //grafiekGWTVeld.paint();
-	        	  return;
-	          }
-		      else if(tekenGetal > 0)  
-		      { if(expressieStrings[0].equals(xAsNaam))
-		        {     boolean isGroterGelijk = true;
-		              if(tekenGetal == 2 || tekenGetal == 3)
-		                  isGroterGelijk = false;
-		              if(checkboxen[regelnummer].getValue())
-		                  interactiePanel.zetOngelijkheid(regelnummer, e2, false, isGroterGelijk, isEn[regelnummer]); 
-		              isOngelijkheid[regelnummer] = true;
-		        }
-		        else if(expressieStrings[0].equals(yAsNaam))
-		        {     boolean isGroterGelijk = true;
-		              if(tekenGetal == 2 || tekenGetal == 3)
-		                   isGroterGelijk = false;
-		              if(checkboxen[regelnummer].getValue())
-		                   interactiePanel.zetOngelijkheid(regelnummer, e2, true, isGroterGelijk, isEn[regelnummer]); 
-		              isOngelijkheid[regelnummer] = true;
-		        }
-		      }//let op: neemt nu ook uitdrukkingen als sin(x) mee.
-		      else //tekenGetal = 0
-		      {    if(expressieStrings[0].equals(yAsNaam) || expressieStrings[0].endsWith("(" + xAsNaam + ")"))
-			      {	if(!functieToegestaan)
-			        {     //formuleVakken[regelnummer].formuleVak.vulVak("$f@");
-			        //regel leegmaken
-			    	  	//grafiekGWTVeld.paint();
-			    	  	return;
-			        }
-				    else
-				    { 
-				        if(geselecteerd[regelnummer])
-				        {   interactiePanel.zetFunctie(regelnummer, e2, "$f" + expressieStrings[1] +"@", expressieStrings[0], domeinen[regelnummer], true, setState, false);
-				            domeinButtons[regelnummer].setVisible(domeinInstelbaar);
-				        }
-				        
-				    } 
-			      }
-		          else if(expressieStrings[0].equals(xAsNaam))
-		          { if(!verticaleLijnToegestaan)
-		            {     //regel leegmaken
-		                  //formuleVakken[regelnummer].formuleVak.vulVak("$f@");
-		              //grafiekGWTVeld.paint();   
-		        	  return;
-		            }
-		            else
-		            {   if(geselecteerd[regelnummer])
-		                        interactiePanel.zetVerticaleLijn(regelnummer, e2);
-		            }
-		          }
-		          else
-		            //regel leegmaken
-		            //formuleVakken[regelnummer].formuleVak.vulVak("$f@");
-		            ;
-		      }
-	      }
-	      catch(Exception e){}
-	      zetEnOfKnoppen();
-	      //resize();
-	      if(interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT 
-	    		  && interactiePanel.mode != OpdrNavIF.ZELFTOETS 
-	    		  && interactiePanel.mode != OpdrNavIF.EINDTOETS)
-	    	  interactiePanel.kijkNa();
-	      else
-	    	  interactiePanel.setComRootChanged(false);
-	      //grafiekGWTVeld.paint();
+    {
+		// In alle lijstjes met expressies het huidige regelnummer verwijderen.
+		// Zo voorkom je dat expressies blijven staan als het type expressie
+		// verandert.
+		if (interactiePanel != null && interactiePanel.typeOpdracht != 1 && regelnummer < domeinButtons.length)
+			domeinButtons[regelnummer].setVisible(false);
+		isOngelijkheid[regelnummer] = false;
+		if (interactiePanel != null)
+		{
+			interactiePanel.zetOngelijkheid(regelnummer, null, true, true, false);
+			if (interactiePanel.domeinen != null 
+				&& interactiePanel.domeinen.length >= regelnummer 
+				&& interactiePanel.domeinen[regelnummer] != null)
+			{
+				interactiePanel.zetFunctie(regelnummer, null, "$f@", null, interactiePanel.domeinen[regelnummer], true, setState, false);
+			}
+			else
+			{
+				interactiePanel.zetFunctie(regelnummer, null, "$f@", null, DEFAULTDOMEIN, true, setState, false);
+			}
+			interactiePanel.zetVerticaleLijn(regelnummer, null);
+		}
+
+		try
+		{
+			// s = s.substring(2,s.length()-1);
+
+			if (s.length() == 0)
+			{ // grafiekGWTVeld.paint();
+				return;
+			}
+			String[] vergTekens =
+			{ "=", ">", "<", "\u2264", "\u2265" };
+			int tekenGetal = 0;
+			String[] expressieStrings = null;
+			Expressie e1 = null; // nu nog niet gebruikt, maar dat komt nog wel
+									// bij parametrisaties.
+			Expressie e2 = null;
+
+			boolean split = false;
+			for (int j = 0; j < vergTekens.length && !split; j++)
+			{
+				expressieStrings = split(s, vergTekens[j]);
+				// logger.info("vergTeken = " + vergTekens[j] + ", en aantal
+				// expressieStrings is: " + expressieStrings.length);
+
+				if (expressieStrings.length == 2)
+				{
+					e1 = FormuleParser
+						.parse(FormuleParser.schoon(FormuleParser.formuleString("$f" + expressieStrings[0] + "@")));
+					// logger.info("in splitten: expressieStrings[1] = " +
+					// expressieStrings[1] + "; gaat nu parsen");
+					// String formuleString = FormuleParser.formuleString("$f" +
+					// expressieStrings[1] + "@");
+					// logger.info("FormuleParser.formuleString(blabla) = " +
+					// formuleString);
+					// String schoon = FormuleParser.schoon(formuleString);
+					// logger.info("FormuleParser.schoon(blabla) = " + schoon);
+
+					e2 = FormuleParser
+						.parse(FormuleParser.schoon(FormuleParser.formuleString("$f" + expressieStrings[1] + "@")));
+
+					if (expressieStrings[0] == null || expressieStrings[1] == null)
+					{
+						split = false;
+					}
+					else
+					{
+						split = true;
+						tekenGetal = j;
+					}
+					break;
+				}
+			}
+			if (!functieBeginAanpasbaar && expressieStrings.length == 2)
+				vulFunctieRegel(expressieStrings[0], expressieStrings[1], regelnummer);
+
+			if (!split)
+			{ // grafiekGWTVeld.paint();
+				return;
+			}
+			while (expressieStrings[0].endsWith(" "))
+			{
+				expressieStrings[0] = expressieStrings[0].substring(0, expressieStrings[0].length() - 1);
+			}
+			if (expressieStrings[0] == null || expressieStrings[1] == null)
+			{
+				// grafiekGWTVeld.paint();
+				return;
+			}
+			if (tekenGetal > 0 && !ongelijkheidToegestaan) // geval ongelijkheid
+			{
+				editors[regelnummer].clearAll();
+				// formuleVakken[regelnummer].formuleVak.vulVak("$f@");
+				// grafiekGWTVeld.paint();
+				return;
+			}
+			else if (tekenGetal > 0)
+			{
+				if (expressieStrings[0].equals(xAsNaam))
+				{
+					boolean isGroterGelijk = true;
+					if (tekenGetal == 2 || tekenGetal == 3)
+						isGroterGelijk = false;
+					if (checkboxen[regelnummer].getValue())
+						interactiePanel.zetOngelijkheid(regelnummer, e2, false, isGroterGelijk, isEn[regelnummer]);
+					isOngelijkheid[regelnummer] = true;
+				}
+				else if (expressieStrings[0].equals(yAsNaam))
+				{
+					boolean isGroterGelijk = true;
+					if (tekenGetal == 2 || tekenGetal == 3)
+						isGroterGelijk = false;
+					if (checkboxen[regelnummer].getValue())
+						interactiePanel.zetOngelijkheid(regelnummer, e2, true, isGroterGelijk, isEn[regelnummer]);
+					isOngelijkheid[regelnummer] = true;
+				}
+			} // let op: neemt nu ook uitdrukkingen als sin(x) mee.
+			else // tekenGetal = 0
+			{
+				if (expressieStrings[0].equals(yAsNaam) || expressieStrings[0].endsWith("(" + xAsNaam + ")"))
+				{
+					if (!functieToegestaan)
+					{ // formuleVakken[regelnummer].formuleVak.vulVak("$f@");
+						// regel leegmaken
+						// grafiekGWTVeld.paint();
+						return;
+					}
+					else
+					{
+						if (geselecteerd[regelnummer])
+						{
+							interactiePanel.zetFunctie(regelnummer, e2, "$f" + expressieStrings[1] + "@",
+								expressieStrings[0], domeinen[regelnummer], true, setState, false);
+							domeinButtons[regelnummer].setVisible(domeinInstelbaar);
+						}
+
+					}
+				}
+				else if (expressieStrings[0].equals(xAsNaam))
+				{
+					if (!verticaleLijnToegestaan)
+					{ // regel leegmaken
+						// formuleVakken[regelnummer].formuleVak.vulVak("$f@");
+						// grafiekGWTVeld.paint();
+						return;
+					}
+					else
+					{
+						if (geselecteerd[regelnummer])
+							interactiePanel.zetVerticaleLijn(regelnummer, e2);
+					}
+				}
+				else
+					// regel leegmaken
+					// formuleVakken[regelnummer].formuleVak.vulVak("$f@");
+					;
+			}
+		}
+		catch (Exception e)
+		{
+		}
+		zetEnOfKnoppen();
+		// resize();
+		if (interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT && interactiePanel.mode != OpdrNavIF.ZELFTOETS
+			&& interactiePanel.mode != OpdrNavIF.EINDTOETS)
+			interactiePanel.kijkNa();
+		else
+			interactiePanel.setComRootChanged(false);
+		// grafiekGWTVeld.paint();
     }
 	
 	public void zetEnOfKnoppen()
-	{	for(int i = 0; i < maxAantalFormules - 1; i++)
-		{	if(i < enOfKnoppen.length)
+	{
+		for (int i = 0; i < maxAantalFormules - 1; i++)
+		{
+			if (i < enOfKnoppen.length)
 			{
-				if(isOngelijkheid[i] && isOngelijkheid[i+1])
+				if (isOngelijkheid[i] && isOngelijkheid[i + 1])
 					enOfKnoppen[i].setVisible(true);
 				else
 					enOfKnoppen[i].setVisible(false);
 			}
 		}
-		
+
 	}
 	
 	public void vulFunctieRegel(String deel1, String deel2, int regelnummer)
@@ -970,258 +1008,243 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	
 	 public static int count(String inputString, String patternString) 
 	 {
-	        int index = 0;
-	        int count = 0;
+		int index = 0;
+		int count = 0;
 
-	        /* -- */
+		/* -- */
 
-	        while (true) {
-	            index = inputString.indexOf(patternString, index);
+		while (true)
+		{
+			index = inputString.indexOf(patternString, index);
 
-	            if (index == -1) {
-	                break;
-	            } else {
-	                index += patternString.length();
-	                count++;
-	            }
-	        }
+			if (index == -1)
+			{
+				break;
+			}
+			else
+			{
+				index += patternString.length();
+				count++;
+			}
+		}
 
-	        return count;
+		return count;
 	}
 	 
-	public static String[] split(String inputString, String splitString) {
-	        int index;
-	        int count = count(inputString, splitString);
-	        int upperBound = inputString.length();
-	        String results[] = new String[count + 1];
+	public static String[] split(String inputString, String splitString)
+	{
+		int index;
+		int count = count(inputString, splitString);
+		int upperBound = inputString.length();
+		String results[] = new String[count + 1];
 
-	        /* -- */
+		/* -- */
 
-	        index = 0;
-	        count = 0;
+		index = 0;
+		count = 0;
 
-	        while (index < upperBound) {
-	            int nextIndex = inputString.indexOf(splitString, index);
+		while (index < upperBound)
+		{
+			int nextIndex = inputString.indexOf(splitString, index);
 
-	            if (nextIndex == -1) {
-	                results[count++] = inputString.substring(index);
-	                return results;
-	            } else {
-	                results[count++] = inputString.substring(index, nextIndex);
-	            }
+			if (nextIndex == -1)
+			{
+				results[count++] = inputString.substring(index);
+				return results;
+			}
+			else
+			{
+				results[count++] = inputString.substring(index, nextIndex);
+			}
 
-	            index = nextIndex + splitString.length();
-	        }
+			index = nextIndex + splitString.length();
+		}
 
-	        // we should never get here
+		// we should never get here
 
-	        return results;
+		return results;
 	}
 	
 	public void setState(Map<String, Object> launchState2, String[] randomVars, HashMap randomValues)
-    {	//logger.fine("begin setState formuleComponent");
-        //logger.info("maxAantalFormules: " + maxAantalFormules);
-        //logger.info(String.valueOf(launchState2));
-		
+    {
 		fromuser = false;
 		String[] expressieStrings = null;
-    	boolean[] geselecteerd = null;
-    	String[][] domeinStrings = null;
+		boolean[] geselecteerd = null;
+		String[][] domeinStrings = null;
 		boolean[] isEn = null;
-    	
-    	/*
-    	if(h.containsKey("expressieStrings")) 
-    		expressieStrings = (String[])h.get("expressieStrings");
-    	if(h.containsKey("geselecteerd")) 
-    		geselecteerd = (boolean[])h.get("geselecteerd");
-    	if(h.containsKey("domeinStrings"))
-    		domeinStrings = (String[][])h.get("domeinStrings");
-    	if(h.containsKey("isEn")) 
-        	isEn = (boolean[])h.get("isEn");
-        */
-    	if(launchState2 != null)
-    	{
-	    	if (launchState2.get("expressieStrings") != null) 
-			{	//ArrayList<String> expressieStringsList = (ArrayList<String>) h.get("expressieStrings");
-	    		expressieStrings = JSONUtilities.toStringArray(launchState2.get("expressieStrings"));
-	    		
-	    		//logger.info("expressieStrings = " + expressieStrings);
-				/*
-	    		expressieStrings = new String[expressieStringsList.size()];
-				for(int i = 0; i < expressieStringsList.size(); i++)
-					expressieStrings[i] = expressieStringsList.get(i);
-					*/
-			} else
+
+		if (launchState2 != null)
+		{
+			if (launchState2.get("expressieStrings") != null)
+			{
+				expressieStrings = JSONUtilities.toStringArray(launchState2.get("expressieStrings"));
+			}
+			else
 				logger.severe("no strings");
-	    	
-	    	if (launchState2.get("geselecteerd") != null) 
-			{	//ArrayList<Boolean> geselecteerdList = (ArrayList<Boolean>) h.get("geselecteerd");
-	    		List<Object> geselecteerdList = JSONUtilities.toArrayList(launchState2.get("geselecteerd"));
+
+			if (launchState2.get("geselecteerd") != null)
+			{
+				List<Object> geselecteerdList = JSONUtilities.toArrayList(launchState2.get("geselecteerd"));
 				geselecteerd = new boolean[geselecteerdList.size()];
-				for(int i = 0; i < geselecteerdList.size(); i++)
-				{	geselecteerd[i] = (Boolean) geselecteerdList.get(i);
-				
+				for (int i = 0; i < geselecteerdList.size(); i++)
+				{
+					geselecteerd[i] = (Boolean) geselecteerdList.get(i);
+
 				}
 			}
-	    	if (launchState2.get("domeinStrings") != null)
-			{	//ArrayList<ArrayList<String>> domeinStringsList = (ArrayList<ArrayList<String>>) h.get("domeinStrings");
-	    		List<Object> domeinStringsList = JSONUtilities.toArrayList(launchState2.get("domeinStrings"));
-	    		domeinStrings = new String[domeinStringsList.size()][2];
-				//System.out.println("size is " + domeinStrings.length);
-				for(int i = 0; i < domeinStringsList.size(); i++)
-				{	domeinStrings[i] = JSONUtilities.toStringArray(domeinStringsList.get(i));
-					//List<Object> lijstje = (List<Object>) domeinStringsList.get(i);
-					//domeinStrings[i][0] = (String) lijstje.get(0);
-					//domeinStrings[i][1] = (String) lijstje.get(1);
+			if (launchState2.get("domeinStrings") != null)
+			{
+				List<Object> domeinStringsList = JSONUtilities.toArrayList(launchState2.get("domeinStrings"));
+				domeinStrings = new String[domeinStringsList.size()][2];
+				for (int i = 0; i < domeinStringsList.size(); i++)
+				{
+					domeinStrings[i] = JSONUtilities.toStringArray(domeinStringsList.get(i));
 				}
 			}
-	    	if (launchState2.get("isEn") != null) 
-			{	List<Object> isEnList = JSONUtilities.toArrayList(launchState2.get("isEn")); 
+			if (launchState2.get("isEn") != null)
+			{
+				List<Object> isEnList = JSONUtilities.toArrayList(launchState2.get("isEn"));
 				isEn = new boolean[isEnList.size()];
-				for(int i = 0; i < isEnList.size(); i++)
-				{	isEn[i] = (Boolean) isEnList.get(i);
-				
+				for (int i = 0; i < isEnList.size(); i++)
+				{
+					isEn[i] = (Boolean) isEnList.get(i);
 				}
-				
-				/*
-	    		ArrayList<Boolean> isEnList = (ArrayList<Boolean>) h.get("isEn");
-				isEn = new boolean[isEnList.size()];
-				for(int i = 0; i < isEnList.size(); i++)
-					isEn[i] = isEnList.get(i);
-					*/
-			} else {
+			}
+			else
+			{
 				isEn = new boolean[maxAantalFormules]; // nooit null
 			}
-	    	this.geselecteerd = geselecteerd;
-	    	//System.out.println("geselecteerd.length: " + geselecteerd.length);
-	    	this.isEn = isEn;
-	    	this.domeinStrings = domeinStrings;
-    	}
-    	
-	    	
-    	if(domeinStrings != null)
-    		domeinen = new double[domeinStrings.length][2];
-     	
-    	if(domeinStrings != null)
-	    	for(int i=0 ; i<domeinStrings.length; i++)
-			{	
-	     		if(domeinStrings != null && i < domeinStrings.length && i < domeinButtons.length)
-	     		{	if(!domeinStrings[i][0].equals("$f@"))
-	    			{	if(randomValues != null)
-	    				{	try
-							{	domeinStrings[i][0] = FormuleParser.randomizeString(domeinStrings[i][0],randomVars,randomValues);
-							}
-							catch(Exception e)
-							{	domeinStrings[i][0] = "$f???@";
-								//this.zetRandomFout(true);
-							}
+			this.geselecteerd = geselecteerd;
+			this.isEn = isEn;
+			this.domeinStrings = domeinStrings;
+		}
+
+		if (domeinStrings != null)
+			domeinen = new double[domeinStrings.length][2];
+
+		if (domeinStrings != null)
+		{
+			for (int i = 0; i < domeinStrings.length; i++)
+			{
+				if (domeinStrings != null && i < domeinStrings.length && i < domeinButtons.length)
+				{
+					if (!domeinStrings[i][0].equals("$f@"))
+					{
+						if (randomValues != null)
+						{
 							try
-							{	domeinStrings[i][1] = FormuleParser.randomizeString(domeinStrings[i][1],randomVars,randomValues);
+							{
+								domeinStrings[i][0] = FormuleParser.randomizeString(domeinStrings[i][0], randomVars,
+									randomValues);
 							}
-							catch(Exception e)
-							{	domeinStrings[i][1] = "$f???@";
-								//this.zetRandomFout(true);
+							catch (Exception e)
+							{
+								domeinStrings[i][0] = "$f???@";
 							}
-	    				}
-	    				zetDomein(domeinStrings[i], i);
-	    			}
-	     		domeinButtons[i].zetDomeinString(domeinStrings[i]);
-	     		}
+							
+							try
+							{
+								domeinStrings[i][1] = FormuleParser.randomizeString(domeinStrings[i][1], randomVars,
+									randomValues);
+							}
+							catch (Exception e)
+							{
+								domeinStrings[i][1] = "$f???@";
+							}
+						}
+						zetDomein(domeinStrings[i], i);
+					}
+					domeinButtons[i].zetDomeinString(domeinStrings[i]);
+				}
 			}
-    	
-    	if(expressieStrings==null) 
-    	{	return;
-    	}
-//    	logger.info("expressieStrings:");
-//    	for(int i = 0; i < expressieStrings.length; i++)
-//    		logger.info("expressieStrings[" + i + "]: " + expressieStrings[i]);
-		for(int i = 0; i < expressieStrings.length; i++)	
-     	{	if(expressieStrings[i].equals("$f@"))
-     			expressieStrings[i] = "";
-     		else if(expressieStrings[i].startsWith("$f") && expressieStrings[i].endsWith("@"))
-			{	//expressieStrings[i] = expressieStrings[i].substring(2, expressieStrings[i].length() - 1);
-				
-     			if(randomVars != null)
-				{	//logger.info("i = " + i + ": randomVars invullen. ExpressieString voor: " + expressieStrings[i]);
-     				try			
-	    			{	expressieStrings[i] = FormuleParser.randomizeString(expressieStrings[i],randomVars,randomValues);
-	    				//logger.info("randomiseren gelukt, resultaat: " + expressieStrings[i]);
-	    				expressieStrings[i] = expressieStrings[i].substring(2, expressieStrings[i].length()-1);
-	    			}
-	    			catch(Exception e)
-	    			{	expressieStrings[i] = "???";
-	    				//logger.log(Level.SEVERE, e.toString(), e);
-	    				//this.zetRandomFout(true);
-	    			}
-     				//logger.info("expressieString na: " + expressieStrings[i]);
+		}
+
+		if (expressieStrings == null)
+		{
+			return;
+		}
+
+		for (int i = 0; i < expressieStrings.length; i++)
+		{
+			if (expressieStrings[i].equals("$f@"))
+				expressieStrings[i] = "";
+			else if (expressieStrings[i].startsWith("$f") && expressieStrings[i].endsWith("@"))
+			{
+				if (randomVars != null)
+				{
+					try
+					{
+						expressieStrings[i] = FormuleParser.randomizeString(expressieStrings[i], randomVars,
+							randomValues);
+						expressieStrings[i] = expressieStrings[i].substring(2, expressieStrings[i].length() - 1);
+					}
+					catch (Exception e)
+					{
+						expressieStrings[i] = "???";
+					}
 				}
 				else
 					expressieStrings[i] = expressieStrings[i].substring(2, expressieStrings[i].length() - 1);
-    			//if(functieBeginAanpasbaar)
-				//	formuleVakken[i].formuleVak.vulVak(expressieStrings[i]);
-     			if(functieBeginAanpasbaar)
-     			{	editors[i].clearAll();
-     				//if(expressieStrings[i].startsWith("$f") && expressieStrings[i].endsWith("@"))
-     					
-     				editors[i].insert(expressieStrings[i]);
-     				editors[i].setCurrentElementRepaint();
-     				
-     			}
-     			else
-     			{	editors[i].clearAll();
-     				//System.out.println("functieString bij " + i + " voor knippen: " + expressieStrings[i]);
-     				String functieString = expressieStrings[i].substring(2);
-     				//System.out.println("functieString bij " + i + ": "  + functieString);
-     				if(formeleFuncties)
-     					functieString = functieString.substring(3);
-     				editors[i].insert(functieString);
-     				editors[i].setCurrentElementRepaint();
-     			}
-     			//logger.info("voor parseFormule: " + i);
-     			parseFormule(expressieStrings[i], i, true);
 
-     			//logger.info("na parseFormule: " + i);
-				if(i>0 && expressieStrings[i].length() > 0 && !expressieStrings[i].endsWith("="))
-					//add(formuleVakken[i],0);
-				{	regelsPanel.remove(regelPanels[i]);
+				if (functieBeginAanpasbaar)
+				{
+					editors[i].clearAll();
+					editors[i].insert(expressieStrings[i]);
+					editors[i].setCurrentElementRepaint();
+
+				}
+				else
+				{
+					editors[i].clearAll();
+					String functieString = expressieStrings[i].substring(2);
+					if (formeleFuncties)
+						functieString = functieString.substring(3);
+					editors[i].insert(functieString);
+					editors[i].setCurrentElementRepaint();
+				}
+
+				parseFormule(expressieStrings[i], i, true);
+
+				if (i > 0 && expressieStrings[i].length() > 0 && !expressieStrings[i].endsWith("="))
+				{
+					regelsPanel.remove(regelPanels[i]);
 					regelsPanel.add(regelPanels[i]);
-					
+
 					regelsPanel.setWidgetLeftWidth(regelPanels[i], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
-					regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight()), Style.Unit.PX);
-					if(interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
-					{	checkboxen[aantalRegels].setVisible(false);
-						//checkboxen[aantalRegels].setValue(true);
+					regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX,
+						Math.max(30, editors[i].getHeight()), Style.Unit.PX);
+					if (interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
+					{
+						checkboxen[aantalRegels].setVisible(false);
 					}
-					aantalRegels = i+1;
+					aantalRegels = i + 1;
 				}
-				
-     			//formuleVakken[i].setVisible(true);
-				if(geselecteerd!=null)
+
+				// formuleVakken[i].setVisible(true);
+				if (geselecteerd != null)
 					checkboxen[i].setValue(geselecteerd[i]);
-				//add(checkboxen[i],0);
-				//if(maxAantalFormules > 1)
-				//	checkboxen[i].setVisible(true);
-				//add(domeinButtons[i], 0);
-				//domeinButtons[i].setVisible(false);
-				//this.isEn[i] = isEn[i]; Niet nodig? Net al gelijk gezet?
-				if(geselecteerd[i]) 
-     				parseFormule(i, true);
+				// add(checkboxen[i],0);
+				// if(maxAantalFormules > 1)
+				// checkboxen[i].setVisible(true);
+				// add(domeinButtons[i], 0);
+				// domeinButtons[i].setVisible(false);
+				// this.isEn[i] = isEn[i]; Niet nodig? Net al gelijk gezet?
+				if (geselecteerd[i])
+					parseFormule(i, true);
 				/*
-				if(i>0)
-				{	add(enOfKnoppen[i-1],0);
-					if(isEn[i-1])
-						enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString("enOfButton_En"));
-					else
-						enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString("enOfButton_Of"));
-				}
-				*/
-     			
+				 * if(i>0) { add(enOfKnoppen[i-1],0); if(isEn[i-1])
+				 * enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString(
+				 * "enOfButton_En")); else
+				 * enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString(
+				 * "enOfButton_Of")); }
+				 */
+
 			}
-			
+
 		}
 		resize();
-     	//layoutVakken(true);
-     	//grafiekComponent.updateTabelNames(geefExpNamen(), true);
+		// layoutVakken(true);
+		// grafiekComponent.updateTabelNames(geefExpNamen(), true);
 		fromuser = true;
     }
 	
@@ -1235,53 +1258,74 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		return y;
 	}
 	
+	/**
+	 * Surround the given string with the formule codes "$f" and "@".
+	 * @param string
+	 * @return
+	 */
+	private String addFormulaCodes(String string)
+	{
+		String startCode = "$f";
+		String endCode = "@";
+		String s = startCode + string + endCode;
+		return s;
+	}
+    
 	public void zetDomein(String[] domeinStrings, int i)
-	{	
-		if(domeinen.length > i)
-		{	if(domeinStrings == null)
-			{	domeinen[i][0] = DEFAULTDOMEIN[0];
+	{
+		if (domeinen.length > i)
+		{
+			if (domeinStrings == null)
+			{
+				domeinen[i][0] = DEFAULTDOMEIN[0];
 				domeinen[i][1] = DEFAULTDOMEIN[1];
 				return;
 			}
-			if(domeinStrings[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
-			{	domeinen[i][0] = Double.NEGATIVE_INFINITY;
+			if (domeinStrings[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
+			{
+				domeinen[i][0] = Double.NEGATIVE_INFINITY;
 			}
-			else if(FormuleParser.geefExpressie(domeinStrings[0]) == null)
-			{	domeinen[i][0] = Double.NEGATIVE_INFINITY;
+			else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])) == null)
+			{
+				domeinen[i][0] = Double.NEGATIVE_INFINITY;
 			}
 			else
-			{	domeinen[i][0] = FormuleParser.geefExpressie(domeinStrings[0]).geefWaarde();
+			{
+				domeinen[i][0] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])).geefWaarde();
 			}
-			if(domeinStrings[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
+			if (domeinStrings[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
 				domeinen[i][1] = Double.POSITIVE_INFINITY;
-			else if(FormuleParser.geefExpressie(domeinStrings[1]) == null)
+			else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])) == null)
 				domeinen[i][1] = Double.POSITIVE_INFINITY;
 			else
-				domeinen[i][1] = FormuleParser.geefExpressie(domeinStrings[1]).geefWaarde();
+				domeinen[i][1] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])).geefWaarde();
+			
+			domeinButtons[i].zetDomeinString(domeinStrings);
+			
+			// geef door aan interactiepanel
+			interactiePanel.zetDomeinen(domeinen);
+			// repaint
+			interactiePanel.grafiekGWTVeld.paint();
+			
+			//Window.alert("FormuleComponentGWT.zetDomein(" + domeinStrings[0] + ", " + domeinStrings[1] + ", " + i + ")");
 		}
 	}
 	
-	public HashMap<String,Object> getState() {
-		/*
-		ArrayList<String> expressieStrings = new ArrayList<String>();
-		ArrayList<Boolean> geselecteerd = new ArrayList<Boolean>();
-		ArrayList<ArrayList<String>> domeinStrings = new ArrayList<ArrayList<String>>();
-		ArrayList<Boolean> isEn = new ArrayList<Boolean>();
+	private String[][] getDomeinStrings()
+	{
+		String[][] domeinStrings = new String[domeinButtons.length][2];
 		
-		for(int i = 0; i < maxAantalFormules; i++)
-		{	String s = editors[i].toString();
-			if(!functieBeginAanpasbaar)
-				s = functieBegin[i] + s;
-			if(s.endsWith("="))
-				s = "$f@";
-			else
-				s = "$f" + s + "@";
-			expressieStrings.add(s);
-			geselecteerd.add(checkboxen[i].getValue());
-			isEn.add(this.isEn[i]);
+		for (int i = 0; i < domeinButtons.length; i++)
+		{
+			String[] string = domeinButtons[i].getDomeinString();
+			domeinStrings[i] = string;
 		}
-		*/
-			
+		
+		return domeinStrings;
+	}
+	
+	public HashMap<String,Object> getState()
+	{
 		Object[] expressieStrings = null;
 		Object[] geselecteerd = null;
 		Object[] domeinStrings = null;
@@ -1290,14 +1334,15 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		expressieStrings = new String[maxAantalFormules];
 		geselecteerd = new Object[maxAantalFormules];
 		isEn = new Object[maxAantalFormules];
-		domeinStrings = this.domeinStrings;
+		domeinStrings = getDomeinStrings();
 		
 		//int teller = 0;
-		for(int i=0 ; i<maxAantalFormules ; i++) {	
+		for (int i = 0; i < maxAantalFormules; i++)
+		{	
 			String hulp; expressieStrings[i] = hulp = editors[i].toString();
-			if(!functieBeginAanpasbaar)
+			if (!functieBeginAanpasbaar)
 				expressieStrings[i] = functieBegin[i] + expressieStrings[i];
-			if(hulp.endsWith("="))
+			if (hulp.endsWith("="))
 				expressieStrings[i] = "$f@";
 			else
 				expressieStrings[i] = "$f" + expressieStrings[i] + "@";

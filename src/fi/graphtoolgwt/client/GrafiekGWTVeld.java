@@ -379,127 +379,162 @@ public class GrafiekGWTVeld {
 	}
 	
 	
-	public void paint() {
-		
+	public void paint()
+	{
 		gIm.clearRect(0, 0, breedte, hoogte);
 		String fontString = "10px sans-serif";
 		gIm.setFont(cFontString);
-//		gIm.setLineWidth(cLineWidthRoosterlijnen);
-		
-		drawXmin = 0; drawXmax = breedte;
-		drawYmin = 0; drawYmax = hoogte;
+		// gIm.setLineWidth(cLineWidthRoosterlijnen);
+
+		drawXmin = 0;
+		drawXmax = breedte;
+		drawYmin = 0;
+		drawYmax = hoogte;
 		boolean drawXAxis = true;
 		boolean drawYAxis = true;
-		
-		int bx = (int)Math.round(interactiePanel.beginx);			
-		int by = (int)Math.round(interactiePanel.beginy);
 
-		if (interactiePanel.schaalX && (by < drawYmin + cFontHeight + 2 * cExtraAxisMargeY) ) {
-			drawYmax =  drawYmax - cFontHeight - 2 * cExtraAxisMargeY; 
+		int bx = (int) Math.round(interactiePanel.beginx);
+		int by = (int) Math.round(interactiePanel.beginy);
+
+		if (interactiePanel.schaalX && (by < drawYmin + cFontHeight + 2 * cExtraAxisMargeY))
+		{
+			drawYmax = drawYmax - cFontHeight - 2 * cExtraAxisMargeY;
 			drawXAxis = false;
 		}
-		if (interactiePanel.schaalX && (by > hoogte) ) {
+		if (interactiePanel.schaalX && (by > hoogte))
+		{
 			drawYmin = drawYmin + cFontHeight + 2 * cExtraAxisMargeY;
 			drawXAxis = false;
 		}
-		if (interactiePanel.yPositief) {
-			drawYmax =  Math.max(drawYmin, Math.min(drawYmax, hoogte-by));
+		if (interactiePanel.yPositief)
+		{
+			drawYmax = Math.max(drawYmin, Math.min(drawYmax, hoogte - by));
 		}
-		
-//		if (by > drawYmax - cFontHeight - 2 * cExtraAxisMarge) {
-//			if (interactiePanel.traceOptie) {
-//				drawXAxis = false;
-//			} else {
-//				drawXAxis = (by <= hoogte );
-//			}
-//			drawYmin = drawYmin + cFontHeight + 2 * cExtraAxisMarge;
-//		}
-		
-		
+
+		// if (by > drawYmax - cFontHeight - 2 * cExtraAxisMarge) {
+		// if (interactiePanel.traceOptie) {
+		// drawXAxis = false;
+		// } else {
+		// drawXAxis = (by <= hoogte );
+		// }
+		// drawYmin = drawYmin + cFontHeight + 2 * cExtraAxisMarge;
+		// }
+
 		int maxWoordBreedteY = 0;
 		int maxWoordHoogteX = 10;
 		boolean witruimteX = by <= 12;
 		boolean witruimteY = false;
-		
-		int scalingMultiplyX = 1; // Standard remain 1, except i case of manual Scaling & zoom-in causes the raster to become to small (otherwise).
+
+		int scalingMultiplyX = 1; // Standard remain 1, except i case of manual
+									// Scaling & zoom-in causes the raster to
+									// become to small (otherwise).
 		int scalingMultiplyY = 1;
-		
-		while ( (interactiePanel.manualScalingX) && (interactiePanel.eenheidxD * scalingMultiplyX) < (0.2 * interactiePanel.eenheid) ) {
+
+		while ((interactiePanel.manualScalingX)
+			&& (interactiePanel.eenheidxD * scalingMultiplyX) < (0.2 * interactiePanel.eenheid))
+		{
 			scalingMultiplyX *= 2;
 		}
-		while ( (interactiePanel.manualScalingY) && (interactiePanel.eenheidyD * scalingMultiplyY) < (0.2 * interactiePanel.eenheid) ) {
+		while ((interactiePanel.manualScalingY)
+			&& (interactiePanel.eenheidyD * scalingMultiplyY) < (0.2 * interactiePanel.eenheid))
+		{
 			scalingMultiplyY *= 2;
 		}
 
-		int imin = -(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX)); 
-		int imax = 1+breedte/(interactiePanel.eenheidx * scalingMultiplyX)-(int)Math.round(interactiePanel.beginx/(interactiePanel.eenheidx * scalingMultiplyX));
-		int jmin = -(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy * scalingMultiplyY)); 
-		int jmax = 1+hoogte/(interactiePanel.eenheidy* scalingMultiplyY)-(int)Math.round(interactiePanel.beginy/(interactiePanel.eenheidy*scalingMultiplyY));
-		
-		if (interactiePanel.roosterZichtbaar || interactiePanel.schaalZichtbaar) {	
-			
-			for(int j=jmin+1 ; j<jmax-1 ; j++) {	
-//				String getal = Double.toString(interactiePanel.schaalFactorY*(j));
-//				if(interactiePanel.yAsLog)
-//					getal = 10 + toSuperScript(getal);
-				String getal; 
-				if (interactiePanel.manualScalingY) {
-					getal = Double.toString(interactiePanel.eenheidyValue*(j) * scalingMultiplyY);
-				} else { // standard scaling, possibly logarithmic
-					getal = Double.toString(interactiePanel.schaalFactorY*(j));
-					if(interactiePanel.yAsLog) {
-						if (j==0) { 
+		int imin = -(int) Math.round(interactiePanel.beginx / (interactiePanel.eenheidx * scalingMultiplyX));
+		int imax = 1 + breedte / (interactiePanel.eenheidx * scalingMultiplyX)
+			- (int) Math.round(interactiePanel.beginx / (interactiePanel.eenheidx * scalingMultiplyX));
+		int jmin = -(int) Math.round(interactiePanel.beginy / (interactiePanel.eenheidy * scalingMultiplyY));
+		int jmax = 1 + hoogte / (interactiePanel.eenheidy * scalingMultiplyY)
+			- (int) Math.round(interactiePanel.beginy / (interactiePanel.eenheidy * scalingMultiplyY));
+
+		if (interactiePanel.roosterZichtbaar || interactiePanel.schaalZichtbaar)
+		{
+
+			for (int j = jmin + 1; j < jmax - 1; j++)
+			{
+				// String getal =
+				// Double.toString(interactiePanel.schaalFactorY*(j));
+				// if(interactiePanel.yAsLog)
+				// getal = 10 + toSuperScript(getal);
+				String getal;
+				if (interactiePanel.manualScalingY)
+				{
+					getal = Double.toString(interactiePanel.eenheidyValue * (j) * scalingMultiplyY);
+				}
+				else
+				{ // standard scaling, possibly logarithmic
+					getal = Double.toString(interactiePanel.schaalFactorY * (j));
+					if (interactiePanel.yAsLog)
+					{
+						if (j == 0)
+						{
 							getal = "0";
-						} else {
+						}
+						else
+						{
 							getal = 10 + toSuperScript(getal);
 						}
-					}					
+					}
 				}
-				
-				if(getal.contains("."))
-				{	getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
-					while(getal.endsWith("0"))
+
+				if (getal.contains("."))
+				{
+					getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
+					while (getal.endsWith("0"))
 					{
 						getal = getal.substring(0, getal.length() - 1);
 					}
-					if(getal.endsWith("."))
-					{	getal = getal.substring(0, getal.length() - 1);
-					
+					if (getal.endsWith("."))
+					{
+						getal = getal.substring(0, getal.length() - 1);
+
 					}
 				}
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
-				if(j!=0 && j%2==0 && (!interactiePanel.yPositief || j>0)) {	
+				if (j != 0 && j % 2 == 0 && (!interactiePanel.yPositief || j > 0))
+				{
 					maxWoordBreedteY = Math.max(maxWoordBreedteY, woordbreedte);
 				}
-				
+
 			}
-			if (interactiePanel.schaalY && (bx < drawXmin + maxWoordBreedteY + 2 * cExtraAxisMargeX) ){
+			if (interactiePanel.schaalY && (bx < drawXmin + maxWoordBreedteY + 2 * cExtraAxisMargeX))
+			{
 				drawXmin = drawXmin + maxWoordBreedteY + 2 * cExtraAxisMargeX;
 				drawYAxis = false;
 			}
-			
-			if (interactiePanel.schaalY && (bx > breedte) ) {
-				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMargeX; 
+
+			if (interactiePanel.schaalY && (bx > breedte))
+			{
+				drawXmax = drawXmax - maxWoordBreedteY - 2 * cExtraAxisMargeX;
 				drawYAxis = false;
 			}
 
-			if (interactiePanel.xPositief) {
-				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
+			if (interactiePanel.xPositief)
+			{
+				drawXmin = Math.min(drawXmax, Math.max(drawXmin, bx));
 			}
 			witruimteY = maxWoordBreedteY >= bx - 2;
 
-			//log-roosterlijnen tekenen (iets lichter dan gewone roosterlijnen):
+			// log-roosterlijnen tekenen (iets lichter dan gewone
+			// roosterlijnen):
 			gIm.setStrokeStyle(roosterKleurLicht);
 			gIm.setLineWidth(cLineWidthLogLines);
-			
-			if(interactiePanel.roosterX)	{	
+
+			if (interactiePanel.roosterX)
+			{
 				gIm.beginPath();
-				for(int i = imin-1; i < imax+1; i++) {
-					if((!interactiePanel.xPositief || i > 0) && interactiePanel.xAsLog && !interactiePanel.roosterGrof) {	
-						for(int k = 1; k < 10; k++) {	
-							int logLineXPos = (int) (bx + i*interactiePanel.eenheidxD + Math.log10(k)*interactiePanel.eenheidxD);
-							if ( (logLineXPos >= drawXmin) && (logLineXPos <= drawXmax) ) {
+				for (int i = imin - 1; i < imax + 1; i++)
+				{
+					if ((!interactiePanel.xPositief || i > 0) && interactiePanel.xAsLog && !interactiePanel.roosterGrof)
+					{
+						for (int k = 1; k < 10; k++)
+						{
+							int logLineXPos = (int) (bx + i * interactiePanel.eenheidxD
+								+ Math.log10(k) * interactiePanel.eenheidxD);
+							if ((logLineXPos >= drawXmin) && (logLineXPos <= drawXmax))
+							{
 								gIm.moveTo(logLineXPos, drawYmin);
 								gIm.lineTo(logLineXPos, drawYmax);
 							}
@@ -508,15 +543,26 @@ public class GrafiekGWTVeld {
 				}
 				gIm.stroke();
 			}
-			if(interactiePanel.roosterY)
-			{	gIm.beginPath();
-				for(int j = jmin-1; j < jmax+1; j++) {	
-					if((!interactiePanel.yPositief || j > 0) && interactiePanel.yAsLog && !interactiePanel.roosterGrof) {	
-						for(int k = 1; k < 10; k++) {	
-//							gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0), (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
-//							gIm.lineTo(breedte, (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD)));
-							int logLineYPos =  (int) (hoogte - (by + j*interactiePanel.eenheidyD + Math.log10(k)*interactiePanel.eenheidyD));
-							if ( (logLineYPos >= drawYmin) && (logLineYPos <= drawYmax) ) {
+			if (interactiePanel.roosterY)
+			{
+				gIm.beginPath();
+				for (int j = jmin - 1; j < jmax + 1; j++)
+				{
+					if ((!interactiePanel.yPositief || j > 0) && interactiePanel.yAsLog && !interactiePanel.roosterGrof)
+					{
+						for (int k = 1; k < 10; k++)
+						{
+							// gIm.moveTo(Math.max(witruimteY?maxWoordBreedteY:0,
+							// interactiePanel.xPositief?bx:0), (int) (hoogte -
+							// (by + j*interactiePanel.eenheidyD +
+							// Math.log10(k)*interactiePanel.eenheidyD)));
+							// gIm.lineTo(breedte, (int) (hoogte - (by +
+							// j*interactiePanel.eenheidyD +
+							// Math.log10(k)*interactiePanel.eenheidyD)));
+							int logLineYPos = (int) (hoogte
+								- (by + j * interactiePanel.eenheidyD + Math.log10(k) * interactiePanel.eenheidyD));
+							if ((logLineYPos >= drawYmin) && (logLineYPos <= drawYmax))
+							{
 								gIm.moveTo(drawXmin, logLineYPos);
 								gIm.lineTo(drawXmax, logLineYPos);
 							}
@@ -525,328 +571,437 @@ public class GrafiekGWTVeld {
 				}
 				gIm.stroke();
 			}
-			//gewone roosterlijnen tekenen:
+			// gewone roosterlijnen tekenen:
 			gIm.setLineWidth(cLineWidthRoosterlijnen);
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
 
-			for(int i=imin ; i<imax ; i++) {	
-//				String getal = Double.toString(interactiePanel.schaalFactorX*(i));
-//				if(interactiePanel.xAsLog)
-//					getal = 10 + toSuperScript(getal);
-				String getal; 
-				if (interactiePanel.manualScalingX) {
-					getal = Double.toString(interactiePanel.eenheidxValue*(i)* scalingMultiplyX);
-				} else { // standard scaling, possibly logarithmic
-					getal = Double.toString(interactiePanel.schaalFactorX*(i));
-					if(interactiePanel.xAsLog) {
-						if (i==0) { 
+			for (int i = imin; i < imax; i++)
+			{
+				// String getal =
+				// Double.toString(interactiePanel.schaalFactorX*(i));
+				// if(interactiePanel.xAsLog)
+				// getal = 10 + toSuperScript(getal);
+				String getal;
+				if (interactiePanel.manualScalingX)
+				{
+					getal = Double.toString(interactiePanel.eenheidxValue * (i) * scalingMultiplyX);
+				}
+				else
+				{ // standard scaling, possibly logarithmic
+					getal = Double.toString(interactiePanel.schaalFactorX * (i));
+					if (interactiePanel.xAsLog)
+					{
+						if (i == 0)
+						{
 							getal = "0";
-						} else {
+						}
+						else
+						{
 							getal = 10 + toSuperScript(getal);
 						}
-					}					
+					}
 				}
 
-				if(getal.contains("."))
-				{	getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
-					while(getal.endsWith("0"))
+				if (getal.contains("."))
+				{
+					getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
+					while (getal.endsWith("0"))
 					{
 						getal = getal.substring(0, getal.length() - 1);
 					}
-					if(getal.endsWith("."))
+					if (getal.endsWith("."))
 					{
 						getal = getal.substring(0, getal.length() - 1);
 					}
 				}
 				TextMetrics tm = gIm.measureText(getal);
 				int woordbreedte = (int) Math.round(tm.getWidth());
-				int xLabel = (int)(interactiePanel.beginx+i*interactiePanel.eenheidxD * scalingMultiplyX -woordbreedte/2);
-//				int yLabel = Math.max(9, Math.min(hoogte-2, hoogte-by+11));
-				int yLabel = Math.max(cFontHeight+cExtraAxisMargeY, Math.min(hoogte-cExtraAxisMargeY, hoogte-by+cExtraAxisMargeY+cFontHeight));
+				int xLabel = (int) (interactiePanel.beginx + i * interactiePanel.eenheidxD * scalingMultiplyX
+					- woordbreedte / 2);
+				// int yLabel = Math.max(9, Math.min(hoogte-2, hoogte-by+11));
+				int yLabel = Math.max(cFontHeight + cExtraAxisMargeY,
+					Math.min(hoogte - cExtraAxisMargeY, hoogte - by + cExtraAxisMargeY + cFontHeight));
 
-				boolean schaalTekenen = (i%2 == 0 || interactiePanel.xAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalX &&
-						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX > drawXmin) &&
-						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX < drawXmax) ;
-				
-				if (interactiePanel.roosterZichtbaar && interactiePanel.roosterX && (!interactiePanel.xPositief || i > 0) && 
-						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX >= drawXmin) &&  
-						(bx+i*interactiePanel.eenheidxD * scalingMultiplyX <= drawXmax)) {	
-					if(schaalTekenen) {	
+				boolean schaalTekenen = (i % 2 == 0 || interactiePanel.xAsLog) && interactiePanel.schaalZichtbaar
+					&& interactiePanel.schaalX && (bx + i * interactiePanel.eenheidxD * scalingMultiplyX > drawXmin)
+					&& (bx + i * interactiePanel.eenheidxD * scalingMultiplyX < drawXmax);
+
+				if (interactiePanel.roosterZichtbaar && interactiePanel.roosterX
+					&& (!interactiePanel.xPositief || i > 0)
+					&& (bx + i * interactiePanel.eenheidxD * scalingMultiplyX >= drawXmin)
+					&& (bx + i * interactiePanel.eenheidxD * scalingMultiplyX <= drawXmax))
+				{
+					if (schaalTekenen)
+					{
 						gIm.beginPath();
-						if ( (drawYmin < yLabel - cFontHeight) ) { 
-							gIm.moveTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), drawYmin);
-							gIm.lineTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), Math.min(yLabel - cFontHeight-cExtraAxisMargeY, drawYmax));
+						if ((drawYmin < yLabel - cFontHeight))
+						{
+							gIm.moveTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX), drawYmin);
+							gIm.lineTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX),
+								Math.min(yLabel - cFontHeight - cExtraAxisMargeY, drawYmax));
 						}
-						if ( (drawYmax > yLabel + cExtraAxisMargeY)  ) {	
-							gIm.moveTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), yLabel + cExtraAxisMargeY );
-							gIm.lineTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), drawYmax);
+						if ((drawYmax > yLabel + cExtraAxisMargeY))
+						{
+							gIm.moveTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX),
+								yLabel + cExtraAxisMargeY);
+							gIm.lineTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX), drawYmax);
 						}
 						gIm.stroke();
 					}
-					else if(i%2 == 0 || !interactiePanel.roosterGrof || interactiePanel.xAsLog) {
+					else if (i % 2 == 0 || !interactiePanel.roosterGrof || interactiePanel.xAsLog)
+					{
 						gIm.beginPath();
-						gIm.moveTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), drawYmin);
-						gIm.lineTo((int)(bx+i*interactiePanel.eenheidxD * scalingMultiplyX ), drawYmax);
+						gIm.moveTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX), drawYmin);
+						gIm.lineTo((int) (bx + i * interactiePanel.eenheidxD * scalingMultiplyX), drawYmax);
 						gIm.stroke();
 					}
 				}
-				if ( (!interactiePanel.xPositief || i > 0) && (schaalTekenen) && (i != 0 || !drawXAxis) ) {
-					gIm.fillText(getal,	xLabel,	yLabel);
-				}
-			}
-
-			for(int j=jmin ; j<jmax ; j++) {	
-
-//				String getal = Double.toString(interactiePanel.schaalFactorY*(j)); 
-//				if(interactiePanel.yAsLog)
-//					getal = 10 + toSuperScript(getal);
-				String getal; 
-				if (interactiePanel.manualScalingY) {
-					getal = Double.toString(interactiePanel.eenheidyValue*(j) * scalingMultiplyY);
-				} else { // standard scaling, possibly logarithmic
-					getal = Double.toString(interactiePanel.schaalFactorY*(j));
-					if(interactiePanel.yAsLog) {
-						if (j==0) { 
-							getal = "0";
-						} else {
-							getal = 10 + toSuperScript(getal);
-						}
-					}					
-				}
-
-				if(getal.contains("."))
-				{	getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
-					while(getal.endsWith("0"))
-					{	getal = getal.substring(0, getal.length() - 1);
-					
-					}
-					if(getal.endsWith("."))
-					{	getal = getal.substring(0, getal.length() - 1);
-					
-					}
-				}
-				TextMetrics tm = gIm.measureText(getal);
-				int woordbreedte = (int) Math.round(tm.getWidth());
-//				int xLabel = Math.max(maxWoordBreedteY-woordbreedte,bx-2-woordbreedte);
-//				int yLabel = (int)(hoogte+cExtraAxisMarge-(interactiePanel.beginy+j*interactiePanel.eenheidyD * scalingMultiplyY ));
-				int xLabel = Math.min(breedte-cExtraAxisMargeX-woordbreedte,Math.max(maxWoordBreedteY-woordbreedte+cExtraAxisMargeX,bx-cExtraAxisMargeX-woordbreedte));
-				int yLabel = (int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY )+(cFontHeight/2));
-				witruimteY = xLabel==maxWoordBreedteY-woordbreedte;
-//				int minimaalBegin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
-				boolean schaalTekenen = (j%2 == 0 || interactiePanel.yAsLog) && interactiePanel.schaalZichtbaar && interactiePanel.schaalY && 
-						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) < drawYmax) && 
-						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) > drawYmin);
-				
-				if ( interactiePanel.roosterZichtbaar && interactiePanel.roosterY && (!interactiePanel.yPositief || j>0) && 
-						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) <= drawYmax) && 
-						(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY) >= drawYmin) )  {
-					if(schaalTekenen)  { 
-						gIm.beginPath();
-						if(xLabel - cExtraAxisMargeX > drawXmin) {	
-							gIm.moveTo(drawXmin, (int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-							gIm.lineTo((int) Math.min(drawXmax, xLabel - cExtraAxisMargeX), (int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-						}
-						if ( (drawXmax > xLabel + woordbreedte + cExtraAxisMargeX)  ) {	
-							gIm.moveTo(Math.max(drawXmin, xLabel + woordbreedte + cExtraAxisMargeX), (int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-							gIm.lineTo(drawXmax, (int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-						}
-						gIm.stroke();
-					}
-					else if(j%2 == 0 || interactiePanel.yAsLog || !interactiePanel.roosterGrof) {	
-						gIm.beginPath();
-						gIm.moveTo(drawXmin,(int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-						gIm.lineTo(drawXmax,(int)(hoogte-(by+j*interactiePanel.eenheidyD * scalingMultiplyY)));
-						gIm.stroke();
-					}
-							
-				}
-				if((!interactiePanel.yPositief || j>0) && (schaalTekenen) && (j != 0 || !drawYAxis) ){
+				if ((!interactiePanel.xPositief || i > 0) && (schaalTekenen) && (i != 0 || !drawXAxis))
+				{
 					gIm.fillText(getal, xLabel, yLabel);
 				}
 			}
-		} else {
+
+			for (int j = jmin; j < jmax; j++)
+			{
+
+				// String getal =
+				// Double.toString(interactiePanel.schaalFactorY*(j));
+				// if(interactiePanel.yAsLog)
+				// getal = 10 + toSuperScript(getal);
+				String getal;
+				if (interactiePanel.manualScalingY)
+				{
+					getal = Double.toString(interactiePanel.eenheidyValue * (j) * scalingMultiplyY);
+				}
+				else
+				{ // standard scaling, possibly logarithmic
+					getal = Double.toString(interactiePanel.schaalFactorY * (j));
+					if (interactiePanel.yAsLog)
+					{
+						if (j == 0)
+						{
+							getal = "0";
+						}
+						else
+						{
+							getal = 10 + toSuperScript(getal);
+						}
+					}
+				}
+
+				if (getal.contains("."))
+				{
+					getal = getal.substring(0, Math.min(getal.indexOf(".") + 3, getal.length()));
+					while (getal.endsWith("0"))
+					{
+						getal = getal.substring(0, getal.length() - 1);
+
+					}
+					if (getal.endsWith("."))
+					{
+						getal = getal.substring(0, getal.length() - 1);
+
+					}
+				}
+				TextMetrics tm = gIm.measureText(getal);
+				int woordbreedte = (int) Math.round(tm.getWidth());
+				// int xLabel =
+				// Math.max(maxWoordBreedteY-woordbreedte,bx-2-woordbreedte);
+				// int yLabel =
+				// (int)(hoogte+cExtraAxisMarge-(interactiePanel.beginy+j*interactiePanel.eenheidyD
+				// * scalingMultiplyY ));
+				int xLabel = Math.min(breedte - cExtraAxisMargeX - woordbreedte,
+					Math.max(maxWoordBreedteY - woordbreedte + cExtraAxisMargeX, bx - cExtraAxisMargeX - woordbreedte));
+				int yLabel = (int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)
+					+ (cFontHeight / 2));
+				witruimteY = xLabel == maxWoordBreedteY - woordbreedte;
+				// int minimaalBegin = Math.max(witruimteY?maxWoordBreedteY:0,
+				// interactiePanel.xPositief?bx:0);
+				boolean schaalTekenen = (j % 2 == 0 || interactiePanel.yAsLog) && interactiePanel.schaalZichtbaar
+					&& interactiePanel.schaalY
+					&& (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY) < drawYmax)
+					&& (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY) > drawYmin);
+
+				if (interactiePanel.roosterZichtbaar && interactiePanel.roosterY
+					&& (!interactiePanel.yPositief || j > 0)
+					&& (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY) <= drawYmax)
+					&& (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY) >= drawYmin))
+				{
+					if (schaalTekenen)
+					{
+						gIm.beginPath();
+						if (xLabel - cExtraAxisMargeX > drawXmin)
+						{
+							gIm.moveTo(drawXmin,
+								(int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+							gIm.lineTo((int) Math.min(drawXmax, xLabel - cExtraAxisMargeX),
+								(int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+						}
+						if ((drawXmax > xLabel + woordbreedte + cExtraAxisMargeX))
+						{
+							gIm.moveTo(Math.max(drawXmin, xLabel + woordbreedte + cExtraAxisMargeX),
+								(int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+							gIm.lineTo(drawXmax,
+								(int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+						}
+						gIm.stroke();
+					}
+					else if (j % 2 == 0 || interactiePanel.yAsLog || !interactiePanel.roosterGrof)
+					{
+						gIm.beginPath();
+						gIm.moveTo(drawXmin, (int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+						gIm.lineTo(drawXmax, (int) (hoogte - (by + j * interactiePanel.eenheidyD * scalingMultiplyY)));
+						gIm.stroke();
+					}
+
+				}
+				if ((!interactiePanel.yPositief || j > 0) && (schaalTekenen) && (j != 0 || !drawYAxis))
+				{
+					gIm.fillText(getal, xLabel, yLabel);
+				}
+			} // end for loop
+		}
+		else
+		{
 			// !(roosterZichtbaar || SchaalZichtbaar)
-			if (interactiePanel.xPositief) { // Zet negatieve X-as uit indien nodig
-				drawXmin =  Math.min(drawXmax, Math.max(drawXmin, bx));
+			if (interactiePanel.xPositief)
+			{ // Zet negatieve X-as uit indien nodig
+				drawXmin = Math.min(drawXmax, Math.max(drawXmin, bx));
 			}
 		}
-		
-		if (interactiePanel.piLijnenZichtbaar) {
-			double rangeX = pixelsXtoValue(breedte)-pixelsXtoValue(0);
+
+		if (interactiePanel.piLijnenZichtbaar)
+		{
+			double rangeX = pixelsXtoValue(breedte) - pixelsXtoValue(0);
 			long piMultiplier = 1;
-			if ( rangeX/(Math.PI*piMultiplier)>(double) cMaxPiLinesOnScreen) {
-				piMultiplier = (long) Math.ceil(rangeX/((cMaxPiLinesOnScreen)*Math.PI));
+			if (rangeX / (Math.PI * piMultiplier) > (double) cMaxPiLinesOnScreen)
+			{
+				piMultiplier = (long) Math.ceil(rangeX / ((cMaxPiLinesOnScreen) * Math.PI));
 			}
-			
+
 			double piScalingDivider;
-			if (interactiePanel.manualScalingX) {
+			if (interactiePanel.manualScalingX)
+			{
 				piScalingDivider = interactiePanel.eenheidxValue;
-			} else {
+			}
+			else
+			{
 				piScalingDivider = interactiePanel.schaalFactorX;
 			}
 
 			int piTextX = 0;
-			int piTextY = Math.min(Math.max(drawYmin+cExtraAxisMargeY+cFontHeight, drawYmax - cExtraAxisMargeY), Math.max( drawYmin+cExtraAxisMargeY+cFontHeight, hoogte - by + cPiFromAxis));
+			int piTextY = Math.min(Math.max(drawYmin + cExtraAxisMargeY + cFontHeight, drawYmax - cExtraAxisMargeY),
+				Math.max(drawYmin + cExtraAxisMargeY + cFontHeight, hoogte - by + cPiFromAxis));
 
 			gIm.setStrokeStyle(grijs);
 			gIm.setFillStyle(zwart);
 
 			// 0 is in beeld
-			if ((bx > 0) && (bx < breedte)) {	
-//				int maxLCnt = (int) Math.round(interactiePanel.beginx / Math.PI);
-				int maxLCnt = (int) Math.round(interactiePanel.beginx / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+			if ((bx > 0) && (bx < breedte))
+			{
+				// int maxLCnt = (int) Math.round(interactiePanel.beginx /
+				// Math.PI);
+				int maxLCnt = (int) Math.round(
+					interactiePanel.beginx / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 				for (int lCnt = 1; lCnt <= maxLCnt; lCnt++)
-				{	//int piX = (int) Math.round(beginx - lCnt * Math.PI * eenheidxD / schaalFactorX); 
-//					int piX = (int) Math.round(interactiePanel.beginx - lCnt * Math.PI * interactiePanel.eenheidxD);
-					int piX = (int) Math.round(interactiePanel.beginx - (lCnt * piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+				{
+					// int piX = (int) Math.round(beginx - lCnt * Math.PI *
+					// eenheidxD / schaalFactorX);
+					// int piX = (int) Math.round(interactiePanel.beginx - lCnt
+					// * Math.PI * interactiePanel.eenheidxD);
+					int piX = (int) Math.round(interactiePanel.beginx
+						- (lCnt * piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 					piTextX = piX - cExtraAxisMargeX;
-					if ((piX > bx || !interactiePanel.xPositief && piX > drawXmin) && (piX < drawXmax)) {	
+					if ((piX > bx || !interactiePanel.xPositief && piX > drawXmin) && (piX < drawXmax))
+					{
 						drawPiLine(piX, by);
-//						double aantalPi = lCnt * interactiePanel.schaalFactorX;
+						// double aantalPi = lCnt *
+						// interactiePanel.schaalFactorX;
 						double aantalPi = piMultiplier * lCnt;
 						int aantalPiInt = (int) aantalPi;
-						if(aantalPi == 0);
-						else if(aantalPi == 1)
+						if (aantalPi == 0)
+							;
+						else if (aantalPi == 1)
 							gIm.fillText("-" + "\u03C0", piTextX, piTextY);
 						else
-						{	if(aantalPiInt == aantalPi)
+						{
+							if (aantalPiInt == aantalPi)
 								gIm.fillText("-" + aantalPiInt + "\u03C0", piTextX, piTextY);
 							else
 								gIm.fillText("-" + Double.toString(aantalPi) + "\u03C0", piTextX, piTextY);
 						}
-//						gIm.beginPath();
-//						gIm.moveTo(piX,hoogte-by-2);
-//						gIm.lineTo(piX,hoogte-by+2);
-//						gIm.stroke();
+						// gIm.beginPath();
+						// gIm.moveTo(piX,hoogte-by-2);
+						// gIm.lineTo(piX,hoogte-by+2);
+						// gIm.stroke();
 					}
-				}
-//				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx) / Math.PI);
-				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx) / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
-				for (int rCnt = 1; rCnt <= maxRCnt; rCnt++) {
-//					int piX = (int) Math.round(interactiePanel.beginx + rCnt * Math.PI * interactiePanel.eenheidxD);
-					int piX = (int) Math.round(interactiePanel.beginx + rCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider) );
+				} // end for loop
+				
+				// int maxRCnt = (int) Math.round((breedte -
+				// interactiePanel.beginx) / Math.PI);
+				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx)
+					/ (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+				for (int rCnt = 1; rCnt <= maxRCnt; rCnt++)
+				{
+					// int piX = (int) Math.round(interactiePanel.beginx + rCnt
+					// * Math.PI * interactiePanel.eenheidxD);
+					int piX = (int) Math.round(interactiePanel.beginx
+						+ rCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 					piTextX = piX - cExtraAxisMargeX;
 
-					if ((piX > bx || !interactiePanel.xPositief && piX > drawXmin) && (piX < drawXmax)) {	
+					if ((piX > bx || !interactiePanel.xPositief && piX > drawXmin) && (piX < drawXmax))
+					{
 						drawPiLine(piX, by);
-//						double aantalPi = rCnt * interactiePanel.schaalFactorX; 
-						double aantalPi = piMultiplier *rCnt;
+						// double aantalPi = rCnt *
+						// interactiePanel.schaalFactorX;
+						double aantalPi = piMultiplier * rCnt;
 						int aantalPiInt = (int) aantalPi;
-						if(aantalPi == 0);
+						if (aantalPi == 0)
+							;
 						else if (aantalPi == 1)
 							gIm.fillText("\u03C0", piTextX, piTextY);
 						else
-						{	if(aantalPiInt == aantalPi)
+						{
+							if (aantalPiInt == aantalPi)
 								gIm.fillText(aantalPiInt + "\u03C0", piTextX, piTextY);
 							else
 								gIm.fillText(Double.toString(aantalPi) + "\u03C0", piTextX, piTextY);
 						}
-//						gIm.beginPath();
-//						gIm.moveTo(piX,hoogte-by-2);
-//						gIm.lineTo(piX,hoogte-by+2);
-//						gIm.stroke();
+						// gIm.beginPath();
+						// gIm.moveTo(piX,hoogte-by-2);
+						// gIm.lineTo(piX,hoogte-by+2);
+						// gIm.stroke();
 					}
-				}
-				
-			}	
+				} // end for loop
+
+			}
 			// 0 is links
-			else if (bx <= 0) {	
-//				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx) / Math.PI);
-				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx) / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+			else if (bx <= 0)
+			{
+				// int maxRCnt = (int) Math.round((breedte -
+				// interactiePanel.beginx) / Math.PI);
+				int maxRCnt = (int) Math.round((breedte - interactiePanel.beginx)
+					/ (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 
-				for (int rCnt = 1; rCnt <= maxRCnt; rCnt++) {	
+				for (int rCnt = 1; rCnt <= maxRCnt; rCnt++)
+				{
 
-					//int piX = (int) Math.round(beginx + rCnt * Math.PI * eenheidxD / schaalFactorX); 
-					int piX = (int) Math.round(interactiePanel.beginx + rCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider) );
+					// int piX = (int) Math.round(beginx + rCnt * Math.PI *
+					// eenheidxD / schaalFactorX);
+					int piX = (int) Math.round(interactiePanel.beginx
+						+ rCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 					piTextX = piX - cExtraAxisMargeX;
-					if ((piX > drawXmin) && (piX < drawXmax)) {	
+					if ((piX > drawXmin) && (piX < drawXmax))
+					{
 						drawPiLine(piX, by);
-//						double aantalPi = rCnt * interactiePanel.schaalFactorX;
-						double aantalPi = piMultiplier *rCnt;
+						// double aantalPi = rCnt *
+						// interactiePanel.schaalFactorX;
+						double aantalPi = piMultiplier * rCnt;
 
 						int aantalPiInt = (int) aantalPi;
-						if(aantalPi == 0);
-						else if(aantalPi == 1)
-							gIm.fillText("\u03C0",piTextX, piTextY);
+						if (aantalPi == 0)
+							;
+						else if (aantalPi == 1)
+							gIm.fillText("\u03C0", piTextX, piTextY);
 						else
-						{	if(aantalPiInt == aantalPi)
+						{
+							if (aantalPiInt == aantalPi)
 								gIm.fillText(aantalPiInt + "\u03C0", piTextX, piTextY);
 							else
 								gIm.fillText(Double.toString(aantalPi) + "\u03C0", piTextX, piTextY);
 						}
-//						gIm.beginPath();
-//						gIm.moveTo(piX, hoogte - by - 2);
-//						gIm.lineTo(piX,hoogte-by+2);
-//						gIm.stroke();
+						// gIm.beginPath();
+						// gIm.moveTo(piX, hoogte - by - 2);
+						// gIm.lineTo(piX,hoogte-by+2);
+						// gIm.stroke();
 					}
-				}
-			}		
+				} // end for loop
+			}
 			// 0 is rechts
-			else if (bx >= breedte && !interactiePanel.xPositief) {	
-//				int maxLCnt = (int) Math.round(interactiePanel.beginx / Math.PI);
-				int maxLCnt = (int) Math.round(interactiePanel.beginx / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+			else if (bx >= breedte && !interactiePanel.xPositief)
+			{
+				// int maxLCnt = (int) Math.round(interactiePanel.beginx /
+				// Math.PI);
+				int maxLCnt = (int) Math.round(
+					interactiePanel.beginx / (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 				for (int lCnt = 1; lCnt <= maxLCnt; lCnt++)
-				{	//int piX = (int) Math.round(beginx - lCnt * Math.PI * eenheidxD / schaalFactorX); 
-//					int piX = (int) Math.round(interactiePanel.beginx - lCnt * Math.PI * interactiePanel.eenheidxD);
-					int piX = (int) Math.round(interactiePanel.beginx - lCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
+				{
+					// int piX = (int) Math.round(beginx - lCnt * Math.PI *
+					// eenheidxD / schaalFactorX);
+					// int piX = (int) Math.round(interactiePanel.beginx - lCnt
+					// * Math.PI * interactiePanel.eenheidxD);
+					int piX = (int) Math.round(interactiePanel.beginx
+						- lCnt * (piMultiplier * Math.PI * interactiePanel.eenheidxD / piScalingDivider));
 					piTextX = piX - cExtraAxisMargeX;
-					if ((piX > drawXmin) && (piX < drawXmax)) {	
+					if ((piX > drawXmin) && (piX < drawXmax))
+					{
 						drawPiLine(piX, by);
-//						double aantalPi = lCnt * interactiePanel.schaalFactorX;
+						// double aantalPi = lCnt *
+						// interactiePanel.schaalFactorX;
 						double aantalPi = piMultiplier * lCnt;
 
 						int aantalPiInt = (int) aantalPi;
-						if(aantalPi == 0);
-						else if(aantalPi == 1)
+						if (aantalPi == 0)
+							;
+						else if (aantalPi == 1)
 							gIm.fillText("-" + "\u03C0", piTextX, piTextY);
 						else
-						{	if(aantalPiInt == aantalPi)
+						{
+							if (aantalPiInt == aantalPi)
 								gIm.fillText("-" + aantalPiInt + "\u03C0", piTextX, piTextY);
 							else
 								gIm.fillText("-" + Double.toString(aantalPi) + "\u03C0", piTextX, piTextY);
 						}
-//						gIm.beginPath();
-//						gIm.moveTo(piX,hoogte-by-2);
-//						gIm.lineTo(piX,hoogte-by+2);
-//						gIm.stroke();
+						// gIm.beginPath();
+						// gIm.moveTo(piX,hoogte-by-2);
+						// gIm.lineTo(piX,hoogte-by+2);
+						// gIm.stroke();
 					}
-				}
-			}		
+				} // end for loop
+			}
 		}
-		if (interactiePanel.assenZichtbaar) {
+		if (interactiePanel.assenZichtbaar)
+		{
 			gIm.setLineWidth(cLineWidthAxes);
 			gIm.setStrokeStyle(zwart);
 			gIm.setFillStyle(zwart);
-		} else {
+		}
+		else
+		{
 			gIm.setLineWidth(cLineWidthRoosterlijnen);
 			gIm.setStrokeStyle(roosterKleur);
 			gIm.setFillStyle(zwart);
 		}
-			
+
 		/* Y-as */
-		if ( (drawYAxis) && (interactiePanel.assenZichtbaar) ){	
-			gIm.beginPath(); 
+		if ((drawYAxis) && (interactiePanel.assenZichtbaar))
+		{
+			gIm.beginPath();
 			gIm.moveTo(bx, drawYmin);
 			gIm.lineTo(bx, drawYmax);
 			gIm.stroke();
 		}
-			
+
 		/* X-as */
-		if ( (drawXAxis) && (interactiePanel.assenZichtbaar) ) {	
+		if ((drawXAxis) && (interactiePanel.assenZichtbaar))
+		{
 			gIm.beginPath();
-			gIm.moveTo(drawXmin, hoogte-by);
-			gIm.lineTo(drawXmax, hoogte-by);
+			gIm.moveTo(drawXmin, hoogte - by);
+			gIm.lineTo(drawXmax, hoogte - by);
 			gIm.stroke();
 		}
-			
-		if (interactiePanel.assenZichtbaar) {
+
+		if (interactiePanel.assenZichtbaar)
+		{
 			TextMetrics tm = gIm.measureText("O");
 			int woordBreedteO = (int) Math.round(tm.getWidth());
-						
+
 			gIm.setFont(cFontStringItalic);
-			if ( (drawXAxis) && (drawYAxis) ) {
-				gIm.fillText("O",bx-woordBreedteO-cExtraAxisMargeX, hoogte-by+cFontHeightItalic);
+			if ((drawXAxis) && (drawYAxis))
+			{
+				gIm.fillText("O", bx - woordBreedteO - cExtraAxisMargeX, hoogte - by + cFontHeightItalic);
 			}
 			String xAsNaam = interactiePanel.grafiekXAsNaam;
 			String yAsNaam = interactiePanel.grafiekYAsNaam;
@@ -854,345 +1009,444 @@ public class GrafiekGWTVeld {
 			int woordBreedteX = (int) Math.round(tm.getWidth());
 			tm = gIm.measureText(yAsNaam);
 			int woordBreedteY = (int) Math.round(tm.getWidth());
-			
+
 			xAsNaamLinks = drawXmax - woordBreedteX - 3 * cExtraAxisMargeX;
-			xAsNaamOnder = Math.max(drawYmin + 0 *cExtraAxisMargeY + cFontHeightItalic, Math.min(drawYmax - cExtraAxisMargeY, hoogte - by - cExtraAxisMargeY) );
+			xAsNaamOnder = Math.max(drawYmin + 0 * cExtraAxisMargeY + cFontHeightItalic,
+				Math.min(drawYmax - cExtraAxisMargeY, hoogte - by - cExtraAxisMargeY));
 			xAsNaamRechts = xAsNaamLinks + woordBreedteX;
 			xAsNaamBoven = xAsNaamOnder - cFontHeightItalic;
 
-			yAsNaamLinks = Math.max( drawXmin+ 1 * cExtraAxisMargeX, Math.min(drawXmax - woordBreedteY - 1 * cExtraAxisMargeX, bx+ 1 * cExtraAxisMargeX + cAxesThicknessInPixels) );
-			yAsNaamOnder = drawYmin + cFontHeightItalic +3 * cExtraAxisMargeY;
+			yAsNaamLinks = Math.max(drawXmin + 1 * cExtraAxisMargeX, Math.min(
+				drawXmax - woordBreedteY - 1 * cExtraAxisMargeX, bx + 1 * cExtraAxisMargeX + cAxesThicknessInPixels));
+			yAsNaamOnder = drawYmin + cFontHeightItalic + 3 * cExtraAxisMargeY;
 			yAsNaamRechts = yAsNaamLinks + woordBreedteY;
 			yAsNaamBoven = yAsNaamOnder - cFontHeightItalic;
-			
-			gIm.fillText(xAsNaam,  xAsNaamLinks, xAsNaamOnder);
+
+			gIm.fillText(xAsNaam, xAsNaamLinks, xAsNaamOnder);
 			gIm.fillText(yAsNaam, yAsNaamLinks, yAsNaamOnder);
 
-			//gIm.setFont(new Font(font.getName(), Font.ITALIC, font.getSize()));
-			//FontMetrics fm = g.getFontMetrics();
-			//int woordbreedte = fm.stringWidth(xAsNaam);
-			//int formuleWoordbreedte = fm.stringWidth(yAsNaam);
-			//g.drawString(xAsNaam, breedte-woordbreedte-5,Math.min(hoogte-17, hoogte-(by)-5));
-			
-			//g.drawString(yAsNaam, Math.max(18,bx+6), 9);
-			
-			//xAsNaamActivator.setBounds(breedte-woordbreedte-5, Math.min(hoogte-17, hoogte-(by)-15), woordbreedte, 15);
-			//yAsNaamActivator.setBounds(Math.max(18,bx+6), 0, formuleWoordbreedte, 15);
-			
-			//xAsNaamTF.setLocation(breedte-85,Math.min(hoogte-17, hoogte-(by)-15));
-			//yAsNaamTF.setLocation(Math.max(18,bx+6),0);
-			//*/
+			// gIm.setFont(new Font(font.getName(), Font.ITALIC,
+			// font.getSize()));
+			// FontMetrics fm = g.getFontMetrics();
+			// int woordbreedte = fm.stringWidth(xAsNaam);
+			// int formuleWoordbreedte = fm.stringWidth(yAsNaam);
+			// g.drawString(xAsNaam, breedte-woordbreedte-5,Math.min(hoogte-17,
+			// hoogte-(by)-5));
+
+			// g.drawString(yAsNaam, Math.max(18,bx+6), 9);
+
+			// xAsNaamActivator.setBounds(breedte-woordbreedte-5,
+			// Math.min(hoogte-17, hoogte-(by)-15), woordbreedte, 15);
+			// yAsNaamActivator.setBounds(Math.max(18,bx+6), 0,
+			// formuleWoordbreedte, 15);
+
+			// xAsNaamTF.setLocation(breedte-85,Math.min(hoogte-17,
+			// hoogte-(by)-15));
+			// yAsNaamTF.setLocation(Math.max(18,bx+6),0);
+			// */
 		}
 
-		if (interactiePanel.tekenDocentFuncties != null && (interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK
-				|| interactiePanel.typeOpdracht == GraphToolGWT.TEKENPUNTENBIJFORMULE && interactiePanel.score > 0 && (interactiePanel.mode == 0 || interactiePanel.mode == 1 || interactiePanel.nagekeken)))
-		{	for(int j = 0; j < interactiePanel.tekenDocentFuncties.length; j++)
-			{	if(interactiePanel.tekenDocentFuncties[j] != null)
-				{	int xMin = Math.max(witruimteY?maxWoordBreedteY:drawXmin, interactiePanel.xPositief?bx:drawXmin);
-					tekenFunctie(gIm, xMin, interactiePanel.tekenDocentFuncties[j], interactiePanel.docentDomeinen[j], 
-							interactiePanel.docentColor);
+		if (interactiePanel.tekenDocentFuncties != null
+			&& (interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK
+				|| interactiePanel.typeOpdracht == GraphToolGWT.TEKENPUNTENBIJFORMULE && interactiePanel.score > 0
+					&& (interactiePanel.mode == 0 || interactiePanel.mode == 1 || interactiePanel.nagekeken)))
+		{
+			for (int j = 0; j < interactiePanel.tekenDocentFuncties.length; j++)
+			{
+				if (interactiePanel.tekenDocentFuncties[j] != null)
+				{
+					int xMin = Math.max(witruimteY ? maxWoordBreedteY : drawXmin,
+						interactiePanel.xPositief ? bx : drawXmin);
+					tekenFunctie(gIm, xMin, interactiePanel.tekenDocentFuncties[j], interactiePanel.docentDomeinen[j],
+						interactiePanel.docentColor);
 				}
 			}
 		}
-		
-		if(!((interactiePanel.mode == 2 || interactiePanel.mode == 3) && !interactiePanel.nagekeken && 
-				(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)))
-				//|| interactiePanel.mode == 0 || interactiePanel.mode == 1) 
-			//gaat dit niet fout bij toetsen waarbij leerling vrij moet kunnen tekenen? Jawel en ook als docent al functies klaarzet en daarna ander type opdrachten zet. Daarom if-statement veranderd. 
-			for(int j=0 ; j<interactiePanel.functies.length ; j++) {	
-				
-				if(interactiePanel.functies[j]!=null && interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam)) {	
-					
-					int xMin = Math.max(witruimteY?maxWoordBreedteY:drawXmin, interactiePanel.xPositief?bx:drawXmin);
+
+		if (!((interactiePanel.mode == 2 || interactiePanel.mode == 3) && !interactiePanel.nagekeken
+			&& (interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK
+				|| interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)))
+		{
+			for (int j = 0; j < interactiePanel.functies.length; j++)
+			{
+				if (interactiePanel.functies[j] != null
+					&& interactiePanel.yAsNaam.equals(interactiePanel.grafiekYAsNaam))
+				{
+					int xMin = Math.max(witruimteY ? maxWoordBreedteY : drawXmin,
+						interactiePanel.xPositief ? bx : drawXmin);
 
 					tekenFunctie(gIm, xMin, interactiePanel.functies[j], interactiePanel.domeinen[j],
-							(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK || interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN 
-							|| interactiePanel.grafiekKleuren)?CssColor.make(interactiePanel.colors[j]):CssColor.make(interactiePanel.colors[0]));
-				
-					if(interactiePanel.traceOptie) {
+						(interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJGRAFIEK
+							|| interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN
+							|| interactiePanel.grafiekKleuren) ? CssColor.make(interactiePanel.colors[j])
+								: CssColor.make(interactiePanel.colors[0]));
+
+					if (interactiePanel.traceOptie)
+					{
 						Expressie expressie;
 						expressie = interactiePanel.functies[j];
-						
-						for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
-							expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
-						}						
-						
+
+						for (int i = 0; i < interactiePanel.schuifParameters.length; i++)
+						{
+							expressie = expressie.substitueer(interactiePanel.schuifParameters[i].geefWaarde(),
+								interactiePanel.schuifParameters[i].geefNaam());
+						}
+
 						gIm.setStrokeStyle(grijs);
 						gIm.setFillStyle(grijs);
 						fontString = "10px sans-serif";
 						gIm.setFont(fontString);
-						
-						//g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
+
+						// g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
 						beginwaarde = Math.max(Math.min(beginwaarde, drawXmax), drawXmin);
 						tracex = Math.max(Math.min(tracex, drawXmax), drawXmin);
-						
-						double d = bx+1.0*((selectnummer+beginwaarde)*interactiePanel.eenheidx);
+
+						double d = bx + 1.0 * ((selectnummer + beginwaarde) * interactiePanel.eenheidx);
 						int x = (int) Math.round(d);
-//						double d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
-//							(selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
+						// double d0 =
+						// interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10,
+						// (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
+						// (selectnummer+beginwaarde)*interactiePanel.schaalFactorX);
 						double d0;
-						if (interactiePanel.manualScalingX) {
-//							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
-//								 (selectnummer+beginwaarde)*interactiePanel.eenheidxValue); 
-							d0 = expressie.geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
-								 (selectnummer+beginwaarde)*interactiePanel.eenheidxValue); 
-							
-						} else {
-//							d0 = interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
-//								 (selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
-							d0 = expressie.geefWaarde(interactiePanel.xAsLog?Math.pow(10, (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
-								 (selectnummer+beginwaarde)*interactiePanel.schaalFactorX); 
+						if (interactiePanel.manualScalingX)
+						{
+							// d0 =
+							// interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10,
+							// (selectnummer+beginwaarde)*interactiePanel.eenheidxValue):
+							// (selectnummer+beginwaarde)*interactiePanel.eenheidxValue);
+							d0 = expressie.geefWaarde(interactiePanel.xAsLog
+								? Math.pow(10, (selectnummer + beginwaarde) * interactiePanel.eenheidxValue)
+								: (selectnummer + beginwaarde) * interactiePanel.eenheidxValue);
+
 						}
-						
-						if(!tracing && !Double.isNaN(d0) && selectnummer<8 && selectnummer>-1 &&
-								x >= interactiePanel.domeinen[j][0] && x <= interactiePanel.domeinen[j][1]) {	
-//							int y = (int)Math.round(interactiePanel.yAsLog?Math.log10(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*d0/interactiePanel.schaalFactorY)):
-//								hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*d0/interactiePanel.schaalFactorY)); 
+						else
+						{
+							// d0 =
+							// interactiePanel.functies[j].geefWaarde(interactiePanel.xAsLog?Math.pow(10,
+							// (selectnummer+beginwaarde)*interactiePanel.schaalFactorX):
+							// (selectnummer+beginwaarde)*interactiePanel.schaalFactorX);
+							d0 = expressie.geefWaarde(interactiePanel.xAsLog
+								? Math.pow(10, (selectnummer + beginwaarde) * interactiePanel.schaalFactorX)
+								: (selectnummer + beginwaarde) * interactiePanel.schaalFactorX);
+						}
+
+						if (!tracing && !Double.isNaN(d0) && selectnummer < 8 && selectnummer > -1
+							&& x >= interactiePanel.domeinen[j][0] && x <= interactiePanel.domeinen[j][1])
+						{
+							// int y =
+							// (int)Math.round(interactiePanel.yAsLog?Math.log10(hoogte
+							// -(interactiePanel.beginy+interactiePanel.eenheidy*d0/interactiePanel.schaalFactorY)):
+							// hoogte
+							// -(interactiePanel.beginy+interactiePanel.eenheidy*d0/interactiePanel.schaalFactorY));
 							int y = (int) Math.round(valueYtoPixels(d0));
-							
+
 							gIm.beginPath();
-							//gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
-							gIm.arc(x, y, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
+							// gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
+							gIm.arc(x, y, GraphToolGWT.cPointRadius, 0, 2 * Math.PI);
 							gIm.closePath();
 							gIm.fill();
 							gIm.stroke();
-							
+
 							gIm.beginPath();
 							gIm.moveTo(x, Math.min(hoogte - by, hoogte));
 							gIm.lineTo(x, y);
-							gIm.lineTo(Math.max(0,  bx), y);
+							gIm.lineTo(Math.max(0, bx), y);
 							gIm.lineTo(x, y);
 							gIm.closePath();
 							gIm.stroke();
-//							gIm.beginPath();
-//							gIm.moveTo(x, Math.min(hoogte - by, hoogte));
-//							gIm.lineTo(x, y);
-//							gIm.lineTo(Math.max(0,  bx), y);
-//							gIm.lineTo(x, y);
-//							gIm.closePath();
-//							gIm.stroke();
+							// gIm.beginPath();
+							// gIm.moveTo(x, Math.min(hoogte - by, hoogte));
+							// gIm.lineTo(x, y);
+							// gIm.lineTo(Math.max(0, bx), y);
+							// gIm.lineTo(x, y);
+							// gIm.closePath();
+							// gIm.stroke();
 
-							
 							/*
-							g.fillOval(x-2,y-2,5,5);
-							g.setStroke(new BasicStroke(1.0f));
-							g.drawLine(x,y,x,Math.min(hoogte-by, hoogte));
-							g.drawLine(x,y,Math.max(0,bx),y);
-							g.setStroke(new BasicStroke(1.0f));
-							*/
-							tracexD = interactiePanel.xAsLog?Math.log10(d):d;
+							 * g.fillOval(x-2,y-2,5,5); g.setStroke(new
+							 * BasicStroke(1.0f));
+							 * g.drawLine(x,y,x,Math.min(hoogte-by, hoogte));
+							 * g.drawLine(x,y,Math.max(0,bx),y); g.setStroke(new
+							 * BasicStroke(1.0f));
+							 */
+							tracexD = interactiePanel.xAsLog ? Math.log10(d) : d;
 							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
 							tracex = (int) Math.round(tracexD);
 							stand = tracex;
-							//interactiePanel.slider.zetStand(tracex);
-							
-							//double dTraceX = Math.round(100*(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD))/100;
-							//double dTraceY = Math.round(100*interactiePanel.functies[j].geefWaarde(dTraceX))/100;
-//							double dTraceX = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD; 
+							// interactiePanel.slider.zetStand(tracex);
+
+							// double dTraceX =
+							// Math.round(100*(interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD
+							// +
+							// interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD))/100;
+							// double dTraceY =
+							// Math.round(100*interactiePanel.functies[j].geefWaarde(dTraceX))/100;
+							// double dTraceX =
+							// interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD
+							// +
+							// interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
 							double dTraceX;
-							if (interactiePanel.manualScalingX) {
-								dTraceX = interactiePanel.eenheidxValue*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.eenheidxValue*tracexD/interactiePanel.eenheidxD; 
-							} else {
-								dTraceX = interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD; 
+							if (interactiePanel.manualScalingX)
+							{
+								dTraceX = interactiePanel.eenheidxValue * (-interactiePanel.beginx)
+									/ interactiePanel.eenheidxD
+									+ interactiePanel.eenheidxValue * tracexD / interactiePanel.eenheidxD;
 							}
-							// double dTraceY = interactiePanel.functies[j].geefWaarde(dTraceX);
+							else
+							{
+								dTraceX = interactiePanel.schaalFactorX * (-interactiePanel.beginx)
+									/ interactiePanel.eenheidxD
+									+ interactiePanel.schaalFactorX * tracexD / interactiePanel.eenheidxD;
+							}
+							// double dTraceY =
+							// interactiePanel.functies[j].geefWaarde(dTraceX);
 							double dTraceY = expressie.geefWaarde(dTraceX);
-							dTraceX = Math.round(100*dTraceX)/100.0;
-							dTraceY = Math.round(100*dTraceY)/100.0;
-//							int tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
+							dTraceX = Math.round(100 * dTraceX) / 100.0;
+							dTraceY = Math.round(100 * dTraceY) / 100.0;
+							// int tracey = (int)Math.round(hoogte
+							// -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
 							int tracey;
-							if (interactiePanel.manualScalingY) {
-								tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.eenheidyValue));
-							} else {
-								tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
+							if (interactiePanel.manualScalingY)
+							{
+								tracey = (int) Math.round(hoogte - (interactiePanel.beginy
+									+ interactiePanel.eenheidy * dTraceY / interactiePanel.eenheidyValue));
+							}
+							else
+							{
+								tracey = (int) Math.round(hoogte - (interactiePanel.beginy
+									+ interactiePanel.eenheidy * dTraceY / interactiePanel.schaalFactorY));
 							}
 
-							//String xWaarde = interactiePanel.dfTrace.format(dTraceX);
-							//String yWaarde = interactiePanel.dfTrace.format(dTraceY);
+							// String xWaarde =
+							// interactiePanel.dfTrace.format(dTraceX);
+							// String yWaarde =
+							// interactiePanel.dfTrace.format(dTraceY);
 							String xWaarde = "" + dTraceX;
 							String yWaarde = "" + dTraceY;
-							//g.setFont(interactiePanel.font);
-							//interactiePanel.fm = g.getFontMetrics();
+							// g.setFont(interactiePanel.font);
+							// interactiePanel.fm = g.getFontMetrics();
 							TextMetrics tm = gIm.measureText(xWaarde);
 							int woordBreedteX = (int) Math.round(tm.getWidth());
 							int woordHoogteX = 10;
 							tm = gIm.measureText(yWaarde);
 							int woordBreedteY = (int) Math.round(tm.getWidth());
 							int woordHoogteY = 10;
-							
-							//int woordBreedteX = interactiePanel.fm.stringWidth(xWaarde);
-							//int woordHoogteX = interactiePanel.fm.getAscent();
-							//int woordBreedteY = interactiePanel.fm.stringWidth(yWaarde);
-							//int woordHoogteY = interactiePanel.fm.getAscent();
+
+							// int woordBreedteX =
+							// interactiePanel.fm.stringWidth(xWaarde);
+							// int woordHoogteX =
+							// interactiePanel.fm.getAscent();
+							// int woordBreedteY =
+							// interactiePanel.fm.stringWidth(yWaarde);
+							// int woordHoogteY =
+							// interactiePanel.fm.getAscent();
 							gIm.setFillStyle(geel);
 							gIm.setStrokeStyle(zwart);
-							//g.setColor(new Color(255,255,200));
-							//g.fillRect(tracex-woordBreedteX/2-2, Math.min(hoogte-by, hoogte-woordHoogteX-2), woordBreedteX+4, woordHoogteX+2);
-							//g.fillRect(Math.max(0,bx-woordBreedteY), tracey-woordHoogteY/2-2, woordBreedteY+4, woordHoogteY+4);
-							//g.setColor(Color.black);
+							// g.setColor(new Color(255,255,200));
+							// g.fillRect(tracex-woordBreedteX/2-2,
+							// Math.min(hoogte-by, hoogte-woordHoogteX-2),
+							// woordBreedteX+4, woordHoogteX+2);
+							// g.fillRect(Math.max(0,bx-woordBreedteY),
+							// tracey-woordHoogteY/2-2, woordBreedteY+4,
+							// woordHoogteY+4);
+							// g.setColor(Color.black);
 							gIm.beginPath();
-							gIm.rect(tracex-woordBreedteX/2-cSliderBoxBorderMargin, 
-									Math.min(hoogte-by, hoogte-cFontHeight-cSliderBoxBorderMargin), 
-									woordBreedteX+2*cSliderBoxBorderMargin, cFontHeight+cSliderBoxBorderMargin);
+							gIm.rect(tracex - woordBreedteX / 2 - cSliderBoxBorderMargin,
+								Math.min(hoogte - by, hoogte - cFontHeight - cSliderBoxBorderMargin),
+								woordBreedteX + 2 * cSliderBoxBorderMargin, cFontHeight + cSliderBoxBorderMargin);
 							gIm.closePath();
 							gIm.fill();
 							gIm.stroke();
 							gIm.beginPath();
-							gIm.rect(Math.max(0,bx-cFontHeight), tracey-cFontHeight/2-cSliderBoxBorderMargin, 
-									woordBreedteY+2*cSliderBoxBorderMargin, cFontHeight+2*cSliderBoxBorderMargin);
+							gIm.rect(Math.max(0, bx - cFontHeight), tracey - cFontHeight / 2 - cSliderBoxBorderMargin,
+								woordBreedteY + 2 * cSliderBoxBorderMargin, cFontHeight + 2 * cSliderBoxBorderMargin);
 							gIm.closePath();
 							gIm.fill();
 							gIm.stroke();
 							gIm.setFillStyle(zwart);
-							gIm.fillText(xWaarde, tracex-woordBreedteX/2, Math.min(hoogte-by+cFontHeight, hoogte-cSliderBoxBorderMargin));
-							gIm.fillText(yWaarde, Math.max(cSliderBoxBorderMargin,bx-woordBreedteY+cSliderBoxBorderMargin), 
-									tracey+cFontHeight/2);
+							gIm.fillText(xWaarde, tracex - woordBreedteX / 2,
+								Math.min(hoogte - by + cFontHeight, hoogte - cSliderBoxBorderMargin));
+							gIm.fillText(yWaarde,
+								Math.max(cSliderBoxBorderMargin, bx - woordBreedteY + cSliderBoxBorderMargin),
+								tracey + cFontHeight / 2);
 						}
-						else {	
-//							double dTraceX = interactiePanel.xAsLog?Math.pow(10, interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD 
-//								+ interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)
-//								/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
+						else
+						{
+							// double dTraceX =
+							// interactiePanel.xAsLog?Math.pow(10,
+							// interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD
+							// +
+							// interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)
+							// /interactiePanel.eenheidxD +
+							// interactiePanel.schaalFactorX*tracexD/interactiePanel.eenheidxD;
 							tracexD = Math.min(drawXmax, Math.max(drawXmin, tracexD));
 							tracex = (int) Math.round(tracexD);
 							stand = tracex;
 							double dTraceX = pixelsXtoValue(tracexD);
 
-//							double dTraceY = interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
-//								(interactiePanel.functies[j].substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
-							double dTraceY = interactiePanel.yAsLog?Math.log10((expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde()):
-								(expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
+							// double dTraceY =
+							// interactiePanel.yAsLog?Math.log10((interactiePanel.functies[j].substitueer(dTraceX,
+							// interactiePanel.grafiekXAsNaam)).geefWaarde()):
+							// (interactiePanel.functies[j].substitueer(dTraceX,
+							// interactiePanel.grafiekXAsNaam)).geefWaarde();
+							double dTraceY = interactiePanel.yAsLog
+								? Math.log10(
+									(expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde())
+								: (expressie.substitueer(dTraceX, interactiePanel.grafiekXAsNaam)).geefWaarde();
 
-							if(!Double.isNaN(dTraceY) && tracex<interactiePanel.breedte && tracex>-1 && (!interactiePanel.xPositief || tracex>bx)
-									&& dTraceX >= interactiePanel.domeinen[j][0] && dTraceX <= interactiePanel.domeinen[j][1]) {	
-								dTraceX = Math.round(100*dTraceX)/100.0;
-								dTraceY = Math.round(100*dTraceY)/100.0;
-							
-//								int tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
+							if (!Double.isNaN(dTraceY) && tracex < interactiePanel.breedte && tracex > -1
+								&& (!interactiePanel.xPositief || tracex > bx)
+								&& dTraceX >= interactiePanel.domeinen[j][0]
+								&& dTraceX <= interactiePanel.domeinen[j][1])
+							{
+								dTraceX = Math.round(100 * dTraceX) / 100.0;
+								dTraceY = Math.round(100 * dTraceY) / 100.0;
+
+								// int tracey = (int)Math.round(hoogte
+								// -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
 								int tracey;
-								if (interactiePanel.manualScalingY) {
-									tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.eenheidyValue));
-								} else {
-									tracey = (int)Math.round(hoogte -(interactiePanel.beginy+interactiePanel.eenheidy*dTraceY/interactiePanel.schaalFactorY));
+								if (interactiePanel.manualScalingY)
+								{
+									tracey = (int) Math.round(hoogte - (interactiePanel.beginy
+										+ interactiePanel.eenheidy * dTraceY / interactiePanel.eenheidyValue));
 								}
-								
+								else
+								{
+									tracey = (int) Math.round(hoogte - (interactiePanel.beginy
+										+ interactiePanel.eenheidy * dTraceY / interactiePanel.schaalFactorY));
+								}
+
 								String xWaarde = "" + dTraceX;
-								String yWaarde = "" + (interactiePanel.yAsLog?Math.pow(10, dTraceY):dTraceY);
-								
+								String yWaarde = "" + (interactiePanel.yAsLog ? Math.pow(10, dTraceY) : dTraceY);
+
 								TextMetrics tm = gIm.measureText(xWaarde);
 								int woordBreedteX = (int) Math.round(tm.getWidth());
 								tm = gIm.measureText(yWaarde);
 								int woordBreedteY = (int) Math.round(tm.getWidth());
-								
-								if (tracey <= drawYmax && tracey >= drawYmin ) {
+
+								if (tracey <= drawYmax && tracey >= drawYmin)
+								{
 									gIm.beginPath();
-									gIm.moveTo(Math.min(drawXmax, Math.max(tracex, drawXmin)), Math.min(drawYmax, Math.max(drawYmin, hoogte-by)));
-									gIm.lineTo(Math.min(drawXmax, Math.max(tracex, drawXmin)),  Math.min(drawYmax, Math.max(drawYmin, tracey)));
-//									if (bx <= drawXmax && bx >= drawXmin ) {
-										gIm.lineTo(Math.min(drawXmax, Math.max(bx, drawXmin)), Math.min(drawYmax, Math.max(drawYmin, tracey)));
-//									}
+									gIm.moveTo(Math.min(drawXmax, Math.max(tracex, drawXmin)),
+										Math.min(drawYmax, Math.max(drawYmin, hoogte - by)));
+									gIm.lineTo(Math.min(drawXmax, Math.max(tracex, drawXmin)),
+										Math.min(drawYmax, Math.max(drawYmin, tracey)));
+									// if (bx <= drawXmax && bx >= drawXmin ) {
+									gIm.lineTo(Math.min(drawXmax, Math.max(bx, drawXmin)),
+										Math.min(drawYmax, Math.max(drawYmin, tracey)));
+									// }
 									gIm.stroke();
 									gIm.beginPath();
-									gIm.arc(tracex, tracey, GraphToolGWT.cPointRadius, 0, 2* Math.PI);
+									gIm.arc(tracex, tracey, GraphToolGWT.cPointRadius, 0, 2 * Math.PI);
 									gIm.closePath();
 									gIm.fill();
 									gIm.stroke();
-									
+
 									/* Rectangle for Y Value */
 									gIm.setFillStyle(geel);
 									gIm.beginPath();
-									gIm.rect(Math.max(drawXmin,bx-woordBreedteY-2*cSliderBoxBorderMargin), 
-											tracey-cFontHeight/2-cSliderBoxBorderMargin, 
-											woordBreedteY+2*cSliderBoxBorderMargin, cFontHeight+2*cSliderBoxBorderMargin);
+									gIm.rect(Math.max(drawXmin, bx - woordBreedteY - 2 * cSliderBoxBorderMargin),
+										tracey - cFontHeight / 2 - cSliderBoxBorderMargin,
+										woordBreedteY + 2 * cSliderBoxBorderMargin,
+										cFontHeight + 2 * cSliderBoxBorderMargin);
 									gIm.closePath();
 									gIm.fill();
 									gIm.stroke();
 									gIm.setFillStyle(zwart);
-									gIm.fillText(yWaarde, Math.max(drawXmin+cSliderBoxBorderMargin,
-											bx-woordBreedteY-cSliderBoxBorderMargin), tracey+cFontHeight/2);
+									gIm.fillText(yWaarde, Math.max(drawXmin + cSliderBoxBorderMargin,
+										bx - woordBreedteY - cSliderBoxBorderMargin), tracey + cFontHeight / 2);
 
 								}
-								
+
 								gIm.setFillStyle(geel);
 								gIm.setStrokeStyle(zwart);
-								
+
 								/* Rectangle for X Value */
 								gIm.beginPath();
-								gIm.rect(tracex-woordBreedteX/2-cSliderBoxBorderMargin, 
-										Math.min(drawYmax, Math.max(drawYmin, hoogte-by)), 
-										woordBreedteX+2*cSliderBoxBorderMargin, cFontHeight+cSliderBoxBorderMargin);
+								gIm.rect(tracex - woordBreedteX / 2 - cSliderBoxBorderMargin,
+									Math.min(drawYmax, Math.max(drawYmin, hoogte - by)),
+									woordBreedteX + 2 * cSliderBoxBorderMargin, cFontHeight + cSliderBoxBorderMargin);
 								gIm.closePath();
 								gIm.fill();
 								gIm.stroke();
 								gIm.setFillStyle(zwart);
-								gIm.fillText(xWaarde, tracex-woordBreedteX/2, 
-										Math.min(drawYmax+cFontHeight, Math.max(drawYmin+cFontHeight, hoogte-by+cFontHeight))
-										);
+								gIm.fillText(xWaarde, tracex - woordBreedteX / 2, Math.min(drawYmax + cFontHeight,
+									Math.max(drawYmin + cFontHeight, hoogte - by + cFontHeight)));
 
 							}
 						}
-						
+
 						gIm.setFillStyle(rood);
 						gIm.setStrokeStyle(grijs);
-						
+
 						gIm.beginPath();
-						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), GraphToolGWT.cPointRadius, 0, 2* Math.PI);
+						gIm.arc(stand, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)), GraphToolGWT.cPointRadius,
+							0, 2 * Math.PI);
 						gIm.closePath();
 						gIm.fill();
 						gIm.stroke();
 
 						gIm.beginPath();
-						gIm.moveTo(drawXmin, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)) );
-						gIm.lineTo(drawXmax, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)) );
-						gIm.stroke();						
-						
+						gIm.moveTo(drawXmin, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)));
+						gIm.lineTo(drawXmax, Math.min(drawYmax, Math.max(hoogte - by, drawYmin)));
+						gIm.stroke();
 					}
-					
 				}
 			}
-
+		}
+		
 		tekenOngelijkheden(gIm);
 		tekenVerticaleLijnen(gIm);
-		tekenVeldGrafieken(imin, imax, jmin, jmax, scalingMultiplyX, scalingMultiplyY, 
-				(interactiePanel.veldLargerGridStartPoints || grafiekSchuivenActief) );
-		
-		//Punten en grafieken uit tekenEditor;
-		if(interactiePanel.docentGraphPoints != null && interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN) {
-			tekenGraphPoints(interactiePanel.getActiveIndex(), gIm, true, witruimteY, maxWoordBreedteY, bx, breedte, hoogte);
+		tekenVeldGrafieken(imin, imax, jmin, jmax, scalingMultiplyX, scalingMultiplyY,
+			(interactiePanel.veldLargerGridStartPoints || grafiekSchuivenActief));
+
+		// Punten en grafieken uit tekenEditor;
+		if (interactiePanel.docentGraphPoints != null
+			&& interactiePanel.typeOpdracht == GraphToolGWT.VINDFORMULEBIJPUNTEN)
+		{
+			tekenGraphPoints(interactiePanel.getActiveIndex(), gIm, true, witruimteY, maxWoordBreedteY, bx, breedte,
+				hoogte);
 		}
-				
-		if(interactiePanel.graphPoints != null) {	
-			// eerst de punten en verbindingen van de niet actieve grafieken	
-			for (int index = 1; index <= interactiePanel.getNumGraphs(); index++) {	
-				if (index != interactiePanel.getActiveIndex()) {	
+
+		if (interactiePanel.graphPoints != null)
+		{
+			// eerst de punten en verbindingen van de niet actieve grafieken
+			for (int index = 1; index <= interactiePanel.getNumGraphs(); index++)
+			{
+				if (index != interactiePanel.getActiveIndex())
+				{
 					tekenGraphPoints(index, gIm, false, witruimteY, maxWoordBreedteY, bx, breedte, hoogte);
 				}
 			}
 			// dan de punten en verbindingen van de actieve grafiek
-			tekenGraphPoints(interactiePanel.getActiveIndex(), gIm, false, witruimteY, maxWoordBreedteY, bx, breedte, hoogte);
+			tekenGraphPoints(interactiePanel.getActiveIndex(), gIm, false, witruimteY, maxWoordBreedteY, bx, breedte,
+				hoogte);
 		}
-		
-//		if(interactiePanel.traceOptie) {	
-//			gIm.setStrokeStyle(zwart);
-//			gIm.setFillStyle(rood);
-//		
-//			gIm.beginPath();
-//			gIm.moveTo(0, hoogte - by);
-//			gIm.lineTo(breedte, hoogte - by);
-//			gIm.stroke();
-//			
-//			gIm.beginPath();
-//			gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
-//			gIm.closePath();
-//			gIm.fill();
-//			gIm.stroke();
-//		}
-		//schuifParameters tekenen.
-		if(interactiePanel.schuifParameters != null) {	
-			for(int i = 0; i < interactiePanel.schuifParameters.length; i++) {	
+
+		// if(interactiePanel.traceOptie) {
+		// gIm.setStrokeStyle(zwart);
+		// gIm.setFillStyle(rood);
+		//
+		// gIm.beginPath();
+		// gIm.moveTo(0, hoogte - by);
+		// gIm.lineTo(breedte, hoogte - by);
+		// gIm.stroke();
+		//
+		// gIm.beginPath();
+		// gIm.arc(stand, hoogte - by, 3, 0, 2* Math.PI);
+		// gIm.closePath();
+		// gIm.fill();
+		// gIm.stroke();
+		// }
+		// schuifParameters tekenen.
+		if (interactiePanel.schuifParameters != null)
+		{
+			for (int i = 0; i < interactiePanel.schuifParameters.length; i++)
+			{
 				interactiePanel.schuifParameters[i].paint(gIm);
 			}
 		}
-		
+
 	}
 
 	public void tekenGraphPoints(int index, Context2d g, boolean docent, boolean witruimteY, int maxWoordBreedteY, int bx, int breedte, int hoogte) {	
@@ -1941,103 +2195,105 @@ public class GrafiekGWTVeld {
 		return parabool;
 	}
 	
-	public void tekenFunctie(Context2d g, int xMin, Expressie expressie, double[] domein, CssColor kleur) {
+	public void tekenFunctie(Context2d g, int xMin, Expressie expressie, double[] domein, CssColor kleur)
+	{
 		Expressie exp = expressie;
-		for (int i=0; i<interactiePanel.schuifParameters.length; i++) {
-			exp = exp.substitueer(interactiePanel.schuifParameters[i].geefWaarde(), interactiePanel.schuifParameters[i].geefNaam());			
+		for (int i = 0; i < interactiePanel.schuifParameters.length; i++)
+		{
+			exp = exp.substitueer(interactiePanel.schuifParameters[i].geefWaarde(),
+				interactiePanel.schuifParameters[i].geefNaam());
 		}
 		g.setLineWidth(cLineWidthCurvesAndFunctions);
 		g.beginPath();
 		//int xMin = Math.max(witruimteY?maxWoordBreedteY:0, interactiePanel.xPositief?bx:0);
 //		int xMax = breedte;
 		int xMax = drawXmax;
-		if(interactiePanel.domeinen != null && domein != null)
-		{	if(!Double.isInfinite(domein[0])) {	
-//				int xMin2 = (int) Math.round(interactiePanel.eenheidxD*(interactiePanel.xAsLog?Math.log10(domein[0]):domein[0])
-//					/interactiePanel.schaalFactorX + interactiePanel.beginx);	
+		if (interactiePanel.domeinen != null && domein != null)
+		{
+			if (!Double.isInfinite(domein[0]))
+			{	
 				int xMin2 = (int) Math.round(valueXtoPixels(domein[0]));
-
 				xMin = Math.max(xMin, xMin2);
 			}
-			if(!Double.isInfinite(domein[1])) {	
-//				int xMax2 = (int) Math.round(interactiePanel.eenheidxD*(interactiePanel.xAsLog?Math.log10(domein[1]):domein[1])
-//					/interactiePanel.schaalFactorX + interactiePanel.beginx);	
+			if(!Double.isInfinite(domein[1]))
+			{
 				int xMax2 = (int) Math.round(valueXtoPixels(domein[1]));
 				xMax = Math.min(xMax, xMax2);
 			}
 		}
-		for(int i=xMin; i<xMax ; i++)
-		{	double ii = i;
-//			double d0 = (exp.substitueer(interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii
-//					/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*ii/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();//dd0.doubleValue();
-//			double d1 = (exp.substitueer(interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)
-//					/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+1)/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();//dd0.doubleValue();
+		
+		for (int i = xMin; i < xMax; i++)
+		{
+			double ii = i;
 			double d0 = exp.substitueer(pixelsXtoValue(ii),  interactiePanel.grafiekXAsNaam).geefWaarde();
 			double d1 = exp.substitueer(pixelsXtoValue(ii+1),  interactiePanel.grafiekXAsNaam).geefWaarde();
 			double d0waarde = d0;
 			double d1waarde = d1;
-			if(Double.isNaN(d1) && !Double.isNaN(d0))
-			{	double newD1waarde = d0;
-				for(int k = 1; k < 20; k++)
-				{	double kd = k;
-//					double dt0 = (exp.substitueer(interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+kd/20)
-//						/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+kd/20)/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();
-					double dt0 = exp.substitueer(pixelsXtoValue(ii+kd/20),  interactiePanel.grafiekXAsNaam).geefWaarde();
+			if (Double.isNaN(d1) && !Double.isNaN(d0))
+			{
+				double newD1waarde = d0;
+				for (int k = 1; k < 20; k++)
+				{
+					double kd = k;
+					double dt0 = exp.substitueer(pixelsXtoValue(ii + kd / 20), interactiePanel.grafiekXAsNaam)
+						.geefWaarde();
 
-					if(Double.isNaN(dt0))
-					{	break;
+					if (Double.isNaN(dt0))
+					{
+						break;
 					}
 					else
 						newD1waarde = dt0;
 				}
 				d1waarde = newD1waarde;
 			}
-			if(Double.isNaN(d0) && !Double.isNaN(d1))
-			{	double newD0waarde = d1;
-				for(int k = 19; k > 0; k--)
-				{	double kd = k;
-//					double dt0 = (exp.substitueer(interactiePanel.xAsLog?Math.pow(10,interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+kd/20)
-//						/interactiePanel.eenheidxD):interactiePanel.schaalFactorX*(-interactiePanel.beginx)/interactiePanel.eenheidxD + interactiePanel.schaalFactorX*(ii+kd/20)/interactiePanel.eenheidxD, interactiePanel.grafiekXAsNaam)).geefWaarde();
+			if (Double.isNaN(d0) && !Double.isNaN(d1))
+			{
+				double newD0waarde = d1;
+				for (int k = 19; k > 0; k--)
+				{
+					double kd = k;
 					double dt0 = exp.substitueer(pixelsXtoValue(ii+kd/20),  interactiePanel.grafiekXAsNaam).geefWaarde();
-					if(Double.isNaN(dt0))
-					{	break;
+					if (Double.isNaN(dt0))
+					{
+						break;
 					}
 					else
 						newD0waarde = dt0;
 				}
 				d0waarde = newD0waarde;
 			}
-			if(!(Double.isNaN(d0) && Double.isNaN(d1)) && (!interactiePanel.yPositief || d0 >= 0 || d1 >= 0) ) {	
+			if (!(Double.isNaN(d0) && Double.isNaN(d1)) && (!interactiePanel.yPositief || d0 >= 0 || d1 >= 0) )
+			{	
 				int x0 = i;
 				int x1 = i+1;
-//				double dy0 = hoogte -(interactiePanel.beginy+interactiePanel.eenheidyD*(interactiePanel.yAsLog?Math.log10(d0waarde):d0waarde)/interactiePanel.schaalFactorY);
-//				double dy1 = hoogte -(interactiePanel.beginy+interactiePanel.eenheidyD*(interactiePanel.yAsLog?Math.log10(d1waarde):d1waarde)/interactiePanel.schaalFactorY);
 				double dy0 = valueYtoPixels(d0waarde);
 				double dy1 = valueYtoPixels(d1waarde);
 
-				if(dy0>1000)dy0 = 1000;
-				if(dy0<-1000)dy0 = -1000;
-				if(dy1>1000)dy1 = 1000;
-				if(dy1<-1000)dy1 = -1000;
+				if (dy0 > 1000)
+					dy0 = 1000;
+				if (dy0 < -1000)
+					dy0 = -1000;
+				if (dy1 > 1000)
+					dy1 = 1000;
+				if (dy1 < -1000)
+					dy1 = -1000;
 
-//				dy0 = Math.min(drawYmax, Math.max(drawYmin, dy0));
-//				dy1 = Math.min(drawYmax, Math.max(drawYmin, dy1));
-				
-				if ((dy0 >= drawYmin) && (dy0 <= drawYmax) && (dy1 >= drawYmin) && (dy1 <= drawYmax) ) {
-					//if(curve.getCurrentPoint()==null && (!interactiePanel.yPositief || d0>=0))
-					if(!interactiePanel.yPositief || d0>=0)
+				if ((dy0 >= drawYmin) && (dy0 <= drawYmax) && (dy1 >= drawYmin) && (dy1 <= drawYmax) )
+				{
+					if (!interactiePanel.yPositief || d0>=0)
 						g.moveTo((float)x0, (float)dy0);
-					//else if(curve.getCurrentPoint() == null) 
 					else
 						g.moveTo((float)x0, hoogte - interactiePanel.beginy);
-					if(!interactiePanel.yPositief || d1>=0) 
+					if (!interactiePanel.yPositief || d1>=0) 
 						g.lineTo((float)x1, (float)dy1);
 					else
 						g.lineTo((float)x1, hoogte - interactiePanel.beginy);
 				}
 			}
-			if(Double.isNaN(d1) || interactiePanel.yPositief && d1<0)
-			{	g.setFillStyle(kleur);
+			if (Double.isNaN(d1) || interactiePanel.yPositief && d1<0)
+			{
+				g.setFillStyle(kleur);
 				g.setStrokeStyle(kleur);
 				g.stroke();
 			}
@@ -2047,9 +2303,9 @@ public class GrafiekGWTVeld {
 		g.stroke();
 	}
 	
-	public void tekenVeldGrafieken(int gridXmin, int gridXmax, int gridYmin, int gridYmax, int scalingMultiplyX, int scalingMultiplyY, boolean veldLargerGridStartPoints) {
-       
-				
+	public void tekenVeldGrafieken(int gridXmin, int gridXmax, int gridYmin, int gridYmax, int scalingMultiplyX,
+		int scalingMultiplyY, boolean veldLargerGridStartPoints)
+	{
 		int loopCounter = 0;
 		// process schuifParameters
 		Expressie xAsExpressie = interactiePanel.veldFuncties[0][0];

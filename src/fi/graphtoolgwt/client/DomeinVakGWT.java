@@ -69,6 +69,11 @@ public class DomeinVakGWT extends LayoutPanel {
 		return editor.toString();
 	}
 	
+	public FormuleEditor getEditor()
+	{
+		return editor;
+	}
+	
 	public void maakEditorLeeg()
 	{
 		editor.clearAll();
