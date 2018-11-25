@@ -3105,6 +3105,23 @@ public class KladjeGWTVeld
 //		paintFormule(true);
 //	}
 	
+	private void setInSCRow(KStrokeContainer sc) {
+		KStrokeContainer referenceSC = null;
+		for (int i=0 ; i<kStrokeContainers.size() ; i++) {
+			KStrokeContainer ksc = kStrokeContainers.get(i);
+			if(ksc!=sc && ksc.getBox().y<sc.getBox().y && Math.abs(ksc.getBox().x-sc.getBox().x)<60
+					&& Math.abs(sc.getBox().y-(ksc.getBox().y+ksc.getBox().height))<60
+					&& (referenceSC==null || ksc.getBox().y>referenceSC.getBox().y)) {
+				referenceSC = ksc;
+			}
+		}
+		if(referenceSC!=null) {
+			int dx = referenceSC.getBox().x - sc.getBox().x;
+			int dy = referenceSC.getBox().y + referenceSC.getBox().height + 15 - sc.getBox().y;
+			sc.translate(dx,dy);
+		}
+	}
+	
 	private void closeCurrentContainer() {
 		
 		if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevantWhenReady()) {
@@ -3120,6 +3137,7 @@ public class KladjeGWTVeld
 //			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
 		
 		currentStrokeContainer.translate(-activeTranslation.x, -activeTranslation.y);
+		setInSCRow(currentStrokeContainer);
 		activeTranslation.x = 0;
 		activeTranslation.y = 0;
 		lastCurrentStrokeContainer = currentStrokeContainer;
@@ -3233,6 +3251,10 @@ public class KladjeGWTVeld
 					eigenaar.fireCheck_n();
 					return;
 				}
+				if(currentHiddenStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY)) {
+					return;
+				}
+				
 				if(!currentHiddenStrokeContainer.writeBoxContains(eventX, eventY)) {
 					closeCurrentHiddenContainer();
 					//addToHistory();
@@ -3267,6 +3289,12 @@ public class KladjeGWTVeld
 				}
 				else
 					eigenaar.fireCheck();
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.setRecognizeOff(true);
+				paint();
 				return;
 			}
 					

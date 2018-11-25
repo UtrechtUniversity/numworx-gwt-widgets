@@ -9,6 +9,9 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/bin.png")
    public ImageResource binResource();
    
+   @Source("fi/kladjegwt/client/images/eye.png")
+   public ImageResource eyeResource();
+   
    @Source("fi/kladjegwt/client/images/goedvink-new.png")
    public ImageResource goedvinkResource();
    

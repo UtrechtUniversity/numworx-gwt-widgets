@@ -7,6 +7,9 @@ import java.util.logging.Logger;
 
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Image;
 
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
@@ -39,6 +42,12 @@ public class KStrokeContainer {
 	
 	private FormuleViewer formuleViewer;
 	
+	private Image eyeImage;
+	private ImageElement eyeImageElement;
+	private boolean recognizeOff;
+	
+	private ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>> fakeStrokes = new  ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>>();
+	
 	//private double schrijfLeesFactor = 2;
 	//private boolean checkable;
 	private static Logger logger = Logger.getLogger("KStrokeContainer");
@@ -48,6 +57,10 @@ public class KStrokeContainer {
 		this.parent = parent;
 		
 		strokeContainer = new StrokeContainer();
+		
+		ImageResource eyeResource = parent.eigenaar.kladjeGWTClientBundle.eyeResource();
+		eyeImage = new Image(eyeResource);
+		eyeImageElement = ImageElement.as(eyeImage.getElement());
 	}
 	
 	public KStrokeContainer (KladjeGWTVeld parent, Rectangle defaultBox) {
@@ -56,17 +69,28 @@ public class KStrokeContainer {
 		this.box = defaultBox;
 		isInputSC = true;
 		strokeContainer = new StrokeContainer();
+		
+		ImageResource eyeResource = parent.eigenaar.kladjeGWTClientBundle.eyeResource();
+		eyeImage = new Image(eyeResource);
+		eyeImageElement = ImageElement.as(eyeImage.getElement());
 	}
 	
 	public boolean addStroke(Stroke stroke) {
 		box = null;
 		writeBox = null;
-		boolean b = strokeContainer.addStroke(stroke);
-		logger.info(strokeContainer.getFormulaString());
-		//if(!"-".equals(stroke.getOneStrokeTeken()))
-		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
-		formuleViewer.setColor(CssColor.make(38, 115, 182));
-		//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+		
+		boolean b = false;
+		if(recognizeOff)
+			b=strokeContainer.addStroke(stroke,false);
+		else {
+			strokeContainer.addStroke(stroke);
+			logger.info(strokeContainer.getFormulaString());
+			//if(!"-".equals(stroke.getOneStrokeTeken()))
+			formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
+			formuleViewer.setColor(CssColor.make(38, 115, 182));
+			//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+		}
+		
 		
 		corrigeerSCPositie();
 		if(getStrokeCount()==0)
@@ -108,6 +132,16 @@ public class KStrokeContainer {
 		int x = getWriteBox().x + getWriteBox().width - 33; 
 		int y = getWriteBox().y + getWriteBox().height - 36; 
 		return new Rectangle(x,y,30,30);
+	}
+	
+	public Rectangle getRecognizeButtonArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		int x = getWriteBox().x + 5; 
+		int y = getWriteBox().y + 5; 
+//		if(correct || isfalse || isHalf || recognizeOff)
+//			return new Rectangle(x,y,0,0);
+		return new Rectangle(x,y,30,20);
 	}
 	
 	private void drawcloseButton(Context2d g, Rectangle r) {
@@ -215,12 +249,15 @@ public class KStrokeContainer {
 
 				drawcloseButton(g, getCloseButtonArea());
 				
+				if(!correct && !isfalse && !isHalf && !recognizeOff)
+					g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
+				
 
 //				int d = (int)strokeContainer.averageHeight;
 //				g.setFillStyle(CssColor.make(0,0,0));
 //				g.fillText(""+d, 300, 20);
 				
-				if(formuleViewer!=null) {
+				if(!recognizeOff && formuleViewer!=null) {
 					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
 					int y = getWriteBox().y+5;//-20-formuleViewer.getHeight();
 					g.translate(x, y);
@@ -228,7 +265,7 @@ public class KStrokeContainer {
 					g.translate(-x, -y);
 				}
 				
-				if(parent.eigenaar.comRoot.hasListeners("action.check"))
+				if(parent.eigenaar.comRoot.hasListeners("action.check") && !recognizeOff)
 					drawCheckButton(g, getCheckButtonArea());
 				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
@@ -309,7 +346,7 @@ public class KStrokeContainer {
 				//g.fillRect(wbox.x + wbox.width-40, wbox.y, 40, 40);
 
 				drawcloseButton(g, getCloseButtonArea());
-				if(formuleViewer!=null) {
+				if(!recognizeOff && formuleViewer!=null) {
 					int x = Math.max(wbox.x+50, getBox()!=null ? getBox().x : 0) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
 					int y = wbox.y+5;//-20-formuleViewer.getHeight();
 					g.translate(x, y);
@@ -411,6 +448,9 @@ public class KStrokeContainer {
 		}
 	}
 	
+	public void setRecognizeOff(boolean b) {
+		recognizeOff=b;
+	}
 //	public void setActive (boolean b) {
 //		active = b;
 //		if(active && getBox()!=null) {
@@ -450,6 +490,8 @@ public class KStrokeContainer {
 	}
 	
 	public String getFormulaString() {
+		if(recognizeOff)
+			return "";
 		if(strokeContainer.isParseable())
 			return strokeContainer.getFormulaString();
 		return "";
@@ -500,6 +542,7 @@ public class KStrokeContainer {
 			
 			int width = Math.min(parent.breedte-40, widthSC+3*margin+47); //47 is breedte gele strook met knoppen)
 			int height = Math.min(parent.hoogte-40, heightSC + 2*margin);
+			width = Math.max(width, height);
 			
 			x = (int)Math.min(x, parent.breedte - width -20);
 			y = (int)Math.min(y, parent.hoogte - height -20);
@@ -608,6 +651,7 @@ public class KStrokeContainer {
 		map.put("correct", new Boolean(correct));
 		map.put("isfalse", new Boolean(isfalse));
 		map.put("isHalf", new Boolean(isHalf));
+		map.put("recognizeOff", new Boolean(recognizeOff));
 		return map;
 	}
 	
@@ -620,6 +664,8 @@ public class KStrokeContainer {
 			isfalse = launchState.getBoolean("isfalse");
 		if(launchState.containsKey("isHalf"))
 			isHalf = launchState.getBoolean("isHalf");
+		if(launchState.containsKey("recognizeOff"))
+			recognizeOff = launchState.getBoolean("recognizeOff");
 		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
 		formuleViewer.setColor(CssColor.make(38, 115, 182));
 	}
