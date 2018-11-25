@@ -1887,15 +1887,22 @@ public class KladjeGWTVeld
 		}
 		else if(lastCurrentStrokeContainer!=null) {
 			lastCurrentStrokeContainer.setCorrect(correct);
+			lastCurrentStrokeContainer.scale(schrijfLeesFactor/1.0);
+			lastCurrentStrokeContainer.setActive(true);
 			currentStrokeContainer = lastCurrentStrokeContainer;
 			if(correct && !correctEquationSend && eigenaar.comRoot.hasListeners("equation.correct")) {
 				eigenaar.sendCorrectEquation();
 				correctEquationSend = true;
 				eigenaar.fireCheck();
 			}
-			currentStrokeContainer.scale(schrijfLeesFactor/1.0);
-			currentStrokeContainer.setActive(true);
 			lastCurrentStrokeContainer = null;
+			
+//			if(currentStrokeContainer!=null) {
+//				currentStrokeContainer.scale(schrijfLeesFactor/1.0);
+//				currentStrokeContainer.setActive(true);
+//				lastCurrentStrokeContainer = null;
+//			}
+//			else return;
 		}
 		closeCurrentContainer();
 		addToHistory();
