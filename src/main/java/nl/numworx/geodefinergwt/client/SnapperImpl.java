@@ -22,7 +22,7 @@ class SnapperImpl extends Snapper {
 	}
 	
 	void pmUp(int x0, int y0, int id, PH ph) {
-		if(isGravityM()) {
+		if(isGravity()) {
 			int ox = (int) ph.getModel().getO().getX().longValue();
 			int dx = (int) ph.getModel().getU().getX().longValue() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
