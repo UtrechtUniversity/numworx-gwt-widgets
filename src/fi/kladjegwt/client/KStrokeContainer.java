@@ -11,6 +11,9 @@ import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
 
+import fi.wiskopdr.FormuleParser;
+import fi.wiskopdr.expressies.BasisExpressie;
+import fi.wiskopdr.expressies.Expressie;
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
@@ -41,9 +44,14 @@ public class KStrokeContainer {
 	private boolean isInputSC = false;
 	
 	private FormuleViewer formuleViewer;
+	private boolean isGetalsExpressie = false;
 	
 	private Image eyeImage;
 	private ImageElement eyeImageElement;
+	
+	private Image approxImage;
+	private ImageElement approxImageElement;
+	
 	private boolean recognizeOff;
 	
 	private ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>> fakeStrokes = new  ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>>();
@@ -61,6 +69,10 @@ public class KStrokeContainer {
 		ImageResource eyeResource = parent.eigenaar.kladjeGWTClientBundle.eyeResource();
 		eyeImage = new Image(eyeResource);
 		eyeImageElement = ImageElement.as(eyeImage.getElement());
+		
+		ImageResource approxResource = parent.eigenaar.kladjeGWTClientBundle.approxResource();
+		approxImage = new Image(approxResource);
+		approxImageElement = ImageElement.as(approxImage.getElement());
 	}
 	
 	public KStrokeContainer (KladjeGWTVeld parent, Rectangle defaultBox) {
@@ -84,9 +96,16 @@ public class KStrokeContainer {
 			b=strokeContainer.addStroke(stroke,false);
 		else {
 			strokeContainer.addStroke(stroke);
-			logger.info(strokeContainer.getFormulaString());
+			//logger.info(strokeContainer.getFormulaString());
 			//if(!"-".equals(stroke.getOneStrokeTeken()))
-			formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
+			String formuleString = "$f"+strokeContainer.getFormulaString()+"@";
+			Expressie formule = FormuleParser.geefExpressie(formuleString);
+//			if(formule!=null) {
+//				logger.info("na parsing: "+formule.toString());
+//				logger.info("geefWaarde: "+formule.geefWaarde());
+//			}
+			isGetalsExpressie = formule!=null && !Double.isNaN(formule.geefWaarde()) && !(formule instanceof BasisExpressie);
+			formuleViewer = new FormuleViewer(formuleString);
 			formuleViewer.setColor(CssColor.make(38, 115, 182));
 			//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		}
@@ -97,6 +116,18 @@ public class KStrokeContainer {
 			box = defaultBox;
 		
 		return b;
+	}
+	
+	public void approximate() {
+		String formuleString = "$f"+strokeContainer.getFormulaString()+"@";
+		Expressie formule = FormuleParser.geefExpressie(formuleString);
+		if(formule!=null) {
+			double approxDouble = formule.geefWaarde();
+			String newFormuleString = formuleString.substring(0,formuleString.length()-1) + "=" + Double.toString(approxDouble) + "@";
+			logger.info("na approx: "+newFormuleString);
+			formuleViewer = new FormuleViewer(newFormuleString);
+			formuleViewer.setColor(CssColor.make(38, 115, 182));
+		}
 	}
 	
 	public void corrigeerSCPositie() {
@@ -139,6 +170,16 @@ public class KStrokeContainer {
 			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
 		int x = getWriteBox().x + 5; 
 		int y = getWriteBox().y + 5; 
+//		if(correct || isfalse || isHalf || recognizeOff)
+//			return new Rectangle(x,y,0,0);
+		return new Rectangle(x,y,30,20);
+	}
+	
+	public Rectangle getApproxButtonArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		int x = getWriteBox().x+getWriteBox().width-31; 
+		int y = getWriteBox().y+getWriteBox().height/2-10; 
 //		if(correct || isfalse || isHalf || recognizeOff)
 //			return new Rectangle(x,y,0,0);
 		return new Rectangle(x,y,30,20);
@@ -251,6 +292,9 @@ public class KStrokeContainer {
 				
 				if(!correct && !isfalse && !isHalf && !recognizeOff)
 					g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
+				
+				if(!recognizeOff && isGetalsExpressie)
+					g.drawImage(approxImageElement, getWriteBox().x+getWriteBox().width-31, getWriteBox().y+getWriteBox().height/2-10);
 				
 
 //				int d = (int)strokeContainer.averageHeight;

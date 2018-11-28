@@ -3304,6 +3304,11 @@ public class KladjeGWTVeld
 				paint();
 				return;
 			}
+			if(currentStrokeContainer!=null && currentStrokeContainer.getApproxButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.approximate();
+				paint();
+				return;
+			}
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
