@@ -3262,6 +3262,11 @@ public class KladjeGWTVeld
 				if(currentHiddenStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY)) {
 					return;
 				}
+				if(currentHiddenStrokeContainer.getApproxButtonArea().contains(eventX, eventY)) {
+					currentHiddenStrokeContainer.approximate();
+					paint();
+					return;
+				}
 				
 				if(!currentHiddenStrokeContainer.writeBoxContains(eventX, eventY)) {
 					closeCurrentHiddenContainer();

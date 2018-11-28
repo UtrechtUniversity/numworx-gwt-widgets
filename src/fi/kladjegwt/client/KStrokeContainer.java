@@ -85,6 +85,10 @@ public class KStrokeContainer {
 		ImageResource eyeResource = parent.eigenaar.kladjeGWTClientBundle.eyeResource();
 		eyeImage = new Image(eyeResource);
 		eyeImageElement = ImageElement.as(eyeImage.getElement());
+		
+		ImageResource approxResource = parent.eigenaar.kladjeGWTClientBundle.approxResource();
+		approxImage = new Image(approxResource);
+		approxImageElement = ImageElement.as(approxImage.getElement());
 	}
 	
 	public boolean addStroke(Stroke stroke) {
