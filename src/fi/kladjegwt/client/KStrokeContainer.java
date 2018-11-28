@@ -103,12 +103,13 @@ public class KStrokeContainer {
 			//logger.info(strokeContainer.getFormulaString());
 			//if(!"-".equals(stroke.getOneStrokeTeken()))
 			String formuleString = "$f"+strokeContainer.getFormulaString()+"@";
-			Expressie formule = FormuleParser.geefExpressie(formuleString);
+//			Expressie formule = FormuleParser.geefExpressie(formuleString);
 //			if(formule!=null) {
 //				logger.info("na parsing: "+formule.toString());
 //				logger.info("geefWaarde: "+formule.geefWaarde());
 //			}
-			isGetalsExpressie = formule!=null && !Double.isNaN(formule.geefWaarde()) && !(formule instanceof BasisExpressie);
+			//isGetalsExpressie = formule!=null && !Double.isNaN(formule.geefWaarde()) && !(formule instanceof BasisExpressie);
+			checkBenaderbaar();
 			formuleViewer = new FormuleViewer(formuleString);
 			formuleViewer.setColor(CssColor.make(38, 115, 182));
 			//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
@@ -122,11 +123,27 @@ public class KStrokeContainer {
 		return b;
 	}
 	
+	public String checkBenaderbaar() {
+		String rekenString = "$f"+strokeContainer.getFormulaString()+"@";
+		if(rekenString.endsWith("=@"))
+			rekenString = rekenString.substring(0, rekenString.length()-2)+"@";
+		if(rekenString.indexOf("=")>-1)
+			rekenString = "$f"+rekenString.substring(rekenString.lastIndexOf("=")+1);
+		logger.info("na = teken "+rekenString);
+		Expressie formule = FormuleParser.geefExpressie(rekenString);
+		isGetalsExpressie = formule!=null && !Double.isNaN(formule.geefWaarde()) && !(formule instanceof BasisExpressie);
+		return rekenString;
+	}
+	
+	
 	public void approximate() {
 		String formuleString = "$f"+strokeContainer.getFormulaString()+"@";
-		Expressie formule = FormuleParser.geefExpressie(formuleString);
+		String rekenString = checkBenaderbaar();
+		Expressie formule = FormuleParser.geefExpressie(rekenString);
 		if(formule!=null) {
 			double approxDouble = formule.geefWaarde();
+			if(formuleString.endsWith("=@"))
+				formuleString = formuleString.substring(0, formuleString.length()-2)+"@";
 			String newFormuleString = formuleString.substring(0,formuleString.length()-1) + "=" + Double.toString(approxDouble) + "@";
 			logger.info("na approx: "+newFormuleString);
 			formuleViewer = new FormuleViewer(newFormuleString);
