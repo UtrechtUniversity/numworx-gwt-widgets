@@ -829,6 +829,7 @@ public class KladjeGWTVeld
 			sc.setState(strokeContainerList.get(sCnt));
 			kStrokeContainers.add(sc);
 		}
+		addToHistory();
 		
 		List<Map<String,Object>> hiddenStrokeContainerList = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("hiddenStrokeContainerList"))
