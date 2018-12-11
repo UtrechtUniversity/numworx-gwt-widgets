@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 //import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -17,7 +16,6 @@ import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 //import fi.graphtool.Slider;
 import com.google.gwt.touch.client.Point;
-
 import fi.beans.lineairealgebra.Vector2d;
 import fi.wiskopdr.expressies.Expressie;
 import gwt.awt.geom.Area;
@@ -139,7 +137,8 @@ public class GrafiekGWTVeld {
 
 	}
 	
-	public GrafiekGWTVeld(GraphToolGWT interactiePanel, int w, int h) {	
+	public GrafiekGWTVeld(GraphToolGWT interactiePanel, int w, int h)
+	{	
 		this.interactiePanel = interactiePanel;
 		grafiekGWTCanvas = Canvas.createIfSupported();
 		
@@ -149,7 +148,6 @@ public class GrafiekGWTVeld {
 		selectnummer = 999;
 		
 		stand = 3;
-		setSize(w, h);
 	}
 	
 	void setSize(int w, int h) {
