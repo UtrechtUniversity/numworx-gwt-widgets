@@ -60,6 +60,7 @@ public class DomeinVakGWT extends LayoutPanel {
 		//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
 		//editor.installKeyboard(kb);
 		//editor.requestFocus(); // Wim: pas requestfocus als zichtbaar
+		editor.setFormuleToolBijFocus(true);
 		this.add(tp);
 		addFormulePanelListeners(tp, editor);
 	}
