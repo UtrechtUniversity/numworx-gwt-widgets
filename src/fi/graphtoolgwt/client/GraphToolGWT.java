@@ -592,7 +592,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		tabelComponent.zetYAsNaam(yAsNaam, true);
 		
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
-		formuleComponent.setPixelSize( breedte  , (formuleComponentHoogte - 2 - offset) );
+		formuleComponent.setPixelSize(breedte, (formuleComponentHoogte - 2 - offset)); // waarom minder hoog dan in constructor?
 		
 		veldComponent = new VeldComponentGWT(this, launchState, breedte, veldComponentHoogte);
 		
@@ -2446,9 +2446,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	}
 
 	@Override
-	public void setState(HashMap<String, Object> h) {
-
-		if(h == null || h.isEmpty()) return;
+	public void setState(HashMap<String, Object> h)
+	{
+		if (h == null || h.isEmpty())
+			return;
+		
 		fromuser = false;
 		//hier alleen dingen in die de leerling veranderd kan hebben.
 		/*
@@ -2656,7 +2658,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		if (!puntenNagekeken)
 		{ 
-			// Moet percee na kijkna worden gezet om de juiste visuele situatie te initialiseren.
+			// Moet persé na kijkna worden gezet om de juiste visuele situatie te initialiseren.
   		    // Want bij kijkNa wordt deze boolean gereset voor normaal gebruik.
 			pointsChangedAction();
 		}
@@ -3855,7 +3857,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		else
 		{	
 			
-			if ((dragPoint == null) && (dragOptie)) { // Move Graph if no point selected
+			if ((dragPoint == null) && (otherPoint == null) && (dragOptie)) { // Move Graph if no point selected
 				grafiekGWTVeld.setGrafiekSchuivenActief(true);
 				int dx = eventX - startxv;
 				int dy =  eventY - startyv;					
