@@ -24,6 +24,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -192,7 +193,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	private LayoutPanel regelsPanel = null;
 	private CheckBox[] checkboxen = new CheckBox[maxAantalFormules];
 	private boolean[] geselecteerd = new boolean[maxAantalFormules];
-	private PushButton[] enOfKnoppen = new PushButton[maxAantalFormules];
+	private Button[] enOfKnoppen = new Button[maxAantalFormules];
 	private DomeinButtonGWT[] domeinButtons = new DomeinButtonGWT[maxAantalFormules];
 	private boolean[] isEn;
 	private boolean[] isOngelijkheid;
@@ -220,7 +221,8 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	boolean fromuser;
 	
 	
-public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte) {
+public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> launchData, int breedte, int hoogte)
+{
 		defaultfont = FormuleHolder.getDefaultActiviteitFont().createCopy();
 		
 		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
@@ -232,7 +234,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		
 		this.breedte = breedte;
 		this.hoogte = hoogte;
-		if(launchData != null) {
+		if (launchData != null)
+		{
 			//if(launchData.containsKey("grafiekKleuren"))
 			//	grafiekKleuren = ((Boolean)launchData.get("grafiekKleuren")).booleanValue();
 			//if(launchData.containsKey("kleurInstelbaar"))
@@ -266,8 +269,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		}
 		
 		
-		for(int i = 0; i < functieBegin.length; i++)
-		{	if(formeleFuncties)
+		for (int i = 0; i < functieBegin.length; i++)
+		{
+			if(formeleFuncties)
 				functieBegin[i] = namen[i] + "(" + xAsNaam + ")=";
 			else
 				functieBegin[i] = yAsNaam + "=";
@@ -309,7 +313,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		nieuweRegelKnop.addClickHandler(new ClickHandler(){
 			
 			@Override
-			public void onClick(ClickEvent event) {
+			public void onClick(ClickEvent event)
+			{
 				voegRegelToe();
 			}
 		});
@@ -317,7 +322,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//regelMeerButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		//addButtonHandler(nieuweRegelKnop);
 		
-		for(int i = 0; i < functieBeginViewers.length; i++) {	
+		for (int i = 0; i < functieBeginViewers.length; i++)
+		{	
 			FormuleViewer f = new FormuleViewer(functieBegin[i]); // font is instellingen.font
 			f.setColor(interactiePanel.getFormuleColor(i));
 			f.setFont(defaultfont); // dit is het standaard font.
@@ -334,8 +340,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			//functieBeginViewers[i].getElement().getStyle().setMarginLeft(5, Unit.PX);
 		}
 		
-		for(int i = 0; i < checkboxen.length; i++)
-		{	checkboxen[i] = new CheckBox();
+		for (int i = 0; i < checkboxen.length; i++)
+		{
+			checkboxen[i] = new CheckBox();
 			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
 			if(i==0)
 				geselecteerd[i] = true;
@@ -344,8 +351,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			checkboxen[i].setValue(geselecteerd[i]);
 		}
 		
-		for(int i = 0 ; i < enOfKnoppen.length; i++) {	
-			enOfKnoppen[i] = new PushButton(GraphToolGWT.rb.enOfButton_En());
+		for (int i = 0 ; i < enOfKnoppen.length; i++)
+		{
+			enOfKnoppen[i] = new Button(GraphToolGWT.rb.enOfButton_En());
 			//enOfKnoppen[i].setMargin(new Insets(0,0,0,0));
 			enOfKnoppen[i].setSize("24px", "19px");
 			enOfKnoppen[i].getElement().getStyle().setPadding(1, Unit.PX);
@@ -353,7 +361,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			enOfKnoppen[i].addClickHandler(new EnOfKnopClickHandler(i));
 		}
 		
-		for(int i = 0; i < domeinButtons.length; i++)
+		for (int i = 0; i < domeinButtons.length; i++)
 		{
 			domeinButtons[i] = new DomeinButtonGWT(interactiePanel, i);
 		}
@@ -405,30 +413,18 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		
 		
-		for(int i = 0; i < regelPanels.length; i++) {	
-			/*regelPanels[i] = new FlowPanel();
-			layoutRegelPanel(regelPanels[i]);
-			highLight(regelPanels[i], true);
-			regelPanels[i].add(checkboxen[i]);
-			if (!functieBeginAanpasbaar)
-				regelPanels[i].add(functieBeginViewers[i]);
-		
-			editors[i] = addNewEditor(regelPanels[i], i);//hoeft niet voor elke regel?
-			if(functieBeginAanpasbaar && functieBeginZichtbaar)
-				editors[i].insert(functieBegin[i]);
-			if(domeinInstelbaar)
-				regelPanels[i].add(domeinButtons[i]);
-				*/
+		for (int i = 0; i < regelPanels.length; i++)
+		{	
 			regelPanels[i] = new LayoutPanel();
 			layoutRegelPanel(regelPanels[i]);
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);
-			//hier
 			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
 			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
 			
-			if(!functieBeginAanpasbaar)
-			{	regelPanels[i].add(functieBeginViewers[i]);
+			if (!functieBeginAanpasbaar)
+			{
+				regelPanels[i].add(functieBeginViewers[i]);
 				regelPanels[i].setWidgetLeftWidth(functieBeginViewers[i], 20, Style.Unit.PX, formeleFuncties?43:30, Style.Unit.PX);
 				regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
 			}
@@ -454,7 +450,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
 					domeinInstelbaar?20:0, Style.Unit.PX);
 			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
-			if(functieBeginAanpasbaar && functieBeginZichtbaar)
+			if (functieBeginAanpasbaar && functieBeginZichtbaar)
 				editors[i].insert(functieBegin[i]);
 			if (domeinInstelbaar)
 			{
@@ -659,7 +655,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			interactiePanel.zetFunctie(this.aantalRegels - 1, null, "$f@", null, DEFAULTDOMEIN, true, setState, false);
 			parseFormule("", this.aantalRegels - 1, false);
 			regelsPanel.remove(regelPanels[this.aantalRegels - 1]);
-			regelsPanel.remove(enOfKnoppen[this.aantalRegels-2]);
+			regelsPanel.remove(enOfKnoppen[this.aantalRegels - 2]);
 			isEn[this.aantalRegels - 2] = true; //gaat dit?
 			this.aantalRegels--;
 		}
@@ -970,7 +966,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		catch (Exception e)
 		{
 		}
-		zetEnOfKnoppen();
+		
 		// resize();
 		if (interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT && interactiePanel.mode != OpdrNavIF.ZELFTOETS
 			&& interactiePanel.mode != OpdrNavIF.EINDTOETS)
@@ -987,7 +983,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			if (i < enOfKnoppen.length)
 			{
 				if (isOngelijkheid[i] && isOngelijkheid[i + 1])
+				{
 					enOfKnoppen[i].setVisible(true);
+				}
 				else
 					enOfKnoppen[i].setVisible(false);
 			}
@@ -1164,6 +1162,8 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			return;
 		}
 
+		aantalRegels = 1;
+		
 		for (int i = 0; i < expressieStrings.length; i++)
 		{
 			if (expressieStrings[i].equals("$f@"))
@@ -1231,17 +1231,26 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				// this.isEn[i] = isEn[i]; Niet nodig? Net al gelijk gezet?
 				if (geselecteerd[i])
 					parseFormule(i, true);
-				/*
-				 * if(i>0) { add(enOfKnoppen[i-1],0); if(isEn[i-1])
-				 * enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString(
-				 * "enOfButton_En")); else
-				 * enOfKnoppen[i-1].setText(GraphToolGWT.rb.getString(
-				 * "enOfButton_Of")); }
-				 */
+				
+				if (i > 0)
+				{
+					regelsPanel.remove(enOfKnoppen[i - 1]);
+					regelsPanel.add(enOfKnoppen[i - 1]);
+					regelsPanel.setWidgetLeftWidth(enOfKnoppen[i - 1], breedte - 30, Style.Unit.PX, 25, Style.Unit.PX);
+					int top = berekenRegelHoogte(aantalRegels - 1) - 12;
 
-			}
+					regelsPanel.setWidgetTopHeight(enOfKnoppen[i - 1], top, Style.Unit.PX, 20, Style.Unit.PX);
+					if (isEn[i - 1])
+						enOfKnoppen[i - 1].setText(GraphToolGWT.rb.getString("enOfButton_En"));
+					else
+						enOfKnoppen[i - 1].setText(GraphToolGWT.rb.getString("enOfButton_Of"));
+					
+				}
+			} // else if goede expressie-string
+		} // for loop i
+		
+		zetEnOfKnoppen();
 
-		}
 		resize();
 		// layoutVakken(true);
 		// grafiekComponent.updateTabelNames(geefExpNamen(), true);
@@ -1270,6 +1279,18 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		String s = startCode + string + endCode;
 		return s;
 	}
+	
+	private boolean hasFormulaCodes(String s)
+	{
+		boolean b = false;
+		String startCode = "$f";
+		String endCode = "@";
+
+		if (s != null)
+			b = s.startsWith(startCode) && s.endsWith(endCode);
+
+		return b;
+	}
     
 	public void zetDomein(String[] domeinStrings, int i)
 	{
@@ -1281,24 +1302,28 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				domeinen[i][1] = DEFAULTDOMEIN[1];
 				return;
 			}
+			
+			// beginwaarde
 			if (domeinStrings[0].equals("$f" + Double.NEGATIVE_INFINITY + "@"))
 			{
 				domeinen[i][0] = Double.NEGATIVE_INFINITY;
 			}
-			else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])) == null)
+			else if (FormuleParser.geefExpressie(hasFormulaCodes(domeinStrings[0]) ? domeinStrings[0] : addFormulaCodes(domeinStrings[0])) == null)
 			{
 				domeinen[i][0] = Double.NEGATIVE_INFINITY;
 			}
 			else
 			{
-				domeinen[i][0] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])).geefWaarde();
+				domeinen[i][0] = FormuleParser.geefExpressie(hasFormulaCodes(domeinStrings[0]) ? domeinStrings[0] : addFormulaCodes(domeinStrings[0])).geefWaarde();
 			}
+			
+			// eindwaarde
 			if (domeinStrings[1].equals("$f" + Double.POSITIVE_INFINITY + "@"))
 				domeinen[i][1] = Double.POSITIVE_INFINITY;
-			else if (FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])) == null)
+			else if (FormuleParser.geefExpressie(hasFormulaCodes(domeinStrings[1]) ? domeinStrings[1] : addFormulaCodes(domeinStrings[1])) == null)
 				domeinen[i][1] = Double.POSITIVE_INFINITY;
 			else
-				domeinen[i][1] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])).geefWaarde();
+				domeinen[i][1] = FormuleParser.geefExpressie(hasFormulaCodes(domeinStrings[1]) ? domeinStrings[1] : addFormulaCodes(domeinStrings[1])).geefWaarde();
 			
 			domeinButtons[i].zetDomeinString(domeinStrings);
 			
@@ -1306,8 +1331,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			interactiePanel.zetDomeinen(domeinen);
 			// repaint
 			interactiePanel.grafiekGWTVeld.paint();
-			
-			//Window.alert("FormuleComponentGWT.zetDomein(" + domeinStrings[0] + ", " + domeinStrings[1] + ", " + i + ")");
 		}
 	}
 	
@@ -1360,18 +1383,19 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	
 	public void verwijderRegel()
 	{
-		if(aantalRegels == 1)
+		if (aantalRegels == 1)
 			return;
 		parseFormule("", aantalRegels - 1, false);
-		if(functieBeginZichtbaar)
+		if (functieBeginZichtbaar)
 		{	//zetVoorvoegsel(aantalRegels - 1);
 			//misschien nodig ivm setState en parsen
 		}
 		//else
 		//	formuleVakken[aantalRegels - 1].formuleVak.vulVak("$f@");
 		regelsPanel.remove(regelPanels[aantalRegels - 1]);
-		if(interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
-		{	checkboxen[aantalRegels-1].setValue(false);
+		if (interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
+		{
+			checkboxen[aantalRegels-1].setValue(false);
 			geselecteerd[aantalRegels - 1] = false;
 		}
 		
@@ -1379,9 +1403,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//remove(checkboxen[aantalRegels-1]);
 		//remove(domeinButtons[aantalRegels-1]);
 		//deze komt waarschijnlijk nog terug: 
-		regelsPanel.remove(enOfKnoppen[aantalRegels-2]);
+		regelsPanel.remove(enOfKnoppen[aantalRegels - 2]);
 		isEn[aantalRegels - 2] = true;
-		enOfKnoppen[aantalRegels-2].setText(GraphToolGWT.rb.enOfButton_En());
+		enOfKnoppen[aantalRegels - 2].setText(GraphToolGWT.rb.enOfButton_En());
 		//layoutVakken(false);
 		aantalRegels--;
 		
@@ -1390,52 +1414,50 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	
 	public void resize()
 	{
-		for(int i = 0; i < aantalRegels; i++)
+		int index = -1;
+		for (int i = 0; i < aantalRegels; i++)
 		{
+			index = i;
 			int ashoogte = editors[i].getMainRegel().getAsHoogte();
 			
-			if(!functieBeginAanpasbaar)
-			{	FormuleViewer f = new FormuleViewer(functieBegin[i]);
-				if(regelPanels[i].getWidgetIndex(functieBeginViewers[i]) > -1)
+			if (!functieBeginAanpasbaar)
+			{
+				FormuleViewer f = new FormuleViewer(functieBegin[i]);
+				if (regelPanels[i].getWidgetIndex(functieBeginViewers[i]) > -1)
 					regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], Math.max(0, ashoogte - f.getMainRegel().getAsHoogte()), Style.Unit.PX, f.getHeight(), Style.Unit.PX);
 			}
-			if(regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
+			if (regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
 				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight(), Style.Unit.PX);
-			if(regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
+			if (regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
 				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 15, Style.Unit.PX);
-			if(regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
+			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
 				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight()), Style.Unit.PX);
 		}
 	}
 	
 	public void voegRegelToe()
-	{	if(aantalRegels >= maxAantalFormules)
+	{
+		if (aantalRegels >= maxAantalFormules)
 		{	
 			return;
 		}
+		
 		parseFormule(aantalRegels - 1, false);
 		regelsPanel.add(regelPanels[aantalRegels]);
 		regelsPanel.setWidgetLeftWidth(regelPanels[aantalRegels], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
 		regelsPanel.setWidgetTopHeight(regelPanels[aantalRegels], berekenRegelHoogte(aantalRegels), Style.Unit.PX, Math.max(editors[aantalRegels].getHeight(), 30), Style.Unit.PX);
-		if(interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
-		{	checkboxen[aantalRegels].setValue(true);
+		if (interactiePanel != null && interactiePanel.typeOpdracht != GraphToolGWT.GEENOPDRACHT)
+		{
+			checkboxen[aantalRegels].setValue(true);
 			geselecteerd[aantalRegels] = true;
-			checkboxen[aantalRegels].setVisible(false);
+			checkboxen[aantalRegels].setVisible(true);
+			checkboxen[0].setVisible(true); // de eerste ook
 		}
-		//else
-		//	checkboxen[aantalRegels].setSelected(true);
 		
 		regelsPanel.add(enOfKnoppen[aantalRegels - 1]);
 		regelsPanel.setWidgetLeftWidth(enOfKnoppen[aantalRegels - 1], breedte - 30, Style.Unit.PX, 25, Style.Unit.PX);
 		regelsPanel.setWidgetTopHeight(enOfKnoppen[aantalRegels - 1], berekenRegelHoogte(aantalRegels) - 12, Style.Unit.PX, 20, Style.Unit.PX);
-		//add(formuleVakken[aantalRegels],0);
-		//zetVoorvoegsel(aantalRegels);	
-		//add(checkboxen[aantalRegels],0);
-		//add(domeinButtons[aantalRegels],0);
-		//domeinButtons[aantalRegels].setVisible(false);
-		//add(enOfKnoppen[aantalRegels - 1], 0);
-		//layoutVakken(false);
-		//formuleVakken[aantalRegels].formuleVak.requestFocus();
+		zetEnOfKnoppen();
 		aantalRegels++;
 		grafiekGWTVeld.paint();
 		editors[aantalRegels - 1].requestFocus();
@@ -1483,12 +1505,14 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		int regelnummer;
 		
 		public CheckBoxClickHandler(int i)
-		{	super();
+		{
+			super();
 			regelnummer = i;
 		}
 		
 		@Override
-		public void onClick(ClickEvent event) {
+		public void onClick(ClickEvent event)
+		{
 			geselecteerd[regelnummer] = !geselecteerd[regelnummer];
 			parseFormule(regelnummer, false);
 			grafiekGWTVeld.paint();
