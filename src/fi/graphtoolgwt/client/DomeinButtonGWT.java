@@ -21,7 +21,7 @@ import fi.wiskopdr.FormuleParser;
 
 public class DomeinButtonGWT extends Button {
 	
-	private IsWidget wrap (IsWidget widget) {
+	private FocusPanel wrap (IsWidget widget) {
 		//FocusOnTouch.installKeyboard(interactiePanel.kb);
 		FocusPanel focus = FocusOnTouch.wrap (widget.asWidget(), false);
 		//focus.addKeyDownHandler(interactiePanel.keyHandler);
@@ -64,10 +64,10 @@ public class DomeinButtonGWT extends Button {
 		this.interactiePanel = interactiePanel;
 		this.index = index;
 		
-		frame = new DialogBox(false);
+		frame = new DialogBox(false,false);
 		//frame.setStyleName("domeinpanel");
 		frameContents = new LayoutPanel();
-		final IsWidget wrap = wrap(frameContents);
+		final FocusPanel wrap = wrap(frameContents);
 		frame.add(wrap);
 		frameContents.setSize("250px", "90px");
 
@@ -156,6 +156,7 @@ public class DomeinButtonGWT extends Button {
 			public void onClick(ClickEvent e)
 			{
 				frame.center();
+				FocusOnTouch.requestFocus(wrap);
 			}
 		};
 
@@ -231,7 +232,17 @@ public class DomeinButtonGWT extends Button {
 		
 		zetDomeinString(domeinStrings);
 		
-		domein = new double[] {Double.parseDouble(domeinStrings[0]), Double.parseDouble(domeinStrings[1])};
+		domein = new double[2]; 
+		if (String.valueOf(Double.NEGATIVE_INFINITY).equals(domeinStrings[0]))
+			domein[0] = Double.NEGATIVE_INFINITY;
+		else
+			domein[0] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[0])).geefWaarde();
+		
+		if (String.valueOf(Double.POSITIVE_INFINITY).equals(domeinStrings[1]))
+			domein[1] = Double.POSITIVE_INFINITY;
+		else
+			domein[1] = FormuleParser.geefExpressie(addFormulaCodes(domeinStrings[1])).geefWaarde();
+
 		interactiePanel.zetDomein(domein, index);
 		interactiePanel.grafiekGWTVeld.paint();
 		if (interactiePanel.formuleComponent.alsOpdracht)
