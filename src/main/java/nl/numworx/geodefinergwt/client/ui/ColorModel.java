@@ -23,7 +23,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 	protected Destroyable item;
 	public int rgba = 0xFF000000;
-	public boolean visible = true;
+	public boolean visible = true, trail;
 	Tracker tracker;
 	private Label visibility = new Label();
 	
@@ -57,6 +57,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 				visibility.destroy();
 				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
 				v.setVisible(false);
+                if(trail) {
+                  tracker.getModel().startTrail(item);
+                }
 				tracker.getModel().add(v);
 			
 			} catch (Exception e) {
@@ -113,7 +116,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		objectMap = value;
 		rgba = value.getInt("color");
 		visible = value.getBoolean("visible", true);
-		visibility.setString(value.getString("visibility"));	}
+		visibility.setString(value.getString("visibility"));
+		trail = value.getBoolean("trail", false);
+	}
 
 	@Override
 	public Void editor() {

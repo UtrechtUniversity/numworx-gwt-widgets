@@ -19,6 +19,7 @@ import fi.euclides.model.Punt;
 import fi.euclides.model.Ray;
 import fi.euclides.model.Segment;
 import fi.euclides.model.SegmentVisitor;
+import fi.euclides.model.TrailBuilder;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
@@ -41,7 +42,7 @@ import nl.numworx.geodefinergwt.client.ui.FontStyle;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
-public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLighter.GeoDefinerWidget {
+public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLighter.GeoDefinerWidget, TrailBuilder {
 	static final FontStyle FONT_STYLE = new FontStyle();
 
 	private static final float DEFAULT_POINTSIZE = 5;
@@ -61,6 +62,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		asWidget().addStyleName("canvas");
 		
 		enableHighLight();
+		
+		getModel().setTrailBuilder(this);
 	}
 
 	void enableHighLight() {
@@ -522,5 +525,13 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public int getOffY() {
 		return offY;
 	}
+  @Override
+  public Destroyable trail(Destroyable d) {
+    Destroyable copy = d.trail();
+    DefaultAdapter adapter = DefaultAdapter.getDefault(copy);
+    adapter.put(Float.class, d.adapt(Float.class)); // point size
+    adapter.put(StrokeStyle.class, d.adapt(StrokeStyle.class)); // line style/width
+    return copy;
+  }
 
 }
