@@ -23,6 +23,8 @@ import com.google.gwt.dom.client.Style.Float;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+import com.google.gwt.event.dom.client.ContextMenuHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -36,10 +38,13 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
+import fi.statistiekgwt.client.event.ColorChangeEvent;
+import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.expressies.Expressie;
 
-public class FormuleComponentGWT extends LayoutPanel {//implements InteractionView{
+public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEventHandler 
+{//implements InteractionView{
 
 	private FormuleEditorFactory factor = GWT.create(FormuleEditorFactory.class);
 	{
@@ -164,6 +169,7 @@ public class FormuleComponentGWT extends LayoutPanel {//implements InteractionVi
 	private boolean domeinInstelbaar = false;
 	
 	boolean grafiekKleurInstelbaar = true;
+	SingleColorPickerDialog colorDialog;
 	boolean functieBeginAanpasbaar = true;
 	
 	private boolean functieToegestaan = true;
@@ -236,10 +242,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		this.hoogte = hoogte;
 		if (launchData != null)
 		{
-			//if(launchData.containsKey("grafiekKleuren"))
-			//	grafiekKleuren = ((Boolean)launchData.get("grafiekKleuren")).booleanValue();
-			//if(launchData.containsKey("kleurInstelbaar"))
-			//	kleurInstelbaar = ((Boolean)launchData.get("kleurInstelbaar")).booleanValue();
+			if (launchData.containsKey("grafiekKleuren"))
+				interactiePanel.grafiekKleuren = ((Boolean)launchData.get("grafiekKleuren")).booleanValue();
+			if (launchData.containsKey("kleurInstelbaar"))
+				grafiekKleurInstelbaar = ((Boolean)launchData.get("kleurInstelbaar")).booleanValue();
 			if(launchData.containsKey("functieBeginZichtbaar"))
 				functieBeginZichtbaar = ((Boolean)launchData.get("functieBeginZichtbaar")).booleanValue();
 			if(launchData.containsKey("functieBeginAanpasbaar"))
@@ -268,7 +274,12 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				yAsNaam = (String)launchData.get("yAsNaam");			
 		}
 		
-		
+		if (grafiekKleurInstelbaar)
+		{
+			colorDialog = new SingleColorPickerDialog();
+			colorDialog.addGraphToolColorChangeEventHandler(this);
+		}
+			
 		for (int i = 0; i < functieBegin.length; i++)
 		{
 			if(formeleFuncties)
@@ -343,7 +354,11 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		for (int i = 0; i < checkboxen.length; i++)
 		{
 			checkboxen[i] = new CheckBox();
-			checkboxen[i].addClickHandler(new CheckBoxClickHandler(i));
+			CheckBoxClickHandler handler = new CheckBoxClickHandler(i);
+			checkboxen[i].addClickHandler(handler);
+			// rechtermuisknop om kleuren in te stellen
+			checkboxen[i].addDomHandler(handler, ContextMenuEvent.getType());
+			
 			if(i==0)
 				geselecteerd[i] = true;
 			else
@@ -1500,7 +1515,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 //		});
 //	}
 	
-	class CheckBoxClickHandler implements ClickHandler
+	class CheckBoxClickHandler implements ClickHandler, ContextMenuHandler
 	{
 		int regelnummer;
 		
@@ -1513,9 +1528,52 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		@Override
 		public void onClick(ClickEvent event)
 		{
+			// gewone click
 			geselecteerd[regelnummer] = !geselecteerd[regelnummer];
 			parseFormule(regelnummer, false);
 			grafiekGWTVeld.paint();
+		}
+
+		@Override
+		public void onContextMenu(ContextMenuEvent event)
+		{
+			// prevent default browser context menu
+			event.preventDefault();
+			event.stopPropagation();
+			
+			// welke checkbox is de source? -> i
+			// rechtermuisknop geeft kleurkiezer
+			// color = checkbox i color
+			int index = getClickedCheckBoxIndex(event);
+			
+			if (index > -1)
+			{
+				colorDialog.setColorA(interactiePanel.getFormuleColor(index));
+				colorDialog.setColorIndex(index);
+				colorDialog.show();
+			}
+		}
+
+		/**
+		 * Get the index of the checkbox that generated the context menu event.
+		 * 
+		 * @param event
+		 * @return
+		 */
+		private int getClickedCheckBoxIndex(ContextMenuEvent event)
+		{
+			int index = -1;
+			
+			for (int i = 0; i < checkboxen.length; i++)
+			{
+				if (event.getSource() == checkboxen[i])
+				{
+					index = i;
+					break;
+				}
+			}
+			
+			return index;
 		}
 	}
 	
@@ -1540,4 +1598,17 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			
 		}
 	}
+
+	@Override
+	public void onColorChange(ColorChangeEvent event)
+	{
+		System.out.println("FormuleComponentGWT.onColorChange(): kleur = " + event.getColorA());
+		if (event instanceof GraphToolColorChangeEvent) // dit moet zo zijn
+		{
+			interactiePanel.setColor(((GraphToolColorChangeEvent) event).getColorIndex(), CssColor.make(((GraphToolColorChangeEvent) event).getColorA()), false);
+			interactiePanel.grafiekGWTVeld.paint();
+			zetGrafiekKleuren();
+		}
+	}
+
 }
