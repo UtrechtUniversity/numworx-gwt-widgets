@@ -22,7 +22,9 @@
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='gwt.Geom' />
   <inherits name='fi.beans.lineairealgebra.LineaireAlgebra'/>
-  
+  <inherits name="fi.statistiekgwt.StatistiekGWT-DWO" />
+  <inherits name='com.googlecode.gwt.charts.Charts' />
+    
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>
 
