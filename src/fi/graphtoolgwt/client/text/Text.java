@@ -26,4 +26,5 @@ public interface Text extends ConstantsWithLookup {
     String fc_huidigDomein();
     String fc_domeinBijFunctie();
     String fc_nieuwDomein();
+	String selectColor();
 }
