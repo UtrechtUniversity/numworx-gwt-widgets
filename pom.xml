@@ -11,14 +11,15 @@
     <resources>
     	<resource>
     	   <directory>src</directory>
-    	   <excludes><exclude>**/*.java</exclude></excludes>
     	</resource>
     </resources>
   	<plugins>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-        	<warSourceDirectory>war</warSourceDirectory>        
+        	<warSourceDirectory>war</warSourceDirectory>
+        	<attachClasses>true</attachClasses>
+			<packagingIncludes>*.css,*gwt/**,${project.artifactId}.html</packagingIncludes>
         </configuration>
       </plugin>
       <plugin>
@@ -76,11 +77,12 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
+  		<version>0.1.1</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>0.0.6</version>
+		<version>0.1.1</version>
 	</dependency>
 			<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -122,4 +124,5 @@
   		</dependency>
   	</dependencies>
   </dependencyManagement>
+  <version>0.0.6-SNAPSHOT</version>
 </project>
