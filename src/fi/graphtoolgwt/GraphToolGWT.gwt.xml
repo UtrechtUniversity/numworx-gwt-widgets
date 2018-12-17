@@ -11,6 +11,7 @@
   <define-property name="gwt.logging.popupHandler"
 		values="ENABLED, DISABLED" />
   <set-property name="gwt.logging.popupHandler" value="DISABLED" />
+ <!-- <set-property name = "gwt.logging.enabled" value = "TRUE"/> -->
  
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -28,6 +29,9 @@
   <inherits name="nl.uu.fi.dwo.formule.Formule" />
   <inherits name='gwt.Geom' />
   <inherits name="fi.beans.lineairealgebra.LineaireAlgebra" />
+  <inherits name="fi.statistiekgwt.StatistiekGWT-DWO" />
+  <inherits name='com.googlecode.gwt.charts.Charts' />
+  
   
 
   <!-- Specify the app entry point class.                         -->
