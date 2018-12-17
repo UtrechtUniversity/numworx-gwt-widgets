@@ -2637,6 +2637,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		tabelComponent.setState(h);
 
 		tekenComponent.setState(h);
+		
 		formuleComponent.setState(h, null, null);
 		veldComponent.setState(h);
 		setActiveIndex(activeIndex, true);
@@ -3857,7 +3858,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		else
 		{	
 			
-			if ((dragPoint == null) && (otherPoint == null) && (dragOptie)) { // Move Graph if no point selected
+			if ((dragPoint == null) && (otherPoint == null) && (dragOptie))
+			{ // Move Graph if no point selected
 				grafiekGWTVeld.setGrafiekSchuivenActief(true);
 				int dx = eventX - startxv;
 				int dy =  eventY - startyv;					
