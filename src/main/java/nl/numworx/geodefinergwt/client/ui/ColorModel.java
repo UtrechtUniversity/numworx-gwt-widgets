@@ -38,7 +38,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	@Override
 	public void install() {
 		//java.util.logging.Logger.getLogger("ColorModel").info("install " + item + " " + rgba);
-		ColorStyle css = new ColorStyle(colorString(rgba));
+		ColorStyle css = new ColorStyle(rgba);
 		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);
 		if (visibility.getString() != null && tracker != null) {
@@ -68,26 +68,6 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		}
 	}
 
-	protected String colorString(int rgba) {
-		int a = (rgba >> 24) & 0xFF;
-		if( a < 0xFF ) {
-			return
-				"rgba("
-				+ ((rgba >> 16 ) & 0xFF)
-				+ ','
-				+ ((rgba >> 8 ) & 0xFF)
-				+ ','
-				+ ( rgba & 0xFF)
-				+ ','
-				+ ( a / 255.0f)
-				+ ')';
-		}
-		String hex = Integer.toHexString(rgba&0xFFFFFF).toUpperCase();
-		hex = "00000" + hex;
-		int l = hex.length();
-		hex = hex.substring(l-6);
-		return "#" + hex;
-	}
 
 	@Override
 	public Map<String, Object> toMap() {

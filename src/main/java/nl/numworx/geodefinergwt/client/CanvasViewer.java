@@ -171,7 +171,21 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	public void selectColor(Destroyable object) {
 		if(tracking || trail)
-			return;
+		{
+		  if (trail) {
+		    ColorStyle cs = object.adapt(ColorStyle.class);
+		    if (cs == null) {
+		      setColor(LIGHT_GRAY);
+		    } else {
+		      setCssColor(CssColor.make(cs.getColor()));
+		    }
+		    DEFAULT_STROKE.toStyle(context);
+		    stroke  = object.adapt(StrokeStyle.class);
+		  }
+		  
+		  
+		  return;
+		}
 		Adapter a = object.getAdapter();
 		//java.util.logging.Logger.getLogger("CanvasViewer").info(object  + ".adapter=" + a);
 		stroke = a.adapt(StrokeStyle.class);
@@ -260,7 +274,6 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public void visitSegment(Segment s) {
 		s = drawTips(s,s);
 		super.visitSegment(s);
-		
 	}
 
 	@Override
@@ -270,8 +283,14 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 			pointSize = ps.floatValue();
 		else
 			pointSize = DEFAULT_POINTSIZE;
-		super.visitPunt(punt);
+		if (trail) {
+		  selectColor(punt);
+          float p2 = pointSize/2f;
+          fillCircle(punt.getXd()-p2, punt.getYd()-p2 , pointSize);
+		} else
+		  super.visitPunt(punt);
 	}
+
 	class PathVisitor implements SegmentVisitor {
 		
 		double x = Double.NEGATIVE_INFINITY;
@@ -343,12 +362,16 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public void visitMP(MP l) {
 		selectColor(l);
 		if(stroke != null) stroke.toStyle(context);
-		trail = true;
+		boolean old = tracking;
+		try {
+		tracking = true;
 		PathVisitor v = new PathVisitor();
 		context.beginPath();
 		l.visitSegments(v);
 		v.destroy();
-		trail = false;
+		} finally {
+		  tracking = old;
+		}
 	}
 
 	@Override
@@ -525,12 +548,19 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public int getOffY() {
 		return offY;
 	}
+
   @Override
   public Destroyable trail(Destroyable d) {
     Destroyable copy = d.trail();
+    if (copy == null) return null;
     DefaultAdapter adapter = DefaultAdapter.getDefault(copy);
     adapter.put(Float.class, d.adapt(Float.class)); // point size
     adapter.put(StrokeStyle.class, d.adapt(StrokeStyle.class)); // line style/width
+    ColorStyle cs = d.adapt(ColorStyle.class);
+    if (cs != null) 
+      adapter.put(cs.trailColorStyle());
+    else
+      adapter.put(null, ColorStyle.class);
     return copy;
   }
 

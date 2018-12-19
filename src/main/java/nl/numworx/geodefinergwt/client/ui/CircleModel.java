@@ -12,8 +12,8 @@ public class CircleModel extends LineModel {
 		super.install();
 		FillStyle f;
 		if(fill != TRANSPARANT)
-			f = new FillStyle(colorString(fill));
-		else f = new FillStyle("none");
+			f = new FillStyle(fill);
+		else f = new FillStyle("none",TRANSPARANT);
 		DefaultAdapter.getDefault(item).put(f);
 	}
 
