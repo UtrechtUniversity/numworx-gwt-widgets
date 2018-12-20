@@ -873,6 +873,8 @@ public class DotplotView extends LayoutPanel implements
 	}
 
 	/**
+	 * The number of dots in the view, taking into account
+	 * wildcards and the minimum and maximum of the scale.
 	 * 
 	 * @return the number of dots in the view
 	 */
@@ -880,18 +882,11 @@ public class DotplotView extends LayoutPanel implements
 	{
 		int n = 0;
 		
-		if (this.model.isOptimizeScaleX())
+		for (int row = 0; row < this.model.getStatTableModel().getRowCount(); row++)
 		{
-			n = this.model.getStatTableModel().getRowCount();
-		}
-		else
-		{
-			for (int row = 0; row < this.model.getStatTableModel().getRowCount(); row++)
+			if (rowIsShownInView(row))
 			{
-				if (rowIsShownInView(row))
-				{
-					n++;
-				}
+				n++;
 			}
 		}
 		
@@ -900,7 +895,8 @@ public class DotplotView extends LayoutPanel implements
 
 	/**
 	 * Returns whether the given row is shown in the view
-	 * given the settings for minimum on scale and maximum on scale.
+	 * given the settings for minimum on scale and maximum on scale,
+	 * and wildcard values.
 	 * 
 	 * @param row
 	 * @return
@@ -916,6 +912,14 @@ public class DotplotView extends LayoutPanel implements
 			if (valueString.equals(ColumnType.WILDCARD) || isOutOfRange(valueString))
 			{
 				b = false;
+			}
+			else if (getYType() != null && getYType().isNumber()) // scatterplot
+			{
+				String valueStringY = (String) this.model.getStatTableModel().getValueAt(row, this.model.getColumnYIndex());
+				if (valueStringY.equals(ColumnType.WILDCARD))
+				{
+					b = false;
+				}
 			}
 		}
 		
@@ -1330,7 +1334,7 @@ public class DotplotView extends LayoutPanel implements
 	}
 
 	/**
-	 * Paint a single point
+	 * Paint a single point in scatterplot.
 	 * 
 	 * @param context
 	 *            the context in which the point will be painted
@@ -1340,9 +1344,9 @@ public class DotplotView extends LayoutPanel implements
 	private void drawPoint(Context2d context, int rowIndex)
 	{
 		// Determine painting location
-		int x = this.determineXCoord(rowIndex);
-		int y = this.determineYCoord(rowIndex);
-		int splitClass = this.getSplitClass(rowIndex);
+		int x = this.determineXCoord(indicesDotsInView[rowIndex]);
+		int y = this.determineYCoord(indicesDotsInView[rowIndex]);
+		int splitClass = this.getSplitClass(indicesDotsInView[rowIndex]);
 
 		if (x < 0 || y < 0 || splitClass < 0)
 		{
@@ -1365,30 +1369,8 @@ public class DotplotView extends LayoutPanel implements
 		}
 	}
 
-	private void drawPoint(Context2d context, int rowIndex, CssColor c)
-	{
-		// Determine painting location
-		int x = this.determineXCoord(rowIndex);
-		int y = this.determineYCoord(rowIndex);
-		int splitClass = this.getSplitClass(rowIndex);
-
-		if (x < 0 || y < 0 || splitClass < 0)
-		{
-			return;
-		}
-		else
-		{
-			if (this.model.columnSplitIndexValid())
-			{
-				y += (splitClass) * (this.getHeight() - this.model.getStatTableModel().getDialogButtonHeight() - 5);
-			}
-			c = ColorUtils.getColor(splitClass);
-			drawPointAtLocation(context, x, y, rowIndex, c);
-		}
-	}
-
 	/**
-	 * Draw a single point (dot) at a given location.
+	 * Draw a single point (dot) at a given location for scatterplot.
 	 * 
 	 * @param context
 	 *            the graphics in which the point will be painted
@@ -1409,48 +1391,6 @@ public class DotplotView extends LayoutPanel implements
 	}
 
 	/**
-	 * Draw a single non-selected point (dot) at a given location.
-	 * 
-	 * @param context
-	 *            the graphics in which the point will be painted
-	 * @param x
-	 *            the x-coordinate of the painting location
-	 * @param y
-	 *            the y-coordinate of the painting location
-	 * @param rowIndex
-	 *            the index of the object that will be painted
-	 */
-	private void drawNonSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex)
-	{
-		// determine the color of the dot depending on the split class
-		CssColor c = this.determineColor(rowIndex);
-		
-		// draw the point with the given color
-		this.drawNonSelectedPointAtLocation(context, x, y, rowIndex, c);
-	}
-
-	/**
-	 * Draw a single selected point (dot) at a given location.
-	 * 
-	 * @param context
-	 *            the graphics in which the point will be painted
-	 * @param x
-	 *            the x-coordinate of the painting location
-	 * @param y
-	 *            the y-coordinate of the painting location
-	 * @param rowIndex
-	 *            the index of the object that will be painted
-	 */
-	private void drawSelectedPointAtLocation(Context2d context, int x, int y, int rowIndex)
-	{
-		// determine the color of the dot depending on the split class
-		CssColor c = this.determineColor(rowIndex);
-		
-		// draw the point with the given color
-		this.drawSelectedPointAtLocation(context, x, y, rowIndex, c);
-	}
-
-	/**
 	 * Draw a single point (dot) at a given location with the given color.
 	 * 
 	 * @param context
@@ -1465,7 +1405,7 @@ public class DotplotView extends LayoutPanel implements
 		double alpha;
 		CssColor transparentColor;
 
-		if (this.model.getStatTableModel().isRowSelected(rowIndex))
+		if (this.model.getStatTableModel().isRowSelected(indicesDotsInView[rowIndex]))
 		{
 			// set non transparent for selected dot
 			alpha = 1;
@@ -1491,7 +1431,8 @@ public class DotplotView extends LayoutPanel implements
 		context.arc(x, y, this.dotRadius, 0, Math.PI * 2.0, true);
 		context.closePath();
 		context.fill();
-		if (this.model.getStatTableModel().isRowSelected(rowIndex))
+
+		if (this.model.getStatTableModel().isRowSelected(indicesDotsInView[rowIndex]))
 		{
 			context.setLineWidth(2);
 			context.setStrokeStyle(ColorUtils.BLACK);
@@ -1504,6 +1445,7 @@ public class DotplotView extends LayoutPanel implements
 
 	/**
 	 * Draw a single non-selected point (dot) at a given location with the given color.
+	 * Used for dotplot with single X variable.
 	 * 
 	 * @param context
 	 * @param x
@@ -1524,6 +1466,7 @@ public class DotplotView extends LayoutPanel implements
 
 	/**
 	 * Draw a single selected point (dot) at a given location with the given color.
+	 * Used for dotplot with single X variable.
 	 * 
 	 * @param context
 	 * @param x
@@ -2799,7 +2742,7 @@ public class DotplotView extends LayoutPanel implements
 						break;
 					}
 				}
-
+				
 				if (dotIndex < pointList.size())
 				{
 					// if i < pointsList.size() then a dot was clicked, so
@@ -3130,11 +3073,14 @@ public class DotplotView extends LayoutPanel implements
 							i * (DotplotView.this.getHeight() - model.getStatTableModel().getDialogButtonHeight() - 5));
 					}
 	
+					// DRAW THE DOTS
 					for (int row = 0; row < numberOfDotsInView(); row++)
 					{
 						// use the ordered indices so that selected dots will be drawn at last
-						// test syl TODO: in elke drawPoint() wordt setFillStyle gedaan voor de geselecteerde; dit zorgt voor slechte performance
-						DotplotView.this.drawPoint(tempContext, indexSortedOnSelected[row]);
+						int index = indexSortedOnSelected[row];
+
+						// syl TODO: in elke drawPoint() wordt setFillStyle gedaan voor de geselecteerde; dit zorgt voor slechte performance
+						DotplotView.this.drawPoint(tempContext, index);
 					}
 				} // SCATTERPLOT
 				else if (DotplotView.this.model.columnXIndexValid())
@@ -3232,7 +3178,7 @@ public class DotplotView extends LayoutPanel implements
 								}
 								else
 								{ // the selected part, index >= startIndexSelected
-									if (i == startIndexSelected)//(index == startIndexSelected) // moet dit i zijn?!
+									if (i == startIndexSelected)
 									{
 										// only once for performance reasons!
 										tempContext.setLineWidth(2);
@@ -3337,7 +3283,7 @@ public class DotplotView extends LayoutPanel implements
 							}
 						}
 					}
-				} // columnYIndexValid
+				} // columnYIndexValid -> alleen Y; nu niet mogelijk
 	
 				// draw the bottom line and labels
 				for (int i = 0; i < (DotplotView.this.isSplitSingleViewSelected() ? 1
