@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.5</version>
 	  		<exclusions>
 	  			<exclusion>
 	  				<artifactId>IdeasGWT</artifactId>
