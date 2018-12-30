@@ -565,7 +565,11 @@ public class KladjeGWTVeld
 	{
 		for(int k=0 ; k<kStrokeContainers.size() ; k++)
 		{	
-			if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive()) {
+//			if(kStrokeContainers.get(k).getRecognizeOff()) {
+//				if()
+//			}
+//			else 
+				if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive()) {
 				activeHSCNumber = 0;
 				return kStrokeContainers.get(k);
 			}
@@ -3118,7 +3122,7 @@ public class KladjeGWTVeld
 		for (int i=0 ; i<kStrokeContainers.size() ; i++) {
 			KStrokeContainer ksc = kStrokeContainers.get(i);
 			if(ksc!=sc && ksc.getBox().y<sc.getBox().y && Math.abs(ksc.getBox().x-sc.getBox().x)<60
-					&& Math.abs(sc.getBox().y-(ksc.getBox().y+ksc.getBox().height))<60
+					&& Math.abs(sc.getBox().y-(ksc.getBox().y+ksc.getBox().height))<100
 					&& (referenceSC==null || ksc.getBox().y>referenceSC.getBox().y)) {
 				referenceSC = ksc;
 			}
@@ -3141,6 +3145,7 @@ public class KladjeGWTVeld
 			return;
 		currentStrokeContainer.setActive(false);
 		currentStrokeContainer.scale(1.0/schrijfLeesFactor);
+		currentStrokeContainer.setEraserActive(false);
 //		if(currentStrokeContainer.getBox().x < 0)
 //			currentStrokeContainer.translate(-currentStrokeContainer.getBox().x+30, 0);
 		
@@ -3239,11 +3244,13 @@ public class KladjeGWTVeld
 					currentHiddenStrokeContainer.setActive(true);
 					if(currentHiddenStrokeContainer.getStrokeCount()>0)
 						return;
+					//paint();
+					//currentHiddenStrokeContainer.getWriteBox();
 				}
 			}
 			if(currentHiddenStrokeContainer!=null) 
 			{	
-				if(currentHiddenStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) 
+				if(currentHiddenStrokeContainer.getCloseButtonArea().contains(eventX, eventY) && currentHiddenStrokeContainer.isActive()) 
 				{
 					eigenaar.sendEquation(activeHSCNumber);
 					closeCurrentHiddenContainer();
@@ -3251,7 +3258,7 @@ public class KladjeGWTVeld
 					paint();
 					return;
 				}
-				if(currentHiddenStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) 
+				if(currentHiddenStrokeContainer.getCheckButtonArea().contains(eventX, eventY) && currentHiddenStrokeContainer.isActive()) 
 				{
 					eigenaar.sendEquation(activeHSCNumber);
 					closeCurrentHiddenContainer();
@@ -3259,12 +3266,13 @@ public class KladjeGWTVeld
 					eigenaar.fireCheck_n();
 					return;
 				}
-				if(currentHiddenStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY)) {
+				if(currentHiddenStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY) && currentHiddenStrokeContainer.isActive()) {
+					//currentHiddenStrokeContainer.setRecognizeOff(true);
 					return;
 				}
-				if(currentHiddenStrokeContainer.getApproxButtonArea().contains(eventX, eventY)) {
+				if(currentHiddenStrokeContainer.getApproxButtonArea().contains(eventX, eventY) && currentHiddenStrokeContainer.isActive()) {
 					currentHiddenStrokeContainer.approximate();
-					paint();
+					paintFormule(false);
 					return;
 				}
 				
@@ -3291,6 +3299,38 @@ public class KladjeGWTVeld
 				return;
 			}
 			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getEraserButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.setEraserActive(true);
+				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getPenButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.setEraserActive(false);
+				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY) 
+					&& !(currentStrokeContainer.isCorrect() || currentStrokeContainer.isFalse() || currentStrokeContainer.isHalf())) {
+				currentStrokeContainer.setRecognizeOff(false);
+				paint();
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getNotRecognizeButtonArea().contains(eventX, eventY) 
+					&& !(currentStrokeContainer.isCorrect() || currentStrokeContainer.isFalse() || currentStrokeContainer.isHalf())) {
+				currentStrokeContainer.setRecognizeOff(true);
+				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getEraserActive() && currentStrokeContainer.writeBoxContains(eventX, eventY)) {
+				currentStrokeContainer.eraseStrokes(eventX, eventY);
+				currentStrokeContainer.setErasing(true, eventX, eventY);
+				paintFormule(false);
+				return;
+			}
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCheckButtonArea().contains(eventX, eventY)) {
 				correctEquationSend = false;
@@ -3305,16 +3345,14 @@ public class KladjeGWTVeld
 				return;
 			}
 			
-			if(currentStrokeContainer!=null && currentStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY)) {
-				currentStrokeContainer.setRecognizeOff(true);
-				paint();
-				return;
-			}
+			
+			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getApproxButtonArea().contains(eventX, eventY)) {
 				currentStrokeContainer.approximate();
-				paint();
+				paintFormule(false);
 				return;
 			}
+			
 					
 			if(currentStrokeContainer!=null && !currentStrokeContainer.writeBoxContains(eventX, eventY)) {
 				closeCurrentContainer();
@@ -3979,7 +4017,7 @@ public class KladjeGWTVeld
 				if(currentStrokeContainer.getStrokeCount()==1)
 					paint();
 			}
-			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant())
+			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !currentStrokeContainer.getRecognizeOff())
 			{	kStrokeContainers.remove(currentStrokeContainer);
 				currentStrokeContainer = null;
 				formulaStrokePoints.clear();
@@ -3987,6 +4025,9 @@ public class KladjeGWTVeld
 				paintFormule(true);
 				return;
 			}
+			
+			if(currentStrokeContainer!=null)
+				currentStrokeContainer.setErasing(false, eventX, eventY);
 			
 			formulaStrokePoints.clear();
 			paintFormule(true);

@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.canvas.dom.client.Context2d.LineCap;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.resources.client.ImageResource;
@@ -17,6 +18,7 @@ import fi.wiskopdr.expressies.Expressie;
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
+import fi.writemathgwt.client.engine.WMObject;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -53,6 +55,10 @@ public class KStrokeContainer {
 	private ImageElement approxImageElement;
 	
 	private boolean recognizeOff;
+	
+	private boolean eraserActive = false;
+	private boolean erasing = false;
+	private int erasingX, erasingY;
 	
 	private ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>> fakeStrokes = new  ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>>();
 	
@@ -166,6 +172,12 @@ public class KStrokeContainer {
 		strokeContainer.wis();
 	}
 	
+	public void eraseStrokes(int x, int y) {
+		strokeContainer.removeStrokes(x,y);
+		if(strokeContainer.getStrokes().size()==0)
+			eraserActive = false;
+	}
+	
 	public int getStrokeCount() {
 		return strokeContainer.getStrokes().size();
 	}
@@ -186,24 +198,54 @@ public class KStrokeContainer {
 		return new Rectangle(x,y,30,30);
 	}
 	
+	public Rectangle getPenButtonArea() {
+		if(!recognizeOff)
+			return new Rectangle(0,0,0,0);
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		int x = getWriteBox().x + 80; 
+		int y = getWriteBox().y + 5; 
+		return new Rectangle(x,y,25,25);
+	}
+	
+	public Rectangle getEraserButtonArea() {
+		if(!recognizeOff)
+			return new Rectangle(0,0,0,0);
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		int x = getWriteBox().x + 108; 
+		int y = getWriteBox().y + 5;  
+		return new Rectangle(x,y,25,25);
+	}
+	
 	public Rectangle getRecognizeButtonArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		int x = getWriteBox().x + 33; 
+		int y = getWriteBox().y + 5; 
+//		if(correct || isfalse || isHalf || recognizeOff)
+//			return new Rectangle(x,y,0,0);
+		return new Rectangle(x,y,25,25);
+	}
+	
+	public Rectangle getNotRecognizeButtonArea() {
 		if(writeBox==null)
 			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
 		int x = getWriteBox().x + 5; 
 		int y = getWriteBox().y + 5; 
 //		if(correct || isfalse || isHalf || recognizeOff)
 //			return new Rectangle(x,y,0,0);
-		return new Rectangle(x,y,30,20);
+		return new Rectangle(x,y,25,25);
 	}
 	
 	public Rectangle getApproxButtonArea() {
 		if(writeBox==null)
 			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
-		int x = getWriteBox().x+getWriteBox().width-31; 
-		int y = getWriteBox().y+getWriteBox().height/2-10; 
+		int x = getWriteBox().x+getWriteBox().width-32; 
+		int y = getWriteBox().y+getWriteBox().height/2-19; 
 //		if(correct || isfalse || isHalf || recognizeOff)
 //			return new Rectangle(x,y,0,0);
-		return new Rectangle(x,y,30,20);
+		return new Rectangle(x,y,27,38);
 	}
 	
 	private void drawcloseButton(Context2d g, Rectangle r) {
@@ -239,6 +281,7 @@ public class KStrokeContainer {
 		//g.setFillStyle(CssColor.make(255, 255, 255));
 		
 		//g.fillRect(r.x, r.y, r.width, r.height);
+		
 		g.setStrokeStyle(CssColor.make(38, 115, 182));
 		g.setLineWidth(4.0d);
 		g.beginPath();
@@ -249,6 +292,153 @@ public class KStrokeContainer {
 		g.closePath();
 		g.stroke();
 	}	
+	
+	private void drawNotRecognizeButton(Context2d g, Rectangle r) {
+		if(recognizeOff)
+			g.setFillStyle(CssColor.make(38, 115, 182));
+		else
+			g.setFillStyle(CssColor.make(180, 195, 228));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		
+		g.setStrokeStyle(CssColor.make(255,255,255));
+		g.setLineWidth(2.0d);
+		int x = r.x+r.width/8;
+		int y = r.y+r.height/8;
+		int w = 3*r.width/4;
+		int h = 3*r.height/4;
+		
+		g.beginPath();
+		g.moveTo(x+w/3, y+2*h/3);
+		g.lineTo(x+2*w/3, y);
+		g.lineTo(x+w, y+2*h/3);
+		g.lineTo(x+w/3, y+2*h/3);
+//		g.closePath();
+//		g.stroke();
+//		
+//		g.beginPath();
+		g.moveTo(x+w/3, y+2*h/3);
+		g.arc(x+w/3, y+2*h/3, w/3, 0, 2*Math.PI);
+		g.moveTo(x+w/3, y+2*h/3);
+		g.closePath();
+		g.stroke();
+	}
+	
+	private void drawRecognizeButton(Context2d g, Rectangle r) {
+		if(!recognizeOff)
+			g.setFillStyle(CssColor.make(38, 115, 182));
+		else
+			g.setFillStyle(CssColor.make(180, 195, 228));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		
+		g.setStrokeStyle(CssColor.make(255,255,255));
+		g.setLineWidth(2.0d);
+		int x = r.x+r.width/8;
+		int y = r.y+r.height/8;
+		int w = 3*r.width/4;
+		int h = 3*r.height/4;
+		
+		g.beginPath();
+		g.moveTo(x+w/6, y+h);
+		g.lineTo(x+w/6, y+h/6);
+		g.arc(x+w/3, y+h/6, w/6, Math.PI, 0 ,false);
+		g.moveTo(x, y+h/2);
+		g.lineTo(x+w/3, y+h/2);
+		g.moveTo(x+w/2, y+h/3);
+		g.lineTo(x+w, y+h);
+		g.moveTo(x+w/2, y+h);
+		g.lineTo(x+w, y+h/3);
+		g.closePath();
+		g.stroke();
+	}
+	
+	private void drawPenButton(Context2d g, Rectangle r) {
+		if(!eraserActive)
+			g.setFillStyle(CssColor.make(38, 115, 182));
+		else
+			g.setFillStyle(CssColor.make(180, 195, 228));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		
+		g.setStrokeStyle(CssColor.make(255,255,255));
+		g.setLineWidth(2.0d);
+		int x = r.x+r.width/8;
+		int y = r.y+r.height/8;
+		int w = 3*r.width/4;
+		int h = 3*r.height/4;
+		
+		g.beginPath();
+		g.moveTo(x, y+h);
+		g.lineTo(x, y+3*h/4);
+		g.lineTo(x+3*w/4, y);
+		g.lineTo(x+w, y+h/4);
+		g.lineTo(x+w/4, y+h);
+		g.lineTo(x, y+h);
+		g.closePath();
+		g.stroke();
+	}
+	
+	private void drawEraserButton(Context2d g, Rectangle r) {
+		if(eraserActive)
+			g.setFillStyle(CssColor.make(38, 115, 182));
+		else
+			g.setFillStyle(CssColor.make(180, 195, 228));
+		g.fillRect(r.x, r.y, r.width, r.height);
+		
+		g.setStrokeStyle(CssColor.make(255,255,255));
+		g.setLineWidth(2.0d);
+		int x = r.x+r.width/8;
+		int y = r.y+r.height/8;
+		int w = 3*r.width/4;
+		int h = 3*r.height/4;
+		
+		g.beginPath();
+		g.moveTo(x+5, y+h-10);
+		g.arcTo(x+w/2 , y , x+w , y , 2);
+		g.arcTo(x+w, y , x+w/2 , y+h , 2);
+		g.arcTo(x+w/2 , y+h , x , y+h , 2);
+		g.arcTo(x , y+h, x+w/2, y , 2);
+		g.closePath();
+		g.stroke();
+		
+		g.setFillStyle(CssColor.make(255,255,255));
+		g.beginPath();
+		g.moveTo(x+w/4, y+h/2);
+		g.lineTo(x+w/2, y);
+		g.lineTo(x+w, y);
+		g.lineTo(x+3*w/4 , y+h/2);
+		g.lineTo(x+w/4, y+h/2);
+		g.closePath();
+		g.fill();
+		
+	}
+	
+	private void drawEraser(Context2d g, Rectangle r) {
+		g.setStrokeStyle(CssColor.make(38, 115, 182));
+		g.setLineWidth(2.0d);
+		int x = r.x+r.width/8;
+		int y = r.y+r.height/8;
+		int w = 3*r.width/4;
+		int h = 3*r.height/4;
+		
+		g.beginPath();
+		g.moveTo(x+5, y+h-10);
+		g.arcTo(x+w/2 , y , x+w , y , 2);
+		g.arcTo(x+w, y , x+w/2 , y+h , 2);
+		g.arcTo(x+w/2 , y+h , x , y+h , 2);
+		g.arcTo(x , y+h, x+w/2, y , 2);
+		g.closePath();
+		g.stroke();
+		
+		g.setFillStyle(CssColor.make(38, 115, 182));
+		g.beginPath();
+		g.moveTo(x+w/4, y+h/2);
+		g.lineTo(x+w/2, y);
+		g.lineTo(x+w, y);
+		g.lineTo(x+3*w/4 , y+h/2);
+		g.lineTo(x+w/4, y+h/2);
+		g.closePath();
+		g.fill();
+		
+	}
 	
 	private void drawShadow(Context2d g, Rectangle r) {
 		for(int i=0 ; i<10 ; i++) {
@@ -288,7 +478,7 @@ public class KStrokeContainer {
 	}
 	
 	public void draw(Context2d g) {
-		if(strokeContainer.getStrokes().size()>0) {
+		if(strokeContainer.getStrokes().size()>0 || recognizeOff) {
 			if(active && !popupMode) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
@@ -300,24 +490,37 @@ public class KStrokeContainer {
 				//g.setFillStyle(CssColor.make(239, 241, 243));
 				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
 				
-//				g.setStrokeStyle(CssColor.make(255, 0, 0));
-//				
-//				g.beginPath();
-//				g.rect(getBox().x,(int)strokeContainer.averageBaseLine-strokeContainer.averageHeight, getBox().width, strokeContainer.averageHeight);
-//				g.closePath();
-//				g.stroke();
+				g.setStrokeStyle(CssColor.make(255, 0, 0));
+				
+				g.beginPath();
+				g.rect(getBox().x,(int)strokeContainer.averageBaseLine-strokeContainer.averageHeight, getBox().width, strokeContainer.averageHeight);
+				g.closePath();
+				g.stroke();
 //				
 //				g.setStrokeStyle(CssColor.make(80, 80, 80));
 
 				drawcloseButton(g, getCloseButtonArea());
 				
-				if(!correct && !isfalse && !isHalf && !recognizeOff)
-					g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
+				if(recognizeOff && !correct && !isfalse && !isHalf)
+					//g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
+					drawRecognizeButton(g,getRecognizeButtonArea());
+				
+				if(!correct && !isfalse && !isHalf)
+					//g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
+					drawNotRecognizeButton(g,getNotRecognizeButtonArea());
 				
 				if(!recognizeOff && isGetalsExpressie)
-					g.drawImage(approxImageElement, getWriteBox().x+getWriteBox().width-31, getWriteBox().y+getWriteBox().height/2-10);
+					g.drawImage(approxImageElement, getWriteBox().x+getWriteBox().width-32, getWriteBox().y+getWriteBox().height/2-19);
 				
-
+				if(recognizeOff) {
+					g.setFont("16px arial");
+					g.fillText("TEKENING", getWriteBox().x+150, getWriteBox().y+25);
+					drawEraserButton(g,getEraserButtonArea());
+					drawPenButton(g,getPenButtonArea());
+				}
+				if(erasing)
+					drawEraser(g,new Rectangle(erasingX-25, erasingY-25, 25,25));
+				
 //				int d = (int)strokeContainer.averageHeight;
 //				g.setFillStyle(CssColor.make(0,0,0));
 //				g.fillText(""+d, 300, 20);
@@ -490,6 +693,10 @@ public class KStrokeContainer {
 		}
 	}
 	
+	public boolean isCorrect() {
+		return correct;
+	}
+	
 	public void setFalse(boolean isfalse) {
 //		if(!isfalse && this.isfalse)
 //			activeTranslation -=25;
@@ -501,6 +708,11 @@ public class KStrokeContainer {
 			isHalf = false;
 		}
 	}
+	
+	public boolean isFalse() {
+		return isfalse;
+	}
+	
 	public void setHalf(boolean isHalf) {
 //		if(!isfalse && this.isfalse)
 //			activeTranslation -=25;
@@ -513,8 +725,68 @@ public class KStrokeContainer {
 		}
 	}
 	
+	public boolean isHalf() {
+		return isHalf;
+	}
+	
+	public void parseAllStrokes() {
+		ArrayList<Stroke> strokes = new ArrayList<Stroke>();
+		for (int i = 0; i < strokeContainer.getStrokes().size(); i++) {	
+			strokes.add(strokeContainer.getStrokes().get(i));
+		}
+		strokeContainer.removeWmObjects();
+		strokeContainer.removeStrokes();
+		boolean swapped = true;
+		while (swapped)	{	
+			swapped = false;
+			for (int i = 1; i < strokes.size(); i++) {	
+				Stroke stroke1 = strokes.get(i-1);
+				Stroke stroke2 = strokes.get(i);
+				if (stroke1.getTimeStamp() > stroke2.getTimeStamp()) {	
+					strokes.set(i-1, stroke2);
+					strokes.set(i, stroke1);
+					swapped = true;
+				}
+			}
+		}
+		for (int i = 0; i < strokes.size(); i++) {	
+			strokeContainer.addStroke(strokes.get(i));
+		}
+		formuleViewer = new FormuleViewer(strokeContainer.getFormulaString());
+		formuleViewer.setColor(CssColor.make(38, 115, 182));
+	}
+	
+	
 	public void setRecognizeOff(boolean b) {
 		recognizeOff=b;
+		if(b) {
+			strokeContainer.removeWmObjects();
+			correct = false;
+			isfalse = false;
+			isHalf = false;
+		}
+		else {
+			writeBox = null;
+			parseAllStrokes();
+		}
+	}
+	
+	public boolean getRecognizeOff() {
+		return recognizeOff;
+	}
+	
+	public void setEraserActive(boolean b) {
+		eraserActive = eraserActive ? false : b;
+	}
+	
+	public void setErasing(boolean b, int x, int y) {
+		erasing = b;
+		erasingX = x;
+		erasingY = y;
+	}
+	
+	public boolean getEraserActive() {
+		return eraserActive;
 	}
 //	public void setActive (boolean b) {
 //		active = b;
@@ -596,6 +868,9 @@ public class KStrokeContainer {
 	
 	public Rectangle getWriteBox() {
 		int margin = 50;
+		
+		
+		
 		if(writeBox==null && strokeContainer != null && strokeContainer.getBoundingBox()!=null) {
 			int xSC = (int)strokeContainer.getBoundingBox().x;
 			int ySC = (int)strokeContainer.getBoundingBox().y;
@@ -615,6 +890,16 @@ public class KStrokeContainer {
 			
 			writeBox = new Rectangle(x, y, width, height);
 		}
+		if(recognizeOff) {
+			int height = parent.hoogte-40;
+			int width = Math.max(writeBox.width,height);
+			int x = writeBox.x;
+			int y = writeBox.y;
+			x = (int)Math.min(x, parent.breedte - width -20);
+			y = (int)Math.min(y, parent.hoogte - height -20);
+			writeBox = new Rectangle(x, y, width, height);
+		}
+			
 //		else if(writeBox==null && strokeContainer != null) { //strokeContainer.getBoundingBox()==null
 //			int width = parent.breedte-40;
 //			int height = Math.min(parent.hoogte-40, defaultBox.height + 2*margin);
@@ -648,6 +933,10 @@ public class KStrokeContainer {
 	}
 	
 	public boolean isNotRelevantWhenReady() {
+		if(strokeContainer.getStrokes().size()==0) {
+			return true;
+
+		}
 		if(strokeContainer.getStrokes().size()==1) {
 			double length = strokeContainer.getStrokes().get(0).getLength();
 			if(length<35)
