@@ -4009,8 +4009,10 @@ public class KladjeGWTVeld
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
 				cleanFormulePoints(formulaStrokePoints);
-				currentStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
-				
+				Stroke stroke = new Stroke(formulaStrokePoints);
+				currentStrokeContainer.addStroke(stroke);
+				if(stroke.getParsePointsbox().height>160 || currentStrokeContainer.getStrokeCount()==1 && stroke.getParsePointsbox().width>200)
+					currentStrokeContainer.setRecognizeOff(true);
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				currentStrokeContainer.setHalf(false);
