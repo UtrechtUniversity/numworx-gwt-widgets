@@ -3236,6 +3236,7 @@ public class KladjeGWTVeld
 			startX = eventX;
 			startY = eventY;
 			
+			
 			if(currentHiddenStrokeContainer==null && currentStrokeContainer==null)
 			{
 				currentHiddenStrokeContainer = findHiddenStrokeContainer(eventX, eventY);
@@ -3245,7 +3246,7 @@ public class KladjeGWTVeld
 					if(currentHiddenStrokeContainer.getStrokeCount()>0)
 						return;
 					//paint();
-					//currentHiddenStrokeContainer.getWriteBox();
+					currentHiddenStrokeContainer.getWriteBox();
 				}
 			}
 			if(currentHiddenStrokeContainer!=null) 
@@ -3307,6 +3308,12 @@ public class KladjeGWTVeld
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getPenButtonArea().contains(eventX, eventY)) {
 				currentStrokeContainer.setEraserActive(false);
+				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getBinButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.wis();
 				paintFormule(false);
 				return;
 			}
@@ -3948,11 +3955,11 @@ public class KladjeGWTVeld
 						paint();
 				}
 				
-				if(currentHiddenStrokeContainer.isNotRelevant()) //currentStrokeContainer.getStrokeCount()==1 &&
+				if(currentHiddenStrokeContainer.isNotRelevant() ) //currentStrokeContainer.getStrokeCount()==1 &&
 				{	currentHiddenStrokeContainer.wis();
 					formulaStrokePoints.clear();
 					eigenaar.sendEquation(activeHSCNumber);
-					closeCurrentHiddenContainer();
+					//closeCurrentHiddenContainer();
 					//
 					paint();
 					paintFormule(true);
