@@ -98,6 +98,13 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
 			regelnummer = i;
 			this.fc = fc;
 			this.setFormuleToolBijFocus(true);
+			
+			// zorg dat de formule editor geen focus heeft, zodat er niet onnodig een DWO-toetsenbord opkomt
+			if (getKeyboard() != null)
+			{
+				getKeyboard().setEditor(null);
+				getKeyboard().blur();
+			}
 		}
 		
 		@Override
@@ -111,7 +118,6 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
 			fc.grafiekGWTVeld.paint();
 		}
 		
-
 		@Override
 		public void setFont(FormuleFont fm) {
 			super.setFont(fm);
