@@ -25,6 +25,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 import com.google.gwt.event.dom.client.ContextMenuHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -362,8 +366,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			checkboxen[i] = new CheckBox();
 			CheckBoxClickHandler handler = new CheckBoxClickHandler(i);
 			checkboxen[i].addClickHandler(handler);
-			// rechtermuisknop om kleuren in te stellen
+			// rechtermuisknop en touch handlers (long tap) om kleuren in te stellen
 			checkboxen[i].addDomHandler(handler, ContextMenuEvent.getType());
+			checkboxen[i].addTouchStartHandler(handler);
+			checkboxen[i].addTouchEndHandler(handler);
 			
 			if(i==0)
 				geselecteerd[i] = true;
@@ -622,10 +628,11 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	
 	public void zetGrafiekKleuren()
 	{	
-		if(editors != null && interactiePanel != null)
-		{	for(int i=0 ; i<editors.length ; i++)
-			{	editors[i].setColor(interactiePanel.getFormuleColor(i));
-			
+		if (editors != null && interactiePanel != null)
+		{
+			for (int i = 0; i < editors.length; i++)
+			{
+				editors[i].setColor(interactiePanel.getFormuleColor(i));
 			}
 		}
 		//if(functieBeginViewers != null && interactiePanel != null)
@@ -1521,9 +1528,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 //		});
 //	}
 	
-	class CheckBoxClickHandler implements ClickHandler, ContextMenuHandler
+	class CheckBoxClickHandler implements ClickHandler, ContextMenuHandler, TouchStartHandler, TouchEndHandler
 	{
 		int regelnummer;
+		protected long taptime;
 		
 		public CheckBoxClickHandler(int i)
 		{
@@ -1547,39 +1555,33 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			event.preventDefault();
 			event.stopPropagation();
 			
-			// welke checkbox is de source? -> i
-			// rechtermuisknop geeft kleurkiezer
-			// color = checkbox i color
-			int index = getClickedCheckBoxIndex(event);
+			colorDialog.setColorA(interactiePanel.getFormuleColor(regelnummer));
+			colorDialog.setColorIndex(regelnummer);
+			colorDialog.show();
+		}
+		
+		protected boolean isLongTap()
+		{
+			long durationTap = System.currentTimeMillis() - taptime;
 			
-			if (index > -1)
+			return durationTap > 300;
+		}
+
+		@Override
+		public void onTouchEnd(TouchEndEvent event)
+		{
+			if (isLongTap())
 			{
-				colorDialog.setColorA(interactiePanel.getFormuleColor(index));
-				colorDialog.setColorIndex(index);
+				colorDialog.setColorA(interactiePanel.getFormuleColor(regelnummer));
+				colorDialog.setColorIndex(regelnummer);
 				colorDialog.show();
 			}
 		}
 
-		/**
-		 * Get the index of the checkbox that generated the context menu event.
-		 * 
-		 * @param event
-		 * @return
-		 */
-		private int getClickedCheckBoxIndex(ContextMenuEvent event)
+		@Override
+		public void onTouchStart(TouchStartEvent event)
 		{
-			int index = -1;
-			
-			for (int i = 0; i < checkboxen.length; i++)
-			{
-				if (event.getSource() == checkboxen[i])
-				{
-					index = i;
-					break;
-				}
-			}
-			
-			return index;
+	        taptime = System.currentTimeMillis();
 		}
 	}
 	
@@ -1608,7 +1610,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 	@Override
 	public void onColorChange(ColorChangeEvent event)
 	{
-		System.out.println("FormuleComponentGWT.onColorChange(): kleur = " + event.getColorA());
 		if (event instanceof GraphToolColorChangeEvent) // dit moet zo zijn
 		{
 			interactiePanel.setColor(((GraphToolColorChangeEvent) event).getColorIndex(), CssColor.make(((GraphToolColorChangeEvent) event).getColorA()), false);
