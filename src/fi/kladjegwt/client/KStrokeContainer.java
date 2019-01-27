@@ -19,6 +19,7 @@ import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
 import fi.writemathgwt.client.engine.WMObject;
+import fi.writemathgwt.client.engine.WMObjectLine;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -383,6 +384,8 @@ public class KStrokeContainer {
 		g.lineTo(x+3*w/4, y);
 		g.lineTo(x+w, y+h/4);
 		g.lineTo(x+w/4, y+h);
+		g.lineTo(x, y+3*h/4);
+		g.lineTo(x+w/4, y+h);
 		g.lineTo(x, y+h);
 		g.closePath();
 		g.stroke();
@@ -536,13 +539,32 @@ public class KStrokeContainer {
 				g.fillRect(getWriteBox().x + getWriteBox().width-40, getWriteBox().y, 40, 40);
 				
 //				g.setStrokeStyle(CssColor.make(255, 0, 0));
+//				g.setLineWidth(1.0d);
 //				
-//				g.beginPath();
-//				g.rect(getBox().x,(int)strokeContainer.averageBaseLine-strokeContainer.averageHeight, getBox().width, strokeContainer.averageHeight);
-//				g.closePath();
-//				g.stroke();
-//				
-//				g.setStrokeStyle(CssColor.make(80, 80, 80));
+//				ArrayList<DoubleRectangle> boxes = strokeContainer.getMainLine().getBoxes();
+//				for(int i=0 ; i<boxes.size() ; i++) {
+//					int xx = (int)boxes.get(i).x;
+//					int yy = (int)boxes.get(i).y;
+//					int ww = (int)boxes.get(i).width;
+//					int hh = (int)boxes.get(i).height;
+//					g.beginPath();
+//					//g.rect(getBox().x,(int)strokeContainer.averageBaseLine-strokeContainer.averageHeight, getBox().width, strokeContainer.averageHeight);
+//					g.rect(xx,yy,ww,hh);
+//					g.closePath();
+//					g.stroke();
+//					
+//				}
+//				g.setFillStyle(CssColor.make("rgba(200, 200, 200, 0.4)"));
+//				ArrayList<WMObjectLine> lines = strokeContainer.getMainLine().getLines();
+//				for(int i=0 ; i<lines.size() ; i++) {
+//					int xx = (int)lines.get(i).getBox().x;
+//					int avb = (int)lines.get(i).getAverageBaseLine();
+//					int ww = (int)lines.get(i).getBox().width;
+//					int avh = (int)lines.get(i).getAverageHeight();
+//					g.fillRect(xx,avb-avh,ww,avh);
+//				}
+				
+				g.setStrokeStyle(CssColor.make(80, 80, 80));
 
 				drawcloseButton(g, getCloseButtonArea());
 				
@@ -818,6 +840,7 @@ public class KStrokeContainer {
 		else {
 			writeBox = null;
 			parseAllStrokes();
+			eraserActive = false;
 		}
 	}
 	
