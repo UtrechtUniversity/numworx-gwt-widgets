@@ -41,6 +41,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		ColorStyle css = new ColorStyle(rgba);
 		DefaultAdapter.getDefault(item).put(css);
 		item.setVisible(visible);
+        if(trail && tracker != null) {
+          tracker.getModel().startTrail(item);
+        }
 		if (visibility.getString() != null && tracker != null) {
 			try {
 				String formula = visibility.getString();
@@ -57,9 +60,6 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 				visibility.destroy();
 				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
 				v.setVisible(false);
-                if(trail) {
-                  tracker.getModel().startTrail(item);
-                }
 				tracker.getModel().add(v);
 			
 			} catch (Exception e) {
