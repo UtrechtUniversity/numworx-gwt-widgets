@@ -122,6 +122,8 @@ public class KStrokeContainer {
 			//formuleViewer.setFont(FormuleFont.createFromFontSize(16));
 		}
 		
+//		if(isNotRelevant())
+//			return false;
 		
 		corrigeerSCPositie();
 		if(getStrokeCount()==0)
@@ -159,7 +161,7 @@ public class KStrokeContainer {
 	}
 	
 	public void corrigeerSCPositie() {
-		if(active && getBox()!=null) {
+		if(active && getBox()!=null && !this.isInputSC) {
 			int correctieX = Math.max(0, getBox().x+getBox().width+80+47 - parent.breedte-20);
 			int correctieY = Math.min(0,getBox().y-70);
 			activeTranslationX += correctieX;
@@ -895,9 +897,12 @@ public class KStrokeContainer {
 				activeTranslationY = Math.min(getBox().y-70  ,  getBox().y+getBox().height - (parent.hoogte-70));
 			
 			translate((int)-activeTranslationX,(int)-activeTranslationY);
+			//defaultBox.translate((int)-activeTranslationX,(int)-activeTranslationY);
 		}
-		else if(getBox()!=null)
+		else if(getBox()!=null) {
 			translate((int)activeTranslationX, (int)activeTranslationY);
+			//defaultBox.translate((int)activeTranslationX, (int)activeTranslationY);
+		}
 	}
 	
 	public void setpopupMode (boolean b) {
@@ -935,6 +940,10 @@ public class KStrokeContainer {
 		if(box==null)
 			box = defaultBox;
 		return box;
+	}
+	
+	public Rectangle getDefaultBox() {
+		return defaultBox;
 	}
 	
 	public Rectangle getDragBox() {

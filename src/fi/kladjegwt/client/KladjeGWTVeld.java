@@ -570,8 +570,8 @@ public class KladjeGWTVeld
 //			}
 //			else 
 				if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive()) {
-				activeHSCNumber = 0;
-				return kStrokeContainers.get(k);
+					activeHSCNumber = 0;
+					return kStrokeContainers.get(k);
 			}
 		}
 		return null;
@@ -3164,6 +3164,9 @@ public class KladjeGWTVeld
 		
 		if(currentHiddenStrokeContainer!=null && currentHiddenStrokeContainer.isNotRelevantWhenReady()) {
 			currentHiddenStrokeContainer.setActive(false);
+			currentHiddenStrokeContainer.getDefaultBox().translate(-activeTranslation.x, -activeTranslation.y);
+			activeTranslation.x = 0;
+			activeTranslation.y = 0;
 			currentHiddenStrokeContainer = null;
 			return;
 		}
@@ -3173,6 +3176,7 @@ public class KladjeGWTVeld
 		//currentStrokeContainer.scale(1.0/schrijfLeesFactor);
 	
 		currentHiddenStrokeContainer.translate(-activeTranslation.x, -activeTranslation.y);
+		currentHiddenStrokeContainer.getDefaultBox().translate(-activeTranslation.x, -activeTranslation.y);
 		activeTranslation.x = 0;
 		activeTranslation.y = 0;
 		currentHiddenStrokeContainer=null;
@@ -3378,8 +3382,9 @@ public class KladjeGWTVeld
 				undo();
 				eigenaar.setChanged();
 			}
+			if(currentHiddenStrokeContainer==null)
+				proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
 			
-			proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
 			if(currentStrokeContainer==null && proActiveStrokeContainer!=null) {
 					
 				proActiveX = proActiveStrokeContainer.getBox().x;
@@ -3526,6 +3531,7 @@ public class KladjeGWTVeld
 			int dx = eventX - startX;
 			int dy = eventY - startY;
 			currentHiddenStrokeContainer.translate(dx, dy);
+			currentHiddenStrokeContainer.getDefaultBox().translate(dx, dy);
 			activeTranslation.x += dx;
 			activeTranslation.y += dy;
 			paintFormule(true);
@@ -3585,11 +3591,13 @@ public class KladjeGWTVeld
 				proActiveStrokeContainer.translate(dx, dy);
 				startX = eventX;
 				startY = eventY;
+				paintFormule(true);
 			}
 			if(formulaStrokePoints.size()>0) {
 				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+				paintFormule(true);
 			}
-			paintFormule(true);
+			//paintFormule(true);
 		}
 		else if (mouseMode == lijnTekenen)
 		{
@@ -3944,15 +3952,19 @@ public class KladjeGWTVeld
 		{	
 			if(currentHiddenStrokeContainer!=null)
 			{
-				if(formulaStrokePoints.size()>0) 
+				if(formulaStrokePoints.size()>0 ) 
 				{
-					cleanFormulePoints(formulaStrokePoints);
-					currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
-					currentHiddenStrokeContainer.setCorrect(false);
-					currentHiddenStrokeContainer.setFalse(false);
-					currentHiddenStrokeContainer.setHalf(false);
-					if(currentHiddenStrokeContainer.getStrokeCount()==1)
-						paint();
+					Stroke strokeNew = new Stroke(formulaStrokePoints);
+					if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) 
+					{
+						cleanFormulePoints(formulaStrokePoints);
+						currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
+						currentHiddenStrokeContainer.setCorrect(false);
+						currentHiddenStrokeContainer.setFalse(false);
+						currentHiddenStrokeContainer.setHalf(false);
+						if(currentHiddenStrokeContainer.getStrokeCount()==1)
+							paint();
+					}
 				}
 				
 				if(currentHiddenStrokeContainer.isNotRelevant() ) //currentStrokeContainer.getStrokeCount()==1 &&
