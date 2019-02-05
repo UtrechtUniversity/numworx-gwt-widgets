@@ -591,6 +591,16 @@ public class KladjeGWTVeld
 		return null;
 	}
 	
+	public String getStrokeCode() {
+		String code = "";
+		for(int i=0 ; i<kStrokeContainers.size() ; i++) 
+		{
+			code += "SCnr "+i+"\n";
+			KStrokeContainer sc = kStrokeContainers.get(i);
+			code += sc.getStrokeCode();
+		}
+		return code;
+	}
 	
 	public String getFormula()
 	{
@@ -3301,6 +3311,7 @@ public class KladjeGWTVeld
 				closeCurrentContainer();
 				addToHistory();
 				paint();
+				eigenaar.fireStrokeCodes();
 				return;
 			}
 			
@@ -4010,6 +4021,7 @@ public class KladjeGWTVeld
 					currentStrokeContainer = proActiveStrokeContainer;
 					currentStrokeContainer.scale(schrijfLeesFactor/1.0);
 					currentStrokeContainer.setActive(true);
+					currentStrokeContainer.setNr(kStrokeContainers.indexOf(currentStrokeContainer));
 					
 				}
 				proActiveStrokeContainer=null;
@@ -4042,6 +4054,7 @@ public class KladjeGWTVeld
 			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !currentStrokeContainer.getRecognizeOff())
 			{	kStrokeContainers.remove(currentStrokeContainer);
 				currentStrokeContainer = null;
+				eigenaar.fireStrokeCodes();
 				formulaStrokePoints.clear();
 				paint();
 				paintFormule(true);

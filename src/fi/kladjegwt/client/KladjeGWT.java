@@ -988,6 +988,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if(comRoot!=null)
 			comRoot.fireEvent(new CBookEvent(this,"action.closePopup"));
 	}
+	
+	public void fireStrokeCodes() {
+		if(comRoot==null)
+			return;
+		String text = kladjeGWTVeld.getStrokeCode();
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", text);
+		comRoot.fireEvent(new CBookEvent(this,"text.strokecode",map));
+	}
 
 
 	@Override

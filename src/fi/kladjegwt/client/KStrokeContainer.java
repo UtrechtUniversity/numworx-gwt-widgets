@@ -61,6 +61,8 @@ public class KStrokeContainer {
 	private boolean erasing = false;
 	private int erasingX, erasingY;
 	
+	private int nr;
+	
 	private ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>> fakeStrokes = new  ArrayList<ArrayList<fi.writemathgwt.client.engine.Point>>();
 	
 	//private double schrijfLeesFactor = 2;
@@ -592,8 +594,8 @@ public class KStrokeContainer {
 					drawEraser(g,new Rectangle(erasingX-25, erasingY-25, 25,25));
 				
 //				int d = (int)strokeContainer.averageHeight;
-//				g.setFillStyle(CssColor.make(0,0,0));
-//				g.fillText(""+d, 300, 20);
+				g.setFillStyle(CssColor.make(0,0,0));
+				g.fillText(""+nr, 30, 30);
 				
 				if(!recognizeOff && formuleViewer!=null) {
 					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
@@ -830,6 +832,9 @@ public class KStrokeContainer {
 		
 	}
 	
+	public void setNr(int nr) {
+		this.nr = nr;
+	}
 	
 	public void setRecognizeOff(boolean b) {
 		recognizeOff=b;
@@ -1010,6 +1015,15 @@ public class KStrokeContainer {
 //			writeBox = new Rectangle(x, y, width, height);
 //		}
 		return writeBox;
+	}
+	
+	public String getStrokeCode() {
+		String code = "";
+		for(int i=0 ; i<strokeContainer.getStrokes().size() ; i++) {
+			code += strokeContainer.getStrokes().get(i).getTestCode();
+			code += "\n";
+		}
+		return code;
 	}
 	
 	public boolean contains(int x, int y) {
