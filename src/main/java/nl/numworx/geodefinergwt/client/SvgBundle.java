@@ -46,6 +46,21 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource translatie_active_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijn.svg")
+  @MimeType("image/svg+xml")
+  DataResource lijn_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijn-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource lijn_active_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijnstuk.svg")
+  @MimeType("image/svg+xml")
+  DataResource lijnstuk_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijnstuk-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource lijnstuk_active_svg();
   
   
 }

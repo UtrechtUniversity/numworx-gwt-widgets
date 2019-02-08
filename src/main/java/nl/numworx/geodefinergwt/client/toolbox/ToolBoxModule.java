@@ -84,7 +84,7 @@ public class ToolBoxModule {
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static
 	ToggleButton line(TrackerImpl tracker, RadioMode model) {
-		return newBtnSpan("line", new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
 	}
 
 	@Provides @IntKey(Tools.SELECTOR) @IntoMap static
@@ -133,7 +133,7 @@ public class ToolBoxModule {
 	
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
 	ToggleButton segment(TrackerImpl tracker, RadioMode model) {
-		return newBtnSpan("segment", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
+		return newSBtn(svg.lijnstuk_svg(),svg.lijnstuk_active_svg(), new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
 	}
 	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
 	ToggleButton halfline(TrackerImpl tracker, RadioMode model) {

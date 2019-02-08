@@ -15,14 +15,14 @@ class IntegralVisitor implements SegmentVisitor {
 	private final double y0;
 	private final Area shape;
 	private final AbstractViewer v;
-	private static Logger LOG = Logger.getLogger(SegmentVisitor.class.getName());
+	private static Logger LOG = Logger.getLogger(IntegralVisitor.class.getName());
 
 	IntegralVisitor(Integral l, Area shape, AbstractViewer v) {
-	    LOG.fine("Integralvisitor " + l + " base " + l.base);
+	    //LOG.fine("Integralvisitor " + l + " base " + l.base);
 		if(l.base > 0) y0 = v.clipTop().doubleValue();
 		else if( l.base < 0) y0 = v.clipBottom().doubleValue();
 		else y0 = v.getModel().getO().getYd();
-		LOG.fine(l + " baseline = "  + y0);
+		//LOG.fine(l + " baseline = "  + y0);
 		this.shape = shape;
 		this.v = v;
 	}
