@@ -2,9 +2,6 @@ package nl.numworx.geodefinergwt.client.toolbox;
 
 import javax.inject.Named;
 
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.resources.client.DataResource;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
 
 import dagger.Module;
@@ -42,7 +39,6 @@ import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
-import nl.numworx.geodefinergwt.client.SvgBundle;
 import nl.numworx.geodefinergwt.client.TextHandler;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.Action;
@@ -53,7 +49,6 @@ import nl.numworx.geodefinergwt.client.ToolBoxPanel.PuntAction;
 public class ToolBoxModule {
 
 	private final static messages rb = GeoDefinerGWT.MESSAGES;
-	private final static SvgBundle svg = GWT.create(SvgBundle.class);
 	
 	private static ToggleButton newPBtn(EventHandler handler, TrackerImpl tracker, RadioMode model) {
 		ToggleButton btn;
@@ -84,7 +79,7 @@ public class ToolBoxModule {
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static
 	ToggleButton line(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
+		return newBtnSpan("line", new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50());
 	}
 
 	@Provides @IntKey(Tools.SELECTOR) @IntoMap static
@@ -101,21 +96,6 @@ public class ToolBoxModule {
     btn.addClickHandler(new Action(handler, tracker,btn,model));
     return btn;
   }
-  
-  private static ToggleButton newSBtn(DataResource r, DataResource r_active, EventHandler h, TrackerImpl tracker, RadioMode model, String t) {
-    ToggleButton btn;
-    btn = new ToggleButton();
-    Image image = new Image(r.getSafeUri());
-    image.setPixelSize(25, 30);
-    btn.getUpFace().setImage(image);
-    image = new Image(r_active.getSafeUri());
-    image.setPixelSize(25, 30);
-    btn.getDownFace().setImage(image);
-    if (t != null) btn.setTitle(t);
-    btn.addClickHandler(new Action(h, tracker, btn, model));
-    return btn;
-  }
-  
 
 	@Provides @IntKey(Tools.DESTROY) @IntoMap static
 	ToggleButton destroy(TrackerImpl tracker, RadioMode model, Instance instance) {
@@ -128,12 +108,12 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
 	ToggleButton pan(TrackerImpl tracker, RadioMode model, @Named("panHandler") EventHandler handler) {
-	    return newSBtn(svg.pan_svg(), svg.pan_active_svg(), handler, tracker, model, rb.Euclides_41());
+		return newBtnSpan("pan", handler, tracker, model, rb.Euclides_41());
 	}
 	
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
 	ToggleButton segment(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.lijnstuk_svg(),svg.lijnstuk_active_svg(), new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
+		return newBtnSpan("segment", new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48());
 	}
 	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
 	ToggleButton halfline(TrackerImpl tracker, RadioMode model) {
@@ -180,7 +160,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CONIC_SECTION) @IntoMap static
 	ToggleButton conic(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.kegelsnede_svg(), svg.kegelsnede_active_svg(), new AddKegelsnedeHandler("Kegelsnede"), tracker, model, "Kegelsnede");
+		return newBtnSpan("conic-section", new AddKegelsnedeHandler("Kegelsnede"), tracker, model, "Kegelsnede");
 	}
 
 	@Provides @IntKey(Tools.FOCUS) @IntoMap static
@@ -210,7 +190,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.AREA) @IntoMap static
 	ToggleButton area(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.oppervlakte_svg(), svg.oppervlakte_active_svg(), new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91());
+		return newBtnSpan("area", new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91());
 	}
 
 	@Provides @IntKey(Tools.ANGLE) @IntoMap static
@@ -225,7 +205,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
 	ToggleButton circleWithRadius(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.cirkel_met_straal_svg(), svg.cirkel_met_straal_active_svg(),new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,null);
+		return newBtnSpan("circleradius", new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,null);
 	}
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static
