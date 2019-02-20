@@ -594,8 +594,8 @@ public class KStrokeContainer {
 					drawEraser(g,new Rectangle(erasingX-25, erasingY-25, 25,25));
 				
 //				int d = (int)strokeContainer.averageHeight;
-				g.setFillStyle(CssColor.make(0,0,0));
-				g.fillText(""+nr, 30, 30);
+//				g.setFillStyle(CssColor.make(0,0,0));
+//				g.fillText(""+nr, 30, 30);
 				
 				if(!recognizeOff && formuleViewer!=null) {
 					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
