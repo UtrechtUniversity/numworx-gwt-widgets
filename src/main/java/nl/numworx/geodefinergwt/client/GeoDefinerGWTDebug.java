@@ -196,24 +196,32 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
-				Tools.SELECTOR,
-				Tools.POINT,
-				Tools.RESET,
+				//Tools.SELECTOR,
+				//Tools.POINT,
+				//Tools.RESET,
 				Tools.LINE,
-				Tools.HALFLINE,
+				//Tools.HALFLINE,
 				Tools.SEGMENT,
-				Tools.CIRCLE,
-				Tools.ARC,
-				Tools.TEXT,
+				//Tools.CIRCLE,
+				//Tools.ARC,
+				//Tools.TEXT,
 				Tools.PAN,
-				Tools.TRIANGLE,
-				Tools.PERPENDICULAR,
-				Tools.PARALLEL,
+				//Tools.TRIANGLE,
+				//Tools.PERPENDICULAR,
+				//Tools.PARALLEL,
 				Tools.CIRCLE_WITH_RADIUS,
-				Tools.DISTANCE,
-				Tools.MIDPOINT,
-				Tools.LOCUS,
-				11,12,13,19,20,21,22,26);
+				//Tools.DISTANCE,
+				//Tools.MIDPOINT,
+				//Tools.LOCUS,
+				//11,
+				//12,
+				13,
+				19//,
+				//20,
+				//21,
+				//22,
+				//26
+				);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
@@ -248,7 +256,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	    configuration.put("$fy<-1@", h);
 		launchDebug.put("configuration", configuration);
 		h = new HashMap<>();
-		h.put("gravity", true); h.put("color", 0xFF000000);
+		h.put("gravity", true); 
+		h.put("color", 0xFF000000);
+		h.put("type", "DOTTED");
+		h.put("width", 0.5);
 		launchDebug.put("axes", Collections.singletonMap("$#@", h));
 		launchDebug.put("checkDWO", checkDWO);
 	//"checkObjects":[{"score":5,"value":"$fpoint(2,1)@"}

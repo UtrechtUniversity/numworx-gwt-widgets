@@ -198,14 +198,14 @@ public class ToolBoxPanel extends Composite implements Tools {
 			panel.getWidget(0).removeFromParent();
 	}
 	
-	private int height = 38;
+	private int height = 40;
 	int getHeight() {
 		return height;
 	}
 	
 	void init(ObjectList list, int w, Map<Integer,Provider<ToggleButton>> buttons) {		
 		ToggleButton btn;
-		height = ((list.size()*38-1)/w+1)*38;
+		height = ((list.size()*34-1)/w+1) * 40;
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
 			btn = null;

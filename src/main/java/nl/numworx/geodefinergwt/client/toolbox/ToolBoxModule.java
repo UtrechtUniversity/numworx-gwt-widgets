@@ -105,11 +105,12 @@ public class ToolBoxModule {
   private static ToggleButton newSBtn(DataResource r, DataResource r_active, EventHandler h, TrackerImpl tracker, RadioMode model, String t) {
     ToggleButton btn;
     btn = new ToggleButton();
+    btn.setStylePrimaryName("SVGToggle");
     Image image = new Image(r.getSafeUri());
-    image.setPixelSize(32, 32);
+    image.setPixelSize(32, 39);
     btn.getUpFace().setImage(image);
     image = new Image(r_active.getSafeUri());
-    image.setPixelSize(32, 32);
+    image.setPixelSize(32, 39);
     btn.getDownFace().setImage(image);
     if (t != null) btn.setTitle(t);
     btn.addClickHandler(new Action(h, tracker, btn, model));
