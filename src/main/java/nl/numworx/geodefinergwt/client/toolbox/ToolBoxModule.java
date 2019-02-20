@@ -106,10 +106,10 @@ public class ToolBoxModule {
     ToggleButton btn;
     btn = new ToggleButton();
     Image image = new Image(r.getSafeUri());
-    image.setPixelSize(25, 30);
+    image.setPixelSize(32, 32);
     btn.getUpFace().setImage(image);
     image = new Image(r_active.getSafeUri());
-    image.setPixelSize(25, 30);
+    image.setPixelSize(32, 32);
     btn.getDownFace().setImage(image);
     if (t != null) btn.setTitle(t);
     btn.addClickHandler(new Action(h, tracker, btn, model));
