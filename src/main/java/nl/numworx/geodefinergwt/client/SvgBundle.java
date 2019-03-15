@@ -61,6 +61,100 @@ public interface SvgBundle extends ClientBundle {
   @Source("nl/numworx/geodefinergwt/client/resources/Lijnstuk-A.svg")
   @MimeType("image/svg+xml")
   DataResource lijnstuk_active_svg();
-  
-  
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Boog-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource boog_active_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Boog.svg")
+  @MimeType("image/svg+xml")
+  DataResource boog_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Deellijn-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource deellijn_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Deellijn.svg")
+  @MimeType("image/svg+xml")
+  DataResource deellijn_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Geef-punt-naam-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource label_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Geef-punt-naam.svg")
+  @MimeType("image/svg+xml")
+  DataResource label_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Loodlijn-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource loodlijn_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Loodlijn.svg")
+  @MimeType("image/svg+xml")
+  DataResource loodlijn_svg();
+ 
+  @Source("nl/numworx/geodefinergwt/client/resources/Parallel-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource parallel_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Parallel.svg")
+  @MimeType("image/svg+xml")
+  DataResource parallel_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Punt-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource punt_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Punt.svg")
+  @MimeType("image/svg+xml")
+  DataResource punt_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Punt-op-lijn-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource puntop_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Punt-op-lijn.svg")
+  @MimeType("image/svg+xml")
+  DataResource puntop_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Reset-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource reset_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Reset.svg")
+  @MimeType("image/svg+xml")
+  DataResource reset_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Select-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource select_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Select.svg")
+  @MimeType("image/svg+xml")
+  DataResource select_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Snijpunt-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource snijpunt_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Snijpunt.svg")
+  @MimeType("image/svg+xml")
+  DataResource snijpunt_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Sporen-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource sporen_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Sporen.svg")
+  @MimeType("image/svg+xml")
+  DataResource sporen_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Verwijder-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource verwijder_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Verwijder.svg")
+  @MimeType("image/svg+xml")
+  DataResource verwijder_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Halfrechte-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource halfrechte_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Halfrechte.svg")
+  @MimeType("image/svg+xml")
+  DataResource halfrechte_svg();
+
+
+
+
 }
