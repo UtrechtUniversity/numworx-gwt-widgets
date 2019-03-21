@@ -154,7 +154,88 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource halfrechte_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-door-3-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_door_3_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-door-3.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_door_3_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-opgegeven-straal-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_opgegeven_straal_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-opgegeven-straal.svg")
+  @MimeType("image/svg+xml")
+  DataResource cirkel_opgegeven_straal_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Hoek-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource hoek_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Hoek.svg")
+  @MimeType("image/svg+xml")
+  DataResource hoek_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Meetkundige-plaats-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource meetkundige_plaats_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Meetkundige-plaats.svg")
+  @MimeType("image/svg+xml")
+  DataResource meetkundige_plaats_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Middelpunt-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource middelpunt_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Middelpunt.svg")
+  @MimeType("image/svg+xml")
+  DataResource middelpunt_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Passer-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource passer_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Passer.svg")
+  @MimeType("image/svg+xml")
+  DataResource passer_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Spiegelpunt-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource spiegelpunt_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Spiegelpunt.svg")
+  @MimeType("image/svg+xml")
+  DataResource spiegelpunt_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Vector-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource vector_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Vector.svg")
+  @MimeType("image/svg+xml")
+  DataResource vector_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Veelhoek-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource veelhoek_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Veelhoek.svg")
+  @MimeType("image/svg+xml")
+  DataResource veelhoek_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Definitie-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource definitie_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Definitie.svg")
+  @MimeType("image/svg+xml")
+  DataResource definitie_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijnstuk-lengte-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource lengte_active_svg();
+  @Source("nl/numworx/geodefinergwt/client/resources/Lijnstuk-lengte.svg")
+  @MimeType("image/svg+xml")
+  DataResource lengte_svg();
 
 }

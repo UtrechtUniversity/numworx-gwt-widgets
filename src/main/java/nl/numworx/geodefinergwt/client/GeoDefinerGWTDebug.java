@@ -198,30 +198,44 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
 				Tools.POINT,
-				Tools.RESET,
 				Tools.LINE,
 				Tools.HALFLINE,
 				Tools.SEGMENT,
-				Tools.CIRCLE,
-				Tools.ARC,
-				Tools.TEXT,
-				Tools.PAN,
-				Tools.TRIANGLE,
+
 				Tools.PERPENDICULAR,
 				Tools.PARALLEL,
+
+				Tools.CIRCLE,
+				Tools.ARC,
+				Tools.TRIANGLE,
+
+
 				Tools.CIRCLE_WITH_RADIUS,
-				Tools.DISTANCE,
+
 				Tools.MIDPOINT,
-				Tools.LOCUS,
 				Tools.BISECTRICE,
-				//12,
+				Tools.MIRROR,
+
 				Tools.CONIC_SECTION,
+				Tools.FOCUS,
+				Tools.TANGENT,
+				Tools.POLELINE,
+				
+				Tools.LOCUS,
+
+				Tools.DISTANCE,
 				Tools.AREA,
-				//20,
-				//21,
+				Tools.ANGLE,
+				Tools.VECTOR,
+
 				Tools.TRAIL,
-				Tools.DESTROY
-				);
+				Tools.TEXT,			
+				Tools.FORMULA,
+
+				Tools.PAN,
+				Tools.DESTROY,
+				Tools.RESET
+			);
 		launchDebug.put("toolbox", toolbox);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");

@@ -160,8 +160,9 @@ body {
 	display: inline-block;
 	outline: none;
 	margin-left: 0px;
-	margin-right: 10px;
+	margin-right: 1px;
 	margin-bottom: 1px;
+	height: 39px;
 }
 
 .SVGToggle-up-disabled {
@@ -170,3 +171,6 @@ body {
 	cursor: default;
 }
 
+.toolbox {
+	line-height: 1px;
+}

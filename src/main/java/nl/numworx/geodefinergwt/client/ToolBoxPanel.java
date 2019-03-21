@@ -96,13 +96,17 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	public static class CirkelAction extends Action {
 
-		SafeHtml[] faces;
-		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
+		Image[] images;
+		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, DataResource ... images) {
 			super(h, t, btn, model);
-			faces = new SafeHtml[images.length]; 
-			for(int i = 0; i < images.length; i++)
-			  faces[i] = face(images[i]);
-			btn.getUpFace().setHTML(faces[0]);
+			this.images = new Image[images.length]; 
+			for(int i = 0; i < images.length; i++) {
+			    Image image = new Image(images[i].getSafeUri());
+			    image.setPixelSize(32, 39);
+			    this.images[i] = image;
+			}
+			  btn.getUpFace().setImage(this.images[0]);
+			  btn.getDownFace().setImage(this.images[1]);
 		}
 
 		@Override
@@ -122,13 +126,13 @@ public class ToolBoxPanel extends Composite implements Tools {
 				Object f = select.firstElement();
 				Object l = select.lastElement();
 				if (f instanceof Segment || l instanceof Segment) {
-					btn.getUpFace().setHTML(faces[1]);
+					btn.getUpFace().setImage(images[2]); btn.getDownFace().setImage(images[3]);
 					break;
 				}
 			default:
-				btn.getUpFace().setHTML(faces[0]); break;
+				btn.getUpFace().setImage(images[0]); btn.getDownFace().setImage(images[1]);break;
 			case 3:
-				btn.getUpFace().setHTML(faces[2]); break;
+				btn.getUpFace().setImage(images[4]); btn.getDownFace().setImage(images[5]);break;
 			}	
 		}
 	}
