@@ -9,6 +9,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.safehtml.client.SafeHtmlTemplates;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Composite;
@@ -95,13 +96,17 @@ public class ToolBoxPanel extends Composite implements Tools {
 
 	public static class CirkelAction extends Action {
 
-		SafeHtml[] faces;
-		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
+		Image[] images;
+		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, DataResource ... images) {
 			super(h, t, btn, model);
-			faces = new SafeHtml[images.length]; 
-			for(int i = 0; i < images.length; i++)
-			  faces[i] = face(images[i]);
-			btn.getUpFace().setHTML(faces[0]);
+			this.images = new Image[images.length]; 
+			for(int i = 0; i < images.length; i++) {
+			    Image image = new Image(images[i].getSafeUri());
+			    image.setPixelSize(32, 39);
+			    this.images[i] = image;
+			}
+			  btn.getUpFace().setImage(this.images[0]);
+			  btn.getDownFace().setImage(this.images[1]);
 		}
 
 		@Override
@@ -121,29 +126,43 @@ public class ToolBoxPanel extends Composite implements Tools {
 				Object f = select.firstElement();
 				Object l = select.lastElement();
 				if (f instanceof Segment || l instanceof Segment) {
-					btn.getUpFace().setHTML(faces[1]);
+					btn.getUpFace().setImage(images[2]); btn.getDownFace().setImage(images[3]);
 					break;
 				}
 			default:
-				btn.getUpFace().setHTML(faces[0]); break;
+				btn.getUpFace().setImage(images[0]); btn.getDownFace().setImage(images[1]);break;
 			case 3:
-				btn.getUpFace().setHTML(faces[2]); break;
+				btn.getUpFace().setImage(images[4]); btn.getDownFace().setImage(images[5]);break;
 			}	
 		}
 	}
 
 	public static class PuntAction extends Action {
 
-		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
-			super(h, t, btn, model);
-			faces = new SafeHtml[images.length];
-			for (int i = 0; i < images.length; i++) {
-				faces[i] = face(images[i]);
-			}
-			btn.getUpFace().setHTML(faces[0]);
-		}
+//		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, String... images) {
+//			super(h, t, btn, model);
+//			faces = new SafeHtml[images.length];
+//			for (int i = 0; i < images.length; i++) {
+//				faces[i] = face(images[i]);
+//			}
+//			btn.getUpFace().setHTML(faces[0]);
+//		}
 
-		private SafeHtml[] faces;
+		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, DataResource...images) {
+		  super(h, t, btn, model);
+		  this.images = new Image[images.length];
+		  for (int i = 0; i < images.length; i++) {
+		    Image image = new Image(images[i].getSafeUri());
+		    image.setPixelSize(32, 39);
+		    this.images[i] = image;
+		  }
+		  
+		  btn.getUpFace().setImage(this.images[0]);
+		  btn.getDownFace().setImage(this.images[1]);
+		}
+		
+		private Image[] images;
+//		private SafeHtml[] faces;
 		/* (non-Javadoc)
 		 * @see fi.euclides.swing.XXXAction#update(fi.euclides.util.Observable, java.lang.Object)
 		 */
@@ -170,15 +189,18 @@ public class ToolBoxPanel extends Composite implements Tools {
 					string = GeoDefinerGWT.MESSAGES.AddPuntHandler_2(); //$NON-NLS-1$
 				} 
 				btn.setTitle(string);
-				btn.getUpFace().setHTML(faces[1]);
+				btn.getUpFace().setImage(images[2]);
+				btn.getDownFace().setImage(images[3]);
 				break;
 			case 2: 
 				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_3());
-				btn.getUpFace().setHTML(faces[2]);
+				btn.getUpFace().setImage(images[4]);
+				btn.getDownFace().setImage(images[5]);
 				break;
 			default:
 				btn.setTitle(GeoDefinerGWT.MESSAGES.AddPuntHandler_0());
-				btn.getUpFace().setHTML(faces[0]);
+				btn.getUpFace().setImage(images[0]);
+				btn.getDownFace().setImage(images[1]);
 				break;
 			}
 		}
@@ -198,14 +220,14 @@ public class ToolBoxPanel extends Composite implements Tools {
 			panel.getWidget(0).removeFromParent();
 	}
 	
-	private int height = 38;
+	private int height = 40;
 	int getHeight() {
 		return height;
 	}
 	
 	void init(ObjectList list, int w, Map<Integer,Provider<ToggleButton>> buttons) {		
 		ToggleButton btn;
-		height = ((list.size()*38-1)/w+1)*38;
+		height = ((list.size()*34-1)/w+1) * 40;
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
 			btn = null;
