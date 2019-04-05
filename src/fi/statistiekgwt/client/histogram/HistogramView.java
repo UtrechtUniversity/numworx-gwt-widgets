@@ -1548,7 +1548,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		{
 			maxValueOnAxis = max;
 		}
-			
+		
 		// determine scale for the axis with percentages or amounts; should be the same for splits in multiple views
 		if (maxValueOnAxis == 0)
 		{
@@ -1565,7 +1565,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 		}
 		else
 		{
-			this.xAxisOffset = this.determineDependentAxisWidth(context, scale);
+			this.xAxisOffset = this.determineDependentAxisWidth(context, scale); // to be updated later...
 		}
 
 		// set bar width
@@ -1709,6 +1709,22 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			this.yAxisOffset = (int) (longest + 15);
 		} // horizontal bars
 
+		// hier zijn xAxisOffset/yAxisOffset gewijzigd
+		// recalculate available space and scale
+		availableSpace = HistogramView.MAX_SCREEN_FRACTION_FOR_BARS *
+        	(this.model.hasVerticalBars() ? 
+        		this.barAreaHeight() : 
+        		this.barAreaWidth()); // if vertical then availableSpace represents height, if horizontal then width
+		
+		if (maxValueOnAxis == 0)
+		{
+			scale = 0;
+		}
+		else
+		{
+			scale = availableSpace / maxValueOnAxis;
+		}
+
 		// correct scales
 		// bepaal de amountscale om de bar-lengtes per split te kunnen berekenen
 		if (this.model.getPercentage())
@@ -1738,7 +1754,7 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 						
 						maxValueOnAxis = 100.0 * maxFraction;
 					}
-			        
+
 					scale = availableSpace/maxValueOnAxis;
 				} // split in single view
 				else
@@ -1754,12 +1770,13 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 			}
 		} // percentage
 		else
-		{ // aantallen
+		{ 
+			// aantallen
 			if (this.model.getStatTableModel().numberOfSplitVarClasses(
 				this.model.getSplitOptions()) > 1)
 			{
 				// er is een split
-
+				
 				if (this.model.isSplitInSingleView())
 				{
 					int maxInSplit = 0;
@@ -1772,7 +1789,6 @@ public class HistogramView extends LayoutPanel implements TableChangeEventHandle
 					maxValueOnAxis = maxInSplit;
 					max = maxInSplit;
 			        
-
 					if (maxValueOnAxis == 0)
 					{
 						scale = 0;
