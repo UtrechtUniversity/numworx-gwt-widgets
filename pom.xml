@@ -110,6 +110,7 @@
   <properties>
   	<skipTests>true</skipTests>
   	<maven.javadoc.skip>true</maven.javadoc.skip>
+  	<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
   </properties>
   <dependencyManagement>
   	<dependencies>
