@@ -126,8 +126,8 @@
   		</dependency>
   	</dependencies>
   </dependencyManagement>
-  <version>0.0.6</version>
+  <version>0.0.7-SNAPSHOT</version>
   <scm>
-  	<developerConnection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/StatistiekGWT/tags/StatistiekGWT-0.0.6</developerConnection>
+  	<developerConnection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/StatistiekGWT/trunk</developerConnection>
   </scm>
 </project>
