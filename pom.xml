@@ -97,7 +97,7 @@
 		<dependency>
 			<groupId>fi.statistiekgwt</groupId>
 			<artifactId>StatistiekGWT</artifactId>
-			<version>0.0.6-SNAPSHOT</version>
+			<version>0.0.6</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
