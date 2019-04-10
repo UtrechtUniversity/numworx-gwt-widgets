@@ -65,6 +65,7 @@ import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.Letter;
 import fi.wiskopdr.expressies.Algebra;
 import fi.wiskopdr.expressies.Expressie;
+import fi.wiskopdr.expressies.VergelijkingMeerv;
 import fi.wiskopdr.expressies.repr.ContentMathML;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text;
@@ -2742,6 +2743,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		comRoot.addCBookEventListener("expression.5", this);
 
 		comRoot.addCBookEventListener("equation.twoGraphs", this);
+		comRoot.addCBookEventListener("equation.graph", this);
 		comRoot.addCBookEventListener("double.parameter", this);
 		comRoot.addCBookEventListener("double.trace", this);
 		comRoot.addCBookEventListener("draw_functions", this);
@@ -4805,6 +4807,30 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
 	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
+	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
+		}
+		
+		if (command.startsWith("equation.graph"))
+		{
+			String vergelijkingString = (String) event.getMessage();
+			if (vergelijkingString.length() < 3 || !vergelijkingString.substring(0, 2).equals("$f"))
+				vergelijkingString = "$f" + vergelijkingString + "@";
+			
+			VergelijkingMeerv v = FormuleParser.parseVergelijking(vergelijkingString);
+			if(v==null) { //misschien is het een expressie
+				vergelijkingString = "$fy=" + vergelijkingString.substring(2);
+			}
+			
+			//String indexString = command.substring(11);
+			//int index = Integer.parseInt(indexString) - 1;
+
+			String functieString = null;
+			
+			v = FormuleParser.parseVergelijking(vergelijkingString);
+			Expressie expr = v.geefVergelijking(0).geefExpRechts();
+	 		functieString = "$f"+expr.toString()+"@";
+			
+	 		zetFunctie(0 /* nr */, expr /* Expressie */, functieString /* expString */, null /*expNaam */, 
 	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
 		}
 				
