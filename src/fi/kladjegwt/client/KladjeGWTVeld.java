@@ -2900,15 +2900,20 @@ public class KladjeGWTVeld
 		double vaasX = 500;
 		double volumeUnit = 20*lastStroke.getParsePointsbox().height;
 		
-		//ArrayList<DoublePoint> points = smooth(lastStroke.getParsePoints(), smoothType);
+		ArrayList<DoublePoint> points = new ArrayList<DoublePoint>();
+		for(int j = 0 ; j < lastStroke.getParsePoints().size() ; j++) {
+			points.add(new DoublePoint(lastStroke.getParsePoints().get(j).x, lastStroke.getParsePoints().get(j).y));
+		}
+		points = smooth(points, smoothType);
 		double vaasY = lastStroke.getParsePoints().get(0).y;
-		for(int j = 1 ; j < lastStroke.getParsePoints().size() ; j++) {
-			double dx = lastStroke.getParsePoints().get(j).x - lastStroke.getParsePoints().get(j-1).x ;
-			double dy = lastStroke.getParsePoints().get(j).y - lastStroke.getParsePoints().get(j-1).y;
+		
+		for(int j = 1 ; j < points.size() ; j++) {
+			double dx = points.get(j).x - points.get(j-1).x ;
+			double dy = points.get(j).y - points.get(j-1).y;
 			
 			double r = Math.sqrt(-volumeUnit*dx/dy);
-			pointsLeft.add(new DoublePoint(vaasX-r, lastStroke.getParsePoints().get(j).y));
-			pointsRight.add(new DoublePoint(vaasX+r, lastStroke.getParsePoints().get(j).y));
+			pointsLeft.add(new DoublePoint(vaasX-r, points.get(j).y));
+			pointsRight.add(new DoublePoint(vaasX+r, points.get(j).y));
 			pointsBottom.add(pointsLeft.get(0));
 			pointsBottom.add(pointsRight.get(0));
 		}
