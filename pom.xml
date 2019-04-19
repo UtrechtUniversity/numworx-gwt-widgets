@@ -36,23 +36,23 @@
 		<dependency>
 			<groupId>fi.euclides</groupId>
 			<artifactId>euclides-gwt</artifactId>
-			<version>0.0.4</version>
+			<version>${euclidesVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
 			<artifactId>euclides-expr</artifactId>
-			<version>0.0.4</version>
+			<version>${euclidesVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
 			<artifactId>euclides-expr</artifactId>
-			<version>0.0.4</version>
+			<version>${euclidesVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -142,7 +142,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.4-SNAPSHOT</euclidesVersion>
+		<euclidesVersion>0.0.5-SNAPSHOT</euclidesVersion>
 		<formuleVersion>0.1.1</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.1</gwtVersion>
