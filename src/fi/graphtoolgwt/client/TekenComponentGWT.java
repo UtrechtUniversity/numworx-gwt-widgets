@@ -92,14 +92,19 @@ public class TekenComponentGWT extends LayoutPanel {
 		int currentX = 5;
 		int currentY = 2;
 		
-		for(int i = 0; i < 10; i++)
-		{	FlowPanel panel = new FlowPanel();
-			panel.getElement().getStyle().setBackgroundColor(CssColor.make(200 + 5*i, 200 + 5*i, 200 + 5*i).toString());
-			this.add(panel);
-			//System.out.println("getOffsetWidth: " + getOffsetWidth());
-			this.setWidgetLeftWidth(panel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-			this.setWidgetTopHeight(panel, 24 - (i + 1)*24/10, Style.Unit.PX, 24/10 + 1, Style.Unit.PX);
-		}	
+//		for(int i = 0; i < 10; i++)
+//		{	FlowPanel panel = new FlowPanel();
+//			panel.getElement().getStyle().setBackgroundColor(CssColor.make(200 + 5*i, 200 + 5*i, 200 + 5*i).toString());
+//			this.add(panel);
+//			//System.out.println("getOffsetWidth: " + getOffsetWidth());
+//			this.setWidgetLeftWidth(panel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+//			this.setWidgetTopHeight(panel, 24 - (i + 1)*24/10, Style.Unit.PX, 24/10 + 1, Style.Unit.PX);
+//		}	
+		
+		this.getElement().getStyle().setBackgroundColor(CssColor.make(240, 240, 240).toString());
+		this.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		this.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+		this.getElement().getStyle().setBorderColor(CssColor.make(210, 210, 210).toString());
 		
 		rechtHoekPanels = new FlowPanel[4];
 		
@@ -144,7 +149,7 @@ public class TekenComponentGWT extends LayoutPanel {
 		this.setWidgetTopHeight(dragButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		
 		dragButton.addClickHandler(toggleClickHandler);
-		currentX += buttonSize + 3 * buttonOffset;
+		currentX += buttonSize + 6 * buttonOffset;
 		
 		puntenButton = new ToggleButton(puntenButtonUpImage, puntenButtonDownImage);
 		puntenButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -180,7 +185,7 @@ public class TekenComponentGWT extends LayoutPanel {
 		this.setWidgetTopHeight(extrapoleerButton, currentY, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		
 		extrapoleerButton.addClickHandler(toggleClickHandler);
-		currentX += buttonSize + 3 * buttonOffset;
+		currentX += buttonSize + 6 * buttonOffset;
 		
 		grKeuze = new ListBox();//{
 		/*public void paintComponent(Context2d g)
@@ -206,7 +211,7 @@ public class TekenComponentGWT extends LayoutPanel {
 		//grKeuze.setBackground(CssColor.make(210,210,210));
 		this.add(grKeuze);
 		this.setWidgetLeftWidth(grKeuze, currentX, Style.Unit.PX, 53, Style.Unit.PX);
-		this.setWidgetTopBottom(grKeuze, 0, Style.Unit.PX, 0, Style.Unit.PX);
+		this.setWidgetTopBottom(grKeuze, 1, Style.Unit.PX, 0, Style.Unit.PX);
 		grKeuze.addItem("Gr 1");
 		grKeuze.addItem("Gr 2");
 		grKeuze.addItem("Gr 3");
@@ -258,7 +263,7 @@ public class TekenComponentGWT extends LayoutPanel {
 	{
 		FlowPanel panel = new FlowPanel();
 		panel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
-		panel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		panel.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
 		panel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
 		this.add(panel);
 		this.setWidgetLeftWidth(panel, x, Style.Unit.PX, width, Style.Unit.PX);

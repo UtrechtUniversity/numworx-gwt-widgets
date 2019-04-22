@@ -313,6 +313,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		//Image regelMinderImg = new Image("images/resources/pijlterug.gif");
 		//regelMinderImg.getElement().getStyle().setMargin(2, Unit.PX);
 		verwijderRegelKnop = new PushButton(regelMinderButtonImage);
+		verwijderRegelKnop.getElement().getStyle().clearColor();
 		verwijderRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
 		//verwijderRegelKnop.add();
 		//verwijderRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
@@ -417,10 +418,10 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		
 		mainPanel.add(verwijderRegelKnop);
 		mainPanel.add(nieuweRegelKnop);
-		mainPanel.setWidgetLeftWidth(verwijderRegelKnop, breedte - 90, Style.Unit.PX, 40, Style.Unit.PX);
-		mainPanel.setWidgetTopHeight(verwijderRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
-		mainPanel.setWidgetLeftWidth(nieuweRegelKnop, breedte - 45, Style.Unit.PX, 40, Style.Unit.PX);
-		mainPanel.setWidgetTopHeight(nieuweRegelKnop, 5, Style.Unit.PX, 30, Style.Unit.PX);
+		mainPanel.setWidgetLeftWidth(verwijderRegelKnop, breedte - 60, Style.Unit.PX, 20, Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(verwijderRegelKnop, 5, Style.Unit.PX, 23, Style.Unit.PX);
+		mainPanel.setWidgetLeftWidth(nieuweRegelKnop, breedte - 30, Style.Unit.PX, 20, Style.Unit.PX);
+		mainPanel.setWidgetTopHeight(nieuweRegelKnop, 5, Style.Unit.PX, 23, Style.Unit.PX);
 		
 		
 		regelsPanel = new LayoutPanel();

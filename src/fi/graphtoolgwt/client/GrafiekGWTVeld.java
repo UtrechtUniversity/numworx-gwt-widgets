@@ -1441,7 +1441,8 @@ public class GrafiekGWTVeld {
 		{
 			for (int i = 0; i < interactiePanel.schuifParameters.length; i++)
 			{
-				interactiePanel.schuifParameters[i].paint(gIm);
+				if(!interactiePanel.schuifParameters[i].geefHideSlider())
+					interactiePanel.schuifParameters[i].paint(gIm);
 			}
 		}
 

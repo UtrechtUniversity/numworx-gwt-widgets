@@ -26,6 +26,7 @@ public class SliderGWT {
 	private int lengte;
 	private int stand;
 	private double waarde;
+	private boolean hideSlider;
 	
 	private double onderGrensWaarde = SchuifParameterGWT.cDefault_onderGrensWaarde;
 	private double bovenGrensWaarde = SchuifParameterGWT.cDefault_bovenGrensWaarde;
@@ -33,7 +34,7 @@ public class SliderGWT {
 	
 	static CssColor rood = CssColor.make(255, 0, 0); // Vulkleur slider-knop
 	static CssColor zwart = CssColor.make(0, 0, 0);  // Tekenkleur
-	static String fontString = "10px sans-serif";
+	static String fontString = "11px sans-serif";
 	
 	public SliderGWT(int aantalPix, int beginStand) {	
 
@@ -48,6 +49,10 @@ public class SliderGWT {
 	
 	public void zetLengte(int aantalPix) {	
 		lengte = aantalPix;
+	}
+	
+	public void zetHideSlider(boolean b) {	
+		hideSlider = b;
 	}
 	
 	public void zetNaam(String naam) {
@@ -85,8 +90,10 @@ public class SliderGWT {
 			int naamBreedte = (int) Math.round(tm.getWidth());
 			
 			g.setFillStyle(zwart);
-			waarde = (double) Math.round(1000 * waarde) / 1000;
-			g.fillText(naam + "=" + waarde, stand + x - naamBreedte, y-cTekstYOffset);
+			String teken = waarde<-0.0001 ? "\u2013" : ""; //een echt minteken is duidelijker
+			waarde = Math.abs((double) Math.round(1000 * waarde) / 1000);
+			
+			g.fillText(naam + " = " + teken + waarde, stand + x - naamBreedte, y-cTekstYOffset);
 			
 		}		
 	}
@@ -105,6 +112,10 @@ public class SliderGWT {
 	
 	public double geefWaarde() {
 		return waarde;
+	}
+	
+	public boolean geefHideSlider() {
+		return hideSlider;
 	}
 	
 	public void zetStapGrootte(double stapGrootte)

@@ -28,7 +28,8 @@ public class SchuifParameterGWT {
 	}
 	
 	public void paint(Context2d g) { 
-		slider.paint(g);
+		if(!slider.geefHideSlider())
+			slider.paint(g);
 	}
 	
 	public boolean mouseTouchPressed( int x, int y) {
@@ -84,6 +85,14 @@ public class SchuifParameterGWT {
 	
 	public int geefLengte() {
 		return slider.geefLengte();
+	}
+	
+	public boolean geefHideSlider() {
+		return slider.geefHideSlider();
+	}
+	
+	public void zetHideSlider(boolean b) {
+		slider.zetHideSlider(b);
 	}
 	
 }

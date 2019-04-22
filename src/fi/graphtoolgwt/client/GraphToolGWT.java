@@ -135,8 +135,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	boolean volledigeBreedte = false;
 	int tekenComponentHoogte = 24;
 	int tabelComponentHoogte = 60;
-	int offset = 5;
-	int grafiekVeldHoogte = hoogte - 2 - 2 * offset;
+	int offset = 5; //5;
+	int grafiekVeldHoogte = hoogte - 2 * offset; //hoogte - 2 - 2 * offset;
 	final int eenheid = 16;
 	
 	private static double[] DEFAULTDOMEIN = new double[] {Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY};
@@ -425,7 +425,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
  */
 	private void initialize( )
 	{
-		grafiekVeldHoogte = hoogte - 2 - 2 * offset;
+		grafiekVeldHoogte = hoogte  + 1 -  offset; //hoogte - 2 - 2 * offset;
 		if(zoomOptie)
 			grafiekVeldHoogte -= zoomPanelHoogte + offset;
 		if(tekenComponentAan)
@@ -457,29 +457,33 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 			}
 		}
-		basisPanel.setSize("" + (breedte + 10) + "px", "" + (hoogte + 10) + "px");
-		basisPanel.getElement().getStyle().setPaddingLeft(3, Style.Unit.PX);
-		basisPanel.getElement().getStyle().setPaddingRight(1, Style.Unit.PX);
-		basisPanel.getElement().getStyle().setPaddingTop(3, Style.Unit.PX);
-		basisPanel.getElement().getStyle().setPaddingBottom(1, Style.Unit.PX);
+		basisPanel.setSize("" + (breedte) + "px", "" + (hoogte) + "px");//setSize("" + (breedte + 10) + "px", "" + (hoogte + 10) + "px");
+//		basisPanel.getElement().getStyle().setPaddingLeft(3, Style.Unit.PX);
+//		basisPanel.getElement().getStyle().setPaddingRight(1, Style.Unit.PX);
+//		basisPanel.getElement().getStyle().setPaddingTop(3, Style.Unit.PX);
+//		basisPanel.getElement().getStyle().setPaddingBottom(1, Style.Unit.PX);
 		
 		zoomPanel = new LayoutPanel();
-		zoomPanel.setSize("" + breedte + "px", "" + zoomPanelHoogte + "px"); 
-		for(int i = 0; i < 10; i++)
-		{
-			FlowPanel panel = new FlowPanel();
-			panel.getElement().getStyle().setBackgroundColor(CssColor.make(200 + 5*i, 200 + 5*i, 200 + 5*i).toString());
-			zoomPanel.add(panel);
-			zoomPanel.setWidgetLeftRight(panel, 0, Style.Unit.PX, 0, Style.Unit.PX);
-			zoomPanel.setWidgetTopHeight(panel, 23 - (i + 1)*23/10, Style.Unit.PX, 23/10 + 1, Style.Unit.PX);
-		}
-		FlowPanel rechthoekPanel = new FlowPanel();
-		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
-		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
-		zoomPanel.add(rechthoekPanel);
-		zoomPanel.setWidgetLeftRight(rechthoekPanel, 0, Style.Unit.PX, 0, Style.Unit.PX);
-		zoomPanel.setWidgetTopBottom(rechthoekPanel, 0, Style.Unit.PX, -1, Style.Unit.PX);
+		zoomPanel.setSize("" + (breedte) + "px", "" + zoomPanelHoogte + "px");
+		zoomPanel.getElement().getStyle().setBackgroundColor(CssColor.make(239,240,241).toString());
+		zoomPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
+		zoomPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		zoomPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+//		for(int i = 0; i < 10; i++)
+//		{
+//			FlowPanel panel = new FlowPanel();
+//			panel.getElement().getStyle().setBackgroundColor(CssColor.make(200 + 5*i, 200 + 5*i, 200 + 5*i).toString());
+//			zoomPanel.add(panel);
+//			zoomPanel.setWidgetLeftRight(panel, 0, Style.Unit.PX, 0, Style.Unit.PX);
+//			zoomPanel.setWidgetTopHeight(panel, 23 - (i + 1)*23/10, Style.Unit.PX, 23/10 + 1, Style.Unit.PX);
+//		}
+//		FlowPanel rechthoekPanel = new FlowPanel();
+//		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
+//		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+//		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+//		zoomPanel.add(rechthoekPanel);
+//		zoomPanel.setWidgetLeftRight(rechthoekPanel, 0, Style.Unit.PX, 0, Style.Unit.PX);
+//		zoomPanel.setWidgetTopBottom(rechthoekPanel, 0, Style.Unit.PX, -1, Style.Unit.PX);
 		if(zoomOptie)
 		{	basisPanel.add(zoomPanel);
 			FlowPanel panel = new FlowPanel();
@@ -495,7 +499,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomStandaardButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomStandaardButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomStandaardButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomInButton = new PushButton(zoomInImage);
 		zoomInButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -503,7 +507,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomInButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomInButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomInButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomUitButton = new PushButton(zoomUitImage);
 		zoomUitButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -511,7 +515,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomUitButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomUitButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomUitButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomInXButton = new PushButton(zoomInXImage);
 		zoomInXButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -519,7 +523,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomInXButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomInXButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomInXButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomUitXButton = new PushButton(zoomUitXImage);
 		zoomUitXButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -527,7 +531,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomUitXButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomUitXButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomUitXButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomInYButton = new PushButton(zoomInYImage);
 		zoomInYButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -535,7 +539,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.setWidgetLeftWidth(zoomInYButton, currentX, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomPanel.setWidgetTopHeight(zoomInYButton, 2, Style.Unit.PX, buttonSize, Style.Unit.PX);
 		zoomInYButton.addClickHandler(new PushClickHandler());
-		currentX += buttonSize + buttonOffset;
+		currentX += buttonSize + 2*buttonOffset;
 		
 		zoomUitYButton = new PushButton(zoomUitYImage);
 		zoomUitYButton.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
@@ -3187,6 +3191,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			double[] paramBovenGrensWaarden = null;
 			double[] paramStapGroottes = null;
 			int[] paramLengtes = null;
+			boolean[] paramHideSlider = null;
 			int[] paramX = null;
 			int[] paramY = null;
 
@@ -3202,6 +3207,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				paramStapGroottes = launchData.getDoubleArray("paramStapGroottes");
 			if (launchData.containsKey("paramLengtes"))
 				paramLengtes = launchData.getIntArray("paramLengtes");
+			if (launchData.containsKey("paramHideSlider"))
+				paramHideSlider = launchData.getBooleanArray("paramHideSlider");
 			if (launchData.containsKey("paramX"))
 				paramX = launchData.getIntArray("paramX");
 			if (launchData.containsKey("paramY"))
@@ -3220,6 +3227,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					schuifParameters[i].zetStapGrootte(paramStapGroottes[i]);
 					schuifParameters[i].zetWaarde(paramWaarden[i]);
 					schuifParameters[i].zetLocatie(paramX[i], paramY[i]);
+					if(paramHideSlider!=null)	
+						schuifParameters[i].zetHideSlider(paramHideSlider[i]);
 				}
 			}
 
@@ -3346,13 +3355,21 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		fromuser = true;
 	}
 	
+	private SchuifParameterGWT geefSchuifParameter(String name) {
+		for (int i=0; i<schuifParameters.length; i++) {
+			if(name.equals(schuifParameters[i].geefNaam()))
+				return schuifParameters[i];
+		}
+		return null;
+	}
+	
 	private void herlokeerSchuifParameters() {
 		// Deze procedure controleert de positie van de schuifparameters tegen de grootte van het grafiekveld
 		// Wanneer de schuifparameter niet past wordt hij naar een standaard-positie verplaatst
 		
 		if (schuifParameters != null) { // er zijn schuifParameters
 			
-			int marge = SliderGWT.cDefault_x; // contstante (minimale afstant tot een rand)
+			int marge = 0;//SliderGWT.cDefault_x; // contstante (minimale afstant tot een rand)
 			int initY = SliderGWT.cDefault_y;
 			int afstand = SliderGWT.cDefault_distance; // constante (minimale afstand tussen schuifparameters)
 			int standaardPos = 0; // eerste standaard-positie
@@ -3564,7 +3581,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		{	
 			for (int i = 0; i < schuifParameters.length; i++)
 			{	
-				schuifParameterTouched = schuifParameterTouched || schuifParameters[i].mouseTouchPressed(eventX, eventY);;
+				if(!schuifParameters[i].geefHideSlider())
+					schuifParameterTouched = schuifParameterTouched || schuifParameters[i].mouseTouchPressed(eventX, eventY);;
 			}
 		}
 		
@@ -4708,7 +4726,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		return hoogte;
 	}
 	public int getWidth() {
-		return breedte + 2 * offset;
+		return breedte+2 ; //+ 2 * offset
 	}
 	
 	public void zetVolledigeBreedte(int breedte)
@@ -4893,8 +4911,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			if (map!=null)
 			{
 				String name = (String)map.get("name");
+				double waarde = ((Double)map.get("value")).doubleValue();
 				if (grafiekXAsNaam.equals(name))
 				{
+					// onderstaande werkt goed, maar niet bij gedefinieerde schalen
+					
+//					int tracex =(int)(eenheidxD*(waarde)/schaalFactorX+beginx);
+//					grafiekGWTVeld.tracexD = tracex;
+//					grafiekGWTVeld.zetSliderStand(tracex);
+//					grafiekGWTVeld.paint();
+					
 // RPJ START == from active java version					
 //					tracing = true;
 //					double xWaarde = ((Double)map.get("value")).doubleValue();
@@ -4914,6 +4940,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			{	
 				String name = (String)map.get("name");
 				double waarde = ((Double)map.get("value")).doubleValue();
+				if(schuifParameters!=null) {
+					SchuifParameterGWT schuifParameter = geefSchuifParameter(name);
+					if(schuifParameter!=null) {
+						schuifParameter.zetWaarde(waarde);
+						grafiekGWTVeld.paint();
+					}
+				}
 // RPJ START == from active java version
 //				SchuifParameter schuifParameter = geefSchuifParameter(name);
 //				if(schuifParameter==null) {	

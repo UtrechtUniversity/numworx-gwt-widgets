@@ -119,3 +119,11 @@
 .margin {
 	margin: 5px;
 }
+
+.pushbutton {
+	display: block;
+	margin: 5px;
+	text-align: center;
+	color: magenta;
+}
+
