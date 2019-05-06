@@ -21,14 +21,17 @@ public class LineModel extends ColorModel<Destroyable> {
 			{ 5, 3 },
 			{ 5, 3, 1, 3 }
 	};
-	
+	boolean rigid; // default beweeglijk
+
 	/* (non-Javadoc)
 	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#install()
 	 */
 	@Override
 	public void install() {
-		super.install();
-		DefaultAdapter.getDefault(item).put(new StrokeStyle(/*Float.toString(width), dashes[type.ordinal()],*/ width, dash[type.ordinal()]));
+	  super.install();
+	  DefaultAdapter adapter = DefaultAdapter.getDefault(item);
+	  adapter.put(new StrokeStyle(/*Float.toString(width), dashes[type.ordinal()],*/ width, dash[type.ordinal()]));
+      adapter.put(Boolean.valueOf(rigid));
 	}
 
 	/* (non-Javadoc)
@@ -37,6 +40,7 @@ public class LineModel extends ColorModel<Destroyable> {
 	@Override
 	public void fromMap(ObjectMap value) {
 		super.fromMap(value);
+        rigid = value.getBoolean("rigid", false);
 		try {
 			width = (float) value.getDouble("width");
 			if(Float.isNaN(width)) width = 1.0f;

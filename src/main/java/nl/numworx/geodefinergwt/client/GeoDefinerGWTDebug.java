@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.numworx.geodefiner.common.PointType;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
@@ -247,7 +248,8 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
 				,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
 				,"$fP=point(1,1)@"
-				,"$fh=halfline(O,P)@"
+				,"$fQ=point(-1,1)@"
+				,"$fh=halfline(Q,P)@"
 				,"$fy=$px$n2@@/2-2@"
 				,"$fwaarde=true@"
 				, "$fy<-1@"
@@ -258,6 +260,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		h.put("color", 0XFFFF0000);
 		h.put("width", 3);
 		h.put("tip", "ATSTART");
+		h.put("rigid", Boolean.FALSE);
 		Map <String,Map<String,Object>> configuration = new HashMap<>();
 		configuration.put("h", h);
 		h = new HashMap<>();
@@ -268,7 +271,15 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	    h  = new HashMap<>();
 	    h.put("color", 0X6F808080);
 	    configuration.put("$fy<-1@", h);
-		launchDebug.put("configuration", configuration);
+	    h = new HashMap();
+	    h.put("rigid", false);
+	    h.put("color", 0xFF000000);
+	    h.put("type", PointType.DISK.name());
+	    h.put("size", 5);
+	    configuration.put("P", h);configuration.put("Q", h);
+	    
+	    
+	    launchDebug.put("configuration", configuration);
 		h = new HashMap<>();
 		h.put("gravity", true); 
 		h.put("color", 0xFF000000);
