@@ -262,6 +262,8 @@ public class KStrokeContainer {
 		int y = getWriteBox().y+getWriteBox().height/2-19; 
 //		if(correct || isfalse || isHalf || recognizeOff)
 //			return new Rectangle(x,y,0,0);
+		if(!parent.calculator)
+			return new Rectangle(x,y,0,0);
 		return new Rectangle(x,y,27,38);
 	}
 	
@@ -580,7 +582,7 @@ public class KStrokeContainer {
 					//g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
 					drawNotRecognizeButton(g,getNotRecognizeButtonArea());
 				
-				if(!recognizeOff && isGetalsExpressie)
+				if(!recognizeOff && isGetalsExpressie && parent.calculator)
 					g.drawImage(approxImageElement, getWriteBox().x+getWriteBox().width-32, getWriteBox().y+getWriteBox().height/2-19);
 				
 				if(recognizeOff) {

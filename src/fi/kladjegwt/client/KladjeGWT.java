@@ -220,6 +220,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	
 	private int[][] rectangleData;
 	
+	private boolean calculator = true;
+	
 	/**
 	 * maak de css in orde en haal via de resources alle plaatjes op 
 	 */
@@ -843,6 +845,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 					logger.info(""+rectangleData[i][0]+" "+rectangleData[i][1]+" "+rectangleData[i][2]+" "+rectangleData[i][3]+" ");
 				}
 			}
+			if(formuleInstellingen.containsKey("calculator")) {
+				calculator = formuleInstellingen.getBoolean("calculator");
+			}
 		}
 		
 		bottomPanel = new LayoutPanel();
@@ -886,6 +891,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		}
 		if(ivmOptie)
 			kladjeGWTVeld.mouseMode = kladjeGWTVeld.ivmOptie;
+		
+		kladjeGWTVeld.calculator = calculator;
 	
 		// docent tekeningen
 		kladjeGWTVeld.setState(map, true);

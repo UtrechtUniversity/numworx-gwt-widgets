@@ -453,6 +453,8 @@ public class KladjeGWTVeld
 	private KStrokeContainer currentHiddenStrokeContainer;
 	private int activeHSCNumber = 0;
 	
+	protected boolean calculator;
+	
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
