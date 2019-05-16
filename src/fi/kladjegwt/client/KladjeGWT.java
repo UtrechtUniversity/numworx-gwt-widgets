@@ -359,6 +359,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		}
 		
 		tekenButton = new ToggleButton(tekenKnopUpImage, tekenKnopDownImage);
+		tekenButton.setDown(true);
 		bottomPanel.add(tekenButton);
 		bottomPanel.setWidgetLeftWidth(tekenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
 		bottomPanel.setWidgetTopHeight(tekenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);

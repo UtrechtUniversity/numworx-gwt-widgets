@@ -218,7 +218,7 @@ public class KladjeGWTVeld
 	/**
 	 * de actuele mouse mode
 	 */
-	int mouseMode = inert;
+	int mouseMode = tekenen;
 	
 	/**
 	 * true na MouseDown/TouchStart, moet true zijn voor MouseMove
