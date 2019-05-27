@@ -21,6 +21,7 @@ import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.Visitor;
+import nl.numworx.geodefiner.common.Grid;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 
 class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMoveHandler {
@@ -89,6 +90,7 @@ class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMov
 
 	@Override
 	public void visitLocus(Locus l) {
+	  if (!(l instanceof Grid))
 		thickerStroke();
 	}
 

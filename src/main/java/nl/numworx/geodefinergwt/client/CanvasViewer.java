@@ -202,6 +202,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 				setColor(RED);
 			else 
 				setCssColor(CssColor.make(c.getColor()));
+	        if(hiLighter != null)
+	            hiLighter.hilight(object);
 			return;
 		}
 // feedback color.
