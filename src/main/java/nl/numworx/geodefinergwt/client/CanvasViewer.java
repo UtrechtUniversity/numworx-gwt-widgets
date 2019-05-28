@@ -31,6 +31,7 @@ import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.CheckObject;
+import nl.numworx.geodefiner.common.Instance.Selector;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Interval;
 import nl.numworx.geodefiner.common.ShortSegment;
@@ -59,15 +60,12 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public CanvasViewer(int width, int height) {
 		super(width, height);
 		hitTester = new HitTesterGWT();
-		asWidget().addStyleName("canvas");
-		
-		enableHighLight();
-		
+		asWidget().addStyleName("canvas");		
 		getModel().setTrailBuilder(this);
 	}
 
-	void enableHighLight() {
-		hiLighter = new HighLighter(hitTester.copy(), this);
+	void enableHighLight(Selector selector) {
+		hiLighter = new HighLighter(hitTester.copy(), this, selector);
 		canvas.addMouseMoveHandler(hiLighter);
 	}
 	

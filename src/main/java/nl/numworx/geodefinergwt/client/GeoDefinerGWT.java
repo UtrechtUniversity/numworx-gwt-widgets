@@ -414,7 +414,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 // configuration
 		setLaunchData(launchData, values);
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
-
+// highlighter after init launchdata.
+        widget.enableHighLight(selector);
 		tracker.paint();
 	}
 

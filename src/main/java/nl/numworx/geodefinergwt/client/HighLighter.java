@@ -21,7 +21,9 @@ import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.Visitor;
+import fi.euclides.model.algo.FreePoint;
 import nl.numworx.geodefiner.common.Grid;
+import nl.numworx.geodefiner.common.Instance.Selector;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 
 class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMoveHandler {
@@ -40,13 +42,14 @@ class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMov
 	
 	private HitTester hits;
 	private GeoDefinerWidget widget;
+	final private boolean hasTools;
 
 
-	HighLighter(HitTester hits, GeoDefinerWidget w) {
+	HighLighter(HitTester hits, GeoDefinerWidget w, Selector s) {
 		this.hits = hits;
 		hits.setVisitor(this);
 		widget = w;
-
+		hasTools = s.isHasTools();
 	}
 
 	@Override
@@ -100,9 +103,21 @@ class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMov
 	}
 
 	public void hilight(Destroyable d) {
+	  if (selectable(d)) {
 		d.visit(hits);
 		hits.done();
+	  }
 	}
+
+	boolean selectable(Destroyable d) {
+	  if (!d.isDefined()) return false; //
+      if (hasTools) return true; // toolbox!
+      Boolean r = d.adapt(Boolean.class);
+      if (r != null) return !r.booleanValue();
+      FreePoint f = d.adapt(FreePoint.class);
+      if (f != null) return f.isFree();
+      return false;
+  }
 	
 	@Override
 	public void onMouseMove(MouseMoveEvent event) {
