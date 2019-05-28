@@ -156,11 +156,18 @@ body {
 	background-image: url("geodefinergwt/fi/euclides/resources/intersection.png");
 }
 
+.SVGToggle:first-child {
+	margin-left: 0px;
+}
+.SVGToggle:last-child {
+	margin-right: 0px;
+}
+
 .SVGToggle {
 	display: inline-block;
 	outline: none;
 	margin-left: 0px;
-	margin-right: 1px;
+	margin-right: 9px;
 	margin-bottom: 1px;
 	height: 39px;
 }
