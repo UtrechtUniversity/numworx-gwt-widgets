@@ -32,7 +32,9 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
-	static interface FaceTemplate extends SafeHtmlTemplates {
+	private static final int BREEDTE_ICON = 40;
+
+  static interface FaceTemplate extends SafeHtmlTemplates {
 	  @Template("<span class='{0}' ></span>")
 	  SafeHtml face(String cls);
 	}
@@ -227,7 +229,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 	
 	void init(ObjectList list, int w, Map<Integer,Provider<ToggleButton>> buttons) {		
 		ToggleButton btn;
-		height = ((list.size()*34-1)/w+1) * 40;
+		height = ((list.size()*BREEDTE_ICON-1)/w+1) * 40;
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
 			btn = null;
