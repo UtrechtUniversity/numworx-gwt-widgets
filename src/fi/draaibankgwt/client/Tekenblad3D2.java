@@ -99,7 +99,8 @@ class Tekenblad3D2 // extends JPanel
     	gIm.setFillStyle(achtergrondkleur);
 	  	
     	if(wis)
-    		gIm.fillRect(0, 0, breedte, hoogte);
+    		gIm.clearRect(0, 0, breedte, hoogte); //liever transparant
+    		//gIm.fillRect(0, 0, breedte, hoogte);
     	penAan(0,0,0);
 		vul = false;
     	eigenaar.tekenprogramma();

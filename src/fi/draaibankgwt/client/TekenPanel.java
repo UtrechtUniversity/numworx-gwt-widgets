@@ -43,6 +43,7 @@ public class TekenPanel //extends JPanel
 		
 	double zoomFactor = 1;
 	
+	
 	public TekenPanel(int w, int h)
 	{
 		draaibankGWTCanvas = Canvas.createIfSupported();
@@ -68,8 +69,7 @@ public class TekenPanel //extends JPanel
 	public void initialiseer()
 	{	
 		
-		// lichtgeel
-		bgcolor = CssColor.make(255,255,200);
+		bgcolor = CssColor.make(255,255,255);
 		achtergrondkleur(bgcolor);
 		
 		maakMuisActieMogelijk();
@@ -91,7 +91,7 @@ public class TekenPanel //extends JPanel
 	{	
 		
 		// lichtgeel
-		bgcolor = CssColor.make(255,255,200);
+		bgcolor = CssColor.make(255,255,255);
 		achtergrondkleur(bgcolor);
 		
 		
@@ -405,7 +405,7 @@ public class TekenPanel //extends JPanel
 	{	
 		
 		
-		if (geefDrukx() < 170 && hoogte - geefDruky() < 170 && hoogte- geefDruky() > 84)
+		if (!demoVersion && geefDrukx() < 170 && hoogte - geefDruky() < 170 && hoogte- geefDruky() > 84)
 		{	
 			
 //System.out.println("druk rooster");
@@ -429,7 +429,7 @@ public class TekenPanel //extends JPanel
 	public void muisSleepActie()
 	{
 		
-		if (geefX() > 170 || hoogte - geefY() > 170 )
+		if (geefX() > 170 || hoogte - geefY() > 170 || demoVersion)
 		{	
 
 			xhoek =-0.5*geefSleepdy();
