@@ -1,10 +1,6 @@
 package fi.geomalggwt.client.formuleobjects;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
+
 
 import fi.geomalggwt.client.expressies.*;
 //import fi.wiskopdr.WiskOpdr;

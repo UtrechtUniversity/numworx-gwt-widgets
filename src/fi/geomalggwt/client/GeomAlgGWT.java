@@ -1035,7 +1035,8 @@ logger.info("post kijkNa");
 		
 		dlp.forceLayout();
 		canvasPanel.forceLayout();
-		kijkNaPanel.forceLayout();
+		if(kijkNaPanel!=null)
+			kijkNaPanel.forceLayout();
 		bottomPanel.forceLayout();
 		
 		paint();

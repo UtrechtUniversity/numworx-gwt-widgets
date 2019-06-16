@@ -1,6 +1,6 @@
 package fi.geomalggwt.client.expressies;
 
-import java.awt.*;
+
 
 public class Macht extends Expressie  
 {		

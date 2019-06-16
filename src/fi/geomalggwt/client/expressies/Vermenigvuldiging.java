@@ -1,6 +1,6 @@
 package fi.geomalggwt.client.expressies;
 
-import java.awt.*;
+
 import java.util.*;
 
 import fi.geomalggwt.client.formuleobjects.FormuleParser;
