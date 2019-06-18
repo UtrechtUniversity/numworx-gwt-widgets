@@ -5,7 +5,6 @@ import java.util.Map;
 
 import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.UIModel;
-import nl.numworx.geodefiner.common.math.Expression;
 import nl.tue.win.riaca.openmath.lang.OMApplication;
 import nl.tue.win.riaca.openmath.lang.OMObject;
 import nl.tue.win.riaca.openmath.lang.OMSymbol;
@@ -17,6 +16,7 @@ import fi.euclides.formuleobjects.FormuleParser;
 import fi.euclides.formuleobjects.TokenMgrError;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
+import fi.euclides.openmath.Expression;
 import fi.euclides.util.DefaultAdapter;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
@@ -47,21 +47,21 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		if (visibility.getString() != null && tracker != null) {
 			try {
 				String formula = visibility.getString();
+				final String orig = formula; 
 				Randomizer r = tracker.adapt(Randomizer.class);
 				if(r != null) formula = r.randomize(formula);
 				formula = formula.substring(2);
+				visibility.destroy(); visibility = new Label();
+				visibility.setString(orig);
 				OMObject o = new FormuleParser(formula).logic();
 				OMApplication oma = new OMApplication();
 				oma.addElement(EUCLIDES_VISIBLE);
 				oma.addElement(new OMVariable(tracker.getMapper().toString(item)));
 				oma.addElement(o);
-				fi.euclides.openmath.Expression expr;
-				expr = tracker.adapt(fi.euclides.openmath.Expression.class);
-				visibility.destroy();
+				Expression expr = tracker.adapt(Expression.class);
 				Destroyable v = expr.interpret(oma, visibility, tracker.getMapper());
 				v.setVisible(false);
 				tracker.getModel().add(v);
-			
 			} catch (Exception e) {
 			} catch (TokenMgrError tme) {
 			}
