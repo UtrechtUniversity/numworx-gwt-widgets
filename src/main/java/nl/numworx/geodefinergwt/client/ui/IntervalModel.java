@@ -67,6 +67,16 @@ public class IntervalModel extends TextModel {
 
 	@Override
 	public UIModel<Label, Void> init(Label item) {
+		if(item == null) {
+			if(this.item != null && this.item.getP() instanceof fi.euclides.model.PuntOp ) {
+				Segment s = (Segment) this.item.getP().getDepend()[0];
+				length = s.getDX();
+				//x = s.getX1(); 
+				//y = s.getY1();
+			}
+			this.item = null;
+			return this; // skip iff null
+		}
 		Animator animator = item.adapt(Animator.class);
 		if(animator != null) {
 			animate = animator.animate;
