@@ -1,6 +1,5 @@
 package nl.numworx.geodefinergwt.client.ui;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import nl.numworx.geodefiner.common.Randomizer;

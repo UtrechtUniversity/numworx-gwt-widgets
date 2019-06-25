@@ -75,7 +75,7 @@ public class IntervalModel extends TextModel {
 				//y = s.getY1();
 			}
 			this.item = null;
-			return this; // skip iff null
+			return super.init(item); // dont skip iff null
 		}
 		Animator animator = item.adapt(Animator.class);
 		if(animator != null) {
