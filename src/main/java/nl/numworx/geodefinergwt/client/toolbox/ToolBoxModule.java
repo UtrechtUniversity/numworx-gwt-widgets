@@ -236,7 +236,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
 	ToggleButton circleWithRadius(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.cirkel_met_straal_svg(), svg.cirkel_met_straal_active_svg(),new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,null);
+		return newSBtn(svg.cirkel_met_straal_svg(), svg.cirkel_met_straal_active_svg(),new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,rb.Euclides_104());
 	}
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static

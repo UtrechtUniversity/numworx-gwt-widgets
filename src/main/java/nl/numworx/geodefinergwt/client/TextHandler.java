@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.Vector;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
@@ -44,6 +46,7 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);
 		fuse = false;
+		setStatus(string);
 		tf.setPopupPositionAndShow(new PositionCallback() {
 			
 			@Override
@@ -63,10 +66,27 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		if(fuse||text.isEmpty()) return;
 		fuse = true;
 		LabelDelegate ld = getTracker().getRegistered(ToC.TYPE);
+		Label label;
+// find label
+		Vector<Destroyable> lijnen = getModel().getLijnen();
+		for(Destroyable item: lijnen) {
+			if (item instanceof Label) {
+				label = (Label) item;
+				if (label.getRegistered() == ld && label.getDepend()[0] == p) {
+// if match replace text
+					label.setString(text);
+					label.notifyObservers();
+					getTracker().paint();
+					return;
+				}
+			}
+		}
+		
+		
 		this.text = text;
 		Destroyable[] depend = ld.createDepend(1);
 		depend[0] = p;
-		Label label = ld.define(depend);
+		label = ld.define(depend);
 		label.setString(text);
 		Volgpunt v = new Volgpunt(p);
 		v.setDxy(Numbers.createInteger(6),Numbers.createInteger(-5));

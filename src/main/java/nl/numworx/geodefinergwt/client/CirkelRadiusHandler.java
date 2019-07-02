@@ -33,6 +33,8 @@ public class CirkelRadiusHandler extends AbstractCirkelLabelHandler implements O
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);
 		fuse = false;
+		String message = GeoDefinerGWT.MESSAGES.CirkelRadiusHandler_0();
+		setStatus(message);
 		tf.setPopupPositionAndShow(new PositionCallback() {
 			
 			@Override
