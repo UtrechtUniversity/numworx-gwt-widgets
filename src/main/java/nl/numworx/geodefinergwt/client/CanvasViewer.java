@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.Vector;
+
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
@@ -553,6 +555,11 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
   public Destroyable trail(Destroyable d) {
     Destroyable copy = d.trail();
     if (copy == null) return null;
+    copyTrailAttributes(d, copy);
+    return copy;
+  }
+
+  public void copyTrailAttributes(Destroyable d, Destroyable copy) {
     DefaultAdapter adapter = DefaultAdapter.getDefault(copy);
     adapter.put(Float.class, d.adapt(Float.class)); // point size
     adapter.put(StrokeStyle.class, d.adapt(StrokeStyle.class)); // line style/width
@@ -561,7 +568,11 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
       adapter.put(cs.trailColorStyle());
     else
       adapter.put(null, ColorStyle.class);
-    return copy;
+  }
+
+  @Override
+  public void toTrail(Destroyable key, Vector<Destroyable> values) {
+    for(Destroyable copy: values) copyTrailAttributes(key, copy);
   }
 
 }

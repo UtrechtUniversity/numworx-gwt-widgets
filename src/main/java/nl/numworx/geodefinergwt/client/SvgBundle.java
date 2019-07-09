@@ -30,11 +30,11 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource oppervlakte_active_svg();
 
-  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-met-straal.svg")
+  @Source("nl/numworx/geodefinergwt/client/resources/vectorpaint-8.svg")
   @MimeType("image/svg+xml")
   DataResource cirkel_met_straal_svg();
 
-  @Source("nl/numworx/geodefinergwt/client/resources/Cirkel-met-straal-A.svg")
+  @Source("nl/numworx/geodefinergwt/client/resources/vectorpaint-9.svg")
   @MimeType("image/svg+xml")
   DataResource cirkel_met_straal_active_svg();
 
