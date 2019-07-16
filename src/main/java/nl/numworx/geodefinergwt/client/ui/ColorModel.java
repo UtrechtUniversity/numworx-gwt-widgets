@@ -22,7 +22,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 	protected Destroyable item;
 	public int rgba = 0xFF000000;
-	public boolean visible = true, trail;
+	public boolean visible = true, trail,log;
 	Tracker tracker;
 	private Label visibility = new Label();
 	
@@ -97,6 +97,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		visible = value.getBoolean("visible", true);
 		visibility.setString(value.getString("visibility"));
 		trail = value.getBoolean("trail", false);
+		log = value.getBoolean("log",false);
 	}
 
 	@Override
