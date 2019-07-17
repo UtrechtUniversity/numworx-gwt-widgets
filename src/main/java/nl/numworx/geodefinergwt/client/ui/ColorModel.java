@@ -4,6 +4,7 @@ import java.util.Map;
 
 import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.UIModel;
+import nl.numworx.geodefinergwt.client.Tracer;
 import nl.tue.win.riaca.openmath.lang.OMApplication;
 import nl.tue.win.riaca.openmath.lang.OMObject;
 import nl.tue.win.riaca.openmath.lang.OMSymbol;
@@ -17,6 +18,7 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.openmath.Expression;
 import fi.euclides.util.DefaultAdapter;
+import fi.euclides.util.Observer;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
@@ -43,6 +45,15 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
         if(trail && tracker != null) {
           tracker.getModel().startTrail(item);
         }
+        if (log && tracker != null) {
+          Tracer observer = tracker.adapt(Tracer.class);
+          if (observer != null) {
+            item.addObserver(observer);
+            DefaultAdapter.getDefault(item).put(observer);
+          }
+          
+        }
+        
 		if (visibility.getString() != null && tracker != null) {
 			try {
 				String formula = visibility.getString();

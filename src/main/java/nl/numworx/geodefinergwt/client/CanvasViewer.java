@@ -8,7 +8,9 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.Widget;
 
+import dagger.Lazy;
 import fi.euclides.event.NameMapper;
+import fi.euclides.event.TrackerContext;
 import fi.euclides.gwt.RectShape;
 import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.model.AbstractViewer;
@@ -97,6 +99,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	SnapperImpl snapper = new SnapperImpl();
 	private StrokeStyle stroke;
+
+    private Lazy<Tracer> tracerProvider = () -> null;
 	@Override
 	public void processMouseUp(int x0, int y0, int id) {
 		down = false;
@@ -111,6 +115,16 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	}
 	public void pmDrag(int x, int y, int id) {
 		super.processMouseDrag(x, y, id);
+		
+        TrackerContext ctx = getCtx(id);
+		if (ctx.selection().isEmpty()) {
+		    Tracer t = tracerProvider.get();
+		    if (t != null) {
+		        ctx.getHitTester().setXY(x, y);
+		        t.update(this, ctx);
+		    }
+		}
+		
 	}
 
 	@Override
@@ -126,6 +140,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		if(cls == Snapper.class) return (T) snapper;
 		if(cls == AbstractViewer.class) return (T) this;
 		if(cls == Widget.class) return (T) asWidget();
+		if(cls == Tracer.class) return (T) tracerProvider.get();
 		return super.adapt(cls);
 	}
 
@@ -573,6 +588,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
   @Override
   public void toTrail(Destroyable key, Vector<Destroyable> values) {
     for(Destroyable copy: values) copyTrailAttributes(key, copy);
+  }
+  public void setTracer(Lazy<Tracer> tracerProvider) {
+    this.tracerProvider = tracerProvider;
+    
   }
 
 }

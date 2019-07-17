@@ -61,6 +61,7 @@ import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.Const;
 import fi.euclides.proof.LabelValue;
+import fi.euclides.util.DefaultAdapter;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
@@ -381,6 +382,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
+    @Inject Lazy<Tracer> tracerProvider;
 
 	@Inject void setExpressions(@Named("expressions") Map<String,String> map) {
 	    expressions = map;
@@ -412,6 +414,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		String random = (String) launchData.get("random");
 		values = launchRandomVars(random, values);
 // configuration
+		if (Boolean.TRUE.equals(launchData.get("logOption"))) {
+		  tracker.setTracer(tracerProvider);
+		}
+		
 		setLaunchData(launchData, values);
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
 // highlighter after init launchdata.

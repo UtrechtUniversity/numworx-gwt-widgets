@@ -6,10 +6,12 @@ import java.util.TreeMap;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import com.google.gwt.user.client.ui.Label;
 
+import dagger.Lazy;
 import fi.euclides.event.EventHandler;
 import fi.euclides.event.HitTester;
 import fi.euclides.event.NameMapper;
@@ -31,13 +33,13 @@ import nl.numworx.geodefiner.common.math.Expression;
 @Singleton
 public class TrackerImpl implements Tracker 
 {
-	Tracker viewer;
+	CanvasViewer viewer;
 	NameMapper mapper;
 	Map<String,LabelDelegate> register;
 	Label status;
 	Randomizer randomizer;
-	
-	@Inject TrackerImpl(AbstractViewer viewer, NamingModel mapper, @Named("status") Label status, Randomizer r, Expression e, Set<LabelDelegate> set) {
+		
+	@Inject TrackerImpl(CanvasViewer viewer, NamingModel mapper, @Named("status") Label status, Randomizer r, Expression e, Set<LabelDelegate> set) {
 		super();
 		this.viewer = viewer;
 		this.mapper = mapper;
@@ -118,4 +120,9 @@ public class TrackerImpl implements Tracker
 	}
 
 	fi.euclides.openmath.Expression expression;
+
+  public void setTracer(Lazy<Tracer> tracerProvider) {
+    viewer.setTracer(tracerProvider);
+    
+  }
 }

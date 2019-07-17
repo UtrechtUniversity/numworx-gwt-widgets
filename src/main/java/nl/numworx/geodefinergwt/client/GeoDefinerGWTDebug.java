@@ -276,6 +276,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	    h.put("color", 0xFF000000);
 	    h.put("type", PointType.DISK.name());
 	    h.put("size", 5);
+	    h.put("log", true);
 	    configuration.put("P", h);configuration.put("Q", h);
 	    
 	    
