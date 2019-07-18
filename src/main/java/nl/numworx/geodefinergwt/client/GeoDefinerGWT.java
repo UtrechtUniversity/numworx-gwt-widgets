@@ -178,6 +178,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		logger.info("voor getState ");
 		lognagekeken();
 		super.getState(hashMap);
+		getLogState(hashMap);
 		lognagekeken();
 		logger.info("getState " + hashMap);
 		return hashMap;
@@ -185,10 +186,18 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 
 	
-	public void setState(HashMap<String, Object> h) {
+	private void getLogState(Map<String, Object> hashMap) {
+      Tracer t = tracker.adapt(Tracer.class);
+      if (t != null) {
+        t.getState(hashMap);
+      }
+  }
+
+  public void setState(HashMap<String, Object> h) {
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
 		setState(map);
+		setLogState(map);
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
 		if(isNagekeken()) {
@@ -202,7 +211,15 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		lognagekeken();
 	}
 
-	public int[][] getScoreObjectives() {
+	private void setLogState(Map<String, Object> map) {
+      Tracer t = tracker.adapt(Tracer.class);
+      if (t != null) {
+        t.setState(map);
+      }
+    
+  }
+
+  public int[][] getScoreObjectives() {
 		return null;
 	}
 

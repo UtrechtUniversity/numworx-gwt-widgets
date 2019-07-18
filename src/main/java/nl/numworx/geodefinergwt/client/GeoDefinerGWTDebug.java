@@ -298,6 +298,8 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		positions.put("waarde", Arrays.asList(1, 40, 1, 40));
 		launchDebug.put("positions", positions);
 		
+		launchDebug.put("logOption", Boolean.TRUE);
+		
 		Map<String, Number> values = new HashMap<String, Number>();
 		values.put("a", Integer.valueOf(10));
 		init(getWidth(), getHeight(), launchDebug, values);

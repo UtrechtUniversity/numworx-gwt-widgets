@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,6 +10,12 @@ import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import com.google.gwt.core.client.GWT;
+import com.google.web.bindery.autobean.shared.AutoBean;
+import com.google.web.bindery.autobean.shared.AutoBeanCodex;
+import com.google.web.bindery.autobean.shared.AutoBeanFactory;
+import com.google.web.bindery.autobean.shared.AutoBeanUtils;
 
 import fi.euclides.event.NameMapper;
 import fi.euclides.event.Tracker;
@@ -26,26 +33,29 @@ import fi.euclides.model.Segment;
 import fi.euclides.model.Track;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.Visitor;
-import fi.euclides.model.math.Numbers;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 @Singleton
 public class Tracer implements Observer, Visitor {
 
   static final Logger LOG = Logger.getLogger(Tracer.class.getName());
-  
-  public static class Entry {
-    long timestamp;
-    String name;
-    boolean visible;
-    Boolean dragging;
-    Double x,y,value;
-    double evx, evy;
-    String arg;
+  private static final String LOG_STATE = "logState";
+
+  interface EntryBeanFactory extends AutoBeanFactory {
+    AutoBean<EntryBean> entry();
   }
-    
-  List<Entry> entries = new LinkedList<>();
+
+  EntryBeanFactory factory = GWT.create(EntryBeanFactory.class);
+  
+  EntryBean entry() {
+    return factory.entry().as();
+  }
+  
+  
+  List<EntryBean> entries = new LinkedList<>();
   Set<Destroyable> drags = new HashSet<>();
   
   class Adder implements Visitor {
@@ -97,7 +107,7 @@ public class Tracer implements Observer, Visitor {
   }
   
   final Adder ADDER = new Adder();
-  Entry top;
+  EntryBean top;
   NameMapper mapper;
   AbstractViewer viewer;
 
@@ -112,9 +122,9 @@ public class Tracer implements Observer, Visitor {
     LOG.info("update " + observable + "," +arg);
     if (observable instanceof Destroyable) {
       Destroyable d = (Destroyable)observable;
-      top = new Entry();
+      top = entry();
       if (arg == null) arg = "update";
-      top.arg = arg.toString();
+      top.setArg(arg.toString());
       d.visit(this);
     } else if (observable == viewer) {
       if (arg instanceof Iterable) {
@@ -124,28 +134,30 @@ public class Tracer implements Observer, Visitor {
         for (TrackerContext item : iter) {
           Track t = item.getTrack();
           if (t == null) continue;
-          top = new Entry();
-          top.evx = item.getHitTester().getX();
-          top.evy = item.getHitTester().getY();
-          top.dragging = Boolean.TRUE;
-          top.arg = item.toString();
+          top = entry();
+          top.setEvx(item.getHitTester().getX());
+          top.setEvy(item.getHitTester().getY());
+          top.setDragging(Boolean.TRUE);
+          top.setArg(item.toString());
           t.visit(ADDER);
           t.visit(this);
         }
         old.removeAll(drags);
         for( Destroyable d: old) {
-          top = new Entry();
-          top.dragging = Boolean.FALSE;
-          top.arg = "dragging";
+          top = entry();
+          top.setDragging(Boolean.FALSE);
+          top.setArg("dragging");
           d.visit(this);
         }
       } else if (arg instanceof TrackerContext) {
-        top = new Entry();
+        top = entry();
         TrackerContext ctx = (TrackerContext) arg;
-        top.arg = arg.toString();
-        top.name = arg.toString();
-        top.evx = ctx.getHitTester().getX();
-        top.evy = ctx.getHitTester().getY();
+        top.setArg(arg.toString());
+        top.setName(arg.toString());
+        top.setEvx(ctx.getHitTester().getX());
+        top.setEvy(ctx.getHitTester().getY());
+        top.setTimestamp(System.currentTimeMillis());
+        LOG.info(top.getName()  + " at " + top.getTimestamp() + " " + top.getEvx());
         entries.add(top);
       }
     }
@@ -153,62 +165,61 @@ public class Tracer implements Observer, Visitor {
 
   private void add(Destroyable p) {
     if (p.adapt(Tracer.class) != null) {
-      top.name = mapper.toString(p);
-      top.timestamp = System.currentTimeMillis();
-      top.visible = p.isVisible() && p.isDefined();
+      top.setName(mapper.toString(p));
+      top.setTimestamp(System.currentTimeMillis());
+      top.setVisible(p.isVisible() && p.isDefined());
+      LOG.info(top.getName()  + "." + top.getArg() + " at " + top.getTimestamp());
       entries.add(top);
     }
   }
-  
-  
-  
+   
   @Override
   public void visitPunt(Punt p) {
-      top.x = p.getXd();
-      top.y = p.getYd();
+      top.setX(p.getXd());
+      top.setY(p.getYd());
       add(p);
   }
 
   @Override
   public void visitLijn(Lijn l) {
-    top.x = l.getX1();
-    top.y = l.getY1();
+    top.setX(l.getX1());
+    top.setY(l.getY1());
     add(l);
   }
 
   @Override
   public void visitCirkel(Cirkel c) {
-    top.x = c.getCenter().getXd();
-    top.y = c.getCenter().getYd();
+    top.setX(c.getCenter().getXd());
+    top.setY(c.getCenter().getYd());
     add(c);
   }
 
   @Override
   public void visitSegment(Segment s) {
-    top.x = s.getX1();
-    top.y = s.getX2();
+    top.setX(s.getX1());
+    top.setY(s.getX2());
     add(s);
   }
 
   @Override
   public void visitLabel(Label label) {
-    top.x = label.getXd();
-    top.y = label.getYd();
-    top.value = label.value.doubleValue();
+    top.setX(label.getXd());
+    top.setY(label.getYd());
+    top.setValue(label.value.doubleValue());
     add(label);
   }
 
   @Override
   public void visitTriangle(Triangle t) {
-    top.x = t.getA().getXd();
-    top.y = t.getA().getYd();
+    top.setX(t.getA().getXd());
+    top.setY(t.getA().getYd());
     add(t);
   }
 
   @Override
   public void visitKegelsnede(Kegelsnede2 k) {
-    top.x = k.getA().getXd();
-    top.y = k.getA().getYd();
+    top.setX(k.getA().getXd());
+    top.setY(k.getA().getYd());
     add(k);
     
   }
@@ -221,18 +232,33 @@ public class Tracer implements Observer, Visitor {
 
   @Override
   public void visitBoog(Boog b) {
-    top.x = b.getCenter().getXd();
-    top.y = b.getCenter().getYd();
+    top.setX(b.getCenter().getXd());
+    top.setY(b.getCenter().getYd());
     add(b);
   }
 
-  public void getState(Map<String,Object> state) {
-    
-  }
+  
+  private List<String> logState = new ArrayList<>();
+  
   public void setState(Map<String,Object> state) {
-    
+    ObjectMap s = JSONUtilities.wrapMap(state);
+    if (s.containsKey(LOG_STATE)) {
+      List<String> strings = s.getStringList(LOG_STATE);
+      this.logState.clear();
+      this.logState.addAll(strings);
+    }
+  }
+  public void getState(Map<String,Object> state) {
+    for(EntryBean entry: entries) {
+      this.logState.add(serializeToJson(entry));
+    }
+    state.put(LOG_STATE, logState);
   }
   
-  
+  String serializeToJson(EntryBean entry) {
+    AutoBean<EntryBean> bean = AutoBeanUtils.getAutoBean(entry);
+    return AutoBeanCodex.encode(bean).getPayload();
+  }
+
   
 }
