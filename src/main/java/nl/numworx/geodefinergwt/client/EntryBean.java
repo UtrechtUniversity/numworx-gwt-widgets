@@ -12,7 +12,7 @@ public interface EntryBean {
 
   void setName(String name);
 
-  boolean isVisible();
+  Boolean isVisible();
 
   void setVisible(boolean visible);
 
@@ -32,11 +32,11 @@ public interface EntryBean {
 
   void setValue(Double value);
 
-  double getEvx();
+  Double getEvx();
 
   void setEvx(double evx);
 
-  double getEvy();
+  Double getEvy();
 
   void setEvy(double evy);
 

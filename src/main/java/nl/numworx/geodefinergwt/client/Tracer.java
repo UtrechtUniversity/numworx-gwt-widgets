@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,16 +45,17 @@ public class Tracer implements Observer, Visitor {
   static final Logger LOG = Logger.getLogger(Tracer.class.getName());
   private static final String LOG_STATE = "logState";
 
-  interface EntryBeanFactory extends AutoBeanFactory {
-    AutoBean<EntryBean> entry();
-  }
-
-  EntryBeanFactory factory = GWT.create(EntryBeanFactory.class);
+//  interface EntryBeanFactory extends AutoBeanFactory {
+//    AutoBean<EntryBean> entry();
+//  }
+//
+//  EntryBeanFactory factory = GWT.create(EntryBeanFactory.class);
+//  
+//  EntryBean entry() {
+//    return factory.entry().as();
+//  }
   
-  EntryBean entry() {
-    return factory.entry().as();
-  }
-  
+  EntryBean entry() { return Entry.entry(); }
   
   List<EntryBean> entries = new LinkedList<>();
   Set<Destroyable> drags = new HashSet<>();
@@ -119,7 +121,6 @@ public class Tracer implements Observer, Visitor {
   
   @Override
   public void update(Observable observable, Object arg) {
-    LOG.info("update " + observable + "," +arg);
     if (observable instanceof Destroyable) {
       Destroyable d = (Destroyable)observable;
       top = entry();
@@ -238,27 +239,45 @@ public class Tracer implements Observer, Visitor {
   }
 
   
-  private List<String> logState = new ArrayList<>();
+  private List<Object> logState = new ArrayList<>();
   
   public void setState(Map<String,Object> state) {
     ObjectMap s = JSONUtilities.wrapMap(state);
     if (s.containsKey(LOG_STATE)) {
-      List<String> strings = s.getStringList(LOG_STATE);
+      List<Object> strings = s.getList(LOG_STATE);
       this.logState.clear();
       this.logState.addAll(strings);
     }
   }
   public void getState(Map<String,Object> state) {
     for(EntryBean entry: entries) {
-      this.logState.add(serializeToJson(entry));
+      this.logState.add(serializeToMap(entry));
     }
+    entries.clear();
     state.put(LOG_STATE, logState);
   }
+
+private Object serializeToMap(EntryBean entry) {
+	Map<String,Object> map = new HashMap<>();
+	putif(map,"timestamp", String.valueOf(entry.getTimestamp()));
+	putif(map,"name", entry.getName());
+	putif(map,"evx", entry.getEvx());
+	putif(map,"evy", entry.getEvy());
+	putif(map,"x", entry.getX());
+	putif(map,"y", entry.getY());
+	putif(map,"visible", entry.isVisible());
+	putif(map,"dragging", entry.getDragging());
+	putif(map,"value", entry.getValue());
+	putif(map,"arg", entry.getArg());
+	return map;
+}
+
+private void putif(Map<String, Object> map, String key, Object value) {
+	if (value != null) 
+		map.put(key, value);
+	
+}
   
-  String serializeToJson(EntryBean entry) {
-    AutoBean<EntryBean> bean = AutoBeanUtils.getAutoBean(entry);
-    return AutoBeanCodex.encode(bean).getPayload();
-  }
 
   
 }

@@ -10,10 +10,10 @@ public class Entry implements EntryBean {
   
   private long timestamp;
   private String name;
-  private boolean visible;
+  private Boolean visible;
   private Boolean dragging;
   private Double x,y,value;
-  private double evx, evy;
+  private Double evx, evy;
   private String arg;
   /* (non-Javadoc)
    * @see nl.numworx.geodefinergwt.client.EntryBean#getTimestamp()
@@ -47,7 +47,7 @@ public class Entry implements EntryBean {
    * @see nl.numworx.geodefinergwt.client.EntryBean#isVisible()
    */
   @Override
-  public boolean isVisible() {
+  public Boolean isVisible() {
     return visible;
   }
   /* (non-Javadoc)
@@ -117,7 +117,7 @@ public class Entry implements EntryBean {
    * @see nl.numworx.geodefinergwt.client.EntryBean#getEvx()
    */
   @Override
-  public double getEvx() {
+  public Double getEvx() {
     return evx;
   }
   /* (non-Javadoc)
@@ -131,7 +131,7 @@ public class Entry implements EntryBean {
    * @see nl.numworx.geodefinergwt.client.EntryBean#getEvy()
    */
   @Override
-  public double getEvy() {
+  public Double getEvy() {
     return evy;
   }
   /* (non-Javadoc)
