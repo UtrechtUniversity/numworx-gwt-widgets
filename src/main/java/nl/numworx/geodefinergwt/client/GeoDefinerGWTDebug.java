@@ -308,6 +308,8 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		FocusOnTouch.focus();
 		setCommunicationRoot(opdrnav);
 		viewer.adapt(Snapper.class).setGravity(true);
+		
+		setState(new HashMap());
 		start();
 	}
 

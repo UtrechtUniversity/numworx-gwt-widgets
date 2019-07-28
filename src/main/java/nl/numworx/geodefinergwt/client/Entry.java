@@ -13,7 +13,7 @@ public class Entry implements EntryBean {
   private Boolean visible;
   private Boolean dragging;
   private Double x,y,value;
-  private Double evx, evy;
+  private Double evx, evy, wx, wy;
   private String arg;
   /* (non-Javadoc)
    * @see nl.numworx.geodefinergwt.client.EntryBean#getTimestamp()
@@ -154,5 +154,23 @@ public class Entry implements EntryBean {
   @Override
   public void setArg(String arg) {
     this.arg = arg;
+  }
+  /**
+   * @return the wy
+   */
+  public Double getWy() {
+    return wy;
+  }
+  /**
+   * @param wy the wy to set
+   */
+  public void setWy(Double wy) {
+    this.wy = wy;
+  }
+  public Double getWx() {
+    return wx;
+  }
+  public void setWx(Double wx) {
+    this.wx = wx;
   }
 }

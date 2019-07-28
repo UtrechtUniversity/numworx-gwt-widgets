@@ -44,4 +44,8 @@ public interface EntryBean {
 
   void setArg(String arg);
 
+  Double getWy();
+  Double getWx();
+  void setWx(Double x);
+  void setWy(Double y);
 }

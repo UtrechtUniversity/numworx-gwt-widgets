@@ -13,6 +13,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONParser;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 import com.google.web.bindery.autobean.shared.AutoBeanFactory;
@@ -21,6 +27,7 @@ import com.google.web.bindery.autobean.shared.AutoBeanUtils;
 import fi.euclides.event.NameMapper;
 import fi.euclides.event.Tracker;
 import fi.euclides.event.TrackerContext;
+import fi.euclides.gwt.MouseContext;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Cirkel;
@@ -55,7 +62,11 @@ public class Tracer implements Observer, Visitor {
 //    return factory.entry().as();
 //  }
   
-  EntryBean entry() { return Entry.entry(); }
+  EntryBean entry() { 
+    EntryBean entry = Entry.entry();
+    entry.setTimestamp(System.currentTimeMillis());
+    return entry;
+  }
   
   List<EntryBean> entries = new LinkedList<>();
   Set<Destroyable> drags = new HashSet<>();
@@ -135,9 +146,9 @@ public class Tracer implements Observer, Visitor {
         for (TrackerContext item : iter) {
           Track t = item.getTrack();
           if (t == null) continue;
+          
           top = entry();
-          top.setEvx(item.getHitTester().getX());
-          top.setEvy(item.getHitTester().getY());
+          setEvent(item);
           top.setDragging(Boolean.TRUE);
           top.setArg(item.toString());
           t.visit(ADDER);
@@ -155,19 +166,30 @@ public class Tracer implements Observer, Visitor {
         TrackerContext ctx = (TrackerContext) arg;
         top.setArg(arg.toString());
         top.setName(arg.toString());
-        top.setEvx(ctx.getHitTester().getX());
-        top.setEvy(ctx.getHitTester().getY());
-        top.setTimestamp(System.currentTimeMillis());
+        setEvent(ctx);
         LOG.info(top.getName()  + " at " + top.getTimestamp() + " " + top.getEvx());
         entries.add(top);
       }
     }
   }
 
+  public void setEvent(TrackerContext item) {
+    MouseContext ctx = item.getAdapter().adapt(MouseContext.class);
+    if (ctx != null) {
+      top.setEvx(ctx.getX());
+      top.setEvy(ctx.getY());
+      top.setTimestamp(ctx.getTimestamp());
+      top.setWx(Double.valueOf(ctx.getScreenX()-ctx.getClientX()));
+      top.setWy(Double.valueOf(ctx.getScreenY()-ctx.getClientY()));
+      return;
+    }
+    top.setEvx(item.getHitTester().getX());
+    top.setEvy(item.getHitTester().getY());
+  }
+
   private void add(Destroyable p) {
     if (p.adapt(Tracer.class) != null) {
       top.setName(mapper.toString(p));
-      top.setTimestamp(System.currentTimeMillis());
       top.setVisible(p.isVisible() && p.isDefined());
       LOG.info(top.getName()  + "." + top.getArg() + " at " + top.getTimestamp());
       entries.add(top);
@@ -248,6 +270,7 @@ public class Tracer implements Observer, Visitor {
       this.logState.clear();
       this.logState.addAll(strings);
     }
+    stamp();
   }
   public void getState(Map<String,Object> state) {
     for(EntryBean entry: entries) {
@@ -269,6 +292,8 @@ private Object serializeToMap(EntryBean entry) {
 	putif(map,"dragging", entry.getDragging());
 	putif(map,"value", entry.getValue());
 	putif(map,"arg", entry.getArg());
+	putif(map, "wx", entry.getWx());
+	putif(map, "wy", entry.getWy());
 	return map;
 }
 
@@ -278,6 +303,36 @@ private void putif(Map<String, Object> map, String key, Object value) {
 	
 }
   
+private void stamp() {
+  RequestBuilder requestBuilder = new RequestBuilder(
+    RequestBuilder.GET, "https://app.dwo.nl/dwo/rest/public/status/getHeartBeat");
+  try {
+    top = entry();
+    top.setArg("request");
+    top.setName("heartbeat");
+    entries.add(top);
+    requestBuilder.sendRequest("", new RequestCallback() {
 
+      @Override
+      public void onResponseReceived(Request request, Response response) {
+        String json = response.getText();
+        double stamp = (long) JSONParser.parse(json).isObject().get("serverTimeStamp").isNumber().doubleValue();
+        top = entry();
+        top.setValue(stamp);
+        top.setArg("response");
+        top.setName("heartbeat");
+        entries.add(top);
+      }
+
+      @Override
+      public void onError(Request request, Throwable exception) {
+        
+        
+      } } );
+  } catch (RequestException e) {
+    // TODO Auto-generated catch block
+    e.printStackTrace();
+  }
+}
   
 }
