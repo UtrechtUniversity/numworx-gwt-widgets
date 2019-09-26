@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -57,7 +57,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.mgwt</groupId>
@@ -66,7 +66,7 @@
 		<dependency>
 			<groupId>org.vectomatic</groupId>
 			<artifactId>lib-gwt-svg</artifactId>
-			<version>0.5.13</version>
+			<version>0.5.15</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
@@ -143,9 +143,9 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.5-SNAPSHOT</euclidesVersion>
-		<formuleVersion>0.1.1</formuleVersion>
+		<formuleVersion>0.1.6-SNAPSHOT</formuleVersion>
 		<debug />
-		<gwtVersion>2.8.1</gwtVersion>
+		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
 		<daggerVersion>2.11</daggerVersion>
