@@ -206,33 +206,33 @@ public class ProgrammaImporter
 	 * @param lines		ArrayList with the original code. WILL BE CHANGED!
 	 * @return			list of lines in block, without the enclosing brackets.
 	 */
-	private ArrayList<String> getBlock(ArrayList<String> lines)
-	{
+	private ArrayList<String> getBlock(ArrayList<String> lines) {
 		ArrayList<String> blockLines = new ArrayList<String>();
-		// set line to first line of lines, remove first line from lines
 		String line = lines.remove(0);
-		if ( line.equals("{") )
-		{	// error
-		}
-		int level=1;
-		while ( level > 0 )
+		while (line.equals("")) // niet moeders mooiste, even hardhandig lege regels verwijderen
 		{
-			if ( lines.isEmpty() )
-			{
+			line = lines.remove(0);
+		}
+		if (!line.equals("{")) {
+			System.out.println("PARSE ERROR: missing {");
+			return blockLines;
+		}
+		int level = 1;
+		while (level > 0) {
+			if (lines.isEmpty()) {
 				System.out.println("PARSE ERROR: missing }");
 				return blockLines;
 			}
-			// set line to current first line of lines, and remove this current first line from lines
 			line = lines.remove(0);
-			if (line.equals("{")) 
+			if (line.equals("{"))
 				level++;
-			if (line.equals("}")) 
+			if (line.equals("}"))
 				level--;
-			// copy line into block, but don't copy last } (that caused level to go down to 0)
-			if ( level > 0 )
-			{
+			// copy line into block, but don't copy last } (that caused level to go down to
+			// 0)
+			if (level > 0) {
 				blockLines.add(line);
-			}			
+			}
 		}
 		return blockLines;
 	}
