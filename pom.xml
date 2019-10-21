@@ -54,13 +54,21 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
+  		<version>0.1.4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.google.gwt</groupId>
+  		<artifactId>gwt-dev</artifactId>
+  		<version>${gwtVersion}</version>
+  		<scope>test</scope>
   	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.3</version>
+  	<version>0.0.6</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Web Logo</name>
+  <version>0.0.7-SNAPSHOT</version>
 </project>
