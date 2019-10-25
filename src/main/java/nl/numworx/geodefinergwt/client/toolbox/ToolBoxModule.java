@@ -134,7 +134,7 @@ public class ToolBoxModule {
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
 	ToggleButton reset(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), new ResetHandler("Reset",instance), tracker, model,null);
+		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), new ResetHandler("Reset",instance), tracker, model,"Reset");
 	}
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
