@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
-			<version>0.1.0</version>
+			<version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
@@ -103,7 +103,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>0.1.7-SNAPSHOT</version>
+			<version>0.1.6</version>
 			<exclusions>
 				<exclusion>
 					<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -121,6 +121,12 @@
 			<artifactId>lineairealgebra</artifactId>
 			<version>0.0.1</version>
 			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-dev</artifactId>
+			<version>${gwtVersion}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 	<parent>

@@ -296,7 +296,7 @@ public class VeldComponentGWT extends LayoutPanel {
 				functionEditors[i].setFont(defaultfont);
 				functionEditors[i].setDefaultFont(defaultfont);
 
-				functionEditorPanels[i] = (TouchPanel) functionEditors[i].getAsPanel();
+				functionEditorPanels[i] = functionEditors[i].getAsPanel();
 				addFormuleEditorListener(functionEditorPanels[i], functionEditors[i]);
 				functionEditorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
 				
@@ -485,7 +485,7 @@ public class VeldComponentGWT extends LayoutPanel {
 				functionEditors[i].setFont(defaultfont);
 				functionEditors[i].setDefaultFont(defaultfont);	
 				functionEditors[i].setColor(systemColor);
-				functionEditorPanels[i].add(functionEditors[i].getAsPanel());
+				//functionEditorPanels[i].add(functionEditors[i].getAsPanel());
 			}				
 			
 			// adjust Checkbox Position

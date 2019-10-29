@@ -412,7 +412,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 		//plaatsComponenten();
 		Stub.publish(this);
-		// initialize();
+		// initialize(); (NPE!)
 
 		/* Om testen mogelijk te maken mischien
 		  if( publish(this) ) initialize_myself() 
