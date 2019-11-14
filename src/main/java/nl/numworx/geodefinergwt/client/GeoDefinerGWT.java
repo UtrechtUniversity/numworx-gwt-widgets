@@ -194,6 +194,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
   }
 
   public void setState(HashMap<String, Object> h) {
+        widget.cancel();
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
 		setState(map);
@@ -209,6 +210,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		start();
 		addFireUpdates();
 		lognagekeken();
+		widget.paint();
 	}
 
 	private void setLogState(Map<String, Object> map) {

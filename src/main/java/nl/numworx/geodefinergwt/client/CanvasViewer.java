@@ -6,6 +6,7 @@ import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 
 import dagger.Lazy;
@@ -77,6 +78,15 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public CanvasViewer() {
 		this(200, 200);
 	}
+	
+	public  void cancel() {
+	  if (animator != null) {
+	    GWT.log("animator canceled");
+	    animator.cancel();
+	    animator = null;
+	  }
+	}
+	
 	/** Lazy
 	 * @see fi.euclides.gwt.svg.SVGWidget#paint()
 	 */
