@@ -153,8 +153,8 @@ public class GrafiekGWTVeld {
 	void setSize(int w, int h) {
 		breedte = w;
 		hoogte = h;
-		grafiekGWTCanvas.setWidth(w + "px");
-		grafiekGWTCanvas.setHeight(h + "px");
+//		grafiekGWTCanvas.setWidth(w + "px");
+//		grafiekGWTCanvas.setHeight(h + "px");
 		grafiekGWTCanvas.setCoordinateSpaceWidth(w);
 		grafiekGWTCanvas.setCoordinateSpaceHeight(h);
 	}
