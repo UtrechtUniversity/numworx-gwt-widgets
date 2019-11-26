@@ -35,16 +35,15 @@ import nl.numworx.geodefiner.common.AddSnapPuntHandler;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.FilteredDestroyHandler;
 import nl.numworx.geodefiner.common.Instance;
-import nl.numworx.geodefiner.common.ResetHandler;
 import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
+import nl.numworx.geodefinergwt.client.ResetHandler;
 import nl.numworx.geodefinergwt.client.SvgBundle;
 import nl.numworx.geodefinergwt.client.TextHandler;
-import nl.numworx.geodefinergwt.client.ToolBoxPanel;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.Action;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.CirkelAction;
 import nl.numworx.geodefinergwt.client.ToolBoxPanel.PuntAction;
@@ -133,8 +132,8 @@ public class ToolBoxModule {
 		return newSBtn(svg.verwijder_svg(),svg.verwijder_active_svg(), new FilteredDestroyHandler(instance), tracker, model,rb.Euclides_37());
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
-	ToggleButton reset(TrackerImpl tracker, RadioMode model, Instance instance) {
-		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), new ResetHandler("Reset",instance), tracker, model,"Reset");
+	ToggleButton reset(TrackerImpl tracker, RadioMode model, ResetHandler reset) {
+		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), reset, tracker, model,"Reset");
 	}
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
