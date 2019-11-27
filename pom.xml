@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.4</version>
+			<version>0.1.5-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -77,7 +77,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.5</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.dagger</groupId>
