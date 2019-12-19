@@ -54,6 +54,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
+  		<version>0.1.1</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -63,7 +64,7 @@
 	<dependency>
 		<groupId>fi.wiskopdrgwt</groupId>
 		<artifactId>WiskOpdrGWT</artifactId>
-		<version>0.0.3</version>
+		<version>0.0.5</version>
   		<exclusions>
   			<exclusion>
   				<artifactId>IdeasGWT</artifactId>
@@ -74,14 +75,15 @@
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>0.0.6</version>
+		<version>0.1.1</version>
 	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.3</version>
+  	<version>0.0.6</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Heks</name>
+  <version>0.0.7-SNAPSHOT</version>
 </project>
