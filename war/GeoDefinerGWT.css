@@ -39,6 +39,8 @@ body {
 
 .canvas {
 	outline: none;
+	touch-action: none;
+	-ms-touch-action: none;
 }
 
 
