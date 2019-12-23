@@ -15,6 +15,7 @@
 
 .canvas {
 	background-color: white;	
+	touch-action: none
 }
 
 .upimage {
