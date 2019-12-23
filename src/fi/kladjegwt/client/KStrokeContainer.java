@@ -608,7 +608,7 @@ public class KStrokeContainer {
 					g.translate(-x, -y);
 				}
 				
-				if(parent.eigenaar.comRoot.hasListeners("action.check") && !recognizeOff)
+				if(parent.eigenaar.comRoot!=null && parent.eigenaar.comRoot.hasListeners("action.check") && !recognizeOff)
 					drawCheckButton(g, getCheckButtonArea());
 				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
@@ -697,7 +697,7 @@ public class KStrokeContainer {
 					g.translate(-x, -y);
 				}
 				
-				if(parent.eigenaar.comRoot.hasListeners("action.check"))
+				if(parent.eigenaar.comRoot!=null && parent.eigenaar.comRoot.hasListeners("action.check"))
 					drawCheckButton(g, getCheckButtonArea());
 				
 				if(correct||isfalse||isHalf) {

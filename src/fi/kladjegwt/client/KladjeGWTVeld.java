@@ -16,6 +16,7 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
+import com.google.gwt.canvas.dom.client.Context2d.LineCap;
 import com.google.gwt.canvas.dom.client.CssColor;
 
 import com.google.gwt.event.dom.client.MouseUpHandler;
@@ -242,6 +243,7 @@ public class KladjeGWTVeld
 	 * worden een Streep by MouseUp/TouchStart
 	 */
 	ArrayList<DoublePoint> draggDoublePoints = new ArrayList<DoublePoint>();
+	ArrayList<DoublePoint> formulaStrokePointsDouble = new ArrayList<DoublePoint>();
 	ArrayList<fi.writemathgwt.client.engine.Point> formulaStrokePoints = new ArrayList<fi.writemathgwt.client.engine.Point>();
 	Stroke lastStroke;
 
@@ -1094,10 +1096,12 @@ public class KladjeGWTVeld
 			return doublePoints;
 	}
 	
+	// bedoeld voor afkapping rommelig begin stroke. Niet meer in gebruik
 	private void cleanFormulePoints(ArrayList<fi.writemathgwt.client.engine.Point> fp)
 	{
 		if(fp.size()<5)
 			return;
+		
 		double[] angles = new double[fp.size()-1];
 		for(int i=1 ; i<fp.size() ; i++) {
 			double dx = fp.get(i).getX() - fp.get(i-1).getX();
@@ -1183,6 +1187,17 @@ public class KladjeGWTVeld
 		g.stroke();
 	}
 	
+	public void paintLastSegment() {
+		gIm.setStrokeStyle(CssColor.make(80, 80, 80));
+		gIm.setLineCap(LineCap.ROUND);
+		
+		DoublePoint p1 = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-2);
+		DoublePoint p2 = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-1);
+		gIm.beginPath();
+		gIm.moveTo(p1.x, p1.y);
+		gIm.lineTo(p2.x, p2.y);
+		gIm.stroke();
+	}
 	public void paintFormule(boolean refresh) {
 		if(refresh) {
 			gIm.clearRect(0, 0, breedte, hoogte);
@@ -3246,6 +3261,7 @@ public class KladjeGWTVeld
 				currentStrokeContainer = new KStrokeContainer(this);
 			
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			mouseDown = true;
 			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 			paint();
@@ -3305,8 +3321,10 @@ public class KladjeGWTVeld
 					//eigenaar.setChanged();
 				}
 				formulaStrokePoints.clear();
+				formulaStrokePointsDouble.clear();
 				mouseDown = true;
 				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+				formulaStrokePointsDouble.add(new DoublePoint(eventX, eventY));
 				//paintFormule(true);
 				return;
 			}
@@ -3420,8 +3438,10 @@ public class KladjeGWTVeld
 			
 			proActiveStrokeContainer = null;
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			mouseDown = true;
 			formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			formulaStrokePointsDouble.add(new DoublePoint(eventX, eventY));
 			paintFormule(true);
 		}
 		else if ((mouseMode == lijnTekenen) ||
@@ -3533,6 +3553,7 @@ public class KladjeGWTVeld
 	{
 		if(currentStrokeContainer != null) {
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			//draggDoublePoints.clear();
 			int dx = eventX - startX;
 			int dy = eventY - startY;
@@ -3545,6 +3566,7 @@ public class KladjeGWTVeld
 		}
 		else if(currentHiddenStrokeContainer != null) {
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			//draggDoublePoints.clear();
 			int dx = eventX - startX;
 			int dy = eventY - startY;
@@ -3613,7 +3635,28 @@ public class KladjeGWTVeld
 			}
 			if(formulaStrokePoints.size()>0) {
 				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
-				paintFormule(true);
+				
+//				if(formulaStrokePoints.size()==1) {
+//					//fix voor Edge: afstand van 1e en 2e punt vaak heel groot ivm delay touch-move
+//					double ddx = formulaStrokePoints.get(1).getX() - formulaStrokePoints.get(0).getX();
+//					double ddy = formulaStrokePoints.get(1).getY() - formulaStrokePoints.get(0).getY();
+//					double dd = ddx*ddx+ddy*ddy;
+//					if(dd>90) {
+//						for(int i=9 ; i>0 ; i--)
+//							fp.add(1, new fi.writemathgwt.client.engine.Point((int)(fp.get(0).x+0.1*i*ddx) , (int)(fp.get(0).y+0.1*i*ddy)));
+//						return;
+//					}
+//					//fix end
+//				}
+				
+				DoublePoint lastPoint = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-1);
+				double xD = 0.5*(lastPoint.x + eventX);
+				double yD = 0.5*(lastPoint.y + eventY);
+				
+				double dx = xD-lastPoint.x;
+				double dy = yD-lastPoint.y;
+				formulaStrokePointsDouble.add(new DoublePoint(xD,yD));
+				paintLastSegment();
 			}
 			//paintFormule(true);
 		}
@@ -3963,6 +4006,7 @@ public class KladjeGWTVeld
 			lastStroke = new Stroke(formulaStrokePoints);
 			currentStrokeContainer.addStroke(lastStroke);
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			processIVM();
 			
 		}
@@ -3976,7 +4020,14 @@ public class KladjeGWTVeld
 					if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) 
 					{
 						cleanFormulePoints(formulaStrokePoints);
-						currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
+						double[] x = new double [formulaStrokePointsDouble.size()];
+						double[] y = new double [formulaStrokePointsDouble.size()];
+						for(int i=0 ; i<x.length ; i++) {
+							x[i] = formulaStrokePointsDouble.get(i).x;
+							y[i] = formulaStrokePointsDouble.get(i).y;
+						}
+						currentHiddenStrokeContainer.addStroke(new Stroke(x,y));	
+						//currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
 						currentHiddenStrokeContainer.setCorrect(false);
 						currentHiddenStrokeContainer.setFalse(false);
 						currentHiddenStrokeContainer.setHalf(false);
@@ -3988,6 +4039,7 @@ public class KladjeGWTVeld
 				if(currentHiddenStrokeContainer.isNotRelevant() ) //currentStrokeContainer.getStrokeCount()==1 &&
 				{	currentHiddenStrokeContainer.wis();
 					formulaStrokePoints.clear();
+					formulaStrokePointsDouble.clear();
 					eigenaar.sendEquation(activeHSCNumber);
 					//closeCurrentHiddenContainer();
 					//
@@ -3998,6 +4050,7 @@ public class KladjeGWTVeld
 				
 				
 				formulaStrokePoints.clear();
+				formulaStrokePointsDouble.clear();
 				paintFormule(true);
 				if(currentHiddenStrokeContainer==null)
 					eigenaar.sendDrawing();
@@ -4046,8 +4099,16 @@ public class KladjeGWTVeld
 //				DoubleRectangle r = lastStroke.getParsePointsbox();
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
+				
 				cleanFormulePoints(formulaStrokePoints);
-				Stroke stroke = new Stroke(formulaStrokePoints);
+				double[] x = new double [formulaStrokePointsDouble.size()];
+				double[] y = new double [formulaStrokePointsDouble.size()];
+				for(int i=0 ; i<x.length ; i++) {
+					x[i] = formulaStrokePointsDouble.get(i).x;
+					y[i] = formulaStrokePointsDouble.get(i).y;
+				}
+				Stroke stroke = new Stroke(x,y);
+				//Stroke stroke = new Stroke(formulaStrokePoints);
 				
 				if(stroke.getParsePointsbox().height>200 || currentStrokeContainer.getStrokeCount()==0 && stroke.getParsePointsbox().width>200)
 					currentStrokeContainer.setRecognizeOff(true);
@@ -4063,6 +4124,7 @@ public class KladjeGWTVeld
 				currentStrokeContainer = null;
 				eigenaar.fireStrokeCodes();
 				formulaStrokePoints.clear();
+				formulaStrokePointsDouble.clear();
 				paint();
 				paintFormule(true);
 				return;
@@ -4072,6 +4134,7 @@ public class KladjeGWTVeld
 				currentStrokeContainer.setErasing(false, eventX, eventY);
 			
 			formulaStrokePoints.clear();
+			formulaStrokePointsDouble.clear();
 			paintFormule(true);
 			if(currentStrokeContainer==null)
 				eigenaar.sendDrawing();
@@ -4295,8 +4358,8 @@ public class KladjeGWTVeld
 		
 		public void onTouchStart(TouchStartEvent e)
 		{
-			e.preventDefault();
 			e.stopPropagation();
+			e.preventDefault();
 			
 			if (e.getTouches().length() == 0)
 				return;
@@ -4330,9 +4393,8 @@ public class KladjeGWTVeld
 		}
 		public void onTouchMove(TouchMoveEvent e)
 		{
-			
-			e.preventDefault();
 			e.stopPropagation();
+			e.preventDefault();
 			
 			if (e.getTouches().length() ==1)
 			{
