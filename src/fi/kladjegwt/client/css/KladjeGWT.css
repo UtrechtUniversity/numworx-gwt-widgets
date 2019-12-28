@@ -10,7 +10,7 @@
 }
 
 .bottom {
-	background-color: rgb(220,220,220);	
+	background-color: rgb(220,220,220); 	
 }
 
 .top {
@@ -19,7 +19,9 @@
 
 .canvas {
 /**	background-color: white; */	
-	touch-action: none;
+touch-action: none; 
+/* 	pointer-events: inherit; */
+	
 }
 
 .upimage {

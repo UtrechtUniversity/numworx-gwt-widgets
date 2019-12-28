@@ -22,16 +22,27 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Image;
+import com.vaadin.pointerevents.client.PointerCancelEvent;
+import com.vaadin.pointerevents.client.PointerCancelHandler;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerEvent;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 
 import fi.writemathgwt.client.engine.DoubleRectangle;
 import fi.writemathgwt.client.engine.Point;
@@ -457,6 +468,8 @@ public class KladjeGWTVeld
 	
 	protected boolean calculator;
 	
+	private boolean hasPointerEventSupport;
+	
 	
 	/**
 	 * constructor, creeer het Canvas en voeg Mouse en Touch Handlers toe
@@ -482,6 +495,11 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas.addTouchStartHandler(touchHandler);
 		kladjeHWTCanvas.addTouchMoveHandler(touchHandler);
 		kladjeHWTCanvas.addTouchEndHandler(touchHandler);
+		
+		KladjePointerHandler pointerHandler = new KladjePointerHandler();
+		(kladjeHWTCanvas.asWidget()).addDomHandler((PointerMoveHandler)pointerHandler, PointerMoveEvent.getType()); 
+		(kladjeHWTCanvas.asWidget()).addDomHandler((PointerUpHandler)pointerHandler, PointerUpEvent.getType()); 
+		(kladjeHWTCanvas.asWidget()).addDomHandler((PointerDownHandler)pointerHandler, PointerDownEvent.getType()); 
 		
 		ImageResource binResource = eigenaar.kladjeGWTClientBundle.binResource();
 		binImage = new Image(binResource);
@@ -1187,16 +1205,23 @@ public class KladjeGWTVeld
 		g.stroke();
 	}
 	
+	private DoublePoint lastPoint;
 	public void paintLastSegment() {
 		gIm.setStrokeStyle(CssColor.make(80, 80, 80));
 		gIm.setLineCap(LineCap.ROUND);
+		int size = formulaStrokePointsDouble.size();
+		if(size==2)
+			lastPoint = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-2);
+		DoublePoint p = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-1);
+		//if(lastPoint.distance2(p)>2) 
+		{
+			gIm.beginPath();
+			gIm.moveTo(lastPoint.x, lastPoint.y);
+			gIm.lineTo(p.x, p.y);
+			gIm.stroke();
+			lastPoint = p;
+		}
 		
-		DoublePoint p1 = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-2);
-		DoublePoint p2 = formulaStrokePointsDouble.get(formulaStrokePointsDouble.size()-1);
-		gIm.beginPath();
-		gIm.moveTo(p1.x, p1.y);
-		gIm.lineTo(p2.x, p2.y);
-		gIm.stroke();
 	}
 	public void paintFormule(boolean refresh) {
 		if(refresh) {
@@ -3633,8 +3658,8 @@ public class KladjeGWTVeld
 				startY = eventY;
 				paintFormule(true);
 			}
-			if(formulaStrokePoints.size()>0) {
-				formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
+			else if(formulaStrokePoints.size()>0) {
+				//formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
 				
 //				if(formulaStrokePoints.size()==1) {
 //					//fix voor Edge: afstand van 1e en 2e punt vaak heel groot ivm delay touch-move
@@ -4019,7 +4044,7 @@ public class KladjeGWTVeld
 					Stroke strokeNew = new Stroke(formulaStrokePoints);
 					if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) 
 					{
-						cleanFormulePoints(formulaStrokePoints);
+						//cleanFormulePoints(formulaStrokePoints);
 						double[] x = new double [formulaStrokePointsDouble.size()];
 						double[] y = new double [formulaStrokePointsDouble.size()];
 						for(int i=0 ; i<x.length ; i++) {
@@ -4100,7 +4125,7 @@ public class KladjeGWTVeld
 //				lastStroke.translate(-r.x, -r.y);
 //				lastStroke.scale(0, 0, 10);
 				
-				cleanFormulePoints(formulaStrokePoints);
+				//cleanFormulePoints(formulaStrokePoints);
 				double[] x = new double [formulaStrokePointsDouble.size()];
 				double[] y = new double [formulaStrokePointsDouble.size()];
 				for(int i=0 ; i<x.length ; i++) {
@@ -4289,6 +4314,9 @@ public class KladjeGWTVeld
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 			e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
@@ -4308,6 +4336,9 @@ public class KladjeGWTVeld
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
@@ -4328,6 +4359,9 @@ public class KladjeGWTVeld
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 			int eventX = e.getX();
 			int eventY = e.getY();
 			
@@ -4358,6 +4392,9 @@ public class KladjeGWTVeld
 		
 		public void onTouchStart(TouchStartEvent e)
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 			e.stopPropagation();
 			e.preventDefault();
 			
@@ -4393,6 +4430,9 @@ public class KladjeGWTVeld
 		}
 		public void onTouchMove(TouchMoveEvent e)
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 			e.stopPropagation();
 			e.preventDefault();
 			
@@ -4426,6 +4466,9 @@ public class KladjeGWTVeld
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			if(hasPointerEventSupport)
+				return;
+			
 //			Touch touch = e.getTouches().get(0);
 //			
 //		    int eventX = touch.getPageX() - kladjeHWTCanvas.getAbsoluteLeft();
@@ -4435,6 +4478,94 @@ public class KladjeGWTVeld
 			mouseUpTouchEndAction(lastTouchX, lastTouchY);
 		}
 
+	}
+	class KladjePointerHandler implements PointerUpHandler, PointerDownHandler, PointerMoveHandler, PointerCancelHandler
+	{
+		int lastTouchX = 0;
+		int lastTouchY = 0;
+		
+		int touchCount = 0;
+		
+		ArrayList<PointerEvent> events;
+
+		@Override
+		public void onPointerCancel(PointerCancelEvent event) {
+			touchCount--;
+			
+			
+		}
+
+		@Override
+		public void onPointerMove(PointerMoveEvent e) {
+			e.stopPropagation();
+			e.preventDefault();
+			
+			
+			if(touchCount==1) {	
+			    boolean shiftPressed = false;
+			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
+				int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());	
+				lastTouchX = eventX;
+				lastTouchY = eventY;
+			    
+				mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
+			}
+			if(touchCount==2) {	
+			    boolean shiftPressed = false;
+			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
+				int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());	
+				
+			    
+				int d=(lastTouchX-eventX)*(lastTouchX-eventX)+(lastTouchY-eventY)*(lastTouchY-eventY);
+				if(d<2000) {
+					mouseMoveTouch2MoveAction(eventX, eventY);
+					lastTouchX = eventX;
+					lastTouchY = eventY;
+				}
+			}
+			
+			e.preventDefault();
+			e.stopPropagation();
+			
+		}
+
+		@Override
+		public void onPointerDown(PointerDownEvent e) {
+			e.stopPropagation();
+			e.preventDefault();
+			
+			touchCount++;
+			
+			hasPointerEventSupport = true;
+			
+			int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
+			int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());
+			
+				
+			if (!moving ) {
+				writing = true;
+				mouseDownTouchStartAction(eventX, eventY);
+				lastTouchX = eventX;
+				lastTouchY = eventY;
+			}
+			
+			e.preventDefault();
+			e.stopPropagation();
+		}
+
+		@Override
+		public void onPointerUp(PointerUpEvent e) {
+			e.stopPropagation();
+			e.preventDefault();
+			
+			touchCount--;
+			
+			moving = false;
+			mouseUpTouchEndAction(lastTouchX, lastTouchY);
+			e.preventDefault();
+			e.stopPropagation();
+			
+		}
 	}
 
 }

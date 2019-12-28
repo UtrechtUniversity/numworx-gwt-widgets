@@ -23,5 +23,10 @@ public class DoublePoint
 		this.x = x; this.y = y;
 	}
 	
+	public double distance2(DoublePoint p)
+	{
+		return (x-p.x)*(x-p.x)+(y-p.y)*(y-p.y);
+	}
+	
 	
 }
