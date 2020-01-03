@@ -23,6 +23,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -782,6 +784,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	public void init(int width, int height, Map<String, Object> map, //launchState,
 			Map<String, Number> values) 
 	{
+		Element body = Document.get().getBody();
+		body.setAttribute("oncontextmenu", "return false;");
 		
 	    logger.severe("KladjeGWT initializing");
 		this.breedte = width;

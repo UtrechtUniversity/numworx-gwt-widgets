@@ -33,6 +33,7 @@ import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Image;
 import com.vaadin.pointerevents.client.PointerCancelEvent;
 import com.vaadin.pointerevents.client.PointerCancelHandler;
@@ -587,11 +588,14 @@ public class KladjeGWTVeld
 	{
 		for(int k=0 ; k<kStrokeContainers.size() ; k++)
 		{	
-//			if(kStrokeContainers.get(k).getRecognizeOff()) {
-//				if()
-//			}
-//			else 
-				if(kStrokeContainers.get(k).contains(x,y,5) && !kStrokeContainers.get(k).isActive()) {
+				if(kStrokeContainers.get(k).contains(x,y,0) && !kStrokeContainers.get(k).isActive()) {
+					activeHSCNumber = 0;
+					return kStrokeContainers.get(k);
+			}
+		}
+		for(int k=0 ; k<kStrokeContainers.size() ; k++)
+		{	
+				if(kStrokeContainers.get(k).contains(x,y,30) && !kStrokeContainers.get(k).isActive()) {
 					activeHSCNumber = 0;
 					return kStrokeContainers.get(k);
 			}
@@ -1207,6 +1211,7 @@ public class KladjeGWTVeld
 	
 	private DoublePoint lastPoint;
 	public void paintLastSegment() {
+		gIm.setLineWidth(2.0d);
 		gIm.setStrokeStyle(CssColor.make(80, 80, 80));
 		gIm.setLineCap(LineCap.ROUND);
 		int size = formulaStrokePointsDouble.size();
@@ -3383,6 +3388,25 @@ public class KladjeGWTVeld
 				return;
 			}
 			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getUndoButtonArea().contains(eventX, eventY)) {
+				currentStrokeContainer.eraseLastStroke();
+				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getFormulaArea().contains(eventX, eventY)) {
+				currentStrokeContainer.setFormuleModus(true);
+				proActiveStrokeContainer = null;
+				if(activeHSCNumber>0)
+					eigenaar.sendEquation(activeHSCNumber);
+				closeCurrentContainer();
+				addToHistory();
+				paint();
+				eigenaar.fireStrokeCodes();
+				return;
+				
+			}
+			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getRecognizeButtonArea().contains(eventX, eventY) 
 					&& !(currentStrokeContainer.isCorrect() || currentStrokeContainer.isFalse() || currentStrokeContainer.isHalf())) {
 				currentStrokeContainer.setRecognizeOff(false);
@@ -3445,11 +3469,13 @@ public class KladjeGWTVeld
 			}
 			if(currentHiddenStrokeContainer==null)
 				proActiveStrokeContainer = findInactiveStrokeContainer(eventX, eventY);
+				
 			
 			if(currentStrokeContainer==null && proActiveStrokeContainer!=null) {
 					
 				proActiveX = proActiveStrokeContainer.getBox().x;
 				proActiveY = proActiveStrokeContainer.getBox().y;
+				proActiveStrokeContainer.setProActive(true);
 				paint();
 				paintFormule(true);
 				return;
@@ -4039,11 +4065,13 @@ public class KladjeGWTVeld
 		{	
 			if(currentHiddenStrokeContainer!=null)
 			{
-				if(formulaStrokePoints.size()>0 ) 
+				if(formulaStrokePointsDouble.size()>0 ) 
 				{
-					Stroke strokeNew = new Stroke(formulaStrokePoints);
-					if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) 
+					//Stroke strokeNew = new Stroke(formulaStrokePoints);
+					//if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) 
 					{
+						
+						
 						//cleanFormulePoints(formulaStrokePoints);
 						double[] x = new double [formulaStrokePointsDouble.size()];
 						double[] y = new double [formulaStrokePointsDouble.size()];
@@ -4051,13 +4079,16 @@ public class KladjeGWTVeld
 							x[i] = formulaStrokePointsDouble.get(i).x;
 							y[i] = formulaStrokePointsDouble.get(i).y;
 						}
-						currentHiddenStrokeContainer.addStroke(new Stroke(x,y));	
-						//currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
-						currentHiddenStrokeContainer.setCorrect(false);
-						currentHiddenStrokeContainer.setFalse(false);
-						currentHiddenStrokeContainer.setHalf(false);
-						if(currentHiddenStrokeContainer.getStrokeCount()==1)
+						Stroke strokeNew = new Stroke(x,y);
+						if(strokeNew.getParsePointsbox().getDiagonal()>15 || currentHiddenStrokeContainer.getStrokeCount()>0) {
+							currentHiddenStrokeContainer.addStroke(strokeNew);	
+							//currentHiddenStrokeContainer.addStroke(new Stroke(formulaStrokePoints));
+							currentHiddenStrokeContainer.setCorrect(false);
+							currentHiddenStrokeContainer.setFalse(false);
+							currentHiddenStrokeContainer.setHalf(false);
+							if(currentHiddenStrokeContainer.getStrokeCount()==1)
 							paint();
+						}
 					}
 				}
 				
@@ -4076,6 +4107,7 @@ public class KladjeGWTVeld
 				
 				formulaStrokePoints.clear();
 				formulaStrokePointsDouble.clear();
+				
 				paintFormule(true);
 				if(currentHiddenStrokeContainer==null)
 					eigenaar.sendDrawing();
@@ -4109,6 +4141,7 @@ public class KladjeGWTVeld
 					currentStrokeContainer.setNr(kStrokeContainers.indexOf(currentStrokeContainer));
 					
 				}
+				proActiveStrokeContainer.setProActive(false);
 				proActiveStrokeContainer=null;
 				addToHistory();
 				paint();
@@ -4137,12 +4170,15 @@ public class KladjeGWTVeld
 				
 				if(stroke.getParsePointsbox().height>200 || currentStrokeContainer.getStrokeCount()==0 && stroke.getParsePointsbox().width>200)
 					currentStrokeContainer.setRecognizeOff(true);
+				
 				currentStrokeContainer.addStroke(stroke);
 				currentStrokeContainer.setCorrect(false);
 				currentStrokeContainer.setFalse(false);
 				currentStrokeContainer.setHalf(false);
 				if(currentStrokeContainer.getStrokeCount()==1)
 					paint();
+				//return;
+				//
 			}
 			if(currentStrokeContainer!=null && currentStrokeContainer.isNotRelevant() && !currentStrokeContainer.getRecognizeOff())
 			{	kStrokeContainers.remove(currentStrokeContainer);
@@ -4392,11 +4428,11 @@ public class KladjeGWTVeld
 		
 		public void onTouchStart(TouchStartEvent e)
 		{
-			if(hasPointerEventSupport)
-				return;
-			
 			e.stopPropagation();
 			e.preventDefault();
+			
+			if(hasPointerEventSupport)
+				return;
 			
 			if (e.getTouches().length() == 0)
 				return;
@@ -4430,11 +4466,12 @@ public class KladjeGWTVeld
 		}
 		public void onTouchMove(TouchMoveEvent e)
 		{
+			e.stopPropagation();
+			e.preventDefault();
+			
 			if(hasPointerEventSupport)
 				return;
 			
-			e.stopPropagation();
-			e.preventDefault();
 			
 			if (e.getTouches().length() ==1)
 			{
@@ -4466,6 +4503,9 @@ public class KladjeGWTVeld
 		}
 		public void onTouchEnd(TouchEndEvent e)
 		{
+			e.preventDefault();
+			e.stopPropagation();
+			
 			if(hasPointerEventSupport)
 				return;
 			
@@ -4479,7 +4519,7 @@ public class KladjeGWTVeld
 		}
 
 	}
-	class KladjePointerHandler implements PointerUpHandler, PointerDownHandler, PointerMoveHandler, PointerCancelHandler
+	class KladjePointerHandler implements PointerUpHandler, PointerDownHandler, PointerMoveHandler, PointerCancelHandler, com.google.gwt.event.shared.EventHandler
 	{
 		int lastTouchX = 0;
 		int lastTouchY = 0;
@@ -4489,7 +4529,10 @@ public class KladjeGWTVeld
 		ArrayList<PointerEvent> events;
 
 		@Override
-		public void onPointerCancel(PointerCancelEvent event) {
+		public void onPointerCancel(PointerCancelEvent e) {
+			e.stopPropagation();
+			e.preventDefault();
+			
 			touchCount--;
 			
 			
@@ -4499,8 +4542,6 @@ public class KladjeGWTVeld
 		public void onPointerMove(PointerMoveEvent e) {
 			e.stopPropagation();
 			e.preventDefault();
-			
-			
 			if(touchCount==1) {	
 			    boolean shiftPressed = false;
 			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
@@ -4533,7 +4574,6 @@ public class KladjeGWTVeld
 		public void onPointerDown(PointerDownEvent e) {
 			e.stopPropagation();
 			e.preventDefault();
-			
 			touchCount++;
 			
 			hasPointerEventSupport = true;
@@ -4566,6 +4606,9 @@ public class KladjeGWTVeld
 			e.stopPropagation();
 			
 		}
+		
+
+		
 	}
 
 }
