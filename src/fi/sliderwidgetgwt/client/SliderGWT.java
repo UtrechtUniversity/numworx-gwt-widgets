@@ -17,12 +17,23 @@ import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.vaadin.pointerevents.client.PointerCancelEvent;
+import com.vaadin.pointerevents.client.PointerCancelHandler;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerEvent;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
+
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 public class SliderGWT extends FlowPanel implements	
 	MouseDownHandler, MouseMoveHandler, MouseUpHandler, 
-	TouchStartHandler, TouchMoveHandler, TouchEndHandler
+	TouchStartHandler, TouchMoveHandler, TouchEndHandler,
+	PointerDownHandler, PointerMoveHandler, PointerUpHandler
 											//MouseListener,
 											// MouseMotionListener
 {
@@ -47,12 +58,14 @@ public class SliderGWT extends FlowPanel implements
 	Context2d context;
 	
 	SliderWidgetGWT sliderWidgetGWT;
+	private boolean hasPointerEventSupport = false;
 
 	public SliderGWT(int aantalPix, int beginst)
 	{
 		super();
 
 		canvas = Canvas.createIfSupported();
+		canvas.getElement().getStyle().setProperty("touchAction", "none");
 		context = canvas.getContext2d();
 
 		this.add(canvas);
@@ -125,22 +138,29 @@ public class SliderGWT extends FlowPanel implements
 	public void paintComponent()
 	{
 		// clear all
-		context.setFillStyle(CssColor.make(255, 255, 255)); // white
-		context.fillRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+		context.clearRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
+		//context.setFillStyle(CssColor.make(255, 255, 255)); // white
+		//context.fillRect(0, 0, canvas.getCoordinateSpaceWidth(), canvas.getCoordinateSpaceHeight());
 
-		context.setFillStyle(CssColor.make(0, 0, 0));//black
-		context.beginPath();
-		context.moveTo(zijkantMarge, bovenMarge);
-		context.lineTo(lengte + zijkantMarge, bovenMarge);
-		context.stroke();
+		//teken slider
+				context.setFillStyle(CssColor.make(0, 0, 0));//black
+				context.beginPath();
+				context.moveTo(zijkantMarge, bovenMarge);
+				context.lineTo(lengte + zijkantMarge, bovenMarge);
+				context.stroke();
 		
-		// teken rondje
+		// vul rondje
 		context.setFillStyle(CssColor.make(255, 0, 0)); // red
 		context.setStrokeStyle(CssColor.make(0, 0, 0)); // black
 		context.beginPath();
 		context.arc(zijkantMarge + stand, bovenMarge, DOT_RADIUS, 0, Math.PI * 2.0, true);
 		context.closePath();
 		context.fill();
+		
+		//teken randje
+		context.setFillStyle(CssColor.make(0, 0, 0));//black
+		context.arc(zijkantMarge + stand, bovenMarge, DOT_RADIUS, 0, Math.PI * 2.0, true);
+		context.stroke();
 		
 		if (naam.length() > 0)
 		{
@@ -170,15 +190,17 @@ public class SliderGWT extends FlowPanel implements
 			
 			if (Math.round(stapGrootte) == stapGrootte)
 			{
-				int intWaarde = (int) Math.round(waarde);
+				String teken = waarde<-0.0001 ? "\u2013" : ""; //een echt minteken is duidelijker
+				int intWaarde = Math.abs((int) Math.round(waarde));
 				String intString = replaceWithLocalDecimalSeparator(String.valueOf(intWaarde));
-				context.fillText(naam + "=" + intString, stand + zijkantMarge - metrics.getWidth(), bovenMarge - 7);
+				context.fillText(naam + " = " + teken + intString, stand + zijkantMarge - metrics.getWidth(), bovenMarge - 9);
 			}
 			else
 			{
-				waarde = (double) Math.round(10 * waarde) / 10;
+				String teken = waarde<-0.0001 ? "\u2013" : ""; //een echt minteken is duidelijker
+				waarde = Math.abs((double) Math.round(10 * waarde) / 10);
 				String waardeString = replaceWithLocalDecimalSeparator(String.valueOf(waarde));
-				context.fillText(naam + "=" + waardeString, stand + zijkantMarge - metrics.getWidth(), bovenMarge - 7);
+				context.fillText(naam + " = " + teken + waardeString, stand + zijkantMarge - metrics.getWidth(), bovenMarge - 9);
 			}
 		}
 	}
@@ -230,23 +252,39 @@ public class SliderGWT extends FlowPanel implements
 		canvas.addTouchStartHandler(this);
 		canvas.addTouchMoveHandler(this);
 		canvas.addTouchEndHandler(this);
+		
+		canvas.addDomHandler((PointerMoveHandler)this, PointerMoveEvent.getType()); 
+		canvas.addDomHandler((PointerUpHandler)this, PointerUpEvent.getType()); 
+		canvas.addDomHandler((PointerDownHandler)this, PointerDownEvent.getType()); 
 	}
 
 	@Override
 	public void onMouseUp(MouseUpEvent event)
 	{
+		event.preventDefault();
+		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		mouseUpTouchEndAction();
 	}
 
 	@Override
 	public void onMouseMove(MouseMoveEvent event)
 	{
+		event.preventDefault();
+		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		mouseMoveTouchMoveAction(event.getX());
 	}
 
 	@Override
 	public void onMouseDown(MouseDownEvent event)
 	{
+		event.preventDefault();
+		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		mouseDownTouchStartAction(event.getX(), event.getY());
 	}
 	
@@ -348,6 +386,8 @@ public class SliderGWT extends FlowPanel implements
 	{
 		event.preventDefault();
 		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		
 		Touch touch = event.getTouches().get(0);
 		int eventX = touch.getPageX() - canvas.getAbsoluteLeft();
@@ -359,6 +399,10 @@ public class SliderGWT extends FlowPanel implements
 	@Override
 	public void onTouchEnd(TouchEndEvent event)
 	{
+		event.preventDefault();
+		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		mouseUpTouchEndAction();
 	}
 
@@ -367,11 +411,43 @@ public class SliderGWT extends FlowPanel implements
 	{
 		event.preventDefault();
 		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		
 		Touch touch = event.getTouches().get(0);
 		int eventX = touch.getPageX() - canvas.getAbsoluteLeft();
 
 		mouseMoveTouchMoveAction(eventX);
+	}
+
+	@Override
+	public void onPointerUp(PointerUpEvent event) {
+		mouseUpTouchEndAction();
+		
+	}
+
+	@Override
+	public void onPointerMove(PointerMoveEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		int eventX = event.getRelativeX(canvas.getElement());
+
+		mouseMoveTouchMoveAction(eventX);
+		
+	}
+
+	@Override
+	public void onPointerDown(PointerDownEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		hasPointerEventSupport = true;
+		
+		int eventX = event.getRelativeX(canvas.getElement());
+		int eventY= event.getRelativeY(canvas.getElement());
+
+		mouseDownTouchStartAction(eventX, eventY);
 	}
 
 }
