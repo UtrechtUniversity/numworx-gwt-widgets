@@ -50,14 +50,10 @@
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
   	</dependency>
-  	<dependency>
-  		<groupId>com.googlecode.mgwt</groupId>
-  		<artifactId>MGWT</artifactId>
-  	</dependency>
 	<dependency>
-		<groupId>nl.uu.fi.dwo.mobile</groupId>
-		<artifactId>formule</artifactId>
-		<version>0.0.4</version>
+	    <groupId>com.vaadin.addon</groupId>
+	    <artifactId>pointer-events</artifactId>
+	    <version>1.0</version>
 	</dependency>
   </dependencies>
   <parent>

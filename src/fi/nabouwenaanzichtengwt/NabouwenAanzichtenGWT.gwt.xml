@@ -8,7 +8,8 @@
   <!-- any one of the following lines.                            -->
   <inherits name='com.google.gwt.user.theme.clean.Clean'/>
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
-  <inherits name='nl.uu.fi.dwo.formule.Formule' />
+  <inherits name='com.vaadin.pointerevents.PointerEvents' />
+<!--   <inherits name='nl.uu.fi.dwo.formule.Formule' /> -->
   <!-- <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
