@@ -4,6 +4,12 @@ package fi.nabouwenaanzichtengwt.client;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 
 /**
  * klasse die het kubusbouwsel op een Canvas tekent; <br>
@@ -247,9 +253,14 @@ public class Viewer3d
 		canvas.addMouseDownHandler(mb);
 		canvas.addMouseUpHandler(mb);
 		canvas.addMouseMoveHandler(mb);
+		//canvas.addMouseOverHandler(mb);
 		canvas.addTouchStartHandler(mb);
 		canvas.addTouchEndHandler(mb);
 		canvas.addTouchMoveHandler(mb);
+		(canvas.asWidget()).addDomHandler((PointerMoveHandler)mb, PointerMoveEvent.getType()); 
+		(canvas.asWidget()).addDomHandler((PointerUpHandler)mb, PointerUpEvent.getType()); 
+		(canvas.asWidget()).addDomHandler((PointerDownHandler)mb, PointerDownEvent.getType()); 
+		
 		
 		achtergrondkleur = CssColor.make("white");
 		leeg = false;
