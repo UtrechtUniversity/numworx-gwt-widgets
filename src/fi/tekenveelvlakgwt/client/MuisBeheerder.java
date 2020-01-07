@@ -13,6 +13,15 @@ import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.vaadin.pointerevents.client.PointerCancelEvent;
+import com.vaadin.pointerevents.client.PointerCancelHandler;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerEvent;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 
 /**
  * klasse om Mouse en Touch events af te handelen; een instantie van deze klasse wordt
@@ -22,7 +31,8 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
  */
 
 public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMoveHandler,
-									  TouchStartHandler, TouchMoveHandler, TouchEndHandler
+									  TouchStartHandler, TouchMoveHandler, TouchEndHandler,
+									  PointerDownHandler, PointerMoveHandler, PointerUpHandler, PointerCancelHandler
 {
 	/**
 	 * x-coordinaat van het laatste MouseDown/TouchStart Event 
@@ -61,6 +71,7 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	 * mouseDown Event?
 	 */
 	boolean mouseDown;
+	private boolean hasPointerEventSupport;
 
 	/**
 	 * constructor voor MuisBeheerder in TekenApplet3D 
@@ -96,6 +107,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{	
 		e.preventDefault();
 		e.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		mouseDown = true;
 		eerstex = e.getX();
 		eerstey = e.getY();
@@ -115,6 +128,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{	
 		e.preventDefault();
 		e.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		if (!mouseDown)
 			return;
 		int x = e.getX();
@@ -138,6 +153,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{	
 		e.preventDefault();
 		e.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 
 		mouseDown = false;
 		if (eigenaar != null)
@@ -157,6 +174,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{
 		event.preventDefault();
 		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		if (event.getTouches().length() > 0) 
 		{
 			Touch touch = event.getTouches().get(0);
@@ -196,6 +215,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{
 		event.preventDefault();
 		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 		if (event.getTouches().length() > 0) 
 		{
 			Touch touch = event.getTouches().get(0);
@@ -232,6 +253,8 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	{
 		event.preventDefault();
 		event.stopPropagation();
+		if(hasPointerEventSupport)
+			return;
 
 		if (eigenaar != null)
 			eigenaar.muisLosActie();
@@ -285,6 +308,98 @@ public class MuisBeheerder implements MouseDownHandler, MouseUpHandler, MouseMov
 	 */
 	public int geefY()
 	{	return laatstey;
+	}
+	@Override
+	public void onPointerCancel(PointerCancelEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+	}
+	@Override
+	public void onPointerUp(PointerUpEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		if (eigenaar != null)
+			eigenaar.muisLosActie();
+
+		if (eigenaar1 != null)
+			eigenaar1.muisLosActie();
+		
+		mouseDown = false;
+
+		event.preventDefault();
+		event.stopPropagation();
+		
+	}
+	@Override
+	public void onPointerMove(PointerMoveEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+		
+		if (!mouseDown)
+			return;
+		
+		int x = 0;
+		int y = 0;
+		if (eigenaar != null)
+		{	
+			x = event.getRelativeX(eigenaar.tb.canvas.getElement());
+			y = event.getRelativeY(eigenaar.tb.canvas.getElement());
+		}
+		else if (eigenaar1 != null)
+		{
+			x = event.getRelativeX(eigenaar1.canvas.getElement());
+			y = event.getRelativeY(eigenaar1.canvas.getElement());
+
+		}
+		dx = x - laatstex;
+		dy = laatstey -y;
+		if (eigenaar != null)
+			eigenaar.muisSleepActie();
+
+		if (eigenaar1 != null)
+			eigenaar1.muisSleepActie();
+
+		laatstex = x;
+		laatstey = y;
+		
+		event.preventDefault();
+		event.stopPropagation();
+		
+	}
+	@Override
+	public void onPointerDown(PointerDownEvent event) {
+		event.preventDefault();
+		event.stopPropagation();
+		mouseDown = true;
+		hasPointerEventSupport = true;
+			
+		if (eigenaar != null)
+		{	
+			eerstex = event.getRelativeX(eigenaar.tb.canvas.getElement());
+			eerstey = event.getRelativeY(eigenaar.tb.canvas.getElement());
+			laatstex = event.getRelativeX(eigenaar.tb.canvas.getElement());
+			laatstey = event.getRelativeY(eigenaar.tb.canvas.getElement());
+		}
+			else if (eigenaar1 != null)
+			{	
+				eerstex = event.getRelativeX(eigenaar1.canvas.getElement());
+				eerstey = event.getRelativeY(eigenaar1.canvas.getElement());
+				laatstex = event.getRelativeX(eigenaar1.canvas.getElement());
+				laatstey = event.getRelativeY(eigenaar1.canvas.getElement());
+				
+			} 
+			if (eigenaar != null)
+				eigenaar.muisDrukActie();
+
+			if (eigenaar1 != null)
+				eigenaar1.muisDrukActie();
+
+		
+		event.preventDefault();
+		event.stopPropagation();
+		
 	}
 
 }	

@@ -14,7 +14,8 @@
 }
 
 .canvas {
-	background-color: transparent !important;	
+	background-color: transparent !important;
+/* 	touch-action: none; */
 }
 
 .radiobutton {

@@ -14,6 +14,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PushButton;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 
 /**
  * klasse die een (of meer) 3d-veelvlakken op een Canvas tekent; <br>
@@ -276,6 +282,10 @@ public class Viewer3d extends LayoutPanel
 		canvas.addTouchStartHandler(mb);
 		canvas.addTouchEndHandler(mb);
 		canvas.addTouchMoveHandler(mb);
+		(canvas.asWidget()).addDomHandler((PointerMoveHandler)mb, PointerMoveEvent.getType()); 
+		(canvas.asWidget()).addDomHandler((PointerUpHandler)mb, PointerUpEvent.getType()); 
+		(canvas.asWidget()).addDomHandler((PointerDownHandler)mb, PointerDownEvent.getType()); 
+		
 
 		leeg = false;
 		schaduw = true;

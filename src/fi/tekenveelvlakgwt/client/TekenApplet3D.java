@@ -4,6 +4,12 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.Style;
 
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 
 /**
  * superklasse die het tekenen afhandelt: deze bevat een instantie van klasse TekenBlad3D, die 
@@ -56,6 +62,10 @@ public class TekenApplet3D extends LayoutPanel
 		tb.canvas.addTouchStartHandler(mb);
 		tb.canvas.addTouchEndHandler(mb);
 		tb.canvas.addTouchMoveHandler(mb);
+		(tb.canvas.asWidget()).addDomHandler((PointerMoveHandler)mb, PointerMoveEvent.getType()); 
+		(tb.canvas.asWidget()).addDomHandler((PointerUpHandler)mb, PointerUpEvent.getType()); 
+		(tb.canvas.asWidget()).addDomHandler((PointerDownHandler)mb, PointerDownEvent.getType()); 
+		
 		
 	}	
 
