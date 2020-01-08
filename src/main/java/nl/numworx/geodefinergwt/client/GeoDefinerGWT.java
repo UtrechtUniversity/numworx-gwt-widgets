@@ -37,6 +37,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -166,6 +168,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
   @Override
 	public void onModuleLoad() {
+        Element body = Document.get().getBody();
+        body.setAttribute("oncontextmenu", "return false;");
 		
 		root = uiBinder.createAndBindUi(this);		
 		RootLayoutPanel.get().add(root);

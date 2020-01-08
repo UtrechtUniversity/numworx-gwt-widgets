@@ -24,6 +24,8 @@ import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -189,9 +191,11 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 	@Override
 	public void onModuleLoad() {
-		root = uiBinder.createAndBindUi(this);
-		
-		RootPanel.get().add(FocusOnTouch.wrap(root, true));
+      Element body = Document.get().getBody();
+      body.setAttribute("oncontextmenu", "return false;");
+
+      root = uiBinder.createAndBindUi(this);
+      RootPanel.get().add(FocusOnTouch.wrap(root, true));
 
 		//FormuleParser.zetWoordFormule(true);
 		
