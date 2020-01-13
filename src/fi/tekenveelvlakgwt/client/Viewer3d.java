@@ -262,6 +262,7 @@ public class Viewer3d extends LayoutPanel
 		canvas.setHeight(h + "px");
 		canvas.setCoordinateSpaceWidth(b);
 		canvas.setCoordinateSpaceHeight(h);
+		canvas.addStyleName(tvGWT.tekenVeelvlakGWTCssResource.canvas());
 		breedte = b;
 		hoogte = h;
 
