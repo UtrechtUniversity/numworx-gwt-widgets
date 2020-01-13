@@ -225,6 +225,7 @@ public class Viewer3d
 		canvas.setHeight(h + "px");
 		canvas.setCoordinateSpaceWidth(b);
 		canvas.setCoordinateSpaceHeight(h);
+		canvas.setStyleName(hb.nabouwenAanzichtenCss.canvas());
 		breedte = b;
 		hoogte = h;
 		eigenaar = hb;
