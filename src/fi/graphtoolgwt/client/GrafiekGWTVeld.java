@@ -27,7 +27,7 @@ public class GrafiekGWTVeld {
 	
 //	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
-	/* contstants */
+	/* constants */
 	private final int cMaxPiLinesOnScreen = 8;
 	private final int cExtraAxisMargeX = 2; // Voorzichtig met wijzigen van deze parameters 
 	private final int cExtraAxisMargeY = 3; // (groter maken kan er toe leiden dat bij bestaande oefeningen een x- of y as verdwijnt)
@@ -141,6 +141,7 @@ public class GrafiekGWTVeld {
 	{	
 		this.interactiePanel = interactiePanel;
 		grafiekGWTCanvas = Canvas.createIfSupported();
+		grafiekGWTCanvas.setStyleName(interactiePanel.graphToolCss.canvas());
 		
 		setSize(w, h);
 		

@@ -31,6 +31,7 @@
   <inherits name="fi.beans.lineairealgebra.LineaireAlgebra" />
   <inherits name="fi.statistiekgwt.StatistiekGWT-DWO" />
   <inherits name='com.googlecode.gwt.charts.Charts' />
+  <inherits name='com.vaadin.pointerevents.PointerEvents' />
   
   
 

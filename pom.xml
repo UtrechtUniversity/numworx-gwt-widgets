@@ -123,6 +123,11 @@
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
+		    <groupId>com.vaadin.addon</groupId>
+		    <artifactId>pointer-events</artifactId>
+		    <version>1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
 			<version>${gwtVersion}</version>

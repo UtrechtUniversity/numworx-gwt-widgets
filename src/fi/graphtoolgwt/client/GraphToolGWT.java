@@ -812,7 +812,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 	}
 	
-	public void getImages() 
+	private void getImages() 
 	{
 		graphToolGWTClientBundle = GWT.create(GraphToolGWTClientBundle.class);
 		graphToolCss = graphToolGWTClientBundle.getGraphToolGWTCSS();
