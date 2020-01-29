@@ -59,6 +59,16 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.HandlerRegistration;
+import com.google.web.bindery.event.shared.HandlerRegistrations;
+import com.googlecode.mgwt.dom.client.event.mouse.HandlerRegistrationCollection;
+import com.vaadin.pointerevents.client.PointerDownEvent;
+import com.vaadin.pointerevents.client.PointerDownHandler;
+import com.vaadin.pointerevents.client.PointerEvent;
+import com.vaadin.pointerevents.client.PointerMoveEvent;
+import com.vaadin.pointerevents.client.PointerMoveHandler;
+import com.vaadin.pointerevents.client.PointerUpEvent;
+import com.vaadin.pointerevents.client.PointerUpHandler;
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.CssColor;
 
@@ -554,15 +564,21 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		grafiekGWTVeld = new GrafiekGWTVeld(this, breedte, grafiekVeldHoogte);
 		grafiekGWTCanvas = grafiekGWTVeld.getCanvas();
 		MouseHandler mouseHandler = new MouseHandler();
-		grafiekGWTCanvas.addMouseDownHandler(mouseHandler);
-		grafiekGWTCanvas.addMouseMoveHandler(mouseHandler);
-		grafiekGWTCanvas.addMouseUpHandler(mouseHandler);
-		
 		TouchHandler touchHandler = new TouchHandler();
-		grafiekGWTCanvas.addTouchStartHandler(touchHandler);
-		grafiekGWTCanvas.addTouchMoveHandler(touchHandler);
-		grafiekGWTCanvas.addTouchEndHandler(touchHandler);
+		others = HandlerRegistrations.compose(
+		grafiekGWTCanvas.addMouseDownHandler(mouseHandler),
+		grafiekGWTCanvas.addMouseMoveHandler(mouseHandler),
+		grafiekGWTCanvas.addMouseUpHandler(mouseHandler),
 		
+		grafiekGWTCanvas.addTouchStartHandler(touchHandler),
+		grafiekGWTCanvas.addTouchMoveHandler(touchHandler),
+		grafiekGWTCanvas.addTouchEndHandler(touchHandler));
+		
+		PointerHandler pointerHandler = new PointerHandler();
+		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerDownEvent.getType());
+		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerUpEvent.getType());
+		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerMoveEvent.getType());
+			
 		grafiekGWTVeld.initContext2d();		
 		
 		grafiekVeldPanel.add(grafiekGWTCanvas);
@@ -4494,7 +4510,105 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		}
 
 	}
+	
+	HandlerRegistration others;
+	
+	class PointerHandler implements PointerDownHandler, PointerMoveHandler, PointerUpHandler {
+
+		private int state = READY;
+		private int id1, x1, y1, id2, x2, y2;
+
+		int pinchStartDistance = 0;
+		int pinchMoveDistance = 0;
+		int pinchMoveDirection = DIAGONAL;
+
+		@Override
+		public void onPointerUp(PointerUpEvent e) {
+			e.preventDefault();
+			GWT.log("pointer-up " + e.getX() + " " + e.getY()  + " " + e.getPointerId());
+			if (state == ONE_FINGER && e.getPointerId() == id1) 
+			{
+				state = READY;
+				mouseUpTouchEndAction(e.getSource(), e.getX(), e.getY());
+			} else if (state == TWO_FINGERS) {
+				if (e.getPointerId() == id2) {
+					state = ONE_FINGER;
+				} else if (e.getPointerId() == id1) {
+					id1 = id2;
+					x1 = e.getX();
+					y1 = e.getY(); 
+					state = ONE_FINGER;
+				}
+				if (state == ONE_FINGER) {
+					mouseUpTouchEndAction(e.getSource(), e.getX(), e.getY());				
+				}
+				
+			}
+		}
+
+		@Override
+		public void onPointerMove(PointerMoveEvent e) {
+			if (others != null) {
+				others.removeHandler();
+				others = null;
+			}
+			e.preventDefault();
+			
+			if ( state == ONE_FINGER && (tekenComponent.getCursorMode() != TekenComponentGWT.DELETE) && e.getPointerId() == id1) {
+				// only move action needs to be taken during drag, draw or default mode
+				int eventX = x1 = e.getX();
+				int eventY = y1 = e.getY();				
+				mouseMoveTouchMoveAction(e.getSource(), eventX, eventY, ONE_FINGER, 0, 0, 0);
+			} else if (state == TWO_FINGERS && e.getPointerId() == id1 ) {
+				x1 = e.getX();
+				y1 = e.getY();
+				pinch(e);
+				
+			} else if (state == TWO_FINGERS && e.getPointerId() == id2) {
+				x2 = e.getX();
+				y2 = e.getY();
+				pinch(e);
+			}
+		}
+
+		private void pinch(PointerMoveEvent e) {
+			pinchMoveDistance = dist(x1, y1, x2, y2);
+			pinchMoveDirection = direction(x1, y1, x2, y2);
+			mouseMoveTouchMoveAction(e.getSource(), x1, y2, state, pinchStartDistance, pinchMoveDistance, pinchMoveDirection);			
+			pinchStartDistance = pinchMoveDistance;					
+		}
+
+		@Override
+		public void onPointerDown(PointerDownEvent e) {
+			if (others != null) {
+				others.removeHandler();
+				others = null;
+			}
+			e.preventDefault();
+
+			int eventX = e.getX();
+			int eventY = e.getY();
+			GWT.log("pointer-down " + eventX + " " + eventY + " " + e.getPointerId());
+			
+			if (state == READY) {
+				state = ONE_FINGER;
+				id1 = e.getPointerId();
+				x1 = eventX;
+				y1 = eventY;
+				mouseDownTouchStartAction(e.getSource(), eventX, eventY, ONE_FINGER);
+			} else if (state == ONE_FINGER ) {
+				state = TWO_FINGERS;
+				id2 = e.getPointerId();
+				x2 = eventX;
+				y2 = eventY;
+				pinchStartDistance = dist(x1, y1, x2, y2);
+				mouseDownTouchStartAction(e.getSource(), x1, y1, TWO_FINGERS);
+			}	
+		}
 		
+	}
+	
+	
 	public void runZoom(boolean isX, boolean isY, boolean isIn) 
 	{
 		{	
