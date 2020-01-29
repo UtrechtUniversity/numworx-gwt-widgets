@@ -448,7 +448,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);
 			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
-			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 15, Style.Unit.PX);
+			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 20, Style.Unit.PX);
 			
 			if (!functieBeginAanpasbaar)
 			{
@@ -459,25 +459,20 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			editors[i] = factor.build(i);
 			if (functieBeginAanpasbaar)
 				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
+			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX); // interlinie 5px
 			editors[i].setFont(defaultfont);
 			editors[i].setDefaultFont(defaultfont);
 
 			editors[i].setColor(interactiePanel.getFormuleColor(i));
-			editorPanels[i] = (TouchPanel) editors[i].getAsPanel();
+			editorPanels[i] = editors[i].getAsPanel();
 			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
 			editors[i].setCurrent(0, 0);
-			//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
-			//editor.installKeyboard(kb);
-			//editors[i].requestFocus();
-			//if (!functieBeginAanpasbaar)
-			//	regelPanels[i].add(functieBeginViewers[i]);
 			regelPanels[i].add(editorPanels[i]);
 			addFormulePanelListeners(editorPanels[i], editors[i]);
 			
 			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
 					domeinInstelbaar?20:0, Style.Unit.PX);
-			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30, Style.Unit.PX);
+			regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, 30+5, Style.Unit.PX);
 			if (functieBeginAanpasbaar && functieBeginZichtbaar)
 				editors[i].insert(functieBegin[i]);
 			if (domeinInstelbaar)
@@ -491,7 +486,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		
 		regelsPanel.add(regelPanels[0]);
 		regelsPanel.setWidgetLeftWidth(regelPanels[0], 0, Style.Unit.PX, breedte - 5, Style.Unit.PX);
-		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30), Style.Unit.PX);
+		regelsPanel.setWidgetTopHeight(regelPanels[0], 0, Style.Unit.PX, Math.max(editors[0].getHeight(), 30)+5, Style.Unit.PX);
 		resize();
 		//checkboxen[0].setValue(true);
 		
@@ -1456,11 +1451,11 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 					regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], Math.max(0, ashoogte - f.getMainRegel().getAsHoogte()), Style.Unit.PX, f.getHeight(), Style.Unit.PX);
 			}
 			if (regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight(), Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight()+5, Style.Unit.PX);
 			if (regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 15, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 20, Style.Unit.PX);
 			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
-				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight()), Style.Unit.PX);
+				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight())+5, Style.Unit.PX);
 		}
 	}
 	
