@@ -416,7 +416,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 //        root.setWidgetTopBottom(basisPanel, 0, Unit.PX, 0, Unit.PX);
 //        root.setWidgetLeftRight(basisPanel, 0, Unit.PX, 0, Unit.PX);
 
-		RootPanel.get().add(this);
+		RootLayoutPanel.get().add(this);
 //		if (grafiekGWTCanvas == null) {
 //		      RootPanel.get(holderId).add(new Label(upgradeMessage));
 //		      return;
