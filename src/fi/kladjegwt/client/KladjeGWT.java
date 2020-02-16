@@ -146,6 +146,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	              regenboogResource, 
 	              zwartResource, grijsResource, roodResource, oranjeResource, groenResource, cyaanResource,  
 	              blauwResource, magentaResource; 
+	              //formuleschrijfImageResource, formuleschrijfaanImageResource;
 	              
 	/**
 	 * de actuele plaatjes: alle ToggleButtons hebben twee plaatjes: een voor de normale toestand
@@ -156,7 +157,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		  tekenTekstUpImage, tekenTekstDownImage, selecterenUpImage, selecterenDownImage,
 		  regenboogImage, 
 		  zwartImage, grijsImage, roodImage, oranjeImage, groenImage, cyaanImage, 
-		  blauwImage, magentaImage; 
+		  blauwImage, magentaImage;
+		  //formuleschrijfImage, formuleschrijfaanImage;
 		  
 	
 	/**
@@ -318,7 +320,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		magentaResource = kladjeGWTClientBundle.magentaResource();
 		magentaImage = new Image(magentaResource);
 		magentaImage.addStyleName(kladjeCss.pushimage2());
-
+		
+		
 	} // getImages	
 		
 

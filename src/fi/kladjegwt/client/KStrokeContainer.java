@@ -17,6 +17,7 @@ import fi.wiskopdr.FormuleParser;
 import fi.wiskopdr.expressies.BasisExpressie;
 import fi.wiskopdr.expressies.Expressie;
 import fi.writemathgwt.client.engine.DoubleRectangle;
+import fi.writemathgwt.client.engine.Point;
 import fi.writemathgwt.client.engine.Stroke;
 import fi.writemathgwt.client.engine.StrokeContainer;
 import fi.writemathgwt.client.engine.WMObject;
@@ -57,8 +58,8 @@ public class KStrokeContainer {
 	private Image eyeImage;
 	private ImageElement eyeImageElement;
 	
-	private Image approxImage;
-	private ImageElement approxImageElement;
+	private Image approxImage, formuleschrijfImage, formuleschrijfaanImage;
+	private ImageElement approxImageElement, formuleschrijfImageElement, formuleschrijfaanImageElement;
 	
 	private boolean recognizeOff;
 	
@@ -87,6 +88,14 @@ public class KStrokeContainer {
 		ImageResource approxResource = parent.eigenaar.kladjeGWTClientBundle.approxResource();
 		approxImage = new Image(approxResource);
 		approxImageElement = ImageElement.as(approxImage.getElement());
+		
+		ImageResource formuleschrijfImageResource = parent.eigenaar.kladjeGWTClientBundle.formuleschrijfResource(); 
+		formuleschrijfImage = new Image(formuleschrijfImageResource);
+		formuleschrijfImageElement = ImageElement.as(formuleschrijfImage.getElement());
+		
+		ImageResource formuleschrijfaanImageResource = parent.eigenaar.kladjeGWTClientBundle.formuleschrijfaanResource(); 
+		formuleschrijfaanImage = new Image(formuleschrijfaanImageResource);
+		formuleschrijfaanImageElement = ImageElement.as(formuleschrijfaanImage.getElement());
 	}
 	
 	public KStrokeContainer (KladjeGWTVeld parent, Rectangle defaultBox) {
@@ -103,6 +112,14 @@ public class KStrokeContainer {
 		ImageResource approxResource = parent.eigenaar.kladjeGWTClientBundle.approxResource();
 		approxImage = new Image(approxResource);
 		approxImageElement = ImageElement.as(approxImage.getElement());
+		
+		ImageResource formuleschrijfImageResource = parent.eigenaar.kladjeGWTClientBundle.formuleschrijfResource(); 
+		formuleschrijfImage = new Image(formuleschrijfImageResource);
+		formuleschrijfImageElement = ImageElement.as(formuleschrijfImage.getElement());
+		
+		ImageResource formuleschrijfaanImageResource = parent.eigenaar.kladjeGWTClientBundle.formuleschrijfaanResource(); 
+		formuleschrijfaanImage = new Image(formuleschrijfaanImageResource);
+		formuleschrijfaanImageElement = ImageElement.as(formuleschrijfaanImage.getElement());
 	}
 	
 	public boolean addStroke(Stroke stroke) {
@@ -198,11 +215,37 @@ public class KStrokeContainer {
 		return strokeContainer.getStrokes().size();
 	}
 	
+	public Rectangle getHandleArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		Point c = parent.getActiveTranslation();
+		int x = getWriteBox().x+2 ; 
+		int y = getWriteBox().y + getWriteBox().height-30 ; 
+		if(recognizeOff) {
+			x = getWriteBox().x+getWriteBox().width/2 + c.x; 
+			y = getWriteBox().y + getWriteBox().height/2+ c.y;
+		}
+		
+//		x = Math.max(x, getBox().x-30); 
+//		y = getBox().y+getBox().height; 
+		return new Rectangle(x,y,30,30);
+		
+	}
+	
+	public Rectangle getHeaderArea() {
+		if(writeBox==null)
+			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
+		if(recognizeOff) 
+			return new Rectangle(getWriteBox().x, getWriteBox().y, getWriteBox().width, 47);
+		else 
+			return new Rectangle(getWriteBox().x + getWriteBox().width - 47 , getWriteBox().y, 47, getWriteBox().height);
+	}
+	
 	public Rectangle getCloseButtonArea() {
 		if(writeBox==null)
 			writeBox = new Rectangle(20,20,parent.breedte-40,parent.hoogte-40);
 		int x = getWriteBox().x + getWriteBox().width - 33; 
-		int y = getWriteBox().y + 6; 
+		int y = getWriteBox().y + 4; 
 		return new Rectangle(x,y,30,30);
 	}
 	
@@ -339,7 +382,7 @@ public class KStrokeContainer {
 		g.moveTo(r.x+r.width/4 , r.y+r.height/2);
 		g.lineTo(r.x+r.width/2, r.y+r.height);
 		g.lineTo(r.x+r.width, r.y);
-		g.moveTo(r.x , r.y);
+		g.moveTo(r.x+r.width/4 , r.y+r.height/2);
 		g.closePath();
 		g.stroke();
 	}	
@@ -560,6 +603,42 @@ public class KStrokeContainer {
 		}
 	}
 	
+	private void drawHandle(Context2d g, Rectangle r) {
+			g.setStrokeStyle( CssColor.make(38, 115, 182));
+			g.setLineWidth(1.0d);
+			g.beginPath();
+			DoublePoint pU = new DoublePoint(r.x+r.width/2,r.y+5);
+			DoublePoint pD = new DoublePoint(r.x+r.width/2,r.y+r.height-5);
+			DoublePoint pL = new DoublePoint(r.x+5,r.y+r.height/2);
+			DoublePoint pR = new DoublePoint(r.x+r.width-5,r.y+r.height/2);
+			int d = 3;
+			g.moveTo(pU.x, pU.y);
+			g.lineTo(pU.x-d, pU.y+d);
+			g.moveTo(pU.x, pU.y);
+			g.lineTo(pU.x+d, pU.y+d);
+			g.moveTo(pU.x, pU.y);
+			g.lineTo(pD.x,pD.y);
+			g.lineTo(pD.x-d,pD.y-d);
+			g.moveTo(pD.x,pD.y);
+			g.lineTo(pD.x+d,pD.y-d);
+			g.moveTo(pD.x,pD.y);
+			
+			g.moveTo(pL.x, pL.y);
+			g.lineTo(pL.x+d, pL.y+d);
+			g.moveTo(pL.x, pL.y);
+			g.lineTo(pL.x+d, pL.y-d);
+			g.moveTo(pL.x, pL.y);
+			g.lineTo(pR.x,pR.y);
+			g.lineTo(pR.x-d,pR.y-d);
+			g.moveTo(pR.x,pR.y);
+			g.lineTo(pR.x-d,pR.y+d);
+			g.moveTo(pR.x,pR.y);
+			
+			g.closePath();
+			g.stroke();
+		
+	}
+	
 	private void drawProActiveAura(Context2d g, Rectangle r) {
 		//g.setFillStyle(CssColor.make("rgba(200,200,200,0.5)"));
 		g.setFillStyle(CssColor.make(255,255,255));
@@ -580,7 +659,9 @@ public class KStrokeContainer {
 	
 	private void drawGrid (Context2d g, Rectangle r) {
 		CssColor ruitjesKleur = CssColor.make(38, 115, 182);
-				
+				Point c = parent.getActiveTranslation();
+				int cx = (c.x-getWriteBox().x)%20;
+				int cy = (c.y-getWriteBox().y)%20;
 					int	lineDistance = (int)(10*parent.schrijfLeesFactor);
 					g.setStrokeStyle(ruitjesKleur);
 					g.setLineWidth(0.2d);
@@ -588,16 +669,16 @@ public class KStrokeContainer {
 					for (int vCnt = 1; vCnt <= vSteps; vCnt++)
 					{
 						g.beginPath();
-						g.moveTo(r.x, r.y + vCnt * lineDistance);
-						g.lineTo(r.x + r.width - 1, r.y + vCnt * lineDistance);
+						g.moveTo(r.x, r.y+cy + vCnt * lineDistance);
+						g.lineTo(r.x + r.width - 1, r.y +cy+ vCnt * lineDistance);
 						g.stroke();
 					}
 					int hSteps = r.width / lineDistance;
 					for (int hCnt = 1; hCnt <= hSteps; hCnt++)
 					{
 						g.beginPath();
-						g.moveTo(r.x + hCnt * lineDistance, r.y);
-						g.lineTo(r.x + hCnt * lineDistance, r.y + r.height - 1);
+						g.moveTo(r.x+cx + hCnt * lineDistance, r.y);
+						g.lineTo(r.x+cx + hCnt * lineDistance, r.y + r.height - 1);
 						g.stroke();
 					}
 					
@@ -668,8 +749,7 @@ public class KStrokeContainer {
 			if(active && !popupMode) {
 				g.setFillStyle(CssColor.make(255, 255, 255));
 				g.fillRect(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10);
-				g.setFillStyle(CssColor.make(255, 243, 180));
-				g.fillRect(getWriteBox().x+getWriteBox().width-42, getWriteBox().y-5, 47, getWriteBox().height+10);
+				
 				drawShadow(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				drawGrid(g,new Rectangle(getWriteBox().x-5, getWriteBox().y-5, getWriteBox().width+10, getWriteBox().height+10));
 				
@@ -702,9 +782,38 @@ public class KStrokeContainer {
 //					g.fillRect(xx,avb-avh,ww,avh);
 //				}
 				
-				g.setStrokeStyle(CssColor.make(80, 80, 80));
+				if(!recognizeOff && formuleViewer!=null) {
+					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
+					int y = getWriteBox().y+5;//-20-formuleViewer.getHeight();
+					g.setFillStyle(CssColor.make(255, 255, 255));
+					g.fillRect(getFormulaArea().x, getFormulaArea().y, getFormulaArea().width,getFormulaArea().height);//formuleViewer.getMainRegel().width, formuleViewer.getMainRegel().height);
+					
+					g.translate(x, y);
+					if(!"".equals(getFormulaString()) && getFormulaString()!=null) {
+						formuleViewer.setColor(CssColor.make(38, 115, 182));
+						formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+						formuleViewer.getMainRegel().paintAll(g);
+					}
+					g.translate(-x, -y);
+				}
+				
+				g.setFillStyle(CssColor.make(255, 243, 180));
+				if(!recognizeOff)
+					g.fillRect(getWriteBox().x+getWriteBox().width-42, getWriteBox().y-4, 47, getWriteBox().height+8);
+				if(recognizeOff) {
+					g.fillRect(getWriteBox().x-4, getWriteBox().y-4, getWriteBox().width+8,47);
+				}
+				
+				if(!recognizeOff) {
+					g.setFillStyle(CssColor.make(255, 255, 255));
+					g.fillRect(getHandleArea().x, getHandleArea().y, getHandleArea().width, getHandleArea().height);
+					drawHandle(g,getHandleArea());
+				}
+				
+				//g.setStrokeStyle(CssColor.make(80, 80, 80));
 
 				drawcloseButton(g, getCloseButtonArea());
+				
 				
 				if(recognizeOff && !correct && !isfalse && !isHalf)
 					//g.drawImage(eyeImageElement, getWriteBox().x+5, getWriteBox().y+5);
@@ -717,6 +826,11 @@ public class KStrokeContainer {
 				if(!recognizeOff && isGetalsExpressie && parent.calculator)
 					g.drawImage(approxImageElement, getWriteBox().x+getWriteBox().width-32, getWriteBox().y+getWriteBox().height/2-19);
 				
+//				if(!recognizeOff) {
+//					g.drawImage(formuleschrijfImageElement, getWriteBox().x+getWriteBox().width-110, getWriteBox().y+5);
+//					drawRecognizeButton(g,new Rectangle(getWriteBox().x+getWriteBox().width-80, getWriteBox().y+5, 25,25));
+//				}
+				
 				if(recognizeOff) {
 					g.setFont("16px arial");
 					g.fillText("TEKENING", getWriteBox().x+250, getWriteBox().y+25);
@@ -728,24 +842,13 @@ public class KStrokeContainer {
 				if(erasing)
 					drawEraser(g,new Rectangle(erasingX-25, erasingY-25, 25,25));
 				
-//				int d = (int)strokeContainer.averageHeight;
-//				g.setFillStyle(CssColor.make(0,0,0));
-//				g.fillText(""+nr, 30, 30);
-				
-				if(!recognizeOff && formuleViewer!=null) {
-					int x = Math.max(getWriteBox().x+50, getBox().x) ;// + getBox().width/2-parent.formuleViewer.getWidth()/2;
-					int y = getWriteBox().y+5;//-20-formuleViewer.getHeight();
-					g.translate(x, y);
-					if(!"".equals(getFormulaString()) && getFormulaString()!=null) {
-						formuleViewer.setColor(CssColor.make(38, 115, 182));
-						formuleViewer.setFont(FormuleFont.createFromFontSize(16));
-						formuleViewer.getMainRegel().paintAll(g);
-					}
-					g.translate(-x, -y);
-				}
-				
 				if(parent.eigenaar.comRoot!=null && parent.eigenaar.comRoot.hasListeners("action.check") && !recognizeOff)
 					drawCheckButton(g, getCheckButtonArea());
+				
+				
+				
+				
+				
 				
 //				g.setFillStyle(CssColor.make(255, 255, 255));
 //				
@@ -869,17 +972,32 @@ public class KStrokeContainer {
 			else
 				g.setStrokeStyle(CssColor.make(80, 80, 80));
 			ArrayList<Stroke> strokes = strokeContainer.getStrokes();
+			Rectangle r = null;
+			if(active && getWriteBox()!=null) {
+				if(!recognizeOff)
+					r = new Rectangle(getWriteBox().x, getWriteBox().y, getWriteBox().width-47, getWriteBox().height);
+				else
+					r = new Rectangle(getWriteBox().x, getWriteBox().y+47, getWriteBox().width, getWriteBox().height-47);
+			}
+				
 			for(int i = 0 ; i < strokes.size() ; i++) {
 				Stroke stroke = strokes.get(i);
 				g.beginPath();
 				double x0 = (int)stroke.getParsePoints().get(0).x;
 				double y0 = (int)stroke.getParsePoints().get(0).y;
-				g.moveTo(x0, y0);
+				if(!active||r==null)
+					g.moveTo(x0, y0);
+				else if(r.contains((int)x0,(int)0))
+					g.moveTo(x0, y0);
+				
 				if(stroke.getParsePointsbox().width>3 ||  stroke.getParsePointsbox().height>3) {
 					for(int j = 1 ; j < stroke.getParsePoints().size() ; j++) {
 						double x = stroke.getParsePoints().get(j).x ;
 						double y = stroke.getParsePoints().get(j).y;
-						g.lineTo(x, y);
+						if(!active||r==null)
+							g.lineTo(x, y);
+						else if(r.contains((int)x,(int)y))
+							g.lineTo(x, y);
 					}
 					g.moveTo(x0, y0);
 					g.closePath();
@@ -891,6 +1009,12 @@ public class KStrokeContainer {
 					g.stroke();
 				}
 			}
+			if(active && recognizeOff) {
+				g.setFillStyle(CssColor.make(255, 255, 255));
+				g.fillRect(getHandleArea().x, getHandleArea().y, getHandleArea().width, getHandleArea().height);
+				drawHandle(g,getHandleArea());
+			}
+			
 		}
 		else {
 			formuleViewer.setFont(FormuleFont.createFromFontSize(18));
@@ -1138,7 +1262,7 @@ public class KStrokeContainer {
 	}
 	
 	public Rectangle getWriteBox() {
-		int margin = 50;
+		int margin = 60;
 		
 		
 		
@@ -1170,7 +1294,7 @@ public class KStrokeContainer {
 		}
 		if(recognizeOff) {
 			int height = parent.hoogte-40;
-			int width = Math.max(writeBox.width,height);
+			int width = parent.breedte-40;//Math.max(writeBox.width,height);
 			int x = writeBox.x;
 			int y = writeBox.y;
 			x = (int)Math.min(x, parent.breedte - width -20);

@@ -3253,6 +3253,10 @@ public class KladjeGWTVeld
 	private boolean moving;
 	private Point activeTranslation = new Point(0,0);
 	
+	public Point getActiveTranslation() {
+		return activeTranslation;
+	}
+	
 	public void mouseDownTouch2StartAction(int eventX, int eventY)
 	{
 		mouseDownTouchStartAction(eventX, eventY);
@@ -3318,6 +3322,10 @@ public class KladjeGWTVeld
 			}
 			if(currentHiddenStrokeContainer!=null) 
 			{	
+				if(currentHiddenStrokeContainer.getHandleArea().contains(eventX, eventY)) {
+					moving = true;
+					return;
+				}
 				if(currentHiddenStrokeContainer.getCloseButtonArea().contains(eventX, eventY) && currentHiddenStrokeContainer.isActive()) 
 				{
 					eigenaar.sendEquation(activeHSCNumber);
@@ -3359,6 +3367,10 @@ public class KladjeGWTVeld
 				return;
 			}
 			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getHandleArea().contains(eventX, eventY)) {
+				moving = true;
+				return;
+			}
 			
 			if(currentStrokeContainer!=null && currentStrokeContainer.getCloseButtonArea().contains(eventX, eventY)) {
 				if(activeHSCNumber>0)
@@ -3446,6 +3458,10 @@ public class KladjeGWTVeld
 			if(currentStrokeContainer!=null && currentStrokeContainer.getApproxButtonArea().contains(eventX, eventY)) {
 				currentStrokeContainer.approximate();
 				paintFormule(false);
+				return;
+			}
+			
+			if(currentStrokeContainer!=null && currentStrokeContainer.getHeaderArea().contains(eventX, eventY)) {
 				return;
 			}
 			
@@ -3683,6 +3699,35 @@ public class KladjeGWTVeld
 				startX = eventX;
 				startY = eventY;
 				paintFormule(true);
+			}
+			else if(moving) {
+				if(currentStrokeContainer != null) {
+					formulaStrokePoints.clear();
+					formulaStrokePointsDouble.clear();
+					//draggDoublePoints.clear();
+					int dx = eventX - startX;
+					int dy = eventY - startY;
+					currentStrokeContainer.translate(dx, dy);
+					activeTranslation.x += dx;
+					activeTranslation.y += dy;
+					paintFormule(true);
+					startX = eventX;
+					startY = eventY;
+				}
+				else if(currentHiddenStrokeContainer != null) {
+					formulaStrokePoints.clear();
+					formulaStrokePointsDouble.clear();
+					//draggDoublePoints.clear();
+					int dx = eventX - startX;
+					int dy = eventY - startY;
+					currentHiddenStrokeContainer.translate(dx, dy);
+					currentHiddenStrokeContainer.getDefaultBox().translate(dx, dy);
+					activeTranslation.x += dx;
+					activeTranslation.y += dy;
+					paintFormule(true);
+					startX = eventX;
+					startY = eventY;
+				}
 			}
 			else if(formulaStrokePoints.size()>0) {
 				//formulaStrokePoints.add(new fi.writemathgwt.client.engine.Point(eventX, eventY));
@@ -4062,7 +4107,7 @@ public class KladjeGWTVeld
 			
 		}
 		else if (mouseMode == formuleOptie)
-		{	
+		{	moving = false;
 			if(currentHiddenStrokeContainer!=null)
 			{
 				if(formulaStrokePointsDouble.size()>0 ) 
@@ -4350,12 +4395,13 @@ public class KladjeGWTVeld
 		
 		public void onMouseDown(MouseDownEvent e)
 		{
-			if(hasPointerEventSupport)
-				return;
+			
 			
 			e.preventDefault();
 			// prevent scrolling 
 			e.stopPropagation();
+			if(hasPointerEventSupport)
+				return;
 			
 			int eventX = e.getX();
 			int eventY = e.getY();
@@ -4372,12 +4418,13 @@ public class KladjeGWTVeld
 		
 		public void onMouseMove(MouseMoveEvent e)	
 		{
-			if(hasPointerEventSupport)
-				return;
+			
 			
 			e.preventDefault();
 			// prevent scrolling
 			e.stopPropagation();
+			if(hasPointerEventSupport)
+				return;
 			
 			if (!mouseDown)
 				return;
@@ -4395,6 +4442,9 @@ public class KladjeGWTVeld
 		
 		public void onMouseUp(MouseUpEvent e)	
 		{
+			e.preventDefault();
+			// prevent scrolling
+			e.stopPropagation();
 			if(hasPointerEventSupport)
 				return;
 			
@@ -4599,6 +4649,9 @@ public class KladjeGWTVeld
 			e.preventDefault();
 			
 			touchCount--;
+			
+			if(moving)
+				touchCount = 0;
 			
 			moving = false;
 			mouseUpTouchEndAction(lastTouchX, lastTouchY);

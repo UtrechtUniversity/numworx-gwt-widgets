@@ -6,6 +6,12 @@ import com.google.gwt.resources.client.ImageResource;
 public interface KladjeGWTClientBundle extends ClientBundle 
 {
 
+	@Source("fi/kladjegwt/client/images/formuleschrijf.png")
+	public ImageResource formuleschrijfResource();
+	 
+	 @Source("fi/kladjegwt/client/images/formuleschrijfaan.png")
+	 public ImageResource formuleschrijfaanResource();
+	 
    @Source("fi/kladjegwt/client/images/bin.png")
    public ImageResource binResource();
    
