@@ -26,6 +26,7 @@ import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.dom.client.Style.BorderStyle;
@@ -120,7 +121,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	final double asDefaultYMin=-7, asDefaultYMax=2, asDefaultYStap=2;
 	
 	//UI
-	FlowPanel basisPanel = new FlowPanel();
+	LayoutPanel basisPanel = new LayoutPanel();
 	//protected FormuleKeyboardIF kb = null;
 	//DockLayoutPanel dlp; //misschien niet nodig?
 	LayoutPanel grafiekVeldPanel;
@@ -416,7 +417,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 //        root.setWidgetTopBottom(basisPanel, 0, Unit.PX, 0, Unit.PX);
 //        root.setWidgetLeftRight(basisPanel, 0, Unit.PX, 0, Unit.PX);
 
-		RootLayoutPanel.get().add(this);
+		//RootLayoutPanel.get().add(this);
+		basisPanel = RootLayoutPanel.get();
 //		if (grafiekGWTCanvas == null) {
 //		      RootPanel.get(holderId).add(new Label(upgradeMessage));
 //		      return;
@@ -469,7 +471,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 			}
 		}
-		basisPanel.setPixelSize(breedte, hoogte );//setSize("" + (breedte + 10) + "px", "" + (hoogte + 10) + "px");
 		
 		zoomPanel = new LayoutPanel();
 		zoomPanel.setPixelSize(breedte, zoomPanelHoogte);
@@ -477,26 +478,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
 		zoomPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		zoomPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
-//		for(int i = 0; i < 10; i++)
-//		{
-//			FlowPanel panel = new FlowPanel();
-//			panel.getElement().getStyle().setBackgroundColor(CssColor.make(200 + 5*i, 200 + 5*i, 200 + 5*i).toString());
-//			zoomPanel.add(panel);
-//			zoomPanel.setWidgetLeftRight(panel, 0, Style.Unit.PX, 0, Style.Unit.PX);
-//			zoomPanel.setWidgetTopHeight(panel, 23 - (i + 1)*23/10, Style.Unit.PX, 23/10 + 1, Style.Unit.PX);
-//		}
-//		FlowPanel rechthoekPanel = new FlowPanel();
-//		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
-//		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
-//		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
-//		zoomPanel.add(rechthoekPanel);
-//		zoomPanel.setWidgetLeftRight(rechthoekPanel, 0, Style.Unit.PX, 0, Style.Unit.PX);
-//		zoomPanel.setWidgetTopBottom(rechthoekPanel, 0, Style.Unit.PX, -1, Style.Unit.PX);
+
+		int basisX = 0;
 		if(zoomOptie)
 		{	basisPanel.add(zoomPanel);
-			FlowPanel panel = new FlowPanel();
-			panel.setPixelSize(breedte, offset);
-			basisPanel.add(panel);
+		    basisPanel.setWidgetTopHeight(zoomPanel, basisX, Unit.PX, zoomPanelHoogte, Unit.PX);
+		    basisX += zoomPanelHoogte + offset;
+//			FlowPanel panel = new FlowPanel();
+//			panel.setPixelSize(breedte, offset);
+//			basisPanel.add(panel);
 		
 		}
 		int currentX = offset;
@@ -587,17 +577,23 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		grafiekVeldPanel.forceLayout();
 		
 		basisPanel.add(grafiekVeldPanel);
-				
+		basisPanel.setWidgetTopHeight(grafiekVeldPanel, basisX, Unit.PX, grafiekVeldHoogte, Unit.PX);
+		basisX += grafiekVeldHoogte;
+
 		tekenComponent = new TekenComponentGWT(this, breedte);
 		tekenComponent.setPixelSize(breedte, tekenComponentHoogte);
 		
 		tekenComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(tekenComponentAan)
-		{	FlowPanel panel = new FlowPanel();
-			panel.setPixelSize(breedte,offset);
-			basisPanel.add(panel);
+		{
+//		    FlowPanel panel = new FlowPanel();
+//			panel.setPixelSize(breedte,offset);
+//			basisPanel.add(panel);
+		    basisX += offset;
 			tekenComponent.forceLayout();
 			basisPanel.add(tekenComponent);
+			basisPanel.setWidgetTopHeight(tekenComponent, basisX, Unit.PX, tekenComponentHoogte, Unit.PX);
+			basisX += tekenComponentHoogte;
 		}
 		tekenComponent.zetLijnenKnoppen(rechteVerbindingen, krommeZonderExtrapolatie, krommeMetExtrapolatie);
 		
@@ -605,11 +601,15 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		tabelComponent.setPixelSize(breedte, tabelComponentHoogte);
 		tabelComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(tabelComponentAan)
-		{	FlowPanel panel = new FlowPanel();
-			panel.setPixelSize(breedte , offset);
-			basisPanel.add(panel);
+		{
+//		    FlowPanel panel = new FlowPanel();
+//			panel.setPixelSize(breedte , offset);
+//			basisPanel.add(panel);
+		    basisX += offset;
 			tabelComponent.forceLayout();
 			basisPanel.add(tabelComponent);
+			basisPanel.setWidgetTopHeight(tabelComponent, basisX, Unit.PX, tabelComponentHoogte, Unit.PX);
+			basisX += tabelComponentHoogte;
 		}
 		tabelComponent.zetZooming(zoomInTabel);
 		tabelComponent.zetXAsNaam(xAsNaam);
@@ -624,20 +624,25 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if(typeOpdracht == VINDFORMULEBIJGRAFIEK || typeOpdracht == VINDFORMULEBIJPUNTEN)
 			formuleComponent.alsOpdracht = true;
 		if(formuleComponentAan) {	
-			FlowPanel panel = new FlowPanel();
-			panel.setPixelSize(breedte, offset);
-			formuleComponent.forceLayout();
-			basisPanel.add(panel);
+//			FlowPanel panel = new FlowPanel();
+//			panel.setPixelSize(breedte, offset);
+//			basisPanel.add(panel);
+		    basisX += offset;
+            formuleComponent.forceLayout();
 			basisPanel.add(formuleComponent);
+			basisPanel.setWidgetTopHeight(formuleComponent, basisX, Unit.PX, formuleComponentHoogte, Unit.PX);
+			basisX += formuleComponentHoogte;
 		}
 		
 		if (veldComponentAan) {
-			FlowPanel panel = new FlowPanel();
-			panel.setPixelSize(breedte, offset);
-			basisPanel.add(panel);
+//			FlowPanel panel = new FlowPanel();
+//			panel.setPixelSize(breedte, offset);
+//			basisPanel.add(panel);
+		    basisX += offset;
 			veldComponent.forceLayout();
 			basisPanel.add(veldComponent);
-			
+			basisPanel.setWidgetTopHeight(veldComponent, basisX, Unit.PX, veldComponentHoogte, Unit.PX);
+			basisX += veldComponentHoogte;
 			//RPJ
 			zetVectorVeld(0, 0, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fax+y@"))));
 			zetVectorVeld(0, 1, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fay-x@"))));		
@@ -737,10 +742,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				kijkNaPanel.setWidgetLeftWidth(foutkruisImage, nakijkButtonWidth, Style.Unit.PX, buttonSize, Style.Unit.PX);
 				kijkNaPanel.setWidgetTopHeight(foutkruisImage, 0, Style.Unit.PX, buttonSize + 4, Style.Unit.PX);
 				
-				FlowPanel panel = new FlowPanel();
-				panel.setSize(breedte + "px", offset + "px");
-				basisPanel.add(panel);
+//				FlowPanel panel = new FlowPanel();
+//				panel.setSize(breedte + "px", offset + "px");
+//				basisPanel.add(panel);
+				basisX += offset;
 				basisPanel.add(kijkNaPanel);
+				basisPanel.setWidgetTopHeight(kijkNaPanel, basisX, Unit.PX, kijkNaPanelHoogte, Unit.PX);
+				basisX +=  kijkNaPanelHoogte;
 			}
 		}
 		
@@ -785,46 +793,21 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		//weet nog niet of nodig, voor de zekerheid:
 		
 		setActiveIndex(activeIndex, true);
-		grafiekGWTVeld.paint();
+        grafiekGWTVeld.paint();
+        basisPanel.forceLayout();
+
+// XXX Hogere school magie: voor Safari force refresh met 'bottom' toggle        
+        
+        Scheduler.get().scheduleDeferred(() ->  {
+		  Style style = grafiekGWTCanvas.getElement().getStyle();
+		  style.clearBottom();
+		  Scheduler.get().scheduleDeferred(() -> style.setBottom(0, Unit.PX));
+//		  basisPanel.setWidgetLeftRight(grafiekVeldPanel, 0, Unit.EM, 0, Unit.EM);
+//		  basisPanel.animate(10);
+		})
+		;
 		
-		//kijkNaPanel.setOpaque(false);
 		
-		
-		
-		/*
-		kijkNaPanel.add(kijkNaButton);
-		kijkNaPanel.add(groenVinkjeLabel);
-		kijkNaPanel.add(oranjeVinkjeLabel);
-		kijkNaPanel.add(kruisjeLabel);
-		kijkNaPanel.setVisible(false);
-		add(kijkNaPanel);
-		*/
-		
-		
-		//HashMap<String, Object> h2 = new HashMap<String, Object>();
-		/*
-		for (Enumeration e = h.keys(); e.hasMoreElements();)
-		{	Object aKey = e.nextElement();
-			Object aValue = h.get(aKey);
-			h2.put(aKey, aValue);
-		}
-		
-		Iterator it = h.entrySet().iterator();
-		while(it.hasNext())
-		{	String aKey = it.next().toString();
-			Object aValue = h.get(aKey);
-			if(!aKey.equals("hoogte"))
-				h2.put(aKey, aValue);
-		}
-		Integer formCompHoogte = 120;
-		if(h != null && h.get("formuleComponentHoogte") != null)
-			formCompHoogte = (Integer) h.get("formuleComponentHoogte");
-		h2.put("hoogte", formCompHoogte);
-		
-		formuleComponent = new FormuleComponentGWT(h2, false, randomVarNamen, randomVarWaarden, this);
-		formuleComponent.zetGrafiekComponent(grafiekGWTVeld);
-		basisPanel.add(formuleComponent);
-		*/
 		
 	}
 	
@@ -2277,6 +2260,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 //		this.randomVarNamen = randomVarNamen; should be set in  "init"
 //		this.randomVarWaarden = randomVarWaarden;
+        basisPanel.setPixelSize(breedte, hoogte );//setSize("" + (breedte + 10) + "px", "" + (hoogte + 10) + "px");
 		
 		//alle gegevens uit launchData halen: 
 		init(breedte, hoogte, launchState, randomVarWaarden);
