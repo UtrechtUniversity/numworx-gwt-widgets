@@ -834,6 +834,8 @@ public class KladjeGWTVeld
 	{
 		if(map == null || map.isEmpty())
 			return;
+		
+		logger.info(map.toString());
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
 		
 		kStrokeContainers.clear();
@@ -4592,7 +4594,7 @@ public class KladjeGWTVeld
 		public void onPointerMove(PointerMoveEvent e) {
 			e.stopPropagation();
 			e.preventDefault();
-			if(touchCount==1) {	
+			//if(touchCount==1) {	
 			    boolean shiftPressed = false;
 			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
 				int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());	
@@ -4600,20 +4602,20 @@ public class KladjeGWTVeld
 				lastTouchY = eventY;
 			    
 				mouseMoveTouchMoveAction(eventX, eventY, shiftPressed);
-			}
-			if(touchCount==2) {	
-			    boolean shiftPressed = false;
-			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
-				int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());	
-				
-			    
-				int d=(lastTouchX-eventX)*(lastTouchX-eventX)+(lastTouchY-eventY)*(lastTouchY-eventY);
-				if(d<2000) {
-					mouseMoveTouch2MoveAction(eventX, eventY);
-					lastTouchX = eventX;
-					lastTouchY = eventY;
-				}
-			}
+			//}
+//			if(touchCount==2) {	
+//			    boolean shiftPressed = false;
+//			    int eventX = e.getRelativeX(kladjeHWTCanvas.getElement());
+//				int eventY = e.getRelativeY(kladjeHWTCanvas.getElement());	
+//				
+//			    
+//				int d=(lastTouchX-eventX)*(lastTouchX-eventX)+(lastTouchY-eventY)*(lastTouchY-eventY);
+//				if(d<2000) {
+//					mouseMoveTouch2MoveAction(eventX, eventY);
+//					lastTouchX = eventX;
+//					lastTouchY = eventY;
+//				}
+//			}
 			
 			e.preventDefault();
 			e.stopPropagation();
@@ -4624,7 +4626,7 @@ public class KladjeGWTVeld
 		public void onPointerDown(PointerDownEvent e) {
 			e.stopPropagation();
 			e.preventDefault();
-			touchCount++;
+			//touchCount++;
 			
 			hasPointerEventSupport = true;
 			
@@ -4648,10 +4650,10 @@ public class KladjeGWTVeld
 			e.stopPropagation();
 			e.preventDefault();
 			
-			touchCount--;
+			//touchCount--;
 			
-			if(moving)
-				touchCount = 0;
+			//if(moving)
+			//	touchCount = 0;
 			
 			moving = false;
 			mouseUpTouchEndAction(lastTouchX, lastTouchY);
