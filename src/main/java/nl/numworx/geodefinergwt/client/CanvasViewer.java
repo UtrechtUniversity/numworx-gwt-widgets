@@ -124,16 +124,17 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		snapper.pmDrag(x0, y0, id, this);
 	}
 	public void pmDrag(int x, int y, int id) {
-		super.processMouseDrag(x, y, id);
 		
         TrackerContext ctx = getCtx(id);
-		if (ctx.getTrack() == null) {
+		//if (ctx.getTrack() == null)
+		{
 		    Tracer t = tracerProvider.get();
 		    if (t != null) {
 		        ctx.getHitTester().setXY(x, y);
 		        t.update(this, ctx);
 		    }
 		}
+        super.processMouseDrag(x, y, id);
 		
 	}
 

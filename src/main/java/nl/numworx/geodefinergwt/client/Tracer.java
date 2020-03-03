@@ -12,18 +12,12 @@ import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONParser;
-import com.google.web.bindery.autobean.shared.AutoBean;
-import com.google.web.bindery.autobean.shared.AutoBeanCodex;
-import com.google.web.bindery.autobean.shared.AutoBeanFactory;
-import com.google.web.bindery.autobean.shared.AutoBeanUtils;
-
 import fi.euclides.event.NameMapper;
 import fi.euclides.event.Tracker;
 import fi.euclides.event.TrackerContext;
@@ -51,20 +45,11 @@ public class Tracer implements Observer, Visitor {
 
   static final Logger LOG = Logger.getLogger(Tracer.class.getName());
   private static final String LOG_STATE = "logState";
-
-//  interface EntryBeanFactory extends AutoBeanFactory {
-//    AutoBean<EntryBean> entry();
-//  }
-//
-//  EntryBeanFactory factory = GWT.create(EntryBeanFactory.class);
-//  
-//  EntryBean entry() {
-//    return factory.entry().as();
-//  }
   
   EntryBean entry() { 
     EntryBean entry = Entry.entry();
     entry.setTimestamp(System.currentTimeMillis());
+    setLastW(entry);
     return entry;
   }
   
@@ -142,6 +127,7 @@ public class Tracer implements Observer, Visitor {
       if (arg instanceof Iterable) {
         Set<Destroyable> old = new HashSet<>(drags);
         drags.clear();
+        @SuppressWarnings("unchecked")
         Iterable<TrackerContext> iter = (Iterable<TrackerContext>)arg;
         for (TrackerContext item : iter) {
           Track t = item.getTrack();
@@ -173,14 +159,22 @@ public class Tracer implements Observer, Visitor {
     }
   }
 
+  private Double lastwx, lastwy;
+  
+  public void setLastW(EntryBean top) {
+    top.setWx(lastwx);
+    top.setWy(lastwy);
+  }
+  
   public void setEvent(TrackerContext item) {
     MouseContext ctx = item.getAdapter().adapt(MouseContext.class);
     if (ctx != null) {
       top.setEvx(ctx.getX());
       top.setEvy(ctx.getY());
       top.setTimestamp(ctx.getTimestamp());
-      top.setWx(Double.valueOf(ctx.getScreenX()-ctx.getClientX()));
-      top.setWy(Double.valueOf(ctx.getScreenY()-ctx.getClientY()));
+      lastwx = Double.valueOf(ctx.getScreenX()-ctx.getClientX());
+      lastwy = Double.valueOf(ctx.getScreenY()-ctx.getClientY());
+      setLastW(top);
       return;
     }
     top.setEvx(item.getHitTester().getX());
@@ -270,8 +264,16 @@ public class Tracer implements Observer, Visitor {
       this.logState.clear();
       this.logState.addAll(strings);
     }
+    newsession();
     stamp();
   }
+  private void newsession() {
+    top = entry();
+    top.setArg("start");
+    top.setName("newsession");
+    entries.add(top);
+  }
+
   public void getState(Map<String,Object> state) {
     for(EntryBean entry: entries) {
       this.logState.add(serializeToMap(entry));

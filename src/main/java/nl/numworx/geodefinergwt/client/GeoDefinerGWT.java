@@ -1,19 +1,14 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import nl.numworx.geodefiner.common.CheckObjectList;
-import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
 import nl.numworx.geodefiner.common.locus.Builder;
@@ -54,7 +49,6 @@ import com.google.gwt.user.client.ui.Widget;
 import dagger.Lazy;
 import fi.euclides.event.SelectHandler;
 import fi.euclides.formuleobjects.Lambda;
-import fi.euclides.formuleobjects.ParseException;
 import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
@@ -63,7 +57,6 @@ import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.Const;
 import fi.euclides.proof.LabelValue;
-import fi.euclides.util.DefaultAdapter;
 import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
