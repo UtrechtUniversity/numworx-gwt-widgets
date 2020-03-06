@@ -159,18 +159,23 @@ public class Tracer implements Observer, Visitor {
     }
   }
 
-  private Double lastwx, lastwy;
+  private Double lastwx, lastwy, evx, evy;
   
   public void setLastW(EntryBean top) {
     top.setWx(lastwx);
     top.setWy(lastwy);
+    if (evx != null) top.setEvx(evx.doubleValue());
+    if (evy != null) top.setEvy(evy.doubleValue());
   }
   
   public void setEvent(TrackerContext item) {
     MouseContext ctx = item.getAdapter().adapt(MouseContext.class);
     if (ctx != null) {
-      top.setEvx(ctx.getX());
+      evx = Double.valueOf(ctx.getX());
+      top.setX(evx);
       top.setEvy(ctx.getY());
+      top.setY(evy);
+      evy = Double.valueOf(ctx.getY());
       top.setTimestamp(ctx.getTimestamp());
       lastwx = Double.valueOf(ctx.getScreenX()-ctx.getClientX());
       lastwy = Double.valueOf(ctx.getScreenY()-ctx.getClientY());
