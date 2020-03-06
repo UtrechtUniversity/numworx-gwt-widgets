@@ -192,7 +192,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	@Override
 	public void onModuleLoad() {
       Element body = Document.get().getBody();
-      body.setAttribute("oncontextmenu", "return false;");
+      //body.setAttribute("oncontextmenu", "return false;");
 
       root = uiBinder.createAndBindUi(this);
       RootPanel.get().add(FocusOnTouch.wrap(root, true));
