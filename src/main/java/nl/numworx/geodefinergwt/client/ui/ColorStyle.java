@@ -41,7 +41,7 @@ public class ColorStyle {
       return 0;
     int a = rgba >>> 24; a = Math.max(10, a/8);
     int r = (rgba >>> 16) & 0xFF; r = bright(r);
-    int g = (rgba >>> 8) & 0xFF; g = bright(r);
+    int g = (rgba >>> 8) & 0xFF; g = bright(g);
     int b = rgba & 0xFF; b = bright(b);
     return (a<<24)| (r<<16) | (g<<8) | b;
   }
