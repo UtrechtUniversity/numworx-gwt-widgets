@@ -120,7 +120,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 		@Override
 		public ObjectMap getConfiguration() {
-			return null;
+			return JSONUtilities.wrapMap(Collections.emptyMap());
 		}
 
 		@Override
@@ -277,9 +277,9 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	    configuration.put("$fy<-1@", h);
 	    h = new HashMap();
 	    h.put("rigid", false);
-	    h.put("color", 0xFF000000);
+	    h.put("color", 0xFFFF0000);
 	    h.put("type", PointType.DISK.name());
-	    h.put("size", 5);
+	    h.put("size", 15);
 	    h.put("log", true);
 	    configuration.put("P", h);configuration.put("Q", h);
 	    
