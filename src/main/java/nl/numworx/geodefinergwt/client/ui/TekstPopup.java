@@ -41,7 +41,6 @@ public class TekstPopup extends PopupPanel implements HasText
 	 * binnen de formule-editor de focus kunt zetten voor de verschillende 
 	 * invulvakken van een formule.
 	 */
-	TouchPanel touchPanel = null;
 	
 	//int tekstX, tekstY;
 	int maxVisibleCharacters = 10;
@@ -109,8 +108,7 @@ public class TekstPopup extends PopupPanel implements HasText
 			editor.setFormuleToolBijFocus(true);
 		}
 		
-		touchPanel = (TouchPanel) editor.getAsPanel(); // Ons kent ons
-		setWidget(touchPanel);
+		setWidget(editor);
 		setText(o.getText());
 		editor.requestFocus();
 		//om te zorgen dat cursor ook getekend wordt:
@@ -121,15 +119,7 @@ public class TekstPopup extends PopupPanel implements HasText
 		
 		addCloseHandler(new PopupCloseHandler());
 		
-		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(editor) {
-
-			@Override
-			public void onTouchStart(TouchStartEvent event)
-			{
-				super.onTouchStart(event);
-			}
-			
-		});
+		new FormuleEditorTouchHandler(editor).initHandler();
 	}
 	
 	public String getText()
