@@ -419,7 +419,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		FormuleCache fc = label.adapt(FormuleCache.class);
 		if(fc == null) fc = new FormuleCache(label, context.getFillStyle());
 		else {
-				if(
+				if(     fc.item != label || // bij mappen is dat niet zo!!!
 						//!down && 
 						!fc.isValid(context.getFillStyle())) // als we de mouse down, laten we de cache staan.
 				{
