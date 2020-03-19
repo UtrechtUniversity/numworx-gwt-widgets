@@ -86,10 +86,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>com.googlecode.mgwt</groupId>
-			<artifactId>MGWT</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>gwt.geom</groupId>
 			<artifactId>gwt-geom</artifactId>
 			<version>0.0.1</version>
@@ -103,7 +99,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>0.1.6</version>
+			<version>0.1.7-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>nl.uu.fi.dwo.mobile</groupId>

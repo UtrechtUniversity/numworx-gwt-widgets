@@ -37,11 +37,10 @@ import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
-
 import fi.statistiekgwt.client.event.ColorChangeEvent;
 import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 import fi.wiskopdr.FormuleParser;
@@ -197,7 +196,7 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
 	private HashMap<String, Object> launchState;
 	//private HashMap<String, Object> instellingen;
 	GraphtFormuleEditor[] editors = new GraphtFormuleEditor[maxAantalFormules];
-	private TouchPanel[] editorPanels = new TouchPanel[maxAantalFormules];
+	private Panel[] editorPanels = new Panel[maxAantalFormules];
 	private Widget[] functieBeginViewers = new Widget[maxAantalFormules];
 	//private FormuleViewer latest_answer_viewer; //nodig??
 	//private FormuleKeyboardIF kb = null;
@@ -468,7 +467,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			editorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
 			editors[i].setCurrent(0, 0);
 			regelPanels[i].add(editorPanels[i]);
-			addFormulePanelListeners(editorPanels[i], editors[i]);
+			addFormulePanelListeners(editors[i]);
 			
 			regelPanels[i].setWidgetLeftRight(editorPanels[i], functieBeginAanpasbaar?20:(formeleFuncties?63:50), Style.Unit.PX, 
 					domeinInstelbaar?20:0, Style.Unit.PX);
@@ -542,34 +541,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		regelMeerButtonImage.addStyleName(graphToolCss.pushimage());
 	}
 	
-	/*
-	public FormuleEditor addNewEditor(Panel p, int i)
+	private void addFormulePanelListeners(final FormuleEditor editor)
 	{
-		FormuleEditor editor = new GraphtFormuleEditor(i);
-		if (functieBeginAanpasbaar)
-			editor.getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-		editor.getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
-		editor.setFont(defaultfont);
-		editor.setColor(interactiePanel.getFormuleColor(i));
-		//System.out.println("setColor: " + interactiePanel.getFormuleColor(i).toString());
-		logger.info("setColor " + i + ":  " + interactiePanel.getFormuleColor(i).toString());
-		TouchPanel tp = (TouchPanel) editor.getAsPanel();
-		tp.getElement().getStyle().setProperty("display", "inline-block");
-		editor.setCurrent(0, 0);
-		//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
-		//editor.installKeyboard(kb);
-		editor.requestFocus();
-		if (!functieBeginAanpasbaar)
-			p.add(functieBeginViewers[i]);
-		p.add(tp);
-		
-		addFormulePanelListeners(tp, editor);
-		return editor;
-	}*/
-	
-	private void addFormulePanelListeners(final TouchPanel tp, final FormuleEditor editor)
-	{
-		tp.addTouchHandler(new FormuleEditorTouchHandler(editor));
+		new FormuleEditorTouchHandler(editor).initHandler();
 	}
 	
 	public void layoutRegelPanel(Widget w)

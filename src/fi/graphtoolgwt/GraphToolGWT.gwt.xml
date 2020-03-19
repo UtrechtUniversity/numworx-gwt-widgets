@@ -22,7 +22,6 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-  <inherits name="com.googlecode.mgwt.MGWT"/>
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.ideas.Ideas' />
   <inherits name="fi.wiskopdr.WiskOpdr"/>
@@ -32,8 +31,6 @@
   <inherits name="fi.statistiekgwt.StatistiekGWT-DWO" />
   <inherits name='com.googlecode.gwt.charts.Charts' />
   <inherits name='com.vaadin.pointerevents.PointerEvents' />
-  
-  
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='fi.graphtoolgwt.client.GraphToolGWT'/>

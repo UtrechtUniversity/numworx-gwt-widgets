@@ -10,7 +10,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 public class DomeinVakGWT extends LayoutPanel {
 	
@@ -54,7 +53,7 @@ public class DomeinVakGWT extends LayoutPanel {
 		editor = new FormuleEditor();
 		editor.getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX);
 		editor.setFont(defaultfont);
-		TouchPanel tp = (TouchPanel) editor.getAsPanel();
+		Panel tp = editor.getAsPanel();
 		tp.getElement().getStyle().setProperty("display", "inline-block");
 		editor.setCurrent(0, 0);
 		//kb = interactiePanel.kb; // THE ONE AND ONLY TODO betere interface naar interactiePanel.kb
@@ -62,7 +61,7 @@ public class DomeinVakGWT extends LayoutPanel {
 		//editor.requestFocus(); // Wim: pas requestfocus als zichtbaar
 		editor.setFormuleToolBijFocus(true);
 		this.add(tp);
-		addFormulePanelListeners(tp, editor);
+		addFormulePanelListeners(editor);
 	}
 	
 	public String geefTekst()
@@ -80,9 +79,9 @@ public class DomeinVakGWT extends LayoutPanel {
 		editor.clearAll();
 	}
 	
-	private void addFormulePanelListeners(final TouchPanel tp, final FormuleEditor editor)
+	private void addFormulePanelListeners(final FormuleEditor editor)
 	{
-		tp.addTouchHandler(new FormuleEditorTouchHandler(editor));
+		new FormuleEditorTouchHandler(editor).initHandler();
 	}
 	
 	/*

@@ -11,40 +11,22 @@ import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
-
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.dom.client.Style.Float;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.FocusHandler;
-import com.google.gwt.event.dom.client.FocusEvent;
-import com.google.gwt.event.dom.client.HandlesAllFocusEvents;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.googlecode.mgwt.dom.client.event.touch.TouchCancelEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchEndEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchHandler;
-import com.googlecode.mgwt.dom.client.event.touch.TouchMoveEvent;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
-
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleEditor;
 import fi.wiskopdr.FormuleParser;
-import fi.wiskopdr.expressies.Expressie;
 
 public class VeldComponentGWT extends LayoutPanel { 
 	
@@ -257,7 +239,7 @@ public class VeldComponentGWT extends LayoutPanel {
 		
 		private String[] functionsBegin;
 		private LayoutPanel[] functionPanels;
-		private TouchPanel[] functionEditorPanels;
+		private Panel[] functionEditorPanels;
 		private FormuleViewer[] functionBeginViewers;
 		private DiffEqFunctionEditor[] functionEditors;
 		private Canvas braceCanvas;
@@ -275,7 +257,7 @@ public class VeldComponentGWT extends LayoutPanel {
 
 			functionsBegin = new String[nrFunctions];
 			functionPanels = new LayoutPanel[nrFunctions];
-			functionEditorPanels = new TouchPanel[nrFunctions];
+			functionEditorPanels = new Panel[nrFunctions];
 			functionBeginViewers = new FormuleViewer[nrFunctions];
 			functionEditors = new DiffEqFunctionEditor[nrFunctions];
 			braceCanvas = Canvas.createIfSupported();
@@ -297,7 +279,7 @@ public class VeldComponentGWT extends LayoutPanel {
 				functionEditors[i].setDefaultFont(defaultfont);
 
 				functionEditorPanels[i] = functionEditors[i].getAsPanel();
-				addFormuleEditorListener(functionEditorPanels[i], functionEditors[i]);
+				addFormuleEditorListener(functionEditors[i]);
 				functionEditorPanels[i].getElement().getStyle().setProperty("display", "inline-block");
 				
 				functionEditors[i].setCurrentElementRepaint();
@@ -372,8 +354,8 @@ public class VeldComponentGWT extends LayoutPanel {
 			}
 		}
 		
-		private void addFormuleEditorListener(final TouchPanel tp, final DiffEqFunctionEditor editor ) {
-			tp.addTouchHandler(new FormuleEditorTouchHandler(editor));
+		private void addFormuleEditorListener(final DiffEqFunctionEditor editor ) {
+			new FormuleEditorTouchHandler(editor).initHandler();
 		}
 		
 		public void setFunction(int functionId, String functionStr) {
