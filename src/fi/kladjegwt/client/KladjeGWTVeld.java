@@ -4085,6 +4085,7 @@ public class KladjeGWTVeld
 	{
 		if (mouseMode == tekenen)
 		{	
+			mouseDown = false;
 			ArrayList<DoublePoint> smoothedDraggDoublePoints = smooth(draggDoublePoints, smoothType);
 			
 			Streep streep = new Streep(drawingColor, smoothedDraggDoublePoints);
