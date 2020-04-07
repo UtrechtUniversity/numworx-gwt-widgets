@@ -3,12 +3,11 @@ package fi.graphtoolgwt.client;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.Event;
 
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.StatistiekGWT;
@@ -170,8 +169,7 @@ public class SingleColorPickerDialog extends Dialog implements HasHandlers
 		close(button == getCancelButton());
 	}
 
-	@Override
-	public void fireEvent(GwtEvent<?> e)
+	public void fireEvent(Event<?> e)
 	{
 		this.eventBus.fireEvent(e);
 	}
@@ -199,7 +197,7 @@ public class SingleColorPickerDialog extends Dialog implements HasHandlers
 	/**
 	 * Subscribe for events
 	 */
-	public HandlerRegistration addGraphToolColorChangeEventHandler(ColorChangeEventHandler handler)
+	public com.google.web.bindery.event.shared.HandlerRegistration addGraphToolColorChangeEventHandler(ColorChangeEventHandler handler)
 	{
 		return this.eventBus.addHandler(GraphToolColorChangeEvent.TYPE, handler);
 	}

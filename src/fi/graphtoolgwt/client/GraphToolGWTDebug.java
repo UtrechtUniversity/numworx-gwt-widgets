@@ -1,6 +1,8 @@
 package fi.graphtoolgwt.client;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -199,7 +201,8 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 
 	    RootLayoutPanel.get().add(FocusOnTouch.wrap(this.asWidget(), true));
 	
-		init(300,600, Collections.emptyMap(), Collections.emptyMap());
+		Map<String, Object> map = new HashMap<>();
+		init(300,600, map, Collections.emptyMap());
 		MockOpdrNav opdrnav = new MockOpdrNav();
 		FocusOnTouch.installKeyboard(opdrnav, opdrnav);
 		FocusOnTouch.focus();

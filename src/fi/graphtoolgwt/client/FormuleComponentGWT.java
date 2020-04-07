@@ -32,6 +32,7 @@ import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -447,7 +448,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);
 			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
-			regelPanels[i].setWidgetTopHeight(checkboxen[i], 5, Style.Unit.PX, 20, Style.Unit.PX);
+			regelPanels[i].setWidgetTopHeight(checkboxen[i], 0, Style.Unit.PX, 20, Style.Unit.PX);
 			
 			if (!functieBeginAanpasbaar)
 			{
@@ -458,7 +459,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			editors[i] = factor.build(i);
 			if (functieBeginAanpasbaar)
 				editors[i].getAsPanel().getElement().getStyle().setMarginLeft(13, Unit.PX);
-			editors[i].getAsPanel().getElement().getStyle().setMarginTop(5, Unit.PX); // interlinie 5px
 			editors[i].setFont(defaultfont);
 			editors[i].setDefaultFont(defaultfont);
 
@@ -1427,7 +1427,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			if (regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
 				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight()+5, Style.Unit.PX);
 			if (regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 10, 5) , Style.Unit.PX, 20, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 17, 0) , Style.Unit.PX, 20, Style.Unit.PX);
 			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
 				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight())+5, Style.Unit.PX);
 		}
