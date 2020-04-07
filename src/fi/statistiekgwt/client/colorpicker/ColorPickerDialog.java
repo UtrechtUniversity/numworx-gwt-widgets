@@ -1,17 +1,16 @@
 package fi.statistiekgwt.client.colorpicker;
 
 import com.google.gwt.canvas.dom.client.CssColor;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.Event;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import fi.statistiekgwt.client.ColorUtils;
 import fi.statistiekgwt.client.StatistiekGWT;
 import fi.statistiekgwt.client.StatistiekUtils;
-import fi.statistiekgwt.client.colorpicker.Dialog;
 import fi.statistiekgwt.client.event.ColorChangeEvent;
 import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 
@@ -256,8 +255,7 @@ public class ColorPickerDialog extends Dialog implements HasHandlers
 		setCssColorB();
 	}
 
-	@Override
-	public void fireEvent(GwtEvent<?> e)
+	public void fireEvent(Event<?> e)
 	{
 		this.eventBus.fireEvent(e);
 	}

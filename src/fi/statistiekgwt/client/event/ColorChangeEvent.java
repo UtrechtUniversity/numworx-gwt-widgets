@@ -1,8 +1,8 @@
 package fi.statistiekgwt.client.event;
 
-import com.google.gwt.event.shared.GwtEvent;
+import com.google.web.bindery.event.shared.Event;
 
-public class ColorChangeEvent extends GwtEvent<ColorChangeEventHandler>
+public class ColorChangeEvent extends Event<ColorChangeEventHandler>
 {
 	public static Type<ColorChangeEventHandler> TYPE = new Type<ColorChangeEventHandler>();
 	
@@ -18,7 +18,7 @@ public class ColorChangeEvent extends GwtEvent<ColorChangeEventHandler>
 	@Override
 	public Type<ColorChangeEventHandler> getAssociatedType()
 	{
-		return this.TYPE;
+		return TYPE;
 	}
 
 	@Override
