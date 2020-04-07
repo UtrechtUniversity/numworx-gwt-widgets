@@ -77,22 +77,22 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.1.1</version>
+  		<version>0.1.6</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>0.1.1</version>
+		<version>0.1.7</version>
 	</dependency>
 			<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
-			<version>0.0.2</version>
+			<version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.5</version>
+			<version>0.0.7-SNAPSHOT</version>
 	  		<exclusions>
 	  			<exclusion>
 	  				<artifactId>IdeasGWT</artifactId>

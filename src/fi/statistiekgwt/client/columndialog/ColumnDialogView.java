@@ -16,11 +16,10 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 
 import fi.statistiekgwt.client.StatistiekCssResource;
 import fi.statistiekgwt.client.StatistiekGWT;
@@ -90,7 +89,7 @@ public class ColumnDialogView extends DialogBox
 	 * binnen de formule-editor de focus kunt zetten voor de verschillende 
 	 * invulvakken van een formule.
 	 */
-	TouchPanel touchPanel = null;
+	Panel touchPanel = null;
 	/**
 	 * Boolean indicating 'Computer variable' button
 	 * has been clicked yes or no.
@@ -209,8 +208,7 @@ public class ColumnDialogView extends DialogBox
 		this.computeVariableEditor = new FormuleEditor();
 		this.kb = computeVariableEditor.getKeyboard();
 		kb.setEnterType(EnterType.APPLY);
-		touchPanel = new TouchPanel();
-		touchPanel.add(computeVariableEditor.getAsPanel());
+		touchPanel = computeVariableEditor.getAsPanel();
 		
 		// compute variable panel
 		this.computeVariablePanel = new FlowPanel();
@@ -220,15 +218,7 @@ public class ColumnDialogView extends DialogBox
 		
 		this.computeVariableEditor.setFormuleToolBijFocus(true);
 
-		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(computeVariableEditor) {
-
-			@Override
-			public void onTouchStart(TouchStartEvent event)
-			{
-				super.onTouchStart(event);
-			}
-			
-		});
+		new FormuleEditorTouchHandler(computeVariableEditor).initHandler();
 
 		this.setTypePanel = new FlowPanel();
 		this.setTypePanel.add(this.kiesNaam);
