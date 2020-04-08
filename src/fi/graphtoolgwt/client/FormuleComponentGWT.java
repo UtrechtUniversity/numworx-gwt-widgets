@@ -1410,6 +1410,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		grafiekGWTVeld.paint();
 	}
 	
+	private final int TOP = 3;
 	public void resize()
 	{
 		int index = -1;
@@ -1422,12 +1423,12 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			{
 				FormuleViewer f = new FormuleViewer(functieBegin[i]);
 				if (regelPanels[i].getWidgetIndex(functieBeginViewers[i]) > -1)
-					regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], Math.max(0, ashoogte - f.getMainRegel().getAsHoogte()), Style.Unit.PX, f.getHeight(), Style.Unit.PX);
+					regelPanels[i].setWidgetTopHeight(functieBeginViewers[i], TOP+Math.max(0, ashoogte - f.getMainRegel().getAsHoogte()), Style.Unit.PX, f.getHeight(), Style.Unit.PX);
 			}
 			if (regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(editorPanels[i], 0, Style.Unit.PX, editors[i].getHeight()+5, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(editorPanels[i], TOP, Style.Unit.PX, editors[i].getHeight()+5, Style.Unit.PX);
 			if (regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(checkboxen[i], Math.max(ashoogte - 17, 0) , Style.Unit.PX, 20, Style.Unit.PX);
+				regelPanels[i].setWidgetTopHeight(checkboxen[i], TOP+Math.max(ashoogte - 17, 0) , Style.Unit.PX, 20, Style.Unit.PX);
 			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
 				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight())+5, Style.Unit.PX);
 		}
