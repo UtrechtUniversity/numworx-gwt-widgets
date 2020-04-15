@@ -3803,7 +3803,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if(zooming)
 			return;
 	
-		if (pinchState == TWO_FINGERS && !zooming && Math.abs(newDistance - startDistance) > 5)
+		if (pinchState == TWO_FINGERS && !zooming && Math.abs(newDistance - startDistance) > 5 && zoomOptie)
 		{	zooming = true;
 			if (newDistance > startDistance)//inzoomen
 			{
@@ -4589,7 +4589,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	}
 	
 	
-	public void runZoom(boolean isX, boolean isY, boolean isIn) 
+	private void runZoom(boolean isX, boolean isY, boolean isIn) 
 	{
 		{	
 			final boolean x = isX;
