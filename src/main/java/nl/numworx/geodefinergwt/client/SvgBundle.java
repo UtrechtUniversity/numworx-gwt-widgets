@@ -238,4 +238,12 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource lengte_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/colorpalette-inactive.svg")
+  @MimeType("image/svg+xml")
+  DataResource colorpalette_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/colorpalette-line-active.svg")
+  @MimeType("image/svg+xml")
+  DataResource colorpalette_active_svg();
+
 }

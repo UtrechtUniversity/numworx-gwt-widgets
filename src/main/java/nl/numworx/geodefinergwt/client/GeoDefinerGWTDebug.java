@@ -202,6 +202,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
+				Tools.COLOR_PALETTE,
 				Tools.POINT,
 				Tools.LINE,
 				Tools.HALFLINE,

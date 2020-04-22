@@ -253,4 +253,9 @@ public class ToolBoxModule {
 		return newSBtn(svg.sporen_svg(), svg.sporen_active_svg(), new TrailHandler(rb.Euclides_44()), tracker, model,rb.Euclides_44());
 	}
 
+	@Provides @IntKey(Tools.COLOR_PALETTE) @IntoMap static
+	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model) {
+		EventHandler handler = new EventHandler("colorpalette") {};
+		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, "Kleurenpalet");
+	}
 }
