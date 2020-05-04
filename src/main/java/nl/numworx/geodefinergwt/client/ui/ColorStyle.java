@@ -9,7 +9,7 @@ public class ColorStyle {
     rgba = i;
   }
 
-  ColorStyle(int i) {
+  public ColorStyle(int i) {
     this(colorString(i),i);
   }
   

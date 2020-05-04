@@ -39,6 +39,7 @@ import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
+import nl.numworx.geodefinergwt.client.ColorHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 import nl.numworx.geodefinergwt.client.ResetHandler;
@@ -255,7 +256,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.COLOR_PALETTE) @IntoMap static
 	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model) {
-		EventHandler handler = new EventHandler("colorpalette") {};
+		EventHandler handler = new ColorHandler("colorpalette");
 		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, "Kleurenpalet");
 	}
 }
