@@ -16,6 +16,10 @@ public class ColorStyle {
   public String getColor() {
     return color;
   }
+ 
+  public int getRGB() {
+	  return rgba;
+  }
 
   @Override
   public String toString() {

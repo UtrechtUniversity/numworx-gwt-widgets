@@ -255,8 +255,8 @@ public class ToolBoxModule {
 	}
 
 	@Provides @IntKey(Tools.COLOR_PALETTE) @IntoMap static
-	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model) {
-		EventHandler handler = new ColorHandler("colorpalette");
+	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
+		EventHandler handler = new ColorHandler("colorpalette", instance.getStateConfiguration());
 		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, "Kleurenpalet");
 	}
 }

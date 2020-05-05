@@ -1,7 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.awt.Color;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.function.Consumer;
 
@@ -9,8 +9,6 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.PushButton;
-
 import fi.euclides.event.EventHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
@@ -18,9 +16,12 @@ import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 
 public class ColorHandler extends EventHandler {
 
-	public ColorHandler(String string) {
+	final private Map<String, Map<String, Object>> state;
+
+
+	public ColorHandler(String string, Map<String,Map<String,Object>> state) {
 		super(string);
-		// TODO Auto-generated constructor stub
+		this.state = state;
 	}
 	@Override
 	public boolean allowSelection(Vector selection) {
@@ -33,6 +34,8 @@ public class ColorHandler extends EventHandler {
 		(value -> {
 			for(Destroyable p: selection) {
 				DefaultAdapter.getDefault(p).put(ColorStyle.class, value);
+				Map<String,Object> pstate = state.computeIfAbsent(getTracker().getMapper().toString(p), k -> new HashMap<>());
+				pstate.put("color", value.getRGB());
 			}
 			getModel().clearSelection();
 		});

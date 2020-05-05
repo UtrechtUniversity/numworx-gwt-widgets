@@ -36,6 +36,12 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	
 	private static final OMObject EUCLIDES_VISIBLE = new OMSymbol("euclides", "visible");
 	
+	public void installLight() {
+		ColorStyle css = new ColorStyle(rgba);
+		DefaultAdapter.getDefault(item).put(css);
+	}
+	
+	
 	@Override
 	public void install() {
 		//java.util.logging.Logger.getLogger("ColorModel").info("install " + item + " " + rgba);
