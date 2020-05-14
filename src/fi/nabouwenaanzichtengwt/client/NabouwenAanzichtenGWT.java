@@ -1,5 +1,6 @@
 package fi.nabouwenaanzichtengwt.client;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,7 @@ import java.util.logging.Logger;
 
 public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
 {
+	private static final String LOG_OPTION = "logOption";
 	/**
 	 * CBook constantes
 	 */
@@ -106,7 +108,12 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	private Map<String, Object> launchState;
 	String[] randomVarNamen = null;
 	Map<String, ?> randomVarWaarden = null;
-
+	/**
+	 * logging 
+	 */
+	public boolean logOption = false;
+	
+	
 	/**
 	 * main panel
 	 */
@@ -629,6 +636,8 @@ logger.info("NabouwenAanzichtenGWT init");
 		ObjectMap launchMap = JSONUtilities.wrapMap(launchData);
 		randomVarWaarden = values;
 		randomVarNamen   = values.keySet().toArray(new String[values.size()]);
+
+		logOption = launchMap.getBoolean(LOG_OPTION, logOption);
 		
 		panel.setSize(breedte + "px", hoogte + "px");
 
@@ -1004,6 +1013,26 @@ logger.info("NabouwenAanzichtenGWT init");
 		return kijkNaActief && !checkExternal;
 	}
 	
+	public void setAttempt(Map<String, ?> parameters) {
+		if (logOption && comRoot != null) {
+			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+		}
+	}
+	public void setAttempt() {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			parameters.put("response", "[[[]]]"); // de blokjes als string, 3d representatie [[[true,true],[true,false]]]
+			if (feedback != null && !feedback.isEmpty())
+				parameters.put("feedback", feedback);
+			setAttempt(parameters);
+		}
+	}
+	
+	
 	public void kijkNa() 
 	{
 		// reset isVeranderdNaNakijken
@@ -1077,6 +1106,8 @@ logger.info("NabouwenAanzichtenGWT init");
 			else
 				fireEvent(EVENT_FALSE);
 		}
+		
+		setAttempt(); // hier?
 	}
 
 	void zetIsVeranderdNaNakijken(boolean b)
