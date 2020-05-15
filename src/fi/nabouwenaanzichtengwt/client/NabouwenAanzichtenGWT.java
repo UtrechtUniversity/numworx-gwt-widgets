@@ -1,6 +1,7 @@
 package fi.nabouwenaanzichtengwt.client;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -1036,7 +1037,7 @@ logger.info("NabouwenAanzichtenGWT init");
 			boolean[][][] state = null;
 			int errorCount = this.errorCount;
 			state = vWerk.kr.geefBooleanRooster();
-			parameters.put("response", state); // de blokjes als string, 3d representatie [[[true,true],[true,false]]]
+			parameters.put("response", Arrays.deepToString(state)); // de blokjes als string, 3d representatie [[[true,true],[true,false]]]
 			if (feedback != null && !feedback.isEmpty())
 				parameters.put("feedback", feedback);
 			setAttempt(parameters);
