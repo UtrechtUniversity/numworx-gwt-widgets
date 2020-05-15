@@ -258,6 +258,7 @@ public class Viewer3d
 		canvas.addTouchStartHandler(mb);
 		canvas.addTouchEndHandler(mb);
 		canvas.addTouchMoveHandler(mb);
+		
 		(canvas.asWidget()).addDomHandler((PointerMoveHandler)mb, PointerMoveEvent.getType()); 
 		(canvas.asWidget()).addDomHandler((PointerUpHandler)mb, PointerUpEvent.getType()); 
 		(canvas.asWidget()).addDomHandler((PointerDownHandler)mb, PointerDownEvent.getType()); 
@@ -1116,6 +1117,8 @@ public class Viewer3d
 		
 		eigenaar.setChanged(true);
 		
+		String changeLog = "";
+		
 		for (int q = aantalKv - 1; q > -1; q--)
 		{
 			int n = sorteerRij[q];
@@ -1126,6 +1129,7 @@ public class Viewer3d
 				if (eigenaar.isBouwen() && !(holdMouse || remove))
 				{
 					changed = kr.voegKubusToe(kv[n].i, kv[n].j, 0);
+					changeLog += "addCube(" + kv[n].i + "," + kv[n].j + "," + 0 + ")";
 					updateLastBuildCommand(changed, true, kv[n].i, kv[n].j, 0);
 					if (gr != null)
 						gr.verhoog(kv[n].i, kv[n].j);
@@ -1133,13 +1137,15 @@ public class Viewer3d
 				else
 				{
 					changed = kr.verwijderKubus(kv[n].i, kv[n].j, 0);
+					changeLog += "removeCube(" + kv[n].i + "," + kv[n].j + "," + 0 + ")";
 					updateLastBuildCommand(changed, false, kv[n].i, kv[n].j, 0);
 					if (gr != null)
 						gr.verlaag(kv[n].i, kv[n].j);
 				}
 				tekenOpnieuw();
-				if (changed)
-					eigenaar.zetVeranderd(false);
+				if (changed) {
+					eigenaar.zetVeranderd(false, changeLog);
+				}
 				return;
 
 			}
@@ -1151,6 +1157,7 @@ public class Viewer3d
 					if (kv[n].m == 0)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k + 1);
+						changeLog += "addCube(" + kv[n].i + "," + kv[n].j + "," + (kv[n].k+1) + ")";
 						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k+1);
 						if (gr != null)
 							gr.verhoog(kv[n].i, kv[n].j);
@@ -1158,41 +1165,47 @@ public class Viewer3d
 					if (kv[n].m == 1)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j - 1, kv[n].k);
+						changeLog += "addCube(" + kv[n].i + "," + (kv[n].j-1) + "," + kv[n].k + ")";
 						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j-1,kv[n].k);
 					}
 					if (kv[n].m == 2)
 					{
 						changed = kr.voegKubusToe(kv[n].i + 1, kv[n].j, kv[n].k);
+						changeLog += "addCube(" + (kv[n].i+1) + "," + kv[n].j + "," + kv[n].k + ")";
 						updateLastBuildCommand(changed, true, kv[n].i+1,kv[n].j,kv[n].k);
 					}
 					if (kv[n].m == 3)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j + 1, kv[n].k);
+						changeLog += "addCube(" + kv[n].i + "," + (kv[n].j+1) + "," + kv[n].k  + ")";
 						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j+1,kv[n].k);
 					}
 					if (kv[n].m == 4)
 					{
 						changed = kr.voegKubusToe(kv[n].i - 1, kv[n].j, kv[n].k);
+						changeLog += "addCube(" + (kv[n].i-1) + "," + kv[n].j + "," + kv[n].k + ")";
 						updateLastBuildCommand(changed, true, kv[n].i-1,kv[n].j,kv[n].k);
 					}
 					if (kv[n].m == 5)
 					{
 						changed = kr.voegKubusToe(kv[n].i, kv[n].j, kv[n].k - 1);
+						changeLog += "addCube(" + kv[n].i + "," + kv[n].j + "," + (kv[n].k-1) + ")";
 						updateLastBuildCommand(changed, true, kv[n].i,kv[n].j,kv[n].k-1);
 					}
 					tekenOpnieuw();
 					if (changed)
-						eigenaar.zetVeranderd(false);
+						eigenaar.zetVeranderd(false, changeLog);
 				}
 				else
 				{
 					changed = kr.verwijderKubus(kv[n].i, kv[n].j, kv[n].k);
+					changeLog += "removeCube(" + kv[n].i + "," + kv[n].j + "," + kv[n].k + ")";
 					updateLastBuildCommand(changed, false, kv[n].i,kv[n].j,kv[n].k);
 					if (gr != null)
 						gr.verlaag(kv[n].i, kv[n].j);
 					tekenOpnieuw();
 					if (changed)
-						eigenaar.zetVeranderd(false);
+						eigenaar.zetVeranderd(false, changeLog);
 				}
 				return;
 			}

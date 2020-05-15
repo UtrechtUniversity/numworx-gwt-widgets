@@ -1,5 +1,6 @@
 package fi.nabouwenaanzichtengwt.client;
 
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -343,6 +344,10 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	 */
 	void zetVeranderd(boolean state)
 	{
+		zetVeranderd(state, null);
+	}
+	void zetVeranderd(boolean state, String changeLog)
+	{
 		if ((blokjesLabel != null) && (vWerk != null))
 		{
 			Msgs msgs = GWT.create(Msgs.class);
@@ -388,7 +393,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 			ingevuld = true;
 		else
 			ingevuld = false;
-
+		if(changeLog != null)
+			setAttempt(changeLog);
 	}
 
 	/**
@@ -1016,6 +1022,7 @@ logger.info("NabouwenAanzichtenGWT init");
 	public void setAttempt(Map<String, ?> parameters) {
 		if (logOption && comRoot != null) {
 			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+			logger.info(parameters.toString());
 		}
 	}
 	public void setAttempt() {
@@ -1025,9 +1032,22 @@ logger.info("NabouwenAanzichtenGWT init");
 			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
 			if (isCorrect()!= null) parameters.put("success", isCorrect());
 			parameters.put("score", Collections.singletonMap("raw", getScore()));
-			parameters.put("response", "[[[]]]"); // de blokjes als string, 3d representatie [[[true,true],[true,false]]]
+			
+			boolean[][][] state = null;
+			int errorCount = this.errorCount;
+			state = vWerk.kr.geefBooleanRooster();
+			parameters.put("response", state); // de blokjes als string, 3d representatie [[[true,true],[true,false]]]
 			if (feedback != null && !feedback.isEmpty())
 				parameters.put("feedback", feedback);
+			setAttempt(parameters);
+		}
+	}
+	
+	public void setAttempt(String changeLog) {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("addRemoveCommand", changeLog); // standaard voor "poging"
 			setAttempt(parameters);
 		}
 	}
@@ -1107,7 +1127,7 @@ logger.info("NabouwenAanzichtenGWT init");
 				fireEvent(EVENT_FALSE);
 		}
 		
-		setAttempt(); // hier?
+		setAttempt(); // hier? Ja, maar ook bij zetVeranderd
 	}
 
 	void zetIsVeranderdNaNakijken(boolean b)
