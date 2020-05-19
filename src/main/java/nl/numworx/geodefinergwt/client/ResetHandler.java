@@ -36,7 +36,7 @@ public class ResetHandler extends nl.numworx.geodefiner.common.ResetHandler {
       box.addCloseHandler(ev -> { popup = null; });
       FlowPanel contents = new FlowPanel();
       FlowPanel buttons = new FlowPanel();
-      contents.add(new Label(GeoDefinerGWT.MESSAGES.Euclides_33() + "?"));
+      contents.add(new Label("Reset?"));
       Button ja = new Button(GeoDefinerGWT.MESSAGES.LabelTester_0()); ja.addClickHandler(this::confirm);
       ja.getElement().getStyle().setPaddingLeft(20, Style.Unit.PX);
       Button nee = new Button(GeoDefinerGWT.MESSAGES.LabelTester_1()); nee.addClickHandler(this::cancel);
