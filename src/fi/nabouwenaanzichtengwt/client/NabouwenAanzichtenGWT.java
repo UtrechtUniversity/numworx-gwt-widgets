@@ -1047,8 +1047,10 @@ logger.info("NabouwenAanzichtenGWT init");
 	public void setAttempt(String changeLog) {
 		if (logOption) {
 // Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+// fixed keys: response, verb:
 			Map<String,Object> parameters = new HashMap<>();
-			parameters.put("addRemoveCommand", changeLog); // standaard voor "poging"
+			parameters.put("response", changeLog);
+			parameters.put("verb", "http://www.dwo.nl/verbs/addRemoveCommand");
 			setAttempt(parameters);
 		}
 	}
