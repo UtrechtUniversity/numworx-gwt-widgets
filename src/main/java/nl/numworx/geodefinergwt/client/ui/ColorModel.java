@@ -18,7 +18,6 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.openmath.Expression;
 import fi.euclides.util.DefaultAdapter;
-import fi.euclides.util.Observer;
 
 public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
@@ -43,7 +42,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	
 	
 	@Override
-	public void install() {
+	public void install(Destroyable item) {
 		//java.util.logging.Logger.getLogger("ColorModel").info("install " + item + " " + rgba);
 		ColorStyle css = new ColorStyle(rgba);
 		DefaultAdapter.getDefault(item).put(css);
@@ -137,6 +136,13 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	public UIModel<T, Void> init2(Destroyable item) {
 		this.item = item;
 		return this;
+	}
+
+
+	@Override
+	public void install() {
+		install(item);
+		
 	}
 
 }

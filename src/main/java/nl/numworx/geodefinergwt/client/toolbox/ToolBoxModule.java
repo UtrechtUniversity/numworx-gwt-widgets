@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client.toolbox;
 
+import java.util.TreeMap;
+
 import javax.inject.Named;
 
 import com.google.gwt.core.shared.GWT;
@@ -25,6 +27,8 @@ import fi.euclides.event.AddRaakLijnHandler;
 import fi.euclides.event.AddSpiegelHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.expr.TrailHandler;
+import fi.euclides.model.Destroyable;
+import fi.euclides.model.Punt;
 import fi.euclides.proof.AfstandHandler;
 import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
@@ -36,8 +40,11 @@ import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.FilteredDestroyHandler;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.Tools;
+import nl.numworx.geodefiner.common.UIModel;
+import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
+import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.ColorHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
@@ -88,8 +95,9 @@ public class ToolBoxModule {
 	}
 
 	@Provides @IntKey(Tools.POINT) @IntoMap static
-	ToggleButton point(TrackerImpl tracker, RadioMode model) {
-		return newPBtn(new AddSnapPuntHandler(), tracker, model);
+	ToggleButton point(TrackerImpl tracker, RadioMode model, PointModel ui, Instance instance) {
+		UIModel<Punt, Void> shim = new UIShim<Punt,Void>(ui, instance.getStateConfiguration(), tracker);
+		return newPBtn(new AddSnapPuntHandler(shim), tracker, model);
 	}
 	
 	@Provides @IntKey(Tools.LINE) @IntoMap static

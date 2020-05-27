@@ -3,6 +3,8 @@ package nl.numworx.geodefinergwt.client.ui;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import nl.numworx.geodefiner.common.PointType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import fi.euclides.model.Groep;
@@ -47,5 +49,6 @@ public class PointModel extends ColorModel<Punt> {
 		return super.toMap();
 	}
 
+	@Inject public PointModel() { }
 	
 }
