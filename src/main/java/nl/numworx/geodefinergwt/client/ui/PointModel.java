@@ -14,7 +14,7 @@ import fi.euclides.util.DefaultAdapter;
 
 public class PointModel extends ColorModel<Punt> {
 	private static final Logger LOG = Logger.getLogger(PointModel.class.getName());
-	int   size = 5;
+	Float   size; // optional 
 	PointType  type = PointType.DISK;
 	public boolean rigid = true;
 
@@ -28,7 +28,7 @@ public class PointModel extends ColorModel<Punt> {
             g.setFree(!rigid);
         }
 		DefaultAdapter adapter = DefaultAdapter.getDefault(item);
-		adapter.put(Float.valueOf(size));
+		if (size != null) adapter.put(size);
 		super.install();
 	}
 
@@ -38,9 +38,9 @@ public class PointModel extends ColorModel<Punt> {
 	@Override
 	public void fromMap(ObjectMap value) {
 		super.fromMap(value);
-		size = value.getInt("size");
-		type = PointType.valueOf(value.getString("type"));
-		rigid = value.getBoolean("rigid", true);
+		if (value.containsKey("size")) size = Float.valueOf(value.getInt("size"));
+		if (value.containsKey("type")) type = PointType.valueOf(value.getString("type"));
+		rigid = value.getBoolean("rigid", false);
 	}
 
 	@Override
