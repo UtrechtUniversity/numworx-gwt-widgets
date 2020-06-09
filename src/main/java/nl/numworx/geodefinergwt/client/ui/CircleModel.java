@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client.ui;
 
+import javax.inject.Inject;
+
 import fi.euclides.util.DefaultAdapter;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -26,5 +28,6 @@ public class CircleModel extends LineModel {
 			fill = TRANSPARANT;
 	}
 	
+	@Inject public CircleModel() { }
 	
 }

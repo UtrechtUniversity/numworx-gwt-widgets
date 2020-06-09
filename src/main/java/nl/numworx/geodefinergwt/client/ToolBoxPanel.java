@@ -27,8 +27,10 @@ import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
 import nl.numworx.geodefiner.common.Tools;
+import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class ToolBoxPanel extends Composite implements Tools {
 
@@ -52,12 +54,13 @@ public class ToolBoxPanel extends Composite implements Tools {
 		final TrackerImpl  tracker;
 		final RadioMode model;
 
-		public Action(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model) {
+		public Action(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, UIShim<? extends Destroyable, Void> shim) {
 			this.h = h;
 			this.btn = btn;
 			this.tracker = t;
 			this.model = model;
 			h.setTracker(t);
+			if(shim!= null) h.setDecorator(shim);
 			btn.addAttachHandler(this);
 		}
 
@@ -99,8 +102,8 @@ public class ToolBoxPanel extends Composite implements Tools {
 	public static class CirkelAction extends Action {
 
 		Image[] images;
-		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, DataResource ... images) {
-			super(h, t, btn, model);
+		public CirkelAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, UIShim<? extends Destroyable, Void> shim, DataResource ... images) {
+			super(h, t, btn, model,shim);
 			this.images = new Image[images.length]; 
 			for(int i = 0; i < images.length; i++) {
 			    Image image = new Image(images[i].getSafeUri());
@@ -151,7 +154,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 //		}
 
 		public PuntAction(EventHandler h, TrackerImpl t, ToggleButton btn, RadioMode model, DataResource...images) {
-		  super(h, t, btn, model);
+		  super(h, t, btn, model,null);
 		  this.images = new Image[images.length];
 		  for (int i = 0; i < images.length; i++) {
 		    Image image = new Image(images[i].getSafeUri());
@@ -227,7 +230,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 		return height;
 	}
 	
-	void init(ObjectList list, int w, Map<Integer,Provider<ToggleButton>> buttons) {		
+	void init(ObjectList list, ObjectList config, int w, Map<Integer,Provider<ToggleButton>> buttons, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {		
 		ToggleButton btn;
 		height = ((list.size()*BREEDTE_ICON-1)/w+1) * 40;
 		for (int i = 0; i < list.size(); i++ ) {
@@ -235,9 +238,27 @@ public class ToolBoxPanel extends Composite implements Tools {
 			btn = null;
 			Provider<ToggleButton> provider = buttons.get(n);
 			if(provider != null)
+			{
 				btn = provider.get();
+				installConfig(i, config, shims);
+			}
 			if(btn != null)	panel.add(btn);
 		}
+	}
+
+
+	private void installConfig(int i, ObjectList config, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+GWT.log("install config " + i + "  " + config);
+		if (config != null && i < config.size()) {
+			ObjectMap map = config.getObjectMap(i);
+			if (map != null) {
+GWT.log("map = " + map);
+				Provider<UIShim<? extends Destroyable, Void>> provider = shims.get(i);
+GWT.log("provider is " + provider);
+				if (provider != null) provider.get().fromMap(map);
+			}
+		}
+		
 	}
 
 

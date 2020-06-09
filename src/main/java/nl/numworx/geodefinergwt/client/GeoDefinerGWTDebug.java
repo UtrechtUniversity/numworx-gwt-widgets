@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import nl.numworx.geodefiner.common.PointType;
 import nl.numworx.geodefiner.common.Snapper;
@@ -242,7 +243,13 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.DESTROY,
 				Tools.RESET
 			);
+		Vector configs = new Vector();
+		configs.setSize(5);
+		configs.set(Tools.POINT, Collections.singletonMap("color", 0XFFFF0000));
+		
+		
 		launchDebug.put("toolbox", toolbox);
+		launchDebug.put("toolboxConfig", configs);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
 		checkDWO.put("score", 10);

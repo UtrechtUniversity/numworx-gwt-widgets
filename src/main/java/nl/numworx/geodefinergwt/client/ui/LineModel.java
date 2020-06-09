@@ -2,6 +2,9 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import nl.numworx.geodefiner.common.LineType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
+import javax.inject.Inject;
+
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
 
@@ -53,5 +56,5 @@ public class LineModel extends ColorModel<Destroyable> {
 			type = LineType.SOLID;
 		}
 	}
-
+	@Inject public LineModel() { }
 }

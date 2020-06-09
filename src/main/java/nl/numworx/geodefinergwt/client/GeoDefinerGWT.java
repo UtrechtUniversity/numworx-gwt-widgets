@@ -11,6 +11,7 @@ import javax.inject.Provider;
 import nl.numworx.geodefiner.common.CheckObjectList;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
+import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefiner.common.locus.Builder;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
@@ -135,7 +136,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				toolbox.init(list, width, buttons.get());
+				toolbox.init(list, launchData.getObjectList("toolboxConfig"), width, buttons.get(), shims.get());
 				root.setWidgetSize(toolbox, toolbox.getHeight());
 				root.setWidgetHidden(southPanel, false);
 				if(checkDWO == null) {
@@ -398,6 +399,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
+	@Inject Lazy<Map<Integer,Provider<UIShim<? extends Destroyable, Void>>>> shims;
     @Inject Lazy<Tracer> tracerProvider;
 
 	@Inject void setExpressions(@Named("expressions") Map<String,String> map) {

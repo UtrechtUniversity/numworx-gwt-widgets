@@ -2,6 +2,8 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Lijn;
 import fi.euclides.util.DefaultAdapter;
@@ -9,7 +11,7 @@ import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
-class SegmentModel extends LineModel {
+public class SegmentModel extends LineModel {
 
 	Tips tip = Tips.NOTIP;
 	
@@ -42,5 +44,5 @@ class SegmentModel extends LineModel {
 			adapter.put(width);
 		}
 	}
-
+	@Inject public SegmentModel() {}
 }

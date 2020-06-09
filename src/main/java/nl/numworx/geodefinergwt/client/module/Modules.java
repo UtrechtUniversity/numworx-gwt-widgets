@@ -32,10 +32,11 @@ import nl.numworx.geodefinergwt.client.CanvasViewer;
 import nl.numworx.geodefinergwt.client.DefinitionsGWT;
 import nl.numworx.geodefinergwt.client.GWTRandomizer;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
+import nl.numworx.geodefinergwt.client.toolbox.ShimModule;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
 import nl.numworx.geodefinergwt.client.ui.HerleidList;
 
-@Module(includes= {ToolBoxModule.class})
+@Module(includes= {ToolBoxModule.class, ShimModule.class})
 public abstract class Modules {
 	
 //	@Provides static AbstractViewer viewer(CanvasViewer w) {
