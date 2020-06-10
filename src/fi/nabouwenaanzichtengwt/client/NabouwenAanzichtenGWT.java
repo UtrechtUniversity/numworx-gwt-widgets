@@ -10,6 +10,7 @@ import java.util.Map;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
@@ -256,6 +257,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	}
 
 	NabouwenAanzichtenGWTClientBundle clientBundle = GWT.create(NabouwenAanzichtenGWTClientBundle.class);
+	private LessonMode lessonMode;
 
 	public void makeResources()
 	{
@@ -395,7 +397,11 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		else
 			ingevuld = false;
 		if(changeLog != null)
+		{
+			if (mode == OpdrNavIF.EINDTOETS)
+				kijkNa(false, false);
 			setAttempt(changeLog);
+		}
 	}
 
 	/**
@@ -597,7 +603,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
-		zetMode(comRoot.getMode());
+		zetMode(comRoot.getMode(),comRoot.getLessonMode());
 		CssColor background = comRoot.getBackground();
 		panel.getElement().getStyle().setBackgroundColor(background.value());
 		if (vWerk != null)
@@ -609,9 +615,10 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		comRoot.addCBookEventListener("blockBuilding", this);
 	}
 	
-	public void zetMode(int mode)
+	public void zetMode(int mode, LessonMode lessonMode)
 	{
 		this.mode = mode;
+		this.lessonMode = lessonMode;
 		if (isNakijkModus())
 		{
 			kijkNaActief = (mode == 0 || mode == 1);
@@ -1093,11 +1100,12 @@ logger.info("NabouwenAanzichtenGWT init");
 			score = Math.max(0, score - errorCount * foutStraf);
 		this.feedback = (String) checkResults.get("feedback");
 		this.goedHalfFout = (Integer) checkResults.get("goedHalfFout");
-
+// Bepaal wanneer er vinkjes getoond worden:		
+boolean showMark = mode == 1 || mode == 2 || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
 			kijkNaPanel.setStyleName("fout", false);
-			kijkNaPanel.setStyleName("half", true);
+			kijkNaPanel.setStyleName("half", showMark);
 			kijkNaPanel.setStyleName("goed", false);
 		}
 
@@ -1105,12 +1113,12 @@ logger.info("NabouwenAanzichtenGWT init");
 		{
 			kijkNaPanel.setStyleName("fout", false);
 			kijkNaPanel.setStyleName("half", false);
-			kijkNaPanel.setStyleName("goed", true);
+			kijkNaPanel.setStyleName("goed", showMark);
 		}
 		else if (goedHalfFout == NabouwenAanzichtenChecker.FOUT)
 		{
 			verhoogErrorCount();
-			kijkNaPanel.setStyleName("fout", true);
+			kijkNaPanel.setStyleName("fout", showMark);
 			kijkNaPanel.setStyleName("half", false);
 			kijkNaPanel.setStyleName("goed", false);
 		}
