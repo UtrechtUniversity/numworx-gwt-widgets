@@ -4,13 +4,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.interaction.client.InteractionView;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -37,6 +41,7 @@ import fi.tekenveelvlakgwt.client.text.Text;
 public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, InteractionView 
 {
 	static final String holderId = "dockholder";
+	private static final String LOG_OPTION = "logOption";
 
 	static final String upgradeMessage = 
 		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
@@ -68,6 +73,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	
 	private int mode;
 	private OpdrNavIF comRoot;
+	private LessonMode lessonMode;
 
 	/**
 	 * instelbaarheid: toon viewer?
@@ -129,6 +135,10 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	double docentDraaihoekY = 1e5d;
 	int score;
 	int scoreMax = 10;
+	/**
+	 * logging 
+	 */
+	public boolean logOption = false;
 	
 	/**
 	 * viewer constanten, zie klasse Viewer3d
@@ -323,9 +333,11 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	{	
     		if (vlakkenKleurenOptie && viewerOnly)
     		{	v3d.zetKleuren(leerlingKleuren);
+    		    v3d.tekenOpnieuw();
     		}
     		if (vlakkenKleurenOptie && profilesOnly)	
     		{	vaktek.zetVaktekKleuren(leerlingKleuren);
+    			vaktek.paint();
     		}
     	}	
     	
@@ -351,21 +363,24 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		if (kijkNaActief)
 			return correct;
 		else
-			return new Boolean(true);
+			return Boolean.TRUE;
 	}
 
 	public void setCommunicationRoot(OpdrNavIF comRoot)
 	{
 		this.comRoot = comRoot;
-		zetMode(comRoot.getMode());
+		zetMode(comRoot.getMode(),comRoot.getLessonMode());
 
 	}
 	
-	public void zetMode(int mode)
+	public void zetMode(int mode, LessonMode lm)
 	{
 		this.mode = mode;
+		this.lessonMode = lm;
 		if (kijkNaActief)    
-			kijkNaActief = (mode == 0 || mode == 1);
+		{
+			//kijkNaActief = (mode == 0 || mode == 1);
+		}
 	}
 	
 	/**
@@ -409,6 +424,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		// Wim: scoreMax uit launchstate halen.
 		if(launchState.containsKey("scoreMax"))
 			scoreMax = launchState.getInt("scoreMax");
+		logOption = launchState.getBoolean(LOG_OPTION, logOption);
 		
 		boolean viewerOnly = false;
 		boolean profilesOnly = false;
@@ -599,10 +615,42 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	   		score = 0;
 	   		nagekeken = false;
 	   		ingevuld = true;
-	   		comRoot.setChanged(true);
+	   		if (mode == OpdrNavIF.EINDTOETS) kijkNa();
+	   		else comRoot.setChanged(true);
 	   	}	
 	}
 
+	public void setAttempt(Map<String, ?> parameters) {
+		if (logOption && comRoot != null) {
+			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+			logger.info(parameters.toString());
+		}
+	}
+	public void setAttempt() {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			
+			parameters.put("response", "???"); 
+			setAttempt(parameters);
+		}
+	}
+	
+	public void setAttempt(String changeLog) {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+// fixed keys: response, verb:
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("response", changeLog);
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+			setAttempt(parameters);
+		}
+	}
 
 	/**
 	 * kijk na, onderscheidt mogelijkheden   
@@ -611,10 +659,12 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	{
     	if (!kijkNaActief)
     		return;
-    	
+    	boolean showMark = mode == 1 || mode == 2 || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
+    	String changeLog = "";
     	if (isVlakkenNakijkModus() && profilesOnly)
     	{
     		correct = vaktek.evalueer(docentKleuren);
+    		changeLog = Arrays.toString(vaktek.getKleuren());
     		nagekeken = true;
     		vaktek.kijkNaPanel.setStyleName("fout", !correct);
     		
@@ -622,6 +672,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	else if (isVlakkenNakijkModus() && viewerOnly)
     	{
     		correct = v3d.evalueer(docentKleuren);
+    		changeLog = Arrays.toString(v3d.getKleuren());
     		nagekeken = true;
     		v3d.kijkNaPanel.setStyleName("goed", correct);
     		v3d.kijkNaPanel.setStyleName("fout", !correct);
@@ -630,6 +681,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
     	else if (isDraaihoekNakijkModus())
     	{
     		correct = v3d.evalueer(docentDraaihoekX, docentDraaihoekY);
+    		changeLog = "(" + v3d.geefDraaiX() + "," + v3d.geefDraaiY() + ")";
     		nagekeken = true;
     	}
 
@@ -638,27 +690,27 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 		
 		if (correct && viewerOnly)
 		{
-    		v3d.kijkNaPanel.setStyleName("goed", true);
+    		v3d.kijkNaPanel.setStyleName("goed", showMark);
     		v3d.kijkNaPanel.setStyleName("fout", false);
 		}
 		else if (!correct && viewerOnly)
 		{
 			v3d.kijkNaPanel.setStyleName("goed", false);
-    		v3d.kijkNaPanel.setStyleName("fout", true);
+    		v3d.kijkNaPanel.setStyleName("fout", showMark);
 		}
 		else if (correct && profilesOnly)
 		{
-			vaktek.kijkNaPanel.setStyleName("goed", true);
+			vaktek.kijkNaPanel.setStyleName("goed", showMark);
 			vaktek.kijkNaPanel.setStyleName("fout", false);
 		}
 		else if (!correct && profilesOnly)
 		{
 			vaktek.kijkNaPanel.setStyleName("goed", false);
-			vaktek.kijkNaPanel.setStyleName("fout", true);
+			vaktek.kijkNaPanel.setStyleName("fout", showMark);
 		}
 		
 		ingevuld = true;
-
+		setAttempt(changeLog);
     	comRoot.setChanged(isCorrect().booleanValue());
 	}
 
