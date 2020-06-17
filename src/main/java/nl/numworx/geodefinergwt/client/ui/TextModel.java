@@ -6,6 +6,7 @@ import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.numworx.geodefiner.common.Volgpunt;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.Punt;
 import fi.euclides.model.math.Numbers;
@@ -16,25 +17,22 @@ public class TextModel extends ColorModel<Label> {
 	FontStyle font = new FontStyle();
 	private float dx, dy;
 	Boolean alwaysF, herleid;
-	Label item;
-	
 	@Override
-	public void install() {
+	public void install(Destroyable item) {
 		DefaultAdapter.getDefault(item).put(align);
 		DefaultAdapter.getDefault(item).put(font);
 		DefaultAdapter.getDefault(item).put(Boolean.class, alwaysF);
-		Punt p = item.getP();
+		Punt p = ((Label) item).getP();
 		if(p instanceof Volgpunt) {
 			((Volgpunt) p).setDxy(Numbers.createDouble(dx), Numbers.createDouble(dy));
 		}
-		super.install();
+		super.install(item);
 	}
 
 	public UIModel<Label, Void> init(Label item) {
 		if(item != null) 
 			align = item.adapt(Align.class);
 		if(align == null) align= Align.BASE;
-		this.item = item;
 		super.init(item);
 		return this;
 	}

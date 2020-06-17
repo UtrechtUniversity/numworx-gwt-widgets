@@ -26,12 +26,9 @@ public class LineModel extends ColorModel<Destroyable> {
 	};
 	boolean rigid; // default beweeglijk
 
-	/* (non-Javadoc)
-	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#install()
-	 */
 	@Override
-	public void install() {
-	  super.install();
+	public void install(Destroyable item) {
+	  super.install(item);
 	  DefaultAdapter adapter = DefaultAdapter.getDefault(item);
 	  adapter.put(getStroke(width, type));
       adapter.put(Boolean.valueOf(rigid));

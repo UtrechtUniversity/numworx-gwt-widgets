@@ -21,7 +21,8 @@ public class IntervalModel extends TextModel {
 	Double step, width;
 	
 	@Override
-	public void install() {
+	public void install(Destroyable d) {
+		Label item = (Label) d;
 		DefaultAdapter adapter = DefaultAdapter.getDefault(item);
 		Animator instance = adapter.adapt(Animator.class);
 		if (instance != null) instance.install(null);
@@ -68,8 +69,8 @@ public class IntervalModel extends TextModel {
 	@Override
 	public UIModel<Label, Void> init(Label item) {
 		if(item == null) {
-			if(this.item != null && this.item.getP() instanceof fi.euclides.model.PuntOp ) {
-				Segment s = (Segment) this.item.getP().getDepend()[0];
+			if(this.item != null && ((Label) this.item).getP() instanceof fi.euclides.model.PuntOp ) {
+				Segment s = (Segment) ((Label) this.item).getP().getDepend()[0];
 				length = s.getDX();
 				//x = s.getX1(); 
 				//y = s.getY1();

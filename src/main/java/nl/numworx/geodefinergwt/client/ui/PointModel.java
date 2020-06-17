@@ -7,6 +7,7 @@ import javax.inject.Inject;
 
 import nl.numworx.geodefiner.common.PointType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import fi.euclides.model.Destroyable;
 import fi.euclides.model.Groep;
 import fi.euclides.model.Punt;
 import fi.euclides.model.algo.FreePoint;
@@ -18,7 +19,7 @@ public class PointModel extends ColorModel<Punt> {
 	PointType  type = PointType.DISK;
 	public boolean rigid = true;
 
-	public void install() {
+	public void install(Destroyable item) {
 		if(item instanceof FreePoint) {
 			FreePoint r = (FreePoint) item;
 			r.setFree(!rigid);
@@ -29,7 +30,7 @@ public class PointModel extends ColorModel<Punt> {
         }
 		DefaultAdapter adapter = DefaultAdapter.getDefault(item);
 		if (size != null) adapter.put(size);
-		super.install();
+		super.install(item);
 	}
 
 	/* (non-Javadoc)
@@ -39,7 +40,13 @@ public class PointModel extends ColorModel<Punt> {
 	public void fromMap(ObjectMap value) {
 		super.fromMap(value);
 		if (value.containsKey("size")) size = Float.valueOf(value.getInt("size"));
-		if (value.containsKey("type")) type = PointType.valueOf(value.getString("type"));
+		if (value.containsKey("type")) {
+			try {
+				type = PointType.valueOf(value.getString("type"));
+			} catch (Exception e) {
+				type = PointType.DISK;
+			}
+		}
 		rigid = value.getBoolean("rigid", false);
 	}
 

@@ -26,8 +26,8 @@ public class GridModel extends LineModel {
 	}
 
 	@Override
-	public void install() {
-		super.install();
+	public void install(Destroyable item) {
+		super.install(item);
 		Snapper snapper = tracker.adapt(Snapper.class);
 		snapper.setGravity(gravity);
 	}

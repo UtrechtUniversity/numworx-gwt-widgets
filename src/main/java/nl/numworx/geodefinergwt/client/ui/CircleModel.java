@@ -2,6 +2,7 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import javax.inject.Inject;
 
+import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
@@ -10,8 +11,8 @@ public class CircleModel extends LineModel {
 	private int fill = TRANSPARANT;
 
 	@Override
-	public void install() {
-		super.install();
+	public void install(Destroyable item) {
+		super.install(item);
 		FillStyle f;
 		if(fill != TRANSPARANT)
 			f = new FillStyle(fill);

@@ -38,7 +38,10 @@ public class DashHandler extends EventHandler {
 		Consumer<LineType> consumer = 
 		(value -> {
 			for(Destroyable p: selection) {
-				DefaultAdapter.getDefault(p).put(StrokeStyle.class, LineModel.getStroke(value));
+				float w = 1f;
+				StrokeStyle s = p.adapt(StrokeStyle.class);
+				if (s != null) w = (float) s.lineWidth;
+				DefaultAdapter.getDefault(p).put(StrokeStyle.class, LineModel.getStroke(w,value));
 				Map<String,Object> pstate = state.computeIfAbsent(getTracker().getMapper().toString(p), k -> new HashMap<>());
 				pstate.put("type", value.name());
 			}

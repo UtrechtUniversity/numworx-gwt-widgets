@@ -33,8 +33,8 @@ public class SegmentModel extends LineModel {
 	}
 
 	@Override
-	public void install() {
-		super.install();
+	public void install(Destroyable item) {
+		super.install(item);
 		DefaultAdapter adapter = DefaultAdapter.getDefault(item);
 		if(tip == Tips.NOTIP) {
 			adapter.put(Tips.class, null);

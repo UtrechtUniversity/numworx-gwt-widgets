@@ -140,7 +140,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 
 	@Override
-	public void install() {
+	final public void install() {
 		install(item);
 		
 	}
