@@ -208,6 +208,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.LINE,
 				Tools.HALFLINE,
 				Tools.SEGMENT,
+				Tools.LINE_PALETTE,
 
 				Tools.PERPENDICULAR,
 				Tools.PARALLEL,
@@ -258,13 +259,13 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		List<String> definitions = Arrays.asList(
 				"$fa=9..#a#@" 
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
-				,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
-				,"$fP=point(1,1)@"
-				,"$fQ=point(-1,1)@"
-				,"$fh=halfline(Q,P)@"
-				,"$fy=$px$n2@@/2-2@"
-				,"$fwaarde=true@"
-				, "$fy<-1@"
+				//,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
+				//,"$fP=point(1,1)@"
+				//,"$fQ=point(-1,1)@"
+				//,"$fh=halfline(Q,P)@"
+				,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
+				//,"$fwaarde=true@"
+				//, "$fy<-1@"
 				);
 		launchDebug.put("definitions", definitions);
 		Map<String,Object> h = new HashMap<>();
@@ -290,7 +291,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 	    h.put("size", 15);
 	    h.put("log", true);
 	    configuration.put("P", h);configuration.put("Q", h);
-	    
+	    h = new HashMap();
+	    h.put("alwaysF", true);
+	    h.put("color", -16777216);
+	    configuration.put("v", h);
 	    
 	    launchDebug.put("configuration", configuration);
 		h = new HashMap<>();

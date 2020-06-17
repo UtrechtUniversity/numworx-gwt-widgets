@@ -43,6 +43,7 @@ import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.ColorHandler;
+import nl.numworx.geodefinergwt.client.DashHandler;
 import nl.numworx.geodefinergwt.client.FormuleHandler;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 import nl.numworx.geodefinergwt.client.ResetHandler;
@@ -267,6 +268,11 @@ public class ToolBoxModule {
 		EventHandler handler = new ColorHandler("colorpalette", instance.getStateConfiguration());
 		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, "Kleurenpalet",null);
 	}
+    @Provides @IntKey(Tools.LINE_PALETTE) @IntoMap static
+    ToggleButton dashpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
+        EventHandler handler = new DashHandler("linepalette", instance.getStateConfiguration(), svg.linetype());
+        return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, "Lijnpalet",null);
+    }
 	
 
 }

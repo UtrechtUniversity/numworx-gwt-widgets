@@ -3,6 +3,7 @@ package nl.numworx.geodefinergwt.client;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.DataResource.MimeType;
+import com.google.gwt.resources.client.ImageResource;
 
 public interface SvgBundle extends ClientBundle {
   @Source("nl/numworx/geodefinergwt/client/resources/Pan-Grab.svg")
@@ -246,4 +247,23 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource colorpalette_active_svg();
 
+  @Source("nl/numworx/geodefinergwt/client/resources/dashedline-inactive.svg")
+  @MimeType("image/svg+xml")
+  DataResource dashpalette_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/dashedline-line-active.svg")
+  @MimeType("image/svg+xml")
+  DataResource dashpalette_active_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/solid.png")
+  ImageResource solid();
+  @Source("nl/numworx/geodefinergwt/client/resources/dotted.png")
+  ImageResource dotted();
+  @Source("nl/numworx/geodefinergwt/client/resources/dashed.png")
+  ImageResource dashed();
+  @Source("nl/numworx/geodefinergwt/client/resources/dotdashed.png")
+  ImageResource dotdashed();
+  
+  @Source("nl/numworx/geodefinergwt/client/resources/linetype.css")
+  LineTypeCss linetype();
 }

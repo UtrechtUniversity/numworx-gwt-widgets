@@ -1,0 +1,33 @@
+@charset "UTF-8";
+
+@sprite .SOLID {
+	gwt-image: 'solid';
+	border: 1px solid gray;
+	height: 30px;
+	width: 67px;
+	background-repeat-x: repeat;
+}
+
+@sprite .DOTTED {
+	gwt-image: 'dotted';
+	border: 1px solid gray;
+	height: 30px;
+	width: 67px;
+	background-repeat-x: repeat;
+}
+
+@sprite .DASHED {
+	gwt-image: 'dashed';
+	border: 1px solid gray;
+	height: 30px;
+	width: 67px;
+	background-repeat-x: repeat;
+}
+
+@sprite .DASHDOTTED {
+	gwt-image: 'dotdashed';
+	border: 1px solid gray;
+	height: 30px;
+	width: 67px;
+	background-repeat-x: repeat;
+}

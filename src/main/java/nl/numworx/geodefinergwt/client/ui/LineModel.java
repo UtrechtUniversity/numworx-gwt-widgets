@@ -12,13 +12,13 @@ public class LineModel extends ColorModel<Destroyable> {
 
 	float width = 1.0f;
 	LineType type = LineType.SOLID;
-	String dashes[] = { 
+	static final String dashes[] = { 
 			null, 
 			"1, 3" ,
 			"5, 3" , 
 			"5, 3, 1, 3"
 	};
-	double dash[][] = {
+	static final double dash[][] = {
 			null,
 			{ 1, 3 },
 			{ 5, 3 },
@@ -33,9 +33,18 @@ public class LineModel extends ColorModel<Destroyable> {
 	public void install() {
 	  super.install();
 	  DefaultAdapter adapter = DefaultAdapter.getDefault(item);
-	  adapter.put(new StrokeStyle(/*Float.toString(width), dashes[type.ordinal()],*/ width, dash[type.ordinal()]));
+	  adapter.put(getStroke(width, type));
       adapter.put(Boolean.valueOf(rigid));
 	}
+
+
+  static public StrokeStyle getStroke(float f, LineType lineType) {
+    return new StrokeStyle(f, dash[lineType.ordinal()]);
+  }
+
+  static public StrokeStyle getStroke(LineType lineType) {
+    return new StrokeStyle(1f, dash[lineType.ordinal()]);
+  }
 
 	/* (non-Javadoc)
 	 * @see nl.numworx.geodefinergwt.client.ui.ColorModel#fromMap(nl.uu.fi.dwo.interaction.client.json.ObjectMap)
