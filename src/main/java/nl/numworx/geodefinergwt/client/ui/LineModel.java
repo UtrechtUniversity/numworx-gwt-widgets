@@ -66,4 +66,11 @@ public class LineModel extends ColorModel<Destroyable> {
 		}
 	}
 	@Inject public LineModel() { }
+
+
+  @Override
+  public void installLight() {
+    super.installLight();
+    DefaultAdapter.getDefault(item).put(getStroke(width, type));
+  }
 }
