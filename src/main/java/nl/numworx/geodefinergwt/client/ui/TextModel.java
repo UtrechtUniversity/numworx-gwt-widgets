@@ -22,10 +22,13 @@ public class TextModel extends ColorModel<Label> {
 		DefaultAdapter.getDefault(item).put(align);
 		DefaultAdapter.getDefault(item).put(font);
 		DefaultAdapter.getDefault(item).put(Boolean.class, alwaysF);
-		Punt p = ((Label) item).getP();
-		if(p instanceof Volgpunt) {
-			((Volgpunt) p).setDxy(Numbers.createDouble(dx), Numbers.createDouble(dy));
+		if (item instanceof Label) { // niet als het een "group" is
+    		Punt p = ((Label) item).getP();
+    		if(p instanceof Volgpunt) {
+    			((Volgpunt) p).setDxy(Numbers.createDouble(dx), Numbers.createDouble(dy));
+    		}
 		}
+		
 		super.install(item);
 	}
 
