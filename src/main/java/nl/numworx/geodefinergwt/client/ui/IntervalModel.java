@@ -44,7 +44,7 @@ public class IntervalModel extends TextModel {
 			adapter.put(StepValue.class, new StepValue(Numbers.createDouble(step.doubleValue()),min));
 			adapterP.put(Label.class, item);
 		}
-		super.install();
+		super.install(d);
 		ColorStyle css = item.adapt(ColorStyle.class);
 		adapterP.put(css);
 		Destroyable segment = item.getP().getDepend()[0];
