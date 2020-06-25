@@ -5,7 +5,6 @@
 	border: 1px solid gray;
 	height: 30px;
 	width: 67px;
-	background-repeat-x: repeat;
 }
 
 @sprite .DOTTED {
@@ -13,7 +12,6 @@
 	border: 1px solid gray;
 	height: 30px;
 	width: 67px;
-	background-repeat-x: repeat;
 }
 
 @sprite .DASHED {
@@ -21,7 +19,6 @@
 	border: 1px solid gray;
 	height: 30px;
 	width: 67px;
-	background-repeat-x: repeat;
 }
 
 @sprite .DASHDOTTED {
@@ -29,5 +26,4 @@
 	border: 1px solid gray;
 	height: 30px;
 	width: 67px;
-	background-repeat-x: repeat;
 }

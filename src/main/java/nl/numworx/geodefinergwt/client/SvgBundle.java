@@ -4,6 +4,8 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.DataResource.MimeType;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.ImageResource.ImageOptions;
+import com.google.gwt.resources.client.ImageResource.RepeatStyle;
 
 public interface SvgBundle extends ClientBundle {
   @Source("nl/numworx/geodefinergwt/client/resources/Pan-Grab.svg")
@@ -256,12 +258,16 @@ public interface SvgBundle extends ClientBundle {
   DataResource dashpalette_active_svg();
 
   @Source("nl/numworx/geodefinergwt/client/resources/solid.png")
+  @ImageOptions(repeatStyle=RepeatStyle.Both)
   ImageResource solid();
   @Source("nl/numworx/geodefinergwt/client/resources/dotted.png")
+  @ImageOptions(repeatStyle=RepeatStyle.Both)
   ImageResource dotted();
   @Source("nl/numworx/geodefinergwt/client/resources/dashed.png")
+  @ImageOptions(repeatStyle=RepeatStyle.Both)
   ImageResource dashed();
   @Source("nl/numworx/geodefinergwt/client/resources/dotdashed.png")
+  @ImageOptions(repeatStyle=RepeatStyle.Both)
   ImageResource dotdashed();
   
   @Source("nl/numworx/geodefinergwt/client/resources/linetype.css")
