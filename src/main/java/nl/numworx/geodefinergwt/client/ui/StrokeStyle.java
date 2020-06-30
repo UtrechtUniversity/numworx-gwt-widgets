@@ -14,18 +14,24 @@ public class StrokeStyle implements SVGConstants {
 	final String dasharray;
 	public final double lineWidth, dash[];
 
-	StrokeStyle(String w, String d, double lw, double dash[]) {
-		width = w;
-		dasharray = d;
-		lineWidth = lw;
-		this.dash = dash;
-	}
+//	StrokeStyle(String w, String d, double lw, double dash[]) {
+//		width = w;
+//		dasharray = d;
+//		lineWidth = lw;
+//		this.dash = dash;
+//	}
 
 	public StrokeStyle( double lw, double dash[]) {
 		width = null;
 		dasharray = null;
 		lineWidth = lw;
-		this.dash = dash;
+		if (dash == null)
+			this.dash = null;
+		else {
+			this.dash = new double[dash.length];
+			for (int i = 0; i < dash.length; i++) this.dash[i] = lw * dash[i]; // Lineaire schaal
+		}
+			
 	}
 	
 	

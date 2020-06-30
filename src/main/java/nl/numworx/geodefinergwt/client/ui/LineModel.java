@@ -12,12 +12,12 @@ public class LineModel extends ColorModel<Destroyable> {
 
 	float width = 1.0f;
 	LineType type = LineType.SOLID;
-	static final String dashes[] = { 
-			null, 
-			"1, 3" ,
-			"5, 3" , 
-			"5, 3, 1, 3"
-	};
+//	static final String dashes[] = { 
+//			null, 
+//			"1, 3" ,
+//			"5, 3" , 
+//			"5, 3, 1, 3"
+//	};
 	static final double dash[][] = {
 			null,
 			{ 1, 3 },

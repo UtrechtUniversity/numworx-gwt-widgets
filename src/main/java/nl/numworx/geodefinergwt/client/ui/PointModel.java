@@ -57,5 +57,11 @@ public class PointModel extends ColorModel<Punt> {
 	}
 
 	@Inject public PointModel() { }
+
+	@Override
+	public void installLight() {
+		if (size != null) DefaultAdapter.getDefault(item).put(size);
+		super.installLight();
+	}
 	
 }

@@ -30,5 +30,15 @@ public class CircleModel extends LineModel {
 	}
 	
 	@Inject public CircleModel() { }
+
+	@Override
+	public void installLight() {
+		FillStyle f;
+		if(fill != TRANSPARANT)
+			f = new FillStyle(fill);
+		else f = new FillStyle("none",TRANSPARANT);
+		DefaultAdapter.getDefault(item).put(f);
+		super.installLight();
+	}
 	
 }

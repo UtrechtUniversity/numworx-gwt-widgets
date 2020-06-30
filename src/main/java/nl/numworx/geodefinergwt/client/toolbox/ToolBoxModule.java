@@ -62,7 +62,7 @@ public class ToolBoxModule {
 	private static ToggleButton newPBtn(EventHandler handler, TrackerImpl tracker, RadioMode model) {
 		ToggleButton btn;
 		btn = new ToggleButton();
-	    btn.setStylePrimaryName("SVGToggle");
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
 		btn.setTitle(rb.Euclides_46());
 		PuntAction p = 
 		    new PuntAction(handler, tracker, btn, model, 
@@ -79,7 +79,7 @@ public class ToolBoxModule {
 //		String compassIcon = "circle1";
 //		String cirkel3Icon = "circle2";
 		btn = new ToggleButton();
-	    btn.setStylePrimaryName("SVGToggle");
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
 		btn.setTitle(string);
 		btn.addClickHandler(new CirkelAction(handler, tracker, btn, model, shim,
 				svg.cirkel_svg(), svg.cirkel_active_svg(), //cirkelIcon, 
@@ -94,7 +94,7 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.POINT) @IntoMap static
 	ToggleButton point(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.POINT).get();
-		GWT.log("shm = " + shim);
+		GWT.log("shm = " + shim); //$NON-NLS-1$
 		return newPBtn(new AddSnapPuntHandler(shim), tracker, model);
 	}
 	
@@ -112,7 +112,7 @@ public class ToolBoxModule {
   private static ToggleButton newSBtn(DataResource r, DataResource r_active, EventHandler h, TrackerImpl tracker, RadioMode model, String t, UIShim<? extends Destroyable, Void> shim) {
     ToggleButton btn;
     btn = new ToggleButton();
-    btn.setStylePrimaryName("SVGToggle");
+    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
     Image image = new Image(r.getSafeUri());
     image.setPixelSize(32, 39);
     btn.getUpFace().setImage(image);
@@ -131,7 +131,7 @@ public class ToolBoxModule {
 	}
 	@Provides @IntKey(Tools.RESET) @IntoMap static
 	ToggleButton reset(TrackerImpl tracker, RadioMode model, ResetHandler reset) {
-		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), reset, tracker, model,"Reset",null);
+		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), reset, tracker, model,rb.ToolBoxModule_4(),null); //$NON-NLS-1$
 	}
 
 	@Provides @IntKey(Tools.PAN) @IntoMap static
@@ -152,7 +152,7 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.TRIANGLE) @IntoMap static
 	ToggleButton triangle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.TRIANGLE).get();
-		return newSBtn(svg.veelhoek_svg(), svg.veelhoek_active_svg(), new AddPolygonHandler("Veelhoek"), tracker, model,"Veelhoek",shim);
+		return newSBtn(svg.veelhoek_svg(), svg.veelhoek_active_svg(), new AddPolygonHandler(rb.ToolBoxModule_5()), tracker, model,rb.ToolBoxModule_6(),shim); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.CIRCLE) @IntoMap static
@@ -164,7 +164,7 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.ARC) @IntoMap static
 	ToggleButton arc(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ARC).get();
-		return newSBtn(svg.boog_svg(), svg.boog_active_svg(), new AddBoogHandler("Boog"), tracker, model,null, shim);
+		return newSBtn(svg.boog_svg(), svg.boog_active_svg(), new AddBoogHandler(rb.ToolBoxModule_7()), tracker, model,null, shim); //$NON-NLS-1$
 	}
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
 	ToggleButton midpoint(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
@@ -197,29 +197,29 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.CONIC_SECTION) @IntoMap static
 	ToggleButton conic(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.kegelsnede_svg(), svg.kegelsnede_active_svg(), new AddKegelsnedeHandler("Kegelsnede"), tracker, model, "Kegelsnede",null);
+		return newSBtn(svg.kegelsnede_svg(), svg.kegelsnede_active_svg(), new AddKegelsnedeHandler(rb.ToolBoxModule_8()), tracker, model, rb.ToolBoxModule_9(),null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.FOCUS) @IntoMap static
 	ToggleButton focus(TrackerImpl tracker, RadioMode model) { // FIXME focus
-		return newSBtn(svg.kegelsnede_svg(),svg.kegelsnede_active_svg(), new AddFocusHandler(), tracker, model, "Brandpunt",null);
+		return newSBtn(svg.kegelsnede_svg(),svg.kegelsnede_active_svg(), new AddFocusHandler(), tracker, model, rb.ToolBoxModule_10(),null); //$NON-NLS-1$
 	}
 
 	@Provides @IntKey(Tools.LOCUS) @IntoMap static
 	ToggleButton locus(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.meetkundige_plaats_svg(), svg.meetkundige_plaats_active_svg(), new AddLocusHandler("Meetkundige plaats"), tracker, model, "Meetkundige plaats",null);
+		return newSBtn(svg.meetkundige_plaats_svg(), svg.meetkundige_plaats_active_svg(), new AddLocusHandler(rb.ToolBoxModule_11()), tracker, model, rb.ToolBoxModule_12(),null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.TANGENT) @IntoMap static
 	ToggleButton tangent(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.TANGENT).get();
-		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddRaakLijnHandler(), tracker, model, "Raaklijn",shim); // FIXME icon
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddRaakLijnHandler(), tracker, model, rb.ToolBoxModule_13(),shim); // FIXME icon //$NON-NLS-1$
 	}
 
 	@Provides @IntKey(Tools.POLELINE) @IntoMap static
 	ToggleButton pole(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.POLELINE).get();
-		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddPoollijnHandler(), tracker, model, "Poollijn",shim); // FIXME icon
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddPoollijnHandler(), tracker, model, rb.ToolBoxModule_14(),shim); // FIXME icon //$NON-NLS-1$
 	}
 	//labels
 	@Provides @IntKey(Tools.DISTANCE) @IntoMap static
@@ -239,7 +239,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
 	ToggleButton vector(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.vector_svg(),svg.vector_active_svg(), new VectorHandler("vector"), tracker, model,null,null);
+		return newSBtn(svg.vector_svg(),svg.vector_active_svg(), new VectorHandler(rb.ToolBoxModule_15()), tracker, model,null,null); //$NON-NLS-1$
 	}
 
 	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
@@ -250,12 +250,12 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.FORMULA) @IntoMap static
 	ToggleButton formula(TrackerImpl tracker, RadioMode model, Definitions definitions) {
-		return newSBtn(svg.definitie_svg(), svg.definitie_active_svg(), new FormuleHandler("Formule", definitions), tracker, model,"Formule",null);
+		return newSBtn(svg.definitie_svg(), svg.definitie_active_svg(), new FormuleHandler(rb.ToolBoxModule_16(), definitions), tracker, model,rb.ToolBoxModule_17(),null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.TEXT) @IntoMap static
 	ToggleButton text(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.label_svg(),svg.label_active_svg(), new TextHandler("Label"), tracker, model, "Label bij punt",null);
+		return newSBtn(svg.label_svg(),svg.label_active_svg(), new TextHandler(rb.ToolBoxModule_18()), tracker, model, rb.ToolBoxModule_19(),null); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.TRAIL) @IntoMap static
@@ -265,13 +265,13 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.COLOR_PALETTE) @IntoMap static
 	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
-		EventHandler handler = new ColorHandler("colorpalette", instance.getStateConfiguration());
-		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, "Kleurenpalet",null);
+		EventHandler handler = new ColorHandler(rb.ToolBoxModule_20(), instance.getStateConfiguration()); //$NON-NLS-1$
+		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_21(),null); //$NON-NLS-1$
 	}
     @Provides @IntKey(Tools.LINE_PALETTE) @IntoMap static
     ToggleButton dashpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
-        EventHandler handler = new DashHandler("linepalette", instance.getStateConfiguration(), svg.linetype());
-        return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, "Lijnpalet",null);
+        EventHandler handler = new DashHandler(rb.ToolBoxModule_22(), instance.getStateConfiguration(), svg.linetype()); //$NON-NLS-1$
+        return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_23(),null); //$NON-NLS-1$
     }
 	
 

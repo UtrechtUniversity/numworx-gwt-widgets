@@ -45,4 +45,17 @@ public class SegmentModel extends LineModel {
 		}
 	}
 	@Inject public SegmentModel() {}
+
+	@Override
+	public void installLight() {
+		DefaultAdapter adapter = DefaultAdapter.getDefault(item);
+		if(tip == Tips.NOTIP) {
+			adapter.put(Tips.class, null);
+			adapter.put(Float.class, null);
+		} else {
+			adapter.put(tip);
+			adapter.put(width);
+		}
+		super.installLight();
+	}
 }
