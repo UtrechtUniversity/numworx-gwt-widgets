@@ -164,7 +164,7 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.ARC) @IntoMap static
 	ToggleButton arc(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ARC).get();
-		return newSBtn(svg.boog_svg(), svg.boog_active_svg(), new AddBoogHandler(rb.ToolBoxModule_7()), tracker, model,null, shim); //$NON-NLS-1$
+		return newSBtn(svg.boog_svg(), svg.boog_active_svg(), new AddBoogHandler(rb.ToolBoxModule_7()), tracker, model,rb.ToolBoxModule_7(), shim); //$NON-NLS-1$
 	}
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
 	ToggleButton midpoint(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
@@ -239,7 +239,7 @@ public class ToolBoxModule {
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
 	ToggleButton vector(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.vector_svg(),svg.vector_active_svg(), new VectorHandler(rb.ToolBoxModule_15()), tracker, model,null,null); //$NON-NLS-1$
+		return newSBtn(svg.vector_svg(),svg.vector_active_svg(), new VectorHandler(rb.ToolBoxModule_15()), tracker, model,rb.ToolBoxModule_15(),null); //$NON-NLS-1$
 	}
 
 	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
