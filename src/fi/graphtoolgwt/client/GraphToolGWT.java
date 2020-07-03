@@ -38,6 +38,8 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseOutEvent;
+import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.TouchEndEvent;
@@ -60,6 +62,8 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 import com.google.web.bindery.event.shared.HandlerRegistrations;
+import com.vaadin.pointerevents.client.PointerCancelEvent;
+import com.vaadin.pointerevents.client.PointerCancelHandler;
 import com.vaadin.pointerevents.client.PointerDownEvent;
 import com.vaadin.pointerevents.client.PointerDownHandler;
 import com.vaadin.pointerevents.client.PointerMoveEvent;
@@ -369,14 +373,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
    	double factorx = 1;
   	double factory = 1;
 	
-	/**
-	 * The message displayed to the user when the server cannot be reached or
-	 * returns an error.
-	 */
-	private static final String SERVER_ERROR = "An error occurred while "
-			+ "attempting to contact the server. Please check your network "
-			+ "connection and try again.";
-
 	private FacetHelper facet;
 	private boolean fromuser;
 
@@ -564,6 +560,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerDownEvent.getType());
 		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerUpEvent.getType());
 		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerMoveEvent.getType());
+// met de mouse out of canvas, cancel drags
+		mouseHandler.pointer = pointerHandler;
+		grafiekGWTCanvas.addMouseOutHandler(mouseHandler);
+		grafiekGWTCanvas.addDomHandler(pointerHandler, PointerCancelEvent.getType());
 			
 		grafiekGWTVeld.initContext2d();		
 		
@@ -4206,9 +4206,10 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	//	if(yAsNaamTF.isVisible())yAsNaamTF.requestFocus();
 	}
 	
-	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler
+	class MouseHandler implements MouseDownHandler, MouseMoveHandler, MouseUpHandler, MouseOutHandler
 	{
 		boolean mouseDown = false;
+		PointerHandler pointer;
 		
 		public void onMouseDown(MouseDownEvent e) {
 			DOM.setCapture(grafiekGWTCanvas.getElement());
@@ -4276,6 +4277,14 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 			mouseUpTouchEndAction(e.getSource(), e.getX(), e.getY());
 
+		}
+
+		@Override
+		public void onMouseOut(MouseOutEvent event) {
+			logger.info("Mouse out");
+			mouseDown = false;
+			pointer.state = READY;
+			
 		}
 	}
 	
@@ -4493,7 +4502,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	
 	HandlerRegistration others;
 	
-	class PointerHandler implements PointerDownHandler, PointerMoveHandler, PointerUpHandler {
+	class PointerHandler implements PointerDownHandler, PointerMoveHandler, PointerUpHandler, PointerCancelHandler {
 
 		private int state = READY;
 		private int id1, x1, y1, id2, x2, y2;
@@ -4584,6 +4593,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				pinchStartDistance = dist(x1, y1, x2, y2);
 				mouseDownTouchStartAction(e.getSource(), x1, y1, TWO_FINGERS);
 			}	
+		}
+
+		@Override
+		public void onPointerCancel(PointerCancelEvent event) {
+			logger.info("Pointer cancel");
+			state = READY;			
 		}
 		
 	}
