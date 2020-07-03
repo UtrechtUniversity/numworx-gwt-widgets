@@ -1428,9 +1428,12 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			if (regelPanels[i].getWidgetIndex(editorPanels[i]) > -1)
 				regelPanels[i].setWidgetTopHeight(editorPanels[i], TOP, Style.Unit.PX, editors[i].getHeight()+5, Style.Unit.PX);
 			if (regelPanels[i].getWidgetIndex(checkboxen[i]) > -1)
-				regelPanels[i].setWidgetTopHeight(checkboxen[i], TOP+Math.max(ashoogte - 17, 0) , Style.Unit.PX, 20, Style.Unit.PX);
-			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1)
+				regelPanels[i].setWidgetTopHeight(checkboxen[i], TOP+Math.max(ashoogte - 17, 0) , Style.Unit.PX, 20, Style.Unit.PX);			
+			if (regelsPanel.getWidgetIndex(regelPanels[i]) > -1) {
 				regelsPanel.setWidgetTopHeight(regelPanels[i], berekenRegelHoogte(i), Style.Unit.PX, Math.max(30, editors[i].getHeight())+5, Style.Unit.PX);
+				regelPanels[i].forceLayout();
+				regelsPanel.forceLayout();
+			}
 		}
 	}
 	
