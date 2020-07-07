@@ -847,7 +847,7 @@ logger.info("NabouwenAanzichtenGWT init");
 			if (showKijkNaKnop() || keuzeBouwenSlopen || volLeegOptie || aantalBlokjes)
 				vWerkHoogte = hoogte - 25;
 
-			vWerk = new Viewer3d(startKr, 351, -30, vWerkBreedte, vWerkHoogte, this);
+			vWerk = new Viewer3d(new KubusRooster(b, 1), 351, -30, vWerkBreedte, vWerkHoogte, this);
 			vWerk.zetAfstand(1000);
 			vWerk.zetSchaduw(true);
 			vWerk.zetBeginHoeken(30, -30);
@@ -1136,9 +1136,9 @@ boolean showMark = mode == 1 || mode == 2 || lessonMode == LessonMode.review || 
 				fireEvent(EVENT_FALSE2);
 			else
 				fireEvent(EVENT_FALSE);
+			setAttempt(); // hier? Ja, maar ook bij zetVeranderd
 		}
 		
-		setAttempt(); // hier? Ja, maar ook bij zetVeranderd
 	}
 
 	void zetIsVeranderdNaNakijken(boolean b)

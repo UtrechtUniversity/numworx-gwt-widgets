@@ -63,4 +63,7 @@
 	<version>0.0.6</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
+  <properties>
+  	<gwt.style>PRETTY</gwt.style>
+  </properties>
 </project>
