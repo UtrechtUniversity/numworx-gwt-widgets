@@ -1058,6 +1058,8 @@ logger.info("NabouwenAanzichtenGWT init");
 			Map<String,Object> parameters = new HashMap<>();
 			parameters.put("response", changeLog);
 			parameters.put("verb", "http://www.dwo.nl/verbs/addRemoveCommand");
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
 			setAttempt(parameters);
 		}
 	}
