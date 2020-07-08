@@ -399,8 +399,14 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 		if(changeLog != null)
 		{
 			if (mode == OpdrNavIF.EINDTOETS)
-				kijkNa(false, false);
+			{
+				kijkNa(false, false); // no comRoot.setChanged here
+			}
 			setAttempt(changeLog);
+			if (mode == OpdrNavIF.EINDTOETS)
+			{
+				comRoot.setChanged(false); // update SCORM values
+			}
 		}
 	}
 
