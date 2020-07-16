@@ -128,6 +128,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	String[] randomVarNamen = null;
 	HashMap<String, Object> randomVarWaarden = null;
 	
+	private int scoreMax = 0;
+	
 	/**
 	 * bevat verwijzingen naar de plaatjes op de knoppen en de css 
 	 */
@@ -498,6 +500,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		if (h.containsKey("interactiePanelLaunchState"))
 			launchState = h.getMap("interactiePanelLaunchState");
 		
+		
 		getImages(); 
 		dlp = new DockLayoutPanel(Style.Unit.PX);
 		dlp.addStyleName(kladjeCss.dock());
@@ -760,7 +763,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 
 	public Boolean isCorrect()
 	{
-		return Boolean.TRUE;
+		if(scoreMax==0)
+			return Boolean.TRUE;
+		return
+				Boolean.FALSE;
 	}
 
 	@Override
@@ -797,6 +803,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
 
 		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		
+		if(launchState.containsKey("scoreMax")) 
+			scoreMax = launchState.getInt("scoreMax");
 
 		// instellingen achtergrondvulling werkveld 
 		if (launchState.containsKey("lijnen"))
