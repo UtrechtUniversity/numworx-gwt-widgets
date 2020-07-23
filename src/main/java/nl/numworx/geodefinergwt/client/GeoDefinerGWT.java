@@ -24,6 +24,7 @@ import nl.tue.win.riaca.openmath.lang.OMObject;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
@@ -93,6 +94,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@UiField ToolBoxPanel toolbox;
 	@UiField(provided=true) messages rb = MESSAGES;
 	private int mode;
+	private LessonMode lessonMode;
 	
 	static {
 		Numbers.setFactory(IntegerFactory.INSTANCE);
@@ -174,6 +176,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public HashMap<String, Object> getState() {
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
 		logger.info("voor getState ");
+		if (mode == OpdrNavIF.EINDTOETS)
+		{
+			fetchScore();
+			setNagekeken(true);
+		}
 		lognagekeken();
 		super.getState(hashMap);
 		getLogState(hashMap);
@@ -202,6 +209,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if(isNagekeken()) {
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
 			fetchScore();
+			// wanneer feedback:
+			if ( mode == OpdrNavIF.OEFENEN
+			  || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN
+			  || mode == OpdrNavIF.ZELFTOETS
+			  || (mode == OpdrNavIF.EINDTOETS && lessonMode != LessonMode.normal)
+			)
 			feedback();
 		}
 		lognagekeken();
@@ -341,6 +354,13 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		
 		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
+		this.lessonMode = comRoot.getLessonMode();
+		if (lessonMode == LessonMode.normal) {
+			if (mode == OpdrNavIF.EINDTOETS || mode == OpdrNavIF.ZELFTOETS) {
+				checkBtn.addStyleName("extern"); // no Kijkna knop.
+			}
+			
+		}
 	}
 
 
