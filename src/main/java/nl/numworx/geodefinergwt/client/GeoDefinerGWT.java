@@ -176,7 +176,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public HashMap<String, Object> getState() {
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
 		logger.info("voor getState ");
-		if (mode == OpdrNavIF.EINDTOETS)
+		if (mode == OpdrNavIF.EINDTOETS||mode == OpdrNavIF.ZELFTOETS)
 		{
 			fetchScore();
 			setNagekeken(true);
@@ -355,7 +355,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
 		this.lessonMode = comRoot.getLessonMode();
-		if (lessonMode == LessonMode.normal) {
+		if (lessonMode != LessonMode.review) {
 			if (mode == OpdrNavIF.EINDTOETS || mode == OpdrNavIF.ZELFTOETS) {
 				checkBtn.addStyleName("extern"); // no Kijkna knop.
 			}
