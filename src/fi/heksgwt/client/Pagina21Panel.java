@@ -102,14 +102,14 @@ public class Pagina21Panel extends ScContainer
 		beginPot = new Tekening(35, 85, 90, 65, eigenaar.beginEindPotMap);
 		add(beginPot);
 		
-		beginLabel = new ScLabel(50, 105, 60, 30, "begin");
+		beginLabel = new ScLabel(50, 105, 60, 30, eigenaar.rb.beginLabel());
 		//activeert de getalcompoenent met begintemp
 		add(beginLabel);
 
 		potErin = new Tekening(30, 170, 100, 90, eigenaar.potErinMap);
 		add(potErin);
 		
-		erinLabel = new ScLabel(65, 215, 60, 30, "erin");
+		erinLabel = new ScLabel(65, 215, 60, 30, eigenaar.rb.erinLabel());
 		add(erinLabel);
 		
 		eindTemp = new GetalComponent(170, 290, 80, 40, eigenaar);
@@ -120,7 +120,7 @@ public class Pagina21Panel extends ScContainer
 		eindPot = new Tekening(35, 285, 90, 65, eigenaar.beginEindPotMap);
 		add(eindPot);
 		
-		eindLabel = new ScLabel(50, 305, 60, 30, "eind");
+		eindLabel = new ScLabel(50, 305, 60, 30, eigenaar.rb.eindLabel());
 		add(eindLabel);
 		
 

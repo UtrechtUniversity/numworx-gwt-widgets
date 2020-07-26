@@ -94,20 +94,20 @@ public class Pagina22Panel extends ScContainer
 		beginPot = new Tekening(35, 55, 90, 65, eigenaar.beginEindPotMap);
 		add(beginPot);
 		
-		beginLabel = new ScLabel(50, 75, 60, 30, "begin");
+		beginLabel = new ScLabel(50, 75, 60, 30, eigenaar.rb.beginLabel());
 		//activeert de getalcompoenent met begintemp
 		add(beginLabel);
 
 		potErin = new Tekening(30, 140, 100, 90, eigenaar.potErinMap);
 		add(potErin);
 		
-		erinLabel = new ScLabel(65, 185, 60, 30, "erin");
+		erinLabel = new ScLabel(65, 185, 60, 30, eigenaar.rb.erinLabel());
 		add(erinLabel);
 
 		potEruit = new Tekening(30, 250, 100, 90, eigenaar.potEruitMap);
 		add(potEruit);
 
-		eruitLabel = new ScLabel(35, 295, 60, 30, "eruit");
+		eruitLabel = new ScLabel(35, 295, 60, 30, eigenaar.rb.eruitLabel());
 		add(eruitLabel);
 
 		eindTemp = new GetalComponent(170, 375, 80, 40, eigenaar);
@@ -117,7 +117,7 @@ public class Pagina22Panel extends ScContainer
 		eindPot = new Tekening(35, 360, 90, 65, eigenaar.beginEindPotMap);
 		add(eindPot);
 
-		eindLabel = new ScLabel(50, 380, 60, 30, "eind");
+		eindLabel = new ScLabel(50, 380, 60, 30, eigenaar.rb.eindLabel());
 		add(eindLabel);
 
 		erinContainer = new BlokjesContainer(180, 150, 165, 90, eigenaar);
