@@ -1109,7 +1109,7 @@ logger.info("NabouwenAanzichtenGWT init");
 		this.feedback = (String) checkResults.get("feedback");
 		this.goedHalfFout = (Integer) checkResults.get("goedHalfFout");
 // Bepaal wanneer er vinkjes getoond worden:		
-boolean showMark = mode == 1 || mode == 2 || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
+boolean showMark = mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
 		if (goedHalfFout == NabouwenAanzichtenChecker.DOOR || goedHalfFout == NabouwenAanzichtenChecker.HALF)
 		{
 			kijkNaPanel.setStyleName("fout", false);
