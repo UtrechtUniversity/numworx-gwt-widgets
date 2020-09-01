@@ -31,6 +31,7 @@ import nl.numworx.geodefiner.common.math.ToC;
 import nl.numworx.geodefinergwt.client.CanvasViewer;
 import nl.numworx.geodefinergwt.client.DefinitionsGWT;
 import nl.numworx.geodefinergwt.client.GWTRandomizer;
+import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.toolbox.ShimModule;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
@@ -84,9 +85,8 @@ public abstract class Modules {
 //	}
 	
 	@Provides @Reusable @Named("panHandler") static EventHandler getPanHandler(CanvasViewer w) {
-	  return new PanHandler("Pan", w);
+	  return new PanHandler(GeoDefinerGWT.MESSAGES.Euclides_41(), w);
 	}
-	
 	@Provides @Named("expressions") static Map<String,String> expressions() {
 	  return new LinkedHashMap<String, String>();
     }
