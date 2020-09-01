@@ -55,9 +55,9 @@ public enum UserConfig implements Visitor, Observer {
 	@Override
 	public void visitTriangle(Triangle t) {
 		DefaultAdapter adapter = DefaultAdapter.getDefault(t);
-		if (adapter.adapt(USER_TRIANGLE_PAINT.getClass()) == null)
+		if (adapter.adapt(FillStyle.class) == null)
 			adapter.put(USER_TRIANGLE_PAINT);
-		if (adapter.adapt(USER_TRIANGLE_COLOR.getClass()) == null)
+		if (adapter.adapt(ColorStyle.class) == null)
 			adapter.put(USER_TRIANGLE_COLOR);
 	}
 
