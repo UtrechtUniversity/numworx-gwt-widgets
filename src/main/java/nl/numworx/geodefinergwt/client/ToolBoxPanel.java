@@ -240,7 +240,7 @@ public class ToolBoxPanel extends Composite implements Tools {
 			if(provider != null)
 			{
 				btn = provider.get();
-				installConfig(i, config, shims);
+				installConfig(n, config, shims);
 			}
 			if(btn != null)	panel.add(btn);
 		}
