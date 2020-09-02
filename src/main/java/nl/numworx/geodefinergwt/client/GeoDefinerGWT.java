@@ -179,7 +179,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if (mode == OpdrNavIF.EINDTOETS||mode == OpdrNavIF.ZELFTOETS)
 		{
 			fetchScore();
-			setNagekeken(true);
+			if (mode == OpdrNavIF.EINDTOETS) setNagekeken(true);
 		}
 		lognagekeken();
 		super.getState(hashMap);
