@@ -67,6 +67,7 @@ import fi.wiskopdr.VariableCollection;
 public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer {
 
 	public static final messages MESSAGES = GWT.create(messages.class);
+	private static final String LOG_OPTION = "logOption";
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
 	private static final String HALF_CSS = "half";
@@ -179,7 +180,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if (mode == OpdrNavIF.EINDTOETS||mode == OpdrNavIF.ZELFTOETS)
 		{
 			fetchScore();
-			if (mode == OpdrNavIF.EINDTOETS) setNagekeken(true);
+			if (mode == OpdrNavIF.EINDTOETS) {
+				if (!isNagekeken()) {
+					setAttempt();
+				}
+				setNagekeken(true);
+			}
 		}
 		lognagekeken();
 		super.getState(hashMap);
@@ -245,6 +251,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public void kijkNa() {
 		update(null, "changed");
 		feedback();
+		setAttempt();
 		setNagekeken(true);logger.info("KijkNA");
 		incErrorCount();
 		fire();
@@ -278,10 +285,32 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
       }
     }
   }
+
   private void fire(String action) {
     comRoot.fireEvent(new CBookEvent(action));
   }
 
+	public void setAttempt(Map<String, ?> parameters) {
+		if (logOption && comRoot != null) {
+			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+			logger.info(parameters.toString());
+		}
+	}
+
+	public void setAttempt() {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			
+			//parameters.put("response", "???"); 
+			setAttempt(parameters);
+		}
+	}
+
+  
   private void nofeedbackImpl() {
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
@@ -421,6 +450,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	@Inject Lazy<Map<Integer,Provider<UIShim<? extends Destroyable, Void>>>> shims;
     @Inject Lazy<Tracer> tracerProvider;
+	boolean logOption;
 
 	@Inject void setExpressions(@Named("expressions") Map<String,String> map) {
 	    expressions = map;
@@ -451,8 +481,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 // random variables
 		String random = (String) launchData.get("random");
 		values = launchRandomVars(random, values);
-// configuration
-		if (Boolean.TRUE.equals(launchData.get("logOption"))) {
+		logOption = Boolean.TRUE.equals(launchData.get("logOption"));
+		if (logOption) {
 		  tracker.setTracer(tracerProvider);
 		}
 		
