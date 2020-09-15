@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import nl.numworx.geodefiner.common.LineType;
 import nl.numworx.geodefiner.common.PointType;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.Tools;
@@ -203,51 +204,56 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
-				Tools.COLOR_PALETTE,
+//				Tools.COLOR_PALETTE,
 				Tools.POINT,
 				Tools.LINE,
 				Tools.HALFLINE,
 				Tools.SEGMENT,
 				Tools.LINE_PALETTE,
-
-				Tools.PERPENDICULAR,
-				Tools.PARALLEL,
+//
+//				Tools.PERPENDICULAR,
+//				Tools.PARALLEL,
 
 				Tools.CIRCLE,
-				Tools.ARC,
-				Tools.TRIANGLE,
-
-
+//				Tools.ARC,
+//				Tools.TRIANGLE,
+//
+//
 				Tools.CIRCLE_WITH_RADIUS,
-
-				Tools.MIDPOINT,
-				Tools.BISECTRICE,
-				Tools.MIRROR,
-
-				Tools.CONIC_SECTION,
-				Tools.FOCUS,
-				Tools.TANGENT,
-				Tools.POLELINE,
-				
-				Tools.LOCUS,
-
-				Tools.DISTANCE,
-				Tools.AREA,
-				Tools.ANGLE,
-				Tools.VECTOR,
-
-				Tools.TRAIL,
-				Tools.TEXT,			
-				Tools.FORMULA,
-
-				Tools.PAN,
+//
+//				Tools.MIDPOINT,
+//				Tools.BISECTRICE,
+//				Tools.MIRROR,
+//
+//				Tools.CONIC_SECTION,
+//				Tools.FOCUS,
+//				Tools.TANGENT,
+//				Tools.POLELINE,
+//				
+//				Tools.LOCUS,
+//
+//				Tools.DISTANCE,
+//				Tools.AREA,
+//				Tools.ANGLE,
+//				Tools.VECTOR,
+//
+//				Tools.TRAIL,
+//				Tools.TEXT,			
+//				Tools.FORMULA,
+//
+//				Tools.PAN,
 				Tools.DESTROY,
 				Tools.RESET
 			);
 		Vector configs = new Vector();
-		configs.setSize(5);
+		configs.setSize(29);
 		configs.set(Tools.POINT, Collections.singletonMap("color", 0XFFFF0000));
-		
+		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
+		configs.set(Tools.CIRCLE_WITH_RADIUS, Collections.singletonMap("color", 0XFFFF8800));
+		HashMap mm = new HashMap();
+		mm.put("color", 0xFF00FF00);
+		mm.put("width", 0.5);
+		configs.set(Tools.SEGMENT, mm );
 		
 		launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);
@@ -300,7 +306,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		h = new HashMap<>();
 		h.put("gravity", true); 
 		h.put("color", 0xFF000000);
-		h.put("type", "DOTTED");
+		h.put("type", LineType.SOLID.name());
 		h.put("width", 0.5);
 		launchDebug.put("axes", Collections.singletonMap("$#@", h));
 		launchDebug.put("checkDWO", checkDWO);
