@@ -903,7 +903,7 @@ logger.info("NabouwenAanzichtenGWT init");
 				if (silhouet)
 				{	vWerk.zetKlikAan(false);
 					vWerk.zetSchaduw(false);
-					startKr.zetVulkleur("zwart");
+					vWerk.kr.zetVulkleur("zwart");
 				}
 			}
 
