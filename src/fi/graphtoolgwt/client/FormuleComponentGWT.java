@@ -447,7 +447,7 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			layoutRegelPanel(regelPanels[i]);
 			highLight(regelPanels[i], true);
 			regelPanels[i].add(checkboxen[i]);
-			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 16, Style.Unit.PX);
+			regelPanels[i].setWidgetLeftWidth(checkboxen[i], 5, Style.Unit.PX, 18, Style.Unit.PX);
 			regelPanels[i].setWidgetTopHeight(checkboxen[i], TOP, Style.Unit.PX, 20, Style.Unit.PX);
 			
 			if (!functieBeginAanpasbaar)
