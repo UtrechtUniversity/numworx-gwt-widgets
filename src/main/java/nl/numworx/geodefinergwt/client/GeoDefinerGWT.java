@@ -327,6 +327,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		super.setNagekeken(b);
 		if( !isNagekeken())
 			nofeedbackImpl();
+		else 
+			if (mode == OpdrNavIF.ZELFTOETS) { fetchScore(); feedback(); }
 	}
 
 	private void addFireUpdates() {

@@ -13,6 +13,7 @@ import fi.euclides.event.EventHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
+import nl.numworx.geodefinergwt.client.ui.FillStyle;
 
 public class ColorHandler extends EventHandler {
 
@@ -36,6 +37,16 @@ public class ColorHandler extends EventHandler {
 				DefaultAdapter.getDefault(p).put(ColorStyle.class, value);
 				Map<String,Object> pstate = state.computeIfAbsent(getTracker().getMapper().toString(p), k -> new HashMap<>());
 				pstate.put("color", value.getRGB());
+				
+				FillStyle f = p.adapt(FillStyle.class);
+				if ( f != null && (f.getRGB()&0xFF000000) != 0) {
+					int a = f.getRGB()|0xFFFFFF;
+					a = a & value.getRGB();
+					DefaultAdapter.getDefault(p).put(new FillStyle(a));
+					pstate.put("fill", a);
+				}
+				
+				
 			}
 			getModel().clearSelection();
 		});

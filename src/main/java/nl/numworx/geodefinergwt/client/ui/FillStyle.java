@@ -6,7 +6,7 @@ public class FillStyle extends ColorStyle {
 		super(c, i);
 	}
  
-	FillStyle(int i) {
+	public FillStyle(int i) {
       super(i);
   }
 

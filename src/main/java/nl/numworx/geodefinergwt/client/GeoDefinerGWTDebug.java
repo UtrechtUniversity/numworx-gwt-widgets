@@ -204,7 +204,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
-//				Tools.COLOR_PALETTE,
+				Tools.COLOR_PALETTE,
 				Tools.POINT,
 				Tools.LINE,
 				Tools.HALFLINE,
@@ -216,9 +216,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 				Tools.CIRCLE,
 //				Tools.ARC,
-//				Tools.TRIANGLE,
-//
-//
+				Tools.TRIANGLE,
 				Tools.CIRCLE_WITH_RADIUS,
 //
 //				Tools.MIDPOINT,
@@ -245,15 +243,20 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.DESTROY,
 				Tools.RESET
 			);
-		Vector configs = new Vector();
+		Vector<Map<?,?>> configs = new Vector();
 		configs.setSize(29);
-		configs.set(Tools.POINT, Collections.singletonMap("color", 0XFFFF0000));
+		configs.set(Tools.POINT, new HashMap(Collections.singletonMap("color", 0XFFFF0000)));
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
-		configs.set(Tools.CIRCLE_WITH_RADIUS, Collections.singletonMap("color", 0XFFFF8800));
+		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
 		HashMap mm = new HashMap();
 		mm.put("color", 0xFF00FF00);
 		mm.put("width", 0.5);
 		configs.set(Tools.SEGMENT, mm );
+
+		mm = new HashMap(configs.get(Tools.CIRCLE));
+		mm.put("fill", 0x80808080);
+		configs.set(Tools.CIRCLE, mm);
+		
 		
 		launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);
