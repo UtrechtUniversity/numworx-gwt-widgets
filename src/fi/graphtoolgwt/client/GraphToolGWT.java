@@ -1343,7 +1343,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 	public void zetNagekeken(boolean b) {
 		if (ingevuld) 
+		{	boolean changed = !nagekeken;
 			nagekeken = b;
+			if (mode == OpdrNavIF.ZELFTOETS && b && changed) {
+				kijkNa(); // feedback
+			}
+		}
 	}
 
 	public void stop() {
