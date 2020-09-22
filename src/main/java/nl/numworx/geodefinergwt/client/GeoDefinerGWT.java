@@ -291,14 +291,14 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
   }
 
 	public void setAttempt(Map<String, ?> parameters) {
-		if (logOption && comRoot != null) {
+		if (attempt && comRoot != null) {
 			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
 			logger.info(parameters.toString());
 		}
 	}
 
 	public void setAttempt() {
-		if (logOption) {
+		if (attempt) {
 // Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
 			Map<String,Object> parameters = new HashMap<>();
 			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
@@ -452,7 +452,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	@Inject Lazy<Map<Integer,Provider<UIShim<? extends Destroyable, Void>>>> shims;
     @Inject Lazy<Tracer> tracerProvider;
-	boolean logOption;
+	private boolean logOption, attempt;
 
 	@Inject void setExpressions(@Named("expressions") Map<String,String> map) {
 	    expressions = map;
@@ -487,7 +487,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if (logOption) {
 		  tracker.setTracer(tracerProvider);
 		}
-		
+		attempt = logOption || launchData.containsKey("smObjectives");
 		setLaunchData(launchData, values);
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
 // highlighter after init launchdata.
