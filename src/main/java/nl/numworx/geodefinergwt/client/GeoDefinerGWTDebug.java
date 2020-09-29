@@ -206,16 +206,16 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.SELECTOR,
 				Tools.COLOR_PALETTE,
 				Tools.POINT,
-				Tools.LINE,
-				Tools.HALFLINE,
-				Tools.SEGMENT,
-				Tools.LINE_PALETTE,
+//				Tools.LINE,
+//				Tools.HALFLINE,
+//				Tools.SEGMENT,
+//				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
 //				Tools.PARALLEL,
 
 				Tools.CIRCLE,
-//				Tools.ARC,
+				Tools.ARC,
 				Tools.TRIANGLE,
 				Tools.CIRCLE_WITH_RADIUS,
 //
@@ -236,7 +236,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 //				Tools.VECTOR,
 //
 //				Tools.TRAIL,
-//				Tools.TEXT,			
+				Tools.TEXT,			
 //				Tools.FORMULA,
 //
 //				Tools.PAN,

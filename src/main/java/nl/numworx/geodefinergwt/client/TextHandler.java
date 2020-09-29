@@ -9,6 +9,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import fi.euclides.event.EventHandler;
+import fi.euclides.event.TrackerContext;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
@@ -30,6 +31,7 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 	Punt p;
 	String text;
 	private boolean fuse;
+	private TekstPopup tf;
 	@Override
 	protected void attachLabel(Punt p) {
 		Widget root = getTracker().adapt(Widget.class);
@@ -42,7 +44,7 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		final int y = p.getY().intValue() + root.getAbsoluteTop() + 5 - offy; // OFFSETY
 		this.p = p;
 		this.text = ""; // empty
-		final TekstPopup tf  = new TekstPopup(this, true);
+		tf = new TekstPopup(this, true);
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);
 		fuse = false;
@@ -94,6 +96,15 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		label.setP(v);
 		getModel().add(label);
 		getTracker().paint();
+	}
+
+	@Override
+	public void pointerPressed(Numbers x, Numbers y, TrackerContext context) {
+		if (tf != null) {
+				tf.hide(true);
+				tf = null;
+		}
+		super.pointerPressed(x, y, context);
 	}
 
 

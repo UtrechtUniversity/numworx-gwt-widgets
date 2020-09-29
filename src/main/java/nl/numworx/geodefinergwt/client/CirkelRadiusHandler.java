@@ -5,6 +5,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 
+import fi.euclides.event.TrackerContext;
 import fi.euclides.model.Punt;
 import fi.euclides.model.math.Numbers;
 import nl.numworx.geodefiner.common.AbstractCirkelLabelHandler;
@@ -15,6 +16,7 @@ public class CirkelRadiusHandler extends AbstractCirkelLabelHandler implements O
 	Punt p;
 	String text;
 	private boolean fuse;
+	private TekstPopup tf;
 
 	public CirkelRadiusHandler(String string) {
 		super(string);
@@ -29,7 +31,7 @@ public class CirkelRadiusHandler extends AbstractCirkelLabelHandler implements O
 		final int y = (int) p.getYd() + root.getAbsoluteTop() + 5; // OFFSETY
 		this.p = p;
 		this.text = ""; // empty
-		final TekstPopup tf  = new TekstPopup(this, false);
+		tf = new TekstPopup(this, false);
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);
 		fuse = false;
@@ -61,6 +63,12 @@ public class CirkelRadiusHandler extends AbstractCirkelLabelHandler implements O
 		} catch (NumberFormatException e) {
 			setStatus(e.toString());
 		}
+	}
+
+	@Override
+	public void pointerPressed(Numbers x, Numbers y, TrackerContext context) {
+		if (tf != null) { tf.hide(true); tf = null; }
+		super.pointerPressed(x, y, context);
 	}
 
 
