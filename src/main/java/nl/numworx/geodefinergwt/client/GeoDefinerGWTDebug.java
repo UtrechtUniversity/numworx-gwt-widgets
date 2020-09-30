@@ -245,7 +245,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 			);
 		Vector<Map<?,?>> configs = new Vector();
 		configs.setSize(29);
-		configs.set(Tools.POINT, new HashMap(Collections.singletonMap("color", 0XFFFF0000)));
+		configs.set(Tools.POINT, new HashMap(Collections.singletonMap("color", 0X80FF0000)));
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
 		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
 		HashMap mm = new HashMap();

@@ -24,8 +24,9 @@ public class ColorHandler extends EventHandler {
 		super(string);
 		this.state = state;
 	}
+
 	@Override
-	public boolean allowSelection(Vector selection) {
+	public boolean allowSelection(@SuppressWarnings("rawtypes") Vector selection) {
 		return !selection.isEmpty();
 	}
 
@@ -34,10 +35,20 @@ public class ColorHandler extends EventHandler {
 		Consumer<ColorStyle> consumer = 
 		(value -> {
 			for(Destroyable p: selection) {
-				DefaultAdapter.getDefault(p).put(ColorStyle.class, value);
+				ColorStyle c = p.adapt(ColorStyle.class);
+				int rgba = 0xFF000000;
+				if (c != null) rgba = c.getRGB();
 				Map<String,Object> pstate = state.computeIfAbsent(getTracker().getMapper().toString(p), k -> new HashMap<>());
-				pstate.put("color", value.getRGB());
-				
+				if ( (rgba & 0xFF000000) == 0xFF000000)
+				{	
+					DefaultAdapter.getDefault(p).put(ColorStyle.class, value);
+					pstate.put("color", value.getRGB());
+				} else {
+					rgba = rgba | 0xFFFFFF;
+					rgba = rgba & value.getRGB();
+					DefaultAdapter.getDefault(p).put(ColorStyle.class, new ColorStyle(rgba));
+					pstate.put("color", rgba);
+				}
 				FillStyle f = p.adapt(FillStyle.class);
 				if ( f != null && (f.getRGB()&0xFF000000) != 0) {
 					int a = f.getRGB()|0xFFFFFF;
