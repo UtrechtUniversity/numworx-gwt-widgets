@@ -272,4 +272,12 @@ public interface SvgBundle extends ClientBundle {
   
   @Source("nl/numworx/geodefinergwt/client/resources/linetype.css")
   LineTypeCss linetype();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Maak-hoek.svg")
+  @MimeType("image/svg+xml")
+  DataResource  maak_hoek_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Maak-hoek-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource maak_hoek_active_svg();
 }

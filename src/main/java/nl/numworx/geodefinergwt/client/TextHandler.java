@@ -44,6 +44,20 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		final int y = p.getY().intValue() + root.getAbsoluteTop() + 5 - offy; // OFFSETY
 		this.p = p;
 		this.text = ""; // empty
+		LabelDelegate ld = getTracker().getRegistered(ToC.TYPE);
+		Label label;
+// find label
+		Vector<Destroyable> lijnen = getModel().getLijnen();
+		for(Destroyable item: lijnen) {
+			if (item instanceof Label) {
+				label = (Label) item;
+				if (label.getRegistered() == ld && label.getDepend()[0] == p) {
+// if match use string as initial text
+					this.text = label.getString(); // not empty
+					break;
+				}
+			}
+		}
 		tf = new TekstPopup(this, true);
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);

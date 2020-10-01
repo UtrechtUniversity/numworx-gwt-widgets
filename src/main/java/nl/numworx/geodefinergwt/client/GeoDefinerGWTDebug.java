@@ -218,6 +218,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.ARC,
 				Tools.TRIANGLE,
 				Tools.CIRCLE_WITH_RADIUS,
+				Tools.ANGLE_POINT,
 //
 //				Tools.MIDPOINT,
 //				Tools.BISECTRICE,

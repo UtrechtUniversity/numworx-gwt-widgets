@@ -88,4 +88,9 @@ public abstract class ShimModule {
 		return new UIShim<Destroyable, Void>(ui, instance.getStateConfiguration(), tracker, (UIShim<Destroyable, Void>) point);
 	}
 
+	@Provides @IntKey(Tools.ANGLE_POINT) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> anglepoint(PointModel ui, Instance instance, Tracker tracker) {
+		return new UIShim<Punt, Void>(ui, instance.getStateConfiguration(), tracker);
+	}
+
 }

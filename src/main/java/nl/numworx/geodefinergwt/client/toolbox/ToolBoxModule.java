@@ -41,6 +41,7 @@ import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
+import nl.numworx.geodefinergwt.client.AddHoekPuntHandler;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.ColorHandler;
 import nl.numworx.geodefinergwt.client.DashHandler;
@@ -274,5 +275,10 @@ public class ToolBoxModule {
         return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_23(),null); //$NON-NLS-1$
     }
 	
+    @Provides @IntKey(Tools.ANGLE_POINT) @IntoMap static
+    ToggleButton hoekpunt(TrackerImpl tracker, RadioMode model, Instance instance, AddHoekPuntHandler handler, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ANGLE_POINT).get();
+    	return newSBtn(svg.maak_hoek_svg(), svg.maak_hoek_active_svg(), handler, tracker, model, rb.ToolBoxModule_24(), shim);
+    }
 
 }
