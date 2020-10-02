@@ -61,6 +61,12 @@
 			<version>0.0.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>nl.numworx.geodefiner</groupId>
+			<artifactId>geodefiner-common</artifactId>
+			<version>0.0.4-SNAPSHOT</version>
+			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
 			<version>0.1.7</version>
@@ -89,6 +95,12 @@
 			<artifactId>dagger-compiler</artifactId>
 			<version>${daggerVersion}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.mobile</groupId>
+			<artifactId>interaction</artifactId>
+			<version>0.1.10-SNAPSHOT</version>
+			<classifier>sources</classifier>
 		</dependency>
 	</dependencies>
 	<build>
