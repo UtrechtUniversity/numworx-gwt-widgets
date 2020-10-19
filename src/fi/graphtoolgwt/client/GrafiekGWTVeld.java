@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.TekstComponent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -156,8 +157,21 @@ public class GrafiekGWTVeld {
 		hoogte = h;
 //		grafiekGWTCanvas.setWidth(w + "px");
 //		grafiekGWTCanvas.setHeight(h + "px");
-		grafiekGWTCanvas.setCoordinateSpaceWidth(w);
-		grafiekGWTCanvas.setCoordinateSpaceHeight(h);
+		Canvas canvas = grafiekGWTCanvas;
+		Context2d ctx = grafiekGWTCanvas.getContext2d();
+		double ratio = TekstComponent.getDeviceRatio(ctx);
+//		grafiekGWTCanvas.setCoordinateSpaceWidth(w);
+//		grafiekGWTCanvas.setCoordinateSpaceHeight(h);
+		//canvas.setPixelSize(w, h);
+		if(ratio > 1.0) {
+			canvas.setCoordinateSpaceHeight((int) (h*ratio));
+			canvas.setCoordinateSpaceWidth((int) (w*ratio));
+			ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+		} else {
+		//change the canvas dimensions
+			canvas.setCoordinateSpaceHeight(h);
+			canvas.setCoordinateSpaceWidth(w);
+		}
 	}
 	
 	public Canvas getCanvas()
