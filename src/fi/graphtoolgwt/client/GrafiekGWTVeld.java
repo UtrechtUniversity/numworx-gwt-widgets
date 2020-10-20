@@ -152,22 +152,25 @@ public class GrafiekGWTVeld {
 		stand = 3;
 	}
 	
+	public double ratio = 1.0;
+	
 	void setSize(int w, int h) {
 		breedte = w;
 		hoogte = h;
 //		grafiekGWTCanvas.setWidth(w + "px");
 //		grafiekGWTCanvas.setHeight(h + "px");
 		Canvas canvas = grafiekGWTCanvas;
-		Context2d ctx = grafiekGWTCanvas.getContext2d();
-		double ratio = TekstComponent.getDeviceRatio(ctx);
+		Context2d ctx = canvas.getContext2d();
+		ratio = TekstComponent.getDeviceRatio(ctx);
 //		grafiekGWTCanvas.setCoordinateSpaceWidth(w);
 //		grafiekGWTCanvas.setCoordinateSpaceHeight(h);
-		//canvas.setPixelSize(w, h);
+		canvas.setPixelSize(w, h);
 		if(ratio > 1.0) {
 			canvas.setCoordinateSpaceHeight((int) (h*ratio));
 			canvas.setCoordinateSpaceWidth((int) (w*ratio));
 			ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 		} else {
+			ratio = 1.0;
 		//change the canvas dimensions
 			canvas.setCoordinateSpaceHeight(h);
 			canvas.setCoordinateSpaceWidth(w);
