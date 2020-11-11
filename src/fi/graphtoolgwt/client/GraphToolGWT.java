@@ -1,6 +1,7 @@
 package fi.graphtoolgwt.client;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +93,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	public static final String ACTION_CORRECT = "action.correct";
 	public static final String ACTION_FALSE = "action.false";
 	public static final String ACTION_FALSE2 = "action.false_2";
+	private static final String LOG_OPTION = "logOption";
 
 	private static final CBookEvent EVENT_CORRECT = new CBookEvent(ACTION_CORRECT); 
 	private static final CBookEvent EVENT_FALSE = new CBookEvent(ACTION_FALSE); 
@@ -100,6 +102,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
     private int errorCount;
     private boolean changed = false;
     private int foutStraf = 2;
+	private boolean logOption, attempt;
 
     boolean moveActionActivated = false; // used to detect when the system is in move_mode
 	final static int cSelectMarge = 5;
@@ -2084,6 +2087,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	public void kijkNa()
     {
 		kijkNa(true, false /* geen setState */);
+		setAttempt();
 	}
 	
 	
@@ -2279,6 +2283,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			formuleComponent.updateFormulas();
 			kijkNa(false /* no show */, false /* geen setState */);
 		}
+			if (mode == OpdrNavIF.EINDTOETS) {
+				if (!nagekeken) {
+					setAttempt();
+				}
+				zetNagekeken(true);
+			}
 		
 		double beginx = 1;
 		double beginy = 1;
@@ -3355,6 +3365,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			}
 
 			calculateExpressiesMetRandomVariabelen();
+
+			logOption = Boolean.TRUE.equals(launchData.get("logOption"));
+			attempt = logOption || launchData.containsKey("smObjectives");	
 		}
 
 		// initialize GUI nadat de launchdata is verwerkt
@@ -4880,6 +4893,25 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	private void fireEvent(CBookEvent event) 
 	{
 		comRoot.fireEvent(event);
+	}
+	public void setAttempt(Map<String, ?> parameters) {
+		if (attempt && comRoot != null) {
+			comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+			logger.info(parameters.toString());
+		}
+	}
+
+	public void setAttempt() {
+		if (attempt && ingevuld) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			
+			//parameters.put("response", "???"); 
+			setAttempt(parameters);
+		}
 	}
 	
 	public void zetAssenDefinitie(double asDefXMin, double asDefXMax, double asDefXStap, double asDefYMin, double asDefYMax, double asDefYStap)
