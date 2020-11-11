@@ -673,6 +673,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		kijkNaButton.addClickHandler(new ClickHandler(){
 			public void onClick(ClickEvent e)
 			{	kijkNa();
+				setAttempt();
 				grafiekGWTVeld.paint();
 			}
 		});
@@ -2087,7 +2088,6 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	public void kijkNa()
     {
 		kijkNa(true, false /* geen setState */);
-		setAttempt();
 	}
 	
 	

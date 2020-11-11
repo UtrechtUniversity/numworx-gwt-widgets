@@ -246,7 +246,11 @@ public class DomeinButtonGWT extends Button {
 		interactiePanel.zetDomein(domein, index);
 		interactiePanel.grafiekGWTVeld.paint();
 		if (interactiePanel.formuleComponent.alsOpdracht)
+		{
 			interactiePanel.kijkNa();
+			interactiePanel.setAttempt();
+		}
+		
 	}
     
     public String[] getDomeinString()

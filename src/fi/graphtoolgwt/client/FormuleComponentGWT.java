@@ -116,7 +116,10 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
             
 			fc.parseFormule(regelnummer, false);
 			if (fc.alsOpdracht)
+			{
 				fc.interactiePanel.kijkNa();
+				fc.interactiePanel.setAttempt();
+			}
 			else
 				fc.interactiePanel.setComRootChanged(false);
 			fc.grafiekGWTVeld.paint();
