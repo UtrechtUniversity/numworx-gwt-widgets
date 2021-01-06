@@ -255,8 +255,9 @@ public class ToolBoxModule {
 	}
 
 	@Provides @IntKey(Tools.TEXT) @IntoMap static
-	ToggleButton text(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.label_svg(),svg.label_active_svg(), new TextHandler(rb.ToolBoxModule_18()), tracker, model, rb.ToolBoxModule_19(),null); //$NON-NLS-1$ //$NON-NLS-2$
+	ToggleButton text(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.TEXT).get();
+		return newSBtn(svg.label_svg(),svg.label_active_svg(), new TextHandler(rb.ToolBoxModule_18()), tracker, model, rb.ToolBoxModule_19(),shim); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	@Provides @IntKey(Tools.TRAIL) @IntoMap static

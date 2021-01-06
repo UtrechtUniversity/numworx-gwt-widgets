@@ -12,6 +12,7 @@ import dagger.multibindings.IntKey;
 import dagger.multibindings.IntoMap;
 import fi.euclides.event.Tracker;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.Label;
 import fi.euclides.model.Punt;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.Tools;
@@ -20,6 +21,7 @@ import nl.numworx.geodefinergwt.client.ui.CircleModel;
 import nl.numworx.geodefinergwt.client.ui.LineModel;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.ui.SegmentModel;
+import nl.numworx.geodefinergwt.client.ui.TextModel;
 
 @Module
 @SuppressWarnings("unchecked")
@@ -93,4 +95,8 @@ public abstract class ShimModule {
 		return new UIShim<Punt, Void>(ui, instance.getStateConfiguration(), tracker);
 	}
 
+	@Provides @IntKey(Tools.TEXT) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> text(TextModel ui, Instance instance, Tracker tracker) {
+		return new UIShim<Label, Void>(ui, instance.getStateConfiguration(), tracker);
+	}
 }
