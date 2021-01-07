@@ -2,6 +2,8 @@ package nl.numworx.geodefinergwt.client.ui;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.UIModel;
 import nl.numworx.geodefiner.common.Volgpunt;
@@ -13,6 +15,10 @@ import fi.euclides.model.math.Numbers;
 import fi.euclides.util.DefaultAdapter;
 
 public class TextModel extends ColorModel<Label> {
+
+	@Inject TextModel() {
+	}
+
 	public Align align = Align.BASE;
 	FontStyle font = new FontStyle();
 	private float dx, dy;
