@@ -22,6 +22,7 @@ import nl.numworx.geodefinergwt.client.ui.LineModel;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.ui.SegmentModel;
 import nl.numworx.geodefinergwt.client.ui.TextModel;
+import nl.numworx.geodefinergwt.client.ui.TriangleModel;
 
 @Module
 @SuppressWarnings("unchecked")
@@ -86,7 +87,7 @@ public abstract class ShimModule {
 	}
 
 	@Provides @IntKey(Tools.TRIANGLE) @IntoMap @Singleton static
-	UIShim<? extends Destroyable, Void> triangle(CircleModel ui, Instance instance, Tracker tracker,@Named("point") UIShim<? extends Destroyable, Void> point) {
+	UIShim<? extends Destroyable, Void> triangle(TriangleModel ui, Instance instance, Tracker tracker,@Named("point") UIShim<? extends Destroyable, Void> point) {
 		return new UIShim<Destroyable, Void>(ui, instance.getStateConfiguration(), tracker, (UIShim<Destroyable, Void>) point);
 	}
 

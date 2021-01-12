@@ -18,7 +18,7 @@ import fi.euclides.util.Observer;
 public enum UserConfig implements Visitor, Observer {
 	INSTANCE;
 	static final Float USER_POINT_SIZE = Float.valueOf(7f);
-	static final ColorStyle USER_TRIANGLE_COLOR = new ColorStyle("#6e5000",0xFF6E5000);
+	static final ColorStyle USER_TRIANGLE_COLOR = new ColorStyle("rgba(0,0,0,0)",0);
 	static final FillStyle USER_TRIANGLE_PAINT = new FillStyle("rgba(220,160,0,0.5)",0x80dca000);
 	@Override
 	public void update(Observable observable, Object arg) {

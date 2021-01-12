@@ -113,4 +113,11 @@ public class UIModelFactoryGWT extends nl.numworx.geodefiner.common.UIModelFacto
 		model = new CircleModel().init(b);
 	}
 
+	@Override
+	public UIModel<?, ?> lightBuild(Destroyable d) {
+		if (d instanceof Triangle) 
+			return new TriangleModel().set(tracker).init(d);
+		return super.lightBuild(d);
+	}
+
 }

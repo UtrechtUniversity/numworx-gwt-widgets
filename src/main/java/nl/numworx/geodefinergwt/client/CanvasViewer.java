@@ -191,7 +191,9 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 			context.fill();
 		}
 		if(stroke != null) stroke.toStyle(context);
-		context.stroke();
+		String s = context.getStrokeStyle().toString();
+		if (!"rgba(0, 0, 0, 0)".equals(s))
+			context.stroke();
 		DefaultAdapter.getDefault(t).put(Shape.class, path);
 	}
 
