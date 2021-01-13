@@ -108,7 +108,7 @@ public class TextHandler extends AbstractTextHandler implements Owner {
 		v.setDxy(Numbers.createInteger(6),Numbers.createInteger(-5));
 		v.setFree(false);
 		label.setP(v);
-		getModel().add(label);
+		visit(getModel().add(label));
 		getTracker().paint();
 	}
 

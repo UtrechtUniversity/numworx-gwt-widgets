@@ -249,6 +249,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		configs.set(Tools.POINT, new HashMap(Collections.singletonMap("color", 0X80FF0000)));
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
 		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
+		configs.set(Tools.TEXT, new HashMap(Collections.singletonMap("color", 0xFFFF0000)));
 		HashMap mm = new HashMap();
 		mm.put("color", 0xFF00FF00);
 		mm.put("width", 0.5);
@@ -258,6 +259,11 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		mm.put("fill", 0x80808080);
 		configs.set(Tools.CIRCLE, mm);
 		
+		
+		mm = new HashMap(configs.get(Tools.TEXT));
+		mm.put("dx", 6);  // 		textModel.setDXY(6f,-5f);
+		mm.put("dy", -5);
+		configs.set(Tools.TEXT, mm);
 		
 		launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);
