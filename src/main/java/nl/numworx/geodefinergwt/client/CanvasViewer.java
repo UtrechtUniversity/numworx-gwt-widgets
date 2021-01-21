@@ -15,7 +15,10 @@ import fi.euclides.event.TrackerContext;
 import fi.euclides.gwt.RectShape;
 import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.model.AbstractViewer;
+import fi.euclides.model.Boog;
+import fi.euclides.model.Cirkel;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.Kegelsnede2;
 import fi.euclides.model.Label;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
@@ -30,6 +33,7 @@ import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
+import gwt.awt.Rectangle;
 import gwt.awt.Shape;
 import gwt.awt.geom.Area;
 import gwt.awt.geom.Path2D;
@@ -49,7 +53,9 @@ import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLighter.GeoDefinerWidget, TrailBuilder {
-	static final FontStyle FONT_STYLE = new FontStyle();
+	private static final String SELECT_COLOR = "rgba(200,128,128,0.4)";
+
+    static final FontStyle FONT_STYLE = new FontStyle();
 
 	private static final float DEFAULT_POINTSIZE = 5;
 	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
@@ -168,6 +174,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	}
 	@Override
 	public void visitTriangle(Triangle t) {
+	    if (isSelected(t)) drawMP(t);
 		selectColor(t);
 		Punt[] depend = (Punt[]) t.getDepend();
 		Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD, depend.length);
@@ -210,8 +217,6 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		    DEFAULT_STROKE.toStyle(context);
 		    stroke  = object.adapt(StrokeStyle.class);
 		  }
-		  
-		  
 		  return;
 		}
 		Adapter a = object.getAdapter();
@@ -226,10 +231,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		CheckObject co = a.adapt(CheckObject.class);
 		//java.util.logging.Logger.getLogger("CanvasViewer").info("color = " + c);
 		if (c != null && co == null) {
-			if(getModel().getSelect().contains(object))
-				setColor(RED);
-			else 
-				setCssColor(CssColor.make(c.getColor()));
+		    setCssColor(CssColor.make(c.getColor()));
 	        if(hiLighter != null)
 	            hiLighter.hilight(object);
 			return;
@@ -237,12 +239,11 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 // feedback color.
 		if(co != null)
 		{   // extra verificatie?
-			if(getModel().getSelect().contains(object))
-				setCssColor(CssColor.make("yellow")); // RED + GREEN?
-			else 
-				setCssColor(CssColor.make("green"));
+		  setCssColor(CssColor.make("green"));
 		} else
-			super.selectColor(object);
+		{
+	      setColor(BLACK);
+		}
 
 		if(hiLighter != null)
 			hiLighter.hilight(object);
@@ -300,8 +301,25 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		context.fill();
 	}
 
+	protected boolean isSelected(Destroyable s) {
+	  if (!trail && !tracking && getModel().getSelect().contains(s)) {
+        stroke  = s.adapt(StrokeStyle.class);
+        if (stroke == null) stroke = DEFAULT_STROKE;
+	    fill = null;
+        setStroke(new StrokeStyle(stroke.lineWidth+8.0, stroke.dash));
+	    context.setStrokeStyle(SELECT_COLOR);
+	    stroke.toStyle(context);
+	    return true;
+	  }
+	  return false;
+	}
+	
+	
 	@Override
 	public void visitSegment(Segment s) {
+	    if (isSelected(s)) {
+	      drawLine(s.getX1(), s.getY1() , s.getX2(), s.getY2());
+	    }
 		s = drawTips(s,s);
 		super.visitSegment(s);
 	}
@@ -318,7 +336,14 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
           float p2 = pointSize/2f;
           fillCircle(punt.getXd()-p2, punt.getYd()-p2 , pointSize);
 		} else
+		{
+		  if (!tracking && getModel().getSelect().contains(punt)) {
+		    float p = pointSize + 8;
+		    context.setFillStyle(SELECT_COLOR);
+		    fillCircle(punt.getXd()-p/2, punt.getYd()-p/2, p);
+		  }
 		  super.visitPunt(punt);
+		}
 	}
 
 	class PathVisitor implements SegmentVisitor {
@@ -364,6 +389,8 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	}
 
 	private void visitIntegral(Integral l) {
+	    if (isSelected(l))
+	      drawMP(l);
 		selectColor(l);
 		Area shape = new Area();
 		l.visitSegments(new IntegralVisitor(l, shape, this));
@@ -390,19 +417,24 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	}
 
 	public void visitMP(MP l) {
+	    if (isSelected(l)) 
+	      drawMP(l);
 		selectColor(l);
 		if(stroke != null) stroke.toStyle(context);
-		boolean old = tracking;
+		drawMP(l);
+	}
+  public void drawMP(MP l) {
+    boolean old = tracking;
 		try {
-		tracking = true;
-		PathVisitor v = new PathVisitor();
-		context.beginPath();
-		l.visitSegments(v);
-		v.destroy();
+    		tracking = true;
+    		PathVisitor v = new PathVisitor();
+    		context.beginPath();
+    		l.visitSegments(v);
+    		v.destroy();
 		} finally {
 		  tracking = old;
 		}
-	}
+  }
 
 	@Override
 	public void visitLocus(Locus l) {
@@ -471,6 +503,16 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	@Override
 	public void visitLabel(Label label) {
+	    if (isSelected(label)) {
+	      Shape shape = label.adapt(Shape.class);
+	      Rectangle r = shape.getBounds();
+	      context.setFillStyle(SELECT_COLOR);
+	      context.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+	    }
+	  
+	  
+	  
+	  
 		if(label.getRegistered() instanceof FlipFlop) {
 			visitFlipFlop(label);
 			return;
@@ -541,13 +583,19 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		if(l instanceof Ray) {
 			visitRay((Ray)l);
 		} else {
-			super.visitLijn(l);			
+		  if (isSelected(l)) {
+		    ll.setLijn(l);
+	        drawLine(ll.getX1(), ll.getY1() , ll.getX2(), ll.getY2());
+		  }
+		  super.visitLijn(l);			
 		}
 	}
 
 	private void visitRay(Ray l) {
 		rr.setLijn(l);
 		Segment s = rr;
+		if (isSelected(l)) drawLine(s.getX1(), s.getY1() , s.getX2(), s.getY2());
+		
 		s = drawTips(s,l);
 		selectColor(l);
 		drawLine(s.getX1(), s.getY1() , s.getX2(), s.getY2());
@@ -602,9 +650,26 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
   public void toTrail(Destroyable key, Vector<Destroyable> values) {
     for(Destroyable copy: values) copyTrailAttributes(key, copy);
   }
+
   public void setTracer(Lazy<Tracer> tracerProvider) {
     this.tracerProvider = tracerProvider;
     
+  }
+
+  @Override
+  public void visitCirkel(Cirkel c) {
+    if (isSelected(c)) {
+      drawCircle(c.getX(), c.getY(), c.getD());
+    }
+    super.visitCirkel(c);
+  }
+
+  @Override
+  public void visitBoog(Boog b) {
+    if(isSelected(b)) {
+      drawArc(b.getX(), b.getY(), b.getD(), b.getStart(), b.length());
+    }
+    super.visitBoog(b);
   }
 
 }
