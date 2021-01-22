@@ -306,7 +306,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
         stroke  = s.adapt(StrokeStyle.class);
         if (stroke == null) stroke = DEFAULT_STROKE;
 	    fill = null;
-        setStroke(new StrokeStyle(stroke.lineWidth+8.0, stroke.dash));
+        setStroke(new StrokeStyle(stroke.lineWidth+8.0, null));
 	    context.setStrokeStyle(SELECT_COLOR);
 	    stroke.toStyle(context);
 	    return true;
