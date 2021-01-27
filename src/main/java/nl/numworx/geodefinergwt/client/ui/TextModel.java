@@ -38,6 +38,18 @@ public class TextModel extends ColorModel<Label> {
 		super.install(item);
 	}
 
+	@Override
+	public void installLight() {
+	  DefaultAdapter adapter = DefaultAdapter.getDefault(item);
+	  adapter.put(align);
+	  adapter.put(font);
+	  adapter.put(Boolean.class, alwaysF);
+
+	  super.installLight();
+	}
+	
+	
+	
 	public UIModel<Label, Void> init(Label item) {
 		if(item != null) 
 			align = item.adapt(Align.class);
