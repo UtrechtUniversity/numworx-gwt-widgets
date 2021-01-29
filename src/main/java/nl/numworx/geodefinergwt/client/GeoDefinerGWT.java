@@ -338,17 +338,22 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				final String name = viewer.getMapper().toString(label);
 				final String command = "double." + name;
 				if (label.getRegistered() instanceof LabelValue &&
-						
+					! name.startsWith("%")	&&
 					comRoot.hasListeners(command)) {
 					label.addObserver(new Observer() {
 
 						@Override
 						public void update(Observable observable, Object arg) {
 							if(arg == null)
-							{	Map<String,Object> map = new TreeMap<String,Object>();
-								map.put("value", label.value.doubleValue());
-								map.put("name", name);
-								comRoot.fireEvent(new CBookEvent(GeoDefinerGWT.this, command, map));							}
+							{	
+								double value = label.value.doubleValue();
+								if (Double.isFinite(value)) {
+								  Map<String,Object> map = new TreeMap<String,Object>();
+                                  map.put("value", value);
+                                  map.put("name", name);
+                                  comRoot.fireEvent(new CBookEvent(GeoDefinerGWT.this, command, map));
+								}
+							}
 						}});
 				}
 			
