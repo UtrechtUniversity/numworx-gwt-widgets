@@ -52,7 +52,9 @@ public class DashHandler extends EventHandler {
 		
 	private void getLineType(Consumer<LineType> consumer) {
 		PopupPanel panel = new PopupPanel(true, true);
+		panel.setStylePrimaryName("MessageBox");
 		LayoutPanel root = new LayoutPanel();
+		root.setStyleName("dashes");
         String[] style = new String[] { css.SOLID(), css.DOTTED(), css.DASHED(), css.DASHDOTTED() };
         css.ensureInjected();
 		panel.setWidget(root);

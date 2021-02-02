@@ -209,7 +209,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.LINE,
 				Tools.HALFLINE,
 //				Tools.SEGMENT,
-//				Tools.LINE_PALETTE,
+				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
 //				Tools.PARALLEL,
@@ -218,13 +218,13 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.ARC,
 				Tools.TRIANGLE,
 				Tools.CIRCLE_WITH_RADIUS,
-				Tools.ANGLE_POINT,
+//				Tools.ANGLE_POINT,
 //
 //				Tools.MIDPOINT,
 //				Tools.BISECTRICE,
 //				Tools.MIRROR,
 //
-				Tools.CONIC_SECTION,
+//				Tools.CONIC_SECTION,
 //				Tools.FOCUS,
 //				Tools.TANGENT,
 //				Tools.POLELINE,

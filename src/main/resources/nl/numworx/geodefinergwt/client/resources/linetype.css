@@ -12,6 +12,7 @@
 	border: 1px solid gray;
 	height: 30px;
 	width: 67px;
+	background-color: white;
 }
 
 @sprite .DASHED {

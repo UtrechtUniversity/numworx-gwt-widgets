@@ -82,7 +82,9 @@ public class ColorHandler extends EventHandler {
 	
 	private void getColor(Consumer<ColorStyle> consumer) {
 		PopupPanel panel = new PopupPanel(true, true);
+		panel.setStylePrimaryName("MessageBox");
 		LayoutPanel root = new LayoutPanel();
+		root.setStyleName("colors");
 		panel.setWidget(root);
 		root.setPixelSize(4*37+15, 2*37+15);
 		for (int i = 0; i < 8; i++) {
