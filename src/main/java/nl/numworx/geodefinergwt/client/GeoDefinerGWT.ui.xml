@@ -18,7 +18,7 @@
 			</g:center>
 			<g:east size="80">
 				<g:FlowPanel ui:field="check" addStyleNames="check">
-				  <g:Button ui:field="checkBtn" ><ui:text from="{rb.kijkNa}"/></g:Button>
+				  <g:Button ui:field="checkBtn" addStyleNames="kijkna"><ui:text from="{rb.kijkNa}"/></g:Button>
 				</g:FlowPanel>
 			</g:east>
 			</g:DockLayoutPanel>

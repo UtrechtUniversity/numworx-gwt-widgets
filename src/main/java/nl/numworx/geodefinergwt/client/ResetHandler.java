@@ -32,16 +32,18 @@ public class ResetHandler extends nl.numworx.geodefiner.common.ResetHandler {
   
   @Override
   public void command() {
-      DialogBox box = new DialogBox(true, true);
+      PopupPanel box = new PopupPanel(true, true);
+      box.setStylePrimaryName("MessageBox");
       box.addCloseHandler(ev -> { popup = null; });
       FlowPanel contents = new FlowPanel();
+      contents.setStyleName("reset", true);
       FlowPanel buttons = new FlowPanel();
       contents.add(new Label("Reset?"));
       Button ja = new Button(GeoDefinerGWT.MESSAGES.LabelTester_0()); ja.addClickHandler(this::confirm);
-      ja.getElement().getStyle().setPaddingLeft(20, Style.Unit.PX);
+      ja.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
       Button nee = new Button(GeoDefinerGWT.MESSAGES.LabelTester_1()); nee.addClickHandler(this::cancel);
       nee.getElement().getStyle().setFloat(Float.RIGHT);
-      nee.getElement().getStyle().setPaddingRight(20, Style.Unit.PX);
+      nee.getElement().getStyle().setMarginLeft(10, Style.Unit.PX);
       buttons.add(ja);buttons.add(nee);
       contents.add(buttons);
       box.setWidget(contents);

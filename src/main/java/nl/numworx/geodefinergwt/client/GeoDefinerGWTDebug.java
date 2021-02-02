@@ -281,7 +281,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				//,"$fh=halfline(Q,P)@"
 				,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
 				//,"$fwaarde=true@"
-				, "$fy<-1-x*x@"
+				//, "$fy<-1-x*x@"
 				);
 		launchDebug.put("definitions", definitions);
 		Map<String,Object> h = new HashMap<>();

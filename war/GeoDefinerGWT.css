@@ -50,117 +50,6 @@ body {
 	width: 32px;
 }
 
-.gwt-ToggleButton span.move {
-	background-image: url("geodefinergwt/fi/euclides/resources/move.png");
-}
-.gwt-ToggleButton span.line {
-	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
-}
-.gwt-ToggleButton span.segment {
-	background-image: url("geodefinergwt/fi/euclides/resources/segment.png");
-}
-.gwt-ToggleButton span.ray {
-	background-image: url("geodefinergwt/fi/euclides/resources/ray.png");
-}
-.gwt-ToggleButton span.move {
-	background-image: url("geodefinergwt/fi/euclides/resources/move.png");
-}
-.gwt-ToggleButton span.delete {
-	background-image: url("geodefinergwt/fi/euclides/resources/delete.png");
-}
-.gwt-ToggleButton span.pan {
-	background-image: url("geodefinergwt/fi/euclides/resources/pan.png");
-}
-.gwt-ToggleButton span.triangle {
-	background-image: url("geodefinergwt/fi/euclides/resources/triangle.png");
-}
-.gwt-ToggleButton span.reset {
-	background-image: url("geodefinergwt/fi/euclides/resources/reseticon.gif");
-}
-.gwt-ToggleButton span.arc {
-	background-image: url("geodefinergwt/fi/euclides/resources/angle.png");
-}
-.gwt-ToggleButton span.midpoint {
-	background-image: url("geodefinergwt/fi/euclides/resources/midpoint.png");
-}
-.gwt-ToggleButton span.perpendicular {
-	background-image: url("geodefinergwt/fi/euclides/resources/plumb.png");
-}
-.gwt-ToggleButton span.parallel {
-	background-image: url("geodefinergwt/fi/euclides/resources/parallel.png");
-}
-.gwt-ToggleButton span.bissectrice {
-	background-image: url("geodefinergwt/fi/euclides/resources/bissectrice.png");
-}
-.gwt-ToggleButton span.distance {
-	background-image: url("geodefinergwt/fi/euclides/resources/distance.png");
-}
-.gwt-ToggleButton span.area {
-	background-image: url("geodefinergwt/fi/euclides/resources/area.png");
-}
-.gwt-ToggleButton span.angle {
-	background-image: url("geodefinergwt/fi/euclides/resources/angle2.png");
-}
-.gwt-ToggleButton span.vector {
-	background-image: url("geodefinergwt/fi/euclides/resources/arrow.png");
-}
-.gwt-ToggleButton span.circleradius {
-	background-image: url("geodefinergwt/fi/euclides/resources/fixedcircle.png");
-}
-.gwt-ToggleButton span.formula {
-	background-image: url("geodefinergwt/fi/euclides/resources/function.png");
-}
-.gwt-ToggleButton span.text {
-	background-image: url("geodefinergwt/fi/euclides/resources/showname.png");
-}
-.gwt-ToggleButton span.trail {
-	background-image: url("geodefinergwt/fi/euclides/resources/thickness2.png");
-}
-
-.gwt-ToggleButton span.circle0 {
-	background-image: url("geodefinergwt/fi/euclides/resources/circle.png");
-}
-.gwt-ToggleButton span.circle1 {
-	background-image: url("geodefinergwt/fi/euclides/resources/circle3.png");
-}
-.gwt-ToggleButton span.circle2 {
-	background-image: url("geodefinergwt/fi/euclides/resources/4.png");
-}
-
-.gwt-ToggleButton span.mirror {
-	background-image: url("geodefinergwt/fi/euclides/resources/mirror.png");
-}
-
-.gwt-ToggleButton span.conic-section {
-	background-image: url("geodefinergwt/fi/euclides/resources/quadric.png");
-}
-
-.gwt-ToggleButton span.focus {
-	background-image: url("geodefinergwt/fi/euclides/resources/quadric.png");
-}
-.gwt-ToggleButton span.locus {
-	background-image: url("geodefinergwt/fi/euclides/resources/objecttracker.png");
-}
-
-.gwt-ToggleButton span.tangent {
-	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
-}
-
-.gwt-ToggleButton span.poleline {
-	background-image: url("geodefinergwt/fi/euclides/resources/line.png");
-}
-
-.gwt-ToggleButton span.point {
-	background-image: url("geodefinergwt/fi/euclides/resources/point.png");
-}
-
-.gwt-ToggleButton span.pointon {
-	background-image: url("geodefinergwt/fi/euclides/resources/qpointon.png");
-}
-.gwt-ToggleButton span.intersection {
-	background-image: url("geodefinergwt/fi/euclides/resources/intersection.png");
-}
-
 .SVGToggle:first-child {
 	margin-left: 0px;
 }
@@ -185,4 +74,36 @@ body {
 
 .toolbox {
 	line-height: 1px;
+}
+
+.check .gwt-Button.kijkna, .reset .gwt-Button {
+	background-color: #1b75bb;
+	border: 2px #1b75bb solid;
+	border-radius: 4px;
+	text-align: center;
+	padding: 3px 6px;
+	color: white;
+	font-family: Ubuntu, sans-serif;
+	background-image: none;
+	text-transform: uppercase;
+	letter-spacing: .3px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.check .gwt-Button.kijkna:hover, .reset .gwt-Button:hover {
+	background-color: #aac1dc;
+	border-color: #aac1dc;
+}
+
+.reset {
+	background-color: #d2e5f5;
+	color: #1b75bb;
+	font-family: Ubuntu, sans-serif;
+	font-size: 14px;	
+	box-shadow: 3px 3px 10px 0px rgb(0 0 0 / 50%);
+	padding: 10px;
+}
+.reset .gwt-Label {
+	margin-bottom: 10px;
 }
