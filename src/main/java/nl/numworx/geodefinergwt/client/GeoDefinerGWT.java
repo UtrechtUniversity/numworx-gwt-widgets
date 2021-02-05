@@ -64,7 +64,7 @@ import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
 import fi.wiskopdr.VariableCollection;
 
-public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, Observer {
+public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener /*, Observer */{
 
 	public static final messages MESSAGES = GWT.create(messages.class);
 	private static final String LOG_OPTION = "logOption";
