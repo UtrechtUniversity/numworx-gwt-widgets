@@ -7,7 +7,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 
-import fi.euclides.event.EventHandler;
 import fi.euclides.event.TrackerContext;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.math.Numbers;
