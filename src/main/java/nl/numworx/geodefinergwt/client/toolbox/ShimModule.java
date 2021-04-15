@@ -3,8 +3,6 @@ package nl.numworx.geodefinergwt.client.toolbox;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.google.gwt.core.client.GWT;
-
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
@@ -17,6 +15,7 @@ import fi.euclides.model.Punt;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
+import nl.numworx.geodefinergwt.client.ui.AngleModel;
 import nl.numworx.geodefinergwt.client.ui.CircleModel;
 import nl.numworx.geodefinergwt.client.ui.LineModel;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
@@ -34,6 +33,11 @@ public abstract class ShimModule {
 	}
 	@Binds @IntKey(Tools.POINT) @IntoMap abstract UIShim<? extends Destroyable, Void>pointInMap(@Named("point") UIShim<? extends Destroyable, Void> point);
 	
+	@Provides @IntKey(Tools.ANGLE) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> angle(AngleModel ui, Instance instance, Tracker tracker) {
+		return new UIShim<Label, Void>(ui, instance.getStateConfiguration(), tracker);
+	}
+
 	@Provides @IntKey(Tools.MIDPOINT) @IntoMap @Singleton static
 	UIShim<? extends Destroyable, Void> midpoint(PointModel ui, Instance instance, Tracker tracker) {
 		return new UIShim<Punt, Void>(ui, instance.getStateConfiguration(), tracker);

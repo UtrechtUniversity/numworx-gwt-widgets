@@ -28,7 +28,6 @@ import fi.euclides.event.EventHandler;
 import fi.euclides.expr.TrailHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.proof.AfstandHandler;
-import fi.euclides.proof.HoekHandler;
 import fi.euclides.proof.OppHandler;
 import fi.euclides.proof.VectorHandler;
 import nl.numworx.geodefiner.common.AddCirkelHandler;
@@ -36,6 +35,7 @@ import nl.numworx.geodefiner.common.AddPolygonHandler;
 import nl.numworx.geodefiner.common.AddSnapPuntHandler;
 import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.FilteredDestroyHandler;
+import nl.numworx.geodefiner.common.HoekHandler;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
@@ -234,8 +234,9 @@ public class ToolBoxModule {
 	}
 
 	@Provides @IntKey(Tools.ANGLE) @IntoMap static
-	ToggleButton angle(TrackerImpl tracker, RadioMode model) {
-		return newSBtn(svg.hoek_svg(),svg.hoek_active_svg(), new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85(),null);
+	ToggleButton angle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.ANGLE).get();
+		return newSBtn(svg.hoek_svg(),svg.hoek_active_svg(), new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85(),shim);
 	}
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
