@@ -505,10 +505,12 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	public void visitLabel(Label label) {
 	    if (isSelected(label)) {
 	      Shape shape = label.adapt(Shape.class);
-	      Rectangle r = shape.getBounds();
-	      context.setFillStyle(SELECT_COLOR);
-	      context.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
-	    }
+	      if (shape != null)
+	      {
+	    	  Rectangle r = shape.getBounds();
+	    	  context.setFillStyle(SELECT_COLOR);
+	    	  context.fillRect(r.getX(), r.getY(), r.getWidth(), r.getHeight());
+	    }}
 	  
 	  
 	  
