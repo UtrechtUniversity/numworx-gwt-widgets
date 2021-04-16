@@ -85,8 +85,10 @@ public class UIModelFactoryGWT extends nl.numworx.geodefiner.common.UIModelFacto
 			model = new IntervalModel().init(label);
 			return;
 		}
-		if (label.getState() == Label.HOEK)
+		if (label.getState() == Label.HOEK) {
 			model = new AngleModel().init(label);
+			return;
+		}
 		model = new TextModel().init(label);
 	}
 
