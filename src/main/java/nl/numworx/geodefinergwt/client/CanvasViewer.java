@@ -1,11 +1,15 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.geom.Rectangle2D;
 import java.util.Vector;
 
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationCallback;
 import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -13,6 +17,7 @@ import dagger.Lazy;
 import fi.euclides.event.NameMapper;
 import fi.euclides.event.TrackerContext;
 import fi.euclides.gwt.RectShape;
+import fi.euclides.gwt.ViewerWidget;
 import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
@@ -31,6 +36,7 @@ import fi.euclides.model.TrailBuilder;
 import fi.euclides.model.Triangle;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
+import fi.euclides.util.Adaptee;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
 import gwt.awt.Rectangle;
@@ -40,6 +46,7 @@ import gwt.awt.geom.Path2D;
 import gwt.awt.geom.PathIterator;
 import nl.numworx.geodefiner.common.Align;
 import nl.numworx.geodefiner.common.CheckObject;
+import nl.numworx.geodefiner.common.Hoekpunt;
 import nl.numworx.geodefiner.common.Instance.Selector;
 import nl.numworx.geodefiner.common.Integral;
 import nl.numworx.geodefiner.common.Interval;
@@ -342,6 +349,10 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		    context.setFillStyle(SELECT_COLOR);
 		    fillCircle(punt.getXd()-p/2, punt.getYd()-p/2, p);
 		  }
+	      	if (punt instanceof Hoekpunt) {
+	  			selectColor(punt);
+	      		visitHoekPunt((Hoekpunt) punt);
+	      	}
 		  super.visitPunt(punt);
 		}
 	}
@@ -520,6 +531,12 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 			return;
 		}
 		selectColor(label);
+
+		if (label.getRegistered() instanceof nl.numworx.geodefiner.common.HoekHandler) {
+			visitHoek(label);
+			return;
+		}
+		
 		if (label.getString().contains("$")
 		  ||Boolean.TRUE.equals(label.adapt(Boolean.class)))
 		{
@@ -576,6 +593,69 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		default:
 		}
 		DefaultAdapter.getDefault(label).put(Shape.class, rect);
+	}
+
+	private void visitHoek(Label label) {
+		Punt center = label.getP();
+		String string = label.getString();
+		FontStyle fs = label.adapt(FontStyle.class);
+		if (fs == null) fs = FONT_STYLE;		
+		fs.toStyle(context);
+		double w = context.measureText(string).getWidth();
+		double h = fs.getFont().getAscent();
+		double HOEKSIZE = fs.getFont().getHeight() * 1.2 ;
+		Destroyable depend[] = label.getDepend();
+		double startAngle = 0;
+		if (depend[1] instanceof Punt) {
+			Punt p0 = (Punt) depend[1];
+			Punt p1 = (Punt) depend[0];
+			double y = p1.getYd() - p0.getYd();
+			double x = p1.getXd() - p0.getXd();
+			startAngle = Math.atan2(-y, x);
+		} else if (depend[0] instanceof Lijn) {
+			Lijn l = (Lijn) depend[0];
+			startAngle = Math.atan2(-l.getDY(), l.getDX());
+		}
+		double value = label.value.doubleValue();
+		FillStrokeStyle oldStroke = context.getStrokeStyle();
+		FillStrokeStyle oldFill   = context.getFillStyle();
+		int rgba = 0xFF000000;
+		ColorStyle st = label.adapt(ColorStyle.class);
+		if (st != null) rgba = st.getRGB();
+		rgba = ((rgba >>> 24)/3) << 24 | (rgba&0xFFFFFF);
+				
+		fill = ColorStyle.colorString(rgba); context.setStrokeStyle(fill);
+		drawArc(center.getXd()-HOEKSIZE/2, center.getYd()-HOEKSIZE/2, HOEKSIZE, startAngle, value);
+		context.setStrokeStyle(oldStroke);
+		context.setFillStyle(oldFill);
+
+		value = startAngle + value/2;
+		double ww = Math.hypot(w/2, h/2);
+		double x,y;
+		x= center.getXd() + (HOEKSIZE/2+ww)*Math.cos(value);
+		y= center.getYd() - (HOEKSIZE/2+ww)*Math.sin(value);
+		String halign = ViewerWidget.TEXT_MIDDLE;
+		String valign = ViewerWidget.TEXT_CENTRAL;
+		drawString(string, x , y, halign, valign, null);
+
+		RectShape rect = 
+				new RectShape(x-w/2, y+h/2 - fs.getFont().getAscent(), w, fs.getFont().getHeight());
+		DefaultAdapter.getDefault((Adaptee) label).put(Shape.class, rect);
+
+	}
+	private void visitHoekPunt(Hoekpunt punt) {
+		double hoek = (punt.hoek());
+		Punt[] p = new Punt[3];
+		p[2] = punt; p[1] = punt.getDepend()[0]; p[0] = punt.getDepend()[1];
+		Label l = new Label();
+		l.setState(Label.HOEK);
+//XXX altijd graden?
+		l.setString(Math.round(hoek * 180.0 / Math.PI)%360 + "°");
+		l.setValue(Numbers.createDouble(hoek));
+		l.setDepend(p);
+		l.setP(p[1]);
+		visitHoek(l);
+		
 	}
 	/* (non-Javadoc)
 	 * @see fi.euclides.model.AbstractViewer#visitLijn(fi.euclides.model.Lijn)

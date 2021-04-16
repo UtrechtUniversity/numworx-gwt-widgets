@@ -208,16 +208,16 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.POINT,
 				Tools.LINE,
 				Tools.HALFLINE,
-//				Tools.SEGMENT,
-				Tools.LINE_PALETTE,
+				Tools.SEGMENT,
+//				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
 //				Tools.PARALLEL,
 
 				Tools.CIRCLE,
 				Tools.ARC,
-				Tools.TRIANGLE,
-				Tools.CIRCLE_WITH_RADIUS,
+//				Tools.TRIANGLE,
+//				Tools.CIRCLE_WITH_RADIUS,
 //				Tools.ANGLE_POINT,
 //
 //				Tools.MIDPOINT,
@@ -233,16 +233,17 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 //
 //				Tools.DISTANCE,
 //				Tools.AREA,
-//				Tools.ANGLE,
+				Tools.ANGLE,
 //				Tools.VECTOR,
 //
 //				Tools.TRAIL,
-				Tools.TEXT,			
+//				Tools.TEXT,			
 //				Tools.FORMULA,
 //
 //				Tools.PAN,
 				Tools.DESTROY,
-				Tools.RESET
+				Tools.RESET,
+				Tools.ANGLE_POINT
 			);
 		Vector<Map<?,?>> configs = new Vector();
 		configs.setSize(29);
@@ -250,6 +251,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
 		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
 		configs.set(Tools.TEXT, new HashMap(Collections.singletonMap("color", 0xFFFF0000)));
+		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
 		HashMap mm = new HashMap();
 		mm.put("color", 0xFF00FF00);
 		mm.put("width", 0.5);
