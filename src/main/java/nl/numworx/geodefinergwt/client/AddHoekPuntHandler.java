@@ -51,8 +51,8 @@ public class AddHoekPuntHandler extends AbstractAddHoekPuntHandler implements Ow
 		AbstractViewer viewer = getTracker().adapt(AbstractViewer.class);
 		final int offx=viewer.clipLeft().intValue();
 		final int offy=viewer.clipTop().intValue();
-		final int x = p2.getX().intValue() + root.getAbsoluteLeft()    - offx; // OFFSETX 
-		final int y = p2.getY().intValue() + root.getAbsoluteTop() + 5 - offy; // OFFSETY
+		final int x = (p1.getX().intValue() + p2.getX().intValue())/2 + root.getAbsoluteLeft() - offx; // OFFSETX 
+		final int y = (p1.getY().intValue() + p2.getY().intValue())/2 + root.getAbsoluteTop()  - offy; // OFFSETY
 		tf = new TekstPopup(this, true);
 		tf.setAutoHideEnabled(true);
 		tf.setAutoHideOnHistoryEventsEnabled(true);
@@ -62,7 +62,7 @@ public class AddHoekPuntHandler extends AbstractAddHoekPuntHandler implements Ow
 			
 			@Override
 			public void setPosition(int offsetWidth, int offsetHeight) {
-				tf.setPopupPosition(x, y);
+				tf.setPopupPosition(x-offsetWidth/2, y-offsetHeight/2);
 			}
 		});
 		

@@ -1,8 +1,5 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.awt.Color;
-import java.awt.FontMetrics;
-import java.awt.geom.Rectangle2D;
 import java.util.Vector;
 
 import com.google.gwt.animation.client.AnimationScheduler;
@@ -23,7 +20,6 @@ import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Cirkel;
 import fi.euclides.model.Destroyable;
-import fi.euclides.model.Kegelsnede2;
 import fi.euclides.model.Label;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
@@ -66,10 +62,21 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	private static final float DEFAULT_POINTSIZE = 5;
 	private static final StrokeStyle DEFAULT_STROKE = new StrokeStyle(1, null);
+
+	private static final ColorStyle COLOR_GREEN   = new ColorStyle(0xFF008000);
+	private static final ColorStyle COLOR_RED     = new ColorStyle(0xFFFF0000);
+	private static final ColorStyle COLOR_BLUE    = new ColorStyle(0xFF0000FF);
+	private static final ColorStyle COLOR_MAGENTA = new ColorStyle(0xFFFF00FF);
+	private static final ColorStyle COLOR_POINTER = new ColorStyle(0xFF404040);
+	private static final ColorStyle COLOR_BLACK   = new ColorStyle(0xFF000000);
+	private static final ColorStyle COLOR_LT_GRAY = new ColorStyle(0xFFC0C0C0);
+	private static final ColorStyle COLOR_WHITE   = new ColorStyle(-1);
+
 	private AnimationHandle animator;
 	private boolean down;
 	private String background = "white";
 	private HighLighter hiLighter;
+	private ColorStyle select;
 	
 	private NameMapper mapper = super.getMapper();
 	@Override public NameMapper getMapper() { return mapper; }
@@ -220,6 +227,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		      setColor(LIGHT_GRAY);
 		    } else {
 		      setCssColor(CssColor.make(cs.getColor()));
+		      select = cs;
 		    }
 		    DEFAULT_STROKE.toStyle(context);
 		    stroke  = object.adapt(StrokeStyle.class);
@@ -239,6 +247,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		//java.util.logging.Logger.getLogger("CanvasViewer").info("color = " + c);
 		if (c != null && co == null) {
 		    setCssColor(CssColor.make(c.getColor()));
+		    select = c;
 	        if(hiLighter != null)
 	            hiLighter.hilight(object);
 			return;
@@ -246,7 +255,9 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 // feedback color.
 		if(co != null)
 		{   // extra verificatie?
-		  setCssColor(CssColor.make("green"));
+		  //setCssColor(CssColor.make("green"));
+			select = COLOR_GREEN;
+			setCssColor(CssColor.make(select.getColor()));
 		} else
 		{
 	      setColor(BLACK);
@@ -619,9 +630,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		double value = label.value.doubleValue();
 		FillStrokeStyle oldStroke = context.getStrokeStyle();
 		FillStrokeStyle oldFill   = context.getFillStyle();
-		int rgba = 0xFF000000;
-		ColorStyle st = label.adapt(ColorStyle.class);
-		if (st != null) rgba = st.getRGB();
+		int rgba = select.getRGB();
 		rgba = ((rgba >>> 24)/3) << 24 | (rgba&0xFFFFFF);
 				
 		fill = ColorStyle.colorString(rgba); context.setStrokeStyle(fill);
@@ -649,6 +658,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		p[2] = punt; p[1] = punt.getDepend()[0]; p[0] = punt.getDepend()[1];
 		Label l = new Label();
 		l.setState(Label.HOEK);
+		l.setAdapter(punt.getAdapter());
 //XXX altijd graden?
 		l.setString(Math.round(hoek * 180.0 / Math.PI)%360 + "°");
 		l.setValue(Numbers.createDouble(hoek));
@@ -753,5 +763,19 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
     }
     super.visitBoog(b);
   }
+@Override
+public void setColor(int n) {
+	switch(n) {
+	case WHITE: select = COLOR_WHITE; break;
+	case RED: select = COLOR_RED; break;
+	case AbstractViewer.blue: select = COLOR_BLUE; break;
+	case AbstractViewer.magenta: select = COLOR_MAGENTA; break;
+	case POINTER_COLOR:	 select = COLOR_POINTER; break;
+	case LIGHT_GRAY: select = COLOR_LT_GRAY; break;
+	case BLACK:
+	default: select = COLOR_BLACK;
+	}
+	super.setColor(n);
+}
 
 }

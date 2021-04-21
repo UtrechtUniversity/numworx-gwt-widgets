@@ -246,11 +246,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 				Tools.ANGLE_POINT
 			);
 		Vector<Map<?,?>> configs = new Vector();
-		configs.setSize(29);
+		configs.setSize(32);
 		configs.set(Tools.POINT, new HashMap(Collections.singletonMap("color", 0X80FF0000)));
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
 		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
 		configs.set(Tools.TEXT, new HashMap(Collections.singletonMap("color", 0xFFFF0000)));
+		configs.set(Tools.ANGLE_POINT, new HashMap(Collections.singletonMap("color", 0xFFFFFF00)));
 		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
 		HashMap mm = new HashMap();
 		mm.put("color", 0xFF00FF00);
