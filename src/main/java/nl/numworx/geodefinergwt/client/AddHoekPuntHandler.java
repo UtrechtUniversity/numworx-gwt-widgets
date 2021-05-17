@@ -24,7 +24,6 @@ public class AddHoekPuntHandler extends AbstractAddHoekPuntHandler implements Ow
 
 	@Override
 	public String getText() {
-		// TODO Auto-generated method stub
 		return "0";
 	}
 
