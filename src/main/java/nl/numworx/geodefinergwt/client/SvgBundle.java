@@ -65,11 +65,11 @@ public interface SvgBundle extends ClientBundle {
   @MimeType("image/svg+xml")
   DataResource lijnstuk_active_svg();
 
-  @Source("nl/numworx/geodefinergwt/client/resources/Boog-A.svg")
+  @Source("nl/numworx/geodefinergwt/client/resources/Boog-door-3-A.svg")
   @MimeType("image/svg+xml")
   DataResource boog_active_svg();
 
-  @Source("nl/numworx/geodefinergwt/client/resources/Boog.svg")
+  @Source("nl/numworx/geodefinergwt/client/resources/Boog-door-3.svg")
   @MimeType("image/svg+xml")
   DataResource boog_svg();
 

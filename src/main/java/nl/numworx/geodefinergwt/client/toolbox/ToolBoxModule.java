@@ -236,7 +236,7 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.ANGLE) @IntoMap static
 	ToggleButton angle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.ANGLE).get();
-		return newSBtn(svg.hoek_svg(),svg.hoek_active_svg(), new HoekHandler(rb.Euclides_85()), tracker, model,rb.Euclides_85(),shim);
+		return newSBtn(svg.hoek_svg(),svg.hoek_active_svg(), new HoekHandler(rb.Euclides_86()), tracker, model,rb.Euclides_85(),shim);
 	}
 
 	@Provides @IntKey(Tools.VECTOR) @IntoMap static
