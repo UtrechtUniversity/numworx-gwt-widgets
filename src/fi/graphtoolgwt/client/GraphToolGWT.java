@@ -449,6 +449,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if((typeOpdracht == 3 || typeOpdracht == 4) && mode != OpdrNavIF.ZELFTOETS && mode != OpdrNavIF.EINDTOETS && !checkExternal) 
 		{	grafiekVeldHoogte -= kijkNaPanelHoogte + offset;
 		}
+
+		if (grafiekVeldHoogte < 1) grafiekVeldHoogte = 1; // Minimum 1 pixel!
+		
 		getImages();
 		
 		for(int i = 0; i < maxAantalExpressies; i++)
@@ -4921,7 +4924,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			// Calculate graph-parameters X
 			double rangeX = asDefXMax-asDefXMin;
 			eenheidxD = breedte/(rangeX/asDefXStap)/2; // gedeeld door 2 tbv een kleinere schaling dan de grove 
-			eenheidx = (int) Math.round(eenheidxD);
+			eenheidx = Math.max(1, (int) Math.round(eenheidxD));
 			eenheidxValue = Math.abs(asDefXStap/2);  // we don't allow negative step-sizes (yet) 
 			beginx = -Math.round(asDefXMin/eenheidxValue * eenheidxD);
 
@@ -4932,8 +4935,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 			// Calculate graph-parameters Y
 			double rangeY = asDefYMax-asDefYMin;
-			eenheidyD = grafiekVeldHoogte/(rangeY/asDefYStap)/2;
-			eenheidy = (int) Math.round(eenheidyD);
+			eenheidyD = grafiekVeldHoogte/(rangeY/asDefYStap)/2; // always positive
+			eenheidy = Math.max((int) Math.round(eenheidyD), 1); // idem.
 			eenheidyValue = Math.abs(asDefYStap/2);  // gedeeld door 2 tbv een kleinere schaling dan de grove
 			beginy = -Math.round(asDefYMin/eenheidyValue * eenheidyD);			
 	
