@@ -87,6 +87,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		hitTester = new HitTesterGWT();
 		asWidget().addStyleName("canvas");		
 		getModel().setTrailBuilder(this);
+		snapper.setPH(this);
 	}
 
 	void enableHighLight(Selector selector) {

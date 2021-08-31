@@ -36,15 +36,14 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	
 	boolean test;
+	private HitTester hitTester;
 	boolean hits(int x0, int y0, PH ph) {
-		if(true) return false; // Nog even niet....
+		if(hitTester == null) return false;
 		test = false;
-		HitTester hit = ph.getHitTester().copy();
-		hit.setXY(x0, y0);
-		hit.setVisitor(this);
+		hitTester.setXY(x0, y0);
 		Vector<Punt> points = ph.getModel().getPunten();
 		for(Punt p : points) {
-			p.visit(hit);
+			p.visit(hitTester);
 			if (test) return true;
 		}
 		return false;
@@ -132,6 +131,11 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	@Override
 	public void visitBoog(Boog b) {
+	}
+	
+	public void setPH(PH ph) {
+		this.hitTester = ph.getHitTester().copy();
+		this.hitTester.setVisitor(this);
 	}
 
 	
