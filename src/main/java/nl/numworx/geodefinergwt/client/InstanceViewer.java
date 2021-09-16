@@ -36,6 +36,7 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 
 import fi.euclides.event.NameMapper;
+import fi.euclides.event.TrackerContext;
 import fi.euclides.gwt.svg.SVGRectShape;
 import fi.euclides.gwt.svg.SVGWidget;
 import fi.euclides.model.Destroyable;
@@ -499,5 +500,10 @@ public class InstanceViewer extends SVGWidget implements PH {
 		} else
 		super.visitLocus(l);
 	}
+
+	@Override
+    public TrackerContext getCtx(int id) {
+      return this;
+    }
 
 }

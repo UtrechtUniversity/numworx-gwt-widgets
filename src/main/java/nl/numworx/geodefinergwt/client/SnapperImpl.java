@@ -3,6 +3,7 @@ package nl.numworx.geodefinergwt.client;
 import java.util.Vector;
 
 import fi.euclides.event.HitTester;
+import fi.euclides.event.TrackerContext;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Cirkel;
 import fi.euclides.model.Kegelsnede2;
@@ -23,6 +24,7 @@ class SnapperImpl extends Snapper implements Visitor {
 		void pmDrag(int x, int y, int id);
 		Model getModel();
 		HitTester getHitTester();
+    TrackerContext getCtx(int id);
 	}
 	
 	
@@ -36,10 +38,12 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	
 	boolean test;
+	TrackerContext ctx;
 	private HitTester hitTester;
-	boolean hits(int x0, int y0, PH ph) {
+	boolean hits(int x0, int y0, int id, PH ph) {
 		if(hitTester == null) return false;
 		test = false;
+		ctx = ph.getCtx(id);
 		hitTester.setXY(x0, y0);
 		Vector<Punt> points = ph.getModel().getPunten();
 		for(Punt p : points) {
@@ -51,7 +55,7 @@ class SnapperImpl extends Snapper implements Visitor {
 	
 	
 	void pmUp(int x0, int y0, int id, PH ph) {
-		if(isGravity() && !hits(x0,y0, ph)) {
+		if(isGravity() && !hits(x0,y0, id, ph)) {
 			int ox = (int) ph.getModel().getO().getX().longValue();
 			int dx = (int) ph.getModel().getU().getX().longValue() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
@@ -79,7 +83,7 @@ class SnapperImpl extends Snapper implements Visitor {
 	
 	void pmDrag(int x0, int y0, int id, PH ph) {
 		setMoved(true);
-		if(isGravityM() && !hits(x0,y0,ph)) {
+		if(isGravityM() && !hits(x0,y0,id, ph)) {
 			int ox = (int) ph.getModel().getO().getXd();
 			int dx = (int) ph.getModel().getU().getXd() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
@@ -106,7 +110,7 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	@Override
 	public void visitPunt(Punt p) {
-		test = true;
+		test = !ctx.isTracked(p);
 	}
 	@Override
 	public void visitLijn(Lijn l) {
@@ -134,8 +138,8 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	
 	public void setPH(PH ph) {
-		this.hitTester = ph.getHitTester().copy();
-		this.hitTester.setVisitor(this);
+//		this.hitTester = ph.getHitTester().copy();
+//		this.hitTester.setVisitor(this);
 	}
 
 	
