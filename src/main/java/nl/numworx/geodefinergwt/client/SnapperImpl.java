@@ -55,7 +55,7 @@ class SnapperImpl extends Snapper implements Visitor {
 	
 	
 	void pmUp(int x0, int y0, int id, PH ph) {
-		if(isGravity() && !hits(x0,y0, id, ph)) {
+		if(isGravity()) {
 			int ox = (int) ph.getModel().getO().getX().longValue();
 			int dx = (int) ph.getModel().getU().getX().longValue() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
@@ -73,9 +73,10 @@ class SnapperImpl extends Snapper implements Visitor {
 			if ( y*2 > dy) y -= dy;
 			//System.out.println(" " + x);
 			if(y > SNAP || y < -SNAP) y = 0;
-
-			x0 = x0-x;
-			y0 = y0-y;
+			if ( (x != 0 || y !=0) && !hits(x0, y0, id, ph))
+			{ x0 = x0-x;
+			  y0 = y0-y;
+			}
 		}
 		ph.pmUp(x0, y0, id);
 
@@ -83,7 +84,7 @@ class SnapperImpl extends Snapper implements Visitor {
 	
 	void pmDrag(int x0, int y0, int id, PH ph) {
 		setMoved(true);
-		if(isGravityM() && !hits(x0,y0,id, ph)) {
+		if(isGravityM()) {
 			int ox = (int) ph.getModel().getO().getXd();
 			int dx = (int) ph.getModel().getU().getXd() - ox;
 			//System.out.print(ev.getX() + " " + ox + " " + dx);
@@ -102,8 +103,10 @@ class SnapperImpl extends Snapper implements Visitor {
 			//System.out.println(" " + x);
 			if(y > SNAP || y < -SNAP) y = 0;
 
-			x0 = x0-x;
-			y0 = y0-y;
+			if ( (x != 0 || y !=0) && !hits(x0, y0, id, ph))
+            { x0 = x0-x;
+              y0 = y0-y;
+            }
 		}
 		ph.pmDrag(x0, y0, id);
 
@@ -138,8 +141,8 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	
 	public void setPH(PH ph) {
-//		this.hitTester = ph.getHitTester().copy();
-//		this.hitTester.setVisitor(this);
+		this.hitTester = ph.getHitTester().copy();
+		this.hitTester.setVisitor(this);
 	}
 
 	
