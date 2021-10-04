@@ -24,7 +24,7 @@ class SnapperImpl extends Snapper implements Visitor {
 		void pmDrag(int x, int y, int id);
 		Model getModel();
 		HitTester getHitTester();
-    TrackerContext getCtx(int id);
+		TrackerContext getCtx(int id);
 	}
 	
 	
@@ -47,8 +47,10 @@ class SnapperImpl extends Snapper implements Visitor {
 		hitTester.setXY(x0, y0);
 		Vector<Punt> points = ph.getModel().getPunten();
 		for(Punt p : points) {
-			p.visit(hitTester);
-			if (test) return true;
+			if (p.isDefined() && p.isVisible()) {
+				p.visit(hitTester);
+				if (test) return true;
+			}
 		}
 		return false;
 	}
