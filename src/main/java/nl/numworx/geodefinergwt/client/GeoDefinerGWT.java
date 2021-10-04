@@ -391,11 +391,14 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		comRoot.addCBookEventListener(CHECK, this);
 		this.mode = comRoot.getMode();
 		this.lessonMode = comRoot.getLessonMode();
+		toetsStyle();
+	}
+
+	private void toetsStyle() {
 		if (lessonMode != LessonMode.review) {
 			if (mode == OpdrNavIF.EINDTOETS || mode == OpdrNavIF.ZELFTOETS) {
 				checkBtn.addStyleName("extern"); // no Kijkna knop.
-			}
-			
+			}			
 		}
 	}
 
@@ -597,6 +600,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		expressions.clear();
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
+		toetsStyle();
 		start();
 	}
 

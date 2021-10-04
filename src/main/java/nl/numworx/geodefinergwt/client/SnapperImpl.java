@@ -40,6 +40,11 @@ class SnapperImpl extends Snapper implements Visitor {
 	boolean test;
 	TrackerContext ctx;
 	private HitTester hitTester;
+/*
+ * Deze routine werkt nooit goed, omdat meerdere punten kunnen meebewegen en daarmee altijd "in de buurt" van de muis zijn. 
+ * Dat is niet alleen het punt onder de muis, maar ook alle andere afhankelijke punten.
+ * Helaas voor Mieke's opgave
+ */
 	boolean hits(int x0, int y0, int id, PH ph) {
 		if(hitTester == null) return false;
 		test = false;
@@ -105,7 +110,7 @@ class SnapperImpl extends Snapper implements Visitor {
 			//System.out.println(" " + x);
 			if(y > SNAP || y < -SNAP) y = 0;
 
-			if ( (x != 0 || y !=0) && !hits(x0, y0, id, ph))
+			//if ( (x != 0 || y !=0) && !hits(x0, y0, id, ph))
             { x0 = x0-x;
               y0 = y0-y;
             }
@@ -143,8 +148,8 @@ class SnapperImpl extends Snapper implements Visitor {
 	}
 	
 	public void setPH(PH ph) {
-		this.hitTester = ph.getHitTester().copy();
-		this.hitTester.setVisitor(this);
+//		this.hitTester = ph.getHitTester().copy();
+//		this.hitTester.setVisitor(this);
 	}
 
 	
