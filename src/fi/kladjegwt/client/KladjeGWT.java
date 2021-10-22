@@ -20,6 +20,7 @@ import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import com.google.gwt.core.client.EntryPoint;
@@ -794,8 +795,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 // doe er wat mee...		
 		if ( premium ) {
 			GWT.log("met een premium abonnement");
+			if (comRoot.getLessonMode() != LessonMode.normal) isAttempt = false;
 		} else {
 			GWT.log("zonder een premium abonnement");
+			isAttempt = false;
 		}
 		
 		comRoot.addCBookEventListener("drawing", this);
