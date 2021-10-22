@@ -8,6 +8,7 @@ import java.util.HashMap;
 //import java.util.Hashtable;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
@@ -739,12 +740,27 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     	
     }
   
+    private Map<String,Object> lastAttempt = Collections.emptyMap();
+    private boolean isAttempt;
+    private HashMap<String,Object> setAttempt(HashMap<String,Object> attempt) {
+    	if (isAttempt && comRoot != null && !lastAttempt.equals(attempt)) {
+    		lastAttempt = attempt;
+    		comRoot.fireEvent(new CBookEvent(this, "logOption", Collections.emptyMap())); // no score, no response, no success
+    	}
+    	return attempt;
+    }
+    private HashMap<String,Object> initAttempt(HashMap<String,Object> attempt) {
+    	if (isAttempt) lastAttempt = attempt;
+    	return attempt;
+    }
+    
+    
     /**
      * get de status van het werkveld, zie methode getState in klasse kladjeGWTVeld
      */
 	public HashMap<String, Object> getState()
 	{
-		return kladjeGWTVeld.getState();
+		return setAttempt(kladjeGWTVeld.getState());
 	}
 
 	/**
@@ -752,6 +768,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	public void setState(HashMap<String, Object> h)
 	{	if(h == null||h.isEmpty()) return;
+		initAttempt(h);
 		kladjeGWTVeld.setState(h, false);
 
 	}
@@ -806,6 +823,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 		if(launchState.containsKey("scoreMax")) 
 			scoreMax = launchState.getInt("scoreMax");
+
+		boolean logOption = launchState.getBoolean("logOption", false);
+		isAttempt = logOption || launchState.containsKey("smObjectives");
 
 		// instellingen achtergrondvulling werkveld 
 		if (launchState.containsKey("lijnen"))
