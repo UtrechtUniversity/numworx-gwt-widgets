@@ -186,7 +186,7 @@ public class KladjeGWTVeld
 	/**
 	 * de kleur van de handle boxes van objecten (blauw) 
 	 */
-	static CssColor hbColor = CssColor.make(0, 0, 255);
+	static CssColor hbColor = CssColor.make(150, 150, 150);
 	
 	/**
 	 * de minimum breedte en hoogte van een handle box
@@ -196,7 +196,7 @@ public class KladjeGWTVeld
 	/**
 	 * de kleur van de selectierechthoek
 	 */
-	CssColor selectieColor = CssColor.make(0, 0, 255);
+	CssColor selectieColor = CssColor.make(200,200, 200);
 		
 	/**
 	 * voorgedefinieerde kleuren
@@ -1422,7 +1422,7 @@ public class KladjeGWTVeld
 		g.scale(scale, scale);
 		g.translate(translation.x,translation.y);
 		
-		g.setLineWidth(3.0d);
+		g.setLineWidth(2.0d);
 		if(mouseMode==ivmOptie)
 			g.setLineWidth(2.0d);
 		
@@ -1596,7 +1596,7 @@ public class KladjeGWTVeld
 			g.beginPath();
 			g.strokeRect(selecteerRechthoek.x, selecteerRechthoek.y, 
     					selecteerRechthoek.width, selecteerRechthoek.height);
-			g.setLineWidth(1.5d);
+			g.setLineWidth(0.8d);
 			if (schalen)
 			{	
 				if (topRightHandle != null)
@@ -4254,7 +4254,7 @@ public class KladjeGWTVeld
 		
 		else if (mouseMode == lijnTekenen)
 		{
-			
+			mouseDown = false;
 			if (lijnEinde != null)
 			{	
 				Lijn lijn = new Lijn(drawingColor, figuurStart.x, figuurStart.y, lijnEinde.x, lijnEinde.y);
@@ -4272,6 +4272,7 @@ public class KladjeGWTVeld
 		}
 		else if (mouseMode == rechthoekTekenen)
 		{
+			mouseDown = false;
 			if (tekenRechthoek != null)
 			{	
 				Rechthoek rechthoek = new Rechthoek(drawingColor, 
@@ -4290,7 +4291,9 @@ public class KladjeGWTVeld
 		
 		
 		else if (mouseMode == cirkelTekenen)
-		{	if (tekenRechthoek != null)
+		{	
+			mouseDown = false;
+			if (tekenRechthoek != null)
 			{
 				Ellips ellips = new Ellips(drawingColor, 
 							       tekenRechthoek.x, tekenRechthoek.y,

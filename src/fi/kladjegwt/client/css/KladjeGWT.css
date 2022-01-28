@@ -14,7 +14,8 @@
 }
 
 .top {
-	background-color: rgb(219,221,223);	
+	/**background-color: rgb(219,221,223); */
+	background-color: rgb(239,241,243);	
 }
 
 .canvas {
@@ -58,7 +59,6 @@ touch-action: none;
 }
 
 .pushbutton {
-
 	background-color: yellow;
 	font-size: 0.875em;
 	padding: 0px;	

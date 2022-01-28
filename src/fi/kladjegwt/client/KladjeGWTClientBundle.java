@@ -30,22 +30,22 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/foutkruis-new.png")
    public ImageResource foutkruisResource();
 	 
-   @Source("fi/kladjegwt/client/images/teken_penknop_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_penknop_up.png")
    public ImageResource tekenKnopUpResource();
 
-   @Source("fi/kladjegwt/client/images/teken_penknop_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_penknop_down.png")
    public ImageResource tekenKnopDownResource();
    
-   @Source("fi/kladjegwt/client/images/teken_lijn_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_lijn_up.png")
    public ImageResource tekenLijnUpResource();
    
-   @Source("fi/kladjegwt/client/images/teken_lijn_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_lijn_down.png")
    public ImageResource tekenLijnDownResource();
 
-   @Source("fi/kladjegwt/client/images/teken_rechthoek_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_rechthoek_up.png")
    public ImageResource tekenRechthoekUpResource();
    
-   @Source("fi/kladjegwt/client/images/teken_rechthoek_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_rechthoek_down.png")
    public ImageResource tekenRechthoekDownResource();
    
    @Source("fi/kladjegwt/client/images/teken_formule_up.gif")
@@ -54,26 +54,32 @@ public interface KladjeGWTClientBundle extends ClientBundle
    @Source("fi/kladjegwt/client/images/teken_formule_down.gif")
    public ImageResource tekenFormuleDownResource();
    
-   @Source("fi/kladjegwt/client/images/teken_cirkel_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_cirkel_up.png")
    public ImageResource tekenCirkelUpResource();
    
-   @Source("fi/kladjegwt/client/images/teken_cirkel_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_cirkel_down.png")
    public ImageResource tekenCirkelDownResource();
    
-   @Source("fi/kladjegwt/client/images/teken_tekst_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_tekst_up.png")
    public ImageResource tekenTekstUpResource();
    
-   @Source("fi/kladjegwt/client/images/teken_tekst_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_tekst_down.png")
    public ImageResource tekenTekstDownResource();
    
-   @Source("fi/kladjegwt/client/images/teken_selecteren_up.gif")
+   @Source("fi/kladjegwt/client/images/teken_selecteren_up.png")
    public ImageResource selecterenUpResource();
    
-   @Source("fi/kladjegwt/client/images/teken_selecteren_down.gif")
+   @Source("fi/kladjegwt/client/images/teken_selecteren_down.png")
    public ImageResource selecterenDownResource();
 
-   @Source("fi/kladjegwt/client/images/regenboog3.gif")
+   @Source("fi/kladjegwt/client/images/regenboog3.png")
    public ImageResource regenboogResource();
+   
+   @Source("fi/kladjegwt/client/images/binknop.png")
+   public ImageResource binKnopResource();
+   
+   @Source("fi/kladjegwt/client/images/terug.png")
+   public ImageResource terugKnopResource();
    
    @Source("fi/kladjegwt/client/images/zwart.gif")
    public ImageResource zwartResource();

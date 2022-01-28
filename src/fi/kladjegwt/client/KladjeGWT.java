@@ -114,14 +114,14 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	 */
 	int breedte = 700;
 	int hoogte = 550;
-	int bottomHeight = 32;
+	int bottomHeight = 37;
 	int topHeight = 52;
 	int leftOffset = 5;
 	int topOffset = 5;
-	int toggleSize = 22;
+	int toggleSize = 26;
 	int pushSize = 24;
-	int buttonWidth = 40;
-	int buttonHeight = 22;
+	int buttonWidth = 25;
+	int buttonHeight = 25;
 
 	/**
 	 * launchdata
@@ -147,7 +147,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	ImageResource tekenFormuleUpResource, tekenFormuleDownResource, tekenKnopUpResource, tekenKnopDownResource, tekenLijnUpResource, tekenLijnDownResource, 
 				  tekenRechthoekUpResource, tekenRechthoekDownResource, tekenCirkelUpResource, tekenCirkelDownResource, 
 				  tekenTekstUpResource, tekenTekstDownResource, selecterenUpResource, selecterenDownResource, 
-	              regenboogResource, 
+	              regenboogResource, binKnopResource, terugKnopResource,
 	              zwartResource, grijsResource, roodResource, oranjeResource, groenResource, cyaanResource,  
 	              blauwResource, magentaResource; 
 	              //formuleschrijfImageResource, formuleschrijfaanImageResource;
@@ -159,7 +159,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	Image tekenFormuleUpImage, tekenFormuleDownImage, tekenKnopUpImage, tekenKnopDownImage, tekenLijnUpImage, tekenLijnDownImage, 
 		  tekenRechthoekUpImage, tekenRechthoekDownImage, tekenCirkelUpImage, tekenCirkelDownImage, 
 		  tekenTekstUpImage, tekenTekstDownImage, selecterenUpImage, selecterenDownImage,
-		  regenboogImage, 
+		  regenboogImage, binKnopImage, terugKnopImage,
 		  zwartImage, grijsImage, roodImage, oranjeImage, groenImage, cyaanImage, 
 		  blauwImage, magentaImage;
 		  //formuleschrijfImage, formuleschrijfaanImage;
@@ -230,6 +230,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	
 	private boolean calculator = true;
 	
+	private boolean toolBarOnTop = true;
+	
 	/**
 	 * maak de css in orde en haal via de resources alle plaatjes op 
 	 */
@@ -292,6 +294,14 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		regenboogResource = kladjeGWTClientBundle.regenboogResource();
 		regenboogImage = new Image(regenboogResource);
 		regenboogImage.addStyleName(kladjeCss.pushimage2());
+		
+		binKnopResource = kladjeGWTClientBundle.binKnopResource();
+		binKnopImage = new Image(binKnopResource);
+		binKnopImage.addStyleName(kladjeCss.pushimage2());
+		
+		terugKnopResource = kladjeGWTClientBundle.terugKnopResource();
+		terugKnopImage = new Image(terugKnopResource);
+		terugKnopImage.addStyleName(kladjeCss.pushimage2());
 
 		zwartResource = kladjeGWTClientBundle.zwartResource();
 		zwartImage = new Image(zwartResource);
@@ -367,13 +377,22 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			currentX += toggleSize + leftOffset;
 		}
 		
+		selecterenButton = new ToggleButton(selecterenUpImage, selecterenDownImage);		
+		selecterenButton.addStyleName("togglebutton");
+		bottomPanel.add(selecterenButton);
+		bottomPanel.setWidgetLeftWidth(selecterenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(selecterenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+		selecterenButton.addClickHandler(toggleClickHandler);
+		
+		currentX += toggleSize + 2*leftOffset;
+		
 		tekenButton = new ToggleButton(tekenKnopUpImage, tekenKnopDownImage);
 		tekenButton.setDown(true);
 		bottomPanel.add(tekenButton);
 		bottomPanel.setWidgetLeftWidth(tekenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
 		bottomPanel.setWidgetTopHeight(tekenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
 
-		
 		tekenButton.addClickHandler(toggleClickHandler);
 
 		currentX += toggleSize + leftOffset;
@@ -431,39 +450,10 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			currentX += toggleSize + leftOffset;
 		}
 		
-		selecterenButton = new ToggleButton(selecterenUpImage, selecterenDownImage);		
-		selecterenButton.addStyleName("togglebutton");
-		bottomPanel.add(selecterenButton);
-		bottomPanel.setWidgetLeftWidth(selecterenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
-		bottomPanel.setWidgetTopHeight(selecterenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
-
-		selecterenButton.addClickHandler(toggleClickHandler);
+  		currentX += toggleSize + 3*leftOffset;
 				
-		currentX += toggleSize + 2 * leftOffset;
+		
 	
-		
-		terugButton = new PushButton(rb.terugTekst());
-		terugButton.addStyleName("pushbutton");
-		bottomPanel.add(terugButton);
-		bottomPanel.setWidgetLeftWidth(terugButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
-		bottomPanel.setWidgetTopHeight(terugButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
-		
-		terugButton.addClickHandler(new PushClickHandler());
-		
-		currentX += buttonWidth + 2 * leftOffset;		
-
-
-		wisButton = new PushButton(rb.wisTekst());
-		wisButton.addStyleName("pushbutton");
-		bottomPanel.add(wisButton);
-		bottomPanel.setWidgetLeftWidth(wisButton, currentX, Style.Unit.PX, buttonWidth, Style.Unit.PX);
-		bottomPanel.setWidgetTopHeight(wisButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
-		
-		wisButton.addClickHandler(new PushClickHandler());
-		
-		currentX += buttonWidth + 2 * leftOffset;
-		currentY -= 2;
-
 		if (kleurkeuze)
 		{
 			kleurkeuzeButton = new PushButton(regenboogImage);
@@ -476,6 +466,32 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 		
 			currentX += toggleSize + leftOffset;
 		}
+		
+		currentX += toggleSize + 3*leftOffset;
+		
+		terugButton = new PushButton(terugKnopImage);//rb.terugTekst());
+		terugButton.addStyleName("pushbutton");
+		bottomPanel.add(terugButton);
+		bottomPanel.setWidgetLeftWidth(terugButton, breedte-2*leftOffset-2*toggleSize, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(terugButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+		terugButton.addClickHandler(new PushClickHandler());
+		
+		currentX += buttonWidth + leftOffset;		
+
+
+		wisButton = new PushButton(binKnopImage);//rb.wisTekst());
+		wisButton.addStyleName("pushbutton");
+		bottomPanel.add(wisButton);
+		bottomPanel.setWidgetLeftWidth(wisButton, breedte-leftOffset-toggleSize, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(wisButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+		wisButton.addClickHandler(new PushClickHandler());
+		
+		currentX += buttonWidth + 2 * leftOffset;
+		//currentY -= 2;
+
+		
 		kladjeGWTVeld.paint();
 		
 	} // makeBottom()
@@ -891,11 +907,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 				calculator = formuleInstellingen.getBoolean("calculator");
 			}
 		}
+		if(launchState.containsKey("toolBarOnTop"))
+			toolBarOnTop = launchState.getBoolean("toolBarOnTop");
 		
 		bottomPanel = new LayoutPanel();
-		bottomPanel.addStyleName(kladjeCss.bottom());
-		if(!formuleOptie && !ivmOptie)
+		bottomPanel.addStyleName(kladjeCss.top());
+		if(!formuleOptie && !ivmOptie && !toolBarOnTop)
 			dlp.addSouth(bottomPanel, bottomHeight);
+		if(!formuleOptie && !ivmOptie && toolBarOnTop)
+			dlp.addNorth(bottomPanel, bottomHeight);
 		
 		if(formuleOptie) {
 			topPanel = new LayoutPanel();
