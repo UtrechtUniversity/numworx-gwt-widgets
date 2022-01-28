@@ -219,6 +219,9 @@ public class TekstElement
 		bottomRightRect = null;
 	}
 
+	public void setColor(CssColor kleur) {
+		this.kleur = kleur;
+	}
 	
 	/**
 	 * schaal dit TekstElement; NB: xPos en yPos onveranderd,

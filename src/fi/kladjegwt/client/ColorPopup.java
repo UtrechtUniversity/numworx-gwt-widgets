@@ -170,56 +170,58 @@ public class ColorPopup extends PopupPanel
 	{
    		public void onClick(ClickEvent e)
 		{
-    		if (e.getSource() == zwartButton)
-    		{	if (zwartButton.isDown())
-    			{	buttonsUp(zwartButton);
-    				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.zwart;
-    			}
-    		}
-    		else if (e.getSource() == grijsButton)
-    		{	if (grijsButton.isDown())
-    			{	buttonsUp(grijsButton);
-    				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.grijs;
-    			}
-    		}
-
-    		else if (e.getSource() == roodButton)
-    		{	if (roodButton.isDown())
-    			{	buttonsUp(roodButton);
-   					owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.rood;
-    			}
-    		}
-
-    		else if (e.getSource() == oranjeButton)
-    		{	if (oranjeButton.isDown())
-    			{	buttonsUp(oranjeButton);
-   					owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.oranje;
-    			}
-    		}
-    		else if (e.getSource() == groenButton)
-    		{	if (groenButton.isDown())
-    			{	buttonsUp(groenButton);
-      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.groen;
-    			}
-    		}
-    		else if (e.getSource() == cyaanButton)
-    		{	if (cyaanButton.isDown())
-    			{	buttonsUp(cyaanButton);
-      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.cyaan;
-    			}
-    		}
-    		else if (e.getSource() == blauwButton)
-    		{	if (blauwButton.isDown())
-    			{	buttonsUp(blauwButton);
-      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.blauw;
-    			}
-    		}
-    		else if (e.getSource() == magentaButton)
-    		{	if (magentaButton.isDown())
-    			{	buttonsUp(magentaButton);
-     				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.magenta;
-    			}
-    		}
+	    		if (e.getSource() == zwartButton)
+	    		{	if (zwartButton.isDown())
+	    			{	buttonsUp(zwartButton);
+	    				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.zwart;
+	    			}
+	    		}
+	    		else if (e.getSource() == grijsButton)
+	    		{	if (grijsButton.isDown())
+	    			{	buttonsUp(grijsButton);
+	    				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.grijs;
+	    			}
+	    		}
+	
+	    		else if (e.getSource() == roodButton)
+	    		{	if (roodButton.isDown())
+	    			{	buttonsUp(roodButton);
+	   					owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.rood;
+	    			}
+	    		}
+	
+	    		else if (e.getSource() == oranjeButton)
+	    		{	if (oranjeButton.isDown())
+	    			{	buttonsUp(oranjeButton);
+	   					owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.oranje;
+	    			}
+	    		}
+	    		else if (e.getSource() == groenButton)
+	    		{	if (groenButton.isDown())
+	    			{	buttonsUp(groenButton);
+	      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.groen;
+	    			}
+	    		}
+	    		else if (e.getSource() == cyaanButton)
+	    		{	if (cyaanButton.isDown())
+	    			{	buttonsUp(cyaanButton);
+	      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.cyaan;
+	    			}
+	    		}
+	    		else if (e.getSource() == blauwButton)
+	    		{	if (blauwButton.isDown())
+	    			{	buttonsUp(blauwButton);
+	      				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.blauw;
+	    			}
+	    		}
+	    		else if (e.getSource() == magentaButton)
+	    		{	if (magentaButton.isDown())
+	    			{	buttonsUp(magentaButton);
+	     				owner.kladjeGWTVeld.drawingColor = KladjeGWTVeld.magenta;
+	    			}
+	    		}
+	    		owner.colorPopup.hide();
+	    		owner.kladjeGWTVeld.colorSelectedObject();
 		}
 		
 	}

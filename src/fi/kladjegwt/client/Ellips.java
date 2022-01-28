@@ -254,6 +254,11 @@ public class Ellips
 		bottomLeftRect = null;
 		
 	}
+	
+	public void setColor(CssColor kleur) {
+		this.kleur = kleur;
+	}
+	
 
 	/**
 	 * maak de klik-rechtoeken voor de twee draai-handles

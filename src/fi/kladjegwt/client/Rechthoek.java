@@ -267,6 +267,10 @@ public class Rechthoek
 		
 	}
 	
+	public void setColor(CssColor kleur) {
+		this.kleur = kleur;
+	}
+	
 	/**
 	 * maak de twee rechthoek Polygonen voor de bounding rechthoek 
 	 */

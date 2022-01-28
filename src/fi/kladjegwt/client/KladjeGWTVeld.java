@@ -3523,7 +3523,7 @@ public class KladjeGWTVeld
 		}
 		else if (mouseMode == tekstTekenen)
 		{
-			mouseDown = true;
+			//mouseDown = true;
 			
 			// positie tekstPopup bij nieuwe tekst
 			startX = eventX + kladjeHWTCanvas.getAbsoluteLeft();
@@ -4311,7 +4311,7 @@ public class KladjeGWTVeld
 		
 		else if (mouseMode == tekstTekenen)
 		{
-
+			mouseDown = false;
 		}
 		
 		else if (mouseMode == selecteren)
@@ -4388,6 +4388,31 @@ public class KladjeGWTVeld
 		
 		} // selecteren
 		
+	}
+	
+	public void colorSelectedObject() {
+		if (mouseMode == selecteren)
+		{
+//			if (selectedStrokeContainer != null)
+//			{	selectedStrokeContainer.tekenHandleBox(g);
+//			}
+			if (selectedStreep != null)
+			{	selectedStreep.setColor(drawingColor);
+			}
+			if (selectedLijn != null)
+			{	selectedLijn.setColor(drawingColor);
+			}
+			if (selectedRechthoek != null)
+			{	selectedRechthoek.setColor(drawingColor);
+			}
+			if (selectedEllips != null)
+			{	selectedEllips.setColor(drawingColor);
+			}
+			if (selectedTekstElement != null)
+			{	selectedTekstElement.setColor(drawingColor);
+			}
+			paint();
+		}
 	}
 	
 	/**

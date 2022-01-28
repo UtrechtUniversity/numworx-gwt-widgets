@@ -172,6 +172,10 @@ public class Lijn
 		
 	}
 	
+	public void setColor(CssColor kleur) {
+		this.kleur = kleur;
+	}
+	
 	/**
 	 * maak de vier handles om the schalen en de bijbehorende klik-rechthoeken
 	 */
