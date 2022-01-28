@@ -230,7 +230,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	
 	private boolean calculator = true;
 	
-	private boolean toolBarOnTop = true;
+	private boolean toolBarOnTop = false;
 	
 	/**
 	 * maak de css in orde en haal via de resources alle plaatjes op 
