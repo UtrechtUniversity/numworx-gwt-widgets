@@ -28,11 +28,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -230,7 +232,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	
 	private boolean calculator = true;
 	
-	private boolean toolBarOnTop = false;
+	private boolean toolBarOnTop = true;
 	
 	/**
 	 * maak de css in orde en haal via de resources alle plaatjes op 
@@ -741,9 +743,15 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     			if (colorPopup == null)
     			{
     				colorPopup = new ColorPopup(KladjeGWT.this);
+    				colorPopup.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+    				colorPopup.getElement().getStyle().setBorderColor(""+CssColor.make(183,195,225));
+    				colorPopup.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+    				colorPopup.getElement().getStyle().setPadding(2, Style.Unit.PX);
+    				colorPopup.getElement().getStyle().setBackgroundColor(""+CssColor.make(239,241,243));
+    				colorPopup.getElement().getStyle().setProperty("boxShadow", "3px 3px 3px #96A1BD");
     				int showX = kleurkeuzeButton.getAbsoluteLeft() + toggleSize/2 - colorPopup.breedte/2;
 
-    				int showY = kleurkeuzeButton.getAbsoluteTop()  - colorPopup.hoogte - topOffset;
+    				int showY = kleurkeuzeButton.getAbsoluteTop()  - colorPopup.hoogte - 4*topOffset;
     				colorPopup.setPopupPosition(showX, showY);
     				colorPopup.show();
     			}

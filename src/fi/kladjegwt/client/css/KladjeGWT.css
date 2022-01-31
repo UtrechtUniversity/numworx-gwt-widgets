@@ -15,7 +15,8 @@
 
 .top {
 	/**background-color: rgb(219,221,223); */
-	background-color: rgb(239,241,243);	
+	background-color: rgb(239,241,243);*/	
+	/**background-color: transparent;*/
 }
 
 .canvas {
@@ -66,7 +67,12 @@ touch-action: none;
 
 .colorpanel {
 	background-color: rgb(239,241,243);	
+	border: none ;
+    
 }
+
+
+
 
 .textbox {
 	font-size: 16px;

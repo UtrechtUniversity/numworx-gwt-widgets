@@ -124,10 +124,13 @@ public class TekstElement
 	 */
 	public void zetTekst(String t, Context2d g)
 	{
+		String fontString = "14px arial, sans-serif";
+		g.setFont(fontString);
+		
 		tekst = new String(t);
 		TextMetrics tm = g.measureText(tekst);
 		breedte = (int) Math.round(tm.getWidth());
-		hoogte = 16;
+		hoogte = 18;
 		breedte = (int) Math.round(scaleX * breedte);
 		hoogte = (int) Math.round(scaleY * hoogte);
 		// nieuw bounding box, dit crert nieuwe handle box
@@ -368,8 +371,8 @@ public class TekstElement
 	 */
 	public void teken(Context2d g)
 	{
-		String fontString = "bold 14px arial, sans-serif";
-		g.setFont(fontString);
+		//String fontString = "16px arial, sans-serif";
+		//g.setFont(fontString);
 		
 		makeBB();
 		// redundant

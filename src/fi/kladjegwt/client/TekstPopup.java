@@ -7,7 +7,10 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
 
 /**
  * een PopupPanel met een TextBox erin om tekst in te voeren;
@@ -60,16 +63,27 @@ public class TekstPopup extends PopupPanel
 	{
 		super(true);
 		
+		getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+		getElement().getStyle().setBorderColor(""+CssColor.make(183,195,225));
+		getElement().getStyle().setBorderWidth(0, Style.Unit.PX);
+		getElement().getStyle().setPadding(2, Style.Unit.PX);
+		getElement().getStyle().setBackgroundColor(""+CssColor.make(239,241,243));
+		//getElement().getStyle().setProperty("boxShadow", "3px 3px 3px #96A1BD");
+		
 		owner = o;
 		tekstX = eventX;
 		tekstY = eventY;
 		
 		textBox = new TextBox();
 		textBox.setMaxLength(maxCharacters);
-
+		textBox.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
+		textBox.getElement().getStyle().setBorderColor(""+CssColor.make(183,195,225));
+		textBox.getElement().getStyle().setBorderWidth(0, Style.Unit.PX);
+		textBox.getElement().getStyle().setPadding(0, Style.Unit.PX);
+		
 		textBox.setWidth("" + breedte + "px");
 		textBox.setHeight("" + hoogte + "px");
-		textBox.addStyleName(KladjeGWT.kladjeCss.textbox());
+		//textBox.addStyleName(KladjeGWT.kladjeCss.textbox());
 		
 		textBox.addKeyDownHandler(new TextBoxKeyDownHandler());
 		textBox.addKeyPressHandler(new TextBoxKeyPressHandler());
@@ -128,7 +142,7 @@ public class TekstPopup extends PopupPanel
 	public void setText(String text)
 	{
 		textBox.setText(text);
-		String fontString = "16px bold, sans-serif";
+		String fontString = "16px plain, sans-serif";
 		//KladjeGWTVeld.gIm.setFont(fontString);
 		//TextMetrics tm = KladjeGWTVeld.gIm.measureText(text);
 		//int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;
@@ -147,7 +161,7 @@ public class TekstPopup extends PopupPanel
 		public void onKeyPress(KeyPressEvent e)
 		{
 			String tekst = textBox.getText();
-			String fontString = "16px bold, sans-serif";
+			String fontString = "16px plain, sans-serif";
 			//KladjeGWTVeld.gIm.setFont(fontString);
 			//TextMetrics tm = KladjeGWTVeld.gIm.measureText(tekst);
 			//int tekstBreedte = Math.max(breedte - 10, (int) Math.round(tm.getWidth())) + 10;

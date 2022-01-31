@@ -4396,20 +4396,50 @@ public class KladjeGWTVeld
 //			if (selectedStrokeContainer != null)
 //			{	selectedStrokeContainer.tekenHandleBox(g);
 //			}
-			if (selectedStreep != null)
-			{	selectedStreep.setColor(drawingColor);
+//			if (selectedStreep != null)
+//			{	selectedStreep.setColor(drawingColor);
+//			}
+//			if (selectedLijn != null)
+//			{	selectedLijn.setColor(drawingColor);
+//			}
+//			if (selectedRechthoek != null)
+//			{	selectedRechthoek.setColor(drawingColor);
+//			}
+//			if (selectedEllips != null)
+//			{	selectedEllips.setColor(drawingColor);
+//			}
+//			if (selectedTekstElement != null)
+//			{	selectedTekstElement.setColor(drawingColor);
+//			}
+			if(!streepVector.isEmpty()) {
+				for(int i=0 ; i<streepVector.size() ; i++) {
+					if(objectsSelected.contains(streepVector.get(i)) || selectedStreep==streepVector.get(i))
+						streepVector.get(i).setColor(drawingColor);
+				}
 			}
-			if (selectedLijn != null)
-			{	selectedLijn.setColor(drawingColor);
+			if(!lijnVector.isEmpty()) {
+				for(int i=0 ; i<lijnVector.size() ; i++) {
+					if(objectsSelected.contains(lijnVector.get(i)) || selectedLijn==lijnVector.get(i))
+						lijnVector.get(i).setColor(drawingColor);
+				}
 			}
-			if (selectedRechthoek != null)
-			{	selectedRechthoek.setColor(drawingColor);
+			if(!rechthoekVector.isEmpty()) {
+				for(int i=0 ; i<rechthoekVector.size() ; i++) {
+					if(objectsSelected.contains(rechthoekVector.get(i)) || selectedRechthoek==rechthoekVector.get(i))
+						rechthoekVector.get(i).setColor(drawingColor);
+				}
 			}
-			if (selectedEllips != null)
-			{	selectedEllips.setColor(drawingColor);
+			if(!ellipsVector.isEmpty()) {
+				for(int i=0 ; i<ellipsVector.size() ; i++) {
+					if(objectsSelected.contains(ellipsVector.get(i)) || selectedEllips==ellipsVector.get(i))
+						ellipsVector.get(i).setColor(drawingColor);
+				}
 			}
-			if (selectedTekstElement != null)
-			{	selectedTekstElement.setColor(drawingColor);
+			if(!tekstElementVector.isEmpty()) {
+				for(int i=0 ; i<tekstElementVector.size() ; i++) {
+					if(objectsSelected.contains(tekstElementVector.get(i)) || selectedTekstElement==tekstElementVector.get(i))
+						tekstElementVector.get(i).setColor(drawingColor);
+				}
 			}
 			paint();
 		}
