@@ -484,7 +484,6 @@ public class KladjeGWTVeld
 		kladjeHWTCanvas = Canvas.createIfSupported();
 		backgroundCanvas = Canvas.createIfSupported();
 		//strokeContainerCanvas = Canvas.createIfSupported();
-
 		setSize(w, h);
 		
 		MouseHandler mouseHandler = new MouseHandler();
@@ -520,6 +519,21 @@ public class KladjeGWTVeld
 		
 	}
 
+	private void setCanvasSize(Canvas canvas, int width, int height) {		
+		Context2d context = canvas.getContext2d();
+	    canvas.setPixelSize(width,height);	    
+		double ratio = nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(context); // retina screens
+		if(ratio > 1.0) {
+			canvas.setCoordinateSpaceHeight((int) (height*ratio));
+			canvas.setCoordinateSpaceWidth((int) (width*ratio));
+			context.setTransform(ratio, 0, 0, ratio, 0, 0);
+		} else {
+		//change the canvas dimensions
+			canvas.setCoordinateSpaceHeight(height);
+			canvas.setCoordinateSpaceWidth(width);
+		}
+	}
+	
 	/**
 	 * zet nieuwe afmetingen
 	 * @param w nieuwe breedte
@@ -529,18 +543,9 @@ public class KladjeGWTVeld
 	{
 		breedte = w;
 		hoogte = h;
-		kladjeHWTCanvas.setWidth(w + "px");
-		kladjeHWTCanvas.setHeight(h + "px");
-		kladjeHWTCanvas.setCoordinateSpaceWidth(w);
-		kladjeHWTCanvas.setCoordinateSpaceHeight(h);
-		backgroundCanvas.setWidth(w + "px");
-		backgroundCanvas.setHeight(h + "px");
-		backgroundCanvas.setCoordinateSpaceWidth(w);
-		backgroundCanvas.setCoordinateSpaceHeight(h);
-//		strokeContainerCanvas.setWidth(w + "px");
-//		strokeContainerCanvas.setHeight(h + "px");
-//		strokeContainerCanvas.setCoordinateSpaceWidth(w);
-//		strokeContainerCanvas.setCoordinateSpaceHeight(h);
+		setCanvasSize(kladjeHWTCanvas, w, h);
+		setCanvasSize(backgroundCanvas, w, h);
+//		setCanvasSize(strokeContainerCanvas, w, h);
 	}
 
 	/**
