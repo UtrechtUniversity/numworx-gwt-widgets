@@ -173,11 +173,11 @@ public class KladjeGWTVeld
 	/**
 	 * de kleur van de lijnen (lichtblauw)
 	 */
-	CssColor lijnenKleur = CssColor.make(150, 150, 255);
+	CssColor lijnenKleur = CssColor.make(175,192,217);//(150, 150, 255);
 	/**
 	 * de kleur van de ruitjes (grijs)
 	 */
-	CssColor ruitjesKleur = CssColor.make(38, 115, 182);
+	CssColor ruitjesKleur = CssColor.make(175,192,217);//(38, 115, 182);
 	
 	/**
 	 * de kleur van de bounding boxes van objecten
@@ -210,6 +210,16 @@ public class KladjeGWTVeld
 	static CssColor blauw = CssColor.make(0, 0, 255);
 	static CssColor magenta = CssColor.make(255, 0, 255);
 	static CssColor geel = CssColor.make(255, 255, 0);
+	
+//	static CssColor zwart = CssColor.make(0, 0, 0);
+//	static CssColor grijs = CssColor.make(180, 180, 180);
+//	static CssColor rood = CssColor.make(233, 50, 35);
+//	static CssColor oranje = CssColor.make(255, 127, 0);
+//	static CssColor groen = CssColor.make(79, 173, 90);
+//	static CssColor cyaan = CssColor.make(80, 173, 234);
+//	static CssColor blauw = CssColor.make(49, 111, 186);
+//	static CssColor magenta = CssColor.make(104, 53, 155);
+//	static CssColor geel = CssColor.make(255, 255, 84);
 	
 	/**
 	 * de actuele tekenkleur (default zwart)
@@ -355,7 +365,7 @@ public class KladjeGWTVeld
 	/**
 	 * maximum aantal snapshots voor "terug"
 	 */
-	int maxHistories = 5;
+	int maxHistories = 15;
 	/**
 	 *  aantal beschikbare snapshots voor "terug"
 	 */
@@ -694,6 +704,15 @@ public class KladjeGWTVeld
 		}
 	}
 	
+	void startHistory()
+	{
+
+		HashMap<String,Object> stateTable = getState(false);
+		
+		histories[0] = stateTable;
+		numHistories = 1;
+				
+	}
 
 	/**
 	 * voeg een snapshot (zie methode getState) toe aan 
@@ -722,13 +741,15 @@ public class KladjeGWTVeld
 	{	
 		if (numHistories > 0)
 			numHistories--;
+			
 		
 		if (numHistories > 0)
 		{	
-			return histories[numHistories - 1];
+			return histories[numHistories-1];
+			
 		}
 		else
-		{	numHistories = 0;
+		{	numHistories = 1;
 			return null;
 		}
 	}
@@ -837,6 +858,11 @@ public class KladjeGWTVeld
 	 */
 	public void setState(Map<String, Object> map, boolean init)
 	{
+		setState(map, init, false);
+	}
+	
+	public void setState(Map<String, Object> map, boolean init, boolean initStudent)
+	{
 		if(map == null || map.isEmpty())
 			return;
 		
@@ -876,7 +902,8 @@ public class KladjeGWTVeld
 			sc.setState(strokeContainerList.get(sCnt));
 			kStrokeContainers.add(sc);
 		}
-		addToHistory();
+		//if(init  || initStudent)
+		//	startHistory();
 		
 		List<Map<String,Object>> hiddenStrokeContainerList = new ArrayList<Map<String,Object>>();
 		if (launchState.containsKey("hiddenStrokeContainerList"))
@@ -999,7 +1026,8 @@ public class KladjeGWTVeld
 			else
 				tekstElementVector.addElement(tekstElement);
 		}
-
+		if(init  || initStudent)
+			startHistory();
 		paint();
 	}
 
@@ -1008,6 +1036,8 @@ public class KladjeGWTVeld
 	 */
 	void undo()
 	{
+		if(numHistories<2)
+			return;
 		wis(false);
 		HashMap<String,Object> lastState = getFromHistory();
 		if (lastState != null)
@@ -1044,7 +1074,7 @@ public class KladjeGWTVeld
 			kStrokeContainers.clear();
 			
 			if (complete)
-				numHistories = 0;
+				addToHistory();
 		}			
 		paint();
 	}
@@ -1360,7 +1390,7 @@ public class KladjeGWTVeld
 		if(mouseMode == formuleOptie)
 			g.setLineWidth(0.1d);
 		else
-			g.setLineWidth(0.4d);
+			g.setLineWidth(0.5d);
 		
 		// achtergrond horizontale lijnen 
 		if (lijnen)

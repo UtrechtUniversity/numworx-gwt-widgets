@@ -796,7 +796,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			initAttempt();
 			return;
 		}
-		kladjeGWTVeld.setState(h, false);
+		kladjeGWTVeld.setState(h, false, true);
 		initAttempt();
 	}
 
