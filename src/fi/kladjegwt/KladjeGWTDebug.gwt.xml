@@ -24,10 +24,14 @@
   <!-- Other module inherits                                      -->
   <!-- <inherits name="com.googlecode.mgwt.MGWT"/> -->
   <inherits name='com.vaadin.pointerevents.PointerEvents' />
-   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.formule.Formule' />
+  <inherits name="com.googlecode.mgwt.MGWTMin" />
   <inherits name='fi.writemathgwt.WriteMathGWT-DWO' />
+   <inherits name="nl.uu.fi.dwo.ideas.Ideas" />
+     <replace-with class="fi.wiskopdr.FailingIdeas">
+        <when-type-is class="nl.uu.fi.dwo.ideas.client.IdeasIF" />
+    </replace-with>
  
   <add-linker name='xsiframe' />
 
