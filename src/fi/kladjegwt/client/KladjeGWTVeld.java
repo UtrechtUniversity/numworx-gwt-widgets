@@ -532,7 +532,7 @@ public class KladjeGWTVeld
 	private void setCanvasSize(Canvas canvas, int width, int height) {		
 		Context2d context = canvas.getContext2d();
 	    canvas.setPixelSize(width,height);	    
-		double ratio = nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(context); // retina screens
+		double ratio = 1.0;//nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(context); // retina screens
 		if(ratio > 1.0) {
 			canvas.setCoordinateSpaceHeight((int) (height*ratio));
 			canvas.setCoordinateSpaceWidth((int) (width*ratio));
