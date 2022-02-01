@@ -532,7 +532,7 @@ public class KladjeGWTVeld
 	private void setCanvasSize(Canvas canvas, int width, int height) {		
 		Context2d context = canvas.getContext2d();
 	    canvas.setPixelSize(width,height);	    
-		double ratio = 1.0;//nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(context); // retina screens
+		double ratio = nl.uu.fi.dwo.interaction.client.TekstComponent.getDeviceRatio(context); // retina screens
 		if(ratio > 1.0) {
 			canvas.setCoordinateSpaceHeight((int) (height*ratio));
 			canvas.setCoordinateSpaceWidth((int) (width*ratio));
@@ -1268,7 +1268,7 @@ public class KladjeGWTVeld
 	public void paintFormule(boolean refresh) {
 		if(refresh) {
 			gIm.clearRect(0, 0, breedte, hoogte);
-			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0, breedte, hoogte);
 		}
 		if(currentStrokeContainer!=null)
 		{
@@ -1353,7 +1353,7 @@ public class KladjeGWTVeld
 		if(mouseMode==formuleOptie) {
 			paint(backgroundgIm);
 			gIm.clearRect(0, 0, breedte, hoogte);
-			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0);
+			gIm.drawImage(backgroundCanvas.getCanvasElement(), 0.0, 0.0, breedte, hoogte);
 			
 			
 		}
