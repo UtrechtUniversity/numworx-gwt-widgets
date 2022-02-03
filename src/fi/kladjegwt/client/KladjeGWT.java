@@ -752,6 +752,9 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
     				int showX = kleurkeuzeButton.getAbsoluteLeft() + toggleSize/2 - colorPopup.breedte/2;
 
     				int showY = kleurkeuzeButton.getAbsoluteTop()  - colorPopup.hoogte - 4*topOffset;
+    				if(toolBarOnTop) {
+    					showY = kleurkeuzeButton.getAbsoluteTop()  + 2*colorPopup.hoogte - 4*topOffset;
+    				}
     				colorPopup.setPopupPosition(showX, showY);
     				colorPopup.show();
     			}
