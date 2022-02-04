@@ -876,6 +876,8 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 			cirkelTekenen = launchState.getBoolean("cirkelTekenen");
 		if (launchState.containsKey("tekstTekenen"))
 			tekstTekenen = launchState.getBoolean("tekstTekenen");
+		if (launchState.containsKey("kleurkeuze"))
+			kleurkeuze = launchState.getBoolean("kleurkeuze");
 		if (launchState.containsKey("formuleOptie"))
 			formuleOptie = launchState.getBoolean("formuleOptie");
 		if (launchState.containsKey("ivmOptie"))
