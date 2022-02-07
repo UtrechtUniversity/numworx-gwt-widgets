@@ -26,7 +26,6 @@
   <inherits name='com.vaadin.pointerevents.PointerEvents' />
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.formule.Formule' />
-  <inherits name="com.googlecode.mgwt.MGWTMin" />
   <inherits name='fi.writemathgwt.WriteMathGWT-DWO' />
    <inherits name="nl.uu.fi.dwo.ideas.Ideas" />
      <replace-with class="fi.wiskopdr.FailingIdeas">
