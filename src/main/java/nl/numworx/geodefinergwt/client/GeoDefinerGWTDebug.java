@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import nl.numworx.geodefiner.common.LineType;
 import nl.numworx.geodefiner.common.PointType;
@@ -28,12 +29,19 @@ import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.RequiresResize;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
+import fi.euclides.model.Punt;
+import fi.euclides.model.math.Numbers;
 import fi.wiskopdr.FormuleParser;
 
-public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
+public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, RequiresResize {
 
 	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
 
@@ -191,14 +199,20 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 
 	}
 
+	private FocusPanel main;
+
 	@Override
 	public void onModuleLoad() {
       Element body = Document.get().getBody();
       //body.setAttribute("oncontextmenu", "return false;");
 
       root = uiBinder.createAndBindUi(this);
-      RootPanel.get().add(FocusOnTouch.wrap(root, true));
+      toolbox.setResizer(this);
+      main = FocusOnTouch.wrap(root, true);
+      RootLayoutPanel.get().add(main);
 
+      
+      
 		//FormuleParser.zetWoordFormule(true);
 		
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
@@ -346,8 +360,51 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint {
 		setCommunicationRoot(opdrnav);
 		viewer.adapt(Snapper.class).setGravity(true);
 		
-		setState(new HashMap());
+		setState(new HashMap<>());
 		start();
+	}
+
+	int oldtop, oldleft, cnt;
+	@Override
+	public void onResize() {
+		int rh = Window.getClientHeight();
+		int rw = Window.getClientWidth();
+		tryResize(rw, rh);
+		int w = root.getOffsetWidth();
+		int h = root.getOffsetHeight();
+		Logger.getGlobal().warning(cnt++ + " On Resize " + w + "<" + rw + ", " + h + "<" + rh);
+		RootLayoutPanel p = RootLayoutPanel.get();		
+		int left = (rw-w)/2;
+		if (left != oldleft) {
+			oldleft = left;
+			p.setWidgetLeftWidth(main, left, Unit.PX, w, Unit.PX);
+		}
+		int top = (rh-h)/2;
+		if (top != oldtop) {
+			oldtop = top;
+			p.setWidgetTopHeight(main, top, Unit.PX, h, Unit.PX);
+		}
+		//p.forceLayout();
+	}
+
+	private void tryResize(int rw, int rh) {
+		if (getWidth() * rh > getHeight() * rw) {
+			rh = rw * getHeight() / getWidth();
+		} else {
+			rw = rh * getWidth() / getHeight();
+		}
+		if (root.getOffsetHeight() != rh || root.getOffsetWidth() != rw)
+		{
+			Logger.getGlobal().warning(cnt++ + " Scale" +  rw + ", " + rh);	
+			root.setPixelSize(rw, rh);	
+			widget.init(rw, rh-68); // ipv setPixelSize
+			Punt o = widget.getModel().getO();
+			o.setXY(Numbers.createRational(rw, 2), Numbers.createRational(rh, 2));
+			Punt u = widget.getModel().getU();
+			u.setXY(Numbers.createRational(rw+rw/4, 2), Numbers.createRational(rh, 2));
+			widget.paint();
+		}
+		
 	}
 
 	

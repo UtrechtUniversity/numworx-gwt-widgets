@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
 
 import javax.inject.Provider;
@@ -15,6 +16,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ToggleButton;
 
 import fi.euclides.event.EventHandler;
@@ -23,7 +25,6 @@ import fi.euclides.model.Destroyable;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Model;
 import fi.euclides.model.Segment;
-import fi.euclides.util.Messages;
 import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
 import nl.numworx.geodefiner.common.Tools;
@@ -32,7 +33,7 @@ import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
-public class ToolBoxPanel extends Composite implements Tools {
+public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 
 	private static final int BREEDTE_ICON = 40;
 
@@ -261,5 +262,15 @@ GWT.log("provider is " + provider);
 		
 	}
 
+	private Optional<RequiresResize> resizer = Optional.empty();
+
+	@Override
+	public void onResize() {
+		resizer.ifPresent(RequiresResize::onResize);
+	}
+
+	public void setResizer(RequiresResize resizer) {
+		this.resizer = Optional.ofNullable(resizer);
+	}
 
 }
