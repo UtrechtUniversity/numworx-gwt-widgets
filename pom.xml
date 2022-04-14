@@ -37,7 +37,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.12-SNAPSHOT</version>
+			<version>0.1.12</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>0.1.7</version>
+			<version>${formuleVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.mgwt</groupId>
@@ -99,7 +99,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.10</version>
+			<version>0.1.12</version>
 			<classifier>sources</classifier>
 		</dependency>
 	</dependencies>
@@ -161,7 +161,7 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.5-SNAPSHOT</euclidesVersion>
-		<formuleVersion>0.1.6-SNAPSHOT</formuleVersion>
+		<formuleVersion>0.1.14</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
