@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -40,10 +42,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ToggleButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,7 +68,7 @@ import fi.euclides.util.Observable;
 import fi.euclides.util.Observer;
 import fi.wiskopdr.VariableCollection;
 
-public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener /*, Observer */{
+public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionStub, CBookEventListener, RequiresResize /*, Observer */{
 
 	public static final messages MESSAGES = GWT.create(messages.class);
 	private static final String LOG_OPTION = "logOption";
@@ -170,6 +174,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		
 		root = uiBinder.createAndBindUi(this);		
 		RootLayoutPanel.get().add(root);
+		volledigeBreedte = true;
 		Stub.publish(this);
 	}
 
@@ -501,6 +506,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 // highlighter after init launchdata.
         widget.enableHighLight(selector);
 		tracker.paint();
+		if (volledigeBreedte) toolbox.setResizer(this);
 	}
 
 
@@ -610,6 +616,30 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if(checkObjects != null)
 			checkObjects.start();
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
+	}
+
+	Logger LOG = Logger.getLogger(getClass().getName());
+	boolean sema;
+	@Override
+	public void onResize() {
+		if (sema) return;
+		sema = true;
+		try {
+			int w = Window.getClientWidth();
+			int h = Window.getClientHeight();
+			if (w != width || h != height) {
+				LOG.info("need resize for " + w + "=" + width + ", " + h + "=" + height);
+				width  = w;
+				height = h;
+				root.setPixelSize(w, h);
+				h -= toolbox.getOffsetHeight(); // 38px (wel of niet?)
+				h -= southPanel.getOffsetHeight(); // 30px
+				widget.init(w, h);
+				widget.paint();
+			}
+		} finally {
+			sema = false;
+		}
 	}
 	
 }
