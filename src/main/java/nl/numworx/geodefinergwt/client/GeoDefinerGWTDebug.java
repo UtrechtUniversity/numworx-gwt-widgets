@@ -292,13 +292,14 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		checkDWO.put("check", Boolean.TRUE);
 		checkDWO.put("extern", Boolean.FALSE);
 		List<String> definitions = Arrays.asList(
-				"$fa=9..#a#@" 
+				//"$fa=9..#a#@" 
+				"$ff(x)=$o1.8$m$ax$n0.84@@@$n0.22@@"
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
-				,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
+				//,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
 				//,"$fP=point(1,1)@"
 				//,"$fQ=point(-1,1)@"
 				//,"$fh=halfline(Q,P)@"
-				,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
+				//,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
 				//,"$fwaarde=true@"
 				//, "$fy<-1-x*x@"
 				);
@@ -397,11 +398,26 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		{
 			Logger.getGlobal().warning(cnt++ + " Scale" +  rw + ", " + rh);	
 			root.setPixelSize(rw, rh);	
-			widget.init(rw, rh-68); // ipv setPixelSize
 			Punt o = widget.getModel().getO();
-			o.setXY(Numbers.createRational(rw, 2), Numbers.createRational(rh, 2));
+			Numbers right = widget.clipRight();
+			Numbers left  = widget.clipLeft();
+			Numbers width = Numbers.sub(right, left);
+			Numbers Ox = o.getX();
+			Numbers nOx = Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
+			
+			Numbers top = widget.clipTop();
+			Numbers bottom = widget.clipBottom();
+			Numbers height = Numbers.sub(bottom, top);
+			Numbers Oy = o.getY();
+			Numbers nOy = Numbers.div(Numbers.mul(Numbers.sub(Oy, top), Numbers.createInteger(rh-68)), height);
+
 			Punt u = widget.getModel().getU();
-			u.setXY(Numbers.createRational(rw+rw/4, 2), Numbers.createRational(rh, 2));
+			Numbers dx = Numbers.sub(u.getX(),Ox);
+			dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
+			widget.init(rw, rh-68); // ipv setPixelSize
+			if (Ox.equals(nOx) && Oy.equals(nOy)) o.forceChanged(); // force changed
+			else o.setXY(nOx, nOy);
+			u.setXY(Numbers.add(dx, nOx), nOy);
 			widget.paint();
 		}
 		
