@@ -1,8 +1,10 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -37,6 +39,7 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
+import fi.euclides.model.Pair;
 import fi.euclides.model.Punt;
 import fi.euclides.model.math.Numbers;
 import fi.wiskopdr.FormuleParser;
@@ -235,7 +238,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 //				Tools.ANGLE_POINT,
 //
 //				Tools.MIDPOINT,
-				Tools.BISECTRICE,
+//				Tools.BISECTRICE,
 //				Tools.MIRROR,
 //
 //				Tools.CONIC_SECTION,
@@ -247,14 +250,14 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 //
 //				Tools.DISTANCE,
 //				Tools.AREA,
-				Tools.ANGLE,
+//				Tools.ANGLE,
 //				Tools.VECTOR,
 //
 //				Tools.TRAIL,
 //				Tools.TEXT,			
 //				Tools.FORMULA,
 //
-//				Tools.PAN,
+				Tools.PAN,
 				Tools.DESTROY,
 				Tools.RESET,
 				Tools.ANGLE_POINT
@@ -296,9 +299,10 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 				"$ff(x)=$o1.8$m$ax$n0.84@@@$n0.22@@"
 				//,"$ft=text(\"$P4x$nx@@$px$n8@@$b1$n2@@M$sx@$o{a}$nbc@@$w{a}+2$b1$n{a}/2@@$m2@@\",O)@"
 				//,"$ft=text(\"M$s8@ afstand e tan $zM@$sx@\",O)@"
-				//,"$fP=point(1,1)@"
-				//,"$fQ=point(-1,1)@"
-				//,"$fh=halfline(Q,P)@"
+				,"$fP=point(1,1)@"
+				,"$fQ=point(-1,1)@"
+				,"$fh=halfline(Q,P)@"
+				,"$fZ=point(2,2)@"
 				//,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
 				//,"$fwaarde=true@"
 				//, "$fy<-1-x*x@"
@@ -322,11 +326,18 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 	    configuration.put("$fy<-1@", h);
 	    h = new HashMap();
 	    h.put("rigid", false);
-	    h.put("color", 0xFFFF0000);
+	    h.put("color", 0x80FF0000);
 	    h.put("type", PointType.DISK.name());
 	    h.put("size", 15);
 	    h.put("log", true);
 	    configuration.put("P", h);configuration.put("Q", h);
+	    h = new HashMap();
+	    h.put("rigid", true);
+	    h.put("color", 0x80FF0000);
+	    h.put("type", PointType.DISK.name());
+	    h.put("size", 15);
+	    h.put("log", false);
+	    configuration.put("Z", h);
 	    h = new HashMap();
 	    h.put("alwaysF", true);
 	    h.put("color", -16777216);
@@ -396,31 +407,50 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		}
 		if (root.getOffsetHeight() != rh || root.getOffsetWidth() != rw)
 		{
-			Logger.getGlobal().warning(cnt++ + " Scale" +  rw + ", " + rh);	
+			Logger.getGlobal().warning(cnt++ + " Scale " +  rw + ", " + rh);	
 			root.setPixelSize(rw, rh);	
 			Punt o = widget.getModel().getO();
 			Numbers right = widget.clipRight();
 			Numbers left  = widget.clipLeft();
 			Numbers width = Numbers.sub(right, left);
 			Numbers Ox = o.getX();
-			Numbers nOx = Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
+			Numbers nOx = nX(rw, left, width, Ox);
 			
 			Numbers top = widget.clipTop();
 			Numbers bottom = widget.clipBottom();
 			Numbers height = Numbers.sub(bottom, top);
 			Numbers Oy = o.getY();
-			Numbers nOy = Numbers.div(Numbers.mul(Numbers.sub(Oy, top), Numbers.createInteger(rh-68)), height);
-
+			Numbers nOy = nY(rh, top, height, Oy);
 			Punt u = widget.getModel().getU();
+			List<Punt> p = widget.getModel().getPunten();
+			p = p.subList(2, p.size());
+			List<Pair<Numbers, Numbers>> save = new ArrayList<>(p.size());
+			p.forEach(n -> save.add(new Pair<>(n.getX(), n.getY())));
 			Numbers dx = Numbers.sub(u.getX(),Ox);
 			dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
-			widget.init(rw, rh-68); // ipv setPixelSize
+			rh -= 68;
+			widget.init(rw, rh); // ipv setPixelSize
 			if (Ox.equals(nOx) && Oy.equals(nOy)) o.forceChanged(); // force changed
 			else o.setXY(nOx, nOy);
 			u.setXY(Numbers.add(dx, nOx), nOy);
+			Iterator<Punt> i = p.iterator();
+			Iterator<Pair<Numbers, Numbers>> pairs = save.iterator();
+			while (i.hasNext() && pairs.hasNext()) {
+				Punt punt = i.next();
+				Pair<Numbers, Numbers> pair = pairs.next();
+				punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+			}
 			widget.paint();
 		}
 		
+	}
+
+	protected Numbers nY(int rh, Numbers top, Numbers height, Numbers Oy) {
+		return Numbers.div(Numbers.mul(Numbers.sub(Oy, top), Numbers.createInteger(rh)), height);
+	}
+
+	protected Numbers nX(int rw, Numbers left, Numbers width, Numbers Ox) {
+		return Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
 	}
 
 	

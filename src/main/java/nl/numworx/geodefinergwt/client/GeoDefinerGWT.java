@@ -635,6 +635,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				h -= toolbox.getOffsetHeight(); // 38px (wel of niet?)
 				h -= southPanel.getOffsetHeight(); // 30px
 				widget.init(w, h);
+				widget.getModel().getO().forceChanged();
 				widget.paint();
 			}
 		} finally {

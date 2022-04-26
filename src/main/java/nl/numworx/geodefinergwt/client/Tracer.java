@@ -321,6 +321,8 @@ private void stamp() {
 
       @Override
       public void onResponseReceived(Request request, Response response) {
+    	int code = response.getStatusCode();
+    	if (code != 200) return;
         String json = response.getText();
         double stamp = (long) JSONParser.parse(json).isObject().get("serverTimeStamp").isNumber().doubleValue();
         top = entry();
