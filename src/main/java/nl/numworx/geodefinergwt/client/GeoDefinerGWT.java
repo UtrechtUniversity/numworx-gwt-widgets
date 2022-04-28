@@ -1,7 +1,10 @@
 package nl.numworx.geodefinergwt.client;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -59,6 +62,8 @@ import fi.euclides.gwt.PrettyFormat;
 import fi.euclides.math.IntegerFactory;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Locus;
+import fi.euclides.model.Pair;
+import fi.euclides.model.Punt;
 import fi.euclides.model.math.DoubleFormat;
 import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.Const;
@@ -634,13 +639,56 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				root.setPixelSize(w, h);
 				h -= toolbox.getOffsetHeight(); // 38px (wel of niet?)
 				h -= southPanel.getOffsetHeight(); // 30px
-				widget.init(w, h);
-				widget.getModel().getO().forceChanged();
+//				widget.init(w, h);
+//				widget.getModel().getO().forceChanged();
+				relocate(w,h);
 				widget.paint();
 			}
 		} finally {
 			sema = false;
 		}
+	}
+
+	protected void relocate(int rw, int rh) {
+		widget.getModel().executeDelay();
+		Punt o = widget.getModel().getO();
+		Numbers right = widget.clipRight();
+		Numbers left  = widget.clipLeft();
+		Numbers width = Numbers.sub(right, left);
+		Numbers Ox = o.getX();
+		Numbers nOx = nX(rw, left, width, Ox);
+		
+		Numbers top = widget.clipTop();
+		Numbers bottom = widget.clipBottom();
+		Numbers height = Numbers.sub(bottom, top);
+		Numbers Oy = o.getY();
+		Numbers nOy = nY(rh, top, height, Oy);
+		Punt u = widget.getModel().getU();
+		List<Punt> p = widget.getModel().getPunten();
+		p = p.subList(2, p.size());
+		List<Pair<Numbers, Numbers>> save = new ArrayList<>(p.size());
+		p.forEach(n -> save.add(new Pair<>(n.getX(), n.getY())));
+		Numbers dx = Numbers.sub(u.getX(),Ox);
+		dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
+		widget.init(rw, rh); // ipv setPixelSize
+		if (Ox.equals(nOx) && Oy.equals(nOy)) o.forceChanged(); // force changed
+		else o.setXY(nOx, nOy);
+		u.setXY(Numbers.add(dx, nOx), nOy);
+		Iterator<Punt> i = p.iterator();
+		Iterator<Pair<Numbers, Numbers>> pairs = save.iterator();
+		while (i.hasNext() && pairs.hasNext()) {
+			Punt punt = i.next();
+			Pair<Numbers, Numbers> pair = pairs.next();
+			punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+		}
+	}
+
+	protected Numbers nY(int rh, Numbers top, Numbers height, Numbers Oy) {
+		return Numbers.div(Numbers.mul(Numbers.sub(Oy, top), Numbers.createInteger(rh)), height);
+	}
+
+	protected Numbers nX(int rw, Numbers left, Numbers width, Numbers Ox) {
+		return Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
 	}
 	
 }

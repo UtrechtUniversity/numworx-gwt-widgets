@@ -1,10 +1,8 @@
 package nl.numworx.geodefinergwt.client;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -39,9 +37,6 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
-import fi.euclides.model.Pair;
-import fi.euclides.model.Punt;
-import fi.euclides.model.math.Numbers;
 import fi.wiskopdr.FormuleParser;
 
 public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, RequiresResize {
@@ -409,48 +404,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		{
 			Logger.getGlobal().warning(cnt++ + " Scale " +  rw + ", " + rh);	
 			root.setPixelSize(rw, rh);	
-			Punt o = widget.getModel().getO();
-			Numbers right = widget.clipRight();
-			Numbers left  = widget.clipLeft();
-			Numbers width = Numbers.sub(right, left);
-			Numbers Ox = o.getX();
-			Numbers nOx = nX(rw, left, width, Ox);
-			
-			Numbers top = widget.clipTop();
-			Numbers bottom = widget.clipBottom();
-			Numbers height = Numbers.sub(bottom, top);
-			Numbers Oy = o.getY();
-			Numbers nOy = nY(rh, top, height, Oy);
-			Punt u = widget.getModel().getU();
-			List<Punt> p = widget.getModel().getPunten();
-			p = p.subList(2, p.size());
-			List<Pair<Numbers, Numbers>> save = new ArrayList<>(p.size());
-			p.forEach(n -> save.add(new Pair<>(n.getX(), n.getY())));
-			Numbers dx = Numbers.sub(u.getX(),Ox);
-			dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
 			rh -= 68;
-			widget.init(rw, rh); // ipv setPixelSize
-			if (Ox.equals(nOx) && Oy.equals(nOy)) o.forceChanged(); // force changed
-			else o.setXY(nOx, nOy);
-			u.setXY(Numbers.add(dx, nOx), nOy);
-			Iterator<Punt> i = p.iterator();
-			Iterator<Pair<Numbers, Numbers>> pairs = save.iterator();
-			while (i.hasNext() && pairs.hasNext()) {
-				Punt punt = i.next();
-				Pair<Numbers, Numbers> pair = pairs.next();
-				punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
-			}
+// rw/rh nieuwe maten widget
+			relocate(rw, rh);
 			widget.paint();
 		}
 		
-	}
-
-	protected Numbers nY(int rh, Numbers top, Numbers height, Numbers Oy) {
-		return Numbers.div(Numbers.mul(Numbers.sub(Oy, top), Numbers.createInteger(rh)), height);
-	}
-
-	protected Numbers nX(int rw, Numbers left, Numbers width, Numbers Ox) {
-		return Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
 	}
 
 	
