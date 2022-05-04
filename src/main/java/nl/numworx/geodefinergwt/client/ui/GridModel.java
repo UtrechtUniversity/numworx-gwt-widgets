@@ -1,7 +1,5 @@
 package nl.numworx.geodefinergwt.client.ui;
 
-import java.util.Map;
-
 import nl.numworx.geodefiner.common.LineType;
 import nl.numworx.geodefiner.common.Snapper;
 import nl.numworx.geodefiner.common.UIModel;
@@ -11,6 +9,7 @@ import fi.euclides.model.Locus;
 
 public class GridModel extends LineModel {
 	boolean gravity;
+	int snap = Snapper.DEFAULT_SNAP;
 
 //	@Override
 //	public Map<String, Object> toMap() {
@@ -22,6 +21,11 @@ public class GridModel extends LineModel {
 	@Override
 	public void fromMap(ObjectMap map) {
 		gravity = map.getBoolean("gravity", false);
+		if (map.containsKey("snap"))
+			snap = map.getInt("snap");
+		else
+			snap = Snapper.DEFAULT_SNAP;
+		
 		super.fromMap(map);
 	}
 
@@ -30,6 +34,7 @@ public class GridModel extends LineModel {
 		super.install(item);
 		Snapper snapper = tracker.adapt(Snapper.class);
 		snapper.setGravity(gravity);
+		snapper.setSnap(snap);
 	}
 	
 	public UIModel<Destroyable, Void> init(Locus item) {
