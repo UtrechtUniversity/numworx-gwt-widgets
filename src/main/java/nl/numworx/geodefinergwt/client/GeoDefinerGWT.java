@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -666,8 +667,15 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		Punt u = widget.getModel().getU();
 		List<Punt> p = widget.getModel().getPunten();
 		p = p.subList(2, p.size());
+		List<Punt> p2 = widget.getModel().getLijnen().stream()
+				.filter(d -> d instanceof fi.euclides.model.Label)
+				.map( d -> {
+					fi.euclides.model.Label l = (fi.euclides.model.Label) d;
+					return l.getP();
+				}).collect(Collectors.toList());		
 		List<Pair<Numbers, Numbers>> save = new ArrayList<>(p.size());
 		p.forEach(n -> save.add(new Pair<>(n.getX(), n.getY())));
+		p2.forEach(n ->save.add(new Pair<>(n.getX(), n.getY())));
 		Numbers dx = Numbers.sub(u.getX(),Ox);
 		dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
 		widget.init(rw, rh); // ipv setPixelSize
@@ -681,6 +689,14 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			Pair<Numbers, Numbers> pair = pairs.next();
 			punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
 		}
+		i = p2.iterator();
+		while (i.hasNext() && pairs.hasNext()) {
+			Punt punt = i.next();
+			Pair<Numbers, Numbers> pair = pairs.next();
+			punt.setXY(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+			//if (!pairs.hasNext()) LOG.info("move to " + Oy  + " " + pair.getB() + " to " + nOy + " " + punt.getY());
+		}
+		
 	}
 
 	protected Numbers nY(int rh, Numbers top, Numbers height, Numbers Oy) {
