@@ -17,14 +17,17 @@ import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.canvas.dom.client.TextMetrics;
 //import fi.graphtool.Slider;
 import com.google.gwt.touch.client.Point;
+import com.google.gwt.user.client.ui.Widget;
+
 import fi.beans.lineairealgebra.Vector2d;
+import fi.graphtoolgwt.client.ui.ResizeWidget;
 import fi.wiskopdr.expressies.Expressie;
 import gwt.awt.geom.Area;
 import gwt.awt.Rectangle;
 import gwt.awt.geom.GeneralPath;
 import gwt.awt.geom.PathIterator;
 
-public class GrafiekGWTVeld {
+public class GrafiekGWTVeld implements ResizeWidget {
 	
 //	private static Logger logger = Logger.getLogger("GrafiekGWTVeld");
 	
@@ -142,7 +145,7 @@ public class GrafiekGWTVeld {
 	{	
 		this.interactiePanel = interactiePanel;
 		grafiekGWTCanvas = Canvas.createIfSupported();
-		grafiekGWTCanvas.setStyleName(interactiePanel.graphToolCss.canvas());
+		grafiekGWTCanvas.setStyleName(GraphToolGWT.graphToolCss.canvas());
 		
 		setSize(w, h);
 		
@@ -3075,6 +3078,17 @@ public class GrafiekGWTVeld {
 		
 		
 		return s;
+	}
+
+	@Override
+	public Widget asWidget() {
+		return grafiekGWTCanvas;
+	}
+
+	@Override
+	public void onResize() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 	/*

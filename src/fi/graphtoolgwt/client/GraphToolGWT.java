@@ -82,6 +82,7 @@ import fi.wiskopdr.expressies.VergelijkingMeerv;
 import fi.wiskopdr.expressies.repr.ContentMathML;
 import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.graphtoolgwt.client.text.Text;
+import fi.graphtoolgwt.client.ui.ResizePanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -127,7 +128,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	LayoutPanel basisPanel = new LayoutPanel();
 	//protected FormuleKeyboardIF kb = null;
 	//DockLayoutPanel dlp; //misschien niet nodig?
-	LayoutPanel grafiekVeldPanel;
+	ResizePanel grafiekVeldPanel;
 	GrafiekGWTVeld grafiekGWTVeld;
 	Canvas grafiekGWTCanvas;
 	
@@ -481,11 +482,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		if(zoomOptie)
 		{	basisPanel.add(zoomPanel);
 		    basisPanel.setWidgetTopHeight(zoomPanel, basisX, Unit.PX, zoomPanelHoogte, Unit.PX);
-		    basisX += zoomPanelHoogte + offset;
-//			FlowPanel panel = new FlowPanel();
-//			panel.setPixelSize(breedte, offset);
-//			basisPanel.add(panel);
-		
+		    basisX += zoomPanelHoogte + offset;		
 		}
 		int currentX = offset;
 		
@@ -546,7 +543,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		currentX += buttonSize + buttonOffset;
 		zoomPanel.forceLayout();
 		
-		grafiekVeldPanel = new LayoutPanel();
+		grafiekVeldPanel = new ResizePanel();
 		grafiekVeldPanel.setPixelSize(breedte , grafiekVeldHoogte);
 		
 		grafiekGWTVeld = new GrafiekGWTVeld(this, breedte, grafiekVeldHoogte);
@@ -573,9 +570,9 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			
 		grafiekGWTVeld.initContext2d();		
 		
-		grafiekVeldPanel.add(grafiekGWTCanvas);
-		grafiekVeldPanel.setWidgetLeftWidth(grafiekGWTCanvas, 0, Style.Unit.PX, breedte, Style.Unit.PX);
-		grafiekVeldPanel.setWidgetTopHeight(grafiekGWTCanvas, 0, Style.Unit.PX, grafiekVeldHoogte, Style.Unit.PX);
+		grafiekVeldPanel.add(grafiekGWTVeld);
+		grafiekVeldPanel.setWidgetLeftWidth(grafiekGWTVeld, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+		grafiekVeldPanel.setWidgetTopHeight(grafiekGWTVeld, 0, Style.Unit.PX, grafiekVeldHoogte, Style.Unit.PX);
 		grafiekVeldPanel.forceLayout();
 		
 		basisPanel.add(grafiekVeldPanel);
