@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
@@ -21,7 +20,6 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
-
 public class GraphToolGWTDebug extends GraphToolGWT {
 
 	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
@@ -199,7 +197,7 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 	@Override
 	public void onModuleLoad() {
 
-	    RootLayoutPanel.get().add(FocusOnTouch.wrap(this.asWidget(), true));
+	    RootLayoutPanel.get().add(FocusOnTouch.wrap(asWidget(), true));
 	
 		Map<String, Object> map = new HashMap<>();
 		init(300,600, map, Collections.emptyMap());

@@ -15,6 +15,7 @@ import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.canvas.dom.client.TextMetrics;
+import com.google.gwt.core.client.GWT;
 //import fi.graphtool.Slider;
 import com.google.gwt.touch.client.Point;
 import com.google.gwt.user.client.ui.Widget;
@@ -3087,8 +3088,17 @@ public class GrafiekGWTVeld implements ResizeWidget {
 
 	@Override
 	public void onResize() {
-		// TODO Auto-generated method stub
+		Widget parent = grafiekGWTCanvas.getParent();
+		if (parent == null) return;
+		int b = parent.getOffsetWidth(); if (b <= 0) return;
+		int h = parent.getOffsetHeight(); if (h <= 0) return;
+		if (b != breedte || h != hoogte)
+		{
+			setSize(b, h);
+			paint();
+		}
 		
+		GWT.log("on Resize " + grafiekGWTCanvas.getOffsetWidth() + " " + grafiekGWTCanvas.getOffsetHeight());		
 	}
 	
 	/*

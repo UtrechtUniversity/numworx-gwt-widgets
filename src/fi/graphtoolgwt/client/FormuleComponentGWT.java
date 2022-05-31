@@ -80,12 +80,7 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
 	private static Logger logger = Logger.getLogger("FormuleComponentGWT");
 
 	private IsWidget wrap (IsWidget widget) {
-		//FocusOnTouch.installKeyboard(interactiePanel.kb);
 		FocusPanel focus = FocusOnTouch.wrap (widget.asWidget(), false);
-		//focus.addKeyDownHandler(interactiePanel.keyHandler);
-		//focus.addKeyPressHandler(interactiePanel.keyHandler);
-		//focus.add(widget);
-		//focus.addMouseUpHandler(new FocusOnTouch(focus));
 		return focus;
 	}	
 	
@@ -313,15 +308,9 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			hoogte = (Integer) h.get("hoogte");
 		*/
 		
-		//Image regelMinderImg = new Image("images/resources/pijlterug.gif");
-		//regelMinderImg.getElement().getStyle().setMargin(2, Unit.PX);
 		verwijderRegelKnop = new PushButton(regelMinderButtonImage);
 		verwijderRegelKnop.getElement().getStyle().clearColor();
 		verwijderRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
-		//verwijderRegelKnop.add();
-		//verwijderRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
-		//regelMinderButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
-		//addButtonHandler(verwijderRegelKnop);
 		verwijderRegelKnop.addClickHandler(new ClickHandler(){
 
 			@Override
@@ -331,8 +320,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 			
 		});
 		
-		//Image regelMeerImg = new Image("images/resources/pijlterug.gif");
-		//regelMeerImg.getElement().getStyle().setMargin(2, Unit.PX);
 		nieuweRegelKnop = new PushButton(regelMeerButtonImage);
 		nieuweRegelKnop.getElement().getStyle().setBorderStyle(BorderStyle.NONE);
 		nieuweRegelKnop.addClickHandler(new ClickHandler(){
@@ -343,9 +330,6 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 				voegRegelToe();
 			}
 		});
-		//nieuweRegelKnop.getElement().getStyle().setFloat(Style.Float.RIGHT);
-		//regelMeerButton.getElement().getStyle().setVisibility(Visibility.HIDDEN);
-		//addButtonHandler(nieuweRegelKnop);
 		
 		for (int i = 0; i < functieBeginViewers.length; i++)
 		{	
@@ -396,34 +380,26 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		{
 			domeinButtons[i] = new DomeinButtonGWT(interactiePanel, i);
 		}
-		
-	
-		//sp = new ScrollPanel();
-		
-		//sp.getElement().getStyle().setWidth(breedte - 5, Unit.PX);
-		//sp.getElement().getStyle().setHeight(hoogte - 5, Unit.PX);
-		//sp.getElement().getStyle().setOverflow(Overflow.AUTO);
-		//sp.getElement().getStyle().setFloat(Style.Float.LEFT);
-		
+				
 		LayoutPanel mainPanel = new LayoutPanel();
 		final IsWidget wrap = wrap(mainPanel);
 		this.add(wrap);
-		this.setWidgetLeftWidth(wrap, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+		this.setWidgetLeftRight(wrap, 0, Style.Unit.PX, 0, Style.Unit.PX);
 		this.setWidgetTopHeight(wrap, 0, Style.Unit.PX, hoogte, Style.Unit.PX); 
 		FlowPanel rechthoekPanel = new FlowPanel();
 		rechthoekPanel.getElement().getStyle().setBorderColor(CssColor.make(211, 211, 211).toString());
 		rechthoekPanel.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
 		rechthoekPanel.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
 		mainPanel.add(rechthoekPanel);
-		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
+//		mainPanel.setWidgetLeftWidth(rechthoekPanel, 0, Style.Unit.PX, breedte, Style.Unit.PX);
 		mainPanel.setWidgetTopHeight(rechthoekPanel, 0, Style.Unit.PX, hoogte, Style.Unit.PX);
 		
 		
 		mainPanel.add(verwijderRegelKnop);
 		mainPanel.add(nieuweRegelKnop);
-		mainPanel.setWidgetLeftWidth(verwijderRegelKnop, breedte - 60, Style.Unit.PX, 20, Style.Unit.PX);
+		mainPanel.setWidgetRightWidth(verwijderRegelKnop, 60, Style.Unit.PX, 20, Style.Unit.PX);
 		mainPanel.setWidgetTopHeight(verwijderRegelKnop, 5, Style.Unit.PX, 23, Style.Unit.PX);
-		mainPanel.setWidgetLeftWidth(nieuweRegelKnop, breedte - 30, Style.Unit.PX, 20, Style.Unit.PX);
+		mainPanel.setWidgetRightWidth(nieuweRegelKnop, 30, Style.Unit.PX, 20, Style.Unit.PX);
 		mainPanel.setWidgetTopHeight(nieuweRegelKnop, 5, Style.Unit.PX, 23, Style.Unit.PX);
 		
 		

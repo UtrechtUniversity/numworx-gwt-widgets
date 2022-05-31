@@ -69,12 +69,12 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.10</version>
+			<version>0.1.12</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.10</version>
+			<version>0.1.12</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
