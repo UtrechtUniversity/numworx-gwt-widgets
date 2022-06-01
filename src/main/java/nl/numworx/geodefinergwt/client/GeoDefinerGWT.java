@@ -677,26 +677,48 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		p.forEach(n -> save.add(new Pair<>(n.getX(), n.getY())));
 		p2.forEach(n ->save.add(new Pair<>(n.getX(), n.getY())));
 		Numbers dx = Numbers.sub(u.getX(),Ox);
-		dx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
+		Numbers ndx = Numbers.div(Numbers.mul(dx, Numbers.createInteger(rw)), width);
 		widget.init(rw, rh); // ipv setPixelSize
 		if (Ox.equals(nOx) && Oy.equals(nOy)) o.forceChanged(); // force changed
 		else o.setXY(nOx, nOy);
-		u.setXY(Numbers.add(dx, nOx), nOy);
+		u.setXY(Numbers.add(ndx, nOx), nOy);
+// FIXME dit is niet goed, omdat het coordinatensysteem vierkant is en niet rechthoekig. Helaas.
+//		O gaat van Ox,Oy naar nOx, nOy
+//		U gaat van Ox+dx, Oy naar nOx+ndx, nOy
+		
 		Iterator<Punt> i = p.iterator();
 		Iterator<Pair<Numbers, Numbers>> pairs = save.iterator();
 		while (i.hasNext() && pairs.hasNext()) {
 			Punt punt = i.next();
 			Pair<Numbers, Numbers> pair = pairs.next();
-			punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+			//punt.moveTo(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+			Numbers a = pair.getA();
+			Numbers na = nC(Ox, nOx, dx, ndx, a);
+			Numbers b = pair.getB();
+			Numbers nb = nC(Oy, nOy, dx, ndx, b);
+			punt.moveTo(na, nb);
+			
 		}
 		i = p2.iterator();
 		while (i.hasNext() && pairs.hasNext()) {
 			Punt punt = i.next();
 			Pair<Numbers, Numbers> pair = pairs.next();
-			punt.setXY(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
+			//punt.setXY(nX(rw, left, width, pair.getA()), nY(rh, top, height, pair.getB()));
 			//if (!pairs.hasNext()) LOG.info("move to " + Oy  + " " + pair.getB() + " to " + nOy + " " + punt.getY());
+			Numbers a = pair.getA();
+			Numbers na = nC(Ox, nOx, dx, ndx, a);
+			Numbers b = pair.getB();
+			Numbers nb = nC(Oy, nOy, dx, ndx, b);
+			punt.setXY(na, nb);
+
 		}
 		
+	}
+
+	private Numbers nC(Numbers Ox, Numbers nOx, Numbers dx, Numbers ndx, Numbers a) {
+		Numbers cx = Numbers.div(Numbers.sub(a, Ox),dx);
+		Numbers na = Numbers.add(nOx, Numbers.mul(cx, ndx));
+		return na;
 	}
 
 	protected Numbers nY(int rh, Numbers top, Numbers height, Numbers Oy) {

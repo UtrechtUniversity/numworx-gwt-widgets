@@ -299,7 +299,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 				,"$fh=halfline(Q,P)@"
 				,"$fZ=point(2,2)@"
 				//,"$fv =map(t -> text(\"{t}\u03c0\", point(t,2)), 1..3)@"
-				//,"$fwaarde=true@"
+				,"$fwaarde=true@"
 				//, "$fy<-1-x*x@"
 				);
 		launchDebug.put("definitions", definitions);
@@ -324,7 +324,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 	    h.put("color", 0x80FF0000);
 	    h.put("type", PointType.DISK.name());
 	    h.put("size", 15);
-	    h.put("log", true);
+	    h.put("log", false);
 	    configuration.put("P", h);configuration.put("Q", h);
 	    h = new HashMap();
 	    h.put("rigid", true);
@@ -353,7 +353,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		launchDebug.put("checkObjects", Collections.singletonList(checkObject));
 
 		Map<String,Object> positions = new HashMap<>();
-		positions.put("waarde", Arrays.asList(1, 40, 1, 40));
+		positions.put("waarde", Arrays.asList(1, 50, 1, 50));
 		launchDebug.put("positions", positions);
 		
 		launchDebug.put("logOption", Boolean.TRUE);
