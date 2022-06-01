@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -21,6 +23,8 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 public class GraphToolGWTDebug extends GraphToolGWT {
+
+	private static final int H = 800;
 
 	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
 
@@ -197,10 +201,20 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 	@Override
 	public void onModuleLoad() {
 
-	    RootLayoutPanel.get().add(FocusOnTouch.wrap(asWidget(), true));
+	    RootLayoutPanel root = RootLayoutPanel.get();
+		FocusPanel child = FocusOnTouch.wrap(asWidget(), true);
+		asWidget().getElement().getStyle().clearPosition();
+		
+		root.add(child);
+		root.setWidgetTopHeight(child, 0, Unit.PX, H, Unit.PX);
+		root.setWidgetLeftWidth(child, 0, Unit.PX, 300, Unit.PX);
 	
 		Map<String, Object> map = new HashMap<>();
-		init(300,600, map, Collections.emptyMap());
+		map.put("tekenComponentAan", Boolean.TRUE);
+		map.put("tabelComponentAan", Boolean.TRUE);
+		map.put("veldComponentAan", Boolean.TRUE);
+
+		init(300,H, map, Collections.emptyMap());
 		MockOpdrNav opdrnav = new MockOpdrNav();
 		FocusOnTouch.installKeyboard(opdrnav, opdrnav);
 		FocusOnTouch.focus();

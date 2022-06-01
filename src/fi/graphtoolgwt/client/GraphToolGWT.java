@@ -543,7 +543,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		zoomPanel.forceLayout();
 		
 		grafiekVeldPanel = new ResizePanel();
-		grafiekVeldPanel.setPixelSize(-1 , grafiekVeldHoogte);
+		//grafiekVeldPanel.setPixelSize(-1 , grafiekVeldHoogte);
 		
 		grafiekGWTVeld = new GrafiekGWTVeld(this, breedte, grafiekVeldHoogte);
 		grafiekGWTCanvas = grafiekGWTVeld.getCanvas();
@@ -575,7 +575,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		grafiekVeldPanel.forceLayout();
 		
 		basisPanel.add(grafiekVeldPanel);
-		basisPanel.setWidgetTopHeight(grafiekVeldPanel, basisX, Unit.PX, grafiekVeldHoogte, Unit.PX);
+		//basisPanel.setWidgetTopHeight(grafiekVeldPanel, basisX, Unit.PX, grafiekVeldHoogte, Unit.PX);
+		basisPanel.setWidgetTopBottom(grafiekVeldPanel, basisX, Unit.PX, hoogte - grafiekVeldHoogte - basisX, Unit.PX);
 		basisX += grafiekVeldHoogte;
 
 		tekenComponent = new TekenComponentGWT(this, breedte);
@@ -587,7 +588,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		    basisX += offset;
 			tekenComponent.forceLayout();
 			basisPanel.add(tekenComponent);
-			basisPanel.setWidgetTopHeight(tekenComponent, basisX, Unit.PX, tekenComponentHoogte, Unit.PX);
+//			basisPanel.setWidgetTopHeight(tekenComponent, basisX, Unit.PX, tekenComponentHoogte, Unit.PX);
+			basisPanel.setWidgetBottomHeight(tekenComponent, hoogte - tekenComponentHoogte - basisX, Unit.PX, tekenComponentHoogte, Unit.PX);
 			basisX += tekenComponentHoogte;
 		}
 		tekenComponent.zetLijnenKnoppen(rechteVerbindingen, krommeZonderExtrapolatie, krommeMetExtrapolatie);
@@ -597,13 +599,11 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		tabelComponent.zetGrafiekComponent(grafiekGWTVeld);
 		if(tabelComponentAan)
 		{
-//		    FlowPanel panel = new FlowPanel();
-//			panel.setPixelSize(breedte , offset);
-//			basisPanel.add(panel);
 		    basisX += offset;
 			tabelComponent.forceLayout();
 			basisPanel.add(tabelComponent);
-			basisPanel.setWidgetTopHeight(tabelComponent, basisX, Unit.PX, tabelComponentHoogte, Unit.PX);
+//			basisPanel.setWidgetTopHeight(tabelComponent, basisX, Unit.PX, tabelComponentHoogte, Unit.PX);
+			basisPanel.setWidgetBottomHeight(tabelComponent, hoogte - tabelComponentHoogte - basisX, Unit.PX, tabelComponentHoogte, Unit.PX);
 			basisX += tabelComponentHoogte;
 		}
 		tabelComponent.zetZooming(zoomInTabel);
@@ -611,7 +611,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		tabelComponent.zetYAsNaam(yAsNaam, true);
 		
 		formuleComponent = new FormuleComponentGWT(this, launchState, breedte, formuleComponentHoogte);
-		formuleComponent.setPixelSize(-1, (formuleComponentHoogte - 2 - offset)); // waarom minder hoog dan in constructor?
+		//formuleComponent.setPixelSize(-1, (formuleComponentHoogte - 2 - offset)); // waarom minder hoog dan in constructor?
 		
 		veldComponent = new VeldComponentGWT(this, launchState, breedte, veldComponentHoogte);
 		
@@ -622,7 +622,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		    basisX += offset;
             formuleComponent.forceLayout();
 			basisPanel.add(formuleComponent);
-			basisPanel.setWidgetTopHeight(formuleComponent, basisX, Unit.PX, formuleComponentHoogte, Unit.PX);
+			//basisPanel.setWidgetTopHeight(formuleComponent, basisX, Unit.PX, formuleComponentHoogte, Unit.PX);
+			basisPanel.setWidgetBottomHeight(formuleComponent, hoogte-formuleComponentHoogte-basisX, Unit.PX, formuleComponentHoogte, Unit.PX);
 			basisX += formuleComponentHoogte;
 		}
 		
@@ -630,7 +631,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		    basisX += offset;
 			veldComponent.forceLayout();
 			basisPanel.add(veldComponent);
-			basisPanel.setWidgetTopHeight(veldComponent, basisX, Unit.PX, veldComponentHoogte, Unit.PX);
+//			basisPanel.setWidgetTopHeight(veldComponent, basisX, Unit.PX, veldComponentHoogte, Unit.PX);
+			basisPanel.setWidgetBottomHeight(veldComponent, hoogte - veldComponentHoogte - basisX, Unit.PX, veldComponentHoogte, Unit.PX);
 			basisX += veldComponentHoogte;
 			//RPJ
 			zetVectorVeld(0, 0, FormuleParser.parse(FormuleParser.schoon(FormuleParser.formuleString("$fax+y@"))));
@@ -3132,16 +3134,16 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 			/* veldComponent Parameters */
 			if (launchData.containsKey("veldGrafiekType"))
 				veldGrafiekType = VeldComponentGWT.FieldGraphType
-					.values()[((Integer) launchData.getInt("veldGrafiekType"))];
+					.values()[launchData.getInt("veldGrafiekType")];
 			if (launchData.containsKey("veldPijlGrootteModus"))
 				veldPijlGrootteModus = VeldComponentGWT.FieldGraphArrowSizeMode
-					.values()[((Integer) launchData.getInt("veldPijlGrootteModus"))];
+					.values()[launchData.getInt("veldPijlGrootteModus")];
 			if (launchData.containsKey("veldPijlGroottePixels"))
-				veldPijlGroottePixels = ((Integer) launchData.getInt("veldPijlGroottePixels"));
+				veldPijlGroottePixels = launchData.getInt("veldPijlGroottePixels");
 			if (launchData.containsKey("veldPijlSchaalfactor"))
-				veldPijlSchaalfactor = ((Double) launchData.getDouble("veldPijlSchaalfactor"));
+				veldPijlSchaalfactor = launchData.getDouble("veldPijlSchaalfactor");
 			if (launchData.containsKey("veldLargerGridStartPoints"))
-				veldLargerGridStartPoints = ((Boolean) launchData.getBoolean("veldLargerGridStartPoints"));
+				veldLargerGridStartPoints = launchData.getBoolean("veldLargerGridStartPoints");
 
 			if (launchData.containsKey("veldComponentHoogte"))
 				veldComponentHoogte = launchData.getInt("veldComponentHoogte");
