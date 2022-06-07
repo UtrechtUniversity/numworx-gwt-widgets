@@ -91,6 +91,13 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	}
 	
 	
+	@Override
+	public int getConstantHeight() {
+		return toolbox.getOffsetHeight() 		// 38px (wel of niet?)
+		       + southPanel.getOffsetHeight(); 	// 30px
+	}
+
+
 	private boolean volledigeBreedte;
 	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
 	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
