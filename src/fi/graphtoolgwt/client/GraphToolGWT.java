@@ -383,6 +383,12 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	private int init_width;
 
 	private int init_height;
+	private int constantHeight;
+
+	@Override
+	public int getConstantHeight() {
+		return constantHeight;
+	}
 
 	private Map<String, Object> init_map;
 
@@ -453,6 +459,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 
 		if (grafiekVeldHoogte < 1) grafiekVeldHoogte = 1; // Minimum 1 pixel!
 		
+		constantHeight = hoogte - grafiekVeldHoogte; // alles behalve de hoogte van het veld is constant.
+
 		getImages();
 		
 		for(int i = 0; i < maxAantalExpressies; i++)
