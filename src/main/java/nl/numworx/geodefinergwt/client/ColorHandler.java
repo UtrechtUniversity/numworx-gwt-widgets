@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import fi.euclides.event.EventHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
+import nl.numworx.geodefiner.IsColor;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
 
@@ -56,8 +57,9 @@ public class ColorHandler extends EventHandler {
 					DefaultAdapter.getDefault(p).put(new FillStyle(a));
 					pstate.put("fill", a);
 				}
-				
-				
+				// shortcut
+				IsColor iscolor = p.adapt(IsColor.class);
+				if (iscolor != null) iscolor.updateColor();				
 			}
 			getModel().clearSelection();
 		});
@@ -68,7 +70,7 @@ public class ColorHandler extends EventHandler {
 		return r << 16|g<<8|b|0xFF000000;
 	}
 	
-	ColorStyle colors[]= {
+	static final ColorStyle colors[]= {
 			new ColorStyle(rgb(69,123,59)),
 			new ColorStyle(rgb(49,100,186)),
 			new ColorStyle(rgb(194,62,56)),
