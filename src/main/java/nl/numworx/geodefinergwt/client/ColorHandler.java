@@ -12,7 +12,6 @@ import com.google.gwt.user.client.ui.PopupPanel;
 import fi.euclides.event.EventHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
-import nl.numworx.geodefiner.IsColor;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 import nl.numworx.geodefinergwt.client.ui.FillStyle;
 

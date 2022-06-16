@@ -43,6 +43,8 @@ public class DashHandler extends EventHandler {
 				DefaultAdapter.getDefault(p).put(StrokeStyle.class, LineModel.getStroke(w,value));
 				Map<String,Object> pstate = state.computeIfAbsent(getTracker().getMapper().toString(p), k -> new HashMap<>());
 				pstate.put("type", value.name());
+				IsLineType linetype = p.adapt(IsLineType.class);
+				if (linetype != null) linetype.updateLineType();
 			}
 			getModel().clearSelection();
 		});
