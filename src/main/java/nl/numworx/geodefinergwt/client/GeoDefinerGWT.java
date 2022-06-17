@@ -207,6 +207,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		}
 		lognagekeken();
 		super.getState(hashMap);
+		if (volledigeBreedte) {
+			hashMap.put("width", Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue());
+			hashMap.put("height", Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue());
+		}
 		getLogState(hashMap);
 		lognagekeken();
 		logger.info("getState " + hashMap);
@@ -226,7 +230,20 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         widget.cancel();
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
+		LOG.severe("O before " + viewer.getModel().getO().getXd());
 		setState(map);
+		LOG.severe("O after " + viewer.getModel().getO().getXd());
+		if (state.containsKey("height") && state.containsKey("width")) {
+			int oldw = Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue();
+			int oldh = Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue();
+			int width = state.getInt("width");
+			int height = state.getInt("height");
+			if (width != oldw || height != oldh ) {
+				LOG.severe("should relocate from " + width + " to " + oldw);
+				widget.init(width, height);
+				relocate(oldw, oldh);
+			}
+		}
 		setLogState(map);
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
@@ -641,7 +658,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			int w = Window.getClientWidth();
 			int h = Window.getClientHeight();
 			if (w != width || h != height) {
-				LOG.info("need resize for " + w + "=" + width + ", " + h + "=" + height);
+				LOG.severe(width + " need resize for " + w + "=" + width + ", " + h + "=" + height);
 				width  = w;
 				height = h;
 				root.setPixelSize(w, h);
