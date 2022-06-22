@@ -205,10 +205,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
       //body.setAttribute("oncontextmenu", "return false;");
 
       root = uiBinder.createAndBindUi(this);
-      toolbox.setResizer(this);
+      //toolbox.setResizer(this);
       main = FocusOnTouch.wrap(root, true);
-      RootLayoutPanel.get().add(main);
-
+      RootLayoutPanel r = RootLayoutPanel.get();
+      r.add(main);
+      r.setWidgetTopHeight(main, 0, Unit.PC, getHeight(), Unit.PC);
+      r.setWidgetLeftWidth(main, 0, Unit.PC, getWidth(), Unit.PC);
       
       
 		//FormuleParser.zetWoordFormule(true);
@@ -282,7 +284,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		mm.put("dy", -5);
 		configs.set(Tools.TEXT, mm);
 		
-		launchDebug.put("toolbox", toolbox);
+		//launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
@@ -404,7 +406,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		{
 			Logger.getGlobal().warning(cnt++ + " Scale " +  rw + ", " + rh);	
 			root.setPixelSize(rw, rh);	
-			rh -= 68;
+			rh -= getConstantHeight();
 // rw/rh nieuwe maten widget
 			relocate(rw, rh);
 			widget.paint();

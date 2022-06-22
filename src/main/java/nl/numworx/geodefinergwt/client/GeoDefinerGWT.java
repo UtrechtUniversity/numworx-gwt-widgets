@@ -42,6 +42,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -81,8 +82,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
 	private static final String HALF_CSS = "half";
-	private int width = 500;
-	private int height = 450;
+	private int width = 500, orgWidth;
+	private int height = 450, orgHeight;
 	private OpdrNavIF comRoot;
 	//private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
@@ -90,11 +91,27 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		logger.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
 	}
 	
+	static class MyDockLayoutPanel extends DockLayoutPanel {
+
+		MyDockLayoutPanel(Unit unit) {
+			super(unit);
+		}
+		
+		static boolean isHidden(Widget w) {
+			LayoutData data = (LayoutData) w.getLayoutData();
+			return data.hidden;
+		}
+	}
+	
+	private boolean southPanelVisible() {
+		return ! MyDockLayoutPanel.isHidden(southPanel);
+	}
 	
 	@Override
 	public int getConstantHeight() {
-		return toolbox.getOffsetHeight() 		// 38px (wel of niet?)
-		       + southPanel.getOffsetHeight(); 	// 30px
+		return toolbox.getHeight() 		// 38px (wel of niet?)
+			   + (southPanelVisible() ? root.getWidgetSize(southPanel).intValue() : 0)
+		       ;//+ southPanel.getOffsetHeight(); 	// 30px
 	}
 
 
@@ -427,6 +444,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		this.mode = comRoot.getMode();
 		this.lessonMode = comRoot.getLessonMode();
 		toetsStyle();
+		widget.init(width, height-getConstantHeight());
 	}
 
 	private void toetsStyle() {
@@ -506,8 +524,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		DoubleFormat.setInstance(new PrettyFormat());
 		Locus.BUILDER = new Builder();
 		widget.init(width, height);
-		this.width = width;
-		this.height = height;
+		orgWidth = this.width = width;
+		orgHeight = this.height = height;
 		Components c = DaggerComponents.builder()
 				.status(status)
 				.widget(widget)
@@ -535,6 +553,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
 // highlighter after init launchdata.
         widget.enableHighLight(selector);
+		widget.init(width, height-getConstantHeight());
 		tracker.paint();
 		if (volledigeBreedte) toolbox.setResizer(this);
 	}
@@ -629,7 +648,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 
 
-	public void reset() {
+	private void reset0(int width, int height) {
 		toolbox.destroy();
 		if(checkObjects != null) checkObjects.destroyAll();
 		definitions.clear();
@@ -637,8 +656,22 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		createModel(viewer.getModel(), width, height);
 		installLaunchData();
 		toetsStyle();
+		widget.init(width, height-getConstantHeight());
 		start();
 	}
+	
+	protected void reset() {
+		if (width == orgWidth && height == orgHeight) 
+		{
+			reset0(width, height);
+		} else {
+			int header = getConstantHeight();
+			reset0(orgWidth, orgHeight);
+			relocate(width, height-header); //terug naar huidige grootte
+		}
+	}
+	
+	
 
 	@Override
 	public void start() {
@@ -752,5 +785,6 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	protected Numbers nX(int rw, Numbers left, Numbers width, Numbers Ox) {
 		return Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
 	}
+	
 	
 }

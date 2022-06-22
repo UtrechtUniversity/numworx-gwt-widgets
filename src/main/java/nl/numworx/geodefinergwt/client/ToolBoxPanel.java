@@ -226,7 +226,7 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 			panel.getWidget(0).removeFromParent();
 	}
 	
-	private int height = 40;
+	private int height = 00;
 	int getHeight() {
 		return height;
 	}
