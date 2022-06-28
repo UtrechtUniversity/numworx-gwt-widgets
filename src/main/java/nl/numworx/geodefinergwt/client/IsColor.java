@@ -45,6 +45,8 @@ public class IsColor extends nl.numworx.geodefiner.common.math.IsColor {
 	public boolean define(Label l) {
 		DefaultAdapter adapter = DefaultAdapter.getDefault(l.getDepend()[0]);
 		adapter.put(new IsColor(l, adapter.adapt(IsColor.class)));
+		adapter = DefaultAdapter.getDefault(l.getDepend()[1]);
+		adapter.put(new IsColor(l, adapter.adapt(IsColor.class)));
 		return super.define(l);
 	}
 

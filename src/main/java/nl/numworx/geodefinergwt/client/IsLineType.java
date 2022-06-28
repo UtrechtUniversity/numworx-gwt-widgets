@@ -40,6 +40,8 @@ public class IsLineType extends nl.numworx.geodefiner.common.math.IsLineType {
 	public boolean define(Label l) {
 		DefaultAdapter adapter = DefaultAdapter.getDefault(l.getDepend()[0]);
 		adapter.put(new IsLineType(l, adapter.adapt(IsLineType.class)));
+		adapter = DefaultAdapter.getDefault(l.getDepend()[1]);
+		adapter.put(new IsLineType(l, adapter.adapt(IsLineType.class)));
 		return super.define(l);
 	}
 
