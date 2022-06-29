@@ -1,5 +1,6 @@
 package nl.numworx.geodefinergwt.client.ui;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import nl.numworx.geodefiner.common.Randomizer;
@@ -117,6 +118,26 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	}
 
 	@Override
+	public void fromLightMap(ObjectMap value) {
+	    if (value.containsKey("color")) {
+	    	rgba = value.getInt("color");
+	    } else {
+	    	ColorStyle style = item.adapt(ColorStyle.class);
+	    	if (style != null) 
+	    		rgba = style.getRGB();
+	    	else 
+	    		rgba = 0xFF000000; // opaque black
+	    }
+	}
+	
+	@Override
+	public Map<String,Object> toLightMap() {
+		Map<String,Object> m = new HashMap<>();
+		m.put("color", rgba);
+		return m;
+	}
+	
+	@Override
 	public Void editor() {
 		return null;
 	}
@@ -138,11 +159,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		return this;
 	}
 
-
 	@Override
 	final public void install() {
 		install(item);
-		
 	}
 
 }

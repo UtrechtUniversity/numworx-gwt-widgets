@@ -68,13 +68,16 @@ public class ColorHandler extends EventHandler {
 	static int rgb(int r, int g, int b) {
 		return r << 16|g<<8|b|0xFF000000;
 	}
+	static int rgb(int rgb) { 
+		return 0xFF000000 | (rgb & 0xFFFFFF);
+	}
 	
 	static final ColorStyle colors[]= {
-			new ColorStyle(rgb(69,123,59)),
-			new ColorStyle(rgb(49,100,186)),
-			new ColorStyle(rgb(194,62,56)),
-			new ColorStyle(rgb(204,104,46)),
-			new ColorStyle(rgb(99,89,203)),
+			new ColorStyle(rgb(0x7fcc99 /*groen*/)),
+			new ColorStyle(rgb(0x7ddfff /*blauw*/)),
+			new ColorStyle(rgb(0xff7f7f /*rood*/)),
+			new ColorStyle(rgb(0xffe67f /*geel*/)),
+			new ColorStyle(rgb(0xc97dff /*paars*/)),
 			new ColorStyle(rgb(100,100,100)),
 			new ColorStyle(rgb(0,0,0)),
 			new ColorStyle(rgb(180,180,180)),

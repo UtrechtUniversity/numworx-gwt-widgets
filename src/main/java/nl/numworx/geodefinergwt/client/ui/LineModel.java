@@ -3,6 +3,8 @@ package nl.numworx.geodefinergwt.client.ui;
 import nl.numworx.geodefiner.common.LineType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import fi.euclides.model.Destroyable;
@@ -69,5 +71,30 @@ public class LineModel extends ColorModel<Destroyable> {
   public void installLight() {
     super.installLight();
     DefaultAdapter.getDefault(item).put(getStroke(width, type));
+  }
+  
+  @Override
+  public void fromLightMap(ObjectMap value) {
+	  super.fromLightMap(value);
+	  StrokeStyle s = item.adapt(StrokeStyle.class);
+	  if (s == null) s = new StrokeStyle(1.0, null);
+	  width = (float) s.lineWidth;
+
+	  if (value.containsKey("type")) 
+		  type = LineType.valueOf(value.getString("type"));
+	  else {
+		  double[] dashes = s.dash;
+		  if (dashes == null) type = LineType.SOLID;
+		  else if (dashes.length == 4) type = LineType.DASHDOTTED;
+		  else if (dashes[0] == s.lineWidth) type = LineType.DOTTED;
+		  else type = LineType.DASHED;
+	  }
+  }
+  
+  @Override
+  public Map<String,Object> toLightMap() {
+	  Map<String,Object> m = super.toLightMap();
+	  m.put("type", type.name());
+	  return m;
   }
 }
