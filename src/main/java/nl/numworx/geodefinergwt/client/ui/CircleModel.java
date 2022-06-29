@@ -1,5 +1,7 @@
 package nl.numworx.geodefinergwt.client.ui;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 
 import fi.euclides.model.Destroyable;
@@ -39,6 +41,28 @@ public class CircleModel extends LineModel {
 		else f = new FillStyle("none",TRANSPARANT);
 		DefaultAdapter.getDefault(item).put(f);
 		super.installLight();
+	}
+	
+	@Override
+	public void fromLightMap(ObjectMap value) {
+		super.fromLightMap(value);
+		if (value.containsKey("fill")) 
+			fill = value.getInt("fill");
+		else {
+			FillStyle f = item.adapt(FillStyle.class);
+			if (f != null) {
+				fill = f.getRGB();
+			} else {
+				fill = TRANSPARANT;
+			}
+		}
+	}
+	
+	@Override
+	public Map<String, Object> toLightMap() {
+		Map<String,Object> m = super.toLightMap();
+		m.put("fill", fill);
+		return m;
 	}
 	
 }
