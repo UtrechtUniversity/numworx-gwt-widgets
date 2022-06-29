@@ -31,7 +31,7 @@ public class IsLineType extends nl.numworx.geodefiner.common.math.IsLineType {
 		return dash[0] == width ? LineType.DOTTED : LineType.DASHED;
 	}
 
-	void updateLineType() {
+	public void updateLineType() {
 		test(label);
 		if (chain != null) chain.updateLineType();
 	}

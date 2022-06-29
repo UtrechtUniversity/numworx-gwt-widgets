@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client.ui;
 
 import nl.numworx.geodefiner.common.LineType;
+import nl.numworx.geodefinergwt.client.IsLineType;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 import java.util.Map;
@@ -69,8 +70,10 @@ public class LineModel extends ColorModel<Destroyable> {
 
   @Override
   public void installLight() {
+	DefaultAdapter.getDefault(item).put(getStroke(width, type));
     super.installLight();
-    DefaultAdapter.getDefault(item).put(getStroke(width, type));
+	IsLineType linetype = item.adapt(IsLineType.class);
+	if (linetype != null) linetype.updateLineType();
   }
   
   @Override

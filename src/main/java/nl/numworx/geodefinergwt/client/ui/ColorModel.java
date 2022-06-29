@@ -5,6 +5,7 @@ import java.util.Map;
 
 import nl.numworx.geodefiner.common.Randomizer;
 import nl.numworx.geodefiner.common.UIModel;
+import nl.numworx.geodefinergwt.client.IsColor;
 import nl.numworx.geodefinergwt.client.Tracer;
 import nl.tue.win.riaca.openmath.lang.OMApplication;
 import nl.tue.win.riaca.openmath.lang.OMObject;
@@ -39,6 +40,9 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 	public void installLight() {
 		ColorStyle css = new ColorStyle(rgba);
 		DefaultAdapter.getDefault(item).put(css);
+		// shortcut
+		IsColor iscolor = item.adapt(IsColor.class);
+		if (iscolor != null) iscolor.updateColor();				
 	}
 	
 	
