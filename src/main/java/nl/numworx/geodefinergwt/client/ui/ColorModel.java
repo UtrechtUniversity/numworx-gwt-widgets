@@ -41,8 +41,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 		ColorStyle css = new ColorStyle(rgba);
 		DefaultAdapter.getDefault(item).put(css);
 		// shortcut
-		IsColor iscolor = item.adapt(IsColor.class);
-		if (iscolor != null) iscolor.updateColor();				
+		isColor(item);	
 	}
 	
 	
@@ -86,6 +85,13 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 			} catch (TokenMgrError tme) {
 			}
 		}
+		isColor(item);				
+	}
+
+
+	private void isColor(Destroyable item) {
+		IsColor iscolor = item.adapt(IsColor.class);
+		if (iscolor != null) iscolor.updateColor();
 	}
 
 

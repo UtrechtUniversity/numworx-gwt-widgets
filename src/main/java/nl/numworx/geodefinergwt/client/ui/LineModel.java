@@ -31,12 +31,17 @@ public class LineModel extends ColorModel<Destroyable> {
 
 	@Override
 	public void install(Destroyable item) {
-	  super.install(item);
 	  DefaultAdapter adapter = DefaultAdapter.getDefault(item);
 	  adapter.put(getStroke(width, type));
       adapter.put(Boolean.valueOf(rigid));
+	  super.install(item);
+  	  isLineType(item);
 	}
 
+	private void isLineType(Destroyable item) {
+		IsLineType linetype = item.adapt(IsLineType.class);
+		if (linetype != null) linetype.updateLineType();
+	}
 
   static public StrokeStyle getStroke(float f, LineType lineType) {
     return new StrokeStyle(f, dash[lineType.ordinal()]);
@@ -72,8 +77,7 @@ public class LineModel extends ColorModel<Destroyable> {
   public void installLight() {
 	DefaultAdapter.getDefault(item).put(getStroke(width, type));
     super.installLight();
-	IsLineType linetype = item.adapt(IsLineType.class);
-	if (linetype != null) linetype.updateLineType();
+	isLineType(item);
   }
   
   @Override

@@ -14,12 +14,12 @@ public class CircleModel extends LineModel {
 
 	@Override
 	public void install(Destroyable item) {
-		super.install(item);
 		FillStyle f;
 		if(fill != TRANSPARANT)
 			f = new FillStyle(fill);
 		else f = new FillStyle("none",TRANSPARANT);
 		DefaultAdapter.getDefault(item).put(f);
+		super.install(item);
 	}
 
 	@Override
