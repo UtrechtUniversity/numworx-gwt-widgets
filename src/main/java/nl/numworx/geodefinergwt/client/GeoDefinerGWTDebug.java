@@ -201,7 +201,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 
 	@Override
 	public void onModuleLoad() {
-      Element body = Document.get().getBody();
+      //Element body = Document.get().getBody();
       //body.setAttribute("oncontextmenu", "return false;");
 
       root = uiBinder.createAndBindUi(this);
@@ -259,32 +259,32 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 				Tools.RESET,
 				Tools.ANGLE_POINT
 			);
-		Vector<Map<?,?>> configs = new Vector();
+		Vector<Map<String,Object>> configs = new Vector<>();
 		configs.setSize(32);
-		HashMap element = new HashMap(Collections.singletonMap("color", 0X80FF0000));
+		HashMap<String, Object> element = new HashMap<>(Collections.singletonMap("color", 0X80FF0000));
 		element.put("size", 17);
 		configs.set(Tools.POINT, element);
 		configs.set(Tools.CIRCLE, Collections.singletonMap("color", 0XFFFFFF00));
-		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap(Collections.singletonMap("color", 0XFFFF8800)));
-		configs.set(Tools.TEXT, new HashMap(Collections.singletonMap("color", 0xFFFF0000)));
-		configs.set(Tools.ANGLE_POINT, new HashMap(Collections.singletonMap("color", 0xFFFFFF00)));
+		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap<>(Collections.singletonMap("color", 0XFFFF8800)));
+		configs.set(Tools.TEXT, new HashMap<>(Collections.singletonMap("color", 0xFFFF0000)));
+		configs.set(Tools.ANGLE_POINT, new HashMap<>(Collections.singletonMap("color", 0xFFFFFF00)));
 		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
-		HashMap mm = new HashMap();
+		HashMap<String,Object> mm = new HashMap<>();
 		mm.put("color", 0xFF00FF00);
 		mm.put("width", 0.5);
 		configs.set(Tools.SEGMENT, mm );
 
-		mm = new HashMap(configs.get(Tools.CIRCLE));
+		mm = new HashMap<String,Object>(configs.get(Tools.CIRCLE));
 		mm.put("fill", 0x80808080);
 		configs.set(Tools.CIRCLE, mm);
 		
 		
-		mm = new HashMap(configs.get(Tools.TEXT));
+		mm = new HashMap<>(configs.get(Tools.TEXT));
 		mm.put("dx", 6);  // 		textModel.setDXY(6f,-5f);
 		mm.put("dy", -5);
 		configs.set(Tools.TEXT, mm);
 		
-		//launchDebug.put("toolbox", toolbox);
+		launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);
 		Map<String,Object> checkDWO = new HashMap<String,Object>();
 		checkDWO.put("formule", "$ftrue@");
@@ -321,21 +321,21 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 	    h  = new HashMap<>();
 	    h.put("color", 0X6F808080);
 	    configuration.put("$fy<-1@", h);
-	    h = new HashMap();
+	    h = new HashMap<>();
 	    h.put("rigid", false);
 	    h.put("color", 0x80FF0000);
 	    h.put("type", PointType.DISK.name());
 	    h.put("size", 15);
 	    h.put("log", false);
 	    configuration.put("P", h);configuration.put("Q", h);
-	    h = new HashMap();
+	    h = new HashMap<>();
 	    h.put("rigid", true);
 	    h.put("color", 0x80FF0000);
 	    h.put("type", PointType.DISK.name());
 	    h.put("size", 15);
 	    h.put("log", false);
 	    configuration.put("Z", h);
-	    h = new HashMap();
+	    h = new HashMap<>();
 	    h.put("alwaysF", true);
 	    h.put("color", -16777216);
 	    configuration.put("v", h);

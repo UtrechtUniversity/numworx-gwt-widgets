@@ -500,7 +500,6 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 	}
 	private void visitFlipFlop(Label label) {
 		boolean value = label.getState() != Label.FALSE;
-		String off = "none";
 		String on = "gray";
        
 		float x = (float) label.getXd();
