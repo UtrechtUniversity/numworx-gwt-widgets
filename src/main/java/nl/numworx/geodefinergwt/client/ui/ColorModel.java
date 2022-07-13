@@ -90,8 +90,7 @@ public class ColorModel<T extends Destroyable> implements UIModel<T, Void> {
 
 
 	private void isColor(Destroyable item) {
-		IsColor iscolor = item.adapt(IsColor.class);
-		if (iscolor != null) iscolor.updateColor();
+		item.forceChanged(IsColor.COLOR);
 	}
 
 

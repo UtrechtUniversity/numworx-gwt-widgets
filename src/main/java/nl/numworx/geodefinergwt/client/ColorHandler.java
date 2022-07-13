@@ -56,9 +56,7 @@ public class ColorHandler extends EventHandler {
 					DefaultAdapter.getDefault(p).put(new FillStyle(a));
 					pstate.put("fill", a);
 				}
-				// shortcut
-				IsColor iscolor = p.adapt(IsColor.class);
-				if (iscolor != null) iscolor.updateColor();				
+				p.forceChanged(IsColor.COLOR);
 			}
 			getModel().clearSelection();
 		});

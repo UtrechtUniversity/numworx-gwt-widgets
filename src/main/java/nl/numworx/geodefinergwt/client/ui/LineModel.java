@@ -39,8 +39,7 @@ public class LineModel extends ColorModel<Destroyable> {
 	}
 
 	private void isLineType(Destroyable item) {
-		IsLineType linetype = item.adapt(IsLineType.class);
-		if (linetype != null) linetype.updateLineType();
+		item.forceChanged(IsLineType.LINE_TYPE);
 	}
 
   static public StrokeStyle getStroke(float f, LineType lineType) {

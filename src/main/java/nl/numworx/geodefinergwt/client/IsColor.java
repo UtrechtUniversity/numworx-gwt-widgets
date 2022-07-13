@@ -5,20 +5,11 @@ import javax.inject.Inject;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Label;
 import fi.euclides.model.math.Numbers;
-import fi.euclides.util.DefaultAdapter;
 import nl.numworx.geodefinergwt.client.ui.ColorStyle;
 
 public class IsColor extends nl.numworx.geodefiner.common.math.IsColor {
 
-	private Label label;
-	private IsColor chain;
-
 	@Inject IsColor() {
-	}
-
-	private IsColor(Label l, IsColor adapt) {
-		this.label = l;
-		this.chain = adapt;
 	}
 
 	@Override
@@ -41,18 +32,4 @@ public class IsColor extends nl.numworx.geodefiner.common.math.IsColor {
 		return getColorA(b);
 	}
 	
-	@Override
-	public boolean define(Label l) {
-		DefaultAdapter adapter = DefaultAdapter.getDefault(l.getDepend()[0]);
-		adapter.put(new IsColor(l, adapter.adapt(IsColor.class)));
-		adapter = DefaultAdapter.getDefault(l.getDepend()[1]);
-		adapter.put(new IsColor(l, adapter.adapt(IsColor.class)));
-		return super.define(l);
-	}
-
-	public void updateColor() {
-		test(label);
-		if (chain != null) chain.updateColor();
-	}
-
 }
