@@ -59,7 +59,7 @@ class HighLighter implements Visitor, MouseDownHandler, MouseUpHandler, MouseMov
 
 	private void thickerStroke() {
 		StrokeStyle s = widget.getStroke();
-		widget.setStroke(new StrokeStyle(s.lineWidth+1.0, s.dash));
+		widget.setStroke(new StrokeStyle(s.lineWidth+1.0, s.dash, 1.0));
 	}
 	
 	@Override

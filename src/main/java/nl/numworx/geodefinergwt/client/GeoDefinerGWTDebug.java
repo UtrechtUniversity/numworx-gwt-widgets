@@ -223,7 +223,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 				Tools.LINE,
 //				Tools.HALFLINE,
 //				Tools.SEGMENT,
-//				Tools.LINE_PALETTE,
+				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
 //				Tools.PARALLEL,

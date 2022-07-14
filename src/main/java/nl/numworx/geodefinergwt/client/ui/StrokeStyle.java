@@ -22,6 +22,10 @@ public class StrokeStyle implements SVGConstants {
 //	}
 
 	public StrokeStyle( double lw, double dash[]) {
+		this(lw, dash, lw);
+	}
+	
+	public StrokeStyle( double lw, double dash[], double scale) {
 		width = null;
 		dasharray = null;
 		lineWidth = lw;
@@ -29,12 +33,11 @@ public class StrokeStyle implements SVGConstants {
 			this.dash = null;
 		else {
 			this.dash = new double[dash.length];
-			for (int i = 0; i < dash.length; i++) this.dash[i] = lw * dash[i]; // Lineaire schaal
+			for (int i = 0; i < dash.length; i++) this.dash[i] = scale * dash[i]; // Lineaire schaal
 		}
 			
 	}
-	
-	
+
 	public void toStyle(OMSVGStyle style) {
 		if (width != null)
 			style.setSVGProperty(CSS_STROKE_WIDTH_PROPERTY, width);
