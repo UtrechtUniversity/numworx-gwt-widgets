@@ -17,6 +17,7 @@ import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.ui.AngleModel;
 import nl.numworx.geodefinergwt.client.ui.CircleModel;
+import nl.numworx.geodefinergwt.client.ui.DashModel;
 import nl.numworx.geodefinergwt.client.ui.LineModel;
 import nl.numworx.geodefinergwt.client.ui.PointModel;
 import nl.numworx.geodefinergwt.client.ui.SegmentModel;
@@ -103,5 +104,10 @@ public abstract class ShimModule {
 	@Provides @IntKey(Tools.TEXT) @IntoMap @Singleton static
 	UIShim<? extends Destroyable, Void> text(TextModel ui, Instance instance, Tracker tracker) {
 		return new UIShim<Label, Void>(ui, instance.getStateConfiguration(), tracker);
+	}
+	
+	@Provides @IntKey(Tools.LINE_PALETTE) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> linePalette(DashModel ui, Instance instance, Tracker tracker) {
+		return new UIShim<Destroyable, Void>(ui, instance.getStateConfiguration(), tracker);
 	}
 }

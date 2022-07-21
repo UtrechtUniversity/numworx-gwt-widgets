@@ -42,6 +42,7 @@ import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
+import nl.numworx.geodefinergwt.client.ui.DashModel;
 import nl.numworx.geodefinergwt.client.AddHoekPuntHandler;
 import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
 import nl.numworx.geodefinergwt.client.ColorHandler;
@@ -273,8 +274,9 @@ public class ToolBoxModule {
 		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_21(),null); //$NON-NLS-1$
 	}
     @Provides @IntKey(Tools.LINE_PALETTE) @IntoMap static
-    ToggleButton dashpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
-        EventHandler handler = new DashHandler(rb.ToolBoxModule_22(), instance.getStateConfiguration(), svg.linetype()); //$NON-NLS-1$
+    ToggleButton dashpalette(TrackerImpl tracker, RadioMode model, Instance instance, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+        DashModel dashmodel = (DashModel) shims.get(Tools.LINE_PALETTE).get().set(tracker);
+		EventHandler handler = new DashHandler(rb.ToolBoxModule_22(), instance.getStateConfiguration(), svg.linetype(), dashmodel); //$NON-NLS-1$
         return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_23(),null); //$NON-NLS-1$
     }
 	

@@ -13,6 +13,7 @@ import fi.euclides.event.EventHandler;
 import fi.euclides.model.Destroyable;
 import fi.euclides.util.DefaultAdapter;
 import nl.numworx.geodefiner.common.LineType;
+import nl.numworx.geodefinergwt.client.ui.DashModel;
 import nl.numworx.geodefinergwt.client.ui.LineModel;
 import nl.numworx.geodefinergwt.client.ui.StrokeStyle;
 
@@ -20,11 +21,13 @@ public class DashHandler extends EventHandler {
 
 	final private Map<String, Map<String, Object>> state;
 	final private LineTypeCss css;
+	final private DashModel model;
 
-	public DashHandler(String string, Map<String,Map<String,Object>> state, LineTypeCss css) {
+	public DashHandler(String string, Map<String,Map<String,Object>> state, LineTypeCss css, DashModel model) {
 		super(string);
 		this.state = state;
 		this.css = css;
+		this.model = model;
 	}
 
 	@Override
@@ -58,20 +61,24 @@ public class DashHandler extends EventHandler {
         String[] style = new String[] { css.SOLID(), css.DOTTED(), css.DASHED(), css.DASHDOTTED() };
         css.ensureInjected();
 		panel.setWidget(root);
-		root.setPixelSize(2*37+15, 4*37+15);
+		int n = 0;
 		for (int i = 0; i < 4; i++) {
-			FocusPanel p = new FocusPanel();
-			LineType color = LineType.values()[i];
-			p.setStyleName(style[i]);
-			root.add(p);
-			root.setWidgetTopHeight(p, 10+i*37, Unit.PX, 32, Unit.PX);
-			root.setWidgetLeftWidth(p, 10+0*37, Unit.PX, 64+5, Unit.PX);
-			p.addClickHandler(ev -> {
-				consumer.accept(color);
-				panel.hide();
-				getTracker().paint();
-			});
+			if (model.isSelected(i)) {
+				FocusPanel p = new FocusPanel();
+				LineType color = LineType.values()[i];
+				p.setStyleName(style[i]);
+				root.add(p);
+				root.setWidgetTopHeight(p, 10+n*37, Unit.PX, 32, Unit.PX);
+				root.setWidgetLeftWidth(p, 10+0*37, Unit.PX, 64+5, Unit.PX);
+				p.addClickHandler(ev -> {
+					consumer.accept(color);
+					panel.hide();
+					getTracker().paint();
+				});
+				n++;
+			}
 		}
+		root.setPixelSize(2*37+15, n*37+15);
 		panel.center();
 	}
 
