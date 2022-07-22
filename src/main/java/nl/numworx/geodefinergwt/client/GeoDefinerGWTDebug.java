@@ -268,6 +268,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		configs.set(Tools.CIRCLE_WITH_RADIUS, new HashMap<>(Collections.singletonMap("color", 0XFFFF8800)));
 		configs.set(Tools.TEXT, new HashMap<>(Collections.singletonMap("color", 0xFFFF0000)));
 		configs.set(Tools.ANGLE_POINT, new HashMap<>(Collections.singletonMap("color", 0xFFFFFF00)));
+		configs.set(Tools.LINE_PALETTE, new HashMap<>(Collections.singletonMap(LineType.DOTTED.name(), false)));
 		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
 		HashMap<String,Object> mm = new HashMap<>();
 		mm.put("color", 0xFF00FF00);
