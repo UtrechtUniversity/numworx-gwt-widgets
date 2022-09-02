@@ -128,7 +128,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		super.paint();
 	}
 
-	SnapperImpl snapper = new SnapperImpl();
+	SnapperDoubleImpl snapper = new SnapperDoubleImpl();
 	private StrokeStyle stroke;
 
     private Lazy<Tracer> tracerProvider = () -> null;
@@ -137,26 +137,48 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		down = false;
 		snapper.pmUp(x0, y0, id, this);
 	}
-	public void pmUp(int x, int y, int id) {
-		super.processMouseUp(x, y, id);
+	@Override
+	public void pmUp(Numbers x, Numbers y, int id) {
+		processMouseUp(x, y, id);
 	}
+
+	protected void processMouseUp(Numbers x, Numbers y, int id) {
+
+		x = Numbers.add(x, clipLeft());
+		y = Numbers.add(y, clipTop());
+		if (!isMoved())
+		{
+			getHandler().pointerClicked(x, y, getCtx(id));
+		}
+		getHandler().pointerReleased(x, y, getCtx(id));
+		paint();
+	}
+
 	@Override
 	public void processMouseDrag(int x0, int y0, int id) {
 		snapper.pmDrag(x0, y0, id, this);
 	}
-	public void pmDrag(int x, int y, int id) {
+	
+	@Override
+	public void pmDrag(Numbers x, Numbers y, int id) {
 		
         TrackerContext ctx = getCtx(id);
 		//if (ctx.getTrack() == null)
 		{
 		    Tracer t = tracerProvider.get();
 		    if (t != null) {
-		        ctx.getHitTester().setXY(x, y);
+		        ctx.getHitTester().setXY(x.doubleValue(), y.doubleValue());
 		        t.update(this, ctx);
 		    }
 		}
-        super.processMouseDrag(x, y, id);
+        processMouseDrag(x, y, id);
 		
+	}
+
+	protected void processMouseDrag(Numbers x, Numbers y, int id) {
+		setMoved(true);
+		getHandler().pointerDragged(Numbers.add(x, clipLeft()), Numbers.add(y, clipTop()), getCtx(id));
+		paint();
 	}
 
 	@Override

@@ -46,6 +46,7 @@ import fi.euclides.model.Locus;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
 import fi.euclides.model.Triangle;
+import fi.euclides.model.math.Numbers;
 import fi.euclides.proof.FlipFlop;
 import fi.euclides.util.Adapter;
 import fi.euclides.util.DefaultAdapter;
@@ -62,15 +63,18 @@ public class InstanceViewer extends SVGWidget implements PH {
 	public void processMouseUp(int x0, int y0, int id) {
 		snapper.pmUp(x0, y0, id, this);
 	}
-	public void pmUp(int x, int y, int id) {
-		super.processMouseUp(x, y, id);
+	@Override
+	public void pmUp(Numbers x, Numbers y, int id) {
+		super.processMouseUp(x.intValue(), y.intValue(), id);
 	}
 	@Override
 	public void processMouseDrag(int x0, int y0, int id) {
 		snapper.pmDrag(x0, y0, id, this);
 	}
-	public void pmDrag(int x, int y, int id) {
-		super.processMouseDrag(x, y, id);
+	
+	@Override
+	public void pmDrag(Numbers x, Numbers y, int id) {
+		super.processMouseDrag(x.intValue(), y.intValue(), id);
 	}
 
 	@Override
