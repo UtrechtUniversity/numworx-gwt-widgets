@@ -212,9 +212,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	public HashMap<String, Object> getState() {
 		HashMap<String, Object> hashMap = new HashMap<String, Object>();
 		logger.info("voor getState ");
+		fetchScore();
 		if (mode == OpdrNavIF.EINDTOETS||mode == OpdrNavIF.ZELFTOETS)
 		{
-			fetchScore();
 			if (mode == OpdrNavIF.EINDTOETS) {
 				if (!isNagekeken()) {
 					setAttempt();
