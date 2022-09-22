@@ -222,7 +222,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 				setNagekeken(true);
 			}
 		} else 
-			super.setNagekeken(true); // ommiddelijke feedback bij setState(map)
+			if (checkDWO != null && checkDWO.isCheck())
+				super.setNagekeken(true); // ommiddelijke feedback bij setState(map)
 		lognagekeken();
 		super.getState(hashMap);
 		if (volledigeBreedte) {
