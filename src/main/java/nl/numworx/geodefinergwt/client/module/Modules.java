@@ -33,6 +33,7 @@ import nl.numworx.geodefinergwt.client.DefinitionsGWT;
 import nl.numworx.geodefinergwt.client.GWTRandomizer;
 import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
 import nl.numworx.geodefinergwt.client.IsColor;
+import nl.numworx.geodefinergwt.client.IsLineType;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.toolbox.ShimModule;
 import nl.numworx.geodefinergwt.client.toolbox.ToolBoxModule;
@@ -73,6 +74,12 @@ public abstract class Modules {
 	@Binds
 	@IntoMap
 	@StringKey("geodefiner.color") abstract LabelDelegate isColor(IsColor delegate);
+	
+	@Binds
+	@IntoMap
+	@StringKey("geodefiner.linetype") abstract LabelDelegate isLineType(IsLineType delegate);
+	
+	
 	
 	@Provides static CheckObjectList checkObjectList(Tracker t, Expression e, Instance instance) {
 		CheckObjectList l = new CheckObjectList(t,e);
