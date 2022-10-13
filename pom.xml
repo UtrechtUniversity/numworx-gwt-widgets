@@ -166,7 +166,7 @@
 		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
-		<daggerVersion>2.11</daggerVersion>
+		<daggerVersion>2.42</daggerVersion>
 	</properties>
 	<scm>
 		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/trunk</developerConnection>
