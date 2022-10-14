@@ -314,7 +314,7 @@ public class DeeltaakBodyComponent extends ProgrammaComponent implements Paramet
 	protected void paintCommand(Context2d g)
 	{
 		g.setFont(WebLogoGWT.boldFontString);
-		g.setFillStyle(CssColor.make(0,0,0));
+		g.setFillStyle(CssColor.make(50,50,50));
 
 		// extra space above PopupPanel for input when editing
 		if ( isEditingName )
