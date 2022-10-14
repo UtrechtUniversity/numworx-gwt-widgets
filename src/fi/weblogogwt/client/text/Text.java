@@ -28,6 +28,8 @@ public interface Text extends ConstantsWithLookup {
 	String printlnTekst();
 	@DefaultStringValue("variabele")
 	String variabeleTekst();
+	@DefaultStringValue("input")
+	String inputTekst();
 	@DefaultStringValue("Herhaal")
 	String herhaal1Tekst();
 	@DefaultStringValue("herhaal")
