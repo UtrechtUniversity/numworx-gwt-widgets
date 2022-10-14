@@ -130,6 +130,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 	private CommandComponent printCC;
 	private CommandComponent printlCC;
 	private CommandComponent varCC;
+	private CommandComponent inputCC;
 	private CommandComponent herhaalCC;
 	private CommandComponent whileCC;
 	private CommandComponent keuzeCC;
@@ -355,9 +356,12 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 		printlCC = new PrintlCComponent(ccx2,ccy+150,ccsw,ccsh, this);
 		ccs.addElement(printlCC);
 		
-		varCC = new VarCComponent(ccx,ccy+190,cclw,ccsh, this);
+		varCC = new VarCComponent(ccx,ccy+180,cclw,ccsh, this);
 		ccs.addElement(varCC);
 	
+		inputCC = new VarInputComponent(ccx,ccy+210,cclw,ccsh, this);
+		ccs.addElement(inputCC);
+		
 		herhaalCC = new ForLoopCommandComponent(ccx,ccy+230,cclw,ccsh+10, this);
 		ccs.addElement(herhaalCC);
 		
@@ -493,6 +497,11 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 			ccs.addElement(varCC);
 		}
 		
+		if(cc == inputCC)
+		{ 	inputCC = new VarInputComponent(x,y,b,h, this);
+			ccs.addElement(inputCC);
+		}
+		
 		for(int i=0; i<aantalDeeltaken; i++)
 		{	if(cc == deeltaakCC[i])
 			{ 	deeltaakCC[i] = new DeeltaakCallCComponent((DeeltaakCallCComponent) cc, this);
@@ -515,11 +524,14 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 		printlCC.setLocation(printlCC.getX(), yLocation);
 		
 		if (printCC.isVisible())
-			yLocation += 40;
+			yLocation += 30;
 		else
 			yLocation += 10;
 		
 		varCC.setLocation(varCC.getX(), yLocation);
+		
+		yLocation += 30;
+		inputCC.setLocation(inputCC.getX(), yLocation);
 		
 		yLocation += 40;
 		herhaalCC.setLocation(herhaalCC.getX(), yLocation);
@@ -566,10 +578,11 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 	public void paintComponent(Context2d g)
 	{	
 		// white
-		g.setFillStyle(CssColor.make(255,255,255));
+		g.setFillStyle(CssColor.make(239,241,243));
 		g.fillRect(xPos,yPos,breedte,hoogte);
 		// light blue for pile part on the left 
 		g.setFillStyle(CssColor.make(205,230,255));
+		//g.setFillStyle(CssColor.make(200,200,200));
 		g.fillRect(xPos+4,yPos+4,172,hoogte-8);
 
 		// paint all CC's starting from the end of the Vector!!
