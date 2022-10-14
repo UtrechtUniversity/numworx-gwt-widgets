@@ -39,7 +39,7 @@ public abstract class SimpleCommandComponent extends CommandComponent
 		g.fillRect(xPos,yPos,getSize().width-1,getSize().height-1);
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		g.strokeRect(xPos,yPos,getSize().width-1,getSize().height-1);
-		g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
+		//g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
 	}
 	
 	/**
