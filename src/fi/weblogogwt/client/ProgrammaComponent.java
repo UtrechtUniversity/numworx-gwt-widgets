@@ -259,7 +259,7 @@ public class ProgrammaComponent extends CompositeCommandComponent
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		// header border
 		g.strokeRect(xPos+0,yPos+0,getWidth()-1,headerHeight);
-		g.strokeRect(xPos+1,yPos+1,getWidth()-3,headerHeight-2);
+		//g.strokeRect(xPos+1,yPos+1,getWidth()-3,headerHeight-2);
 		// always draw a line at the bottom, so the PC won't be 'open' when scrolling
 		g.beginPath();
 		g.moveTo(xPos+0, yPos+getHeight()-1);
@@ -319,7 +319,7 @@ public class ProgrammaComponent extends CompositeCommandComponent
 	protected void paintCommand(Context2d g)
 	{
 		g.setFont(WebLogoGWT.boldFontString);
-		g.setFillStyle(CssColor.make(0,0,0));
+		g.setFillStyle(CssColor.make(50,50,50));
 		g.fillText(defaultName,xPos+10,yPos+18);
 	}
 
@@ -356,12 +356,32 @@ public class ProgrammaComponent extends CompositeCommandComponent
 		for(int i=0 ; i<commandBlock.getComponentCount() ; i++)
 		{	Object c = commandBlock.getComponent(i);
 			if (c instanceof CommandComponent)
-			{	boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
+			{	
+				if (c instanceof VarInputComponent) {
+					((VarInputComponent)c).preExecute(this, trb, ub, varSet);
+					restartPlace = i;
+					break;
+				}
+				boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
 				if (tracekleur) return true;
 			}
 		}
 		return false;
 	}	
+	
+	int restartPlace = 0;
+	
+	public boolean resumeExecuteContent(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
+	{	
+		for(int i=restartPlace ; i<commandBlock.getComponentCount() ; i++)
+		{	Object c = commandBlock.getComponent(i);
+			if (c instanceof CommandComponent)
+			{	boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
+				if (tracekleur) return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * execute method for this ProgrammaComponent; redefined for DeeltaakBodyComponent  
