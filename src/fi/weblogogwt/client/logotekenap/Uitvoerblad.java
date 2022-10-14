@@ -1,6 +1,9 @@
 package fi.weblogogwt.client.logotekenap;
 
 import com.google.gwt.user.client.ui.LayoutPanel;
+
+import fi.weblogogwt.client.VarInputComponent;
+
 import com.google.gwt.canvas.client.Canvas;
 
 /**
@@ -37,6 +40,10 @@ public abstract class Uitvoerblad extends LayoutPanel
 	public abstract void printl(String s);
 	
 	public abstract void print(String s);
+	
+	public abstract String input(String s);
+	
+	public abstract void prepareInput(VarInputComponent vic, String s);
 	
  	public abstract void initializeDrawing(boolean b);
  	
