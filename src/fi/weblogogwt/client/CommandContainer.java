@@ -473,12 +473,12 @@ public class CommandContainer
 	 */
 	protected void paintComponent(Context2d g)
 	{	// yellowish background	
-		g.setFillStyle(CssColor.make(238,238,170));
+		g.setFillStyle(CssColor.make(255,255,220));
 		g.fillRect(xPos+1,yPos+1,getSize().width-1,getSize().height-1);
 		// outline in black
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		g.strokeRect(xPos,yPos,getSize().width-1,getSize().height-1);
-		g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
+		//g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
 		if(caretUp)
 		{	
 			g.setStrokeStyle(CssColor.make(0,255,0));
