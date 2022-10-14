@@ -1,6 +1,10 @@
 package fi.weblogogwt.client.logotekenap;
 
+import fi.weblogogwt.client.InputTextField;
+import fi.weblogogwt.client.ParameterEditorListener;
+import fi.weblogogwt.client.ParameterTextField;
 import fi.weblogogwt.client.Polygon;
+import fi.weblogogwt.client.VarInputComponent;
 import fi.weblogogwt.client.WebLogoGWT;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -18,7 +22,7 @@ import com.google.gwt.dom.client.Style;
  * links(degrees) and rechts(degrees) are relative to the to the turtle (cursor) direction;        
  *
  */
-public class Tekenblad extends Uitvoerblad
+public class Tekenblad extends Uitvoerblad implements ParameterEditorListener
 {
 	/**
 	 * width and height of drawing area
@@ -94,6 +98,11 @@ public class Tekenblad extends Uitvoerblad
 	 * Canvas for drawing upon
 	 */
 	Canvas tekenbladCanvas;
+	
+	InputTextField inputEditor = new InputTextField(50, 25, this);
+	String inputString = "";
+	VarInputComponent varInputComponent;
+	
 		
 	/**
 	 * constructor
@@ -449,6 +458,29 @@ public class Tekenblad extends Uitvoerblad
 		consoleX = consoleStartX;
 		consoleY = consoleY+16;
 	}
+	
+	/**
+	 * input String s at the current console position
+	 * and start a new line
+	 */
+	public String input(String s)
+	{
+		return inputString;
+	}
+	
+	public void prepareInput(VarInputComponent vic,  String s)
+	{
+		varInputComponent = vic;
+		printConsole(s);
+		TextMetrics tm = gIm.measureText(s);
+		int width = (int) Math.round(tm.getWidth());
+		consoleY = consoleY+16;
+		inputEditor.setPopupPosition(this.getAbsoluteLeft()+consoleX+ width, consoleY-16);
+		inputEditor.show();
+		inputEditor.textBox.setText("");
+		inputEditor.textBox.setFocus(true);
+		
+	}
 
 	/**
 	 * print String s at the current console position
@@ -530,6 +562,19 @@ public class Tekenblad extends Uitvoerblad
 
 		else
 			return CssColor.make(0, 0, 0);
+	}
+
+	@Override
+	public void parameterEdited(String text) {
+		inputString = inputEditor.getText();
+		inputEditor.hide();
+		varInputComponent.execute(this);
+	}
+
+	@Override
+	public void parameterComponentClicked(int x, int y) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
