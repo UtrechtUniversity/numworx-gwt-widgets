@@ -248,13 +248,13 @@ public abstract class LoopCommandComponent extends CompositeCommandComponent imp
 		} 
 		else
 		{	// orange
-			g.setFillStyle(CssColor.make(255, 127, 0));
+			g.setFillStyle(CssColor.make(255, 200, 0));
 		}	
 		g.fillRect(xPos+0,yPos+0,getSize().width-1,getSize().height-1);
 		// black;
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		g.strokeRect(xPos+0,yPos+0,getSize().width-1,getSize().height-1);
-		g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
+		//g.strokeRect(xPos+1,yPos+1,getSize().width-3,getSize().height-3);
 	}
 
 	/**
