@@ -126,8 +126,8 @@ public class DeeltaakCallCComponent extends ParameterCommandComponent
 	protected void paintBackground(Context2d g)
 	{
 		super.paintBackground(g);
-		g.strokeRect(xPos+5,yPos+1,getSize().width-11,getSize().height-1);
-		g.strokeRect(xPos+6,yPos+1,getSize().width-13,getSize().height-3);
+		g.strokeRect(xPos+5,yPos,getSize().width-11,getSize().height-1);
+		//g.strokeRect(xPos+6,yPos+1,getSize().width-13,getSize().height-3);
 	}
 
 	/**
