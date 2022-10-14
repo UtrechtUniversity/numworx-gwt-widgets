@@ -397,7 +397,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 	protected void paintBackground(Context2d g)
 	{
 		//orange
-		g.setFillStyle(CssColor.make(255, 127, 0));
+		g.setFillStyle(CssColor.make(255, 200, 0));
 		if (traceKleur)
 		{	g.setFillStyle(traceActiveColor);
 		}
@@ -405,7 +405,7 @@ public class KeuzeCommandComponent extends CompositeCommandComponent implements 
 		// black border
 		g.setStrokeStyle(CssColor.make(0,0,0));
 		g.strokeRect(xPos+0, yPos+0, getSize().width-1, getSize().height-1);
-		g.strokeRect(xPos+1, yPos+1, getSize().width-3, getSize().height-3);
+		//g.strokeRect(xPos+1, yPos+1, getSize().width-3, getSize().height-3);
 		// Als/If
 		g.setFont(WebLogoGWT.fontString);
 		g.setFillStyle(CssColor.make(0,0,0));
