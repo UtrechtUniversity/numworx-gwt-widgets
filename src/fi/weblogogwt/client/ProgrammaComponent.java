@@ -8,6 +8,9 @@ import fi.weblogogwt.client.WebLogoGWT;
 import fi.weblogogwt.client.VarSet;
 
 import com.google.gwt.canvas.dom.client.CssColor;
+
+import java.util.logging.Logger;
+
 import com.google.gwt.canvas.dom.client.Context2d;
 
 /**
@@ -20,6 +23,8 @@ import com.google.gwt.canvas.dom.client.Context2d;
 
 public class ProgrammaComponent extends CompositeCommandComponent 
 {	
+	private final static Logger logger = Logger.getLogger("ProgrammaComponent");
+	
 	/**
 	 * fixed for ProgrammaComponent, editable for DeeltaakBodyComponent
 	 */
@@ -352,18 +357,20 @@ public class ProgrammaComponent extends CompositeCommandComponent
 	 * @return true if succeeded
 	 */
 	public boolean executeContent(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
-	{	
+	{	restartPlace = 0;
 		for(int i=0 ; i<commandBlock.getComponentCount() ; i++)
 		{	Object c = commandBlock.getComponent(i);
 			if (c instanceof CommandComponent)
 			{	
 				if (c instanceof VarInputComponent) {
-					((VarInputComponent)c).preExecute(this, trb, ub, varSet);
-					restartPlace = i;
-					break;
+					boolean tracekleur = ((VarInputComponent)c).preExecute(this, trb, ub, varSet);
+					restartPlace = i+1;
+					return traceKleur;
 				}
-				boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
-				if (tracekleur) return true;
+				else {
+					boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
+					if (tracekleur) return true;
+				}
 			}
 		}
 		return false;
@@ -372,12 +379,20 @@ public class ProgrammaComponent extends CompositeCommandComponent
 	int restartPlace = 0;
 	
 	public boolean resumeExecuteContent(TraceBeheerder trb, Uitvoerblad ub, VarSet varSet)
-	{	
+	{	logger.info("resumeExecuteContent");
 		for(int i=restartPlace ; i<commandBlock.getComponentCount() ; i++)
 		{	Object c = commandBlock.getComponent(i);
 			if (c instanceof CommandComponent)
-			{	boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
-				if (tracekleur) return true;
+			{	
+				if (c instanceof VarInputComponent) {
+					boolean tracekleur = ((VarInputComponent)c).preExecute(this, trb, ub, varSet);
+					restartPlace = i+1;
+					return traceKleur;
+				}
+				else {
+					boolean tracekleur = ((CommandComponent)c).execute(trb, ub, varSet);
+					if (tracekleur) return true;
+				}
 			}
 		}
 		return false;
