@@ -34,6 +34,11 @@ public class VarSet
 	 */
 	private ArrayList<TAVariable> variabelen;
 	/**
+	 * List of all string variables. New stringvariables will be added to the end, so the list will be ordered
+	 * with respect to the level that we're in.
+	 */
+	private ArrayList<StringVariable> stringVariabelen;
+	/**
 	 * Descriptions associated with each level, such as 'In Deeltaak vierkant'.
 	 * this array is used as a stack
 	 */
@@ -45,13 +50,14 @@ public class VarSet
 	public VarSet()
 	{	
 		variabelen = new ArrayList<TAVariable>();
+		stringVariabelen = new ArrayList<StringVariable>();
 		level = 0;
 		levelOfCurrentDeeltaak = 0;
 		deeltaaklevels = new int[100];
 		for ( int i=0; i<100; i++ )
 			deeltaaklevels[i] = 0;
 		levelDescriptions = new String[100];
-		levelDescriptions[0] = "Tekenalgoritme";
+		levelDescriptions[0] = "Algoritme";
 	}
 	
 	/**
@@ -90,6 +96,14 @@ public class VarSet
 			{	it.remove();
 			}
 		}
+		Iterator<StringVariable> sit = stringVariabelen.iterator();
+		while ( sit.hasNext() )
+		{
+			StringVariable tav = sit.next();
+			if ( tav.getLevel()==level )
+			{	sit.remove();
+			}
+		}
 		level--;
 		levelOfCurrentDeeltaak = deeltaaklevels[level];
 	}
@@ -104,6 +118,11 @@ public class VarSet
 	private boolean isVarVisible(TAVariable tav)
 	{
 		return ( tav.getLevel() >= levelOfCurrentDeeltaak ||  tav.getLevel()==0 );
+	}
+	
+	private boolean isVarVisible(StringVariable sv)
+	{
+		return ( sv.getLevel() >= levelOfCurrentDeeltaak ||  sv.getLevel()==0 );
 	}
 
 	/**
@@ -124,6 +143,23 @@ public class VarSet
 				if ( isVarVisible(tav) )
 				{
 					return variabelen.get(i);
+				} 
+			}
+		}
+		return null;
+	}
+	
+	private StringVariable findStringVariable(String s)
+	{
+		StringVariable sv;
+		for ( int i=stringVariabelen.size()-1; i>=0; i-- )
+		{
+			sv = stringVariabelen.get(i);
+			if (s.equals(sv.getName()) ) 
+			{
+				if ( isVarVisible(sv) )
+				{
+					return stringVariabelen.get(i);
 				} 
 			}
 		}
@@ -153,6 +189,22 @@ public class VarSet
 		}
 	}
 	
+	public void setStringVar(String varName, String value)
+	{	
+		if( value.startsWith("§") )
+		{	
+			StringVariable sv = findStringVariable(varName);
+			if ( sv == null )
+			{
+				stringVariabelen.add(new StringVariable(varName, value, level));
+			} 
+			else
+			{
+				sv.setValue(value);
+			}
+		}
+	}
+	
 	/**
 	 * Add a variable to the varset that is a parameter. Parameters are 'call by value',
 	 * so a value is added, not an expression!
@@ -162,6 +214,11 @@ public class VarSet
 	public void setParameter(String varName, double value)
 	{
 		variabelen.add(new TAVariable(varName, value, level));
+	}
+	
+	public void setStringParameter(String varName, String value)
+	{
+		stringVariabelen.add(new StringVariable(varName, value, level));
 	}
 	
 	/**
