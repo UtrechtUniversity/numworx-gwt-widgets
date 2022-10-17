@@ -96,7 +96,7 @@ public class VarInputComponent extends SimpleCommandComponent implements Paramet
 		if ( editingName )
 		{
 			varnaamParam.setParameter(text);
-			commandName = varnaamParam.getParameterText();
+			commandName = text + " = input( " + waarde.getParameterText() + " )";
 			editingName = false;
 			schuifveld.jlsvContext2d.setFont(WebLogoGWT.fontString);
 			tm = schuifveld.jlsvContext2d.measureText(varnaamParam.getParameterText()+equalsString);
@@ -106,7 +106,7 @@ public class VarInputComponent extends SimpleCommandComponent implements Paramet
 		else if ( editingValue )
 		{
 			waarde.setParameter(text);
-			commandName = varnaamParam.getParameterText();
+			commandName = varnaamParam.getParameterText() + " = input( " + text + " )";
 			editingValue = false;
 		}
 		// remove PopupPanel for editing
@@ -208,7 +208,10 @@ public class VarInputComponent extends SimpleCommandComponent implements Paramet
 		tm = schuifveld.jlsvContext2d.measureText(varnaamParam.getParameterText()+equalsString);
 		int width = (int) Math.round(tm.getWidth());
 		separatorX = 10+width; 
-		waarde.setParameter(exp);
+		
+		String expClean = exp.substring(exp.indexOf("(")+1, exp.indexOf(")"));
+		waarde.setParameter(expClean.trim());
+		commandName = varnaamParam.getParameterText() + " = input( " + waarde.getParameterText() + " )";
 	}
 	
 	/**
@@ -241,11 +244,22 @@ public class VarInputComponent extends SimpleCommandComponent implements Paramet
 		return traceKleur;
 	}
 	
-	public void preExecute(ProgrammaComponent pc, TraceBeheerder trb, Uitvoerblad ub, VarSet varSet) {
+	public void resumeExecute(Uitvoerblad ub)
+	{
+		pc.resumeExecuteContent(trb, ub, varSet);
+	}
+	
+	public boolean preExecute(ProgrammaComponent pc, TraceBeheerder trb, Uitvoerblad ub, VarSet varSet) {
 		this.pc = pc;
 		this.trb = trb;
 		this.varSet = varSet;
 		ub.prepareInput(this,((TextParameter)waarde).getValueText());
+		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
+		if ( traceKleur ) 
+		{	trb.setCommandInfo(varnaamParam.getParameterText()+" = ", varSet);
+		}
+		return traceKleur;
 	}
 	
 	/**
@@ -311,7 +325,7 @@ public class VarInputComponent extends SimpleCommandComponent implements Paramet
 	}
 	
 	public String getCode(String tab)
-	{	String s = tab + varnaamParam.getParameterText()+equalsString+waarde.getParameterText() + "\n";
+	{	String s = tab + varnaamParam.getParameterText()+equalsString+"input( "+waarde.getParameterText()+" )" + "\n";
 		return s;
 	}	
 }
