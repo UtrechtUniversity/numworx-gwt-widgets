@@ -568,7 +568,12 @@ public class Tekenblad extends Uitvoerblad implements ParameterEditorListener
 	public void parameterEdited(String text) {
 		inputString = inputEditor.getText();
 		inputEditor.hide();
+		consoleX = 200;
+		printConsole(inputString);
+		consoleY = consoleY+16;
+		consoleX = consoleStartX;
 		varInputComponent.execute(this);
+		varInputComponent.resumeExecute(this);
 	}
 
 	@Override
