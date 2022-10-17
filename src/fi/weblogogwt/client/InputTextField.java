@@ -122,7 +122,7 @@ public class InputTextField extends PopupPanel
 	{
 		public void onClose(CloseEvent<PopupPanel> e)
 		{
-			owner.parameterEdited(getText());
+			//owner.parameterEdited(getText());
 		}
 	}
 	
