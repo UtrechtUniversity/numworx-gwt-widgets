@@ -58,7 +58,7 @@ public class Identifier extends TAParameter
      */
     private boolean isUnicodeIdentifierStart(char ch)
     {
-    	return (Character.isLetter(ch) == true); // || (Character.getType(ch) == Character.LETTER_NUMBER); 
+    	return (Character.isLetter(ch) == true || ch=='§'); // || (Character.getType(ch) == Character.LETTER_NUMBER); 
     }
 
     /**
