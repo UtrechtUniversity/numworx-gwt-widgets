@@ -515,9 +515,17 @@ public class ProgrammaImporter
 		String[] params = StringUtils.split(codeline,"=");
 		if ( params.length > 1)
 		{
-			cc = new VarCComponent(-100,-100,25,25, veld);
-			cc.clearStapel();
-			((VarCComponent)cc).setVariable(params[0], params[1]);
+			if(params[1].startsWith(" input")) {
+				cc = new VarInputComponent(-100,-100,25,25, veld);
+				cc.clearStapel();
+				((VarInputComponent)cc).setVariable(params[0], params[1]);
+			}
+			else {
+				cc = new VarCComponent(-100,-100,25,25, veld);
+				cc.clearStapel();
+				((VarCComponent)cc).setVariable(params[0], params[1]);
+			}
+			
 		}		
 		return cc;
 	}
