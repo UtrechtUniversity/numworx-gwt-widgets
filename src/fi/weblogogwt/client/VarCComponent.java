@@ -24,6 +24,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 	 * Expression evaluating to the value of the variable
 	 */
 	private NumericParameter waarde;
+	private String stringWaarde;
 	/**
 	 * variable name
 	 */
@@ -205,6 +206,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		int width = (int) Math.round(tm.getWidth());
 		separatorX = 10+width; 
 		waarde.setParameter(exp);
+		stringWaarde = exp;
 	}
 	
 	/**
@@ -219,6 +221,10 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		// determine the correctness of the expression for real, with the current varSet!
 		if ( !(varnaamParam.isCorrect()  && waarde.isCorrect(varSet)) ) 
 			return false; 
+		if(varnaamParam.getParameterText().startsWith("§"))
+			varSet.setStringVar(varnaamParam.getParameterText(), stringWaarde);	
+		else
+			varSet.setStringVar(varnaamParam.getParameterText(), stringWaarde);	
 		varSet.setVar(varnaamParam.getParameterText(), waarde.getExpressie());		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
 		if (traceKleur) traceKleurCnt = 0;
