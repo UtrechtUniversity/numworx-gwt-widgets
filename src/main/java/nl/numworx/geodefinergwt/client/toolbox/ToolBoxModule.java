@@ -13,7 +13,6 @@ import dagger.Provides;
 import dagger.multibindings.IntKey;
 import dagger.multibindings.IntoMap;
 import fi.euclides.event.AddBissectriceHandler;
-import fi.euclides.event.AddBoogHandler;
 import fi.euclides.event.AddBoogHandler2;
 import fi.euclides.event.AddFocusHandler;
 import fi.euclides.event.AddKegelsnedeHandler;
@@ -38,6 +37,7 @@ import nl.numworx.geodefiner.common.Definitions;
 import nl.numworx.geodefiner.common.FilteredDestroyHandler;
 import nl.numworx.geodefiner.common.HoekHandler;
 import nl.numworx.geodefiner.common.Instance;
+import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
@@ -127,6 +127,34 @@ public class ToolBoxModule {
     return btn;
   }
   
+  private static ToggleButton newSegmentBtn(EventHandler h, TrackerImpl tracker, RadioMode model,  UIShim<? extends Destroyable, Void> shim) {
+	  	DataResource r = svg.lijnstuk_svg();
+	  	DataResource r_active = svg.lijnstuk_active_svg();
+	  	String t = rb.Euclides_48();
+	  	Map<String, Object> map = shim.toMap();
+	  	if (map != null && Tips.ATEND.name().equals(map.get("tip"))) // iets met map
+	  	{
+	  		r = svg.vector_svg();
+	  		r_active = svg.vector_active_svg();
+	  		t = rb.ToolBoxModule_15();
+	  	}
+
+	  	ToggleButton btn;
+	    btn = new ToggleButton();
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+	    Image image = new Image(r.getSafeUri());
+	    image.setPixelSize(32, 39);
+	    btn.getUpFace().setImage(image);
+	    image = new Image(r_active.getSafeUri());
+	    image.setPixelSize(32, 39);
+	    btn.getDownFace().setImage(image);
+	    if (t != null) btn.setTitle(t);
+	    btn.addClickHandler(new Action(h, tracker, btn, model, shim));
+	    return btn;
+	  }
+
+  
+  
 
 	@Provides @IntKey(Tools.DESTROY) @IntoMap static
 	ToggleButton destroy(TrackerImpl tracker, RadioMode model, Instance instance) {
@@ -145,8 +173,9 @@ public class ToolBoxModule {
 	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
 	ToggleButton segment(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.SEGMENT).get();
-		return newSBtn(svg.lijnstuk_svg(),svg.lijnstuk_active_svg(), new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model,rb.Euclides_48(),shim);
+		return newSegmentBtn(new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model, shim);
 	}
+	
 	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
 	ToggleButton halfline(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.HALFLINE).get();

@@ -240,8 +240,8 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 			Provider<ToggleButton> provider = buttons.get(n);
 			if(provider != null)
 			{
-				btn = provider.get();
-				installConfig(n, config, shims);
+				installConfig(n, config, shims); // this order
+				btn = provider.get();			 // link to shims
 			}
 			if(btn != null)	panel.add(btn);
 		}

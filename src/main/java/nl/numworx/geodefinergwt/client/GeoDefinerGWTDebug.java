@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import nl.numworx.geodefiner.common.LineType;
 import nl.numworx.geodefiner.common.PointType;
 import nl.numworx.geodefiner.common.Snapper;
+import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefiner.common.Tools;
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
 import nl.uu.fi.dwo.interaction.client.FormuleEditorIF;
@@ -222,7 +223,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 				Tools.POINT,
 				Tools.LINE,
 //				Tools.HALFLINE,
-//				Tools.SEGMENT,
+				Tools.SEGMENT,
 				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
@@ -271,8 +272,9 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		configs.set(Tools.LINE_PALETTE, new HashMap<>(Collections.singletonMap(LineType.DOTTED.name(), false)));
 		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
 		HashMap<String,Object> mm = new HashMap<>();
-		mm.put("color", 0xFF00FF00);
-		mm.put("width", 0.5);
+		mm.put("color", 0xFF00AF00);
+		mm.put("width", 4.5);
+		//mm.put("tip", Tips.ATSTART.name());
 		configs.set(Tools.SEGMENT, mm );
 
 		mm = new HashMap<String,Object>(configs.get(Tools.CIRCLE));
