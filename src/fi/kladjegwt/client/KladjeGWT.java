@@ -812,8 +812,7 @@ public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, 
 	{
 		if(scoreMax==0)
 			return Boolean.TRUE;
-		return
-				Boolean.FALSE;
+		return null; // nakijken door docent!
 	}
 
 	@Override
