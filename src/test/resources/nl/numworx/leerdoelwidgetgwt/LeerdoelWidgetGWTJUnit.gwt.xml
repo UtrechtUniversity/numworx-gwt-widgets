@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module rename-to="LeerdoelWidgetGWT">
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT' />
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/LeerdoelWidgetGWT/greet" class="nl.numworx.leerdoelwidgetgwt.server.GreetingServiceImpl" />
+
+</module>
