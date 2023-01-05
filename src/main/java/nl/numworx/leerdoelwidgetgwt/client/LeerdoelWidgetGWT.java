@@ -9,15 +9,22 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.fusesource.restygwt.client.Defaults;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
+import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import fi.dwo.gwt.lib.rest.DwoConstants;
 import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -38,7 +45,7 @@ import nl.uu.fi.dwo.rest.persistence.PersistenceId;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub {
+public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter {
 
 	OpdrNavIF root;
 	private int height;
@@ -76,6 +83,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		DwoConstants constants = GWT.create(DwoConstants.class);
+		Defaults.setServiceRoot(constants.server());
+	    Defaults.setDispatcher(DefaultFilterawareDispatcher.singleton());
+    	DefaultFilterawareDispatcher.singleton().addFilter(this);
 		panel = RootLayoutPanel.get();
 		Stub.publish(this);
 	}
@@ -120,8 +131,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub {
 		methods = MethodManager.student(); // of teacher! 
 		SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
 		profile = new DomDwoProfileId();
-		profile.setId(new PersistenceId("MYSQL:PersistenceProfile;77")); // from context
-		DomSchoolClass schoolclass = new DomSchoolClass();
+		profile.setId(new PersistenceId("MYSQL:PersistenceDwoProfile;77")); // from context
+		DomSchoolClass schoolclass = null;
 		
 		Promise<DomMethod> m = methods.getMethod(context, activeMethod, profile);
 		Promise<DomStudentModelContext4Student> p;
@@ -246,5 +257,11 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub {
 			result.add(list.getInt(i));
 		}
 		return result;
+	}
+
+	@Override
+	public boolean filter(Method method, RequestBuilder builder) {
+		builder.setHeader("Authorization", root.getContext().getString("Authorization"));
+		return true;
 	}
 }

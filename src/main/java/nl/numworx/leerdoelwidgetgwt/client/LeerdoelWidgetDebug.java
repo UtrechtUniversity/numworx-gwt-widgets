@@ -3,7 +3,12 @@ package nl.numworx.leerdoelwidgetgwt.client;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.fusesource.restygwt.client.Defaults;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
+
 import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
@@ -23,7 +28,11 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public void onModuleLoad() {
-		HashMap data = new HashMap();
+		Defaults.setServiceRoot("/dwo/rest/");
+	    Defaults.setDispatcher(DefaultFilterawareDispatcher.singleton());
+    	DefaultFilterawareDispatcher.singleton().addFilter(this);
+
+    	HashMap data = new HashMap();
 		int w = 400;
 		int h = 400;
 		init(w, h, data, Collections.emptyMap());
@@ -132,6 +141,11 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 		return null;
 	}
 
+	@Override
+	public boolean filter(Method method, RequestBuilder builder) {
+		builder.setHeader("Authorization", "Basic test:test");
+		return true;
+	}
 	
 	
 }
