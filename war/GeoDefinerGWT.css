@@ -79,7 +79,7 @@ body {
 .check .gwt-Button.kijkna, .reset .gwt-Button {
 	background-color: #1b75bb;
 	border: 2px #1b75bb solid;
-	border-radius: 4px;
+	border-radius: 0px;
 	text-align: center;
 	padding: 3px 6px;
 	color: white;

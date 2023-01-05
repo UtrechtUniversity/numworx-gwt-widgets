@@ -84,7 +84,10 @@ public class LineModel extends ColorModel<Destroyable> {
 	  super.fromLightMap(value);
 	  StrokeStyle s = item.adapt(StrokeStyle.class);
 	  if (s == null) s = new StrokeStyle(1.0, null);
-	  width = (float) s.lineWidth;
+	  if (value.containsKey("width"))
+		  width = (float) value.getDouble("width");
+	  else
+		  width = (float) s.lineWidth;
 
 	  if (value.containsKey("type")) 
 		  type = LineType.valueOf(value.getString("type"));
