@@ -9,7 +9,7 @@
   <artifactId>LeerdoelWidgetGWT</artifactId>
   <packaging>${packaging}</packaging>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Maven Archetype for GWT</name>
+  <name>Leerdoel Widget GWT</name>
 
   <properties>
     <!-- Convenience property to set the GWT version -->
@@ -21,7 +21,14 @@
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <allowSnapshots>true</allowSnapshots>
-    <packaging>gwt-app</packaging>
+    <packaging>war</packaging>
+    <gwtModule>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT</gwtModule>
+	<runTarget>${project.artifactId}.html</runTarget>
+	<context.xml>context8.xml</context.xml>
+    <tomcat7.version>7.0.76</tomcat7.version>
+    <local.dwo>/dwo</local.dwo>
+    <DWOServerVersion>2.5.18-SNAPSHOT</DWOServerVersion>
+    <gwt.style>PRETTY</gwt.style>
   </properties>
 
   <dependencyManagement>
@@ -76,16 +83,19 @@
     		<artifactId>DWOGwtClient</artifactId>
 			<version>2.5.18-SNAPSHOT</version>
 			<classifier>classes</classifier>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
 			<version>2.5.18-SNAPSHOT</version>
 			<classifier>sources</classifier>
+			<scope>provided</scope>
 		</dependency>
   </dependencies>
 
   <build>
+    <finalName>${project.artifactId}</finalName>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -138,28 +148,177 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>net.ltgt.gwt.maven</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <configuration>
-          <moduleName>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT</moduleName>
-          <moduleShortName>leerdoelwidgetgwt</moduleShortName>
-          <style>PRETTY</style>
-          <attachClasses>true</attachClasses>
-        </configuration>
-      </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>${gwt.version}</version>
+				<configuration>
+					<module>${gwtModule}</module>
+					<runTarget>${runTarget}</runTarget>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+					<extraJvmArgs>-Xms768m -Xmx2048m</extraJvmArgs>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+<!--							<goal>i18n</goal>-->
+							<goal>compile</goal>
+<!--							<goal>test</goal>-->
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+
+
       <plugin> <!-- attach-sources voor GWT -->
       	<groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>         
-      
+           <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <server>TomcatServer</server>
+                    <path>/</path>
+                    <systemProperties>
+                    	<CDN_HOST>localhost:8082</CDN_HOST>
+                    	<DWO_ENV>test</DWO_ENV>                   
+                    </systemProperties>
+                    <warSourceDirectory>target/${project.artifactId}-${project.version}</warSourceDirectory>
+					<contextFile>src/test/tomcat/${context.xml}</contextFile>
+                    <webapps>
+                        <webapp>
+                            <groupId>nl.uu.fi.dwo</groupId>
+                            <artifactId>DWOServer</artifactId>
+                            <version>${DWOServerVersion}</version>
+                            <type>war</type>    
+                            <asWebapp>true</asWebapp> 
+                            <contextPath>${local.dwo}</contextPath>
+                            <contextFile>src/test/tomcat/${context.xml}</contextFile>
+                        </webapp>
+                  </webapps>                         
+                </configuration> 
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>5.1.49</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-core</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-util</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-coyote</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-api</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-jdbc</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-dbcp</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-servlet-api</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-jsp-api</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-jasper</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-jasper-el</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-el-api</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-catalina</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-tribes</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-catalina-ha</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-annotations-api</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat</groupId>
+                        <artifactId>tomcat-juli</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+
+                    <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-logging-juli</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.tomcat.embed</groupId>
+                        <artifactId>tomcat-embed-logging-log4j</artifactId>
+                        <version>${tomcat7.version}</version>
+                    </dependency>                                
+                </dependencies>
+            </plugin>            
+     
     </plugins>
   </build>
 <profiles>
 	<profile>
 		<id>debug</id>
 		<properties>
-			<packaging>gwt-lib</packaging>
 		</properties>
 	</profile>
 </profiles>

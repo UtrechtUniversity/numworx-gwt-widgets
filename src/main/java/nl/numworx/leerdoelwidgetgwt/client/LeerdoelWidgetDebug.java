@@ -9,6 +9,7 @@ import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import nl.uu.fi.dwo.interaction.client.FormuleClipboardIF;
@@ -19,6 +20,9 @@ import nl.uu.fi.dwo.interaction.client.Role;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.rest.dom.entities.DomHasRole;
+import nl.uu.fi.dwo.rest.persistence.PersistenceClassType;
+import nl.uu.fi.dwo.rest.persistence.PersistenceId;
 
 public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF {
 
@@ -33,6 +37,13 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
     	DefaultFilterawareDispatcher.singleton().addFilter(this);
 
     	HashMap data = new HashMap();
+    	data.put("activeMethod", "LOCAL;none;Getal&Ruimte");
+    	data.put("studentModelID", "MYSQL;" + PersistenceClassType.PersistentStudentModelContext.name() + ";1");
+    	data.put("filter", Collections.emptyMap());
+    	data.put("dwoProfileID", "MYSQL;" + PersistenceClassType.PersistentDwoProfile.name() + ";77");
+    	panel = RootLayoutPanel.get();
+    	
+    	
 		int w = 400;
 		int h = 400;
 		init(w, h, data, Collections.emptyMap());
@@ -131,13 +142,12 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public ObjectMap getConfiguration() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public ObjectMap getContext() {
-		// TODO Auto-generated method stub
+		// iets met schoolclass
 		return null;
 	}
 
@@ -145,6 +155,17 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 	public boolean filter(Method method, RequestBuilder builder) {
 		builder.setHeader("Authorization", "Basic test:test");
 		return true;
+	}
+
+	@Override
+	void setContext(OpdrNavIF root) {
+		super.setContext(root);
+		DomHasRole role = context.getDomHasRole();
+		String u = ";243932"; //leerlingwim
+		String sg = ";581";   // student group
+		role.setUserId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentUser.name() + u));
+		role.setSchoolGroupId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentSchoolGroup.name() + sg));
+		role.setId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentHasRole.name() + u + sg));	
 	}
 	
 	

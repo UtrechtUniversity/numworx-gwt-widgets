@@ -1,18 +1,18 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 
 import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
+import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
@@ -27,6 +27,8 @@ import com.google.gwt.user.client.ui.Widget;
 import fi.dwo.gwt.lib.rest.DwoConstants;
 import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
+import fi.dwo.gwt.lib.rest.util.Dwo2ExceptionGWTTranslator;
+import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -35,25 +37,44 @@ import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
+import nl.uu.fi.dwo.rest.dom.entities.DomHasRole;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomSchoolClass;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContextId;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
+import nl.uu.fi.dwo.rest.locale.DwoLocalesForGWT;
+import nl.uu.fi.dwo.rest.persistence.PersistenceClassType;
 import nl.uu.fi.dwo.rest.persistence.PersistenceId;
+import nl.uu.fi.dwo.rest.util.Dwo2ExceptionTranslator;
+import nl.uu.fi.dwo.rest.util.Dwo2LocaleMessageTranslator;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter {
 
+	private static final Failure FAILURE = new Failure() {
+
+		@Override
+		public void fail(Promise<?> resolved) throws Exception {
+			java.util.logging.Logger.getGlobal().log(Level.SEVERE, "failure", resolved.getFailure());		
+		} };
+
+		static {
+	        //Initialize an Exception translator.imply removing all DOM elements can cause issues with other elements in the page.
+	        Dwo2ExceptionTranslator.setTranslator(new Dwo2ExceptionGWTTranslator());
+	        Dwo2LocaleMessageTranslator.setTranslator(new Dwo2LocaleMessageGWTTranslator());
+	}
+		
+		
 	OpdrNavIF root;
 	private int height;
 	private int width;
 	private boolean volledigeBreedte;
 	private int asHoogte;
 	private LeerdoelGraph graph;
-	private DomContext context = new DomContext();
+	DomContext context = new DomContext();
 	
 	LayoutPanel panel;
 	private Map<String, Map<String, Set<Integer>>> filter;
@@ -130,19 +151,43 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		MethodManager methods;
 		methods = MethodManager.student(); // of teacher! 
 		SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
-		profile = new DomDwoProfileId();
-		profile.setId(new PersistenceId("MYSQL:PersistenceDwoProfile;77")); // from context
 		DomSchoolClass schoolclass = null;
-		
-		Promise<DomMethod> m = methods.getMethod(context, activeMethod, profile);
+		setContext(root);
+		Promise<DomMethod> m;
+		if (activeMethod != null ) m = methods.getMethod(context, activeMethod, profile);
+		else {
+			DomMethod value = new DomMethod();
+			value.setMethod(DwoLocalesForGWT.instance.NUM_LBL_METHOD_NONE()); // FIXED i18n
+			m = Promises.resolved(value);
+		}
 		Promise<DomStudentModelContext4Student> p;
-		p = models.getStudentModelForClass(context, studentModelID, schoolclass);
+		p = models.getStudentModel(context, studentModelID, schoolclass).map(value -> {
+			DomStudentModelContext4Student result = new DomStudentModelContext4Student();
+			result.setFilter(filter);
+			result.setId(value.getId());
+			result.setModelStructure(value.getModelStructure());
+			result.setSchoolClass(schoolclass);
+			return result;
+		});
 		Promises.all(p,m).then(xxx -> {
 			initialize(m,p,null);
 			return xxx;
-		});
+		}, FAILURE);
 	}
 
+	void setContext(OpdrNavIF root) {
+		DomHasRole role = new DomHasRole();
+		context.setDomHasRole(role);
+		String learnerId = root.getLearnerId();
+		if (learnerId.startsWith("1-")) {
+			String[] split = learnerId.split("-");
+			String u = ";" + split[1];
+			String sg = ";" + split[2]; // uitzoeken		
+			role.setUserId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentUser + u));
+			role.setSchoolGroupId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentSchoolGroup + sg));
+			role.setId(new PersistenceId("MYSQL;"+ PersistenceClassType.PersistentHasRole + u + sg));	
+		}
+	}
 	@Override
 	public void zetVolledigeBreedte(int breedte) {
 		if (volledigeBreedte) {
@@ -211,8 +256,12 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      leerdoelScore = h.getBoolean("leerdoelScore");
 	    
 	    this.filter = convert(filter);
-	    this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
+	    //activeMethod = "LOCAL;none;Getal&Ruimte";
+	    if (activeMethod != null)
+	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
 	    this.studentModelID = new DomStudentModelContextId(new PersistenceId(studentModelID));
+		profile = new DomDwoProfileId();
+		profile.setId(new PersistenceId(h.getString("dwoProfileID"))); // from launchdata
 	    
 	    graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu);
 	
