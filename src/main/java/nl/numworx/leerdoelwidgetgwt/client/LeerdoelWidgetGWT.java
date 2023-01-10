@@ -12,6 +12,7 @@ import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
+import org.osgi.util.promise.FailedPromisesException;
 import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
@@ -58,7 +59,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		@Override
 		public void fail(Promise<?> resolved) throws Exception {
-			java.util.logging.Logger.getGlobal().log(Level.SEVERE, "failure", resolved.getFailure());		
+			Throwable failure = resolved.getFailure();
+			Throwable[] list = { failure } ;
+			
+			if (failure instanceof FailedPromisesException) {
+				list = ((FailedPromisesException) failure).getFailedPromises().toArray(list);
+			}
+			
+			for (Throwable t: list)
+				java.util.logging.Logger.getGlobal().log(Level.SEVERE, "failure " + t, t);		
 		} };
 
 		static {
@@ -81,6 +90,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private DomMethod activeMethod;
 	private DomDwoProfileId profile;
 	private DomStudentModelContextId studentModelID;
+	private boolean leerdoelScore;
 	
 	public LeerdoelWidgetGWT(HashMap<String, Object> h, HashMap<String, Number> randomVarWaarden, int volleBreedte) {
 		this();
@@ -169,8 +179,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			result.setSchoolClass(schoolclass);
 			return result;
 		});
+		final Promise<DomStudentModelDataScore> s = 
+				leerdoelScore ?	models.getStudentModelDataScore(context, studentModelID) : Promises.failed(new Error()) ;
 		Promises.all(p,m).then(xxx -> {
-			initialize(m,p,null);
+			initialize(m,p,s);
 			return xxx;
 		}, FAILURE);
 	}
@@ -256,6 +268,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      leerdoelScore = h.getBoolean("leerdoelScore");
 	    
 	    this.filter = convert(filter);
+	    this.leerdoelScore = leerdoelScore;
 	    //activeMethod = "LOCAL;none;Getal&Ruimte";
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
@@ -281,6 +294,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		item.getModelStructure().setActiveMethod(activeMethod.getId());
 		graph.setModelScore(item, s, activeMethod);
 	    graph.doFilter(filter);
+	    if (!leerdoelScore) graph.zoomFit();
 	}
 
 	private Map<String, Map<String, Set<Integer>>> convert(ObjectMap filter) {

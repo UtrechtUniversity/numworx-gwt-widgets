@@ -1,5 +1,8 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph;
@@ -12,6 +15,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	
 
 	private boolean leerdoelPopup;
+	private boolean doFilter;
 
 	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup) {
 		super();
@@ -57,6 +61,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	}
 	
 	public void setTitleVisible(boolean visible) {
+		this.doFilter = visible;
 		setWidgetVisible(title, visible);
 	}
 
@@ -67,6 +72,17 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		Node node = new Node(obj, info, p);
 		if (!leerdoelPopup) return node;
 		return node.addClickHandler();
+	}
+
+	@Override
+	public void doFilter(Map<String, Map<String, Set<Integer>>> f) {
+		if (doFilter)
+			super.doFilter(f);
+	}
+
+	@Override
+	public void zoomFit() {
+		super.zoomFit();
 	}
 
 
