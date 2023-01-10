@@ -1,21 +1,73 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import com.google.gwt.event.dom.client.ContextMenuEvent;
+
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph.Node;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelMethodInfo;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 
 public class LeerdoelGraph extends StudentResultsGraph {
+	
+	
 
-	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu) {
+	private boolean leerdoelPopup;
+
+	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup) {
 		super();
-		
-		initHandlers(voorkennisMenu);
+		this.leerdoelPopup = leerdoelPopup;
+		setVoorKennisVisible(voorkennisKnop);
+		setZoomVisible(zoomKnoppen);
+
+		initHandlers(voorkennisKnop, voorkennisMenu, zoomKnoppen);
 	}
 
-	private void initHandlers(boolean voorkennisMenu) {
-		super.initHandlers(); // FIXME
+	private void initHandlers(boolean voorkennisKnop, boolean voorkennisMenu, boolean zoomKnoppen) {
+		image.addMouseMoveHandler(this);
+		image.addMouseUpHandler(this);
+		image.addMouseDownHandler(this);
+		image.addMouseOutHandler(this);
+		
+		if (zoomKnoppen) {
+			zoomFitBtn.addClickHandler(new ZoomFit());
+			zoomOutBtn.addClickHandler(new Zoom(true));
+			zoomInBtn.addClickHandler(new Zoom(false));
+		}
+		if (voorkennisKnop) {
+			voorkennisBtn.addClickHandler(new Voorkennis());
+			verbergBtn.addClickHandler(new VerbergVoorkennis());
+		}
+		if (voorkennisMenu)
+			addDomHandler(this, ContextMenuEvent.getType()); // FIXME
 	}
 
 	@Override
 	protected void initHandlers() {
 	}
+
+	
+	public void setVoorKennisVisible(boolean visible) {
+		setWidgetVisible(voorkennisBtn, visible);
+	}
+
+	public void setZoomVisible(boolean visible) {
+		setWidgetVisible(zoomFitBtn, visible);
+		setWidgetVisible(zoomInBtn, visible);
+		setWidgetVisible(zoomOutBtn, visible);
+	}
+	
+	public void setTitleVisible(boolean visible) {
+		setWidgetVisible(title, visible);
+	}
+
+	@Override
+	protected Node nodeFactory(DomStudentModelObj obj, String p, DomStudentModelMethodInfo info) {
+		// TODO Auto-generated method stub
+		final String p1 = p;
+		Node node = new Node(obj, info, p);
+		if (!leerdoelPopup) return node;
+		return node.addClickHandler();
+	}
+
 
 }

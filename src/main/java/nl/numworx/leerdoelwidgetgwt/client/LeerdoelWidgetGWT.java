@@ -263,8 +263,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		profile = new DomDwoProfileId();
 		profile.setId(new PersistenceId(h.getString("dwoProfileID"))); // from launchdata
 	    
-	    graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu);
-	
+	    graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup);
+	    graph.setTitleVisible(filterHeader);
+	    
 	    panel.add(graph);
 	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
 	    panel.setWidgetTopHeight(graph, 0, Unit.PX, height, Unit.PX);
