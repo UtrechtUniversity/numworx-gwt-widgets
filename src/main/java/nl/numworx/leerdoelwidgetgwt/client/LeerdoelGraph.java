@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph.Node;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelMethodInfo;
@@ -14,13 +15,14 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	
 	
 
-	private boolean leerdoelPopup;
+	private boolean leerdoelPopup, voorkennisKnop;
 	private boolean doFilter;
 
-	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup) {
-		super();
+	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup, DescriptionPresenter description) {
+		super(description);
 		this.leerdoelPopup = leerdoelPopup;
-		setVoorKennisVisible(voorkennisKnop);
+		this.voorkennisKnop = voorkennisKnop;
+		super.setVoorKennisVisible(voorkennisKnop);
 		setZoomVisible(zoomKnoppen);
 
 		initHandlers(voorkennisKnop, voorkennisMenu, zoomKnoppen);
@@ -51,7 +53,8 @@ public class LeerdoelGraph extends StudentResultsGraph {
 
 	
 	public void setVoorKennisVisible(boolean visible) {
-		setWidgetVisible(voorkennisBtn, visible);
+		if(voorkennisKnop)
+			super.setVoorKennisVisible(visible);
 	}
 
 	public void setZoomVisible(boolean visible) {

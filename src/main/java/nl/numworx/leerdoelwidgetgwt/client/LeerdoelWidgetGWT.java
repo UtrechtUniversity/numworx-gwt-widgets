@@ -4,6 +4,7 @@ package nl.numworx.leerdoelwidgetgwt.client;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -27,7 +28,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 import fi.dwo.gwt.lib.rest.DwoConstants;
 import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
+import fi.dwo.gwt.lib.rest.CallManagers.OAuthManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
+import fi.dwo.gwt.lib.rest.CallManagers.SecuredUserAccountManager;
 import fi.dwo.gwt.lib.rest.util.Dwo2ExceptionGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
@@ -36,7 +39,12 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.DwoGlobalVars;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
+import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileFull;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
 import nl.uu.fi.dwo.rest.dom.entities.DomHasRole;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
@@ -91,6 +99,11 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private DomDwoProfileId profile;
 	private DomStudentModelContextId studentModelID;
 	private boolean leerdoelScore;
+	private boolean filterHeader;
+	private boolean zoomKnoppen;
+	private boolean voorkennisMenu;
+	private boolean voorkennisKnop;
+	private boolean leerdoelPopup;
 	
 	public LeerdoelWidgetGWT(HashMap<String, Object> h, HashMap<String, Number> randomVarWaarden, int volleBreedte) {
 		this();
@@ -163,7 +176,39 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
 		DomSchoolClass schoolclass = null;
 		setContext(root);
+
+	    OAuthManager oauth = new OAuthManager();	    
+		SecuredUserAccountManager account = new SecuredUserAccountManager();
+
+		DwoGlobalVars vars = new DwoGlobalVars(account, oauth) {
+
+			@Override
+			public boolean isPremium() {
+				return true;
+			}
+
+			@Override
+			public Promise<DomDwoProfileFull> getProfile() {
+				
+				DomDwoProfileFull value = new DomDwoProfileFull();
+				value.setId(profile.getId());
+				return Promises.resolved(value);
+			} 
+			
+		};
+		//vars.setProfile(profile);
+		StudentModelService service = new StudentModelService(vars, context, methods);
+		DescriptionPresenter description = new DescriptionPresenter(Optional.empty(), true, service);
+		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description);
+	    graph.setTitleVisible(filterHeader);
+	    
+	    panel.add(graph);
+	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
+	    panel.setWidgetTopHeight(graph, 0, Unit.PX, height, Unit.PX);
+
+		
 		Promise<DomMethod> m;
+		//m = service.getActiveMethod(activeMethod.getId());
 		if (activeMethod != null ) m = methods.getMethod(context, activeMethod, profile);
 		else {
 			DomMethod value = new DomMethod();
@@ -241,12 +286,12 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	    String studentModelID = null;
 	    ObjectMap filter = null;
 	    String activeMethod = null;
-	    boolean leerdoelPopup = true;
-	    boolean voorkennisKnop = false;
-	    boolean voorkennisMenu = false;
-	    boolean zoomKnoppen = false;
-	    boolean filterHeader = false;
-	    boolean leerdoelScore = false;
+	     leerdoelPopup = true;
+	     voorkennisKnop = false;
+	     voorkennisMenu = false;
+	     zoomKnoppen = false;
+	     filterHeader = false;
+	     leerdoelScore = false;
 	    
 	    if(h.containsKey("activeMethod"))
 	      activeMethod = h.getString("activeMethod");
@@ -269,19 +314,12 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	    
 	    this.filter = convert(filter);
 	    this.leerdoelScore = leerdoelScore;
-	    //activeMethod = "LOCAL;none;Getal&Ruimte";
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
 	    this.studentModelID = new DomStudentModelContextId(new PersistenceId(studentModelID));
 		profile = new DomDwoProfileId();
 		profile.setId(new PersistenceId(h.getString("dwoProfileID"))); // from launchdata
 	    
-	    graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup);
-	    graph.setTitleVisible(filterHeader);
-	    
-	    panel.add(graph);
-	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
-	    panel.setWidgetTopHeight(graph, 0, Unit.PX, height, Unit.PX);
 	    
 
 	
