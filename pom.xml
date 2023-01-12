@@ -7,7 +7,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.numworx.leerdoelwidget</groupId>
   <artifactId>LeerdoelWidgetGWT</artifactId>
-  <packaging>${packaging}</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <name>Leerdoel Widget GWT</name>
 
@@ -322,4 +321,11 @@
 		</properties>
 	</profile>
 </profiles>
+	<parent>
+		<groupId>fi.parentgwt</groupId>
+		<artifactId>ParentGWT</artifactId>
+		<version>0.0.6</version>
+		<relativePath>../ParentGWT</relativePath>
+	</parent>
+	<packaging>war</packaging>
 </project>
