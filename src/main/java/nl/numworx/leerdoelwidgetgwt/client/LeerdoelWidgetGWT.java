@@ -33,6 +33,7 @@ import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredUserAccountManager;
 import fi.dwo.gwt.lib.rest.util.Dwo2ExceptionGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
+import fi.dwo.gwt.lib.rest.util.RestAuthenticator;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -43,6 +44,7 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.DwoGlobalVars;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileFull;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
@@ -197,7 +199,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			
 		};
 		//vars.setProfile(profile);
-		StudentModelService service = new StudentModelService(vars, context, methods);
+		//StudentModelService service = new StudentModelService(vars, context, methods);
+		StudentResultsService service = new StudentResultsService(models, vars, methods, context);
 		DescriptionPresenter description = new DescriptionPresenter(Optional.empty(), true, service);
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description);
 	    graph.setTitleVisible(filterHeader);
@@ -363,7 +366,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 	@Override
 	public boolean filter(Method method, RequestBuilder builder) {
-		builder.setHeader("Authorization", root.getContext().getString("Authorization"));
+		String auth = root.getContext().getString("Authorization");
+		builder.setHeader("Authorization", auth);
+		RestAuthenticator.instance.setAuthorization(auth);
 		return true;
 	}
 }
