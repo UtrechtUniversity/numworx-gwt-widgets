@@ -176,7 +176,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		MethodManager methods;
 		methods = MethodManager.student(); // of teacher! 
 		SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
-		DomSchoolClass schoolclass = null;
+		DomSchoolClass schoolclass = new DomSchoolClass();
 		setContext(root);
 
 	    OAuthManager oauth = new OAuthManager();	    
@@ -195,7 +195,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 				DomDwoProfileFull value = new DomDwoProfileFull();
 				value.setId(profile.getId());
 				return Promises.resolved(value);
-			} 
+			}
+
+			@Override
+			public DomSchoolClass getCurrentSchoolClass() {
+				return schoolclass;
+			}
+			
 			
 		};
 		//vars.setProfile(profile);
