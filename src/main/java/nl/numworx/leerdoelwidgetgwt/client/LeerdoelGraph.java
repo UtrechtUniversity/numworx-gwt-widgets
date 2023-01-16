@@ -77,11 +77,11 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		return node.addClickHandler();
 	}
 
-	@Override
-	public void doFilter(Map<String, Map<String, Set<Integer>>> f) {
-		if (doFilter)
-			super.doFilter(f);
-	}
+//	@Override
+//	public void doFilter(Map<String, Map<String, Set<Integer>>> f) {
+//		if (doFilter)
+//			super.doFilter(f);
+//	}
 
 	@Override
 	protected void doFilterFit(DomStudentModelMethodInfo info) {
