@@ -169,6 +169,12 @@
 				</executions>
 			</plugin>
 
+        <plugin>
+        	<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+				</configuration>
+        </plugin>        
 
 
       <plugin> <!-- attach-sources voor GWT -->
