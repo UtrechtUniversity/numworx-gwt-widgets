@@ -84,6 +84,12 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	}
 
 	@Override
+	protected void doFilterFit(DomStudentModelMethodInfo info) {
+		if (doFilter)
+			super.doFilterFit(info);
+	}
+
+	@Override
 	public void zoomFit() {
 		super.zoomFit();
 	}
