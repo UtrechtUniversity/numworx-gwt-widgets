@@ -24,7 +24,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		this.voorkennisKnop = voorkennisKnop;
 		super.setVoorKennisVisible(voorkennisKnop);
 		setZoomVisible(zoomKnoppen);
-
+		getElement().getStyle().clearBackgroundColor();
 		initHandlers(voorkennisKnop, voorkennisMenu, zoomKnoppen);
 	}
 
