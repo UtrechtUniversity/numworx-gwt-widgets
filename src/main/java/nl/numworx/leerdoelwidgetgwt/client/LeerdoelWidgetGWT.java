@@ -50,6 +50,7 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.XAPIService_Factory;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileFull;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
@@ -215,7 +216,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		};
 		//vars.setProfile(profile);
 		//StudentModelService service = new StudentModelService(vars, context, methods);
-		StudentResultsService service = new StudentResultsService(models, vars, methods, context);
+		StudentResultsService service = //new StudentResultsService(models, vars, methods, context);
+				XAPIService_Factory.newInstance(models, vars, methods, context);
 		DescriptionPresenter description = new DescriptionPresenter(Optional.empty(), true, service);
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description);
 	    graph.setTitleVisible(filterHeader);
