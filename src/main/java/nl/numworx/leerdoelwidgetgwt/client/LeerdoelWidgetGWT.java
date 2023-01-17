@@ -324,7 +324,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	    if(h.containsKey("voorkennisMenu"))
 	      voorkennisMenu = h.getBoolean("voorkennisMenu");
 	    if(h.containsKey("zoomKnoppen"))
-	      zoomKnoppen = h.getBoolean("zoomKnoppen");
+	      zoomKnoppen = h.getBoolean("zoomKnoppen"); // en dan ook niet slepen!
 	    if(h.containsKey("filterHeader"))
 	      filterHeader = h.getBoolean("filterHeader");
 	    if(h.containsKey("leerdoelScore"))
