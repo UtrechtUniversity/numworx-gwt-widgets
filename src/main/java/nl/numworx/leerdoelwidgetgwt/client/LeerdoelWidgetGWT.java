@@ -25,6 +25,8 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.EventBus;
+import com.google.web.bindery.event.shared.SimpleEventBus;
 
 import fi.dwo.gwt.lib.rest.DwoConstants;
 import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
@@ -38,9 +40,12 @@ import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.DwoGlobalVars;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEvent;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEventHandler;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
@@ -63,7 +68,7 @@ import nl.uu.fi.dwo.rest.util.Dwo2LocaleMessageTranslator;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter {
+public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter, SwitchViewEventHandler {
 
 	private static final Failure FAILURE = new Failure() {
 
@@ -106,6 +111,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean voorkennisMenu;
 	private boolean voorkennisKnop;
 	private boolean leerdoelPopup;
+	private EventBus evbus;
 	
 	public LeerdoelWidgetGWT(HashMap<String, Object> h, HashMap<String, Number> randomVarWaarden, int volleBreedte) {
 		this();
@@ -123,6 +129,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	}
 	
 	public LeerdoelWidgetGWT() {
+		evbus = new SimpleEventBus();
+		SwitchViewEventHandler handler = this;
+		evbus.addHandler(SwitchViewEvent.TYPE, handler);
 	}
 	
 	/**
@@ -376,5 +385,18 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		builder.setHeader("Authorization", auth);
 		RestAuthenticator.instance.setAuthorization(auth);
 		return true;
+	}
+
+	@Override
+	public void onSwitchViewEvent(SwitchViewEvent event) {
+		switch(event.getEventValue()) {
+		case GOTO_URL:
+			String message = event.getSearch().get("message").substring(5);
+			CBookEvent cbe = new CBookEvent(this, "gotoPlace", "#" + message);
+			root.fireEvent(cbe);
+			break;
+		default:
+		}
+		
 	}
 }
