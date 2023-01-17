@@ -245,7 +245,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			return result;
 		});
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	models.getStudentModelDataScore(context, studentModelID) : Promises.failed(new Error()) ;
+				leerdoelScore ?	service.getScore(studentModelID) : Promises.failed(new Error()) ;
 		Promises.all(p,m).then(xxx -> {
 			initialize(m,p,s);
 			return xxx;
