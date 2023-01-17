@@ -106,6 +106,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private DomMethod activeMethod;
 	private DomDwoProfileId profile;
 	private DomStudentModelContextId studentModelID;
+	private DomStudentModelContext4Student studentModel;
 	private boolean leerdoelScore;
 	private boolean filterHeader;
 	private boolean zoomKnoppen;
@@ -179,7 +180,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void zetNagekeken(boolean b) {
 		
 	}
-
+	StudentResultsService service;
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.root = comRoot;
@@ -216,9 +217,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		};
 		//vars.setProfile(profile);
 		//StudentModelService service = new StudentModelService(vars, context, methods);
-		StudentResultsService service = //new StudentResultsService(models, vars, methods, context);
-				XAPIService_Factory.newInstance(models, vars, methods, context);
-		DescriptionPresenter description = new DescriptionPresenter(Optional.empty(), true, service);
+		service = XAPIService_Factory.newInstance(models, vars, methods, context);
+		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, service);
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description);
 	    graph.setTitleVisible(filterHeader);
 	    
@@ -244,10 +244,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			result.setSchoolClass(schoolclass);
 			return result;
 		});
-		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	service.getScore(studentModelID) : Promises.failed(new Error()) ;
 		Promises.all(p,m).then(xxx -> {
-			initialize(m,p,s);
+			initialize(m,p);
 			return xxx;
 		}, FAILURE);
 	}
@@ -333,10 +331,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      leerdoelScore = h.getBoolean("leerdoelScore");
 	    
 	    this.filter = convert(filter);
-	    this.leerdoelScore = leerdoelScore;
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
-	    this.studentModelID = new DomStudentModelContextId(new PersistenceId(studentModelID));
+	    this.studentModelID = this.studentModel = new DomStudentModelContext4Student(new PersistenceId(studentModelID));
 		profile = new DomDwoProfileId();
 		profile.setId(new PersistenceId(h.getString("dwoProfileID"))); // from launchdata
 	    
@@ -345,12 +342,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	
 	}
 
-	private void initialize(Promise<DomMethod> m, Promise<DomStudentModelContext4Student> p, Promise<DomStudentModelDataScore> s) {
+	private void initialize(Promise<DomMethod> m, Promise<DomStudentModelContext4Student> p) {
 		activeMethod = m.getValue();
-		DomStudentModelContext4Student item = p.getValue();
-		item.setFilter(filter);
-		item.getModelStructure().setActiveMethod(activeMethod.getId());
-		graph.setModelScore(item, s, activeMethod);
+		studentModel = p.getValue();
+		studentModel.setFilter(filter);
+		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
+		final Promise<DomStudentModelDataScore> s = 
+				leerdoelScore ?	service.getScore(studentModel) : Promises.failed(new Error()) ;
+		graph.setModelScore(studentModel, s, activeMethod);
 	    graph.doFilter(filter);
 	    if (!leerdoelScore) graph.zoomFit();
 	}
