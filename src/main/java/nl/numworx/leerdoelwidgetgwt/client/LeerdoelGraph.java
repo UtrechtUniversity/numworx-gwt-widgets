@@ -29,12 +29,12 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	}
 
 	private void initHandlers(boolean voorkennisKnop, boolean voorkennisMenu, boolean zoomKnoppen) {
-		image.addMouseMoveHandler(this);
-		image.addMouseUpHandler(this);
-		image.addMouseDownHandler(this);
-		image.addMouseOutHandler(this);
 		
 		if (zoomKnoppen) {
+			image.addMouseMoveHandler(this);
+			image.addMouseUpHandler(this);
+			image.addMouseDownHandler(this);
+			image.addMouseOutHandler(this);
 			zoomFitBtn.addClickHandler(new ZoomFit());
 			zoomOutBtn.addClickHandler(new Zoom(true));
 			zoomInBtn.addClickHandler(new Zoom(false));
