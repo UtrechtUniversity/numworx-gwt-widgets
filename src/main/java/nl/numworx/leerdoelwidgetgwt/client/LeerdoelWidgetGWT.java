@@ -393,7 +393,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		switch(event.getEventValue()) {
 		case GOTO_URL:
 			String message = event.getSearch().get("message").substring(5);
-			CBookEvent cbe = new CBookEvent(this, "gotoPlace", "#" + message);
+			CBookEvent cbe = new CBookEvent(this, "gotoPlace", message);
 			root.fireEvent(cbe);
 			break;
 		default:
