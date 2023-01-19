@@ -28,8 +28,8 @@
     <local.dwo>/dwo</local.dwo>
     <DWOServerVersion>2.5.18-SNAPSHOT</DWOServerVersion>
     <gwt.style>PRETTY</gwt.style>
-    <gwt.forceCompilation>true</gwt.forceCompilation>
     <gwtVersion>2.9.0</gwtVersion>
+    <gwt.compiler.force>true</gwt.compiler.force>
   </properties>
 
   <dependencyManagement>
