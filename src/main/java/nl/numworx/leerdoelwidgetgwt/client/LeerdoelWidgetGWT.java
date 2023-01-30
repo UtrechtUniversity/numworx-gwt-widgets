@@ -219,9 +219,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		//StudentModelService service = new StudentModelService(vars, context, methods);
 		service = XAPIService_Factory.newInstance(models, vars, methods, context);
 		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, service);
-		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description);
-	    graph.setTitleVisible(filterHeader);
-	    
+		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
 	    panel.add(graph);
 	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
 	    panel.setWidgetTopHeight(graph, 0, Unit.PX, height, Unit.PX);

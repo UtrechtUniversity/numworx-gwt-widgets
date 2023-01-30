@@ -1,13 +1,10 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
-import java.util.Map;
-import java.util.Set;
-
 import com.google.gwt.event.dom.client.ContextMenuEvent;
 
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.FilterTitle;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph;
-import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsGraph.Node;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelMethodInfo;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 
@@ -18,7 +15,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	private boolean leerdoelPopup, voorkennisKnop;
 	private boolean doFilter;
 
-	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup, DescriptionPresenter description) {
+	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup, DescriptionPresenter description, boolean filterHeader) {
 		super(description);
 		this.leerdoelPopup = leerdoelPopup;
 		this.voorkennisKnop = voorkennisKnop;
@@ -26,6 +23,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		setZoomVisible(zoomKnoppen);
 		getElement().getStyle().clearBackgroundColor();
 		initHandlers(voorkennisKnop, voorkennisMenu, zoomKnoppen);
+	    setTitleVisible(filterHeader, voorkennisMenu);
 	}
 
 	private void initHandlers(boolean voorkennisKnop, boolean voorkennisMenu, boolean zoomKnoppen) {
@@ -52,6 +50,25 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	}
 
 	
+	@Override
+	protected FilterTitle createFilterTitle() {
+		if (doFilter) return super.createFilterTitle();
+
+		return new FilterTitle(null) {
+
+			@Override
+			protected void initialize() {
+				setStylePrimaryName("filter-title-alt");
+				initClose();
+			} 
+			
+		};
+	}
+
+	@Override
+	protected void initTitle() {
+	}
+
 	public void setVoorKennisVisible(boolean visible) {
 		if(voorkennisKnop)
 			super.setVoorKennisVisible(visible);
@@ -63,9 +80,11 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		setWidgetVisible(zoomOutBtn, visible);
 	}
 	
-	public void setTitleVisible(boolean visible) {
+	public void setTitleVisible(boolean visible, boolean voorkennisMenu) {
 		this.doFilter = visible;
-		setWidgetVisible(title, visible);
+		super.initTitle();
+		
+		setWidgetVisible(title, visible||voorkennisMenu);
 	}
 
 	@Override
