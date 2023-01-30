@@ -60,6 +60,7 @@ public class LeerdoelGraph extends StudentResultsGraph {
 			protected void initialize() {
 				setStylePrimaryName("filter-title-alt");
 				initClose();
+				close.setText("Terug");
 			} 
 			
 		};
