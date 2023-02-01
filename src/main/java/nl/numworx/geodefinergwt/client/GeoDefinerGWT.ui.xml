@@ -16,7 +16,7 @@
 			<g:center>
 				<g:Label ui:field="status"/>
 			</g:center>
-			<g:east size="80">
+			<g:east size="124">
 				<g:FlowPanel ui:field="check" addStyleNames="check">
 				  <g:Button ui:field="checkBtn" addStyleNames="kijkna"><ui:text from="{rb.kijkNa}"/></g:Button>
 				</g:FlowPanel>
