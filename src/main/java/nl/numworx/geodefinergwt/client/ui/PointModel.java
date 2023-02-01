@@ -63,5 +63,17 @@ public class PointModel extends ColorModel<Punt> {
 		if (size != null) DefaultAdapter.getDefault(item).put(size);
 		super.installLight();
 	}
-	
+
+	@Override
+	public void fromLightMap(ObjectMap value) {
+		if (value.containsKey("size")) size = Float.valueOf(value.getInt("size"));
+		super.fromLightMap(value);
+	}
+	@Override
+	public Map<String, Object> toLightMap() {
+		Map<String, Object> map = super.toLightMap();
+		if (size != null) map.put("size", size.intValue());
+		return map;
+	}
+
 }

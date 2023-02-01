@@ -91,6 +91,11 @@ body {
 	font-weight: bold;
 }
 
+.check .gwt-Button.kijkna {
+	float: right;
+	margin-right: 15px;
+}
+
 .check .gwt-Button.kijkna:hover, .reset .gwt-Button:hover {
 	background-color: #aac1dc;
 	border-color: #aac1dc;

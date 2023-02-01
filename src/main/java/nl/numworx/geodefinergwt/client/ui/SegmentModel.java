@@ -58,4 +58,22 @@ public class SegmentModel extends LineModel {
 		}
 		super.installLight();
 	}
+	
+	@Override
+	public void fromLightMap(ObjectMap map) {
+		try { 
+			tip = Tips.valueOf(map.getString("tip"));
+		} catch (Exception e) {
+			tip = Tips.NOTIP;
+		}
+		super.fromLightMap(map);
+	}
+
+	@Override
+	public Map<String, Object> toLightMap() {
+		Map<String, Object> map = super.toLightMap();
+		if(tip != Tips.NOTIP) map.put("tip", tip.name());
+		return map;
+	}
+
 }
