@@ -30,6 +30,7 @@
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
+    <interactionVersion>0.1.14</interactionVersion>
   </properties>
 
   <dependencyManagement>
@@ -71,13 +72,13 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>0.1.12</version>
+			<version>${interactionVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>0.1.12</version>
+			<version>${interactionVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
