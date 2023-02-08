@@ -39,6 +39,7 @@ import fi.dwo.gwt.lib.rest.util.RestAuthenticator;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Role;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
@@ -47,6 +48,7 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.DwoGlobalVars;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEvent;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEventHandler;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
@@ -57,6 +59,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
 import nl.uu.fi.dwo.rest.dom.entities.DomHasRole;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomSchoolClass;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContextId;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
@@ -99,7 +102,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean volledigeBreedte;
 	private int asHoogte;
 	private LeerdoelGraph graph;
-	DomContext context = new DomContext();
+	final DomContext context = new DomContext();
 	
 	LayoutPanel panel;
 	private Map<String, Map<String, Set<Integer>>> filter;
@@ -180,14 +183,80 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void zetNagekeken(boolean b) {
 		
 	}
-	StudentResultsService service;
+	RoleAPI roleAPI;
+
+	interface RoleAPI {
+		//StudentResultsService getService();
+		DescriptionService getDescriptionService();
+		MethodManager getMethodManager();
+		Promise<DomStudentModelContext> getStudentModel(DomContext context, DomStudentModelContextId studentModelID,
+				DomSchoolClass schoolclass);
+		Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel);
+	}
+
+	class LearnerAPI implements RoleAPI {
+		final StudentResultsService service;
+		final SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
+		final MethodManager methods;
+	
+		public LearnerAPI(DwoGlobalVars vars) {
+			methods = MethodManager.student();
+			service = XAPIService_Factory.newInstance(models, vars, methods, context);
+		}
+
+		public DescriptionService getDescriptionService() {
+			return service;
+		}
+		
+		public MethodManager getMethodManager() {
+			return methods;
+		}
+		public Promise<DomStudentModelContext> getStudentModel(DomContext context, DomStudentModelContextId id, DomSchoolClass schoolclass) {
+			return models.getStudentModel(context, id, schoolclass);
+		}
+
+		@Override
+		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
+			return service.getScore(studentModel);
+		}
+	}
+	
+	class TeacherAPI implements RoleAPI {
+		final MethodManager methods = MethodManager.teacher();
+		final StudentModelService service;
+
+		TeacherAPI(DwoGlobalVars vars) {
+			service = StudentModelService_Factory.newInstance(vars, context, methods);
+		}
+
+		@Override
+		public DescriptionService getDescriptionService() {
+			return service;
+		}
+
+		public MethodManager getMethodManager() {
+			return methods;
+		}
+
+		@Override
+		public Promise<DomStudentModelContext> getStudentModel(DomContext context,
+				DomStudentModelContextId studentModelID, DomSchoolClass schoolclass) {
+			return service.getStudentModel(studentModelID.getId());
+		}
+
+		@Override
+		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
+			return Promises.failed(new Error());
+		}
+	}
+	
+	
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.root = comRoot;
-		MethodManager methods;
-		methods = MethodManager.student(); // of teacher! 
-		SecuredStudentStudentModelManager models = new SecuredStudentStudentModelManager();
-		DomSchoolClass schoolclass = new DomSchoolClass();
+		Role role = comRoot.getRole();
+		if (role != Role.Learner) leerdoelScore = false;
+		DomSchoolClass schoolclass = role == Role.Learner ? new DomSchoolClass() : null;
 		setContext(root);
 
 	    OAuthManager oauth = new OAuthManager();	    
@@ -215,10 +284,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			
 			
 		};
-		//vars.setProfile(profile);
-		//StudentModelService service = new StudentModelService(vars, context, methods);
-		service = XAPIService_Factory.newInstance(models, vars, methods, context);
-		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, service);
+		roleAPI = role == Role.Learner ? new LearnerAPI(vars) : new TeacherAPI(vars);
+		
+		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
 	    panel.add(graph);
 	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
@@ -226,15 +294,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		
 		Promise<DomMethod> m;
-		//m = service.getActiveMethod(activeMethod.getId());
-		if (activeMethod != null ) m = methods.getMethod(context, activeMethod, profile);
+		if (activeMethod != null ) m = roleAPI.getMethodManager().getMethod(context, activeMethod, profile);
 		else {
 			DomMethod value = new DomMethod();
 			value.setMethod(DwoLocalesForGWT.instance.NUM_LBL_METHOD_NONE()); // FIXED i18n
 			m = Promises.resolved(value);
 		}
 		Promise<DomStudentModelContext4Student> p;
-		p = models.getStudentModel(context, studentModelID, schoolclass).map(value -> {
+		p = roleAPI.getStudentModel(context, studentModelID, schoolclass).map(value -> {
 			DomStudentModelContext4Student result = new DomStudentModelContext4Student();
 			result.setFilter(filter);
 			result.setId(value.getId());
@@ -346,7 +413,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	service.getScore(studentModel) : Promises.failed(new Error()) ;
+				leerdoelScore ?	roleAPI.getScore(studentModel) : Promises.failed(new Error()) ;
 		graph.setModelScore(studentModel, s, activeMethod);
 	    graph.doFilter(filter);
 	    if (!leerdoelScore) graph.zoomFit();
