@@ -13,12 +13,13 @@ public class LeerdoelGraph extends StudentResultsGraph {
 	
 
 	private boolean leerdoelPopup, voorkennisKnop;
-	private boolean doFilter;
+	private boolean doFilter, zoomKnoppen;
 
 	public LeerdoelGraph(boolean voorkennisKnop, boolean zoomKnoppen, boolean voorkennisMenu, boolean leerdoelPopup, DescriptionPresenter description, boolean filterHeader) {
 		super(description);
 		this.leerdoelPopup = leerdoelPopup;
 		this.voorkennisKnop = voorkennisKnop;
+		this.zoomKnoppen = zoomKnoppen;
 		super.setVoorKennisVisible(voorkennisKnop);
 		setZoomVisible(zoomKnoppen);
 		getElement().getStyle().clearBackgroundColor();
@@ -90,7 +91,6 @@ public class LeerdoelGraph extends StudentResultsGraph {
 
 	@Override
 	protected Node nodeFactory(DomStudentModelObj obj, String p, DomStudentModelMethodInfo info) {
-		// TODO Auto-generated method stub
 		final String p1 = p;
 		Node node = new Node(obj, info, p);
 		if (!leerdoelPopup) return node;
@@ -114,5 +114,12 @@ public class LeerdoelGraph extends StudentResultsGraph {
 		super.zoomFit();
 	}
 
+	@Override
+	protected void resizer() {
+		if (zoomKnoppen)
+			super.resizer();
+		else
+			zoomFit();
+	}
 
 }

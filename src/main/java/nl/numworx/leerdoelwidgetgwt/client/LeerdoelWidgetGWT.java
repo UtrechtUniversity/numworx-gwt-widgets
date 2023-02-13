@@ -289,8 +289,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
 	    panel.add(graph);
-	    panel.setWidgetLeftWidth(graph, 0, Unit.PX, width, Unit.PX);
-	    panel.setWidgetTopHeight(graph, 0, Unit.PX, height, Unit.PX);
+	    panel.setWidgetLeftRight(graph, 0, Unit.PX, 0, Unit.PX);
+	    panel.setWidgetTopBottom(graph, 0, Unit.PX, 0, Unit.PX);
 
 		
 		Promise<DomMethod> m;
