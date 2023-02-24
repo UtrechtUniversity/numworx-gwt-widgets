@@ -103,7 +103,10 @@ public class LineModel extends ColorModel<Destroyable> {
   @Override
   public Map<String,Object> toLightMap() {
 	  Map<String,Object> m = super.toLightMap();
-	  m.put("type", type.name());
+	  if (type != LineType.SOLID) 
+		  m.put("type", type.name());
+	  if (width != 1.0f)
+		  m.put("width", width);
 	  return m;
   }
 }
