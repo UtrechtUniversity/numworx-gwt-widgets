@@ -88,7 +88,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			}
 			
 			for (Promise<?> t: list)
+			{
+				if (t.getFailure()instanceof ReviewAPI.ReviewException) continue;
 				java.util.logging.Logger.getGlobal().log(Level.WARNING, "failure " + t, t.getFailure());		
+			}
 		} };
 
 		static {
@@ -194,6 +197,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		Promise<DomStudentModelContext> getStudentModel(DomContext context, DomStudentModelContextId studentModelID,
 				DomSchoolClass schoolclass);
 		Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel);
+		default Promise<DomMethod> getMethod(DomContext context, DomMethod id, DomDwoProfileId profile) {
+			return getMethodManager().getMethod(context, id, profile);
+		}
 	}
 
 	class LearnerAPI implements RoleAPI {
@@ -302,7 +308,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		
 		Promise<DomMethod> m;
-		if (activeMethod != null ) m = roleAPI.getMethodManager().getMethod(context, activeMethod, profile);
+		if (activeMethod != null ) m = roleAPI.getMethod(context, activeMethod, profile);
 		else {
 			DomMethod value = new DomMethod();
 			value.setMethod(DwoLocalesForGWT.instance.NUM_LBL_METHOD_NONE()); // FIXED i18n
