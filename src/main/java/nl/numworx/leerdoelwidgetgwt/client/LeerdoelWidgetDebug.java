@@ -76,8 +76,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public String getLearnerId() {
-		// TODO Auto-generated method stub
-		return null;
+		return "2-XXXX-YYYY";
 	}
 
 	@Override
@@ -100,14 +99,12 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public LessonMode getLessonMode() {
-		// TODO Auto-generated method stub
-		return null;
+		return LessonMode.review;
 	}
 
 	@Override
 	public Role getRole() {
-		// TODO Auto-generated method stub
-		return null;
+		return Role.Learner;
 	}
 
 	@Override

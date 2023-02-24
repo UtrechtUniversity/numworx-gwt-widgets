@@ -1,6 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +39,7 @@ import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.RestAuthenticator;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Role;
 import nl.uu.fi.dwo.interaction.client.Stub;
@@ -79,14 +81,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		@Override
 		public void fail(Promise<?> resolved) throws Exception {
 			Throwable failure = resolved.getFailure();
-			Throwable[] list = { failure } ;
+			Collection<Promise<?>> list = Collections.singleton(resolved) ;
 			
 			if (failure instanceof FailedPromisesException) {
-				list = ((FailedPromisesException) failure).getFailedPromises().toArray(list);
+				list = ((FailedPromisesException) failure).getFailedPromises();
 			}
 			
-			for (Throwable t: list)
-				java.util.logging.Logger.getGlobal().log(Level.SEVERE, "failure " + t, t);		
+			for (Promise<?> t: list)
+				java.util.logging.Logger.getGlobal().log(Level.WARNING, "failure " + t, t.getFailure());		
 		} };
 
 		static {
@@ -284,7 +286,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			
 			
 		};
-		roleAPI = role == Role.Learner ? new LearnerAPI(vars) : new TeacherAPI(vars);
+		if (comRoot.getLessonMode() == LessonMode.review)
+		{
+			leerdoelScore = false;
+			roleAPI = new ReviewAPI(vars);
+		} else {
+			roleAPI = role == Role.Learner ? new LearnerAPI(vars) : new TeacherAPI(vars);
+		}
 		
 		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
 		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);

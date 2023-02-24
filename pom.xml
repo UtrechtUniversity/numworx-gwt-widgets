@@ -46,6 +46,11 @@
   </dependencyManagement>
 
   <dependencies>
+		<dependency><!-- before GWT -->
+			<groupId>org.vectomatic</groupId>
+			<artifactId>lib-gwt-svg</artifactId>
+			<version>0.5.15</version>
+		</dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
