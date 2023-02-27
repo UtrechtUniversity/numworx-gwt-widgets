@@ -44,6 +44,7 @@ import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Role;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 import nl.uu.fi.dwo.interaction.client.json.ObjectList;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.DwoGlobalVars;
@@ -74,7 +75,7 @@ import nl.uu.fi.dwo.rest.util.Dwo2LocaleMessageTranslator;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter, SwitchViewEventHandler {
+public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter, SwitchViewEventHandler, CBookEventListener {
 
 	private static final Failure FAILURE = new Failure() {
 
@@ -292,6 +293,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			
 			
 		};
+		
+		comRoot.addCBookEventListener("action.setNotEditable", this);
+		
 		if (comRoot.getLessonMode() == LessonMode.review)
 		{
 			leerdoelScore = false;
@@ -478,5 +482,11 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		default:
 		}
 		
+	}
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event) {
+		// Alleen voor "action.setNotEditable"
+		// TODO doe niks
 	}
 }
