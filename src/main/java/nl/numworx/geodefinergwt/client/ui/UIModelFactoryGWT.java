@@ -12,6 +12,7 @@ import fi.euclides.event.Tracker;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Cirkel;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.GeoImage;
 import fi.euclides.model.Groep;
 import fi.euclides.model.Kegelsnede2;
 import fi.euclides.model.Label;
@@ -124,4 +125,8 @@ public class UIModelFactoryGWT extends nl.numworx.geodefiner.common.UIModelFacto
 		return super.lightBuild(d);
 	}
 
+	@Override
+	public void visitImage(GeoImage image) {
+		model = new CircleModel().init(image);
+	}
 }

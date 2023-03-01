@@ -219,12 +219,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		Map<String, Object> launchDebug = new HashMap<String, Object>();
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
-				Tools.COLOR_PALETTE,
+//				Tools.COLOR_PALETTE,
 				Tools.POINT,
 				Tools.LINE,
 //				Tools.HALFLINE,
-				Tools.SEGMENT,
-				Tools.LINE_PALETTE,
+//				Tools.SEGMENT,
+//				Tools.LINE_PALETTE,
 //
 //				Tools.PERPENDICULAR,
 //				Tools.PARALLEL,
@@ -255,10 +255,11 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 //				Tools.TEXT,			
 //				Tools.FORMULA,
 //
-				Tools.PAN,
+//				Tools.PAN,
 				Tools.DESTROY,
 				Tools.RESET,
-				Tools.ANGLE_POINT
+//				Tools.ANGLE_POINT
+				Tools.GEO_TRIANGLE
 			);
 		Vector<Map<String,Object>> configs = new Vector<>();
 		configs.setSize(32);

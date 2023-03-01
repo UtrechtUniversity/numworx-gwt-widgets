@@ -315,4 +315,9 @@ public class ToolBoxModule {
     	return newSBtn(svg.maak_hoek_svg(), svg.maak_hoek_active_svg(), handler, tracker, model, rb.ToolBoxModule_24(), shim);
     }
 
+    @Provides @IntKey(Tools.GEO_TRIANGLE) @IntoMap static
+    ToggleButton geotriangle() {
+    	return new ToggleButton("Geo");
+    }
+    
 }
