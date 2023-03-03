@@ -1,6 +1,7 @@
 package nl.numworx.geodefinergwt.client;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,8 +16,11 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import nl.numworx.geodefiner.common.CheckObjectList;
+import nl.numworx.geodefiner.common.GeoTriangle;
 import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.NamingModel;
+import nl.numworx.geodefiner.common.Tools;
+import nl.numworx.geodefiner.common.UIModel;
 import nl.numworx.geodefiner.common.UIShim;
 import nl.numworx.geodefiner.common.locus.Builder;
 import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
@@ -82,8 +86,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	private static final String GOED_CSS = "goed";
 	private static final String FOUT_CSS = "fout";
 	private static final String HALF_CSS = "half";
-	private int width = 500, orgWidth;
-	private int height = 450, orgHeight;
+	private int width = 700, orgWidth;
+	private int height = 650, orgHeight;
 	private OpdrNavIF comRoot;
 	//private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
@@ -551,6 +555,21 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		  tracker.setTracer(tracerProvider);
 		}
 		attempt = logOption || launchData.containsKey("smObjectives");
+
+		// if launchdata contains Tools.GEO_TRIANGLE: 		
+				ObjectMap map = JSONUtilities.wrapMap(launchData);
+				if (map.containsKey("toolbox")) {
+					Collection<Integer> tools = map.getIntegerList("toolbox");
+					if (tools.contains(Tools.GEO_TRIANGLE)) {
+						GeoTriangle triangle = new GWTTriangle(viewer);
+						triangle.setVisible(true);
+						viewer.getMapper().rename(triangle, "geo");
+						UIModel<?, ?> uimodel = uiModelFactory.build(triangle);
+						uimodel.install();
+						viewer.getModel().add(triangle);						
+					}
+				}
+		
 		setLaunchData(launchData, values);
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
 // highlighter after init launchdata.

@@ -45,7 +45,7 @@ public class HitTesterGWT extends HitTester {
 		Shape shape = t.adapt(Shape.class);
 		if(shape != null) {
 			if ( shape.contains(lastx, lasty))
-				call(t);
+				call(id(t));
 			return;
 		}
 		super.visitTriangle(t);

@@ -8,6 +8,7 @@ import com.google.gwt.animation.client.AnimationScheduler.AnimationHandle;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.user.client.ui.Widget;
 
 import dagger.Lazy;
@@ -20,6 +21,7 @@ import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Cirkel;
 import fi.euclides.model.Destroyable;
+import fi.euclides.model.GeoImage;
 import fi.euclides.model.Label;
 import fi.euclides.model.Lijn;
 import fi.euclides.model.Locus;
@@ -798,6 +800,25 @@ public void setColor(int n) {
 	default: select = COLOR_BLACK;
 	}
 	super.setColor(n);
+}
+@Override
+protected void drawImage(GeoImage image) {
+	ImageElement img = image.adapt(ImageElement.class);
+	if (img == null) {	
+		super.drawImage(image);
+		return;
+	}
+	context.save();
+	Punt imageCenter = image.imageCenter();
+	Punt center = image.center();
+	Numbers rotor = image.rotation();
+	context.translate(center.getXd(), center.getYd());
+	double angle = Math.atan2(Numbers.imag(rotor).doubleValue(), Numbers.real(rotor).doubleValue());
+	double scale = Numbers.abs(rotor).doubleValue();
+	context.rotate(angle);
+	context.scale(scale, scale);
+	context.drawImage(img, -imageCenter.getXd(), -imageCenter.getYd());
+	context.restore();
 }
 
 }

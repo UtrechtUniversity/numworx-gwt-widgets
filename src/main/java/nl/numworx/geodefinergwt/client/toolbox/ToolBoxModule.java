@@ -316,8 +316,23 @@ public class ToolBoxModule {
     }
 
     @Provides @IntKey(Tools.GEO_TRIANGLE) @IntoMap static
-    ToggleButton geotriangle() {
-    	return new ToggleButton("Geo");
+    ToggleButton geotriangle(TrackerImpl tracker) {
+        ToggleButton btn;
+        btn = new ToggleButton();
+        btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+        Image image = new Image(svg.geodriehoek().getSafeUri());
+        image.setPixelSize(32, 39);
+        btn.getUpFace().setImage(image);
+        image = new Image(svg.geodriehoek_active().getSafeUri());
+        image.setPixelSize(32, 39);
+        btn.getDownFace().setImage(image);
+        btn.setTitle(rb.ToolBoxModule_25());
+        btn.addClickHandler(ev -> {
+        	Destroyable geo = tracker.getMapper().fromString("geo");
+        	geo.setVisible(btn.getValue());
+        	tracker.paint();
+        });
+        return btn;
     }
     
 }

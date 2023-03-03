@@ -280,4 +280,11 @@ public interface SvgBundle extends ClientBundle {
   @Source("nl/numworx/geodefinergwt/client/resources/Maak-hoek-A.svg")
   @MimeType("image/svg+xml")
   DataResource maak_hoek_active_svg();
+  
+  @Source("nl/numworx/geodefinergwt/client/resources/geodriehoekKnop.png")
+  ImageResource geodriehoek();
+  @Source("nl/numworx/geodefinergwt/client/resources/geodriehoekKnop-A.png")
+  ImageResource geodriehoek_active();
+  
+  
 }
