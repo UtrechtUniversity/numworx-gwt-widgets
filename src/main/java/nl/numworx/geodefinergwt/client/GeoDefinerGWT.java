@@ -562,10 +562,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 					Collection<Integer> tools = map.getIntegerList("toolbox");
 					if (tools.contains(Tools.GEO_TRIANGLE)) {
 						GeoTriangle triangle = new GWTTriangle(viewer);
-						triangle.setVisible(true);
+						triangle.setVisible(false);
 						viewer.getMapper().rename(triangle, "geo");
-						UIModel<?, ?> uimodel = uiModelFactory.build(triangle);
-						uimodel.install();
 						viewer.getModel().add(triangle);						
 					}
 				}
