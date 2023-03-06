@@ -819,6 +819,21 @@ protected void drawImage(GeoImage image) {
 	context.scale(scale, scale);
 	context.drawImage(img, -imageCenter.getXd(), -imageCenter.getYd());
 	context.restore();
-}
+// shape:
+	Punt[] depend = (Punt[]) image.getDepend();
+	Path2D.Double path = new Path2D.Double(Path2D.WIND_EVEN_ODD, depend.length);
+	int length = depend.length;
+	double x = depend[0].getXd();
+	double y = depend[0].getYd();
+	path.moveTo(x, y);
+	for (int i = 1; i < length; i++) {
+		Punt p = depend[i];
+		x = p.getXd();
+		y = p.getYd();
+		path.lineTo(x, y);
+	}
+	path.closePath();
+	DefaultAdapter.getDefault(image).put(Shape.class, path);	
+  }
 
 }
