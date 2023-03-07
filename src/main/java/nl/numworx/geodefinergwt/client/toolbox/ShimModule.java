@@ -110,4 +110,15 @@ public abstract class ShimModule {
 	UIShim<? extends Destroyable, Void> linePalette(DashModel ui, Instance instance, Tracker tracker) {
 		return new UIShim<Destroyable, Void>(ui, instance.getStateConfiguration(), tracker);
 	}
+
+	@Provides @IntKey(Tools.ZOOM_IN) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> zoomin(ZoomInModel ui, Tracker tracker) {
+		return new UIShim<Destroyable, Void>(ui, null, tracker);
+	}
+	@Provides @IntKey(Tools.ZOOM_OUT) @IntoMap @Singleton static
+	UIShim<? extends Destroyable, Void> zoomout(ZoomOutModel ui, Tracker tracker) {
+		return new UIShim<Destroyable, Void>(ui, null, tracker);
+	}
+	
+	
 }

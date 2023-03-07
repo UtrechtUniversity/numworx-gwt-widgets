@@ -286,5 +286,22 @@ public interface SvgBundle extends ClientBundle {
   @Source("nl/numworx/geodefinergwt/client/resources/geodriehoekKnop-A.png")
   ImageResource geodriehoek_active();
   
+  @Source("nl/numworx/geodefinergwt/client/resources/Magnify.svg")
+  @MimeType("image/svg+xml")
+  DataResource  magnify_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Magnify-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource magnify_active_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Minify.svg")
+  @MimeType("image/svg+xml")
+  DataResource  minify_svg();
+
+  @Source("nl/numworx/geodefinergwt/client/resources/Minify-A.svg")
+  @MimeType("image/svg+xml")
+  DataResource minify_active_svg();
+
+  
   
 }

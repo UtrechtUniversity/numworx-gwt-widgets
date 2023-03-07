@@ -222,7 +222,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 //				Tools.COLOR_PALETTE,
 				Tools.POINT,
 				Tools.LINE,
-//				Tools.HALFLINE,
+				Tools.HALFLINE,
 //				Tools.SEGMENT,
 //				Tools.LINE_PALETTE,
 //
@@ -254,15 +254,15 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 //				Tools.TRAIL,
 //				Tools.TEXT,			
 //				Tools.FORMULA,
-//
+				Tools.ZOOM_IN,
 //				Tools.PAN,
 				Tools.DESTROY,
 				Tools.RESET,
 //				Tools.ANGLE_POINT
 				Tools.GEO_TRIANGLE
 			);
-		Vector<Map<String,Object>> configs = new Vector<>();
-		configs.setSize(32);
+		Vector<Map<String,Object>> configs = new Vector<>(Tools.TOOL_SIZE);
+		configs.setSize(Tools.TOOL_SIZE);
 		HashMap<String, Object> element = new HashMap<>(Collections.singletonMap("color", 0X80FF0000));
 		element.put("size", 17);
 		configs.set(Tools.POINT, element);
@@ -271,6 +271,9 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		configs.set(Tools.TEXT, new HashMap<>(Collections.singletonMap("color", 0xFFFF0000)));
 		configs.set(Tools.ANGLE_POINT, new HashMap<>(Collections.singletonMap("color", 0xFFFFFF00)));
 		configs.set(Tools.LINE_PALETTE, new HashMap<>(Collections.singletonMap(LineType.DOTTED.name(), false)));
+
+		configs.set(Tools.ZOOM_IN, Collections.singletonMap("magnification", 1.4));
+		
 		//configs.set(Tools.ANGLE,  Collections.singletonMap("rad", false));
 		HashMap<String,Object> mm = new HashMap<>();
 		mm.put("color", 0xFF00AF00);
@@ -287,6 +290,12 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		mm.put("dx", 6);  // 		textModel.setDXY(6f,-5f);
 		mm.put("dy", -5);
 		configs.set(Tools.TEXT, mm);
+		
+		mm = new HashMap<String,Object>();
+		mm.put("width", 4.5);
+		mm.put("tip", Tips.NOTIP.name());
+		mm.put("color", 0xFF0000FF);
+		configs.set(Tools.HALFLINE, mm);
 		
 		launchDebug.put("toolbox", toolbox);
 		launchDebug.put("toolboxConfig", configs);

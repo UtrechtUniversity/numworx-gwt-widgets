@@ -40,6 +40,8 @@ import nl.numworx.geodefiner.common.Instance;
 import nl.numworx.geodefiner.common.Tips;
 import nl.numworx.geodefiner.common.Tools;
 import nl.numworx.geodefiner.common.UIShim;
+import nl.numworx.geodefiner.common.ZoomInHandler;
+import nl.numworx.geodefiner.common.ZoomOutHandler;
 import nl.numworx.geodefinergwt.client.TrackerImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.ui.DashModel;
@@ -334,5 +336,18 @@ public class ToolBoxModule {
         });
         return btn;
     }
-    
+ 
+    @Provides @IntKey(Tools.ZOOM_IN) @IntoMap static
+    ToggleButton zoomin(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+        EventHandler handler = new ZoomInHandler(rb.ToolBoxModule_26());
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ZOOM_IN).get();
+		return newSBtn(svg.magnify_svg(),svg.magnify_active_svg(), handler, tracker, model, rb.ToolBoxModule_26(), shim);
+    }
+
+    @Provides @IntKey(Tools.ZOOM_OUT) @IntoMap static
+    ToggleButton zoomout(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ZOOM_OUT).get();
+        EventHandler handler = new ZoomOutHandler(rb.ToolBoxModule_27());
+		return newSBtn(svg.minify_svg(),svg.minify_active_svg(), handler, tracker, model, rb.ToolBoxModule_27(), shim);
+    }
 }
