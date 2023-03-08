@@ -318,7 +318,7 @@ public class ToolBoxModule {
     }
 
     @Provides @IntKey(Tools.GEO_TRIANGLE) @IntoMap static
-    ToggleButton geotriangle(TrackerImpl tracker) {
+    ToggleButton geotriangle(TrackerImpl tracker, Instance instance, RadioMode model) {
         ToggleButton btn;
         btn = new ToggleButton();
         btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
@@ -331,8 +331,14 @@ public class ToolBoxModule {
         btn.setTitle(rb.ToolBoxModule_25());
         btn.addClickHandler(ev -> {
         	Destroyable geo = tracker.getMapper().fromString("geo");
-        	geo.setVisible(btn.getValue());
+        	boolean on = btn.getValue();
+			geo.setVisible(on);
         	tracker.paint();
+			if (on) {
+				instance.selector.command();
+	        	ToggleButton bs = model.toggles.get(tracker.getPointerHandler());
+				model.down(bs);
+			}
         });
         return btn;
     }
