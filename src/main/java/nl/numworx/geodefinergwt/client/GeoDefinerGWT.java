@@ -557,16 +557,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		attempt = logOption || launchData.containsKey("smObjectives");
 
 		// if launchdata contains Tools.GEO_TRIANGLE: 		
-				ObjectMap map = JSONUtilities.wrapMap(launchData);
-				if (map.containsKey("toolbox")) {
-					Collection<Integer> tools = map.getIntegerList("toolbox");
-					if (tools.contains(Tools.GEO_TRIANGLE)) {
-						GeoTriangle triangle = new GWTTriangle(viewer);
-						triangle.setVisible(false);
-						viewer.getMapper().rename(triangle, "geo");
-						viewer.getModel().add(triangle);						
-					}
-				}
+		ObjectMap map = JSONUtilities.wrapMap(launchData);
+		installGeoTriangle(map);
 		
 		setLaunchData(launchData, values);
         definitions.readonly = viewer.getModel().getIndex(); // readonly moet gezet na init definitions, niet idempotent, na of voor setState
@@ -575,6 +567,18 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		widget.init(width, height-getConstantHeight());
 		tracker.paint();
 		if (volledigeBreedte) toolbox.setResizer(this);
+	}
+
+	private void installGeoTriangle(ObjectMap launchData) {
+		if (launchData.containsKey("toolbox")) {
+			Collection<Integer> tools = launchData.getIntegerList("toolbox");
+			if (tools.contains(Tools.GEO_TRIANGLE)) {
+				GeoTriangle triangle = new GWTTriangle(viewer);
+				triangle.setVisible(false);
+				viewer.getMapper().rename(triangle, GeoTriangle.NAME);
+				viewer.getModel().add(triangle);						
+			}
+		}
 	}
 
 
@@ -673,6 +677,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		definitions.clear();
 		expressions.clear();
 		createModel(viewer.getModel(), width, height);
+		installGeoTriangle(launchData);
 		installLaunchData();
 		toetsStyle();
 		widget.init(width, height-getConstantHeight());
