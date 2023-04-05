@@ -10,9 +10,9 @@
 	<module>../WidgetPlayer</module>
   	<module>../AlgebraExprGWT</module>
   	<module>../AlgebraPijlenGWT</module>
-<!--
   	<module>../BalansFruitGWT</module>
 	<module>../BinomVerdGWT</module>
+<!--
 	<module>../CalculatorGWT</module>
 	<module>../DoorzienGWT</module>
 	<module>../DraaibankGWT</module>
