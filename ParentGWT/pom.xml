@@ -8,8 +8,8 @@
   <modules>
 	<module>../WiskOpdrPlayer</module>
 	<module>../WidgetPlayer</module>
-<!--
   	<module>../AlgebraExprGWT</module>
+<!--
   	<module>../AlgebraPijlenGWT</module>
   	<module>../BalansFruitGWT</module>
 	<module>../BinomVerdGWT</module>
