@@ -1,0 +1,691 @@
+package fi.binomverdgwt.client;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.TouchStartHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.ToggleButton;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.resources.client.ImageResource;
+
+import java.util.logging.Logger;
+
+import fi.binomverdgwt.client.text.Text;
+
+public class BinomVerdGWT implements EntryPoint, InteractionStub 
+{
+	public static Text rb;
+	
+	private static Logger logger = Logger.getLogger("BinomVerdGWT");
+	
+    static final String holderId = "dockholder";
+	static final String upgradeMessage = 
+		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
+	
+	// UI
+	DockLayoutPanel dlp;
+	
+	BinomVerdPanel binomVerdPanel;
+	
+	int buttonWidth = 40;
+	int buttonHeight = 22;
+
+	int breedte = 500;
+	int hoogte = 450;
+	int bottomHeight = 32;
+	int leftOffset = 5;
+	int topOffset = 5;
+	
+//	CssColor bottomBgColor = CssColor.make(220, 220, 220);	
+	
+	private Map<String, Object> launchState;
+	String[] randomVarNamen = new String[0];
+	Map<String, Number> randomVarWaarden = new HashMap<String, Number>();
+	
+	private int mode;
+	private OpdrNavIF comRoot;
+	Boolean correct = null;
+	boolean nagekeken = false;
+	boolean ingevuld = false;
+	
+	boolean bvSetState = false;
+
+	// images
+	BinomVerdGWTClientBundle binomVerdGWTClientBundle;
+	ImageResource foutKruisResource, goedKrulResource;
+	Image foutKruisImage, goedKrulImage;
+
+	static BinomVerdGWTCssResource binomVerdGWTCss;
+	
+	public void getImages() 
+	{
+		rb = GWT.create(Text.class);
+		
+		binomVerdGWTClientBundle = GWT.create(BinomVerdGWTClientBundle.class);
+		binomVerdGWTCss = binomVerdGWTClientBundle.getBinomVerdGWTCSS();
+		binomVerdGWTCss.ensureInjected();
+
+		
+		foutKruisResource = binomVerdGWTClientBundle.foutKruisResource();
+		goedKrulResource = binomVerdGWTClientBundle.goedKrulResource();
+		foutKruisImage = new Image(foutKruisResource);
+		goedKrulImage = new Image(goedKrulResource);
+	}	
+
+
+	public void onModuleLoad() 
+	{
+		
+//System.out.println("onModuleLoad");		
+
+		getImages();
+		
+		dlp = new DockLayoutPanel(Style.Unit.PX);
+		dlp.addStyleName("dock");
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
+		RootPanel.get(holderId).add(dlp);
+		RootPanel.get(holderId).addStyleName("root");
+	
+		Stub.publish(this);
+		//init(breedte, hoogte, new HashMap<String, Object>(), new HashMap<String, Number>());
+		
+
+			
+	}
+	
+	public BinomVerdGWT()
+	{
+		
+	}
+	
+	public BinomVerdGWT(HashMap<String,Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
+	{
+		
+//System.out.println("constructor");
+
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
+		this.randomVarNamen = randomVarNamen;
+		this.randomVarWaarden = randomVarWaarden;
+		if (h.containsKey("breedte"))
+			breedte = h.getInt("breedte");
+		if (h.containsKey("hoogte"))
+			hoogte = h.getInt("hoogte");
+		if (h.containsKey("interactiePanelLaunchState"))
+			launchState = h.getMap("interactiePanelLaunchState");
+
+		getImages();
+		
+//System.out.println("b = " + breedte + " h = " + hoogte);		
+		
+		dlp = new DockLayoutPanel(Style.Unit.PX);
+		dlp.addStyleName("dock");
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
+		
+		init(breedte, hoogte, launchState, randomVarWaarden);
+		
+
+	}
+
+	public void	makeBottom()
+	{
+		
+		
+	}
+
+    class PushMouseHandler implements MouseDownHandler
+    {
+    	
+    	public void onMouseDown(MouseDownEvent e)
+    	{
+			//e.preventDefault();
+			e.stopPropagation();
+    		
+    		
+    	}
+    }
+    
+    class PushTouchStartHandler implements TouchStartHandler
+    {
+    	public void onTouchStart(TouchStartEvent e)
+    	{
+			
+    		// DIT NIET toevoegen!!
+    		//e.preventDefault();
+			e.stopPropagation();
+    		
+    		
+    	}
+    }
+	
+	public Widget asWidget()
+	{
+		return dlp;
+	}
+	
+	@Override
+	public HashMap<String, Object> getState()
+	{
+		HashMap<String, Object> h = binomVerdPanel.getState();
+		h.put("nagekeken", new Boolean(nagekeken));
+		h.put("ingevuld",new Boolean(ingevuld));
+		return h;
+	}
+
+	@Override
+	public void setState(HashMap<String, Object> h)
+	{
+		if(h == null || h.isEmpty()) return; // setStateNull();
+		bvSetState = true;
+		binomVerdPanel.setState(h);
+		bvSetState = false;
+		ingevuld = false;
+		
+		if (h.containsKey("nagekeken"))
+		{	nagekeken = ((Boolean) h.get("nagekeken")).booleanValue();
+		}
+		if (h.containsKey("ingevuld"))
+			ingevuld = ((Boolean) h.get("ingevuld")).booleanValue();
+
+		
+		if (ingevuld && (mode == 0 || nagekeken))
+		//if (nagekeken)
+			kijkNa();
+		
+
+	}
+
+	@Override
+	public int getScore()
+	{
+		return binomVerdPanel.score;
+	}
+
+	@Override
+	public Boolean isCorrect()
+	{
+		if (binomVerdPanel.kijkOpdrachtNa)
+			return correct;
+		else
+			return Boolean.TRUE;
+
+	}
+
+	@Override
+	public void setCommunicationRoot(OpdrNavIF comRoot)
+	{
+		this.comRoot = comRoot;
+		zetMode(comRoot.getMode());
+
+
+	}
+	
+	public void zetNagekeken(boolean b) 
+	{	nagekeken = true;
+	}
+	
+	public void zetMode(int mode)
+	{	this.mode = mode;
+		if (binomVerdPanel.kijkOpdrachtNa)    
+			binomVerdPanel.kijkOpdrachtNa = (mode == 0 || mode == 1);
+
+	}
+
+    public void changed()
+	{
+    	
+	  	if (binomVerdPanel.kijkOpdrachtNa && !bvSetState) 
+		{
+//System.out.println("changed");	  		
+	   		correct = null;
+    		nagekeken = false;
+    		ingevuld = true;
+    		
+    		comRoot.setChanged(true);
+		   	
+		}
+	}
+
+	@Override
+	public void kijkNa() 
+	{
+		binomVerdPanel.kijkNa();
+		nagekeken = true;
+		ingevuld = true;
+		comRoot.setChanged(isCorrect().booleanValue());
+		
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+	}
+
+	@Override
+	public int getAsHoogte() {
+		return 0;
+	}
+
+	@Override
+	public int getHeight() 
+	{	return hoogte;
+	}
+
+	@Override
+	public int getWidth() 
+	{	return breedte;
+	}
+
+	@Override
+	public void setAsHoogte(int ashoogte) {
+	}
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+
+	public void init(int width, int height, Map<String, Object> map, //launchState,
+			Map<String, Number> values) 
+	{
+logger.info("BinomVerdGWT init");
+		
+		this.breedte = width;
+		this.hoogte = height;
+		//this.launchState = launchState;
+		
+		dlp.setPixelSize(breedte,hoogte);
+		
+//System.out.println("init " + breedte + " " + hoogte);		
+		
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
+
+		// edit state variabelen in BinomVerdPanel
+		
+		getImages();
+		
+		binomVerdPanel = new BinomVerdPanel(this, breedte, hoogte);
+		
+		dlp.add(binomVerdPanel);
+		
+		if (launchState.containsKey("kijkNa")) 
+		{			
+			binomVerdPanel.kijkOpdrachtNa = launchState.getBoolean("kijkNa");
+		}	
+		
+		binomVerdPanel.plaatsComponenten(true);
+		
+logger.info("BinomVerdGWT componenten geplaatst");		
+		
+		Canvas binomVerdGWTCanvas = binomVerdPanel.getCanvas();
+		
+		if (binomVerdGWTCanvas == null) 
+		{
+	      RootPanel.get(holderId).add(new Label(upgradeMessage));
+	      return;
+	    }
+		
+logger.info("BinomVerdGWT pre setState");
+
+		binomVerdPanel.setState(map);
+logger.info("initializeer Random Waarden");
+		randomVarWaarden = values;
+		randomVarNamen = randomVarWaarden.keySet().toArray(new String[randomVarWaarden.size()]);		
+		
+logger.info("BinomVerdGWT post setState");		
+
+		BVInvoer invoer = new BVInvoer("");
+		
+		//vul de randomwaarden in
+		if (launchState.containsKey("initGrensLinks")) 
+		{
+			invoer.setInput(launchState.getString("initGrensLinks"));
+			if (invoer.isRandomInput()) 
+			{
+				binomVerdPanel.staafjesPanel.setGrensLinks((int) substitueerRandom(0, invoer.getInput(), randomVarNamen, randomVarWaarden));
+			}
+			else 
+			{
+				binomVerdPanel.staafjesPanel.setGrensLinks(Integer.parseInt(invoer.getInput()));
+			}
+			
+		}
+		if (launchState.containsKey("initGrensRechts")) 
+		{
+			invoer.setInput(launchState.getString("initGrensRechts"));
+			if (invoer.isRandomInput()) 
+			{
+				binomVerdPanel.staafjesPanel.setGrensRechts((int) substitueerRandom(10, invoer.getInput(), randomVarNamen, randomVarWaarden));
+			}
+			else 
+			{
+				binomVerdPanel.staafjesPanel.setGrensRechts(Integer.parseInt(invoer.getInput()));
+			}
+		}
+		
+		if (binomVerdPanel.nInvoer.isRandomInput()) 
+		{
+			binomVerdPanel.n = (int) substitueerRandom((double) binomVerdPanel.n, binomVerdPanel.nInvoer.getInput(), 
+					                                    randomVarNamen, randomVarWaarden);
+			binomVerdPanel.nInvoer.setInput(Integer.toString(binomVerdPanel.n));
+			
+			
+		}
+		
+		if (binomVerdPanel.pInvoer.isRandomInput()) 
+		{
+			if (!binomVerdPanel.pInvoer.isBreuk()) 
+			{
+				binomVerdPanel.p = substitueerRandom(binomVerdPanel.p, binomVerdPanel.pInvoer.getInput(), 
+						                             randomVarNamen, randomVarWaarden);
+				binomVerdPanel.pInvoer.setInput(Double.toString(binomVerdPanel.p));
+			}
+			else 
+			{
+				double teller;
+				double noemer;
+				if (BVInvoer.isRandomVar(binomVerdPanel.pInvoer.getTellerString())) 
+				{
+					teller = substitueerRandom(binomVerdPanel.p, binomVerdPanel.pInvoer.getTellerString(), 
+											   randomVarNamen, randomVarWaarden);
+				}
+				else
+				{
+					teller = Double.parseDouble(binomVerdPanel.pInvoer.getTellerString());
+				}
+				
+				if (BVInvoer.isRandomVar(binomVerdPanel.pInvoer.getNoemerString())) 
+				{
+					noemer = substitueerRandom(1.0, binomVerdPanel.pInvoer.getNoemerString(), randomVarNamen, randomVarWaarden);
+				}
+				else 
+				{
+					noemer = Double.parseDouble(binomVerdPanel.pInvoer.getNoemerString());
+				}
+				
+				binomVerdPanel.p = teller/noemer;
+				if (binomVerdPanel.p > 1.0) 
+				{ //kansen groter dan 1.0 zijn onzin
+					binomVerdPanel.p = 1.0;
+				}
+				binomVerdPanel.pInvoer.setInput(Double.toString(teller) + "/" + Double.toString(noemer));
+			}
+		}
+//		System.out.println("PInvoer: " + binomVerdPanel.pInvoer.getInput());
+		binomVerdPanel.pInvoer.haalPuntNulWeg();
+		
+		if (binomVerdPanel.MInvoer.isRandomInput()) 
+		{
+			binomVerdPanel.M = (int) substitueerRandom((double) binomVerdPanel.M, binomVerdPanel.MInvoer.getInput(), 
+					                                    randomVarNamen, randomVarWaarden);
+			binomVerdPanel.MInvoer.setInput(Integer.toString(binomVerdPanel.M));
+			
+			
+		}
+
+		if (binomVerdPanel.populatieInvoer.isRandomInput()) 
+		{
+			binomVerdPanel.populatie = (int) substitueerRandom((double) binomVerdPanel.populatie, binomVerdPanel.populatieInvoer.getInput(), 
+					                                           randomVarNamen, randomVarWaarden);
+			binomVerdPanel.populatieInvoer.setInput(Integer.toString(binomVerdPanel.populatie));
+			
+			
+		}
+
+		
+		//zet nakijkopties
+		if (launchState.containsKey("kijkNa")) 
+		{			
+			binomVerdPanel.kijkOpdrachtNa = launchState.getBoolean("kijkNa");
+			
+			if (launchState.containsKey("scoreMax")) {
+				binomVerdPanel.maxScore = launchState.getInt("scoreMax");
+			}
+			
+			if (binomVerdPanel.kijkOpdrachtNa) 
+			{
+				if (launchState.containsKey("antwoordN")) 
+				{
+					binomVerdPanel.kijkNNa = true;
+					invoer.setInput(launchState.getString("antwoordN"));
+					if (invoer.isRandomInput()) 
+					{
+						binomVerdPanel.antwoordN = (int) substitueerRandom(30, invoer.getInput(), randomVarNamen, randomVarWaarden);
+					}
+					else 
+					{
+						binomVerdPanel.antwoordN = Integer.parseInt(invoer.getInput());
+					}
+				}
+				else 
+				{
+					binomVerdPanel.kijkNNa = false;
+				}
+				
+				if (launchState.containsKey("antwoordGrenzenVan") && launchState.containsKey("antwoordGrenzenTot")) {
+					binomVerdPanel.kijkGrenzenNa = true;
+					invoer.setInput(launchState.getString("antwoordGrenzenVan"));
+					if (invoer.isRandomInput()) 
+					{
+						binomVerdPanel.antwoordGrensLinks = (int) substitueerRandom(5, invoer.getInput(), randomVarNamen, randomVarWaarden);
+					}
+					else 
+					{
+						binomVerdPanel.antwoordGrensLinks = Integer.parseInt(launchState.getString("antwoordGrenzenVan"));
+					}
+					
+					invoer.setInput(launchState.getString("antwoordGrenzenTot"));
+					if (invoer.isRandomInput()) 
+					{
+						binomVerdPanel.antwoordGrensRechts = (int) substitueerRandom(10, invoer.getInput(), randomVarNamen, randomVarWaarden);
+					}
+					else 
+					{
+						binomVerdPanel.antwoordGrensRechts = Integer.parseInt(launchState.getString("antwoordGrenzenTot"));
+					}
+					
+				}
+				else 
+				{
+					binomVerdPanel.kijkGrenzenNa = false;
+				}
+				
+				if (launchState.containsKey("antwoordVerdeling")) 
+				{
+					binomVerdPanel.kijkVerdelingNa = true;
+					binomVerdPanel.antwoordVerdeling = launchState.getInt("antwoordVerdeling");
+					
+					if (binomVerdPanel.antwoordVerdeling == 0) 
+					{
+						//er moet een binomiale verdeling worden nagekeken
+						if (launchState.containsKey("antwoordP")) 
+						{
+							binomVerdPanel.kijkPNa = true;
+							invoer.setInput(launchState.getString("antwoordP"));
+//							System.out.println("Kijk P na invoer: " + invoer.getInput());
+							if (invoer.isRandomInput()) 
+							{
+								if(invoer.isBreuk()) 
+								{
+									double teller;
+									double noemer;
+									if (BVInvoer.isRandomVar(invoer.getTellerString())) 
+									{
+										teller = substitueerRandom(1, invoer.getTellerString(), randomVarNamen, randomVarWaarden);
+									}
+									else 
+									{
+										teller = Double.parseDouble(invoer.getTellerString());
+									}
+									if (BVInvoer.isRandomVar(invoer.getNoemerString())) 
+									{
+										noemer = substitueerRandom(1, invoer.getNoemerString(), randomVarNamen, randomVarWaarden);
+									}
+									else 
+									{
+										noemer = Double.parseDouble(invoer.getNoemerString());
+									}
+									binomVerdPanel.antwoordP = new BVInvoer(Double.toString(teller) + "/" + Double.toString(noemer));
+								}
+								else 
+								{
+									binomVerdPanel.antwoordP = new BVInvoer(Double.toString(
+											substitueerRandom(0.5, invoer.getInput(), randomVarNamen, randomVarWaarden)));
+								}
+							}
+							else 
+							{
+								/*
+								if(invoer.isBreuk()) {
+									this.antwoordP = Double.parseDouble(invoer.getTellerString()) / Double.parseDouble(invoer.getNoemerString());
+								}
+								else {
+									this.antwoordP = Double.parseDouble(invoer.getInput());
+								}*/
+								binomVerdPanel.antwoordP = new BVInvoer(invoer.getInput());
+							}
+						}
+						else 
+						{
+							binomVerdPanel.kijkPNa = false;
+						}
+					}
+					else 
+					{
+						//er moet een hypergeometrische verdeling worden nagekeken
+						if (launchState.containsKey("antwoordM")) {
+							binomVerdPanel.kijkMNa = true;
+							invoer.setInput(launchState.getString("antwoordM"));
+							if (invoer.isRandomInput()) 
+							{
+								binomVerdPanel.antwoordM = (int) substitueerRandom(50, invoer.getInput(), randomVarNamen, randomVarWaarden);
+							}
+							else 
+							{
+								binomVerdPanel.antwoordM = Integer.parseInt(invoer.getInput());
+							}
+						}
+						else 
+						{
+							binomVerdPanel.kijkMNa = false;
+						}
+						
+						if (launchState.containsKey("antwoordPopulatie")) 
+						{
+							binomVerdPanel.kijkPopulatieNa = true;
+							invoer.setInput(launchState.getString("antwoordPopulatie"));
+							if (invoer.isRandomInput()) 
+							{
+								binomVerdPanel.antwoordPopulatie = (int) substitueerRandom(100, invoer.getInput(), 
+																			randomVarNamen, randomVarWaarden);
+							}
+							else 
+							{
+								binomVerdPanel.antwoordPopulatie = Integer.parseInt(invoer.getInput());
+							}
+						}
+						else 
+						{
+							binomVerdPanel.kijkPopulatieNa = false;
+						}
+					}
+				}
+				else 
+				{
+					binomVerdPanel.kijkVerdelingNa = false;
+				}
+				
+			}
+			else 
+			{
+				binomVerdPanel.kijkOpdrachtNa = false;
+				binomVerdPanel.kijkGrenzenNa = false;
+				binomVerdPanel.kijkNNa = false;
+				binomVerdPanel.kijkMNa = false;
+				binomVerdPanel.kijkVerdelingNa = false;
+				binomVerdPanel.kijkPopulatieNa = false;
+				binomVerdPanel.kijkPNa = false;
+			}
+			
+		}
+		else 
+		{
+			binomVerdPanel.kijkOpdrachtNa = false;
+			binomVerdPanel.kijkGrenzenNa = false;
+			binomVerdPanel.kijkNNa = false;
+			binomVerdPanel.kijkMNa = false;
+			binomVerdPanel.kijkVerdelingNa = false;
+			binomVerdPanel.kijkPopulatieNa = false;
+			binomVerdPanel.kijkPNa = false;
+		}
+		
+
+		binomVerdPanel.vernieuw();
+		
+		binomVerdPanel.staafjesPanel.updateSuccessenSliderPosition();
+
+		binomVerdPanel.plaatsComponenten(false);
+		
+		
+//System.out.println("init binomVerdPanel.paint()");
+
+		dlp.forceLayout();
+		binomVerdPanel.forceLayout();
+		
+		binomVerdPanel.paint();
+		
+		ingevuld = false;
+
+
+	}
+
+	public static double substitueerRandom(double def, String s, String[] randomVarNamen, Map<String, Number> randomVarWaarden2) 
+	{	double d = Double.NaN;
+		s = s.substring(1, s.length() - 1);
+		String[] delen = StringUtils.split(s, "/");
+		int decFactor = 1;
+	
+//		for (int j = 0 ; j < randomVarNamen.length; j++)
+//		{	
+////System.out.println("rava " + j + " " + randomVars[j]);			
+//			if (randomVarNamen[j].equals(delen[0])) 
+//				d =  randomVarWaarden2.get(randomVarNamen[j]).doubleValue();
+//		}
+		if(randomVarWaarden2.containsKey(delen[0]))
+			d = randomVarWaarden2.get(delen[0]).doubleValue();
+		
+		if (delen.length > 1)
+		{	decFactor = Integer.parseInt(delen[1]);
+			d = d / decFactor;
+		}
+		if (Double.isNaN(d)) 
+			d = def;
+		return d;
+	}
+
+}
