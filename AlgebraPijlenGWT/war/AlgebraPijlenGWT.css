@@ -1,0 +1,33 @@
+/** Dit file staat niet in de css map */
+
+
+.root {
+	background-color: yellow;  
+}	
+
+.dock {
+	background-color: orange; 
+}
+
+body {
+	overflow: hidden;
+	margin: 0px !important;
+}
+
+.kijknapanel {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.goed {
+	background-image: url("images/resources/knop-indicatie-goed.png");
+}
+
+.half {
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.fout {
+	background-image: url("images/resources/knop-indicatie-fout.png");
+}
