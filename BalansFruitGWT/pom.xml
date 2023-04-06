@@ -15,6 +15,10 @@
     	</resource>
     </resources>
   	<plugins>
+  	  <plugin>
+    	<groupId>org.apache.maven.plugins</groupId>
+    	<artifactId>maven-toolchains-plugin</artifactId>
+  	  </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
@@ -28,7 +32,7 @@
          <configuration>
               <module>${project.groupId}.${project.artifactId}</module>
               <runTarget>${project.artifactId}.html</runTarget>
-        	  <warSourceDirectory>war</warSourceDirectory>        
+        	  <warSourceDirectory>war</warSourceDirectory>
              </configuration>
         <executions>
           <execution>
@@ -46,14 +50,10 @@
   	  </plugin>
     </plugins>
   </build>
-  <properties>
-  	<gwtVersion>2.5.1</gwtVersion>
-  </properties>
   <dependencies>
   	<dependency>
   		<groupId>com.google.gwt</groupId>
   		<artifactId>gwt-user</artifactId>
-  		<version>${gwtVersion}</version>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
@@ -69,7 +69,14 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.4</version>
+  	<version>0.0.7-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
+  <properties>
+  	<gwtVersion>2.5.1</gwtVersion>
+  	<maven.compiler.source>1.7</maven.compiler.source>
+  	<maven.compiler.target>1.7</maven.compiler.target>
+  	<jdk8>/usr/lib/jvm/java-8-openjdk-amd64</jdk8>
+  	<gwt.jvm>${jdk8}</gwt.jvm>
+  </properties>
 </project>
