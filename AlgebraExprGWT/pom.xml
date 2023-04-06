@@ -58,12 +58,12 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
-			<version>0.0.2</version>
+			<version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.3</version>
+			<version>0.0.7</version>
 	  		<exclusions>
 	  			<exclusion>
 	  				<artifactId>IdeasGWT</artifactId>
@@ -80,8 +80,13 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.4</version>
+  	<version>0.0.7-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Algebra Expressies</name>
+  <properties>
+  	<gwtVersion>2.8.2</gwtVersion>
+  	<maven.compiler.target>1.8</maven.compiler.target>
+  	<maven.compiler.source>1.8</maven.compiler.source>
+  </properties>
 </project>
