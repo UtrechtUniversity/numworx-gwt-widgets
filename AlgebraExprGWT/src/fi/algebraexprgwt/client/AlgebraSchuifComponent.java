@@ -1,9 +1,5 @@
 package fi.algebraexprgwt.client;
 
-import java.awt.*;
-import java.awt.event.*;
-//import java.util.Hashtable;
-
 import java.util.HashMap;
 
 import com.google.gwt.canvas.dom.client.Context2d;

@@ -8,6 +8,9 @@
 <module rename-to='algebraexprgwt'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User'/>
+  <define-property name="gwt.logging.popupHandler"
+                values="ENABLED, DISABLED" />
+  <set-property name="gwt.logging.popupHandler" value="DISABLED" />
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -20,6 +23,7 @@
   <!-- Other module inherits -->
   <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='nl.uu.fi.dwo.formule.Formule' />
+
     
   <set-property name="gwt.logging.enabled" value="TRUE"/>
   <set-property name="gwt.logging.logLevel" value="FINEST"/>
