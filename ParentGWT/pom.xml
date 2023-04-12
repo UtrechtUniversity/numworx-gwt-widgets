@@ -16,8 +16,8 @@
 	<module>../DoorzienGWT</module>
 	<module>../DraaibankGWT</module>
 	<module>../GeomAlgGWT</module>
-<!--
 	<module>../Grafiek3DGWT</module>
+<!--
 	<module>../HeksGWT</module>
 	<module>../KansbomenGWT</module>
 	<module>../KladjeGWT</module>
