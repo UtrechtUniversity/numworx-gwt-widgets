@@ -17,6 +17,7 @@
 	<module>../DraaibankGWT</module>
 	<module>../GeomAlgGWT</module>
 	<module>../Grafiek3DGWT</module>
+	<module>../GraphToolGWT</module>
 	<module>../HeksGWT</module>
 <!--
 	<module>../KansbomenGWT</module>
@@ -33,7 +34,6 @@
 	<module>../VerknippenGWT</module>
 	<module>../WebLogoGWT</module>
 	<module>../WebLogo3dGWT</module>
-	<module>../GraphToolGWT</module>
 	<module>../GeoDefinerGWT</module>
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>

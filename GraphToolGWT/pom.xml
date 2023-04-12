@@ -140,7 +140,7 @@
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
 		<relativePath>../ParentGWT</relativePath>
-		<version>0.0.6</version>
+		<version>0.0.7-SNAPSHOT</version>
 	</parent>
 	<version>2.4.19-SNAPSHOT</version>
 	<scm>
