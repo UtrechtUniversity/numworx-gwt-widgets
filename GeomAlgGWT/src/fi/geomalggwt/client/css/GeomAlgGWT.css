@@ -1,0 +1,61 @@
+/** Dit file staat in de css map */
+
+
+.root {
+	background-color: white; 
+}	
+
+.dock {
+	background-color: white; 
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	background-color: white;	
+}
+
+.upimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.downimage {
+	position: relative;
+	top: -4px;
+	left: -6px;
+}		
+
+.pushimage {
+	position: relative;
+	top: -3px;
+	left: -6px;
+}		
+
+.togglebutton {
+	
+	font-family: Helvetica, sans serif;
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+	color: red;
+	
+}
+
+.pushbutton {
+
+	/** background-color: yellow; */
+	font-size: 0.975em;
+	font-weight: bold;
+	text-align: center;
+	font-family: Helvetica, sans serif;
+	/** padding: 0px; */	
+}	
+
+.checkbox input {
+	margin-right: 3px !important;
+	vertical-align: middle;
+}
