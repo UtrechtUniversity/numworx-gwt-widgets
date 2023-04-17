@@ -1,0 +1,1142 @@
+package fi.kladjegwt.client;
+
+
+
+import java.awt.List;
+//import java.awt.Point;
+import java.util.HashMap;
+//import java.util.Hashtable;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.logging.Logger;
+
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleViewer;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
+import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.InteractionView;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Stub;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
+import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
+import nl.uu.fi.dwo.interaction.client.json.ObjectList;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.dom.client.Style.BorderStyle;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.canvas.client.Canvas;
+import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.ToggleButton;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.resources.client.ImageResource;
+
+import fi.kladjegwt.client.text.Text;
+import fi.writemathgwt.client.engine.ReferenceSamples;
+import fi.writemathgwt.client.engine.Stroke;
+import fi.writemathgwt.client.engine.StrokeContainer;
+
+
+/**
+ * hoofdklasse voor KladjeGWT; deze klasse creeert en beheert de teken- en selectie knoppen 
+ * (de aanwezigheid van tekenknoppen is instelbaar), de terugknop. de wisknop en de
+ * kleurkeuzeknop (instelbaar);<br>.  
+ * de klasse leest ook docent-data (als die er zijn) in, d.w.z. tekeningen die door de
+ * docent zijn klaargezet.  
+ * @author huub
+ */
+
+public class KladjeGWT implements EntryPoint, InteractionStub, InteractionView, CBookEventListener
+{
+	private static Logger logger = Logger.getLogger("KladjeGWT");
+	static final String upgradeMessage = 
+		"Your browser does not support the HTML5 Canvas. Please upgrade your browser to view this demo.";
+	static final Text rb = GWT.create(Text.class);
+
+	/**
+	 * Premium feature. True als de school een premium abonnement heeft.
+	 * Let op: wordt pas gezet bij {@link #setCommunicationRoot(OpdrNavIF)}.
+	 * Daarvoor is deze boolean nog false!
+	 */
+	public static boolean premium = false;
+	
+	OpdrNavIF comRoot;
+	
+	/**
+	 * GUI componenten: dlp hangt aan de root, bottomPanel
+	 * zit in dlp-south, het Canvas van KladjeGWTVeld zit
+	 * in dlp-centrum   
+	 */
+	DockLayoutPanel dlp;
+	/**
+	 * LayoutPanel voor knoppen
+	 */
+	LayoutPanel bottomPanel;
+	
+	LayoutPanel topPanel;
+	
+	/**
+	 * klasse die het tekengebeuren afhandelt
+	 */
+	KladjeGWTVeld kladjeGWTVeld;
+	/**
+	 * het Canvas om op te tekenen (dit gebeurt in klasse kladjeGWTVeld)
+	 */
+	Canvas kladjeGWTCanvas;
+	
+	/**
+	 * toggle knoppen: tekenen en selecteren is altijd mogelijk, de andere acties zijn instelbaar 
+	 */
+	ToggleButton formuleButton, tekenButton, tekenLijnButton, tekenRechthoekButton, tekenCirkelButton,
+    			 tekenTekstButton, selecterenButton;
+	
+	/**
+	 * knoppen voor undo, wissen en (instelbaar) het oproepen van de colorPopup 
+	 */
+	PushButton terugButton, wisButton, kleurkeuzeButton;
+	/**
+	 * de ColorPopup (zie klasse ColorPopup)
+	 */
+	ColorPopup colorPopup;
+	
+	/**
+	 * layout constantes in pixels
+	 */
+	int breedte = 700;
+	int hoogte = 550;
+	int bottomHeight = 37;
+	int topHeight = 52;
+	int leftOffset = 5;
+	int topOffset = 5;
+	int toggleSize = 26;
+	int pushSize = 24;
+	int buttonWidth = 25;
+	int buttonHeight = 25;
+
+	/**
+	 * launchdata
+	 */
+	private Map<String, Object> launchState;
+	String[] randomVarNamen = null;
+	HashMap<String, Object> randomVarWaarden = null;
+	
+	private int scoreMax = 0;
+	
+	/**
+	 * bevat verwijzingen naar de plaatjes op de knoppen en de css 
+	 */
+	KladjeGWTClientBundle kladjeGWTClientBundle;
+	/**
+	 * cascading style sheet
+	 */
+	static KladjeCssResource kladjeCss;
+	/**
+	 * resources voor de plaatjes: alle ToggleButtons hebben twee resources: een voor de normale toestand
+	 * en een voor de ingedrukte toestand
+	 */
+	ImageResource tekenFormuleUpResource, tekenFormuleDownResource, tekenKnopUpResource, tekenKnopDownResource, tekenLijnUpResource, tekenLijnDownResource, 
+				  tekenRechthoekUpResource, tekenRechthoekDownResource, tekenCirkelUpResource, tekenCirkelDownResource, 
+				  tekenTekstUpResource, tekenTekstDownResource, selecterenUpResource, selecterenDownResource, 
+	              regenboogResource, binKnopResource, terugKnopResource,
+	              zwartResource, grijsResource, roodResource, oranjeResource, groenResource, cyaanResource,  
+	              blauwResource, magentaResource; 
+	              //formuleschrijfImageResource, formuleschrijfaanImageResource;
+	              
+	/**
+	 * de actuele plaatjes: alle ToggleButtons hebben twee plaatjes: een voor de normale toestand
+	 * en een voor de ingedrukte toestand
+	 */
+	Image tekenFormuleUpImage, tekenFormuleDownImage, tekenKnopUpImage, tekenKnopDownImage, tekenLijnUpImage, tekenLijnDownImage, 
+		  tekenRechthoekUpImage, tekenRechthoekDownImage, tekenCirkelUpImage, tekenCirkelDownImage, 
+		  tekenTekstUpImage, tekenTekstDownImage, selecterenUpImage, selecterenDownImage,
+		  regenboogImage, binKnopImage, terugKnopImage,
+		  zwartImage, grijsImage, roodImage, oranjeImage, groenImage, cyaanImage, 
+		  blauwImage, magentaImage;
+		  //formuleschrijfImage, formuleschrijfaanImage;
+		  
+	
+	/**
+	 * instelbaarheid: kleuren kiezen?
+	 */
+	boolean kleurkeuze = true;
+	
+	/**
+	 * instelbaarheid: lijnen als achtergrond tekenveld?  
+	 */
+	boolean lijnen = false;
+	/**
+	 * instelbaarheid: ruitjes als achtergrond tekenveld?  
+	 */
+	boolean ruitjes = true;
+	/**
+	 * instelbaarheid: afmeting van de ruitjes als achtergrond (in pixels)
+	 */
+	int ruitjesSize = 20;
+	/**
+	 * instelbaarheid: formule tekenen?
+	 */
+	boolean formuleOptie = false;
+	/**
+	 * instelbaarheid: ivm?
+	 */
+	boolean ivmOptie = false;
+	/**
+	 * instelbaarheid: lijnen tekenen?
+	 */
+	boolean lijnTekenen = true;
+	/**
+	 * instelbaarheid: rechthoeken tekenen?
+	 */
+	boolean rechthoekTekenen = true;
+	/**
+	 * instelbaarheid: ellipsen tekenen?
+	 */
+	boolean cirkelTekenen = true;
+	/**
+	 * instelbaarheid: tekst toevoegen?
+	 */
+	boolean tekstTekenen = true;
+
+	/**
+	 * instelbaarheid: objecten draaien? 
+	 */
+	boolean roteren = true;
+	/**
+	 * instelbaarheid: objecten schalen
+	 */
+	boolean schalen = true;
+	
+	private Point translation = new fi.kladjegwt.client.Point(0,0);
+	
+	private double scale = 1.0;
+	
+	private int asHoogte;
+	
+	private StrokeContainer strokeContainer = new StrokeContainer();
+	
+	private FormuleViewer formuleViewer;
+	
+	private int[][] rectangleData;
+	
+	private boolean calculator = true;
+	
+	private boolean toolBarOnTop = false;
+	
+	/**
+	 * maak de css in orde en haal via de resources alle plaatjes op 
+	 */
+	public void getImages() 
+	{
+		kladjeGWTClientBundle = GWT.create(KladjeGWTClientBundle.class);
+		kladjeCss = kladjeGWTClientBundle.getKladjeGWTCSS();
+		kladjeCss.ensureInjected();
+		
+		tekenKnopUpResource = kladjeGWTClientBundle.tekenKnopUpResource();
+		tekenKnopDownResource = kladjeGWTClientBundle.tekenKnopDownResource();
+		tekenKnopUpImage = new Image(tekenKnopUpResource);
+		tekenKnopDownImage = new Image(tekenKnopDownResource);
+		tekenKnopUpImage.addStyleName(kladjeCss.upimage());
+		tekenKnopDownImage.addStyleName(kladjeCss.downimage());
+		
+		tekenFormuleUpResource = kladjeGWTClientBundle.tekenFormuleUpResource();
+		tekenFormuleDownResource = kladjeGWTClientBundle.tekenFormuleDownResource();
+		tekenFormuleUpImage = new Image(tekenFormuleUpResource);
+		tekenFormuleDownImage = new Image(tekenFormuleDownResource);
+		tekenFormuleUpImage.addStyleName(kladjeCss.upimage());
+		tekenFormuleDownImage.addStyleName(kladjeCss.downimage());
+		
+		tekenLijnUpResource = kladjeGWTClientBundle.tekenLijnUpResource();
+		tekenLijnDownResource = kladjeGWTClientBundle.tekenLijnDownResource();
+		tekenLijnUpImage = new Image(tekenLijnUpResource);
+		tekenLijnDownImage = new Image(tekenLijnDownResource);
+		tekenLijnUpImage.addStyleName(kladjeCss.upimage());
+		tekenLijnDownImage.addStyleName(kladjeCss.downimage());
+
+		tekenRechthoekUpResource = kladjeGWTClientBundle.tekenRechthoekUpResource();
+		tekenRechthoekDownResource = kladjeGWTClientBundle.tekenRechthoekDownResource();
+		tekenRechthoekUpImage = new Image(tekenRechthoekUpResource);
+		tekenRechthoekDownImage = new Image(tekenRechthoekDownResource);
+		tekenRechthoekUpImage.addStyleName(kladjeCss.upimage());
+		tekenRechthoekDownImage.addStyleName(kladjeCss.downimage());
+
+		tekenCirkelUpResource = kladjeGWTClientBundle.tekenCirkelUpResource();
+		tekenCirkelDownResource = kladjeGWTClientBundle.tekenCirkelDownResource();
+		tekenCirkelUpImage = new Image(tekenCirkelUpResource);
+		tekenCirkelDownImage = new Image(tekenCirkelDownResource);
+		tekenCirkelUpImage.addStyleName(kladjeCss.upimage());
+		tekenCirkelDownImage.addStyleName(kladjeCss.downimage());
+		
+		tekenTekstUpResource = kladjeGWTClientBundle.tekenTekstUpResource();
+		tekenTekstDownResource = kladjeGWTClientBundle.tekenTekstDownResource();
+		tekenTekstUpImage = new Image(tekenTekstUpResource);
+		tekenTekstDownImage = new Image(tekenTekstDownResource);
+		tekenTekstUpImage.addStyleName(kladjeCss.upimage());
+		tekenTekstDownImage.addStyleName(kladjeCss.downimage());
+
+		selecterenUpResource = kladjeGWTClientBundle.selecterenUpResource();
+		selecterenDownResource = kladjeGWTClientBundle.selecterenDownResource();
+		selecterenUpImage = new Image(selecterenUpResource);
+		selecterenDownImage = new Image(selecterenDownResource);
+		selecterenUpImage.addStyleName(kladjeCss.upimage());
+		selecterenDownImage.addStyleName(kladjeCss.downimage());
+		
+		
+		regenboogResource = kladjeGWTClientBundle.regenboogResource();
+		regenboogImage = new Image(regenboogResource);
+		regenboogImage.addStyleName(kladjeCss.pushimage2());
+		
+		binKnopResource = kladjeGWTClientBundle.binKnopResource();
+		binKnopImage = new Image(binKnopResource);
+		binKnopImage.addStyleName(kladjeCss.pushimage2());
+		
+		terugKnopResource = kladjeGWTClientBundle.terugKnopResource();
+		terugKnopImage = new Image(terugKnopResource);
+		terugKnopImage.addStyleName(kladjeCss.pushimage2());
+
+		zwartResource = kladjeGWTClientBundle.zwartResource();
+		zwartImage = new Image(zwartResource);
+		zwartImage.addStyleName(kladjeCss.pushimage2());
+
+		grijsResource = kladjeGWTClientBundle.grijsResource();
+		grijsImage = new Image(grijsResource);
+		grijsImage.addStyleName(kladjeCss.pushimage2());
+		
+		roodResource = kladjeGWTClientBundle.roodResource();
+		roodImage = new Image(roodResource);
+		roodImage.addStyleName(kladjeCss.pushimage2());
+		
+		oranjeResource = kladjeGWTClientBundle.oranjeResource();
+		oranjeImage = new Image(oranjeResource);
+		oranjeImage.addStyleName(kladjeCss.pushimage2());
+		
+		groenResource = kladjeGWTClientBundle.groenResource();
+		groenImage = new Image(groenResource);
+		groenImage.addStyleName(kladjeCss.upimage());
+		
+		cyaanResource = kladjeGWTClientBundle.cyaanResource();
+		cyaanImage = new Image(cyaanResource);
+		cyaanImage.addStyleName(kladjeCss.pushimage2());
+		
+		blauwResource = kladjeGWTClientBundle.blauwResource();
+		blauwImage = new Image(blauwResource);
+		blauwImage.addStyleName(kladjeCss.pushimage2());
+
+		magentaResource = kladjeGWTClientBundle.magentaResource();
+		magentaImage = new Image(magentaResource);
+		magentaImage.addStyleName(kladjeCss.pushimage2());
+		
+		
+	} // getImages	
+		
+
+	public void onModuleLoad() 
+	{
+		getImages();
+		
+		dlp = new DockLayoutPanel(Style.Unit.PX);
+		dlp.addStyleName(kladjeCss.dock());
+		dlp.setPixelSize(breedte,hoogte);
+
+		RootLayoutPanel.get().add(dlp);
+		RootLayoutPanel.get().addStyleName(kladjeCss.root());
+		
+		Stub.publish(this); 
+
+	}	
+
+	/**
+	 * creeer de ToggleButtons en PushButtons (indien ingesteld) op het bottomPanel en voeg
+	 * Click Handlers toe 
+	 */
+	public void makeBottom()
+	{
+		int currentX = leftOffset;
+		int currentY = topOffset;
+		ToggleClickHandler toggleClickHandler = new ToggleClickHandler();
+		
+		if (formuleOptie)
+		{
+			formuleButton = new ToggleButton(tekenFormuleUpImage, tekenFormuleDownImage);
+			formuleButton.addStyleName("togglebutton");
+			bottomPanel.add(formuleButton);
+			bottomPanel.setWidgetLeftWidth(formuleButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(formuleButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+			formuleButton.addClickHandler(toggleClickHandler);
+		
+			currentX += toggleSize + leftOffset;
+		}
+		
+		selecterenButton = new ToggleButton(selecterenUpImage, selecterenDownImage);		
+		selecterenButton.addStyleName("togglebutton");
+		bottomPanel.add(selecterenButton);
+		bottomPanel.setWidgetLeftWidth(selecterenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(selecterenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+		selecterenButton.addClickHandler(toggleClickHandler);
+		
+		currentX += toggleSize + 2*leftOffset;
+		
+		tekenButton = new ToggleButton(tekenKnopUpImage, tekenKnopDownImage);
+		tekenButton.setDown(true);
+		bottomPanel.add(tekenButton);
+		bottomPanel.setWidgetLeftWidth(tekenButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(tekenButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+		tekenButton.addClickHandler(toggleClickHandler);
+
+		currentX += toggleSize + leftOffset;
+
+		if (lijnTekenen)
+		{
+			tekenLijnButton = new ToggleButton(tekenLijnUpImage, tekenLijnDownImage);
+			tekenLijnButton.addStyleName("togglebutton");
+			bottomPanel.add(tekenLijnButton);
+			bottomPanel.setWidgetLeftWidth(tekenLijnButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(tekenLijnButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+			tekenLijnButton.addClickHandler(toggleClickHandler);
+		
+			currentX += toggleSize + leftOffset;
+		}
+		
+		if (rechthoekTekenen)
+		{	
+			tekenRechthoekButton = new ToggleButton(tekenRechthoekUpImage, tekenRechthoekDownImage);
+			tekenRechthoekButton.addStyleName("togglebutton");
+			bottomPanel.add(tekenRechthoekButton);
+			bottomPanel.setWidgetLeftWidth(tekenRechthoekButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(tekenRechthoekButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+			tekenRechthoekButton.addClickHandler(toggleClickHandler);
+		
+			currentX += toggleSize + leftOffset;
+		}
+		
+		if (cirkelTekenen)
+		{	
+			tekenCirkelButton = new ToggleButton(tekenCirkelUpImage, tekenCirkelDownImage);		
+			tekenCirkelButton.addStyleName("togglebutton");
+			bottomPanel.add(tekenCirkelButton);
+			bottomPanel.setWidgetLeftWidth(tekenCirkelButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(tekenCirkelButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+			tekenCirkelButton.addClickHandler(toggleClickHandler);
+				
+			currentX += toggleSize + leftOffset;
+		}	
+
+		
+  		if (tekstTekenen)
+  		{
+			tekenTekstButton = new ToggleButton(tekenTekstUpImage, tekenTekstDownImage); 
+			tekenTekstButton.addStyleName("togglebutton");
+			bottomPanel.add(tekenTekstButton);
+			bottomPanel.setWidgetLeftWidth(tekenTekstButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(tekenTekstButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+
+			tekenTekstButton.addClickHandler(toggleClickHandler);
+
+			currentX += toggleSize + leftOffset;
+		}
+		
+  		currentX += toggleSize + 3*leftOffset;
+				
+		
+	
+		if (kleurkeuze)
+		{
+			kleurkeuzeButton = new PushButton(regenboogImage);
+			kleurkeuzeButton.addStyleName("pushbutton");
+			bottomPanel.add(kleurkeuzeButton);
+			bottomPanel.setWidgetLeftWidth(kleurkeuzeButton, currentX, Style.Unit.PX, toggleSize, Style.Unit.PX);
+			bottomPanel.setWidgetTopHeight(kleurkeuzeButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+			kleurkeuzeButton.addClickHandler(new PushClickHandler());
+		
+			currentX += toggleSize + leftOffset;
+		}
+		
+		currentX += toggleSize + 3*leftOffset;
+		
+		terugButton = new PushButton(terugKnopImage);//rb.terugTekst());
+		terugButton.addStyleName("pushbutton");
+		bottomPanel.add(terugButton);
+		bottomPanel.setWidgetLeftWidth(terugButton, breedte-2*leftOffset-2*toggleSize, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(terugButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+		terugButton.addClickHandler(new PushClickHandler());
+		
+		currentX += buttonWidth + leftOffset;		
+
+
+		wisButton = new PushButton(binKnopImage);//rb.wisTekst());
+		wisButton.addStyleName("pushbutton");
+		bottomPanel.add(wisButton);
+		bottomPanel.setWidgetLeftWidth(wisButton, breedte-leftOffset-toggleSize, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		bottomPanel.setWidgetTopHeight(wisButton, currentY, Style.Unit.PX, toggleSize, Style.Unit.PX);
+		
+		wisButton.addClickHandler(new PushClickHandler());
+		
+		currentX += buttonWidth + 2 * leftOffset;
+		//currentY -= 2;
+
+		
+		kladjeGWTVeld.paint();
+		
+	} // makeBottom()
+	
+	
+
+	public KladjeGWT()
+	{
+		
+	}
+	
+	
+	
+	public KladjeGWT(HashMap<String, Object> map, String[] randomVarNamen, HashMap randomVarWaarden)
+	{
+		ObjectMap h = JSONUtilities.wrapMap(map);
+		
+		this.randomVarNamen = randomVarNamen;
+		this.randomVarWaarden = randomVarWaarden;
+		if (h.containsKey("breedte"))
+			breedte = h.getInt("breedte");
+		if (h.containsKey("hoogte"))
+			hoogte = h.getInt("hoogte");
+		if (h.containsKey("interactiePanelLaunchState"))
+			launchState = h.getMap("interactiePanelLaunchState");
+		
+		
+		getImages(); 
+		dlp = new DockLayoutPanel(Style.Unit.PX);
+		dlp.addStyleName(kladjeCss.dock());
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
+		init(breedte, hoogte, launchState, randomVarWaarden);
+
+	}
+	
+	
+	
+	public Widget asWidget()
+	{
+		return dlp; 
+	}
+	
+	/**
+	 * ToggleButton tb werd ingedrukt, dus zorg dat alle andere
+	 * ToggelButtons niet ingedrukt zijn (GWT heeft niet zoiets als een RadioButtonGroup)   
+	 * @param tb de ToggleButton die werd ingedrukt
+	 */
+   	void buttonsUp(ToggleButton tb)
+   	{
+   		if (tekenButton != null && !tekenButton.equals(tb))
+   			tekenButton.setDown(false);
+   		if (formuleButton != null && !formuleButton.equals(tb))
+   			formuleButton.setDown(false);
+   		if (tekenLijnButton != null && !tekenLijnButton.equals(tb))
+   			tekenLijnButton.setDown(false);
+ 		if (tekenRechthoekButton != null && !tekenRechthoekButton.equals(tb))
+   			tekenRechthoekButton.setDown(false);
+   		if (tekenCirkelButton != null && !tekenCirkelButton.equals(tb))
+   			tekenCirkelButton.setDown(false);
+ 		if (tekenTekstButton != null && !tekenTekstButton.equals(tb))
+ 			tekenTekstButton.setDown(false);
+   		if (selecterenButton != null && !selecterenButton.equals(tb))
+   			selecterenButton.setDown(false);
+   	}
+	
+
+   	/**
+   	 * inner class voor het afhandelen van Click Events op Toggle Buttons;
+   	 * gebruik methode buttonsUp zodat de ToggleButtons zich als een RadioButtonGroup gedragen; <br>
+   	 * @author huub
+   	 */
+   	class ToggleClickHandler implements ClickHandler
+	{
+
+   		public void onClick(ClickEvent e)
+		{
+			//e.preventDefault();
+			
+			// deze zorgt dat je niet scollt in de DWOPlayer
+			e.stopPropagation();
+
+    		if (e.getSource() == tekenButton)
+    		{
+    			// ToggleButton werd ingedrukt
+    			if (tekenButton.isDown())
+    			{
+    				buttonsUp(tekenButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.tekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);    				
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    			}
+    			else // ToggleButton werd uitgedrukt
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		else if (e.getSource() == formuleButton)
+    		{
+    			// ToggleButton werd ingedrukt
+    			if (formuleButton.isDown())
+    			{
+    				buttonsUp(formuleButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
+    				kladjeGWTVeld.hideTekstVeld(true);    				
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    			}
+    			else // ToggleButton werd uitgedrukt
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		else if (e.getSource() == tekenLijnButton)
+    		{
+    			if (tekenLijnButton.isDown())
+    			{
+    				buttonsUp(tekenLijnButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.lijnTekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    				
+    			}
+    			else
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		else if (e.getSource() == tekenRechthoekButton)
+    		{
+    			if (tekenRechthoekButton.isDown())
+    			{
+    				buttonsUp(tekenRechthoekButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.rechthoekTekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    				
+    			}
+    			else
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		else if (e.getSource() == tekenCirkelButton)
+    		{
+    			if (tekenCirkelButton.isDown())
+    			{
+    				buttonsUp(tekenCirkelButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.cirkelTekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    				
+    			}
+    			else
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		
+    		else if (e.getSource() == tekenTekstButton)
+    		{
+    			if (tekenTekstButton.isDown())
+    			{
+    				buttonsUp(tekenTekstButton);
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.tekstTekenen;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.paint();
+    				
+    			}
+    			else
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+    		
+    		else if (e.getSource() == selecterenButton)
+    		{
+    			if (selecterenButton.isDown())
+    			{
+    				buttonsUp(selecterenButton);
+    				kladjeGWTVeld.setSelecteerMode();
+    				kladjeGWTVeld.hideTekstVeld(true);
+    				kladjeGWTVeld.selecteerRechthoek = null;
+    				kladjeGWTVeld.resetSelectedObject();
+    				kladjeGWTVeld.resetSelectedObjects();
+    				kladjeGWTVeld.paint();
+    				
+    			}
+    			else
+    			{
+    				kladjeGWTVeld.mouseMode = kladjeGWTVeld.inert;
+    				kladjeGWTVeld.hideTekstVeld(true);
+    			}
+    			
+    		}
+
+		}
+		
+	}
+
+    
+   	/**
+   	 * inner class for handling Click Events on PushButtons
+   	 * @author huub
+   	 */
+    class PushClickHandler implements ClickHandler
+    {
+    	public void onClick(ClickEvent e)
+    	{
+			//e.preventDefault();
+			e.stopPropagation();
+    		
+    		if (e.getSource() == terugButton)
+    		{
+    			kladjeGWTVeld.hideTekstVeld(true);
+    			kladjeGWTVeld.undo();
+    			setChanged();
+    			    			
+    		}
+    		else if (e.getSource() == wisButton)
+    		{
+    			kladjeGWTVeld.wis(true);
+    			setChanged();
+    		}
+    		else if (e.getSource() == kleurkeuzeButton)
+    		{
+    			kladjeGWTVeld.hideTekstVeld(true);
+    			
+    			// maak een nieuwe colorPopup
+    			if (colorPopup == null)
+    			{
+    				colorPopup = new ColorPopup(KladjeGWT.this);
+    				colorPopup.getElement().getStyle().setBorderStyle(BorderStyle.SOLID);
+    				colorPopup.getElement().getStyle().setBorderColor(""+CssColor.make(183,195,225));
+    				colorPopup.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+    				colorPopup.getElement().getStyle().setPadding(2, Style.Unit.PX);
+    				colorPopup.getElement().getStyle().setBackgroundColor(""+CssColor.make(239,241,243));
+    				colorPopup.getElement().getStyle().setProperty("boxShadow", "3px 3px 3px #96A1BD");
+    				int showX = kleurkeuzeButton.getAbsoluteLeft() + toggleSize/2 - colorPopup.breedte/2;
+
+    				int showY = kleurkeuzeButton.getAbsoluteTop()  - colorPopup.hoogte - 4*topOffset;
+    				if(toolBarOnTop) {
+    					showY = kleurkeuzeButton.getAbsoluteTop()  + 2*colorPopup.hoogte - 4*topOffset;
+    				}
+    				colorPopup.setPopupPosition(showX, showY);
+    				colorPopup.show();
+    			}
+    			else
+    			{
+    				colorPopup.show();
+    			}
+    		}
+    		
+    	}
+    	
+    }
+  
+    private HashMap<String,Object> lastAttempt;
+    private boolean isAttempt;
+    private HashMap<String,Object> setAttempt(HashMap<String,Object> attempt) {
+    	if (isAttempt && comRoot != null && !attempt.equals(lastAttempt)) {
+    		lastAttempt = attempt;
+    		comRoot.fireEvent(new CBookEvent(this, "logOption", Collections.emptyMap())); // no score, no response, no success
+    	}
+    	return attempt;
+    }
+    private void initAttempt() {
+    	if (isAttempt) lastAttempt = kladjeGWTVeld.getState(false);
+    	return;
+    }
+    
+    
+    /**
+     * get de status van het werkveld, zie methode getState in klasse kladjeGWTVeld
+     */
+	public HashMap<String, Object> getState()
+	{
+		return setAttempt(kladjeGWTVeld.getState());
+	}
+
+	/**
+	 * zet de status van het werkveld, zie methode setState in klasse kladjeGWTVeld 
+	 */
+	public void setState(HashMap<String, Object> h)
+	{	if(h == null||h.isEmpty()) {
+			initAttempt();
+			return;
+		}
+		kladjeGWTVeld.setState(h, false, true);
+		initAttempt();
+	}
+
+	public int getScore()
+	{
+		return 0;
+	}
+
+	public Boolean isCorrect()
+	{
+		if(scoreMax==0)
+			return Boolean.TRUE;
+		return null; // nakijken door docent!
+	}
+
+	@Override
+	public void setCommunicationRoot(OpdrNavIF comRoot)
+	{
+		this.comRoot = comRoot;
+		premium = comRoot.getContext().getBoolean("premium", premium); // installeer hier premium feature.
+// doe er wat mee...		
+		if ( premium ) {
+			GWT.log("met een premium abonnement");
+			if (comRoot.getLessonMode() != LessonMode.normal) isAttempt = false;
+		} else {
+			GWT.log("zonder een premium abonnement");
+			isAttempt = false;
+		}
+		
+		comRoot.addCBookEventListener("drawing", this);
+		comRoot.addCBookEventListener("action.setCorrect", this);
+		comRoot.addCBookEventListener("action.setFalse", this);
+		comRoot.addCBookEventListener("action.setHalf", this);
+		comRoot.addCBookEventListener("double.translationX", this);
+		comRoot.addCBookEventListener("double.translationY", this);
+	}
+
+	
+	public void init(int width, int height, Map<String, Object> map, //launchState,
+			Map<String, Number> values) 
+	{
+		Element body = Document.get().getBody();
+		body.setAttribute("oncontextmenu", "return false;");
+		
+	    logger.severe("KladjeGWT initializing");
+		this.breedte = width;
+		this.hoogte = height;
+		
+		dlp.setSize("" + breedte + "px", "" + hoogte + "px");
+
+		ObjectMap launchState = JSONUtilities.wrapMap(map);
+		
+		if(launchState.containsKey("scoreMax")) 
+			scoreMax = launchState.getInt("scoreMax");
+
+		boolean logOption = launchState.getBoolean("logOption", false);
+		isAttempt = logOption || launchState.containsKey("smObjectives");
+
+		// instellingen achtergrondvulling werkveld 
+		if (launchState.containsKey("lijnen"))
+			lijnen = launchState.getBoolean("lijnen");
+		if (launchState.containsKey("ruitjes"))
+			ruitjes = launchState.getBoolean("ruitjes");
+		if (launchState.containsKey("ruitjessize"))
+			ruitjesSize = launchState.getInt("ruitjessize");
+
+		// instellingen tekenopties
+		if (launchState.containsKey("lijnTekenen"))
+			lijnTekenen = launchState.getBoolean("lijnTekenen");
+		if (launchState.containsKey("rechthoekTekenen"))
+			rechthoekTekenen = launchState.getBoolean("rechthoekTekenen");
+		if (launchState.containsKey("cirkelTekenen"))
+			cirkelTekenen = launchState.getBoolean("cirkelTekenen");
+		if (launchState.containsKey("tekstTekenen"))
+			tekstTekenen = launchState.getBoolean("tekstTekenen");
+		if (launchState.containsKey("kleurkeuze"))
+			kleurkeuze = launchState.getBoolean("kleurkeuze");
+		if (launchState.containsKey("formuleOptie"))
+			formuleOptie = launchState.getBoolean("formuleOptie");
+		if (launchState.containsKey("ivmOptie"))
+			ivmOptie = launchState.getBoolean("ivmOptie");
+		
+		// instellingen schaal- en roteeroptie
+		if (launchState.containsKey("roteren"))
+			roteren = launchState.getBoolean("roteren");
+		if (launchState.containsKey("schalen"))
+			schalen = launchState.getBoolean("schalen");
+		
+		int translationx = translation.x;
+		if(launchState.containsKey("translationX"))
+			translationx = launchState.getInt("translationX");
+		int translationy = translation.y;
+		if(launchState.containsKey("translationY"))
+			translationy = launchState.getInt("translationY");
+		translation = new fi.kladjegwt.client.Point(translationx,translationy);
+		
+		if(launchState.containsKey("scale"))
+			scale = launchState.getDouble("scale");
+		
+		//ArrayList<Object> rectangless = null;
+		if(launchState.containsKey("formuleInstellingen")) {
+			ObjectMap formuleInstellingen = launchState.getObjectMap("formuleInstellingen");
+			if(formuleInstellingen.containsKey("rectangleData")) {
+				ObjectList rectangles = formuleInstellingen.getObjectList("rectangleData");
+				rectangleData = new int[rectangles.size()][4];
+				for(int i=0 ; i<rectangles.size() ; i++) {
+					int[] rectAttr = rectangles.getIntArray(i);
+					for(int j=0 ; j<4 ; j++) {
+						rectangleData[i][j]=rectAttr[j];
+					}
+				}
+				for(int i=0 ; i<rectangles.size() ; i++) {
+					logger.info(""+rectangleData[i][0]+" "+rectangleData[i][1]+" "+rectangleData[i][2]+" "+rectangleData[i][3]+" ");
+				}
+			}
+			if(formuleInstellingen.containsKey("calculator")) {
+				calculator = formuleInstellingen.getBoolean("calculator");
+			}
+		}
+		if(launchState.containsKey("toolBarOnTop"))
+			toolBarOnTop = launchState.getBoolean("toolBarOnTop");
+		
+		bottomPanel = new LayoutPanel();
+		bottomPanel.addStyleName(kladjeCss.top());
+		if(!formuleOptie && !ivmOptie && !toolBarOnTop)
+			dlp.addSouth(bottomPanel, bottomHeight);
+		if(!formuleOptie && !ivmOptie && toolBarOnTop)
+			dlp.addNorth(bottomPanel, bottomHeight);
+		
+		if(formuleOptie) {
+			topPanel = new LayoutPanel();
+			topPanel.addStyleName(kladjeCss.top());
+			//dlp.addNorth(topPanel, topHeight);
+		}
+		
+		int veldhoogte = hoogte - (formuleOptie||ivmOptie ? 0 : bottomHeight);
+		
+		kladjeGWTVeld = new KladjeGWTVeld(breedte,veldhoogte, this); 
+
+		kladjeGWTCanvas = kladjeGWTVeld.getCanvas();
+		if (kladjeGWTCanvas == null) 
+		{
+	      RootLayoutPanel.get().add(new Label(upgradeMessage));
+	      return;
+	    }
+		
+		kladjeGWTCanvas.addStyleName(kladjeCss.canvas());
+		kladjeGWTVeld.initContext2d();		
+		
+		dlp.add(kladjeGWTCanvas);
+
+		kladjeGWTVeld.lijnen = lijnen;
+		kladjeGWTVeld.ruitjes = ruitjes;
+		kladjeGWTVeld.lineDistance = ruitjesSize;
+		kladjeGWTVeld.roteren = roteren;
+		kladjeGWTVeld.schalen = schalen;
+		kladjeGWTVeld.translation = translation;
+		kladjeGWTVeld.scale = scale;
+		if(formuleOptie) {
+			kladjeGWTVeld.mouseMode = kladjeGWTVeld.formuleOptie;
+			if(rectangleData!=null)
+				kladjeGWTVeld.setRectangleData(rectangleData);
+		}
+		if(ivmOptie)
+			kladjeGWTVeld.mouseMode = kladjeGWTVeld.ivmOptie;
+		
+		kladjeGWTVeld.calculator = calculator;
+	
+		// docent tekeningen
+		kladjeGWTVeld.setState(map, true);
+
+		makeBottom();
+		
+		dlp.forceLayout();
+		bottomPanel.forceLayout();
+		
+		kladjeGWTVeld.paint();
+	}
+
+	@Override
+	public void kijkNa() {
+	}
+
+	@Override
+	public void zetVolledigeBreedte(int breedte) {
+		this.breedte = breedte;
+	}
+
+	@Override
+	public int getAsHoogte() {
+		return asHoogte;
+	}
+
+	public int getHeight() 
+	{
+		return hoogte;
+	}
+
+	public int getWidth() 
+	{
+		return breedte;
+	}
+
+	public void setAsHoogte(int ashoogte) {
+		this.asHoogte = ashoogte;
+	}
+
+	//@Override
+	public void zetNagekeken(boolean b) {
+	}
+
+	//@Override
+	public int[][] getScoreObjectives() {
+		return null;
+	}
+	
+	public void setChanged() {
+//		if(formuleViewer!=null)
+//			topPanel.remove(formuleViewer.getAsPanel());
+//		formuleViewer = new FormuleViewer(kladjeGWTVeld.getFormula());
+//		formuleViewer.setFont(FormuleFont.createFromFontSize(16));
+//		topPanel.add(formuleViewer.getAsPanel());
+		
+		
+		if(comRoot==null)
+			return;
+		Map<String,Object> map = kladjeGWTVeld.getState(false);
+		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+		comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
+//		logger.info("in setChanged");
+	}
+	
+	public void sendDrawing() {
+		if(comRoot==null)
+			return;
+		Map<String,Object> map = kladjeGWTVeld.getState(false);
+		comRoot.fireEvent(new CBookEvent(this,"drawing",map));
+	}
+	
+	public void sendEquation() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"equation",kladjeGWTVeld.getFormula()));
+	}
+	
+	public void sendEquation(int nr) {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"equation."+nr,kladjeGWTVeld.getInputFormula()));
+	}
+	
+	public void sendCorrectEquation() {
+		if(comRoot!=null) {
+			comRoot.fireEvent(new CBookEvent(this,"equation.correct",kladjeGWTVeld.getFormula()));
+		}
+	}
+	
+	public void fireCheck() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"action.check"));
+	}
+	
+	public void fireCheck_n() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"action.check.n"));
+	}
+	
+	public void fireClose() {
+		if(comRoot!=null)
+			comRoot.fireEvent(new CBookEvent(this,"action.closePopup"));
+	}
+	
+	public void fireStrokeCodes() {
+		if(comRoot==null)
+			return;
+		String text = kladjeGWTVeld.getStrokeCode();
+		Map<String,Object> map = new HashMap<String,Object>();
+		map.put("content", text);
+		comRoot.fireEvent(new CBookEvent(this,"text.strokecode",map));
+	}
+
+
+	@Override
+	public void acceptCBookEvent(CBookEvent event) {
+		String command = event.getCommand();
+		if (command.startsWith("drawing"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	kladjeGWTVeld.setState(map, false);
+				
+			}
+		}
+		
+		
+		
+		if (command.startsWith("action.setFalse"))
+		{
+			{	kladjeGWTVeld.setFalse(true);
+				kladjeGWTVeld.paintFormule(false);
+			}
+		}
+		
+		if (command.startsWith("action.setCorrect"))
+		{
+			{	kladjeGWTVeld.setCorrect(true);
+				kladjeGWTVeld.paintFormule(false);
+			}
+		}
+		
+		if (command.startsWith("action.setHalf"))
+		{
+			{	kladjeGWTVeld.setHalf(true);
+				kladjeGWTVeld.paintFormule(false);
+			}
+		}
+		
+		if (command.startsWith("double.translationX"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	
+				logger.info("map!=null");
+				logger.info(map.toString());
+				int valueX = (int)((Double)map.get("value")).doubleValue();
+				translation = new fi.kladjegwt.client.Point(-valueX, translation.y);
+				kladjeGWTVeld.translation = translation;
+				kladjeGWTVeld.paint();
+			}
+		}
+		if (command.startsWith("double.translationY"))
+		{
+			Map map = (Map)event.getParameters();
+			if (map!=null)
+			{	int valueY = (int)((Double)map.get("value")).doubleValue();
+				translation = new fi.kladjegwt.client.Point(translation.x, -valueY);
+				kladjeGWTVeld.translation = translation;
+				kladjeGWTVeld.paint();
+			}
+		}
+	}
+}
