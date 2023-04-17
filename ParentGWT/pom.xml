@@ -19,8 +19,8 @@
 	<module>../Grafiek3DGWT</module>
 	<module>../GraphToolGWT</module>
 	<module>../HeksGWT</module>
-<!--
 	<module>../KansbomenGWT</module>
+<!--
 	<module>../KladjeGWT</module>
 	<module>../LeerdoelWidgetGWT</module>
 	<module>../MozarchGWT</module>
