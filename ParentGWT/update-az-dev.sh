@@ -13,6 +13,7 @@ sh update-app-az-dev.sh GraphToolGWT graphtoolgwt GraphToolGWT
 sh update-app-az-dev.sh HeksGWT heksgwt HeksGWT
 sh update-app-az-dev.sh KansbomenGWT kansbomengwt KansbomenGWT
 sh update-app-az-dev.sh KladjeGWT kladjegwt KladjeGWT
+sh update-app-az-dev.sh LeerdoelWidgetGWT leerdoelwidgetgwt LeerdoelWidgetGWT
 sh update-app-az-dev.sh MozarchGWT mozarchgwt MozarchGWT
 sh update-app-az-dev.sh NabouwenAanzichtenGWT nabouwenaanzichtengwt NabouwenAanzichtenGWT
 sh update-app-az-dev.sh NormVerdGWT normverdgwt NormVerdGWT
@@ -27,5 +28,4 @@ sh update-app-az-dev.sh VerknippenGWT verknippengwt VerknippenGWT
 sh update-app-az-dev.sh WebLogoGWT weblogogwt WebLogoGWT
 sh update-app-az-dev.sh WebLogo3dGWT weblogo3dgwt WebLogo3dGWT
 sh update-app-az-dev.sh GeoDefinerGWT geodefinergwt GeoDefinerGWT
-sh update-app-az-dev.sh LeerdoelWidgetGWT leerdoelwidgetgwt LeerdoelWidgetGWT
 
