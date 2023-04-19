@@ -27,8 +27,8 @@
 	<module>../NormVerdGWT</module>
 	<module>../SliderWidgetGWT</module>
 	<module>../StatistiekGWT</module>
-<!--
 	<module>../StatSimGWT</module>
+<!--
 	<module>../TegelsLeggenGWT</module>
 	<module>../TekenVeelvlakGWT</module>
 	<module>../VerknippenGWT</module>
