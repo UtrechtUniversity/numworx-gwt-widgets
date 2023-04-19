@@ -1,0 +1,43 @@
+body {
+  text-align: center;
+  margin: 0px;
+  padding: 0px;
+  overflow: hidden;
+}
+
+h1 {
+  font-size: 2em;
+  font-weight: bold;
+  color: #777777;
+  margin: 10px 0px 10px;
+  text-align: center;
+}
+
+#source {
+  font-size: 1em;
+  color: #777777;
+  text-align: center;
+}
+
+#source a {
+  text-decoration: none;
+}
+
+.kijknapanel {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.goed {
+	background-image: url("images/resources/knop-indicatie-goed.png");
+}
+
+.half {
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.fout {
+	background-image: url("images/resources/knop-indicatie-fout.png");
+}
+
