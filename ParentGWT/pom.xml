@@ -24,8 +24,8 @@
 	<module>../LeerdoelWidgetGWT</module>
 	<module>../MozarchGWT</module>
 	<module>../NabouwenAanzichtenGWT</module>
-<!--
 	<module>../NormVerdGWT</module>
+<!--
 	<module>../SliderWidgetGWT</module>
 	<module>../StatistiekGWT</module>
 	<module>../StatSimGWT</module>
