@@ -234,16 +234,17 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 	void init(ObjectList list, ObjectList config, int w, Map<Integer,Provider<ToggleButton>> buttons, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {		
 		ToggleButton btn;
 		height = ((list.size()*BREEDTE_ICON-1)/w+1) * 40;
+		for(int n = 0; n < config.size(); n++) {
+			installConfig(n, config, shims);
+		}		
 		for (int i = 0; i < list.size(); i++ ) {
 			int n = list.getInt(i);
-			btn = null;
 			Provider<ToggleButton> provider = buttons.get(n);
 			if(provider != null)
 			{
-				installConfig(n, config, shims); // this order
 				btn = provider.get();			 // link to shims
+				if(btn != null)	panel.add(btn);
 			}
-			if(btn != null)	panel.add(btn);
 		}
 	}
 

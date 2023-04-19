@@ -220,7 +220,7 @@ public class GeoDefinerGWTDebug extends GeoDefinerGWT implements EntryPoint, Req
 		List<Integer> toolbox = Arrays.asList(
 				Tools.SELECTOR,
 //				Tools.COLOR_PALETTE,
-				Tools.POINT,
+//				Tools.POINT,
 				Tools.LINE,
 				Tools.HALFLINE,
 //				Tools.SEGMENT,
