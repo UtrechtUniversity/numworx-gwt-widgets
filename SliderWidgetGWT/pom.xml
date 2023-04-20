@@ -65,7 +65,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.6</version>
+  	<version>0.0.7-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Slider widget</name>

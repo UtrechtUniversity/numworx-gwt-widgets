@@ -143,10 +143,6 @@
 		<version>0.0.7-SNAPSHOT</version>
 	</parent>
 	<version>2.4.19-SNAPSHOT</version>
-	<scm>
-		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/GraphToolGWT/trunk</developerConnection>
-		<connection>scm:svn:https://svn.science.uu.nl/repos/project.fisme.java/GraphToolGWT/trunk</connection>
-	</scm>
 	<properties>
 		<gwt.style>PRETTY</gwt.style>
 	</properties>
