@@ -30,8 +30,8 @@
 	<module>../StatSimGWT</module>
 	<module>../TegelsLeggenGWT</module>
 	<module>../TekenVeelvlakGWT</module>
-<!--
 	<module>../VerknippenGWT</module>
+<!--
 	<module>../WebLogoGWT</module>
 	<module>../WebLogo3dGWT</module>
 	<module>../GeoDefinerGWT</module>
