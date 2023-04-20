@@ -1,0 +1,22 @@
+/** Add css rules here for your application. */
+body {
+	margin: 0 !important;
+	overflow: hidden !important;
+}
+
+
+.root {
+	background-color: yellow; 
+}	
+
+.dock {
+	background-color: orange; 
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	background-color: white;	
+}
