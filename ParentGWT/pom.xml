@@ -33,11 +33,9 @@
 	<module>../VerknippenGWT</module>
 	<module>../WebLogoGWT</module>
 	<module>../WebLogo3dGWT</module>
-<!--
 	<module>../GeoDefinerGWT</module>
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
--->
   </modules>
   <properties>
   	<gwtVersion>2.8.2</gwtVersion>
