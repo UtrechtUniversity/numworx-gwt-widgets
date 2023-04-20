@@ -1,0 +1,37 @@
+package fi.weblogo3dgwt.client;
+
+import fi.weblogo3dgwt.client.parameters.NumericParameter;
+import fi.weblogo3dgwt.client.logotekenap3d.TraceBeheerder;
+import fi.weblogo3dgwt.client.logotekenap3d.TekenApplet3D;
+
+/**
+ * class representing the stapz(dz) command: move the cursor dz 
+ * perpendicular to the direction of the cursor or equivalent: 
+ * move the current x-y-z coordinate system dz in the direction of the
+ * positive z-axis; see class TekenApplet3D; <br>
+ */
+
+public class StapZCComponent  extends ParameterCommandComponent
+{
+	public StapZCComponent(int x, int y, int b, int h, JavaLogoSchuifVeld sv)
+	{	
+		super(x,y,b,h,sv);
+		noParameters = 1;
+		parameters[0] = new NumericParameter();
+		commandName = WebLogo3dGWT.rb.stapZTekst();
+		commandNameTranslated = "stepz";
+	}
+		
+	public boolean execute(TraceBeheerder trb, TekenApplet3D ub, VarSet varSet)
+	{	
+		if (!parameters[0].isCorrect(varSet)) 
+			return false; 
+		ub.stapz(((NumericParameter) parameters[0]).getValue());
+		traceKleur = trb.commandExecuted(varSet.getLevel());
+		if (traceKleur) traceKleurCnt = 0;
+		if (traceKleur) 
+			trb.setCommandInfo(getActualCall(), varSet);
+		return traceKleur;
+	}
+	
+}
