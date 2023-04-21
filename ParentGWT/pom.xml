@@ -33,7 +33,7 @@
 	<module>../VerknippenGWT</module>
 	<module>../WebLogoGWT</module>
 	<module>../WebLogo3dGWT</module>
-	<!-- <module>../GeoDefinerGWT</module> -->
+	<module>../GeoDefinerGWT</module>
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
   </modules>
