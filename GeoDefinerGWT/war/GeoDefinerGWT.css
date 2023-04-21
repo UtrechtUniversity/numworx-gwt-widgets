@@ -1,0 +1,117 @@
+@CHARSET "UTF-8";
+body {
+	overflow: hidden;
+	margin: 0px !important;
+	background: transparent !important; /* was initial (niet voor ie/edge) */
+	touch-action: none;
+	-ms-touch-action: none;
+
+}
+
+.check {
+	background-repeat: no-repeat;
+	background-position: right top;
+	background-color: transparent;
+}
+
+.check.fout {
+	background-image: url("images/resources/knop-indicatie-fout.png");
+}
+
+.check.goed {
+	background-image: url("images/resources/knop-indicatie-goed.png");
+}
+
+.check.half {
+	background-image: url("images/resources/knop-indicatie-magdoor.png");
+}
+
+.check .extern {
+	background-color: black;
+	visibility: hidden;
+}
+
+.toolbox .gwt-ToggleButton {
+	padding: 0px !important;
+	display: inline-block;
+	outline: none;
+}
+
+.canvas {
+	outline: none;
+	touch-action: none;
+	-ms-touch-action: none;
+}
+
+
+.gwt-ToggleButton span {
+	display: inline-block;
+	height: 32px;
+	width: 32px;
+}
+
+.SVGToggle:first-child {
+	margin-left: 0px;
+}
+.SVGToggle:last-child {
+	margin-right: 0px;
+}
+
+.SVGToggle {
+	display: inline-block;
+	outline: none;
+	margin-left: 0px;
+	margin-right: 8px;
+	margin-bottom: 1px;
+	height: 39px;
+}
+
+.SVGToggle-up-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=45);
+	cursor: default;
+}
+
+.toolbox {
+	line-height: 1px;
+}
+
+.check .gwt-Button.kijkna, .reset .gwt-Button {
+	background-color: #1b75bb;
+	border: 2px #1b75bb solid;
+	border-radius: 0px;
+	text-align: center;
+	padding: 3px 6px;
+	color: white;
+	font-family: Ubuntu, sans-serif;
+	background-image: none;
+	text-transform: uppercase;
+	letter-spacing: .3px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.check .gwt-Button.kijkna {
+	float: right;
+	margin-right: 15px;
+}
+
+.check .gwt-Button.kijkna:hover, .reset .gwt-Button:hover {
+	background-color: #aac1dc;
+	border-color: #aac1dc;
+}
+
+.reset {
+	padding: 10px;
+}
+.reset .gwt-Label {
+	margin-bottom: 10px;
+}
+
+.colors, .reset, .dashes {
+	background-color: #d2e5f5;
+	color: #1b75bb;
+	font-family: Ubuntu, sans-serif;
+	font-size: 14px;	
+	box-shadow: 3px 3px 10px 0px rgb(0 0 0 / 50%);
+}
