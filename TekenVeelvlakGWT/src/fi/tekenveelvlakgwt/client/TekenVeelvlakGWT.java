@@ -659,7 +659,7 @@ public class TekenVeelvlakGWT implements EntryPoint, InteractionStub, Interactio
 	{
     	if (!kijkNaActief)
     		return;
-    	boolean showMark = mode == 1 || mode == 2 || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
+    	boolean showMark = mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN || lessonMode == LessonMode.review || lessonMode == LessonMode.browse;
     	String changeLog = "";
     	if (isVlakkenNakijkModus() && profilesOnly)
     	{
