@@ -33,6 +33,15 @@
   				<artifactId>WiskOpdrGWT</artifactId>
   			</exclusion>
   		</exclusions>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>DWOplayer</artifactId>
+  		<version>2.5.20-SNAPSHOT</version>
+  		<classifier>dwo2</classifier>
+  		<type>war</type>
+  		<scope>runtime</scope>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -45,6 +54,7 @@
   				<artifactId>WiskOpdrGWT</artifactId>
   			</exclusion>
   		</exclusions>
+  		<scope>provided</scope>
   	</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -79,6 +89,27 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.3</version>
+				<configuration>
+				   <overlays>
+					<overlay>
+						<groupId>nl.uu.fi.dwo.mobile</groupId>
+						<artifactId>DWOplayer</artifactId>
+						<classifier>dwo2</classifier>
+						<includes>
+							<include>DWOplayer.css</include>
+							<include>KeyboardGWT.css</include>
+							<include>images/**</include>
+							<include>scripts/**</include>
+						</includes>
+					</overlay>
+				  </overlays>
+				  <warSourceExcludes>WEB-INF/**,META-INF/**</warSourceExcludes>
+				</configuration>
 			</plugin>
   	</plugins>
   </build>
