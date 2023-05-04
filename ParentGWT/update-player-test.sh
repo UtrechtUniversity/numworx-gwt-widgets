@@ -6,7 +6,7 @@ S3=s3://test-dwo-nl/apps
 set -e
 PROD="--profile prod"
 #PROD=
-cd ../DWOPlayer;
+cd ../WiskOpdrPlayer;
 
 W=/Volumes/fisme-sites/www-dev/dwo
 TODAY=$(date +%-d-%-m-%Y)
@@ -17,13 +17,14 @@ if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
 mvn clean
-mvn verify -P WiskOpdrPlayer -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
+mvn verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
 (cd target/WiskOpdrPlayer; rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
 	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
 	aws $PROD s3 cp --acl public-read KeyboardGWT.css $S3/;\
 )
-mvn package -P WidgetPlayer -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
+cd ../WidgetPlayer
+mvn clean package -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
 (cd target/WidgetPlayer; rsync --delete $OPTIONS WidgetPlayer $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive WidgetPlayer $S3/WidgetPlayer;\
 )
