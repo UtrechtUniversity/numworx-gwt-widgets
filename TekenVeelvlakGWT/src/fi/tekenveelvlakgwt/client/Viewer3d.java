@@ -852,8 +852,8 @@ public class Viewer3d extends LayoutPanel
 			{
 				vulAan(1, "grijs");
 			}
-			else
-				vulAan(n, "grijs");
+//			else
+//				vulAan(n, "grijs");
 		}
 
 		if (v.vulkleur != "zwart")
@@ -869,8 +869,8 @@ public class Viewer3d extends LayoutPanel
 				vulUit();
 			else if (n == 1)
 				vulUit(1);
-			else
-				vulUit(n);
+//			else
+//				vulUit(n);
 		}
 
 		if (!(v.lijnkleur == "transparant"))
@@ -1379,7 +1379,8 @@ public class Viewer3d extends LayoutPanel
 	 */
 	public void muisKkActie()
 	{
-		for (int j = vvRij[0].aantalVlakken - 1; j > -1; j--)
+		//for (int j = vvRij[0].aantalVlakken - 1; j > -1; j--)
+		for (int j = 0 ; j < vvRij[0].aantalVlakken ; j++)
 		{
 			if (p[j].contains(mb.geefDrukx(), mb.geefDruky()))
 			{
