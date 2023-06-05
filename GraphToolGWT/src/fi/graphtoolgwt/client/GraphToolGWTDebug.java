@@ -51,8 +51,7 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 
 		@Override
 		public int getMode() {
-			// TODO Auto-generated method stub
-			return 0;
+			return 3;
 		}
 
 		@Override
@@ -212,7 +211,17 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 		Map<String, Object> map = new HashMap<>();
 		map.put("tekenComponentAan", Boolean.TRUE);
 		map.put("tabelComponentAan", Boolean.TRUE);
-		map.put("veldComponentAan", Boolean.TRUE);
+		map.put("veldComponentAan", Boolean.FALSE);
+		map.put("formuleComponentAan", Boolean.FALSE);
+		map.put("typeOpdracht" , TEKENTABELPUNTEN);
+		
+		map.put("docentGraphPointsX", new Double[] { 1.0, 2.0, 3.0 });
+		map.put("docentGraphPointsY", new Double[] { 1.0, 2.0, 4.0 });
+		map.put("docentGraphPointsIndex", new Integer[] { 0,1,2} );
+		map.put("docentGraphPointsTabelIndex", new Integer[] {0,0,0 } );
+		map.put("docentGraphPointsXString", new String[] { "1","2", "3"});
+		map.put("docentGraphPointsYString", new String[] { "1","2", "4.0"});
+		
 
 		init(300,H, map, Collections.emptyMap());
 		MockOpdrNav opdrnav = new MockOpdrNav();
