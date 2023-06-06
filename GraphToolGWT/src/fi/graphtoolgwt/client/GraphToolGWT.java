@@ -1937,7 +1937,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 					if (pt.getIndex() == 1)
 					{
 						llgPtsCopy.addElement(graphPoints.elementAt(pCnt));
-						graphPointColors.setElementAt(cColorRed.value(), pCnt); // default is false
+						if(show) graphPointColors.setElementAt(cColorRed.value(), pCnt); // default is false
 					}
 				}
 				//RealPoint[] llgPtsArray = new RealPoint[graphPoints.size()];
@@ -2280,7 +2280,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 		
 		if ( (!moveActionActivated) && 
 				( (mode == OpdrNavIF.EINDTOETS) || (mode == OpdrNavIF.ZELFTOETS) ) ) {
-			formuleComponent.updateFormulas();
+			if (formuleComponentAan)
+				formuleComponent.updateFormulas();
 			kijkNa(false /* no show */, false /* geen setState */);
 		}
 			if (mode == OpdrNavIF.EINDTOETS) {
