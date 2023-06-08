@@ -24,7 +24,7 @@ import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 import nl.uu.fi.dwo.interaction.client.keyboard.FocusOnTouch;
 public class GraphToolGWTDebug extends GraphToolGWT {
 
-	private static final int H = 800;
+	private static final int H = 400;
 
 	private class MockOpdrNav implements OpdrNavIF, FormuleKeyboardIF, FormuleClipboardIF {
 
@@ -51,8 +51,7 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 
 		@Override
 		public int getMode() {
-			// TODO Auto-generated method stub
-			return 0;
+			return 3;
 		}
 
 		@Override
@@ -212,7 +211,19 @@ public class GraphToolGWTDebug extends GraphToolGWT {
 		Map<String, Object> map = new HashMap<>();
 		map.put("tekenComponentAan", Boolean.TRUE);
 		map.put("tabelComponentAan", Boolean.TRUE);
-		map.put("veldComponentAan", Boolean.TRUE);
+		map.put("veldComponentAan", Boolean.FALSE);
+		map.put("formuleComponentAan", Boolean.FALSE);
+		map.put("typeOpdracht" , TEKENTABELPUNTEN);
+		map.put("maxScores", new int[] { 10,0,0,0,0,0,0,0,0 });
+		map.put("scoreMax", 10);
+		
+		map.put("docentGraphPointsX", new double[] { 1.0, 2.0, 3.0 });
+		map.put("docentGraphPointsY", new double[] { 1.0, 2.0, 4.0 });
+		map.put("docentGraphPointsIndex", new int[] { 0,0,0} );
+		map.put("docentGraphPointsTabelIndex", new int[] {0,0,0 } );
+		map.put("docentGraphPointsXString", new String[] { "1","2", "3"});
+		map.put("docentGraphPointsYString", new String[] { "1","2", "4.0"});
+		
 
 		init(300,H, map, Collections.emptyMap());
 		MockOpdrNav opdrnav = new MockOpdrNav();
