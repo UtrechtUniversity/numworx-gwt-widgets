@@ -59,13 +59,13 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.15</version>
+			<version>0.1.16-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.15</version>
+			<version>0.1.16-SNAPSHOT</version>
 			<scope>provided</scope>
 			<classifier>sources</classifier>
 		</dependency>
