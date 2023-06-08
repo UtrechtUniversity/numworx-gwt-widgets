@@ -25,7 +25,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>DWOplayer</artifactId>
-  		<version>2.5.20-SNAPSHOT</version>
+  		<version>2.5.20</version>
   		<classifier>classes</classifier>
   		<exclusions>
   			<exclusion>
@@ -38,7 +38,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>DWOplayer</artifactId>
-  		<version>2.5.20-SNAPSHOT</version>
+  		<version>2.5.20</version>
   		<classifier>dwo2</classifier>
   		<type>war</type>
   		<scope>runtime</scope>
@@ -46,7 +46,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>DWOplayer</artifactId>
-  		<version>2.5.20-SNAPSHOT</version>
+  		<version>2.5.20</version>
   		<classifier>sources</classifier>
   		<exclusions>
   			<exclusion>
