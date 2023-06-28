@@ -25,7 +25,7 @@
 	<module>../MozarchGWT</module>
 	<module>../NabouwenAanzichtenGWT</module>
 	<module>../NormVerdGWT</module>
-	<module>../Repl</module>
+	<module>../ReplGWT</module>
 	<module>../SliderWidgetGWT</module>
 	<module>../StatistiekGWT</module>
 	<module>../StatSimGWT</module>
