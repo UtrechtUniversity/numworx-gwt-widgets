@@ -17,6 +17,7 @@ sh update-app-az-dev.sh LeerdoelWidgetGWT leerdoelwidgetgwt LeerdoelWidgetGWT
 sh update-app-az-dev.sh MozarchGWT mozarchgwt MozarchGWT
 sh update-app-az-dev.sh NabouwenAanzichtenGWT nabouwenaanzichtengwt NabouwenAanzichtenGWT
 sh update-app-az-dev.sh NormVerdGWT normverdgwt NormVerdGWT
+sh update-app-az-dev.sh ReplGWT replgwt ReplGWT
 sh update-app-az-dev.sh SliderWidgetGWT sliderwidgetgwt SliderWidgetGWT
 sh update-app-az-dev.sh StatistiekGWT statistiekgwt StatistiekGWT
 sh update-app-az-dev.sh StatSimGWT statsimgwt StatSimGWT
