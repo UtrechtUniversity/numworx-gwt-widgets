@@ -5,6 +5,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>fi.parentgwt</groupId>
+		<artifactId>ParentGWT</artifactId>
+		<version>0.0.6</version>
+	</parent>
   <groupId>nl.numworx.replgwt</groupId>
   <artifactId>ReplGWT</artifactId>
   <packaging>war</packaging>
@@ -51,6 +56,17 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.mobile</groupId>
+			<artifactId>interaction</artifactId>
+			<version>0.1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.mobile</groupId>
+			<artifactId>interaction</artifactId>
+			<version>0.1.13</version>
+			<classifier>sources</classifier>
+		</dependency>
   </dependencies>
 
   <build>
