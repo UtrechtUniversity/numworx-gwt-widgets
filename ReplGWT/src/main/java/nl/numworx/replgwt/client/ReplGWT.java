@@ -21,6 +21,12 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   private int width;
   private int height;
 
+  
+private static native void runit(String input) /*-{
+ $wnd.runit(input)
+}-*/;
+  
+  
 /**
    * This is the entry point method.
    */
@@ -104,8 +110,10 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 
 @Override
 public void acceptCBookEvent(CBookEvent event) {
-	String program = (String) event.getParameter("content");
-
-	getElement().setInnerText(program);
+	if ("text.program".equals(event.getCommand())) {
+		String program = (String) event.getParameter("content");
+		runit(program);
+	}
 }
+
 }

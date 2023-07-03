@@ -18,6 +18,45 @@
     <!-- Any title is fine                         -->
     <!--                                           -->
     <title>Repl</title>
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.js" ></script>
+<script type="text/javascript">
+function tickle() {
+	
+}
+
+async function main(input, out) {
+	var options = { }
+	options.stdout = function(text) { out.innerHTML = out.innerHTML + text + "\n"};
+	options.stderr = options.stdout
+	options.stdin =  window.prompt
+	
+  	let pyodide = await loadPyodide(options);
+  // Pyodide is now ready to use...
+
+  try {
+    var result = pyodide.runPython(input)
+  	if (result) out.innerHTML = out.innerHTML + "\n\n" + result;
+  } catch (e) {
+	  out.innerHTML = out.innerHTML + "\n\n" + e;
+  }
+  
+  
+  };
+
+
+function runit(prog) { 
+   var mypre = document.getElementById("output"); 
+   mypre.innerHTML = ''; 
+   main(prog, mypre)
+} 
+
+
+function runprog() {
+	var prog = document.getElementById("yourcode").value; 
+	runit(prog)
+}
+
+</script> 
 
     <!--                                           -->
     <!-- This script loads your compiled module.   -->
@@ -32,18 +71,12 @@
   <!-- you can leave the body empty if you want  -->
   <!-- to create a completely dynamic UI.        -->
   <!--                                           -->
-  <body>
+<body>
 
-    <!-- OPTIONAL: include this if you want history support -->
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
-
-    <!-- RECOMMENDED if your web app will not function without JavaScript enabled -->
-    <noscript>
-      <div style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
-        Your web browser must have JavaScript enabled
-        in order for this application to display correctly.
-      </div>
-    </noscript>
-
-  </body>
+	<form> 
+		<textarea id="yourcode" cols="40" rows="10"></textarea>
+		<button type="button" onclick="runprog()">Run</button> 
+	</form> 
+	<pre id="output" ></pre> 
+</body>
 </html>
