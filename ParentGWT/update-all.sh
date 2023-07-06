@@ -18,6 +18,7 @@ sh update-app-www-dev.sh LeerdoelWidgetGWT leerdoelwidgetgwt LeerdoelWidgetGWT
 sh update-app-www-dev.sh MozarchGWT mozarchgwt MozarchGWT
 sh update-app-www-dev.sh NabouwenAanzichtenGWT nabouwenaanzichtengwt NabouwenAanzichtenGWT
 sh update-app-www-dev.sh NormVerdGWT normverdgwt NormVerdGWT
+sh update-app-www-dev.sh ReplGWT replgwt ReplGWT
 sh update-app-www-dev.sh SliderWidgetGWT sliderwidgetgwt SliderWidgetGWT
 sh update-app-www-dev.sh StatistiekGWT statistiekgwt StatistiekGWT
 sh update-app-www-dev.sh StatSimGWT statsimgwt StatSimGWT
