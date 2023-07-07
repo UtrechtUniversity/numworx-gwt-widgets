@@ -1,5 +1,6 @@
 #!/bin/sh
 set -ex
+sh update-app-az-dev.sh AIModelGWT aimodelgwt AIModelGWT
 sh update-app-az-dev.sh AlgebraExprGWT algebraexprgwt AlgebraExprGWT
 sh update-app-az-dev.sh AlgebraPijlenGWT algebrapijlengwt AlgebraPijlenGWT
 sh update-app-az-dev.sh BalansFruitGWT balansfruitgwt BalansFruitGWT
