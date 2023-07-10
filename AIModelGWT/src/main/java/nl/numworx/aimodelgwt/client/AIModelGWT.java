@@ -1,9 +1,13 @@
 package nl.numworx.aimodelgwt.client;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,8 +22,21 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class AIModelGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener {
-  private int width;
+  private static final String TEXT = "text.aimodel";
+private int width;
   private int height;
+private OpdrNavIF comRoot;
+  
+  static final String TUPELS = "tupels.aimodel", ACTION = "action.visible";
+  
+  static final Tupel[] DUMMY = {
+		  new Tupel("ha", "rho≠0"),
+		  new Tupel("testvalue", "r=0.835"),
+		  new Tupel("n", "9"),
+		  new Tupel("test","rpearson"),
+		  new Tupel("alpha","0.01")
+  };
+  
 
 /**
    * This is the entry point method.
@@ -65,6 +82,7 @@ public void zetNagekeken(boolean b) {
 
 @Override
 public void setCommunicationRoot(OpdrNavIF comRoot) {
+	this.comRoot = comRoot;
 	comRoot.addCBookEventListener("text.program", this);
 }
 
@@ -102,11 +120,26 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 	this.height = height;
 }
 
+
 @Override
 public void acceptCBookEvent(CBookEvent event) {
-	if ("text.program".equals(event.getCommand())) {
-		String program = (String) event.getParameter("content");
+	if (TEXT.equals(event.getCommand())) {
+		String model = (String) event.getParameter("content");
+		GWT.log(model);
+		fire(DUMMY);
+		
 	}
+}
+
+private void fire(Tupel[] tupels) {
+	List<Map<String,String>> list = new ArrayList<>();
+	for(Tupel t: tupels) { 
+		list.add(t.toJSON());
+	}
+	CBookEvent ev = new CBookEvent(this, TUPELS, Collections.singletonMap(TUPELS, list));
+	comRoot.fireEvent(ev);
+	ev = new CBookEvent(this, ACTION);
+	comRoot.fireEvent(ev);
 }
 
 }
