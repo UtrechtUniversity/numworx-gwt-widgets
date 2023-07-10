@@ -83,7 +83,7 @@ public void zetNagekeken(boolean b) {
 @Override
 public void setCommunicationRoot(OpdrNavIF comRoot) {
 	this.comRoot = comRoot;
-	comRoot.addCBookEventListener("text.program", this);
+	comRoot.addCBookEventListener(TEXT, this);
 }
 
 @Override
@@ -136,7 +136,7 @@ private void fire(Tupel[] tupels) {
 	for(Tupel t: tupels) { 
 		list.add(t.toJSON());
 	}
-	CBookEvent ev = new CBookEvent(this, TUPELS, Collections.singletonMap(TUPELS, list));
+	CBookEvent ev = new CBookEvent(this, TUPELS, Collections.singletonMap("tupels", list));
 	comRoot.fireEvent(ev);
 	ev = new CBookEvent(this, ACTION);
 	comRoot.fireEvent(ev);

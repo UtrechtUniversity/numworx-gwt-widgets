@@ -24,7 +24,7 @@
     <!-- GWT 2.9 support 8, 9 and 11 -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-
+	<gwt.style>PRETTY</gwt.style>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
