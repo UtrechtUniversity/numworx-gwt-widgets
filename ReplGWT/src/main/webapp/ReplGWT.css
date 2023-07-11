@@ -1,1 +1,4 @@
 /** Add css rules here for your application. */
+#output {
+	overflow: scroll;
+}

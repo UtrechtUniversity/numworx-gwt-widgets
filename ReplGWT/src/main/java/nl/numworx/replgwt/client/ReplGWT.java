@@ -39,11 +39,17 @@ private static native void runit(String input) /*-{
 @Override
 public HashMap<String, Object> getState() {
 	HashMap<String,Object> state = new HashMap<>();
+	RootPanel content = RootPanel.get("output");
+	String inner = content.getElement().getInnerHTML();
+	state.put("content", inner);
 	return state;
 }
 
 @Override
 public void setState(HashMap<String, Object> h) {
+	String inner = h.getOrDefault("content", "").toString();
+	RootPanel content = RootPanel.get("output");
+	content.getElement().setInnerHTML(inner);
 }
 
 @Override
