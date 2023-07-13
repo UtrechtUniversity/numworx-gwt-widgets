@@ -4,9 +4,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.webworker.client.ErrorEvent;
+import com.google.gwt.webworker.client.ErrorHandler;
+import com.google.gwt.webworker.client.MessageEvent;
+import com.google.gwt.webworker.client.MessageHandler;
+import com.google.gwt.webworker.client.Worker;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -17,20 +28,38 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener {
+public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler {
   private int width;
   private int height;
+  String modules;
+  Worker worker;
 
   
-private static native void runit(String input) /*-{
- $wnd.runit(input)
-}-*/;
+//private static native void runit(String input) /*-{
+// $wnd.runit(input)
+//}-*/;
   
+  protected static native void install(ReplGWT me) /*-{
+  	$wnd.runit = function(test) {
+  		me.@nl.numworx.replgwt.client.ReplGWT::runit(Ljava/lang/String;)(test)
+  	}
+  }-*/;
+
+  int cnt;
+  protected void runit(String message) {
+	  GWT.log(message);
+	  JSONObject object = new JSONObject();
+	  object.put("python", new JSONString(message));
+	  object.put("id", new JSONNumber(++cnt));
+	  worker.postMessage(object.toString());
+  }
   
 /**
    * This is the entry point method.
    */
   public void onModuleLoad() {
+	  modules = GWT.getModuleBaseURL();
+	  GWT.log("modules = " + modules);
 	  RootPanel root = RootPanel.get();
 	  root.add(this);
 	  Stub.publish(this);
@@ -85,11 +114,6 @@ public void zetVolledigeBreedte(int breedte) {
 }
 
 @Override
-public Widget asWidget() {
-	return this;
-}
-
-@Override
 public int getAsHoogte() {
 	return 0;
 }
@@ -112,6 +136,9 @@ public void setAsHoogte(int ashoogte) {
 public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 	this.width = width;
 	this.height = height;
+	worker = Worker.create(modules + "dist/webworker.js");
+	worker.setOnMessage(this);
+	worker.setOnError(this);
 }
 
 @Override
@@ -120,6 +147,39 @@ public void acceptCBookEvent(CBookEvent event) {
 		String program = (String) event.getParameter("content");
 		runit(program);
 	}
+}
+
+@Override
+public void onMessage(MessageEvent event) {
+	GWT.log(event.getDataAsString());
+	JSONObject obj = new JSONObject(event.getDataAsJSO());
+	if (obj.containsKey("results")) {
+		print(obj.get("results").toString());
+	} else if (obj.containsKey("error")) {
+		print(obj.get("error").toString());
+	} else if (obj.containsKey("output")) {
+		printx(obj.get("output"));
+	} else if (obj.containsKey("request")) {
+		String antw = Window.prompt(obj.get("request").toString(), "");
+		worker.postMessage(new JSONString(antw).toString());
+	}
+			
+}
+
+private void print(String string) {
+	RootPanel output = RootPanel.get("output");
+	String inner = output.getElement().getInnerHTML();
+	output.getElement().setInnerHTML(inner + (inner.isEmpty()?"":"\n") + string);
+}
+private void printx(JSONValue string) {
+	RootPanel output = RootPanel.get("output");
+	String inner = output.getElement().getInnerHTML();
+	output.getElement().setInnerHTML(inner + string);
+}
+
+@Override
+public void onError(ErrorEvent event) {
+	GWT.log(event.getMessage());
 }
 
 }

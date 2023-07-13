@@ -11,11 +11,11 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-  <inherits name='nl.uu.fi.dwo.interaction.Interaction' /> 
+  <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
   <inherits name='com.google.gwt.webworker.WebWorker' /> 
 
   <!-- Specify the app entry point class.                         -->
-  <entry-point class='nl.numworx.replgwt.client.ReplGWT' />
+  <entry-point class='nl.numworx.replgwt.client.ReplGWTDebug' />
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client' />

@@ -12,49 +12,22 @@
     <!--                                                               -->
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="replgwt.css">
+    <link type="text/css" rel="stylesheet" href="ReplGWT.css">
 
     <!--                                           -->
     <!-- Any title is fine                         -->
     <!--                                           -->
     <title>Repl</title>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.23.3/full/pyodide.js" ></script>
 <script type="text/javascript">
 function tickle() {
 	
 }
 
-async function main(input, out) {
-	var options = { }
-	options.stdout = function(text) { out.innerHTML = out.innerHTML + text + "\n"};
-	options.stderr = options.stdout
-	options.stdin =  window.prompt
-	
-  	let pyodide = await loadPyodide(options);
-  // Pyodide is now ready to use...
-
-  try {
-    var result = pyodide.runPython(input)
-  	if (result) out.innerHTML = out.innerHTML + "\n\n" + result;
-  } catch (e) {
-	  out.innerHTML = out.innerHTML + "\n\n" + e;
-  }
-  
-  
-  };
-
-
-function runit(prog) { 
-   var mypre = document.getElementById("output"); 
-   mypre.innerHTML = ''; 
-   main(prog, mypre)
-} 
-
-
 function runprog() {
 	var prog = document.getElementById("yourcode").value; 
 	runit(prog)
 }
+
 
 </script> 
 
