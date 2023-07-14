@@ -34,11 +34,7 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   String modules;
   Worker worker;
 
-  
-//private static native void runit(String input) /*-{
-// $wnd.runit(input)
-//}-*/;
-  
+    
   protected static native void install(ReplGWT me) /*-{
   	$wnd.runit = function(test) {
   		me.@nl.numworx.replgwt.client.ReplGWT::runit(Ljava/lang/String;)(test)
@@ -154,13 +150,15 @@ public void onMessage(MessageEvent event) {
 	GWT.log(event.getDataAsString());
 	JSONObject obj = new JSONObject(event.getDataAsJSO());
 	if (obj.containsKey("results")) {
-		print(obj.get("results").toString());
+		printx(obj.get("results"));
 	} else if (obj.containsKey("error")) {
-		print(obj.get("error").toString());
+		printx("\n");
+		printx(obj.get("error"));
 	} else if (obj.containsKey("output")) {
 		printx(obj.get("output"));
 	} else if (obj.containsKey("request")) {
-		String antw = Window.prompt(obj.get("request").toString(), "");
+		String antw = Window.prompt(obj.get("request").toString(), "") + "\n";
+		printx(antw);
 		worker.postMessage(new JSONString(antw).toString());
 	}
 			
@@ -171,10 +169,16 @@ private void print(String string) {
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + (inner.isEmpty()?"":"\n") + string);
 }
-private void printx(JSONValue string) {
+protected void printx(String string) {
 	RootPanel output = RootPanel.get("output");
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + string);
+}
+
+protected void printx(JSONValue value) {
+	JSONString s = value.isString();
+	if (s != null) printx(s.stringValue());
+	else printx(value.toString());
 }
 
 @Override

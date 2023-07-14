@@ -11,12 +11,17 @@ self.output = function(ch) {
 	self.postMessage(JSON.stringify( { "output": string } ))
 }
 
-self.input = async function() {
+self.resolver = function(x) { }
+
+self.input = function() {
 	let p = new Promise( (resolve, err) => {
 	 	self.resolver = resolve;
 	 	self.postMessage(JSON.stringify( { "request": "input" } ));
 	 });
-	 return await p;	 
+	 let result = a
+	 wait p;
+	 console.log(result)
+	 return result 
 	 }
 	 
 
@@ -25,7 +30,7 @@ async function loadPyodideAndPackages() {
   await self.pyodide.loadPackage(["numpy", "pytz"]);
   self.pyodide.setStdout( { isatty: true, raw: self.output })
   self.pyodide.setStderr( { isatty: true, raw: self.output })
-  self.pyodide.setStdin(  { isatty: true, stdin: self.input })
+  self.pyodide.setStdin(  { isatty: true, stdin: self.input, autoEOF: false })
   
 }
 let pyodideReadyPromise = loadPyodideAndPackages();
