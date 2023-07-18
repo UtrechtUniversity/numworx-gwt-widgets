@@ -28,6 +28,8 @@ public class ReplGWTDebug extends ReplGWT implements Consumer<String> {
 
 	public void onModuleLoad() {
 		  modules = GWT.getModuleBaseURL();
+		  String serviceurl = modules + "dist/serviceworker.js";
+		  installServiceWorker(serviceurl, this);
 		  install(this);
 		  init(600,300,null, null);
 	  }
@@ -38,6 +40,10 @@ public class ReplGWTDebug extends ReplGWT implements Consumer<String> {
 		consuming = false;
 		printx(t);
 		startInput();
+	}
+
+	protected void setServiceWorker(ServiceWorker w) {
+		service = w;
 	}
 
 }

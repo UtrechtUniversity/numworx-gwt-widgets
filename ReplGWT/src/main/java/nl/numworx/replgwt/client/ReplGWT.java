@@ -2,6 +2,7 @@ package nl.numworx.replgwt.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -11,9 +12,7 @@ import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.webworker.client.ErrorEvent;
+import com.google.gwt.user.client.ui.SimplePanel;import com.google.gwt.webworker.client.ErrorEvent;
 import com.google.gwt.webworker.client.ErrorHandler;
 import com.google.gwt.webworker.client.MessageEvent;
 import com.google.gwt.webworker.client.MessageHandler;
@@ -33,8 +32,27 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   private int height;
   String modules;
   Worker worker;
-
-    
+  ServiceWorker service;
+  
+  static native void installServiceWorker(String url, ReplGWT me) /*-{
+	  $wnd.navigator.serviceWorker.register(url).then(function(registration) {
+	  var serviceWorker = registration.active;
+	  if (!serviceWorker) {
+	    location.reload();
+	  }  
+	  me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
+	});
+  }-*/;
+  
+  
+  protected void setServiceWorker(ServiceWorker w) {
+	  service = w;
+  }
+  
+//private static native void runit(String input) /*-{
+// $wnd.runit(input)
+//}-*/;
+  
   protected static native void install(ReplGWT me) /*-{
   	$wnd.runit = function(test) {
   		me.@nl.numworx.replgwt.client.ReplGWT::runit(Ljava/lang/String;)(test)
@@ -56,6 +74,9 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   public void onModuleLoad() {
 	  modules = GWT.getModuleBaseURL();
 	  GWT.log("modules = " + modules);
+	  String serviceurl = modules + "dist/serviceworker.js";
+	  installServiceWorker(serviceurl, this);
+	  
 	  RootPanel root = RootPanel.get();
 	  root.add(this);
 	  Stub.publish(this);
@@ -159,7 +180,7 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("request")) {
 		String antw = Window.prompt(obj.get("request").toString(), "") + "\n";
 		printx(antw);
-		worker.postMessage(new JSONString(antw).toString());
+		service.postMessage((antw).toString());
 	}
 			
 }

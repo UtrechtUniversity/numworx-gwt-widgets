@@ -20,7 +20,7 @@
   <properties>
     <!-- Convenience property to set the GWT version -->
     <gwt.version>2.9.0</gwt.version>
-
+    <gwt.style>PRETTY</gwt.style>
     <!-- GWT 2.9 support 8, 9 and 11 -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -109,7 +109,7 @@
         <configuration>
           <runTarget>ReplGWT.html</runTarget>
           <modules>
-            <module>nl.numworx.replgwt.ReplGWT</module>
+            <module>nl.numworx.replgwt.ReplGWTDebug</module>
           </modules>
         </configuration>
       </plugin>

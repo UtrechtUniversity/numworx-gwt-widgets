@@ -11,19 +11,15 @@ self.output = function(ch) {
 	self.postMessage(JSON.stringify( { "output": string } ))
 }
 
-self.resolver = function(x) { }
-
 self.input = function() {
-	let p = new Promise( (resolve, err) => {
-	 	self.resolver = resolve;
-	 	self.postMessage(JSON.stringify( { "request": "input" } ));
-	 });
-	 let result = a
-	 wait p;
-	 console.log(result)
-	 return result 
-	 }
-	 
+  self.postMessage(JSON.stringify( { "request": "input" } ));
+  const request = new XMLHttpRequest();
+  // `false` makes the request synchronous
+  request.open('GET', '/get_input/', false);
+  request.send(null);
+  console.log('status', request.status);
+  return request.responseText;
+}
 
 async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide();
