@@ -56,6 +56,12 @@ protected InputReader w;
 protected boolean consuming;
   protected void runit(String message) {
 	  GWT.log(message);
+	  w.removeFromParent();
+	  consuming = false;
+	  
+	  RootPanel output = RootPanel.get("output");
+	  output.clear();
+	  output.getElement().setInnerHTML(""); // clear it all
 	  JSONObject object = new JSONObject();
 	  object.put("python", new JSONString(message));
 	  object.put("id", new JSONNumber(++cnt));

@@ -4,13 +4,15 @@ import java.util.function.Consumer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBox;
 
-public class InputReader extends Composite implements HasText, ValueChangeHandler<String> {
+public class InputReader extends Composite implements HasText, ValueChangeHandler<String>, ClickHandler {
 
 	private static final Consumer<String> NULL = (x) -> {};
 
@@ -33,6 +35,7 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 	public InputReader() {
 		textBox = new TextBox();
 		textBox.addValueChangeHandler(this);
+		//textBox.addClickHandler(this);
 		textBox.addStyleDependentName("input");
 		initWidget(textBox);
 	}
@@ -60,6 +63,14 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 			textBox.setFocus(true);			
 		});
 		
+	}
+
+
+	@Override
+	public void onClick(ClickEvent event) {
+		consumer.accept(getText());
+		event.preventDefault();
+		event.stopPropagation();
 	}
 	
 	
