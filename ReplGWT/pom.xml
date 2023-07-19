@@ -26,6 +26,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <Debug></Debug>
   </properties>
 
   <dependencyManagement>
@@ -109,7 +110,7 @@
         <configuration>
           <runTarget>ReplGWT.html</runTarget>
           <modules>
-            <module>nl.numworx.replgwt.ReplGWTDebug</module>
+            <module>nl.numworx.replgwt.ReplGWT${Debug}</module>
           </modules>
         </configuration>
       </plugin>

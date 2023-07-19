@@ -16,7 +16,7 @@ addEventListener('message', event => {
 
 addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  if (u.pathname === '/get_input/') {
+  if (u.pathname === '/dwo/apps/get_input/') {
     e.respondWith(new Promise(r => resolver = r));
   }
 });

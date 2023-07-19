@@ -34,25 +34,16 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   Worker worker;
   ServiceWorker service;
   
-  static native void installServiceWorker(String url, ReplGWT me) /*-{
-	  $wnd.navigator.serviceWorker.register(url).then(function(registration) {
-	  var serviceWorker = registration.active;
-	  if (!serviceWorker) {
-	    location.reload();
-	  }  
-	  me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
-	});
+  static native void installServiceWorker(ReplGWT me) /*-{
+  	serviceWorker = $wnd.serviceWorker
+	me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
   }-*/;
   
   
   protected void setServiceWorker(ServiceWorker w) {
 	  service = w;
   }
-  
-//private static native void runit(String input) /*-{
-// $wnd.runit(input)
-//}-*/;
-  
+    
   protected static native void install(ReplGWT me) /*-{
   	$wnd.runit = function(test) {
   		me.@nl.numworx.replgwt.client.ReplGWT::runit(Ljava/lang/String;)(test)
@@ -74,8 +65,7 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   public void onModuleLoad() {
 	  modules = GWT.getModuleBaseURL();
 	  GWT.log("modules = " + modules);
-	  String serviceurl = modules + "dist/serviceworker.js";
-	  installServiceWorker(serviceurl, this);
+	  installServiceWorker(this);
 	  
 	  RootPanel root = RootPanel.get();
 	  root.add(this);

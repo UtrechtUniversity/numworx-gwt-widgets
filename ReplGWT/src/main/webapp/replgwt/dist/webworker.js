@@ -15,7 +15,7 @@ self.input = function() {
   self.postMessage(JSON.stringify( { "request": "input" } ));
   const request = new XMLHttpRequest();
   // `false` makes the request synchronous
-  request.open('GET', '/get_input/', false);
+  request.open('GET', '/dwo/apps/get_input/', false);
   request.send(null);
   console.log('status', request.status);
   return request.responseText;

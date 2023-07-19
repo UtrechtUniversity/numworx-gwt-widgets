@@ -28,8 +28,7 @@ public class ReplGWTDebug extends ReplGWT implements Consumer<String> {
 
 	public void onModuleLoad() {
 		  modules = GWT.getModuleBaseURL();
-		  String serviceurl = modules + "dist/serviceworker.js";
-		  installServiceWorker(serviceurl, this);
+		  installServiceWorker(this);
 		  install(this);
 		  init(600,300,null, null);
 	  }

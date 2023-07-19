@@ -19,6 +19,16 @@
     <!--                                           -->
     <title>Repl</title>
 <script type="text/javascript">
+
+var serviceWorker;
+
+navigator.serviceWorker.register("/dwo/apps/serviceworker.js").then(function(registration) {
+	  serviceWorker = registration.active;
+	  if (!serviceWorker) {
+	    location.reload();
+	  }  
+})
+
 function tickle() {
 	
 }
