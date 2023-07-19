@@ -146,7 +146,7 @@ public void setAsHoogte(int ashoogte) {
 public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 	this.width = width;
 	this.height = height;
-	worker = Worker.create(modules + "dist/webworker.js");
+	worker = Worker.create("/dwo/apps/webworker.js");
 	worker.setOnMessage(this);
 	worker.setOnError(this);
 	w = new InputReader();
