@@ -42,6 +42,7 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   
   protected void setServiceWorker(ServiceWorker w) {
 	  service = w;
+	  java.util.logging.Logger.getLogger("ReplGWT").severe(String.valueOf(w));
   }
     
   protected static native void install(ReplGWT me) /*-{
@@ -168,11 +169,15 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("output")) {
 		printx(obj.get("output"));
 	} else if (obj.containsKey("request")) {
-		String antw = Window.prompt(obj.get("request").toString(), "") + "\n";
-		printx(antw);
-		service.postMessage((antw).toString());
+		requestInput();
 	}
 			
+}
+
+protected void requestInput() {
+	String antw = "123" + "\n";
+	printx(antw);
+	service.postMessage((antw).toString());
 }
 
 private void print(String string) {

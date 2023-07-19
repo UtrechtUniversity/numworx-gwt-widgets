@@ -37,12 +37,23 @@ public class ReplGWTDebug extends ReplGWT implements Consumer<String> {
 	public void accept(String t) {
 		w.removeFromParent();
 		consuming = false;
+		t += "\n";
 		printx(t);
-		startInput();
+		service.postMessage((t).toString());
 	}
 
 	protected void setServiceWorker(ServiceWorker w) {
 		service = w;
+		  java.util.logging.Logger.getLogger("ReplGWTDebug").severe(String.valueOf(w));
+	}
+
+	@Override
+	protected void requestInput() {
+		if (consuming) {
+			  java.util.logging.Logger.getLogger("ReplGWTDebug").severe("consuming");
+			  return;
+		}
+		startInput();
 	}
 
 }
