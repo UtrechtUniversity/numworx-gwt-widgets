@@ -26,7 +26,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <debug>ReplGWTDebug</debug>
+    <debug>ReplGWT</debug>
   </properties>
 
   <dependencyManagement>
@@ -109,12 +109,22 @@
           gwt-maven-plugin documentation at codehaus.org -->
         <configuration>
           <runTarget>ReplGWT.html</runTarget>
+          <style>${gwt.style}</style>
           <modules>
-            <module>nl.numworx.replgwt.ReplGWTDebug</module>
+            <module>nl.numworx.replgwt.${debug}</module>
           </modules>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
+  <profiles>
+  	<profile>
+  		<id>debug</id>
+  		<properties>
+  			<debug>ReplGWTDebug</debug>
+  			<gwt.style>PRETTY</gwt.style>
+  		</properties>
+  	</profile>
+  
+  </profiles>
 </project>

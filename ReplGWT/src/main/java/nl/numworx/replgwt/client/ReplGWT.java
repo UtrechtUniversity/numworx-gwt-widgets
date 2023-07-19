@@ -27,7 +27,7 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler {
+public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String> {
   private int width;
   private int height;
   String modules;
@@ -52,6 +52,8 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   }-*/;
 
   int cnt;
+protected InputReader w;
+protected boolean consuming;
   protected void runit(String message) {
 	  GWT.log(message);
 	  JSONObject object = new JSONObject();
@@ -147,6 +149,9 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 	worker = Worker.create(modules + "dist/webworker.js");
 	worker.setOnMessage(this);
 	worker.setOnError(this);
+	w = new InputReader();
+	w.setConsumer(this);
+
 }
 
 @Override
@@ -175,9 +180,11 @@ public void onMessage(MessageEvent event) {
 }
 
 protected void requestInput() {
-	String antw = "123" + "\n";
-	printx(antw);
-	service.postMessage((antw).toString());
+	if (consuming) {
+		  java.util.logging.Logger.getLogger("ReplGWT").severe("consuming");
+		  return;
+	}
+	startInput();
 }
 
 private void print(String string) {
@@ -200,6 +207,23 @@ protected void printx(JSONValue value) {
 @Override
 public void onError(ErrorEvent event) {
 	GWT.log(event.getMessage());
+}
+
+
+protected void startInput() {
+	RootPanel.get("output").add(w);
+	w.start();
+	consuming = true;
+}
+
+
+@Override
+public void accept(String t) {
+	w.removeFromParent();
+	consuming = false;
+	t += "\n";
+	printx(t);
+	service.postMessage((t).toString());
 }
 
 }

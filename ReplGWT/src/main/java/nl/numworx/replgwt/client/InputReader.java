@@ -55,6 +55,7 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 	}
 
 	public void start() {
+		textBox.setValue("");
 		Scheduler.get().scheduleDeferred(() -> { 
 			textBox.setFocus(true);			
 		});
