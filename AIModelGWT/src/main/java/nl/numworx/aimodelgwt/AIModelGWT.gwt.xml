@@ -11,7 +11,8 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-  <inherits name='nl.uu.fi.dwo.interaction.Interaction' /> 
+  <inherits name='nl.uu.fi.dwo.interaction.Interaction' />
+  <inherits name='nl.uu.fi.dwo.ideas.Ideas' /> 
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='nl.numworx.aimodelgwt.client.AIModelGWT' />
