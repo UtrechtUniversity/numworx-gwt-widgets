@@ -8,6 +8,8 @@ import java.util.Map;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -16,6 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 import nl.uu.fi.dwo.ideas.client.IdeasIF;
 import nl.uu.fi.dwo.ideas.client.RuleIF;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
@@ -86,7 +89,8 @@ public void zetNagekeken(boolean b) {
 @Override
 public void setCommunicationRoot(OpdrNavIF comRoot) {
 	this.comRoot = comRoot;
-	comRoot.addCBookEventListener(TEXT, this);
+	if (comRoot.getLessonMode() == LessonMode.normal)
+		comRoot.addCBookEventListener(TEXT, this);
 }
 
 @Override
@@ -126,14 +130,17 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 }
 
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @Override
 public void acceptCBookEvent(CBookEvent event) {
 	if (TEXT.equals(event.getCommand())) {
 		String model = (String) event.getParameter("content");
-		Rule rule = new Rule(model);
+		Map context = new HashMap();
+		context.put("language", getLocale());
+		context.put("learnerId", comRoot.getLearnerId());	
+		Rule rule = new Rule(model, context);
 		RuleIF[] input = new RuleIF[] { rule };
 		cas.aiModel(input, STRATEGY, this);
-		
 	}
 }
 
@@ -163,6 +170,19 @@ public void onSuccess(RuleIF[] result) {
 	fire(tupels);
 
 }
+
+
+public static String getLocale() {
+	String locale;
+	locale = LocaleInfo.getCurrentLocale().getLocaleName();
+	String query = Window.Location.getParameter("locale");
+	if(query != null && !query.isEmpty()) {
+		locale = query;
+	} else if("default".equals(locale)) // no default please.
+		return "nl";
+	return locale;
+}
+
 
 private Tupel toTupel(RuleIF r) {
 	String expr = r.getExpr();

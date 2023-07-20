@@ -2,20 +2,20 @@ package nl.numworx.aimodelgwt.client;
 
 import java.util.Map;
 
+import nl.uu.fi.dwo.ideas.client.AbstractRule;
 import nl.uu.fi.dwo.ideas.client.RuleIF;
 
-class Rule implements RuleIF {
+class Rule extends AbstractRule implements RuleIF {
 	
 	private String expr;
-	
+	private Map context;
 
 	Rule(String expr) {
 		this.expr = expr;
 	}
-
-	@Override
-	public String getId() {
-		return null;
+	Rule(String expr, Map context) {
+		this.expr = expr;
+		this.context = context;
 	}
 
 	@Override
@@ -24,33 +24,8 @@ class Rule implements RuleIF {
 	}
 
 	@Override
-	public boolean isException() {
-		return false;
-	}
-
-	@Override
-	public String getName() {
-		return null;
-	}
-
-	@Override
-	public boolean isReady() {
-		return false;
-	}
-
-	@Override
 	public Map getContext() {
-		return null;
-	}
-
-	@Override
-	public String getPrefix() {
-		return null;
-	}
-
-	@Override
-	public String getArgument() {
-		return null;
+		return context;
 	}
 
 }
