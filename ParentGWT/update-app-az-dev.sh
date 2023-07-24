@@ -11,7 +11,10 @@ then
 fi
 if test -z "$SAS" 
 then
-	EXP=$(date -v+1d +%Y-%m-%d)
+# BSD (MacOSX)
+#	EXP=$(date -v+1d +%Y-%m-%d)
+# posix (ubuntu)
+	EXP=$(date -d 'next day' +%Y-%m-%d)
 	SAS=$(az storage container generate-sas --account-name numworxcontentdev --name content  --auth-mode key  --permissions dlrw --expiry $EXP --account-key $KEY)
 	SAS=$(echo $SAS|tr -d '"')
 fi
@@ -28,8 +31,8 @@ then
 #SAS=$(az storage container generate-sas --account-name numworxcontentdev --name content  --auth-mode key  --permissions dlrw --expiry $EXP --account-key $KEY)
 #SAS=$(echo $SAS|tr -d '"')
 
-azcopy copy $3.css https://numworxcontentdev.blob.core.windows.net/content/apps/?"$SAS" --recursive=true
-azcopy copy $2 https://numworxcontentdev.blob.core.windows.net/content/apps/?"$SAS" --recursive=true
+azcopy sync $3.css https://numworxcontentdev.blob.core.windows.net/content/apps/?"$SAS"
+azcopy sync $2 https://numworxcontentdev.blob.core.windows.net/content/apps/?"$SAS" --recursive=true --delete-destination true
 
 
 
