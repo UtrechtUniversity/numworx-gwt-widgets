@@ -1,6 +1,7 @@
 #!/bin/bash
 . ~/.bashrc
 set -ex
+sh update-app-www-dev.sh AIModelGWT aimodelgwt AIModelGWT
 sh update-app-www-dev.sh AlgebraExprGWT algebraexprgwt AlgebraExprGWT
 sh update-app-www-dev.sh AlgebraPijlenGWT algebrapijlengwt AlgebraPijlenGWT
 sh update-app-www-dev.sh BalansFruitGWT balansfruitgwt BalansFruitGWT
