@@ -1,10 +1,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+    <parent>
+    	<groupId>nl.uu.fi.dwo</groupId>
+    	<artifactId>DWO.master.pom</artifactId>
+    	<version>1.1</version>
+    </parent>
   <groupId>fi.parentgwt</groupId>
   <artifactId>ParentGWT</artifactId>
   <version>0.0.7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>parent pom for GWT widgets</name>
+  <properties>
+  	<gwtVersion>2.8.2</gwtVersion>
+  	<mgwtVersion>1.1.2</mgwtVersion>
+  	<maven.compiler.source>1.8</maven.compiler.source>
+  	<maven.compiler.target>1.8</maven.compiler.target>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	<interactionVersion>0.0.5</interactionVersion>
+  </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
 	<module>../WidgetPlayer</module>
@@ -39,14 +52,6 @@
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
   </modules>
-  <properties>
-  	<gwtVersion>2.8.2</gwtVersion>
-  	<mgwtVersion>1.1.2</mgwtVersion>
-  	<maven.compiler.source>1.8</maven.compiler.source>
-  	<maven.compiler.target>1.8</maven.compiler.target>
-  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<interactionVersion>0.0.5</interactionVersion>
-  </properties>
   <dependencyManagement>
    <dependencies>
   	<dependency>
@@ -68,6 +73,22 @@
    </dependencies>
   </dependencyManagement>
   <build>
+  	<plugins>
+    		<plugin>
+            	<groupId>external.atlassian.jgitflow</groupId>
+            	<artifactId>jgitflow-maven-plugin</artifactId>
+            	<configuration>
+                	<!-- see goals wiki page for configuration options -->
+                	<flowInitContext>
+             			<developBranchName>develop</developBranchName>  
+             			<masterBranchName>main</masterBranchName>    	
+                	</flowInitContext>
+                	<localOnly>false</localOnly>
+                	<allowSnapshots>false</allowSnapshots>
+                	<enableSshAgent>true</enableSshAgent>
+            	</configuration>
+        	</plugin>
+  	</plugins>
   	<pluginManagement>
   		<plugins>
    <plugin>
@@ -102,39 +123,22 @@
     		<artifactId>maven-compiler-plugin</artifactId>
     		<version>3.6.1</version>   	
     	  </plugin>
-   		</plugins>
-  	</pluginManagement> 
-  	<plugins>
-    		<plugin>
+    	  <plugin>
             	<groupId>external.atlassian.jgitflow</groupId>
             	<artifactId>jgitflow-maven-plugin</artifactId>
             	<version>1.0-m5.1</version>
-            	<configuration>
-                	<!-- see goals wiki page for configuration options -->
-                	<flowInitContext>
-             			<developBranchName>develop</developBranchName>  
-             			<masterBranchName>main</masterBranchName>    	
-                	</flowInitContext>
-                	<localOnly>false</localOnly>
-                	<allowSnapshots>false</allowSnapshots>
-                	<enableSshAgent>true</enableSshAgent>
-            	</configuration>
-			  <dependencies>
-			    <dependency>
-			      <groupId>com.jcraft</groupId>
-			      <artifactId>jsch</artifactId>
-			      <version>0.1.54</version>
-			    </dependency>
-			  </dependencies>
-        	</plugin>
-  	</plugins>
+				  <dependencies>
+				    <dependency>
+				      <groupId>com.jcraft</groupId>
+				      <artifactId>jsch</artifactId>
+				      <version>0.1.54</version>
+				    </dependency>
+				  </dependencies>
+    	  </plugin>
+   		</plugins>
+  	</pluginManagement> 
   </build>
     <scm>
         <developerConnection>scm:git:git@github.com:UtrechtUniversity/numworx-gwt-widgets.git</developerConnection>
     </scm>
-    <parent>
-    	<groupId>nl.uu.fi.dwo</groupId>
-    	<artifactId>DWO.master.pom</artifactId>
-    	<version>1.1</version>
-    </parent>
 </project>
