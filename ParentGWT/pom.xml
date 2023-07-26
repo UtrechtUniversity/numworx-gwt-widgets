@@ -104,7 +104,34 @@
     	  </plugin>
    		</plugins>
   	</pluginManagement> 
+  	<plugins>
+    		<plugin>
+            	<groupId>external.atlassian.jgitflow</groupId>
+            	<artifactId>jgitflow-maven-plugin</artifactId>
+            	<version>1.0-m5.1</version>
+            	<configuration>
+                	<!-- see goals wiki page for configuration options -->
+                	<flowInitContext>
+             			<developBranchName>develop</developBranchName>  
+             			<masterBranchName>main</masterBranchName>    	
+                	</flowInitContext>
+                	<localOnly>false</localOnly>
+                	<allowSnapshots>false</allowSnapshots>
+                	<enableSshAgent>true</enableSshAgent>
+            	</configuration>
+			  <dependencies>
+			    <dependency>
+			      <groupId>com.jcraft</groupId>
+			      <artifactId>jsch</artifactId>
+			      <version>0.1.54</version>
+			    </dependency>
+			  </dependencies>
+        	</plugin>
+  	</plugins>
   </build>
+    <scm>
+        <developerConnection>scm:git:git@github.com:UtrechtUniversity/numworx-gwt-widgets.git</developerConnection>
+    </scm>
     <parent>
     	<groupId>nl.uu.fi.dwo</groupId>
     	<artifactId>DWO.master.pom</artifactId>
