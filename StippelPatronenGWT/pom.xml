@@ -59,7 +59,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.7-SNAPSHOT</version>
+  	<version>0.0.7</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Stippel Patronen</name>

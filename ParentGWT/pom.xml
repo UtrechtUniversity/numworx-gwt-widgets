@@ -7,7 +7,7 @@
     </parent>
   <groupId>fi.parentgwt</groupId>
   <artifactId>ParentGWT</artifactId>
-  <version>0.0.7-SNAPSHOT</version>
+  <version>0.0.7</version>
   <packaging>pom</packaging>
   <name>parent pom for GWT widgets</name>
   <properties>
