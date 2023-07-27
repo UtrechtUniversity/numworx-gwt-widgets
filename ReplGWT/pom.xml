@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.7</version>
+		<version>0.0.8-SNAPSHOT</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.replgwt</groupId>
   <artifactId>ReplGWT</artifactId>
   <packaging>war</packaging>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>REPL Interpreter for GWT</name>
 
   <properties>
