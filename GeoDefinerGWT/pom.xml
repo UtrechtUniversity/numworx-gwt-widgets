@@ -4,11 +4,11 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.8-SNAPSHOT</version>
+		<version>0.0.7</version>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.4</version>
 	<packaging>war</packaging>
 	<name>GeoDefiner GWT</name>
 	<dependencies>
