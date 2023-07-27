@@ -1,0 +1,17 @@
+/** Add css rules here for your application. */
+body {
+	overflow: hidden;
+	margin: 0px !important;
+	background: transparent !important; /* was initial (niet voor ie/edge) */
+}
+.root {
+/**	background-color: yellow; */
+}	
+
+.dock {
+/**	background-color: orange; */
+}
+
+.canvas {
+	background-color: white;	
+}

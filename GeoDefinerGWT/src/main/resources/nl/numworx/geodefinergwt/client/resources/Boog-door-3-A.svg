@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 907.1 1105.5" style="enable-background:new 0 0 907.1 1105.5;" xml:space="preserve">
+<style type="text/css">
+	.st0{display:none;}
+	.st1{display:inline;fill:#CECECE;}
+	.st2{fill:#0F75BC;}
+	.st3{fill:#AAC1DC;}
+	.st4{display:inline;fill:#7297C7;}
+	.st5{display:inline;fill:#0F75BC;}
+	.st6{display:inline;fill:#314770;}
+	.st7{display:inline;}
+	.st8{fill:none;stroke:#C8E6FE;stroke-width:50;stroke-miterlimit:10;}
+	.st9{fill:#AAC1DC;stroke:#7297C7;stroke-width:50;stroke-miterlimit:10;}
+	.st10{display:none;fill:#AAC1DC;stroke:#0F75BC;stroke-miterlimit:10;}
+</style>
+<g id="Hulplijnen" class="st0">
+	<path id="Achtergrond" class="st1" d="M0,4.4h907.1v907.1H0V4.4z"/>
+</g>
+<g id="Accentlijn">
+	<rect y="1006.3" class="st2" width="907.1" height="99.2"/>
+</g>
+<g id="Achtergrond_1">
+	<path class="st3" d="M907.1,794.1c0,62.6-50.8,113.4-113.4,113.4H113.4C50.8,907.5,0,856.7,0,794.1V113.8
+		C0,51.2,50.8,0.4,113.4,0.4h680.3c62.6,0,113.4,50.8,113.4,113.4L907.1,794.1L907.1,794.1z"/>
+</g>
+<g id="Achtergrond_2" class="st0">
+	<path class="st4" d="M907.1,794.1c0,62.6-50.8,113.4-113.4,113.4H113.4C50.8,907.5,0,856.7,0,794.1V113.8
+		C0,51.2,50.8,0.4,113.4,0.4h680.3c62.6,0,113.4,50.8,113.4,113.4L907.1,794.1L907.1,794.1z"/>
+</g>
+<g id="Achtergrond_3" class="st0">
+	<path class="st5" d="M907.1,794.1c0,62.6-50.8,113.4-113.4,113.4H113.4C50.8,907.5,0,856.7,0,794.1V113.8
+		C0,51.2,50.8,0.4,113.4,0.4h680.3c62.6,0,113.4,50.8,113.4,113.4L907.1,794.1L907.1,794.1z"/>
+</g>
+<g id="Achtergrond_4" class="st0">
+	<path class="st6" d="M907.1,794.1c0,62.6-50.8,113.4-113.4,113.4H113.4C50.8,907.5,0,856.7,0,794.1V113.8
+		C0,51.2,50.8,0.4,113.4,0.4h680.3c62.6,0,113.4,50.8,113.4,113.4L907.1,794.1L907.1,794.1z"/>
+</g>
+<g id="Achtergrond_zwart" class="st0">
+	<path class="st7" d="M907.1,794.1c0,62.6-50.8,113.4-113.4,113.4H113.4C50.8,907.5,0,856.7,0,794.1V113.8
+		C0,51.2,50.8,0.4,113.4,0.4h680.3c62.6,0,113.4,50.8,113.4,113.4L907.1,794.1L907.1,794.1z"/>
+</g>
+<g id="Boog_door_drie">
+	<circle class="st8" cx="453.5" cy="453.9" r="297.6"/>
+	<rect x="136" y="542.5" class="st3" width="396.8" height="251.9"/>
+	<circle class="st9" cx="605" cy="716.4" r="78"/>
+	<circle class="st9" cx="610.8" cy="191.8" r="78"/>
+	<circle class="st9" cx="155.9" cy="454.1" r="78"/>
+	<polygon class="st10" points="155.9,457.2 610.8,195.8 609.8,720.4 	"/>
+</g>
+</svg>

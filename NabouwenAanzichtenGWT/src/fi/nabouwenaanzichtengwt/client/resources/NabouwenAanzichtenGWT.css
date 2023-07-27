@@ -1,0 +1,57 @@
+.root {
+/**	background-color: yellow; */
+}	
+
+.dock {
+/**	background-color: orange; */
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	background-color: white;	
+	touch-action: none;
+}
+
+.upimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.downimage {
+	position: relative;
+	top: -4px;
+	left: -6px;
+}		
+
+.togglebutton {
+	
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+	color: red;
+	
+}
+
+.radiobutton {
+	text-align: left;
+	font-family: Helvetica, sans serif;
+	/** background-color: yellow; */
+}	
+
+.pushbutton {
+
+	background-color: yellow;
+	font-size: 0.975em;
+	font-family: Helvetica, sans serif;	
+	/**padding: 2px;*/ 	
+	text-align: center;
+}
+
+
+.borderless {
+	border-collapse: collapse;
+}

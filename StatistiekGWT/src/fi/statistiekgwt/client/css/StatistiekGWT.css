@@ -1,0 +1,353 @@
+/** dit file staat in statistiekgwt/client/css */
+
+/** Used in the canvas of Boxplot, DotplotView.DotPanel and HistogramView.HistogramBarPanel. */
+.canvas {
+	background-color: white;
+}
+
+/** Used for StatTable.resetButton and CrossTabulationTableUserOptionsPanel.swapButton. */
+.pushbutton {
+	background-color: rgb(240, 240, 240); /* default button grey */
+	background-image: none;
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+	/*font-size: 0.875em;*/
+	padding: 0px;
+}
+
+/** Used for buttons in StatTable. */
+.tableButton {
+	vertical-align: middle;
+	margin: 1px; /* this margin is the value of StatistiekGWT.MARGIN */
+	padding: 5px;
+	white-space: nowrap;
+	/*background: rgb(220, 229, 245);/*rgb(220, 237, 255); /* DWO blue #DCEDFF */
+}
+
+/** DWO blue. Used for ColorLegend, SeperateViewDialog, 
+	StatTable.table, StatTable.pager, StatTable.editDataPanel (panel with the 6 buttons),
+	dialogButtonPanel of all views (i.e., BoxplotView, CrossTabulationTableView, DescriptivesView,
+	DotplotView, FrequencyTableView, and HistogramView). */
+.backgroundblue {
+	background-color: rgb(220, 237, 255); /* DWO blue #DCEDFF */
+}
+
+/** Selection color. Used for DescriptivesView.dataLabels. */
+.backgroundgrey {
+	background-color: rgb(192, 192, 192); /* selection color */
+}
+
+/** Used for the scrollPanel of BoxplotView, CrossTabulationView, 
+	DescriptivesView, and FrequencyTableView. 
+	Waarom niet Dotplot, Histogram (CustomScrollPanel)? */
+.backgroundwhite {
+	background-color: rgb(255, 255, 255); /* white */
+}
+
+/** Used for ChangeViewNameDialog.nameField, ColumnDialogView.nameField,
+	and ColumnDialogView.addEnumElementField. */
+.textbox {
+	width: 100%;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+/** Used for ColumnDialogView.uitlegArea. */
+.textarea {
+	border:1px solid #999999;
+    width:100%;
+    height:100%;
+   	min-height:150px;
+	min-width:175px;
+    margin:5px 0;
+    padding:3px;
+}
+
+/** Used to set the cell style of columns and column headers in datagrid. */
+.datagridcell {
+	font-size: 13px;
+	color: gray;
+	padding: 2px 5px !important;
+	border: none !important;
+	width: 100%;
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+/** Used to prevent text selection while dragging the mouse in datagrid. */
+.noSelect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;           /* non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+/** Used in the userOptionsPanel of all views. */
+.titlelabel {
+	font-style: italic;
+	text-align: center;
+	padding-bottom: 3px;
+}
+
+/** Used in the userOptionsPanel of all views, StatInteractiePanelView.addViewTab,
+	and ColumnDialogView. */
+.spaceTopLabel {
+	padding-top: 3px;
+}
+
+/** Used in ChangeViewNameDialog, ColorLegend.columnLabel, FrequencyTableView split class label,
+	and HistogramUserOptionsPanel.percentageRadioItem.*/
+.spaceBottomLabel {
+	padding-bottom: 3px;
+}
+
+/* Set vertical-align in input and label to align checkbox and its text. */
+/* Let op: dit heeft invloed op de cell in datagrid... */
+input {
+    vertical-align: middle; 
+}
+
+/* Set vertical-align in input and label to align checkbox and its text. */
+/* Let op: dit heeft invloed op de cell in datagrid... */
+label {
+    vertical-align: middle; 
+}
+
+/** Used for the different sections (for example, variable, display, splitOptions settings)
+	in the userOptionsPanel of all views. */
+.settingspanel {
+	margin: 2px;
+	padding: 5px;
+}
+
+/** Used for userOptionsPanel.allSettingsPanel of all views, and in 
+	ColumnDialogView. */
+.horizontalPanel {
+	border-color: lightgrey;/*#D3D3D3;*/
+	margin: 5px;
+}
+
+/** Used in ChangeViewNameDialog, ColorLegend.labelsPanel,
+	and in StatTable.pasteDataDialog. */
+.horizontalPanelWithoutBorder {
+	margin: 5px;
+	padding: 5px;
+}
+
+/** Used for DescriptivesView to show the overall and the selection table
+	next to each other. */
+.horizontalPanelDescriptives {
+	margin: 3px;
+	padding: 3px;
+}
+
+/** Used in the userOptionsPanel of all views. */
+.horizontalrule {
+	border: 0;
+    height: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    width: 90%;
+    align: center;
+    text-align:center; 
+    margin: 5px;
+}
+
+/** Used for ColorLegend.splitClassLabels. */
+.splitClassLabel {
+	height: 14px;
+    white-space: nowrap;
+    padding-right: 3px;
+}
+
+/** Used for ColorLegend.columnLabel and ColorLegend.colorLabel. */
+.colorlegendlabel {
+	height: 14px;
+    white-space: nowrap;
+}
+
+/** Used for userOptionsPanel.splitBoundariesArea of Boxplot,
+	Descriptives, Dotplot, FrequencyTable, and Histogram, 
+	and of FrequencyTableUserOptionsPanel.boundariesArea. */
+.boxsizingborder {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+
+/** Used for StatTable.table. */
+.dataGrid {
+    overflow: auto; /*hidden;*/
+    white-space: nowrap;
+    table-layout: fixed;/*auto;*/
+}
+
+/** Used for StatTable.tableMessageLabel. */
+.noScrollBars {
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden
+}
+
+/** Used in StatTable.pasteDataDialog */
+.failMessage {
+	color:red;
+}
+
+/** Used in the userOptionsPanels of the views boxplot, crosstabulationtable,
+	dotplot, and histogram. */
+.radioButton {
+	display: block; /* prevent default of showing radiobuttons on one line, instead show each on a new line */
+	white-space:nowrap;
+}
+
+/** Used in the userOptionsPanels of the views dotplot and frequencytable. */
+.checkBox {
+	display: block; /* prevent default of showing checkboxes on one line, instead show each on a new line */
+	white-space:nowrap;
+}
+
+/** Used in ChangeViewNameDialog, ColorLegend, StatInteractiePanelView, StatTable,
+	ColorPickerDialog, ColumnDialogView, DotplotUserOptionsPanel. */
+.margin {
+	margin: 5px;
+}
+
+/** Used for SeparateViewDialog. */
+.separateViewDialog {
+	font-size: 12px;	
+}
+
+/** Used for the userOptionsPanel.splitButton in all views with
+	a split facility (all views except crosstabulationtable). */
+.button {
+	white-space: nowrap;
+}
+
+/** Used for FlexTable in the views crosstabulationtable, descriptives, and frequencytable. */
+.flexTable td {
+	border: 1px solid #BBBBBB;
+	padding: 3px;
+	spacing: 3px;
+	padding-bottom: 0px;
+}
+
+/** Used for DescriptivesView.selectionFlexTable */
+.flexTableSelection td {
+	border: 1px solid #BBBBBB;
+	padding: 3px;
+	spacing: 3px;
+	padding-bottom: 0px;
+	background-color: rgb(192, 192, 192); /* selection color */
+}
+
+/** Used for the bin labels in CrossTabulationTableView and
+	for column name and data labels in descriptives.*/
+.noWrap {
+	white-space: nowrap;
+}
+
+/** Used for split class labels in DescriptivesView. */
+.descriptivesSplitClassLabel {
+	padding-top: 0px;
+	padding-bottom: 7px;
+	padding-left: 5px;
+}
+
+/** Used for varColorBox and colorPreviewPanel in DotplotUserOptionsPanel. */
+.block {
+	display: block; /* prevent default of showing radiobuttons on one line, instead show each on a new line */
+	white-space:nowrap;
+}
+
+/** Used in StatTable.StatTableClickHandler when importing CSV. */
+.waitCursor {
+	cursor: wait !important;
+	pointerEvents: none;
+}
+
+/** Used in StatInteractiePanelView.DragTabHandler. */
+.moveCursor {
+	cursor: move !important;
+	pointerEvents: none;
+}
+
+
+/** Used for ScrollableTabLayoutPanel. */
+@external gwt-TabLayoutPanel;
+@external gwt-TabLayoutPanelTabs;
+@external gwt-TabLayoutPanelTab;
+@external gwt-TabLayoutPanelTab-selected;
+@external gwt-TabLayoutPanelTabInner;
+@external gwt-TabLayoutPanelContent;
+/** TabLayoutPanel */
+/**the panel itself**/
+.gwt-TabLayoutPanel {
+    border: none;
+    margin: 0px;
+    padding: 0px;
+}
+/**the tab bar element**/
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTabs {
+/*    background-color: #F4F4F4 !important;*/
+    background-color: #bfbfbf !important;
+}
+/**an individual tab**/
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab {
+/*    background-color: #6F6F6E !important;*/
+    background-color: #8C8C8A !important;
+}
+
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTab-selected {
+/*    background-color: white !important;*/
+    background-color: #DCEDFF !important; /* DWO blue */
+}
+/**an element nested in each tab (useful for styling)**/
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelTabInner {
+    font-family: Arial !important;
+}
+
+/**applied to all child content widgets**/
+.gwt-TabLayoutPanel .gwt-TabLayoutPanelContent {
+    border: none;
+    margin: 0px;
+    overflow: hidden;
+    padding: 15px;
+}
+
+.dataGridSelectedRow {
+/*   background: #628cd5; */
+  background: #B2C6EB !important; /* lighter blue */
+  color: white;
+  height: auto;
+  overflow: auto;
+}
+
+/** Used for the datagrid table in StatTable. */
+@external gwt-DataGridCell;
+@external gwt-DataGridWidget;
+@external gwt-DataGridSelectedRow;
+.gwt-DataGridCell {
+	white-space: nowrap;
+    overflow: auto;
+    padding: 2px 5px !important;
+}
+
+.gwt-DataGridWidget {
+	white-space: nowrap;
+    overflow: auto;
+    padding: 2px 5px !important;
+}
+
+.gwt-DataGridSelectedRow {
+/*  background: #628cd5; */
+  background: #B2C6EB !important; /*lighter blue*/
+  color: white;
+  height: auto;
+  overflow: auto;
+}

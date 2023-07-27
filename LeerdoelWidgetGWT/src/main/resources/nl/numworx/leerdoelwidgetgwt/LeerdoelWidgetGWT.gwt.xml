@@ -1,0 +1,16 @@
+<module rename-to="leerdoelwidgetgwt">
+  <inherits name="com.google.gwt.logging.Logging"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
+  <inherits name="com.google.gwt.user.User"/>
+  <inherits name="com.google.gwt.user.theme.clean.Clean"/>
+  <inherits name="com.google.gwt.json.JSON"/>
+  <inherits name="nl.uu.fi.dwo.interaction.Interaction"/>
+  <inherits name="nl.uu.fi.dwo.lms.gwtclient.gwtclient-DWO"/>
+  <source path="client"/>
+  <source path="shared"/>
+  <entry-point class="nl.numworx.leerdoelwidgetgwt.client.LeerdoelWidgetGWT"/>
+  <set-property name="gwt.logging.enabled" value="TRUE"/>
+  <set-property name="gwt.logging.logLevel" value="FINEST"/>
+  <extend-property values="nl" name="locale"/>
+  <set-property name="user.agent" value="gecko1_8,safari"/>
+</module>

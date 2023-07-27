@@ -1,0 +1,57 @@
+/** Add css rules here for your application. */
+
+
+.root {
+	background-color: white; 
+}	
+
+.dock {
+	background-color: yellow; 
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	background-color: white;	
+}
+
+.toolbar {
+	background-color: rgb(220,220,220);
+}
+
+.pushimage {
+	position: relative;
+	top: -3px;
+	left: -6px;
+}
+
+.pushbutton {
+
+	background-color: yellow;
+	text-align: center;
+	font-size: 0.975em;
+	font-family: Helvetica, sans serif;
+	/** padding: 0px; */	
+}
+
+.normalmenuitem {
+	font-weight: normal;
+	font-family: Helvetica, sans serif;
+}
+
+.boldmenuitem {
+	font-weight: bold;
+	font-family: Helvetica, sans serif;
+}	
+
+.menubar {
+	text-align: left;
+}
+
+.helpbar {
+	text-align: left;
+	font-size: 0.875em;
+	font-family: Helvetica, sans serif;
+}

@@ -1,0 +1,359 @@
+package nl.numworx.geodefinergwt.client.toolbox;
+
+import java.util.Map;
+import javax.inject.Named;
+import javax.inject.Provider;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.resources.client.DataResource;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.ToggleButton;
+
+import dagger.Module;
+import dagger.Provides;
+import dagger.multibindings.IntKey;
+import dagger.multibindings.IntoMap;
+import fi.euclides.event.AddBissectriceHandler;
+import fi.euclides.event.AddBoogHandler2;
+import fi.euclides.event.AddFocusHandler;
+import fi.euclides.event.AddKegelsnedeHandler;
+import fi.euclides.event.AddLijnHandler;
+import fi.euclides.event.AddLocusHandler;
+import fi.euclides.event.AddLoodLijnHandler;
+import fi.euclides.event.AddMiddelPuntHandler;
+import fi.euclides.event.AddParallelHandler;
+import fi.euclides.event.AddPoollijnHandler;
+import fi.euclides.event.AddRaakLijnHandler;
+import fi.euclides.event.AddSpiegelHandler;
+import fi.euclides.event.EventHandler;
+import fi.euclides.expr.TrailHandler;
+import fi.euclides.model.Destroyable;
+import fi.euclides.proof.AfstandHandler;
+import fi.euclides.proof.OppHandler;
+import fi.euclides.proof.VectorHandler;
+import nl.numworx.geodefiner.common.AddCirkelHandler;
+import nl.numworx.geodefiner.common.AddPolygonHandler;
+import nl.numworx.geodefiner.common.AddSnapPuntHandler;
+import nl.numworx.geodefiner.common.Definitions;
+import nl.numworx.geodefiner.common.FilteredDestroyHandler;
+import nl.numworx.geodefiner.common.HoekHandler;
+import nl.numworx.geodefiner.common.Instance;
+import nl.numworx.geodefiner.common.Tips;
+import nl.numworx.geodefiner.common.Tools;
+import nl.numworx.geodefiner.common.UIShim;
+import nl.numworx.geodefiner.common.ZoomInHandler;
+import nl.numworx.geodefiner.common.ZoomOutHandler;
+import nl.numworx.geodefinergwt.client.TrackerImpl;
+import nl.numworx.geodefinergwt.client.i18n.messages;
+import nl.numworx.geodefinergwt.client.ui.DashModel;
+import nl.numworx.geodefinergwt.client.AddHoekPuntHandler;
+import nl.numworx.geodefinergwt.client.CirkelRadiusHandler;
+import nl.numworx.geodefinergwt.client.ColorHandler;
+import nl.numworx.geodefinergwt.client.DashHandler;
+import nl.numworx.geodefinergwt.client.FormuleHandler;
+import nl.numworx.geodefinergwt.client.GeoDefinerGWT;
+import nl.numworx.geodefinergwt.client.ResetHandler;
+import nl.numworx.geodefinergwt.client.SvgBundle;
+import nl.numworx.geodefinergwt.client.TextHandler;
+import nl.numworx.geodefinergwt.client.ToolBoxPanel.Action;
+import nl.numworx.geodefinergwt.client.ToolBoxPanel.CirkelAction;
+import nl.numworx.geodefinergwt.client.ToolBoxPanel.PuntAction;
+
+@Module
+public class ToolBoxModule {
+
+	private final static messages rb = GeoDefinerGWT.MESSAGES;
+	private final static SvgBundle svg = GWT.create(SvgBundle.class);
+	
+	private static ToggleButton newPBtn(EventHandler handler, TrackerImpl tracker, RadioMode model) {
+		ToggleButton btn;
+		btn = new ToggleButton();
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+		btn.setTitle(rb.Euclides_46());
+		PuntAction p = 
+		    new PuntAction(handler, tracker, btn, model, 
+		      svg.punt_svg(),     svg.punt_active_svg(),
+		      svg.puntop_svg(),   svg.puntop_active_svg(),
+		      svg.snijpunt_svg(), svg.snijpunt_active_svg());
+		btn.addClickHandler(p);
+		return btn;
+	}
+
+	static private ToggleButton newCBtn(EventHandler handler, TrackerImpl tracker, RadioMode model, String string, UIShim<? extends Destroyable, Void> shim) {
+		ToggleButton btn;
+//		String cirkelIcon  = "circle0";
+//		String compassIcon = "circle1";
+//		String cirkel3Icon = "circle2";
+		btn = new ToggleButton();
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+		btn.setTitle(string);
+		btn.addClickHandler(new CirkelAction(handler, tracker, btn, model, shim,
+				svg.cirkel_svg(), svg.cirkel_active_svg(), //cirkelIcon, 
+				svg.cirkel_opgegeven_straal_svg(), svg.cirkel_opgegeven_straal_active_svg(), //compassIcon, 
+				svg.cirkel_door_3_svg(), svg.cirkel_door_3_active_svg() //cirkel3Icon
+				
+				
+				));
+		return btn;
+	}
+
+	@Provides @IntKey(Tools.POINT) @IntoMap static
+	ToggleButton point(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.POINT).get();
+		GWT.log("shm = " + shim); //$NON-NLS-1$
+		return newPBtn(new AddSnapPuntHandler(shim), tracker, model);
+	}
+	
+	@Provides @IntKey(Tools.LINE) @IntoMap static
+	ToggleButton line(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.LINE).get();
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddLijnHandler(AddLijnHandler.LINE), tracker, model, rb.Euclides_50(),shim);
+	}
+
+	@Provides @IntKey(Tools.SELECTOR) @IntoMap static
+	ToggleButton selector(TrackerImpl tracker, RadioMode model, Instance instance) {
+      return newSBtn(svg.select_svg(), svg.select_active_svg(), instance.selector, tracker, model, rb.Euclides_35(),null);
+	}
+  
+  private static ToggleButton newSBtn(DataResource r, DataResource r_active, EventHandler h, TrackerImpl tracker, RadioMode model, String t, UIShim<? extends Destroyable, Void> shim) {
+    ToggleButton btn;
+    btn = new ToggleButton();
+    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+    Image image = new Image(r.getSafeUri());
+    image.setPixelSize(32, 39);
+    btn.getUpFace().setImage(image);
+    image = new Image(r_active.getSafeUri());
+    image.setPixelSize(32, 39);
+    btn.getDownFace().setImage(image);
+    if (t != null) btn.setTitle(t);
+    btn.addClickHandler(new Action(h, tracker, btn, model, shim));
+    return btn;
+  }
+  
+  private static ToggleButton newSegmentBtn(EventHandler h, TrackerImpl tracker, RadioMode model,  UIShim<? extends Destroyable, Void> shim) {
+	  	DataResource r = svg.lijnstuk_svg();
+	  	DataResource r_active = svg.lijnstuk_active_svg();
+	  	String t = rb.Euclides_48();
+	  	Map<String, Object> map = shim.toMap();
+	  	if (map != null && Tips.ATEND.name().equals(map.get("tip"))) // iets met map
+	  	{
+	  		r = svg.vector_svg();
+	  		r_active = svg.vector_active_svg();
+	  		t = rb.ToolBoxModule_15();
+	  	}
+
+	  	ToggleButton btn;
+	    btn = new ToggleButton();
+	    btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+	    Image image = new Image(r.getSafeUri());
+	    image.setPixelSize(32, 39);
+	    btn.getUpFace().setImage(image);
+	    image = new Image(r_active.getSafeUri());
+	    image.setPixelSize(32, 39);
+	    btn.getDownFace().setImage(image);
+	    if (t != null) btn.setTitle(t);
+	    btn.addClickHandler(new Action(h, tracker, btn, model, shim));
+	    return btn;
+	  }
+
+  
+  
+
+	@Provides @IntKey(Tools.DESTROY) @IntoMap static
+	ToggleButton destroy(TrackerImpl tracker, RadioMode model, Instance instance) {
+		return newSBtn(svg.verwijder_svg(),svg.verwijder_active_svg(), new FilteredDestroyHandler(instance), tracker, model,rb.Euclides_37(),null);
+	}
+	@Provides @IntKey(Tools.RESET) @IntoMap static
+	ToggleButton reset(TrackerImpl tracker, RadioMode model, ResetHandler reset) {
+		return newSBtn(svg.reset_svg(), svg.reset_active_svg(), reset, tracker, model,rb.ToolBoxModule_4(),null); //$NON-NLS-1$
+	}
+
+	@Provides @IntKey(Tools.PAN) @IntoMap static
+	ToggleButton pan(TrackerImpl tracker, RadioMode model, @Named("panHandler") EventHandler handler) {
+	    return newSBtn(svg.pan_svg(), svg.pan_active_svg(), handler, tracker, model, rb.Euclides_41(),null);
+	}
+	
+	@Provides @IntKey(Tools.SEGMENT) @IntoMap static
+	ToggleButton segment(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.SEGMENT).get();
+		return newSegmentBtn(new AddLijnHandler(AddLijnHandler.SEGMENT), tracker, model, shim);
+	}
+	
+	@Provides @IntKey(Tools.HALFLINE) @IntoMap static
+	ToggleButton halfline(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.HALFLINE).get();
+		return newSBtn(svg.halfrechte_svg(), svg.halfrechte_active_svg(), new AddLijnHandler(AddLijnHandler.RAY), tracker, model,rb.Euclides_49(),shim);
+	}
+	@Provides @IntKey(Tools.TRIANGLE) @IntoMap static
+	ToggleButton triangle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.TRIANGLE).get();
+		return newSBtn(svg.veelhoek_svg(), svg.veelhoek_active_svg(), new AddPolygonHandler(rb.ToolBoxModule_5()), tracker, model,rb.ToolBoxModule_6(),shim); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Provides @IntKey(Tools.CIRCLE) @IntoMap static
+	ToggleButton circle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.CIRCLE).get();
+		return newCBtn(new AddCirkelHandler(), tracker, model,rb.Euclides_52(), shim);
+	}
+
+	@Provides @IntKey(Tools.ARC) @IntoMap static
+	ToggleButton arc(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ARC).get();
+		return newSBtn(svg.boog_svg(), svg.boog_active_svg(), new AddBoogHandler2(rb.ToolBoxModule_7()), tracker, model,rb.ToolBoxModule_7(), shim); //$NON-NLS-1$
+	}
+	@Provides @IntKey(Tools.MIDPOINT) @IntoMap static
+	ToggleButton midpoint(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.MIDPOINT).get();
+		return newSBtn(svg.middelpunt_svg(),svg.middelpunt_active_svg(), new AddMiddelPuntHandler(), tracker, model,rb.Euclides_54(),shim);
+	}
+
+	@Provides @IntKey(Tools.PERPENDICULAR) @IntoMap static
+	ToggleButton perpendicular(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.PERPENDICULAR).get();
+		return newSBtn(svg.loodlijn_svg(), svg.loodlijn_active_svg(), new AddLoodLijnHandler(), tracker, model,rb.Euclides_56(),shim);
+	}
+
+	@Provides @IntKey(Tools.PARALLEL) @IntoMap static
+	ToggleButton parallel(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.PARALLEL).get();
+		return newSBtn(svg.parallel_svg(),svg.parallel_active_svg(), new AddParallelHandler(), tracker, model,rb.Euclides_58(),shim);
+	}
+
+	@Provides @IntKey(Tools.BISECTRICE) @IntoMap static
+	ToggleButton bissectrice(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.BISECTRICE).get();
+		return newSBtn(svg.deellijn_svg(), svg.deellijn_active_svg(), new AddBissectriceHandler(), tracker, model,rb.Euclides_60(),shim);
+	}
+
+	@Provides @IntKey(Tools.MIRROR) @IntoMap static
+	ToggleButton mirror(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.spiegelpunt_svg(),svg.spiegelpunt_active_svg(), new AddSpiegelHandler(), tracker, model, rb.Euclides_62(),null);
+	}
+
+	@Provides @IntKey(Tools.CONIC_SECTION) @IntoMap static
+	ToggleButton conic(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.kegelsnede_svg(), svg.kegelsnede_active_svg(), new AddKegelsnedeHandler(rb.ToolBoxModule_8()), tracker, model, rb.ToolBoxModule_9(),null); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Provides @IntKey(Tools.FOCUS) @IntoMap static
+	ToggleButton focus(TrackerImpl tracker, RadioMode model) { // FIXME focus
+		return newSBtn(svg.kegelsnede_svg(),svg.kegelsnede_active_svg(), new AddFocusHandler(), tracker, model, rb.ToolBoxModule_10(),null); //$NON-NLS-1$
+	}
+
+	@Provides @IntKey(Tools.LOCUS) @IntoMap static
+	ToggleButton locus(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.meetkundige_plaats_svg(), svg.meetkundige_plaats_active_svg(), new AddLocusHandler(rb.ToolBoxModule_11()), tracker, model, rb.ToolBoxModule_12(),null); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Provides @IntKey(Tools.TANGENT) @IntoMap static
+	ToggleButton tangent(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.TANGENT).get();
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddRaakLijnHandler(), tracker, model, rb.ToolBoxModule_13(),shim); // FIXME icon //$NON-NLS-1$
+	}
+
+	@Provides @IntKey(Tools.POLELINE) @IntoMap static
+	ToggleButton pole(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.POLELINE).get();
+		return newSBtn(svg.lijn_svg(), svg.lijn_active_svg(), new AddPoollijnHandler(), tracker, model, rb.ToolBoxModule_14(),shim); // FIXME icon //$NON-NLS-1$
+	}
+	//labels
+	@Provides @IntKey(Tools.DISTANCE) @IntoMap static
+	ToggleButton distance(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.lengte_svg(),svg.lengte_active_svg(), new AfstandHandler(rb.Euclides_88()), tracker, model,rb.Euclides_88(),null);
+	}
+
+	@Provides @IntKey(Tools.AREA) @IntoMap static
+	ToggleButton area(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.oppervlakte_svg(), svg.oppervlakte_active_svg(), new OppHandler(rb.Euclides_91()), tracker, model,rb.Euclides_91(),null);
+	}
+
+	@Provides @IntKey(Tools.ANGLE) @IntoMap static
+	ToggleButton angle(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.ANGLE).get();
+		return newSBtn(svg.hoek_svg(),svg.hoek_active_svg(), new HoekHandler(rb.Euclides_86()), tracker, model,rb.Euclides_85(),shim);
+	}
+
+	@Provides @IntKey(Tools.VECTOR) @IntoMap static
+	ToggleButton vector(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.vector_svg(),svg.vector_active_svg(), new VectorHandler(rb.ToolBoxModule_15()), tracker, model,rb.ToolBoxModule_15(),null); //$NON-NLS-1$
+	}
+
+	@Provides @IntKey(Tools.CIRCLE_WITH_RADIUS) @IntoMap static
+	ToggleButton circleWithRadius(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.CIRCLE_WITH_RADIUS).get();
+		return newSBtn(svg.cirkel_met_straal_svg(), svg.cirkel_met_straal_active_svg(),new CirkelRadiusHandler(rb.AddCirkelHandler_0()), tracker, model,rb.Euclides_104(),shim);
+	}
+
+	@Provides @IntKey(Tools.FORMULA) @IntoMap static
+	ToggleButton formula(TrackerImpl tracker, RadioMode model, Definitions definitions) {
+		return newSBtn(svg.definitie_svg(), svg.definitie_active_svg(), new FormuleHandler(rb.ToolBoxModule_16(), definitions), tracker, model,rb.ToolBoxModule_17(),null); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Provides @IntKey(Tools.TEXT) @IntoMap static
+	ToggleButton text(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<?extends Destroyable, Void> shim = shims.get(Tools.TEXT).get();
+		return newSBtn(svg.label_svg(),svg.label_active_svg(), new TextHandler(rb.ToolBoxModule_18()), tracker, model, rb.ToolBoxModule_19(),shim); //$NON-NLS-1$ //$NON-NLS-2$
+	}
+
+	@Provides @IntKey(Tools.TRAIL) @IntoMap static
+	ToggleButton trail(TrackerImpl tracker, RadioMode model) {
+		return newSBtn(svg.sporen_svg(), svg.sporen_active_svg(), new TrailHandler(rb.Euclides_44()), tracker, model,rb.Euclides_44(),null);
+	}
+
+	@Provides @IntKey(Tools.COLOR_PALETTE) @IntoMap static
+	ToggleButton colorpalette(TrackerImpl tracker, RadioMode model, Instance instance) {
+		EventHandler handler = new ColorHandler(rb.ToolBoxModule_20(), instance.getStateConfiguration()); //$NON-NLS-1$
+		return newSBtn(svg.colorpalette_svg(), svg.colorpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_21(),null); //$NON-NLS-1$
+	}
+    @Provides @IntKey(Tools.LINE_PALETTE) @IntoMap static
+    ToggleButton dashpalette(TrackerImpl tracker, RadioMode model, Instance instance, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+        DashModel dashmodel = (DashModel) shims.get(Tools.LINE_PALETTE).get().set(tracker);
+		EventHandler handler = new DashHandler(rb.ToolBoxModule_22(), instance.getStateConfiguration(), svg.linetype(), dashmodel); //$NON-NLS-1$
+        return newSBtn(svg.dashpalette_svg(), svg.dashpalette_active_svg(), handler, tracker, model, rb.ToolBoxModule_23(),null); //$NON-NLS-1$
+    }
+	
+    @Provides @IntKey(Tools.ANGLE_POINT) @IntoMap static
+    ToggleButton hoekpunt(TrackerImpl tracker, RadioMode model, Instance instance, AddHoekPuntHandler handler, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ANGLE_POINT).get();
+    	return newSBtn(svg.maak_hoek_svg(), svg.maak_hoek_active_svg(), handler, tracker, model, rb.ToolBoxModule_24(), shim);
+    }
+
+    @Provides @IntKey(Tools.GEO_TRIANGLE) @IntoMap static
+    ToggleButton geotriangle(TrackerImpl tracker, Instance instance, RadioMode model) {
+        ToggleButton btn;
+        btn = new ToggleButton();
+        btn.setStylePrimaryName("SVGToggle"); //$NON-NLS-1$
+        Image image = new Image(svg.geodriehoek().getSafeUri());
+        image.setPixelSize(32, 39);
+        btn.getUpFace().setImage(image);
+        image = new Image(svg.geodriehoek_active().getSafeUri());
+        image.setPixelSize(32, 39);
+        btn.getDownFace().setImage(image);
+        btn.setTitle(rb.ToolBoxModule_25());
+        btn.addClickHandler(ev -> {
+        	Destroyable geo = tracker.getMapper().fromString("geo");
+        	boolean on = btn.getValue();
+			geo.setVisible(on);
+        	tracker.paint();
+			if (on) {
+				instance.selector.command();
+	        	ToggleButton bs = model.toggles.get(tracker.getPointerHandler());
+				model.down(bs);
+			}
+        });
+        return btn;
+    }
+ 
+    @Provides @IntKey(Tools.ZOOM_IN) @IntoMap static
+    ToggleButton zoomin(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+        EventHandler handler = new ZoomInHandler(rb.ToolBoxModule_26());
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ZOOM_IN).get();
+		return newSBtn(svg.magnify_svg(),svg.magnify_active_svg(), handler, tracker, model, rb.ToolBoxModule_26(), shim);
+    }
+
+    @Provides @IntKey(Tools.ZOOM_OUT) @IntoMap static
+    ToggleButton zoomout(TrackerImpl tracker, RadioMode model, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
+		UIShim<? extends Destroyable, Void> shim = shims.get(Tools.ZOOM_OUT).get();
+        EventHandler handler = new ZoomOutHandler(rb.ToolBoxModule_27());
+		return newSBtn(svg.minify_svg(),svg.minify_active_svg(), handler, tracker, model, rb.ToolBoxModule_27(), shim);
+    }
+}

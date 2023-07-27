@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 17.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="-37.1 -31.3 907.1 1105.5" enable-background="new -37.1 -31.3 907.1 1105.5" xml:space="preserve">
+<g id="Hulplijnen" display="none">
+	<path id="Achtergrond" fill="#CECECE" d="M-37.1-26.9H870v907.1H-37.1V-26.9z"/>
+</g>
+<g id="Accentlijn">
+	<rect x="-37.1" y="975" fill="#0F75BC" width="907.1" height="99.2"/>
+</g>
+<g id="Achtergrond_1">
+	<path fill="#AAC1DC" d="M870,762.8c0,62.6-50.8,113.4-113.4,113.4H76.3c-62.6,0-113.4-50.8-113.4-113.4V82.5
+		c0-62.6,50.8-113.4,113.4-113.4h680.3C819.2-30.9,870,19.9,870,82.5V762.8z"/>
+</g>
+<g id="Lijn_A" >
+	
+	<line display="inline" fill="none" stroke="#FFFFFF" stroke-width="50" stroke-miterlimit="10" x1="746.9" y1="97.9" x2="93.2" y2="751.6"/>
+	
+	<circle display="inline" fill="#AAC1DC" stroke="#0F75BC" stroke-width="50" stroke-miterlimit="10" cx="600.6" cy="244.7" r="78"/>
+	<circle display="inline" fill="#AAC1DC" stroke="#0F75BC" stroke-width="50" stroke-miterlimit="10" cx="247" cy="598.9" r="78"/>
+</g>
+
+</svg>

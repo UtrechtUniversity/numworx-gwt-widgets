@@ -1,0 +1,129 @@
+@url tekenUrl tekencursor;
+@url gumUrl gumcursor;
+
+/** dit file staat in graphtoolgwt/client/css */
+
+
+.root {
+	cursor: default;
+	background-color: yellow;
+}	
+
+.vertical {
+	/** background-color: orange; */
+	
+}
+
+.dock {
+	/** background-color: orange; */
+}
+
+.bottom {
+	background-color: rgb(220,220,220);	
+}
+
+.canvas {
+	touch-action: none;	
+}
+
+.domeinpanel {
+	background-color: white !important;
+}
+
+.upimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.downimage {
+	position: relative;
+	top: -4px;
+	left: -6px;
+}		
+
+.pushimage {
+	position: relative;
+	top: -3px;
+	left: -5px;
+}		
+
+.togglebutton {
+	border-style: none;
+	margin: 0px;
+	padding: 0px;
+	color: red;
+}
+
+.pushbutton {
+
+	background-color: yellow;
+	font-size: 0.875em;
+	padding: 0px;	
+}
+
+.colorpanel {
+	background-color: rgb(190,190,190);	
+}
+
+.backgroundred {
+	background-color: rgb(255, 0, 0);
+}
+
+.backgroundblue {
+	background-color: rgb(0, 0, 255);
+}
+
+.textbox {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.textblack {
+	color: black;	
+}	
+.textgray {
+	color: rgb(220,220,220);	
+}	
+.textred {
+	color: red;	
+}	
+.textorange {
+	color: orange;	
+}	
+.textgreen {
+	color: rgb(0,255,0);	
+}
+.textcyaan {
+	color: cyan;
+}
+.textblue {
+	color: blue;
+}
+.textmagenta {
+	color: magenta;
+}
+
+.cursor_gum {
+	cursor: gumUrl 10 22, auto; 
+}
+
+.cursor_teken {
+	cursor: tekenUrl 10 22, auto; 
+}
+
+.cursor_drag {
+	cursor: default; 
+}
+
+.margin {
+	margin: 5px;
+}
+
+.pushbutton {
+	display: block;
+	margin: 5px;
+	text-align: center;
+	color: magenta;
+}
+

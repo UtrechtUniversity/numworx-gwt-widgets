@@ -1,0 +1,24 @@
+package fi.geomalggwt.client;
+
+import com.google.gwt.resources.client.ClientBundle;
+import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.ClientBundle.Source;
+
+public interface GeomAlgGWTClientBundle extends ClientBundle
+{
+	   @Source("fi/geomalggwt/client/images/foutkruis.gif")
+	   public ImageResource foutKruisResource();
+
+	   @Source("fi/geomalggwt/client/images/goedkrul_en.gif")
+	   public ImageResource goedKrulResource();
+
+	   @Source("fi/geomalggwt/client/images/goedkrulhalf.gif")
+	   public ImageResource goedKrulHalfResource();
+
+	   @Source("fi/geomalggwt/client/images/reseticon.gif")
+	   public ImageResource resetResource();
+	
+	   @Source("fi/geomalggwt/client/css/GeomAlgGWT.css")
+	   public GeomAlgGWTCssResource getGeomAlgGWTCSS();
+
+}

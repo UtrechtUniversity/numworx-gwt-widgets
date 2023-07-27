@@ -1,0 +1,26 @@
+package nl.numworx.geodefinergwt.client.i18n;
+
+import com.google.gwt.core.client.GWT;
+
+import fi.euclides.util.Messages;
+
+public class MessagesImpl extends Messages {
+	final messages m;
+
+	public MessagesImpl(messages rb) {
+		m = rb;
+	}
+
+	@Override
+	protected String getStringImpl(String string) {
+		try {
+			//if(!GWT.isProdMode())
+				string = string.replace('.', '_'); // FIXME BUG in GWT 2.6?
+			return m.getString(string);
+		} catch(Exception e) {
+			GWT.log("missing key " + string, e);
+		}
+		return super.getStringImpl(string);
+	}
+	
+}
