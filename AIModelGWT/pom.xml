@@ -8,13 +8,13 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.7-SNAPSHOT</version>
+		<version>0.0.7</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.aimodelgwt</groupId>
   <artifactId>AIModelGWT</artifactId>
   <packaging>war</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>AI-model for GWT</name>
 
   <properties>
