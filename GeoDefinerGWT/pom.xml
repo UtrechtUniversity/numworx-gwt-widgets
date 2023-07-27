@@ -5,6 +5,7 @@
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
 		<version>0.0.8-SNAPSHOT</version>
+        	<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
