@@ -1,6 +1,7 @@
 package nl.numworx.aimodelgwt.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,8 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class AIModelGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, AsyncCallback<RuleIF[]> {
-  private static final String TEXT = "text.aimodel";
+  private static final String LOG_OPTION = "logOption";
+private static final String TEXT = "text.aimodel";
 private int width;
   private int height;
 private OpdrNavIF comRoot;
@@ -43,6 +45,7 @@ private OpdrNavIF comRoot;
 		  new Tupel("alpha","0.01")
   };
   IdeasIF cas;
+  boolean logOption;
 
 /**
    * This is the entry point method.
@@ -127,6 +130,7 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 	this.height = height;
 	cas = CasServer.create();
 	cas.setStrategie(STRATEGY);
+	logOption = Boolean.TRUE.equals(launchData.get(LOG_OPTION));
 }
 
 
@@ -158,6 +162,14 @@ private void fire(Tupel[] tupels) {
 @Override
 public void onFailure(Throwable caught) {
 	GWT.log("failure cas.aiModel", caught);	
+	Map<String,Object> parameters = new HashMap<>();
+	parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+	if (isCorrect()!= null) parameters.put("success", isCorrect());
+	parameters.put("score", Collections.singletonMap("raw", getScore()));
+	parameters.put("response", "FAILURE " + caught); 
+
+	comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+
 }
 
 @Override
@@ -167,10 +179,28 @@ public void onSuccess(RuleIF[] result) {
 	for (RuleIF r: result) {
 		tupels[i++] = toTupel(r);
 	}
+	if (logOption) setAttempt(tupels);
 	fire(tupels);
 
 }
 
+
+private void setAttempt(Tupel[] tupels) {
+	// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+				Map<String,Object> parameters = new HashMap<>();
+				parameters.put("verb", "http://adlnet.gov/expapi/verbs/attempted"); // standaard voor "poging"
+				if (isCorrect()!= null) parameters.put("success", isCorrect());
+				parameters.put("score", Collections.singletonMap("raw", getScore()));
+				
+				
+				
+				
+				parameters.put("response", Arrays.asList(tupels).toString()); 
+
+				comRoot.fireEvent(new CBookEvent(this, LOG_OPTION, parameters));
+
+	
+}
 
 public static String getLocale() {
 	String locale;

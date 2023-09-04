@@ -2,6 +2,7 @@
 <module rename-to='aimodelgwt'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
   <inherits name='com.google.gwt.user.User' />
+  <inherits name="com.google.gwt.logging.Logging"/>
 
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
@@ -19,5 +20,9 @@
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client' />
+
+
+    <set-property name="gwt.logging.logLevel" value="FINE"/>
+    <set-property name="gwt.logging.enabled" value="TRUE"/>
 
 </module>
