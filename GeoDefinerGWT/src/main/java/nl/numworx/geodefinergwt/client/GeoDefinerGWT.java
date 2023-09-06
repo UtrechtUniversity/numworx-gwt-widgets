@@ -809,6 +809,13 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	protected Numbers nX(int rw, Numbers left, Numbers width, Numbers Ox) {
 		return Numbers.div(Numbers.mul(Numbers.sub(Ox, left), Numbers.createInteger(rw)), width);
 	}
+
+	@Override
+	protected void installCheckObjects() {
+		super.installCheckObjects();
+		boolean feedback = checkObjects.isFeedback();
+		widget.setFeedback(feedback);
+	}
 	
 	
 }

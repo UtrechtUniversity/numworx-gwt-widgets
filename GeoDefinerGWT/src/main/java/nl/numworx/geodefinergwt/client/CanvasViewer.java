@@ -270,7 +270,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 		ColorStyle c = a.adapt(ColorStyle.class);
 		CheckObject co = a.adapt(CheckObject.class);
 		//java.util.logging.Logger.getLogger("CanvasViewer").info("color = " + c);
-		if (c != null && co == null) {
+		if (c != null && (co == null||!isFeedback())) {
 		    setCssColor(CssColor.make(c.getColor()));
 		    select = c;
 	        if(hiLighter != null)
@@ -278,7 +278,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 			return;
 		}
 // feedback color.
-		if(co != null)
+		if(co != null && isFeedback())
 		{   // extra verificatie?
 		  //setCssColor(CssColor.make("green"));
 			select = COLOR_GREEN;
@@ -292,6 +292,14 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 			hiLighter.hilight(object);
 	}
 
+	private boolean feedback = true;
+	public boolean isFeedback() {
+		return false;
+	}
+	public void setFeedback(boolean fb) {
+		feedback = fb;
+	}
+	
 	@Override
 	public void drawLine(double x1, double y1, double x2, double y2) {
 		if(stroke != null) stroke.toStyle(context);

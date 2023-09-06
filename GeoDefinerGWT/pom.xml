@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.6-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.6-SNAPSHOT</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
