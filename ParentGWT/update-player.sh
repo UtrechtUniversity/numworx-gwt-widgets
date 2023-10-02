@@ -9,10 +9,11 @@ PROD="--profile prod"
 cd ../DWOPlayer;
 
 W=/Volumes/fisme-sites/www-dev/dwo
+W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo
 TODAY=$(date +%-d-%-m-%Y)
 
 T=$W/apps/DWOplayer
-if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
+#if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 #T=$W/apps/noordhoff/DWOplayer
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
@@ -22,14 +23,14 @@ mvn clean verify -P WiskOpdrPlayer -Dgwt.compiler.force=true -Dgwt.compiler.loca
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
 	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
 	aws $PROD s3 cp --acl public-read KeyboardGWT.css $S3/;\
-	azcopy sync DWOplayer.css https://numworxprod.blob.core.windows.net/test/apps/DWOplayer.css?"$SAS"
-	azcopy sync KeyboardGWT.css https://numworxprod.blob.core.windows.net/test/apps/KeyboardGWT.css?"$SAS"
-	azcopy sync DWOplayer/ https://numworxprod.blob.core.windows.net/test/apps/DWOplayer/?"$SAS" --recursive=true --delete-destination true
+#	azcopy sync DWOplayer.css https://numworxprod.blob.core.windows.net/test/apps/DWOplayer.css?"$SAS"
+#	azcopy sync KeyboardGWT.css https://numworxprod.blob.core.windows.net/test/apps/KeyboardGWT.css?"$SAS"
+#	azcopy sync DWOplayer/ https://numworxprod.blob.core.windows.net/test/apps/DWOplayer/?"$SAS" --recursive=true --delete-destination true
 )
 mvn clean verify -P WidgetPlayer -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
 (cd target/WidgetPlayer; rsync --delete $OPTIONS WidgetPlayer $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive WidgetPlayer $S3/WidgetPlayer;\
-	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
+#	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
 )
 
 #mvn package -P NoordhoffPlayer -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2

@@ -76,4 +76,17 @@
   	<jdk8>/usr/lib/jvm/java-8-openjdk-amd64</jdk8>
   	<gwt.jvm>${jdk8}</gwt.jvm>
   </properties>
+  <profiles>
+	<profile>
+		<id>macjdk</id>
+		<activation>
+			<os>
+				<family>mac</family>
+			</os>
+		</activation>
+		<properties>
+		  <jdk8>/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home</jdk8>
+		</properties>
+	</profile>
+  </profiles>
 </project>

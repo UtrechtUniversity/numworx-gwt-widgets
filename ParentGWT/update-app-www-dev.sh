@@ -2,6 +2,7 @@ set -e
 cd ../$1/target/$3
 PATH=$PATH:/usr/local/bin
 W=/Volumes/fisme-sites/www-dev/dwo/apps
+W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo/apps
 D=../../../DWOplayer/war
 S3=s3://test-dwo-nl/apps
 #S3=s3://cds.dwo.nl/apps

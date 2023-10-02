@@ -9,10 +9,11 @@ PROD="--profile prod"
 cd ../WiskOpdrPlayer;
 
 W=/Volumes/fisme-sites/www-dev/dwo
+W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo
 TODAY=$(date +%-d-%-m-%Y)
 
 T=$W/apps/DWOplayer
-if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
+#if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 #T=$W/apps/noordhoff/DWOplayer
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
