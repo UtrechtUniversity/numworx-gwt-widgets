@@ -20,16 +20,16 @@
     <title>Repl</title>
 <script type="text/javascript">
 
-var serviceWorker;
-var promise = navigator.serviceWorker.register("/dwo/apps/serviceworker.js");
+// var serviceWorker;
+// var promise = navigator.serviceWorker.register("/dwo/apps/serviceworker.js");
 
-promise.then(function(registration) {
-	  serviceWorker = registration.active;
-	  if (!serviceWorker) {
-	    location.reload();
-	  }  
-	  console.log("servicework set to " + serviceWorker);
-})
+// promise.then(function(registration) {
+// 	  serviceWorker = registration.active;
+// 	  if (!serviceWorker) {
+// 	    location.reload();
+// 	  }  
+// 	  console.log("servicework set to " + serviceWorker);
+// })
 
 function tickle() {
 	

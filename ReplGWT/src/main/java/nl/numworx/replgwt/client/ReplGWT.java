@@ -6,6 +6,11 @@ import java.util.function.Consumer;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -27,23 +32,23 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String> {
+public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String>, RequestCallback {
   private int width;
   private int height;
   String modules;
   Worker worker;
-  ServiceWorker service;
+//  ServiceWorker service;
+//  
+//  static native void installServiceWorker(ReplGWT me) /*-{
+//  	serviceWorker = $wnd.serviceWorker
+//	me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
+//  }-*/;
   
-  static native void installServiceWorker(ReplGWT me) /*-{
-  	serviceWorker = $wnd.serviceWorker
-	me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
-  }-*/;
   
-  
-  protected void setServiceWorker(ServiceWorker w) {
-	  service = w;
-	  java.util.logging.Logger.getLogger("ReplGWT").severe(String.valueOf(w));
-  }
+//  protected void setServiceWorker(ServiceWorker w) {
+//	  service = w;
+//	  java.util.logging.Logger.getLogger("ReplGWT").severe(String.valueOf(w));
+//  }
     
   protected static native void install(ReplGWT me) /*-{
   	$wnd.runit = function(test) {
@@ -74,7 +79,7 @@ protected boolean consuming;
   public void onModuleLoad() {
 	  modules = GWT.getModuleBaseURL();
 	  GWT.log("modules = " + modules);
-	  installServiceWorker(this);
+//	  installServiceWorker(this);
 	  
 	  RootPanel root = RootPanel.get();
 	  root.add(this);
@@ -180,6 +185,7 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("output")) {
 		printx(obj.get("output"));
 	} else if (obj.containsKey("request")) {
+		id = obj.get("id").isString().stringValue();
 		requestInput();
 	}
 			
@@ -222,6 +228,7 @@ protected void startInput() {
 	consuming = true;
 }
 
+String id = "";
 
 @Override
 public void accept(String t) {
@@ -229,7 +236,25 @@ public void accept(String t) {
 	consuming = false;
 	t += "\n";
 	printx(t);
-	service.postMessage((t).toString());
+	RequestBuilder builder = new RequestBuilder(RequestBuilder.PUT, "/dwo/apps/get_input/"+id);
+	builder.setRequestData(t);
+	builder.setCallback(this);
+	try {
+		builder.send();
+	} catch (RequestException e) {
+	}
+}
+
+@Override
+public void onResponseReceived(Request request, Response response) {
+	// TODO Auto-generated method stub
+	
+}
+
+@Override
+public void onError(Request request, Throwable exception) {
+	// TODO Auto-generated method stub
+	
 }
 
 }

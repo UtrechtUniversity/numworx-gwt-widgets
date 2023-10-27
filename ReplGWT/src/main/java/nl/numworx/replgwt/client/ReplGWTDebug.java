@@ -14,15 +14,10 @@ public class ReplGWTDebug extends ReplGWT {
 
 	public void onModuleLoad() {
 		  modules = GWT.getModuleBaseURL();
-		  installServiceWorker(this);
+		 // installServiceWorker(this);
 		  install(this);
 		  init(600,300,null, null);
 	  }
-
-	protected void setServiceWorker(ServiceWorker w) {
-		service = w;
-		  java.util.logging.Logger.getLogger("ReplGWTDebug").severe(String.valueOf(w));
-	}
 
 
 }
