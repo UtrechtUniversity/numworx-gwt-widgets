@@ -3,6 +3,7 @@ package nl.numworx.replgwt.client;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -33,6 +34,7 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String>, RequestCallback {
+  private static final Logger LOG = java.util.logging.Logger.getLogger("ReplGWT");
   private int width;
   private int height;
   String modules;
@@ -193,7 +195,7 @@ public void onMessage(MessageEvent event) {
 
 protected void requestInput() {
 	if (consuming) {
-		  java.util.logging.Logger.getLogger("ReplGWT").severe("consuming");
+		  LOG.severe("consuming");
 		  return;
 	}
 	startInput();
@@ -247,13 +249,13 @@ public void accept(String t) {
 
 @Override
 public void onResponseReceived(Request request, Response response) {
-	// TODO Auto-generated method stub
+	LOG.warning("on success " + request + " " + response.getStatusCode() + " " + response.getText());
 	
 }
 
 @Override
 public void onError(Request request, Throwable exception) {
-	// TODO Auto-generated method stub
+	LOG.severe("On Error  " + request + " " + exception);
 	
 }
 
