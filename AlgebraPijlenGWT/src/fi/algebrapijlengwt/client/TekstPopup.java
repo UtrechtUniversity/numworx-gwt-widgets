@@ -1,6 +1,7 @@
 package fi.algebrapijlengwt.client;
 
 import com.google.gwt.user.client.Event.NativePreviewEvent;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
 import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
@@ -38,7 +39,7 @@ public class TekstPopup extends PopupPanel
 	 * binnen de formule-editor de focus kunt zetten voor de verschillende 
 	 * invulvakken van een formule.
 	 */
-	TouchPanel touchPanel = null;
+	FlowPanel touchPanel = null;
 	
 	//int tekstX, tekstY;
 	int maxVisibleCharacters = 10;
@@ -56,7 +57,7 @@ public class TekstPopup extends PopupPanel
 		//tekstX = eventX;
 		//tekstY = eventY;
 		
-		touchPanel = new TouchPanel();
+		touchPanel = new FlowPanel();
 		
 		editor = new FormuleEditor(){
 
@@ -134,15 +135,16 @@ public class TekstPopup extends PopupPanel
 		
 		addCloseHandler(new PopupCloseHandler());
 		
-		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(editor) {
-
-			@Override
-			public void onTouchStart(TouchStartEvent event)
-			{
-				super.onTouchStart(event);
-			}
-			
-		});
+//		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(editor) {
+//
+//			@Override
+//			public void onTouchStart(TouchStartEvent event)
+//			{
+//				super.onTouchStart(event);
+//			}
+//			
+//		});
+		new FormuleEditorTouchHandler(editor).initHandler();
 	}
 	
 	public String getText()
