@@ -26,7 +26,7 @@
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>0.1.14</interactionVersion>
+    <interactionVersion>2.5.24</interactionVersion>
   </properties>
 
   <dependencyManagement>
@@ -35,6 +35,13 @@
         <groupId>com.google.gwt</groupId>
         <artifactId>gwt</artifactId>
         <version>${gwt.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>nl.uu.fi.dwo</groupId>
+        <artifactId>DWO</artifactId>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -85,14 +92,14 @@
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.18</version>
+			<version>${project.version}</version>
 			<classifier>classes</classifier>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.18</version>
+			<version>${project.version}</version>
 			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
@@ -339,4 +346,5 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
+	<version>2.5.26-SNAPSHOT</version>
 </project>
