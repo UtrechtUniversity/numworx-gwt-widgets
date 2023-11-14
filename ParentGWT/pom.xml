@@ -12,7 +12,7 @@
   <name>parent pom for GWT widgets</name>
   <properties>
   	<gwtVersion>2.8.2</gwtVersion>
-  	<mgwtVersion>1.1.2</mgwtVersion>
+  	<mgwtVersion>2.0.0</mgwtVersion>
   	<maven.compiler.source>1.8</maven.compiler.source>
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
@@ -57,7 +57,7 @@
    <dependencies>
   	<dependency>
   		<groupId>com.googlecode.mgwt</groupId>
-  		<artifactId>MGWT</artifactId>
+  		<artifactId>mgwt</artifactId>
   		<version>${mgwtVersion}</version>
   	</dependency>
   	<dependency>
