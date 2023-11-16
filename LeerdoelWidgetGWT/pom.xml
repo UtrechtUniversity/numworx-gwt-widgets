@@ -22,7 +22,6 @@
 	<context.xml>context8.xml</context.xml>
     <tomcat7.version>7.0.107</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
-    <DWOServerVersion>2.5.18</DWOServerVersion>
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
@@ -44,6 +43,12 @@
         <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+          <groupId>nl.uu.fi.dwo</groupId>
+          <artifactId>DWOServer</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>         
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -103,6 +108,13 @@
 			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
+      <dependency>
+          <groupId>nl.uu.fi.dwo</groupId>
+          <artifactId>DWOServer</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>runtime</scope>        
+      </dependency>
   </dependencies>
 
   <build>
@@ -204,13 +216,12 @@
                     	<CDN_HOST>localhost:8082</CDN_HOST>
                     	<DWO_ENV>test</DWO_ENV>                   
                     </systemProperties>
-                    <warSourceDirectory>target/${project.artifactId}-${project.version}</warSourceDirectory>
 					<contextFile>src/test/tomcat/${context.xml}</contextFile>
                     <webapps>
                         <webapp>
                             <groupId>nl.uu.fi.dwo</groupId>
                             <artifactId>DWOServer</artifactId>
-                            <version>${DWOServerVersion}</version>
+                            <version>${project.version}</version>
                             <type>war</type>    
                             <asWebapp>true</asWebapp> 
                             <contextPath>${local.dwo}</contextPath>
@@ -336,6 +347,7 @@
 	<profile>
 		<id>debug</id>
 		<properties>
+    		<gwtModule>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWTDebug</gwtModule>
 		</properties>
 	</profile>
 </profiles>
