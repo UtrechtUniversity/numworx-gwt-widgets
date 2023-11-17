@@ -24,7 +24,6 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -60,6 +59,7 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.FilterUtil;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.XAPIService_Factory;
@@ -204,6 +204,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	RoleAPI roleAPI;
 	private LeerdoelTree tree;
 	private LeerdoelPresenter presenter;
+	private EastPanel east;
 
 	interface RoleAPI {
 		//StudentResultsService getService();
@@ -216,6 +217,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			return getMethodManager().getMethod(context, id, profile);
 		}
 	}
+	
+	
 
 	class LearnerAPI implements RoleAPI {
 		final StudentResultsService service;
@@ -240,7 +243,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		@Override
 		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
-			return service.getScore(studentModel);
+			return service.getScore(studentModel).recoverWith(p -> emptyScore(studentModel));
 		}
 	}
 	
@@ -329,10 +332,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case 1: //lijst
 			Panel parent = new ScrollPanel();
 			panel.add(parent);
-			panel.setWidgetLeftRight(parent, 0, Unit.PCT, 50, Unit.PCT);
+			panel.setWidgetLeftRight(parent, 0, Unit.PCT, 440, Unit.PX);
 			tree = new LeerdoelTree(parent, evbus);
+			east = new EastPanel();
+			panel.add(east);
+			panel.setWidgetRightWidth(east, 0, Unit.PCT, 440, Unit.PX);
+			tree.enableScore(leerdoelScore);
 			presenter = new LeerdoelPresenter(evbus, vars);
 			presenter.setView(tree);
+			presenter.setEast(east);
 			presenter.setService(roleAPI);
 			
 		}
@@ -455,7 +463,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	roleAPI.getScore(studentModel) : Promises.failed(new Error()) ;
+				leerdoelScore ?	roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
 
 		switch(type) {
 		case 0:		
@@ -466,6 +474,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case 1:
 			presenter.setModelScore(studentModel, s, activeMethod);
 		}
+	}
+
+	private Promise<DomStudentModelDataScore> emptyScore(DomStudentModelContext4Student studentModel) {
+		DomStudentModelDataScore score = new DomStudentModelDataScore();
+		score.setDomStudentModelStructureScore(studentModel.getModelStructure().generateStudentModelStructureScore());
+		score.setModelId(studentModel);
+		return Promises.resolved(score);
 	}
 
 	private Map<String, Map<String, Set<Integer>>> convert(ObjectMap filter) {

@@ -41,6 +41,9 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
     	data.put("studentModelID", "MYSQL;" + PersistenceClassType.PersistentStudentModelContext.name() + ";1");
     	data.put("filter", Collections.emptyMap());
     	data.put("dwoProfileID", "MYSQL;" + PersistenceClassType.PersistentDwoProfile.name() + ";77");
+    	data.put("leerdoelScore", false);
+    	data.put("type", 1);
+    	
     	panel = RootLayoutPanel.get();
     	
     	
@@ -76,7 +79,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public String getLearnerId() {
-		return "2-XXXX-YYYY";
+		return "1-XXXX-YYYY";
 	}
 
 	@Override
@@ -99,7 +102,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public LessonMode getLessonMode() {
-		return LessonMode.review;
+		return LessonMode.normal;
 	}
 
 	@Override
@@ -150,7 +153,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public boolean filter(Method method, RequestBuilder builder) {
-		builder.setHeader("Authorization", "Basic test:test");
+		builder.setHeader("Authorization", "Basic bWVlc3RlcndpbTo1ZmZkY2M5YzkyYzMwMWFkYjA2NGEzZmZkOWJkMjY0Yw==");
 		return true;
 	}
 
@@ -158,7 +161,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 	void setContext(OpdrNavIF root) {
 		super.setContext(root);
 		DomHasRole role = context.getDomHasRole();
-		String u = ";243932"; //leerlingwim
+		String u = ";306633"; //meesterwim
 		String sg = ";581";   // student group
 		role.setUserId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentUser.name() + u));
 		role.setSchoolGroupId(new PersistenceId("MYSQL;" + PersistenceClassType.PersistentSchoolGroup.name() + sg));

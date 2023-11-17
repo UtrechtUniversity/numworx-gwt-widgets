@@ -48,7 +48,10 @@ public class ReviewAPI implements RoleAPI, DescriptionService {
 
 	@Override
 	public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
-		return getFailed();
+		DomStudentModelDataScore score = new DomStudentModelDataScore();
+		score.setDomStudentModelStructureScore(studentModel.getModelStructure().generateStudentModelStructureScore());
+		score.setModelId(studentModel);
+		return Promises.resolved(score);
 	}
 
 	@Override
