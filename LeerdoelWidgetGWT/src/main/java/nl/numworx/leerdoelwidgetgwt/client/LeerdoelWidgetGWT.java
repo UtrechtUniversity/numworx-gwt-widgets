@@ -4,7 +4,6 @@ package nl.numworx.leerdoelwidgetgwt.client;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -24,12 +23,10 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -62,22 +59,18 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter_Factor
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
-import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.FilterUtil;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.XAPIService_Factory;
-import nl.uu.fi.dwo.rest.dom.DomTree;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileFull;
 import nl.uu.fi.dwo.rest.dom.entities.DomDwoProfileId;
 import nl.uu.fi.dwo.rest.dom.entities.DomHasRole;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomSchoolClass;
-import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelCategory;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContextId;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
-import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 import nl.uu.fi.dwo.rest.locale.DwoLocalesForGWT;
 import nl.uu.fi.dwo.rest.persistence.PersistenceClassType;
 import nl.uu.fi.dwo.rest.persistence.PersistenceId;
@@ -138,6 +131,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private int type;
 	private EventBus evbus;
 	
+	@SuppressWarnings("unchecked")
 	public LeerdoelWidgetGWT(HashMap<String, Object> h, HashMap<String, Number> randomVarWaarden, int volleBreedte) {
 		this();
 		ObjectMap map = JSONUtilities.wrapMap(h);
@@ -335,12 +329,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case 1: //lijst
 			Panel parent = new ScrollPanel();
 			panel.add(parent);
-			panel.setWidgetLeftRight(parent, 0, Unit.PCT, 440, Unit.PX);
+			int right = Math.min(440, width/2);
+			panel.setWidgetLeftRight(parent, 0, Unit.PCT, right, Unit.PX);
 			tree = new LeerdoelTree(parent, evbus);
 			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
 			east = EastPanel_Factory.newInstance(service);
 			panel.add(east);
-			panel.setWidgetRightWidth(east, 0, Unit.PCT, 440, Unit.PX);
+			panel.setWidgetRightWidth(east, 0, Unit.PCT, right, Unit.PX);
 			tree.enableScore(leerdoelScore);
 			east.enableScore(leerdoelScore);
 			presenter = new LeerdoelPresenter(evbus, vars);

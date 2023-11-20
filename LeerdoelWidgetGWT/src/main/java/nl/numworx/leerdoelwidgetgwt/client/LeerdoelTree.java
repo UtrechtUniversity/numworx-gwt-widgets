@@ -18,6 +18,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 public class LeerdoelTree extends StudentResultsTree implements SelectionHandler<TreeItem> {
 
 	private EventBus bus;
+	boolean  isMethod = true;
 
 	public LeerdoelTree(Panel parent, EventBus bus) {
 		super(bus);
@@ -33,9 +34,14 @@ public class LeerdoelTree extends StudentResultsTree implements SelectionHandler
 
 	public void buildTree(DomStudentModelContext4Student studentModel, Promise<DomStudentModelDataScore> s, DomMethod method) {
 		setMethod(method);
+		isMethod = method != null;
+		filter = studentModel.getFilter();
 		DomStudentModelStructure model = studentModel.getModelStructure();
 		StudentResultsPresenter.setCurrentInfo(model.getCategories(), model.getInfo(), currentInfo);
-		super.insertTree(studentModel, s);
+		if (isMethod)
+			super.insertMethodTree(studentModel, s);
+		else
+			super.insertTree(studentModel, s);
 		
 	}
 
