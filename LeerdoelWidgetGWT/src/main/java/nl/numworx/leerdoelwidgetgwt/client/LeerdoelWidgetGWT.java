@@ -58,8 +58,10 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEventHandler;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.FilterUtil;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.XAPIService_Factory;
@@ -320,6 +322,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		} else {
 			roleAPI = role == Role.Learner ? new LearnerAPI(vars) : new TeacherAPI(vars);
 		}
+		DescriptionPresenter service;
 		switch(type) {
 		
 		case 0: // graph
@@ -334,15 +337,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			panel.add(parent);
 			panel.setWidgetLeftRight(parent, 0, Unit.PCT, 440, Unit.PX);
 			tree = new LeerdoelTree(parent, evbus);
-			east = new EastPanel();
+			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
+			east = EastPanel_Factory.newInstance(service);
 			panel.add(east);
 			panel.setWidgetRightWidth(east, 0, Unit.PCT, 440, Unit.PX);
 			tree.enableScore(leerdoelScore);
+			east.enableScore(leerdoelScore);
 			presenter = new LeerdoelPresenter(evbus, vars);
 			presenter.setView(tree);
 			presenter.setEast(east);
-			presenter.setService(roleAPI);
-			
 		}
 		
 		Promise<DomMethod> m;

@@ -32,7 +32,6 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructureScore;
 
 public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 	private static final Logger LOG = Logger.getLogger(LeerdoelPresenter.class.getName());
-	private RoleAPI service;
 	private LeerdoelTree view;
 	private EastPanel east;
 	private EventBus bus;
@@ -56,11 +55,6 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 		this.east = east;
 	}
 
-	void setService(RoleAPI s) {
-		this.service = s;
-		east.service = DescriptionPresenter_Factory.newInstance(Optional.of(bus), false, s.getDescriptionService());
-	}
-
 	public void setModelScore(DomStudentModelContext4Student studentModel, Promise<DomStudentModelDataScore> s,
 			DomMethod method) {
 		this.model = studentModel;
@@ -69,7 +63,6 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 		DomStudentModelContextInfo info = structure.getInfo();
 		// build tree
 		view.buildTree(studentModel, s,  method);
-		east.model = studentModel;
 		east.title.setText(getTitle(info));
 		
 	}
@@ -86,7 +79,7 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 		east.clearVisibility();
 		if (userObject instanceof DomStudentModelContext4Student) {
 			DomStudentModelContext4Student model = this.model;
-			east.setDescription(model.getModelStructure().getInfo());
+			east.setDescription(model, model.getModelStructure().getInfo());
 			score.then ( p -> {
 				DomStudentModelStructureScore score = p.getValue().getDomStudentModelStructureScore();
 				east.setPerc(score);
@@ -96,7 +89,7 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 			DomStudentModelContext4Student model = this.model;
 			DomStudentModelStructure structure = model.getModelStructure();
 			DomStudentModelCategory o = structure.getCategories().get(((Integer) userObject).intValue());
-			east.setDescription(o.getInfo());
+			east.setDescription(model, o.getInfo());
 			score.then(p -> { 
 				DomStudentModelCategoryScore score = p.getValue().getDomStudentModelStructureScore().getCategories().get(((Integer) userObject).intValue());
 				east.setPerc(score);
@@ -114,7 +107,7 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 				o0 = o0.getObjectives().get(elems[i]);
 			}
 			final DomStudentModelObj oo = o0;
-			east.setDescription(oo.getInfo());
+			east.setDescription(model, oo.getInfo());
 
             score.then( p -> { 
 				DomStudentModelObjectiveScore score = p.getValue().getDomStudentModelStructureScore().getCategories().get(cat).getObjectives().get(obj);
