@@ -9,6 +9,7 @@ import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
@@ -41,14 +42,14 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
     	data.put("studentModelID", "MYSQL;" + PersistenceClassType.PersistentStudentModelContext.name() + ";1");
     	data.put("filter", Collections.emptyMap());
     	data.put("dwoProfileID", "MYSQL;" + PersistenceClassType.PersistentDwoProfile.name() + ";77");
-    	data.put("leerdoelScore", false);
+    	data.put("leerdoelScore", true);
     	data.put("type", 1);
     	
     	panel = RootLayoutPanel.get();
     	
     	
-		int w = 400;
-		int h = 400;
+		int w = Window.getClientWidth();
+		int h = Window.getClientHeight();
 		init(w, h, data, Collections.emptyMap());
 		setCommunicationRoot(this);
 	}

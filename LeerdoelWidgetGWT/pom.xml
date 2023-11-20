@@ -49,6 +49,7 @@
           <artifactId>DWOServer</artifactId>
           <version>${project.version}</version>
           <type>war</type>         
+	  <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -113,7 +114,7 @@
           <artifactId>DWOServer</artifactId>
           <version>${project.version}</version>
           <type>war</type>
-          <scope>runtime</scope>        
+          <scope>test</scope>        
       </dependency>
   </dependencies>
 
