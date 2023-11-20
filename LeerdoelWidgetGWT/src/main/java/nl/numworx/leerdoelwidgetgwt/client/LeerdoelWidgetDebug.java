@@ -154,7 +154,7 @@ public class LeerdoelWidgetDebug extends LeerdoelWidgetGWT implements OpdrNavIF 
 
 	@Override
 	public boolean filter(Method method, RequestBuilder builder) {
-		builder.setHeader("Authorization", "Basic bWVlc3RlcndpbTo1ZmZkY2M5YzkyYzMwMWFkYjA2NGEzZmZkOWJkMjY0Yw==");
+		builder.setHeader("Authorization", "Basic test:test");
 		return true;
 	}
 
