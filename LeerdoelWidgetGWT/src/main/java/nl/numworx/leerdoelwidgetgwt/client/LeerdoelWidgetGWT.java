@@ -330,12 +330,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			Panel parent = new ScrollPanel();
 			panel.add(parent);
 			int right = Math.min(440, width/2);
+			if (!leerdoelPopup) right = 0;
 			panel.setWidgetLeftRight(parent, 0, Unit.PCT, right, Unit.PX);
 			tree = new LeerdoelTree(parent, evbus);
 			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
 			east = EastPanel_Factory.newInstance(service);
-			panel.add(east);
-			panel.setWidgetRightWidth(east, 0, Unit.PCT, right, Unit.PX);
+			if (leerdoelPopup) {
+				panel.add(east);
+				panel.setWidgetRightWidth(east, 0, Unit.PCT, right, Unit.PX);
+			}
 			tree.enableScore(leerdoelScore);
 			east.enableScore(leerdoelScore);
 			presenter = new LeerdoelPresenter(evbus, vars);
