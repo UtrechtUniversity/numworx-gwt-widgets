@@ -34,7 +34,7 @@ public class LeerdoelTree extends StudentResultsTree implements SelectionHandler
 
 	public void buildTree(DomStudentModelContext4Student studentModel, Promise<DomStudentModelDataScore> s, DomMethod method) {
 		setMethod(method);
-		isMethod = method != null;
+		isMethod = method != null && method.getId() != null;
 		filter = studentModel.getFilter();
 		DomStudentModelStructure model = studentModel.getModelStructure();
 		StudentResultsPresenter.setCurrentInfo(model.getCategories(), model.getInfo(), currentInfo);

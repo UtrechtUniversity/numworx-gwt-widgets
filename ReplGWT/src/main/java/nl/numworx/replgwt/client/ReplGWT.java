@@ -63,19 +63,23 @@ protected InputReader w;
 protected boolean consuming;
   protected void runit(String message) {
 	  GWT.log(message);
+	  reset();
+	  JSONObject object = new JSONObject();
+	  object.put("python", new JSONString(message));
+	  object.put("id", new JSONNumber(++cnt));
+	  worker.postMessage(object.toString());
+  }
+
+  private void reset() {
 	  w.removeFromParent();
 	  consuming = false;
 	  
 	  RootPanel output = RootPanel.get("output");
 	  output.clear();
 	  output.getElement().setInnerHTML(""); // clear it all
-	  JSONObject object = new JSONObject();
-	  object.put("python", new JSONString(message));
-	  object.put("id", new JSONNumber(++cnt));
-	  worker.postMessage(object.toString());
   }
   
-/**
+  /**
    * This is the entry point method.
    */
   public void onModuleLoad() {
@@ -172,6 +176,8 @@ public void acceptCBookEvent(CBookEvent event) {
 	if ("text.program".equals(event.getCommand())) {
 		String program = (String) event.getParameter("content");
 		runit(program);
+	} else if ("action.reset".contentEquals(event.getCommand())) {
+		reset();
 	}
 }
 
