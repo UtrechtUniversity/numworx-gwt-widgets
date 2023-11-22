@@ -1553,7 +1553,7 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 							}
 	    				}
 					}
-					if (show)
+					if (show && functies[i] != null)
 						setColor(i, color, true);
 					else
 					;	//nog iets leegmaken, zodat niet wordt getekend?
@@ -1561,13 +1561,13 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 				}
 				for (int i = 0; i < functieCorrect.length; i++)
 				{
-					if (!functieCorrect[i])
+					if (!functieCorrect[i] && functies[i] != null)
 					{
 						fout = true;
 						break;
 					}
 				}
-				if (!fout)
+				if (!fout && ingevuld)
 					correct = true;
 			}
 		}
