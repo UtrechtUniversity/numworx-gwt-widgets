@@ -90,6 +90,7 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
+					<localWorkers>1</localWorkers>
 					<module>${gwtModule}</module>
 					<runTarget>${runTarget}</runTarget>
 					<extraJvmArgs>-Xms768m -Xmx2048m</extraJvmArgs>

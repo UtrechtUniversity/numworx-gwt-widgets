@@ -128,6 +128,7 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
+					<localWorkers>1</localWorkers>
 					<module>${project.groupId}.${project.artifactId}${debug}</module>
 					<runTarget>${project.artifactId}${debug}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
