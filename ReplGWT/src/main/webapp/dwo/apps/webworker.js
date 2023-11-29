@@ -43,7 +43,6 @@ self.input = function() {
 
 async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide();
-  await self.pyodide.loadPackage(["numpy", "pytz"]);
   self.pyodide.setStdout( { isatty: true, raw: self.output })
   self.pyodide.setStderr( { isatty: true, raw: self.output })
   self.pyodide.setStdin(  { isatty: true, stdin: self.input, autoEOF: true })
