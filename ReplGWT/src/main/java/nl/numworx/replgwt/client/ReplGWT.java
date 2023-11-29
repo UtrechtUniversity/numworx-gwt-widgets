@@ -134,6 +134,7 @@ public void zetNagekeken(boolean b) {
 @Override
 public void setCommunicationRoot(OpdrNavIF comRoot) {
 	comRoot.addCBookEventListener("text.program", this);
+	comRoot.addCBookEventListener("action.reset", this);
 }
 
 @Override
