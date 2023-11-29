@@ -72,7 +72,7 @@ protected boolean consuming;
 
   private void reset() {
 	  w.removeFromParent();
-	  consuming = false;
+	  recreateWorker();
 	  
 	  RootPanel output = RootPanel.get("output");
 	  output.clear();
@@ -163,12 +163,33 @@ public void setAsHoogte(int ashoogte) {
 public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 	this.width = width;
 	this.height = height;
-	worker = Worker.create("/dwo/apps/webworker.js");
-	worker.setOnMessage(this);
-	worker.setOnError(this);
+	createWorker();
 	w = new InputReader();
 	w.setConsumer(this);
 
+}
+
+private void createWorker() {
+	worker = Worker.create("/dwo/apps/webworker.js");
+	worker.setOnMessage(this);
+	worker.setOnError(this);
+}
+
+private void recreateWorker() {
+	if (consuming) {
+		worker.terminate();
+		createWorker();
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.DELETE, "/dwo/apps/get_input/"+id);
+		builder.setRequestData("");
+		builder.setCallback(this);
+		Request r = null;
+		try {
+			r = builder.send();
+		} catch (RequestException e) {
+			onError(r, e);
+		}
+		consuming = false;
+	}
 }
 
 @Override
@@ -226,7 +247,7 @@ protected void printx(JSONValue value) {
 
 @Override
 public void onError(ErrorEvent event) {
-	GWT.log(event.getMessage());
+	LOG.warning(event.getMessage());
 }
 
 
@@ -261,8 +282,7 @@ public void onResponseReceived(Request request, Response response) {
 
 @Override
 public void onError(Request request, Throwable exception) {
-	LOG.severe("On Error  " + request + " " + exception);
-	
+	LOG.severe("On Error  " + request + " " + exception);	
 }
 
 }
