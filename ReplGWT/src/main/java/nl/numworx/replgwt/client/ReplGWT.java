@@ -196,6 +196,11 @@ private void recreateWorker() {
 public void acceptCBookEvent(CBookEvent event) {
 	if ("text.program".equals(event.getCommand())) {
 		String program = (String) event.getParameter("content");
+		//$Z35@ -> #
+		// $Z nnn @ -> codepoint(nnn)
+		program = program.replace("$Z35@", "#");
+		program = program.replace("$Z36@", "$"); // FIXME niet SAFE!!!
+		program = program.replace("$Z64@", "@");
 		runit(program);
 	} else if ("action.reset".contentEquals(event.getCommand())) {
 		reset();
