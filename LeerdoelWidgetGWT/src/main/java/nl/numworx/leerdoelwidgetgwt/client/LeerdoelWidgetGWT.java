@@ -268,7 +268,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		@Override
 		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
-			return Promises.failed(new Error());
+			return emptyScore(studentModel);
 		}
 	}
 	
@@ -277,7 +277,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.root = comRoot;
 		Role role = comRoot.getRole();
-		if (role != Role.Learner) leerdoelScore = false;
+		//if (role != Role.Learner) leerdoelScore = false;
 		DomSchoolClass schoolclass = role == Role.Learner ? new DomSchoolClass() : null;
 		setContext(root);
 
@@ -464,7 +464,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
+				leerdoelScore ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
 
 		switch(type) {
 		case 0:		
