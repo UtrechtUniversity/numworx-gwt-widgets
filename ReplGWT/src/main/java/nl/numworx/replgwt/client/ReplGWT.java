@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -216,7 +217,18 @@ public void onMessage(MessageEvent event) {
 		printx(obj.get("results"));
 	} else if (obj.containsKey("error")) {
 		printx("\n");
-		printx(obj.get("error"));
+		JSONValue value = obj.get("error");
+		JSONString s = value.isString();
+		if (s != null) {
+			String trace = s.stringValue();
+			int file = trace.indexOf("File \"<exec>\"");
+			if (file >= 0) {
+				trace = trace.substring(file).replace("File \"<exec>\",", "At");
+				value = new JSONString(trace);
+			}
+		}
+		printx(value);
+		scrollToBottom();
 	} else if (obj.containsKey("output")) {
 		printx(obj.get("output"));
 	} else if (obj.containsKey("request")) {
@@ -224,6 +236,14 @@ public void onMessage(MessageEvent event) {
 		requestInput();
 	}
 			
+}
+
+private void scrollToBottom() {
+	RootPanel output = RootPanel.get("output");
+	int h = output.getElement().getScrollHeight();
+	Element div = output.getElement().getParentElement();
+	int s = div.getClientHeight();
+	output.getElement().setScrollTop(Math.max(0, h-s));	
 }
 
 protected void requestInput() {
@@ -240,6 +260,9 @@ private void print(String string) {
 	output.getElement().setInnerHTML(inner + (inner.isEmpty()?"":"\n") + string);
 }
 protected void printx(String string) {
+	string = string.replace("&", "&amp;");
+	string = string.replace("<", "&lt;");
+	string = string.replace(">", "&gt;");
 	RootPanel output = RootPanel.get("output");
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + string);
