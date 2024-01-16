@@ -3,12 +3,12 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.8-SNAPSHOT</version>
+  	<version>0.0.8</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
   <artifactId>WiskOpdrPlayer</artifactId>
-  <version>2.5.27-SNAPSHOT</version>
+  <version>2.5.27</version>
   <packaging>war</packaging>
   <name>WiskOpdr Player</name>
   <properties>

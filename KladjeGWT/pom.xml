@@ -99,7 +99,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.8-SNAPSHOT</version>
+  	<version>0.0.8</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Kladje</name>
