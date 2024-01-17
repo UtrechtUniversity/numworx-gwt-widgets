@@ -2,6 +2,9 @@ package nl.numworx.replgwt.client;
 
 import java.util.Map;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.ui.RootPanel;
 
 
 public class ReplGWTDebug extends ReplGWT {
@@ -14,15 +17,11 @@ public class ReplGWTDebug extends ReplGWT {
 
 	public void onModuleLoad() {
 		  modules = GWT.getModuleBaseURL();
-		  installServiceWorker(this);
+		 // installServiceWorker(this);
 		  install(this);
 		  init(600,300,null, null);
+		  Document.get().getElementById("content").getStyle().setTop(13, Style.Unit.EM);
 	  }
-
-	protected void setServiceWorker(ServiceWorker w) {
-		service = w;
-		  java.util.logging.Logger.getLogger("ReplGWTDebug").severe(String.valueOf(w));
-	}
 
 
 }

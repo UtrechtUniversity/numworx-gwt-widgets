@@ -24,7 +24,9 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -53,7 +55,10 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.SwitchViewEventHandler;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.StudentModelService_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.StudentResultsService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.XAPIService_Factory;
 import nl.uu.fi.dwo.rest.dom.entities.DomContext;
@@ -109,6 +114,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private int asHoogte;
 	private LeerdoelGraph graph;
 	final DomContext context = new DomContext();
+
 	
 	LayoutPanel panel;
 	private Map<String, Map<String, Set<Integer>>> filter;
@@ -122,8 +128,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean voorkennisMenu;
 	private boolean voorkennisKnop;
 	private boolean leerdoelPopup;
+	private int type;
 	private EventBus evbus;
 	
+	@SuppressWarnings("unchecked")
 	public LeerdoelWidgetGWT(HashMap<String, Object> h, HashMap<String, Number> randomVarWaarden, int volleBreedte) {
 		this();
 		ObjectMap map = JSONUtilities.wrapMap(h);
@@ -190,6 +198,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		
 	}
 	RoleAPI roleAPI;
+	private LeerdoelTree tree;
+	private LeerdoelPresenter presenter;
+	private EastPanel east;
 
 	interface RoleAPI {
 		//StudentResultsService getService();
@@ -202,6 +213,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			return getMethodManager().getMethod(context, id, profile);
 		}
 	}
+	
+	
 
 	class LearnerAPI implements RoleAPI {
 		final StudentResultsService service;
@@ -226,7 +239,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		@Override
 		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
-			return service.getScore(studentModel);
+			return service.getScore(studentModel).recoverWith(p -> emptyScore(studentModel));
 		}
 	}
 	
@@ -255,7 +268,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 		@Override
 		public Promise<DomStudentModelDataScore> getScore(DomStudentModelContext4Student studentModel) {
-			return Promises.failed(new Error());
+			return emptyScore(studentModel);
 		}
 	}
 	
@@ -264,7 +277,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
 		this.root = comRoot;
 		Role role = comRoot.getRole();
-		if (role != Role.Learner) leerdoelScore = false;
+		//if (role != Role.Learner) leerdoelScore = false;
 		DomSchoolClass schoolclass = role == Role.Learner ? new DomSchoolClass() : null;
 		setContext(root);
 
@@ -303,13 +316,35 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		} else {
 			roleAPI = role == Role.Learner ? new LearnerAPI(vars) : new TeacherAPI(vars);
 		}
+		DescriptionPresenter service;
+		switch(type) {
 		
-		DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
-		graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
-	    panel.add(graph);
-	    panel.setWidgetLeftRight(graph, 0, Unit.PX, 0, Unit.PX);
-	    panel.setWidgetTopBottom(graph, 0, Unit.PX, 0, Unit.PX);
-
+		case 0: // graph
+			DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
+			graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
+			panel.add(graph);
+			panel.setWidgetLeftRight(graph, 0, Unit.PX, 0, Unit.PX);
+			panel.setWidgetTopBottom(graph, 0, Unit.PX, 0, Unit.PX);
+			break;
+		case 1: //lijst
+			Panel parent = new ScrollPanel();
+			panel.add(parent);
+			int right = Math.min(440, width/2);
+			if (!leerdoelPopup) right = 0;
+			panel.setWidgetLeftRight(parent, 0, Unit.PCT, right, Unit.PX);
+			tree = new LeerdoelTree(parent, evbus);
+			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
+			east = EastPanel_Factory.newInstance(service);
+			if (leerdoelPopup) {
+				panel.add(east);
+				panel.setWidgetRightWidth(east, 0, Unit.PCT, right, Unit.PX);
+			}
+			tree.enableScore(leerdoelScore);
+			east.enableScore(leerdoelScore);
+			presenter = new LeerdoelPresenter(evbus, vars);
+			presenter.setView(tree);
+			presenter.setEast(east);
+		}
 		
 		Promise<DomMethod> m;
 		if (activeMethod != null ) m = roleAPI.getMethod(context, activeMethod, profile);
@@ -393,6 +428,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	     zoomKnoppen = false;
 	     filterHeader = false;
 	     leerdoelScore = false;
+	     type = 0;
 	    
 	    if(h.containsKey("activeMethod"))
 	      activeMethod = h.getString("activeMethod");
@@ -412,17 +448,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      filterHeader = h.getBoolean("filterHeader");
 	    if(h.containsKey("leerdoelScore"))
 	      leerdoelScore = h.getBoolean("leerdoelScore");
-	    
+	    if (h.containsKey("type"))
+	    	type = h.getInt("type");
 	    this.filter = convert(filter);
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
 	    this.studentModelID = this.studentModel = new DomStudentModelContext4Student(new PersistenceId(studentModelID));
 		profile = new DomDwoProfileId();
 		profile.setId(new PersistenceId(h.getString("dwoProfileID"))); // from launchdata
-	    
-	    
-
-	
 	}
 
 	private void initialize(Promise<DomMethod> m, Promise<DomStudentModelContext4Student> p) {
@@ -431,10 +464,24 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ?	roleAPI.getScore(studentModel) : Promises.failed(new Error()) ;
-		graph.setModelScore(studentModel, s, activeMethod);
-	    graph.doFilter(filter);
-	    if (!leerdoelScore) graph.zoomFit();
+				leerdoelScore ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
+
+		switch(type) {
+		case 0:		
+			graph.setModelScore(studentModel, s, activeMethod);
+		    graph.doFilter(filter);
+		    if (!leerdoelScore) graph.zoomFit();
+		    break;
+		case 1:
+			presenter.setModelScore(studentModel, s, activeMethod);
+		}
+	}
+
+	private Promise<DomStudentModelDataScore> emptyScore(DomStudentModelContext4Student studentModel) {
+		DomStudentModelDataScore score = new DomStudentModelDataScore();
+		score.setDomStudentModelStructureScore(studentModel.getModelStructure().generateStudentModelStructureScore());
+		score.setModelId(studentModel);
+		return Promises.resolved(score);
 	}
 
 	private Map<String, Map<String, Set<Integer>>> convert(ObjectMap filter) {
@@ -489,4 +536,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		// Alleen voor "action.setNotEditable"
 		// TODO doe niks
 	}
+	
+	
+
 }

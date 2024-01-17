@@ -59,6 +59,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
+  		<version>0.0.5</version>
   	</dependency>
   	<dependency>
   		<groupId>com.allen-sauer.gwt.dnd</groupId>
@@ -69,11 +70,24 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.7</version>
+  	<version>0.0.8</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <properties>
   	<jdk8>/usr/lib/jvm/java-8-openjdk-amd64</jdk8>
   	<gwt.jvm>${jdk8}</gwt.jvm>
   </properties>
+  <profiles>
+	<profile>
+		<id>macjdk</id>
+		<activation>
+			<os>
+				<family>mac</family>
+			</os>
+		</activation>
+		<properties>
+		  <jdk8>/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home</jdk8>
+		</properties>
+	</profile>
+  </profiles>
 </project>

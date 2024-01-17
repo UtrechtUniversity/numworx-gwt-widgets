@@ -11,19 +11,38 @@ self.output = function(ch) {
 	self.postMessage(JSON.stringify( { "output": string } ))
 }
 
+self.makeid = function(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+}
+
+
 self.input = function() {
-  self.postMessage(JSON.stringify( { "request": "input" } ));
+  var id = self.makeid(8);
+  self.postMessage(JSON.stringify( { "request": "input", "id": id } ));
   const request = new XMLHttpRequest();
   // `false` makes the request synchronous
-  request.open('GET', '/dwo/apps/get_input/', false);
-  request.send(null);
-  console.log('status', request.status);
+  do {
+  	request.open('GET', '/dwo/apps/get_input/'+id, false);
+  	request.send(null);
+  	console.log('status', request.status);
+  } while (request.status == 404)
+  const del = new XMLHttpRequest();
+  del.open("DELETE", "/dwo/apps/get_input/"+id, true);
+  del.send(null); // send and forget....
+
   return request.responseText;
 }
 
 async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide();
-  await self.pyodide.loadPackage(["numpy", "pytz"]);
   self.pyodide.setStdout( { isatty: true, raw: self.output })
   self.pyodide.setStderr( { isatty: true, raw: self.output })
   self.pyodide.setStdin(  { isatty: true, stdin: self.input, autoEOF: true })

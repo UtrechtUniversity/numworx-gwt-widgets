@@ -24,7 +24,7 @@
    <inherits name="nl.uu.fi.dwo.formule.Formule" />
    <inherits name="nl.tue.win.riaca.openmath.OpenMath" />
 <!-- dependent formule -->
-   <inherits name="com.googlecode.mgwt.MGWTMin" />
+<!--    <inherits name="com.googlecode.mgwt.MGWTMin" /> -->
    <inherits name="nl.uu.fi.dwo.ideas.Ideas" />
   <inherits name='dagger.Dagger'/>
    

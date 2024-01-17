@@ -4,11 +4,12 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
-		<version>0.0.7</version>
+		<version>0.0.8</version>
+        	<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>GeoDefinerGWT</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<packaging>war</packaging>
 	<name>GeoDefiner GWT</name>
 	<dependencies>
@@ -37,7 +38,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.13</version>
+			<version>2.5.24</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -58,22 +59,18 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.6</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
 			<version>${formuleVersion}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.googlecode.mgwt</groupId>
-			<artifactId>MGWT</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.vectomatic</groupId>
@@ -99,7 +96,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.13</version>
+			<version>2.5.24</version>
 			<classifier>sources</classifier>
 		</dependency>
 	</dependencies>
@@ -131,6 +128,7 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
+					<localWorkers>1</localWorkers>
 					<module>${project.groupId}.${project.artifactId}${debug}</module>
 					<runTarget>${project.artifactId}${debug}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
@@ -161,7 +159,7 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.5</euclidesVersion>
-		<formuleVersion>0.1.14</formuleVersion>
+		<formuleVersion>2.5.24</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->

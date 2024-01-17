@@ -3,9 +3,16 @@ package nl.numworx.replgwt.client;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
@@ -27,23 +34,24 @@ import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String> {
+public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub, CBookEventListener, MessageHandler, ErrorHandler, Consumer<String>, RequestCallback {
+  private static final Logger LOG = java.util.logging.Logger.getLogger("ReplGWT");
   private int width;
   private int height;
   String modules;
   Worker worker;
-  ServiceWorker service;
+//  ServiceWorker service;
+//  
+//  static native void installServiceWorker(ReplGWT me) /*-{
+//  	serviceWorker = $wnd.serviceWorker
+//	me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
+//  }-*/;
   
-  static native void installServiceWorker(ReplGWT me) /*-{
-  	serviceWorker = $wnd.serviceWorker
-	me.@nl.numworx.replgwt.client.ReplGWT::setServiceWorker(Lnl/numworx/replgwt/client/ServiceWorker;)(serviceWorker)
-  }-*/;
   
-  
-  protected void setServiceWorker(ServiceWorker w) {
-	  service = w;
-	  java.util.logging.Logger.getLogger("ReplGWT").severe(String.valueOf(w));
-  }
+//  protected void setServiceWorker(ServiceWorker w) {
+//	  service = w;
+//	  java.util.logging.Logger.getLogger("ReplGWT").severe(String.valueOf(w));
+//  }
     
   protected static native void install(ReplGWT me) /*-{
   	$wnd.runit = function(test) {
@@ -56,25 +64,29 @@ protected InputReader w;
 protected boolean consuming;
   protected void runit(String message) {
 	  GWT.log(message);
-	  w.removeFromParent();
-	  consuming = false;
-	  
-	  RootPanel output = RootPanel.get("output");
-	  output.clear();
-	  output.getElement().setInnerHTML(""); // clear it all
+	  reset();
 	  JSONObject object = new JSONObject();
 	  object.put("python", new JSONString(message));
 	  object.put("id", new JSONNumber(++cnt));
 	  worker.postMessage(object.toString());
   }
+
+  private void reset() {
+	  w.removeFromParent();
+	  recreateWorker();
+	  
+	  RootPanel output = RootPanel.get("output");
+	  output.clear();
+	  output.getElement().setInnerHTML(""); // clear it all
+  }
   
-/**
+  /**
    * This is the entry point method.
    */
   public void onModuleLoad() {
 	  modules = GWT.getModuleBaseURL();
 	  GWT.log("modules = " + modules);
-	  installServiceWorker(this);
+//	  installServiceWorker(this);
 	  
 	  RootPanel root = RootPanel.get();
 	  root.add(this);
@@ -123,6 +135,7 @@ public void zetNagekeken(boolean b) {
 @Override
 public void setCommunicationRoot(OpdrNavIF comRoot) {
 	comRoot.addCBookEventListener("text.program", this);
+	comRoot.addCBookEventListener("action.reset", this);
 }
 
 @Override
@@ -152,19 +165,47 @@ public void setAsHoogte(int ashoogte) {
 public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 	this.width = width;
 	this.height = height;
-	worker = Worker.create("/dwo/apps/webworker.js");
-	worker.setOnMessage(this);
-	worker.setOnError(this);
+	createWorker();
 	w = new InputReader();
 	w.setConsumer(this);
 
 }
 
+private void createWorker() {
+	worker = Worker.create("/dwo/apps/webworker.js");
+	worker.setOnMessage(this);
+	worker.setOnError(this);
+}
+
+private void recreateWorker() {
+	if (consuming) {
+		worker.terminate();
+		createWorker();
+		RequestBuilder builder = new RequestBuilder(RequestBuilder.DELETE, "/dwo/apps/get_input/"+id);
+		builder.setRequestData("");
+		builder.setCallback(this);
+		Request r = null;
+		try {
+			r = builder.send();
+		} catch (RequestException e) {
+			onError(r, e);
+		}
+		consuming = false;
+	}
+}
+
+
+
 @Override
 public void acceptCBookEvent(CBookEvent event) {
 	if ("text.program".equals(event.getCommand())) {
 		String program = (String) event.getParameter("content");
+		//$Z35@ -> #
+		// $Z nnn @ -> codepoint(nnn)
+		program = Util.decodeZ(program);
 		runit(program);
+	} else if ("action.reset".contentEquals(event.getCommand())) {
+		reset();
 	}
 }
 
@@ -176,18 +217,38 @@ public void onMessage(MessageEvent event) {
 		printx(obj.get("results"));
 	} else if (obj.containsKey("error")) {
 		printx("\n");
-		printx(obj.get("error"));
+		JSONValue value = obj.get("error");
+		JSONString s = value.isString();
+		if (s != null) {
+			String trace = s.stringValue();
+			int file = trace.indexOf("File \"<exec>\"");
+			if (file >= 0) {
+				trace = trace.substring(file).replace("File \"<exec>\",", "At");
+				value = new JSONString(trace);
+			}
+		}
+		printx(value);
+		scrollToBottom();
 	} else if (obj.containsKey("output")) {
 		printx(obj.get("output"));
 	} else if (obj.containsKey("request")) {
+		id = obj.get("id").isString().stringValue();
 		requestInput();
 	}
 			
 }
 
+private void scrollToBottom() {
+	RootPanel output = RootPanel.get("output");
+	int h = output.getElement().getScrollHeight();
+	Element div = output.getElement().getParentElement();
+	int s = div.getClientHeight();
+	output.getElement().setScrollTop(Math.max(0, h-s));	
+}
+
 protected void requestInput() {
 	if (consuming) {
-		  java.util.logging.Logger.getLogger("ReplGWT").severe("consuming");
+		  LOG.severe("consuming");
 		  return;
 	}
 	startInput();
@@ -199,6 +260,9 @@ private void print(String string) {
 	output.getElement().setInnerHTML(inner + (inner.isEmpty()?"":"\n") + string);
 }
 protected void printx(String string) {
+	string = string.replace("&", "&amp;");
+	string = string.replace("<", "&lt;");
+	string = string.replace(">", "&gt;");
 	RootPanel output = RootPanel.get("output");
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + string);
@@ -212,7 +276,7 @@ protected void printx(JSONValue value) {
 
 @Override
 public void onError(ErrorEvent event) {
-	GWT.log(event.getMessage());
+	LOG.warning(event.getMessage());
 }
 
 
@@ -222,6 +286,7 @@ protected void startInput() {
 	consuming = true;
 }
 
+String id = "";
 
 @Override
 public void accept(String t) {
@@ -229,7 +294,24 @@ public void accept(String t) {
 	consuming = false;
 	t += "\n";
 	printx(t);
-	service.postMessage((t).toString());
+	RequestBuilder builder = new RequestBuilder(RequestBuilder.PUT, "/dwo/apps/get_input/"+id);
+	builder.setRequestData(t);
+	builder.setCallback(this);
+	try {
+		builder.send();
+	} catch (RequestException e) {
+	}
+}
+
+@Override
+public void onResponseReceived(Request request, Response response) {
+	LOG.warning("on success " + request + " " + response.getStatusCode() + " " + response.getText());
+	
+}
+
+@Override
+public void onError(Request request, Throwable exception) {
+	LOG.severe("On Error  " + request + " " + exception);	
 }
 
 }

@@ -91,7 +91,6 @@ public class LeerdoelGraph extends StudentResultsGraph {
 
 	@Override
 	protected Node nodeFactory(DomStudentModelObj obj, String p, DomStudentModelMethodInfo info) {
-		final String p1 = p;
 		Node node = new Node(obj, info, p);
 		if (!leerdoelPopup) return node;
 		return node.addClickHandler();

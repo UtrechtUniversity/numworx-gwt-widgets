@@ -5,6 +5,14 @@
 
 <web-app>
 
+  <servlet>
+  	<servlet-name>get_input</servlet-name>
+  	<servlet-class>fi.dwo.server.apps.GetInput</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>get_input</servlet-name>
+  	<url-pattern>/dwo/apps/get_input/*</url-pattern>
+  </servlet-mapping>
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>ReplGWT.html</welcome-file>

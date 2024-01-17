@@ -29,6 +29,8 @@ class Tupel {
 		this(name, value, INITIAL);
 	}
 
-	
+	public String toString() {
+		return toJSON().toString();
+	}
 	
 }
