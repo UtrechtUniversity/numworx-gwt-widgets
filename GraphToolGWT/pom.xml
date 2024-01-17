@@ -63,7 +63,7 @@
 		<dependency>
 			<groupId>fi.statistiekgwt</groupId>
 			<artifactId>StatistiekGWT</artifactId>
-			<version>0.0.8</version>
+			<version>0.0.9-SNAPSHOT</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
@@ -140,9 +140,9 @@
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>ParentGWT</artifactId>
 		<relativePath>../ParentGWT</relativePath>
-		<version>0.0.8</version>
+		<version>0.0.9-SNAPSHOT</version>
 	</parent>
-	<version>2.5.24</version>
+	<version>2.5.25-SNAPSHOT</version>
 	<properties>
 		<gwt.style>PRETTY</gwt.style>
 		<gwtVersion>2.9.0</gwtVersion>
