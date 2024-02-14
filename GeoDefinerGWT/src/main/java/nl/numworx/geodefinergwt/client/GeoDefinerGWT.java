@@ -123,6 +123,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
 	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 	private static final String CHECK = "check";
+	private static final String ACTION_RESET = "action.reset";
 
 	@UiField DockLayoutPanel southPanel;
 	@UiField Label status;
@@ -447,6 +448,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		FormuleHolder.installKeyboard(comRoot.getKeyboard());
 		
 		comRoot.addCBookEventListener(CHECK, this);
+		comRoot.addCBookEventListener(ACTION_RESET, this);
 		this.mode = comRoot.getMode();
 		this.lessonMode = comRoot.getLessonMode();
 		toetsStyle();
@@ -633,7 +635,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
           viewer.paint();
           return;
         }
-
+        if (ACTION_RESET.equals(event.getCommand())) {
+        	reset();
+        	return;
+        }
 	}
 
 	/* (non-Javadoc)
