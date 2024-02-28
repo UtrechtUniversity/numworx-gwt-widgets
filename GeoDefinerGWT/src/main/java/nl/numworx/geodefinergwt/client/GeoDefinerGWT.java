@@ -707,6 +707,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			reset0(orgWidth, orgHeight);
 			relocate(width, height-header); //terug naar huidige grootte
 		}
+
+		fire(ACTION_RESET);
 	}
 	
 	
