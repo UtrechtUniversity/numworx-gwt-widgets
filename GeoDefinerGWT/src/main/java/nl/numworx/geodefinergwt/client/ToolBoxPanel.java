@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Vector;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.gwt.core.shared.GWT;
@@ -224,6 +225,7 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 		int size = panel.getWidgetCount();
 		for(int i = 0; i < size; i++)
 			panel.getWidget(0).removeFromParent();
+		select = null;
 	}
 	
 	private int height = 00;
@@ -231,9 +233,11 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 		return height;
 	}
 	
-	void init(ObjectList list, ObjectList config, int w, Map<Integer,Provider<ToggleButton>> buttons, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {		
+	ToggleButton select;
+	void init(ObjectList list, ObjectList config, int w, Map<Integer,Provider<ToggleButton>> buttons, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims, RadioMode model) {		
 		ToggleButton btn;
 		height = ((list.size()*BREEDTE_ICON-1)/w+1) * 40;
+		this.model = model;
 		if (config != null)
 		for(int n = 0; n < config.size(); n++) {
 			installConfig(n, config, shims);
@@ -244,11 +248,21 @@ public class ToolBoxPanel extends Composite implements Tools, RequiresResize {
 			if(provider != null)
 			{
 				btn = provider.get();			 // link to shims
-				if(btn != null)	panel.add(btn);
+				if(btn != null)	{
+					if (n == Tools.SELECTOR) select = btn;
+					panel.add(btn);
+				}
 			}
 		}
 	}
 
+	RadioMode model;
+	public void selectSelector() {
+		if (select != null && model != null) {
+			model.down(select);
+		}
+	}
+ 	
 
 	private void installConfig(int i, ObjectList config, Map<Integer, Provider<UIShim<? extends Destroyable, Void>>> shims) {
 GWT.log("install config " + i + "  " + config);

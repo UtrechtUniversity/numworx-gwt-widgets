@@ -27,6 +27,7 @@ import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
+import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.tue.win.riaca.openmath.lang.OMBinding;
@@ -178,16 +179,22 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				toolbox.init(list, launchData.getObjectList("toolboxConfig"), width, buttons.get(), shims.get());
+				toolbox.init(list, launchData.getObjectList("toolboxConfig"), width, buttons.get(), shims.get(), model.get());
 				root.setWidgetSize(toolbox, toolbox.getHeight());
 				root.setWidgetHidden(southPanel, false);
 				if(checkDWO == null) {
 					southPanel.setWidgetHidden(check, true);
 				}
+				selectSelector();
 				return;
 			}
 		}
 		root.setWidgetHidden(toolbox, true);
+	}
+
+	private void selectSelector() {
+		selector.command();
+		toolbox.selectSelector();
 	}
 
 	
@@ -315,6 +322,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		incErrorCount();
 		fire();
 		lognagekeken();
+		selectSelector();
 	}
 
 	@UiHandler("checkBtn") void kijkNa(ClickEvent evt) { kijkNa(); }
@@ -520,6 +528,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	@Inject Lazy<Map<Integer,Provider<UIShim<? extends Destroyable, Void>>>> shims;
+	@Inject Lazy<RadioMode> model;
     @Inject Lazy<Tracer> tracerProvider;
 	private boolean logOption, attempt;
 
