@@ -1,6 +1,8 @@
 package fi.nabouwenaanzichtengwt.client;
 
 
+import java.util.logging.Logger;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -21,6 +23,7 @@ import com.vaadin.pointerevents.client.PointerUpHandler;
 
 public class Viewer3d
 {
+	private double deg15 = Math.PI / 180 * 15;
 	/**
 	 * teken Canvas
 	 */
@@ -516,6 +519,32 @@ public class Viewer3d
 		mat.ydraai(beginy + yhoek);
 		tekenKubusRooster();
 	}
+	
+	Punt3D normalVlak(Matrix3D hoekMatrix) {
+		Punt3D p = new Punt3D(0,0,0);
+		Matrix3D m = hoekMatrix;
+		p =  m.geefVolgendPunt(p, 0, 1, 0);
+		//logger.info("normalVlak = " + p.x + "," + p.y + "," + p.z);
+		return p;
+	}
+
+	protected Matrix3D hoekMatrix() {
+		Matrix3D m = new Matrix3D();
+		m.initialiseer();
+		m.xdraai(beginx + xhoek);
+		m.ydraai(beginy + yhoek);
+		return m;
+	}
+
+	Punt3D pijl(Matrix3D hoekMatrix) {
+		Punt3D p = new Punt3D(0,0,0);
+		Matrix3D m = hoekMatrix;
+		p =  m.geefVolgendPunt(p, 0, 0, 1);
+		//logger.info("pijl = " + p.x + "," + p.y + "," + p.z);
+		return p;
+	}
+	
+	
 
 	/**
 	 * teken het kubusrooster: grondvlak (als nodig), pijl of
@@ -1082,6 +1111,13 @@ public class Viewer3d
     		lastBuildCommand = "";
     }
 
+    Punt3D lastNormal = new Punt3D(0,1,0);
+    double cos15 = Math.cos(Math.PI * 15 / 180);
+    static Logger logger = Logger.getLogger("Viewer3d");
+    double rotatie;
+    enum Side { LEFT, FRONT, RIGHT, BACK, TOP};
+    Side side;
+    
 	/**
 	 * actie bij MouseMove/TouchMove Event: draai
 	 */
@@ -1092,13 +1128,89 @@ public class Viewer3d
 		holdMouse = holdMouse && System.currentTimeMillis() - holdMouseStartTime < 300;
 		if (!holdMouse && muisAan)
 		{
+
+			//logger.info("voor xh " + xhoek + " yh " + yhoek);
+			Matrix3D old = hoekMatrix();
+			old.transpose();
+			
 			xhoek -= 0.5 * mb.geefSleepdy();
 			if (xhoek > 90 - beginx)
 				xhoek = 90 - beginx;
 			if (xhoek < 0 - beginx)
 				xhoek = 0 - beginx;
 			yhoek += 0.5 * mb.geefSleepdx();
+			//logger.info("na   xh " + xhoek + " yh " + yhoek);
 			tekenOpnieuw();
+
+			
+			Matrix3D hoek = hoekMatrix();
+			Punt3D normal = normalVlak(hoek);
+			Punt3D pijl = pijl(hoek);
+			old.mult(hoek); // old = hoek * old; premultiply
+			double trace = old.trace();
+			trace = Math.max(-1, trace); // fouten in berekening.
+			trace = Math.min(3,  trace);
+			double angle = Math.acos((trace - 1.0)*0.5);
+			rotatie += angle;
+			//logger.info("hoek = " + angle/(Math.PI/180) + ", totaal " + rotatie/(Math.PI/180));
+			if (rotatie > deg15) {
+				logger.info(" rotatie meer dan 15 graden ");
+				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
+				rotatie = 0.0;
+			}
+			if (Math.abs(normal.z) > cos15) {
+				if (side != Side.TOP)
+				{	side = Side.TOP;
+					logger.info("mostly normal z: kijk van boven");
+					eigenaar.viewed(side.name());
+			
+			} else if (Math.abs(normal.y) > cos15) {
+				if ((pijl.x) > cos15) {
+					if (side != Side.LEFT)
+					{
+						side = Side.LEFT;
+						eigenaar.viewed(side.name());
+						logger.info("mostly pijl x linkerkant");
+					}
+				}
+				else if ((pijl.x) < -cos15) {
+			    	if (side != Side.RIGHT)
+			    	{
+				    	side = Side.RIGHT;
+						eigenaar.viewed(side.name());
+			    		logger.info("mostly pijl x rechterkant");
+			    	}
+			    }
+				else if ((pijl.z) > cos15)  {
+			    	if (side != Side.FRONT)
+			    	{
+				    	side = Side.FRONT;
+						eigenaar.viewed(side.name());				    	
+			    		logger.info("mostly pijl z voor");
+			    	}
+			    }
+				else if ((pijl.z) < -cos15) {
+			    	if (side != Side.BACK)
+			    	{
+				    	side = Side.BACK;
+						eigenaar.viewed(side.name());				    	
+				    	logger.info("mostly pijl z achter");
+			    	}
+			    } else {
+			    	if (side != null) {
+			    		logger.info("gray area");
+				    	side = null;
+				    	eigenaar.viewed("unknown");
+			    	}
+			    }
+			} else {
+				if (side != null)
+				{
+					side = null;
+					eigenaar.viewed("unknown");
+					logger.info("grijs gebied");
+				}
+			}
 		}
 
 	}
