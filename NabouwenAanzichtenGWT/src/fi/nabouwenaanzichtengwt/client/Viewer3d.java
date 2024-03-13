@@ -1153,64 +1153,65 @@ public class Viewer3d
 			double angle = Math.acos((trace - 1.0)*0.5);
 			rotatie += angle;
 			//logger.info("hoek = " + angle/(Math.PI/180) + ", totaal " + rotatie/(Math.PI/180));
-			if (rotatie > deg15) {
-				logger.info(" rotatie meer dan 15 graden ");
-				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
-				rotatie = 0.0;
-			}
 			if (Math.abs(normal.z) > cos15) {
 				if (side != Side.TOP)
-				{	side = Side.TOP;
+				{	side = Side.TOP; rotatie = deg15;
 					logger.info("mostly normal z: kijk van boven");
-					eigenaar.viewed(side.name());
+					eigenaar.viewed("entering " + side.name());
 			
 			} else if (Math.abs(normal.y) > cos15) {
 				if ((pijl.x) > cos15) {
 					if (side != Side.LEFT)
 					{
-						side = Side.LEFT;
-						eigenaar.viewed(side.name());
+						side = Side.LEFT; rotatie = deg15;
+						eigenaar.viewed("entering " + side.name());
 						logger.info("mostly pijl x linkerkant");
 					}
 				}
 				else if ((pijl.x) < -cos15) {
 			    	if (side != Side.RIGHT)
 			    	{
-				    	side = Side.RIGHT;
-						eigenaar.viewed(side.name());
+				    	side = Side.RIGHT; rotatie = deg15;
+						eigenaar.viewed("entering " + side.name());
 			    		logger.info("mostly pijl x rechterkant");
 			    	}
 			    }
 				else if ((pijl.z) > cos15)  {
 			    	if (side != Side.FRONT)
 			    	{
-				    	side = Side.FRONT;
-						eigenaar.viewed(side.name());				    	
+				    	side = Side.FRONT; rotatie = deg15;
+						eigenaar.viewed("entering " + side.name());				    	
 			    		logger.info("mostly pijl z voor");
 			    	}
 			    }
 				else if ((pijl.z) < -cos15) {
 			    	if (side != Side.BACK)
 			    	{
-				    	side = Side.BACK;
-						eigenaar.viewed(side.name());				    	
+				    	side = Side.BACK; rotatie = deg15;
+						eigenaar.viewed("entering " + side.name());				    	
 				    	logger.info("mostly pijl z achter");
 			    	}
 			    } else {
 			    	if (side != null) {
-			    		logger.info("gray area");
-				    	side = null;
-				    	eigenaar.viewed("unknown");
+				    	eigenaar.viewed("leaving " + side );
+			    		logger.info("leaving " + side);
+				    	side = null; rotatie = deg15;
 			    	}
 			    }
 			} else {
 				if (side != null)
 				{
-					side = null;
-					eigenaar.viewed("unknown");
+					eigenaar.viewed("leaving " + side);
+					side = null; rotatie = deg15;
 					logger.info("grijs gebied");
-				}
+				}}
 			}
+			if (rotatie >= deg15) {
+				logger.info(" rotatie meer dan 15 graden ");
+				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
+				rotatie = 0.0;
+			}
+
 		}
 
 	}
