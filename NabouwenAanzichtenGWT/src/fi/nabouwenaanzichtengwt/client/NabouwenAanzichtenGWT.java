@@ -102,8 +102,8 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	/**
 	 * breedte en hoogte
 	 */
-	private int breedte = 600;
-	private int hoogte = 250;
+	protected int breedte = 600;
+	protected int hoogte = 250;
 	
 	/**
 	 * launch data
@@ -1068,6 +1068,33 @@ logger.info("NabouwenAanzichtenGWT init");
 			parameters.put("score", Collections.singletonMap("raw", getScore()));
 			setAttempt(parameters);
 		}
+	}
+	
+	public void rotated(String rotation) {
+		if (logOption) {
+// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+// fixed keys: response, verb:
+			Map<String,Object> parameters = new HashMap<>();
+			parameters.put("response", rotation);
+			parameters.put("verb", "http://www.dwo.nl/verbs/rotated");
+			if (isCorrect()!= null) parameters.put("success", isCorrect());
+			parameters.put("score", Collections.singletonMap("raw", getScore()));
+			setAttempt(parameters);
+		}
+	}
+	
+	public void viewed(String side) {
+		if (logOption) {
+			// Build parameters voor logging: zie FormuleEditorWithAnswer.buildLoggingMap
+			// fixed keys: response, verb:
+						Map<String,Object> parameters = new HashMap<>();
+						parameters.put("response", side);
+						parameters.put("verb", " http://id.tincanapi.com/verb/viewed");
+						if (isCorrect()!= null) parameters.put("success", isCorrect());
+						parameters.put("score", Collections.singletonMap("raw", getScore()));
+						setAttempt(parameters);
+					}
+		
 	}
 	
 	

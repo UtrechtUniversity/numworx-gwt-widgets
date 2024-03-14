@@ -47,6 +47,12 @@
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
+  		<groupId>com.google.gwt</groupId>
+  		<artifactId>gwt-dev</artifactId>
+  		<version>${gwtVersion}</version>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
   		<version>0.1.7</version>

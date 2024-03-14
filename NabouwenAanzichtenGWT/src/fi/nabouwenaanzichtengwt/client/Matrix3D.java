@@ -29,6 +29,21 @@ public class Matrix3D
 		yy = 1.0;
 		zz = 1.0;
 	}
+	
+	public Matrix3D(Matrix3D m) {
+		rotatieRij = new Rotatie3D[150];
+		aantalRotaties = m.aantalRotaties;
+		System.arraycopy(m.rotatieRij, 0, rotatieRij, 0, aantalRotaties);
+		starthoekx = m.starthoekx;
+		starthoeky = m.starthoeky;
+		starthoekz = m.starthoekz;
+		startschaal = m.startschaal;
+		xx = m.xx; xy = m.xy; xz = m.xz;
+		yx = m.yx; yy = m.yy; yz = m.yz;
+		zx = m.zx; zy = m.zy; zz = m.zz;
+	}
+	
+	
 	void initialiseer()
 	{	rotatieRij = new Rotatie3D[150];
 		aantalRotaties = 0;
@@ -90,8 +105,11 @@ public class Matrix3D
 		}
 		
 		if(aantalRotaties>0 && (rotatieRij[aantalRotaties-1].as == as))
-		{	rotatieRij[aantalRotaties-1].rotatieHoek += rotatieHoek;
-			if(rotatieRij[aantalRotaties-1].rotatieHoek%360 == 0) aantalRotaties--;
+		{	rotatieHoek += rotatieRij[aantalRotaties-1].rotatieHoek;
+			if (rotatieHoek % 360 == 0)
+				aantalRotaties--;
+			else
+				rotatieRij[aantalRotaties-1] = new Rotatie3D(as, rotatieHoek);
 		}
 		else 
 		{	rotatieRij[aantalRotaties] = r;
@@ -189,6 +207,23 @@ public class Matrix3D
 		zy = lzy;
 		zz = lzz;
     }
+	
+	void transpose() {
+		double lxy = xy;
+		double lyx = yx;
+		double lxz = xz;
+		double lzx = zx;
+		double lyz = yz;
+		double lzy = zy;
+		
+		xy = lyx;
+		xz = lzx;
+		yx = lxy;
+		yz = lzy;
+		zx = lxz;
+		zy = lyz;
+	}
+	
 
 	Punt3D geefVolgendPunt(Punt3D bp, double dx, double dy, double dz)
 	{
@@ -197,5 +232,9 @@ public class Matrix3D
 		ep.y = bp.y + dx*yx + dy*yy + dz*yz;
 		ep.z = bp.z + dx*zx + dy*zy + dz*zz;
 		return ep;
+	}
+
+	public double trace() {
+		return xx + yy + zz;
 	}
 }
