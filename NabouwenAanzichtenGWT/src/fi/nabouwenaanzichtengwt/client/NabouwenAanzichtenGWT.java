@@ -323,7 +323,7 @@ public class NabouwenAanzichtenGWT implements EntryPoint, InteractionStub, Inter
 	 * moet nakijken. 
 	 * @return true/false
 	 */
-	private boolean isNakijkModus()
+	boolean isNakijkModus()
 	{
 		return kijkNaActief || checkExternal;
 	}

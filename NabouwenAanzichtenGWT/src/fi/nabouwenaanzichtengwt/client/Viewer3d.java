@@ -1142,7 +1142,8 @@ public class Viewer3d
 			//logger.info("na   xh " + xhoek + " yh " + yhoek);
 			tekenOpnieuw();
 
-			
+			if (eigenaar.logOption && eigenaar.isNakijkModus())
+			{	
 			Matrix3D hoek = hoekMatrix();
 			Punt3D normal = normalVlak(hoek);
 			Punt3D pijl = pijl(hoek);
@@ -1158,7 +1159,7 @@ public class Viewer3d
 				{	side = Side.TOP; rotatie = deg15;
 					logger.info("mostly normal z: kijk van boven");
 					eigenaar.viewed("entering " + side.name());
-			
+				}
 			} else if (Math.abs(normal.y) > cos15) {
 				if ((pijl.x) > cos15) {
 					if (side != Side.LEFT)
@@ -1204,7 +1205,7 @@ public class Viewer3d
 					eigenaar.viewed("leaving " + side);
 					side = null; rotatie = deg15;
 					logger.info("grijs gebied");
-				}}
+				}
 			}
 			if (rotatie >= deg15) {
 				logger.info(" rotatie meer dan 15 graden ");
@@ -1212,7 +1213,7 @@ public class Viewer3d
 				rotatie = 0.0;
 			}
 
-		}
+		}}
 
 	}
 
