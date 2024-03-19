@@ -276,9 +276,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			}
 		}
 		setLogState(map);
+		boolean nagekeken = this.isNagekeken();
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
-		if(isNagekeken()) {
+		if(nagekeken) {
+			super.setNagekeken(true);
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
 			fetchScore();
 			// wanneer feedback:

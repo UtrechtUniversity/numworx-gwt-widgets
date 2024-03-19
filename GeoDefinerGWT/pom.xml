@@ -59,12 +59,12 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.6</version>
+			<version>0.0.7-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.6</version>
+			<version>0.0.7-SNAPSHOT</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
@@ -158,7 +158,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.5</euclidesVersion>
+		<euclidesVersion>0.0.8-SNAPSHOT</euclidesVersion>
 		<formuleVersion>2.5.24</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>
