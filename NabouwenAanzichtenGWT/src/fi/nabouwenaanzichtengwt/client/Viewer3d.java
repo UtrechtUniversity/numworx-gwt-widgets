@@ -23,7 +23,10 @@ import com.vaadin.pointerevents.client.PointerUpHandler;
 
 public class Viewer3d
 {
-	private double deg15 = Math.PI / 180 * 15;
+	private static final double deg15 = Math.PI / 180 * 15;
+	private static final double deg5  = Math.PI / 180 * 5;
+	
+	private static final double ANGLE_TRESHOLD = deg15;
 	/**
 	 * teken Canvas
 	 */
@@ -1112,7 +1115,11 @@ public class Viewer3d
     }
 
     Punt3D lastNormal = new Punt3D(0,1,0);
-    double cos15 = Math.cos(Math.PI * 15 / 180);
+    static final double cos15 = Math.cos(deg15);
+    static final double cos30 = Math.cos(Math.PI * 30 / 180);
+    
+    static final double SIDE_TRESHOLD = cos30;
+    
     static Logger logger = Logger.getLogger("Viewer3d");
     double rotatie;
     enum Side { LEFT, FRONT, RIGHT, BACK, TOP};
@@ -1154,41 +1161,41 @@ public class Viewer3d
 			double angle = Math.acos((trace - 1.0)*0.5);
 			rotatie += angle;
 			//logger.info("hoek = " + angle/(Math.PI/180) + ", totaal " + rotatie/(Math.PI/180));
-			if (Math.abs(normal.z) > cos15) {
+			if (Math.abs(normal.z) > SIDE_TRESHOLD) {
 				if (side != Side.TOP)
 				{	side = Side.TOP; rotatie = deg15;
 					logger.info("mostly normal z: kijk van boven");
 					eigenaar.viewed("entering " + side.name());
 				}
-			} else if (Math.abs(normal.y) > cos15) {
-				if ((pijl.x) > cos15) {
+			} else if (Math.abs(normal.y) > SIDE_TRESHOLD) {
+				if ((pijl.x) > SIDE_TRESHOLD) {
 					if (side != Side.LEFT)
 					{
-						side = Side.LEFT; rotatie = deg15;
+						side = Side.LEFT; rotatie = ANGLE_TRESHOLD;
 						eigenaar.viewed("entering " + side.name());
 						logger.info("mostly pijl x linkerkant");
 					}
 				}
-				else if ((pijl.x) < -cos15) {
+				else if ((pijl.x) < -SIDE_TRESHOLD) {
 			    	if (side != Side.RIGHT)
 			    	{
-				    	side = Side.RIGHT; rotatie = deg15;
+				    	side = Side.RIGHT; rotatie = ANGLE_TRESHOLD;
 						eigenaar.viewed("entering " + side.name());
 			    		logger.info("mostly pijl x rechterkant");
 			    	}
 			    }
-				else if ((pijl.z) > cos15)  {
+				else if ((pijl.z) > SIDE_TRESHOLD)  {
 			    	if (side != Side.FRONT)
 			    	{
-				    	side = Side.FRONT; rotatie = deg15;
+				    	side = Side.FRONT; rotatie = ANGLE_TRESHOLD;
 						eigenaar.viewed("entering " + side.name());				    	
 			    		logger.info("mostly pijl z voor");
 			    	}
 			    }
-				else if ((pijl.z) < -cos15) {
+				else if ((pijl.z) < -SIDE_TRESHOLD) {
 			    	if (side != Side.BACK)
 			    	{
-				    	side = Side.BACK; rotatie = deg15;
+				    	side = Side.BACK; rotatie = ANGLE_TRESHOLD;
 						eigenaar.viewed("entering " + side.name());				    	
 				    	logger.info("mostly pijl z achter");
 			    	}
@@ -1196,19 +1203,19 @@ public class Viewer3d
 			    	if (side != null) {
 				    	eigenaar.viewed("leaving " + side );
 			    		logger.info("leaving " + side);
-				    	side = null; rotatie = deg15;
+				    	side = null; rotatie = ANGLE_TRESHOLD;
 			    	}
 			    }
 			} else {
 				if (side != null)
 				{
 					eigenaar.viewed("leaving " + side);
-					side = null; rotatie = deg15;
+					side = null; rotatie = ANGLE_TRESHOLD;
 					logger.info("grijs gebied");
 				}
 			}
-			if (rotatie >= deg15) {
-				logger.info(" rotatie meer dan 15 graden ");
+			if (rotatie >= ANGLE_TRESHOLD) {
+				logger.info(" rotatie meer dan (1)5 graden ");
 				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
 				rotatie = 0.0;
 			}
