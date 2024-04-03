@@ -93,7 +93,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	//private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
 	private void lognagekeken() {
-		logger.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
+		logger.warning("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
 	}
 	
 	static class MyDockLayoutPanel extends DockLayoutPanel {
@@ -236,14 +236,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		} else 
 			if (checkDWO != null && checkDWO.isCheck())
 				super.setNagekeken(true); // ommiddelijke feedback bij setState(map)
-		lognagekeken();
 		super.getState(hashMap);
 		if (volledigeBreedte) {
 			hashMap.put("width", Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue());
 			hashMap.put("height", Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue());
 		}
 		getLogState(hashMap);
-		lognagekeken();
 		logger.info("getState " + hashMap);
 		return hashMap;
 	}
@@ -277,9 +275,11 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		}
 		setLogState(map);
 		boolean nagekeken = this.isNagekeken();
+		lognagekeken();
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
 		if(nagekeken) {
+			LOG.warning("set feedback in setstate");
 			super.setNagekeken(true);
 			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
 			fetchScore();
@@ -331,6 +331,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	private void feedback() {
 		Boolean status = getStatus();
+		LOG.warning("set feedback " + status);
 		check.setStyleName(HALF_CSS, status == null);
 		check.setStyleName(FOUT_CSS, Boolean.FALSE.equals(status));
 		check.setStyleName(GOED_CSS, Boolean.TRUE.equals(status));
@@ -381,6 +382,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
   
   private void nofeedbackImpl() {
+	  LOG.warning("remove feedback");
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
