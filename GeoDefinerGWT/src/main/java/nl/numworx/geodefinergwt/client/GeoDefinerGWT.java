@@ -262,6 +262,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		//LOG.severe("O before " + viewer.getModel().getO().getXd());
 		setState(map);
 		//LOG.severe("O after " + viewer.getModel().getO().getXd());
+		boolean nagekeken = this.isNagekeken();
 		if (state.containsKey("height") && state.containsKey("width")) {
 			int oldw = Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue();
 			int oldh = Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue();
@@ -270,33 +271,42 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			if (width != oldw || height != oldh ) {
 				LOG.severe("should relocate from " + width + " to " + oldw);
 				widget.init(width, height);
-				relocate(oldw, oldh);
+				boolean oldsema = sema;
+				try {
+					sema = true; // relocating..
+					relocate(oldw, oldh); // trashes nagekeken
+				} finally {
+					sema = oldsema;
+				}
 			}
 		}
 		setLogState(map);
-		boolean nagekeken = this.isNagekeken();
 		lognagekeken();
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
-		if(nagekeken) {
-			LOG.warning("set feedback in setstate");
-			super.setNagekeken(true);
-			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
-			fetchScore();
-			// wanneer feedback:
-			if ( mode == OpdrNavIF.OEFENEN
-			  || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN
-			  || mode == OpdrNavIF.ZELFTOETS
-			  || (mode == OpdrNavIF.EINDTOETS && lessonMode != LessonMode.normal)
-			)
-			feedback();
-		}
+		restoreNagekeken(nagekeken);
 		lognagekeken();
 		start();
 		addFireUpdates();
 		lognagekeken();
 		widget.paint();
 	}
+
+private void restoreNagekeken(boolean nagekeken) {
+	if(nagekeken) {
+		LOG.warning("set feedback in setstate");
+		super.setNagekeken(true);
+		//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
+		fetchScore();
+		// wanneer feedback:
+		if ( mode == OpdrNavIF.OEFENEN
+		  || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN
+		  || mode == OpdrNavIF.ZELFTOETS
+		  || (mode == OpdrNavIF.EINDTOETS && lessonMode != LessonMode.normal)
+		)
+		feedback();
+	}
+}
 
 	private void setLogState(Map<String, Object> map) {
       Tracer t = tracker.adapt(Tracer.class);
@@ -382,7 +392,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
   
   private void nofeedbackImpl() {
-	  LOG.severe("remove feedback");
+	  if (!sema) LOG.severe("remove feedback");
+	  else return; // XXX dit moet je testen!!!
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
@@ -736,6 +747,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			int h = Window.getClientHeight();
 			if (w != width || h != height) {
 				LOG.severe(width + " need resize for " + w + "=" + width + ", " + h + "=" + height);
+				boolean nagekeken = isNagekeken();
 				width  = w;
 				height = h;
 				root.setPixelSize(w, h);
@@ -744,6 +756,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 //				widget.init(w, h);
 //				widget.getModel().getO().forceChanged();
 				relocate(w,h);
+				restoreNagekeken(nagekeken);
 				widget.paint();
 			}
 		} finally {
