@@ -259,9 +259,9 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         widget.cancel();
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
-		LOG.severe("O before " + viewer.getModel().getO().getXd());
+		//LOG.severe("O before " + viewer.getModel().getO().getXd());
 		setState(map);
-		LOG.severe("O after " + viewer.getModel().getO().getXd());
+		//LOG.severe("O after " + viewer.getModel().getO().getXd());
 		if (state.containsKey("height") && state.containsKey("width")) {
 			int oldw = Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue();
 			int oldh = Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue();
@@ -382,7 +382,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
   
   private void nofeedbackImpl() {
-	  LOG.warning("remove feedback");
+	  LOG.severe("remove feedback");
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
