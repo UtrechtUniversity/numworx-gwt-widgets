@@ -392,7 +392,7 @@ private void restoreNagekeken(boolean nagekeken) {
 
   
   private void nofeedbackImpl() {
-	  if (!sema) LOG.severe("remove feedback");
+	  if (!sema) LOG.fine("remove feedback");
 	  else return; // XXX dit moet je testen!!!
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
