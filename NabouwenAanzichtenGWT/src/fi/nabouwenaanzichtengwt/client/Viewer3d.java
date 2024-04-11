@@ -1118,7 +1118,7 @@ public class Viewer3d
     static final double cos15 = Math.cos(deg15);
     static final double cos30 = Math.cos(Math.PI * 30 / 180);
     
-    static final double SIDE_TRESHOLD = cos30;
+    static final double SIDE_TRESHOLD = cos15;
     
     static Logger logger = Logger.getLogger("Viewer3d");
     double rotatie;
