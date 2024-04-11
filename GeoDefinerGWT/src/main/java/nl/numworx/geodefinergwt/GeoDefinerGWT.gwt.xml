@@ -32,7 +32,7 @@
   <entry-point class='nl.numworx.geodefinergwt.client.GeoDefinerGWT'/>
   <add-linker name='xsiframe' />
 <!-- Logging TRUE/FALSE FINEST/.../SEVERE -->   
-    <set-property name="gwt.logging.logLevel" value="WARNING"/>
+    <set-property name="gwt.logging.logLevel" value="INFO"/>
     <set-property name="gwt.logging.enabled" value="TRUE"/>
  
     <replace-with class="fi.wiskopdr.FailingIdeas">
