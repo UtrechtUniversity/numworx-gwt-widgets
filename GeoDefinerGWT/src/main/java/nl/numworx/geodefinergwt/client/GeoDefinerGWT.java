@@ -294,6 +294,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
 private void restoreNagekeken(boolean nagekeken) {
 	if(nagekeken) {
+		tracker.getModel().executeDelay();
 		LOG.warning("set feedback in setstate");
 		super.setNagekeken(true);
 		//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
