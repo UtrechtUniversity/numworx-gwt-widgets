@@ -170,19 +170,19 @@ public class Viewer3d
 	/**
 	 * de initiele draaiing van het kubusbouwsel om de x-as resp. de y-as
 	 */
-	private double beginx, beginy;
+	double beginx, beginy;
 	
 	/**
 	 * actuele draaiing van het kubusbouwsel om de x-as is beginx+xhoek;<br> 
 	 * xhoek wordt veranderd bij slepen, zie methode muisSleepActie 
 	 */
-	private double xhoek;
+	double xhoek;
 	
 	/**
 	 * actuele draaiing van het kubusbouwsel om de y-as is beginy+yhoek;<br> 
 	 * yhoek wordt veranderd bij slepen, zie methode muisSleepActie 
 	 */
-	private double yhoek;
+	double yhoek;
 	
 	/**
 	 * de gesorteerde vlakken uit een de verschillende Lichaam3D 
@@ -214,6 +214,7 @@ public class Viewer3d
 	 */
 	private String lastBuildCommand = "";
 
+	Viewer3d() { }
 	/**
 	 * constructor: initialiseer de attributen, het Canvas en de
 	 * Mouse/Touch handlers voor het Canvas  
@@ -1136,7 +1137,7 @@ public class Viewer3d
 		if (!holdMouse && muisAan)
 		{
 
-			//logger.info("voor xh " + xhoek + " yh " + yhoek);
+			logger.info("voor xh " + xhoek + " yh " + yhoek);
 			Matrix3D old = hoekMatrix();
 			old.transpose();
 			
@@ -1146,7 +1147,7 @@ public class Viewer3d
 			if (xhoek < 0 - beginx)
 				xhoek = 0 - beginx;
 			yhoek += 0.5 * mb.geefSleepdx();
-			//logger.info("na   xh " + xhoek + " yh " + yhoek);
+			logger.info("na   xh " + xhoek + " yh " + yhoek);
 			tekenOpnieuw();
 
 			if (eigenaar.logOption && eigenaar.isNakijkModus())
@@ -1160,7 +1161,7 @@ public class Viewer3d
 			trace = Math.min(3,  trace);
 			double angle = Math.acos((trace - 1.0)*0.5);
 			rotatie += angle;
-			//logger.info("hoek = " + angle/(Math.PI/180) + ", totaal " + rotatie/(Math.PI/180));
+			logger.info("hoek = " + deg(angle) + ", totaal " + deg(rotatie));
 			if (Math.abs(normal.z) > SIDE_TRESHOLD) {
 				if (side != Side.TOP)
 				{	side = Side.TOP; rotatie = deg15;
@@ -1215,7 +1216,7 @@ public class Viewer3d
 				}
 			}
 			if (rotatie >= ANGLE_TRESHOLD) {
-				logger.info(" rotatie meer dan (1)5 graden ");
+				logger.info( deg(rotatie) + " rotatie >= " + deg(ANGLE_TRESHOLD) +  " graden ");
 				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
 				rotatie = 0.0;
 			}
@@ -1225,6 +1226,10 @@ public class Viewer3d
 	}
 
 	
+	long deg(double rotatie2) {
+		return Math.round(rotatie2/Math.PI * 180);
+	}
+
 	/**
 	 * actie bij MouseUp/TouchEnd Event: bepaal of een vlakje van het grondvlak
 	 * of een vlakje van een kubusje was aangeklikt; voeg een kubusje toe of
