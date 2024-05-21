@@ -8,7 +8,6 @@ PROD="--profile prod"
 #PROD=
 cd ../WiskOpdrPlayer;
 
-W=/Volumes/fisme-sites/www-dev/dwo
 W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo
 TODAY=$(date +%-d-%-m-%Y)
 
@@ -17,7 +16,7 @@ T=$W/apps/DWOplayer
 #T=$W/apps/noordhoff/DWOplayer
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=OBFUSCATED
 (cd target/WiskOpdrPlayer; 
     rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
