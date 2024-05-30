@@ -52,6 +52,7 @@
 	<module>../GeoDefinerGWT</module>
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
+	<module>../SQLiteGWT</module>
   </modules>
   <dependencyManagement>
    <dependencies>

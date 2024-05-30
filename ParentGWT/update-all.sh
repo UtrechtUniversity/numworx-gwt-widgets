@@ -21,6 +21,7 @@ sh update-app-www-dev.sh NabouwenAanzichtenGWT nabouwenaanzichtengwt NabouwenAan
 sh update-app-www-dev.sh NormVerdGWT normverdgwt NormVerdGWT
 sh update-app-www-dev.sh ReplGWT replgwt ReplGWT
 sh update-app-www-dev.sh SliderWidgetGWT sliderwidgetgwt SliderWidgetGWT
+sh update-app-www-dev.sh SQLiteGWT sqlitegwt SQLiteGWT
 sh update-app-www-dev.sh StatistiekGWT statistiekgwt StatistiekGWT
 sh update-app-www-dev.sh StatSimGWT statsimgwt StatSimGWT
 sh update-app-www-dev.sh StippelPatronenGWT stippelpatronengwt StippelPatronenGWT
