@@ -178,7 +178,7 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 }
 
 private void createWorker() {
-	worker = Worker.create("/dwo/apps/sqlworker.js");
+	worker = Worker.create("sqlworker.js");
 	worker.setOnMessage(this);
 	worker.setOnError(this);
 

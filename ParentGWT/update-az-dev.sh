@@ -21,6 +21,7 @@ sh update-app-az-dev.sh NabouwenAanzichtenGWT nabouwenaanzichtengwt NabouwenAanz
 sh update-app-az-dev.sh NormVerdGWT normverdgwt NormVerdGWT
 sh update-app-az-dev.sh ReplGWT replgwt ReplGWT
 sh update-app-az-dev.sh SliderWidgetGWT sliderwidgetgwt SliderWidgetGWT
+sh update-app-az-dev.sh SQLiteGWT sqlitegwt SQLiteGWT
 sh update-app-az-dev.sh StatistiekGWT statistiekgwt StatistiekGWT
 sh update-app-az-dev.sh StatSimGWT statsimgwt StatSimGWT
 sh update-app-az-dev.sh StippelPatronenGWT stippelpatronengwt StippelPatronenGWT
