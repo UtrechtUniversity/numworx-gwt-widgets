@@ -3,7 +3,7 @@
  */
 importScripts("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js");
 
-let db;
+let dbmap = { };
 
 self.output = function(ch) {
     let string = String.fromCharCode(ch);
@@ -39,6 +39,7 @@ self.input = async function() {
 };
 
 async function loadSQL(databaseFile) {
+
     const SQL = await initSqlJs({
         locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/${file}`
     });
@@ -47,34 +48,32 @@ async function loadSQL(databaseFile) {
     // Fetch the predefined database file
     const response = await fetch(databaseFile);
     const buffer = await response.arrayBuffer();
-    db = new SQL.Database(new Uint8Array(buffer));
+    const db = new SQL.Database(new Uint8Array(buffer));
+    return db;
    
 }
-let predefinedDatabaseFile = "https://www.fi.uu.nl/dwo/resources/sqlite_danilo.db"; 
-// Replace with your actual URL https://www.fi.uu.nl/dwo/resources/danilo_setup.sql
+let predefinedDatabaseFile = "https://www.fi.uu.nl/dwo/resources/sqlite_danilo.db";
 
-   
-let sqlReadyPromise = loadSQL(predefinedDatabaseFile);
+dbmap[predefinedDatabaseFile] = loadSQL(predefinedDatabaseFile);
 
 
 self.onmessage = async (event) => {
-    // Make sure loading is done
-    await sqlReadyPromise;
     const data = JSON.parse(event.data);
     if (typeof data === 'string') {
         self.resolver(data);
         self.resolver = function(x) {};
         return;
-}
-
-    if (typeof data === 'string') {
-        self.resolver(data);
-        self.resolver = function(x) {};
-        return;
-    }
+	}    
     
-    const { id, python } = data;
-     query=python;
+    const { id, python, url } = data;
+    const query=python;
+    var promise = dbmap[url];
+    if (!promise) {
+    	promise = loadSQL(url);
+    	dbmap[url] = promise;
+  	}
+    // Make sure loading is done
+  	const db = await promise;   
     // Now is the easy part, the one that is similar to working in the main thread:
     try {
         const result = db.exec(query);

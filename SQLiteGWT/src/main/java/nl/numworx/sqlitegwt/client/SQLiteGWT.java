@@ -18,20 +18,21 @@ import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;import com.google.gwt.webworker.client.ErrorEvent;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.webworker.client.ErrorEvent;
 import com.google.gwt.webworker.client.ErrorHandler;
 import com.google.gwt.webworker.client.MessageEvent;
 import com.google.gwt.webworker.client.MessageHandler;
 import com.google.gwt.webworker.client.Worker;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -40,7 +41,7 @@ public class SQLiteGWT extends SimplePanel implements EntryPoint, InteractionStu
   private static final Logger LOG = java.util.logging.Logger.getLogger("SQLiteGWT");
   private int width;
   private int height;
-  String modules;
+  String modules, url = "https://www.fi.uu.nl/dwo/resources/sqlite_danilo.db";
   Worker worker;
 
 //  ServiceWorker service;
@@ -71,6 +72,7 @@ protected boolean consuming;
 	  JSONObject object = new JSONObject();
 	  object.put("python", new JSONString(message));
 	  object.put("id", new JSONNumber(++cnt));
+	  object.put("url", new JSONString(url));
 	  worker.postMessage(object.toString());
   }
 
@@ -170,6 +172,9 @@ public void setAsHoogte(int ashoogte) {
 public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 	this.width = width;
 	this.height = height;
+	ObjectMap map = JSONUtilities.wrapMap(launchData);
+	if (map.containsKey("url"))
+		this.url = map.getString("url");
 	createWorker();
 	w = new InputReader();
 	w.setConsumer(this);
@@ -185,7 +190,6 @@ private void createWorker() {
 }
 
 private void displayError(JSONValue value) {
-	// TODO Auto-generated method stub
 	printx(value);
 	scrollToBottom();
 }
