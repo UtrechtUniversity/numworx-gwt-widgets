@@ -100,14 +100,12 @@
     		<artifactId>DWOGwtClient</artifactId>
 			<version>2.5.27</version>
 			<classifier>classes</classifier>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
 			<version>2.5.27</version>
 			<classifier>sources</classifier>
-			<scope>provided</scope>
 		</dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>

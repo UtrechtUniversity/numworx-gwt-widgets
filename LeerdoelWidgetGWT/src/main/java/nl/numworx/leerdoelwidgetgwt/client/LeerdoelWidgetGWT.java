@@ -4,6 +4,7 @@ package nl.numworx.leerdoelwidgetgwt.client;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -23,6 +24,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
@@ -201,6 +203,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private LeerdoelTree tree;
 	private LeerdoelPresenter presenter;
 	private EastPanel east;
+	private LeerdoelRecommender recommender;
+	private List<String> objectives;
 
 	interface RoleAPI {
 		//StudentResultsService getService();
@@ -344,6 +348,22 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			presenter = new LeerdoelPresenter(evbus, vars);
 			presenter.setView(tree);
 			presenter.setEast(east);
+			break;
+		case 2:
+			parent = new ScrollPanel();
+			panel.add(parent);
+			Label kop = new Label("Persoonlijke aanbeveling X");
+			panel.add(kop);
+			panel.setWidgetTopHeight(kop, 0, Unit.EM, 2, Unit.EM);
+			panel.setWidgetTopBottom(parent, 2, Unit.EM, 0, Unit.EM);
+			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
+			recommender = new LeerdoelRecommender();
+			recommender.setObjectives(objectives);
+			recommender.setService(service);
+			
+			parent.add(recommender);
+			
+			break;
 		}
 		
 		Promise<DomMethod> m;
@@ -429,6 +449,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	     filterHeader = false;
 	     leerdoelScore = false;
 	     type = 0;
+	     objectives = Collections.emptyList();
 	    
 	    if(h.containsKey("activeMethod"))
 	      activeMethod = h.getString("activeMethod");
@@ -450,6 +471,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      leerdoelScore = h.getBoolean("leerdoelScore");
 	    if (h.containsKey("type"))
 	    	type = h.getInt("type");
+	    if (h.containsKey("objectives"))
+	    	objectives = h.getStringList("objectives");
+	    
 	    this.filter = convert(filter);
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
@@ -474,6 +498,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		    break;
 		case 1:
 			presenter.setModelScore(studentModel, s, activeMethod);
+			break;
+		case 2:
+			recommender.setModelScore(studentModel, s, activeMethod);
+			break;
 		}
 	}
 
