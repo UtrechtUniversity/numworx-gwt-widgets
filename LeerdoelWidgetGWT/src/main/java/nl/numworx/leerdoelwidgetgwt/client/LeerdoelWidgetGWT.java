@@ -360,6 +360,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			recommender = new LeerdoelRecommender();
 			recommender.setObjectives(objectives);
 			recommender.setService(service);
+			recommender.setShowScore(leerdoelScore);
 			
 			parent.add(recommender);
 			
@@ -487,8 +488,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel = p.getValue();
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
+// bij recommender(2): altijd score ophalen!
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
+				leerdoelScore || type == 2 ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
 
 		switch(type) {
 		case 0:		
@@ -517,12 +519,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		Map<String, Map<String, Set<Integer>>> result = new HashMap<>();
 		Set<String> keys = filter.keySet();
 		for(String key: keys) {
-			result.put(key, convert2(filter.getObjectMap(key)));
+			ObjectMap value = filter.getObjectMap(key); // else NPE
+			if ("null".equals(key)) key = null; // BUG in keySet()?????
+			result.put(key, convert2(value));
 		}
 		return result;
 	}
 
 	private Map<String, Set<Integer>> convert2(ObjectMap objectMap) {
+		if (objectMap == null) return null;
 		Map<String, Set<Integer>> result = new HashMap<>();
 		for(String key: objectMap.keySet()) {
 			result.put(key, convert3(objectMap.getObjectList(key)));

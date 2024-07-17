@@ -180,11 +180,12 @@
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<extraJvmArgs>-Xms768m -Xmx2048m</extraJvmArgs>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+					<i18nConstantsBundle>nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages</i18nConstantsBundle>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
-<!--							<goal>i18n</goal>-->
+							<goal>i18n</goal>
 							<goal>compile</goal>
 <!--							<goal>test</goal>-->
 						</goals>
@@ -196,6 +197,7 @@
         	<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+					<attachClasses>true</attachClasses>
 				</configuration>
         </plugin>        
 
