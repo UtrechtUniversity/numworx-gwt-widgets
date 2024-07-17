@@ -38,6 +38,7 @@ public class LeerdoelRecommender extends Composite {
 		list = new VerticalPanel();
 		list.addStyleName("recommender");
 		Label header = new Label(rb.intro());
+		header.addStyleName("intro");
 		list.add(header);
 		initWidget(list);
 	}
@@ -45,10 +46,10 @@ public class LeerdoelRecommender extends Composite {
 	public void setObjectives(List<String> objectives) {
 		this.objectives = objectives.stream().map(this::strip).collect(Collectors.toList());
 // debuggertje:
-		for (String o : objectives) {
-			Label l = new Label(o);
-			list.add(l);
-		}
+//		for (String o : objectives) {
+//			Label l = new Label(o);
+//			list.add(l);
+//		}
 		
 	}
 
@@ -69,6 +70,8 @@ public class LeerdoelRecommender extends Composite {
 			east.setDescription(studentModel, info);
 			east.setPerc(score);
 			east.enableScore(showScore);
+			east.setStylePrimaryName("east-panel");
+			east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			list.add(east);
 		}		
 		return null;
@@ -127,12 +130,8 @@ public class LeerdoelRecommender extends Composite {
 		this.service = service;		
 	}
 
-	public boolean isShowScore() {
-		return showScore;
-	}
-
-	public void setShowScore(boolean showScore) {
-		//this.showScore = showScore;
+	public void enableScore(boolean showScore) {
+		this.showScore = showScore;
 	}
 
 }

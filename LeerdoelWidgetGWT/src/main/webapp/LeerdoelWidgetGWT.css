@@ -5,3 +5,15 @@ body {
 	margin: 0px !important;
 	background-color: transparent !important;
 }
+
+.recommender .profile-borderBox {
+	border: none 0px;
+}
+
+.recommender  {
+	font-weight: normal;
+}
+
+.recommender .profile-borderBox > .gwt-Label {
+	color: unset;
+}

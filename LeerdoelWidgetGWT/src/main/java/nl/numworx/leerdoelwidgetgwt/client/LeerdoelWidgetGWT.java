@@ -352,18 +352,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case 2:
 			parent = new ScrollPanel();
 			panel.add(parent);
-			Label kop = new Label("Persoonlijke aanbeveling X");
-			panel.add(kop);
-			panel.setWidgetTopHeight(kop, 0, Unit.EM, 2, Unit.EM);
-			panel.setWidgetTopBottom(parent, 2, Unit.EM, 0, Unit.EM);
+			panel.setWidgetTopBottom(parent, 0, Unit.EM, 0, Unit.EM);
 			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
 			recommender = new LeerdoelRecommender();
 			recommender.setObjectives(objectives);
 			recommender.setService(service);
-			recommender.setShowScore(leerdoelScore);
-			
-			parent.add(recommender);
-			
+			recommender.enableScore(leerdoelScore);		
+			parent.add(recommender);			
 			break;
 		}
 		
