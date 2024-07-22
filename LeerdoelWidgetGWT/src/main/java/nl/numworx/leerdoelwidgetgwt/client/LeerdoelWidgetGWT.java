@@ -38,6 +38,7 @@ import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
 import fi.dwo.gwt.lib.rest.CallManagers.OAuthManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredUserAccountManager;
+import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import fi.dwo.gwt.lib.rest.util.Dwo2ExceptionGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.RestAuthenticator;
@@ -350,15 +351,16 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			presenter.setEast(east);
 			break;
 		case 2:
-			parent = new ScrollPanel();
-			panel.add(parent);
-			panel.setWidgetTopBottom(parent, 0, Unit.EM, 0, Unit.EM);
-			service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
 			recommender = new LeerdoelRecommender();
+			panel.add(recommender);
+			panel.setWidgetTopBottom(recommender, 0, Unit.EM, 0, Unit.EM);
+			///service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
 			recommender.setObjectives(objectives);
-			recommender.setService(service);
-			recommender.enableScore(leerdoelScore);		
-			parent.add(recommender);			
+			recommender.setService(roleAPI.getDescriptionService());
+			recommender.enableScore(leerdoelScore);
+			recommender.keyboard = root.getKeyboard();
+			recommender.idler = new IdleDetect(evbus);
+			recommender.width = width - 9;
 			break;
 		}
 		

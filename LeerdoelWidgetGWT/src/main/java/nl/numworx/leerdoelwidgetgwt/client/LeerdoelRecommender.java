@@ -1,19 +1,34 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.osgi.util.promise.Promise;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.SimpleLayoutPanel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 
+import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
+import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
@@ -28,20 +43,26 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 public class LeerdoelRecommender extends Composite {
 	
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
+    private final static String lang = LocaleInfo.getCurrentLocale().getLocaleName();
+    private static java.util.logging.Logger LOG = Logger.getLogger("LeerdoelRecommender");
 	
-	private VerticalPanel list;
+	private DockLayoutPanel list;
 	private List<String> objectives;
-	private DescriptionPresenter service;
+	private DescriptionService service;
+	FormuleKeyboardIF keyboard;
 	private boolean showScore = true;
 
 	private Label header;
 
+	IdleDetect idler;
+	int width;
+
 	LeerdoelRecommender() {
-		list = new VerticalPanel();
+		list = new DockLayoutPanel(Unit.EM);
 		list.addStyleName("recommender");
 		header = new Label(rb.intro());
 		header.addStyleName("intro");
-		list.add(header);
+		list.addNorth(header, 5);
 		initWidget(list);
 	}
 
@@ -58,26 +79,30 @@ public class LeerdoelRecommender extends Composite {
 	private String strip(String in) {
 		return in.split("/",2)[0];
 	}
+	private String getTitle(DomStudentModelContextInfo info) {
+		return AbstractStudentModelPresenter.getTitle(info, lang);
+	}
 	
 	
 	Promise<?> setModelScore(DomStudentModelContext4Student studentModel, DomStudentModelDataScore s, DomMethod activeMethod) {		
 		int cnt = 0;
+		StackLayoutPanel stack = new StackLayoutPanel(Unit.EM);
 		for (String o : objectives) {	
 			
 			DomStudentModelContextInfo info = getInfo(studentModel, o);
 			if (info == null) 
 				continue;
 			DomStudentModelScore<?> score = getScore(s.getDomStudentModelStructureScore(), o);
-			EastPanel east = EastPanel_Factory.newInstance(service);
-			east.setDescription(studentModel, info);
-			east.setPerc(score);
-			east.enableScore(showScore);
-			east.setStylePrimaryName("east-panel");
-			east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
-			list.add(east);
+			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
+			Label title = new Label(getTitle(info));
+			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200);
+			stack.add(east, title, 2);
 			cnt ++;
 		}
 		if (cnt == 0) header.setText(rb.allok());
+		else
+			list.add(stack);
+		list.forceLayout();
 		return null;
 	}
 	
@@ -130,12 +155,35 @@ public class LeerdoelRecommender extends Composite {
 		
 	}
 
-	public void setService(DescriptionPresenter service) {
+	public void setService(DescriptionService service) {
 		this.service = service;		
 	}
 
 	public void enableScore(boolean showScore) {
 		this.showScore = showScore;
+	}
+
+	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height) {
+		SimpleLayoutPanel parent = new SimpleLayoutPanel();
+		promise.then(p -> {
+			StubWidget tekstpanel = new StubWidget(9, keyboard, idler);
+			ObjectMap launch;
+			String value = p.getValue();
+			JSONValue js;
+			js = JSONParser.parseLenient(value);
+			js = js.isObject().get("opdracht_1_1");
+			js = js.isObject().get("interactiePanelLaunchData");
+			js = js.isArray().get(5);
+			js = js.isObject().get("interactiePanelLaunchState");
+			
+			LOG.info(js.toString());
+			launch = JSONUtilities.wrapMap(js.isObject());
+			
+			tekstpanel.init(width, height, launch);
+			parent.add(tekstpanel);
+			return null;
+		});
+		return parent;
 	}
 
 }
