@@ -18,6 +18,8 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 
@@ -31,6 +33,7 @@ import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.Util;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelCategory;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
@@ -93,16 +96,27 @@ public class LeerdoelRecommender extends Composite {
 			if (info == null) 
 				continue;
 			DomStudentModelScore<?> score = getScore(s.getDomStudentModelStructureScore(), o);
+			double greenPerc = Util.getGreen(score) * 200;
+			if (greenPerc > 50) 
+				continue;
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			Label title = new Label(getTitle(info));
 			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200);
-			stack.add(east, title, 2);
+			com.google.gwt.user.client.ui.Widget panel = east;
+			if (showScore) {
+				DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
+				p.addSouth(Util.scoreItem("", score, Util.MAX_LEVEL), 2); // als in eastPanel
+				p.add(east);
+				panel = p;
+			}
+			stack.add(panel, title, 2);
 			cnt ++;
 		}
 		if (cnt == 0) header.setText(rb.allok());
 		else
 			list.add(stack);
 		list.forceLayout();
+		RootLayoutPanel.get().setStyleName("alert", cnt!=0);
 		return null;
 	}
 	

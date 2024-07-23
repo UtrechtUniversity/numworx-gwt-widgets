@@ -17,3 +17,31 @@ body {
 .recommender .profile-borderBox > .gwt-Label {
 	color: unset;
 }
+.gwt-Frame, 
+.gwt-Frame-widget {
+	border: 0px none !important;
+}
+
+.alert {
+	border: 3px solid red;
+}
+
+
+.recommender-header {
+	background-color: rgb(238, 238, 238);
+	font-size: 18px;
+	text-align: center;
+	padding-top: 10px;
+}
+.recommender-header::before {
+	content: "▶";
+	font-size: 30px;
+	padding-left: 20px;
+	display: block;
+	margin-top: -8px;
+	float: left;
+}
+
+.recommender-header-down.recommender-header::before {
+	content: "▼";
+}

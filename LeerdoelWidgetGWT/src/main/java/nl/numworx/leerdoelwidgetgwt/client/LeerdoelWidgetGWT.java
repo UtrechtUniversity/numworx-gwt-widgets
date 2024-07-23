@@ -352,15 +352,22 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			break;
 		case 2:
 			recommender = new LeerdoelRecommender();
+			RecommenderHeader header = new RecommenderHeader();
+			panel.add(header);
+			int margin = 10;
+			panel.setWidgetTopHeight(header, margin, Unit.PX, header.getHeight(), Unit.PX);
+			panel.setWidgetLeftRight(header, margin, Unit.PX, margin, Unit.PX);
 			panel.add(recommender);
-			panel.setWidgetTopBottom(recommender, 0, Unit.EM, 0, Unit.EM);
-			///service = DescriptionPresenter_Factory.newInstance(Optional.of(evbus), false, roleAPI.getDescriptionService());
+			panel.setWidgetTopBottom(recommender, header.getHeight() + margin*2, Unit.PX, margin, Unit.PX);
+			panel.setWidgetLeftRight(recommender, margin, Unit.PX, margin, Unit.PX);
+			panel.setStyleName("alert");
 			recommender.setObjectives(objectives);
 			recommender.setService(roleAPI.getDescriptionService());
 			recommender.enableScore(leerdoelScore);
 			recommender.keyboard = root.getKeyboard();
 			recommender.idler = new IdleDetect(evbus);
 			recommender.width = width - 9;
+			header.setCenter(recommender);
 			break;
 		}
 		
