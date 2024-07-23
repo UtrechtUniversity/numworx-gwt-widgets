@@ -368,6 +368,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			recommender.idler = new IdleDetect(evbus);
 			recommender.width = width - 9;
 			header.setCenter(recommender);
+			
+			header.addValueChangeHandler(ev -> { 
+				HashMap<String,Number> parameters = new HashMap<>();
+				parameters.put("width", width);
+				parameters.put("height", height);
+				if (!ev.getValue().booleanValue())
+					parameters.put("height", header.getHeight() + margin*2);
+				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
+			});
 			break;
 		}
 		

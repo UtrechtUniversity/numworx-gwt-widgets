@@ -1,6 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -19,7 +20,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
 	private static final int HEIGHT = 42;
 	private IsWidget center;
-	private boolean down = true;
+	private boolean down = true; // nog even...
 	public boolean isDown() {
 		return down;
 	}
@@ -42,7 +43,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 
 	public void setCenter(IsWidget center) {
 		this.center = center;
-		updateUpDown();
+		Scheduler.get().scheduleDeferred(this::updateUpDown);
 	}
 
 	private void updateUpDown() {
