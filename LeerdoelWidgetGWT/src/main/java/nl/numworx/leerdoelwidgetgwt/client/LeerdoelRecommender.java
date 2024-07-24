@@ -27,6 +27,7 @@ import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
@@ -59,6 +60,7 @@ public class LeerdoelRecommender extends Composite {
 
 	IdleDetect idler;
 	int width;
+	OpdrNavIF comRoot;
 
 	LeerdoelRecommender() {
 		list = new DockLayoutPanel(Unit.EM);
@@ -180,7 +182,7 @@ public class LeerdoelRecommender extends Composite {
 	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height) {
 		SimpleLayoutPanel parent = new SimpleLayoutPanel();
 		promise.then(p -> {
-			StubWidget tekstpanel = new StubWidget(9, keyboard, idler);
+			StubWidget tekstpanel = new StubWidget(9, keyboard, idler, comRoot);
 			ObjectMap launch;
 			String value = p.getValue();
 			JSONValue js;

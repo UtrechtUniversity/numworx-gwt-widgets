@@ -21,6 +21,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Frame;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import fi.dwo.gwt.lib.rest.ui.IdleDetect;
@@ -35,7 +36,7 @@ import nl.uu.fi.dwo.interaction.client.json.JSONObjectMapImpl;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 
-public class StubWidget extends Composite implements Handler, LoadHandler, FormuleEditorIF {
+public class StubWidget extends Composite implements Handler, LoadHandler, FormuleEditorIF, RequiresResize {
 
 	private static FormuleFont defaultFont;
 
@@ -71,10 +72,12 @@ public class StubWidget extends Composite implements Handler, LoadHandler, Formu
 	private HashMap<String, Number> randomVars = new HashMap<>();
 	private HashMap<String, Object> lastResort;
 	private IdleDetect idler;
+	private OpdrNavIF comRoot;
 
-	public StubWidget(int id, FormuleKeyboardIF kb, IdleDetect idler) {
+	public StubWidget(int id, FormuleKeyboardIF kb, IdleDetect idler, OpdrNavIF comRoot) {
 		this.kb = kb;
 		this.idler = idler;
+		this.comRoot = comRoot;
 		String profile = "77";
 		String p = Window.Location.getParameter("profile");
 		if (p != null) profile = p;
@@ -82,7 +85,7 @@ public class StubWidget extends Composite implements Handler, LoadHandler, Formu
 		String locale;
 		locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-		frame = new Frame("widget.jsp?id=" + id + "&profile=" + profile + "&locale=" + locale);
+		frame = new Frame("WidgetPlayer.jsp?id=" + id + "&profile=" + profile + "&locale=" + locale);
 		frame.addStyleDependentName("widget");
 	}
 
@@ -321,7 +324,7 @@ public void setState(HashMap<String, Object> h) {
 	private void fireJSEvent(JavaScriptObject jso) {
 		JSONObject value = new JSONObject(jso);
 		CBookEvent evt = new CBookEvent(JSONUtilities.wrapMap(value));
-		//fireEvent(evt);
+		fireEvent(evt);
 		Timer t = new Timer()
 		{
 			@Override
@@ -331,6 +334,14 @@ public void setState(HashMap<String, Object> h) {
 		};
 		t.schedule(1);
 
+	}
+
+	private void fireEvent(CBookEvent evt) {
+		if (evt.getCommand().equals("gotoPlace"))
+			comRoot.fireEvent(evt);
+		else if (evt.getCommand().equals("resize")) {
+			GWT.log("resize " + evt);
+		}
 	}
 
 	private void setEnterType(String type) {
@@ -711,6 +722,13 @@ public void setState(HashMap<String, Object> h) {
 	public void insertcp(int codepoint) {
 		insert("$Z" + codepoint + "@");
 		
+	}
+
+	@Override
+	public void onResize() {
+		int w = getParent().getOffsetWidth();
+		GWT.log("offsetwidth = " + w);
+		//frame.setPixelSize(w, -1);	// frame volgt parent size	
 	}
 
 

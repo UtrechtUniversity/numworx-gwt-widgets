@@ -24,6 +24,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
@@ -367,6 +368,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			recommender.keyboard = root.getKeyboard();
 			recommender.idler = new IdleDetect(evbus);
 			recommender.width = width - 9;
+			recommender.comRoot = comRoot;
 			header.setCenter(recommender);
 			
 			header.addValueChangeHandler(ev -> { 
@@ -581,6 +583,12 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void acceptCBookEvent(CBookEvent event) {
 		// Alleen voor "action.setNotEditable"
 		// TODO doe niks
+	}
+
+	@Override
+	public int getConstantHeight() { // niet goed, alleen in uitgeklapt?
+		if (type != 0) return Window.getClientHeight();
+		return 0;
 	}
 	
 	

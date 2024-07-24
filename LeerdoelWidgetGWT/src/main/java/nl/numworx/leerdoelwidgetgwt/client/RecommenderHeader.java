@@ -20,7 +20,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
 	private static final int HEIGHT = 42;
 	private IsWidget center;
-	private boolean down = true; // nog even...
+	private boolean down = false; // nog even...
 	public boolean isDown() {
 		return down;
 	}
@@ -49,7 +49,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	private void updateUpDown() {
 		RootLayoutPanel root = RootLayoutPanel.get();
 		Widget w = Widget.asWidgetOrNull(center);
-		if (w != null && w.isAttached()) root.setWidgetVisible(w, down);
+		//if (w != null && w.isAttached()) root.setWidgetVisible(w, down);
 		setStyleDependentName("down", down);
 		ValueChangeEvent.fire(this, down);
 	}
