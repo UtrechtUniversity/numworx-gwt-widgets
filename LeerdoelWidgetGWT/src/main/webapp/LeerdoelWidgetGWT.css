@@ -14,6 +14,11 @@ body {
 	font-weight: normal;
 }
 
+.recommender .gwt-StackLayoutPanel .gwt-StackLayoutPanelHeader {
+	background: #eee;
+}
+
+
 .recommender .profile-borderBox > .gwt-Label {
 	color: unset;
 }
@@ -22,8 +27,12 @@ body {
 	border: 0px none !important;
 }
 
-.alert {
-	border: 3px solid red;
+.framed {
+	border: 2px #1b75bb solid;
+	border-radius: 4px;
+}
+.alert.framed.profile-borderBox {
+	border-color: red !important;
 }
 
 

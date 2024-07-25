@@ -140,7 +140,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		this();
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		width = map.getInt("breedte");
-		height = map.getInt("hoogte");
+		wantedheight = map.getInt("hoogte");
 		volledigeBreedte = map.getBoolean("volledigeBreedte", false);
 		if (volledigeBreedte) 
 			width = volleBreedte;
@@ -207,6 +207,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private EastPanel east;
 	private LeerdoelRecommender recommender;
 	private List<String> objectives;
+	private int wantedheight;
 
 	interface RoleAPI {
 		//StudentResultsService getService();
@@ -361,7 +362,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			panel.add(recommender);
 			panel.setWidgetTopBottom(recommender, header.getHeight() + margin*2, Unit.PX, margin, Unit.PX);
 			panel.setWidgetLeftRight(recommender, margin, Unit.PX, margin, Unit.PX);
-			panel.setStyleName("alert");
+			panel.addStyleName("framed");
+			panel.addStyleName("profile-borderBox");
 			recommender.setObjectives(objectives);
 			recommender.setService(roleAPI.getDescriptionService());
 			recommender.enableScore(leerdoelScore);
@@ -373,10 +375,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			
 			header.addValueChangeHandler(ev -> { 
 				HashMap<String,Number> parameters = new HashMap<>();
-				parameters.put("width", width);
-				parameters.put("height", height);
+				parameters.put("width", width = panel.getOffsetWidth());
+				parameters.put("height", wantedheight = height);
 				if (!ev.getValue().booleanValue())
-					parameters.put("height", header.getHeight() + margin*2);
+					parameters.put("height", wantedheight = header.getHeight() + margin*2);
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
 			});
 			break;
@@ -436,7 +438,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	
 	@Override
 	public int getHeight() {
-		return height;
+		return wantedheight;
 	}
 	
 	@Override
@@ -453,6 +455,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 		this.width = width;
 		this.height = height;
+		this.wantedheight = height;
 		ObjectMap h = JSONUtilities.wrapMap(launchData);
 		
 	    String studentModelID = null;
@@ -587,7 +590,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 	@Override
 	public int getConstantHeight() { // niet goed, alleen in uitgeklapt?
-		if (type != 0) return Window.getClientHeight();
+		if (type != 0) return wantedheight;
 		return 0;
 	}
 	

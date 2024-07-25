@@ -728,7 +728,7 @@ public void setState(HashMap<String, Object> h) {
 	public void onResize() {
 		int w = getParent().getOffsetWidth();
 		GWT.log("offsetwidth = " + w);
-		//frame.setPixelSize(w, -1);	// frame volgt parent size	
+		frame.setPixelSize(w, -1);	// frame volgt parent size	
 	}
 
 

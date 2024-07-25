@@ -18,6 +18,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
@@ -44,7 +45,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 
-public class LeerdoelRecommender extends Composite {
+public class LeerdoelRecommender extends ResizeComposite {
 	
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
     private final static String lang = LocaleInfo.getCurrentLocale().getLocaleName();
