@@ -54,3 +54,7 @@ body {
 .recommender-header-down.recommender-header::before {
 	content: "▼";
 }
+
+.recommender .intro {
+	padding-bottom: 10px;
+}
