@@ -85,7 +85,7 @@ public class StubWidget extends Composite implements Handler, LoadHandler, Formu
 		String locale;
 		locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-		frame = new Frame("WidgetPlayer.jsp?id=" + id + "&profile=" + profile + "&locale=" + locale);
+		frame = new Frame("WidgetPlayer.jsp?responsive=true&id=" + id + "&profile=" + profile + "&locale=" + locale);
 		frame.addStyleDependentName("widget");
 	}
 
@@ -727,8 +727,10 @@ public void setState(HashMap<String, Object> h) {
 	@Override
 	public void onResize() {
 		int w = getParent().getOffsetWidth();
-		GWT.log("offsetwidth = " + w);
-		frame.setPixelSize(w, -1);	// frame volgt parent size	
+		int h = getParent().getOffsetHeight();
+		GWT.log("offsetwidth = " + w + ", " + h);
+		if (h == 0) h = -1;
+		frame.setPixelSize(w, h);	// frame volgt parent size, maar geen hoogte 0
 	}
 
 

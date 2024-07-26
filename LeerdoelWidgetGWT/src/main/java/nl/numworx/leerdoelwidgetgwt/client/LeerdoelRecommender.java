@@ -18,10 +18,12 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 
 import fi.dwo.gwt.lib.rest.ui.IdleDetect;
@@ -63,12 +65,26 @@ public class LeerdoelRecommender extends ResizeComposite {
 	int width;
 	OpdrNavIF comRoot;
 
+	class FollowFlow extends SimplePanel implements RequiresResize {
+
+		@Override
+		public void onResize() {
+			int h = header.getOffsetHeight();
+			int oldh = list.getWidgetSize(this).intValue();
+			if (oldh != h && h != 0)
+				list.setWidgetSize(this, h);			
+		}		
+	}
+	
+	
 	LeerdoelRecommender() {
-		list = new DockLayoutPanel(Unit.EM);
+		list = new DockLayoutPanel(Unit.PX);
 		list.addStyleName("recommender");
+		FollowFlow flow = new FollowFlow();
 		header = new Label(rb.intro());
+		flow.add(header);
 		header.addStyleName("intro");
-		list.addNorth(header, 5);
+		list.addNorth(flow, 50);
 		initWidget(list);
 	}
 
