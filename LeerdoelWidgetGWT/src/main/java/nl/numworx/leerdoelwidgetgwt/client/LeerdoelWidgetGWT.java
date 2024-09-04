@@ -353,7 +353,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			presenter.setEast(east);
 			break;
 		case 2:
-			recommender = new LeerdoelRecommender();
+			recommender = new LeerdoelRecommender(this);
 			RecommenderHeader header = new RecommenderHeader();
 			panel.add(header);
 			int margin = 10;

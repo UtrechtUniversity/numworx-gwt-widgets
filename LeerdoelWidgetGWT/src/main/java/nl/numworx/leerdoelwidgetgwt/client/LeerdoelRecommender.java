@@ -64,6 +64,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 	IdleDetect idler;
 	int width;
 	OpdrNavIF comRoot;
+	private LeerdoelWidgetGWT parent;
 
 	class FollowFlow extends SimplePanel implements RequiresResize {
 
@@ -77,7 +78,8 @@ public class LeerdoelRecommender extends ResizeComposite {
 	}
 	
 	
-	LeerdoelRecommender() {
+	LeerdoelRecommender(LeerdoelWidgetGWT parent) {
+		this.parent = parent;
 		list = new DockLayoutPanel(Unit.PX);
 		list.addStyleName("recommender");
 		FollowFlow flow = new FollowFlow();
@@ -199,7 +201,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height) {
 		SimpleLayoutPanel parent = new SimpleLayoutPanel();
 		promise.then(p -> {
-			StubWidget tekstpanel = new StubWidget(9, keyboard, idler, comRoot);
+			StubWidget tekstpanel = new StubWidget(this.parent, 9, keyboard, idler, comRoot);
 			ObjectMap launch;
 			String value = p.getValue();
 			JSONValue js;
