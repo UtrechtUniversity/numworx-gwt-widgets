@@ -39,6 +39,7 @@ import nl.uu.fi.dwo.interaction.client.keyboard.EnterType;
 public class StubWidget extends Composite implements Handler, LoadHandler, FormuleEditorIF, RequiresResize {
 
 	private static FormuleFont defaultFont;
+	private static final Logger LOG = Logger.getLogger(StubWidget.class.getName());
 
 	private native static void setState(Object inner, String state) /*-{
 		inner.setState(state);
@@ -73,8 +74,10 @@ public class StubWidget extends Composite implements Handler, LoadHandler, Formu
 	private HashMap<String, Object> lastResort;
 	private IdleDetect idler;
 	private OpdrNavIF comRoot;
+	final LeerdoelWidgetGWT parent;
 
-	public StubWidget(int id, FormuleKeyboardIF kb, IdleDetect idler, OpdrNavIF comRoot) {
+	public StubWidget(LeerdoelWidgetGWT parent, int id, FormuleKeyboardIF kb, IdleDetect idler, OpdrNavIF comRoot) {
+		this.parent = parent;
 		this.kb = kb;
 		this.idler = idler;
 		this.comRoot = comRoot;
@@ -92,7 +95,7 @@ public class StubWidget extends Composite implements Handler, LoadHandler, Formu
 	private void initFrame() {
 		frame.setPixelSize(width , height);
 		detachhandler = frame.addAttachHandler(this);
-		setWidget(frame);
+		initWidget(frame);
 	}
 
 	public void init(int width, int height, ObjectMap launch) {
@@ -338,9 +341,17 @@ public void setState(HashMap<String, Object> h) {
 
 	private void fireEvent(CBookEvent evt) {
 		if (evt.getCommand().equals("gotoPlace"))
+		{
+			String message = evt.getMessage();
+			LOG.severe("fireEvent message is " + message);
+			if (message.startsWith("s:")) {
+				evt = new CBookEvent(parent, "gotoPlace", "x" + message);
+			}
+			
 			comRoot.fireEvent(evt);
+		}
 		else if (evt.getCommand().equals("resize")) {
-			GWT.log("resize " + evt);
+			LOG.severe("resize " + evt);
 		}
 	}
 

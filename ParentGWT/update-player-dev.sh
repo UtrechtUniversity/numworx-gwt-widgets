@@ -1,6 +1,6 @@
 #!/bin/bash
 # copy to az, for teuniz.dwo.nl
-. generate-sas.sh
+. ./generate-sas.sh
 PATH=$PATH:/usr/local/bin
 set -e
 cd ../WiskOpdrPlayer;
