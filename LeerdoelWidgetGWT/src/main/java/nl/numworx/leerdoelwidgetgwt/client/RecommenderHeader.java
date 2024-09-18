@@ -2,6 +2,7 @@ package nl.numworx.leerdoelwidgetgwt.client;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -15,6 +16,8 @@ import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 public class RecommenderHeader extends Composite implements HasValueChangeHandlers<Boolean>, ClickHandler {
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);

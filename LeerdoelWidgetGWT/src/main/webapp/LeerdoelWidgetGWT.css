@@ -16,6 +16,7 @@ body {
 
 .recommender .gwt-StackLayoutPanel .gwt-StackLayoutPanelHeader {
 	background: #eee;
+	font-size: 1.3em;
 }
 
 
@@ -38,7 +39,7 @@ body {
 
 .recommender-header {
 	background-color: rgb(238, 238, 238);
-	font-size: 18px;
+	font-size: 1.5em;
 	text-align: center;
 	padding-top: 10px;
 }

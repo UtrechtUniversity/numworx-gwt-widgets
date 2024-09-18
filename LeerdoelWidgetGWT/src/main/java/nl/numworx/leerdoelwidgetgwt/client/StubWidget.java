@@ -217,6 +217,7 @@ private void publish(Object inner) {
 		if (height > 0 && height != this.height) {
 			Logger.getLogger("StubView").info("Change height to " + height);
 			frame.setPixelSize(-1, height);
+			this.height = height;
 		}
 	} catch(Exception e) {
 		Logger.getLogger("StubView").log(Level.SEVERE,"init "+ e);
@@ -742,6 +743,10 @@ public void setState(HashMap<String, Object> h) {
 		GWT.log("offsetwidth = " + w + ", " + h);
 		if (h == 0) h = -1;
 		frame.setPixelSize(w, h);	// frame volgt parent size, maar geen hoogte 0
+	}
+
+	public int getHeight() {
+		return height;
 	}
 
 

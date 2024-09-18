@@ -20,10 +20,12 @@ import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
@@ -355,6 +357,37 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case 2:
 			recommender = new LeerdoelRecommender(this);
 			RecommenderHeader header = new RecommenderHeader();
+			recommender.setComRoot(comRoot);
+// font overerven, altijd aan
+			ObjectMap instellingen = comRoot.getConfiguration();
+			// fontSize, fontName, fgColor
+			if (instellingen.containsKey("fontSize")) {
+				panel.getElement().getStyle().setFontSize(instellingen.getInt("fontSize"), Unit.PX);
+			}
+			if (instellingen.containsKey("fontName")) {
+				panel.getElement().getStyle().setProperty("fontFamily", instellingen.getString("fontName"));
+			}
+			if (instellingen.containsKey("fgColor")) {
+				String fgcolor;
+				Object o = instellingen.get("fgColor");
+				if (o instanceof JSONString) {
+					fgcolor = ((JSONString) o).stringValue();
+				} else
+				if (o instanceof String) {
+					fgcolor = o.toString();
+				} else {
+					ObjectMap m = instellingen.getObjectMap("fgColor");
+					if (m != null) {
+						int red = m.getInt("red");
+						int green = m.getInt("green");
+						int blue = m.getInt("blue");
+						fgcolor = CssColor.make(red, green, blue).value();
+					} else 
+						fgcolor = CssColor.make(0,0,0).value();
+				}
+				panel.getElement().getStyle().setColor(fgcolor);
+			}
+
 			panel.add(header);
 			int margin = 10;
 			panel.setWidgetTopHeight(header, margin, Unit.PX, header.getHeight(), Unit.PX);
@@ -370,7 +403,6 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			recommender.keyboard = root.getKeyboard();
 			recommender.idler = new IdleDetect(evbus);
 			recommender.width = width - 9;
-			recommender.comRoot = comRoot;
 			header.setCenter(recommender);
 			
 			header.addValueChangeHandler(ev -> { 

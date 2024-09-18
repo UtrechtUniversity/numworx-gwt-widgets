@@ -1,5 +1,6 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,10 +9,14 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
+import org.osgi.util.promise.Promises;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
@@ -25,6 +30,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
+import com.google.gwt.user.client.ui.Widget;
 
 import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
@@ -63,8 +69,10 @@ public class LeerdoelRecommender extends ResizeComposite {
 
 	IdleDetect idler;
 	int width;
-	OpdrNavIF comRoot;
+	private OpdrNavIF comRoot;
 	private LeerdoelWidgetGWT parent;
+	private StackLayoutPanel stack;
+	private List<Promise<StubWidget>> widgets = new ArrayList<>();
 
 	class FollowFlow extends SimplePanel implements RequiresResize {
 
@@ -77,6 +85,19 @@ public class LeerdoelRecommender extends ResizeComposite {
 		}		
 	}
 	
+	class Selector implements SelectionHandler<Integer> {
+
+		@Override
+		public void onSelection(SelectionEvent<Integer> event) {
+			int index = event.getSelectedItem();
+			final Promise<StubWidget> p = widgets.get(index);
+			if (!p.isDone()) return;
+			StubWidget s = p.getValue();
+			LOG.severe("hoogte " + s.getOffsetHeight() + " wanted " + s.getHeight());
+			
+		}
+		
+	}
 	
 	LeerdoelRecommender(LeerdoelWidgetGWT parent) {
 		this.parent = parent;
@@ -88,6 +109,14 @@ public class LeerdoelRecommender extends ResizeComposite {
 		header.addStyleName("intro");
 		list.addNorth(flow, 50);
 		initWidget(list);
+	}
+
+	OpdrNavIF getComRoot() {
+		return comRoot;
+	}
+
+	void setComRoot(OpdrNavIF comRoot) {
+		this.comRoot = comRoot;
 	}
 
 	public void setObjectives(List<String> objectives) {
@@ -110,7 +139,8 @@ public class LeerdoelRecommender extends ResizeComposite {
 	
 	Promise<?> setModelScore(DomStudentModelContext4Student studentModel, DomStudentModelDataScore s, DomMethod activeMethod) {		
 		int cnt = 0;
-		StackLayoutPanel stack = new StackLayoutPanel(Unit.EM);
+		stack = new StackLayoutPanel(Unit.EM);
+		stack.setAnimationDuration(0);
 		for (String o : objectives) {	
 			
 			DomStudentModelContextInfo info = getInfo(studentModel, o);
@@ -122,7 +152,9 @@ public class LeerdoelRecommender extends ResizeComposite {
 				continue;
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			Label title = new Label(getTitle(info));
-			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200);
+			Deferred<StubWidget> defer = new Deferred<>();
+			widgets.add(defer.getPromise());
+			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200, defer);
 			com.google.gwt.user.client.ui.Widget panel = east;
 			if (showScore) {
 				DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
@@ -136,6 +168,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 		if (cnt == 0) header.setText(rb.allok());
 		else
 			list.add(stack);
+		stack.addSelectionHandler(new Selector());
 		list.forceLayout();
 		RootLayoutPanel.get().setStyleName("alert", cnt!=0);
 		return null;
@@ -198,7 +231,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 		this.showScore = showScore;
 	}
 
-	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height) {
+	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height, Deferred<StubWidget> defer) {
 		SimpleLayoutPanel parent = new SimpleLayoutPanel();
 		promise.then(p -> {
 			StubWidget tekstpanel = new StubWidget(this.parent, 9, keyboard, idler, comRoot);
@@ -216,7 +249,11 @@ public class LeerdoelRecommender extends ResizeComposite {
 			
 			tekstpanel.init(width, height, launch);
 			parent.add(tekstpanel);
+			defer.resolve(tekstpanel);
 			return null;
+		}).then(null, (p)  -> {
+			GWT.log("ERROR in tekstPanel", p.getFailure());
+			parent.add(new Label(p.getFailure().toString()));
 		});
 		return parent;
 	}
