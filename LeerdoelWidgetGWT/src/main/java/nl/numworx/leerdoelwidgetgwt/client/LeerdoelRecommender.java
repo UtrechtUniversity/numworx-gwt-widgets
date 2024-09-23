@@ -14,10 +14,12 @@ import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Composite;
@@ -137,7 +139,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 	}
 	
 	
-	Promise<?> setModelScore(DomStudentModelContext4Student studentModel, DomStudentModelDataScore s, DomMethod activeMethod) {		
+	Promise<Integer> setModelScore(DomStudentModelContext4Student studentModel, DomStudentModelDataScore s, DomMethod activeMethod) {		
 		int cnt = 0;
 		stack = new StackLayoutPanel(Unit.EM);
 		stack.setAnimationDuration(0);
@@ -168,10 +170,24 @@ public class LeerdoelRecommender extends ResizeComposite {
 		if (cnt == 0) header.setText(rb.allok());
 		else
 			list.add(stack);
-		stack.addSelectionHandler(new Selector());
+		//stack.addSelectionHandler(new Selector());
 		list.forceLayout();
 		RootLayoutPanel.get().setStyleName("alert", cnt!=0);
 		return null;
+	}
+
+	protected Promise<Integer> extradiff() {
+		return Promises.all(widgets).then(p -> {
+			int max = 0;
+			int wanted = 0;
+			for(Promise<StubWidget> w : widgets) {
+				StubWidget ss = w.getValue();
+				max = Math.max(ss.getOffsetHeight(), max);
+				wanted = Math.max(ss.getHeight(), wanted);
+			}
+			int extra = wanted - max;
+			return Promises.resolved(extra);
+		});
 	}
 	
 	
@@ -231,6 +247,15 @@ public class LeerdoelRecommender extends ResizeComposite {
 		this.showScore = showScore;
 	}
 
+	private static native void shift5(JavaScriptObject o) /*-{
+		o.shift();
+		o.shift();
+		o.shift();
+		o.shift();
+		o.shift();
+	}-*/;
+	
+	
 	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height, Deferred<StubWidget> defer) {
 		SimpleLayoutPanel parent = new SimpleLayoutPanel();
 		promise.then(p -> {
@@ -243,7 +268,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 			js = js.isObject().get("interactiePanelLaunchData");
 			js = js.isArray().get(5);
 			js = js.isObject().get("interactiePanelLaunchState");
-			
+// FIXME Altijd 1 hok er omheen. Je ziet niets als dat niet zo is.			
 			LOG.info(js.toString());
 			launch = JSONUtilities.wrapMap(js.isObject());
 			

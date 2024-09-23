@@ -20,9 +20,11 @@ import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
+import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.json.client.JSONString;
@@ -281,6 +283,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		}
 	}
 	
+	boolean pasAanH = true;
 	
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
@@ -410,7 +413,26 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 				parameters.put("width", width = panel.getOffsetWidth());
 				parameters.put("height", wantedheight = height);
 				if (!ev.getValue().booleanValue())
-					parameters.put("height", wantedheight = header.getHeight() + margin*2);
+				{	parameters.put("height", wantedheight = header.getHeight() + margin*2);
+				} else {
+					if (pasAanH)
+					AnimationScheduler.get().requestAnimationFrame
+					
+					((t) -> {
+						recommender.extradiff().then( qq ->  { int extra = qq.getValue(); 
+						GWT.log("extra is = " + extra);
+						if (pasAanH && extra != 0) {
+							this.height += extra;
+							parameters.put("height", wantedheight = height);
+							comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
+							pasAanH = false;
+						}
+							return null; });
+						
+						
+						
+					});
+				}
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
 			});
 			break;
