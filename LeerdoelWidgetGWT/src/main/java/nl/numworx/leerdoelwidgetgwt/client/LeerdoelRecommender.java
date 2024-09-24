@@ -179,11 +179,8 @@ public class LeerdoelRecommender extends ResizeComposite {
 	protected Promise<Integer> extradiff() {
 		if (widgets.isEmpty()) {
 			// only header in view
-			int h = list.getWidgetSize(header.getParent()).intValue();
-			LOG.warning("eerst h " + h);
-			h = header.getOffsetHeight();
+			int h = header.getOffsetHeight();
 			int l = list.getOffsetHeight();
-			LOG.warning(" widget empty" + h + ", " + l + " , " + stack.getOffsetHeight());
 			return Promises.resolved(h-l);
 		}
 		return Promises.all(widgets).then(p -> {
