@@ -57,6 +57,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 
 public class LeerdoelRecommender extends ResizeComposite {
 	
+	private static final String $IMAGE$MAP$ = "$IMAGE$MAP$";
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
     private final static String lang = LocaleInfo.getCurrentLocale().getLocaleName();
     private static java.util.logging.Logger LOG = Logger.getLogger("LeerdoelRecommender");
@@ -270,12 +271,19 @@ public class LeerdoelRecommender extends ResizeComposite {
 			String value = p.getValue();
 			JSONValue js;
 			js = JSONParser.parseLenient(value);
+			JSONValue imagemap = js.isObject().get($IMAGE$MAP$);
+			if (imagemap != null) imagemap = imagemap.isObject();
 			js = js.isObject().get("opdracht_1_1");
 			js = js.isObject().get("interactiePanelLaunchData");
 			js = js.isArray().get(5);
 			js = js.isObject().get("interactiePanelLaunchState");
 // FIXME Altijd 1 hok er omheen. Je ziet niets als dat niet zo is.			
+
+			if (imagemap != null) {
+				js.isObject().put($IMAGE$MAP$, imagemap);
+			}
 			LOG.info(js.toString());
+			
 			launch = JSONUtilities.wrapMap(js.isObject());
 			
 			tekstpanel.init(width, height, launch);
