@@ -1,5 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import java.util.HashMap;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
@@ -70,5 +72,13 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	public int getHeight() { 
 		return HEIGHT;
 	}
+
+	public void getState(HashMap<String, Object> state) {
+		state.put("down", down);		
+	}
 	
+	public void setState(ObjectMap state) {
+		down = state.getBoolean("down", false);
+		updateUpDown();
+	}
 }

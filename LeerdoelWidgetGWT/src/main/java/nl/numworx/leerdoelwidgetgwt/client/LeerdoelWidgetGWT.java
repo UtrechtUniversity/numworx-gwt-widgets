@@ -15,6 +15,7 @@ import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
+import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.FailedPromisesException;
 import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
@@ -90,6 +91,13 @@ import nl.uu.fi.dwo.rest.util.Dwo2LocaleMessageTranslator;
  */
 public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter, SwitchViewEventHandler, CBookEventListener {
 
+	enum Type {
+		GRAPH,
+		TREE,
+		RECOMMENDER,
+	}
+	
+	
 	private static final Failure FAILURE = new Failure() {
 
 		@Override
@@ -136,7 +144,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean voorkennisMenu;
 	private boolean voorkennisKnop;
 	private boolean leerdoelPopup;
-	private int type;
+	private Type type;
 	private EventBus evbus;
 	
 	@SuppressWarnings("unchecked")
@@ -175,11 +183,34 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 	@Override
 	public HashMap<String, Object> getState() {
-		return new HashMap<>();
+		HashMap<String, Object> state = new HashMap<>();
+		switch(type) {
+		case RECOMMENDER:
+			recommender.getState(state);
+			header.getState(state);
+		case TREE:
+		case GRAPH:
+		}
+		return state;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+		ObjectMap state = JSONUtilities.wrapMap(h);
+		switch(type) {
+		case RECOMMENDER:
+			try {
+				ready.resolveWith(recommender.extradiff());
+			} catch (Exception e) {
+			}
+			ready.getPromise().onResolve( () -> {
+				recommender.setState(state);
+				header.setState(state);
+			});
+			break;
+		case TREE:
+		case GRAPH:
+		}
 	}
 
 	@Override
@@ -225,7 +256,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		}
 	}
 	
-	
+	Deferred<Object> ready = new Deferred<>();
 
 	class LearnerAPI implements RoleAPI {
 		final StudentResultsService service;
@@ -284,6 +315,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	}
 	
 	boolean pasAanH = true;
+	private RecommenderHeader header;
 	
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
@@ -331,14 +363,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		DescriptionPresenter service;
 		switch(type) {
 		
-		case 0: // graph
+		case GRAPH: // graph
 			DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
 			graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
 			panel.add(graph);
 			panel.setWidgetLeftRight(graph, 0, Unit.PX, 0, Unit.PX);
 			panel.setWidgetTopBottom(graph, 0, Unit.PX, 0, Unit.PX);
 			break;
-		case 1: //lijst
+		case TREE: //lijst
 			Panel parent = new ScrollPanel();
 			panel.add(parent);
 			int right = Math.min(440, width/2);
@@ -357,9 +389,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			presenter.setView(tree);
 			presenter.setEast(east);
 			break;
-		case 2:
+		case RECOMMENDER:
 			recommender = new LeerdoelRecommender(this);
-			RecommenderHeader header = new RecommenderHeader();
+			header = new RecommenderHeader();
 			recommender.setComRoot(comRoot);
 // font overerven, altijd aan
 			ObjectMap instellingen = comRoot.getConfiguration();
@@ -419,7 +451,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 					AnimationScheduler.get().requestAnimationFrame
 					
 					((t) -> {
-						recommender.extradiff().then( qq ->  { int extra = qq.getValue(); 
+						Promise<Object> x = recommender.extradiff().then( qq ->  { int extra = qq.getValue(); 
 						GWT.log("extra is = " + extra);
 						if (pasAanH && extra != 0) {
 							this.height += extra;
@@ -428,7 +460,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 							pasAanH = false;
 						}
 							return null; });
-						
+						try {
+							ready.resolveWith(x);
+						} catch (Exception e) {
+						}
 						
 						
 					});
@@ -521,7 +556,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	     zoomKnoppen = false;
 	     filterHeader = false;
 	     leerdoelScore = false;
-	     type = 0;
+	     type = Type.GRAPH;
 	     objectives = Collections.emptyList();
 	    
 	    if(h.containsKey("activeMethod"))
@@ -543,7 +578,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	    if(h.containsKey("leerdoelScore"))
 	      leerdoelScore = h.getBoolean("leerdoelScore");
 	    if (h.containsKey("type"))
-	    	type = h.getInt("type");
+	    	type = Type.values()[h.getInt("type")];
 	    if (h.containsKey("objectives"))
 	    	objectives = h.getStringList("objectives");
 	    
@@ -562,18 +597,18 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
 // bij recommender(2): altijd score ophalen!
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore || type == 2 ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
+				leerdoelScore || type == Type.RECOMMENDER ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
 
 		switch(type) {
-		case 0:		
+		case GRAPH:		
 			graph.setModelScore(studentModel, s, activeMethod);
 		    graph.doFilter(filter);
 		    if (!leerdoelScore) graph.zoomFit();
 		    break;
-		case 1:
+		case TREE:
 			presenter.setModelScore(studentModel, s, activeMethod);
 			break;
-		case 2:
+		case RECOMMENDER:
 			recommender.setModelScore(studentModel, s, activeMethod);
 			break;
 		}
@@ -644,7 +679,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 	@Override
 	public int getConstantHeight() { // niet goed, alleen in uitgeklapt?
-		if (type != 0) return wantedheight;
+		if (type != Type.GRAPH) return wantedheight;
 		return 0;
 	}
 	

@@ -1,7 +1,6 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,16 +18,13 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RequiresResize;
 import com.google.gwt.user.client.ui.ResizeComposite;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimpleLayoutPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
@@ -41,10 +37,7 @@ import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
-import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
-import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel;
-import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.EastPanel_Factory;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.Util;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelCategory;
@@ -75,7 +68,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 	private OpdrNavIF comRoot;
 	private LeerdoelWidgetGWT parent;
 	private StackLayoutPanel stack;
-	private List<Promise<StubWidget>> widgets = new ArrayList<>();
+	private Deferred<List<Promise<StubWidget>>> widgets = new Deferred<>();
 
 	class FollowFlow extends SimplePanel implements RequiresResize {
 
@@ -93,7 +86,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 		@Override
 		public void onSelection(SelectionEvent<Integer> event) {
 			int index = event.getSelectedItem();
-			final Promise<StubWidget> p = widgets.get(index);
+			final Promise<StubWidget> p = widgets.getPromise().flatMap(w -> w.get(index));
 			if (!p.isDone()) return;
 			StubWidget s = p.getValue();
 			LOG.severe("hoogte " + s.getOffsetHeight() + " wanted " + s.getHeight());
@@ -139,11 +132,19 @@ public class LeerdoelRecommender extends ResizeComposite {
 		return AbstractStudentModelPresenter.getTitle(info, lang);
 	}
 	
+	static class HeaderLabel extends Label {
+		final String objective;
+		HeaderLabel(String text, String objective) {
+			super(text);
+			this.objective = objective;
+		}
+	}
 	
 	Promise<Integer> setModelScore(DomStudentModelContext4Student studentModel, DomStudentModelDataScore s, DomMethod activeMethod) {		
 		int cnt = 0;
 		stack = new StackLayoutPanel(Unit.EM);
 		stack.setAnimationDuration(0);
+		List<Promise<StubWidget>> widgets = new ArrayList<>();
 		for (String o : objectives) {	
 			
 			DomStudentModelContextInfo info = getInfo(studentModel, o);
@@ -154,7 +155,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 			if (greenPerc > 50) 
 				continue;
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
-			Label title = new Label(getTitle(info));
+			Label title = new HeaderLabel(getTitle(info),o);
 			Deferred<StubWidget> defer = new Deferred<>();
 			widgets.add(defer.getPromise());
 			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200, defer);
@@ -174,27 +175,31 @@ public class LeerdoelRecommender extends ResizeComposite {
 		//stack.addSelectionHandler(new Selector());
 		list.forceLayout();
 		RootLayoutPanel.get().setStyleName("alert", cnt!=0);
+		this.widgets.resolve(widgets);
 		return null;
 	}
 
 	protected Promise<Integer> extradiff() {
-		if (widgets.isEmpty()) {
+		return widgets.getPromise().flatMap( 
+				wl -> {
+		if (wl.isEmpty()) {
 			// only header in view
 			int h = header.getOffsetHeight();
 			int l = list.getOffsetHeight();
 			return Promises.resolved(h-l);
-		}
-		return Promises.all(widgets).then(p -> {
+		};
+		
+		return Promises.all(wl).then(p -> {
 			int max = 0;
 			int wanted = 0;
-			for(Promise<StubWidget> w : widgets) {
+			for(Promise<StubWidget> w : wl) {
 				StubWidget ss = w.getValue();
 				max = Math.max(ss.getOffsetHeight(), max);
 				wanted = Math.max(ss.getHeight(), wanted);
 			}
 			int extra = wanted - max;
 			return Promises.resolved(extra);
-		});
+		});});
 	}
 	
 	
@@ -295,6 +300,29 @@ public class LeerdoelRecommender extends ResizeComposite {
 			parent.add(new Label(p.getFailure().toString()));
 		});
 		return parent;
+	}
+
+	HashMap<String, Object> getState(HashMap<String, Object> result) {
+		int selection = stack.getVisibleIndex();
+		if (selection < 0) return result;
+		Widget w = stack.getHeaderWidget(selection);
+		HeaderLabel h = (HeaderLabel) w;
+		String objective = h.objective;
+		result.put("selected", objective);		
+		return result;
+	}
+
+	void setState(ObjectMap state) {
+		String objective = state.getString("selected");
+		int n = stack.getWidgetCount();
+		for(int i = 0; i < n; i++) {
+			Widget w = stack.getHeaderWidget(i);
+			HeaderLabel h = (HeaderLabel) w;
+			if  (h.objective.equals(objective)) {
+				stack.showWidget(i);
+				break;
+			}
+		}
 	}
 
 }
