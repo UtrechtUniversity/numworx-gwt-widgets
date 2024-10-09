@@ -15,6 +15,7 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Timer;
@@ -395,6 +396,7 @@ public void setState(HashMap<String, Object> h) {
 //		}
 		JSONObject object = new JSONObject();
 		object.put("premium", JSONBoolean.getInstance(isPremium())); //werkt altijd!
+		object.put("lesson_mode", new JSONString("normal"));
 		return JSONUtilities.wrapMap(object);
 	}
 
