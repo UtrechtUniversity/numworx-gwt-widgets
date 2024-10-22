@@ -152,7 +152,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 				continue;
 			DomStudentModelScore<?> score = getScore(s.getDomStudentModelStructureScore(), o);
 			double greenPerc = Util.getGreen(score) * 200;
-			if (greenPerc > 50) 
+			if (greenPerc >= 90) 
 				continue;
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			Label title = new HeaderLabel(getTitle(info),o);
