@@ -22,6 +22,7 @@
   <modules>
 	<module>../WiskOpdrPlayer</module>
 	<module>../WidgetPlayer</module>
+	<module>../PrintPlayer</module>
 	<module>../AIModelGWT</module>
   	<module>../AlgebraExprGWT</module>
   	<module>../AlgebraPijlenGWT</module>
