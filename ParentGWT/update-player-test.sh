@@ -18,7 +18,7 @@ T=$W/apps/DWOplayer
 OPTIONS=-rclD
 mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=OBFUSCATED
 (cd target/WiskOpdrPlayer; 
-    rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css $W/apps/;\
+    rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css PrintPlayer.css $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
 	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
 	aws $PROD s3 cp --acl public-read PrintPlayer.css $S3/;\
