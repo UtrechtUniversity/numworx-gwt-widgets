@@ -34,6 +34,7 @@ import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
+import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
@@ -303,16 +304,19 @@ public class LeerdoelRecommender extends ResizeComposite {
 	}
 
 	HashMap<String, Object> getState(HashMap<String, Object> result) {
-		int selection = stack.getVisibleIndex();
-		if (selection < 0) return result;
-		Widget w = stack.getHeaderWidget(selection);
-		HeaderLabel h = (HeaderLabel) w;
-		String objective = h.objective;
-		result.put("selected", objective);		
+		if (stack != null) {
+			int selection = stack.getVisibleIndex();
+			if (selection < 0) return result;
+			Widget w = stack.getHeaderWidget(selection);
+			HeaderLabel h = (HeaderLabel) w;
+			String objective = h.objective;
+			result.put("selected", objective);		
+		}
 		return result;
 	}
 
 	void setState(ObjectMap state) {
+		if (stack != null) {
 		String objective = state.getString("selected");
 		int n = stack.getWidgetCount();
 		for(int i = 0; i < n; i++) {
@@ -322,7 +326,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 				stack.showWidget(i);
 				break;
 			}
-		}
+		}}
 	}
 
 }

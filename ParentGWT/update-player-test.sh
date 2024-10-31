@@ -16,7 +16,7 @@ T=$W/apps/DWOplayer
 #T=$W/apps/noordhoff/DWOplayer
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=OBFUSCATED
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
 (cd target/WiskOpdrPlayer; 
     rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css PrintPlayer.css $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
