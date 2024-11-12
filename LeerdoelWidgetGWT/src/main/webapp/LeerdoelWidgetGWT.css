@@ -17,6 +17,8 @@ body {
 .recommender .gwt-StackLayoutPanel .gwt-StackLayoutPanelHeader {
 	background: #eee;
 	font-size: 1.3em;
+	text-overflow: ellipsis;
+	text-wrap: nowrap;
 }
 
 
