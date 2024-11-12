@@ -19,6 +19,7 @@ body {
 	font-size: 1.3em;
 	text-overflow: ellipsis;
 	text-wrap: nowrap;
+	overflow-x: clip
 }
 
 
