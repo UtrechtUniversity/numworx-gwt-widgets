@@ -315,7 +315,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	}
 	
 	boolean pasAanH = true;
-	private RecommenderHeader header;
+	RecommenderHeader header;
 	
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
@@ -681,6 +681,16 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public int getConstantHeight() { // niet goed, alleen in uitgeklapt?
 		if (type != Type.GRAPH) return wantedheight;
 		return 0;
+	}
+
+	public void requestDelta(int extra) {
+		if (extra != 0) {
+			HashMap<String,Number> parameters = new HashMap<>();
+			parameters.put("width", width = panel.getOffsetWidth());
+			this.height += extra;
+			parameters.put("height", wantedheight = height);
+			root.fireEvent(new CBookEvent(this, "resize", parameters));
+		}
 	}
 	
 	

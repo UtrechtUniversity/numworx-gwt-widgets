@@ -1,6 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
+import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Style.Unit;
@@ -49,7 +51,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 
-public class LeerdoelRecommender extends ResizeComposite {
+public class LeerdoelRecommender extends ResizeComposite implements SelectionHandler<Integer> {
 	
 	private static final String $IMAGE$MAP$ = "$IMAGE$MAP$";
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
@@ -82,19 +84,19 @@ public class LeerdoelRecommender extends ResizeComposite {
 		}		
 	}
 	
-	class Selector implements SelectionHandler<Integer> {
-
-		@Override
-		public void onSelection(SelectionEvent<Integer> event) {
-			int index = event.getSelectedItem();
-			final Promise<StubWidget> p = widgets.getPromise().flatMap(w -> w.get(index));
-			if (!p.isDone()) return;
-			StubWidget s = p.getValue();
-			LOG.severe("hoogte " + s.getOffsetHeight() + " wanted " + s.getHeight());
-			
-		}
-		
-	}
+//	class Selector implements SelectionHandler<Integer> {
+//
+//		@Override
+//		public void onSelection(SelectionEvent<Integer> event) {
+//			int index = event.getSelectedItem();
+//			final Promise<StubWidget> p = widgets.getPromise().flatMap(w -> w.get(index));
+//			if (!p.isDone()) return;
+//			StubWidget s = p.getValue();
+//			LOG.severe("hoogte " + s.getOffsetHeight() + " wanted " + s.getHeight());
+//			
+//		}
+//		
+//	}
 	
 	LeerdoelRecommender(LeerdoelWidgetGWT parent) {
 		this.parent = parent;
@@ -135,9 +137,12 @@ public class LeerdoelRecommender extends ResizeComposite {
 	
 	static class HeaderLabel extends Label {
 		final String objective;
-		HeaderLabel(String text, String objective) {
+		final Promise<StubWidget> widget;
+		HeaderLabel(String text, String objective, Promise<StubWidget> promise) {
 			super(text);
 			this.objective = objective;
+			this.widget = promise;
+			this.setTitle(text);
 		}
 	}
 	
@@ -145,6 +150,7 @@ public class LeerdoelRecommender extends ResizeComposite {
 		int cnt = 0;
 		stack = new StackLayoutPanel(Unit.EM);
 		stack.setAnimationDuration(0);
+		stack.addSelectionHandler(this);
 		List<Promise<StubWidget>> widgets = new ArrayList<>();
 		for (String o : objectives) {	
 			
@@ -156,8 +162,8 @@ public class LeerdoelRecommender extends ResizeComposite {
 			if (greenPerc >= 90) 
 				continue;
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
-			Label title = new HeaderLabel(getTitle(info),o);
 			Deferred<StubWidget> defer = new Deferred<>();
+			Label title = new HeaderLabel(getTitle(info), o, defer.getPromise());
 			widgets.add(defer.getPromise());
 			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200, defer);
 			com.google.gwt.user.client.ui.Widget panel = east;
@@ -180,9 +186,8 @@ public class LeerdoelRecommender extends ResizeComposite {
 		return null;
 	}
 
-	protected Promise<Integer> extradiff() {
-		return widgets.getPromise().flatMap( 
-				wl -> {
+	private Promise<Integer> calcdiff(List<Promise<StubWidget>> wl) 
+	{
 		if (wl.isEmpty()) {
 			// only header in view
 			int h = header.getOffsetHeight();
@@ -198,9 +203,16 @@ public class LeerdoelRecommender extends ResizeComposite {
 				max = Math.max(ss.getOffsetHeight(), max);
 				wanted = Math.max(ss.getHeight(), wanted);
 			}
-			int extra = wanted - max;
+			int extra = 12 + wanted - max;
 			return Promises.resolved(extra);
-		});});
+		});
+	}	
+	
+	protected Promise<Integer> extradiff() {
+		return widgets.getPromise().flatMap(this::calcdiff);
+	}
+	protected Promise<Integer> singlediff(Promise<StubWidget> w) {
+		return calcdiff(Collections.singletonList(w));
 	}
 	
 	
@@ -328,5 +340,22 @@ public class LeerdoelRecommender extends ResizeComposite {
 			}
 		}}
 	}
+
+	@Override
+	public void onSelection(SelectionEvent<Integer> event) {
+		int selected = event.getSelectedItem();
+		AnimationScheduler.get().requestAnimationFrame( (t) -> {
+		HeaderLabel label = (HeaderLabel) stack.getHeaderWidget(selected);
+// de single diff berekeing werkt alleen als widget zichtbaar is.		
+		Promise<Integer> diff = singlediff(label.widget);
+		diff.onResolve(() -> {
+			int current = stack.getVisibleIndex();
+			boolean down = parent.header.isDown();
+			if (current == selected && down) {
+				int delta = diff.getValue().intValue();
+				parent.requestDelta(delta);
+			}
+		});
+	});}
 
 }
