@@ -240,7 +240,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private LeerdoelTree tree;
 	private LeerdoelPresenter presenter;
 	private EastPanel east;
-	private LeerdoelRecommender recommender;
+	LeerdoelRecommender recommender;
 	private List<String> objectives;
 	private int wantedheight;
 
@@ -470,6 +470,13 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 				}
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
 			});
+			int wanted = 220 + objectives.size() * 30; 
+			if (height < wanted) {
+				HashMap<String,Number> parameters = new HashMap<>();
+				parameters.put("width", width);
+				parameters.put("height", height = wanted);
+				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));			
+			}		
 			break;
 		}
 		

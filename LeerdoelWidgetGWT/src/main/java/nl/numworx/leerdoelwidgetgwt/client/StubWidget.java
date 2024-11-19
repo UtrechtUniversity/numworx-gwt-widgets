@@ -11,6 +11,7 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONObject;
@@ -23,6 +24,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.RequiresResize;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.web.bindery.event.shared.HandlerRegistration;
 
 import fi.dwo.gwt.lib.rest.ui.IdleDetect;
@@ -354,6 +356,13 @@ public void setState(HashMap<String, Object> h) {
 		}
 		else if (evt.getCommand().equals("resize")) {
 			LOG.severe("resize " + evt);
+			ObjectMap parameters = JSONUtilities.wrapMap(evt.getParameters());
+			int h = parameters.getInt("height");
+			int w = parameters.getInt("width");
+			width = w; height = h; // is dit okay?
+// big hack
+			StackLayoutPanel s = parent.recommender.stack;
+			SelectionEvent.fire(s, s.getVisibleIndex());
 		}
 	}
 

@@ -36,7 +36,6 @@ import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
-import nl.uu.fi.dwo.interaction.client.LessonMode;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
@@ -70,7 +69,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	int width;
 	private OpdrNavIF comRoot;
 	private LeerdoelWidgetGWT parent;
-	private StackLayoutPanel stack;
+	StackLayoutPanel stack;
 	private Deferred<List<Promise<StubWidget>>> widgets = new Deferred<>();
 
 	class FollowFlow extends SimplePanel implements RequiresResize {
@@ -209,7 +208,12 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	}	
 	
 	protected Promise<Integer> extradiff() {
-		return widgets.getPromise().flatMap(this::calcdiff);
+		return widgets.getPromise()
+				.map( l -> {
+					if (l.isEmpty() || stack == null) return l;
+					return Collections.singletonList(l.get(stack.getVisibleIndex())); // only one
+				})
+				.flatMap(this::calcdiff);
 	}
 	protected Promise<Integer> singlediff(Promise<StubWidget> w) {
 		return calcdiff(Collections.singletonList(w));
