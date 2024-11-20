@@ -1,6 +1,6 @@
 #!/bin/sh
 set -ex
-. generate-sas.sh
+. ./generate-sas.sh
 sh update-app-az-dev.sh AIModelGWT aimodelgwt AIModelGWT
 sh update-app-az-dev.sh AlgebraExprGWT algebraexprgwt AlgebraExprGWT
 sh update-app-az-dev.sh AlgebraPijlenGWT algebrapijlengwt AlgebraPijlenGWT
@@ -32,4 +32,3 @@ sh update-app-az-dev.sh VerknippenGWT verknippengwt VerknippenGWT
 sh update-app-az-dev.sh WebLogoGWT weblogogwt WebLogoGWT
 sh update-app-az-dev.sh WebLogo3dGWT weblogo3dgwt WebLogo3dGWT
 sh update-app-az-dev.sh GeoDefinerGWT geodefinergwt GeoDefinerGWT
-

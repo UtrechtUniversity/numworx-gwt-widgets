@@ -62,3 +62,7 @@ body {
 .recommender .intro {
 	padding-bottom: 10px;
 }
+
+.parent-iframe div {
+	overflow-y: auto !important;
+}

@@ -16,6 +16,7 @@ import org.osgi.util.promise.Promises;
 import com.google.gwt.animation.client.AnimationScheduler;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Style.Overflow;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
@@ -287,6 +288,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	
 	SimpleLayoutPanel tekstPanel(Promise<String> promise, int width, int height, Deferred<StubWidget> defer) {
 		SimpleLayoutPanel parent = new SimpleLayoutPanel();
+		parent.addStyleName("parent-iframe");
 		promise.then(p -> {
 			StubWidget tekstpanel = new StubWidget(this.parent, 9, keyboard, idler, comRoot);
 			ObjectMap launch;
