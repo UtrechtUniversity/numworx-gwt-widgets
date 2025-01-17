@@ -81,6 +81,12 @@
 			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
+                <dependency>
+                        <groupId>com.googlecode.mgwt</groupId>
+                        <artifactId>mgwt</artifactId>
+                        <scope>provided</scope>
+                        <version>2.0.0</version>
+                </dependency>
   </dependencies>
   <build>
 	<finalName>${finalName}</finalName>
