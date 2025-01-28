@@ -169,7 +169,8 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 			com.google.gwt.user.client.ui.Widget panel = east;
 			if (showScore) {
 				DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
-				p.addSouth(Util.scoreItem("", score, Util.MAX_LEVEL), 2); // als in eastPanel
+				Optional<String> empty = Optional.empty();
+				p.addSouth(Util.scoreItem("", score, Util.MAX_LEVEL, empty), 2); // als in eastPanel
 				p.add(east);
 				panel = p;
 			}
