@@ -1,7 +1,7 @@
 /**
  * sql-worker.js
  */
-importScripts("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/sql-wasm.js");
+importScripts("https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/sql-wasm.js");
 
 let dbmap = { };
 
@@ -41,7 +41,7 @@ self.input = async function() {
 async function loadSQL(databaseFile) {
 
     const SQL = await initSqlJs({
-        locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.1/${file}`
+        locateFile: (file) => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.12.0/${file}`
     });
     
     
