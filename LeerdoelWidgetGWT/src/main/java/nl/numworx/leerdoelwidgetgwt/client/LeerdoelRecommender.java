@@ -1,6 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
+import nl.uu.fi.dwo.rest.util.StudentModelUtil;
 
 public class LeerdoelRecommender extends ResizeComposite implements SelectionHandler<Integer> {
 	
@@ -59,7 +61,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
     private static java.util.logging.Logger LOG = Logger.getLogger("LeerdoelRecommender");
 	
 	private DockLayoutPanel list;
-	private List<String> objectives;
+	private Collection<String> objectives;
 	private DescriptionService service;
 	FormuleKeyboardIF keyboard;
 	private boolean showScore = true;
@@ -119,7 +121,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	}
 
 	public void setObjectives(List<String> objectives) {
-		this.objectives = objectives.stream().map(this::strip).collect(Collectors.toList());
+		this.objectives = StudentModelUtil.strip(objectives);
 // debuggertje:
 //		for (String o : objectives) {
 //			Label l = new Label(o);
@@ -129,7 +131,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	}
 
 	private String strip(String in) {
-		return in.split("/",2)[0];
+		return StudentModelUtil.strip(in);
 	}
 	private String getTitle(DomStudentModelContextInfo info) {
 		return AbstractStudentModelPresenter.getTitle(info, lang);
