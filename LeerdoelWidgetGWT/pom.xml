@@ -357,5 +357,5 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<version>2.5.36-SNAPSHOT</version>
+	<version>2.5.39-SNAPSHOT</version>
 </project>
