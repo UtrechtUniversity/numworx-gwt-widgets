@@ -19,3 +19,10 @@ mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.s
 
 	azcopy sync WidgetPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
 )
+cd ../PrintPlayer
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
+(cd target/PrintPlayer;
+
+        azcopy sync PrintPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/PrintPlayer/?"$SAS" --recursive=true --delete-destination true
+)
+

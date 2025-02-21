@@ -16,7 +16,7 @@
 	<gwtModule>${project.groupId}.WiskOpdrPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
 	<runTarget>${project.artifactId}.html</runTarget>
-	<gwtVersion>2.9.0</gwtVersion>
+	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>
     <dependencies>

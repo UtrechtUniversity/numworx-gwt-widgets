@@ -16,7 +16,7 @@
 	<gwtModule>${project.groupId}.WidgetPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
 	<runTarget>${project.artifactId}.html</runTarget>
-	<gwtVersion>2.9.0</gwtVersion>
+	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -81,12 +81,6 @@
 			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
-                <dependency>
-                        <groupId>com.googlecode.mgwt</groupId>
-                        <artifactId>mgwt</artifactId>
-                        <scope>provided</scope>
-                        <version>2.0.0</version>
-                </dependency>
   </dependencies>
   <build>
 	<finalName>${finalName}</finalName>
