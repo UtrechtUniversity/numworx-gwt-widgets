@@ -39,6 +39,8 @@ import nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages;
 import nl.uu.fi.dwo.interaction.client.FormuleKeyboardIF;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+import nl.uu.fi.dwo.interaction.client.Role;
+import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
@@ -59,6 +61,14 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	private static final LeerdoelWidgetMessages rb = GWT.create(LeerdoelWidgetMessages.class);
     private final static String lang = LocaleInfo.getCurrentLocale().getLocaleName();
     private static java.util.logging.Logger LOG = Logger.getLogger("LeerdoelRecommender");
+    
+    private final static String PASSED = "action.passed";
+    private final static String FAILED = "action.failed";
+    
+    private void fire(boolean mastered) {   	
+    	CBookEvent event = new CBookEvent(mastered ? PASSED : FAILED);
+		comRoot.fireEvent(event);
+    }
 	
 	private DockLayoutPanel list;
 	private Collection<String> objectives;
@@ -153,6 +163,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		stack = new StackLayoutPanel(Unit.EM);
 		stack.setAnimationDuration(0);
 		stack.addSelectionHandler(this);
+		double[] scoreBoard = new double[objectives.size()];
 		List<Promise<StubWidget>> widgets = new ArrayList<>();
 		for (String o : objectives) {	
 			
@@ -163,6 +174,12 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 			double greenPerc = Util.getGreen(score) * 200;
 			if (greenPerc >= 90) 
 				continue;
+			int insert = 0;
+			while(insert < cnt && scoreBoard[insert] < greenPerc) insert ++;
+			System.arraycopy(scoreBoard, insert, scoreBoard, insert+1, cnt-insert);
+			scoreBoard[insert] = greenPerc;
+			
+			
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			Deferred<StubWidget> defer = new Deferred<>();
 			Label title = new HeaderLabel(getTitle(info), o, defer.getPromise());
@@ -176,7 +193,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 				p.add(east);
 				panel = p;
 			}
-			stack.add(panel, title, 2);
+			stack.insert(panel, title, 2, insert);
 			cnt ++;
 		}
 		if (cnt == 0) header.setText(rb.allok());
@@ -186,6 +203,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		list.forceLayout();
 		RootLayoutPanel.get().setStyleName("alert", cnt!=0);
 		this.widgets.resolve(widgets);
+		fire(cnt == 0 || comRoot.getRole() == Role.Instructor); // Instructors weten alles!
 		return null;
 	}
 

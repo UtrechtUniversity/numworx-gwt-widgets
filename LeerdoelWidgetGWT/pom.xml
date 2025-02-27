@@ -8,9 +8,9 @@
 
   <properties>
     <!-- Convenience property to set the GWT version -->
-    <gwt.version>2.9.0</gwt.version>
+    <gwt.version>2.10.0</gwt.version>
 
-    <!-- GWT 2.9 support 8, 9 and 11 -->
+    <!-- GWT 2.9/10 support 8, 9 and 11 -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
@@ -23,7 +23,7 @@
     <tomcat7.version>7.0.107</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
     <gwt.style>PRETTY</gwt.style>
-    <gwtVersion>2.9.0</gwtVersion>
+    <gwtVersion>2.10.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
     <interactionVersion>2.5.34</interactionVersion>
   </properties>
@@ -40,16 +40,16 @@
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
         <artifactId>DWO</artifactId>
-        <version>2.5.39-SNAPSHOT</version>
+        <version>2.5.40-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>
           <artifactId>DWOServer</artifactId>
-          <version>2.5.38</version>
+          <version>2.5.39</version>
           <type>war</type>         
-	  <scope>test</scope>
+	  	  <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -97,13 +97,13 @@
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.39-SNAPSHOT</version>
+			<version>2.5.40-SNAPSHOT</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.39-SNAPSHOT</version>
+			<version>2.5.40-SNAPSHOT</version>
 			<classifier>sources</classifier>
 		</dependency>
       <dependency>
@@ -357,5 +357,5 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<version>2.5.39-SNAPSHOT</version>
+	<version>2.5.40-SNAPSHOT</version>
 </project>
