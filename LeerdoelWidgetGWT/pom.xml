@@ -7,8 +7,11 @@
   <name>Leerdoel Widget GWT</name>
 
   <properties>
-    <!-- Convenience property to set the GWT version -->
-    <gwt.version>2.10.0</gwt.version>
+    <!-- Convenience property to set the GWT version 
+         LET OP 2.10.0 geeft CORS errors met het ophalen van de nocache.js scripts,
+         voorlopig niet upgraden naar 2.10.0 
+    -->
+    <gwt.version>2.9.0</gwt.version>
 
     <!-- GWT 2.9/10 support 8, 9 and 11 -->
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -23,7 +26,7 @@
     <tomcat7.version>7.0.107</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
     <gwt.style>PRETTY</gwt.style>
-    <gwtVersion>2.10.0</gwtVersion>
+    <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
     <interactionVersion>2.5.34</interactionVersion>
   </properties>

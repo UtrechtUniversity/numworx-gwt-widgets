@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,12 +44,14 @@ import nl.uu.fi.dwo.interaction.client.Role;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentmodel.AbstractStudentModelPresenter;
+import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionPresenter;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.DescriptionService;
 import nl.uu.fi.dwo.lms.gwtclient.gwt.studentresults.Util;
 import nl.uu.fi.dwo.rest.dom.entities.DomMethod;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelCategory;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContextInfo;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObjectiveScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelScore;
@@ -64,6 +67,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
     
     private final static String PASSED = "action.passed";
     private final static String FAILED = "action.failed";
+    private final static String MASTERY = StudentModelUtil.MASTERY;
     
     private void fire(boolean mastered) {   	
     	CBookEvent event = new CBookEvent(mastered ? PASSED : FAILED);
@@ -72,6 +76,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	
 	private DockLayoutPanel list;
 	private Collection<String> objectives;
+	private Map<String,String> variants;
 	private DescriptionService service;
 	FormuleKeyboardIF keyboard;
 	private boolean showScore = true;
@@ -130,7 +135,16 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		this.comRoot = comRoot;
 	}
 
+	
+	
 	public void setObjectives(List<String> objectives) {
+		this.variants = new HashMap<>();
+		objectives.forEach(o -> {
+			String[] split = o.split("/", 2);
+			if (split.length == 2) {
+				this.variants.put(split[0], split[1]);
+			}
+		} );		
 		this.objectives = StudentModelUtil.strip(objectives);
 // debuggertje:
 //		for (String o : objectives) {
@@ -170,26 +184,31 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 			DomStudentModelContextInfo info = getInfo(studentModel, o);
 			if (info == null) 
 				continue;
-			DomStudentModelScore<?> score = getScore(s.getDomStudentModelStructureScore(), o);
-			double greenPerc = Util.getGreen(score) * 200;
-			if (greenPerc >= 90) 
+			DomStudentModelObjectiveScore score = (DomStudentModelObjectiveScore) getScore(s.getDomStudentModelStructureScore(), o);
+			//double greenPerc = Util.getGreen(score) * 200;
+			double mastery = score.getVariants().getOrDefault(MASTERY, 0.5);
+			if (mastery >= 0.95) 
 				continue;
 			int insert = 0;
-			while(insert < cnt && scoreBoard[insert] < greenPerc) insert ++;
+			while(insert < cnt && scoreBoard[insert] < mastery) insert ++;
 			System.arraycopy(scoreBoard, insert, scoreBoard, insert+1, cnt-insert);
-			scoreBoard[insert] = greenPerc;
+			scoreBoard[insert] = mastery;
 			
 			
 			//east.setPixelSize(-1, 200); // size of "content panel of iframe, echter er zit een scrollpane tussen en die heeft size 0
 			Deferred<StubWidget> defer = new Deferred<>();
 			Label title = new HeaderLabel(getTitle(info), o, defer.getPromise());
 			widgets.add(defer.getPromise());
-			SimpleLayoutPanel east = tekstPanel(service.getDescription(studentModel, info),width,200, defer);
+			Promise<String> description = service.getDescription(studentModel, info);
+			SimpleLayoutPanel east = tekstPanel(description,width,200, defer);
+			Optional<String> variant = Optional.ofNullable(this.variants.get(o));
 			com.google.gwt.user.client.ui.Widget panel = east;
+			if (variant.isPresent()) {
+				description.map(json -> DescriptionPresenter.selectVariant(json, info, variant));
+			}
 			if (showScore) {
 				DockLayoutPanel p = new DockLayoutPanel(Unit.EM);
-				Optional<String> empty = Optional.empty();
-				p.addSouth(Util.scoreItem("", score, Util.MAX_LEVEL, empty), 2); // als in eastPanel
+				p.addSouth(Util.scoreItem("", score, Util.MAX_LEVEL, variant), 2); // als in eastPanel
 				p.add(east);
 				panel = p;
 			}
