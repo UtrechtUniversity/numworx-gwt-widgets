@@ -144,6 +144,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean voorkennisMenu;
 	private boolean voorkennisKnop;
 	private boolean leerdoelPopup;
+	private boolean visible;
 	private Type type;
 	private EventBus evbus;
 	
@@ -392,6 +393,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		case RECOMMENDER:
 			recommender = new LeerdoelRecommender(this);
 			header = new RecommenderHeader();
+			header.initialDown(visible);
 			recommender.setComRoot(comRoot);
 // font overerven, altijd aan
 			ObjectMap instellingen = comRoot.getConfiguration();
@@ -584,6 +586,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      filterHeader = h.getBoolean("filterHeader");
 	    if(h.containsKey("leerdoelScore"))
 	      leerdoelScore = h.getBoolean("leerdoelScore");
+	    visible = h.getBoolean("visible", false);
 	    if (h.containsKey("type"))
 	    	type = Type.values()[h.getInt("type")];
 	    if (h.containsKey("objectives"))
