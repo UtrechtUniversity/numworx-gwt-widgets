@@ -26,6 +26,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	private static final int HEIGHT = 42;
 	private IsWidget center;
 	private boolean down = false; // nog even...
+	private boolean visible = false;
 	public boolean isDown() {
 		return down;
 	}
@@ -33,6 +34,10 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	public void setDown(boolean down) {
 		this.down = down;
 		updateUpDown();
+	}
+	
+	public void initialDown(boolean initial) {
+		visible = initial;
 	}
 
 	public RecommenderHeader() {
@@ -78,7 +83,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	}
 	
 	public void setState(ObjectMap state) {
-		down = state.getBoolean("down", false);
+		down = state.getBoolean("down", visible);
 		updateUpDown();
 	}
 }
