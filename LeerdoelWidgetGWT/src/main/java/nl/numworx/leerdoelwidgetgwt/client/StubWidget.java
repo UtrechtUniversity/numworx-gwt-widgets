@@ -221,6 +221,7 @@ private void publish(Object inner) {
 			Logger.getLogger("StubView").info("Change height to " + height);
 			frame.setPixelSize(-1, height);
 			this.height = height;
+			resizeStack();
 		}
 	} catch(Exception e) {
 		Logger.getLogger("StubView").log(Level.SEVERE,"init "+ e);
@@ -361,9 +362,13 @@ public void setState(HashMap<String, Object> h) {
 			int w = parameters.getInt("width");
 			width = w; height = h; // is dit okay?
 // big hack
-			StackLayoutPanel s = parent.recommender.stack;
-			SelectionEvent.fire(s, s.getVisibleIndex());
+			resizeStack();
 		}
+	}
+
+	private void resizeStack() {
+		StackLayoutPanel s = parent.recommender.stack;
+		SelectionEvent.fire(s, s.getVisibleIndex());
 	}
 
 	private void setEnterType(String type) {

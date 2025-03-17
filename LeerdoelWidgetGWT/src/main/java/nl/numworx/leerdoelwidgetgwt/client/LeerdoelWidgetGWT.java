@@ -27,6 +27,7 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.Window;
@@ -35,6 +36,7 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -469,6 +471,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 						
 						
 					});
+					StackLayoutPanel s = recommender.stack; // big hack
+					SelectionEvent.fire(s, s.getVisibleIndex());
+
 				}
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
 			});
