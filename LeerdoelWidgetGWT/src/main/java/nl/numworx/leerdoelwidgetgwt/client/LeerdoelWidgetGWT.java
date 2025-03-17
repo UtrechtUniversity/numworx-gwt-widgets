@@ -451,7 +451,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 				if (!ev.getValue().booleanValue())
 				{	parameters.put("height", wantedheight = header.getHeight() + margin*2);
 				} else {
-					if (pasAanH)
+					if (false && pasAanH)
 					AnimationScheduler.get().requestAnimationFrame
 					
 					((t) -> {
@@ -471,8 +471,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 						
 						
 					});
-					StackLayoutPanel s = recommender.stack; // big hack
-					SelectionEvent.fire(s, s.getVisibleIndex());
+					recommender.stackResize(); // big hack, deze werkt altijd.
 
 				}
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
@@ -483,7 +482,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 				parameters.put("width", width);
 				parameters.put("height", height = wanted);
 				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));			
-			}		
+			}	
+			header.setDown(false);
 			break;
 		}
 		

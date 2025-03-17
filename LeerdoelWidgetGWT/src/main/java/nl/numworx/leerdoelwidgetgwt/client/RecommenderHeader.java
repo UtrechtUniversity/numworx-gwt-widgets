@@ -11,6 +11,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
@@ -33,6 +34,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 
 	public void setDown(boolean down) {
 		this.down = down;
+		java.util.logging.Logger.getLogger("RecommenderHeader").info("setDown " + down);
 		updateUpDown();
 	}
 	
@@ -53,7 +55,7 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 
 	public void setCenter(IsWidget center) {
 		this.center = center;
-		Scheduler.get().scheduleDeferred(this::updateUpDown);
+		//Scheduler.get().scheduleDeferred(this::updateUpDown);
 	}
 
 	private void updateUpDown() {
@@ -83,7 +85,8 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 	}
 	
 	public void setState(ObjectMap state) {
-		down = state.getBoolean("down", visible);
-		updateUpDown();
+		final boolean d = state.getBoolean("down", visible);
+		new Timer() { public void run() { setDown(d); } }.schedule(2000); // tien seconden
+		//updateUpDown();
 	}
 }

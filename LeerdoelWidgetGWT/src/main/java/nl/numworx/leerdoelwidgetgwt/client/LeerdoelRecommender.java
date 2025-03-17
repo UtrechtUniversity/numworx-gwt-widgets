@@ -25,6 +25,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RequiresResize;
@@ -226,6 +227,10 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		return null;
 	}
 
+	void stackResize() {
+		SelectionEvent.fire(stack, stack.getVisibleIndex());
+	}
+	
 	private Promise<Integer> calcdiff(List<Promise<StubWidget>> wl) 
 	{
 		if (wl.isEmpty()) {

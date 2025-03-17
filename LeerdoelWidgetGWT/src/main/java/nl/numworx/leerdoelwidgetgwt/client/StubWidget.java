@@ -221,7 +221,13 @@ private void publish(Object inner) {
 			Logger.getLogger("StubView").info("Change height to " + height);
 			frame.setPixelSize(-1, height);
 			this.height = height;
-			resizeStack();
+			Timer t = new Timer() { 			
+				@Override
+				public void run()
+				{
+					resizeStack();
+				}};
+				t.schedule(100);
 		}
 	} catch(Exception e) {
 		Logger.getLogger("StubView").log(Level.SEVERE,"init "+ e);
@@ -367,8 +373,7 @@ public void setState(HashMap<String, Object> h) {
 	}
 
 	private void resizeStack() {
-		StackLayoutPanel s = parent.recommender.stack;
-		SelectionEvent.fire(s, s.getVisibleIndex());
+		parent.recommender.stackResize();
 	}
 
 	private void setEnterType(String type) {
