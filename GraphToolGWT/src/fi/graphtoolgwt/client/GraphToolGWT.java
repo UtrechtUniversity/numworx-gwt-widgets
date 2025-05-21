@@ -4979,6 +4979,8 @@ public class GraphToolGWT implements EntryPoint, InteractionStub, FacetAware, CB
 	 		Expressie expr = FormuleParser.geefExpressie(formuleString);
 	 		zetFunctie(index /* nr */, expr /* Expressie */, formuleString /* expString */, null /*expNaam */, 
 	 				DEFAULTDOMEIN /* domein */, true /* update */ , false /* setState */, false /* docent */);
+// update formule editor
+	 		formuleComponent.updateEditor(index, formuleString, formuleComponentAan);
 		}
 		
 		if (command.startsWith("equation.graph"))
