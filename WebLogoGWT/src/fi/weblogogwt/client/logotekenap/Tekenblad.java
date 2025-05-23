@@ -476,9 +476,12 @@ public class Tekenblad extends Uitvoerblad implements ParameterEditorListener
 		int width = (int) Math.round(tm.getWidth());
 		consoleY = consoleY+16;
 		inputEditor.setPopupPosition(this.getAbsoluteLeft()+consoleX+ width, consoleY-16);
-		inputEditor.show();
 		inputEditor.textBox.setText("");
-		inputEditor.textBox.setFocus(true);
+		if (eigenaar.uitvoerVeldZichtbaar) // geen uitvoer, dan ook geen invoer
+		{
+			inputEditor.show();
+			inputEditor.textBox.setFocus(true);
+		}
 		
 	}
 

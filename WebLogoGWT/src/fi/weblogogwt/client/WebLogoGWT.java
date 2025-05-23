@@ -191,7 +191,7 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	/**
 	 * parametrisation: drawing part available
 	 */
-	boolean uitvoerVeldZichtbaar = true;
+	public boolean uitvoerVeldZichtbaar = true;
 	/**
 	 * parametrisation: program part available
 	 */
