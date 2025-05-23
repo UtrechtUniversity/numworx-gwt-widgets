@@ -70,4 +70,12 @@
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <name>Web Logo</name>
+  <profiles>
+	  <profile>
+		  <id>pretty</id>
+		  <properties>
+		  	<gwt.style>PRETTY</gwt.style>
+		  </properties>
+	  </profile>	  
+  </profiles>
 </project>

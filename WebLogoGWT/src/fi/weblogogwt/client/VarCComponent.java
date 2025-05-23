@@ -24,7 +24,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 	 * Expression evaluating to the value of the variable
 	 */
 	private NumericParameter waarde;
-	private String stringWaarde;
+	private String stringWaarde; // == waarde.getParameterText()
 	/**
 	 * variable name
 	 */
@@ -76,6 +76,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		commandName = WebLogoGWT.rb.variabeleTekst();			
 		commandNameTranslated = "variable"; 
 		waarde = new NumericParameter();
+		stringWaarde = waarde.getParameterText();
 		varnaamParam = new Identifier(commandName);
 		schuifveld.jlsvContext2d.setFont(WebLogoGWT.fontString);
 		tm = schuifveld.jlsvContext2d.measureText(commandName+equalsString);
@@ -103,6 +104,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		else if ( editingValue )
 		{
 			waarde.setParameter(text);
+			stringWaarde = text;
 			commandName = varnaamParam.getParameterText() + " = " + text;
 			editingValue = false;
 		}
@@ -224,8 +226,7 @@ public class VarCComponent extends SimpleCommandComponent implements ParameterEd
 		if(varnaamParam.getParameterText().startsWith("§"))
 			varSet.setStringVar(varnaamParam.getParameterText(), stringWaarde);	
 		else
-			varSet.setStringVar(varnaamParam.getParameterText(), stringWaarde);	
-		varSet.setVar(varnaamParam.getParameterText(), waarde.getExpressie());		
+			varSet.setVar(varnaamParam.getParameterText(), waarde.getExpressie());		
 		traceKleur = trb.commandExecuted(varSet.getLevel());
 		if (traceKleur) traceKleurCnt = 0;
 		if ( traceKleur ) 
