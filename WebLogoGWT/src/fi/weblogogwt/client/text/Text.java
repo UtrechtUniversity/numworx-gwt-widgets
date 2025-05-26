@@ -103,7 +103,8 @@ public interface Text extends ConstantsWithLookup {
 	String CBA_double_input4();
 
 	
-	
+	@DefaultStringValue("commentaar")
+	String commentTekst();
 	
 	
 

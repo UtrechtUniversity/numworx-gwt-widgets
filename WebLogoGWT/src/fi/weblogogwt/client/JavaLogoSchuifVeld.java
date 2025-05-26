@@ -129,6 +129,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 	private CommandComponent vulbladCC;
 	private CommandComponent printCC;
 	private CommandComponent printlCC;
+	private CommandComponent commentCC;
 	private CommandComponent varCC;
 	private CommandComponent inputCC;
 	private CommandComponent herhaalCC;
@@ -355,27 +356,30 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 			
 		printlCC = new PrintlCComponent(ccx2,ccy+150,ccsw,ccsh, this);
 		ccs.addElement(printlCC);
+
+		commentCC = new CommentCComponent(ccx,ccy+150+30,cclw,ccsh, this);
+		ccs.addElement(commentCC);
 		
-		varCC = new VarCComponent(ccx,ccy+180,cclw,ccsh, this);
+		varCC = new VarCComponent(ccx,ccy+180+30,cclw,ccsh, this);
 		ccs.addElement(varCC);
 	
-		inputCC = new VarInputComponent(ccx,ccy+210,cclw,ccsh, this);
+		inputCC = new VarInputComponent(ccx,ccy+210+30,cclw,ccsh, this);
 		ccs.addElement(inputCC);
 		
-		herhaalCC = new ForLoopCommandComponent(ccx,ccy+230,cclw,ccsh+10, this);
+		herhaalCC = new ForLoopCommandComponent(ccx,ccy+230+30,cclw,ccsh+10, this);
 		ccs.addElement(herhaalCC);
 		
-		whileCC = new WhileLoopCommandComponent(ccx,ccy+270,cclw,ccsh+10, this);
+		whileCC = new WhileLoopCommandComponent(ccx,ccy+270+30,cclw,ccsh+10, this);
 		ccs.addElement(whileCC);
 		
-		keuzeCC = new KeuzeCommandComponent(ccx,ccy+310,cclw,ccsh+10, this);
+		keuzeCC = new KeuzeCommandComponent(ccx,ccy+310+30,cclw,ccsh+10, this);
 		ccs.addElement(keuzeCC);
         
 		deeltaakComponenten = new DeeltaakBodyComponent[aantalDeeltaken];
 		deeltaakCC = new DeeltaakCallCComponent[aantalDeeltaken];
 		for(int i=0; i < aantalDeeltaken; i++)
 		{
-			deeltaakCC[i] = new DeeltaakCallCComponent(xPos+ccx,yPos+ccy+360+30*i,cclw,ccsh, i+1, this);
+			deeltaakCC[i] = new DeeltaakCallCComponent(xPos+ccx,yPos+ccy+360+30*i+30,cclw,ccsh, i+1, this);
 			ccs.addElement(deeltaakCC[i]);
 
 			// create with dummy location and height
@@ -432,6 +436,11 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 		if(cc == printCC)
 		{ 	printCC = new PrintCComponent(x,y,b,h, this);
 			ccs.addElement(printCC);
+		}
+		if (cc == commentCC) 
+		{
+			commentCC = new CommentCComponent(x,y,b,h, this);
+			ccs.addElement(commentCC);
 		}
 		if(cc == vulbladCC)
 		{ 	vulbladCC = new VulBladCComponent(x,y,b,h, this);
@@ -522,9 +531,10 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 		
 		printCC.setLocation(printCC.getX(), yLocation);
 		printlCC.setLocation(printlCC.getX(), yLocation);
+		commentCC.setLocation(commentCC.getX(), yLocation+30);
 		
 		if (printCC.isVisible())
-			yLocation += 30;
+			yLocation += 30+30;
 		else
 			yLocation += 10;
 		
@@ -934,6 +944,7 @@ public class JavaLogoSchuifVeld extends LayoutPanel
 	public void zetPrintCommandsZichtbaar(boolean b)
 	{	printCC.setVisible(b);
 		printlCC.setVisible(b);
+		commentCC.setVisible(b);
 		herschikStapel();
 	}
 
