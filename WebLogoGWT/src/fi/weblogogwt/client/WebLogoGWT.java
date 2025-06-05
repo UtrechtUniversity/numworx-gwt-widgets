@@ -225,6 +225,8 @@ public class WebLogoGWT implements EntryPoint, InteractionStub, CBookEventListen
 	 */
 	boolean codeIOZichtbaar = true;
 	
+	boolean runZichtbaar = true;
+	
 	/**
 	 * flagg for tracing
 	 */
@@ -357,6 +359,8 @@ logger.info("WebLogoGWT constructor");
 			tekenCommandsZichtbaar = launchState.getBoolean("tekenCommandsZichtbaar");
 		if (launchState != null && launchState.containsKey("traceZichtbaar"))
 			traceZichtbaar = launchState.getBoolean("traceZichtbaar");
+		if (launchState != null && launchState.containsKey("runZichtbaar"))
+			runZichtbaar = launchState.getBoolean("runZichtbaar");
 		if (launchState != null && launchState.containsKey("codeIOZichtbaar"))
 			codeIOZichtbaar = launchState.getBoolean("codeIOZichtbaar");
 		// a non-null launchstate from the DWO always contains state
@@ -429,10 +433,10 @@ logger.info("WebLogoGWT constructor");
 			// dlp.setHeight("100%");
 		}
 		else
-			dlp.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+			dlp.setPixelSize(this.breedte, this.hoogte);
 
 		webLogoPanel = new LayoutPanel();
-		webLogoPanel.setSize("" + this.breedte + "px", "" + this.hoogte + "px");
+		webLogoPanel.setPixelSize(this.breedte, this.hoogte);
 		webLogoPanel.addStyleName(webLogoGWTCssResource.bottom());
 
 		// System.out.println("this b " + this.breedte);
@@ -508,7 +512,7 @@ logger.info("WebLogoGWT constructor");
 		trb = new TraceBeheerder(uitvoerblad, jlsVeld, this);
 
 		bottomPanel = new LayoutPanel();
-		bottomPanel.setSize("" + breedte + "px", "" + bottomHeight + "px");
+		bottomPanel.setPixelSize(breedte, bottomHeight);
 		bottomPanel.addStyleName(webLogoGWTCssResource.bottom());
 
 		makeBottom();
@@ -586,6 +590,7 @@ logger.info("WebLogoGWT constructor");
 		bottomPanel.add(runButton);
 		bottomPanel.setWidgetLeftWidth(runButton, currentX, Style.Unit.PX, buttonWidth - 10, Style.Unit.PX);
 		bottomPanel.setWidgetTopHeight(runButton, currentY, Style.Unit.PX, buttonHeight, Style.Unit.PX);
+		bottomPanel.setWidgetVisible(runButton, runZichtbaar);		
 		runButton.addClickHandler(new PushClickHandler());
 		
 		currentX += leftOffset + buttonWidth - 10;
