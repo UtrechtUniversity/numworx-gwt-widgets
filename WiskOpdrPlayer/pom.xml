@@ -95,7 +95,6 @@
                         <groupId>com.googlecode.mgwt</groupId>
                         <artifactId>mgwt</artifactId>
                         <scope>provided</scope>
-                        <version>2.0.0</version>
                 </dependency>
   </dependencies>
   <build>
@@ -124,6 +123,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>3.2.3</version>
 				<configuration>
+	       			<warSourceDirectory>src/main/webapp</warSourceDirectory>
+	        		<packagingIncludes>**</packagingIncludes>
 				   <overlays>
 					<overlay>
 						<groupId>nl.uu.fi.dwo.mobile</groupId>
