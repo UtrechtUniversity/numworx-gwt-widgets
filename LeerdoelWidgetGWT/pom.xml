@@ -29,6 +29,8 @@
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
     <interactionVersion>2.5.34</interactionVersion>
+    <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
+
   </properties>
 
   <dependencyManagement>

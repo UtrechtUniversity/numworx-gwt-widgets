@@ -369,7 +369,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	HashMap<String, Object> getState(HashMap<String, Object> result) {
 		if (stack != null) {
 			int selection = stack.getVisibleIndex();
-			if (selection < 0) return result;
+			if (selection < 0|| stack.getWidgetCount() == 0) return result;
 			Widget w = stack.getHeaderWidget(selection);
 			HeaderLabel h = (HeaderLabel) w;
 			String objective = h.objective;
@@ -396,9 +396,17 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 	public void onSelection(SelectionEvent<Integer> event) {
 		int selected = event.getSelectedItem();
 		AnimationScheduler.get().requestAnimationFrame( (t) -> {
-		HeaderLabel label = (HeaderLabel) stack.getHeaderWidget(selected);
-// de single diff berekeing werkt alleen als widget zichtbaar is.		
-		Promise<Integer> diff = singlediff(label.widget);
+		Promise<Integer> diff0;
+		if (selected < 0 || selected >= stack.getWidgetCount()) {
+			// wat hier te doen
+			LOG.warning("DEBUG HIER stack is leeg, wat nu?");
+			diff0 = calcdiff(Collections.emptyList());
+		} else {
+			HeaderLabel label = (HeaderLabel) stack.getHeaderWidget(selected);
+// de single diff berekening werkt alleen als widget zichtbaar is.		
+			diff0 = singlediff(label.widget);
+		}
+		final Promise<Integer> diff = diff0;
 		diff.onResolve(() -> {
 			int current = stack.getVisibleIndex();
 			boolean down = parent.header.isDown();
