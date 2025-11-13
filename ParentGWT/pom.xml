@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
     <parent>
     	<groupId>nl.uu.fi.dwo</groupId>
-    	<artifactId>DWO.master.pom</artifactId>
-    	<version>1.1</version>
+    	<artifactId>dwo.master.pom</artifactId>
+    	<version>1.2-SNAPSHOT</version>
     </parent>
   <groupId>fi.parentgwt</groupId>
   <artifactId>ParentGWT</artifactId>
@@ -17,7 +17,7 @@
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<interactionVersion>0.0.5</interactionVersion>
+  	<interactionVersion>2.5.47-SNAPSHOT</interactionVersion>
   </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
@@ -82,10 +82,20 @@
    </dependencies>
   </dependencyManagement>
  	<repositories>	<!-- als de mirror uit staat -->
-		<repository>
-		  <id>repos</id>
-		  <url>https://repos.dwo.nl/artifactory/repos</url>
-		</repository>
+                    <repository>
+                     <id>numworx-dwo-openmath</id>
+                     <snapshots>
+                        <enabled>true</enabled>
+                     </snapshots>
+                     <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-openmath</url>
+                  </repository>
+                    <repository>
+                     <id>numworx-dwo-project</id>
+                     <snapshots>
+                        <enabled>true</enabled>
+                     </snapshots>
+                     <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-project</url>
+                  </repository>
 	</repositories>
   <build>
   	<plugins>
