@@ -8,8 +8,7 @@ PROD="--profile prod"
 #PROD=
 cd ../DWOPlayer;
 
-W=/Volumes/fisme-sites/www-dev/dwo
-W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo
+W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www/dwo
 TODAY=$(date +%-d-%-m-%Y)
 
 T=$W/apps/DWOplayer

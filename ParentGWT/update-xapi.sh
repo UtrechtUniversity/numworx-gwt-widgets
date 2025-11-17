@@ -4,7 +4,7 @@ set -e
 
 cd ../../workspace-neon/DWOPlayer;
 
-W=/volumes/fisme-sites/www-dev/dwo
+W=/volumes/fisme-sites/www/dwo
 TODAY=$(date +%-d-%-m-%Y)
 mvn package -P TinCanPlayer -Dgwt.compiler.force=true
 (cd target/TinCanPlayer; rsync --delete -rav DWOplayer DWOplayer.css $W/apps/2014_v1_0)

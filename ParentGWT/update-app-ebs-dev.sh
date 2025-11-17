@@ -1,7 +1,7 @@
 set -ex
 cd ../$1/target/$3
 PATH=$PATH:/usr/local/bin
-W=/volumes/fisme-sites/www-dev/dwo/apps
+W=/volumes/fisme-sites/www/dwo/apps
 D=../../../../workspace-neon/DWOplayer/war
 G=../../../DWOApp/war/dwo/apps
 #S3=s3://test-dwo-nl/apps

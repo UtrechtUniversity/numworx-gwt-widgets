@@ -8,7 +8,7 @@ PROD="--profile prod"
 #PROD=
 cd ../WiskOpdrPlayer;
 
-W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www-dev/dwo
+W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www/dwo
 TODAY=$(date +%-d-%-m-%Y)
 
 T=$W/apps/DWOplayer
