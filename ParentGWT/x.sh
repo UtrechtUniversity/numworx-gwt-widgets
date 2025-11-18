@@ -2,7 +2,7 @@
 . ~/.bashrc
 cd ../DWOPlayer;
 
-W=/volumes/fisme-sites/www-dev/dwo
+W=/volumes/fisme-sites/www/dwo
 TODAY=$(date +%-d-%-m-%Y)
 T=$W/apps/noordhoff/DWOplayer
 if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
