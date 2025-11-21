@@ -142,7 +142,7 @@
     		<configuration>
        			<warSourceDirectory>war</warSourceDirectory>
        			<warSourceExcludes>*gwt/</warSourceExcludes>
-        		<packagingIncludes>*.css,*gwt/**,${project.artifactId}.html</packagingIncludes>
+        		<packagingIncludes>*.css,*gwt/**</packagingIncludes>
         	</configuration>
    	      </plugin>
     	  <plugin>
