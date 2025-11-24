@@ -54,7 +54,12 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.1.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>interaction</artifactId>
+  		<classifier>sources</classifier>
+  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -75,7 +80,11 @@
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>0.1.1</version>
+	</dependency>
+	<dependency>
+		<groupId>com.googlecode.mgwt</groupId>
+		<artifactId>MGWT</artifactId>
+		<version>1.1.2</version>
 	</dependency>
   </dependencies>
   <parent>

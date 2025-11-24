@@ -56,6 +56,11 @@
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
   	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>interaction</artifactId>
+  		<classifier>sources</classifier>
+  	</dependency>
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>

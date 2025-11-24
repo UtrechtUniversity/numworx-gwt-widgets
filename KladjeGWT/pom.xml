@@ -55,31 +55,31 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.24</version>
+  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.24</version>
+  		<version>2.5.47-SNAPSHOT</version>
   		<classifier>sources</classifier>
   	</dependency>
   	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>2.5.24</version>
+		<version>2.5.47-SNAPSHOT</version>
 	</dependency>
 			<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
-			<artifactId>IdeasGWT</artifactId>
-			<version>0.1.1</version>
+			<artifactId>ideasgwt</artifactId>
+			<version>0.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
-			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.7</version>
+			<artifactId>wiskopdrgwt</artifactId>
+			<version>0.0.8-SNAPSHOT</version>
 	  		<exclusions>
 	  			<exclusion>
-	  				<artifactId>IdeasGWT</artifactId>
+	  				<artifactId>ideasgwt</artifactId>
 	  				<groupId>nl.uu.fi.dwo.ideas</groupId>
 	  			</exclusion>
 	  		</exclusions>
@@ -87,7 +87,7 @@
   	<dependency>
   		<groupId>fi.writemathgwt</groupId>
   		<artifactId>WriteMathGWT</artifactId>
-  		<version>2.5.5</version>
+  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.gwt</groupId>
