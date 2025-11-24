@@ -28,7 +28,7 @@
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>2.5.34</interactionVersion>
+    <interactionVersion>2.5.47-SNAPSHOT</interactionVersion>
     <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
 
   </properties>
@@ -44,15 +44,15 @@
       </dependency>
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>DWO</artifactId>
-        <version>2.5.40-SNAPSHOT</version>
+        <artifactId>dwo</artifactId>
+        <version>2.5.47-SNAPSHOT</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>DWOServer</artifactId>
-          <version>2.5.39</version>
+          <artifactId>dwoserver</artifactId>
+          <version>2.5.47-SNAPSHOT</version>
           <type>war</type>         
 	  	  <scope>test</scope>
       </dependency>
@@ -101,19 +101,19 @@
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
-    		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.40-SNAPSHOT</version>
+    		<artifactId>dwogwtclient</artifactId>
+			<version>2.5.47-SNAPSHOT</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
-    		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.40-SNAPSHOT</version>
+    		<artifactId>dwogwtclient</artifactId>
+			<version>2.5.47-SNAPSHOT</version>
 			<classifier>sources</classifier>
 		</dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>DWOServer</artifactId>
+          <artifactId>dwoserver</artifactId>
           <type>war</type>
           <scope>test</scope>        
       </dependency>
@@ -224,7 +224,7 @@
                     <webapps>
                         <webapp>
                             <groupId>nl.uu.fi.dwo</groupId>
-                            <artifactId>DWOServer</artifactId>
+                            <artifactId>dwoserver</artifactId>
                             <version>${project.version}</version>
                             <type>war</type>    
                             <asWebapp>true</asWebapp> 
@@ -362,5 +362,5 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<version>2.5.40-SNAPSHOT</version>
+	<version>2.5.47-SNAPSHOT</version>
 </project>
