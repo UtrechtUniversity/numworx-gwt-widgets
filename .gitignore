@@ -3,6 +3,7 @@ LeerdoelWidgetGWT/src/main/webapp/styles.css
 target/
 .settings
 .classpath
+.project
 *.class
 
 # Package Files #
