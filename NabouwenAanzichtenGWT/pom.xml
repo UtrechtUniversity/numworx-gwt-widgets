@@ -55,7 +55,12 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.1.7</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>interaction</artifactId>
+  		<classifier>sources</classifier>
+  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
 	<dependency>
 	    <groupId>com.vaadin.addon</groupId>
