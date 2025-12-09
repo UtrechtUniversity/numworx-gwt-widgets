@@ -8,14 +8,14 @@
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
   <artifactId>WidgetPlayer</artifactId>
-  <version>2.5.47-SNAPSHOT</version>
+  <version>2.5.47</version>
   <packaging>war</packaging>
-  <name>Widget Player</name>
+  <name>WidgetPlayer</name>
   <properties>
 	<finalName>WidgetPlayer</finalName>
 	<gwtModule>${project.groupId}.WidgetPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
-	<runTarget>${project.artifactId}.html</runTarget>
+	<runTarget>${project.name}.html</runTarget>
 	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>
