@@ -54,7 +54,11 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.1.4</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>interaction</artifactId>
+  		<classifier>sources</classifier>
   	</dependency>
   	<dependency>
   		<groupId>com.google.gwt</groupId>

@@ -1,8 +1,7 @@
 package fi.heksgwt.client;
 
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.googlecode.mgwt.dom.client.event.touch.TouchStartEvent;
-import com.googlecode.mgwt.ui.client.widget.touch.TouchPanel;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 
@@ -31,7 +30,7 @@ public class TekstPopup extends PopupPanel
 	 * binnen de formule-editor de focus kunt zetten voor de verschillende
 	 * invulvakken van een formule.
 	 */
-	TouchPanel touchPanel = null;
+	Panel touchPanel = null;
 	/**
 	 * Geeft aan of invoer-popup geopend is.
 	 */
@@ -49,8 +48,6 @@ public class TekstPopup extends PopupPanel
 
 		owner = o;
 		bigOwner = bigO;
-
-		touchPanel = new TouchPanel();
 
 		editor = new FormuleEditor()
 		{
@@ -75,7 +72,7 @@ public class TekstPopup extends PopupPanel
 
 		kb = editor.getKeyboard();
 
-		touchPanel.add(editor.getAsPanel());
+		touchPanel = (editor.getAsPanel());
 		setWidget(touchPanel);
 		editor.requestFocus();
 		//om te zorgen dat cursor ook getekend wordt:
@@ -86,15 +83,7 @@ public class TekstPopup extends PopupPanel
 
 		addCloseHandler(new PopupCloseHandler());
 		
-		touchPanel.addTouchHandler(new FormuleEditorTouchHandler(editor) {
-
-			@Override
-			public void onTouchStart(TouchStartEvent event)
-			{
-				super.onTouchStart(event);
-			}
-			
-		});
+		new FormuleEditorTouchHandler(editor).initHandler();
 	}
 
 	public String getText()

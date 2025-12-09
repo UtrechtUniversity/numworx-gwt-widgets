@@ -54,17 +54,22 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>0.1.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>nl.uu.fi.dwo.mobile</groupId>
+  		<artifactId>interaction</artifactId>
+  		<classifier>sources</classifier>
+  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.ideas</groupId>
-		<artifactId>IdeasGWT</artifactId>
-		<version>0.0.2</version>
+		<artifactId>ideasgwt</artifactId>
+		<version>0.1.9</version>
 	</dependency>
 	<dependency>
 		<groupId>fi.wiskopdrgwt</groupId>
-		<artifactId>WiskOpdrGWT</artifactId>
-		<version>0.0.5</version>
+		<artifactId>wiskopdrgwt</artifactId>
+		<version>0.0.8-SNAPSHOT</version>
   		<exclusions>
   			<exclusion>
   				<artifactId>IdeasGWT</artifactId>
@@ -75,7 +80,6 @@
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>0.1.1</version>
 	</dependency>
   </dependencies>
   <parent>
