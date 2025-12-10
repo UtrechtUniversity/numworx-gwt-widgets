@@ -8,10 +8,10 @@
         <relativePath>../ParentGWT</relativePath>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
-	<artifactId>GeoDefinerGWT</artifactId>
+	<artifactId>geodefinergwt</artifactId>
 	<version>0.0.6-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>GeoDefiner GWT</name>
+	<name>GeoDefinerGWT</name>
 	<dependencies>
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -38,7 +38,7 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.47-SNAPSHOT</version>
+			<version>2.5.47</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -80,7 +80,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>wiskopdrgwt</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
+			<version>2.5.47</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.dagger</groupId>
@@ -97,7 +97,7 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<classifier>sources</classifier>
-			<version>2.5.47-SNAPSHOT</version>
+			<version>2.5.47</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -108,13 +108,6 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.1</version>
 				<configuration>
-<!-- 		<annotationProcessorPaths> -->
-<!-- 			<path> -->
-<!-- 			<groupId>com.google.dagger</groupId> -->
-<!-- 			<artifactId>dagger-compiler</artifactId> -->
-<!-- 			<version>${daggerVersion}</version> -->
-<!-- 			</path> -->
-<!-- 		</annotationProcessorPaths> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -129,8 +122,8 @@
 				<version>${gwtVersion}</version>
 				<configuration>
 					<localWorkers>1</localWorkers>
-					<module>${project.groupId}.${project.artifactId}${debug}</module>
-					<runTarget>${project.artifactId}${debug}.html</runTarget>
+					<module>${project.groupId}.${project.name}${debug}</module>
+					<runTarget>${project.name}${debug}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
 					<extraJvmArgs>-Xms768m -Xmx1024m</extraJvmArgs>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
@@ -159,16 +152,13 @@
 	</build>
 	<properties>
 		<euclidesVersion>0.0.8-SNAPSHOT</euclidesVersion>
-		<formuleVersion>2.5.47-SNAPSHOT</formuleVersion>
+		<formuleVersion>2.5.47</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
 		<gwt.compiler.force>true</gwt.compiler.force>	
 		<daggerVersion>2.42</daggerVersion>
 	</properties>
-	<scm>
-		<developerConnection>scm:svn:https://svn.science.uu.nl/repos/sci.velth101.numworx/GeoDefinerGWT/trunk</developerConnection>
-	</scm>
 	<profiles>
 		<profile>
 			<id>debug</id>

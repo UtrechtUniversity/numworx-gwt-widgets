@@ -9,7 +9,7 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.aimodelgwt</groupId>
-  <artifactId>AIModelGWT</artifactId>
+  <artifactId>aimodelgwt</artifactId>
   <packaging>war</packaging>
   <version>0.0.3-SNAPSHOT</version>
   <name>AI-model for GWT</name>

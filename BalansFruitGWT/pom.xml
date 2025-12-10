@@ -1,9 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.balansfruitgwt</groupId>
-  <artifactId>BalansFruitGWT</artifactId>
+  <artifactId>balansfruitgwt</artifactId>
   <packaging>war</packaging>
-  <name>De fruitweegschaal</name>
   <build>
   	<finalName>${project.artifactId}</finalName>
 	<sourceDirectory>src</sourceDirectory>
@@ -26,8 +25,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>
              </configuration>
         <executions>
@@ -112,4 +111,6 @@
 		</properties>
 	</profile>
   </profiles>
+  <description>De fruitweegschaal</description>
+  <name>BalansFruitGWT</name>
 </project>
