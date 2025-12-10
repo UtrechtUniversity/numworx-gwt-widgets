@@ -3,8 +3,9 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.numworx.leerdoelwidget</groupId>
-  <artifactId>LeerdoelWidgetGWT</artifactId>
-  <name>Leerdoel Widget GWT</name>
+  <artifactId>leerdoelwidgetgwt</artifactId>
+  <name>LeerdoelWidgetGWT</name>
+  <description>Leerdoel Widget GWT</description>
 
   <properties>
     <!-- Convenience property to set the GWT version 
@@ -21,14 +22,14 @@
     <allowSnapshots>true</allowSnapshots>
     <packaging>war</packaging>
     <gwtModule>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT</gwtModule>
-	<runTarget>${project.artifactId}.html</runTarget>
+	<runTarget>${project.name}.html</runTarget>
 	<context.xml>context8.xml</context.xml>
     <tomcat7.version>7.0.107</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>2.5.47-SNAPSHOT</interactionVersion>
+    <interactionVersion>2.5.47</interactionVersion>
     <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
 
   </properties>
@@ -45,14 +46,14 @@
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
         <artifactId>dwo</artifactId>
-        <version>2.5.47-SNAPSHOT</version>
+        <version>2.5.47</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>
           <artifactId>dwoserver</artifactId>
-          <version>2.5.47-SNAPSHOT</version>
+          <version>2.5.47</version>
           <type>war</type>         
 	  	  <scope>test</scope>
       </dependency>
@@ -102,13 +103,13 @@
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>dwogwtclient</artifactId>
-			<version>2.5.47-SNAPSHOT</version>
+			<version>2.5.47</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>dwogwtclient</artifactId>
-			<version>2.5.47-SNAPSHOT</version>
+			<version>2.5.47</version>
 			<classifier>sources</classifier>
 		</dependency>
       <dependency>

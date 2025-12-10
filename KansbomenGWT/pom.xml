@@ -1,7 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.kansbomengwt</groupId>
-  <artifactId>KansbomenGWT</artifactId>
+  <artifactId>kansbomengwt</artifactId>
+  <name>KansbomenGWT</name>
   <packaging>war</packaging>
   <build>
   	<finalName>${project.artifactId}</finalName>
@@ -25,8 +26,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>        
              </configuration>
         <executions>
@@ -68,5 +69,5 @@
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
-  <name>Kansbomen</name>
+  <description>Kansbomen</description>
 </project>

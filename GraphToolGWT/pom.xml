@@ -7,9 +7,10 @@
 		<version>0.0.9-SNAPSHOT</version>
 	</parent>
 	<groupId>fi.graphtoolgwt</groupId>
-	<artifactId>GraphToolGWT</artifactId>
+	<artifactId>graphtoolgwt</artifactId>
+	<name>GraphToolGWT</name>
 	<packaging>war</packaging>
-	<name>Grafieken tool</name>
+	<description>Grafieken tool</description>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -32,8 +33,8 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
-					<module>${project.groupId}.${project.artifactId}</module>
-					<runTarget>${project.artifactId}.html</runTarget>
+					<module>${project.groupId}.${project.name}</module>
+					<runTarget>${project.name}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
 				</configuration>
 				<executions>
