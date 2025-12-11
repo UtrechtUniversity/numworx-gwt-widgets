@@ -75,11 +75,13 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
+		<version>2.5.47</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
 		<classifier>sources</classifier>
+		<version>2.5.47</version>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -119,11 +121,6 @@
   			<groupId>com.google.gwt</groupId>
   			<artifactId>gwt-dev</artifactId>
   			<version>${gwtVersion}</version>
-  		</dependency>
-  		<dependency>
-  			<groupId>nl.uu.fi.dwo.mobile</groupId>
-  			<artifactId>interaction</artifactId>
-  			<version>0.1.1</version>
   		</dependency>
   	</dependencies>
   </dependencyManagement>
