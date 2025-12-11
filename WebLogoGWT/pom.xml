@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.weblogogwt</groupId>
-  <artifactId>WebLogoGWT</artifactId>
   <packaging>war</packaging>
   <build>
   	<finalName>${project.artifactId}</finalName>
@@ -25,8 +24,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>        
              </configuration>
         <executions>
@@ -73,7 +72,6 @@
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
-  <name>Web Logo</name>
   <profiles>
 	  <profile>
 		  <id>pretty</id>
@@ -82,4 +80,7 @@
 		  </properties>
 	  </profile>	  
   </profiles>
+  <description>Web Logo</description>
+  <name>WebLogoGWT</name>
+  <artifactId>weblogogwt</artifactId>
 </project>
