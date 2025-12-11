@@ -1,5 +1,5 @@
 set -e
-cd ../$1/target/$3
+cd ../$1/target/$2
 PATH=$PATH:/usr/local/bin
 W=$USER@gemini.science.uu.nl:/science/wwwprojects/FI-Sites/www/dwo/apps
 D=../../../DWOplayer/war

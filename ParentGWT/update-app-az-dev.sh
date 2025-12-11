@@ -12,7 +12,7 @@ then
 . generate-sas.sh
 fi
 
-cd ../$1/target/$3
+cd ../$1/target/$2
 if test -f $2/$2.nocache.js
 then
 
