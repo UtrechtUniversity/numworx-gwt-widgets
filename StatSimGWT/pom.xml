@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.statsimgwt</groupId>
-  <artifactId>StatSimGWT</artifactId>
   <packaging>war</packaging>
   <build>
   	<finalName>${project.artifactId}</finalName>
@@ -25,8 +24,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>        
              </configuration>
         <executions>
@@ -63,9 +62,11 @@
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
+  	<artifactId>parentgwt</artifactId>
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
-  <name>Statistiek Simulatie</name>
+  <description>Statistiek Simulatie</description>
+  <name>StatSimGWT</name>
+  <artifactId>statsimgwt</artifactId>
 </project>

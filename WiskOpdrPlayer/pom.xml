@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
+  	<artifactId>parentgwt</artifactId>
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
-  <artifactId>WiskOpdrPlayer</artifactId>
+  <artifactId>wiskopdrplayer</artifactId>
   <version>2.5.47</version>
   <packaging>war</packaging>
   <name>WiskOpdrPlayer</name>
@@ -15,7 +15,7 @@
 	<finalName>WiskOpdrPlayer</finalName>
 	<gwtModule>${project.groupId}.WiskOpdrPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
-	<runTarget>${project.artifactId}.html</runTarget>
+	<runTarget>${project.name}.html</runTarget>
 	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>

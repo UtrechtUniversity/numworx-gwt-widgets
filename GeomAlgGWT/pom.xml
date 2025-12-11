@@ -76,7 +76,7 @@
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
+  	<artifactId>parentgwt</artifactId>
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
