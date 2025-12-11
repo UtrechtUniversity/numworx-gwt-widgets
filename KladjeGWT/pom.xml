@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.kladjegwt</groupId>
-  <artifactId>KladjeGWT</artifactId>
   <packaging>war</packaging>
   <build>
   	<finalName>${project.artifactId}</finalName>
@@ -25,8 +24,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>
         	  <style>PRETTY</style>        
              </configuration>
@@ -55,18 +54,15 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.47-SNAPSHOT</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.47-SNAPSHOT</version>
   		<classifier>sources</classifier>
   	</dependency>
   	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>2.5.47-SNAPSHOT</version>
 	</dependency>
 			<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -76,7 +72,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>wiskopdrgwt</artifactId>
-			<version>0.0.8-SNAPSHOT</version>
+			<version>2.5.47</version>
 	  		<exclusions>
 	  			<exclusion>
 	  				<artifactId>ideasgwt</artifactId>
@@ -87,7 +83,7 @@
   	<dependency>
   		<groupId>fi.writemathgwt</groupId>
   		<artifactId>WriteMathGWT</artifactId>
-  		<version>2.5.47-SNAPSHOT</version>
+  		<version>2.5.47</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.gwt</groupId>
@@ -102,8 +98,10 @@
   	<version>0.0.9-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
-  <name>Kladje</name>
   <properties>
   	<gwt.compiler.force>true</gwt.compiler.force>
   </properties>
+  <description>Kladje</description>
+  <name>KladjeGWT</name>
+  <artifactId>kladjegwt</artifactId>
 </project>
