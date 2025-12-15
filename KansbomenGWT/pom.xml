@@ -59,7 +59,6 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.47-SNAPSHOT</version>
   		<classifier>sources</classifier>
   	</dependency>
   </dependencies>
