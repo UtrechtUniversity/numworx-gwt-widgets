@@ -16,7 +16,7 @@ T=$W/apps/DWOplayer
 #T=$W/apps/noordhoff/DWOplayer
 #if ! test -e $T-$TODAY; then mv $T $T-$TODAY; fi
 OPTIONS=-rclD
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY -Pgithub
 (cd target/WiskOpdrPlayer; 
     rsync --delete $OPTIONS DWOplayer KeyboardGWT.css DWOplayer.css PrintPlayer.css $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
@@ -30,13 +30,13 @@ mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.s
 	
 )
 cd ../WidgetPlayer
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -o
 (cd target/WidgetPlayer; rsync --delete $OPTIONS WidgetPlayer $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive WidgetPlayer $S3/WidgetPlayer;\
 #	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
 )
 cd ../PrintPlayer
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -o
 (cd target/PrintPlayer; rsync --delete $OPTIONS PrintPlayer $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive PrintPlayer $S3/PrintPlayer;\
 #	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
