@@ -63,6 +63,7 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<classifier>sources</classifier>
+			<version>${interactionVersion}</version>
 		</dependency>
 	    <dependency>
 	      <groupId>de.knightsoft-net</groupId>
