@@ -36,7 +36,7 @@ mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithu
 #	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
 )
 cd ../PrintPlayer
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -o
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -Dgwt.style=PRETTY -o
 (cd target/PrintPlayer; rsync --delete $OPTIONS PrintPlayer $W/apps/;\
 	aws $PROD s3 cp --acl public-read --recursive PrintPlayer $S3/PrintPlayer;\
 #	azcopy sync WidgetPlayer/ https://numworxprod.blob.core.windows.net/test/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
