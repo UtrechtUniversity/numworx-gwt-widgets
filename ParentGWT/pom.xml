@@ -17,7 +17,8 @@
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<interactionVersion>2.5.48-SNAPSHOT</interactionVersion>
+  	<dwoVersion>2.5.48</dwoVersion>
+  	<interactionVersion>${dwoVersion}</interactionVersion>
   </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
