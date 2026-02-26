@@ -55,18 +55,16 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.47</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.47</version>
   		<classifier>sources</classifier>
   	</dependency>
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>2.5.47</version>
+		<version>${dwoVersion}</version>
 	</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
@@ -77,7 +75,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>parentgwt</artifactId>
-  	<version>0.0.9-SNAPSHOT</version>
+  	<version>2.5.48-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <description>Geometrische Algebra</description>

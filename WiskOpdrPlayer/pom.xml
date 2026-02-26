@@ -3,12 +3,11 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>parentgwt</artifactId>
-  	<version>0.0.9-SNAPSHOT</version>
+  	<version>2.5.48-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
   <artifactId>wiskopdrplayer</artifactId>
-  <version>2.5.48</version>
   <packaging>war</packaging>
   <name>WiskOpdrPlayer</name>
   <properties>
@@ -23,7 +22,7 @@
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
         <artifactId>dwo</artifactId>
-        <version>${project.version}</version>
+        <version>${dwoVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -38,7 +37,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>dwoplayer</artifactId>
-		<version>2.5.48</version>
+		<version>${dwoVersion}</version>
   		<classifier>classes</classifier>
   		<exclusions>
   			<exclusion>
@@ -58,7 +57,7 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>dwoplayer</artifactId>
-<version>2.5.48</version>
+<version>${dwoVersion}</version>
   		<classifier>sources</classifier>
   		<exclusions>
   			<exclusion>

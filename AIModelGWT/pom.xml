@@ -5,13 +5,12 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>parentgwt</artifactId>
-		<version>0.0.9-SNAPSHOT</version>
+		<version>2.5.48-SNAPSHOT</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.aimodelgwt</groupId>
   <artifactId>aimodelgwt</artifactId>
   <packaging>war</packaging>
-  <version>0.0.3-SNAPSHOT</version>
   <name>AI-model for GWT</name>
 
   <properties>

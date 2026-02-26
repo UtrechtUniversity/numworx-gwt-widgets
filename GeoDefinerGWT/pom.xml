@@ -4,12 +4,11 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>parentgwt</artifactId>
-		<version>0.0.9-SNAPSHOT</version>
+		<version>2.5.48-SNAPSHOT</version>
         <relativePath>../ParentGWT</relativePath>
 	</parent>
 	<groupId>nl.numworx.geodefinergwt</groupId>
 	<artifactId>geodefinergwt</artifactId>
-	<version>0.0.6-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>GeoDefinerGWT</name>
 	<dependencies>
@@ -38,7 +37,6 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.47</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.euclides</groupId>
@@ -59,12 +57,12 @@
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.7-SNAPSHOT</version>
+			<version>${euclidesVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.numworx.geodefiner</groupId>
 			<artifactId>geodefiner-common</artifactId>
-			<version>0.0.7-SNAPSHOT</version>
+			<version>${euclidesVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
@@ -80,7 +78,7 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>wiskopdrgwt</artifactId>
-			<version>2.5.47</version>
+			<version>${dwoVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.dagger</groupId>
@@ -97,7 +95,6 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<classifier>sources</classifier>
-			<version>2.5.47</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -151,8 +148,8 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>0.0.8-SNAPSHOT</euclidesVersion>
-		<formuleVersion>2.5.47</formuleVersion>
+		<euclidesVersion>2.5.48-SNAPSHOT</euclidesVersion>
+		<formuleVersion>${dwoVersion}</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>
 		<gwt.style>PRETTY</gwt.style> <!--  -D gwt.style=PRETTY -->
