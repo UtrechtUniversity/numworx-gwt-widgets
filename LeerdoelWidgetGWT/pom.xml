@@ -29,7 +29,6 @@
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>2.5.47</interactionVersion>
     <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
 
   </properties>
@@ -42,20 +41,6 @@
         <version>${gwt.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>dwo</artifactId>
-        <version>2.5.47</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-          <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>dwoserver</artifactId>
-          <version>2.5.47</version>
-          <type>war</type>         
-	  	  <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -91,25 +76,23 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>dwogwtclient</artifactId>
-			<version>2.5.47</version>
+			<version>${dwoVersion}</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
     		<artifactId>dwogwtclient</artifactId>
-			<version>2.5.47</version>
+			<version>${dwoVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
       <dependency>
@@ -226,7 +209,7 @@
                         <webapp>
                             <groupId>nl.uu.fi.dwo</groupId>
                             <artifactId>dwoserver</artifactId>
-                            <version>${project.version}</version>
+                            <version>${dwoVersion}</version>
                             <type>war</type>    
                             <asWebapp>true</asWebapp> 
                             <contextPath>${local.dwo}</contextPath>
@@ -363,5 +346,5 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<version>2.5.47-SNAPSHOT</version>
+	<version>2.5.48-SNAPSHOT</version>
 </project>
