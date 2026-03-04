@@ -42,23 +42,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-<<<<<<< HEAD
-      <dependency>
-        <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>dwo</artifactId>
-        <version>${dwoVersion}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-          <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>dwoserver</artifactId>
-          <version>${dwoVersion}</version>
-          <type>war</type>
-	  <scope>test</scope>
-      </dependency>
-=======
->>>>>>> f640fa53b28448031e2a1d89160af7b79fde7caa
     </dependencies>
   </dependencyManagement>
 
@@ -363,8 +346,4 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-<<<<<<< HEAD
-=======
-	<version>2.5.48-SNAPSHOT</version>
->>>>>>> f640fa53b28448031e2a1d89160af7b79fde7caa
 </project>
