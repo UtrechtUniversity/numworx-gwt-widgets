@@ -29,7 +29,6 @@
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>${dwoVersion}</interactionVersion>
     <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
 
   </properties>
@@ -43,6 +42,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+<<<<<<< HEAD
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
         <artifactId>dwo</artifactId>
@@ -57,6 +57,8 @@
           <type>war</type>
 	  <scope>test</scope>
       </dependency>
+=======
+>>>>>>> f640fa53b28448031e2a1d89160af7b79fde7caa
     </dependencies>
   </dependencyManagement>
 
@@ -91,13 +93,11 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
@@ -226,7 +226,7 @@
                         <webapp>
                             <groupId>nl.uu.fi.dwo</groupId>
                             <artifactId>dwoserver</artifactId>
-                            <version>${project.version}</version>
+                            <version>${dwoVersion}</version>
                             <type>war</type>    
                             <asWebapp>true</asWebapp> 
                             <contextPath>${local.dwo}</contextPath>
@@ -363,4 +363,8 @@
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
+<<<<<<< HEAD
+=======
+	<version>2.5.48-SNAPSHOT</version>
+>>>>>>> f640fa53b28448031e2a1d89160af7b79fde7caa
 </project>
