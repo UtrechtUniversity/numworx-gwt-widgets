@@ -148,7 +148,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<euclidesVersion>2.5.48-SNAPSHOT</euclidesVersion>
+		<euclidesVersion>${authorVersion}</euclidesVersion>
 		<formuleVersion>${dwoVersion}</formuleVersion>
 		<debug />
 		<gwtVersion>2.8.2</gwtVersion>

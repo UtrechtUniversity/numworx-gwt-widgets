@@ -141,7 +141,6 @@
 	<properties>
 		<gwt.style>PRETTY</gwt.style>
 		<gwtVersion>2.9.0</gwtVersion>
-		<authorVersion>2.5.48-SNAPSHOT</authorVersion>
 	</properties>
 <dependencyManagement>
   <dependencies>

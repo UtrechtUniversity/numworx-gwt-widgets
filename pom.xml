@@ -9,6 +9,9 @@
   <artifactId>widgets-parent</artifactId>
   <version>2.5.48-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <properties>
+	<authorVersion>2.5.48</authorVersion>
+  </properties>
   <modules>
 	<module>ParentGWT</module>
   </modules>
