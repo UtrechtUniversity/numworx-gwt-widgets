@@ -20,7 +20,7 @@
     <gwtModule>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT</gwtModule>
 	<runTarget>${project.artifactId}.html</runTarget>
 	<context.xml>context8.xml</context.xml>
-    <tomcat7.version>7.0.107</tomcat7.version>
+    <tomcat7.version>9.0.113</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
