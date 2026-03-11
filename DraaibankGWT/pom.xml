@@ -66,7 +66,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>parentgwt</artifactId>
-  	<version>2.5.48-SNAPSHOT</version>
+  	<version>2.5.48</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
 </project>
