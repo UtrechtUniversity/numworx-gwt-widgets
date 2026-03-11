@@ -4,7 +4,7 @@
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>parentgwt</artifactId>
 		<relativePath>../ParentGWT</relativePath>
-		<version>2.5.48-SNAPSHOT</version>
+		<version>2.5.49-SNAPSHOT</version>
 	</parent>
 	<groupId>fi.graphtoolgwt</groupId>
 	<artifactId>graphtoolgwt</artifactId>
