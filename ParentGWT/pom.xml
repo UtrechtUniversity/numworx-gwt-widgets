@@ -1,13 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
     <parent>
-    	<groupId>nl.uu.fi.dwo</groupId>
-    	<artifactId>DWO.master.pom</artifactId>
-    	<version>1.1</version>
+    	<groupId>fi.parentgwt</groupId>
+    	<artifactId>widgets-parent</artifactId>
+    	<version>2.5.48</version>
     </parent>
   <groupId>fi.parentgwt</groupId>
-  <artifactId>ParentGWT</artifactId>
-  <version>0.0.8</version>
+  <artifactId>parentgwt</artifactId>
   <packaging>pom</packaging>
   <name>parent pom for GWT widgets</name>
   <properties>
@@ -17,11 +16,13 @@
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<interactionVersion>0.0.5</interactionVersion>
+  	<dwoVersion>2.5.48</dwoVersion>
+  	<interactionVersion>${dwoVersion}</interactionVersion>
   </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
 	<module>../WidgetPlayer</module>
+	<module>../PrintPlayer</module>
 	<module>../AIModelGWT</module>
   	<module>../AlgebraExprGWT</module>
   	<module>../AlgebraPijlenGWT</module>
@@ -52,6 +53,7 @@
 	<module>../GeoDefinerGWT</module>
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
+	<module>../SQLiteGWT</module>
   </modules>
   <dependencyManagement>
    <dependencies>
@@ -66,6 +68,12 @@
   		<version>${gwtVersion}</version>
   		<scope>provided</scope>
   	</dependency>
+	<dependency>
+		<groupId>org.gwtproject</groupId>
+		<artifactId>gwt-user</artifactId>
+  		<version>${gwtVersion}</version>
+		<scope>provided</scope>
+	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
@@ -73,6 +81,22 @@
   	</dependency>
    </dependencies>
   </dependencyManagement>
+ 	<repositories>	<!-- als de mirror uit staat -->
+                    <repository>
+                     <id>numworx-dwo-openmath</id>
+                     <snapshots>
+                        <enabled>true</enabled>
+                     </snapshots>
+                     <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-openmath</url>
+                  </repository>
+                    <repository>
+                     <id>numworx-dwo-project</id>
+                     <snapshots>
+                        <enabled>true</enabled>
+                     </snapshots>
+                     <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-project</url>
+                  </repository>
+	</repositories>
   <build>
   	<plugins>
     		<plugin>
@@ -118,7 +142,7 @@
     		<configuration>
        			<warSourceDirectory>war</warSourceDirectory>
        			<warSourceExcludes>*gwt/</warSourceExcludes>
-        		<packagingIncludes>*.css,*gwt/**,${project.artifactId}.html</packagingIncludes>
+        		<packagingIncludes>*.css,*gwt/**</packagingIncludes>
         	</configuration>
    	      </plugin>
     	  <plugin>

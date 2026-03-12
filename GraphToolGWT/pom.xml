@@ -1,9 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>fi.parentgwt</groupId>
+		<artifactId>parentgwt</artifactId>
+		<relativePath>../ParentGWT</relativePath>
+		<version>2.5.48</version>
+	</parent>
 	<groupId>fi.graphtoolgwt</groupId>
-	<artifactId>GraphToolGWT</artifactId>
+	<artifactId>graphtoolgwt</artifactId>
+	<name>GraphToolGWT</name>
 	<packaging>war</packaging>
-	<name>Grafieken tool</name>
+	<description>Grafieken tool</description>
 	<build>
 		<finalName>${project.artifactId}</finalName>
 		<sourceDirectory>src</sourceDirectory>
@@ -19,7 +26,6 @@
 				<configuration>
 					<warSourceDirectory>war</warSourceDirectory>
 					<attachClasses>true</attachClasses>
-					<packagingIncludes>*.css,*gwt/**,${project.artifactId}.html</packagingIncludes>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -27,8 +33,8 @@
 				<artifactId>gwt-maven-plugin</artifactId>
 				<version>${gwtVersion}</version>
 				<configuration>
-					<module>${project.groupId}.${project.artifactId}</module>
-					<runTarget>${project.artifactId}.html</runTarget>
+					<module>${project.groupId}.${project.name}</module>
+					<runTarget>${project.name}.html</runTarget>
 					<warSourceDirectory>war</warSourceDirectory>
 				</configuration>
 				<executions>
@@ -62,30 +68,28 @@
 		</dependency>
 		<dependency>
 			<groupId>fi.statistiekgwt</groupId>
-			<artifactId>StatistiekGWT</artifactId>
-			<version>0.0.8</version>
+			<artifactId>statistiekgwt</artifactId>
+			<version>${project.version}</version>
 			<classifier>classes</classifier>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.24</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.24</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
 			<artifactId>IdeasGWT</artifactId>
-			<version>0.1.1</version>
+			<version>0.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
-			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.7</version>
+			<artifactId>wiskopdrgwt</artifactId>
+			<version>${dwoVersion}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>IdeasGWT</artifactId>
@@ -100,12 +104,11 @@
 		<dependency>
 			<groupId>gwt.geom</groupId>
 			<artifactId>gwt-geom</artifactId>
-			<version>0.0.1</version>
+			<version>${authorVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>formule</artifactId>
-			<version>2.5.27</version>
 			<exclusions>
 				<exclusion>
 					<groupId>nl.uu.fi.dwo.mobile</groupId>
@@ -116,12 +119,12 @@
 		<dependency>
 			<groupId>fi.beans</groupId>
 			<artifactId>lineairealgebra</artifactId>
-			<version>0.0.1</version>
+			<version>${dwoVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.beans</groupId>
 			<artifactId>lineairealgebra</artifactId>
-			<version>0.0.1</version>
+			<version>${dwoVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
@@ -132,19 +135,22 @@
 		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
-			<version>${gwtVersion}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-	<parent>
-		<groupId>fi.parentgwt</groupId>
-		<artifactId>ParentGWT</artifactId>
-		<relativePath>../ParentGWT</relativePath>
-		<version>0.0.8</version>
-	</parent>
-	<version>2.5.24</version>
 	<properties>
 		<gwt.style>PRETTY</gwt.style>
 		<gwtVersion>2.9.0</gwtVersion>
 	</properties>
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt</artifactId>
+      <version>${gwtVersion}</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
 </project>

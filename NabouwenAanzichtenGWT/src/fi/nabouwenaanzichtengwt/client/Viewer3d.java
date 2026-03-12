@@ -1,6 +1,8 @@
 package fi.nabouwenaanzichtengwt.client;
 
 
+import java.util.logging.Logger;
+
 import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -21,6 +23,10 @@ import com.vaadin.pointerevents.client.PointerUpHandler;
 
 public class Viewer3d
 {
+	private static final double deg15 = Math.PI / 180 * 15;
+	private static final double deg5  = Math.PI / 180 * 5;
+	
+	private static final double ANGLE_TRESHOLD = deg15;
 	/**
 	 * teken Canvas
 	 */
@@ -164,19 +170,19 @@ public class Viewer3d
 	/**
 	 * de initiele draaiing van het kubusbouwsel om de x-as resp. de y-as
 	 */
-	private double beginx, beginy;
+	double beginx, beginy;
 	
 	/**
 	 * actuele draaiing van het kubusbouwsel om de x-as is beginx+xhoek;<br> 
 	 * xhoek wordt veranderd bij slepen, zie methode muisSleepActie 
 	 */
-	private double xhoek;
+	double xhoek;
 	
 	/**
 	 * actuele draaiing van het kubusbouwsel om de y-as is beginy+yhoek;<br> 
 	 * yhoek wordt veranderd bij slepen, zie methode muisSleepActie 
 	 */
-	private double yhoek;
+	double yhoek;
 	
 	/**
 	 * de gesorteerde vlakken uit een de verschillende Lichaam3D 
@@ -208,6 +214,7 @@ public class Viewer3d
 	 */
 	private String lastBuildCommand = "";
 
+	Viewer3d() { }
 	/**
 	 * constructor: initialiseer de attributen, het Canvas en de
 	 * Mouse/Touch handlers voor het Canvas  
@@ -516,6 +523,32 @@ public class Viewer3d
 		mat.ydraai(beginy + yhoek);
 		tekenKubusRooster();
 	}
+	
+	Punt3D normalVlak(Matrix3D hoekMatrix) {
+		Punt3D p = new Punt3D(0,0,0);
+		Matrix3D m = hoekMatrix;
+		p =  m.geefVolgendPunt(p, 0, 1, 0);
+		//logger.info("normalVlak = " + p.x + "," + p.y + "," + p.z);
+		return p;
+	}
+
+	protected Matrix3D hoekMatrix() {
+		Matrix3D m = new Matrix3D();
+		m.initialiseer();
+		m.xdraai(beginx + xhoek);
+		m.ydraai(beginy + yhoek);
+		return m;
+	}
+
+	Punt3D pijl(Matrix3D hoekMatrix) {
+		Punt3D p = new Punt3D(0,0,0);
+		Matrix3D m = hoekMatrix;
+		p =  m.geefVolgendPunt(p, 0, 0, 1);
+		//logger.info("pijl = " + p.x + "," + p.y + "," + p.z);
+		return p;
+	}
+	
+	
 
 	/**
 	 * teken het kubusrooster: grondvlak (als nodig), pijl of
@@ -1082,6 +1115,17 @@ public class Viewer3d
     		lastBuildCommand = "";
     }
 
+    Punt3D lastNormal = new Punt3D(0,1,0);
+    static final double cos15 = Math.cos(deg15);
+    static final double cos30 = Math.cos(Math.PI * 30 / 180);
+    
+    static final double SIDE_TRESHOLD = cos15;
+    
+    static Logger logger = Logger.getLogger("Viewer3d");
+    double rotatie;
+    enum Side { LEFT, FRONT, RIGHT, BACK, TOP};
+    Side side;
+    
 	/**
 	 * actie bij MouseMove/TouchMove Event: draai
 	 */
@@ -1092,18 +1136,100 @@ public class Viewer3d
 		holdMouse = holdMouse && System.currentTimeMillis() - holdMouseStartTime < 300;
 		if (!holdMouse && muisAan)
 		{
+
+			logger.info("voor xh " + xhoek + " yh " + yhoek);
+			Matrix3D old = hoekMatrix();
+			old.transpose();
+			
 			xhoek -= 0.5 * mb.geefSleepdy();
 			if (xhoek > 90 - beginx)
 				xhoek = 90 - beginx;
 			if (xhoek < 0 - beginx)
 				xhoek = 0 - beginx;
 			yhoek += 0.5 * mb.geefSleepdx();
+			logger.info("na   xh " + xhoek + " yh " + yhoek);
 			tekenOpnieuw();
-		}
+
+			if (eigenaar.logOption && eigenaar.isNakijkModus())
+			{	
+			Matrix3D hoek = hoekMatrix();
+			Punt3D normal = normalVlak(hoek);
+			Punt3D pijl = pijl(hoek);
+			old.mult(hoek); // old = hoek * old; premultiply
+			double trace = old.trace();
+			trace = Math.max(-1, trace); // fouten in berekening.
+			trace = Math.min(3,  trace);
+			double angle = Math.acos((trace - 1.0)*0.5);
+			rotatie += angle;
+			logger.info("hoek = " + deg(angle) + ", totaal " + deg(rotatie));
+			if (Math.abs(normal.z) > SIDE_TRESHOLD) {
+				if (side != Side.TOP)
+				{	side = Side.TOP; rotatie = deg15;
+					logger.info("mostly normal z: kijk van boven");
+					eigenaar.viewed("entering " + side.name());
+				}
+			} else if (Math.abs(normal.y) > SIDE_TRESHOLD) {
+				if ((pijl.x) > SIDE_TRESHOLD) {
+					if (side != Side.LEFT)
+					{
+						side = Side.LEFT; rotatie = ANGLE_TRESHOLD;
+						eigenaar.viewed("entering " + side.name());
+						logger.info("mostly pijl x linkerkant");
+					}
+				}
+				else if ((pijl.x) < -SIDE_TRESHOLD) {
+			    	if (side != Side.RIGHT)
+			    	{
+				    	side = Side.RIGHT; rotatie = ANGLE_TRESHOLD;
+						eigenaar.viewed("entering " + side.name());
+			    		logger.info("mostly pijl x rechterkant");
+			    	}
+			    }
+				else if ((pijl.z) > SIDE_TRESHOLD)  {
+			    	if (side != Side.FRONT)
+			    	{
+				    	side = Side.FRONT; rotatie = ANGLE_TRESHOLD;
+						eigenaar.viewed("entering " + side.name());				    	
+			    		logger.info("mostly pijl z voor");
+			    	}
+			    }
+				else if ((pijl.z) < -SIDE_TRESHOLD) {
+			    	if (side != Side.BACK)
+			    	{
+				    	side = Side.BACK; rotatie = ANGLE_TRESHOLD;
+						eigenaar.viewed("entering " + side.name());				    	
+				    	logger.info("mostly pijl z achter");
+			    	}
+			    } else {
+			    	if (side != null) {
+				    	eigenaar.viewed("leaving " + side );
+			    		logger.info("leaving " + side);
+				    	side = null; rotatie = ANGLE_TRESHOLD;
+			    	}
+			    }
+			} else {
+				if (side != null)
+				{
+					eigenaar.viewed("leaving " + side);
+					side = null; rotatie = ANGLE_TRESHOLD;
+					logger.info("grijs gebied");
+				}
+			}
+			if (rotatie >= ANGLE_TRESHOLD) {
+				logger.info( deg(rotatie) + " rotatie >= " + deg(ANGLE_TRESHOLD) +  " graden ");
+				eigenaar.rotated("("+ (xhoek+beginx) + "," + (yhoek+beginy) + ")");
+				rotatie = 0.0;
+			}
+
+		}}
 
 	}
 
 	
+	long deg(double rotatie2) {
+		return Math.round(rotatie2/Math.PI * 180);
+	}
+
 	/**
 	 * actie bij MouseUp/TouchEnd Event: bepaal of een vlakje van het grondvlak
 	 * of een vlakje van een kubusje was aangeklikt; voeg een kubusje toe of

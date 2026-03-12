@@ -4,15 +4,12 @@
   <modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>fi.parentgwt</groupId>
-		<artifactId>ParentGWT</artifactId>
-		<version>0.0.8</version>
+		<artifactId>parentgwt</artifactId>
+		<version>2.5.48</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.replgwt</groupId>
-  <artifactId>ReplGWT</artifactId>
   <packaging>war</packaging>
-  <version>0.0.2</version>
-  <name>REPL Interpreter for GWT</name>
 
   <properties>
     <!-- Convenience property to set the GWT version -->
@@ -60,13 +57,12 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.13</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>0.1.13</version>
 			<classifier>sources</classifier>
+			<version>${interactionVersion}</version>
 		</dependency>
 	    <dependency>
 	      <groupId>de.knightsoft-net</groupId>
@@ -75,8 +71,8 @@
 	    </dependency>
 	    <dependency>
 	    	<groupId>fi.dwo</groupId>
-			<artifactId>DWO-apps</artifactId>
-	        <version>2.5.25</version>
+			<artifactId>dwo-apps</artifactId>
+	        <version>${dwoVersion}</version>
 	        <classifier>classes</classifier>	    
 	    </dependency>
   </dependencies>
@@ -130,4 +126,7 @@
   	</profile>
   
   </profiles>
+  <description>REPL Interpreter for GWT</description>
+  <name>ReplGWT</name>
+  <artifactId>replgwt</artifactId>
 </project>

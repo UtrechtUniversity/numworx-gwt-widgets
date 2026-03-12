@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+	<parent>
+        <groupId>nl.uu.fi.dwo</groupId>
+        <artifactId>dwo</artifactId>
+        <version>2.5.48</version>
+	</parent>
+  <groupId>fi.parentgwt</groupId>
+  <artifactId>widgets-parent</artifactId>
+  <version>2.5.48</version>
+  <packaging>pom</packaging>
+  <properties>
+	<authorVersion>2.5.48</authorVersion>
+  </properties>
+  <modules>
+	<module>ParentGWT</module>
+  </modules>
+  <repositories>
+    <repository>
+	<id>numworx-dwo-project</id>
+	<url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-project</url>
+	<snapshots><enabled>true</enabled></snapshots>
+    </repository>
+    <repository>
+	<id>numworx-dwo-author</id>
+	<url>https://maven.pkg.github.com/UtrechtUniversity/numworx-dwo-author</url>
+	<snapshots><enabled>true</enabled></snapshots>
+    </repository>
+  </repositories>
+    <distributionManagement>
+	    <repository>
+	      <id>github</id>
+	      <name>GitHub Packages</name>
+	      <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-gwt-widgets</url>
+	    </repository>
+        <snapshotRepository>
+          <id>github</id>
+          <name>GitHub Packages</name>
+          <url>https://maven.pkg.github.com/UtrechtUniversity/numworx-gwt-widgets</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <profiles>
+	<profile><id>github</id>
+	</profile>
+    </profiles>
+</project>

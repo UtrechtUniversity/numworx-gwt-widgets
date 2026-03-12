@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- The DOCTYPE declaration above will set the    -->
+<!-- browser's rendering engine into               -->
+<!-- "Standards Mode". Replacing this declaration  -->
+<!-- with a "Quirks Mode" doctype may lead to some -->
+<!-- differences in layout.                        -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <!--                                                               -->
+    <!-- Consider inlining CSS to reduce the number of requested files -->
+    <!--                                                               -->
+    <link type="text/css" rel="stylesheet" href="SQLiteGWT.css">
+
+    <!--                                           -->
+    <!-- Any title is fine                         -->
+    <!--                                           -->
+    <title>SQLite</title>
+<script type="text/javascript">
+
+// var serviceWorker;
+// var promise = navigator.serviceWorker.register("/dwo/apps/serviceworker.js");
+
+// promise.then(function(registration) {
+// 	  serviceWorker = registration.active;
+// 	  if (!serviceWorker) {
+// 	    location.reload();
+// 	  }  
+// 	  console.log("servicework set to " + serviceWorker);
+// })
+
+function tickle() {
+	
+}
+
+function runprog() {
+	var prog = document.getElementById("yourcode").value; 
+	runit(prog)
+}
+
+
+</script> 
+
+    <!--                                           -->
+    <!-- This script loads your compiled module.   -->
+    <!-- If you add any GWT meta tags, they must   -->
+    <!-- be added before this line.                -->
+    <!--                                           -->
+    <script type="text/javascript" src="sqlitegwt/sqlitegwt.nocache.js"></script>
+  </head>
+
+  <!--                                           -->
+  <!-- The body can have arbitrary html, or      -->
+  <!-- you can leave the body empty if you want  -->
+  <!-- to create a completely dynamic UI.        -->
+  <!--                                           -->
+<body>
+
+	<form> 
+		<textarea id="yourcode" cols="40" rows="10"></textarea>
+		<button type="button" onclick="runprog()">Run</button> 
+	</form>
+	<div id="content">
+		<pre id="output" ></pre>
+	</div>
+</body>
+</html>

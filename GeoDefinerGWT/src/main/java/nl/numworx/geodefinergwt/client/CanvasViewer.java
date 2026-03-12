@@ -294,7 +294,7 @@ public class CanvasViewer extends SpeelVeld implements SnapperImpl.PH, HighLight
 
 	private boolean feedback = true;
 	public boolean isFeedback() {
-		return false;
+		return feedback;
 	}
 	public void setFeedback(boolean fb) {
 		feedback = fb;

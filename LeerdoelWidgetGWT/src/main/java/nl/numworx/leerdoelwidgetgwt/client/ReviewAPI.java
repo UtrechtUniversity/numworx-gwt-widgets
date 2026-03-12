@@ -64,4 +64,9 @@ public class ReviewAPI implements RoleAPI, DescriptionService {
 		return getFailed();
 	}
 
+	@Override
+	public Promise<String> getCSS(DomStudentModelContextId current, DomStudentModelContextInfo info) {
+		return getFailed();
+	}
+
 }

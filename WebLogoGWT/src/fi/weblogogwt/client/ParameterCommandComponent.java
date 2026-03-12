@@ -147,7 +147,7 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 	 * to be edited; see description of strBeforeEditor and strAfterEditor
 	 * @param index index of parameter to be edited
 	 */
-	private void setBeforeAndAfterStrings(int index)
+	void setBeforeAndAfterStrings(int index)
 	{
 		strBeforeEditor = strOpen;
 		strAfterEditor = strClose;
@@ -316,7 +316,7 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 			{	g.setFillStyle(CssColor.make(255,0,0));
 			}
 			// display command text or part of it depending on breedte
-			String fullText = getCommandName() + strOpen +  getFullParameterText() + strClose;
+			String fullText = getFullText();
 			TextMetrics tm = g.measureText(fullText);
 			int textWidth = (int) Math.round(tm.getWidth());
 			if (textWidth > breedte - 10)
@@ -346,6 +346,10 @@ public abstract class ParameterCommandComponent extends SimpleCommandComponent i
 			else // display full text
 				g.fillText(fullText,xPos+10, yPos+18);
 		}
+	}
+
+	protected String getFullText() {
+		return getCommandName() + strOpen +  getFullParameterText() + strClose;
 	}
 
 	/**

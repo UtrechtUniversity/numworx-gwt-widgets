@@ -1,20 +1,29 @@
 #!/bin/bash
-. ~/.bashrc
+# copy to az, for teuniz.dwo.nl
+. ./generate-sas.sh
 PATH=$PATH:/usr/local/bin
-S3=s3://test-dwo-nl/apps
-S3=s3://ebs-dev-dwo-nl/apps
 set -e
-PROD="--profile prod"
-PROD=
-cd ../DWOPlayer;
-mvn clean
-mvn package -P WiskOpdrPlayer -Dgwt.compiler.force=true
-(cd target/WiskOpdrPlayer;\
-	aws $PROD s3 sync --delete --acl public-read DWOplayer $S3/DWOplayer;\
-	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
+cd ../WiskOpdrPlayer;
+
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY -Pgithub
+(cd target/WiskOpdrPlayer; 
+	
+	azcopy sync DWOplayer.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/DWOplayer.css?"$SAS"
+	azcopy sync PrintPlayer.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/PrintPlayer.css?"$SAS"
+	azcopy sync KeyboardGWT.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/KeyboardGWT.css?"$SAS"
+	azcopy sync DWOplayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/DWOplayer/?"$SAS" --recursive=true --delete-destination true
+	
 )
-mvn package -P NoordhoffPlayer -Dgwt.compiler.force=true
-(cd target/NoordhoffPlayer;\
-	aws $PROD s3 sync --acl public-read --delete DWOplayer $S3/noordhoff/DWOplayer;\
-	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/noordhoff/;\
+cd ../WidgetPlayer
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY  -Pgithub
+(cd target/WidgetPlayer;
+
+	azcopy sync WidgetPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
 )
+cd ../PrintPlayer
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY  -Pgithub
+(cd target/PrintPlayer;
+
+        azcopy sync PrintPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/PrintPlayer/?"$SAS" --recursive=true --delete-destination true
+)
+

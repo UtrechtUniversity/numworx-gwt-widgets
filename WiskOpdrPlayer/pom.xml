@@ -2,28 +2,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.8</version>
+  	<artifactId>parentgwt</artifactId>
+  	<version>2.5.48</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
-  <artifactId>WiskOpdrPlayer</artifactId>
-  <version>2.5.27</version>
+  <artifactId>wiskopdrplayer</artifactId>
   <packaging>war</packaging>
-  <name>WiskOpdr Player</name>
+  <name>WiskOpdrPlayer</name>
   <properties>
 	<finalName>WiskOpdrPlayer</finalName>
 	<gwtModule>${project.groupId}.WiskOpdrPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
-	<runTarget>${project.artifactId}.html</runTarget>
-	<gwtVersion>2.9.0</gwtVersion>
+	<runTarget>${project.name}.html</runTarget>
+	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>DWO</artifactId>
-        <version>${project.version}</version>
+        <artifactId>dwo</artifactId>
+        <version>${dwoVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -31,36 +30,39 @@
   </dependencyManagement>
   <dependencies>
 		<dependency>
-			<groupId>com.google.gwt</groupId>
+			<groupId>org.gwtproject</groupId>
 			<artifactId>gwt-user</artifactId>
 			<scope>provided</scope>
 		</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>DWOplayer</artifactId>
+  		<artifactId>dwoplayer</artifactId>
+		<version>${dwoVersion}</version>
   		<classifier>classes</classifier>
   		<exclusions>
   			<exclusion>
   				<groupId>fi.wiskopdrgwt</groupId>
-  				<artifactId>WiskOpdrGWT</artifactId>
+  				<artifactId>wiskopdrgwt</artifactId>
   			</exclusion>
   		</exclusions>
   		<scope>provided</scope>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>DWOplayer</artifactId>
+  		<artifactId>dwoplayer</artifactId>
+<version>2.5.48</version>
   		<type>war</type>
   		<scope>runtime</scope>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>DWOplayer</artifactId>
+  		<artifactId>dwoplayer</artifactId>
+<version>${dwoVersion}</version>
   		<classifier>sources</classifier>
   		<exclusions>
   			<exclusion>
   				<groupId>fi.wiskopdrgwt</groupId>
-  				<artifactId>WiskOpdrGWT</artifactId>
+  				<artifactId>wiskopdrgwt</artifactId>
   			</exclusion>
   		</exclusions>
   		<scope>provided</scope>
@@ -68,13 +70,11 @@
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.26</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.26</version>
 			<scope>provided</scope>
 			<classifier>sources</classifier>
 		</dependency>
@@ -91,6 +91,11 @@
 			<classifier>sources</classifier>
 			<scope>provided</scope>
 		</dependency>
+                <dependency>
+                        <groupId>com.googlecode.mgwt</groupId>
+                        <artifactId>mgwt</artifactId>
+                        <scope>provided</scope>
+                </dependency>
   </dependencies>
   <build>
 	<finalName>${finalName}</finalName>
@@ -116,15 +121,17 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.2.3</version>
 				<configuration>
+	       			<warSourceDirectory>src/main/webapp</warSourceDirectory>
+	        		<packagingIncludes>**</packagingIncludes>
 				   <overlays>
 					<overlay>
 						<groupId>nl.uu.fi.dwo.mobile</groupId>
-						<artifactId>DWOplayer</artifactId>
+						<artifactId>dwoplayer</artifactId>
 						<includes>
 							<include>DWOplayer.css</include>
 							<include>KeyboardGWT.css</include>
+							<include>PrintPlayer.css</include>
 							<include>images/**</include>
 							<include>scripts/**</include>
 						</includes>

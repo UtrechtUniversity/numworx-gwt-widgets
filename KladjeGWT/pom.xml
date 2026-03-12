@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.kladjegwt</groupId>
-  <artifactId>KladjeGWT</artifactId>
   <packaging>war</packaging>
   <build>
   	<finalName>${project.artifactId}</finalName>
@@ -25,8 +24,8 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>${gwtVersion}</version>
          <configuration>
-              <module>${project.groupId}.${project.artifactId}</module>
-              <runTarget>${project.artifactId}.html</runTarget>
+              <module>${project.groupId}.${project.name}</module>
+              <runTarget>${project.name}.html</runTarget>
         	  <warSourceDirectory>war</warSourceDirectory>
         	  <style>PRETTY</style>        
              </configuration>
@@ -55,31 +54,28 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.24</version>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>interaction</artifactId>
-  		<version>2.5.24</version>
   		<classifier>sources</classifier>
   	</dependency>
   	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>2.5.24</version>
 	</dependency>
 			<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
-			<artifactId>IdeasGWT</artifactId>
-			<version>0.1.1</version>
+			<artifactId>ideasgwt</artifactId>
+			<version>0.1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
-			<artifactId>WiskOpdrGWT</artifactId>
-			<version>0.0.7</version>
+			<artifactId>wiskopdrgwt</artifactId>
+			<version>${dwoVersion}</version>
 	  		<exclusions>
 	  			<exclusion>
-	  				<artifactId>IdeasGWT</artifactId>
+	  				<artifactId>ideasgwt</artifactId>
 	  				<groupId>nl.uu.fi.dwo.ideas</groupId>
 	  			</exclusion>
 	  		</exclusions>
@@ -87,7 +83,7 @@
   	<dependency>
   		<groupId>fi.writemathgwt</groupId>
   		<artifactId>WriteMathGWT</artifactId>
-  		<version>2.5.5</version>
+  		<version>${dwoVersion}</version>
   	</dependency>
   	<dependency>
   		<groupId>com.google.gwt</groupId>
@@ -98,12 +94,14 @@
   </dependencies>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.8</version>
+  	<artifactId>parentgwt</artifactId>
+  	<version>2.5.48</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
-  <name>Kladje</name>
   <properties>
   	<gwt.compiler.force>true</gwt.compiler.force>
   </properties>
+  <description>Kladje</description>
+  <name>KladjeGWT</name>
+  <artifactId>kladjegwt</artifactId>
 </project>

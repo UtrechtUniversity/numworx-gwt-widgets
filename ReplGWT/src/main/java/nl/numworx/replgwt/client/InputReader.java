@@ -6,19 +6,25 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.FocusEvent;
+import com.google.gwt.event.dom.client.FocusHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBox;
 
-public class InputReader extends Composite implements HasText, ValueChangeHandler<String>, ClickHandler {
+import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
+
+public class InputReader extends Composite implements HasText, ValueChangeHandler<String>, ClickHandler, FocusHandler {
 
 	private static final Consumer<String> NULL = (x) -> {};
 
 	private TextBox textBox;
 	
 	private Consumer<String> consumer = NULL;
+
+	private OpdrNavIF comRoot;
 	
 	public Consumer<String> getConsumer() {
 		return consumer;
@@ -37,6 +43,7 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 		textBox.addValueChangeHandler(this);
 		//textBox.addClickHandler(this);
 		textBox.addStyleDependentName("input");
+		textBox.addFocusHandler(this);
 		initWidget(textBox);
 	}
 
@@ -59,12 +66,13 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 
 	public void start() {
 		textBox.setValue("");
+		removeFocus();
 		Scheduler.get().scheduleDeferred(() -> { 
 			textBox.setFocus(true);			
 		});
 		
 	}
-
+	
 
 	@Override
 	public void onClick(ClickEvent event) {
@@ -72,6 +80,22 @@ public class InputReader extends Composite implements HasText, ValueChangeHandle
 		event.preventDefault();
 		event.stopPropagation();
 	}
+
+
+	public void setComRoot(OpdrNavIF comRoot) {
+		this.comRoot = comRoot;
+	}
 	
+	private void removeFocus() {
+		if (comRoot != null) {
+			comRoot.getKeyboard().blur();
+		}
+	}
+
+
+	@Override
+	public void onFocus(FocusEvent event) {
+		removeFocus();
+	}
 	
 }

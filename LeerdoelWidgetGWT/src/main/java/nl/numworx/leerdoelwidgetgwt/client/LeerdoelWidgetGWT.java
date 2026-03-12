@@ -4,6 +4,7 @@ package nl.numworx.leerdoelwidgetgwt.client;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -14,19 +15,28 @@ import org.fusesource.restygwt.client.Defaults;
 import org.fusesource.restygwt.client.Method;
 import org.fusesource.restygwt.client.dispatcher.DefaultFilterawareDispatcher;
 import org.fusesource.restygwt.client.dispatcher.DispatcherFilter;
+import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.FailedPromisesException;
 import org.osgi.util.promise.Failure;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
 
+import com.google.gwt.animation.client.AnimationScheduler;
+import com.google.gwt.canvas.dom.client.CssColor;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.web.bindery.event.shared.EventBus;
 import com.google.web.bindery.event.shared.SimpleEventBus;
@@ -36,6 +46,7 @@ import fi.dwo.gwt.lib.rest.CallManagers.MethodManager;
 import fi.dwo.gwt.lib.rest.CallManagers.OAuthManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredStudentStudentModelManager;
 import fi.dwo.gwt.lib.rest.CallManagers.SecuredUserAccountManager;
+import fi.dwo.gwt.lib.rest.ui.IdleDetect;
 import fi.dwo.gwt.lib.rest.util.Dwo2ExceptionGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.Dwo2LocaleMessageGWTTranslator;
 import fi.dwo.gwt.lib.rest.util.RestAuthenticator;
@@ -82,6 +93,13 @@ import nl.uu.fi.dwo.rest.util.Dwo2LocaleMessageTranslator;
  */
 public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, DispatcherFilter, SwitchViewEventHandler, CBookEventListener {
 
+	enum Type {
+		GRAPH,
+		TREE,
+		RECOMMENDER,
+	}
+	
+	
 	private static final Failure FAILURE = new Failure() {
 
 		@Override
@@ -128,7 +146,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private boolean voorkennisMenu;
 	private boolean voorkennisKnop;
 	private boolean leerdoelPopup;
-	private int type;
+	private boolean visible;
+	private Type type;
 	private EventBus evbus;
 	
 	@SuppressWarnings("unchecked")
@@ -136,7 +155,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		this();
 		ObjectMap map = JSONUtilities.wrapMap(h);
 		width = map.getInt("breedte");
-		height = map.getInt("hoogte");
+		wantedheight = map.getInt("hoogte");
 		volledigeBreedte = map.getBoolean("volledigeBreedte", false);
 		if (volledigeBreedte) 
 			width = volleBreedte;
@@ -167,11 +186,34 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 
 	@Override
 	public HashMap<String, Object> getState() {
-		return new HashMap<>();
+		HashMap<String, Object> state = new HashMap<>();
+		switch(type) {
+		case RECOMMENDER:
+			recommender.getState(state);
+			header.getState(state);
+		case TREE:
+		case GRAPH:
+		}
+		return state;
 	}
 
 	@Override
 	public void setState(HashMap<String, Object> h) {
+		ObjectMap state = JSONUtilities.wrapMap(h);
+		switch(type) {
+		case RECOMMENDER:
+			try {
+				ready.resolveWith(recommender.extradiff());
+			} catch (Exception e) {
+			}
+			ready.getPromise().onResolve( () -> {
+				recommender.setState(state);
+				header.setState(state);
+			});
+			break;
+		case TREE:
+		case GRAPH:
+		}
 	}
 
 	@Override
@@ -201,6 +243,9 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private LeerdoelTree tree;
 	private LeerdoelPresenter presenter;
 	private EastPanel east;
+	LeerdoelRecommender recommender;
+	private List<String> objectives;
+	private int wantedheight;
 
 	interface RoleAPI {
 		//StudentResultsService getService();
@@ -214,7 +259,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		}
 	}
 	
-	
+	Deferred<Object> ready = new Deferred<>();
 
 	class LearnerAPI implements RoleAPI {
 		final StudentResultsService service;
@@ -272,6 +317,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		}
 	}
 	
+	boolean pasAanH = true;
+	RecommenderHeader header;
 	
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
@@ -319,14 +366,14 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		DescriptionPresenter service;
 		switch(type) {
 		
-		case 0: // graph
+		case GRAPH: // graph
 			DescriptionPresenter description = new DescriptionPresenter(Optional.of(evbus), true, roleAPI.getDescriptionService());
 			graph = new LeerdoelGraph(voorkennisKnop, zoomKnoppen, voorkennisMenu, leerdoelPopup, description, filterHeader);
 			panel.add(graph);
 			panel.setWidgetLeftRight(graph, 0, Unit.PX, 0, Unit.PX);
 			panel.setWidgetTopBottom(graph, 0, Unit.PX, 0, Unit.PX);
 			break;
-		case 1: //lijst
+		case TREE: //lijst
 			Panel parent = new ScrollPanel();
 			panel.add(parent);
 			int right = Math.min(440, width/2);
@@ -344,6 +391,100 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			presenter = new LeerdoelPresenter(evbus, vars);
 			presenter.setView(tree);
 			presenter.setEast(east);
+			break;
+		case RECOMMENDER:
+			recommender = new LeerdoelRecommender(this);
+			header = new RecommenderHeader();
+			header.initialDown(visible);
+			recommender.setComRoot(comRoot);
+// font overerven, altijd aan
+			ObjectMap instellingen = comRoot.getConfiguration();
+			// fontSize, fontName, fgColor
+			if (instellingen.containsKey("fontSize")) {
+				panel.getElement().getStyle().setFontSize(instellingen.getInt("fontSize"), Unit.PX);
+			}
+			if (instellingen.containsKey("fontName")) {
+				panel.getElement().getStyle().setProperty("fontFamily", instellingen.getString("fontName"));
+			}
+			if (instellingen.containsKey("fgColor")) {
+				String fgcolor;
+				Object o = instellingen.get("fgColor");
+				if (o instanceof JSONString) {
+					fgcolor = ((JSONString) o).stringValue();
+				} else
+				if (o instanceof String) {
+					fgcolor = o.toString();
+				} else {
+					ObjectMap m = instellingen.getObjectMap("fgColor");
+					if (m != null) {
+						int red = m.getInt("red");
+						int green = m.getInt("green");
+						int blue = m.getInt("blue");
+						fgcolor = CssColor.make(red, green, blue).value();
+					} else 
+						fgcolor = CssColor.make(0,0,0).value();
+				}
+				panel.getElement().getStyle().setColor(fgcolor);
+			}
+
+			panel.add(header);
+			int margin = 10;
+			panel.setWidgetTopHeight(header, margin, Unit.PX, header.getHeight(), Unit.PX);
+			panel.setWidgetLeftRight(header, margin, Unit.PX, margin, Unit.PX);
+			panel.add(recommender);
+			panel.setWidgetTopBottom(recommender, header.getHeight() + margin*2, Unit.PX, margin, Unit.PX);
+			panel.setWidgetLeftRight(recommender, margin, Unit.PX, margin, Unit.PX);
+			panel.addStyleName("framed");
+			panel.addStyleName("profile-borderBox");
+			recommender.setObjectives(objectives);
+			recommender.setService(roleAPI.getDescriptionService());
+			recommender.enableScore(leerdoelScore);
+			recommender.keyboard = root.getKeyboard();
+			recommender.idler = new IdleDetect(evbus);
+			recommender.width = width - 9;
+			header.setCenter(recommender);
+			
+			header.addValueChangeHandler(ev -> { 
+				HashMap<String,Number> parameters = new HashMap<>();
+				parameters.put("width", width = panel.getOffsetWidth());
+				parameters.put("height", wantedheight = height);
+				if (!ev.getValue().booleanValue())
+				{	parameters.put("height", wantedheight = header.getHeight() + margin*2);
+				} else {
+					if (false && pasAanH)
+					AnimationScheduler.get().requestAnimationFrame
+					
+					((t) -> {
+						Promise<Object> x = recommender.extradiff().then( qq ->  { int extra = qq.getValue(); 
+						GWT.log("extra is = " + extra);
+						if (pasAanH && extra != 0) {
+							this.height += extra;
+							parameters.put("height", wantedheight = height);
+							comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
+							pasAanH = false;
+						}
+							return null; });
+						try {
+							ready.resolveWith(x);
+						} catch (Exception e) {
+						}
+						
+						
+					});
+					recommender.stackResize(); // big hack, deze werkt altijd.
+
+				}
+				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));
+			});
+			int wanted = 220 + objectives.size() * 30; 
+			if (height < wanted) {
+				HashMap<String,Number> parameters = new HashMap<>();
+				parameters.put("width", width);
+				parameters.put("height", height = wanted);
+				comRoot.fireEvent(new CBookEvent(this, "resize", parameters));			
+			}	
+			header.setDown(false);
+			break;
 		}
 		
 		Promise<DomMethod> m;
@@ -400,7 +541,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	
 	@Override
 	public int getHeight() {
-		return height;
+		return wantedheight;
 	}
 	
 	@Override
@@ -417,6 +558,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 		this.width = width;
 		this.height = height;
+		this.wantedheight = height;
 		ObjectMap h = JSONUtilities.wrapMap(launchData);
 		
 	    String studentModelID = null;
@@ -428,7 +570,8 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	     zoomKnoppen = false;
 	     filterHeader = false;
 	     leerdoelScore = false;
-	     type = 0;
+	     type = Type.GRAPH;
+	     objectives = Collections.emptyList();
 	    
 	    if(h.containsKey("activeMethod"))
 	      activeMethod = h.getString("activeMethod");
@@ -448,8 +591,12 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	      filterHeader = h.getBoolean("filterHeader");
 	    if(h.containsKey("leerdoelScore"))
 	      leerdoelScore = h.getBoolean("leerdoelScore");
+	    visible = h.getBoolean("visible", false);
 	    if (h.containsKey("type"))
-	    	type = h.getInt("type");
+	    	type = Type.values()[h.getInt("type")];
+	    if (h.containsKey("objectives"))
+	    	objectives = h.getStringList("objectives");
+	    
 	    this.filter = convert(filter);
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));
@@ -463,17 +610,22 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		studentModel = p.getValue();
 		studentModel.setFilter(filter);
 		studentModel.getModelStructure().setActiveMethod(activeMethod.getId());
+// bij recommender(2): altijd score ophalen!
 		final Promise<DomStudentModelDataScore> s = 
-				leerdoelScore ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
+				leerdoelScore || type == Type.RECOMMENDER ? roleAPI.getScore(studentModel) : emptyScore(studentModel) ;
 
 		switch(type) {
-		case 0:		
+		case GRAPH:		
 			graph.setModelScore(studentModel, s, activeMethod);
 		    graph.doFilter(filter);
 		    if (!leerdoelScore) graph.zoomFit();
 		    break;
-		case 1:
+		case TREE:
 			presenter.setModelScore(studentModel, s, activeMethod);
+			break;
+		case RECOMMENDER:
+			recommender.setModelScore(studentModel, s, activeMethod);
+			break;
 		}
 	}
 
@@ -489,12 +641,15 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 		Map<String, Map<String, Set<Integer>>> result = new HashMap<>();
 		Set<String> keys = filter.keySet();
 		for(String key: keys) {
-			result.put(key, convert2(filter.getObjectMap(key)));
+			ObjectMap value = filter.getObjectMap(key); // else NPE
+			if ("null".equals(key)) key = null; // BUG in keySet()?????
+			result.put(key, convert2(value));
 		}
 		return result;
 	}
 
 	private Map<String, Set<Integer>> convert2(ObjectMap objectMap) {
+		if (objectMap == null) return null;
 		Map<String, Set<Integer>> result = new HashMap<>();
 		for(String key: objectMap.keySet()) {
 			result.put(key, convert3(objectMap.getObjectList(key)));
@@ -535,6 +690,22 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	public void acceptCBookEvent(CBookEvent event) {
 		// Alleen voor "action.setNotEditable"
 		// TODO doe niks
+	}
+
+	@Override
+	public int getConstantHeight() { // niet goed, alleen in uitgeklapt?
+		if (type != Type.GRAPH) return wantedheight;
+		return 0;
+	}
+
+	public void requestDelta(int extra) {
+		if (extra != 0) {
+			HashMap<String,Number> parameters = new HashMap<>();
+			parameters.put("width", width = panel.getOffsetWidth());
+			this.height += extra;
+			parameters.put("height", wantedheight = height);
+			root.fireEvent(new CBookEvent(this, "resize", parameters));
+		}
 	}
 	
 	

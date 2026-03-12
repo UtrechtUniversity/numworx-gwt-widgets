@@ -42,6 +42,8 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import fi.graphtoolgwt.client.FormuleComponentGWT.GraphtFormuleEditor;
 import fi.statistiekgwt.client.event.ColorChangeEvent;
 import fi.statistiekgwt.client.event.ColorChangeEventHandler;
 import fi.wiskopdr.FormuleParser;
@@ -188,7 +190,7 @@ public class FormuleComponentGWT extends LayoutPanel  implements ColorChangeEven
 	
 	private int formuleComponentHoogte; 
 	
-	private String[] functieBegin = new String[maxAantalFormules];
+	String[] functieBegin = new String[maxAantalFormules];
 	//private boolean hasPrefix = true;
 	private int breedte = 300;
 	private int hoogte = 120;
@@ -1571,4 +1573,17 @@ public FormuleComponentGWT(GraphToolGWT interactiePanel, Map<String, Object> lau
 		}
 	}
 
+	public void updateEditor(int index, String formule, boolean paint) {
+ 		GraphtFormuleEditor editor = editors[index];
+ 		editor.clearAll();
+ 		formule = formule.substring(2, formule.length()-1);
+ 		if (functieBeginZichtbaar && functieBeginAanpasbaar) {
+ 			formule = functieBegin[index] + formule;
+ 		}
+		editor.insert(formule);
+		if (paint) {
+			editor.setCurrentElementRepaint();
+		}
+
+	}
 }

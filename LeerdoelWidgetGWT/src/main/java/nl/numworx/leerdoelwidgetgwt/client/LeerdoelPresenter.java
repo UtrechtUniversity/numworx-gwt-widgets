@@ -1,5 +1,7 @@
 package nl.numworx.leerdoelwidgetgwt.client;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 import org.osgi.util.promise.Failure;
@@ -23,11 +25,13 @@ import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelCategoryScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContext4Student;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelContextInfo;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelDataScore;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelMethodInfo;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObj;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelObjectiveScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelScore;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructure;
 import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelStructureScore;
+import nl.uu.fi.dwo.rest.dom.entities.DomStudentModelVariant;
 
 public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 	private static final Logger LOG = Logger.getLogger(LeerdoelPresenter.class.getName());
@@ -70,18 +74,36 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 		return AbstractStudentModelPresenter.getTitle(info, lang);
 	}
 
+	private static final String WEETJES = "W:";
+
+	private Optional<DomStudentModelMethodInfo> getMethodInfo(DomStudentModelContextInfo info, TreeItem item) {
+		List<DomStudentModelVariant> variants = info.getVariants();
+		if (variants != null && !variants.isEmpty() && info.getMethodInfo() != null) {
+			item = item.getParentItem();
+			if(WEETJES.equals(item.getUserObject())) item = item.getParentItem();
+			int[] index = (int[]) item.getUserObject();
+			String key = view.method.key() + "-" + view.method.books.get(index[0]) + "-" + (index[1]+1);
+			return info.getMethodInfo().stream()
+					.filter( t -> key.equals(t.key()))
+					.findAny();
+		}
+		return Optional.empty();
+	}
+
 	private void onMethodSelection(TreeItem item, Object userObject) {
 		east.clearVisibility();
 		StudentResultsTree tree = view;
+		DomStudentModelMethodInfo methodinfo = null;
 		DomStudentModelScore<?> score = tree.scoreMap.get(item);
-		if ("W:".equals(userObject)) {
+		if (WEETJES.equals(userObject)) {
 			userObject = item.getParentItem().getUserObject();
 		}
 		if (userObject instanceof DomStudentModelScore<?>) {
 			score = (DomStudentModelScore<?>) userObject;
 			String id = score.getId();
 			DomStudentModelContextInfo info = tree.currentInfo.get(id);
-			east.setDescription(model,info);
+			methodinfo = getMethodInfo(info, item).orElse(null);
+			east.setDescription(model,info, methodinfo);
 		} else if (userObject instanceof Integer) {
 			east.title.setText(tree.method.books.get(((Integer) userObject).intValue()));
 			east.description.clear();
@@ -94,7 +116,7 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 			east.title.setText(tree.method.getMethod());
 			east.description.clear();
 		}	
-		if (score != null) east.setPerc(score); else east.setPerc(StudentResultsPresenter.NULLSCORE);
+		if (score != null) east.setPerc(score, methodinfo); else east.setPerc(StudentResultsPresenter.NULLSCORE, null);
 	}
 
 	
@@ -111,20 +133,20 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 		east.clearVisibility();
 		if (userObject instanceof DomStudentModelContext4Student) {
 			DomStudentModelContext4Student model = this.model;
-			east.setDescription(model, model.getModelStructure().getInfo());
+			east.setDescription(model, model.getModelStructure().getInfo(), null);
 			score.then ( p -> {
 				DomStudentModelStructureScore score = p.getValue().getDomStudentModelStructureScore();
-				east.setPerc(score);
+				east.setPerc(score, null);
 				return p;
 			}, FAILURE);
 		} else if (userObject instanceof Integer) {
 			DomStudentModelContext4Student model = this.model;
 			DomStudentModelStructure structure = model.getModelStructure();
 			DomStudentModelCategory o = structure.getCategories().get(((Integer) userObject).intValue());
-			east.setDescription(model, o.getInfo());
+			east.setDescription(model, o.getInfo(), null);
 			score.then(p -> { 
 				DomStudentModelCategoryScore score = p.getValue().getDomStudentModelStructureScore().getCategories().get(((Integer) userObject).intValue());
-				east.setPerc(score);
+				east.setPerc(score,null);
 				return p; }, FAILURE)
 			;			
 		} else if (userObject instanceof int[]) {
@@ -139,12 +161,12 @@ public class LeerdoelPresenter implements SelectionHandler<TreeItem> {
 				o0 = o0.getObjectives().get(elems[i]);
 			}
 			final DomStudentModelObj oo = o0;
-			east.setDescription(model, oo.getInfo());
+			east.setDescription(model, oo.getInfo(),null);
 
             score.then( p -> { 
 				DomStudentModelObjectiveScore score = p.getValue().getDomStudentModelStructureScore().getCategories().get(cat).getObjectives().get(obj);
 				for (int i = 2; i < elems.length; i++ ) score = score.getChildren().get(elems[i]);
-				east.setPerc(score);
+				east.setPerc(score,null);
 				return p; }, FAILURE);
 		}
 		

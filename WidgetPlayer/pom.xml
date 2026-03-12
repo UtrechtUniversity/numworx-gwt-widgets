@@ -2,28 +2,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
   	<groupId>fi.parentgwt</groupId>
-  	<artifactId>ParentGWT</artifactId>
-  	<version>0.0.8</version>
+  	<artifactId>parentgwt</artifactId>
+  	<version>2.5.48</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <groupId>nl.uu.fi.dwo.mobile</groupId>
-  <artifactId>WidgetPlayer</artifactId>
-  <version>2.5.27</version>
+  <artifactId>widgetplayer</artifactId>
   <packaging>war</packaging>
-  <name>Widget Player</name>
+  <name>WidgetPlayer</name>
   <properties>
 	<finalName>WidgetPlayer</finalName>
 	<gwtModule>${project.groupId}.WidgetPlayer</gwtModule>
 	<gwt.style>OBFUSCATED</gwt.style>
-	<runTarget>${project.artifactId}.html</runTarget>
-	<gwtVersion>2.9.0</gwtVersion>
+	<runTarget>${project.name}.html</runTarget>
+	<gwtVersion>2.10.0</gwtVersion>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>DWO</artifactId>
-        <version>${project.version}</version>
+        <artifactId>dwo</artifactId>
+        <version>${dwoVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -37,36 +36,38 @@
 		</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>DWOplayer</artifactId>
+  		<artifactId>dwoplayer</artifactId>
   		<classifier>classes</classifier>
-  		<exclusions>
+  		<scope>provided</scope>
+		<exclusions>
   			<exclusion>
   				<groupId>fi.wiskopdrgwt</groupId>
-  				<artifactId>WiskOpdrGWT</artifactId>
+  				<artifactId>wiskopdrgwt</artifactId>
   			</exclusion>
   		</exclusions>
   	</dependency>
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>DWOplayer</artifactId>
+  		<artifactId>dwoplayer</artifactId>
   		<classifier>sources</classifier>
+		<scope>provided</scope>
   		<exclusions>
   			<exclusion>
   				<groupId>fi.wiskopdrgwt</groupId>
-  				<artifactId>WiskOpdrGWT</artifactId>
+  				<artifactId>wiskopdrgwt</artifactId>
   			</exclusion>
   		</exclusions>
   	</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.26</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
-			<version>2.5.26</version>
 			<classifier>sources</classifier>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>

@@ -3,14 +3,18 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.numworx.leerdoelwidget</groupId>
-  <artifactId>LeerdoelWidgetGWT</artifactId>
-  <name>Leerdoel Widget GWT</name>
+  <artifactId>leerdoelwidgetgwt</artifactId>
+  <name>LeerdoelWidgetGWT</name>
+  <description>Leerdoel Widget GWT</description>
 
   <properties>
-    <!-- Convenience property to set the GWT version -->
+    <!-- Convenience property to set the GWT version 
+         LET OP 2.10.0 geeft CORS errors met het ophalen van de nocache.js scripts,
+         voorlopig niet upgraden naar 2.10.0 
+    -->
     <gwt.version>2.9.0</gwt.version>
 
-    <!-- GWT 2.9 support 8, 9 and 11 -->
+    <!-- GWT 2.9/10 support 8, 9 and 11 -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
@@ -18,14 +22,15 @@
     <allowSnapshots>true</allowSnapshots>
     <packaging>war</packaging>
     <gwtModule>nl.numworx.leerdoelwidgetgwt.LeerdoelWidgetGWT</gwtModule>
-	<runTarget>${project.artifactId}.html</runTarget>
+	<runTarget>${project.name}.html</runTarget>
 	<context.xml>context8.xml</context.xml>
     <tomcat7.version>7.0.107</tomcat7.version>
     <local.dwo>/dwo</local.dwo>
     <gwt.style>PRETTY</gwt.style>
     <gwtVersion>2.9.0</gwtVersion>
     <gwt.compiler.force>true</gwt.compiler.force>
-    <interactionVersion>2.5.24</interactionVersion>
+    <gwt.compiler.localWorkers>3</gwt.compiler.localWorkers>
+
   </properties>
 
   <dependencyManagement>
@@ -36,20 +41,6 @@
         <version>${gwt.version}</version>
         <type>pom</type>
         <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>nl.uu.fi.dwo</groupId>
-        <artifactId>DWO</artifactId>
-        <version>2.5.27</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-          <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>DWOServer</artifactId>
-          <version>2.5.27</version>
-          <type>war</type>         
-	  <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -69,7 +60,6 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>
-      <version>${gwt.version}</version>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -86,33 +76,28 @@
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.mobile</groupId>
 			<artifactId>interaction</artifactId>
 			<scope>provided</scope>
-			<version>${interactionVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
-    		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.27</version>
+    		<artifactId>dwogwtclient</artifactId>
+			<version>${dwoVersion}</version>
 			<classifier>classes</classifier>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 		    <groupId>nl.uu.fi.dwo.lms</groupId>
-    		<artifactId>DWOGwtClient</artifactId>
-			<version>2.5.27</version>
+    		<artifactId>dwogwtclient</artifactId>
+			<version>${dwoVersion}</version>
 			<classifier>sources</classifier>
-			<scope>provided</scope>
 		</dependency>
       <dependency>
           <groupId>nl.uu.fi.dwo</groupId>
-          <artifactId>DWOServer</artifactId>
-          <version>2.5.27</version>
+          <artifactId>dwoserver</artifactId>
           <type>war</type>
           <scope>test</scope>        
       </dependency>
@@ -182,11 +167,12 @@
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<extraJvmArgs>-Xms768m -Xmx2048m</extraJvmArgs>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+					<i18nConstantsBundle>nl.numworx.leerdoelwidgetgwt.client.locale.LeerdoelWidgetMessages</i18nConstantsBundle>
 				</configuration>
 				<executions>
 					<execution>
 						<goals>
-<!--							<goal>i18n</goal>-->
+							<goal>i18n</goal>
 							<goal>compile</goal>
 <!--							<goal>test</goal>-->
 						</goals>
@@ -198,6 +184,7 @@
         	<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
+					<attachClasses>true</attachClasses>
 				</configuration>
         </plugin>        
 
@@ -221,8 +208,8 @@
                     <webapps>
                         <webapp>
                             <groupId>nl.uu.fi.dwo</groupId>
-                            <artifactId>DWOServer</artifactId>
-                            <version>${project.version}</version>
+                            <artifactId>dwoserver</artifactId>
+                            <version>${dwoVersion}</version>
                             <type>war</type>    
                             <asWebapp>true</asWebapp> 
                             <contextPath>${local.dwo}</contextPath>
@@ -354,10 +341,9 @@
 </profiles>
 	<parent>
 		<groupId>fi.parentgwt</groupId>
-		<artifactId>ParentGWT</artifactId>
-		<version>0.0.8</version>
+		<artifactId>parentgwt</artifactId>
+		<version>2.5.48</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
 	<packaging>war</packaging>
-	<version>2.5.26</version>
 </project>

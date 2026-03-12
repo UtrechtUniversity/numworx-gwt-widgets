@@ -27,6 +27,7 @@ import nl.numworx.geodefinergwt.client.i18n.MessagesImpl;
 import nl.numworx.geodefinergwt.client.i18n.messages;
 import nl.numworx.geodefinergwt.client.module.Components;
 import nl.numworx.geodefinergwt.client.module.DaggerComponents;
+import nl.numworx.geodefinergwt.client.toolbox.RadioMode;
 import nl.numworx.geodefinergwt.client.ui.UIModelFactoryGWT;
 import nl.numworx.geodefinergwt.client.ui.UserConfig;
 import nl.tue.win.riaca.openmath.lang.OMBinding;
@@ -92,7 +93,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	//private final static Logger LOG = Logger.getLogger("GeoDefinerGWT");
 	
 	private void lognagekeken() {
-		logger.info("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
+		logger.warning("nagekeken = " + isNagekeken() + ", score = " + score + ", feedback = " + getStatus() + ", err = " + getErrorCount());
 	}
 	
 	static class MyDockLayoutPanel extends DockLayoutPanel {
@@ -123,6 +124,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	interface MyUiBinder extends UiBinder<DockLayoutPanel, GeoDefinerGWT> {}
 	static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 	private static final String CHECK = "check";
+	private static final String ACTION_RESET = "action.reset";
 
 	@UiField DockLayoutPanel southPanel;
 	@UiField Label status;
@@ -177,16 +179,22 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		if( launchData.containsKey("toolbox")) {
 			ObjectList list = launchData.getObjectList("toolbox");
 			if(list.size() > 0) {
-				toolbox.init(list, launchData.getObjectList("toolboxConfig"), width, buttons.get(), shims.get());
+				toolbox.init(list, launchData.getObjectList("toolboxConfig"), width, buttons.get(), shims.get(), model.get());
 				root.setWidgetSize(toolbox, toolbox.getHeight());
 				root.setWidgetHidden(southPanel, false);
 				if(checkDWO == null) {
 					southPanel.setWidgetHidden(check, true);
 				}
+				selectSelector();
 				return;
 			}
 		}
 		root.setWidgetHidden(toolbox, true);
+	}
+
+	private void selectSelector() {
+		selector.command();
+		toolbox.selectSelector();
 	}
 
 	
@@ -228,14 +236,12 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		} else 
 			if (checkDWO != null && checkDWO.isCheck())
 				super.setNagekeken(true); // ommiddelijke feedback bij setState(map)
-		lognagekeken();
 		super.getState(hashMap);
 		if (volledigeBreedte) {
 			hashMap.put("width", Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue());
 			hashMap.put("height", Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue());
 		}
 		getLogState(hashMap);
-		lognagekeken();
 		logger.info("getState " + hashMap);
 		return hashMap;
 	}
@@ -253,9 +259,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
         widget.cancel();
 		Map<String,Object> map = h;
 		viewer.getModel().addObserver(UserConfig.INSTANCE);
-		LOG.severe("O before " + viewer.getModel().getO().getXd());
+		//LOG.severe("O before " + viewer.getModel().getO().getXd());
 		setState(map);
-		LOG.severe("O after " + viewer.getModel().getO().getXd());
+		//LOG.severe("O after " + viewer.getModel().getO().getXd());
+		boolean nagekeken = this.isNagekeken();
 		if (state.containsKey("height") && state.containsKey("width")) {
 			int oldw = Numbers.sub(widget.clipRight() , widget.clipLeft()).intValue();
 			int oldh = Numbers.sub(widget.clipBottom(), widget.clipTop()).intValue();
@@ -264,29 +271,43 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			if (width != oldw || height != oldh ) {
 				LOG.severe("should relocate from " + width + " to " + oldw);
 				widget.init(width, height);
-				relocate(oldw, oldh);
+				boolean oldsema = sema;
+				try {
+					sema = true; // relocating..
+					relocate(oldw, oldh); // trashes nagekeken
+				} finally {
+					sema = oldsema;
+				}
 			}
 		}
 		setLogState(map);
+		lognagekeken();
 		observeNewItems(UserConfig.INSTANCE, new CheckObjectList.CheckVisitor(checkObjects, viewer.getModel()));
 		lognagekeken();
-		if(isNagekeken()) {
-			//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
-			fetchScore();
-			// wanneer feedback:
-			if ( mode == OpdrNavIF.OEFENEN
-			  || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN
-			  || mode == OpdrNavIF.ZELFTOETS
-			  || (mode == OpdrNavIF.EINDTOETS && lessonMode != LessonMode.normal)
-			)
-			feedback();
-		}
+		restoreNagekeken(nagekeken);
 		lognagekeken();
 		start();
 		addFireUpdates();
 		lognagekeken();
 		widget.paint();
 	}
+
+private void restoreNagekeken(boolean nagekeken) {
+	if(nagekeken) {
+		tracker.getModel().executeDelay();
+		LOG.warning("set feedback in setstate");
+		super.setNagekeken(true);
+		//if(mode == OpdrNavIF.OEFENEN || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN) 
+		fetchScore();
+		// wanneer feedback:
+		if ( mode == OpdrNavIF.OEFENEN
+		  || mode == OpdrNavIF.OEFENEN_STRAFPUNTEN
+		  || mode == OpdrNavIF.ZELFTOETS
+		  || (mode == OpdrNavIF.EINDTOETS && lessonMode != LessonMode.normal)
+		)
+		feedback();
+	}
+}
 
 	private void setLogState(Map<String, Object> map) {
       Tracer t = tracker.adapt(Tracer.class);
@@ -314,12 +335,14 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		incErrorCount();
 		fire();
 		lognagekeken();
+		selectSelector();
 	}
 
 	@UiHandler("checkBtn") void kijkNa(ClickEvent evt) { kijkNa(); }
 	
 	private void feedback() {
 		Boolean status = getStatus();
+		LOG.warning("set feedback " + status);
 		check.setStyleName(HALF_CSS, status == null);
 		check.setStyleName(FOUT_CSS, Boolean.FALSE.equals(status));
 		check.setStyleName(GOED_CSS, Boolean.TRUE.equals(status));
@@ -370,6 +393,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 
   
   private void nofeedbackImpl() {
+	  if (!sema) LOG.fine("remove feedback");
+	  else return; // XXX dit moet je testen!!!
 		check.removeStyleName(HALF_CSS);
 		check.removeStyleName(FOUT_CSS);
 		check.removeStyleName(GOED_CSS);
@@ -447,6 +472,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 		FormuleHolder.installKeyboard(comRoot.getKeyboard());
 		
 		comRoot.addCBookEventListener(CHECK, this);
+		comRoot.addCBookEventListener(ACTION_RESET, this);
 		this.mode = comRoot.getMode();
 		this.lessonMode = comRoot.getLessonMode();
 		toetsStyle();
@@ -518,6 +544,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 	
 	@Inject Lazy<Map<Integer,Provider<ToggleButton>>> buttons;
 	@Inject Lazy<Map<Integer,Provider<UIShim<? extends Destroyable, Void>>>> shims;
+	@Inject Lazy<RadioMode> model;
     @Inject Lazy<Tracer> tracerProvider;
 	private boolean logOption, attempt;
 
@@ -633,7 +660,10 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
           viewer.paint();
           return;
         }
-
+        if (ACTION_RESET.equals(event.getCommand())) {
+        	reset();
+        	return;
+        }
 	}
 
 	/* (non-Javadoc)
@@ -693,6 +723,8 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			reset0(orgWidth, orgHeight);
 			relocate(width, height-header); //terug naar huidige grootte
 		}
+
+		fire(ACTION_RESET);
 	}
 	
 	
@@ -716,6 +748,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 			int h = Window.getClientHeight();
 			if (w != width || h != height) {
 				LOG.severe(width + " need resize for " + w + "=" + width + ", " + h + "=" + height);
+				boolean nagekeken = isNagekeken();
 				width  = w;
 				height = h;
 				root.setPixelSize(w, h);
@@ -724,6 +757,7 @@ public class GeoDefinerGWT extends Instance implements EntryPoint, InteractionSt
 //				widget.init(w, h);
 //				widget.getModel().getO().forceChanged();
 				relocate(w,h);
+				restoreNagekeken(nagekeken);
 				widget.paint();
 			}
 		} finally {

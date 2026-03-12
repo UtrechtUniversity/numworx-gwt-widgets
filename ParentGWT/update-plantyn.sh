@@ -4,7 +4,7 @@ set -ex
 cd ../DWOPlayer;
 OPTIONS=-rclDv
 
-W=/Volumes/fisme-sites/www-dev/dwo
+W=/Volumes/fisme-sites/www/dwo
 TODAY=$(date +%-d-%-m-%Y)
 mvn package -P TinCanPlayer -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2
 (cd target/TinCanPlayer; rsync --delete $OPTIONS DWOplayer DWOplayer.css KeyboardGWT.css images scripts $W/apps/plantyn/)

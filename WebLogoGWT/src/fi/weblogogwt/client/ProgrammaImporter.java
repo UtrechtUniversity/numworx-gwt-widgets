@@ -510,6 +510,16 @@ public class ProgrammaImporter
 			}
 			return cc;
 		}
+// # comment 
+		if (codeline.startsWith("#")) {
+			CommentCComponent ccc;
+			cc = ccc = new CommentCComponent(-100,-100, 25, 25, veld);
+			cc.clearStapel();
+			ccc.setParameter(codeline.substring(2));
+			return cc;
+		}
+		
+		
 		// 3: variabele-expressie
 //System.out.println("     +++  was var-expressie");
 		String[] params = StringUtils.split(codeline,"=");
