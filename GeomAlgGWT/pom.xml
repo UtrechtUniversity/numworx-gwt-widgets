@@ -64,7 +64,6 @@
 	<dependency>
 		<groupId>nl.uu.fi.dwo.mobile</groupId>
 		<artifactId>formule</artifactId>
-		<version>${dwoVersion}</version>
 	</dependency>
 		<dependency>
 			<groupId>nl.uu.fi.dwo.ideas</groupId>
