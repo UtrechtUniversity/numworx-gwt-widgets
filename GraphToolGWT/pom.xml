@@ -89,7 +89,6 @@
 		<dependency>
 			<groupId>fi.wiskopdrgwt</groupId>
 			<artifactId>wiskopdrgwt</artifactId>
-			<version>${dwoVersion}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>IdeasGWT</artifactId>
@@ -119,12 +118,10 @@
 		<dependency>
 			<groupId>fi.beans</groupId>
 			<artifactId>lineairealgebra</artifactId>
-			<version>${dwoVersion}</version>
 		</dependency>
 		<dependency>
 			<groupId>fi.beans</groupId>
 			<artifactId>lineairealgebra</artifactId>
-			<version>${dwoVersion}</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
