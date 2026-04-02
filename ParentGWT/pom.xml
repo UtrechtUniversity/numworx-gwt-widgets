@@ -55,6 +55,7 @@
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
 	<module>../SQLiteGWT</module>
+	<module>../fsmgwt</module>
   </modules>
   <dependencyManagement>
    <dependencies>

@@ -69,7 +69,6 @@
 	<dependency>
 		<groupId>fi.wiskopdrgwt</groupId>
 		<artifactId>wiskopdrgwt</artifactId>
-		<version>${dwoVersion}</version>
   		<exclusions>
   			<exclusion>
   				<artifactId>IdeasGWT</artifactId>
