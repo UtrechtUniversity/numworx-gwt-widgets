@@ -16,8 +16,10 @@
   <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
-
+  <inherits name="com.google.web.bindery.autobean.AutoBean"/>
   <!-- Other module inherits                                      -->
+   <inherits name="org.vectomatic.libgwtsvg" />
+   <inherits name="nl.tue.win.riaca.openmath.OpenMath" />
    <inherits name="fi.euclides.Euclides" />
    <inherits name="nl.numworx.fsm.Fsm" />
    <inherits name="nl.uu.fi.dwo.interaction.Interaction" />  

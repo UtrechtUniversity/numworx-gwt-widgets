@@ -26,8 +26,8 @@
     <!-- Don't let your Mac use a crazy non-standard encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <euclidesVersion>${authorVersion}</euclidesVersion>
-    <gwtVersion>2.10.0</gwtVersion>
+    <euclidesVersion>2.5.49-SNAPSHOT</euclidesVersion>
+    <gwtVersion>2.8.2</gwtVersion>
 
   </properties>
 
@@ -35,9 +35,9 @@
     <dependencies>
       <!-- ensure all GWT deps use the same version (unless overridden) -->
       <dependency>
-        <groupId>org.gwtproject</groupId>
+        <groupId>com.google.gwt</groupId>
         <artifactId>gwt</artifactId>
-        <version>2.10.0</version>
+        <version>${gwtVersion}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -46,19 +46,22 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.gwtproject</groupId>
+      <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
       <scope>runtime</scope>
+      <version>${gwtVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.gwtproject</groupId>
+      <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <scope>provided</scope>
+      <version>${gwtVersion}</version>
     </dependency>
     <dependency>
-      <groupId>org.gwtproject</groupId>
+      <groupId>com.google.gwt</groupId>
       <artifactId>gwt-dev</artifactId>
       <scope>provided</scope>
+      <version>${gwtVersion}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -110,42 +113,64 @@
     <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 
     <plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>${gwtVersion}</version>
+				<configuration>
+					<localWorkers>1</localWorkers>
+					<module>nl.numworx.fsmgwt.Fsmgwt</module>
+					<runTarget>Fsmgwt.html</runTarget>
+					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
+					<extraJvmArgs>-Xms768m -Xmx1024m</extraJvmArgs>
+					<hostedWebapp>${webappDirectory}</hostedWebapp>
+					<port>8888</port>
+				</configuration>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-      <!-- GWT Maven Plugin-->
-      <plugin>
-        <groupId>net.ltgt.gwt.maven</groupId>
-        <artifactId>gwt-maven-plugin</artifactId>
-        <version>1.0.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <moduleName>nl.numworx.fsmgwt.Fsmgwt</moduleName>
-          <moduleShortName>Fsmgwt</moduleShortName>
-          <failOnError>true</failOnError>
-          <!-- GWT compiler 2.8 and above requires 1.8, hence define sourceLevel here if you use
-               a different source language for java compilation -->
-          <sourceLevel>1.8</sourceLevel>
-          <!-- Compiler configuration -->
-          <compilerArgs>
-            <!-- Ask GWT to create the Story of Your Compile (SOYC) (gwt:compile) -->
-            <arg>-compileReport</arg>
-            <arg>-XcompilerMetrics</arg>
-          </compilerArgs>
-          <!-- DevMode configuration -->
-          <warDir>${project.build.directory}/${project.build.finalName}</warDir>
-          <classpathScope>compile+runtime</classpathScope>
-          <!-- URL(s) that should be opened by DevMode (gwt:devmode). -->
-          <startupUrls>
-            <startupUrl>Fsmgwt.html</startupUrl>
-          </startupUrls>
-        </configuration>
-      </plugin>
+<!--       GWT Maven Plugin-->
+<!--      <plugin>-->
+<!--        <groupId>net.ltgt.gwt.maven</groupId>-->
+<!--        <artifactId>gwt-maven-plugin</artifactId>-->
+<!--        <version>1.0.1</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>compile</goal>-->
+<!--              <goal>test</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <moduleName>nl.numworx.fsmgwt.Fsmgwt</moduleName>-->
+<!--          <moduleShortName>Fsmgwt</moduleShortName>-->
+<!--          <failOnError>true</failOnError>-->
+<!--           GWT compiler 2.8 and above requires 1.8, hence define sourceLevel here if you use-->
+<!--               a different source language for java compilation -->
+<!--          <sourceLevel>1.8</sourceLevel>-->
+<!--           Compiler configuration -->
+<!--          <compilerArgs>-->
+<!--             Ask GWT to create the Story of Your Compile (SOYC) (gwt:compile) -->
+<!--            <arg>-compileReport</arg>-->
+<!--            <arg>-XcompilerMetrics</arg>-->
+<!--          </compilerArgs>-->
+<!--           DevMode configuration -->
+<!--          <warDir>${project.build.directory}/${project.build.finalName}</warDir>-->
+<!--          <classpathScope>compile+runtime</classpathScope>-->
+<!--           URL(s) that should be opened by DevMode (gwt:devmode). -->
+<!--          <startupUrls>-->
+<!--            <startupUrl>Fsmgwt.html</startupUrl>-->
+<!--          </startupUrls>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
 
       <!-- Skip normal test execution, we use gwt:test instead -->
       <plugin>
