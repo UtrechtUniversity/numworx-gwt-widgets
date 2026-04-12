@@ -3,7 +3,8 @@
     <parent>
     	<groupId>fi.parentgwt</groupId>
     	<artifactId>widgets-parent</artifactId>
-    	<version>2.5.48</version>
+    	<version>2.5.49</version>
+    	<relativePath>..</relativePath>
     </parent>
   <groupId>fi.parentgwt</groupId>
   <artifactId>parentgwt</artifactId>
@@ -16,8 +17,8 @@
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<dwoVersion>2.5.48</dwoVersion>
-  	<interactionVersion>${dwoVersion}</interactionVersion>
+  	<dwoVersion>2.5.49</dwoVersion>
+  	<interactionVersion>2.5.48</interactionVersion>
   </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
@@ -54,6 +55,7 @@
 	<module>../StippelPatronenGWT</module>
 	<module>../StroomDiagrammenGWT</module>
 	<module>../SQLiteGWT</module>
+	<module>../fsmgwt</module>
   </modules>
   <dependencyManagement>
    <dependencies>

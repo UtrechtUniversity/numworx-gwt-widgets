@@ -3,14 +3,14 @@
 	<parent>
         <groupId>nl.uu.fi.dwo</groupId>
         <artifactId>dwo</artifactId>
-        <version>2.5.48</version>
+        <version>2.5.49</version>
 	</parent>
   <groupId>fi.parentgwt</groupId>
   <artifactId>widgets-parent</artifactId>
-  <version>2.5.48</version>
+  <version>2.5.49</version>
   <packaging>pom</packaging>
   <properties>
-	<authorVersion>2.5.48</authorVersion>
+	<authorVersion>2.5.49</authorVersion>
   </properties>
   <modules>
 	<module>ParentGWT</module>
