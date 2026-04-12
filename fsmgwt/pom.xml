@@ -26,7 +26,7 @@
     <!-- Don't let your Mac use a crazy non-standard encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <euclidesVersion>2.5.49-SNAPSHOT</euclidesVersion>
+    <euclidesVersion>${authorVersion}</euclidesVersion>
     <gwtVersion>2.8.2</gwtVersion>
 
   </properties>
@@ -72,12 +72,12 @@
     <dependency>
     	<groupId>nl.numworx.fsm</groupId>
     	<artifactId>fsm</artifactId>
-    	<version>2.5.49-SNAPSHOT</version>
+    	<version>${authorVersion}</version>
     </dependency>
     <dependency>
     	<groupId>nl.numworx.fsm</groupId>
     	<artifactId>fsm</artifactId>
-    	<version>2.5.49-SNAPSHOT</version>
+    	<version>${authorVersion}</version>
     	<classifier>sources</classifier>
     </dependency>
 		<dependency>
