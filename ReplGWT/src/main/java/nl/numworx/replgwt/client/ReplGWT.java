@@ -2,22 +2,26 @@ package nl.numworx.replgwt.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;import com.google.gwt.webworker.client.ErrorEvent;
 import com.google.gwt.webworker.client.ErrorHandler;
@@ -235,9 +239,42 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("request")) {
 		id = obj.get("id").isString().stringValue();
 		requestInput();
+	} else if (obj.containsKey("display_type")) {
+		// assume turtle
+		obj = obj.get("content").isObject();
+		Element element = makeElement(obj);
+		element.setId("turtle");
+		Element t = Document.get().getElementById("turtle");
+		if (t != null) t.removeFromParent(); // drop it...
+		Document.get().getElementById("content").appendChild(element); // at end, should be, or at first?
 	}
 			
 }
+
+private Element makeElement(JSONObject obj) {
+	String tag = obj.get("tag").isString().stringValue();
+	Element elem = Document.get().createElement(tag);
+	JSONObject props = obj.get("props").isObject();
+	Set<String> keys = props.keySet();
+	for (String prop: keys) {
+		JSONValue value = props.get(prop);
+		if (value.isString() != null)
+			elem.setAttribute(prop, value.isString().stringValue());
+		else if (value.isNumber() != null)
+			setAttribute(elem, prop, value.isNumber().doubleValue());
+			
+	}
+	JSONArray children = obj.get("children").isArray();
+	int count = children.size();
+	for(int i = 0; i < count; i++) {
+		elem.appendChild(makeElement(children.get(i).isObject()));
+	}
+	return elem;
+}
+
+private static native void setAttribute(Element elem, String prop, double value) /*-{
+	elem.setAttribute(prop, value)
+}-*/;
 
 private void scrollToBottom() {
 	RootPanel output = RootPanel.get("output");
