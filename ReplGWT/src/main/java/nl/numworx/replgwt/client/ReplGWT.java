@@ -205,8 +205,6 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 		String size = map.getString("size");
 		if (size == null) size = "100%"; // default is full height;
 		north.getElement().getStyle().setProperty("height", size); // as a string, 100%, 40px etc. 
-	} else {
-		north.getElement().getStyle().setDisplay(Display.NONE);
 	}
 
 	RootPanel south = RootPanel.get("south");
@@ -215,10 +213,13 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 		String size = map.getString("size");
 		if (size == null) size = "100%"; // default is full height;
 		south.getElement().getStyle().setProperty("height", size); // as a string, 100%, 40px etc. 
-	} else {
-		south.getElement().getStyle().setDisplay(Display.NONE);
 	}
 
+	if (side != null) {
+		RootPanel.get("content").setStylePrimaryName(side);
+	}
+
+	
 }
 
 private void createWorker() {

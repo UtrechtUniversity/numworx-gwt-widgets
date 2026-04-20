@@ -21,3 +21,15 @@ body {
 	height: 100%;
 	width: 100%
 }
+
+.north #north {
+	border-bottom: solid 1px;
+}
+
+.north #south, .south #north {
+	display: none;
+}
+
+.south #south {
+	border-top: solid 1px;
+}
