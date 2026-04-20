@@ -23,8 +23,8 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		init(400,300, null, null);
-		//Stub.publish(this);
+		//init(400,300, null, null);
+		Stub.publish(this);
 	}
 
 	@Override
