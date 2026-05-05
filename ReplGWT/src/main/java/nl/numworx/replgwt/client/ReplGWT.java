@@ -2,22 +2,29 @@ package nl.numworx.replgwt.client;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Style.Display;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
 import com.google.gwt.json.client.JSONNumber;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;import com.google.gwt.webworker.client.ErrorEvent;
 import com.google.gwt.webworker.client.ErrorHandler;
@@ -26,10 +33,12 @@ import com.google.gwt.webworker.client.MessageHandler;
 import com.google.gwt.webworker.client.Worker;
 
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
+import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
 import nl.uu.fi.dwo.interaction.client.Stub;
 import nl.uu.fi.dwo.interaction.client.event.CBookEvent;
 import nl.uu.fi.dwo.interaction.client.event.CBookEventListener;
+import nl.uu.fi.dwo.interaction.client.json.ObjectMap;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -39,6 +48,7 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   private int width;
   private int height;
   String modules;
+  String turtleOutput;
   Worker worker;
 //  ServiceWorker service;
 //  
@@ -65,9 +75,11 @@ protected boolean consuming;
   protected void runit(String message) {
 	  GWT.log(message);
 	  reset();
+	  boolean hasTurtle = message.contains("turtle");
 	  JSONObject object = new JSONObject();
 	  object.put("python", new JSONString(message));
 	  object.put("id", new JSONNumber(++cnt));
+	  object.put("hasTurtle", JSONBoolean.getInstance(hasTurtle));
 	  worker.postMessage(object.toString());
   }
 
@@ -75,9 +87,14 @@ protected boolean consuming;
 	  w.removeFromParent();
 	  recreateWorker();
 	  
-	  RootPanel output = RootPanel.get("output");
-	  output.clear();
-	  output.getElement().setInnerHTML(""); // clear it all
+	  empty(RootPanel.get("output"));
+	  empty(RootPanel.get("north")); 
+	  
+  }
+
+  protected void empty(Panel output) {
+	output.clear();
+	output.getElement().setInnerHTML(""); // clear it all
   }
   
   /**
@@ -99,6 +116,11 @@ public HashMap<String, Object> getState() {
 	RootPanel content = RootPanel.get("output");
 	String inner = content.getElement().getInnerHTML();
 	state.put("content", inner);
+	if (turtleOutput != null) {
+		content = RootPanel.get(turtleOutput);
+		inner = content.getElement().getInnerHTML();
+		state.put("turtle", inner);
+	}
 	return state;
 }
 
@@ -107,6 +129,11 @@ public void setState(HashMap<String, Object> h) {
 	String inner = h.getOrDefault("content", "").toString();
 	RootPanel content = RootPanel.get("output");
 	content.getElement().setInnerHTML(inner);
+	if (turtleOutput != null) {
+		inner = h.getOrDefault("turtle", "").toString();
+		content = RootPanel.get(turtleOutput);
+		content.getElement().setInnerHTML(inner);
+	}
 }
 
 @Override
@@ -169,7 +196,30 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 	createWorker();
 	w = new InputReader();
 	w.setConsumer(this);
+	
+	ObjectMap map = JSONUtilities.wrapMap(launchData);
+	String side = map.getString("side");
+	RootPanel north = RootPanel.get("north");
+	if ("north".equals(side)) {
+		turtleOutput = side;
+		String size = map.getString("size");
+		if (size == null) size = "100%"; // default is full height;
+		north.getElement().getStyle().setProperty("height", size); // as a string, 100%, 40px etc. 
+	}
 
+	RootPanel south = RootPanel.get("south");
+	if ("south".equals(side)) {
+		turtleOutput = side;
+		String size = map.getString("size");
+		if (size == null) size = "100%"; // default is full height;
+		south.getElement().getStyle().setProperty("height", size); // as a string, 100%, 40px etc. 
+	}
+
+	if (side != null) {
+		RootPanel.get("content").setStylePrimaryName(side);
+	}
+
+	
 }
 
 private void createWorker() {
@@ -235,8 +285,37 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("request")) {
 		id = obj.get("id").isString().stringValue();
 		requestInput();
+	} else if (obj.containsKey("display_type") && turtleOutput != null) {
+		// assume turtle
+		obj = obj.get("content").isObject();
+		Element element = makeElement(obj);
+// north of south
+		String string = element.getString();
+		LOG.info("SVG " + string);		
+		Document.get().getElementById(turtleOutput).setInnerHTML(string);
 	}
 			
+}
+
+private Element makeElement(JSONObject obj) {
+	String tag = obj.get("tag").isString().stringValue();
+	Element elem = Document.get().createElement(tag);
+	JSONObject props = obj.get("props").isObject();
+	Set<String> keys = props.keySet();
+	for (String prop: keys) {
+		JSONValue value = props.get(prop);
+		if (value.isString() != null)
+			elem.setAttribute(prop, value.isString().stringValue());
+		else if (value.isNumber() != null)
+			elem.setAttribute(prop, value.toString());
+			
+	}
+	JSONArray children = obj.get("children").isArray();
+	int count = children.size();
+	for(int i = 0; i < count; i++) {
+		elem.appendChild(makeElement(children.get(i).isObject()));
+	}
+	return elem;
 }
 
 private void scrollToBottom() {

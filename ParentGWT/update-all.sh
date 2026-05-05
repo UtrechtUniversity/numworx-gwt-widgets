@@ -32,3 +32,4 @@ sh update-app-www-dev.sh VerknippenGWT verknippengwt VerknippenGWT
 sh update-app-www-dev.sh WebLogoGWT weblogogwt WebLogoGWT
 sh update-app-www-dev.sh WebLogo3dGWT weblogo3dgwt WebLogo3dGWT
 sh update-app-www-dev.sh GeoDefinerGWT geodefinergwt GeoDefinerGWT
+sh update-app-www-dev.sh fsmgwt fsmgwt Fsmgwt
