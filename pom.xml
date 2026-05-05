@@ -10,7 +10,7 @@
   <version>2.5.50-SNAPSHOT</version>
   <packaging>pom</packaging>
   <properties>
-	<authorVersion>2.5.50-SNAPSHOT</authorVersion>
+	<authorVersion>2.5.50</authorVersion>
   </properties>
   <modules>
 	<module>ParentGWT</module>
