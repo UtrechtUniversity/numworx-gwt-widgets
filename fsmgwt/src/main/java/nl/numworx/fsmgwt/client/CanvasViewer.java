@@ -1,7 +1,5 @@
 package nl.numworx.fsmgwt.client;
 
-import fi.euclides.event.AddLijnHandler;
-import fi.euclides.event.AddPuntHandler;
 import fi.euclides.event.EventHandler;
 import fi.euclides.gwt.canvas.SpeelVeld;
 import fi.euclides.model.Boog;
@@ -10,10 +8,10 @@ import fi.euclides.model.Dpunt;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
 import fi.euclides.model.VrijPunt;
-import nl.numworx.fsm.shared.AddBoogHandler;
 import nl.numworx.fsm.shared.FSMMapper;
 import nl.numworx.fsm.shared.Hits;
 import nl.numworx.fsm.shared.Hoekpunt;
+import nl.numworx.fsm.shared.UnifiedHandler;
 
 public class CanvasViewer extends SpeelVeld {
 
@@ -25,10 +23,8 @@ public class CanvasViewer extends SpeelVeld {
 		hitTester = new Hits();
 		mapper = new FSMMapper();
 		EventHandler eventHandler;
-
-		eventHandler = new AddPuntHandler();
-		eventHandler = new AddLijnHandler(AddLijnHandler.SEGMENT);
-		eventHandler = new AddBoogHandler();
+		
+		eventHandler = new UnifiedHandler("FSM");
 		
 		eventHandler.setTracker(this);
 		setPointerHandler(eventHandler);
