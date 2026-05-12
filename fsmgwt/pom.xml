@@ -27,6 +27,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <euclidesVersion>${authorVersion}</euclidesVersion>
     <gwtVersion>2.8.2</gwtVersion>
+    <gwt.style>PRETTY</gwt.style>
 
   </properties>
 

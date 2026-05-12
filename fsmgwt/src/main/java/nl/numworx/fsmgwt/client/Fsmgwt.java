@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 import fi.euclides.util.Hashtable;
 import nl.numworx.fsm.editor.Output;
+import nl.numworx.fsm.shared.Hoekpunt;
 import nl.numworx.fsm.shared.Memento;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -26,9 +27,9 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 
 	private int height;
 	private int width;
+	private int scoreMax;
 	private CanvasViewer viewer;
 	private Memento memento;
-
 
 	/**
 	 * This is the entry point method.
@@ -41,12 +42,12 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 	@Override
 	public HashMap<String, Object> getState() {
 		Object model, names, accepted;
-		memento.getModel().clearSelection();
+		viewer.getModel().clearSelection();
 		JSONOutput dos = new JSONOutput();
 		memento.setDataOutputStream(dos);
 		HashMap<String, Object> result = new HashMap<>();
 		try {
-			memento.writeModel(memento.getModel());
+			memento.writeModel(viewer);
 			model = dos.toList();
 			result.put("model", model);
 			dos = new JSONOutput();
@@ -78,12 +79,14 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 				GWT.log("setState fails", e);
 			}
 		}
+
 	}
 	
 	
 	@Override
 	public void setState(HashMap<String, Object> h) {
 		setState( (Map<String,Object>)h);
+		viewer.paint();
 	}
 
 	@Override
@@ -98,7 +101,9 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 
 	@Override
 	public Boolean isCorrect() {
-		return Boolean.TRUE;
+		if (scoreMax == 0)
+			return Boolean.TRUE;
+		return null;
 	}
 
 	@Override
@@ -146,11 +151,16 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 	public void init(int width, int height, Map<String, Object> launchData, Map<String, Number> values) {
 		this.width = width;
 		this.height = height;
+// extra's
+		Hoekpunt.addCreator();
 		memento = new Memento();
 		viewer = new CanvasViewer(width, height);
 		viewer.setModel(memento.getModel());
 		initWidget(viewer.asWidget());
 		RootPanel.get().add(this);
+		ObjectMap m = JSONUtilities.wrapMap(launchData);
+		scoreMax = m.getInt("scoreMax");
 		setState(launchData);
+
 	}
 }
