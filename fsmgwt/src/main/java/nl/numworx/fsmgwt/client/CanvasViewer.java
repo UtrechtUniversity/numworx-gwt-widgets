@@ -6,6 +6,7 @@ import fi.euclides.event.NameMapper;
 import fi.euclides.event.TrackerContext;
 import fi.euclides.gwt.MouseContext;
 import fi.euclides.gwt.canvas.SpeelVeld;
+import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Dpunt;
@@ -16,12 +17,17 @@ import fi.euclides.model.math.Numbers;
 import nl.numworx.fsm.shared.FSMMapper;
 import nl.numworx.fsm.shared.Hits;
 import nl.numworx.fsm.shared.Hoekpunt;
-import nl.numworx.fsm.shared.UnifiedHandler;
 
 public class CanvasViewer extends SpeelVeld {
 
+	@Override
+	public <T> T adapt(Class<T> clz) {
+		if (clz == AbstractViewer.class) return (T) this;
+		return super.adapt(clz);
+	}
+
 	private FSMMapper mapper;
-	private UnifiedHandler eventHandler;
+	private GWTHandler eventHandler;
 
 	public CanvasViewer(int width, int height) {
 		super(width, height);
@@ -29,7 +35,7 @@ public class CanvasViewer extends SpeelVeld {
 		hitTester = new Hits();
 		mapper = new FSMMapper();
 
-		eventHandler = new UnifiedHandler("FSM");
+		eventHandler = new GWTHandler();
 		
 		eventHandler.setTracker(this);
 		setPointerHandler(eventHandler);

@@ -22,7 +22,8 @@
    <inherits name="nl.tue.win.riaca.openmath.OpenMath" />
    <inherits name="fi.euclides.Euclides" />
    <inherits name="nl.numworx.fsm.Fsm" />
-   <inherits name="nl.uu.fi.dwo.interaction.Interaction" />  
+   <inherits name="nl.uu.fi.dwo.interaction.Interaction" /> 
+   <inherits name='nl.uu.fi.dwo.formule.Formule' />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='nl.numworx.fsmgwt.client.Fsmgwt'/>
