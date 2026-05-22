@@ -17,6 +17,7 @@ import fi.euclides.model.math.Numbers;
 import nl.numworx.fsm.shared.FSMMapper;
 import nl.numworx.fsm.shared.Hits;
 import nl.numworx.fsm.shared.Hoekpunt;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld {
 
@@ -32,6 +33,7 @@ public class CanvasViewer extends SpeelVeld {
 	public CanvasViewer(int width, int height) {
 		super(width, height);
 		pointSize = 75;
+		context.setFont(FormuleFont.createFromFontSize(18).getFontStyle());
 		hitTester = new Hits();
 		mapper = new FSMMapper();
 
