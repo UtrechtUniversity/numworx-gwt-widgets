@@ -35,7 +35,10 @@ public class JSONInput implements DataInput {
 	@Override
 	public String readUTF() throws IOException {
 		next();
-		return list.getString(cursor++);
+		//return list.getString(cursor++); // cannot handle null
+		Object o = list.get(cursor++);
+		if (o != null) return o.toString();
+		return null;
 	}
 
 	@Override

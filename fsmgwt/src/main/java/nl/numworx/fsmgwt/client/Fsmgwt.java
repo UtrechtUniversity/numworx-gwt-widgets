@@ -13,6 +13,7 @@ import fi.euclides.util.Hashtable;
 import nl.numworx.fsm.editor.Output;
 import nl.numworx.fsm.shared.Hoekpunt;
 import nl.numworx.fsm.shared.Memento;
+import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
 import nl.uu.fi.dwo.interaction.client.OpdrNavIF;
@@ -118,6 +119,7 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 
 	@Override
 	public void setCommunicationRoot(OpdrNavIF comRoot) {
+		FormuleHolder.installKeyboard(comRoot.getKeyboard());
 	}
 
 	@Override
