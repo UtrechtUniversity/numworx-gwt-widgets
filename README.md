@@ -1,6 +1,8 @@
 ## Turtle
 
 An implementation of Python's native turtle module that works with Pyodide.
+Fork of https://github.com/RaspberryPiFoundation/turtle.git.
+Added show() command.
 
 Instead of rendering to a tkinter window, this package outputs a Python dict
 that represents an SVG which can then be added to the DOM. This allows the
