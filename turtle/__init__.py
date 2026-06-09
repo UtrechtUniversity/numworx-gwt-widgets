@@ -1469,6 +1469,11 @@ def restart():
     Screen().reset()
     Turtle._pen = None
 
+import basthon
+def show():
+    svg_dict = Screen().show_scene()
+    basthon.kernel.display_event({ "display_type": "turtle", "content": svg_dict })
+
 # Creating functions based
 
 import inspect

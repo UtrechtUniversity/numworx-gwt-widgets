@@ -25,3 +25,7 @@ This package was adapted from
 package. It therefore has the same GPLv3 license.
 
 See the banner at the top of `__init__.py`.
+
+## Building
+Use venv for python3.14
+install module build with pip
