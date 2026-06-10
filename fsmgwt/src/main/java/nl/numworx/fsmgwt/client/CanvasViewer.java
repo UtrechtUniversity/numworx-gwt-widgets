@@ -85,8 +85,16 @@ public class CanvasViewer extends SpeelVeld {
 		
 		if (name != null) {
 			double d = Math.atan2(s.getDY(), s.getDX());
+			if ( d < -Math.PI/2) {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.BOTTOM);						
+			} else			
+			if (d > Math.PI/2) {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.TOP);			
+			} else 
 			if (d > 0) {
-				context.setTextAlign(TextAlign.RIGHT);
+				context.setTextAlign(TextAlign.LEFT);
 				context.setTextBaseline(TextBaseline.BOTTOM);
 			} else {
 				context.setTextAlign(TextAlign.LEFT);
