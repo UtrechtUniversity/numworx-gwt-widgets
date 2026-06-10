@@ -1,5 +1,7 @@
 package nl.numworx.fsmgwt.client;
 
+import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
+import com.google.gwt.canvas.dom.client.Context2d.TextBaseline;
 import com.google.gwt.user.client.Timer;
 
 import fi.euclides.event.NameMapper;
@@ -60,6 +62,8 @@ public class CanvasViewer extends SpeelVeld {
 		}		
 		String name = mapper.toString(punt);
 		if (name != null) {
+			context.setTextAlign(TextAlign.CENTER);
+			context.setTextBaseline(TextBaseline.MIDDLE);			
 			drawString(name, punt.getXd(), punt.getYd());
 		}
 	}
@@ -80,6 +84,14 @@ public class CanvasViewer extends SpeelVeld {
 		drawLine(x1, y1, x2, y2);
 		
 		if (name != null) {
+			double d = Math.atan2(s.getDY(), s.getDX());
+			if (d > 0) {
+				context.setTextAlign(TextAlign.RIGHT);
+				context.setTextBaseline(TextBaseline.BOTTOM);
+			} else {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.TOP);
+			}
 			drawString(name, (x1+x2)/2, (y1+y2)/2);
 		}
 	}
@@ -139,7 +151,9 @@ public class CanvasViewer extends SpeelVeld {
 		String name = mapper.toString(b);
 		if (name != null) {
 			Punt punt = b.getCenter();
-			drawString(name, punt.getXd(), punt.getYd());
+			context.setTextBaseline(TextBaseline.MIDDLE);
+			context.setTextAlign(TextAlign.LEFT);
+			drawString(name, punt.getXd()+d/2+2, punt.getYd());
 		}
 	}
 	
