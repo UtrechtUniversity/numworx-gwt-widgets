@@ -15,32 +15,32 @@ public class JSONOutput implements DataOutput {
 	}
 
 	@Override
-	public void writeByte(int i) throws IOException {
+	public void writeByte(int i) {
 		list.add(i);
 	}
 
 	@Override
-	public void writeUTF(String s) throws IOException {
+	public void writeUTF(String s) {
 		list.add(s);
 	}
 
 	@Override
-	public void writeInt(int i) throws IOException {
+	public void writeInt(int i) {
 		list.add(i);
 	}
 
 	@Override
-	public void writeDouble(double d) throws IOException {
+	public void writeDouble(double d) {
 		list.add(d);
 	}
 
 	@Override
-	public void writeLong(long a) throws IOException {
+	public void writeLong(long a) {
 		list.add(Long.toString(a));
 	}
 
 	@Override
-	public void writeBoolean(boolean b) throws IOException {
+	public void writeBoolean(boolean b)  {
 		list.add(b);
 	}
 

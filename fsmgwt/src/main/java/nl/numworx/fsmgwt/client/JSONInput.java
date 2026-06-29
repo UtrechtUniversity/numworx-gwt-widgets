@@ -1,6 +1,5 @@
 package nl.numworx.fsmgwt.client;
 
-import java.io.EOFException;
 import java.io.IOException;
 
 import fi.euclides.persist.DataInput;
@@ -13,7 +12,7 @@ public class JSONInput implements DataInput {
 	
 	
 	private void next() throws IOException {
-		if (cursor == list.size()) throw new EOFException();
+		if (cursor == list.size()) throw new IOException("EOF");
 	}
 
 	public JSONInput(ObjectList list) {
@@ -36,7 +35,10 @@ public class JSONInput implements DataInput {
 	@Override
 	public String readUTF() throws IOException {
 		next();
-		return list.getString(cursor++);
+		//return list.getString(cursor++); // cannot handle null
+		Object o = list.get(cursor++);
+		if (o != null) return o.toString();
+		return null;
 	}
 
 	@Override

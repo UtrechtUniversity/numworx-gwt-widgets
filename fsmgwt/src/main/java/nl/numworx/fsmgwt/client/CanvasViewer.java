@@ -1,34 +1,45 @@
 package nl.numworx.fsmgwt.client;
 
-import fi.euclides.event.AddLijnHandler;
-import fi.euclides.event.AddPuntHandler;
-import fi.euclides.event.EventHandler;
+import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
+import com.google.gwt.canvas.dom.client.Context2d.TextBaseline;
+import com.google.gwt.user.client.Timer;
+
+import fi.euclides.event.NameMapper;
+import fi.euclides.event.TrackerContext;
+import fi.euclides.gwt.MouseContext;
 import fi.euclides.gwt.canvas.SpeelVeld;
+import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Boog;
 import fi.euclides.model.Destroyable;
 import fi.euclides.model.Dpunt;
 import fi.euclides.model.Punt;
 import fi.euclides.model.Segment;
 import fi.euclides.model.VrijPunt;
-import nl.numworx.fsm.shared.AddBoogHandler;
+import fi.euclides.model.math.Numbers;
 import nl.numworx.fsm.shared.FSMMapper;
 import nl.numworx.fsm.shared.Hits;
 import nl.numworx.fsm.shared.Hoekpunt;
+import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld {
 
+	@Override
+	public <T> T adapt(Class<T> clz) {
+		if (clz == AbstractViewer.class) return (T) this;
+		return super.adapt(clz);
+	}
+
 	private FSMMapper mapper;
+	private GWTHandler eventHandler;
 
 	public CanvasViewer(int width, int height) {
 		super(width, height);
 		pointSize = 75;
+		context.setFont(FormuleFont.createFromFontSize(18).getFontStyle());
 		hitTester = new Hits();
 		mapper = new FSMMapper();
-		EventHandler eventHandler;
 
-		eventHandler = new AddPuntHandler();
-		eventHandler = new AddLijnHandler(AddLijnHandler.SEGMENT);
-		eventHandler = new AddBoogHandler();
+		eventHandler = new GWTHandler();
 		
 		eventHandler.setTracker(this);
 		setPointerHandler(eventHandler);
@@ -45,9 +56,14 @@ public class CanvasViewer extends SpeelVeld {
 		}
 		
 		drawCircle(punt.getXd()-p2, punt.getYd()-p2 , pointSize);
-		
+		if (Boolean.TRUE.equals(punt.adapt(Boolean.class)))
+		{	float shrink = 0.8f;
+			drawCircle(punt.getXd()-p2*shrink, punt.getYd()-p2*shrink, pointSize*shrink);
+		}		
 		String name = mapper.toString(punt);
 		if (name != null) {
+			context.setTextAlign(TextAlign.CENTER);
+			context.setTextBaseline(TextBaseline.MIDDLE);			
 			drawString(name, punt.getXd(), punt.getYd());
 		}
 	}
@@ -68,6 +84,22 @@ public class CanvasViewer extends SpeelVeld {
 		drawLine(x1, y1, x2, y2);
 		
 		if (name != null) {
+			double d = Math.atan2(s.getDY(), s.getDX());
+			if ( d < -Math.PI/2) {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.BOTTOM);						
+			} else			
+			if (d > Math.PI/2) {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.TOP);			
+			} else 
+			if (d > 0) {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.BOTTOM);
+			} else {
+				context.setTextAlign(TextAlign.LEFT);
+				context.setTextBaseline(TextBaseline.TOP);
+			}
 			drawString(name, (x1+x2)/2, (y1+y2)/2);
 		}
 	}
@@ -127,8 +159,61 @@ public class CanvasViewer extends SpeelVeld {
 		String name = mapper.toString(b);
 		if (name != null) {
 			Punt punt = b.getCenter();
-			drawString(name, punt.getXd(), punt.getYd());
+			context.setTextBaseline(TextBaseline.MIDDLE);
+			context.setTextAlign(TextAlign.LEFT);
+			drawString(name, punt.getXd()+d/2+2, punt.getYd());
 		}
+	}
+	
+	@Override
+	public void processMouseDown(MouseContext ctx) {
+		super.processMouseDown(ctx);
+		startTimer(ctx);
+	}
+	
+	Timer useTimer;
+	boolean timerDone;
+	private void startTimer(MouseContext ctx) {
+		cancelTimer();
+		TrackerContext tc = getCtx(ctx.getID());
+		int x = ctx.getX();
+		int y = ctx.getY();
+		useTimer = new Timer() {
+
+			@Override
+			public void run() {	
+				timerDone = true;
+				eventHandler.pointerClickedLong(Numbers.createInteger(x), Numbers.createInteger(y), tc);
+				paint();
+			}
+			
+		};
+		useTimer.schedule(3000);
+	}
+	private void cancelTimer() {
+		if (useTimer != null) {
+			useTimer.cancel();
+			useTimer = null;
+			timerDone = false;
+		}
+	}
+	
+	@Override
+	public void processMouseUp(MouseContext ctx) {
+		if (!timerDone) 
+			super.processMouseUp(ctx);
+		cancelTimer();
+	}
+	
+	@Override
+	public void processMouseDrag(MouseContext ctx) {
+		cancelTimer();
+		super.processMouseDrag(ctx);
+	}
+
+	@Override
+	public NameMapper getMapper() {
+		return mapper;
 	}
 
 }

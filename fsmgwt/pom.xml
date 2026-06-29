@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>fi.parentgwt</groupId>
 		<artifactId>parentgwt</artifactId>
-		<version>2.5.50</version>
+		<version>3.0.0</version>
 		<relativePath>../ParentGWT</relativePath>
 	</parent>
   <groupId>nl.numworx.fsm</groupId>
@@ -27,6 +27,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <euclidesVersion>${authorVersion}</euclidesVersion>
     <gwtVersion>2.8.2</gwtVersion>
+    <gwt.style>PRETTY</gwt.style>
 
   </properties>
 
@@ -104,6 +105,10 @@
 			<artifactId>euclides-expr</artifactId>
 			<version>${euclidesVersion}</version>
 			<classifier>sources</classifier>
+		</dependency>
+		<dependency>
+			<groupId>nl.uu.fi.dwo.mobile</groupId>
+			<artifactId>formule</artifactId>
 		</dependency>
   </dependencies>
 
