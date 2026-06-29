@@ -74,7 +74,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>parentgwt</artifactId>
-  	<version>3.0.0-SNAPSHOT</version>
+  	<version>3.0.0</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <description>Teken veelvlakken</description>
