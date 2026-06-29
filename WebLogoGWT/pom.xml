@@ -69,7 +69,7 @@
   <parent>
   	<groupId>fi.parentgwt</groupId>
   	<artifactId>parentgwt</artifactId>
-  	<version>3.0.0</version>
+  	<version>3.0.1-SNAPSHOT</version>
   	<relativePath>../ParentGWT</relativePath>
   </parent>
   <profiles>
