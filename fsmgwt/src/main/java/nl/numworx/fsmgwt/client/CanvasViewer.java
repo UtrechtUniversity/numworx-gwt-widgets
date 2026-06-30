@@ -159,6 +159,7 @@ public class CanvasViewer extends SpeelVeld {
 		String name = mapper.toString(b);
 		if (name != null) {
 			Punt punt = b.getCenter();
+			if (end.getIndex()>0) punt = (Punt) b.getDepend()[1];
 			context.setTextBaseline(TextBaseline.MIDDLE);
 			context.setTextAlign(TextAlign.LEFT);
 			drawString(name, punt.getXd()+d/2+2, punt.getYd());
