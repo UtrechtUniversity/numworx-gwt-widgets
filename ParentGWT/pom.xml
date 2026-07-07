@@ -17,8 +17,6 @@
   	<maven.compiler.target>1.8</maven.compiler.target>
 	<maven.javadoc.skip>true</maven.javadoc.skip>
   	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  	<dwoVersion>3.0.0</dwoVersion>
-  	<interactionVersion>2.5.48</interactionVersion>
   </properties>
   <modules>
 	<module>../WiskOpdrPlayer</module>
@@ -76,11 +74,6 @@
   		<version>${gwtVersion}</version>
 		<scope>provided</scope>
 	</dependency>
-  	<dependency>
-  		<groupId>nl.uu.fi.dwo.mobile</groupId>
-  		<artifactId>interaction</artifactId>
-  		<version>${interactionVersion}</version>
-  	</dependency>
    </dependencies>
   </dependencyManagement>
  	<repositories>	<!-- als de mirror uit staat -->
