@@ -1,5 +1,6 @@
 package nl.numworx.replgwt.client;
 
+import java.util.Collections;
 import java.util.Map;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
@@ -19,7 +20,8 @@ public class ReplGWTDebug extends ReplGWT {
 		  modules = GWT.getModuleBaseURL();
 		 // installServiceWorker(this);
 		  install(this);
-		  init(600,300,null, null);
+		  Map<String, Object> map = Collections.singletonMap("side", "north");
+		  init(600,300,map, Collections.emptyMap());
 		  Document.get().getElementById("content").getStyle().setTop(13, Style.Unit.EM);
 	  }
 

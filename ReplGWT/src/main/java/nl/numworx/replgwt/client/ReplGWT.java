@@ -10,7 +10,9 @@ import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.Style.Display;
+import com.google.gwt.dom.client.Text;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -288,7 +290,7 @@ public void onMessage(MessageEvent event) {
 	} else if (obj.containsKey("display_type") && turtleOutput != null) {
 		// assume turtle
 		obj = obj.get("content").isObject();
-		Element element = makeElement(obj);
+		Element element = (Element) makeElement(obj);
 // north of south
 		String string = element.getString();
 		LOG.info("SVG " + string);		
@@ -297,8 +299,19 @@ public void onMessage(MessageEvent event) {
 			
 }
 
-private Element makeElement(JSONObject obj) {
-	String tag = obj.get("tag").isString().stringValue();
+private Node makeElement(JSONObject obj) {
+	JSONValue jsonValue = obj.get("tag");
+	if (jsonValue == null) {
+		// if not a tag, a text element?
+		jsonValue = obj.get("text");
+		String text = "";
+		if (jsonValue != null) {
+		 text = jsonValue.isString().stringValue();
+		}
+		Text elem = Document.get().createTextNode(text);
+		return elem;
+	}
+	String tag = jsonValue.isString().stringValue();
 	Element elem = Document.get().createElement(tag);
 	JSONObject props = obj.get("props").isObject();
 	Set<String> keys = props.keySet();
