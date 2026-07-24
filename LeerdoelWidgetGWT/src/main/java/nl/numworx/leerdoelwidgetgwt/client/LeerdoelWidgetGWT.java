@@ -244,6 +244,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	private LeerdoelPresenter presenter;
 	private EastPanel east;
 	LeerdoelRecommender recommender;
+	ObjectMap teksten;
 	private List<String> objectives;
 	private int wantedheight;
 
@@ -394,7 +395,7 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 			break;
 		case RECOMMENDER:
 			recommender = new LeerdoelRecommender(this);
-			header = new RecommenderHeader();
+			header = new RecommenderHeader(this);
 			header.initialDown(visible);
 			recommender.setComRoot(comRoot);
 // font overerven, altijd aan
@@ -596,7 +597,10 @@ public class LeerdoelWidgetGWT implements EntryPoint, InteractionStub, Dispatche
 	    	type = Type.values()[h.getInt("type")];
 	    if (h.containsKey("objectives"))
 	    	objectives = h.getStringList("objectives");
-	    
+	    if (h.containsKey("teksten"))
+	    	teksten = h.getObjectMap("teksten");
+	    else
+	    	teksten = JSONUtilities.wrapMap(Collections.emptyMap());
 	    this.filter = convert(filter);
 	    if (activeMethod != null)
 	    	this.activeMethod = new DomMethod(new PersistenceId(activeMethod));

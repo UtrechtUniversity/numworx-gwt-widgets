@@ -121,11 +121,18 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		list = new DockLayoutPanel(Unit.PX);
 		list.addStyleName("recommender");
 		FollowFlow flow = new FollowFlow();
-		header = new Label(rb.intro());
+		header = new Label(intro());
 		flow.add(header);
 		header.addStyleName("intro");
 		list.addNorth(flow, 50);
 		initWidget(list);
+	}
+
+	private String intro() {
+		ObjectMap t = parent.teksten;
+		if (t.containsKey("intro"))
+			return t.getString("intro");
+		return rb.intro();
 	}
 
 	OpdrNavIF getComRoot() {
@@ -216,7 +223,7 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 			stack.insert(panel, title, 2, insert);
 			cnt ++;
 		}
-		if (cnt == 0) header.setText(rb.allok());
+		if (cnt == 0) header.setText(allok());
 		else
 			list.add(stack);
 		//stack.addSelectionHandler(new Selector());
@@ -225,6 +232,14 @@ public class LeerdoelRecommender extends ResizeComposite implements SelectionHan
 		this.widgets.resolve(widgets);
 		fire(cnt == 0 || comRoot.getRole() == Role.Instructor); // Instructors weten alles!
 		return null;
+	}
+
+	private String allok() {
+		ObjectMap t = parent.teksten;
+		if (t.containsKey("allok")) {
+			return t.getString("allok");
+		}
+		return rb.allok();
 	}
 
 	void stackResize() {

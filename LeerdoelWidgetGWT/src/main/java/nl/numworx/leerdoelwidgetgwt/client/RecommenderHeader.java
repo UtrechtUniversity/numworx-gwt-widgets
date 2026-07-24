@@ -42,8 +42,13 @@ public class RecommenderHeader extends Composite implements HasValueChangeHandle
 		visible = initial;
 	}
 
-	public RecommenderHeader() {
-		Label header = new Label(rb.header());
+	public RecommenderHeader(LeerdoelWidgetGWT parent) {
+		String tekst = rb.header();
+		ObjectMap t = parent.teksten;
+		if (t.containsKey("header")) {
+			tekst = t.getString("header");
+		}
+		Label header = new Label(tekst);
 		header.setStylePrimaryName("recommender-header");
 		initWidget(header);
 		header.addClickHandler(this);
