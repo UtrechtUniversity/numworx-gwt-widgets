@@ -39,6 +39,7 @@ Many open source artifacts are used from the maven central repository
 All others
 Copyright 2025 Universiteit Utrecht. All rights reserved.
 
+This work is licensed under the GNU General Public License version 3.
 
 ## Contact 
 
