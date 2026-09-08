@@ -2,6 +2,8 @@ package nl.numworx.fsmgwt.client;
 
 import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
 import com.google.gwt.canvas.dom.client.Context2d.TextBaseline;
+import com.google.gwt.canvas.dom.client.CssColor;
+import com.google.gwt.canvas.dom.client.FillStrokeStyle;
 import com.google.gwt.user.client.Timer;
 
 import fi.euclides.event.NameMapper;
@@ -32,6 +34,8 @@ public class CanvasViewer extends SpeelVeld {
 
 	private FSMMapper mapper;
 	private GWTHandler eventHandler;
+	private TextAlign textAlign;
+	private TextBaseline textBaseline;
 
 	public CanvasViewer(int width, int height) {
 		super(width, height);
@@ -63,12 +67,25 @@ public class CanvasViewer extends SpeelVeld {
 		}		
 		String name = mapper.toString(punt);
 		if (name != null) {
-			context.setTextAlign(TextAlign.CENTER);
-			context.setTextBaseline(TextBaseline.MIDDLE);			
+			setTextAlign(TextAlign.CENTER);
+			this.textAlign = TextAlign.CENTER;
+			setTextBaseline(TextBaseline.MIDDLE);			
 			drawString(name, punt.getXd(), punt.getYd());
 		}
 	}
 
+	
+	
+	private void setTextBaseline(TextBaseline middle) {
+		context.setTextBaseline(middle);
+		this.textBaseline=middle;
+		
+	}
+	private void setTextAlign(TextAlign center) {
+		context.setTextAlign(center);
+		textAlign=center;
+		
+	}
 	@Override
 	public void visitSegment(Segment s) {
 		selectColor(s);
@@ -87,19 +104,19 @@ public class CanvasViewer extends SpeelVeld {
 		if (name != null) {
 			double d = Math.atan2(s.getDY(), s.getDX());
 			if ( d < -Math.PI/2) {
-				context.setTextAlign(TextAlign.LEFT);
-				context.setTextBaseline(TextBaseline.BOTTOM);						
+				setTextAlign(TextAlign.LEFT);
+				setTextBaseline(TextBaseline.BOTTOM);						
 			} else			
 			if (d > Math.PI/2) {
-				context.setTextAlign(TextAlign.LEFT);
-				context.setTextBaseline(TextBaseline.TOP);			
+				setTextAlign(TextAlign.LEFT);
+				setTextBaseline(TextBaseline.TOP);			
 			} else 
 			if (d > 0) {
-				context.setTextAlign(TextAlign.LEFT);
-				context.setTextBaseline(TextBaseline.BOTTOM);
+				setTextAlign(TextAlign.LEFT);
+				setTextBaseline(TextBaseline.BOTTOM);
 			} else {
-				context.setTextAlign(TextAlign.LEFT);
-				context.setTextBaseline(TextBaseline.TOP);
+				setTextAlign(TextAlign.LEFT);
+				setTextBaseline(TextBaseline.TOP);
 			}
 			drawString(name, (x1+x2)/2, (y1+y2)/2);
 		}
@@ -183,8 +200,8 @@ public class CanvasViewer extends SpeelVeld {
 			} else {
 				x = punt.getXd() + d/2+2;
 			}
-			context.setTextBaseline(TextBaseline.MIDDLE);
-			context.setTextAlign(TextAlign.LEFT);
+			setTextBaseline(TextBaseline.MIDDLE);
+			setTextAlign(TextAlign.LEFT);
 			drawString(name, x, punt.getYd());
 		}
 	}
@@ -238,6 +255,32 @@ public class CanvasViewer extends SpeelVeld {
 	@Override
 	public NameMapper getMapper() {
 		return mapper;
+	}
+	@Override
+	protected void drawString(String string, double x, double y) {
+		double w = context.measureText(string).getWidth();
+		double s = 14;
+		double rx = x;
+		double ry = y;
+		context.save();
+		FillStrokeStyle bg = CssColor.make("rgba(255,255,255,0.75");
+		context.setFillStyle(bg);
+		switch(textAlign) {
+		default:
+		case LEFT: break;
+		case RIGHT: rx = rx - w; break;
+		case CENTER: rx = rx - w / 2; break;
+		}
+		switch(textBaseline) {
+		default:
+		case TOP: break;
+		case MIDDLE: ry -= s/2; break;
+		case BOTTOM: ry -= s; break;
+		}
+		context.fillRect(rx, ry, w, s);
+		context.restore();
+
+		super.drawString(string, x, y);
 	}
 
 }
