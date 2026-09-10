@@ -1,6 +1,7 @@
 package nl.numworx.fsmgwt.client;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		//init(400,300, null, null);
+		//Map<String, Object> launchdata = Collections.singletonMap("scoreMax", 10);init(400,300, launchdata, null);
 		Stub.publish(this);
 	}
 
