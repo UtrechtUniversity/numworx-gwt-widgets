@@ -10,7 +10,7 @@ Er zijn 3 manieren waarop dit kan worden getoond:
 3. met behulp van een lijst met uitsluitend de _rode_ leerdoelen. D.w.z. leerdoelen met een score onder een bepaalde drempel.
 
 ## Werking
-Met behulp van de auteursomgeving van Numworx wordt de widget geconfigureerd. Deze configuratie wordt opgehaald via de  _Stub.publish_  interface. De  _LeerdoelWidgetGwt.html_  is dan voor in een &lt;iframe&gt; binnen een Numworx activiteit.
+Met behulp van de auteursomgeving van Numworx wordt de widget geconfigureerd. Deze configuratie wordt opgehaald via de  _Stub.publish_  interface. De  _LeerdoelWidgetGWT.html_  is dan voor in een &lt;iframe&gt; binnen een Numworx activiteit.
 
 ## Licentie
 
@@ -21,7 +21,8 @@ Copyright 2025 Universiteit Utrecht. All rights reserved.
 
 [Wim van Velthoven](mailto:w.p.g.vanvelthoven@uu.nl)
 
-##Appendix
+## Appendix
+
 ![NOLAI](https://avatars.githubusercontent.com/u/190490637?s=100)
 
 Dit project is medegefinancierd door het Nationaal 
