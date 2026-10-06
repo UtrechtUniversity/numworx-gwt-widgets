@@ -17,6 +17,11 @@ Met behulp van de auteursomgeving van Numworx wordt de widget geconfigureerd. De
 This work is licensed under the GNU General Public License version 3.
 Copyright 2025 Universiteit Utrecht. All rights reserved.
 
+## Referenties
+
+* The Design of a High School Computer Science Learning Platform based on Student Modelling: Facilitating Classes without a Qualified Computer Science Teacher in the Netherlands 
+* van der Lubbe, L., van Borkulo, S., Boon, P., van Velthoven, W. P. G., & Jeuring, J. (2023). Bridging the Computer Science Teacher Shortage with a Digital Learning Platform. In J. Jovanovic, I.-A. Chounta, J. Uhomoibhi, & B. McLaren (Eds.), Proceedings of the 15th International Conference on Computer Supported Education - Volume 1, CSEDU 2023 (Vol. 1, pp. 289-296). (International Conference on Computer Supported Education, CSEDU - Proceedings; Vol. 1). SciTePress. https://doi.org/10.5220/0011971900003470
+
 ## Contact 
 
 [Wim van Velthoven](mailto:w.p.g.vanvelthoven@uu.nl)
