@@ -32,3 +32,4 @@ sh update-app-az-dev.sh VerknippenGWT verknippengwt VerknippenGWT
 sh update-app-az-dev.sh WebLogoGWT weblogogwt WebLogoGWT
 sh update-app-az-dev.sh WebLogo3dGWT weblogo3dgwt WebLogo3dGWT
 sh update-app-az-dev.sh GeoDefinerGWT geodefinergwt GeoDefinerGWT
+sh update-app-az-dev.sh fmsgwt fsmgwt Fsmgwt
