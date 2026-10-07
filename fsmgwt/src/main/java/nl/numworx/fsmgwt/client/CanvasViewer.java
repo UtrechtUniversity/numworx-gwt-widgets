@@ -22,6 +22,7 @@ import fi.euclides.proof.DrieOpEenRij;
 import nl.numworx.fsm.shared.FSMMapper;
 import nl.numworx.fsm.shared.Hits;
 import nl.numworx.fsm.shared.Hoekpunt;
+import nl.numworx.fsmgwt.client.text.DeleteHandler;
 import nl.uu.fi.dwo.interaction.client.FormuleFont;
 
 public class CanvasViewer extends SpeelVeld {
@@ -159,14 +160,16 @@ public class CanvasViewer extends SpeelVeld {
 
 		Punt a = Boog.startOf(b);
 		final Punt c = Boog.endOf(b);
-		Segment seg = new Segment(a,c);
+		final Punt m = (Punt) b.getDepend()[1];
+		Segment seg = new Segment(a,m);
 		double hyp = Math.hypot(seg.getDX(), seg.getDY());
 		double x1 = seg.getX1() + pointSize/2.0 * seg.getDX() / hyp;
 		double y1 = seg.getY1() + pointSize/2.0 * seg.getDY() / hyp;
+		seg = new Segment(m,c);
 		double x2 = seg.getX2() - pointSize/2.0 * seg.getDX() / hyp;
 		double y2 = seg.getY2() - pointSize/2.0 * seg.getDY() / hyp;
 		seg = new Segment(new VrijPunt(x1, y1), new VrijPunt(x2, y2));
-		a = (Punt) b.getDepend()[1];
+		a = m;
 		Boog bb = 
 				c.getIndex() <= 0 ? b :
 				new Boog(seg.getP1(), a, seg.getP2());
@@ -244,6 +247,7 @@ public class CanvasViewer extends SpeelVeld {
 		if (!timerDone) 
 			super.processMouseUp(ctx);
 		cancelTimer();
+		canvas.setFocus(true);
 	}
 	
 	@Override
@@ -281,6 +285,9 @@ public class CanvasViewer extends SpeelVeld {
 		context.restore();
 
 		super.drawString(string, x, y);
+	}
+	public void addKeyDownHandler(DeleteHandler handler) {
+		canvas.addKeyDownHandler(handler);
 	}
 
 }
