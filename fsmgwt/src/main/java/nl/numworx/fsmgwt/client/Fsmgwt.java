@@ -15,6 +15,7 @@ import nl.numworx.fsm.editor.Output;
 import nl.numworx.fsm.shared.Hoekpunt;
 import nl.numworx.fsm.shared.Memento;
 import nl.numworx.fsm.shared.MidBoogPunt;
+import nl.numworx.fsmgwt.client.text.DeleteHandler;
 import nl.uu.fi.dwo.formule.client.formuleholder.FormuleHolder;
 import nl.uu.fi.dwo.interaction.client.InteractionStub;
 import nl.uu.fi.dwo.interaction.client.JSONUtilities;
@@ -161,6 +162,8 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 		memento = new Memento();
 		viewer = new CanvasViewer(width, height);
 		viewer.setModel(memento.getModel());
+		DeleteHandler handler = new DeleteHandler(memento.getModel());
+		viewer.addKeyDownHandler(handler);
 		initWidget(viewer.asWidget());
 		RootPanel.get().add(this);
 		ObjectMap m = JSONUtilities.wrapMap(launchData);
