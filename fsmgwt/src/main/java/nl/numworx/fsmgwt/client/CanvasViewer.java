@@ -1,5 +1,6 @@
 package nl.numworx.fsmgwt.client;
 
+import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.canvas.dom.client.Context2d.TextAlign;
 import com.google.gwt.canvas.dom.client.Context2d.TextBaseline;
 import com.google.gwt.canvas.dom.client.CssColor;
@@ -38,6 +39,9 @@ public class CanvasViewer extends SpeelVeld {
 	private TextAlign textAlign;
 	private TextBaseline textBaseline;
 
+	
+	public Canvas getCanvas() { return canvas; }
+	
 	public CanvasViewer(int width, int height) {
 		super(width, height);
 		pointSize = 75;

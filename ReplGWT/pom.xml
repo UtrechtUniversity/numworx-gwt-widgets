@@ -139,7 +139,7 @@
                    <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
-                        <version>5.1.49</version>
+                        <version>5.1.121</version>
                     </dependency>
 <!-- werkt niet, omdat cache-api in de wars zit en die gaat voor. -->
 					<dependency>

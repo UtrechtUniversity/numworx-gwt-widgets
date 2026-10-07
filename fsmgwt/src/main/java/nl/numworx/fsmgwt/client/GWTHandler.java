@@ -3,11 +3,13 @@ package nl.numworx.fsmgwt.client;
 import java.util.Objects;
 import java.util.Vector;
 
+import com.google.gwt.canvas.client.Canvas;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 
+import fi.euclides.event.Tracker;
 import fi.euclides.event.TrackerContext;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
@@ -58,14 +60,24 @@ public class GWTHandler extends UnifiedHandler {
 		public void setText(String text) {
 			getTracker().getMapper().rename(item, text);
 			getTracker().paint();
+			canvas.setFocus(true); // keep focus after settext.
 		}
 	}
-
+	private Canvas canvas;
 
 	public GWTHandler() {
 		super("FSM");
 		
 	}
+
+	
+	public void setTracker(CanvasViewer tracker) {
+		this.canvas = tracker.getCanvas();
+		super.setTracker(tracker);
+	}
+
+
+
 
 	Timer useTimer;
 	boolean timerDone;

@@ -162,7 +162,7 @@ public class Fsmgwt extends Composite implements EntryPoint, InteractionStub  {
 		memento = new Memento();
 		viewer = new CanvasViewer(width, height);
 		viewer.setModel(memento.getModel());
-		DeleteHandler handler = new DeleteHandler(memento.getModel());
+		DeleteHandler handler = new DeleteHandler(viewer);
 		viewer.addKeyDownHandler(handler);
 		initWidget(viewer.asWidget());
 		RootPanel.get().add(this);
