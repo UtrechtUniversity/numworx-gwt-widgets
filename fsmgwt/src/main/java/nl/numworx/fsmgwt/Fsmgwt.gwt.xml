@@ -24,7 +24,7 @@
    <inherits name="nl.numworx.fsm.Fsm" />
    <inherits name="nl.uu.fi.dwo.interaction.Interaction" /> 
    <inherits name='nl.uu.fi.dwo.formule.Formule' />
-   <inherits name='nl.numworx.geodefiner.Geodefiner' />
+   <inherits name='nl.numworx.geodefiner.GeoDefiner' />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='nl.numworx.fsmgwt.client.Fsmgwt'/>
