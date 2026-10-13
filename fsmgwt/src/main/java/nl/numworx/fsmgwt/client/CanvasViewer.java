@@ -93,6 +93,12 @@ public class CanvasViewer extends SpeelVeld {
 	}
 	@Override
 	public void visitSegment(Segment s) {
+		if (trail) {
+			context.setLineWidth(1);
+			super.visitSegment(s);
+			return;
+		}
+		
 		selectColor(s);
 		context.setLineWidth(3);
 		double hyp = Math.hypot(s.getDX(), s.getDY());
