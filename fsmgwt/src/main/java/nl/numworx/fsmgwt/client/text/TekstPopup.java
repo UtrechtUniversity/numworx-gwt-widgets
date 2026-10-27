@@ -47,7 +47,7 @@ public class TekstPopup extends PopupPanel implements HasText
 	
 	public TekstPopup(HasText o, boolean isAlpha)
 	{
-		super(false);
+		super(true);
 		
 		this.isForLabel = isAlpha;
 		
@@ -179,7 +179,8 @@ public class TekstPopup extends PopupPanel implements HasText
 	{
 		public void onClose(CloseEvent<PopupPanel> e)
 		{
-			owner.setText(getText());
+			if (!e.isAutoClosed())
+				owner.setText(getText());
 			setPopupOpened(false);
 		}
 	}
@@ -207,7 +208,7 @@ public class TekstPopup extends PopupPanel implements HasText
 				hidePopup();
 			}
 		}
-		
+		super.onPreviewNativeEvent(event);
 		// t.b.v. invoegen formule met DWO-keyboard; de maat van editor-inhoud is pas bekend na mouseout
 		resizePopup();
 	}
@@ -217,7 +218,7 @@ public class TekstPopup extends PopupPanel implements HasText
 	 * 
 	 * @param b
 	 */
-	void setPopupOpened(boolean b)
+	public void setPopupOpened(boolean b)
 	{
 		popupOpened = b;
 	}
@@ -270,4 +271,18 @@ public class TekstPopup extends PopupPanel implements HasText
 		else
 			setHeight(editor.getHeight() + "px");	
 	}
+
+	public void dispose() {
+		if (isPopupOpened()) 
+			hidePopupWithoutSavingInput();
+		
+	}
+
+	@Override
+	public void show() {
+		super.show();
+		setPopupOpened(true);
+	}
+	
+	
 }	

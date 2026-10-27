@@ -9,7 +9,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.PopupPanel.PositionCallback;
 
-import fi.euclides.event.Tracker;
 import fi.euclides.event.TrackerContext;
 import fi.euclides.model.AbstractViewer;
 import fi.euclides.model.Destroyable;
@@ -18,6 +17,8 @@ import nl.numworx.fsm.shared.UnifiedHandler;
 import nl.numworx.fsmgwt.client.text.TekstPopup;
 
 public class GWTHandler extends UnifiedHandler {
+	
+	private TekstPopup tf;
 
 	private final class PopupTimer extends Timer implements HasText {
 		final Destroyable item;
@@ -29,11 +30,12 @@ public class GWTHandler extends UnifiedHandler {
 		}
 
 		@Override
-		public void run() {	
+		public void run() {
+			tfDispose();
 			timerDone = true;
 			useTimer = null;
 			RootPanel root = RootPanel.get();
-			TekstPopup tf = new TekstPopup(this, true);
+			tf = new TekstPopup(this, true);
 			AbstractViewer viewer = getTracker().adapt(AbstractViewer.class);
 			final int offx=viewer.clipLeft().intValue();
 			final int offy=viewer.clipTop().intValue();
@@ -88,6 +90,7 @@ public class GWTHandler extends UnifiedHandler {
 		useTimer.schedule(1000);
 	}
 	public void cancelTimer() {
+		tfDispose();
 		if (useTimer != null) {
 			useTimer.cancel();
 			useTimer = null;
@@ -108,6 +111,14 @@ public class GWTHandler extends UnifiedHandler {
 	public void pointerPressed(Numbers x, Numbers y, TrackerContext context) {
 		cancelTimer();
 		super.pointerPressed(x, y, context);
+	}
+
+
+	private void tfDispose() {
+		if (tf != null) {
+			tf.dispose(); // destroy
+			tf = null;
+		}
 	}
 
 }

@@ -1,23 +1,15 @@
-set -ex
+set -e
+cd ../$1/target/$2
 PATH=$PATH:/usr/local/bin
+S3=s3://dev-dwo-nl-581490975307-eu-west-1-an/apps
 X=echo
 X=
-if test -z "$KEY" 
-then
-   echo no key
-   exit 1
-fi
-if test -z "$SAS" 
-then
-. generate-sas.sh
-fi
-
-cd ../$1/target/$2
+OPTIONS=-rclD
 if test -f $2/$2.nocache.js
 then
 
-azcopy sync $3.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/$3.css?"$SAS"
-azcopy sync $2/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/$2/?"$SAS" --recursive=true --delete-destination true
+$X aws --profile prod s3 cp --recursive --acl public-read $2 $S3/$2
+$X aws --profile prod s3 cp --acl public-read $3.css $S3/$3.css
 
 else
 	echo $2 missing in $(pwd)
