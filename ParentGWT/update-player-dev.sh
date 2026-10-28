@@ -13,7 +13,7 @@ mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.s
 	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
 	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
 	aws $PROD s3 cp --acl public-read PrintPlayer.css $S3/;\
-	aws $PROD s3 cp --acl public-read KeyboardGWT.css $S3/;\	
+	aws $PROD s3 cp --acl public-read KeyboardGWT.css $S3/;\
 )
 
 cd ../WidgetPlayer
