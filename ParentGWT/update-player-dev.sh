@@ -1,29 +1,29 @@
 #!/bin/bash
-# copy to az, for teuniz.dwo.nl
-. ./generate-sas.sh
+. ~/.bashrc
 PATH=$PATH:/usr/local/bin
+S3=s3://dev-dwo-nl-581490975307-eu-west-1-an/apps
 set -e
-cd ../WiskOpdrPlayer;
+PROD="--profile prod"
+#PROD=
 
+cd ../WiskOpdrPlayer
 mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY -Pgithub
 (cd target/WiskOpdrPlayer; 
-	
-	azcopy sync DWOplayer.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/DWOplayer.css?"$SAS"
-	azcopy sync PrintPlayer.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/PrintPlayer.css?"$SAS"
-	azcopy sync KeyboardGWT.css https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/KeyboardGWT.css?"$SAS"
-	azcopy sync DWOplayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/DWOplayer/?"$SAS" --recursive=true --delete-destination true
-	
+    
+	aws $PROD s3 cp --acl public-read --recursive DWOplayer $S3/DWOplayer;\
+	aws $PROD s3 cp --acl public-read DWOplayer.css $S3/;\
+	aws $PROD s3 cp --acl public-read PrintPlayer.css $S3/;\
+	aws $PROD s3 cp --acl public-read KeyboardGWT.css $S3/;\	
 )
+
 cd ../WidgetPlayer
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY  -Pgithub
-(cd target/WidgetPlayer;
-
-	azcopy sync WidgetPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/WidgetPlayer/?"$SAS" --recursive=true --delete-destination true
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -o
+(cd target/WidgetPlayer;\
+	aws $PROD s3 cp --acl public-read --recursive WidgetPlayer $S3/WidgetPlayer;\
 )
+
 cd ../PrintPlayer
-mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Dgwt.style=PRETTY  -Pgithub
-(cd target/PrintPlayer;
-
-        azcopy sync PrintPlayer/ https://$ACCOUNT.blob.core.windows.net/$CONTAINER/apps/PrintPlayer/?"$SAS" --recursive=true --delete-destination true
+mvn clean verify -Dgwt.compiler.force=true -Dgwt.compiler.localWorkers=2 -Pgithub -Dgwt.style=PRETTY -o
+(cd target/PrintPlayer;\
+	aws $PROD s3 cp --acl public-read --recursive PrintPlayer $S3/PrintPlayer;\
 )
-
