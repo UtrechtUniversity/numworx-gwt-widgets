@@ -112,7 +112,7 @@ public class CanvasViewer extends SpeelVeld {
 		}
 		double x2 = s.getX2() - pointSize/2.0 * s.getDX() / hyp;
 		double y2 = s.getY2() - pointSize/2.0 * s.getDY() / hyp;
-		if (tracking) {
+		if (tracking && s.getP2().getIndex() == 0) {
 			x2 = s.getX2();
 			y2 = s.getY2();
 		}
