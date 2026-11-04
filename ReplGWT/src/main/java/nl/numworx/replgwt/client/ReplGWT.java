@@ -316,6 +316,8 @@ private Node makeElement(JSONObject obj) {
 	JSONObject props = obj.get("props").isObject();
 	Set<String> keys = props.keySet();
 	for (String prop: keys) {
+		if (prop.startsWith("on"))
+			continue; // no onXXXX eventhandlers.
 		JSONValue value = props.get(prop);
 		if (value.isString() != null)
 			elem.setAttribute(prop, value.isString().stringValue());
