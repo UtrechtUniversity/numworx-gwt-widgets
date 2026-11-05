@@ -224,8 +224,14 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 	
 }
 
+
+public static native Worker create(String url) /*-{
+	return new Worker(url, { type: "module" });
+}-*/;
+
+
 private void createWorker() {
-	worker = Worker.create("/dwo/apps/webworker.js");
+	worker = create("/dwo/apps/webworker.js");
 	worker.setOnMessage(this);
 	worker.setOnError(this);
 }

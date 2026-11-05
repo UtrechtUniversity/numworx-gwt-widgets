@@ -4,8 +4,9 @@
 // Setup your project to serve `py-worker.js`. You should also serve
 // `pyodide.js`, and all its associated `.asm.js`, `.json`,
 // and `.wasm` files as well:
-importScripts("https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js");
-importScripts("deploy.jsp");
+import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs";
+import { deploy } from "./deploy.jsp";
+//var deploy = "http://localhost:8082/apps/"
 
 self.state = { bytes: [], cnt: 0, off: 0, code: ""}
 

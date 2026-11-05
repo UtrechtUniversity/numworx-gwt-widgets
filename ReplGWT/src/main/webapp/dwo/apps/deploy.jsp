@@ -11,7 +11,7 @@
     response.setHeader("Cache-Control", "max-age=3600"); // HTTP 1.1.
     response.setDateHeader("Expires", System.currentTimeMillis() + 1000*60*60 );
 %>
-var deploy = "//<%= cdn %>/apps/"
+export var deploy = "//<%= cdn %>/apps/"
 var dwo_env = "<%= env %>"
 var casServer = "<%= cas %>"
 var hubServer = "<%=hub%>"
