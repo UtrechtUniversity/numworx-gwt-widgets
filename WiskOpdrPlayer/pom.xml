@@ -26,7 +26,6 @@
   	<dependency>
   		<groupId>nl.uu.fi.dwo.mobile</groupId>
   		<artifactId>dwoplayer</artifactId>
-		<version>${dwoVersion}</version>
   		<classifier>classes</classifier>
   		<exclusions>
   			<exclusion>

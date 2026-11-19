@@ -74,6 +74,7 @@ public class ReplGWT extends SimplePanel implements EntryPoint, InteractionStub,
   int cnt;
 protected InputReader w;
 protected boolean consuming;
+private RootPanel output;
   protected void runit(String message) {
 	  GWT.log(message);
 	  reset();
@@ -89,8 +90,9 @@ protected boolean consuming;
 	  w.removeFromParent();
 	  recreateWorker();
 	  
-	  empty(RootPanel.get("output"));
-	  empty(RootPanel.get("north")); 
+	  empty(output);
+	  empty(RootPanel.get("north"));
+	  empty(RootPanel.get("south")); 
 	  
   }
 
@@ -115,7 +117,7 @@ protected boolean consuming;
 @Override
 public HashMap<String, Object> getState() {
 	HashMap<String,Object> state = new HashMap<>();
-	RootPanel content = RootPanel.get("output");
+	RootPanel content = this.output;
 	String inner = content.getElement().getInnerHTML();
 	state.put("content", inner);
 	if (turtleOutput != null) {
@@ -129,7 +131,7 @@ public HashMap<String, Object> getState() {
 @Override
 public void setState(HashMap<String, Object> h) {
 	String inner = h.getOrDefault("content", "").toString();
-	RootPanel content = RootPanel.get("output");
+	RootPanel content = this.output;
 	content.getElement().setInnerHTML(inner);
 	if (turtleOutput != null) {
 		inner = h.getOrDefault("turtle", "").toString();
@@ -217,7 +219,8 @@ public void init(int width, int height, Map<String, Object> launchData, Map<Stri
 		south.getElement().getStyle().setProperty("height", size); // as a string, 100%, 40px etc. 
 	}
 
-	if (side != null) {
+	this.output = RootPanel.get("output"); // THIS ORDER, before "content";
+	if (side != null) {		
 		RootPanel.get("content").setStylePrimaryName(side);
 	}
 
@@ -340,7 +343,6 @@ private Node makeElement(JSONObject obj) {
 }
 
 private void scrollToBottom() {
-	RootPanel output = RootPanel.get("output");
 	int h = output.getElement().getScrollHeight();
 	Element div = output.getElement().getParentElement();
 	int s = div.getClientHeight();
@@ -356,7 +358,6 @@ protected void requestInput() {
 }
 
 private void print(String string) {
-	RootPanel output = RootPanel.get("output");
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + (inner.isEmpty()?"":"\n") + string);
 }
@@ -364,7 +365,6 @@ protected void printx(String string) {
 	string = string.replace("&", "&amp;");
 	string = string.replace("<", "&lt;");
 	string = string.replace(">", "&gt;");
-	RootPanel output = RootPanel.get("output");
 	String inner = output.getElement().getInnerHTML();
 	output.getElement().setInnerHTML(inner + string);
 }
@@ -382,7 +382,7 @@ public void onError(ErrorEvent event) {
 
 
 protected void startInput() {
-	RootPanel.get("output").add(w);
+	output.add(w);
 	w.start();
 	consuming = true;
 }
